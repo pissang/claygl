@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                var sphere = new qtek3d.geometry.Sphere({
+                    widthSegments : 20,
+                    heightSegments : 20
+                });
+                var cube = new qtek3d.geometry.Cube({
+                    widthSegments : 10,
+                    heightSegments : 10,
+                    depthSegments : 10
+                });
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 10,
+                    heightSegments : 10
+                })
+                sphere.generateBarycentric();
+                cube.generateBarycentric();
+                plane.generateBarycentric();
+
+                var shader = qtek3d.shader.library.get('buildin.wireframe');
+                var material = new qtek3d.Material({
+                    shader : shader,
+                    transparent : true
+                })
+                material.setUniform("lineWidth", 2);
+
+                camera.position = [0, 2, 3];
+                camera.lookAt( [0, 0, 0] );
+
+                var sphereMesh = new qtek3d.Mesh({
+                    geometry : sphere,
+                    material : material
+                });
+                var cubeMesh = new qtek3d.Mesh({
+                    geometry : cube,
+                    material : material
+                });
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material
+                })
+                sphereMesh.x(-1.5);
+                cubeMesh.x(1.5);
+                cubeMesh.scale = [0.7, 0.7, 0.7];
+                scene.add( sphereMesh );
+                scene.add( planeMesh );
+                scene.add( cubeMesh );
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    cubeMesh.pitch( pitch );
+                    planeMesh.pitch( pitch );
+                    sphereMesh.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 20);
+            })
+            
+        </script>
+    </body>
+</html>

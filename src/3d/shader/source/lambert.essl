@@ -1,0 +1,204 @@
+/**
+ * http://en.wikipedia.org/wiki/Lambertian_reflectance
+ */
+
+@export buildin.lambert.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
+uniform mat4 world : WORLD;
+
+uniform vec2 uvRepeat : [1.0, 1.0];
+
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 normal : NORMAL;
+
+attribute vec3 barycentric;
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+varying vec3 v_Barycentric;
+
+void main(){
+
+    gl_Position = worldViewProjection * vec4( position, 1.0 );
+
+    v_Texcoord = texcoord * uvRepeat;
+    v_Normal = normalize( ( worldInverseTranspose * vec4(normal, 0.0) ).xyz );
+    v_WorldPosition = ( world * vec4( position, 1.0) ).xyz;
+
+    v_Barycentric = barycentric;
+}
+
+@end
+
+
+
+
+@export buildin.lambert.fragment
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+
+uniform sampler2D diffuseMap;
+
+#ifdef SHADOWMAP_NUMBER
+uniform sampler2D shadowMap[ SHADOWMAP_NUMBER ];
+uniform mat4 shadowCameraMatrix[ SHADOWMAP_NUMBER ];
+#endif
+
+uniform vec3 color : [1.0, 1.0, 1.0];
+uniform float alpha : 1.0;
+
+// Uniforms for wireframe
+uniform float lineWidth : 0.0;
+uniform vec3 lineColor : [0.0, 0.0, 0.0];
+varying vec3 v_Barycentric;
+
+#ifdef AMBIENT_LIGHT_NUMBER
+@import buildin.header.ambient_light
+#endif
+#ifdef POINT_LIGHT_NUMBER
+@import buildin.header.point_light
+#endif
+#ifdef DIRECTIONAL_LIGHT_NUMBER
+@import buildin.header.directional_light
+#endif
+#ifdef SPOT_LIGHT_NUMBER
+@import buildin.header.spot_light
+#endif
+
+#extension GL_OES_standard_derivatives : enable
+// Import util functions and uniforms needed
+@import buildin.util.calculate_attenuation
+
+@import buildin.util.edge_factor
+
+@import buildin.plugin.compute_shadow_map
+
+void main(){
+    
+    gl_FragColor = vec4(color, alpha);
+
+    #ifdef DIFFUSEMAP_ENABLED
+        vec4 tex = texture2D( diffuseMap, v_Texcoord );
+        // http://freesdk.crydev.net/display/SDKDOC3/Specular+Maps
+        gl_FragColor.rgb *= tex.rgb;
+    #endif
+
+    vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
+    
+    #ifdef AMBIENT_LIGHT_NUMBER
+        for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++){
+            diffuseColor += ambientLightColor[i];
+        }
+    #endif
+    // Compute point light color
+    #ifdef POINT_LIGHT_NUMBER
+        #if defined( SHADOWMAP_ENABLED ) && defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+            float shadowFallOffs[POINT_LIGHT_NUMBER];
+            computeShadowFallOfPointLights( v_WorldPosition, shadowFallOffs );
+        #endif
+        for(int i = 0; i < POINT_LIGHT_NUMBER; i++){
+
+            vec3 lightPosition = pointLightPosition[i];
+            vec3 lightColor = pointLightColor[i];
+            float range = pointLightRange[i];
+
+            vec3 lightDirection = lightPosition - v_WorldPosition;
+
+            // Calculate point light attenuation
+            float dist = length(lightDirection);
+            float attenuation = calculateAttenuation(dist, range);
+
+            // Normalize vectors
+            lightDirection /= dist;
+
+            float ndl = dot( v_Normal, lightDirection );
+
+            float shadowFallOff = 1.0;
+            #if defined( SHADOWMAP_ENABLED ) && defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+                shadowFallOff = shadowFallOffs[ i ];
+            #endif
+
+            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowFallOff;
+        }
+    #endif
+    #ifdef DIRECTIONAL_LIGHT_NUMBER
+        #if defined( SHADOWMAP_ENABLED ) && defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+            float shadowFallOffs[DIRECTIONAL_LIGHT_NUMBER];
+            computeShadowFallOfDirectionalLights( v_WorldPosition, shadowFallOffs );
+        #endif
+        for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+            vec3 lightDirection = -directionalLightDirection[i];
+            vec3 lightColor = directionalLightColor[i];
+            
+            float ndl = dot( v_Normal, normalize( lightDirection ) );
+
+            float shadowFallOff = 1.0;
+            #if defined( SHADOWMAP_ENABLED ) && defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+                shadowFallOff = shadowFallOffs[ i ];
+            #endif
+
+            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowFallOff;
+        }
+    #endif
+    
+    #ifdef SPOT_LIGHT_NUMBER
+        #if defined( SHADOWMAP_ENABLED ) && defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+            float shadowFallOffs[SPOT_LIGHT_NUMBER];
+            computeShadowFallOfSpotLights( v_WorldPosition, shadowFallOffs );
+        #endif
+        for(int i = 0; i < SPOT_LIGHT_NUMBER; i++){
+            vec3 lightPosition = -spotLightPosition[i];
+            vec3 spotLightDirection = normalize( spotLightDirection[i] );
+            vec3 lightColor = spotLightColor[i];
+            float range = spotLightRange[i];
+            float umbraAngleCosine = spotLightUmbraAngleCosine[i];
+            float penumbraAngleCosine = spotLightPenumbraAngleCosine[i];
+            float falloffFactor = spotLightFalloffFactor[i];
+
+            vec3 lightDirection = lightPosition - v_WorldPosition;
+            // Calculate attenuation
+            float dist = length(lightDirection);
+            float attenuation = calculateAttenuation(dist, range); 
+
+            // Normalize light direction
+            lightDirection /= dist;
+            // Calculate spot light fall off
+            float lightDirectCosine = dot(spotLightDirection, lightDirection);
+
+            float falloff;
+            if( lightDirectCosine < penumbraAngleCosine ){
+                falloff = 1.0;
+            }else if( lightDirectCosine > umbraAngleCosine ){
+                falloff = 0.0;
+            }else{
+                falloff = (lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine);
+                falloff = pow(falloff, falloffFactor);
+            }
+
+            float ndl = dot( v_Normal, lightDirection );
+            ndl = clamp(ndl, 0.0, 1.0);
+
+            float shadowFallOff = 1.0;
+            #if defined( SHADOWMAP_ENABLED ) && defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+                shadowFallOff = shadowFallOffs[i];
+            #endif
+
+            diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowFallOff;
+
+        }
+    #endif
+
+    gl_FragColor.xyz *= diffuseColor;
+    if( lineWidth > 0.01){
+        gl_FragColor.xyz = gl_FragColor.xyz * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+    }
+
+}
+
+@end

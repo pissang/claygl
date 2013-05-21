@@ -1,0 +1,98 @@
+/**
+ *  http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
+ */
+
+@export buildin.pp.gaussian_blur_v.fragment
+
+uniform sampler2D texture; // the texture with the scene you want to blur
+varying vec2 v_Texcoord;
+ 
+uniform float blurSize : 3.0; 
+uniform float imageWidth : 512.0;
+
+void main(void)
+{
+   vec4 sum = vec4(0.0);
+ 
+   // blur in y (vertical)
+   // take nine samples, with the distance blurSize between them
+   sum += texture2D(texture, vec2(v_Texcoord.x - 4.0*blurSize/imageWidth, v_Texcoord.y)) * 0.05;
+   sum += texture2D(texture, vec2(v_Texcoord.x - 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x - 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x - blurSize/imageWidth, v_Texcoord.y)) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.16;
+   sum += texture2D(texture, vec2(v_Texcoord.x + blurSize/imageWidth, v_Texcoord.y)) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x + 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x + 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x + 4.0*blurSize/imageWidth, v_Texcoord.y)) * 0.05;
+ 
+   gl_FragColor = sum;
+}
+
+@end
+
+@export buildin.pp.gaussian_blur_h.fragment
+
+uniform sampler2D texture; // this should hold the texture rendered by the horizontal blur pass
+varying vec2 v_Texcoord;
+ 
+uniform float blurSize : 3.0;
+uniform float imageHeight : 512.0;
+ 
+void main(void)
+{
+   vec4 sum = vec4(0.0);
+ 
+   // blur in y (vertical)
+   // take nine samples, with the distance blurSize between them
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 4.0*blurSize/imageHeight)) * 0.05;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 3.0*blurSize/imageHeight)) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 2.0*blurSize/imageHeight)) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - blurSize/imageHeight)) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.16;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + blurSize/imageHeight)) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 2.0*blurSize/imageHeight)) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 3.0*blurSize/imageHeight)) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 4.0*blurSize/imageHeight)) * 0.05;
+ 
+   gl_FragColor = sum;
+}
+
+@end
+
+@export buildin.pp.box_blur.fragment
+
+uniform sampler2D texture;
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 3.0;
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
+
+void main(void){
+
+   vec4 tex = texture2D(texture, v_Texcoord);
+   float offsetX = blurSize / imageWidth;
+   float offsetY = blurSize / imageHeight;
+   tex += texture2D(texture, v_Texcoord + vec2(offsetX, 0.0) );
+   tex += texture2D(texture, v_Texcoord + vec2(offsetX, offsetY) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, offsetY) );
+   tex += texture2D(texture, v_Texcoord + vec2(0.0, offsetY) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, 0.0) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, -offsetY) );
+   tex += texture2D(texture, v_Texcoord + vec2(offsetX, -offsetY) );
+   tex += texture2D(texture, v_Texcoord + vec2(0.0, -offsetY) );
+
+   tex /= 9.0;
+   return tex;
+}
+
+@end
+
+// http://www.slideshare.net/DICEStudio/five-rendering-ideas-from-battlefield-3-need-for-speed-the-run
+
+@export buildin.pp.hexagonal_blur_1.fragment
+
+@end
+
+@export buildin.pp_hexagonal_blur_2.fragment

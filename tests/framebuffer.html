@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    FrameBuffer = qtek3d.FrameBuffer,
+                    Cube = qtek3d.geometry.Cube,
+                    Plane = qtek3d.geometry.Plane;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                //Create scene
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    }),
+                    cube = new qtek3d.geometry.Cube;
+                var shader = new Shader({
+                    vertex : Shader.source("buildin.vertex.phong"),
+                    fragment : Shader.source("buildin.fragment.phong")
+                })
+                shader.enableTexture("diffuseMap");
+                var material = new qtek3d.Material({
+                    shader : shader
+                });
+                var texture = new qtek3d.texture.Texture2D;
+                texture.image = new Image;
+                texture.image.onload = function(){
+                    texture.dirty();
+                }
+                texture.image.src = "assets/textures/crate.gif";
+                material.setUniform("diffuseMap", texture );
+                var mesh = new qtek3d.Mesh({
+                    material : material,
+                    geometry : cube
+                })
+
+                scene.add( mesh );
+
+                camera.position = [0, 1.5, 3];
+                camera.lookAt( [0, 0, 0] );
+
+                var light = new qtek3d.light.Point({
+                    color : [1.5, 1.5, 1.5]
+                })
+                light.position = [0, 0, 3];
+                scene.add( light );
+
+                var frameBuffer = new FrameBuffer();
+                var rtt = new qtek3d.texture.Texture2D({
+                    width : 1024,
+                    height : 1024,
+                });
+                frameBuffer.attach( renderer.gl, rtt );
+                var rttShader = qtek3d.shader.library.get("buildin.basic", "diffuseMap");
+                var rttMesh = new qtek3d.Mesh({
+                    geometry : new Plane({
+                        detailX : 100,
+                        detailY : 100
+                    }),
+                    material : new qtek3d.Material({
+                        shader : rttShader
+                    })
+                });
+                rttMesh.material.setUniform("diffuseMap", rtt);
+                var rttScene = new qtek3d.Scene();
+                rttScene.add( rttMesh );
+
+                var orthCamera = new qtek3d.camera.Orthographic();
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    frameBuffer.bind( renderer );
+                    renderer.render( scene, camera );
+                    frameBuffer.unbind( renderer );
+
+                    renderer.render( rttScene, orthCamera );
+                    
+                    mesh.pitch( pitch );
+                    pitch += Math.PI/500;
+
+                }, 20)
+            })
+            
+        </script>
+    </body>
+</html>

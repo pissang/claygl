@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+                var sphere = new qtek3d.geometry.Sphere({
+                    widthSegments : 50,
+                    heightSegments : 50,
+                    radius : 1.0
+                });
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 10,
+                    heightSegments : 10
+                })
+
+                var shader = new Shader({
+                    vertex : Shader.source("buildin.vertex.lambert"),
+                    fragment : Shader.source("buildin.fragment.lambert")
+                })
+
+                var material = new qtek3d.Material({
+                    shader : shader
+                })
+
+                camera.position = [0, 5, 5];
+                camera.lookAt( [0, 0, 0] );
+
+                var sphereMesh = new qtek3d.Mesh({
+                    geometry : sphere,
+                    material : material
+                });
+                sphereMesh.y(1);
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material
+                });
+                planeMesh.roll(-Math.PI/2);
+                planeMesh.scale = [4, 4, 4];
+
+                scene.add( sphereMesh );
+                scene.add( planeMesh );
+
+                var light = new qtek3d.light.Spot();
+                light.position = [2, 2, 2];
+                light.lookAt([0, 0, 0]);
+                scene.add(light);
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                }, 20);
+            })
+            
+        </script>
+    </body>
+</html>

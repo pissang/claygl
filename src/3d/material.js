@@ -1,0 +1,147 @@
+define( function(require){
+
+    var Base = require("core/base");
+    var Shader = require("./shader");
+    var util = require("util/util");
+    var Texture = require('./texture');
+    var Texture2D = require('./texture/texture2d');
+    var TextureCube = require('./texture/texturecube');
+    var _ = require("_");
+
+    var Material = Base.derive( function(){
+
+        return {
+
+            __GUID__ : util.genGUID(),
+
+            //{
+            // type
+            // value
+            // semantic
+            //}
+            uniforms : {},
+
+            shader : null,
+
+            
+            depthTest : true,
+            depthWrite : true,
+
+            transparent : false,
+            // Blend func is a callback function when the material 
+            // have custom blending
+            // The gl context will be the only argument passed in tho the
+            // blend function
+            // Detail of blend function in WebGL:
+            // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
+            //
+            // Example :
+            // function( _gl ){
+            //  _gl.blendEquation( _gl.FUNC_ADD );
+            //  _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+            // }
+            blend : null,
+
+            // Binding lights in the renderer automatically
+            autoBindingLights : true
+        }
+    }, function(){
+        if( this.shader ){
+            this.attachShader( this.shader );
+        }
+    }, {
+
+        bind : function( _gl ){
+
+            var slot = 0;
+            // Set uniforms
+            _.each( this.uniforms, function( uniform, symbol ){
+                // Only set the none-semantic uniform
+                // The semantic uniform will be set by system
+                if( uniform.semantic ){
+                    return;
+                }
+                if( uniform.value === null ){
+                    return;
+                }
+                if( uniform.value.instanceof &&
+                    uniform.value.instanceof( Texture) ){
+                
+                    var texture = uniform.value;
+
+                    _gl.activeTexture( _gl['TEXTURE' + slot] );
+                    texture.bind( _gl );
+
+                    this.shader.setUniform( _gl, '1i', symbol, slot );
+
+                    slot++;
+                }
+                else if( uniform.value instanceof Array ){
+                    // Texture Array
+                    var exampleValue = uniform.value[0];
+
+                    if( exampleValue && 
+                        exampleValue.instanceof && 
+                        exampleValue.instanceof(Texture) ){
+
+                        var res = [];
+                        for( var i = 0; i < uniform.value.length; i++){
+                            var texture = uniform.value[i];
+                            _gl.activeTexture( _gl['TEXTURE'+slot] );
+                            texture.bind(_gl);
+
+                            res.push(slot++);
+                        }
+                        this.shader.setUniform( _gl, '1iv', symbol, res );
+
+                    }else{
+                        this.shader.setUniform( _gl, uniform.type, symbol, uniform.value );
+                    }
+                }
+                else{
+                    
+                    this.shader.setUniform( _gl, uniform.type, symbol, uniform.value );
+                }
+
+            }, this );
+        },
+
+        setUniform : function( symbol, value ){
+            var uniform = this.uniforms[symbol];
+            if( uniform ){
+                uniform.value = value;
+            }else{
+                // console.warn('Uniform "'+symbol+'" not exist');
+            }
+        },
+
+        setUniforms : function(obj){
+            for( var symbol in obj){
+                var value = obj[symbol];
+                this.setUniform( symbol, value );
+            }
+        },
+
+        getUniform : function(symbol){
+            var uniform = this.uniforms[symbol];
+            if( uniform ){
+                return uniform.value;
+            }else{
+                // console.warn('Uniform '+symbol+' not exist');
+            }
+        },
+
+        attachShader : function( shader ){
+            this.uniforms = shader.createUniforms();
+            this.shader = shader;
+        },
+
+        detachShader : function(){
+            this.shader = null;
+            this.uniforms = {};
+        }
+
+    })
+
+    return Material;
+} )

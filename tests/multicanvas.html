@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="600" height="640" id="Renderer1" style="float:left"></canvas>
+        <canvas width="600" height="640" id="Renderer2" style="float:left"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    Material = qtek3d.Material,
+                    Mesh = qtek3d.Mesh,
+                    Cube = qtek3d.geometry.Cube,
+                    meshUtil = qtek3d.util.mesh,
+                    shaderLibrary = qtek3d.shader.library;
+
+                var renderer1 = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Renderer1")
+                });
+                var renderer2 = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Renderer2")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer1.canvas.width/renderer1.canvas.height,
+                        far : 500
+                    });
+
+                var cube = new Cube();
+                var shader = shaderLibrary.get("buildin.lambert", "diffuseMap");
+                
+                var material = new Material({
+                    shader : shader
+                });
+                var texture = new qtek3d.texture.Texture2D;
+                texture.image = new Image;
+                texture.image.onload = function(){
+                    texture.dirty();
+                }
+                texture.image.src = "assets/textures/crate.gif";
+                var uniforms = material.uniforms;
+                uniforms.diffuseMap.value = texture;
+                uniforms.color.value = [1, 1, 1];
+
+                var mesh = new Mesh({
+                    geometry : cube,
+                    material : material
+                });
+
+                camera.position = [0, 4, 4];
+                camera.lookAt( [0, 0, 0] );
+
+                scene.add( mesh );
+
+                var light = new qtek3d.light.Directional({
+                    color : [1.5, 1.5, 1.5]
+                })
+                light.position = [50, 50, 50];
+                light.lookAt( [0, 0, 0] );
+                scene.add( light );
+
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer2.render( scene, camera );
+                    renderer1.render( scene, camera );
+                    mesh.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 20);
+            })
+            
+        </script>
+    </body>
+</html>

@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    // 'text!../tests/assets/models/leeperrysmith/leeperrysmith.js'], function(qtek, modelData){
+                    'text!../tests/assets/models/dragon.js'], function(qtek, modelData){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    _ = require("_");
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+                var data = JSON.parse(modelData);
+
+                var loader = new qtek.loader.three.JSON();
+                console.profile("parse");
+                var meshList = loader.parse(data);
+                console.profileEnd("parse");
+                
+                var shader = qtek3d.shader.library.get("buildin.lambert");
+
+                var material = new qtek3d.Material({
+                    shader : shader,
+                });
+                var root = new qtek3d.Node();
+                _.each(meshList, function(mesh){
+                    mesh.material = material;
+                    // mesh.geometry.generateVertexNormals();
+                    mesh.geometry.generateBarycentric();
+                    root.add(mesh);
+                });
+                material.setUniform("lineWidth", 1.0);
+                material.setUniform("lineColor", [0.4, 0.4, 0.4]);
+
+                camera.position = [0, 10, 20];
+                camera.lookAt( [0, 0, 0] );
+
+                scene.add( root );
+                // Add Plane
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 20,
+                    heightSegments : 20
+                });
+                plane.generateBarycentric();
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material
+                });
+                planeMesh.scale = [60, 60, 60]
+                planeMesh.roll(-Math.PI/2);
+                root.add(planeMesh);
+
+                var light = new qtek3d.light.Directional();
+                light.intensity = 1.2;
+                light.position = [10, 10, 10];
+                light.lookAt(root.position);
+                scene.add(light);
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    root.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 500);
+            })
+            
+        </script>
+    </body>
+</html>

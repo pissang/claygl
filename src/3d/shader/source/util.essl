@@ -1,0 +1,73 @@
+// Use light attenuation formula in
+// http://blog.slindev.com/2011/01/10/natural-light-attenuation/
+@export buildin.util.calculate_attenuation
+
+uniform float attenuationFactor : 5.0;
+
+float calculateAttenuation(float dist, float range){
+    float attenuation = 1.0;
+    if( range > 0.0){
+        attenuation = dist*dist/(range*range);
+        float att_s = attenuationFactor;
+        attenuation = 1.0/(attenuation*att_s+1.0);
+        att_s = 1.0/(att_s+1.0);
+        attenuation = attenuation - att_s;
+        attenuation /= 1.0 - att_s;
+    }
+    return attenuation;
+}
+
+@end
+
+//http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
+@export buildin.util.edge_factor
+
+float edgeFactor(float width){
+    vec3 d = fwidth(v_Barycentric);
+    vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
+    return min(min(a3.x, a3.y), a3.z);
+}
+
+@end
+
+// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+// http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/
+@export buildin.util.pack_depth
+vec4 packDepth( const in float depth ){
+
+    const vec4 bitShifts = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
+    const vec4 bitMask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+
+    vec4 rgba = fract( depth * bitShifts );
+
+    rgba -= rgba.xxyz * bitMask;
+
+    return rgba;
+}
+@end
+
+@export buildin.util.unpack_depth
+float unpackDepth( const in vec4 rgba ){
+    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);
+    return dot(rgba, bitShifts);
+}
+@end
+
+@export buildin.util.pack_depth_half
+vec2 packDepthHalf( const in float depth ){
+    const vec2 bitShifts = vec2(256.0, 1.0);
+    const vec4 bitMask = vec4(0.0, 1.0/256.0);
+
+    vec2 rg = fract(depth*bitShifts);
+    rg -= rg.xx * bitMask;
+
+    return rg;
+}
+@end
+
+@export buildin.util.unpack_depth_half
+float unpackDepthHalf( const in vec2 rg ){
+    const vec4 bitShifts = vec2(1.0/256.0, 1.0);
+    return dot(rg, bitShifts);
+}
+@end

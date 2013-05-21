@@ -1,0 +1,70 @@
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="//localhost/github/three.js/build/three.js"></script>
+</head>
+<body>
+    <canvas id="Main"></canvas>
+    <script type="text/shader" id="vertexShader">
+
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec4 vTangent;
+        attribute vec4 tangent;
+
+        void main(){
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            vUv = uv;
+            vNormal = normal;
+            vTangent = tangent;
+        }
+    </script>
+    <script type="text/shader" id="fragmentShader">
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec4 vTangent;
+
+        void main(){
+
+            gl_FragColor = vec4( vNormal, 1.0);
+        }
+
+    </script>
+    <script type="text/javascript">
+        var renderer = new THREE.WebGLRenderer({
+            canvas : document.getElementById("Main")
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 15;
+        camera.position.y = 15;
+        camera.lookAt(new THREE.Vector3(0, 200, 500));
+
+        var scene = new THREE.Scene();
+        var loader = new THREE.JSONLoader( );
+
+        loader.load("../sponza/sponza.js", function(geometry, materials){
+
+            // var mesh = new THREE.Mesh(geometry, new THREE.ShaderMaterial({
+            //     vertexShader : document.getElementById("vertexShader").textContent,
+            //     fragmentShader : document.getElementById("fragmentShader").textContent,
+            // }));
+            var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials) );
+            geometry.computeTangents();
+            scene.add(mesh);
+
+            startRender();
+        }, "../sponza/textures");
+
+        var light = new THREE.DirectionalLight();
+        light.position = [10, 10, 10];
+
+        scene.add(light);
+        function startRender(){
+            setInterval( function(){
+                renderer.render( scene, camera );
+            }, 20);
+        }
+    </script>
+</body>
+</html>

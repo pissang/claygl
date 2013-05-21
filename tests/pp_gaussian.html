@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    pp_Node = qtek3d.compositor.graph.Node,
+                    pp_SceneNode = qtek3d.compositor.graph.SceneNode,
+                    ppGraph = new qtek3d.compositor.graph.Graph;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                //Create scene
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    }),
+                    cube = new qtek3d.geometry.Cube;
+                var shader = new Shader({
+                    vertex : Shader.source("buildin.vertex.lambert"),
+                    fragment : Shader.source("buildin.fragment.lambert")
+                })
+                shader.enableTexture("diffuseMap");
+                var material = new qtek3d.Material({
+                    shader : shader
+                });
+                var texture = new qtek3d.texture.Texture2D;
+                texture.image = new Image;
+                texture.image.onload = function(){
+                    texture.dirty();
+                }
+                texture.image.src = "assets/textures/crate.gif";
+                material.setUniform("diffuseMap", texture );
+                var mesh = new qtek3d.Mesh({
+                    material : material,
+                    geometry : cube
+                })
+
+                scene.add( mesh );
+
+                camera.position = [0, 2, 2];
+                camera.lookAt( [0, 0, 0] );
+
+                var light = new qtek3d.light.Directional({
+                    color : [1.5, 1.5, 1.5]
+                })
+                light.position = [50, 50, 50];
+                light.lookAt( [0, 0, 0] );
+                scene.add( light );
+
+                ppGraph.add(new pp_SceneNode({
+                    name : "scene",
+                    scene : scene,
+                    camera : camera,
+                    outputs : {
+                        "color" : {
+                            parameters : {
+                                width : 256,
+                                height : 256
+                            }
+                        }
+                    }
+                }) );
+                var gaussian_h = new pp_Node({
+                    name : "gaussian_h",
+                    shader : Shader.source("buildin.fragment.pp.gaussian_blur_h"),
+                    inputs : {
+                        "texture" : {
+                            node : "scene",
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            parameters : {
+                                width : 256,
+                                height : 256
+                            }
+                        }
+                    }
+                })
+                var gaussian_v = new pp_Node({
+                    name : "gaussian_v",
+                    shader : Shader.source("buildin.fragment.pp.gaussian_blur_v"),
+                    inputs : {
+                        "texture" : {
+                            node : "gaussian_h",
+                            pin : "color"
+                        }
+                    },
+                    outputs : null
+                })
+                ppGraph.add( gaussian_v );
+                ppGraph.add( gaussian_h );
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    ppGraph.render( renderer );
+                    mesh.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 20 )
+            })
+            
+        </script>
+    </body>
+</html>

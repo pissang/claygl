@@ -1,0 +1,41 @@
+@export buildin.wireframe.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 world : WORLD;
+
+attribute vec3 position : POSITION;
+attribute vec3 barycentric;
+
+varying vec3 v_Barycentric;
+
+void main(){
+
+    gl_Position = worldViewProjection * vec4( position, 1.0 );
+
+    v_Barycentric = barycentric;
+}
+
+@end
+
+
+
+@export buildin.wireframe.fragment
+
+uniform vec3 color : [0.0, 0.0, 0.0];
+
+uniform float alpha : 1.0;
+uniform float lineWidth : 1.5;
+
+varying vec3 v_Barycentric;
+
+#extension GL_OES_standard_derivatives : enable
+
+@import buildin.util.edge_factor
+
+void main(){
+
+    gl_FragColor.rgb = color;
+    gl_FragColor.a = ( 1.0-edgeFactor(lineWidth) ) * alpha;
+}
+
+@end

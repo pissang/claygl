@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    'glmatrix',
+                    'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, glMatrix, modelData){
+                var qtek3d = qtek['3d'],
+                    mat4 = glMatrix.mat4,
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+                var shadowMapPlugin = new qtek3d.plugin.ShadowMap({
+                    renderer : renderer
+                });
+                shadowMapPlugin.enable();
+
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 100
+                    });
+                
+                //=================================
+                // Create scene
+                //================================
+                var light = new qtek3d.light.Spot({
+                    position : [4, 4, 4],
+                    intensity : 4.0
+                });
+                light.lookAt([0, 0, 0]);
+                scene.add(light);
+
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 1,
+                    heightSegments : 1
+                })
+                plane.generateBarycentric();
+                var shader = qtek3d.shader.library.get('buildin.phong');
+
+                var material = new qtek3d.Material({
+                    shader : shader
+                });
+
+                var loader = new qtek.loader.three.JSON({
+                    textureRootPath : "assets/models/nanosuit/tex"
+                });
+                var data = JSON.parse(modelData);
+                var meshList = loader.parse(data);
+                
+                var root = new qtek3d.Node();
+
+                _.each(meshList, function(mesh){
+                    // mesh.material = material
+                    mesh.material.shader.disableTexture("normalMap");
+                    root.add(mesh);
+                });
+                scene.add(root);
+                root.scale = [0.2, 0.2, 0.2];
+                root.position = [1, 0.2, 1];
+
+                camera.position = [0, 4, 5];
+                camera.lookAt( [0, 1, 0] );
+
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material
+                });
+                planeMesh.roll(-Math.PI/2);
+                planeMesh.scale = [10, 10, 10];
+
+                scene.add( planeMesh );
+
+                // Shadow Map Pass
+
+                var time = 0;
+                setInterval( function(){
+                    light.x( 4 * Math.sin(time+=0.01) );
+                    light.z( 4 * Math.cos(time+=0.01) );
+                    light.lookAt( [0, 0, 0]);
+
+                    renderer.render(scene, camera);
+                }, 20);
+
+            })
+            
+        </script>
+    </body>
+</html>

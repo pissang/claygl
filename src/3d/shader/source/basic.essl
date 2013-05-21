@@ -1,0 +1,57 @@
+@export buildin.basic.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+uniform vec2 uvRepeat : [1.0, 1.0];
+
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 normal : NORMAL;
+
+attribute vec3 barycentric;
+
+varying vec2 v_Texcoord;
+varying vec3 v_Barycentric;
+
+void main(){
+
+    gl_Position = worldViewProjection * vec4( position, 1.0 );
+
+    v_Texcoord = texcoord * uvRepeat;
+    v_Barycentric = barycentric;
+}
+
+@end
+
+
+
+
+@export buildin.basic.fragment
+
+varying vec2 v_Texcoord;
+uniform sampler2D diffuseMap;
+uniform vec3 color : [1.0, 1.0, 1.0];
+uniform float alpha : 1.0;
+
+// Uniforms for wireframe
+uniform float lineWidth : 0.0;
+uniform vec3 lineColor : [0.0, 0.0, 0.0];
+varying vec3 v_Barycentric;
+
+@import buildin.util.edge_factor
+
+void main(){
+
+    gl_FragColor = vec4(color, alpha);
+    
+    #ifdef DIFFUSEMAP_ENABLED
+        vec4 tex = texture2D( diffuseMap, v_Texcoord );
+        gl_FragColor.rgb *= tex.rgb;
+    #endif
+    
+    if( lineWidth > 0.01){
+        gl_FragColor.xyz = gl_FragColor.xyz * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+    }
+}
+
+@end

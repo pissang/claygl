@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    Material = qtek3d.Material,
+                    Mesh = qtek3d.Mesh,
+                    Cube = qtek3d.geometry.Cube,
+                    meshUtil = qtek3d.util.mesh,
+                    shaderLibrary = qtek3d.shader.library;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+                var shadowMapPlugin = new qtek3d.plugin.ShadowMap({
+                    renderer : renderer
+                });
+                shadowMapPlugin.enable();
+
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                var cube = new Cube();
+                var shader = shaderLibrary.get('buildin.lambert', "diffuseMap");
+                var material = new Material({
+                    shader : shader
+                });
+                var texture = new qtek3d.texture.Texture2D;
+                texture.image = new Image;
+                texture.image.onload = function(){
+                    texture.dirty();
+                }
+                texture.image.src = "assets/textures/crate.gif";
+                var uniforms = material.uniforms;
+                uniforms.diffuseMap.value = texture;
+
+                var meshList = [];
+                for( var i = 0; i < 3; i++){
+                    for(var j = 0; j < 3; j++){
+                        for( var k = 0; k < 3; k++){
+
+                            var mesh = new Mesh({
+                                geometry : cube,
+                                material : material
+                            });
+                            mesh.scale = [0.4, 0.4, 0.4];
+                            mesh.x(4-Math.random()*8);
+                            mesh.y(4-Math.random()*8);
+                            mesh.z(4-Math.random()*8);
+                            meshList.push( mesh );  
+                        }
+                    }
+                }
+                var root = new qtek3d.Node();
+                var cubes = meshUtil.merge( meshList );
+                root.add(cubes);
+                scene.add(root);
+
+                var bigCube = new qtek3d.Mesh({
+                    geometry : new qtek3d.geometry.Cube({
+                        inside : true
+                    }),
+                    material : new qtek3d.Material({
+                        shader : qtek3d.shader.library.get("buildin.lambert")
+                    }),
+                    scale : [10, 10, 10]
+                })
+                root.add(bigCube);
+
+                camera.position = [0, 2, 10];
+                camera.lookAt( [0, 0, 0] );
+
+                var light = new qtek3d.light.Point({
+                    color : [1.5, 1.5, 1.5],
+                    // shadowResolution : 256,
+                    range : 30,
+                    castShadow : true
+                })
+                light.position = [2, 2, 2];
+                light.lookAt([0, 0, 0]);
+                scene.add( light );
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    root.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 1000);
+            })
+            
+        </script>
+    </body>
+</html>

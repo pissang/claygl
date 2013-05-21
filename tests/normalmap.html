@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+                var cube = new qtek3d.geometry.Cube({
+                    widthSegments : 10,
+                    heightSegments : 10
+                });
+                cube.generateUniqueVertex();
+                cube.generateTangents();
+
+                var shader = qtek3d.shader.library.get("buildin.phong", ["normalMap", "diffuseMap"]);
+                var material = new qtek3d.Material({
+                    shader : shader
+                });
+                material.setUniform("normalMap", loadTexture("assets/textures/normal_map.jpg"));
+                material.setUniform("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
+                material.setUniform("shininess", 100);
+
+                camera.position = [0, 0, 4];
+                camera.lookAt( [0, 0, 0] );
+
+                var mesh = new qtek3d.Mesh({
+                    geometry : cube,
+                    material : material
+                });
+                scene.add( mesh );
+                var light = new qtek3d.light.Directional({
+                    position : [10, 10, 10]
+                })
+                light.lookAt(mesh.position);
+                scene.add(light);
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    mesh.pitch( pitch );
+                    pitch += Math.PI/500;
+                }, 20);
+
+
+                function loadTexture(src){
+                    var texture = new qtek3d.texture.Texture2D({
+                        image : new Image()
+                    })
+                    texture.image.onload = function(){
+                        texture.dirty();
+                    }
+                    texture.image.src = src;
+                    return texture;
+                }
+            })
+            
+        </script>
+    </body>
+</html>

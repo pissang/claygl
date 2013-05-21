@@ -1,0 +1,133 @@
+// Variance Shadow Mapping
+// http://www.punkuser.net/vsm/vsm_paper.pdf
+// http://developer.download.nvidia.com/SDK/10/direct3d/Source/VarianceShadowMapping/Doc/VarianceShadowMapping.pdf
+@export buildin.vsm.depth.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+varying vec4 v_ViewPosition;
+void main(){
+
+    v_ViewPosition = worldViewProjection * vec4( position, 1.0 );
+    gl_Position = worldViewProjection * vec4( position , 1.0 );
+
+}
+@end
+
+
+@export buildin.vsm.depth.fragment
+
+varying vec4 v_ViewPosition;
+
+uniform int writeChannel : 0;
+
+void main(){
+    float z = v_ViewPosition.z / v_ViewPosition.w;
+
+    if( writeChannel == 0){
+        gl_FragColor = vec4(z, z*z, 0.0, 0.0);
+    }else{
+        gl_FragColor = vec4(0.0, 0.0, z, z*z);
+    }
+}
+@end
+
+@export buildin.plugin.compute_shadow_map
+
+#if defined( SHADOWMAP_ENABLED )
+
+vec4 vsmBoxFilter(sampler2D texture, vec2 uv){
+    vec4 tex = texture2D(texture, uv);
+    float offset = 1.0/512.0;
+    tex += texture2D(texture, uv+vec2(offset, 0.0) );
+    tex += texture2D(texture, uv+vec2(offset, offset) );
+    tex += texture2D(texture, uv+vec2(-offset, offset) );
+    tex += texture2D(texture, uv+vec2(0.0, offset) );
+    tex += texture2D(texture, uv+vec2(-offset, 0.0) );
+    tex += texture2D(texture, uv+vec2(-offset, -offset) );
+    tex += texture2D(texture, uv+vec2(offset, -offset) );
+    tex += texture2D(texture, uv+vec2(0.0, -offset) );
+
+    tex /= 9.0;
+    return tex;
+}
+
+float computeShadowFalloffOfSingleMap( sampler2D map, mat4 lightVPM, vec3 position){
+    vec4 posInLightSpace = ( lightVPM * vec4(position, 1.0) );
+    posInLightSpace.xyz /= posInLightSpace.w;
+
+    float z = posInLightSpace.z;
+    // In frustum
+    if( all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
+        all(lessThan(posInLightSpace.xyz, vec3(1.0))) ){
+        
+        // To texture uv
+        vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
+        // vec2 moments = texture2D( map, uv ).xy;
+        vec2 moments = vsmBoxFilter( map, uv ).xy;
+        
+        float variance = moments.y - moments.x * moments.x;
+
+        float mD = moments.x - z;
+        float p = variance / (variance + mD * mD);
+
+        if(moments.x + 0.002 < z){
+            return clamp(p, 0.0, 1.0);
+        }else{
+            return 1.0;
+        }
+    }
+    return 1.0;
+}
+
+#if defined(SPOT_LIGHT_NUMBER) && defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfSpotLights( vec3 position, inout float shadowFalloffs[SPOT_LIGHT_NUMBER]  ){
+    for( int i = SPOT_LIGHT_SHADOWMAP_OFFSET; i < SPOT_LIGHT_SHADOWMAP_OFFSET + SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowFalloff = computeShadowFalloffOfSingleMap( shadowMap[i], shadowCameraMatrix[i], position );
+        shadowFalloffs[ i - SPOT_LIGHT_SHADOWMAP_OFFSET ] = shadowFalloff;
+    }
+    // set default fallof of rest lights
+    for( int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+}
+
+#endif
+
+
+#if defined(POINT_LIGHT_NUMBER) && defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfPointLights( vec3 position, inout float shadowFalloffs[POINT_LIGHT_NUMBER]  ){
+    for( int i = 0; i < POINT_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+    for( int i = POINT_LIGHT_SHADOWMAP_OFFSET; i < POINT_LIGHT_SHADOWMAP_OFFSET + POINT_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowFalloff = computeShadowFalloffOfSingleMap( shadowMap[i], shadowCameraMatrix[i], position );
+        
+        shadowFalloffs[ (i - POINT_LIGHT_SHADOWMAP_OFFSET) / 6 ] *= shadowFalloff;
+    }
+}
+
+#endif
+
+
+#if defined(DIRECTIONAL_LIGHT_NUMBER) && defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFalloffs[DIRECTIONAL_LIGHT_NUMBER] ){
+    for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_OFFSET; i < DIRECTIONAL_LIGHT_SHADOWMAP_OFFSET + DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowFalloff = computeShadowFalloffOfSingleMap( shadowMap[i], shadowCameraMatrix[i], position );
+        shadowFalloffs[ i - POINT_LIGHT_SHADOWMAP_OFFSET] = shadowFalloff;
+    }
+    // set default fallof of rest lights
+    for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+}
+
+#endif
+
+#endif
+
+@end

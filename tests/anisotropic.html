@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    _ = require("_");
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                var shader = qtek3d.shader.library.get("buildin.basic", "diffuseMap");
+
+                var material = new qtek3d.Material({
+                    shader : shader
+                });
+                var image = new Image;
+                image.src = "assets/textures/ground_tile.jpg";
+                var texture = new qtek3d.texture.Texture2D({
+                    image : image,
+                    wrapS : 'REPEAT',
+                    wrapT : 'REPEAT',
+                    anisotropic : 8
+                });
+                image.onload = function(){
+                    texture.dirty();
+                };
+                material.setUniform("diffuseMap", texture);
+                material.setUniform("uvRepeat", [10, 10])
+
+                var root = new qtek3d.Node();
+
+                camera.position = [0, 4, 14];
+                camera.lookAt( [0, 1, 0] );
+
+                scene.add( root );
+                // Add Plane
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 1,
+                    heightSegments : 1
+                });
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material,
+                    scale : [60, 60, 60]
+                });
+                planeMesh.y(-0.8);
+                planeMesh.roll(-Math.PI/2);
+                root.add(planeMesh);
+
+                var pitch = 0;
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    pitch += Math.PI/500;
+                }, 20);
+            })
+            
+        </script>
+    </body>
+</html>
