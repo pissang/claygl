@@ -4,6 +4,7 @@
 define( function(require){
 
     var Base = require("core/base");
+    var Vector3 = require("core/vector3");
     var Shader = require("../shader");
     var Light = require("../light");
     var SpotLight = require("../light/spot");
@@ -13,11 +14,11 @@ define( function(require){
     var Material = require("../material");
     var FrameBuffer = require("../framebuffer");
     var Texture2d = require("../texture/texture2d");
+    var TextureCube = require("../texture/texturecube");
     var PerspectiveCamera = require("../camera/perspective");
     var OrthoCamera = require("../camera/orthographic");
 
-    var glMatrix = require("glmatrix");
-    var mat4 = glMatrix.mat4;
+    var Matrix4 = require("core/matrix4");
 
     var _ = require("_");
 
@@ -28,19 +29,11 @@ define( function(require){
     var ShadowMapPlugin = Base.derive(function(){
         return {
 
-            renderer : null,
-
-            _depthMaterial : new Material({
-                shader : new Shader({
-                    vertex : Shader.source("buildin.vsm.depth.vertex"),
-                    fragment : Shader.source("buildin.vsm.depth.fragment")
-                })
-            }),
+            technique : "VSM",  //"NORMAL", "PCF", "VSM"
 
             _textures : {},
 
             _cameras : {},
-            _cameraMatrices : [],
 
             _shadowMapNumber : {
                 'POINT_LIGHT' : 0,
@@ -51,36 +44,53 @@ define( function(require){
                 'SPOT_LIGHT' : 0,
                 'DIRECTIONAL_LIGHT' : 1,
                 'SPOT_LIGHT' : 2
-            },
+            }
 
-            _latestRenderQueue : []
+        }
+    }, function(){
+        if( this.technique == "VSM"){
+            this._depthMaterial =  new Material({
+                shader : new Shader({
+                    vertex : Shader.source("buildin.vsm.depth.vertex"),
+                    fragment : Shader.source("buildin.vsm.depth.fragment")
+                })
+            });
+            // Point light write the distance instance of depth projected
+            // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
+            this._pointLightDepthMaterial = new Material({
+                shader : new Shader({
+                    vertex : Shader.source("buildin.vsm.distance.vertex"),
+                    fragment : Shader.source("buildin.vsm.distance.fragment")
+                })
+            })
+        }else{
+            this._depthMaterial = new Material({
+                shader : new Shader({
+                    vertex : Shader.source("buildin.sm.depth.vertex"),
+                    fragment : Shader.source("buildin.sm.depth.fragment")
+                })
+            })
+            this._pointLightDepthMaterial = new Material({
+                shader : new Shader({
+                    vertex : Shader.source("buildin.sm.distance.vertex"),
+                    fragment : Shader.source("buildin.sm.distance.fragment")
+                })
+            })
         }
     }, {
 
-        enable : function(){
-            this.renderer.on("beforerender", this._renderShadowPass, this );
+        render : function( renderer, scene ){
+            this._renderShadowPass( renderer, scene );
         },
 
-        disable : function(){
-            this.renderer.off("beforerender", this._renderShadowPass, this );
-
-            for(var i = 0; i < this._latestRenderQueue.length; i++){
-                var shader = this._latestRenderQueue[i].material.shader;
-                shader.disableTexture("shadowMap");
-                shader.update();
-            }
-        },
-
-        _renderShadowPass : function(scene, camera){
+        _renderShadowPass : function( renderer, scene ){
 
             var renderQueue = [],
                 lightCastShadow = [],
                 meshReceiveShadow = [];
 
-            var renderer = this.renderer,
-                _gl = renderer.gl;
+            var _gl = renderer.gl;
 
-            // Scene update is redundancy
             scene.update();
 
             scene.traverse( function(node){
@@ -92,14 +102,13 @@ define( function(require){
                 if( node.material && node.material.shader ){
                     if( node.castShadow ){
                         renderQueue.push(node);
-
                     }
                     if( node.receiveShadow ){
                         meshReceiveShadow.push(node);
 
-                        node.material.shader.enableTexture("shadowMap");
+                        node.material.setUniform("shadowEnabled", 1);
                     }else{
-                        node.material.shader.disableTexture("shadowMap");
+                        node.material.setUniform("shadowEnabled", 0);
                     }
                 };
             } );
@@ -111,10 +120,22 @@ define( function(require){
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
             var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+            var targetMap = {
+                'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
+                'py' : 'TEXTURE_CUBE_MAP_POSITIVE_Y',
+                'pz' : 'TEXTURE_CUBE_MAP_POSITIVE_Z',
+                'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
+                'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
+                'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
+            }
             var cursor = 0;
 
-            var texturesUniform = [];
-            var matricesUniform = this._cameraMatrices;
+            // Shadow uniforms
+            var spotLightShadowMaps = [],
+                spotLightMatrices = [],
+                directionalLightShadowMaps = [],
+                directionalLightMatrices = [],
+                pointLightShadowMaps = [];
 
             var order = this._shadowMapOrder;
             // Store the shadow map in order
@@ -131,10 +152,8 @@ define( function(require){
                 if( light.instanceof(SpotLight) ||
                     light.instanceof(DirectionalLight) ){
                     
-                    light.shadowMapIndex = cursor;
-
-                    var texture = this._getTexture(light.shadowMapIndex, light);
-                    var camera = this._getCamera(light.shadowMapIndex, light);
+                    var texture = this._getTexture(light.__GUID__, light);
+                    var camera = this._getCamera(light.__GUID__, light);
 
                     frameBuffer.attach( renderer.gl, texture );
                     frameBuffer.bind(renderer);
@@ -145,67 +164,49 @@ define( function(require){
                     renderer.renderQueue( renderQueue, camera, this._depthMaterial, true );
 
                     frameBuffer.unbind(renderer);
-                    //
-                    texturesUniform.push( texture );
-                    var matrix = matricesUniform[ cursor];
-                    if( ! matrix){
-                        matrix = matricesUniform[ cursor] = mat4.create();
+        
+                    var matrix = new Matrix4();
+                    matrix.copy(camera.worldMatrix)
+                        .invert()
+                        .multiplyLeft(camera.projectionMatrix);
+
+                    if( light.instanceof(SpotLight) ){
+                        spotLightShadowMaps.push(texture);
+                        spotLightMatrices.push(matrix._array);
+                    }else{
+                        directionalLightShadowMaps.push(texture);
+                        directionalLightMatrices.push(matrix._array);
                     }
-                    mat4.invert(matrix, camera.worldMatrix);
-                    mat4.multiply(matrix, camera.projectionMatrix, matrix);
 
-                    cursor++;
-
-                    this._shadowMapNumber[ light.type ] ++;
                 }else if(light.instanceof(PointLight) ){
                     
-                    light.shadowMapIndex = cursor;
+                    var texture = this._getTexture(light.__GUID__, light);
+                    pointLightShadowMaps.push( texture );
 
                     for(var i = 0; i < 6; i++){
                         var target = targets[i];
-                        var texture = this._getTexture(light.shadowMapIndex, light, target);
-                        var camera = this._getCamera(light.shadowMapIndex, light, target);
+                        var camera = this._getCamera(light.__GUID__, light, target);
 
-                        frameBuffer.attach( renderer.gl, texture );
+                        frameBuffer.attach( renderer.gl, texture, 'COLOR_ATTACHMENT0', targetMap[target] );
                         frameBuffer.bind(renderer);
 
                         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                         renderer._scene = scene;
-                        renderer.renderQueue( renderQueue, camera, this._depthMaterial, true );
+                        this._pointLightDepthMaterial.setUniform("lightPosition", light.position._array);
+                        renderer.renderQueue( renderQueue, camera, this._pointLightDepthMaterial, true );
 
                         frameBuffer.unbind(renderer);
-
-                        texturesUniform.push( texture );
-                        var matrix = matricesUniform[ cursor + i];
-                        if( ! matrix){
-                            matrix = matricesUniform[ cursor + i] = mat4.create();
-                        }
-                        mat4.invert(matrix, camera.worldMatrix);
-                        mat4.multiply(matrix, camera.projectionMatrix, matrix);
                     }
-                    this._shadowMapNumber['POINT_LIGHT']+=6;
 
-                    cursor += 6;
                 }
+
+                this._shadowMapNumber[ light.type ] ++;
             }, this );
-    
-            var shadowMapNumber = 0;
-            for(var name in this._shadowMapNumber){
-                var number = this._shadowMapNumber[name];
-                shadowMapNumber += number;
-            }
-            var shadowFalloffUniform = {
-                'spotLightShadowFalloff' : createEmptyArray(this._shadowMapNumber['SPOT_LIGHT'], 1),
-                'pointLightShadowFalloff' : createEmptyArray(this._shadowMapNumber['POINT_LIGHT'], 1),
-                'directionalLightShadowFalloff' : createEmptyArray(this._shadowMapNumber['DIRECTIONAL_LIGHT'], 1),
-            }
 
             for(var i = 0; i < meshReceiveShadow.length; i++){
                 var mesh = meshReceiveShadow[i],
                     material = mesh.material;
-                material.setUniform('shadowMap', texturesUniform);
-                material.setUniform('shadowCameraMatrix', matricesUniform);
 
                 var shader = material.shader;
 
@@ -221,62 +222,46 @@ define( function(require){
                     }
                 }
                 if( shaderNeedsUpdate){
-                    var offset = 0;
-                    for(var name in this._shadowMapNumber ){
-                        var key = name + "_SHADOWMAP_OFFSET";
-                        var number = this._shadowMapNumber[name];
-                        shader.fragmentDefines[key] = offset;
-                        offset += number;
-                    }
-                    shader.fragmentDefines['SHADOWMAP_NUMBER'] = shadowMapNumber;
                     shader.update();
                 }
 
-                material.setUniforms(shadowFalloffUniform);
+                material.setUniforms({
+                    "spotLightShadowMap" : spotLightShadowMaps,
+                    "directionalLightShadowMap" : directionalLightShadowMaps,
+                    "directionalLightMatrix" : directionalLightMatrices,
+                    "pointLightShadowMap" : pointLightShadowMaps,
+                    "spotLightMatrix" : spotLightMatrices,
+                });
             }
-            // Save the latest render queue
-            this._latestRenderQueue = renderQueue;
         },
 
-        _getTexture : function(key, light, target){
+        _getTexture : function(key, light){
             var texture = this._textures[ key ];
             var resolution = light.shadowResolution || 512;
             var needsUpdate = false;
-            if( texture ){ 
-                // Cube shadow maps of point light
-                if( target ){
-                    texture = texture[ target ];
-                    if( ! texture){
-                        needsUpdate = true;
-                    }else{
-                        if( texture.width !== resolution){
-                            texture.dispose();
-                            needsUpdate = true;
-                        }
-                    }
-                }else{
-                    if( texture.width !== resolution){
-                        texture.dispose();
-                        needsUpdate = true;
-                    }
+            if( texture ){
+                if( texture.width !== resolution){
+                    texture.dispose();
+                    needsUpdate = true;
                 }
             }else{
                 needsUpdate = true;
-                if( target){
-                    this._textures[key] = {};
-                }
             }
             if( needsUpdate){
-                texture = new Texture2d({
-                    width : resolution,
-                    height : resolution,
-                    type : 'FLOAT'
-                })
-                if( target ){
-                    this._textures[key][target] = texture;
+                if( light.instanceof(PointLight) ){
+                    texture = new TextureCube({
+                        width : resolution,
+                        height : resolution,
+                        type : 'FLOAT'
+                    })
                 }else{
-                    this._textures[key] = texture;
+                    texture = new Texture2d({
+                        width : resolution,
+                        height : resolution,
+                        type : 'FLOAT'
+                    })   
                 }
+                this._textures[key] = texture;
             }
 
             return texture;
@@ -293,7 +278,6 @@ define( function(require){
             if( ! camera ){
                 if( light.instanceof(SpotLight) ||
                     light.instanceof(PointLight) ){
-                    
                     camera = new PerspectiveCamera({
                         near : 0.1
                     });
@@ -312,40 +296,40 @@ define( function(require){
                 camera.far = light.range;
             }
             if( light.instanceof(PointLight) ){
-                camera.position = light.position;
                 camera.far = light.range;
                 camera.fov = 90;
+
+                camera.position.set(0, 0, 0);
                 switch(target){
                     case 'px':
-                        camera.pitch(Math.PI/2);
+                        camera.up.set(0, -1, 0);
+                        camera.lookAt( new Vector3(1, 0, 0) );
                         break;
                     case 'nx':
-                        camera.pitch(-Math.PI/2);
+                        camera.up.set(0, -1, 0);
+                        camera.lookAt( new Vector3(-1, 0, 0) );
                         break;
                     case 'py':
-                        camera.roll(-Math.PI/2);
+                        camera.up.set(0, 0, 1);
+                        camera.lookAt( new Vector3(0, 1, 0) );
                         break;
                     case 'ny':
-                        camera.roll(Math.PI/2);
+                        camera.up.set(0, 0, -1);
+                        camera.lookAt( new Vector3(0, -1, 0) );
                         break;
+                    case 'pz':
+                        camera.up.set(0, -1, 0);
+                        camera.lookAt( new Vector3(0, 0, 1) );
                     case 'nz':
-                        camera.pitch(Math.PI);
-                    default:
+                        camera.up.set(0, -1, 0);
+                        camera.lookAt( new Vector3(0, 0, -1) );
                         break;
                 }
+                camera.position.copy( light.position );
                 camera.update();
 
             }else{
-                mat4.copy( camera.worldMatrix, light.worldMatrix );
-                var m = camera.worldMatrix;
-                // Invert x and z axis
-                m[0] = -m[0];
-                m[1] = -m[1];
-                m[2] = -m[2];
-
-                m[8] = -m[8];
-                m[9] = -m[9];
-                m[10] = -m[10];
+                camera.worldMatrix.copy(light.worldMatrix);
             }
             camera.updateProjectionMatrix();
 

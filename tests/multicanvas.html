@@ -62,26 +62,24 @@
                     material : material
                 });
 
-                camera.position = [0, 4, 4];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 4, 4);
+                camera.lookAt( scene.position );
 
                 scene.add( mesh );
 
                 var light = new qtek3d.light.Directional({
                     color : [1.5, 1.5, 1.5]
                 })
-                light.position = [50, 50, 50];
-                light.lookAt( [0, 0, 0] );
+                light.position.set(50, 50, 50);
+                light.lookAt( scene.position );
                 scene.add( light );
 
-
-                var pitch = 0;
 
                 setInterval( function(){
                     renderer2.render( scene, camera );
                     renderer1.render( scene, camera );
-                    mesh.pitch( pitch );
-                    pitch += Math.PI/500;
+
+                    mesh.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
             

@@ -68,8 +68,6 @@ define( function(require) {
                  }
             },
 
-            _verticesNumber : 0,
-
             useFaces : true,
             // Face is list of triangles, each face
             // is an array of the vertex indices of triangle
@@ -79,6 +77,10 @@ define( function(require) {
 
             //Max Value of Uint16, i.e. 0xfff
             chunkSize : 65535,
+
+            _enabledAttributes : null,
+
+            _verticesNumber : 0,
 
             // Save the normal type, can have face normal or vertex normal
             // Normally vertex normal is more smooth
@@ -109,6 +111,8 @@ define( function(require) {
             for ( var contextId in this.cache._caches ) {
                 this.cache._caches[ contextId ][ "dirty_"+field ] = true;
             }
+
+            this._enabledAttributes = null;
         },
 
         getVerticesNumber : function() {
@@ -117,8 +121,14 @@ define( function(require) {
         },
 
         getEnabledAttributes : function(){
+            // Cache
+            if( this._enabledAttributes){
+                return this._enabledAttributes;
+            }
+
             var result = {};
             var verticesNumber = this.getVerticesNumber();
+
             for(var name in this.attributes){
                 var attrib = this.attributes[name];
                 if( attrib.value &&
@@ -128,14 +138,17 @@ define( function(require) {
                     }
                 }
             }
+
+            this._enabledAttributes = result;
+
             return result;
         },
 
         getDirtyAttributes : function( ){
 
             var result = {};
-            var verticesNumber = this.getVerticesNumber();
             var attributes = this.getEnabledAttributes();
+            
             var noDirtyAttributes = true;
             for(var name in attributes ){
                 var attrib = attributes[name];
@@ -156,7 +169,8 @@ define( function(require) {
 
         getBufferChunks : function( _gl ) {
 
-            this.cache.use(_gl.__GUID__ + "_dirty");
+            this.cache.use(_gl.__GUID__ );
+
             var isDirty = this.cache.getContext();
             var dirtyAttributes = this.getDirtyAttributes();
 
@@ -170,7 +184,6 @@ define( function(require) {
                     isDirty[ "dirty_"+name ] = false ;
                 }
             }
-            this.cache.use(_gl.__GUID__+"_buffers");
             return this.cache.get("chunks");
         },
 
@@ -405,8 +418,6 @@ define( function(require) {
         },
 
         _updateBuffer : function( _gl, dirtyAttributes, isFacesDirty ) {
-
-            this.cache.use(_gl.__GUID__ + "_buffers");
 
             var chunks = this.cache.get("chunks");
             if( ! chunks){
@@ -731,6 +742,7 @@ define( function(require) {
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
 
+            matrix = matrix._array;
             for ( var i = 0; i < positions.length; i++) {
                 vec3.transformMat4( positions[i], positions[i], matrix );
             }

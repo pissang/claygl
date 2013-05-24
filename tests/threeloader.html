@@ -56,8 +56,8 @@
                 material.setUniform("lineWidth", 1.0);
                 material.setUniform("lineColor", [0.4, 0.4, 0.4]);
 
-                camera.position = [0, 10, 20];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 10, 20);
+                camera.lookAt(root.position);
 
                 scene.add( root );
                 // Add Plane
@@ -70,23 +70,21 @@
                     geometry : plane,
                     material : material
                 });
-                planeMesh.scale = [60, 60, 60]
-                planeMesh.roll(-Math.PI/2);
+                planeMesh.scale.set(60, 60, 60);
+                planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
                 var light = new qtek3d.light.Directional();
                 light.intensity = 1.2;
-                light.position = [10, 10, 10];
+                light.position.set(10, 10, 10);
                 light.lookAt(root.position);
                 scene.add(light);
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    root.pitch( pitch );
-                    pitch += Math.PI/500;
-                }, 500);
+                    
+                    root.rotation.rotateY(Math.PI/500);
+                }, 20);
             })
             
         </script>

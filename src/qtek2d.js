@@ -26,12 +26,18 @@ define( function(require){
         "Base": require('core/base'),
         "Cache": require('core/cache'),
         "Event": require('core/event'),
+        // "Matrix3": require('core/matrix3'),
+        // "Matrix4": require('core/matrix4'),
         "mixin": {
             "derive": require('core/mixin/derive'),
             "Dirty": require('core/mixin/dirty'),
             "notifier": require('core/mixin/notifier')
         },
-        "requester": require('core/request')
+        "Quaternion": require('core/quaternion'),
+        "requester": require('core/request'),
+        "Vector2": require('core/vector2'),
+        // "Vector3": require('core/vector3'),
+        // "Vector4": require('core/vector4')
     },
     "loader": {
         // "three": {

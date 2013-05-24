@@ -32,10 +32,8 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-                var shadowMapPlugin = new qtek3d.plugin.ShadowMap({
-                    renderer : renderer
-                });
-                shadowMapPlugin.enable();
+                
+                var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -44,18 +42,10 @@
                     });
 
                 var cube = new Cube();
-                var shader = shaderLibrary.get('buildin.lambert', "diffuseMap");
+                var shader = shaderLibrary.get('buildin.lambert');
                 var material = new Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D;
-                texture.image = new Image;
-                texture.image.onload = function(){
-                    texture.dirty();
-                }
-                texture.image.src = "assets/textures/crate.gif";
-                var uniforms = material.uniforms;
-                uniforms.diffuseMap.value = texture;
 
                 var meshList = [];
                 for( var i = 0; i < 3; i++){
@@ -66,11 +56,11 @@
                                 geometry : cube,
                                 material : material
                             });
-                            mesh.scale = [0.4, 0.4, 0.4];
-                            mesh.x(4-Math.random()*8);
-                            mesh.y(4-Math.random()*8);
-                            mesh.z(4-Math.random()*8);
-                            meshList.push( mesh );  
+                            mesh.scale.set(0.4, 0.4, 0.4);
+                            mesh.position.x = 4-Math.random()*8;
+                            mesh.position.y = 4-Math.random()*8;
+                            mesh.position.z = 4-Math.random()*8;
+                            meshList.push( mesh );
                         }
                     }
                 }
@@ -86,30 +76,28 @@
                     material : new qtek3d.Material({
                         shader : qtek3d.shader.library.get("buildin.lambert")
                     }),
-                    scale : [10, 10, 10]
+                    scale : new qtek.core.Vector3(10, 10, 10)
                 })
                 root.add(bigCube);
 
-                camera.position = [0, 2, 10];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 2, 10);
+                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
 
                 var light = new qtek3d.light.Point({
                     color : [1.5, 1.5, 1.5],
-                    // shadowResolution : 256,
+                    shadowResolution : 512,
                     range : 30,
                     castShadow : true
                 })
-                light.position = [2, 2, 2];
-                light.lookAt([0, 0, 0]);
+                light.position.set(2, 2, 2);
+                light.lookAt( new qtek.core.Vector3(0, 0, 0) );
                 scene.add( light );
 
-                var pitch = 0;
-
                 setInterval( function(){
+                    shadowMapPass.render( renderer, scene );
                     renderer.render( scene, camera );
-                    root.pitch( pitch );
-                    pitch += Math.PI/500;
-                }, 1000);
+                    root.rotation.rotateY(0.005);
+                }, 20);
             })
             
         </script>

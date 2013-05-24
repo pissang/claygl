@@ -2,7 +2,7 @@
  *  http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
  */
 
-@export buildin.pp.gaussian_blur_v.fragment
+@export buildin.compositor.gaussian_blur_v
 
 uniform sampler2D texture; // the texture with the scene you want to blur
 varying vec2 v_Texcoord;
@@ -31,7 +31,7 @@ void main(void)
 
 @end
 
-@export buildin.pp.gaussian_blur_h.fragment
+@export buildin.compositor.gaussian_blur_h
 
 uniform sampler2D texture; // this should hold the texture rendered by the horizontal blur pass
 varying vec2 v_Texcoord;
@@ -60,7 +60,7 @@ void main(void)
 
 @end
 
-@export buildin.pp.box_blur.fragment
+@export buildin.compositor.box_blur
 
 uniform sampler2D texture;
 varying vec2 v_Texcoord;
@@ -91,8 +91,8 @@ void main(void){
 
 // http://www.slideshare.net/DICEStudio/five-rendering-ideas-from-battlefield-3-need-for-speed-the-run
 
-@export buildin.pp.hexagonal_blur_1.fragment
+@export buildin.compositor.hexagonal_blur_1
 
 @end
 
-@export buildin.pp_hexagonal_blur_2.fragment
+@export buildin.compositor_hexagonal_blur_2

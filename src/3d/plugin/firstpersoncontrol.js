@@ -4,6 +4,7 @@
 define( function(require){
 
     var Base = require("core/base");
+    var Vector3 = require("core/vector3");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
     var mat4 = glMatrix.mat4;
@@ -25,8 +26,8 @@ define( function(require){
             _moveRight : false
         }
     }, function(){
-        this._offsetPitch = this.camera.rotation[1] * 180 / Math.PI;
-        this._offsetRoll = this.camera.rotation[0] * 180 / Math.PI;
+        this._offsetPitch = this.camera.rotation.y * 180 / Math.PI;
+        this._offsetRoll = this.camera.rotation.x * 180 / Math.PI;
 
     }, {
         enable : function(){
@@ -87,16 +88,16 @@ define( function(require){
 
             if( this._moveForward){
                 // Opposite direction of z
-                vec3.add(position, position, vec3.scale(zAxis, zAxis, -this.speed) );
+                position.scaleAndAdd(zAxis, -this.speed);
             }
             if( this._moveBackward){
-                vec3.add(position, position, vec3.scale(zAxis, zAxis, this.speed) );
+                position.scaleAndAdd(zAxis, this.speed);
             }
             if( this._moveLeft){
-                vec3.add(position, position, vec3.scale(xAxis, xAxis, -this.speed/2) );
+                position.scaleAndAdd(xAxis, -this.speed/2);
             }
             if( this._moveRight){
-                vec3.add(position, position, vec3.scale(xAxis, xAxis, this.speed/2) );
+                position.scaleAndAdd(xAxis, this.speed/2);
             }
         },
 
@@ -166,24 +167,24 @@ define( function(require){
         },
 
         _getXAxis : (function(){
-            var axis = vec3.create();
+            var axis = new Vector3();
             return function( normalize ){
                 var m = this.camera.matrix;
-                vec3.set(axis, m[0], m[1], m[2]);
+                axis.set(m[0], m[1], m[2]);
                 if( normalize ){
-                    vec3.normalize(axis, axis);
+                    axis.normalize();
                 }
                 return axis;
             }
         })(),
 
         _getZAxis : (function(){
-            var axis = vec3.create();
+            var axis = new Vector3();
             return function( normalize ){
                 var m = this.camera.matrix;
-                vec3.set(axis, m[8], m[9], m[10]);
+                axis.set(m[8], m[9], m[10]);
                 if( normalize ){
-                    vec3.normalize(axis, axis);
+                    axis.normalize()
                 }
                 return axis;
             }

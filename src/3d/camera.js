@@ -1,13 +1,11 @@
 define( function(require){
 
     var Node = require("./node");
-    var glMatrix = require('glmatrix');
-    var mat4 = glMatrix.mat4;
-    var vec3 = glMatrix.vec3;
+    var Matrix4 = require("core/matrix4");
 
     var Camera = Node.derive(function() {
         return {
-            projectionMatrix : mat4.create(),
+            projectionMatrix : new Matrix4(),
         }
     }, function(){
         this.update();
@@ -18,16 +16,7 @@ define( function(require){
             Node.prototype.update.call( this, _gl );
             
             this.updateProjectionMatrix();
-        },
-
-        lookAt : ( function() {
-            var lookAtMat4 = mat4.create();
-            return function( target ){
-                mat4.lookAt( lookAtMat4, this.position, target, this.up );
-                
-                this.updateFromLookAtMatrix( lookAtMat4 );
-            }
-        } )()
+        }
     });
 
     return Camera;

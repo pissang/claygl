@@ -46,8 +46,8 @@
                 material.setUniform("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
                 material.setUniform("shininess", 100);
 
-                camera.position = [0, 0, 4];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 0, 4);
+                camera.lookAt( scene.position );
 
                 var mesh = new qtek3d.Mesh({
                     geometry : cube,
@@ -55,17 +55,14 @@
                 });
                 scene.add( mesh );
                 var light = new qtek3d.light.Directional({
-                    position : [10, 10, 10]
+                    position : new qtek.core.Vector3(10, 10, 10)
                 })
                 light.lookAt(mesh.position);
                 scene.add(light);
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    mesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    mesh.rotation.rotateY(Math.PI/500);
                 }, 20);
 
 

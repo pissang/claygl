@@ -30,10 +30,8 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-                var shadowMapPlugin = new qtek3d.plugin.ShadowMap({
-                    renderer : renderer
-                });
-                shadowMapPlugin.enable();
+                
+                var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -45,10 +43,10 @@
                 // Create scene
                 //================================
                 var light = new qtek3d.light.Spot({
-                    position : [4, 4, 4],
+                    position : new qtek.core.Vector3(4, 4, 4),
                     intensity : 4.0
                 });
-                light.lookAt([0, 0, 0]);
+                light.lookAt(new qtek.core.Vector3());
                 scene.add(light);
 
                 var plane = new qtek3d.geometry.Plane({
@@ -72,22 +70,22 @@
 
                 _.each(meshList, function(mesh){
                     // mesh.material = material
-                    mesh.material.shader.disableTexture("normalMap");
+                    mesh.material.shader.disableTexture("diffuseMap", "normalMap");
                     root.add(mesh);
                 });
                 scene.add(root);
-                root.scale = [0.2, 0.2, 0.2];
-                root.position = [1, 0.2, 1];
+                root.scale.set(0.2, 0.2, 0.2);
+                root.position.set(1, 0.2, 1);
 
-                camera.position = [0, 4, 5];
-                camera.lookAt( [0, 1, 0] );
+                camera.position.set(0, 4, 5);
+                camera.lookAt( new qtek.core.Vector3(0, 1, 0) );
 
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
                     material : material
                 });
-                planeMesh.roll(-Math.PI/2);
-                planeMesh.scale = [10, 10, 10];
+                planeMesh.rotation.rotateX( -Math.PI/2 );
+                planeMesh.scale.set(10, 10, 10);
 
                 scene.add( planeMesh );
 
@@ -95,10 +93,11 @@
 
                 var time = 0;
                 setInterval( function(){
-                    light.x( 4 * Math.sin(time+=0.01) );
-                    light.z( 4 * Math.cos(time+=0.01) );
-                    light.lookAt( [0, 0, 0]);
-
+                    light.position.x = 4 * Math.sin(time+=0.01);
+                    light.position.z = 4 * Math.cos(time+=0.01);
+                    light.lookAt( new qtek.core.Vector3() );
+                    
+                    shadowMapPass.render( renderer, scene );
                     renderer.render(scene, camera);
                 }, 20);
 

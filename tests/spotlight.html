@@ -42,38 +42,36 @@
                 })
 
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.vertex.lambert"),
-                    fragment : Shader.source("buildin.fragment.lambert")
+                    vertex : Shader.source("buildin.lambert.vertex"),
+                    fragment : Shader.source("buildin.lambert.fragment")
                 })
 
                 var material = new qtek3d.Material({
                     shader : shader
                 })
 
-                camera.position = [0, 5, 5];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 5, 5);
+                camera.lookAt( new qtek.core.Vector3() );
 
                 var sphereMesh = new qtek3d.Mesh({
                     geometry : sphere,
                     material : material
                 });
-                sphereMesh.y(1);
+                sphereMesh.position.y = 1;
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
                     material : material
                 });
-                planeMesh.roll(-Math.PI/2);
-                planeMesh.scale = [4, 4, 4];
+                planeMesh.rotation.rotateX(-Math.PI/2);
+                planeMesh.scale.set(4, 4, 4);
 
                 scene.add( sphereMesh );
                 scene.add( planeMesh );
 
                 var light = new qtek3d.light.Spot();
-                light.position = [2, 2, 2];
-                light.lookAt([0, 0, 0]);
+                light.position.set(2, 2, 2);
+                light.lookAt(new qtek.core.Vector3());
                 scene.add(light);
-
-                var pitch = 0;
 
                 setInterval( function(){
                     renderer.render( scene, camera );

@@ -2,8 +2,7 @@ define( function(require){
 
     var Light = require('../light');
     var Shader = require('../shader');
-    var glMatrix = require('glmatrix');
-    var vec3 = glMatrix.vec3;
+    var Vector3 = require('core/vector3');
 
     var SHADER_STR = [ '@export buildin.header.spot_light',
                         'uniform vec3 spotLightPosition[SPOT_LIGHT_NUMBER];',
@@ -33,7 +32,7 @@ define( function(require){
             'spotLightPosition' : {
                 type : '3f',
                 value : function( instance ){
-                    return instance.getWorldPosition();
+                    return instance.getWorldPosition()._array;
                 }
             },
             'spotLightRange' : {
@@ -63,12 +62,13 @@ define( function(require){
             'spotLightDirection' : {
                 type : '3f',
                 value : ( function(){
-                    var z = vec3.create(),
+                    var z = new Vector3(),
                         m;
                     return function( instance ){
-                        m = instance.worldMatrix;
-                        vec3.set( z, m[8], m[9], m[10] );
-                        return z;
+                        m = instance.worldMatrix._array;
+                        // Direction is target to eye
+                        z.set(-m[8], -m[9], -m[10]);
+                        return z._array;
                     }
                 })()
             },

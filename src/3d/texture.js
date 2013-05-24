@@ -95,8 +95,9 @@ define( function(require){
 			// Use of none-power of two texture
 			// http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
 			
-			var isPowerOfTwo = this.isPowerOfTwo( this.image || {width : this.width, height:this.height} );
-			if( ! isPowerOfTwo || ! this.generateMipmaps ){
+			var isPowerOfTwo = this.isPowerOfTwo();
+
+			if( ! isPowerOfTwo || ! this.generateMipmaps || this.format === 'DEPTH_COMPONENT' ){
 				// none-power of two flag
 				this.NPOT = true;
 				// Save the original value for restore
@@ -132,13 +133,10 @@ define( function(require){
 					this.wrapT = this._wrapTOriginal;
 				}
 			}
-		},
 
-		isPowerOfTwo : function(image){
-			var width = image.width,
-				height = image.height;
-			return ( width & (width-1) ) === 0 &&
-					( height & (height-1) ) === 0;
+			if( this.format === "DEPTH_COMPONENT"){
+				this.generateMipmaps = false;
+			}
 		},
 
 		nextHighestPowerOfTwo : function(x) {
@@ -152,7 +150,11 @@ define( function(require){
 		dispose : function( _gl ){
 			this.cache.use(_gl.__GUID__);
 			_gl.deleteTexture( this.cache.get("webgl_texture") );
-		}
+		},
+
+		isRenderable : function(){},
+		
+		isPowerOfTwo : function(){},
 	} )
 
 	return Texture;

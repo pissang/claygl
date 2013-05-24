@@ -56,8 +56,8 @@
                 })
                 material.setUniform("lineWidth", 2);
 
-                camera.position = [0, 2, 3];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 2, 3);
+                camera.lookAt( new qtek.core.Vector3() );
 
                 var sphereMesh = new qtek3d.Mesh({
                     geometry : sphere,
@@ -71,21 +71,18 @@
                     geometry : plane,
                     material : material
                 })
-                sphereMesh.x(-1.5);
-                cubeMesh.x(1.5);
-                cubeMesh.scale = [0.7, 0.7, 0.7];
+                sphereMesh.position.x = -1.5;
+                cubeMesh.position.x = 1.5;
+                cubeMesh.scale.set(0.7, 0.7, 0.7);
                 scene.add( sphereMesh );
                 scene.add( planeMesh );
                 scene.add( cubeMesh );
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    cubeMesh.pitch( pitch );
-                    planeMesh.pitch( pitch );
-                    sphereMesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    cubeMesh.rotation.rotateY(Math.PI/500);
+                    planeMesh.rotation.rotateY(Math.PI/500);
+                    sphereMesh.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
             

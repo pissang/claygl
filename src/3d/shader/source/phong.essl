@@ -56,11 +56,6 @@ uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
 uniform sampler2D environmentMap;
 
-#ifdef SHADOWMAP_NUMBER
-uniform sampler2D shadowMap[ SHADOWMAP_NUMBER ];
-uniform mat4 shadowCameraMatrix[ SHADOWMAP_NUMBER ];
-#endif
-
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
@@ -124,9 +119,11 @@ void main(){
         }
     #endif
     #ifdef POINT_LIGHT_NUMBER
-        #if defined( SHADOWMAP_ENABLED ) && defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+        #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
             float shadowFallOffs[POINT_LIGHT_NUMBER];
-            computeShadowFallOfPointLights( v_WorldPosition, shadowFallOffs );
+            if( shadowEnabled ){
+                computeShadowFallOfPointLights( v_WorldPosition, shadowFallOffs );
+            }
         #endif
         for(int i = 0; i < POINT_LIGHT_NUMBER; i++){
 
@@ -151,8 +148,10 @@ void main(){
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowFallOff = 1.0;
-            #if defined( SHADOWMAP_ENABLED ) && defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-                shadowFallOff = shadowFallOffs[ i ];
+            #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+                if( shadowEnabled ){
+                    shadowFallOff = shadowFallOffs[i];
+                }
             #endif
 
             diffuseColor += lightColor * ndl * attenuation * shadowFallOff;
@@ -163,9 +162,11 @@ void main(){
     #endif
 
     #ifdef DIRECTIONAL_LIGHT_NUMBER
-        #if defined( SHADOWMAP_ENABLED ) && defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+        #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
             float shadowFallOffs[DIRECTIONAL_LIGHT_NUMBER];
-            computeShadowFallOfDirectionalLights( v_WorldPosition, shadowFallOffs );
+            if( shadowEnabled ){
+                computeShadowFallOfDirectionalLights( v_WorldPosition, shadowFallOffs );
+            }
         #endif
         for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++){
 
@@ -181,8 +182,10 @@ void main(){
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowFallOff = 1.0;
-            #if defined( SHADOWMAP_ENABLED ) && defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-                shadowFallOff = shadowFallOffs[ i ];
+            #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+                if( shadowEnabled ){
+                    shadowFallOff = shadowFallOffs[i];
+                }
             #endif
 
             diffuseColor += lightColor * ndl * shadowFallOff;
@@ -192,9 +195,11 @@ void main(){
     #endif
 
     #ifdef SPOT_LIGHT_NUMBER
-        #if defined( SHADOWMAP_ENABLED ) && defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+        #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
             float shadowFallOffs[SPOT_LIGHT_NUMBER];
-            computeShadowFallOfSpotLights( v_WorldPosition, shadowFallOffs );
+            if( shadowEnabled ){
+                computeShadowFallOfSpotLights( v_WorldPosition, shadowFallOffs );
+            }
         #endif
         for(int i = 0; i < SPOT_LIGHT_NUMBER; i++){
             vec3 lightPosition = spotLightPosition[i];
@@ -235,8 +240,10 @@ void main(){
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowFallOff = 1.0;
-            #if defined( SHADOWMAP_ENABLED ) && defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-                shadowFallOff = shadowFallOffs[i];
+            #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+                if( shadowEnabled ){
+                    shadowFallOff = shadowFallOffs[i];
+                }
             #endif
 
             diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowFallOff;

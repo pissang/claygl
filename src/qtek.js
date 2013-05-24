@@ -28,6 +28,7 @@ define( function(require){
 			"Orthographic": require('3d/camera/orthographic'),
 			"Perspective": require('3d/camera/perspective')
 		},
+		"Compositor": require('3d/compositor'),
 		"compositor": {
 			"graph": {
 				"Graph": require('3d/compositor/graph/graph'),
@@ -59,8 +60,10 @@ define( function(require){
 		"Mesh": require('3d/mesh'),
 		"Node": require('3d/node'),
 		"plugin": {
-			"FirstPersonControl": require('3d/plugin/firstpersoncontrol'),
-			"ShadowMap": require('3d/plugin/shadowmap')
+			"FirstPersonControl": require('3d/plugin/firstpersoncontrol')
+		},
+		"prepass": {
+			"ShadowMap": require('3d/prepass/shadowmap')
 		},
 		"Renderer": require('3d/renderer'),
 		"Scene": require('3d/scene'),
@@ -81,12 +84,18 @@ define( function(require){
 		"Base": require('core/base'),
 		"Cache": require('core/cache'),
 		"Event": require('core/event'),
+		"Matrix3": require('core/matrix3'),
+		"Matrix4": require('core/matrix4'),
 		"mixin": {
 			"derive": require('core/mixin/derive'),
 			"Dirty": require('core/mixin/dirty'),
 			"notifier": require('core/mixin/notifier')
 		},
-		"requester": require('core/request')
+		"Quaternion": require('core/quaternion'),
+		"requester": require('core/request'),
+		"Vector2": require('core/vector2'),
+		"Vector3": require('core/vector3'),
+		"Vector4": require('core/vector4')
 	},
 	"loader": {
 		"three": {

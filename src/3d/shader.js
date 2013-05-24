@@ -150,16 +150,17 @@ define( function(require){
 			this.update();
 		},
 		setFragment : function(str){
-			this.fragment = str;
+			this.fragment = str;_caches
 			this.update();
 		},
 		bind : function( _gl ){
 
-			this.cache.use( _gl.__GUID__ + "_program" );
+			this.cache.use( _gl.__GUID__ , {
+				"locations" : {},
+				"attriblocations" : {}
+			} );
 
 			if( this.cache.get("dirty") || this.cache.miss("program") ){
-				// clean the uniform and attribute location cache
-				this.cache.clearContext();
 				
 				this._buildProgram( _gl, this._vertexProcessed, this._fragmentProcessed );
 			
@@ -170,7 +171,12 @@ define( function(require){
 		},
 		// Overwrite the dirty method
 		dirty : function(){
-			this.cache.clearAll();
+			for( var contextId in this.cache._caches){
+				var context = this.cache._caches[contextId];
+				context["dirty"] = true;
+				context["locations"] = {};
+				context["attriblocations"] = {};
+			}
 		},
 
 		update : function( force ){
@@ -254,12 +260,10 @@ define( function(require){
 
 		setUniform : function( _gl, type, symbol, value ){
 
-			this.cache.use( _gl.__GUID__ + "_program" );
 			var program = this.cache.get("program");			
 
-			this.cache.use( _gl.__GUID__ + "_uniformlocation");
-
-			var location = this.cache.get( symbol );
+			var locationsMap = this.cache.get( "locations" );
+			var location = locationsMap[symbol];
 			// Uniform is not existed in the shader
 			if( location === null){
 				return;
@@ -269,10 +273,10 @@ define( function(require){
 				// Unform location is a WebGLUniformLocation Object
 				// If the uniform not exist, it will return null
 				if( location === null  ){
-					this.cache.put( symbol, null );
+					locationsMap[symbol] = null;
 					return;
 				}
-				this.cache.put( symbol, location );
+				locationsMap[symbol] = location;
 			}
 			switch( type ){
 				case '1i':
@@ -367,11 +371,9 @@ define( function(require){
 		 */
 		enableAttributes : function( _gl, attribList ){
 			
-			this.cache.use( _gl.__GUID__ + "_program" );
 			var program = this.cache.get("program");
 
-			this.cache.use( _gl.__GUID__ + "_attriblocation");
-			var locationsMap = this.cache.getContext();
+			var locationsMap = this.cache.get("attriblocations");
 
 			if( typeof(attribList) === "string"){
 				attribList = Array.prototype.slice.call(arguments, 1);
@@ -429,23 +431,19 @@ define( function(require){
 					break;
 			}
 
-			this.cache.use( _gl.__GUID__ + "_program" );
 			var program = this.cache.get("program");			
 
-			this.cache.use( _gl.__GUID__ + "_attriblocation");
+			var locationsMap = this.cache.get("attriblocations");
+			var location = locationsMap[symbol];
 
-			var location = this.cache.get( symbol );
-
-			if( this.cache.miss(symbol) ){
+			if( typeof(location) === "undefined" ){
 				location = _gl.getAttribLocation( program, symbol );
 				// Attrib location is a number from 0 to ...
 				if( location === -1){
 					return;
 				}
-				this.cache.put( symbol, location );
+				locationsMap[symbol] = location;
 			}
-
-			this.cache.use( _gl.__GUID__ + "_attribenabled" );
 
 			_gl.vertexAttribPointer( location, size, glType, false, 0, 0 );
 		},
@@ -648,8 +646,6 @@ define( function(require){
 
 		_buildProgram : function(_gl, vertexShaderString, fragmentShaderString){
 
-			this.cache.use( _gl.__GUID__ + "_program" );
-
 			if( this.cache.get("program") ){
 				_gl.deleteProgram( this.cache.get("program") );
 			}
@@ -736,7 +732,7 @@ define( function(require){
 	Shader.source = function( name ){
 		var shaderStr = _source[name];
 		if( ! shaderStr ){
-			console.warn( 'Shader "' + name + '" not existed in library');
+			console.error( 'Shader "' + name + '" not existed in library');
 			return;
 		}
 		return shaderStr;

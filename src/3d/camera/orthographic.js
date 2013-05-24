@@ -1,12 +1,9 @@
 define( function(require){
 
-    var Camera = require('../camera'),
-        glMatrix = require('glmatrix'),
-        mat4 = glMatrix.mat4;
+    var Camera = require('../camera');
 
     var Orthographic = Camera.derive( function(){
         return {
-
             left : -1,
             right : 1,
             near : 0,
@@ -17,7 +14,7 @@ define( function(require){
     }, {
         
         updateProjectionMatrix : function(){
-            mat4.ortho( this.projectionMatrix, this.left, this.right, this.bottom, this.top, this.near, this.far );
+            this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
         }
     });
 

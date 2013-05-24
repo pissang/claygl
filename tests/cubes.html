@@ -29,7 +29,8 @@
                     shaderLibrary = qtek3d.shader.library;
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
                 });
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -60,34 +61,33 @@
                                 geometry : cube,
                                 material : material
                             });
-                            mesh.x(40-Math.random()*80);
-                            mesh.y(40-Math.random()*80);
-                            mesh.z(40-Math.random()*80);
+                            mesh.position.x = 40-Math.random()*80;
+                            mesh.position.y = 40-Math.random()*80;
+                            mesh.position.z = 40-Math.random()*80;
                             meshList.push( mesh );  
                         }
                     }
                 }
                 var root = new qtek3d.Node();
+                console.profile("merge");
                 var cubes = meshUtil.merge( meshList );
+                console.profileEnd("merge");
                 root.add(cubes);
                 scene.add(root);
 
-                camera.position = [0, 2, 10];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 2, 10);
+                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
 
                 var light = new qtek3d.light.Point({
                     color : [1.5, 1.5, 1.5]
                 })
-                light.position = [0, 0, 0];
+                light.position.set(0, 0, 0);
                 light.range = 30;
                 scene.add( light );
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    root.pitch( pitch );
-                    pitch += Math.PI/500;
+                    root.rotation.rotateY( Math.PI/500 );
                 }, 20);
             })
             

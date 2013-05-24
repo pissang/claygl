@@ -3,11 +3,11 @@ define( function(require){
 
     var Geometry = require('../geometry');
     var Plane = require('./plane');
-    var glMatrix = require('glmatrix');
-    var mat4 = glMatrix.mat4;
+    var Matrix4 = require('core/matrix4');
+    var Vector3 = require('core/vector3');
     var _ = require('_');
 
-    var planeMatrix = mat4.create();
+    var planeMatrix = new Matrix4();
     
     var Cube = Geometry.derive( function(){
 
@@ -52,7 +52,7 @@ define( function(require){
 
     function createPlane( pos, widthSegments, heightSegments ){
 
-        mat4.identity(planeMatrix);
+        planeMatrix.identity();
 
         var plane = new Plane({
             widthSegments : widthSegments,
@@ -61,27 +61,27 @@ define( function(require){
 
         switch( pos ){
             case "px":
-                mat4.translate( planeMatrix, planeMatrix, [1, 0, 0] );
-                mat4.rotateY( planeMatrix, planeMatrix, Math.PI/2 );
+                planeMatrix.translate(new Vector3(1, 0, 0) );
+                planeMatrix.rotateY( Math.PI/2 );
                 break;
             case "nx":
-                mat4.translate( planeMatrix, planeMatrix, [-1, 0, 0] );
-                mat4.rotateY( planeMatrix, planeMatrix, -Math.PI/2 );
+                planeMatrix.translate(new Vector3(-1, 0, 0) );
+                planeMatrix.rotateY( -Math.PI/2 );
                 break;
             case "py":
-                mat4.translate( planeMatrix, planeMatrix, [0, 1, 0] );
-                mat4.rotateX( planeMatrix, planeMatrix, -Math.PI/2 );
+                planeMatrix.translate(new Vector3(0, 1, 0) );
+                planeMatrix.rotateX( -Math.PI/2 );
                 break;
             case "ny":
-                mat4.translate( planeMatrix, planeMatrix, [0, -1, 0] );
-                mat4.rotateX( planeMatrix, planeMatrix, Math.PI/2 );
+                planeMatrix.translate(new Vector3(0, -1, 0) );
+                planeMatrix.rotateX( Math.PI/2 );
                 break;
             case "pz":
-                mat4.translate( planeMatrix, planeMatrix, [0, 0, 1] );
+                planeMatrix.translate(new Vector3(0, 0, 1) );
                 break;
             case "nz":
-                mat4.translate( planeMatrix, planeMatrix, [0, 0, -1] );
-                mat4.rotateY( planeMatrix, planeMatrix, Math.PI );
+                planeMatrix.translate(new Vector3(0, 0, -1) );
+                planeMatrix.rotateY( Math.PI );
                 break;
         }
         plane.applyMatrix( planeMatrix );

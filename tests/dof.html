@@ -21,41 +21,42 @@
 
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
+
                 var qtek3d = qtek['3d'],
                     Shader = qtek3d.Shader,
-                    _ = require("_");
+                    pp_Node = qtek3d.compositor.graph.Node,
+                    pp_SceneNode = qtek3d.compositor.graph.SceneNode,
+                    compositor = new qtek3d.compositor.graph.Graph;
+
+                var _ = require("_");
+
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-
                 var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
+                        far : 50
                     });
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.three.JSON({
                     textureRootPath : "assets/models/nanosuit/tex"
                 });
-                loader.on('load:texture', function(){
-                })
                 console.profile("parse");
                 var meshList = loader.parse(data);
                 console.profileEnd("parse");
                 
                 var shader = qtek3d.shader.library.get("buildin.lambert", "diffuseMap");
 
-                var material = new qtek3d.Material({
+                var groundMaterial = new qtek3d.Material({
                     shader : shader
                 });
-                // material.setUniform("lineWidth", 0.7);
-                material.setUniform("color", [0.2, 0.2, 0.2]);
-                // material.setUniform("lineColor", [0.7, 0.7, 0.7]);
+                groundMaterial.setUniform("color", [0.2, 0.2, 0.2]);
                 var image = new Image;
                 image.src = "assets/textures/ground_tile.jpg";
                 var texture = new qtek3d.texture.Texture2D({
@@ -66,9 +67,8 @@
                 image.onload = function(){
                     texture.dirty();
                 };
-                material.setUniform("diffuseMap", texture);
-                material.setUniform("uvRepeat", [10, 10]);
-
+                groundMaterial.setUniform("diffuseMap", texture);
+                groundMaterial.setUniform("uvRepeat", [10, 10]);
 
                 var root = new qtek3d.Node();
 
@@ -77,11 +77,11 @@
                     mesh.material.setUniform("shininess", 100);
                     mesh.material.shader.disableTexture("normalMap");
                     mesh.material.setUniform("specular", [0.6, 0.6, 0.6]);
-                    root.add(mesh);
+                    // root.add(mesh);
                 });
 
-                camera.position.set(0, 14, -14);
-                camera.lookAt( new qtek.core.Vector3(0, 6, 0) );
+                camera.position = [0, 14, 14];
+                camera.lookAt( [0, 6, 0] );
 
                 scene.add( root );
                 // Add Plane
@@ -91,53 +91,68 @@
                 });
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
-                    material : material,
-                    scale : new qtek.core.Vector3(60, 60, 60)
+                    material : groundMaterial,
+                    scale : [60, 60, 60]
                 });
-                planeMesh.position.y = -0.8;
-                planeMesh.rotation.rotateX(-Math.PI/2);
+                planeMesh.y(-0.8);
+                planeMesh.roll(-Math.PI/2);
                 root.add(planeMesh);
-                // Add cube
-                var cube = new qtek3d.geometry.Cube();
-                var cubeMaterial = new qtek3d.Material({
-                    shader : qtek3d.shader.library.get("buildin.lambert")
-                });
-                var cubeList = [];
-                for(var i = 0; i < 5; i++){
-                    for(var j = 0; j < 5; j++){
-                        var cubeMesh = new qtek3d.Mesh({
-                            geometry : cube,
-                            material : cubeMaterial,
-                            scale : new qtek.core.Vector3(2, 2, 2),
-                            position : new qtek.core.Vector3(20*Math.sin(Math.random()*3.14), 10*Math.random(), 20*Math.cos(Math.random()*3.14))
-                        });
-                        cubeList.push(cubeMesh);
-                    }
-                }
-                root.add( qtek3d.util.mesh.merge(cubeList) );
-                cubeMaterial.setUniform("color", [0.4, 0.4, 0.4]);
 
                 var light = new qtek3d.light.Directional({
                     intensity : 4.0,
-                    position : new qtek.core.Vector3(20, 14, -20)
+                    position : [20, 14, 20]
                 });
                 light.lookAt(root.position);
                 scene.add(light);
 
-                // var light2 = new qtek3d.light.Directional({
-                //     position : new qtek.core.Vector3(0, 10, -20),
-                //     intensity : 2.0
-                // });
-                // light2.lookAt(root.position);
-                // scene.add(light2);
+                // Post processing
+                var sceneNode = new pp_SceneNode({
+                    scene : scene,
+                    camera : camera,
+                    outputs : {
+                        "color" : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : {
+                                width : 512,
+                                height : 512
+                            }
+                        }
+                        // "depth" : {
+                        //     attachment : 'DEPTH_ATTACHMENT',
+                        //     parameters : {
+                        //         width : 512,
+                        //         height : 512,
+                        //         format : 'DEPTH_COMPONENT',
+                        //         type : 'UNSIGNED_SHORT'
+                        //     }
+                        // }
+                    }
+                });
+                var outputNode = new pp_Node({
+                    shader : Shader.source("buildin.compositor.linear_depth"),
+                    inputs : {
+                        "texture" : {
+                            node : sceneNode,
+                            pin : "depth"
+                        }
+                    }
+                });
+                // root.scale = [0.01, 0.01, 0.01];
+                outputNode.setParameters({
+                    far : camera.far,
+                    near : camera.near
+                })
 
-                var pitch = 0;
+                compositor.add( sceneNode );
+                compositor.add( outputNode );
+
+                // var pitch = 0;
 
                 setInterval( function(){
                     shadowMapPass.render( renderer, scene );
-                    renderer.render( scene, camera );
-                    // root.rotation.y = pitch;
-                    pitch += Math.PI/500;
+                    compositor.render( renderer );
+                    // root.pitch( pitch );
+                    // pitch += Math.PI/500;
                 }, 20);
             })
             

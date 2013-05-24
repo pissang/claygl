@@ -25,7 +25,7 @@
                     Shader = qtek3d.Shader,
                     pp_Node = qtek3d.compositor.graph.Node,
                     pp_SceneNode = qtek3d.compositor.graph.SceneNode,
-                    ppGraph = new qtek3d.compositor.graph.Graph;
+                    compositor = new qtek3d.compositor.graph.Graph;
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main")
@@ -38,8 +38,8 @@
                     }),
                     cube = new qtek3d.geometry.Cube;
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.vertex.lambert"),
-                    fragment : Shader.source("buildin.fragment.lambert")
+                    vertex : Shader.source("buildin.lambert.vertex"),
+                    fragment : Shader.source("buildin.lambert.fragment")
                 })
                 shader.enableTexture("diffuseMap");
                 var material = new qtek3d.Material({
@@ -59,17 +59,17 @@
 
                 scene.add( mesh );
 
-                camera.position = [0, 2, 2];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 2, 2);
+                camera.lookAt( new qtek.core.Vector3() );
 
                 var light = new qtek3d.light.Directional({
                     color : [1.5, 1.5, 1.5]
                 })
-                light.position = [50, 50, 50];
-                light.lookAt( [0, 0, 0] );
+                light.position.set(50, 50, 50);
+                light.lookAt( new qtek.core.Vector3() );
                 scene.add( light );
 
-                ppGraph.add(new pp_SceneNode({
+                compositor.add(new pp_SceneNode({
                     name : "scene",
                     scene : scene,
                     camera : camera,
@@ -84,7 +84,7 @@
                 }) );
                 var gaussian_h = new pp_Node({
                     name : "gaussian_h",
-                    shader : Shader.source("buildin.fragment.pp.gaussian_blur_h"),
+                    shader : Shader.source("buildin.compositor.gaussian_blur_h"),
                     inputs : {
                         "texture" : {
                             node : "scene",
@@ -102,7 +102,7 @@
                 })
                 var gaussian_v = new pp_Node({
                     name : "gaussian_v",
-                    shader : Shader.source("buildin.fragment.pp.gaussian_blur_v"),
+                    shader : Shader.source("buildin.compositor.gaussian_blur_v"),
                     inputs : {
                         "texture" : {
                             node : "gaussian_h",
@@ -111,15 +111,13 @@
                     },
                     outputs : null
                 })
-                ppGraph.add( gaussian_v );
-                ppGraph.add( gaussian_h );
-
-                var pitch = 0;
+                compositor.add( gaussian_v );
+                compositor.add( gaussian_h );
 
                 setInterval( function(){
-                    ppGraph.render( renderer );
-                    mesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    compositor.render( renderer );
+
+                    mesh.rotation.rotateY(Math.PI/500);
                 }, 20 )
             })
             

@@ -116,8 +116,15 @@ define( function(require) {
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
             attachment = attachment || 'COLOR_ATTACHMENT0';
             if( attachment === 'DEPTH_ATTACHMENT' ){
-                if( ! _gl.getExtension("WEBKIT_WEBGL_depth_texture") ||
-                    _gl.getExtension("MOZ_WEBGL_depth_texture") ){
+
+                var extension = this._depthTextureExtension;
+                if( typeof(extension) === "undefined"){
+                    extension = _gl.getExtension("WEBKIT_WEBGL_depth_texture") ||
+                                _gl.getExtension("MOZ_WEBGL_depth_texture")
+                }
+                this._depthTextureExtension = extension;
+                
+                if( !extension ){
                     console.error( " Depth texture is not supported by browser ");
                     return;
                 }
@@ -130,17 +137,13 @@ define( function(require) {
             }
 
             this._attachedTextures[ attachment ] = texture;
-
+            
             _gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl[ attachment ], _gl[ target ], texture.getWebGLTexture( _gl ), 0)
 
             _gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
         },
 
         detach : function(){},
-
-        detachDepth : function(){
-            this.cache.put("depth_texture", false);
-        },
 
         dispose : function( _gl ){
 

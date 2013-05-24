@@ -38,8 +38,8 @@
                     }),
                     cube = new qtek3d.geometry.Cube;
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.vertex.lambert"),
-                    fragment : Shader.source("buildin.fragment.lambert")
+                    vertex : Shader.source("buildin.lambert.vertex"),
+                    fragment : Shader.source("buildin.lambert.fragment")
                 })
                 shader.enableTexture("diffuseMap");
                 var material = new qtek3d.Material({
@@ -59,14 +59,14 @@
 
                 scene.add( mesh );
 
-                camera.position = [0, 2, 2];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 2, 2);
+                camera.lookAt( new qtek.core.Vector3() );
 
                 var light = new qtek3d.light.Directional({
                     color : [1.5, 1.5, 1.5]
                 })
-                light.position = [50, 50, 50];
-                light.lookAt( [0, 0, 0] );
+                light.position.set(50, 50, 50);
+                light.lookAt( new qtek.core.Vector3() );
                 scene.add( light );
 
                 ppGraph.add(new pp_SceneNode({
@@ -84,7 +84,7 @@
                 }) );
                 var colorAdjustNode = new pp_Node({
                     name : "coloradjust",
-                    shader : Shader.source("buildin.fragment.pp.coloradjust"),
+                    shader : Shader.source("buildin.compositor.coloradjust"),
                     inputs : {
                         "texture" : {
                             node : "scene",
@@ -96,12 +96,10 @@
                 colorAdjustNode.setParameter("gamma", 1.3);
                 ppGraph.add( colorAdjustNode );
 
-                var pitch = 0;
-
                 setInterval( function(){
                     ppGraph.render( renderer );
-                    mesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    
+                    mesh.rotation.rotateY(Math.PI/500);
                 }, 20 )
             })
             

@@ -1,4 +1,4 @@
-@export buildin.pp.coloradjust.fragment
+@export buildin.compositor.coloradjust
 
 varying vec2 v_Texcoord;
 uniform sampler2D texture;

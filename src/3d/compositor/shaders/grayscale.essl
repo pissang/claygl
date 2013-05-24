@@ -1,5 +1,5 @@
 
-@export buildin.pp.grayscale.fragment
+@export buildin.compositor.grayscale
 
 varying vec2 v_Texcoord;
 
@@ -14,3 +14,5 @@ void main()
 
     gl_FragColor = vec4(vec3(luminance), tex.a);
 }
+
+@end

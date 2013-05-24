@@ -14,8 +14,13 @@ void main(){
 
 uniform float far : 1000.0;
 uniform float near : 0.1;
+
 void main(){
 
+    float q = far / (far - near);
+    float depth = near * q /( q - gl_FragCoord.z);
+
+    gl_FragColor = depth;
 }
 @end
 

@@ -30,9 +30,10 @@ define( function(require){
             var geometry = this.geometry;
 
             var glDrawMode = _gl[ this.mode.toUpperCase() ];
-
+            
             //Draw each chunk
             var chunks = geometry.getBufferChunks( _gl );
+            
 
             for( var c = 0; c < chunks.length; c++){
                 currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__ + "_" + c;

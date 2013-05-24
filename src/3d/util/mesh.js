@@ -49,44 +49,37 @@ define( function( require ){
 
 
             var faceOffset = 0,
-                useFaces = templateGeo.faces.length !== 0,
-                vertexCount,
-                currentGeo,
-                currentAttr,
-                targetAttr,
-                newValue,
-                i, len, newFace, face,
-                mesh;
+                useFaces = templateGeo.faces.length !== 0;
                 
             for( var k = 0; k < meshes.length; k++){
-                mesh = meshes[k];
-                currentGeo = mesh.geometry;
+                var mesh = meshes[k];  
+                var currentGeo = mesh.geometry;
 
                 mesh.updateMatrix();
-                vertexCount = currentGeo.getVerticesNumber();
+                var vertexCount = currentGeo.getVerticesNumber();
 
                 for(var name in currentGeo.attributes ){
 
-                    currentAttr = currentGeo.attributes[name];
-                    targetAttr = geometry.attributes[name];
+                    var currentAttr = currentGeo.attributes[name];
+                    var targetAttr = geometry.attributes[name];
                     // Skip the unused attributes;
                     if( ! currentAttr.value.length ){
                         continue;
                     }
-                    for(i = 0; i < vertexCount; i++){
+                    for(var i = 0; i < vertexCount; i++){
 
                         // Transform position, normal and tangent
                         if( name === "position" ){
-                            newValue = cloneValue(currentAttr.value[i]);
-                            vec3.transformMat4(newValue, newValue, mesh.matrix);
+                            var newValue = cloneValue(currentAttr.value[i]);
+                            vec3.transformMat4(newValue, newValue, mesh.matrix._array);
                             targetAttr.value.push( newValue );   
                         }
                         else if( name === "normal" ){
-                            newValue = cloneValue(currentAttr.value[i]);
+                            var newValue = cloneValue(currentAttr.value[i]);
                             targetAttr.value.push( newValue );
                         }
                         else if( name === "tangent" ){
-                            newValue = cloneValue(currentAttr.value[i]);
+                            var newValue = cloneValue(currentAttr.value[i]);
                             targetAttr.value.push( newValue );
                         }else{
                             targetAttr.value.push( cloneValue(currentAttr.value[i]) );
@@ -96,10 +89,10 @@ define( function( require ){
                 }
 
                 if( useFaces ){
-                    len = currentGeo.faces.length;
+                    var len = currentGeo.faces.length;
                     for(i =0; i < len; i++){
-                        newFace = [];
-                        face = currentGeo.faces[i];
+                        var newFace = [];
+                        var face = currentGeo.faces[i];
                         newFace[0] = face[0] + faceOffset;
                         newFace[1] = face[1] + faceOffset;
                         newFace[2] = face[2] + faceOffset;

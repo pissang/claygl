@@ -9,6 +9,7 @@ define( function(require){
     var Mesh = require('../mesh');
     var Scene = require('../scene');
     var vertexShaderString = require("text!./shaders/vertex.essl");
+    var Texture = require('../texture');
 
     var planeGeo = new Plane();
     var mesh = new Mesh({
@@ -24,7 +25,7 @@ define( function(require){
             // Fragment shader string
             fragment : "",
 
-            output : null,
+            outputs : null,
 
             _material : null
 
@@ -56,9 +57,16 @@ define( function(require){
 
         bind : function( renderer, frameBuffer ){
             
-            if( this.output ){
-
-                frameBuffer.attach( renderer.gl, this.output );
+            if( this.outputs ){
+                if( this.outputs.instanceof &&
+                    this.outputs.instanceof(Texture) ){
+                    frameBuffer.attach( renderer.gl, this.outputs )
+                }else{
+                    for( var attachment in this.outputs){
+                        var texture = this.outputs[attachment];
+                        frameBuffer.attach( renderer.gl, texture, attachment );
+                    }   
+                }
                 frameBuffer.bind( renderer );
             }
         },
@@ -74,7 +82,9 @@ define( function(require){
             if( frameBuffer ){
                 this.bind( renderer, frameBuffer );
             }
-            renderer.render( scene, camera );
+
+            renderer.render( scene, camera, true );
+
             if( frameBuffer ){
                 this.unbind( renderer, frameBuffer );
             }
@@ -84,6 +94,8 @@ define( function(require){
     // Some build in shaders
     Shader.import( require('text!./shaders/coloradjust.essl') );
     Shader.import( require('text!./shaders/blur.essl') );
+    Shader.import( require('text!./shaders/grayscale.essl') );
+    Shader.import( require('text!./shaders/lineardepth.essl') );
 
     return Pass;
 } )

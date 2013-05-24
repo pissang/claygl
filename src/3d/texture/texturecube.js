@@ -41,8 +41,8 @@ define( function(require){
 
 			this.beforeUpdate( _gl );
 
-			var glFormat = _gl[ this.format.upperCase() ],
-				glType = _gl[ this.type.upperCase() ];
+			var glFormat = _gl[ this.format.toUpperCase() ],
+				glType = _gl[ this.type.toUpperCase() ];
 
 			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl[ this.wrapS.toUpperCase() ] );
 			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl[ this.wrapT.toUpperCase() ] );
@@ -84,12 +84,32 @@ define( function(require){
 			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 		},
 		// Overwrite the isPowerOfTwo method
-		isPowerOfTwo : function( image){
-			return isPowerOfTwo( image.px.width ) &&
-					isPowerOfTwo( image.px.height );
+		isPowerOfTwo : function(){
+			if( this.image.px ){
+				return isPowerOfTwo( this.image.px.width ) &&
+						isPowerOfTwo( this.image.px.height );
+            }else{
+            	return isPowerOfTwo( this.width ) &&
+						isPowerOfTwo( this.height );
+            }
+
 			function isPowerOfTwo( value ){
 				return value & (value-1) === 0
 			}
+		},
+		isRenderable : function(){
+			if( this.image.px ){
+				return this.image.px.complete &&
+						this.image.nx.complete &&
+						this.image.py.complete &&
+						this.image.ny.complete &&
+						this.image.pz.complete &&
+						this.image.nz.complete;
+			}else{
+				return this.width && this.height;
+			}
 		}
-	})
+	});
+
+	return TextureCube;
 } )

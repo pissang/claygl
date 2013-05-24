@@ -54,6 +54,7 @@ define( function(require){
         bind : function( _gl ){
 
             var slot = 0;
+
             // Set uniforms
             _.each( this.uniforms, function( uniform, symbol ){
                 // Only set the none-semantic uniform
@@ -68,8 +69,12 @@ define( function(require){
                     uniform.value.instanceof( Texture) ){
                 
                     var texture = uniform.value;
+                    // Maybe texture is not loaded yet;
+                    if( ! texture.isRenderable() ){
+                        return;
+                    }
 
-                    _gl.activeTexture( _gl['TEXTURE' + slot] );
+                    _gl.activeTexture( _gl.TEXTURE0 + slot );
                     texture.bind( _gl );
 
                     this.shader.setUniform( _gl, '1i', symbol, slot );
@@ -87,7 +92,12 @@ define( function(require){
                         var res = [];
                         for( var i = 0; i < uniform.value.length; i++){
                             var texture = uniform.value[i];
-                            _gl.activeTexture( _gl['TEXTURE'+slot] );
+                            // Maybe texture is not loaded yet;
+                            if( ! texture.isRenderable() ){
+                                continue;
+                            }
+
+                            _gl.activeTexture( _gl.TEXTURE0 + slot );
                             texture.bind(_gl);
 
                             res.push(slot++);

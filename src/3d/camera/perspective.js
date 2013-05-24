@@ -1,8 +1,6 @@
 define( function(require){
 
-	var Camera = require('../camera'),
-		glMatrix = require('glmatrix'),
-		mat4 = glMatrix.mat4;
+	var Camera = require('../camera');
 
 
 	var Perspective = Camera.derive( function(){
@@ -20,7 +18,7 @@ define( function(require){
 		
 		updateProjectionMatrix : function(){
 			var rad = this.fov / 180 * Math.PI;
-			mat4.perspective( this.projectionMatrix, rad, this.aspect, this.near, this.far );
+			this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
 		}
 	});
 

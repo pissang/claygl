@@ -42,7 +42,7 @@ define( function(require){
 
             if( this.image ){
                 // After image is loaded
-                if( this.image.width )
+                if( this.image.complete )
                     _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, this.image );
             }
             // Can be used as a blank texture when writing render to texture(RTT)
@@ -50,7 +50,7 @@ define( function(require){
                 _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
             }           
         
-            if( ! this.NPOT && this.generateMipmaps  ){
+            if( ! this.NPOT && this.generateMipmaps ){
                 _gl.generateMipmap( _gl.TEXTURE_2D );
             }
             
@@ -58,6 +58,26 @@ define( function(require){
 
         },
         
+        isPowerOfTwo : function(){
+            if( this.image ){
+                var width = this.image.width,
+                    height = this.image.height;   
+            }else{
+                var width = this.width,
+                    height = this.height;
+            }
+            return ( width & (width-1) ) === 0 &&
+                    ( height & (height-1) ) === 0;
+        },
+
+        isRenderable : function(){
+            if( this.image ){
+                return this.image.complete;
+            }else{
+                return this.width && this.height;
+            }
+        },
+
         bind : function( _gl ){
             _gl.bindTexture( _gl.TEXTURE_2D, this.getWebGLTexture(_gl) );
         },

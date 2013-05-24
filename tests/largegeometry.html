@@ -41,8 +41,8 @@
                 sphere.generateBarycentric();
 
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.vertex.wireframe"),
-                    fragment : Shader.source("buildin.fragment.wireframe")
+                    vertex : Shader.source("buildin.wireframe.vertex"),
+                    fragment : Shader.source("buildin.wireframe.fragment")
                 })
                 var material = new qtek3d.Material({
                     shader : shader,
@@ -50,8 +50,8 @@
                 })
                 material.setUniform("width", 2);
 
-                camera.position = [0, 1, 2];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 1, 2);
+                camera.lookAt( scene.position );
 
                 var sphereMesh = new qtek3d.Mesh({
                     geometry : sphere,
@@ -59,12 +59,9 @@
                 });
                 scene.add( sphereMesh );
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    sphereMesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    sphereMesh.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
             

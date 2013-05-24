@@ -37,8 +37,8 @@
                     }),
                     cube = new qtek3d.geometry.Cube;
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.vertex.phong"),
-                    fragment : Shader.source("buildin.fragment.phong")
+                    vertex : Shader.source("buildin.phong.vertex"),
+                    fragment : Shader.source("buildin.phong.fragment")
                 })
                 shader.enableTexture("diffuseMap");
                 var material = new qtek3d.Material({
@@ -58,13 +58,13 @@
 
                 scene.add( mesh );
 
-                camera.position = [0, 1.5, 3];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 1.5, 3);
+                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
 
                 var light = new qtek3d.light.Point({
                     color : [1.5, 1.5, 1.5]
                 })
-                light.position = [0, 0, 3];
+                light.position.set(0, 0, 3);
                 scene.add( light );
 
                 var frameBuffer = new FrameBuffer();
@@ -89,8 +89,6 @@
 
                 var orthCamera = new qtek3d.camera.Orthographic();
 
-                var pitch = 0;
-
                 setInterval( function(){
                     frameBuffer.bind( renderer );
                     renderer.render( scene, camera );
@@ -98,8 +96,7 @@
 
                     renderer.render( rttScene, orthCamera );
                     
-                    mesh.pitch( pitch );
-                    pitch += Math.PI/500;
+                    mesh.rotation.rotateY(Math.PI/500);
 
                 }, 20)
             })

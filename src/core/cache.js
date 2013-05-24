@@ -11,10 +11,16 @@ define( function(){
 
     Cache.prototype = {
 
-        use : function( contextId ){
+        use : function( contextId, documentSchema ){
 
             if( ! this._caches.hasOwnProperty( contextId ) ){
                 this._caches[ contextId ] = {};
+
+                if( documentSchema){
+                    for(var name in documentSchema){
+                        this._caches[contextId][ name ] = documentSchema[name];
+                    }   
+                }
             }
             this._contextId = contextId;
 

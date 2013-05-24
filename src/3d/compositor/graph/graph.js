@@ -55,11 +55,15 @@ define( function( require ){
 
         findPin : function( info ){
             var node;
-            for( var i = 0; i < this._nodes.length; i++){
-                var tmp = this._nodes[i];
-                if( tmp.name === info.node ){
-                    node = tmp;
+            if( typeof(info.node) === 'string'){
+                for( var i = 0; i < this._nodes.length; i++){
+                    var tmp = this._nodes[i];
+                    if( tmp.name === info.node ){
+                        node = tmp;
+                    }
                 }
+            }else{
+                node = info.node;
             }
             if( node ){
                 if( node.outputs[info.pin] ){

@@ -11,7 +11,7 @@
              }
     outputs : {
                 diffuse : {
-                    attach : "COLOR_ATTACHMENT0"
+                    attachment : "COLOR_ATTACHMENT0"
                     parameters : {
                         format : "RGBA",
                         width : 512,
@@ -23,6 +23,7 @@
    }
  * Multiple outputs is reserved for MRT support
  *
+ * TODO blending 
  */
 define( function( require ){
 
@@ -46,16 +47,16 @@ define( function( require ){
             
             outputs : null,
             // Example:
-            // {
+            // inputName : {
             //  node : [Node],
             //  pin : 'xxxx'    
             // }
             _inputLinks : {},
             // Example:
-            // {
+            // outputName : [{
             //  node : [Node],
             //  pin : 'xxxx'    
-            // }
+            // }]
             _outputLinks : {},
 
             _textures : {},
@@ -76,21 +77,36 @@ define( function( require ){
         }
     }, {
 
-        render : function( renderer, texture ){
+        render : function( renderer ){
 
             for( var inputName in this._inputLinks ){
                 var link = this._inputLinks[inputName];
                 var inputTexture = link.node.getOutput( renderer, link.pin );
                 this.pass.setUniform( inputName, inputTexture );
             }
-
-            if( texture ){
-                this.pass.output = texture;
-                this.pass.render( renderer, frameBuffer );
-            }else{
+            // Output
+            if( ! this.outputs){
+                this.pass.outputs = null;
                 this.pass.render( renderer );
             }
+            else{
+                this.pass.outputs = {};
 
+                for( var name in this.outputs){
+
+                    var outputInfo = this.outputs[name];
+
+                    var texture = texturePool.get( outputInfo.parameters );
+                    this._textures[name] = texture;
+
+                    var attachment = outputInfo.attachment || 'COLOR_ATTACHMENT0';
+                    this.pass.outputs[ attachment ] = texture;
+
+                }
+
+                this.pass.render( renderer, frameBuffer );
+            }
+            
             for( var inputName in this._inputLinks ){
                 var link = this._inputLinks[inputName];
                 link.node.removeReference( link.pin );
@@ -99,6 +115,12 @@ define( function( require ){
 
         setParameter : function( name, value ){
             this.pass.setUniform( name, value );
+        },
+
+        setParameters : function(obj){
+            for(var name in obj){
+                this.setParameter(name, obj[name]);
+            }
         },
 
         getOutput : function( renderer, name ){
@@ -110,12 +132,10 @@ define( function( require ){
                 // Already been rendered in this frame
                 return this._textures[name];
             }
-            var texture = texturePool.get( outputInfo.parameters );
-            this._textures[name] = texture;
 
-            this.render( renderer, texture );
+            this.render( renderer );
             
-            return texture;
+            return this._textures[name];
         },
 
         removeReference : function( name ){

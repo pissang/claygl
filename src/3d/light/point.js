@@ -27,7 +27,7 @@ define( function(require){
 			'pointLightPosition' : {
 				type : '3f',
 				value : function( instance ){
-					return instance.getWorldPosition();
+					return instance.getWorldPosition()._array;
 				}
 			},
 			'pointLightRange' : {

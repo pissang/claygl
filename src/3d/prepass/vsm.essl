@@ -1,0 +1,220 @@
+/**
+ *  Variance Shadow Mapping
+ * http://www.punkuser.net/vsm/vsm_paper.pdf
+ * http://developer.download.nvidia.com/SDK/10/direct3d/Source/VarianceShadowMapping/Doc/VarianceShadowMapping.pdf
+ */
+@export buildin.vsm.depth.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+varying vec4 v_ViewPosition;
+void main(){
+
+    v_ViewPosition = worldViewProjection * vec4( position, 1.0 );
+    gl_Position = worldViewProjection * vec4( position , 1.0 );
+
+}
+@end
+
+
+@export buildin.vsm.depth.fragment
+
+varying vec4 v_ViewPosition;
+
+void main(){
+    float z = v_ViewPosition.z / v_ViewPosition.w;
+
+    gl_FragColor = vec4(z, z*z, 0.0, 0.0);
+}
+@end
+
+// Point light shadow mapping
+// http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
+@export buildin.vsm.distance.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 world : WORLD;
+
+attribute vec3 position : POSITION;
+
+varying vec3 v_WorldPosition;
+
+void main(){
+
+    gl_Position = worldViewProjection * vec4( position , 1.0 );
+    v_WorldPosition = ( world * vec4(position, 1.0) ).xyz;
+}
+
+@end
+
+@export buildin.vsm.distance.fragment
+
+uniform vec3 lightPosition;
+
+varying vec3 v_WorldPosition;
+
+void main(){
+
+    float dist = distance(lightPosition, v_WorldPosition);
+
+    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
+}
+@end
+
+
+@export buildin.plugin.compute_shadow_map
+
+#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+
+#ifdef SPOT_LIGHT_SHADOWMAP_NUMBER
+uniform sampler2D spotLightShadowMap[ SPOT_LIGHT_SHADOWMAP_NUMBER ];
+uniform mat4 spotLightMatrix[ SPOT_LIGHT_SHADOWMAP_NUMBER ]; 
+#endif
+
+#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
+uniform sampler2D directionalLightShadowMap[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
+uniform mat4 directionalLightMatrix[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
+#endif
+
+#ifdef POINT_LIGHT_SHADOWMAP_NUMBER
+uniform samplerCube pointLightShadowMap[ POINT_LIGHT_SHADOWMAP_NUMBER ];
+#endif
+
+uniform bool shadowEnabled : true;
+
+#if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+
+vec4 vsmBoxFilter(sampler2D texture, vec2 uv){
+    vec4 tex = texture2D(texture, uv);
+    float offset = 1.0/512.0;
+    tex += texture2D(texture, uv+vec2(offset, 0.0) );
+    tex += texture2D(texture, uv+vec2(offset, offset) );
+    tex += texture2D(texture, uv+vec2(-offset, offset) );
+    tex += texture2D(texture, uv+vec2(0.0, offset) );
+    tex += texture2D(texture, uv+vec2(-offset, 0.0) );
+    tex += texture2D(texture, uv+vec2(-offset, -offset) );
+    tex += texture2D(texture, uv+vec2(offset, -offset) );
+    tex += texture2D(texture, uv+vec2(0.0, -offset) );
+
+    tex /= 9.0;
+    return tex;
+}
+
+float computeShadowFalloff( sampler2D map, mat4 lightVPM, vec3 position){
+    vec4 posInLightSpace = ( lightVPM * vec4(position, 1.0) );
+    posInLightSpace.xyz /= posInLightSpace.w;
+
+    float z = posInLightSpace.z;
+    // In frustum
+    if( all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
+        all(lessThan(posInLightSpace.xyz, vec3(1.0))) ){
+        
+        // To texture uv
+        vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
+        // vec2 moments = texture2D( map, uv ).xy;
+        vec2 moments = vsmBoxFilter( map, uv ).xy;
+        
+        float variance = moments.y - moments.x * moments.x;
+
+        float mD = moments.x - z;
+        float p = variance / (variance + mD * mD);
+
+        if(moments.x + 0.002 < z){
+            return clamp(p, 0.0, 1.0);
+        }else{
+            return 1.0;
+        }
+    }
+    return 1.0;
+}
+
+#endif
+
+#ifdef POINT_LIGHT_SHADOWMAP_NUMBER
+
+vec4 vsmBoxFilterCube(samplerCube texture, vec3 direction){
+    vec4 tex = textureCube(texture, direction);
+    float offset = 0.05;
+    tex += textureCube(texture, direction + vec3(offset, 0.0, 0.0) );
+    tex += textureCube(texture, direction + vec3(offset, offset, 0.0) );
+    tex += textureCube(texture, direction + vec3(-offset, offset, 0.0) );
+    tex += textureCube(texture, direction + vec3(0.0, offset, 0.0) );
+    tex += textureCube(texture, direction + vec3(-offset, 0.0, 0.0) );
+    tex += textureCube(texture, direction + vec3(-offset, -offset, 0.0) );
+    tex += textureCube(texture, direction + vec3(offset, -offset, 0.0) );
+    tex += textureCube(texture, direction + vec3(0.0, -offset, 0.0) );
+
+    tex /= 9.0;
+    return tex;
+}
+
+float computeShadowFallOfCube( samplerCube map, vec3 direction ){
+    
+    vec2 moments = vsmBoxFilterCube( map, direction).xy;
+
+    float variance = moments.y - moments.x * moments.x;
+
+    float dist = length(direction);
+    float mD = moments.x - dist;
+    float p = variance / (variance + mD * mD);
+
+    if(moments.x + 0.002 < dist){
+        return clamp(p, 0.0, 1.0);
+    }else{
+        return 1.0;
+    }
+}
+
+#endif
+
+#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfSpotLights( vec3 position, inout float shadowFalloffs[SPOT_LIGHT_NUMBER]  ){
+    for( int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowFalloff = computeShadowFalloff( spotLightShadowMap[i], spotLightMatrix[i], position );
+        shadowFalloffs[ i ] = shadowFalloff;
+    }
+    // set default fallof of rest lights
+    for( int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+}
+
+#endif
+
+
+#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfPointLights( vec3 position, inout float shadowFalloffs[POINT_LIGHT_NUMBER]  ){
+    for( int i = 0; i < POINT_LIGHT_SHADOWMAP_NUMBER; i++){
+        vec3 lightPosition = pointLightPosition[i];
+        vec3 direction = position - lightPosition;
+        shadowFalloffs[ i ] = computeShadowFallOfCube( pointLightShadowMap[i], direction );
+    }
+    for( int i = POINT_LIGHT_SHADOWMAP_NUMBER; i < POINT_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+}
+
+#endif
+
+
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+
+void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFalloffs[DIRECTIONAL_LIGHT_NUMBER] ){
+    for( int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowFalloff = computeShadowFalloff( directionalLightShadowMap[i], directionalLightMatrix[i], position );
+        shadowFalloffs[ i ] = shadowFalloff;
+    }
+    // set default fallof of rest lights
+    for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+        shadowFalloffs[i] = 1.0;
+    }
+}
+
+#endif
+
+#endif
+
+@end

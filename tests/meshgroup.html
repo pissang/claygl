@@ -64,8 +64,8 @@
                 for(var i = 0; i < 5; i++){
                     for(var j = 0; j < 5; j++){
                         var node = cloneNode(nodeTpl);
-                        node.x(20-i*10);
-                        node.z(20-j*10);
+                        node.position.x = 20-i*10;
+                        node.position.z = 20-j*10;
                         root.add( node );
                     }
                 }
@@ -82,8 +82,8 @@
                     return node;
                 }
 
-                camera.position = [0, 20, 40];
-                camera.lookAt( [0, 0, 0] );
+                camera.position.set(0, 20, 40);
+                camera.lookAt( scene.position );
 
                 scene.add( root );
                 // Add Plane
@@ -96,24 +96,22 @@
                     geometry : plane,
                     material : material
                 });
-                planeMesh.scale = [60, 60, 60];
-                planeMesh.y(-1);
-                planeMesh.roll(-Math.PI/2);
+                planeMesh.scale.set(60, 60, 60);
+                planeMesh.position.y = -1;
+                planeMesh.rotation.x = -Math.PI/2;
                 root.add(planeMesh);
 
                 var light = new qtek3d.light.Directional();
                 light.intensity = 4.0;
-                light.position = [10, 10, 10];
+                light.position.set(10, 10, 10);
                 light.lookAt(root.position);
                 scene.add(light);
                 scene.add(new qtek3d.light.Ambient());
 
-                var pitch = 0;
-
                 setInterval( function(){
                     renderer.render( scene, camera );
-                    root.pitch( pitch );
-                    pitch += Math.PI/500;
+                    
+                    root.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
             
