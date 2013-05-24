@@ -131,13 +131,10 @@
                 // light2.lookAt(root.position);
                 // scene.add(light2);
 
-                var pitch = 0;
-
                 setInterval( function(){
                     shadowMapPass.render( renderer, scene );
                     renderer.render( scene, camera );
-                    // root.rotation.y = pitch;
-                    pitch += Math.PI/500;
+                    root.rotate(new qtek.core.Vector3(0,0,0), 0.01);
                 }, 20);
             })
             

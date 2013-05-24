@@ -159,7 +159,7 @@ float computeShadowFallOfCube( samplerCube map, vec3 direction ){
     float mD = moments.x - dist;
     float p = variance / (variance + mD * mD);
 
-    if(moments.x + 0.002 < dist){
+    if(moments.x + 0.001 < dist){
         return clamp(p, 0.0, 1.0);
     }else{
         return 1.0;

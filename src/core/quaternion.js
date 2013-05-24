@@ -72,18 +72,23 @@ define( function(require){
 
         add : function(b){
             quat.add( this._array, this._array, b._array );
+            this._dirty = true;
             return this;
         },
 
         calculateW : function(){
             quat.calculateW(this._array, this._array);
+            this._dirty = true;
+            return this;
         },
 
         set : function(x, y, z, w){
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            this._array[0] = x;
+            this._array[1] = y;
+            this._array[2] = z;
+            this._array[3] = w;
+            this._dirty = true;
+            return this;
         },
 
         clone : function(){
@@ -96,11 +101,13 @@ define( function(require){
          */
         conjugate : function(){
             quat.conjugate(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
         copy : function(b){
             quat.copy( this._array, b._array );
+            this._dirty = true;
             return this;
         },
 
@@ -110,6 +117,7 @@ define( function(require){
 
         fromMat3 : function(m){
             quat.fromMat3(this._array, m._array);
+            this._dirty = true;
             return this;
         },
 
@@ -121,17 +129,20 @@ define( function(require){
                 // Not like mat4, mat3 in glmatrix seems to be row-based
                 mat3.transpose(m3, m3);
                 quat.fromMat3(this._array, m3);
+                this._dirty = true;
                 return this;
             }
         })(),
 
         identity : function(){
             quat.identity(this._array);
+            this._dirty = true;
             return this;
         },
 
         invert : function(){
             quat.invert(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -148,38 +159,50 @@ define( function(require){
          */
         lerp : function(a, b, t){
             quat.lerp(this._array, a._array, b._array, t);
+            this._dirty = true;
             return this;
         },
 
         mul : function(b){
             quat.mul(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         multiply : function(b){
             quat.multiply(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         normalize : function(){
             quat.normalize(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
         rotateX : function(rad){
-            quat.rotateX(this._array, this._array, rad);
+            quat.rotateX(this._array, this._array, rad); 
+            this._dirty = true;
+            return this;
         },
 
         rotateY : function(rad){
             quat.rotateY(this._array, this._array, rad);
+            this._dirty = true;
+            return this;
         },
 
         rotateZ : function(rad){
             quat.rotateZ(this._array, this._array, rad);
+            this._dirty = true;
+            return this;
         },
 
         setAxisAngle : function(axis /*Vector3*/, rad){
             quat.setAxisAngle(this._array, axis._array, rad);
+            this._dirty = true;
+            return this;
         },
 
         sqrLen : function(){

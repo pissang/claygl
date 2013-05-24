@@ -72,14 +72,17 @@ define( function(require){
 
         add : function(b){
             vec4.add( this._array, this._array, b._array );
+            this._dirty = true;
             return this;
         },
 
         set : function(x, y, z, w){
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            this._array[0] = x;
+            this._array[1] = y;
+            this._array[2] = z;
+            this._array[3] = w;
+            this._dirty = true;
+            return this;
         },
 
         clone : function(){
@@ -88,6 +91,7 @@ define( function(require){
 
         copy : function(b){
             vec4.copy( this._array, b._array );
+            this._dirty = true;
             return this;
         },
 
@@ -106,11 +110,14 @@ define( function(require){
 
         div : function(b){
             vec4.div(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         divide : function(b){
-            return vec4.divide(this._array, this._array, b._array);
+            vec4.divide(this._array, this._array, b._array);
+            this._dirty = true;
+            return this;
         },
 
         dot : function(b){
@@ -129,36 +136,43 @@ define( function(require){
          */
         lerp : function(a, b, t){
             vec4.lerp(this._array, a._array, b._array, t);
+            this._dirty = true;
             return this;
         },
 
         mul : function(b){
             vec4.mul(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         multiply : function(b){
             vec4.multiply(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         negate : function(){
             vec4.negate(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
         normalize : function(){
             vec4.normalize(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
         random : function(scale){
             vec4.random(this._array, scale);
+            this._dirty = true;
             return this;
         },
 
         scale : function(s){
             vec4.scale(this._array, this._array, s);
+            this._dirty = true;
             return this;
         },
         /**
@@ -166,6 +180,7 @@ define( function(require){
          */
         scaleAndAdd : function(b, s){
             vec4.scaleAndAdd(this._array, this._array, b._array, s);
+            this._dirty = true;
             return this;
         },
 
@@ -186,22 +201,26 @@ define( function(require){
         },
 
         sub : function(b){
-            vec4.sub(this._array, b._array);
+            vec4.sub(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
-        substract : function(b){
-            vec4.substract(this._array, b._array);
+        subtract : function(b){
+            vec4.subtract(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
         transformMat4 : function(m){
             vec4.transformMat4(this._array, this._array, m._array);
+            this._dirty = true;
             return this;
         },
 
         transformQuat : function(q){
             vec4.transformQuat(this._array, this._array, q._array);
+            this._dirty = true;
             return this;
         },     
 

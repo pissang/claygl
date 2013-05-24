@@ -23,8 +23,8 @@
                     'glmatrix',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, glMatrix, modelData){
                 var qtek3d = qtek['3d'],
-                    mat4 = glMatrix.mat4,
-                    Shader = qtek3d.Shader;
+                    Shader = qtek3d.Shader,
+                    Vector3 = qtek.core.Vector3;
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main"),
@@ -43,17 +43,15 @@
                 // Create scene
                 //================================
                 var light = new qtek3d.light.Spot({
-                    position : new qtek.core.Vector3(4, 4, 4),
+                    position : new Vector3(0, 4, 4),
                     intensity : 4.0
                 });
-                light.lookAt(new qtek.core.Vector3());
                 scene.add(light);
 
                 var plane = new qtek3d.geometry.Plane({
                     widthSegments : 1,
                     heightSegments : 1
                 })
-                plane.generateBarycentric();
                 var shader = qtek3d.shader.library.get('buildin.phong');
 
                 var material = new qtek3d.Material({
@@ -70,7 +68,7 @@
 
                 _.each(meshList, function(mesh){
                     // mesh.material = material
-                    mesh.material.shader.disableTexture("diffuseMap", "normalMap");
+                    mesh.material.shader.disableTexture("normalMap");
                     root.add(mesh);
                 });
                 scene.add(root);
@@ -78,7 +76,7 @@
                 root.position.set(1, 0.2, 1);
 
                 camera.position.set(0, 4, 5);
-                camera.lookAt( new qtek.core.Vector3(0, 1, 0) );
+                camera.lookAt( new Vector3(0, 1, 0) );
 
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
@@ -92,11 +90,11 @@
                 // Shadow Map Pass
 
                 var time = 0;
+                var zeroVector = new Vector3();
+                var upAxis = new Vector3(0, 1, 0);
                 setInterval( function(){
-                    light.position.x = 4 * Math.sin(time+=0.01);
-                    light.position.z = 4 * Math.cos(time+=0.01);
-                    light.lookAt( new qtek.core.Vector3() );
-                    
+                    light.rotateAround(zeroVector, upAxis, 0.01);
+                    light.lookAt(zeroVector)
                     shadowMapPass.render( renderer, scene );
                     renderer.render(scene, camera);
                 }, 20);

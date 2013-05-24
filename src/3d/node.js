@@ -62,29 +62,16 @@ define( function(require){
             }
         },
 
-        lookAt : (function(){
-            var m = new Matrix4();
-            return function( target ){
-                m.lookAt(this.position, target, this.up ).invert();
-                this.updateFromLookAtMatrix( m );
-            }
-        })(),
-
-        updateFromLookAtMatrix : (function(){
-
-            var lookAtMat3 = new Matrix3();
-            var scaleVector = new Vector3();
-            return function(m){
-                
-                m.decomposeMatrix(scaleVector, this.rotation, this.position);
-
-                if( ! this.useEuler){
-                    this.eulerAngle.setEulerFromQuaternion(this.rotation);
-                }
-            }
-        })(),
-
         updateMatrix : function(){
+            // TODO 
+            // use defineSetter to set dirty when the position, rotation, scale is changed ??
+            if( ! this.position._dirty &&
+                ! this.rotation._dirty &&
+                ! this.eulerAngle._dirty &&
+                ! this.scale._dirty){
+                return;
+            }
+
             var m = this.matrix;
 
             m.identity();
@@ -99,10 +86,23 @@ define( function(require){
             m.fromRotationTranslation(this.rotation, this.position);
 
             m.scale(this.scale);
+
+            this.rotation._dirty = false;
+            this.scale._dirty = false;
+            this.position._dirty = false;
+            this.eulerAngle._dirty = false;
         },
 
         decomposeMatrix : function(){
             this.matrix.decomposeMatrix( this.scale, this.rotation, this.position );
+            if( ! this.useEuler){
+                this.eulerAngle.setEulerFromQuaternion(this.rotation);
+            }
+            
+            this.rotation._dirty = false;
+            this.scale._dirty = false;
+            this.position._dirty = false;
+            this.eulerAngle._dirty = false;
         },
 
         updateWorldMatrix : function(  ){
@@ -137,23 +137,63 @@ define( function(require){
 
         getWorldPosition : function(){
             
-            var m = this.worldMatrix;
+            var m = this.worldMatrix._array;
 
-            // [0]  [4]  [8]   [12]
-            // [1]  [5]  [9]   [13]
-            // [2]  [6]  [10]  [14]
-            // [3]  [7]  [11]  [15]
             return new Vector3(m[12], m[13], m[14]);
         },
 
+        translate : function(v){
+            this.updateMatrix();
+            this.translate(v);
+            this.decomposeMatrix();
+        },
+
+        rotate : function(angle, axis){
+            this.updateMatrix();
+            this.matrix.rotate(angle, axis);
+            this.decomposeMatrix();
+        },
+        // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
         rotateAround : (function(){
+            
             var v = new Vector3();
-            var rotateMat = new Matrix4();
+            var RTMatrix = new Matrix4();
+
             return function(point, axis, angle){
-                v.copy(point).substract(this.position);
+
+                v.copy(this.position).subtract(point);
+
+                this.matrix.identity();
+                // parent joint
+                this.matrix.translate(point);
+                this.matrix.rotate(angle, axis);
+
+                // Transform self
+                if( this.useEuler ){
+                    this.rotation.identity();
+                    this.rotation.rotateX( this.eulerAngle.x );
+                    this.rotation.rotateY( this.eulerAngle.y );
+                    this.rotation.rotateZ( this.eulerAngle.z );
+                }
+                RTMatrix.fromRotationTranslation(this.rotation, v);
+                this.matrix.multiply(RTMatrix);
+                this.matrix.scale(this.scale);
+
+                this.decomposeMatrix();
+            }
+        })(),
+
+        lookAt : (function(){
+            var m = new Matrix4();
+            var scaleVector = new Vector3();
+            return function( target ){
+                m.lookAt(this.position, target, this.up ).invert();
+
+                m.decomposeMatrix(scaleVector, this.rotation, this.position);
 
             }
         })()
+
     });
 
 
