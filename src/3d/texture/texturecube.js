@@ -4,52 +4,52 @@
  */
 define( function(require){
 
-	var Texture = require('../texture'),
-		_ = require('_');
+    var Texture = require('../texture'),
+        _ = require('_');
 
-	var targetMap = {
-		'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
-		'py' : 'TEXTURE_CUBE_MAP_POSITIVE_Y',
-		'pz' : 'TEXTURE_CUBE_MAP_POSITIVE_Z',
-		'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
-		'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
-		'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
-	}
+    var targetMap = {
+        'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
+        'py' : 'TEXTURE_CUBE_MAP_POSITIVE_Y',
+        'pz' : 'TEXTURE_CUBE_MAP_POSITIVE_Z',
+        'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
+        'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
+        'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
+    }
 
-	var TextureCube = Texture.derive({
-		image : {
-			px : null,
-			nx : null,
-			py : null,
-			ny : null,
-			pz : null,
-			nz : null
-		},
-		pixels : {
-			px : null,
-			nx : null,
-			py : null,
-			ny : null,
-			pz : null,
-			nz : null
-		}
-	}, {
+    var TextureCube = Texture.derive({
+        image : {
+            px : null,
+            nx : null,
+            py : null,
+            ny : null,
+            pz : null,
+            nz : null
+        },
+        pixels : {
+            px : null,
+            nx : null,
+            py : null,
+            ny : null,
+            pz : null,
+            nz : null
+        }
+    }, {
 
-		update : function( _gl ){
+        update : function( _gl ){
 
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture") );
+            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture") );
 
-			this.beforeUpdate( _gl );
+            this.beforeUpdate( _gl );
 
-			var glFormat = _gl[ this.format.toUpperCase() ],
-				glType = _gl[ this.type.toUpperCase() ];
+            var glFormat = _gl[ this.format.toUpperCase() ],
+                glType = _gl[ this.type.toUpperCase() ];
 
-			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl[ this.wrapS.toUpperCase() ] );
-			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl[ this.wrapT.toUpperCase() ] );
+            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl[ this.wrapS.toUpperCase() ] );
+            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl[ this.wrapT.toUpperCase() ] );
 
-			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl[ this.magFilter.toUpperCase() ] );
-			_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
-			
+            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl[ this.magFilter.toUpperCase() ] );
+            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
+            
             if( this.cache.miss("anisotropic_ext") ){
                 var ext = _gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
                 if( ! ext){
@@ -63,53 +63,53 @@ define( function(require){
                 }
             }
 
-			_.each( this.image, function(img, target){
-				if( img )
-					_gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, glFormat, glType, img );
-				else
-					_gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target] );
-			}, this);
+            _.each( this.image, function(img, target){
+                if( img )
+                    _gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, glFormat, glType, img );
+                else
+                    _gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target] );
+            }, this);
 
-			if( !this.NPOT && this.generateMipmaps ){
-				_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-			}
-
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-		},
-		bind : function( _gl ){
-
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl) );
-		},
-		unbind : function( _gl ){
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-		},
-		// Overwrite the isPowerOfTwo method
-		isPowerOfTwo : function(){
-			if( this.image.px ){
-				return isPowerOfTwo( this.image.px.width ) &&
-						isPowerOfTwo( this.image.px.height );
-            }else{
-            	return isPowerOfTwo( this.width ) &&
-						isPowerOfTwo( this.height );
+            if( !this.NPOT && this.generateMipmaps ){
+                _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
             }
 
-			function isPowerOfTwo( value ){
-				return value & (value-1) === 0
-			}
-		},
-		isRenderable : function(){
-			if( this.image.px ){
-				return this.image.px.complete &&
-						this.image.nx.complete &&
-						this.image.py.complete &&
-						this.image.ny.complete &&
-						this.image.pz.complete &&
-						this.image.nz.complete;
-			}else{
-				return this.width && this.height;
-			}
-		}
-	});
+            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+        },
+        bind : function( _gl ){
 
-	return TextureCube;
+            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl) );
+        },
+        unbind : function( _gl ){
+            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+        },
+        // Overwrite the isPowerOfTwo method
+        isPowerOfTwo : function(){
+            if( this.image.px ){
+                return isPowerOfTwo( this.image.px.width ) &&
+                        isPowerOfTwo( this.image.px.height );
+            }else{
+                return isPowerOfTwo( this.width ) &&
+                        isPowerOfTwo( this.height );
+            }
+
+            function isPowerOfTwo( value ){
+                return value & (value-1) === 0
+            }
+        },
+        isRenderable : function(){
+            if( this.image.px ){
+                return this.image.px.complete &&
+                        this.image.nx.complete &&
+                        this.image.py.complete &&
+                        this.image.ny.complete &&
+                        this.image.pz.complete &&
+                        this.image.nz.complete;
+            }else{
+                return this.width && this.height;
+            }
+        }
+    });
+
+    return TextureCube;
 } )

@@ -100,9 +100,9 @@ define( function(require){
 
                 var camera = this.camera;
 
-                camera.rotateAround( camera.position, camera.up, -this._offsetPitch * Math.PI / 180);
-
-                camera.rotateAround( camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
+                camera.rotateAround(camera.position, camera.up, -this._offsetPitch * Math.PI / 180);
+                var xAxis = this._getXAxis(true);
+                camera.rotateAround(camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
 
                 this._offsetRoll = this._offsetPitch = 0;
             }
