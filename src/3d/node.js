@@ -22,8 +22,6 @@ define( function(require){
 
             scale : new Vector3(1, 1, 1),
 
-            up : new Vector3(0, 1, 0),
-
             // Euler angles
             // https://en.wikipedia.org/wiki/Rotation_matrix
             eulerAngle : new Vector3(),
@@ -186,13 +184,13 @@ define( function(require){
         lookAt : (function(){
             var m = new Matrix4();
             var scaleVector = new Vector3();
-            return function( target ){
-                m.lookAt(this.position, target, this.up ).invert();
+            return function( target, up ){
+                m.lookAt(this.position, target, up || this.matrix.up ).invert();
 
                 m.decomposeMatrix(scaleVector, this.rotation, this.position);
 
             }
-        })()
+        })(),
 
     });
 

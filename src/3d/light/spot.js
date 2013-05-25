@@ -62,13 +62,10 @@ define( function(require){
             'spotLightDirection' : {
                 type : '3f',
                 value : ( function(){
-                    var z = new Vector3(),
-                        m;
+                    var z = new Vector3();
                     return function( instance ){
-                        m = instance.worldMatrix._array;
                         // Direction is target to eye
-                        z.set(-m[8], -m[9], -m[10]);
-                        return z._array;
+                        return z.copy(instance.matrix.forward).negate()._array;
                     }
                 })()
             },

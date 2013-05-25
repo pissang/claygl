@@ -60,7 +60,8 @@ define( function(require){
 		"Mesh": require('3d/mesh'),
 		"Node": require('3d/node'),
 		"plugin": {
-			"FirstPersonControl": require('3d/plugin/firstpersoncontrol')
+			"FirstPersonControl": require('3d/plugin/firstpersoncontrol'),
+			"OrbitControl": require('3d/plugin/orbitcontrol')
 		},
 		"prepass": {
 			"ShadowMap": require('3d/prepass/shadowmap')

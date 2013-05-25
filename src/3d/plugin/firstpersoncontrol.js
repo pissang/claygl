@@ -8,6 +8,8 @@ define( function(require){
     var Matrix4 = require("core/matrix4");
     var Quaternion = require("core/quaternion");
 
+    var upVector = new Vector3(0, 1, 0);
+
     var FirstPersonControl = Base.derive(function(){
         return {
             camera : null,
@@ -78,11 +80,12 @@ define( function(require){
             var rotateQuat = new Quaternion();
             
             return function(){
+                
+                var camera = this.camera;
 
                 var position = this.camera.position,
-                    xAxis = this._getXAxis(true),
-                    zAxis = this._getZAxis(true),
-                    yAxis = this._getYAxis(true);
+                    xAxis = camera.matrix.right.normalize(),
+                    zAxis = camera.matrix.forward.normalize();
 
                 if( this._moveForward){
                     // Opposite direction of z
@@ -98,10 +101,9 @@ define( function(require){
                     position.scaleAndAdd(xAxis, this.speed/2);
                 }
 
-                var camera = this.camera;
 
-                camera.rotateAround(camera.position, camera.up, -this._offsetPitch * Math.PI / 180);
-                var xAxis = this._getXAxis(true);
+                camera.rotateAround(camera.position, upVector, -this._offsetPitch * Math.PI / 180);
+                var xAxis = camera.matrix.right;
                 camera.rotateAround(camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
 
                 this._offsetRoll = this._offsetPitch = 0;
@@ -173,43 +175,7 @@ define( function(require){
                     this._moveRight = false;
                     break; 
             }
-        },
-
-        _getXAxis : (function(){
-            var axis = new Vector3();
-            return function( normalize ){
-                var m = this.camera.matrix._array;
-                axis.set(m[0], m[1], m[2]);
-                if( normalize ){
-                    axis.normalize();
-                }
-                return axis;
-            }
-        })(),
-
-        _getZAxis : (function(){
-            var axis = new Vector3();
-            return function( normalize ){
-                var m = this.camera.matrix._array;
-                axis.set(m[8], m[9], m[10]);
-                if( normalize ){
-                    axis.normalize()
-                }
-                return axis;
-            }
-        })(),
-
-        _getYAxis : (function(){
-             var axis = new Vector3();
-            return function( normalize ){
-                var m = this.camera.matrix._array;
-                axis.set(m[4], m[5], m[6]);
-                if( normalize ){
-                    axis.normalize();
-                }
-                return axis;
-            }
-        })()
+        }
     })
 
     function bindOnce( func, context){

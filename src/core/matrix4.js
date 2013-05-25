@@ -1,6 +1,7 @@
 define( function(require){
 
     var glMatrix = require("glmatrix");
+    var Vector3 = require("./vector3");
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
     var mat3 = glMatrix.mat3;
@@ -20,6 +21,10 @@ define( function(require){
     }
     var Matrix4 = function(){
 
+        var axisX = new Vector3(),
+            axisY = new Vector3(),
+            axisZ = new Vector3();
+
         return Object.create(Matrix4Proto, {
 
             m00 : makeProperty(0),
@@ -38,6 +43,66 @@ define( function(require){
             m31 : makeProperty(13),
             m32 : makeProperty(14),
             m33 : makeProperty(15),
+
+            // Forward axis of local matrix, i.e. z axis
+            forward : {
+                configurable : false,
+                get : function(){
+                    var el = this._array;
+                    axisZ.set(el[8], el[9], el[10]);
+                    return axisZ;
+                },
+                // TODO Here has a problem
+                // If only set an item of vector will not work
+                set : function(v){
+                    var el = this._array,
+                        v = v._array;
+                    el[8] = v[8];
+                    el[9] = v[9];
+                    el[10] = v[10];
+
+                    this.decomposeMatrix();
+                }
+            },
+
+            // Up axis of local matrix, i.e. y axis
+            up : {
+                configurable : false,
+                enumerable : true,
+                get : function(){
+                    var el = this._array;
+                    axisY.set(el[4], el[5], el[6]);
+                    return axisY;
+                },
+                set : function(v){
+                    var el = this._array,
+                        v = v._array;
+                    el[4] = v[4];
+                    el[5] = v[5];
+                    el[6] = v[6];
+
+                    this.decomposeMatrix();
+                }
+            },
+
+            // Right axis of local matrix, i.e. x axis
+            right : {
+                configurable : false,
+                get : function(){
+                    var el = this._array;
+                    axisX.set(el[0], el[1], el[2]);
+                    return axisX;
+                },
+                set : function(v){
+                    var el = this._array,
+                        v = v._array;
+                    el[0] = v[0];
+                    el[1] = v[1];
+                    el[2] = v[2];
+
+                    this.decomposeMatrix();
+                }
+            },
             
             _array : {
                 writable : false,

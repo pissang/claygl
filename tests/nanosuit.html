@@ -3,8 +3,8 @@
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
     </head>
-    <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+    <body style="margin:0px">
+        <canvas id="Main"></canvas>
         <script type="text/javascript">
             requirejs.config({
                 'baseUrl' : '../src',
@@ -29,6 +29,7 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
+                renderer.resize(window.innerWidth, window.innerHeight);
 
                 var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
@@ -80,7 +81,7 @@
                     root.add(mesh);
                 });
 
-                camera.position.set(0, 14, -14);
+                camera.position.set(0, 14, 14);
                 camera.lookAt( new qtek.core.Vector3(0, 6, 0) );
 
                 scene.add( root );
@@ -119,9 +120,9 @@
 
                 var light = new qtek3d.light.Directional({
                     intensity : 4.0,
-                    position : new qtek.core.Vector3(20, 14, -20)
+                    position : new qtek.core.Vector3(20, 14, 20)
                 });
-                light.lookAt(root.position);
+                light.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
                 scene.add(light);
 
                 // var light2 = new qtek3d.light.Directional({
@@ -131,10 +132,16 @@
                 // light2.lookAt(root.position);
                 // scene.add(light2);
 
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                control.enable();
+
                 setInterval( function(){
                     shadowMapPass.render( renderer, scene );
                     renderer.render( scene, camera );
-                    root.rotate(new qtek.core.Vector3(0,0,0), 0.01);
                 }, 20);
             })
             

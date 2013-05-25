@@ -302,27 +302,22 @@ define( function(require){
                 camera.position.set(0, 0, 0);
                 switch(target){
                     case 'px':
-                        camera.up.set(0, -1, 0);
-                        camera.lookAt( new Vector3(1, 0, 0) );
+                        camera.lookAt( px, ny );
                         break;
                     case 'nx':
-                        camera.up.set(0, -1, 0);
-                        camera.lookAt( new Vector3(-1, 0, 0) );
+                        camera.lookAt( nx, ny );
                         break;
                     case 'py':
-                        camera.up.set(0, 0, 1);
-                        camera.lookAt( new Vector3(0, 1, 0) );
+                        camera.lookAt( py, pz );
                         break;
                     case 'ny':
-                        camera.up.set(0, 0, -1);
-                        camera.lookAt( new Vector3(0, -1, 0) );
+                        camera.lookAt( ny, nz );
                         break;
                     case 'pz':
-                        camera.up.set(0, -1, 0);
-                        camera.lookAt( new Vector3(0, 0, 1) );
+                        camera.lookAt( pz, ny );
+                        break;
                     case 'nz':
-                        camera.up.set(0, -1, 0);
-                        camera.lookAt( new Vector3(0, 0, -1) );
+                        camera.lookAt( nz, ny );
                         break;
                 }
                 camera.position.copy( light.position );
@@ -337,6 +332,14 @@ define( function(require){
         }
     });
     
+    var px = new Vector3(1, 0, 0);
+    var nx = new Vector3(-1, 0, 0);
+    var py = new Vector3(0, 1, 0);
+    var ny = new Vector3(0, -1, 0);
+    var pz = new Vector3(0, 0, 1);
+    var nz = new Vector3(0, 0, -1);
+
+
     function createEmptyArray(size, value){
         var arr = [];
         for(var i = 0; i < size; i++){
