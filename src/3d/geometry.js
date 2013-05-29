@@ -65,6 +65,20 @@ define( function(require) {
                     type : 'float',
                     size : 3,
                     value : []
+                 },
+                 // Skinning attributes
+                 // Each vertex can be bind to 4 bones, because the 
+                 // sum of weights is 1, so the weights is stored in vec3 and the last
+                 // can be calculated by 1-w.x-w.y-w.z
+                 boneWeight : {
+                    type : 'float',
+                    size : 3,
+                    value : []
+                 },
+                 boneIndex : {
+                    type : 'float',
+                    size : 4,
+                    value : []
                  }
             },
 

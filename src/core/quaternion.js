@@ -8,7 +8,7 @@ define( function(require){
         x = x || 0;
         y = y || 0;
         z = z || 0;
-        w = w || 1;
+        w = typeof(w) === "undefined" ? 1 : w;
                 
         return Object.create(QuaternionProto, {
 
@@ -201,6 +201,12 @@ define( function(require){
 
         setAxisAngle : function(axis /*Vector3*/, rad){
             quat.setAxisAngle(this._array, axis._array, rad);
+            this._dirty = true;
+            return this;
+        },
+
+        slerp : function(a, b, t){
+            quat.slerp(this._array, a._array, b._array, t);
             this._dirty = true;
             return this;
         },

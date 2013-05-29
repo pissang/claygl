@@ -17,11 +17,16 @@ define( function(require){
             mode : "TRIANGLES",
             
             receiveShadow : true,
-            castShadow : true
+            castShadow : true,
+
+            // Skinned Mesh
+            skeleton : null
         }
     }, {
 
-        render : function( _gl, globalMaterial ) {
+        render : function( renderer, globalMaterial ) {
+
+            var _gl = renderer.gl;
 
             this.trigger('beforerender', _gl);
             
@@ -31,9 +36,13 @@ define( function(require){
 
             var glDrawMode = _gl[ this.mode.toUpperCase() ];
             
-            //Draw each chunk
+            // Set pose matrices of skinned mesh
+            if(this.skeleton){
+                var skinMatricesArray = this.skeleton.getBoneMatricesArray();
+                shader.setUniform(_gl, "m4v", "boneMatrices", skinMatricesArray);
+            }
+            // Draw each chunk
             var chunks = geometry.getBufferChunks( _gl );
-            
 
             for( var c = 0; c < chunks.length; c++){
                 currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__ + "_" + c;

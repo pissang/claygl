@@ -1,6 +1,7 @@
 define( function(require){
     
     var Texture2D = require("../../texture/texture2d");
+    var _ = require("_");
 
     var pool = {};
 
@@ -39,12 +40,16 @@ define( function(require){
             wrapT : "CLAMP_TO_EDGE",
             minFilter : "LINEAR_MIPMAP_LINEAR",
             magFilter : "LINEAR",
-            generateMipMaps : true,
+            generateMipmaps : true,
             anisotropy : 1,
             flipY : true,
             unpackAlignment : 4,
             premultiplyAlpha : false
         }
+
+        _.defaults(parameters, defaultParams);
+        fallBack(parameters);
+
         var key = "";
         for(var name in defaultParams) {
             if( parameters[name] ){
@@ -55,6 +60,36 @@ define( function(require){
             key += chunk;
         }
         return key;
+    }
+
+    function fallBack(target){
+
+        var IPOT = isPowerOfTwo(target.width, target.height);
+
+        if( target.format === "DEPTH_COMPONENT"){
+            target.generateMipmaps = false;
+        }
+
+        if( ! IPOT || ! target.generateMipmaps){
+            if( target.minFilter.indexOf("NEAREST") == 0){
+                target.minFilter = 'NEAREST';
+            }else{
+                target.minFilter = 'LINEAR'
+            }
+
+            if( target.magFilter.indexOf("NEAREST") == 0){
+                target.magFilter = 'NEAREST';
+            }else{
+                target.magFilter = 'LINEAR'
+            }
+            target.wrapS = 'CLAMP_TO_EDGE';
+            target.wrapT = 'CLAMP_TO_EDGE';
+        }
+    }
+
+    function isPowerOfTwo(width, height){
+        return ( width & (width-1) ) === 0 &&
+                ( height & (height-1) ) === 0;
     }
 
     return texturePool

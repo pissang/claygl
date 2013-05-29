@@ -121,12 +121,12 @@ define( function(require){
 
             var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
             var targetMap = {
-                'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
-                'py' : 'TEXTURE_CUBE_MAP_POSITIVE_Y',
-                'pz' : 'TEXTURE_CUBE_MAP_POSITIVE_Z',
-                'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
-                'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
-                'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
+                'px' : _gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+                'py' : _gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+                'pz' : _gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+                'nx' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+                'ny' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                'nz' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
             }
             var cursor = 0;
 
@@ -187,7 +187,7 @@ define( function(require){
                         var target = targets[i];
                         var camera = this._getCamera(light.__GUID__, light, target);
 
-                        frameBuffer.attach( renderer.gl, texture, 'COLOR_ATTACHMENT0', targetMap[target] );
+                        frameBuffer.attach( renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target] );
                         frameBuffer.bind(renderer);
 
                         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);

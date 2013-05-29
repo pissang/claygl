@@ -10,9 +10,12 @@ define( function(require){
 
     var Material = Base.derive( function(){
 
-        return {
+        var id = util.genGUID();
 
-            __GUID__ : util.genGUID(),
+        return {
+            __GUID__ : id,
+
+            name : 'MATERIAL_' + id,
 
             //{
             // type
@@ -63,6 +66,10 @@ define( function(require){
                     return;
                 }
                 if( uniform.value === null ){
+                    return;
+                }
+                else if(uniform.value instanceof Array
+                    && ! uniform.value.length){
                     return;
                 }
                 if( uniform.value.instanceof &&

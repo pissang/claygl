@@ -36,28 +36,27 @@
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
         var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 15;
-        camera.position.y = 15;
-        camera.lookAt(new THREE.Vector3(0, 200, 500));
+        camera.position.z = 20;
+        camera.position.y = 20;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var scene = new THREE.Scene();
         var loader = new THREE.JSONLoader( );
 
-        loader.load("../sponza/sponza.js", function(geometry, materials){
+        loader.load("../knight.js", function(geometry, materials){
 
-            // var mesh = new THREE.Mesh(geometry, new THREE.ShaderMaterial({
-            //     vertexShader : document.getElementById("vertexShader").textContent,
-            //     fragmentShader : document.getElementById("fragmentShader").textContent,
-            // }));
-            var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials) );
+            var mesh = new THREE.Mesh(geometry, new THREE.ShaderMaterial({
+                vertexShader : document.getElementById("vertexShader").textContent,
+                fragmentShader : document.getElementById("fragmentShader").textContent,
+            }));
+            // var mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials) );
             geometry.computeTangents();
             scene.add(mesh);
-
             startRender();
         }, "../sponza/textures");
 
         var light = new THREE.DirectionalLight();
-        light.position = [10, 10, 10];
+        light.position = [1, 1, 1];
 
         scene.add(light);
         function startRender(){

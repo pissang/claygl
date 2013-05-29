@@ -6,6 +6,7 @@ define( function(require) {
     var Base = require("core/base");
     var Texture2D = require("./texture/texture2d");
     var TextureCube = require("./texture/texturecube");
+    var WebGLInfo = require('./webglinfo');
 
     var FrameBuffer = Base.derive( function(){
 
@@ -109,23 +110,19 @@ define( function(require) {
             this.cache.put("width", texture.width);
             this.cache.put("height", texture.height);
 
-            target = target || 'TEXTURE_2D';
+            target = target || _gl.TEXTURE_2D;
 
             // If the depth_texture extension is enabled, developers
             // Can attach a depth texture to the depth buffer
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
-            attachment = attachment || 'COLOR_ATTACHMENT0';
+            attachment = attachment || _gl.COLOR_ATTACHMENT0;
+            
             if( attachment === 'DEPTH_ATTACHMENT' ){
 
-                var extension = this._depthTextureExtension;
-                if( typeof(extension) === "undefined"){
-                    extension = _gl.getExtension("WEBKIT_WEBGL_depth_texture") ||
-                                _gl.getExtension("MOZ_WEBGL_depth_texture")
-                }
-                this._depthTextureExtension = extension;
-                
+                var extension = WebGLInfo.getExtension("WEBGL_depth_texture");
+
                 if( !extension ){
-                    console.error( " Depth texture is not supported by browser ");
+                    console.error( " Depth texture is not supported by the browser ");
                     return;
                 }
                 if( texture.format !== "DEPTH_COMPONENT" ){
@@ -137,8 +134,8 @@ define( function(require) {
             }
 
             this._attachedTextures[ attachment ] = texture;
-            
-            _gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl[ attachment ], _gl[ target ], texture.getWebGLTexture( _gl ), 0)
+
+            _gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture( _gl ), 0)
 
             _gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
         },

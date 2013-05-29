@@ -90,9 +90,67 @@ void main(void){
 @end
 
 // http://www.slideshare.net/DICEStudio/five-rendering-ideas-from-battlefield-3-need-for-speed-the-run
+@export buildin.compositor.hexagonal_blur_mrt_1
 
-@export buildin.compositor.hexagonal_blur_1
+// MRT in chrome
+// https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+#extension GL_EXT_draw_buffers : require
+
+uniform sampler2D texture;
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 2.0;
+
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
+
+void main(void){
+   float offsetY = blurSize / imageHeight;
+   float offsetX = blurSize / imageWidth;
+
+   vec4 color = vec4(0.0);
+   // Top
+   for(int i = 0; i < 10; i++){
+      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offsetY * float(i)) );
+   }
+   gl_FragData[0] = color;
+   // Down left
+   for(int i = 0; i < 10; i++){
+      color += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offsetX * float(i), offsetY * float(i)) );
+   }
+   gl_FragData[1] = color;
+}
 
 @end
 
-@export buildin.compositor_hexagonal_blur_2
+@export buildin.compositor.hexagonal_blur_mrt_2
+
+uniform sampler2D texture0;
+uniform sampler2D texture1;
+
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 2.0;
+
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
+
+void main(void){
+   float offsetY = blurSize / imageHeight;
+   float offsetX = blurSize / imageWidth;
+
+   vec4 color1 = vec4(0.0);
+   // Down left
+   for(int i = 0; i < 10; i++){
+      color1 += 1.0/10.0 * texture2D(texture0, v_Texcoord - vec2(offsetX * float(i), offsetY * float(i)) );
+   }
+   vec4 color2 = vec4(0.0);
+   // Down right
+   for(int i = 0; i < 10; i++){
+      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offsetX * float(i), -offsetY * float(i)) );
+   }
+
+   gl_FragColor = (color1 + color2) / 2.0;
+}
+
+@end

@@ -23,6 +23,7 @@ define( function(require){
 		"util": require('2d/util')
 	},
 	"3d": {
+		"Bone": require('3d/bone'),
 		"Camera": require('3d/camera'),
 		"camera": {
 			"Orthographic": require('3d/camera/orthographic'),
@@ -34,6 +35,7 @@ define( function(require){
 				"Graph": require('3d/compositor/graph/graph'),
 				"Node": require('3d/compositor/graph/node'),
 				"SceneNode": require('3d/compositor/graph/scenenode'),
+				"TextureNode": require('3d/compositor/graph/texturenode'),
 				"Texturepool": require('3d/compositor/graph/texturepool')
 			},
 			"Pass": require('3d/compositor/pass')
@@ -72,6 +74,7 @@ define( function(require){
 		"shader": {
 			"library": require('3d/shader/library')
 		},
+		"Skeleton": require('3d/skeleton'),
 		"Texture": require('3d/texture'),
 		"texture": {
 			"Texture2D": require('3d/texture/texture2d'),
@@ -79,7 +82,13 @@ define( function(require){
 		},
 		"util": {
 			"mesh": require('3d/util/mesh')
-		}
+		},
+		"WebGLInfo": require('3d/webglinfo')
+	},
+	"animation": {
+		"Animation": require('animation/animation'),
+		"Controller": require('animation/controller'),
+		"Easing": require('animation/easing')
 	},
 	"core": {
 		"Base": require('core/base'),

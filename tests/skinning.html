@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body style="margin:0px">
+        <canvas id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    'text!../tests/assets/models/knight.js'], function(qtek, modelData){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    _ = require("_");
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+                var data = JSON.parse(modelData);
+
+                var loader = new qtek.loader.three.JSON();
+                console.profile("parse");
+                var meshList = loader.parse(data);
+                console.profileEnd("parse");
+                
+                var shader = qtek3d.shader.library.get("buildin.lambert");
+
+                var material = new qtek3d.Material({
+                    shader : shader,
+                });
+                var root = new qtek3d.Node();
+
+                var skeleton;
+                _.each(meshList, function(mesh){
+                    skeleton = mesh.skeleton;
+                    mesh.geometry.generateVertexNormals();
+                    // mesh.geometry.generateBarycentric();
+                    root.add(mesh);
+                });
+                material.setUniform("lineWidth", 0.7);
+                material.setUniform("lineColor", [0.7, 0.7, 0.7]);
+
+                camera.position.set(0, 10, 20);
+                camera.lookAt(root.position);
+
+                scene.add( root );
+                // Add Plane
+                var plane = new qtek3d.geometry.Plane({
+                    widthSegments : 20,
+                    heightSegments : 20
+                });
+                plane.generateBarycentric();
+                var planeMesh = new qtek3d.Mesh({
+                    geometry : plane,
+                    material : material
+                });
+                planeMesh.scale.set(60, 60, 60);
+                planeMesh.rotation.rotateX(-Math.PI/2);
+                root.add(planeMesh);
+
+                var light = new qtek3d.light.Directional();
+                light.intensity = 1.2;
+                light.position.set(10, 10, 10);
+                light.lookAt(root.position);
+                scene.add(light);
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                control.enable();
+
+                var time = 0;
+
+                var helperScene = createBoneHelper();
+
+                setInterval( function(){
+                    renderer.render( scene, camera );
+                    // renderer.clear = renderer.gl.DEPTH_BUFFER_BIT;
+                    // renderer.render( helperScene, camera );
+                    // renderer.clear = 16640
+                    skeleton.setPose(time);
+                    time += 0.02;
+                    time %= 2;
+                }, 100);
+
+                function createBoneHelper(){
+                    var sphereGeometry = new qtek3d.geometry.Sphere({
+                        widthSegments : 10,
+                        heightSegments : 10,
+                        radius : 0.1
+                    });
+                    var shader = new qtek3d.Shader({
+                        vertex : Shader.source("buildin.phong.vertex"),
+                        fragment : Shader.source("buildin.phong.fragment")
+                    });
+                    var material = new qtek3d.Material({
+                        shader : shader
+                    });
+                    material.setUniform('color', [1.0, 0, 0]);
+                    var scene = new qtek3d.Scene();
+                    var light = new qtek3d.light.Directional();
+                    light.intensity = 1.2;
+                    light.position.set(10, 10, 10);
+                    light.lookAt(new qtek.core.Vector3());
+                    scene.add(light);
+
+                    _.each(skeleton.bones, function(bone){
+                        var mesh = new qtek3d.Mesh({
+                            geometry : sphereGeometry,
+                            material : material
+                        });
+                        mesh.on("afterupdate", function(){
+                            mesh.worldMatrix.copy(bone.worldMatrix);
+                        })
+                        scene.add(mesh);
+                    })
+
+                    return scene;
+                }
+            })
+            
+        </script>
+    </body>
+</html>

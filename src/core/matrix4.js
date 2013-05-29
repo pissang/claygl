@@ -60,8 +60,6 @@ define( function(require){
                     el[8] = v[8];
                     el[9] = v[9];
                     el[10] = v[10];
-
-                    this.decomposeMatrix();
                 }
             },
 
@@ -80,8 +78,6 @@ define( function(require){
                     el[4] = v[4];
                     el[5] = v[5];
                     el[6] = v[6];
-
-                    this.decomposeMatrix();
                 }
             },
 
@@ -99,8 +95,6 @@ define( function(require){
                     el[0] = v[0];
                     el[1] = v[1];
                     el[2] = v[2];
-
-                    this.decomposeMatrix();
                 }
             },
             

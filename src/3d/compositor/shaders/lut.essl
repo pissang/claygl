@@ -1,5 +1,6 @@
 
 // https://github.com/BradLarson/GPUImage?source=c
+@export buildin.compositor.lut
 
 varying vec2 v_Texcoord;
 
@@ -34,3 +35,5 @@ void main()
     vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
     gl_FragColor = vec4(newColor.rgb, tex.w);
 }
+
+@end

@@ -17,6 +17,10 @@ define( function(require){
     var Texture2D = require("3d/texture/texture2d");
     var TextureCube = require("3d/texture/texturecube");
     var shaderLibrary = require("3d/shader/library");
+    var Skeleton = require("3d/skeleton");
+    var Bone = require("3d/bone");
+    var Vector3 = require("core/vector3");
+    var Quaternion = require("core/quaternion");
     var _ = require("_");
 
     var glMatrix = require("glmatrix");
@@ -51,8 +55,8 @@ define( function(require){
         parse : function(data){
             var geometryList = [];
             var cursorList = [];
-            // At most 1000 materials
-            for(var i = 0; i < 1000; i++){
+            
+            for(var i = 0; i < data.materials.length; i++){
                 geometryList[i] = null;
                 cursorList[i] = 0;
             }
@@ -64,7 +68,12 @@ define( function(require){
                 dVertices = data.vertices,
                 dNormals = data.normals,
                 dColors = data.colors,
+                dSkinIndices = data.skinIndices,
+                dSkinWeights = data.skinWeights,
                 dUvs = data.uvs;
+
+            var skinned = dSkinIndices && dSkinIndices.length
+                        && dSkinWeights && dSkinWeights.length;
 
             var geometry = geometryList[0],
                 attributes = geometry.attributes,
@@ -73,6 +82,8 @@ define( function(require){
                 texcoords = [attributes.texcoord0.value,
                             attributes.texcoord1.value],
                 colors = attributes.color.value,
+                boneIndices = attributes.boneIndex.value,
+                boneWeights = attributes.boneWeight.value,
                 faces = geometry.faces;
 
             var nUvLayers = 0;
@@ -105,13 +116,22 @@ define( function(require){
                     positions = attributes.position.value;
                     normals = attributes.normal.value;
                     texcoords = [attributes.texcoord0.value,
-                                attributes.texcoord1.value]
+                                attributes.texcoord1.value];
                     colors = attributes.color.value;
+                    boneWeights = attributes.boneWeight.value;
+                    boneIndices = attributes.boneIndex.value;
 
                     isNew[faceIndex] = false;
                     return newIndexMap[oi];
                 }else{
+
                     positions.push( [ dVertices[oi*3], dVertices[oi*3+1], dVertices[oi*3+2] ] );
+                    //Skin data
+                    if(skinned){
+                        boneWeights.push( [dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0] );
+                        boneIndices.push( [dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1] );
+                    }
+
                     newIndexMap[oi] = cursorList[materialIndex];
                     geoIndexMap[oi] = materialIndex;
 
@@ -155,24 +175,26 @@ define( function(require){
                     positions = attributes.position.value;
                     normals = attributes.normal.value;
                     texcoords = [attributes.texcoord0.value,
-                                attributes.texcoord1.value]
+                                attributes.texcoord1.value];
                     colors = attributes.color.value;
+                    boneWeights = attributes.boneWeight.value;
+                    boneIndices = attributes.boneIndex.value;
                     faces = geometry.faces;
                 }
                 if(isQuad){
                     // Split into two triangle faces, 1-2-4 and 2-3-4
-                    var i1 = dFaces[offset++],
-                        i2 = dFaces[offset++],
-                        i3 = dFaces[offset++],
-                        i4 = dFaces[offset++];
+                    var i1o = dFaces[offset++],
+                        i2o = dFaces[offset++],
+                        i3o = dFaces[offset++],
+                        i4o = dFaces[offset++];
                     // Face1
-                    i1 = getNewIndex(i1, 0);
-                    i2 = getNewIndex(i2, 1);
-                    i3 = getNewIndex(i4, 2);
+                    var i1 = getNewIndex(i1o, 0),
+                        i2 = getNewIndex(i2o, 1),
+                        i3 = getNewIndex(i4o, 2),
                     // Face2
-                    i4 = getNewIndex(i2, 3);
-                    var i5 = getNewIndex(i3, 4);
-                    var i6 = getNewIndex(i4, 5);
+                        i4 = getNewIndex(i2o, 3),
+                        i5 = getNewIndex(i3o, 4),
+                        i6 = getNewIndex(i4o, 5);
                     faces.push([i1, i2, i3], [i4, i5, i6]);
                 }else{
                     var i1 = dFaces[offset++],
@@ -307,17 +329,28 @@ define( function(require){
                     }
                 }
             }
+
+            if(skinned){
+                var skeleton = this.parseSkeleton(data);
+                var boneNumber = skeleton.bones.length;
+            }else{
+                var boneNumber = 0;
+            }
+
             var meshList = [];
             for(var i = 0; i < data.materials.length; i++){
                 var geometry = geometryList[i];
                 if( geometry 
                     && geometry.faces.length 
                     && geometry.attributes.position.value.length ){
-                    var material = this.parseMaterial(data.materials[i]);
+                    var material = this.parseMaterial(data.materials[i], boneNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],
                         material : material
                     }) ;
+                    if( skinned){
+                        mesh.skeleton = skeleton;
+                    }
                     meshList.push(mesh);
                 }
             }
@@ -326,7 +359,55 @@ define( function(require){
             return meshList;
         },
 
-        parseMaterial : function(mConfig){
+        parseSkeleton : function(data){
+            var bones = [];
+            var dBones = data.bones;
+            for( var i = 0; i < dBones.length; i++){
+                var dBone = dBones[i];
+                var bone = new Bone({
+                    parentIndex : dBone.parent,
+                    name : dBone.name,
+                    position : new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
+                    rotation : new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
+                    scale : new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
+                });
+                bones.push(bone);
+            }
+
+            var skeleton = new Skeleton({
+                bones : bones
+            });
+            skeleton.update();
+
+            if( data.animation){
+                var dFrames = data.animation.hierarchy;
+
+                // Parse Animations
+                for(var i = 0; i < dFrames.length; i++){
+                    var channel = dFrames[i];
+                    var bone = bones[i];
+                    for(var j = 0; j < channel.keys.length; j++){
+                        var key = channel.keys[j];
+                        bone.poses[j] = {};
+                        var pose = bone.poses[j];
+                        pose.time = parseFloat(key.time);
+                        if(key.pos){
+                            pose.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
+                        }
+                        if(key.rot){
+                            pose.rotation = new Quaternion(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
+                        }
+                        if(key.scl){
+                            pose.scale = new Vector3(key.scl[0], key.scl[1], key.scl[2]);
+                        }
+                    }
+                }
+            }
+
+            return skeleton;
+        },
+
+        parseMaterial : function(mConfig, boneNumber){
             var shaderName = "buildin.lambert";
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
             if( shading === "phong" || shading === "lambert"){
@@ -339,8 +420,20 @@ define( function(require){
             if( mConfig.mapNormal || mConfig.mapBump ){
                 enabledTextures.push('normalMap');
             }
-
-            var shader = shaderLibrary.get(shaderName, enabledTextures);
+            if(boneNumber == 0){
+                var shader = shaderLibrary.get(shaderName, enabledTextures);
+            }else{
+                // Shader for skinned mesh
+                var shader = new Shader({
+                    vertex : Shader.source(shaderName+".vertex"),
+                    fragment : Shader.source(shaderName+".fragment")
+                })
+                for(var i = 0; i < enabledTextures; i++){
+                    shader.enableTexture(enabledTextures[i]);
+                }
+                shader.vertexDefines["SKINNING"] = null;
+                shader.vertexDefines["BONE_MATRICES_NUMBER"] = boneNumber;
+            }
 
             var material = new Material({
                 shader : shader

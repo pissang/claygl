@@ -1,0 +1,166 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body style="margin:0px">
+        <canvas id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
+
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    pp_Node = qtek3d.compositor.graph.Node,
+                    pp_SceneNode = qtek3d.compositor.graph.SceneNode,
+                    pp_TextureNode = qtek3d.compositor.graph.TextureNode,
+                    compositor = new qtek3d.compositor.graph.Graph;
+
+                var _ = require("_");
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+
+                renderer.resize(window.innerWidth, window.innerHeight);
+
+                var ext = qtek3d.WebGLInfo.getExtension("EXT_draw_buffers");
+
+                var gl = renderer.gl;
+                var maxDrawingBuffers = gl.getParameter(ext.MAX_DRAW_BUFFERS_EXT);
+                var maxColorAttachments = gl.getParameter(ext.MAX_COLOR_ATTACHMENTS_EXT);
+                
+
+                var texture = new qtek3d.texture.Texture2D({
+                    image : new Image
+                })
+                texture.image.onload = function(){
+                    texture.dirty();
+                    renderer.resize(texture.image.width, texture.image.height);
+                    compositor.render( renderer );
+                }
+                texture.image.src = "assets/textures/sunset.jpg";
+                // Post processing
+                var textureNode = new pp_TextureNode({
+                    texture : texture,
+                    outputs : {
+                        "color" : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : {
+                                width : 512,
+                                height : 512
+                            }
+                        }
+                    }
+                });
+                var floatTextureParam = {
+                    width : 512,
+                    height : 512,
+                    type : 'FLOAT',
+                    generateMipmaps : false,
+                    minFilter : "NEAREST",
+                    magFilter : "NEAREST"
+                }
+                var colorAdjustNode = new pp_Node({
+                    shader : Shader.source("buildin.compositor.coloradjust"),
+                    name : "Color Adjust",
+                    inputs : {
+                        "texture" : {
+                            node : textureNode,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+
+                var hexagonalBlur1 = new pp_Node({
+                    shader : Shader.source("buildin.compositor.hexagonal_blur_mrt_1"),
+                    name : "Hexagonal Blur Pass1",
+                    inputs : {
+                        "texture" : {
+                            node : colorAdjustNode,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color0" : {
+                            attachment : gl.COLOR_ATTACHMENT0,
+                            parameters : floatTextureParam
+                        },
+                        "color1" : {
+                            attachment : gl.COLOR_ATTACHMENT0 + 1,
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+                var hexagonalBlur2 = new pp_Node({
+                    shader : Shader.source("buildin.compositor.hexagonal_blur_mrt_2"),
+                    name : "Hexagonal Blur Pass2",
+                    inputs : {
+                        "texture0" : {
+                            node : hexagonalBlur1,
+                            pin : "color0"
+                        },
+                        "texture1" : {
+                            node : hexagonalBlur1,
+                            pin : "color1"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : floatTextureParam
+                        }
+                    }
+                })
+
+                var colorAdjustNode2 = new pp_Node({
+                    shader : Shader.source("buildin.compositor.coloradjust"),
+                    name : "Color Adjust",
+                    inputs : {
+                        "texture" : {
+                            node : hexagonalBlur2,
+                            pin : "color"
+                        }
+                    }
+                });
+                colorAdjustNode.setParameter("gamma", 8.0);
+                colorAdjustNode2.setParameter("gamma", 1/8);
+
+                hexagonalBlur1.setParameter("blurSize", 0.5);
+                hexagonalBlur2.setParameter("blurSize", 0.5);
+
+                compositor.add( textureNode );
+                compositor.add( colorAdjustNode );
+                compositor.add( colorAdjustNode2 );
+                compositor.add( hexagonalBlur1 );
+                compositor.add( hexagonalBlur2 );
+
+
+                // setInterval( function(){
+                    // compositor.render( renderer );
+                // }, 1000);
+            })
+            
+        </script>
+    </body>
+</html>

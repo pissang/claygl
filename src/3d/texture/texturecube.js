@@ -4,8 +4,9 @@
  */
 define( function(require){
 
-    var Texture = require('../texture'),
-        _ = require('_');
+    var Texture = require('../texture');
+    var WebGLInfo = require('../webglinfo');
+    var _ = require('_');
 
     var targetMap = {
         'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
@@ -50,17 +51,9 @@ define( function(require){
             _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl[ this.magFilter.toUpperCase() ] );
             _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
             
-            if( this.cache.miss("anisotropic_ext") ){
-                var ext = _gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
-                if( ! ext){
-                    ext = _gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
-                }
-                this.cache.put("anisotropic_ext", null);
-            }else{
-                var ext = this.cache.get("anisotropic_ext");
-                if( ext){
-                    _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, ext.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
-                }
+            var anisotropicExt = WebGLInfo.getExtension("EXT_texture_filter_anisotropic");
+            if( anisotropicExt){
+                _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
 
             _.each( this.image, function(img, target){

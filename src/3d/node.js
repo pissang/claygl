@@ -10,9 +10,13 @@ define( function(require){
 
     var Node = Base.derive( function(){
 
+        var id = util.genGUID();
+
         return {
             
-            __GUID__ : util.genGUID(),
+            __GUID__ : id,
+
+            name : 'NODE_' + id,
 
             visible : true,
 
@@ -64,10 +68,12 @@ define( function(require){
             // TODO 
             // use defineSetter to set dirty when the position, rotation, scale is changed ??
             if( ! this.position._dirty &&
-                ! this.rotation._dirty &&
-                ! this.eulerAngle._dirty &&
                 ! this.scale._dirty){
-                return;
+                if( this.useEuler && ! this.eulerAngle._dirty){
+                    return;
+                }else if( ! this.rotation._dirty){
+                    return;
+                }
             }
 
             var m = this.matrix;

@@ -33,7 +33,9 @@ define( function(require){
             _offsetY : 0,
 
             // Zoom with mouse wheel
-            _forward : 0
+            _forward : 0,
+
+            _op : 0  //0 : ROTATE, 1 : PAN
         }
     }, {
 
@@ -43,11 +45,14 @@ define( function(require){
 
             this.canvas.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
             this.canvas.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
+            this.canvas.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
         },
 
         disable : function(){
             this.camera.off("beforeupdate", this._beforeUpdateCamera);
             this.canvas.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
+            this.canvas.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
+            this.canvas.removeEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this));
             this._mouseUp();
         },
 
@@ -65,14 +70,27 @@ define( function(require){
 
             this._offsetX = e.pageX;
             this._offsetY = e.pageY;
+
+            // Rotate
+            if( e.button === 0){
+                this._op = 0;
+            }else if( e.button === 1){
+                this._op = 1;
+            }
         },
 
         _mouseMove : function(e){
             var dx = e.pageX - this._offsetX,
                 dy = e.pageY - this._offsetY;
 
-            this._offsetPitch += dx * this.sensitivity / 100;
-            this._offsetRoll += dy * this.sensitivity / 100;
+            if(this._op === 0){
+                this._offsetPitch += dx * this.sensitivity / 100;
+                this._offsetRoll += dy * this.sensitivity / 100;
+            }else if(this._op === 1){
+                // TODO Auto fit the size of scene
+                this._panX += dx * this.sensitivity / 20;
+                this._panY += dy * this.sensitivity / 20;
+            }
 
             this._offsetX = e.pageX;
             this._offsetY = e.pageY;
@@ -93,19 +111,28 @@ define( function(require){
 
             var camera = this.camera;
 
-            // Rotate
-            camera.rotateAround(this.origin, upVector, -this._offsetPitch);            
-            var xAxis = camera.matrix.right;
-            camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
-            this._offsetRoll = this._offsetPitch = 0;
-
+            if( this._op === 0){
+                // Rotate
+                camera.rotateAround(this.origin, upVector, -this._offsetPitch);            
+                var xAxis = camera.matrix.right;
+                camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
+                this._offsetRoll = this._offsetPitch = 0;
+            }
+            else if( this._op === 1){
+                // Pan
+                var xAxis = camera.matrix.right.normalize().scale(-this._panX);
+                var yAxis = camera.matrix.up.normalize().scale(this._panY);
+                camera.position.add(xAxis).add(yAxis);
+                this.origin.add(xAxis).add(yAxis);
+                this._panX = this._panY = 0;
+            }
+            
             // Zoom
             var zAxis = camera.matrix.forward.normalize();
             var distance = camera.position.distance(this.origin);
             camera.position.scaleAndAdd(zAxis, distance * this._forward / 2000);
             this._forward = 0;
 
-            // Pan
         }
     });
 

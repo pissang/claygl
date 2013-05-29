@@ -34,10 +34,6 @@ define( function( require ){
     var Shader = require("../../shader");
     var texturePool = require("./texturepool");
 
-    var frameBuffer = new FrameBuffer({
-        depthBuffer : false
-    })
-
     var Node = Base.derive( function(){
         return {
 
@@ -46,6 +42,8 @@ define( function( require ){
             inputs : {},
             
             outputs : null,
+
+            shader : '',
             // Example:
             // inputName : {
             //  node : [Node],
@@ -75,10 +73,15 @@ define( function( require ){
             });
             this.pass = pass;   
         }
+        if(this.outputs){
+            this.frameBuffer = new FrameBuffer({
+                depthBuffer : false
+            })
+        }
     }, {
 
         render : function( renderer ){
-
+            var _gl = renderer.gl;
             for( var inputName in this._inputLinks ){
                 var link = this._inputLinks[inputName];
                 var inputTexture = link.node.getOutput( renderer, link.pin );
@@ -99,12 +102,15 @@ define( function( require ){
                     var texture = texturePool.get( outputInfo.parameters );
                     this._textures[name] = texture;
 
-                    var attachment = outputInfo.attachment || 'COLOR_ATTACHMENT0';
+                    var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
+                    if(typeof(attachment) == "string"){
+                        attachment = _gl[attachment];
+                    }
                     this.pass.outputs[ attachment ] = texture;
 
                 }
 
-                this.pass.render( renderer, frameBuffer );
+                this.pass.render( renderer, this.frameBuffer );
             }
             
             for( var inputName in this._inputLinks ){

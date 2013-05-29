@@ -1,0 +1,15 @@
+
+@export buildin.compositor.output
+
+varying vec2 v_Texcoord;
+
+uniform sampler2D texture;
+
+void main()
+{
+    vec4 tex = texture2D( texture, v_Texcoord );
+
+    gl_FragColor = tex;
+}
+
+@end

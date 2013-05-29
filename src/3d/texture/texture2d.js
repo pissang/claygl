@@ -5,6 +5,7 @@
 define( function(require){
 
     var Texture = require('../texture');
+    var WebGLInfo = require('../webglinfo');
 
     var Texture2D = Texture.derive({
         
@@ -27,17 +28,9 @@ define( function(require){
             _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl[ this.magFilter.toUpperCase() ] );
             _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
             
-            if( this.cache.miss("anisotropic_ext") ){
-                var ext = _gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
-                if( ! ext){
-                    ext = _gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
-                }
-                this.cache.put("anisotropic_ext", ext);
-            }else{
-                var ext = this.cache.get("anisotropic_ext");
-                if( ext){
-                    _gl.texParameterf(_gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
-                }
+            var anisotropicExt = WebGLInfo.getExtension("EXT_texture_filter_anisotropic");
+            if( anisotropicExt){
+                _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
 
             if( this.image ){

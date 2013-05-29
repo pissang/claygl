@@ -92,12 +92,21 @@ define( function(require){
             _gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha );
             _gl.pixelStorei( _gl.UNPACK_ALIGNMENT, this.unpackAlignment );
 
+            this.fallBack();
+        },
+
+        fallBack : function(){
+
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
             
             var isPowerOfTwo = this.isPowerOfTwo();
 
-            if( ! isPowerOfTwo || ! this.generateMipmaps || this.format === 'DEPTH_COMPONENT' ){
+            if( this.format === "DEPTH_COMPONENT"){
+                this.generateMipmaps = false;
+            }
+
+            if( ! isPowerOfTwo || ! this.generateMipmaps){
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore
@@ -106,17 +115,18 @@ define( function(require){
                 this._wrapSOriginal = this.wrapS;
                 this._wrapTOriginal = this.wrapT;
 
-                if( this.minFilter.indexOf("NEARST") == 0){
-                    this.minFilter = 'NEARST';
+                if( this.minFilter.indexOf("NEAREST") == 0){
+                    this.minFilter = 'NEAREST';
                 }else{
                     this.minFilter = 'LINEAR'
                 }
 
-                if( this.magFilter.indexOf("NEARST") == 0){
-                    this.magFilter = 'NEARST';
+                if( this.magFilter.indexOf("NEAREST") == 0){
+                    this.magFilter = 'NEAREST';
                 }else{
                     this.magFilter = 'LINEAR'
                 }
+
                 this.wrapS = 'CLAMP_TO_EDGE';
                 this.wrapT = 'CLAMP_TO_EDGE';
             }else{
@@ -134,9 +144,6 @@ define( function(require){
                 }
             }
 
-            if( this.format === "DEPTH_COMPONENT"){
-                this.generateMipmaps = false;
-            }
         },
 
         nextHighestPowerOfTwo : function(x) {

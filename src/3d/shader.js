@@ -129,9 +129,9 @@ define( function(require){
             lightNumber : {},
             // {
             //  enabled : true
-            //  shaderType : "vertexs",
+            //  shaderType : "vertex",
             // }
-            _vextureStatus : {},
+            _textureStatus : {},
 
             _vertexProcessed : "",
             _fragmentProcessed : "",
@@ -502,7 +502,6 @@ define( function(require){
             
             // Add precision
             this._fragmentProcessed = ['precision', this.precision, 'float'].join(' ')+';\n' + tmp;
-
         },
 
         _parseUniforms : function(){

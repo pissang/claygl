@@ -10,6 +10,7 @@ define( function(require){
     var Scene = require('../scene');
     var vertexShaderString = require("text!./shaders/vertex.essl");
     var Texture = require('../texture');
+    var WebGLInfo = require('../webglinfo');
 
     var planeGeo = new Plane();
     var mesh = new Mesh({
@@ -58,14 +59,9 @@ define( function(require){
         bind : function( renderer, frameBuffer ){
             
             if( this.outputs ){
-                if( this.outputs.instanceof &&
-                    this.outputs.instanceof(Texture) ){
-                    frameBuffer.attach( renderer.gl, this.outputs )
-                }else{
-                    for( var attachment in this.outputs){
-                        var texture = this.outputs[attachment];
-                        frameBuffer.attach( renderer.gl, texture, attachment );
-                    }   
+                for( var attachment in this.outputs){
+                    var texture = this.outputs[attachment];
+                    frameBuffer.attach( renderer.gl, texture, attachment );
                 }
                 frameBuffer.bind( renderer );
             }
@@ -77,10 +73,26 @@ define( function(require){
 
         render : function( renderer, frameBuffer ){
 
+            var _gl = renderer.gl;
+
             mesh.material = this._material;
 
             if( frameBuffer ){
                 this.bind( renderer, frameBuffer );
+            }
+
+            // MRT Support in chrome
+            // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+            var ext = WebGLInfo.getExtension("EXT_draw_buffers");
+            if(ext){
+                var bufs = [];
+                for( var attachment in this.outputs){
+                    attachment = parseInt(attachment);
+                    if(attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8){
+                        bufs.push(attachment);
+                    }
+                }
+                ext.drawBuffersEXT(bufs);
             }
 
             renderer.render( scene, camera, true );
@@ -95,7 +107,8 @@ define( function(require){
     Shader.import( require('text!./shaders/coloradjust.essl') );
     Shader.import( require('text!./shaders/blur.essl') );
     Shader.import( require('text!./shaders/grayscale.essl') );
-    Shader.import( require('text!./shaders/lineardepth.essl') );
+    Shader.import( require('text!./shaders/lut.essl') );
+    Shader.import( require('text!./shaders/output.essl') );
 
     return Pass;
 } )

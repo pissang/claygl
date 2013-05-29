@@ -7,6 +7,7 @@ define( function(require){
     var util = require("util/util");
     var Light = require("./light");
     var Mesh = require("./mesh");
+    var WebGLInfo = require('./webglinfo');
 
     var Renderer = Base.derive( function() {
         return {
@@ -37,8 +38,6 @@ define( function(require){
 
             viewportInfo : {},
 
-            _extensions : null
-
         }
     }, function(){
         if ( ! this.canvas) {
@@ -55,9 +54,9 @@ define( function(require){
             });
             this.gl.__GUID__ = this.__GUID__;
 
-            this.getExtensions();
-
             this.resize( this.canvas.width, this.canvas.height );
+
+            WebGLInfo.initialize(this.gl);
         }
         catch(e) {
             throw "Error creating WebGL Context";
@@ -88,20 +87,6 @@ define( function(require){
                 width : width,
                 height : height
             }
-        },
-
-        getExtensions : function(){
-            if( ! this._extensions){
-                this._extensions = {};
-                _.each( OES_EXTENSION_LIST, function(extName){
-                    this._extensions[extName] = this.gl.getExtension(extName);
-                }, this );
-            }
-            return this._extensions;
-        },
-
-        hasExtension : function(name){
-            return this._extensions[name];
         },
 
         render : function( scene, camera, silent ) {
@@ -357,7 +342,7 @@ define( function(require){
                 if( ! silent){
                     this.trigger("beforerender:mesh", object);
                 }
-                var drawInfo = object.render( _gl, globalMaterial );
+                var drawInfo = object.render( this, globalMaterial );
                 if( ! silent){
                     this.trigger("afterrender:mesh", object, drawInfo);
                 }
@@ -407,14 +392,6 @@ define( function(require){
         'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
-
-    // http://www.khronos.org/registry/webgl/extensions/
-    var OES_EXTENSION_LIST = ["OES_texture_float",
-                                "OES_texture_half_float",
-                                "OES_standard_derivatives",
-                                "OES_vertex_array_object",
-                                "OES_element_index_uint"];
-
 
     return Renderer;
 } )

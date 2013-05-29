@@ -16,6 +16,12 @@ attribute vec4 tangent : TANGENT;
 
 attribute vec3 barycentric;
 
+#ifdef SKINNING
+attribute vec3 boneWeight;
+attribute vec4 boneIndex;
+
+uniform mat4 boneMatrices[ BONE_MATRICES_NUMBER ];
+#endif
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -26,15 +32,39 @@ varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 
 void main(){
+    
+    vec3 skinnedPosition = position;
+    vec3 skinnedNormal = normal;
+    vec3 skinnedTangent = tangent.xyz;
+    #ifdef SKINNING
+        mat4 skinMatrix;
+        if(boneIndex.x >= 0.0){
+            skinMatrix = boneMatrices[int(boneIndex.x)] * boneWeight.x;
+        }
+        if(boneIndex.y >= 0.0){
+            skinMatrix += boneMatrices[int(boneIndex.y)] * boneWeight.y;
+        }
+        if(boneIndex.z >= 0.0){
+            skinMatrix += boneMatrices[int(boneIndex.z)] * boneWeight.z;
+        }
+        if(boneIndex.w >= 0.0){
+            skinMatrix += boneMatrices[int(boneIndex.w)] * (1.0-boneWeight.x-boneWeight.y-boneWeight.z);
+        }
+        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+        // Normal matrix ???
+        skinnedNormal = (skinMatrix * vec4(normal, 0.0)).xyz;
+        skinnedTangent = (skinMatrix * vec4(tangent.xyz, 0.0)).xyz;
 
-    gl_Position = worldViewProjection * vec4( position, 1.0 );
+    #endif
+
+    gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );
 
     v_Texcoord = texcoord * uvRepeat;
-    v_WorldPosition = ( world * vec4( position, 1.0) ).xyz;
+    v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;
     v_Barycentric = barycentric;
 
-    v_Normal = normalize( ( worldInverseTranspose * vec4(normal, 0.0) ).xyz );
-    v_Tangent = normalize( (worldInverseTranspose * vec4(tangent.xyz, 0.0) ).xyz );
+    v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );
+    v_Tangent = normalize( (worldInverseTranspose * vec4(skinnedTangent, 0.0) ).xyz );
     v_Bitangent = normalize( cross(v_Normal, v_Tangent) * tangent.w );
 
 }

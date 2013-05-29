@@ -1,34 +1,36 @@
 /**
- * @export{class} SceneNode
+ * @export{class} TextureNode
  */
 define( function( require ){
 
     var Node = require("./node");
-    var Pass = require("../pass");
     var FrameBuffer = require("../../framebuffer");
     var texturePool = require("./texturepool");
+    var Shader = require("../../shader");
 
-    var SceneNode = Node.derive( function(){
+    var TextureNode = Node.derive( function(){
         return {
-            scene : null,
-            camera : null,
-            material : null
-        }
-    }, function(){
-        if(this.frameBuffer){
-            this.frameBuffer.depthBuffer = true;
+            
+            shader : Shader.source("buildin.compositor.output"),
+
+            texture : null
         }
     }, {
         render : function( renderer ){
-
+            var _gl = renderer.gl;
+            this.pass.setUniform("texture", this.texture);
+            
             if( ! this.outputs){
-                renderer.render( this.scene, this.camera );
+                this.pass.outputs = null;
+                this.pass.render( renderer );
             }else{
                 
-                var frameBuffer = this.frameBuffer;
+                this.pass.outputs = {};
 
                 for( var name in this.outputs){
+
                     var outputInfo = this.outputs[name];
+
                     var texture = texturePool.get( outputInfo.parameters );
                     this._textures[name] = texture;
 
@@ -36,20 +38,14 @@ define( function( require ){
                     if(typeof(attachment) == "string"){
                         attachment = _gl[attachment];
                     }
-                    frameBuffer.attach( renderer.gl, texture, attachment);
-                }
-                frameBuffer.bind( renderer );
+                    this.pass.outputs[ attachment ] = texture;
 
-                if( this.material ){
-                    this.scene.material = this.material;
                 }
-                renderer.render( this.scene, this.camera );
-                this.scene.material = null;
 
-                frameBuffer.unbind( renderer );
+                this.pass.render( renderer, this.frameBuffer );
             }
         }
     })
 
-    return SceneNode;
+    return TextureNode;
 } )
