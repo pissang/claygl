@@ -199,8 +199,8 @@ define( function(require){
         updateLightUnforms : function(lights) {
             
             var lightUniforms = this._scene.lightUniforms;
-            for (var symbol in this._scene.lightUniforms) {
-                lightUniforms[symbol].length = 0;
+            for(var symbol in lightUniforms){
+                lightUniforms[symbol].value.length = 0;
             }
             for (var i = 0; i < lights.length; i++) {
                 
@@ -210,20 +210,24 @@ define( function(require){
 
                     var uniformTpl = light.uniformTemplates[symbol];
                     if( ! lightUniforms[symbol] ){
-                        lightUniforms[ symbol] = [];
+                        lightUniforms[ symbol] = {
+                            type : "",
+                            value : []
+                        }
                     }
                     var value = uniformTpl.value( light );
                     var lu = lightUniforms[symbol];
+                    lu.type = uniformTpl.type + "v";
                     switch(uniformTpl.type){
                         case "1i":
                         case "1f":
-                            lu.push(value);
+                            lu.value.push(value);
                             break;
                         case "2f":
                         case "3f":
                         case "4f":
                             for(var j =0; j < value.length; j++){
-                                lu.push(value[j]);
+                                lu.value.push(value[j]);
                             }
                             break;
                         default:
@@ -270,16 +274,15 @@ define( function(require){
                     }
 
                     shader.bind( _gl );
+
+                    // Set lights uniforms
+                    for (var symbol in scene.lightUniforms ) {
+                        var lu = scene.lightUniforms[symbol];
+                        shader.setUniform(_gl, lu.type, symbol, lu.value);
+                    }
                     prevShaderID = shader.__GUID__;
                 }
                 if (prevMaterialID !== material.__GUID__) {
-                    // Set lights uniforms
-                    for (var symbol in scene.lightUniforms ) {
-                        var uniform = material.uniforms[symbol];
-                        if( uniform ){
-                            uniform.value = scene.lightUniforms[symbol];
-                        }
-                    }
 
                     material.bind( _gl );
                     prevMaterialID = material.__GUID__;

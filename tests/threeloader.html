@@ -36,7 +36,7 @@
                     });
                 var data = JSON.parse(modelData);
 
-                var loader = new qtek.loader.three.JSON();
+                var loader = new qtek.loader.three.Model();
                 console.profile("parse");
                 var meshList = loader.parse(data);
                 console.profileEnd("parse");

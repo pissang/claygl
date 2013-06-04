@@ -42,7 +42,7 @@ define( function(require){
                 }
             },
 
-            _array :{
+            _array : {
                 writable : false,
                 configurable : false,
                 value : vec3.fromValues(x, y, z)

@@ -4,23 +4,32 @@
  *  name : "xxx",
     shader : shader,
  *  inputs :{ 
-                "texture" : {
-                    node : "xxx",
-                    pin : "diffuse"
-                }
-             }
+        "texture" : {
+            node : "xxx",
+            pin : "diffuse"
+        }
+    },
+    // Optional, only use for the node in group
+    groupInputs : {
+        // Group input pin name : node input pin name
+        "texture" : "texture"
+    },
     outputs : {
-                diffuse : {
-                    attachment : "COLOR_ATTACHMENT0"
-                    parameters : {
-                        format : "RGBA",
-                        width : 512,
-                        height : 512
-                    }
+            diffuse : {
+                attachment : "COLOR_ATTACHMENT0"
+                parameters : {
+                    format : "RGBA",
+                    width : 512,
+                    height : 512
                 }
             }
-
-   }
+        }
+    },
+    // Optional, only use for the node in group
+    groupOutputs : {
+        // Node output pin name : group output pin name
+        "diffuse" : "diffuse"
+    }
  * Multiple outputs is reserved for MRT support
  *
  * TODO blending 
@@ -49,13 +58,13 @@ define( function( require ){
             //  node : [Node],
             //  pin : 'xxxx'    
             // }
-            _inputLinks : {},
+            inputLinks : {},
             // Example:
             // outputName : [{
             //  node : [Node],
             //  pin : 'xxxx'    
             // }]
-            _outputLinks : {},
+            outputLinks : {},
 
             _textures : {},
 
@@ -82,8 +91,8 @@ define( function( require ){
 
         render : function( renderer ){
             var _gl = renderer.gl;
-            for( var inputName in this._inputLinks ){
-                var link = this._inputLinks[inputName];
+            for( var inputName in this.inputLinks ){
+                var link = this.inputLinks[inputName];
                 var inputTexture = link.node.getOutput( renderer, link.pin );
                 this.pass.setUniform( inputName, inputTexture );
             }
@@ -113,8 +122,8 @@ define( function( require ){
                 this.pass.render( renderer, this.frameBuffer );
             }
             
-            for( var inputName in this._inputLinks ){
-                var link = this._inputLinks[inputName];
+            for( var inputName in this.inputLinks ){
+                var link = this.inputLinks[inputName];
                 link.node.removeReference( link.pin );
             }
         },
@@ -149,7 +158,7 @@ define( function( require ){
             if( this._outputReferences[name] === 0){
                 // Output of this node have alreay been used by all other nodes
                 // Put the texture back to the pool.
-                texturePool.put( this._textures[name] );
+                texturePool.put(this._textures[name]);
                 this._textures[name] = null;
             }
         },
@@ -157,27 +166,27 @@ define( function( require ){
         link : function( inputPinName, fromNode, fromPinName){
 
             // The relationship from output pin to input pin is one-on-multiple
-            this._inputLinks[ inputPinName ] = {
+            this.inputLinks[ inputPinName ] = {
                 node : fromNode,
                 pin : fromPinName
             }
-            if( ! fromNode._outputLinks[ fromPinName ] ){
-                fromNode._outputLinks[ fromPinName ] = [];
+            if( ! fromNode.outputLinks[ fromPinName ] ){
+                fromNode.outputLinks[ fromPinName ] = [];
             }
-            fromNode._outputLinks[ fromPinName ].push( {
+            fromNode.outputLinks[ fromPinName ].push( {
                 node : this,
                 pin : inputPinName
             } )
         },
 
         clear : function(){
-            this._inputLinks = {};
-            this._outputLinks = {};
+            this.inputLinks = {};
+            this.outputLinks = {};
         },
 
         updateReference : function( ){
-            for( var name in this._outputLinks ){
-                this._outputReferences[ name ] = this._outputLinks[name].length;
+            for( var name in this.outputLinks ){
+                this._outputReferences[ name ] = this.outputLinks[name].length;
             }
         }
     })

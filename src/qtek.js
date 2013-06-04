@@ -33,10 +33,11 @@ define( function(require){
 		"compositor": {
 			"graph": {
 				"Graph": require('3d/compositor/graph/graph'),
+				"Group": require('3d/compositor/graph/group'),
 				"Node": require('3d/compositor/graph/node'),
 				"SceneNode": require('3d/compositor/graph/scenenode'),
 				"TextureNode": require('3d/compositor/graph/texturenode'),
-				"Texturepool": require('3d/compositor/graph/texturepool')
+				"TexturePool": require('3d/compositor/graph/texturepool')
 			},
 			"Pass": require('3d/compositor/pass')
 		},
@@ -77,6 +78,8 @@ define( function(require){
 		"Skeleton": require('3d/skeleton'),
 		"Texture": require('3d/texture'),
 		"texture": {
+			"Compressed2d": require('3d/texture/compressed2d'),
+			"Compressedcube": require('3d/texture/compressedcube'),
 			"Texture2D": require('3d/texture/texture2d'),
 			"TextureCube": require('3d/texture/texturecube')
 		},
@@ -109,10 +112,10 @@ define( function(require){
 	},
 	"loader": {
 		"three": {
-			"JSON": require('loader/three/json')
+			"Model": require('loader/three/model'),
+			"Scene": require('loader/three/scene')
 		}
 	},
-	"Text": require('text'),
 	"util": {
 		"Color": require('util/color'),
 		"Util": require('util/util'),

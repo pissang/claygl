@@ -27,7 +27,7 @@
                     pp_Node = qtek3d.compositor.graph.Node,
                     pp_SceneNode = qtek3d.compositor.graph.SceneNode,
                     pp_TextureNode = qtek3d.compositor.graph.TextureNode,
-                    compositor = new qtek3d.compositor.graph.Graph;
+                    compositor = new qtek3d.Compositor();
 
                 var _ = require("_");
 
@@ -53,7 +53,7 @@
                     renderer.resize(texture.image.width, texture.image.height);
                     compositor.render( renderer );
                 }
-                texture.image.src = "assets/textures/sunset.jpg";
+                texture.image.src = "assets/textures/dolphin_sunset.jpg";
                 // Post processing
                 var textureNode = new pp_TextureNode({
                     texture : texture,
@@ -68,8 +68,8 @@
                     }
                 });
                 var floatTextureParam = {
-                    width : 512,
-                    height : 512,
+                    width : 256,
+                    height : 256,
                     type : 'FLOAT',
                     generateMipmaps : false,
                     minFilter : "NEAREST",
@@ -146,8 +146,8 @@
                 colorAdjustNode.setParameter("gamma", 8.0);
                 colorAdjustNode2.setParameter("gamma", 1/8);
 
-                hexagonalBlur1.setParameter("blurSize", 0.5);
-                hexagonalBlur2.setParameter("blurSize", 0.5);
+                hexagonalBlur1.setParameter("blurSize", 1.0);
+                hexagonalBlur2.setParameter("blurSize", 1.0);
 
                 compositor.add( textureNode );
                 compositor.add( colorAdjustNode );

@@ -2,22 +2,14 @@ module.exports = function(grunt){
 
     function makeRequirejsConfig(special) {
         var common = {
-            'baseUrl' : './',
+            'baseUrl' : './src',
             'paths' : {
-                '2d' : 'src/2d',
-                '3d' : 'src/3d',
-                'animation' : 'src/animation',
-                'core' : 'src/core',
-                'math' : 'src/math',
-                'util' : 'src/util',
-                'text' : 'src/text',
-                'loader' : 'src/loader',
-                '_' : 'thirdparty/lodash.compat',
-                'glmatrix' : 'thirdparty/gl-matrix'
+                '_' : '../thirdparty/lodash.compat',
+                'glmatrix' : '../thirdparty/gl-matrix'
             },
             // 'exclude' : ['glmatrix', '_'],
-            'name' : 'build/almond',
-            'include' : [ "src/qtek"],
+            'name' : '../build/almond',
+            'include' : [ "qtek"],
                         
             'out':"dist/qtek.js",
             'wrap' : {
@@ -28,13 +20,13 @@ module.exports = function(grunt){
         }
 
         if( special === "webgl"){
-            common["include"] = ["src/qtek3d.js"];
+            common["include"] = ["qtek3d"];
             common["out"] = "dist/qtek.webgl.js";
         }else if( special === "canvas" ){
-            common["include"] = ["src/qtek2d.js"];
+            common["include"] = ["qtek2d"];
             common["out"] = "dist/qtek.canvas.js";
         }else if( special === "image"){
-            common["include"] = ["src/qtekimage.js"];
+            common["include"] = ["qtekimage"];
             common["out"] = "dist/qtek.image.js";
         }
         return common;

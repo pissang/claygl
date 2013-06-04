@@ -60,11 +60,6 @@ define( function(require){
 
             // Set uniforms
             _.each( this.uniforms, function( uniform, symbol ){
-                // Only set the none-semantic uniform
-                // The semantic uniform will be set by system
-                if( uniform.semantic ){
-                    return;
-                }
                 if( uniform.value === null ){
                     return;
                 }

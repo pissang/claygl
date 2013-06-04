@@ -25,10 +25,11 @@
                     Shader = qtek3d.Shader,
                     pp_Node = qtek3d.compositor.graph.Node,
                     pp_SceneNode = qtek3d.compositor.graph.SceneNode,
-                    ppGraph = new qtek3d.compositor.graph.Graph;
+                    compositor = new qtek3d.Compositor();
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
                 });
                 //Create scene
                 var scene = new qtek3d.Scene,
@@ -69,7 +70,7 @@
                 light.lookAt( new qtek.core.Vector3() );
                 scene.add( light );
 
-                ppGraph.add(new pp_SceneNode({
+                compositor.add(new pp_SceneNode({
                     name : "scene",
                     scene : scene,
                     camera : camera,
@@ -94,10 +95,10 @@
                     outputs : null
                 })
                 colorAdjustNode.setParameter("gamma", 1.3);
-                ppGraph.add( colorAdjustNode );
+                compositor.add( colorAdjustNode );
 
                 setInterval( function(){
-                    ppGraph.render( renderer );
+                    compositor.render( renderer );
                     
                     mesh.rotation.rotateY(Math.PI/500);
                 }, 20 )

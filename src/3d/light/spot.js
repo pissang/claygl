@@ -5,13 +5,13 @@ define( function(require){
     var Vector3 = require('core/vector3');
 
     var SHADER_STR = [ '@export buildin.header.spot_light',
-                        'uniform vec3 spotLightPosition[SPOT_LIGHT_NUMBER];',
-                        'uniform vec3 spotLightDirection[SPOT_LIGHT_NUMBER];',
-                        'uniform float spotLightRange[SPOT_LIGHT_NUMBER];',
-                        'uniform float spotLightUmbraAngleCosine[SPOT_LIGHT_NUMBER];',
-                        'uniform float spotLightPenumbraAngleCosine[SPOT_LIGHT_NUMBER];',
-                        'uniform float spotLightFalloffFactor[SPOT_LIGHT_NUMBER];',
-                        'uniform vec3 spotLightColor[SPOT_LIGHT_NUMBER];',
+                        'uniform vec3 spotLightPosition[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform vec3 spotLightDirection[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform float spotLightRange[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform float spotLightUmbraAngleCosine[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform float spotLightPenumbraAngleCosine[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform float spotLightFalloffFactor[SPOT_LIGHT_NUMBER] : unconfigurable;',
+                        'uniform vec3 spotLightColor[SPOT_LIGHT_NUMBER] : unconfigurable;',
                         '@end;' ].join('\n');
 
     Shader.import(SHADER_STR);

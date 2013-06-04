@@ -3,8 +3,8 @@
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
     </head>
-    <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+    <body style="margin:0px">
+        <canvas id="Main"></canvas>
 
         <script type="text/javascript">
             requirejs.config({
@@ -25,11 +25,14 @@
                     Shader = qtek3d.Shader,
                     pp_Node = qtek3d.compositor.graph.Node,
                     pp_SceneNode = qtek3d.compositor.graph.SceneNode,
-                    compositor = new qtek3d.compositor.graph.Graph;
+                    pp_Group = qtek3d.compositor.graph.Group,
+                    compositor = new qtek3d.Compositor();
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
                 });
+                renderer.resize(window.innerWidth, window.innerHeight);
                 //Create scene
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -82,14 +85,21 @@
                         }
                     }
                 }) );
-                var gaussian_h = new pp_Node({
-                    name : "gaussian_h",
-                    shader : Shader.source("buildin.compositor.gaussian_blur_h"),
+
+                var group = new pp_Group({
                     inputs : {
                         "texture" : {
                             node : "scene",
                             pin : "color"
                         }
+                    }
+                });
+                
+                var gaussian_h = new pp_Node({
+                    name : "gaussian_h",
+                    shader : Shader.source("buildin.compositor.gaussian_blur_h"),
+                    groupInputs : {
+                        "texture" : "texture"
                     },
                     outputs : {
                         "color" : {
@@ -108,17 +118,17 @@
                             node : "gaussian_h",
                             pin : "color"
                         }
-                    },
-                    outputs : null
+                    }
                 })
-                compositor.add( gaussian_v );
-                compositor.add( gaussian_h );
+                group.add( gaussian_v );
+                group.add( gaussian_h );
+
+                compositor.add(group);
 
                 setInterval( function(){
                     compositor.render( renderer );
-
                     mesh.rotation.rotateY(Math.PI/500);
-                }, 20 )
+                }, 1000 )
             })
             
         </script>

@@ -13,9 +13,6 @@ define( function(require){
         mat2 = glMatrix.mat2
         mat3 = glMatrix.mat3,
         mat4 = glMatrix.mat4,
-        vec2 = glMatrix.vec2,
-        vec3 = glMatrix.vec3,
-        vec4 = glMatrix.vec4,
         util = require("util/util"),
         _ = require("_");
 
@@ -515,6 +512,7 @@ define( function(require){
             function _uniformParser(str, type, symbol, isArray, semanticWrapper, semantic){
                 if( type && symbol ){
                     var uniformType = uniformTypeMap[type];
+                    var isConfigurable = true;
                     if( uniformType ){
                         if( type === "sampler2D" || type === "samplerCube" ){
                             // Texture is default disabled
@@ -528,22 +526,32 @@ define( function(require){
                         }
                         if( semantic ){
                             if( availableSemantics.indexOf(semantic) < 0 ){
-                                var defaultValueFunc = self._parseDefaultValue( type, semantic );
-                                if( ! defaultValueFunc)
-                                    console.warn('Unkown semantic "' + semantic + '"');
-                                else
-                                    semantic = "";
-                            }else{
+                                // The uniform is not configurable, which means it will not appear
+                                // in the material uniform properties
+                                if(semantic === "unconfigurable"){
+                                    isConfigurable = false;
+                                }else{
+                                    var defaultValueFunc = self._parseDefaultValue( type, semantic );
+                                    if( ! defaultValueFunc)
+                                        console.warn('Unkown semantic "' + semantic + '"');
+                                    else
+                                        semantic = "";
+                                }
+                            }
+                            else{
                                 self.semantics[ semantic ] = {
                                     symbol : symbol,
                                     type : uniformType
                                 }
+                                isConfigurable = false;
                             }
-                        }   
-                        uniforms[ symbol ] = {
-                            type : uniformType,
-                            value : isArray ? uniformValueConstructor['array'] : ( defaultValueFunc || uniformValueConstructor[ type ] ),
-                            semantic : semantic || null
+                        }
+                        if(isConfigurable){
+                            uniforms[ symbol ] = {
+                                type : uniformType,
+                                value : isArray ? uniformValueConstructor['array'] : ( defaultValueFunc || uniformValueConstructor[ type ] ),
+                                semantic : semantic || null
+                            }
                         }
                     }
                     return ["uniform", type, symbol, isArray].join(" ")+";\n";

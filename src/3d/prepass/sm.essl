@@ -26,7 +26,7 @@ void main(){
     // gl_FragCoord consider the polygon offset ?
     float z = v_ViewPosition.z / v_ViewPosition.w;
 
-    gl_FragColor = packDepth(z * 0.5 + 0.5);
+    gl_FragColor = packDepth(z);
 }
 @end
 
@@ -55,6 +55,8 @@ uniform vec3 lightPosition;
 
 varying vec3 v_WorldPosition;
 
+@import buildin.util.pack_depth
+
 void main(){
 
     float dist = distance(lightPosition, v_WorldPosition);
@@ -71,7 +73,23 @@ void main(){
 ////////////////////////////////////////////////////////////////
 @export buildin.plugin.compute_shadow_map
 
-#if defined( SHADOWMAP_ENABLED ) && defined( SHADOWMAP_NUMBER )
+#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+
+#ifdef SPOT_LIGHT_SHADOWMAP_NUMBER
+uniform sampler2D spotLightShadowMap[ SPOT_LIGHT_SHADOWMAP_NUMBER ];
+uniform mat4 spotLightMatrix[ SPOT_LIGHT_SHADOWMAP_NUMBER ]; 
+#endif
+
+#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
+uniform sampler2D directionalLightShadowMap[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
+uniform mat4 directionalLightMatrix[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
+#endif
+
+#ifdef POINT_LIGHT_SHADOWMAP_NUMBER
+uniform samplerCube pointLightShadowMap[ POINT_LIGHT_SHADOWMAP_NUMBER ];
+#endif
+
+uniform bool shadowEnabled : true;
 
 // Normal
 @import buildin.util.unpack_depth
@@ -80,17 +98,17 @@ void main(){
 
 float computeShadowFalloff(sampler2D map, mat4 lightVPM, vec3 position){
     float shadowFallOff = 1.0;
-    vec4 posInLightSpace = ( shadowCameraMatrix[i] * vec4(v_WorldPosition, 1.0) );
+    vec4 posInLightSpace = ( lightVPM * vec4(v_WorldPosition, 1.0) );
     posInLightSpace.xyz /= posInLightSpace.w;
     // In frustum
     if( all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
         all(lessThan(posInLightSpace.xyz, vec3(1.0))) ){
         // To texture uv
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
-        vec4 shadowTex = texture2D( shadowMap[i], uv );
-        float z = unpackDepth(shadowTex) * 2.0 - 1.0 ;
+        vec4 shadowTex = texture2D( map, uv );
+        float z = unpackDepth(shadowTex) ;
         
-        if( z + 0.001 < posInLightSpace.z ){
+        if( z + 0.0025 < posInLightSpace.z ){
             shadowFallOff = 0.2;
         }
     }

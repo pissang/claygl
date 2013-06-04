@@ -13,7 +13,7 @@ glob("**/*.js", {
     var namespace = {};
 
     files.forEach(function(file){
-        if( file.match(/qtek.*?\.js/)){
+        if( file.match(/qtek.*?\.js/) || file === "text.js"){
             return;
         }
         var fileNameWithOutExt = file.slice(0, -3);
@@ -33,7 +33,7 @@ glob("**/*.js", {
     })
 
     var jsString = JSON.stringify( namespace, null, '\t' );
-    jsString = jsString.replace(/\"\__require\((\S*?)\)__\"/g, "require($1)")
+    jsString = jsString.replace(/\"\__require\((\S*?)\)__\"/g, 'require($1)')
 
     var output = template.replace(/\{\{\$exportsObject\}\}/, jsString);
 

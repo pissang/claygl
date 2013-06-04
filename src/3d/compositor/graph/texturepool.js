@@ -1,3 +1,6 @@
+/**
+ * @export{class} TexturePool
+ */
 define( function(require){
     
     var Texture2D = require("../../texture/texture2d");

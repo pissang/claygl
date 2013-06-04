@@ -2,7 +2,7 @@
  * Load three.js JSON Format model
  *
  * Format specification : https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
- * @export{class} JSON
+ * @export{class} Model
  */
 define( function(require){
 
@@ -27,7 +27,7 @@ define( function(require){
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
 
-    var Loader = Base.derive(function(){
+    var Loader = Node.derive(function(){
         return {
             textureRootPath : "",
 
@@ -53,6 +53,52 @@ define( function(require){
             })
         },
         parse : function(data){
+            
+            var geometryList = this.parseGeometry(data);
+
+            var dSkinIndices = data.skinIndices,
+                dSkinWeights = data.skinWeights;
+            var skinned = dSkinIndices && dSkinIndices.length
+                        && dSkinWeights && dSkinWeights.length;
+
+            if(skinned){
+                var skeleton = this.parseSkeleton(data);
+                var boneNumber = skeleton.bones.length;
+            }else{
+                var boneNumber = 0;
+            }
+
+            if(skinned){
+                var skeleton = this.parseSkeleton(data);
+                var boneNumber = skeleton.bones.length;
+            }else{
+                var boneNumber = 0;
+            }
+
+            var meshList = [];
+            for(var i = 0; i < data.materials.length; i++){
+                var geometry = geometryList[i];
+                if( geometry 
+                    && geometry.faces.length 
+                    && geometry.attributes.position.value.length ){
+                    var material = this.parseMaterial(data.materials[i], boneNumber);
+                    var mesh = new Mesh({
+                        geometry : geometryList[i],
+                        material : material
+                    }) ;
+                    if( skinned){
+                        mesh.skeleton = skeleton;
+                    }
+                    meshList.push(mesh);
+                }
+            }
+            
+            this.trigger('load', meshList);
+            return meshList;
+        },
+
+        parseGeometry : function(data){
+
             var geometryList = [];
             var cursorList = [];
             
@@ -330,33 +376,7 @@ define( function(require){
                 }
             }
 
-            if(skinned){
-                var skeleton = this.parseSkeleton(data);
-                var boneNumber = skeleton.bones.length;
-            }else{
-                var boneNumber = 0;
-            }
-
-            var meshList = [];
-            for(var i = 0; i < data.materials.length; i++){
-                var geometry = geometryList[i];
-                if( geometry 
-                    && geometry.faces.length 
-                    && geometry.attributes.position.value.length ){
-                    var material = this.parseMaterial(data.materials[i], boneNumber);
-                    var mesh = new Mesh({
-                        geometry : geometryList[i],
-                        material : material
-                    }) ;
-                    if( skinned){
-                        mesh.skeleton = skeleton;
-                    }
-                    meshList.push(mesh);
-                }
-            }
-            
-            this.trigger('load', meshList);
-            return meshList;
+            return geometryList;
         },
 
         parseSkeleton : function(data){

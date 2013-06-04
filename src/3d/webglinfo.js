@@ -12,8 +12,8 @@ define( function(){
                             "OES_element_index_uint",
                             "WEBGL_compressed_texture_s3tc",
                             'WEBGL_depth_texture',
-                            "EXT_texture_filter_anisotropic",
-                            "EXT_draw_buffers"];
+                            "EXT_texture_filter_anisotropic"];
+                            // "EXT_draw_buffers"];
 
     var initialized = false;
 

@@ -30,26 +30,27 @@ float edgeFactor(float width){
 
 @end
 
-// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
-// http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/
+// Pack depth
+// http://devmaster.net/posts/3002/shader-effects-shadow-mapping
 @export buildin.util.pack_depth
 vec4 packDepth( const in float depth ){
 
-    const vec4 bitShifts = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
-    const vec4 bitMask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+    const vec4 bias = vec4(1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0, 0.0);
 
-    vec4 rgba = fract( depth * bitShifts );
-
-    rgba -= rgba.xxyz * bitMask;
-
-    return rgba;
+    float r = depth;
+    float g = fract(r * 255.0);
+    float b = fract(g * 255.0);
+    float a = fract(b * 255.0);
+    vec4 colour = vec4(r, g, b, a);
+    
+    return colour - (colour.yzww * bias);
 }
 @end
 
 @export buildin.util.unpack_depth
-float unpackDepth( const in vec4 rgba ){
-    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);
-    return dot(rgba, bitShifts);
+float unpackDepth( const in vec4 colour ){
+    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0), 1.0 / (255.0 * 255.0 * 255.0));
+    return dot(colour, bitShifts);
 }
 @end
 

@@ -37,7 +37,7 @@
                     });
                 var data = JSON.parse(modelData);
 
-                var loader = new qtek.loader.three.JSON();
+                var loader = new qtek.loader.three.Model();
                 console.profile("parse");
                 var meshList = loader.parse(data);
                 console.profileEnd("parse");
@@ -53,7 +53,6 @@
                 _.each(meshList, function(mesh){
                     skeleton = mesh.skeleton;
                     mesh.geometry.generateVertexNormals();
-                    // mesh.geometry.generateBarycentric();
                     root.add(mesh);
                 });
                 material.setUniform("lineWidth", 0.7);

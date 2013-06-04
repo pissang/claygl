@@ -5,33 +5,30 @@ define( function( require ){
 
     var Graph = Base.derive( function(){
         return {
-
-            _nodes : [],
-
-            _finalNode : null
+            nodes : []
         }
     }, {
 
         
         add : function( node ){
 
-            this._nodes.push( node );
+            this.nodes.push( node );
 
             this.dirty("graph");
         },
 
         remove : function( node ){
-            _.without( this._nodes, node );
+            _.without( this.nodes, node );
             this.dirty("graph");
         },
 
         update : function(){
-            for(var i = 0; i < this._nodes.length; i++){
-                this._nodes[i].clear();
+            for(var i = 0; i < this.nodes.length; i++){
+                this.nodes[i].clear();
             }
             // Traverse all the nodes and build the graph
-            for(var i = 0; i < this._nodes.length; i++){
-                var node = this._nodes[i];
+            for(var i = 0; i < this.nodes.length; i++){
+                var node = this.nodes[i];
 
                 if( ! node.inputs){
                     continue;
@@ -46,9 +43,6 @@ define( function( require ){
                         console.warn("Pin of "+fromPinInfo.node+"."+fromPinInfo.pin+" not exist");
                     }
                 }
-                if( ! node.outputs ){
-                    this._finalNode = node;
-                }
             }
 
         },
@@ -56,8 +50,8 @@ define( function( require ){
         findPin : function( info ){
             var node;
             if( typeof(info.node) === 'string'){
-                for( var i = 0; i < this._nodes.length; i++){
-                    var tmp = this._nodes[i];
+                for( var i = 0; i < this.nodes.length; i++){
+                    var tmp = this.nodes[i];
                     if( tmp.name === info.node ){
                         node = tmp;
                     }
@@ -75,21 +69,8 @@ define( function( require ){
             }
         },
 
-        load : function( json ){
+        fromJSON : function( json ){
 
-        },
-
-        render : function( renderer ){
-            if( this.isDirty("graph") ){
-                this.update();
-                this.fresh("graph");
-            }
-            for(var i = 0; i < this._nodes.length; i++){
-                this._nodes[i].updateReference();
-            }
-            if( this._finalNode ){
-                this._finalNode.render( renderer );
-            }
         }
     })
     

@@ -57,7 +57,8 @@ define( function(require){
         },
         "util": {
             "mesh": require('3d/util/mesh')
-        }
+        },
+        "WebGLInfo": require('3d/webglinfo')
     },
     "core": {
         "Base": require('core/base'),
@@ -78,10 +79,10 @@ define( function(require){
     },
     "loader": {
         "three": {
-            "JSON": require('loader/three/json')
+            "Model": require('loader/three/model'),
+            "Scene": require('loader/three/scene')
         }
     },
-    "Text": require('text'),
     "util": {
         "Color": require('util/color'),
         "Util": require('util/util'),

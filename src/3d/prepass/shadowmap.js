@@ -28,9 +28,6 @@ define( function(require){
 
     var ShadowMapPlugin = Base.derive(function(){
         return {
-
-            technique : "VSM",  //"NORMAL", "PCF", "VSM"
-
             _textures : {},
 
             _cameras : {},
@@ -48,35 +45,20 @@ define( function(require){
 
         }
     }, function(){
-        if( this.technique == "VSM"){
-            this._depthMaterial =  new Material({
-                shader : new Shader({
-                    vertex : Shader.source("buildin.vsm.depth.vertex"),
-                    fragment : Shader.source("buildin.vsm.depth.fragment")
-                })
-            });
-            // Point light write the distance instance of depth projected
-            // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
-            this._pointLightDepthMaterial = new Material({
-                shader : new Shader({
-                    vertex : Shader.source("buildin.vsm.distance.vertex"),
-                    fragment : Shader.source("buildin.vsm.distance.fragment")
-                })
+        this._depthMaterial =  new Material({
+            shader : new Shader({
+                vertex : Shader.source("buildin.vsm.depth.vertex"),
+                fragment : Shader.source("buildin.vsm.depth.fragment")
             })
-        }else{
-            this._depthMaterial = new Material({
-                shader : new Shader({
-                    vertex : Shader.source("buildin.sm.depth.vertex"),
-                    fragment : Shader.source("buildin.sm.depth.fragment")
-                })
+        });
+        // Point light write the distance instance of depth projected
+        // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
+        this._pointLightDepthMaterial = new Material({
+            shader : new Shader({
+                vertex : Shader.source("buildin.vsm.distance.vertex"),
+                fragment : Shader.source("buildin.vsm.distance.fragment")
             })
-            this._pointLightDepthMaterial = new Material({
-                shader : new Shader({
-                    vertex : Shader.source("buildin.sm.distance.vertex"),
-                    fragment : Shader.source("buildin.sm.distance.fragment")
-                })
-            })
-        }
+        })
     }, {
 
         render : function( renderer, scene ){
@@ -252,12 +234,20 @@ define( function(require){
                     texture = new TextureCube({
                         width : resolution,
                         height : resolution,
+                        // minFilter : "NEAREST",
+                        // magFilter : "NEAREST",
+                        // generateMipmaps : false,
                         type : 'FLOAT'
                     })
                 }else{
                     texture = new Texture2d({
                         width : resolution,
                         height : resolution,
+                        // It seems the min filter and mag filter must
+                        // be nearest in the chrome canary if the type is float
+                        // minFilter : "NEAREST",
+                        // magFilter : "NEAREST",
+                        // generateMipmaps : false,
                         type : 'FLOAT'
                     })   
                 }

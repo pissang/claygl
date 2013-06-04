@@ -24,7 +24,8 @@
                     Shader = qtek3d.Shader;
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
                 });
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
