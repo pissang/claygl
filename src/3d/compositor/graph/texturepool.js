@@ -30,6 +30,15 @@ define( function(require){
             }
             var list = pool[key];
             list.push( texture );
+        },
+
+        clear : function(){
+            for(name in pool){
+                for(var i = 0; i < pool[name].length; i++){
+                    pool[name][i].dispose();
+                }
+            }
+            pool = {};
         }
     }
 

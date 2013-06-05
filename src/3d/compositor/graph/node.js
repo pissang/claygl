@@ -39,7 +39,6 @@ define( function( require ){
     var Base = require("core/base");
     var Pass = require("../pass");
     var FrameBuffer = require("../../framebuffer");
-    var vertexShaderStr = require("text!../shaders/vertex.essl");
     var Shader = require("../../shader");
     var texturePool = require("./texturepool");
 
@@ -108,7 +107,7 @@ define( function( require ){
 
                     var outputInfo = this.outputs[name];
 
-                    var texture = texturePool.get( outputInfo.parameters );
+                    var texture = texturePool.get( outputInfo.parameters || {} );
                     this._textures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
@@ -116,7 +115,6 @@ define( function( require ){
                         attachment = _gl[attachment];
                     }
                     this.pass.outputs[ attachment ] = texture;
-
                 }
 
                 this.pass.render( renderer, this.frameBuffer );

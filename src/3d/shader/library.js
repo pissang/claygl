@@ -52,11 +52,11 @@ define( function(require){
     }
 
     // Some build in shaders
-    Shader.import( require('text!3d/shader/source/basic.essl') );
-    Shader.import( require('text!3d/shader/source/lambert.essl') );
-    Shader.import( require('text!3d/shader/source/phong.essl') );
-    Shader.import( require('text!3d/shader/source/wireframe.essl') );
-    Shader.import( require('text!3d/shader/source/util.essl') );
+    Shader.import( require('text!./source/basic.essl') );
+    Shader.import( require('text!./source/lambert.essl') );
+    Shader.import( require('text!./source/phong.essl') );
+    Shader.import( require('text!./source/wireframe.essl') );
+    Shader.import( require('text!./source/util.essl') );
     // Shader.import( require('text!3d/shader/source/depth.essl') );
 
     put("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));

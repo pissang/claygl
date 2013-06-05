@@ -62,6 +62,11 @@ define(function(require){
                     node.render(renderer);
                 }
             }
+            for(var name in this.groupOutputs){
+                if( ! this._textures[name]){
+                    console.error('Group output pin "' + name + '" is not attached');
+                }
+            }
 
             for( var inputName in this.inputLinks ){
                 var link = this.inputLinks[inputName];

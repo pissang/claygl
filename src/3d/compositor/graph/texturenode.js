@@ -31,7 +31,7 @@ define( function( require ){
 
                     var outputInfo = this.outputs[name];
 
-                    var texture = texturePool.get( outputInfo.parameters );
+                    var texture = texturePool.get( outputInfo.parameters || {} );
                     this._textures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;

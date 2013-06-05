@@ -67,8 +67,10 @@ define( function(require){
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
-            canvas.style.width = width + "px";
-            canvas.style.height = height + "px";
+            if( this.devicePixelRatio !== 1.0){
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+            }
              
             // set the size of the drawingBuffer
             canvas.width = width * this.devicePixelRatio;

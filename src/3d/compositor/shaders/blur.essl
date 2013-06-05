@@ -72,16 +72,16 @@ uniform float imageHeight : 512.0;
 void main(void){
 
    vec4 tex = texture2D(texture, v_Texcoord);
-   float offsetX = blurSize / imageWidth;
-   float offsetY = blurSize / imageHeight;
-   tex += texture2D(texture, v_Texcoord + vec2(offsetX, 0.0) );
-   tex += texture2D(texture, v_Texcoord + vec2(offsetX, offsetY) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, offsetY) );
-   tex += texture2D(texture, v_Texcoord + vec2(0.0, offsetY) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, 0.0) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offsetX, -offsetY) );
-   tex += texture2D(texture, v_Texcoord + vec2(offsetX, -offsetY) );
-   tex += texture2D(texture, v_Texcoord + vec2(0.0, -offsetY) );
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+
+   tex += texture2D(texture, v_Texcoord + vec2(offset.x, 0.0) );
+   tex += texture2D(texture, v_Texcoord + vec2(offset.x, offset.y) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, offset.y) );
+   tex += texture2D(texture, v_Texcoord + vec2(0.0, offset.y) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, 0.0) );
+   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, -offset.y) );
+   tex += texture2D(texture, v_Texcoord + vec2(offset.x, -offset.y) );
+   tex += texture2D(texture, v_Texcoord + vec2(0.0, -offset.y) );
 
    tex /= 9.0;
    return tex;
@@ -105,20 +105,20 @@ uniform float imageWidth : 512.0;
 uniform float imageHeight : 512.0;
 
 void main(void){
-   float offsetY = blurSize / imageHeight;
-   float offsetX = blurSize / imageWidth;
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
 
    vec4 color = vec4(0.0);
    // Top
    for(int i = 0; i < 10; i++){
-      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offsetY * float(i)) );
+      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
    }
    gl_FragData[0] = color;
+   vec4 color2 = vec4(0.0);
    // Down left
    for(int i = 0; i < 10; i++){
-      color += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offsetX * float(i), offsetY * float(i)) );
+      color2 += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
    }
-   gl_FragData[1] = color;
+   gl_FragData[1] = (color + color2) / 2.0;
 }
 
 @end
@@ -136,21 +136,103 @@ uniform float imageWidth : 512.0;
 uniform float imageHeight : 512.0;
 
 void main(void){
-   float offsetY = blurSize / imageHeight;
-   float offsetX = blurSize / imageWidth;
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
 
    vec4 color1 = vec4(0.0);
    // Down left
    for(int i = 0; i < 10; i++){
-      color1 += 1.0/10.0 * texture2D(texture0, v_Texcoord - vec2(offsetX * float(i), offsetY * float(i)) );
+      color1 += 1.0/10.0 * texture2D(texture0, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
    }
    vec4 color2 = vec4(0.0);
    // Down right
    for(int i = 0; i < 10; i++){
-      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offsetX * float(i), -offsetY * float(i)) );
+      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
    }
 
    gl_FragColor = (color1 + color2) / 2.0;
+}
+
+@end
+
+
+@export buildin.compositor.hexagonal_blur_1
+
+uniform sampler2D texture;
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 1.0;
+
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
+
+void main(void){
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+
+   vec4 color = vec4(0.0);
+   // Top
+   for(int i = 0; i < 10; i++){
+      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
+   }
+   gl_FragColor = color;
+}
+
+@end
+
+@export buildin.compositor.hexagonal_blur_2
+
+uniform sampler2D texture;
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 1.0;
+
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
+
+void main(void){
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+
+   vec4 color = vec4(0.0);
+   // Down left
+   for(int i = 0; i < 10; i++){
+      color += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+   }
+   gl_FragColor = color;
+}
+@end
+
+@export buildin.compositor.hexagonal_blur_3
+
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+
+varying vec2 v_Texcoord;
+
+uniform float blurSize : 1.0;
+
+uniform float imageWidth : 1.0;
+uniform float imageHeight : 1.0;
+
+void main(void){
+   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+
+   vec4 color1 = vec4(0.0);
+   // Down left
+   for(int i = 0; i < 10; i++){
+      color1 += 1.0/10.0 * texture2D(texture1, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+   }
+   vec4 color2 = vec4(0.0);
+   // Down right
+   for(int i = 0; i < 10; i++){
+      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+   }
+
+   vec4 color3 = vec4(0.0);
+   // Down right
+   for(int i = 0; i < 10; i++){
+      color3 += 1.0/10.0 * texture2D(texture2, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+   }
+
+   gl_FragColor = (color1 + color2 + color3) / 3.0;
 }
 
 @end
