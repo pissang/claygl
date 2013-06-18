@@ -54,7 +54,7 @@ define( function(require) {
                     value : []
                  },
                  color : {
-                    type : 'float',
+                    type : 'ubyte',
                     semantic : "COLOR",
                     size : 3,
                     value : []

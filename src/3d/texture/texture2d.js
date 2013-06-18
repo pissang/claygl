@@ -29,7 +29,7 @@ define( function(require){
             _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
             
             var anisotropicExt = WebGLInfo.getExtension("EXT_texture_filter_anisotropic");
-            if( anisotropicExt){
+            if( anisotropicExt && this.anisotropic > 1){
                 _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
 

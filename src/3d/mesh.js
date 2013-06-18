@@ -76,7 +76,7 @@ define( function(require){
                         var buffer = attributeBufferInfo.buffer;
 
                         _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-                        shader.setMeshAttribute( _gl, symbol, attributeBufferInfo );
+                        shader.setMeshAttribute( _gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size );
                     }
                 }
                 //Do drawing

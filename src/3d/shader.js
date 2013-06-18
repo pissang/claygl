@@ -406,10 +406,8 @@ define( function(require){
             }
         },
 
-        setMeshAttribute : function( _gl, symbol, info ){
-            var type = info.type,
-                size = info.size,
-                glType;
+        setMeshAttribute : function( _gl, symbol, type, size ){
+            var glType;
             switch( type ){
                 case "byte":
                     glType = _gl.BYTE;

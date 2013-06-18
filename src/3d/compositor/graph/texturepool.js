@@ -32,10 +32,10 @@ define( function(require){
             list.push( texture );
         },
 
-        clear : function(){
+        clear : function(gl){
             for(name in pool){
                 for(var i = 0; i < pool[name].length; i++){
-                    pool[name][i].dispose();
+                    pool[name][i].dispose(gl);
                 }
             }
             pool = {};
