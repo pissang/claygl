@@ -4,3 +4,4 @@ tests/js/sponza.js
 tests/assets/models/sponza
 qtek.todo
 gh-pages
+.DS_Store
