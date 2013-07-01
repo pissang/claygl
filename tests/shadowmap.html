@@ -39,12 +39,10 @@
                         far : 100
                     });
                 
-                //=================================
-                // Create scene
-                //================================
                 var light = new qtek3d.light.Spot({
                     position : new Vector3(0, 4, 4),
-                    intensity : 4.0
+                    intensity : 4.0,
+                    shadowResolution : 1024
                 });
                 scene.add(light);
 

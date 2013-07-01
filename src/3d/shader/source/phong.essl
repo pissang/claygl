@@ -83,7 +83,9 @@ varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 
 uniform sampler2D diffuseMap;
+uniform sampler2D alphaMap;
 uniform sampler2D normalMap;
+uniform sampler2D specularMap;
 uniform sampler2D environmentMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];

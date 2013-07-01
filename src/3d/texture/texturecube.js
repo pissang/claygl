@@ -92,17 +92,22 @@ define( function(require){
         },
         isRenderable : function(){
             if( this.image.px ){
-                return this.image.px.complete &&
-                        this.image.nx.complete &&
-                        this.image.py.complete &&
-                        this.image.ny.complete &&
-                        this.image.pz.complete &&
-                        this.image.nz.complete;
+                return isImageRenderable(this.image.px) &&
+                       isImageRenderable(this.image.nx) &&
+                       isImageRenderable(this.image.py) &&
+                       isImageRenderable(this.image.ny) &&
+                       isImageRenderable(this.image.pz) &&
+                       isImageRenderable(this.image.nz);
             }else{
                 return this.width && this.height;
             }
         }
     });
+
+    function isImageRenderable(image){
+        return image.nodeName === "CANVAS" ||
+                image.complete;
+    }
 
     return TextureCube;
 } )

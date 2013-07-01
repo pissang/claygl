@@ -25,8 +25,8 @@ void main(){
     // Whats the difference between gl_FragCoord.z and this v_ViewPosition
     // gl_FragCoord consider the polygon offset ?
     float z = v_ViewPosition.z / v_ViewPosition.w;
-
-    gl_FragColor = packDepth(z);
+    // Map to 0.0 - 1.0
+    gl_FragColor = packDepth((z + 1.0) / 2.0);
 }
 @end
 
@@ -96,23 +96,40 @@ uniform bool shadowEnabled : true;
 
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
+float shadowContrib(sampler2D map, vec2 uv, float z){
+    vec4 tex = texture2D(map, uv);
+    return (unpackDepth(tex) * 2.0 - 1.0) + 0.003 < z ? 0.0 : 1.0;
+}
+
+float pcf(sampler2D map, vec2 uv, float z){
+
+    float shadowFalloff = shadowContrib(map, uv, z);
+    float offset = 1.0/512.0;
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, 0.0), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(0.0, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, 0.0), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, -offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, -offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(0.0, -offset), z);
+
+    return shadowFalloff / 9.0;
+}
+
 float computeShadowFalloff(sampler2D map, mat4 lightVPM, vec3 position){
-    float shadowFallOff = 1.0;
-    vec4 posInLightSpace = ( lightVPM * vec4(v_WorldPosition, 1.0) );
+    float shadowFalloff = 1.0;
+    vec4 posInLightSpace = lightVPM * vec4(v_WorldPosition, 1.0);
     posInLightSpace.xyz /= posInLightSpace.w;
     // In frustum
     if( all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
         all(lessThan(posInLightSpace.xyz, vec3(1.0))) ){
         // To texture uv
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
-        vec4 shadowTex = texture2D( map, uv );
-        float z = unpackDepth(shadowTex) ;
-        
-        if( z + 0.0025 < posInLightSpace.z ){
-            shadowFallOff = 0.2;
-        }
+
+        shadowFalloff = pcf(map, uv, posInLightSpace.z);
     }
-    return shadowFallOff;
+    return shadowFalloff;
 }
 
 #endif
@@ -123,7 +140,7 @@ float computeShadowFallOfCube( samplerCube map, vec3 direction ){
     vec4 shadowTex = textureCube(map, direction);
     float dist = length(direction);
 
-    if( unpackDepth(shadowTex) + 0.001 < dist ){
+    if( unpackDepth(shadowTex) + 0.002 < dist ){
         return 0.0;
     }else{
         return 1.0;
@@ -168,7 +185,7 @@ void computeShadowFallOfPointLights( vec3 position, inout float shadowFalloffs[P
 void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFalloffs[DIRECTIONAL_LIGHT_NUMBER] ){
     for( int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
         float shadowFalloff = computeShadowFalloff( directionalLightShadowMap[i], directionalLightMatrix[i], position );
-        shadowFalloffs[ i ] = shadowFalloff;
+        shadowFalloffs[i] = shadowFalloff;
     }
     // set default fallof of rest lights
     for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){

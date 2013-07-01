@@ -38,6 +38,7 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
+#extension GL_OES_standard_derivatives : enable
 @import buildin.util.edge_factor
 
 void main(){

@@ -36,7 +36,7 @@
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
+                        far : 100
                     });
                 var data = JSON.parse(modelData);
 
@@ -54,9 +54,7 @@
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                // material.setUniform("lineWidth", 0.7);
                 material.setUniform("color", [0.2, 0.2, 0.2]);
-                // material.setUniform("lineColor", [0.7, 0.7, 0.7]);
                 var image = new Image;
                 image.src = "assets/textures/ground_tile.jpg";
                 var texture = new qtek3d.texture.Texture2D({
@@ -74,17 +72,17 @@
                 var root = new qtek3d.Node();
 
                 _.each(meshList, function(mesh){
-                    // mesh.geometry.generateTangents();
-                    mesh.material.setUniform("shininess", 100);
+                    mesh.material.setUniform("shininess", 50);
                     mesh.material.shader.disableTexture("normalMap");
                     mesh.material.setUniform("specular", [0.6, 0.6, 0.6]);
                     root.add(mesh);
                 });
 
-                camera.position.set(0, 14, 14);
-                camera.lookAt( new qtek.core.Vector3(0, 6, 0) );
+                camera.position.set(0, 4, 5);
+                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
 
                 scene.add( root );
+                root.scale.set(0.2, 0.2, 0.2);
                 // Add Plane
                 var plane = new qtek3d.geometry.Plane({
                     widthSegments : 1,
@@ -92,45 +90,43 @@
                 });
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
-                    material : material,
-                    scale : new qtek.core.Vector3(60, 60, 60)
+                    material : material
                 });
-                planeMesh.position.y = -0.8;
+                planeMesh.position.y = -0.1;
                 planeMesh.rotation.rotateX(-Math.PI/2);
-                root.add(planeMesh);
-                // Add cube
-                var cube = new qtek3d.geometry.Cube();
-                var cubeMaterial = new qtek3d.Material({
-                    shader : qtek3d.shader.library.get("buildin.lambert")
-                });
-                var cubeList = [];
-                for(var i = 0; i < 5; i++){
-                    for(var j = 0; j < 5; j++){
-                        var cubeMesh = new qtek3d.Mesh({
-                            geometry : cube,
-                            material : cubeMaterial,
-                            scale : new qtek.core.Vector3(2, 2, 2),
-                            position : new qtek.core.Vector3(20*Math.sin(Math.random()*3.14), 10*Math.random(), 20*Math.cos(Math.random()*3.14))
-                        });
-                        cubeList.push(cubeMesh);
-                    }
-                }
-                root.add( qtek3d.util.mesh.merge(cubeList) );
-                cubeMaterial.setUniform("color", [0.4, 0.4, 0.4]);
+                planeMesh.scale.set(10, 10, 10);
+
+                scene.add(planeMesh);
 
                 var light = new qtek3d.light.Directional({
                     intensity : 4.0,
-                    position : new qtek.core.Vector3(20, 14, 20)
+                    position : new qtek.core.Vector3(2, 2, 2),
+                    shadowCamera : {
+                        left : -5,
+                        right : 5,
+                        top : 5,
+                        bottom : -5,
+                        near : 0,
+                        far : 30
+                    }
                 });
                 light.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
                 scene.add(light);
 
-                // var light2 = new qtek3d.light.Directional({
-                //     position : new qtek.core.Vector3(0, 10, -20),
-                //     intensity : 2.0
-                // });
-                // light2.lookAt(root.position);
-                // scene.add(light2);
+                var aidLight = new qtek3d.light.Directional({
+                    intensity : 2.0,
+                    position : new qtek.core.Vector3(2, 4, -2),
+                    shadowCamera : {
+                        left : -5,
+                        right : 5,
+                        top : 5,
+                        bottom : -5,
+                        near : 0,
+                        far : 30
+                    }
+                });
+                aidLight.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
+                scene.add(aidLight);
 
                 var control = new qtek3d.plugin.OrbitControl({
                     camera : camera,

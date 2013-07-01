@@ -31,25 +31,23 @@ float edgeFactor(float width){
 @end
 
 // Pack depth
-// http://devmaster.net/posts/3002/shader-effects-shadow-mapping
+// Float value can only be 0.0 - 1.0 ?
 @export buildin.util.pack_depth
 vec4 packDepth( const in float depth ){
 
-    const vec4 bias = vec4(1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0, 0.0);
+    const vec4 bitShifts = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
 
-    float r = depth;
-    float g = fract(r * 255.0);
-    float b = fract(g * 255.0);
-    float a = fract(b * 255.0);
-    vec4 colour = vec4(r, g, b, a);
-    
-    return colour - (colour.yzww * bias);
+    const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+    vec4 res = fract( depth * bitShifts );
+    res -= res.xxyz * bit_mask;
+
+    return res;
 }
 @end
 
 @export buildin.util.unpack_depth
 float unpackDepth( const in vec4 colour ){
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0), 1.0 / (255.0 * 255.0 * 255.0));
+    const vec4 bitShifts = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
     return dot(colour, bitShifts);
 }
 @end

@@ -24,7 +24,7 @@ define( function(require){
 
     var frameBuffer = new FrameBuffer();
 
-    Shader.import( require('text!./vsm.essl') );
+    Shader.import( require('text!./sm.essl') );
 
     var ShadowMapPlugin = Base.derive(function(){
         return {
@@ -47,16 +47,16 @@ define( function(require){
     }, function(){
         this._depthMaterial =  new Material({
             shader : new Shader({
-                vertex : Shader.source("buildin.vsm.depth.vertex"),
-                fragment : Shader.source("buildin.vsm.depth.fragment")
+                vertex : Shader.source("buildin.sm.depth.vertex"),
+                fragment : Shader.source("buildin.sm.depth.fragment")
             })
         });
         // Point light write the distance instance of depth projected
         // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
         this._pointLightDepthMaterial = new Material({
             shader : new Shader({
-                vertex : Shader.source("buildin.vsm.distance.vertex"),
-                fragment : Shader.source("buildin.vsm.distance.fragment")
+                vertex : Shader.source("buildin.sm.distance.vertex"),
+                fragment : Shader.source("buildin.sm.distance.fragment")
             })
         })
     }, {
@@ -234,22 +234,21 @@ define( function(require){
                     texture = new TextureCube({
                         width : resolution,
                         height : resolution,
-                        // minFilter : "NEAREST",
-                        // magFilter : "NEAREST",
-                        // generateMipmaps : false,
-                        type : 'FLOAT'
-                    })
+                        minFilter : "NEAREST",
+                        magFilter : "NEAREST",
+                        generateMipmaps : false
+                        // type : 'FLOAT'
+                    });
                 }else{
                     texture = new Texture2d({
                         width : resolution,
                         height : resolution,
-                        // It seems the min filter and mag filter must
-                        // be nearest in the chrome canary if the type is float
-                        // minFilter : "NEAREST",
-                        // magFilter : "NEAREST",
-                        // generateMipmaps : false,
-                        type : 'FLOAT'
-                    })   
+                        
+                        minFilter : "NEAREST",
+                        magFilter : "NEAREST",
+                        generateMipmaps : false
+                        // type : 'FLOAT'
+                    });
                 }
                 this._textures[key] = texture;
             }

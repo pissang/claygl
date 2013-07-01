@@ -34,9 +34,7 @@ define( function(require){
             }
 
             if( this.image ){
-                // After image is loaded
-                if( this.image.complete )
-                    _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, this.image );
+                _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, this.image );
             }
             // Can be used as a blank texture when writing render to texture(RTT)
             else{
@@ -65,7 +63,8 @@ define( function(require){
 
         isRenderable : function(){
             if( this.image ){
-                return this.image.complete;
+                return this.image.nodeName === "CANVAS" ||
+                        this.image.complete;
             }else{
                 return this.width && this.height;
             }

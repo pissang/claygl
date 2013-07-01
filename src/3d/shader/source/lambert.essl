@@ -72,6 +72,7 @@ varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
 
 uniform sampler2D diffuseMap;
+uniform sampler2D alphaMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;

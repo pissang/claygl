@@ -57,6 +57,7 @@ define( function(require){
         },
 
         _mouseWheel : function(e){
+            e.preventDefault();
             var delta = e.wheelDelta // Webkit 
                         || -e.detail; // Firefox
 
@@ -87,9 +88,10 @@ define( function(require){
                 this._offsetPitch += dx * this.sensitivity / 100;
                 this._offsetRoll += dy * this.sensitivity / 100;
             }else if(this._op === 1){
-                // TODO Auto fit the size of scene
-                this._panX += dx * this.sensitivity / 20;
-                this._panY += dy * this.sensitivity / 20;
+                var len = this.origin.distance(this.camera.position);
+                var tmp = Math.sin(this.camera.fov/2) / 100;
+                this._panX -= dx * this.sensitivity * len * tmp;
+                this._panY -= dy * this.sensitivity * len * tmp;
             }
 
             this._offsetX = e.pageX;
