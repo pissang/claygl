@@ -1,0 +1,22 @@
+@export buildin.deferred.depth.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+
+void main(){
+
+    gl_Position = worldViewProjection * vec4( position , 1.0 );
+}
+@end
+
+@export buildin.deferred.depth.fragment
+
+@import buildin.util.pack_depth
+
+void main(){
+
+    gl_FragColor = packDepth(gl_FragCoord.z / 2.0 + 1.0);
+}
+@end
+

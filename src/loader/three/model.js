@@ -27,7 +27,7 @@ define( function(require){
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
 
-    var Loader = Node.derive(function(){
+    var Loader = Base.derive(function(){
         return {
             textureRootPath : "",
 

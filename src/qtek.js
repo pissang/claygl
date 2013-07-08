@@ -4,21 +4,24 @@ define( function(require){
 	"2d": {
 		"Camera": require('2d/camera'),
 		"Node": require('2d/node'),
-		"renderable": {
-			"Arc": require('2d/renderable/arc'),
-			"Circle": require('2d/renderable/circle'),
-			"Image": require('2d/renderable/image'),
-			"Line": require('2d/renderable/line'),
-			"Path": require('2d/renderable/path'),
-			"Polygon": require('2d/renderable/polygon'),
-			"Rectangle": require('2d/renderable/rectangle'),
-			"RoundedRectangle": require('2d/renderable/roundedrectangle'),
-			"Sector": require('2d/renderable/sector'),
-			"Text": require('2d/renderable/text'),
-			"TextBox": require('2d/renderable/textbox')
-		},
 		"Renderer": require('2d/renderer'),
 		"Scene": require('2d/scene'),
+		"shape": {
+			"Arc": require('2d/shape/arc'),
+			"Circle": require('2d/shape/circle'),
+			"Ellipse": require('2d/shape/ellipse'),
+			"HTML": require('2d/shape/html'),
+			"Image": require('2d/shape/image'),
+			"Line": require('2d/shape/line'),
+			"Path": require('2d/shape/path'),
+			"Polygon": require('2d/shape/polygon'),
+			"Rectangle": require('2d/shape/rectangle'),
+			"RoundedRectangle": require('2d/shape/roundedrectangle'),
+			"Sector": require('2d/shape/sector'),
+			"SVGPath": require('2d/shape/svgpath'),
+			"Text": require('2d/shape/text'),
+			"TextBox": require('2d/shape/textbox')
+		},
 		"Style": require('2d/style'),
 		"util": require('2d/util')
 	},
@@ -97,6 +100,8 @@ define( function(require){
 		"Base": require('core/base'),
 		"Cache": require('core/cache'),
 		"Event": require('core/event'),
+		"Matrix2": require('core/matrix2'),
+		"Matrix2d": require('core/matrix2d'),
 		"Matrix3": require('core/matrix3'),
 		"Matrix4": require('core/matrix4'),
 		"mixin": {
@@ -111,6 +116,7 @@ define( function(require){
 		"Vector4": require('core/vector4')
 	},
 	"loader": {
+		"SVG": require('loader/svg'),
 		"three": {
 			"Model": require('loader/three/model'),
 			"Scene": require('loader/three/scene')

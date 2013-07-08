@@ -134,7 +134,7 @@ define( function(require) {
             return this._verticesNumber;
         },
 
-        getEnabledAttributes : function(){
+        _getEnabledAttributes : function(){
             // Cache
             if( this._enabledAttributes){
                 return this._enabledAttributes;
@@ -158,10 +158,10 @@ define( function(require) {
             return result;
         },
 
-        getDirtyAttributes : function( ){
+        _getDirtyAttributes : function( ){
 
             var result = {};
-            var attributes = this.getEnabledAttributes();
+            var attributes = this._getEnabledAttributes();
             
             var noDirtyAttributes = true;
             for(var name in attributes ){
@@ -186,7 +186,7 @@ define( function(require) {
             this.cache.use(_gl.__GUID__ );
 
             var isDirty = this.cache.getContext();
-            var dirtyAttributes = this.getDirtyAttributes();
+            var dirtyAttributes = this._getDirtyAttributes();
 
             var isFacesDirty = this.cache.get("dirty_faces") || this.cache.miss("dirty_faces");
 
@@ -197,6 +197,7 @@ define( function(require) {
                 for (var name in dirtyAttributes ) {
                     isDirty[ "dirty_"+name ] = false ;
                 }
+                isDirty['dirty_faces'] = false;
             }
             return this.cache.get("chunks");
         },
@@ -680,7 +681,7 @@ define( function(require) {
             }
 
             var cursor = this.getVerticesNumber(),
-                attributes = this.getEnabledAttributes(),
+                attributes = this._getEnabledAttributes(),
                 faces = this.faces;
 
             function cloneAttribute( idx ){

@@ -45,7 +45,7 @@ define( function( require ){
 
                 // MRT Support in chrome
                 // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-                var ext = WebGLInfo.getExtension("EXT_draw_buffers");
+                var ext = WebGLInfo.getExtension(_gl, "EXT_draw_buffers");
                 if(ext){
                     var bufs = [];
                     for( var attachment in this.outputs){

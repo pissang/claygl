@@ -20,6 +20,14 @@ define(function(require) {
         this.loop = typeof(options.loop) == 'undefined'
                     ? false : options.loop;
 
+        if (this.loop) {
+            if (typeof(this.loop) == 'number') {
+                this._currentLoop = this.loop;
+            } else {
+                this._currentLoop = 9999999;
+            }
+        }
+
         this.gap = options.gap || 0;
 
         this.easing = options.easing || 'Linear';
@@ -53,10 +61,10 @@ define(function(require) {
             this.fire('frame', schedule);
 
             if (percent == 1) {
-                if (this.loop) {
+                if (this.loop && this._currentLoop) {
                     this.restart();
+                    this._currentLoop--;
                     return 'restart';
-
                 }else{
                     // Mark this controller to be deleted
                     // In the animation.update

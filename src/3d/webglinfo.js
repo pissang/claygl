@@ -15,14 +15,15 @@ define( function(){
                             "EXT_texture_filter_anisotropic",
                             "EXT_draw_buffers"];
 
-    var initialized = false;
+    var initialized = {};
 
     var extensions = {};
 
     var WebGLInfo = {
 
         initialize : function( _gl ){
-            if(initialized){
+
+            if(initialized[_gl.__GUID__]){
                 return;
             }
             // Basic info
@@ -43,11 +44,14 @@ define( function(){
                 extensions[extName] = ext;
             }
 
-            initialized = true;
+            initialized[_gl.__GUID__] = true;
         },
 
-        getExtension : function(name){
-            return extensions[name];
+        getExtension : function(_gl, name) {
+            var guid = _gl.__GUID__;
+            if (extensions[guid]) {
+                return extensions[guid][name];
+            }
         }
     }
 

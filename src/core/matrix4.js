@@ -202,10 +202,6 @@ define( function(require){
             return this;
         },
 
-        rotateAround : function(point, axis, angle){
-            console.warn("TODO");
-        },
-
         // Static method
         // Decompose a matrix to SRT
         // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx

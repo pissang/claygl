@@ -95,7 +95,7 @@ define( function(require){
          */
         normalFromMat4 : function(a){
             mat3.normalFromMat4(this._array, a._array);
-            return a;
+            return this;
         },
         transpose : function(){
             mat3.transpose(this._array, this._array);

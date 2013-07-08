@@ -119,7 +119,7 @@ define( function(require) {
             
             if( attachment === 'DEPTH_ATTACHMENT' ){
 
-                var extension = WebGLInfo.getExtension("WEBGL_depth_texture");
+                var extension = WebGLInfo.getExtension(_gl, "WEBGL_depth_texture");
 
                 if( !extension ){
                     console.error( " Depth texture is not supported by the browser ");
