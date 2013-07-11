@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var Light = require('../light');
     var Shader = require('../shader');
@@ -11,7 +11,7 @@ define( function(require){
 
     Shader.import(SHADER_STR);
 
-    var DirectionalLight = Light.derive( function(){
+    var DirectionalLight = Light.derive(function() {
 
         return {
             // Config of orthographic camera for shadow mapping generate
@@ -31,9 +31,9 @@ define( function(require){
         uniformTemplates : {
             'directionalLightDirection' : {
                 type : '3f',
-                value : ( function(){
+                value : (function() {
                     var z = new Vector3();
-                    return function( instance ){
+                    return function(instance) {
                         // Direction is target to eye
                         return z.copy(instance.matrix.forward).negate()._array;
                     }
@@ -41,7 +41,7 @@ define( function(require){
             },
             'directionalLightColor' : {
                 type : '3f',
-                value : function( instance ){
+                value : function(instance) {
                     var color = instance.color,
                         intensity = instance.intensity;
                     return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];

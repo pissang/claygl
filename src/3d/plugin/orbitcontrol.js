@@ -1,7 +1,7 @@
 /**
  * @export{class} OrbitControl
  */
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
@@ -10,7 +10,7 @@ define( function(require){
 
     var upVector = new Vector3(0, 1, 0);
 
-    var OrbitControl = Base.derive(function(){
+    var OrbitControl = Base.derive(function() {
         return {
             
             camera : null,
@@ -39,7 +39,7 @@ define( function(require){
         }
     }, {
 
-        enable : function(){
+        enable : function() {
 
             this.camera.on("beforeupdate", this._beforeUpdateCamera, this);
 
@@ -48,7 +48,7 @@ define( function(require){
             this.canvas.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
         },
 
-        disable : function(){
+        disable : function() {
             this.camera.off("beforeupdate", this._beforeUpdateCamera);
             this.canvas.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
             this.canvas.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
@@ -56,7 +56,7 @@ define( function(require){
             this._mouseUp();
         },
 
-        _mouseWheel : function(e){
+        _mouseWheel : function(e) {
             e.preventDefault();
             var delta = e.wheelDelta // Webkit 
                         || -e.detail; // Firefox
@@ -64,7 +64,7 @@ define( function(require){
             this._forward += delta * this.sensitivity;
         },
 
-        _mouseDown : function(e){
+        _mouseDown : function(e) {
             document.addEventListener("mousemove", bindOnce(this._mouseMove, this), false);
             document.addEventListener("mouseup", bindOnce(this._mouseUp, this), false);
             document.addEventListener("mouseout", bindOnce(this._mouseOut, this), false);
@@ -73,21 +73,21 @@ define( function(require){
             this._offsetY = e.pageY;
 
             // Rotate
-            if( e.button === 0){
+            if (e.button === 0) {
                 this._op = 0;
-            }else if( e.button === 1){
+            } else if (e.button === 1) {
                 this._op = 1;
             }
         },
 
-        _mouseMove : function(e){
+        _mouseMove : function(e) {
             var dx = e.pageX - this._offsetX,
                 dy = e.pageY - this._offsetY;
 
-            if(this._op === 0){
+            if (this._op === 0) {
                 this._offsetPitch += dx * this.sensitivity / 100;
                 this._offsetRoll += dy * this.sensitivity / 100;
-            }else if(this._op === 1){
+            } else if (this._op === 1) {
                 var len = this.origin.distance(this.camera.position);
                 var tmp = Math.sin(this.camera.fov/2) / 100;
                 this._panX -= dx * this.sensitivity * len * tmp;
@@ -98,29 +98,28 @@ define( function(require){
             this._offsetY = e.pageY;
         },
 
-        _mouseUp : function(){
+        _mouseUp : function() {
 
             document.removeEventListener("mousemove", bindOnce(this._mouseMove, this));
             document.removeEventListener("mouseup", bindOnce(this._mouseUp, this));
             document.removeEventListener("mouseout", bindOnce(this._mouseOut, this));
         },
 
-        _mouseOut : function(){
+        _mouseOut : function() {
             this._mouseUp();
         },
 
-        _beforeUpdateCamera : function(){
+        _beforeUpdateCamera : function() {
 
             var camera = this.camera;
 
-            if( this._op === 0){
+            if (this._op === 0) {
                 // Rotate
                 camera.rotateAround(this.origin, upVector, -this._offsetPitch);            
                 var xAxis = camera.matrix.right;
                 camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
                 this._offsetRoll = this._offsetPitch = 0;
-            }
-            else if( this._op === 1){
+            } else if (this._op === 1) {
                 // Pan
                 var xAxis = camera.matrix.right.normalize().scale(-this._panX);
                 var yAxis = camera.matrix.up.normalize().scale(this._panY);
@@ -138,9 +137,9 @@ define( function(require){
         }
     });
 
-    function bindOnce( func, context){
-        if( ! func.__bindfuc__){
-            func.__bindfuc__ = function(){
+    function bindOnce(func, context) {
+        if (!func.__bindfuc__) {
+            func.__bindfuc__ = function() {
                 return func.apply(context, arguments); 
             }
         }

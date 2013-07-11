@@ -1,4 +1,4 @@
-define(function(){
+define(function() {
 
 /**
  * derive a sub class from base class
@@ -9,9 +9,9 @@ define(function(){
  *
  * @export{object}
  */
-function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/){
+function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 
-    if( typeof initialize == "object"){
+    if( typeof initialize == "object") {
         proto = initialize;
         initialize = null;
     }
@@ -20,10 +20,10 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/){
     var extendedProto = {
         // instanceof operator cannot work well,
         // so we write a method to simulate it
-        'instanceof' : function(constructor){
+        'instanceof' : function(constructor) {
             var selfConstructor = sub;
-            while(selfConstructor){
-                if( selfConstructor === constructor ){
+            while(selfConstructor) {
+                if( selfConstructor === constructor ) {
                     return true;
                 }
                 selfConstructor = selfConstructor.__super__;
@@ -33,7 +33,7 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/){
 
     var _super = this;
 
-    var sub = function(options){
+    var sub = function(options) {
 
         // call super constructor
         _super.call( this );
@@ -46,17 +46,17 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/){
 
         _.extend( this, options );
 
-        if( this.constructor == sub){
+        if (this.constructor == sub) {
             // find the base class, and the initialize function will be called 
             // in the order of inherit
             var base = sub,
                 initializeChain = [initialize];
-            while(base.__super__){
+            while (base.__super__) {
                 base = base.__super__;
                 initializeChain.unshift( base.__initialize__ );
             }
-            for(var i = 0; i < initializeChain.length; i++){
-                if( initializeChain[i] ){
+            for (var i = 0; i < initializeChain.length; i++) {
+                if( initializeChain[i] ) {
                     initializeChain[i].call( this );
                 }
             }

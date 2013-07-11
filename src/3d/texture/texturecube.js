@@ -2,7 +2,7 @@
  *
  * @export{class} TextureCube
  */
-define( function(require){
+define(function(require) {
 
     var Texture = require('../texture');
     var WebGLInfo = require('../webglinfo');
@@ -36,78 +36,78 @@ define( function(require){
         }
     }, {
 
-        update : function( _gl ){
+        update : function(_gl) {
 
-            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture") );
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture"));
 
-            this.beforeUpdate( _gl );
+            this.beforeUpdate(_gl);
 
-            var glFormat = _gl[ this.format.toUpperCase() ],
-                glType = _gl[ this.type.toUpperCase() ];
+            var glFormat = _gl[this.format.toUpperCase()],
+                glType = _gl[this.type.toUpperCase()];
 
-            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl[ this.wrapS.toUpperCase() ] );
-            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl[ this.wrapT.toUpperCase() ] );
+            _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl[this.wrapS.toUpperCase()]);
+            _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl[this.wrapT.toUpperCase()]);
 
-            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl[ this.magFilter.toUpperCase() ] );
-            _gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl[ this.minFilter.toUpperCase() ] );
+            _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl[this.magFilter.toUpperCase()]);
+            _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl[this.minFilter.toUpperCase()]);
             
             var anisotropicExt = WebGLInfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
-            if( anisotropicExt && this.anisotropic > 1){
+            if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
 
-            _.each( this.image, function(img, target){
-                if( img )
-                    _gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, glFormat, glType, img );
+            _.each(this.image, function(img, target) {
+                if (img)
+                    _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, glFormat, glType, img);
                 else
-                    _gl.texImage2D( _gl[ targetMap[target] ], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target] );
+                    _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target]);
             }, this);
 
-            if( !this.NPOT && this.generateMipmaps ){
-                _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+            if (!this.NPOT && this.generateMipmaps) {
+                _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
             }
 
-            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
-        bind : function( _gl ){
+        bind : function(_gl) {
 
-            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl) );
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
         },
-        unbind : function( _gl ){
-            _gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+        unbind : function(_gl) {
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
         // Overwrite the isPowerOfTwo method
-        isPowerOfTwo : function(){
-            if( this.image.px ){
-                return isPowerOfTwo( this.image.px.width ) &&
-                        isPowerOfTwo( this.image.px.height );
-            }else{
-                return isPowerOfTwo( this.width ) &&
-                        isPowerOfTwo( this.height );
+        isPowerOfTwo : function() {
+            if (this.image.px) {
+                return isPowerOfTwo(this.image.px.width) &&
+                        isPowerOfTwo(this.image.px.height);
+            } else {
+                return isPowerOfTwo(this.width) &&
+                        isPowerOfTwo(this.height);
             }
 
-            function isPowerOfTwo( value ){
+            function isPowerOfTwo(value) {
                 return value & (value-1) === 0
             }
         },
-        isRenderable : function(){
-            if( this.image.px ){
+        isRenderable : function() {
+            if (this.image.px) {
                 return isImageRenderable(this.image.px) &&
                        isImageRenderable(this.image.nx) &&
                        isImageRenderable(this.image.py) &&
                        isImageRenderable(this.image.ny) &&
                        isImageRenderable(this.image.pz) &&
                        isImageRenderable(this.image.nz);
-            }else{
+            } else {
                 return this.width && this.height;
             }
         }
     });
 
-    function isImageRenderable(image){
+    function isImageRenderable(image) {
         return image.nodeName === "CANVAS" ||
                 image.complete;
     }
 
     return TextureCube;
-} )
+})

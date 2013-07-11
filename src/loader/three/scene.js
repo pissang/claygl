@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var request = require("core/request");
@@ -15,44 +15,44 @@ define(function(require){
     var Material = require("3d/material");
     var Geometry = require("3d/geometry");
 
-    var SceneLoader = Base.derive(function(){
+    var SceneLoader = Base.derive(function() {
         return {
             textureRootPath : "",
             textureNumber : 0
         }
     }, {
 
-        load : function(url){
+        load : function(url) {
             var self = this;
 
             this.textureNumber = 0;
 
             request.get({
                 url : url,
-                onprogress : function(percent, loaded, total){
+                onprogress : function(percent, loaded, total) {
                     self.trigger("progress", percent, loaded, total);
                 },
-                onerror : function(e){
+                onerror : function(e) {
                     self.trigger("error", e);
                 },
                 responseType : "text",
-                onload : function(data){
+                onload : function(data) {
                     self.parse( JSON.parse(data) );
                 }
             })
         },
-        parse : function(data){
+        parse : function(data) {
             var scene = new Scene();
             this.parseHierarchy(root, scene);
         },
 
-        parseHierarchy : function(parentObjData, parentNode){
+        parseHierarchy : function(parentObjData, parentNode) {
             
-            for(var name in parentObjData){
+            for (var name in parentObjData) {
                 var childData = parentObjData[name];
-                if(childData.geometry && childData.material){
+                if (childData.geometry && childData.material) {
                     var child = new Mesh();
-                }else{
+                } else {
                     var child = new Node();
                 }
             }

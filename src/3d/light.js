@@ -1,8 +1,8 @@
-define( function(require){
+define(function(require){
 
     var Node = require("./node");
 
-    var Light = Node.derive( function(){
+    var Light = Node.derive(function(){
         return {
             color : [1, 1, 1],
             intensity : 1.0,
@@ -12,7 +12,7 @@ define( function(require){
             shadowResolution : 512
         }
     }, {
-    } );
+    });
 
     return Light;
-} )
+})

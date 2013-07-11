@@ -2,17 +2,17 @@ define(function(require){
 
     var Graph = require("./compositor/graph/graph");
 
-    var Compositor = Graph.derive(function(){
+    var Compositor = Graph.derive(function() {
         return {
         }
     }, {
-        render : function( renderer ){
-            if( this.isDirty("graph") ){
+        render : function(renderer) {
+            if(this.isDirty("graph")) {
                 this.update();
                 this.fresh("graph");
             }
             var finaNode;
-            for(var i = 0; i < this.nodes.length; i++){
+            for (var i = 0; i < this.nodes.length; i++) {
                 var node = this.nodes[i];
                 // Find output node
                 if( ! node.outputs){

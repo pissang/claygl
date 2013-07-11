@@ -2,17 +2,17 @@
  * From lightgl
  * https://github.com/evanw/lightgl.js/blob/master/src/mesh.js
  */
-define( function(require){
+define(function(require) {
 
 	var Geometry = require('../geometry');
 
-	var Plane = Geometry.derive( function(){
+	var Plane = Geometry.derive(function() {
 
 		return {
 			widthSegments : 1,
 			heightSegments : 1
 		}
-	}, function(){
+	}, function() {
 
 		var heightSegments = this.heightSegments,
 			widthSegments = this.widthSegments,
@@ -27,9 +27,12 @@ define( function(require){
 				var s = x / widthSegments;
 
 				positions.push([2 * s - 1, 2 * t - 1, 0]);
-				if ( texcoords ) texcoords.push([s, t]);
-
-				if ( normals ) normals.push([0, 0, 1]);
+				if (texcoords) {
+					texcoords.push([s, t]);
+				}
+				if (normals) {
+					normals.push([0, 0, 1]);
+				}
 				if (x < widthSegments && y < heightSegments) {
 					var i = x + y * (widthSegments + 1);
 					faces.push([i, i + 1, i + widthSegments + 1]);
@@ -41,4 +44,4 @@ define( function(require){
 	})
 
 	return Plane;
-} )
+})

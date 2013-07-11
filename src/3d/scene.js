@@ -1,8 +1,8 @@
-define( function(require){
+define(function(require){
 
     var Node = require('./node');
 
-    var Scene = Node.derive( function(){
+    var Scene = Node.derive(function(){
         return {
 
             // Global material of scene
@@ -22,4 +22,4 @@ define( function(require){
     });
 
     return Scene;
-} )
+})

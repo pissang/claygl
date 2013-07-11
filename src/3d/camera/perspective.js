@@ -1,9 +1,9 @@
-define( function(require){
+define(function(require) {
 
     var Camera = require('../camera');
 
 
-    var Perspective = Camera.derive( function(){
+    var Perspective = Camera.derive(function() {
         return {
 
             fov : 50,
@@ -16,7 +16,7 @@ define( function(require){
         }
     }, {
         
-        updateProjectionMatrix : function(){
+        updateProjectionMatrix : function() {
             var rad = this.fov / 180 * Math.PI;
             this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
         }

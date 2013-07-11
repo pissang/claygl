@@ -1,7 +1,7 @@
 /**
  * @export{class} FirstPersonControl
  */
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
@@ -10,7 +10,7 @@ define( function(require){
 
     var upVector = new Vector3(0, 1, 0);
 
-    var FirstPersonControl = Base.derive(function(){
+    var FirstPersonControl = Base.derive(function() {
         return {
             camera : null,
             canvas : null,
@@ -27,7 +27,7 @@ define( function(require){
             _offsetRoll : 0
         }
     }, {
-        enable : function(){
+        enable : function() {
             this.camera.on("beforeupdate", this._beforeUpdateCamera, this);
 
             this.camera.eulerOrder = ["Y", "X", "Z"];
@@ -47,7 +47,7 @@ define( function(require){
             document.addEventListener("keyup", bindOnce(this._keyUp, this), false);
         },
 
-        disable : function(){
+        disable : function() {
 
             this.camera.off('beforeupdate', this._beforeUpdateCamera);
 
@@ -57,16 +57,16 @@ define( function(require){
                                     el.mozExitPointerLock ||
                                     el.webkitExitPointerLock
 
-            if( el.exitPointerLock ){
+            if (el.exitPointerLock) {
                 el.exitPointerLock();
             }
-            document.removeEventListener("pointerlockchange", bindOnce( this._lockChange, this ));
-            document.removeEventListener("mozpointerlockchange", bindOnce( this._lockChange, this ));
-            document.removeEventListener("webkitpointerlockchange", bindOnce( this._lockChange, this ));
+            document.removeEventListener("pointerlockchange", bindOnce(this._lockChange, this));
+            document.removeEventListener("mozpointerlockchange", bindOnce(this._lockChange, this));
+            document.removeEventListener("webkitpointerlockchange", bindOnce(this._lockChange, this));
         
         },
 
-        requestPointerLock : function(){
+        requestPointerLock : function() {
             var el = this;
             el.requestPointerLock = el.requestPointerLock ||
                                     el.mozRequestPointerLock ||
@@ -75,11 +75,11 @@ define( function(require){
             el.requestPointerLock();
         },
 
-        _beforeUpdateCamera : (function(){
+        _beforeUpdateCamera : (function() {
 
             var rotateQuat = new Quaternion();
             
-            return function(){
+            return function() {
                 
                 var camera = this.camera;
 
@@ -87,17 +87,17 @@ define( function(require){
                     xAxis = camera.matrix.right.normalize(),
                     zAxis = camera.matrix.forward.normalize();
 
-                if( this._moveForward){
+                if (this._moveForward) {
                     // Opposite direction of z
                     position.scaleAndAdd(zAxis, -this.speed);
                 }
-                if( this._moveBackward){
+                if (this._moveBackward) {
                     position.scaleAndAdd(zAxis, this.speed);
                 }
-                if( this._moveLeft){
+                if (this._moveLeft) {
                     position.scaleAndAdd(xAxis, -this.speed/2);
                 }
-                if( this._moveRight){
+                if (this._moveRight) {
                     position.scaleAndAdd(xAxis, this.speed/2);
                 }
 
@@ -111,10 +111,10 @@ define( function(require){
 
         })(),
 
-        _lockChange : function(){
-            if( document.pointerlockElement === this.canvas ||
+        _lockChange : function() {
+            if (document.pointerlockElement === this.canvas ||
                 document.mozPointerlockElement === this.canvas ||
-                document.webkitPointerLockElement === this.canvas){
+                document.webkitPointerLockElement === this.canvas) {
 
                 document.addEventListener('mousemove', bindOnce(this._mouseMove, this), false);
             }else{
@@ -122,7 +122,7 @@ define( function(require){
             }
         },
 
-        _mouseMove : function(e){
+        _mouseMove : function(e) {
             var dx = e.movementX || 
                     e.mozMovementX ||
                     e.webkitMovementX || 0;
@@ -135,8 +135,8 @@ define( function(require){
             
         },
 
-        _keyDown : function(e){
-            switch( e.keyCode){
+        _keyDown : function(e) {
+            switch(e.keyCode) {
                 case 87: //w
                 case 37: //up arrow
                     this._moveForward = true;
@@ -156,8 +156,8 @@ define( function(require){
             }
         },
 
-        _keyUp : function(e){
-            switch( e.keyCode){
+        _keyUp : function(e) {
+            switch(e.keyCode) {
                 case 87: //w
                 case 37: //up arrow
                     this._moveForward = false;
@@ -178,9 +178,9 @@ define( function(require){
         }
     })
 
-    function bindOnce( func, context){
-        if( ! func.__bindfuc__){
-            func.__bindfuc__ = function(){
+    function bindOnce(func, context) {
+        if (!func.__bindfuc__) {
+            func.__bindfuc__ = function() {
                 return func.apply(context, arguments); 
             }
         }
@@ -188,4 +188,4 @@ define( function(require){
     }
 
     return FirstPersonControl;
-} )
+})

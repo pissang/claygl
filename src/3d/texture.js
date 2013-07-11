@@ -2,17 +2,17 @@
  * Base class for all textures like compressed texture, texture2d, texturecube
  * TODO mapping
  */
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base"),
         _ = require("_");
 
-    var Texture = Base.derive( function(){
+    var Texture = Base.derive(function() {
 
         return {
 
             // Width and height is used when the image is null and want
-            // to use it as a texture attach to framebuffer( RTT )
+            // to use it as a texture attach to framebuffer(RTT)
             width : 512,
             height : 512,
 
@@ -57,56 +57,56 @@ define( function(require){
         }
     }, {
 
-        getWebGLTexture : function( _gl ){
+        getWebGLTexture : function(_gl) {
 
-            this.cache.use( _gl.__GUID__ );
+            this.cache.use(_gl.__GUID__);
 
-            if( this.cache.miss( "webgl_texture" ) ){
+            if(this.cache.miss("webgl_texture")) {
                 // In a new gl context, create new texture and set dirty true
-                this.cache.put( "webgl_texture", _gl.createTexture() );
-                this.cache.put( "dirty", true );
+                this.cache.put("webgl_texture", _gl.createTexture());
+                this.cache.put("dirty", true);
             }
-            if( this.cache.get("dirty") ){
-                this.update( _gl );
+            if(this.cache.get("dirty")) {
+                this.update(_gl);
                 this.cache.put("dirty", false);
             }
 
-            return this.cache.get( "webgl_texture" );
+            return this.cache.get("webgl_texture");
         },
 
-        bind : function(){},
-        unbind : function(){},
+        bind : function() {},
+        unbind : function() {},
         
         // Overwrite the dirty method
-        dirty : function(){
-            for( var contextId in this.cache._caches ){
+        dirty : function() {
+            for(var contextId in this.cache._caches) {
                 this.cache._caches[ contextId ][ "dirty" ] = true;
             }
         },
 
-        update : function( _gl ){},
+        update : function(_gl) {},
 
         // Update the common parameters of texture
-        beforeUpdate : function( _gl ){
-            _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, this.flipY );
-            _gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha );
-            _gl.pixelStorei( _gl.UNPACK_ALIGNMENT, this.unpackAlignment );
+        beforeUpdate : function(_gl) {
+            _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
+            _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
+            _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
 
             this.fallBack();
         },
 
-        fallBack : function(){
+        fallBack : function() {
 
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
             
             var isPowerOfTwo = this.isPowerOfTwo();
 
-            if( this.format === "DEPTH_COMPONENT"){
+            if(this.format === "DEPTH_COMPONENT") {
                 this.generateMipmaps = false;
             }
 
-            if( ! isPowerOfTwo || ! this.generateMipmaps){
+            if(! isPowerOfTwo || ! this.generateMipmaps) {
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore
@@ -115,31 +115,31 @@ define( function(require){
                 this._wrapSOriginal = this.wrapS;
                 this._wrapTOriginal = this.wrapT;
 
-                if( this.minFilter.indexOf("NEAREST") == 0){
+                if(this.minFilter.indexOf("NEAREST") == 0) {
                     this.minFilter = 'NEAREST';
-                }else{
+                } else {
                     this.minFilter = 'LINEAR'
                 }
 
-                if( this.magFilter.indexOf("NEAREST") == 0){
+                if(this.magFilter.indexOf("NEAREST") == 0) {
                     this.magFilter = 'NEAREST';
-                }else{
+                } else {
                     this.magFilter = 'LINEAR'
                 }
 
                 this.wrapS = 'CLAMP_TO_EDGE';
                 this.wrapT = 'CLAMP_TO_EDGE';
-            }else{
-                if( this._minFilterOriginal ){
+            } else {
+                if(this._minFilterOriginal) {
                     this.minFilter = this._minFilterOriginal;
                 }
-                if( this._magFilterOriginal ){
+                if(this._magFilterOriginal) {
                     this.magFilter = this._magFilterOriginal;
                 }
-                if( this._wrapSOriginal ){
+                if(this._wrapSOriginal) {
                     this.wrapS = this._wrapSOriginal;
                 }
-                if( this._wrapTOriginal ){
+                if(this._wrapTOriginal) {
                     this.wrapT = this._wrapTOriginal;
                 }
             }
@@ -154,15 +154,15 @@ define( function(require){
             return x + 1;
         },
 
-        dispose : function( _gl ){
+        dispose : function(_gl) {
             this.cache.use(_gl.__GUID__);
-            _gl.deleteTexture( this.cache.get("webgl_texture") );
+            _gl.deleteTexture(this.cache.get("webgl_texture"));
         },
 
-        isRenderable : function(){},
+        isRenderable : function() {},
         
-        isPowerOfTwo : function(){},
-    } )
+        isPowerOfTwo : function() {},
+    })
 
     return Texture;
-} )
+})

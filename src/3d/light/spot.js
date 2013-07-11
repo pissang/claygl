@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var Light = require('../light');
     var Shader = require('../shader');
@@ -31,39 +31,39 @@ define( function(require){
         uniformTemplates : {
             'spotLightPosition' : {
                 type : '3f',
-                value : function( instance ){
+                value : function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
             'spotLightRange' : {
                 type : '1f',
-                value : function( instance ){
+                value : function(instance) {
                     return instance.range;
                 }
             },
             'spotLightUmbraAngleCosine' : {
                 type : '1f',
-                value : function( instance ){
+                value : function(instance) {
                     return Math.cos(instance.umbraAngle * Math.PI / 180);
                 }
             },
             'spotLightPenumbraAngleCosine' : {
                 type : '1f',
-                value : function( instance ){
+                value : function(instance) {
                     return Math.cos(instance.penumbraAngle * Math.PI / 180);
                 }
             },
             'spotLightFalloffFactor' : {
                 type : '1f',
-                value : function( instance ){
+                value : function(instance) {
                     return instance.falloffFactor
                 }
             },
             'spotLightDirection' : {
                 type : '3f',
-                value : ( function(){
+                value : (function() {
                     var z = new Vector3();
-                    return function( instance ){
+                    return function(instance) {
                         // Direction is target to eye
                         return z.copy(instance.matrix.forward).negate()._array;
                     }
@@ -71,7 +71,7 @@ define( function(require){
             },
             'spotLightColor' : {
                 type : '3f',
-                value : function( instance ){
+                value : function(instance) {
                     var color = instance.color,
                         intensity = instance.intensity;
                     return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];

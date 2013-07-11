@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var _ = require("_");
@@ -9,7 +9,7 @@ define( function(require){
     var Mesh = require("./mesh");
     var WebGLInfo = require('./webglinfo');
 
-    var Renderer = Base.derive( function() {
+    var Renderer = Base.derive(function() {
         return {
 
             __GUID__ : util.genGUID(),
@@ -39,8 +39,8 @@ define( function(require){
             viewportInfo : {},
 
         }
-    }, function(){
-        if ( ! this.canvas) {
+    }, function() {
+        if (! this.canvas) {
             this.canvas = document.createElement("canvas");
         }
         try {
@@ -54,7 +54,7 @@ define( function(require){
             });
             this.gl.__GUID__ = this.__GUID__;
 
-            this.resize( this.canvas.width, this.canvas.height );
+            this.resize(this.canvas.width, this.canvas.height);
 
             WebGLInfo.initialize(this.gl);
         }
@@ -67,7 +67,7 @@ define( function(require){
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
-            if( this.devicePixelRatio !== 1.0){
+            if (this.devicePixelRatio !== 1.0) {
                 canvas.style.width = width + "px";
                 canvas.style.height = height + "px";
             }
@@ -76,12 +76,12 @@ define( function(require){
             canvas.width = width * this.devicePixelRatio;
             canvas.height = height * this.devicePixelRatio;
 
-            this.setViewport(0, 0, canvas.width, canvas.height );
+            this.setViewport(0, 0, canvas.width, canvas.height);
         },
 
         setViewport : function(x, y, width, height) {
 
-            this.gl.viewport( x, y, width, height );
+            this.gl.viewport(x, y, width, height);
 
             this.viewportInfo = {
                 x : x,
@@ -91,11 +91,11 @@ define( function(require){
             }
         },
 
-        render : function( scene, camera, silent ) {
+        render : function(scene, camera, silent) {
             
             var _gl = this.gl;
             
-            if( ! silent){
+            if (! silent) {
                 // Render plugin like shadow mapping must set the silent true
                 this.trigger("beforerender", scene, camera);
             }
@@ -116,69 +116,69 @@ define( function(require){
 
             // Traverse the scene and add the renderable
             // object to the render queue;
-            scene.traverse( function(node) {
-                if( ! node.visible){
+            scene.traverse(function(node) {
+                if (! node.visible) {
                     return true;
                 }
-                if( node.instanceof( Light ) ){
-                    lights.push( node );
+                if (node.instanceof(Light)) {
+                    lights.push(node);
                 }
                 // A node have render method and material property
                 // can be rendered on the scene
-                if( ! node.render ) {
+                if (! node.render) {
                     return;
                 }
-                if( sceneMaterial ){
-                    if( sceneMaterial.transparent ){
-                        transparentQueue.push( node );
+                if (sceneMaterial) {
+                    if (sceneMaterial.transparent) {
+                        transparentQueue.push(node);
                     }else{
-                        opaqueQueue.push( node );
+                        opaqueQueue.push(node);
                     }
                 }else{
-                    if(! node.material || ! node.material.shader){
+                    if (! node.material || ! node.material.shader) {
                         return;
                     }
-                    if( ! node.geometry){
+                    if (! node.geometry) {
                         return;
                     }
-                    if( node.material.transparent ){
-                        transparentQueue.push( node );
+                    if (node.material.transparent) {
+                        transparentQueue.push(node);
                     }else{
-                        opaqueQueue.push( node );
+                        opaqueQueue.push(node);
                     }
                 }
-            } )
+            })
     
-            if( scene.filter ){
-                opaqueQueue = _.filter( opaqueQueue, scene.filter );
-                transparentQueue = _.filter( transparentQueue, scene.filter );
+            if (scene.filter) {
+                opaqueQueue = _.filter(opaqueQueue, scene.filter);
+                transparentQueue = _.filter(transparentQueue, scene.filter);
             }
 
             var lightNumber = {};
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
-                if( ! lightNumber[light.type] ){
+                if (! lightNumber[light.type]) {
                     lightNumber[light.type] = 0;
                 }
                 lightNumber[light.type]++;
             }
             scene.lightNumber = lightNumber;
-            this.updateLightUnforms( lights );
+            this.updateLightUnforms(lights);
 
             // Sort material to reduce the cost of setting uniform in material
             // PENDING : sort geometry ??
-            opaqueQueue.sort( this._materialSortFunc );
-            transparentQueue.sort( this._materialSortFunc );
+            opaqueQueue.sort(this._materialSortFunc);
+            transparentQueue.sort(this._materialSortFunc);
 
-            if( ! silent){
+            if (! silent) {
                 this.trigger("beforerender:opaque", opaqueQueue);
             }
 
-            _gl.enable( _gl.DEPTH_TEST );
-            _gl.disable( _gl.BLEND );
-            this.renderQueue( opaqueQueue, camera, sceneMaterial, silent );
+            _gl.enable(_gl.DEPTH_TEST);
+            _gl.disable(_gl.BLEND);
+            this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
-            if( ! silent){
+            if (! silent) {
                 this.trigger("afterrender:opaque", opaqueQueue);
                 this.trigger("beforerender:transparent", transparentQueue);
             }
@@ -186,12 +186,12 @@ define( function(require){
             _gl.disable(_gl.DEPTH_TEST);
             _gl.enable(_gl.BLEND);
             // Default blend function
-            _gl.blendEquation( _gl.FUNC_ADD );
-            _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+            _gl.blendEquation(_gl.FUNC_ADD);
+            _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
 
-            this.renderQueue( transparentQueue, camera, sceneMaterial, silent );
+            this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
-            if( ! silent){
+            if (! silent) {
                 this.trigger("afterrender:transparent", transparentQueue);
                 this.trigger("afterrender", scene, camera);
             }
@@ -201,26 +201,26 @@ define( function(require){
         updateLightUnforms : function(lights) {
             
             var lightUniforms = this._scene.lightUniforms;
-            for(var symbol in lightUniforms){
+            for (var symbol in lightUniforms) {
                 lightUniforms[symbol].value.length = 0;
             }
             for (var i = 0; i < lights.length; i++) {
                 
                 var light = lights[i];
                 
-                for ( symbol in light.uniformTemplates) {
+                for (symbol in light.uniformTemplates) {
 
                     var uniformTpl = light.uniformTemplates[symbol];
-                    if( ! lightUniforms[symbol] ){
+                    if (! lightUniforms[symbol]) {
                         lightUniforms[ symbol] = {
                             type : "",
                             value : []
                         }
                     }
-                    var value = uniformTpl.value( light );
+                    var value = uniformTpl.value(light);
                     var lu = lightUniforms[symbol];
                     lu.type = uniformTpl.type + "v";
-                    switch(uniformTpl.type){
+                    switch (uniformTpl.type) {
                         case "1i":
                         case "1f":
                             lu.value.push(value);
@@ -228,7 +228,7 @@ define( function(require){
                         case "2f":
                         case "3f":
                         case "4f":
-                            for(var j =0; j < value.length; j++){
+                            for (var j =0; j < value.length; j++) {
                                 lu.value.push(value[j]);
                             }
                             break;
@@ -239,15 +239,15 @@ define( function(require){
             }
         },
 
-        renderQueue : function( queue, camera, globalMaterial, silent ){
+        renderQueue : function(queue, camera, globalMaterial, silent) {
 
             // Calculate view and projection matrix
-            mat4.invert( matrices['VIEW'],  camera.worldMatrix._array );
-            mat4.copy( matrices['PROJECTION'], camera.projectionMatrix._array );
-            mat4.multiply( matrices['VIEWPROJECTION'], camera.projectionMatrix._array, matrices['VIEW'] );
-            mat4.copy( matrices['VIEWINVERSE'], camera.worldMatrix._array );
-            mat4.invert( matrices['PROJECTIONINVERSE'], matrices['PROJECTION'] );
-            mat4.invert( matrices['VIEWPROJECTIONINVERSE'], matrices['VIEWPROJECTION'] );
+            mat4.invert(matrices['VIEW'],  camera.worldMatrix._array);
+            mat4.copy(matrices['PROJECTION'], camera.projectionMatrix._array);
+            mat4.multiply(matrices['VIEWPROJECTION'], camera.projectionMatrix._array, matrices['VIEW']);
+            mat4.copy(matrices['VIEWINVERSE'], camera.worldMatrix._array);
+            mat4.invert(matrices['PROJECTIONINVERSE'], matrices['PROJECTION']);
+            mat4.invert(matrices['VIEWPROJECTIONINVERSE'], matrices['VIEWPROJECTION']);
 
             var prevMaterialID;
             var prevShaderID;
@@ -261,13 +261,13 @@ define( function(require){
                 var geometry = object.geometry;
                 var customBlend = material.transparent && material.blend;
 
-                if (prevShaderID !== shader.__GUID__ ) {
+                if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
                     var lightNumberChanged = false;
-                    if ( ! _.isEqual(shader.lightNumber, scene.lightNumber)) {
+                    if (! _.isEqual(shader.lightNumber, scene.lightNumber)) {
                         lightNumberChanged = true;
                     }
-                    if ( lightNumberChanged ) {
+                    if (lightNumberChanged) {
                         for (var type in scene.lightNumber) {
                             var number = scene.lightNumber[ type ];
                             shader.lightNumber[ type ] = number;
@@ -275,10 +275,10 @@ define( function(require){
                         shader.update();
                     }
 
-                    shader.bind( _gl );
+                    shader.bind(_gl);
 
                     // Set lights uniforms
-                    for (var symbol in scene.lightUniforms ) {
+                    for (var symbol in scene.lightUniforms) {
                         var lu = scene.lightUniforms[symbol];
                         shader.setUniform(_gl, lu.type, symbol, lu.value);
                     }
@@ -286,87 +286,87 @@ define( function(require){
                 }
                 if (prevMaterialID !== material.__GUID__) {
 
-                    material.bind( _gl );
+                    material.bind(_gl);
                     prevMaterialID = material.__GUID__;
 
                     Mesh.materialChanged();
                 }
 
-                if ( customBlend ){
-                    customBlend( _gl );
+                if (customBlend) {
+                    customBlend(_gl);
                 }
 
                 var worldM = object.worldMatrix._array;
 
                 // All matrices ralated to world matrix will be updated on demand;
-                if ( shader.semantics.hasOwnProperty('WORLD') ||
-                    shader.semantics.hasOwnProperty('WORLDTRANSPOSE') ) {
-                    mat4.copy( matrices['WORLD'], worldM );
+                if (shader.semantics.hasOwnProperty('WORLD') ||
+                    shader.semantics.hasOwnProperty('WORLDTRANSPOSE')) {
+                    mat4.copy(matrices['WORLD'], worldM);
                 }
-                if ( shader.semantics.hasOwnProperty('WORLDVIEW') ||
+                if (shader.semantics.hasOwnProperty('WORLDVIEW') ||
                     shader.semantics.hasOwnProperty('WORLDVIEWINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE') ) {
-                    mat4.multiply( matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
+                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE')) {
+                    mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
                 }
-                if ( shader.semantics.hasOwnProperty('WORLDVIEWPROJECTION') ||
+                if (shader.semantics.hasOwnProperty('WORLDVIEWPROJECTION') ||
                     shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE') ){
-                    mat4.multiply( matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
+                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE')) {
+                    mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
                 }
-                if ( shader.semantics.hasOwnProperty('WORLDINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDINVERSETRANSPOSE') ) {
-                    mat4.invert( matrices['WORLDINVERSE'], worldM );
+                if (shader.semantics.hasOwnProperty('WORLDINVERSE') ||
+                    shader.semantics.hasOwnProperty('WORLDINVERSETRANSPOSE')) {
+                    mat4.invert(matrices['WORLDINVERSE'], worldM);
                 }
-                if ( shader.semantics.hasOwnProperty('WORLDVIEWINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE') ) {
-                    mat4.invert( matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW'] );
+                if (shader.semantics.hasOwnProperty('WORLDVIEWINVERSE') ||
+                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE')) {
+                    mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
                 }
-                if ( shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE') ){
-                    mat4.invert( matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION'] );
+                if (shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSE') ||
+                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE')) {
+                    mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
 
                 for (var semantic in matrices) {
 
-                    if( shader.semantics.hasOwnProperty( semantic ) ){
+                    if (shader.semantics.hasOwnProperty(semantic)) {
                         var matrix = matrices[semantic];
                         var semanticInfo = shader.semantics[semantic];
-                        shader.setUniform( _gl, semanticInfo.type, semanticInfo.symbol, matrix);
+                        shader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
                     }
 
                     var semanticTranspose = semantic + "TRANSPOSE";
-                    if( shader.semantics.hasOwnProperty( semantic + "TRANSPOSE") ) {
+                    if (shader.semantics.hasOwnProperty(semantic + "TRANSPOSE")) {
                         var matrixTranspose = matrices[semantic+'TRANSPOSE'];
                         var matrix = matrices[semantic];
                         var semanticTransposeInfo = shader.semantics[semantic+"TRANSPOSE"];
-                        mat4.transpose( matrixTranspose, matrix);
-                        shader.setUniform( _gl, semanticTransposeInfo.type, semanticTransposeInfo.symbol, matrixTranspose  );
+                        mat4.transpose(matrixTranspose, matrix);
+                        shader.setUniform(_gl, semanticTransposeInfo.type, semanticTransposeInfo.symbol, matrixTranspose );
                     }
                 }
 
-                if( ! silent){
+                if (! silent) {
                     this.trigger("beforerender:mesh", object);
                 }
-                var drawInfo = object.render( this, globalMaterial );
-                if( ! silent){
+                var drawInfo = object.render(this, globalMaterial);
+                if (! silent) {
                     this.trigger("afterrender:mesh", object, drawInfo);
                 }
                 // Restore the default blend function
                 if (customBlend) {
-                    _gl.blendEquation( _gl.FUNC_ADD );
-                    _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );    
+                    _gl.blendEquation(_gl.FUNC_ADD);
+                    _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);    
                 }
 
             }
         },
 
-        _materialSortFunc : function(x, y){
-            if ( x.material.shader == y.material.shader) {
+        _materialSortFunc : function(x, y) {
+            if (x.material.shader == y.material.shader) {
                 return x.material.__GUID__ - y.material.__GUID__;
             }
             return x.material.shader.__GUID__ - y.material.__GUID__;
         }
-    } )
+    })
 
 
     var matrices = {
@@ -399,4 +399,4 @@ define( function(require){
     };
 
     return Renderer;
-} )
+})

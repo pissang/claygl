@@ -1,9 +1,9 @@
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var Matrix4 = require("core/matrix4");
 
-    var Skeleton = Base.derive(function(){
+    var Skeleton = Base.derive(function() {
         return {
             // Root bones
             roots : [],
@@ -20,17 +20,17 @@ define( function(require){
 
             _boneMatricesArray : null
         }
-    }, function(){
+    }, function() {
         this.updateHierarchy();
         this.updateJointMatrices();
     }, {
 
-        updateHierarchy : function(){
+        updateHierarchy : function() {
             this.roots = [];
             var bones = this.bones;
-            for(var i = 0; i < bones.length; i++){
+            for (var i = 0; i < bones.length; i++) {
                 var bone = bones[i];
-                if(bone.parentIndex >= 0){
+                if (bone.parentIndex >= 0) {
                     var parent = bones[bone.parentIndex];
                     parent.add(bone);
                 }else{
@@ -39,43 +39,43 @@ define( function(require){
             }
         },
 
-        updateJointMatrices : function(){
-            for(var i = 0; i < this.roots.length; i++){
+        updateJointMatrices : function() {
+            for (var i = 0; i < this.roots.length; i++) {
                 this.roots[i].update();
             }
-            for(var i = 0; i < this.bones.length; i++){
+            for (var i = 0; i < this.bones.length; i++) {
                 var bone = this.bones[i];
                 this._jointMatrices[i] = (new Matrix4()).copy(bone.worldMatrix).invert();
                 this._boneMatrices[i] = new Matrix4();
             }
         },
 
-        update : function(){
-            for(var i = 0; i < this.roots.length; i++){
+        update : function() {
+            for (var i = 0; i < this.roots.length; i++) {
                 this.roots[i].update();
             }
             var boneMatricesArray = this.getBoneMatricesArray();
             var cursor = 0;
-            for(var i = 0; i < this.bones.length; i++){
+            for (var i = 0; i < this.bones.length; i++) {
                 var matrixCurrentPose = this.bones[i].worldMatrix;
                 this._boneMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
 
-                for(var j = 0; j < 16; j++){
+                for (var j = 0; j < 16; j++) {
                     var array = this._boneMatrices[i]._array;
                     boneMatricesArray[cursor++] = array[j];
                 }
             }
         },
 
-        getBoneMatricesArray : function(){
-            if( ! this._boneMatricesArray ){
+        getBoneMatricesArray : function() {
+            if (! this._boneMatricesArray) {
                 this._boneMatricesArray = new Float32Array(this.bones.length * 16);
             }
             return this._boneMatricesArray;
         },
 
-        setPose : function(time){
-            for(var i = 0; i < this.bones.length; i++){
+        setPose : function(time) {
+            for (var i = 0; i < this.bones.length; i++) {
                 this.bones[i].setPose(time);
             }
             this.update();
@@ -83,4 +83,4 @@ define( function(require){
     });
 
     return Skeleton;
-} )
+})

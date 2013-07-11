@@ -4,7 +4,7 @@
  * Format specification : https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
  * @export{class} Model
  */
-define( function(require){
+define( function(require) {
 
     var Base = require('core/base');
 
@@ -27,32 +27,32 @@ define( function(require){
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
 
-    var Loader = Base.derive(function(){
+    var Loader = Base.derive(function() {
         return {
             textureRootPath : "",
 
             textureNumber : 0
         };
     }, {
-        load : function(url){
+        load : function(url) {
             var self = this;
 
             this.textureNumber = 0;
             request.get({
                 url : url,
-                onprogress : function(percent, loaded, total){
+                onprogress : function(percent, loaded, total) {
                     self.trigger("progress", percent, loaded, total);
                 },
-                onerror : function(e){
+                onerror : function(e) {
                     self.trigger("error", e);
                 },
                 responseType : "text",
-                onload : function(data){
-                    self.parse( JSON.parse(data) )
+                onload : function(data) {
+                    self.parse(JSON.parse(data))
                 }
             })
         },
-        parse : function(data){
+        parse : function(data) {
             
             var geometryList = this.parseGeometry(data);
 
@@ -61,14 +61,14 @@ define( function(require){
             var skinned = dSkinIndices && dSkinIndices.length
                         && dSkinWeights && dSkinWeights.length;
 
-            if(skinned){
+            if (skinned) {
                 var skeleton = this.parseSkeleton(data);
                 var boneNumber = skeleton.bones.length;
             }else{
                 var boneNumber = 0;
             }
 
-            if(skinned){
+            if (skinned) {
                 var skeleton = this.parseSkeleton(data);
                 var boneNumber = skeleton.bones.length;
             }else{
@@ -76,17 +76,18 @@ define( function(require){
             }
 
             var meshList = [];
-            for(var i = 0; i < data.materials.length; i++){
+            for (var i = 0; i < data.materials.length; i++) {
                 var geometry = geometryList[i];
-                if( geometry 
+                if (geometry 
                     && geometry.faces.length 
-                    && geometry.attributes.position.value.length ){
+                    && geometry.attributes.position.value.length) {
+
                     var material = this.parseMaterial(data.materials[i], boneNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],
                         material : material
                     }) ;
-                    if( skinned){
+                    if ( skinned) {
                         mesh.skeleton = skeleton;
                     }
                     meshList.push(mesh);
@@ -97,12 +98,12 @@ define( function(require){
             return meshList;
         },
 
-        parseGeometry : function(data){
+        parseGeometry : function(data) {
 
             var geometryList = [];
             var cursorList = [];
             
-            for(var i = 0; i < data.materials.length; i++){
+            for (var i = 0; i < data.materials.length; i++) {
                 geometryList[i] = null;
                 cursorList[i] = 0;
             }
@@ -133,10 +134,10 @@ define( function(require){
                 faces = geometry.faces;
 
             var nUvLayers = 0;
-            if( dUvs[0] && dUvs[0].length ){
+            if (dUvs[0] && dUvs[0].length) {
                 nUvLayers++;
             }
-            if( dUvs[1] && dUvs[1].length ){
+            if (dUvs[1] && dUvs[1].length) {
                 nUvLayers++;
             }
 
@@ -146,15 +147,15 @@ define( function(require){
             // Cache the reorganized index
             var newIndexMap = [];
             var geoIndexMap = [];
-            for(var i = 0; i < dVertices.length; i++){
+            for (var i = 0; i < dVertices.length; i++) {
                 newIndexMap[i] = -1;
                 geoIndexMap[i] = -1;
             }
 
             var currentGeometryIndex = 0;
             var isNew = [];
-            function getNewIndex(oi, faceIndex){
-                if( newIndexMap[oi] >= 0){
+            function getNewIndex(oi, faceIndex) {
+                if ( newIndexMap[oi] >= 0) {
                     // Switch to the geometry of existed index 
                     currentGeometryIndex = geoIndexMap[oi];
                     geometry = geometryList[currentGeometryIndex];
@@ -171,11 +172,11 @@ define( function(require){
                     return newIndexMap[oi];
                 }else{
 
-                    positions.push( [ dVertices[oi*3], dVertices[oi*3+1], dVertices[oi*3+2] ] );
+                    positions.push([dVertices[oi*3], dVertices[oi*3+1], dVertices[oi*3+2]]);
                     //Skin data
-                    if(skinned){
-                        boneWeights.push( [dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0] );
-                        boneIndices.push( [dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1] );
+                    if (skinned) {
+                        boneWeights.push([dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0]);
+                        boneIndices.push([dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1]);
                     }
 
                     newIndexMap[oi] = cursorList[materialIndex];
@@ -191,29 +192,29 @@ define( function(require){
             var faceUvs = [];
             var faceNormals = [];
             var faceColors = [];
-            for(var i =0; i < 4; i++){
+            for (var i =0; i < 4; i++) {
                 faceUvs[i] = [0, 0];
                 faceNormals[i] = [0, 0, 0];
                 faceColors[i] = [0, 0, 0];
             }
             var materialIndex = 0;
 
-            while(offset < len){
+            while (offset < len) {
                 var type = dFaces[offset++];
-                var isQuad = isBitSet( type, 0 ),
-                    hasMaterial = isBitSet( type, 1 ),
-                    hasFaceUv = isBitSet( type, 2 ),
-                    hasFaceVertexUv = isBitSet( type, 3 ),
-                    hasFaceNormal = isBitSet( type, 4 ),
-                    hasFaceVertexNormal = isBitSet( type, 5 ),
-                    hasFaceColor = isBitSet( type, 6 ),
-                    hasFaceVertexColor = isBitSet( type, 7 );
+                var isQuad = isBitSet(type, 0),
+                    hasMaterial = isBitSet(type, 1),
+                    hasFaceUv = isBitSet(type, 2),
+                    hasFaceVertexUv = isBitSet(type, 3),
+                    hasFaceNormal = isBitSet(type, 4),
+                    hasFaceVertexNormal = isBitSet(type, 5),
+                    hasFaceColor = isBitSet(type, 6),
+                    hasFaceVertexColor = isBitSet(type, 7);
 
                 var nVertices = isQuad ? 4 : 3;
 
-                if(hasMaterial){
+                if (hasMaterial) {
                     materialIndex = dFaces[ offset+ (isQuad ? 4 : 3) ];
-                    if( ! geometryList[materialIndex] ){
+                    if ( ! geometryList[materialIndex] ) {
                         geometryList[materialIndex] = new Geometry;
                     }
                     geometry = geometryList[materialIndex];
@@ -227,7 +228,7 @@ define( function(require){
                     boneIndices = attributes.boneIndex.value;
                     faces = geometry.faces;
                 }
-                if(isQuad){
+                if (isQuad) {
                     // Split into two triangle faces, 1-2-4 and 2-3-4
                     var i1o = dFaces[offset++],
                         i2o = dFaces[offset++],
@@ -242,7 +243,7 @@ define( function(require){
                         i5 = getNewIndex(i3o, 4),
                         i6 = getNewIndex(i4o, 5);
                     faces.push([i1, i2, i3], [i4, i5, i6]);
-                }else{
+                } else {
                     var i1 = dFaces[offset++],
                         i2 = dFaces[offset++],
                         i3 = dFaces[offset++];
@@ -251,16 +252,16 @@ define( function(require){
                     i3 = getNewIndex(i3, 2);
                     faces.push([i1, i2, i3]);
                 }
-                if(hasMaterial){
+                if (hasMaterial) {
                     offset++;
                 }
-                if(hasFaceUv){
-                    for(var i = 0; i < nUvLayers; i++){
+                if (hasFaceUv) {
+                    for (var i = 0; i < nUvLayers; i++) {
                         var uvLayer = dUvs[i];
                         var uvIndex = faces[offset++];
                         var u = uvLayer[uvIndex*2];
                         var v = uvLayer[uvIndex*2+1];
-                        if(isQuad){
+                        if (isQuad) {
                             // Random write of array seems not slow
                             // http://jsperf.com/random-vs-sequence-array-set
                             isNew[0] && (texcoords[i][i1] = [u, v]);
@@ -269,22 +270,22 @@ define( function(require){
                             isNew[3] && (texcoords[i][i4] = [u, v]);
                             isNew[4] && (texcoords[i][i5] = [u, v]);
                             isNew[5] && (texcoords[i][i6] = [u, v]);
-                        }else{
+                        } else {
                             isNew[0] && (texcoords[i][i1] = [u, v]);
                             isNew[1] && (texcoords[i][i2] = [u, v]);
                             isNew[2] && (texcoords[i][i3] = [u, v]);
                         }
                     }
                 }
-                if(hasFaceVertexUv){
-                    for(var i = 0; i < nUvLayers; i++){
+                if (hasFaceVertexUv) {
+                    for (var i = 0; i < nUvLayers; i++) {
                         var uvLayer = dUvs[i];
-                        for(var j = 0; j < nVertices; j++){
+                        for (var j = 0; j < nVertices; j++) {
                             var uvIndex = dFaces[offset++];
                             faceUvs[j][0] = uvLayer[uvIndex*2];
                             faceUvs[j][1] = uvLayer[uvIndex*2+1];
                         }
-                        if(isQuad){
+                        if (isQuad) {
                             // Use array slice to clone array is incredibly faster than 
                             // Construct from Float32Array
                             // http://jsperf.com/typedarray-v-s-array-clone/2
@@ -294,19 +295,19 @@ define( function(require){
                             isNew[3] && (texcoords[i][i4] = faceUvs[1].slice());
                             isNew[4] && (texcoords[i][i5] = faceUvs[2].slice());
                             isNew[5] && (texcoords[i][i6] = faceUvs[3].slice());
-                        }else{
+                        } else {
                             isNew[0] && (texcoords[i][i1] = faceUvs[0].slice());
                             isNew[1] && (texcoords[i][i2] = faceUvs[1].slice());
                             isNew[2] && (texcoords[i][i3] = faceUvs[2].slice());
                         }
                     }
                 }
-                if(hasFaceNormal){
+                if (hasFaceNormal) {
                     var normalIndex = dFaces[offset++]*3;
                     var x = dNormals[normalIndex++];
                     var y = dNormals[normalIndex++];
                     var z = dNormals[normalIndex];
-                    if(isQuad){
+                    if (isQuad) {
                         isNew[0] && (normals[i1] = [x, y, z]);
                         isNew[1] && (normals[i2] = [x, y, z]);
                         isNew[2] && (normals[i3] = [x, y, z]);
@@ -319,30 +320,30 @@ define( function(require){
                         isNew[2] && (normals[i3] = [x, y, z]);
                     }
                 }
-                if(hasFaceVertexNormal){
-                    for(var i = 0; i < nVertices; i++){
+                if (hasFaceVertexNormal) {
+                    for (var i = 0; i < nVertices; i++) {
                         var normalIndex = dFaces[offset++]*3;
                         faceNormals[i][0] = dNormals[normalIndex++];
                         faceNormals[i][1] = dNormals[normalIndex++];
                         faceNormals[i][2] = dNormals[normalIndex];
                     }
-                    if(isQuad){
+                    if (isQuad) {
                         isNew[0] && (normals[i1] = faceNormals[0].slice());
                         isNew[1] && (normals[i2] = faceNormals[1].slice());
                         isNew[2] && (normals[i3] = faceNormals[3].slice());
                         isNew[3] && (normals[i4] = faceNormals[1].slice());
                         isNew[4] && (normals[i5] = faceNormals[2].slice());
                         isNew[5] && (normals[i6] = faceNormals[3].slice());
-                    }else{
+                    } else {
                         isNew[0] && (normals[i1] = faceNormals[0].slice());
                         isNew[1] && (normals[i2] = faceNormals[1].slice());
                         isNew[2] && (normals[i3] = faceNormals[2].slice());
                     }
                 }
-                if(hasFaceColor){
+                if (hasFaceColor) {
                     var colorIndex = dFaces[offset++];
                     var color = hex2rgb(dColors[colorIndex]);
-                    if(isQuad){
+                    if (isQuad) {
                         // Does't clone the color here
                         isNew[0] && (colors[i1] = color);
                         isNew[1] && (colors[i2] = color);
@@ -350,25 +351,25 @@ define( function(require){
                         isNew[3] && (colors[i4] = color);
                         isNew[4] && (colors[i5] = color);
                         isNew[5] && (colors[i6] = color);
-                    }else{
+                    } else {
                         isNew[0] && (colors[i1] = color);
                         isNew[1] && (colors[i2] = color);
                         isNew[2] && (colors[i3] = color);
                     }
                 }
-                if(hasFaceVertexColor){
-                    for(var i = 0; i < nVertices; i++){
+                if (hasFaceVertexColor) {
+                    for (var i = 0; i < nVertices; i++) {
                         var colorIndex = dFaces[offset++];
                         faceColors[i] = hex2rgb(dColors[colorIndex]);
                     }
-                    if(isQuad){
+                    if (isQuad) {
                         isNew[0] && (colors[i1] = faceColors[0].slice());
                         isNew[1] && (colors[i2] = faceColors[1].slice());
                         isNew[2] && (colors[i3] = faceColors[3].slice());
                         isNew[3] && (colors[i4] = faceColors[1].slice());
                         isNew[4] && (colors[i5] = faceColors[2].slice());
                         isNew[5] && (colors[i6] = faceColors[3].slice());
-                    }else{
+                    } else {
                         isNew[0] && (colors[i1] = faceColors[0].slice());
                         isNew[1] && (colors[i2] = faceColors[1].slice());
                         isNew[2] && (colors[i3] = faceColors[2].slice());
@@ -379,10 +380,10 @@ define( function(require){
             return geometryList;
         },
 
-        parseSkeleton : function(data){
+        parseSkeleton : function(data) {
             var bones = [];
             var dBones = data.bones;
-            for( var i = 0; i < dBones.length; i++){
+            for ( var i = 0; i < dBones.length; i++) {
                 var dBone = dBones[i];
                 var bone = new Bone({
                     parentIndex : dBone.parent,
@@ -399,25 +400,25 @@ define( function(require){
             });
             skeleton.update();
 
-            if( data.animation){
+            if ( data.animation) {
                 var dFrames = data.animation.hierarchy;
 
                 // Parse Animations
-                for(var i = 0; i < dFrames.length; i++){
+                for (var i = 0; i < dFrames.length; i++) {
                     var channel = dFrames[i];
                     var bone = bones[i];
-                    for(var j = 0; j < channel.keys.length; j++){
+                    for (var j = 0; j < channel.keys.length; j++) {
                         var key = channel.keys[j];
                         bone.poses[j] = {};
                         var pose = bone.poses[j];
                         pose.time = parseFloat(key.time);
-                        if(key.pos){
+                        if (key.pos) {
                             pose.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
                         }
-                        if(key.rot){
+                        if (key.rot) {
                             pose.rotation = new Quaternion(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
                         }
-                        if(key.scl){
+                        if (key.scl) {
                             pose.scale = new Vector3(key.scl[0], key.scl[1], key.scl[2]);
                         }
                     }
@@ -427,28 +428,28 @@ define( function(require){
             return skeleton;
         },
 
-        parseMaterial : function(mConfig, boneNumber){
+        parseMaterial : function(mConfig, boneNumber) {
             var shaderName = "buildin.lambert";
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
-            if( shading === "phong" || shading === "lambert"){
+            if (shading === "phong" || shading === "lambert") {
                 shaderName = "buildin." + shading;
             }
             var enabledTextures = [];
-            if( mConfig.mapDiffuse ){
+            if (mConfig.mapDiffuse) {
                 enabledTextures.push("diffuseMap");
             }
-            if( mConfig.mapNormal || mConfig.mapBump ){
+            if (mConfig.mapNormal || mConfig.mapBump) {
                 enabledTextures.push('normalMap');
             }
-            if(boneNumber == 0){
+            if (boneNumber == 0) {
                 var shader = shaderLibrary.get(shaderName, enabledTextures);
-            }else{
+            } else {
                 // Shader for skinned mesh
                 var shader = new Shader({
                     vertex : Shader.source(shaderName+".vertex"),
                     fragment : Shader.source(shaderName+".fragment")
                 })
-                for(var i = 0; i < enabledTextures; i++){
+                for (var i = 0; i < enabledTextures; i++) {
                     shader.enableTexture(enabledTextures[i]);
                 }
                 shader.vertexDefines["SKINNING"] = null;
@@ -458,46 +459,46 @@ define( function(require){
             var material = new Material({
                 shader : shader
             });
-            if( mConfig.colorDiffuse ){
+            if (mConfig.colorDiffuse) {
                 material.setUniform("color", mConfig.colorDiffuse );
-            }else if( mConfig.DbgColor){
+            } else if (mConfig.DbgColor) {
                 material.setUniform("color", hex2rgb(mConfig.DbgColor));
             }
-            if( mConfig.colorSpecular ){
+            if (mConfig.colorSpecular) {
                 material.setUniform("specular", mConfig.colorSpecular );
             }
-            if(mConfig.transparent !== undefined && mConfig.transparent){
+            if (mConfig.transparent !== undefined && mConfig.transparent) {
                 material.transparent = true;
             }
-            if( ! _.isUndefined(mConfig.depthTest)){
+            if ( ! _.isUndefined(mConfig.depthTest)) {
                 material.depthTest = mConfig.depthTest;
             }
-            if( ! _.isUndefined(mConfig.depthWrite)){
+            if ( ! _.isUndefined(mConfig.depthWrite)) {
                 material.depthTest = mConfig.depthWrite;
             }
             
-            if(mConfig.transparency && mConfig.transparency < 1){
+            if (mConfig.transparency && mConfig.transparency < 1) {
                 material.setUniform("opacity", mConfig.transparency);
             }
-            if(mConfig.specularCoef){
+            if (mConfig.specularCoef) {
                 material.setUniform("shininess", mConfig.specularCoef);
             }
 
             // Textures
-            if( mConfig.mapDiffuse ){
+            if (mConfig.mapDiffuse) {
                 material.setUniform("diffuseMap", this.loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
             }
-            if( mConfig.mapBump){
+            if (mConfig.mapBump) {
                 material.setUniform("normalMap", this.loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
             }
-            if( mConfig.mapNormal){
+            if (mConfig.mapNormal) {
                 material.setUniform("normalMap", this.loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
             }
 
             return material;
         },
 
-        loadTexture : function(path, wrap){
+        loadTexture : function(path, wrap) {
             var self = this;
 
             var img = new Image();
@@ -506,11 +507,11 @@ define( function(require){
 
             this.textureNumber++;
 
-            if( wrap && wrap.length ){
+            if (wrap && wrap.length) {
                 texture.wrapS = wrap[0].toUpperCase();
                 texture.wrapT = wrap[1].toUpperCase();
             }
-            img.onload = function(){
+            img.onload = function() {
                 self.trigger("load:texture", texture);
                 texture.dirty();
             }
@@ -521,19 +522,19 @@ define( function(require){
     })
 
 
-    function isBitSet(value, position){
+    function isBitSet(value, position) {
         return value & ( 1 << position );
     }
 
 
-    function hex2rgb(hex){
+    function hex2rgb(hex) {
         var r = (hex >> 16) & 0xff,
             g = (hex >> 8) & 0xff,
             b = hex & 0xff;
         return [r/255, g/255, b/255];
     }
 
-    function translateColor(color){
+    function translateColor(color) {
         return [color[0]/255, color[1]/255, color[2]/255];
     }
 

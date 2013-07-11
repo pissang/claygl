@@ -1,7 +1,7 @@
 /**
  * @export{class} TexturePool
  */
-define( function(require){
+define(function(require) {
     
     var Texture2D = require("../../texture/texture2d");
     var _ = require("_");
@@ -10,31 +10,31 @@ define( function(require){
 
     var texturePool = {
 
-        get : function( parameters ){
-            var key = generateKey( parameters );
-            if( ! pool.hasOwnProperty( key ) ){
+        get : function(parameters) {
+            var key = generateKey(parameters);
+            if (!pool.hasOwnProperty(key)) {
                 pool[key] = [];
             }
             var list = pool[key];
-            if( ! list.length ){
-                var texture = new Texture2D( parameters );
+            if (!list.length) {
+                var texture = new Texture2D(parameters);
                 return texture;
             }
             return list.pop();
         },
 
-        put : function( texture ){
-            var key = generateKey( texture );
-            if( ! pool.hasOwnProperty( key ) ){
+        put : function(texture) {
+            var key = generateKey(texture);
+            if (!pool.hasOwnProperty(key)) {
                 pool[key] = [];
             }
             var list = pool[key];
-            list.push( texture );
+            list.push(texture);
         },
 
-        clear : function(gl){
-            for(name in pool){
-                for(var i = 0; i < pool[name].length; i++){
+        clear : function(gl) {
+            for (name in pool) {
+                for (var i = 0; i < pool[name].length; i++) {
                     pool[name][i].dispose(gl);
                 }
             }
@@ -42,7 +42,7 @@ define( function(require){
         }
     }
 
-    function generateKey( parameters ){
+    function generateKey(parameters) {
         var defaultParams = {
             width : 512,
             height : 512,
@@ -63,8 +63,8 @@ define( function(require){
         fallBack(parameters);
 
         var key = "";
-        for(var name in defaultParams) {
-            if( parameters[name] ){
+        for (var name in defaultParams) {
+            if (parameters[name]) {
                 var chunk = parameters[name].toString();
             }else{
                 var chunk = defaultParams[name].toString();
@@ -74,24 +74,24 @@ define( function(require){
         return key;
     }
 
-    function fallBack(target){
+    function fallBack(target) {
 
         var IPOT = isPowerOfTwo(target.width, target.height);
 
-        if( target.format === "DEPTH_COMPONENT"){
+        if (target.format === "DEPTH_COMPONENT") {
             target.generateMipmaps = false;
         }
 
-        if( ! IPOT || ! target.generateMipmaps){
-            if( target.minFilter.indexOf("NEAREST") == 0){
+        if (!IPOT || !target.generateMipmaps) {
+            if (target.minFilter.indexOf("NEAREST") == 0) {
                 target.minFilter = 'NEAREST';
-            }else{
+            } else {
                 target.minFilter = 'LINEAR'
             }
 
-            if( target.magFilter.indexOf("NEAREST") == 0){
+            if (target.magFilter.indexOf("NEAREST") == 0) {
                 target.magFilter = 'NEAREST';
-            }else{
+            } else {
                 target.magFilter = 'LINEAR'
             }
             target.wrapS = 'CLAMP_TO_EDGE';
@@ -99,10 +99,10 @@ define( function(require){
         }
     }
 
-    function isPowerOfTwo(width, height){
-        return ( width & (width-1) ) === 0 &&
-                ( height & (height-1) ) === 0;
+    function isPowerOfTwo(width, height) {
+        return (width & (width-1)) === 0 &&
+                (height & (height-1)) === 0;
     }
 
     return texturePool
-} )
+})

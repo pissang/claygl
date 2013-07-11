@@ -1,6 +1,6 @@
 /**
  * @export{class} SVG
- * shapes : done : circle, line, polygon, rect, polyline, ellipse
+ * shapes : circle, line, polygon, rect, polyline, ellipse, path
  */
 define(function(require) {
 
@@ -188,7 +188,7 @@ define(function(require) {
 
         },
         'text' : function(xmlNode, parentNode) {
-            
+
         },
         "path" : function(xmlNode, parentNode) {
             var path = new SVGPath();

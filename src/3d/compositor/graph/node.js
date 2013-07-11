@@ -34,7 +34,7 @@
  *
  * TODO blending 
  */
-define( function( require ){
+define(function(require) {
 
     var Base = require("core/base");
     var Pass = require("../pass");
@@ -42,7 +42,7 @@ define( function( require ){
     var Shader = require("../../shader");
     var texturePool = require("./texturepool");
 
-    var Node = Base.derive( function(){
+    var Node = Base.derive(function() {
         return {
 
             name : "",
@@ -74,86 +74,85 @@ define( function( require ){
             //}
             _outputReferences : {}
         }
-    }, function(){
-        if( this.shader ){
+    }, function() {
+        if (this.shader) {
             var pass = new Pass({
                 fragment : this.shader
             });
             this.pass = pass;   
         }
-        if(this.outputs){
+        if (this.outputs) {
             this.frameBuffer = new FrameBuffer({
                 depthBuffer : false
             })
         }
     }, {
 
-        render : function( renderer ){
+        render : function(renderer) {
             var _gl = renderer.gl;
-            for( var inputName in this.inputLinks ){
+            for (var inputName in this.inputLinks) {
                 var link = this.inputLinks[inputName];
-                var inputTexture = link.node.getOutput( renderer, link.pin );
-                this.pass.setUniform( inputName, inputTexture );
+                var inputTexture = link.node.getOutput(renderer, link.pin);
+                this.pass.setUniform(inputName, inputTexture);
             }
             // Output
-            if( ! this.outputs){
+            if (! this.outputs) {
                 this.pass.outputs = null;
-                this.pass.render( renderer );
-            }
-            else{
+                this.pass.render(renderer);
+            } else {
                 this.pass.outputs = {};
 
-                for( var name in this.outputs){
+                for (var name in this.outputs) {
 
                     var outputInfo = this.outputs[name];
 
-                    var texture = texturePool.get( outputInfo.parameters || {} );
+                    var texture = texturePool.get(outputInfo.parameters || {});
                     this._textures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                    if(typeof(attachment) == "string"){
+                    if (typeof(attachment) == "string") {
                         attachment = _gl[attachment];
                     }
                     this.pass.outputs[ attachment ] = texture;
                 }
 
-                this.pass.render( renderer, this.frameBuffer );
+                this.pass.render(renderer, this.frameBuffer);
             }
             
-            for( var inputName in this.inputLinks ){
+            for (var inputName in this.inputLinks) {
                 var link = this.inputLinks[inputName];
-                link.node.removeReference( link.pin );
+                link.node.removeReference(link.pin);
             }
         },
 
-        setParameter : function( name, value ){
-            this.pass.setUniform( name, value );
+        setParameter : function(name, value) {
+            this.pass.setUniform(name, value);
         },
 
-        setParameters : function(obj){
-            for(var name in obj){
+        setParameters : function(obj) {
+            for (var name in obj) {
                 this.setParameter(name, obj[name]);
             }
         },
 
-        getOutput : function( renderer, name ){
+        getOutput : function(renderer, name) {
             var outputInfo = this.outputs[name];
-            if( ! outputInfo){
+            if (! outputInfo) {
                 return ;
             }
-            if( this._textures[name] ){
+            if (this._textures[name]) {
                 // Already been rendered in this frame
                 return this._textures[name];
             }
 
-            this.render( renderer );
+            this.render(renderer);
             
             return this._textures[name];
         },
 
-        removeReference : function( name ){
+        removeReference : function(name) {
             this._outputReferences[name]--;
-            if( this._outputReferences[name] === 0){
+            if (this._outputReferences[name] === 0) {
                 // Output of this node have alreay been used by all other nodes
                 // Put the texture back to the pool.
                 texturePool.put(this._textures[name]);
@@ -161,29 +160,29 @@ define( function( require ){
             }
         },
 
-        link : function( inputPinName, fromNode, fromPinName){
+        link : function(inputPinName, fromNode, fromPinName) {
 
             // The relationship from output pin to input pin is one-on-multiple
             this.inputLinks[ inputPinName ] = {
                 node : fromNode,
                 pin : fromPinName
             }
-            if( ! fromNode.outputLinks[ fromPinName ] ){
+            if (! fromNode.outputLinks[ fromPinName ]) {
                 fromNode.outputLinks[ fromPinName ] = [];
             }
-            fromNode.outputLinks[ fromPinName ].push( {
+            fromNode.outputLinks[ fromPinName ].push({
                 node : this,
                 pin : inputPinName
-            } )
+            })
         },
 
-        clear : function(){
+        clear : function() {
             this.inputLinks = {};
             this.outputLinks = {};
         },
 
-        updateReference : function( ){
-            for( var name in this.outputLinks ){
+        updateReference : function() {
+            for (var name in this.outputLinks) {
                 this._outputReferences[ name ] = this.outputLinks[name].length;
             }
         }

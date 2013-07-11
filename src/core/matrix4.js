@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var glMatrix = require("glmatrix");
     var Vector3 = require("./vector3");
@@ -7,19 +7,19 @@ define( function(require){
     var mat3 = glMatrix.mat3;
     var quat = glMatrix.quat;
 
-    function makeProperty(n){
+    function makeProperty(n) {
         return {
             configurable : false,
-            set : function(value){
+            set : function(value) {
                 this._array[n] = value;
                 this._dirty = true;
             },
-            get : function(){
+            get : function() {
                 return this._array[n];
             }
         }
     }
-    var Matrix4 = function(){
+    var Matrix4 = function() {
 
         var axisX = new Vector3(),
             axisY = new Vector3(),
@@ -47,14 +47,14 @@ define( function(require){
             // Forward axis of local matrix, i.e. z axis
             forward : {
                 configurable : false,
-                get : function(){
+                get : function() {
                     var el = this._array;
                     axisZ.set(el[8], el[9], el[10]);
                     return axisZ;
                 },
                 // TODO Here has a problem
                 // If only set an item of vector will not work
-                set : function(v){
+                set : function(v) {
                     var el = this._array,
                         v = v._array;
                     el[8] = v[8];
@@ -67,12 +67,12 @@ define( function(require){
             up : {
                 configurable : false,
                 enumerable : true,
-                get : function(){
+                get : function() {
                     var el = this._array;
                     axisY.set(el[4], el[5], el[6]);
                     return axisY;
                 },
-                set : function(v){
+                set : function(v) {
                     var el = this._array,
                         v = v._array;
                     el[4] = v[4];
@@ -84,12 +84,12 @@ define( function(require){
             // Right axis of local matrix, i.e. x axis
             right : {
                 configurable : false,
-                get : function(){
+                get : function() {
                     var el = this._array;
                     axisX.set(el[0], el[1], el[2]);
                     return axisX;
                 },
-                set : function(v){
+                set : function(v) {
                     var el = this._array,
                         v = v._array;
                     el[0] = v[0];
@@ -110,94 +110,94 @@ define( function(require){
 
         constructor : Matrix4,
 
-        adjoint : function(){
+        adjoint : function() {
             mat4.adjoint(this._array, this._array);
             return this;
         },
-        clone : function(){
+        clone : function() {
             return (new Matrix4()).copy(this);
         },
-        copy : function(b){
+        copy : function(b) {
             mat4.copy(this._array, b._array);
             return this;
         },
-        determinant : function(){
+        determinant : function() {
             return mat4.determinant(this._array);
         },
-        fromQuat : function(q){
+        fromQuat : function(q) {
             mat4.fromQuat(this._array, q._array);
             return this;
         },
-        fromRotationTranslation : function(q, v){
+        fromRotationTranslation : function(q, v) {
             mat4.fromRotationTranslation(this._array, q._array, v._array);
             return this;
         },
-        frustum : function(left, right, bottom, top, near, far){
+        frustum : function(left, right, bottom, top, near, far) {
             mat4.frustum(this._array, left, right, bottom, top, near, far);
             return this;
         },
-        identity : function(){
+        identity : function() {
             mat4.identity(this._array);
             return this;
         },
-        invert : function(){
+        invert : function() {
             mat4.invert(this._array, this._array);
             return this;
         },
-        lookAt : function(eye, center, up){
+        lookAt : function(eye, center, up) {
             mat4.lookAt(this._array, eye._array, center._array, up._array);
             return this;
         },
-        mul : function(b){
+        mul : function(b) {
             mat4.mul(this._array, this._array, b._array);
             return this;
         },
-        mulLeft : function(b){
+        mulLeft : function(b) {
             mat4.mul(this._array, b._array, this._array);
             return this;
         },
-        multiply : function(b){
+        multiply : function(b) {
             mat4.multiply(this._array, this._array, b._array);
             return this;
         },
         // Apply left multiply
-        multiplyLeft : function(b){
+        multiplyLeft : function(b) {
             mat4.multiply(this._array, b._array, this._array);
             return this;
         },
-        ortho : function(left, right, bottom, top, near, far){
+        ortho : function(left, right, bottom, top, near, far) {
             mat4.ortho(this._array, left, right, bottom, top, near, far);
             return this;
         },
-        perspective : function(fovy, aspect, near, far){
+        perspective : function(fovy, aspect, near, far) {
             mat4.perspective(this._array, fovy, aspect, near, far);
             return this;
         },
-        rotate : function(rad, axis /*Vector3*/){
+        rotate : function(rad, axis /*Vector3*/) {
             mat4.rotate(this._array, this._array, rad, axis._array);
             return this;
         },
-        rotateX : function(rad){
+        rotateX : function(rad) {
             mat4.rotateX(this._array, this._array, rad);
             return this;
         },
-        rotateY : function(rad){
+        rotateY : function(rad) {
             mat4.rotateY(this._array, this._array, rad);
             return this;
         },
-        rotateZ : function(rad){
+        rotateZ : function(rad) {
             mat4.rotateZ(this._array, this._array, rad);
             return this;
         },
-        scale : function(v){
+        scale : function(v) {
             mat4.scale(this._array, this._array, v._array);
             return this;
         },
-        translate : function(v){
+        translate : function(v) {
             mat4.translate(this._array, this._array, v._array);
             return this;
         },
-        transpose : function(){
+        transpose : function() {
             mat4.transpose(this._array, this._array);
             return this;
         },
@@ -205,7 +205,7 @@ define( function(require){
         // Static method
         // Decompose a matrix to SRT
         // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
-        decomposeMatrix : (function(){
+        decomposeMatrix : (function() {
 
             var x = vec3.create();
             var y = vec3.create();
@@ -213,7 +213,7 @@ define( function(require){
 
             var m3 = mat3.create();
             
-            return function( scale, rotation, position ){
+            return function( scale, rotation, position ) {
 
                 var el = this._array;
                 vec3.set(x, el[0], el[1], el[2]);
@@ -247,7 +247,7 @@ define( function(require){
             }
         })(),
 
-        toString : function(){
+        toString : function() {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         }
     }

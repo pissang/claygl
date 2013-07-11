@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var Node = require("./node");
     var Matrix4 = require("core/matrix4");
@@ -7,17 +7,17 @@ define( function(require){
         return {
             projectionMatrix : new Matrix4(),
         }
-    }, function(){
+    }, function() {
         this.update();
     }, {
         
-        update : function( _gl ) {
+        update : function(_gl) {
 
-            Node.prototype.update.call( this, _gl );
+            Node.prototype.update.call(this, _gl);
             
             this.updateProjectionMatrix();
         }
     });
 
     return Camera;
-} )
+})

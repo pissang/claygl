@@ -1,25 +1,30 @@
-define( function(require){
+define( function(require) {
 
     var Base = require('./base');
 
     var Event = Base.derive({
         cancelBubble : false
     }, {
-        stopPropagation : function(){
+        stopPropagation : function() {
             this.cancelBubble = true;
         }
     })
 
-    Event.throw = function(eventType, target, props){
-        var e = new MouseEvent(props);
-        e.sourceTarget = target;
+    Event.throw = function(eventType, target, props) {
+        
+        var e = new Event(props);
 
-        // enable bubble
-        while(target && !e.cancelBubble ){
-            e.target = target;
+        e.type = eventType;
+        e.target = target;
+
+        // enable bubbling
+        while (target && !e.cancelBubble ) {
+            e.currentTarget = target;
             target.trigger(eventType, e);
 
             target = target.parent;
         }
     }
+
+    return Event;
 } )

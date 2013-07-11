@@ -1,11 +1,11 @@
-define( function(require){
+define(function(require) {
 
     var Node = require("./node");
     var _ = require("_");
 
     var prevDrawID = 0;
 
-    var Mesh = Node.derive( function() {
+    var Mesh = Node.derive(function() {
 
         return {
             
@@ -24,7 +24,7 @@ define( function(require){
         }
     }, {
 
-        render : function( renderer, globalMaterial ) {
+        render : function(renderer, globalMaterial) {
 
             var _gl = renderer.gl;
 
@@ -34,57 +34,57 @@ define( function(require){
             var shader = material.shader;
             var geometry = this.geometry;
 
-            var glDrawMode = _gl[ this.mode.toUpperCase() ];
+            var glDrawMode = _gl[this.mode.toUpperCase()];
             
             // Set pose matrices of skinned mesh
-            if(this.skeleton){
+            if (this.skeleton) {
                 var skinMatricesArray = this.skeleton.getBoneMatricesArray();
                 shader.setUniform(_gl, "m4v", "boneMatrices", skinMatricesArray);
             }
             // Draw each chunk
-            var chunks = geometry.getBufferChunks( _gl );
+            var chunks = geometry.getBufferChunks(_gl);
 
-            for( var c = 0; c < chunks.length; c++){
+            for (var c = 0; c < chunks.length; c++) {
                 currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__ + "_" + c;
 
                 var chunk = chunks[c],
                     attributeBuffers = chunk.attributeBuffers,
                     indicesBuffer = chunk.indicesBuffer;
 
-                if( currentDrawID !== prevDrawID ){
+                if (currentDrawID !== prevDrawID) {
                     prevDrawID = currentDrawID;
                     
                     availableAttributes = {};
-                    for(var name in attributeBuffers){
+                    for (var name in attributeBuffers) {
                         var attributeBufferInfo = attributeBuffers[name];
                         var semantic = attributeBufferInfo.semantic;
 
-                        if( semantic ){
-                            var semanticInfo = shader.semantics[ semantic ];
+                        if (semantic) {
+                            var semanticInfo = shader.semantics[semantic];
                             var symbol = semanticInfo && semanticInfo.symbol;
-                        }else{
+                        } else {
                             var symbol = name;
                         }
-                        if(symbol && shader.attributeTemplates[symbol] ){
+                        if (symbol && shader.attributeTemplates[symbol]) {
                             availableAttributes[symbol] = attributeBufferInfo;
                         }
                     }
-                    shader.enableAttributes(_gl, Object.keys(availableAttributes) );
+                    shader.enableAttributes(_gl, Object.keys(availableAttributes));
                     // Setting attributes;
-                    for( var symbol in availableAttributes ){
+                    for (var symbol in availableAttributes) {
                         var attributeBufferInfo = availableAttributes[symbol];
                         var buffer = attributeBufferInfo.buffer;
 
-                        _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-                        shader.setMeshAttribute( _gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size );
+                        _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                        shader.setMeshAttribute(_gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size);
                     }
                 }
                 //Do drawing
-                if( geometry.useFaces ){
-                    _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer );
-                    _gl.drawElements( glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0 );
-                }else{
-                    _gl.drawArrays( glDrawMode, 0, geometry.vertexCount );
+                if (geometry.useFaces) {
+                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                    _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
+                } else {
+                    _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
                 }
             }
 
@@ -98,7 +98,7 @@ define( function(require){
             return drawInfo;
         },
 
-        bindGeometry : function( _gl ) {
+        bindGeometry : function(_gl) {
 
             var shader = this.material.shader;
             var geometry = this.geometry;
@@ -110,9 +110,9 @@ define( function(require){
     // Called when material is changed
     // In case the material changed and geometry not changed
     // And the previous material has less attributes than next material
-    Mesh.materialChanged = function(){
+    Mesh.materialChanged = function() {
         prevDrawID = 0;
     }
 
     return Mesh;
-} )
+})

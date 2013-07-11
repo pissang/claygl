@@ -3,9 +3,8 @@ define( function(require){
 	var exportsObject =  {
 	"2d": {
 		"Camera": require('2d/camera'),
+		"Layer": require('2d/layer'),
 		"Node": require('2d/node'),
-		"Renderer": require('2d/renderer'),
-		"Scene": require('2d/scene'),
 		"shape": {
 			"Arc": require('2d/shape/arc'),
 			"Circle": require('2d/shape/circle'),
@@ -22,6 +21,7 @@ define( function(require){
 			"Text": require('2d/shape/text'),
 			"TextBox": require('2d/shape/textbox')
 		},
+		"Stage": require('2d/stage'),
 		"Style": require('2d/style'),
 		"util": require('2d/util')
 	},
@@ -124,8 +124,7 @@ define( function(require){
 	},
 	"util": {
 		"Color": require('util/color'),
-		"Util": require('util/util'),
-		"Xmlparser": require('util/xmlparser')
+		"Util": require('util/util')
 	}
 };
 

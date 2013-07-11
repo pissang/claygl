@@ -1,7 +1,6 @@
 define( function(require){
 
 	return {
-
 		genGUID : (function(){
 			var guid = 0;
 			

@@ -1,8 +1,8 @@
-define( function(require){
+define(function(require) {
 
     var Camera = require('../camera');
 
-    var Orthographic = Camera.derive( function(){
+    var Orthographic = Camera.derive(function() {
         return {
             left : -1,
             right : 1,
@@ -13,7 +13,7 @@ define( function(require){
         }
     }, {
         
-        updateProjectionMatrix : function(){
+        updateProjectionMatrix : function() {
             this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
         }
     });

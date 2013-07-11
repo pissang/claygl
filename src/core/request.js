@@ -1,9 +1,9 @@
 /**
  *  @export{object} requester
  */
-define( function(require){
+define(function(require) {
 
-    function get(options){
+    function get(options) {
 
         var xhr = new XMLHttpRequest();
 
@@ -14,27 +14,27 @@ define( function(require){
         // arraybuffer, blob, document, json, text
         xhr.responseType = options.responseType || "text";
 
-        if(options.onprogress){
+        if (options.onprogress) {
             //https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest
-            xhr.onprogress = function(e){
-                if(e.lengthComputable){
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable) {
                     var percent = e.loaded / e.total;
                     options.onprogress(percent, e.loaded, e.total);
-                }else{
+                } else {
                     options.onprogress(null);
                 }
             }
         }
-        xhr.onload = function(e){
+        xhr.onload = function(e) {
             options.onload && options.onload(xhr.response);
         }
-        if(options.onerror){
+        if (options.onerror) {
             xhr.onerror = options.onerror;
         }
         xhr.send(null);
     }
 
-    function put(options){
+    function put(options) {
 
     }
 
@@ -42,4 +42,4 @@ define( function(require){
         get : get,
         put : put
     }
-} )
+})

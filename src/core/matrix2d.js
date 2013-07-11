@@ -1,22 +1,22 @@
-define( function(require){
+define(function(require) {
 
     var glMatrix = require("glmatrix");
     var mat2d = glMatrix.mat2d;
 
-    function makeProperty(n){
+    function makeProperty(n) {
         return {
             configurable : false,
-            set : function(value){
+            set : function(value) {
                 this._array[n] = value;
                 this._dirty = true;
             },
-            get : function(){
+            get : function() {
                 return this._array[n];
             }
         }
     }
 
-    var Matrix2d = function(){
+    var Matrix2d = function() {
 
         return Object.create(Matrix2dProto, {
 
@@ -39,51 +39,51 @@ define( function(require){
 
         constructor : Matrix2d,
 
-        clone : function(){
+        clone : function() {
             return (new Matrix2d()).copy(this);
         },
-        copy : function(b){
+        copy : function(b) {
             mat2d.copy(this._array, b._array);
             return this;
         },
-        determinant : function(){
+        determinant : function() {
             return mat2d.determinant(this._array);
         },
-        identity : function(){
+        identity : function() {
             mat2d.identity(this._array);
             return this;
         },
-        invert : function(){
+        invert : function() {
             mat2d.invert(this._array, this._array);
             return this;
         },
-        mul : function(b){
+        mul : function(b) {
             mat2d.mul(this._array, this._array, b._array);
             return this;
         },
-        mulLeft : function(b){
+        mulLeft : function(b) {
             mat2d.mul(this._array, b._array, this._array);
             return this;
         },
-        multiply : function(b){
+        multiply : function(b) {
             mat2d.multiply(this._array, this._array, b._array);
             return this;
         },
-        multiplyLeft : function(b){
+        multiplyLeft : function(b) {
             mat2d.multiply(this._array, b._array, this._array);
             return this;
         },
-        rotate : function(rad){
+        rotate : function(rad) {
             mat2d.rotate(this._array, this._array, rad);
             return this;
         },
-        scale : function(s){
+        scale : function(s) {
             mat2d.scale(this._array, this._array, s._array);
         },
-        translate : function(v){
+        translate : function(v) {
             mat2d.translate(this._array, this._array, v._array);
         },
-        toString : function(){
+        toString : function() {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         }
     }

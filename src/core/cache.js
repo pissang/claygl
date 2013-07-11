@@ -1,5 +1,6 @@
-define( function(){
-    var Cache = function(){
+define(function() {
+
+    var Cache = function() {
 
         this._contextId = "",
 
@@ -11,14 +12,14 @@ define( function(){
 
     Cache.prototype = {
 
-        use : function( contextId, documentSchema ){
+        use : function(contextId, documentSchema) {
 
-            if( ! this._caches.hasOwnProperty( contextId ) ){
+            if (! this._caches.hasOwnProperty(contextId)) {
                 this._caches[ contextId ] = {};
 
-                if( documentSchema){
-                    for(var name in documentSchema){
-                        this._caches[contextId][ name ] = documentSchema[name];
+                if (documentSchema) {
+                    for (var name in documentSchema) {
+                        this._caches[contextId][name] = documentSchema[name];
                     }   
                 }
             }
@@ -27,35 +28,35 @@ define( function(){
             this._context = this._caches[ contextId ];
         },
 
-        put : function(key, value){
+        put : function(key, value) {
 
             this._context[ key ] = value;
         },
 
-        get : function(key){
+        get : function(key) {
 
             return this._context[ key ];
         },
 
-        clearContext : function(){
+        clearContext : function() {
             this._caches[ this._contextId ] = {};
             this._context = {};
         },
 
-        'delete' : function( key ){
+        'delete' : function(key) {
             delete this._context[ key ];
         },
 
-        clearAll : function(){
+        clearAll : function() {
             this._caches = {};
         },
 
-        getContext : function(){
+        getContext : function() {
             return this._context;
         },
 
-        miss : function( key ){
-            return ! this._context.hasOwnProperty( key );
+        miss : function(key) {
+            return ! this._context.hasOwnProperty(key);
         }
     }
 
@@ -63,4 +64,4 @@ define( function(){
 
     return Cache;
 
-} )
+})

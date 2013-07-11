@@ -1,7 +1,7 @@
 /**
  * @export{class} ShadowMap
  */
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
@@ -24,9 +24,9 @@ define( function(require){
 
     var frameBuffer = new FrameBuffer();
 
-    Shader.import( require('text!./sm.essl') );
+    Shader.import(require('text!./sm.essl'));
 
-    var ShadowMapPlugin = Base.derive(function(){
+    var ShadowMapPlugin = Base.derive(function() {
         return {
             _textures : {},
 
@@ -44,7 +44,7 @@ define( function(require){
             }
 
         }
-    }, function(){
+    }, function() {
         this._depthMaterial =  new Material({
             shader : new Shader({
                 vertex : Shader.source("buildin.sm.depth.vertex"),
@@ -61,11 +61,11 @@ define( function(require){
         })
     }, {
 
-        render : function( renderer, scene ){
-            this._renderShadowPass( renderer, scene );
+        render : function(renderer, scene) {
+            this._renderShadowPass(renderer, scene);
         },
 
-        _renderShadowPass : function( renderer, scene ){
+        _renderShadowPass : function(renderer, scene) {
 
             var renderQueue = [],
                 lightCastShadow = [],
@@ -75,17 +75,17 @@ define( function(require){
 
             scene.update();
 
-            scene.traverse( function(node){
-                if( node.instanceof(Light) ){
-                    if( node.castShadow ){
+            scene.traverse(function(node) {
+                if (node.instanceof(Light)) {
+                    if (node.castShadow) {
                         lightCastShadow.push(node);
                     }
                 }
-                if( node.material && node.material.shader ){
-                    if( node.castShadow ){
+                if (node.material && node.material.shader) {
+                    if (node.castShadow) {
                         renderQueue.push(node);
                     }
-                    if( node.receiveShadow ){
+                    if (node.receiveShadow) {
                         meshReceiveShadow.push(node);
 
                         node.material.setUniform("shadowEnabled", 1);
@@ -93,10 +93,10 @@ define( function(require){
                         node.material.setUniform("shadowEnabled", 0);
                     }
                 };
-            } );
+            });
 
-            _gl.enable( _gl.DEPTH_TEST );
-            _gl.disable( _gl.BLEND );
+            _gl.enable(_gl.DEPTH_TEST);
+            _gl.disable(_gl.BLEND);
 
             _gl.clearColor(0.0, 0.0, 0.0, 0.0);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
@@ -121,29 +121,29 @@ define( function(require){
 
             var order = this._shadowMapOrder;
             // Store the shadow map in order
-            lightCastShadow.sort(function(a, b){
+            lightCastShadow.sort(function(a, b) {
                 return order[a] - order[b];
             })
             // reset
-            for(var name in this._shadowMapNumber){
+            for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
             }
             // Create textures for shadow map
-            _.each( lightCastShadow, function( light ){
+            _.each(lightCastShadow, function(light) {
 
-                if( light.instanceof(SpotLight) ||
-                    light.instanceof(DirectionalLight) ){
+                if (light.instanceof(SpotLight) ||
+                    light.instanceof(DirectionalLight)) {
                     
                     var texture = this._getTexture(light.__GUID__, light);
                     var camera = this._getCamera(light.__GUID__, light);
 
-                    frameBuffer.attach( renderer.gl, texture );
+                    frameBuffer.attach(renderer.gl, texture);
                     frameBuffer.bind(renderer);
 
                     _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                     renderer._scene = scene;
-                    renderer.renderQueue( renderQueue, camera, this._depthMaterial, true );
+                    renderer.renderQueue(renderQueue, camera, this._depthMaterial, true);
 
                     frameBuffer.unbind(renderer);
         
@@ -152,31 +152,31 @@ define( function(require){
                         .invert()
                         .multiplyLeft(camera.projectionMatrix);
 
-                    if( light.instanceof(SpotLight) ){
+                    if (light.instanceof(SpotLight)) {
                         spotLightShadowMaps.push(texture);
                         spotLightMatrices.push(matrix._array);
-                    }else{
+                    } else {
                         directionalLightShadowMaps.push(texture);
                         directionalLightMatrices.push(matrix._array);
                     }
 
-                }else if(light.instanceof(PointLight) ){
+                } else if (light.instanceof(PointLight)) {
                     
                     var texture = this._getTexture(light.__GUID__, light);
-                    pointLightShadowMaps.push( texture );
+                    pointLightShadowMaps.push(texture);
 
-                    for(var i = 0; i < 6; i++){
+                    for (var i = 0; i < 6; i++) {
                         var target = targets[i];
                         var camera = this._getCamera(light.__GUID__, light, target);
 
-                        frameBuffer.attach( renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target] );
+                        frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
                         frameBuffer.bind(renderer);
 
                         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                         renderer._scene = scene;
                         this._pointLightDepthMaterial.setUniform("lightPosition", light.position._array);
-                        renderer.renderQueue( renderQueue, camera, this._pointLightDepthMaterial, true );
+                        renderer.renderQueue(renderQueue, camera, this._pointLightDepthMaterial, true);
 
                         frameBuffer.unbind(renderer);
                     }
@@ -184,26 +184,26 @@ define( function(require){
                 }
 
                 this._shadowMapNumber[ light.type ] ++;
-            }, this );
+            }, this);
 
-            for(var i = 0; i < meshReceiveShadow.length; i++){
+            for (var i = 0; i < meshReceiveShadow.length; i++) {
                 var mesh = meshReceiveShadow[i],
                     material = mesh.material;
 
                 var shader = material.shader;
 
                 var shaderNeedsUpdate = false;
-                for( var name in this._shadowMapNumber ){
+                for (var name in this._shadowMapNumber) {
                     var number = this._shadowMapNumber[name];
                     var key = name + "_SHADOWMAP_NUMBER";
 
-                    if( shader.fragmentDefines[key] !== number &&
-                        number > 0){
+                    if (shader.fragmentDefines[key] !== number &&
+                        number > 0) {
                         shader.fragmentDefines[key] = number;
                         shaderNeedsUpdate = true;
                     }
                 }
-                if( shaderNeedsUpdate){
+                if (shaderNeedsUpdate) {
                     shader.update();
                 }
 
@@ -217,20 +217,20 @@ define( function(require){
             }
         },
 
-        _getTexture : function(key, light){
+        _getTexture : function(key, light) {
             var texture = this._textures[ key ];
             var resolution = light.shadowResolution || 512;
             var needsUpdate = false;
-            if( texture ){
-                if( texture.width !== resolution){
+            if (texture) {
+                if (texture.width !== resolution) {
                     texture.dispose();
                     needsUpdate = true;
                 }
-            }else{
+            } else{
                 needsUpdate = true;
             }
-            if( needsUpdate){
-                if( light.instanceof(PointLight) ){
+            if (needsUpdate) {
+                if (light.instanceof(PointLight)) {
                     texture = new TextureCube({
                         width : resolution,
                         height : resolution,
@@ -239,7 +239,7 @@ define( function(require){
                         generateMipmaps : false
                         // type : 'FLOAT'
                     });
-                }else{
+                } else {
                     texture = new Texture2d({
                         width : resolution,
                         height : resolution,
@@ -256,60 +256,60 @@ define( function(require){
             return texture;
         },
 
-        _getCamera : function(key, light, target){
+        _getCamera : function(key, light, target) {
             var camera = this._cameras[ key ];
-            if( target && ! camera){
+            if (target && !camera) {
                 camera = this._cameras[key] = {};
             }
-            if( target){
+            if (target) {
                 camera = camera[target];   
             }
-            if( ! camera ){
-                if( light.instanceof(SpotLight) ||
-                    light.instanceof(PointLight) ){
+            if (!camera) {
+                if (light.instanceof(SpotLight) ||
+                    light.instanceof(PointLight)) {
                     camera = new PerspectiveCamera({
                         near : 0.1
                     });
-                }else if( light.instanceof(DirectionalLight) ){
-                    camera = new OrthoCamera( light.shadowCamera );
+                } else if (light.instanceof(DirectionalLight)) {
+                    camera = new OrthoCamera(light.shadowCamera);
                 }
-                if( target ){
+                if (target) {
                     this._cameras[key][target] = camera;
-                }else{
+                } else {
                     this._cameras[key] = camera;
                 }
             }
-            if( light.instanceof(SpotLight) ){
+            if (light.instanceof(SpotLight)) {
                 // Update properties
                 camera.fov = light.penumbraAngle * 2;
                 camera.far = light.range;
             }
-            if( light.instanceof(PointLight) ){
+            if (light.instanceof(PointLight)) {
                 camera.far = light.range;
                 camera.fov = 90;
 
                 camera.position.set(0, 0, 0);
-                switch(target){
+                switch (target) {
                     case 'px':
-                        camera.lookAt( px, ny );
+                        camera.lookAt(px, ny);
                         break;
                     case 'nx':
-                        camera.lookAt( nx, ny );
+                        camera.lookAt(nx, ny);
                         break;
                     case 'py':
-                        camera.lookAt( py, pz );
+                        camera.lookAt(py, pz);
                         break;
                     case 'ny':
-                        camera.lookAt( ny, nz );
+                        camera.lookAt(ny, nz);
                         break;
                     case 'pz':
-                        camera.lookAt( pz, ny );
+                        camera.lookAt(pz, ny);
                         break;
                     case 'nz':
-                        camera.lookAt( nz, ny );
+                        camera.lookAt(nz, ny);
                         break;
                 }
-                camera.position.copy( light.position );
+                camera.position.copy(light.position);
                 camera.update();
 
             }else{
@@ -329,12 +329,12 @@ define( function(require){
     var nz = new Vector3(0, 0, -1);
 
 
-    function createEmptyArray(size, value){
+    function createEmptyArray(size, value) {
         var arr = [];
-        for(var i = 0; i < size; i++){
+        for (var i = 0; i < size; i++) {
             arr.push(value);
         }
         return arr;
     }
     return ShadowMapPlugin;
-} )
+})

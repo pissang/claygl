@@ -7,19 +7,19 @@
  * @method has(eventName)
  * @export{object}
  */
-define(function(){
+define(function() {
 
     return{
-        trigger : function(){
-            if( ! this.__handlers__){
+        trigger : function() {
+            if ( ! this.__handlers__) {
                 return;
             }
             var name = arguments[0];
             var params = Array.prototype.slice.call( arguments, 1 );
 
             var handlers = this.__handlers__[ name ];
-            if( handlers ){
-                for( var i = 0; i < handlers.length; i+=2){
+            if (handlers) {
+                for (var i = 0; i < handlers.length; i+=2) {
                     var handler = handlers[i],
                         context = handlers[i+1];
                     handler.apply(context || this, params);
@@ -27,16 +27,16 @@ define(function(){
             }
         },
         
-        on : function( target, handler, context/*optional*/ ){
+        on : function( target, handler, context/*optional*/ ) {
 
-            if( ! target){
+            if (!target) {
                 return;
             }
             var handlers = this.__handlers__ || ( this.__handlers__={} );
-            if( ! handlers[target] ){
+            if ( ! handlers[target]) {
                 handlers[target] = [];
             }
-            if( handlers[target].indexOf(handler) == -1){
+            if (handlers[target].indexOf(handler) == -1) {
                 // structure in list
                 // [handler,context,handler,context,handler,context..]
                 handlers[target].push( handler );
@@ -46,31 +46,31 @@ define(function(){
             return handler;
         },
 
-        off : function( target, handler ){
+        off : function( target, handler ) {
             
             var handlers = this.__handlers__ || ( this.__handlers__={} );
 
-            if( handlers[target] ){
-                if( handler ){
+            if (handlers[target]) {
+                if (handler) {
                     var arr = handlers[target];
                     // remove handler and context
                     var idx = arr.indexOf(handler);
                     if( idx >= 0)
                         arr.splice( idx, 2 );
-                }else{
+                } else {
                     handlers[target] = [];
                 }
             }
         },
 
-        has : function( target, handler ){
-            if( ! this.__handlers__ ||
-                ! this.__handlers__[target] ){
+        has : function( target, handler ) {
+            if ( ! this.__handlers__ ||
+                ! this.__handlers__[target]) {
                 return false;
             }
-            if( ! handler){
+            if ( ! handler) {
                 return this.__handlers__[target].length;
-            }else{
+            } else {
                 return this.__handlers__[target].indexOf( handler ) !== -1;
             }
         }

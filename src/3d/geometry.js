@@ -3,7 +3,7 @@
  * PENDING: use perfermance hint and remove the array after the data is transfered?
  * static draw & dynamic draw?
  */
-define( function(require) {
+define(function(require) {
 
     var Base = require("core/base");
     var util = require("util/util");
@@ -16,7 +16,7 @@ define( function(require) {
 
     var arrSlice = Array.prototype.slice;
 
-    var Geometry = Base.derive( function() {
+    var Geometry = Base.derive(function() {
 
         return {
 
@@ -114,16 +114,16 @@ define( function(require) {
     }, {
 
         // Overwrite the dirty method
-        dirty : function( field ) {
-            if ( ! field ) {
+        dirty : function(field) {
+            if (! field) {
                 this.dirty("indices");
-                for(var name in this.attributes){
+                for (var name in this.attributes) {
                     this.dirty(name);
                 }
                 return;
             }
-            for ( var contextId in this.cache._caches ) {
-                this.cache._caches[ contextId ][ "dirty_"+field ] = true;
+            for (var contextId in this.cache._caches) {
+                this.cache._caches[contextId]["dirty_"+field] = true;
             }
 
             this._enabledAttributes = null;
@@ -134,20 +134,20 @@ define( function(require) {
             return this._verticesNumber;
         },
 
-        _getEnabledAttributes : function(){
+        _getEnabledAttributes : function() {
             // Cache
-            if( this._enabledAttributes){
+            if (this._enabledAttributes) {
                 return this._enabledAttributes;
             }
 
             var result = {};
             var verticesNumber = this.getVerticesNumber();
 
-            for(var name in this.attributes){
+            for (var name in this.attributes) {
                 var attrib = this.attributes[name];
-                if( attrib.value &&
-                    attrib.value.length ){
-                    if( attrib.value.length === verticesNumber ){
+                if (attrib.value &&
+                    attrib.value.length) {
+                    if (attrib.value.length === verticesNumber) {
                         result[name] = attrib;
                     }
                 }
@@ -158,51 +158,51 @@ define( function(require) {
             return result;
         },
 
-        _getDirtyAttributes : function( ){
+        _getDirtyAttributes : function() {
 
             var result = {};
             var attributes = this._getEnabledAttributes();
             
             var noDirtyAttributes = true;
-            for(var name in attributes ){
+            for (var name in attributes) {
                 var attrib = attributes[name];
-                if( this.cache.get("dirty_"+name) ||
-                    this.cache.miss("dirty_"+name) ){
+                if (this.cache.get("dirty_"+name) ||
+                    this.cache.miss("dirty_"+name)) {
                     result[name] = attributes[name];
                     noDirtyAttributes = false;
                 }
             }
-            if( ! noDirtyAttributes ){
+            if (! noDirtyAttributes) {
                 return result;
             }
         },
 
-        getChunkNumber : function(){
+        getChunkNumber : function() {
             return this._arrayChunks.length;
         },
 
-        getBufferChunks : function( _gl ) {
+        getBufferChunks : function(_gl) {
 
-            this.cache.use(_gl.__GUID__ );
+            this.cache.use(_gl.__GUID__);
 
             var isDirty = this.cache.getContext();
             var dirtyAttributes = this._getDirtyAttributes();
 
             var isFacesDirty = this.cache.get("dirty_faces") || this.cache.miss("dirty_faces");
 
-            if( dirtyAttributes ){
-                this._updateAttributesAndIndicesArrays( dirtyAttributes, isFacesDirty );
-                this._updateBuffer( _gl, dirtyAttributes, isFacesDirty );
+            if (dirtyAttributes) {
+                this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
+                this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
-                for (var name in dirtyAttributes ) {
-                    isDirty[ "dirty_"+name ] = false ;
+                for (var name in dirtyAttributes) {
+                    isDirty["dirty_"+name] = false ;
                 }
                 isDirty['dirty_faces'] = false;
             }
             return this.cache.get("chunks");
         },
 
-        _updateAttributesAndIndicesArrays : function( attributes, isFacesDirty ){
+        _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
 
             var self = this,
                 cursors = {},
@@ -212,9 +212,9 @@ define( function(require) {
 
 
             var ArrayConstructors = {};
-            for(var name in attributes){
+            for (var name in attributes) {
                 // Type can be byte, ubyte, short, ushort, float
-                switch( type ) {
+                switch(type) {
                     case "byte":
                         ArrayConstructors[name] = Int8Array;
                         break;
@@ -234,8 +234,8 @@ define( function(require) {
                 cursors[name] = 0;
             }
 
-            var newChunk = function(chunkIdx){
-                if( self._arrayChunks[chunkIdx] ){
+            var newChunk = function(chunkIdx) {
+                if (self._arrayChunks[chunkIdx]) {
                     return self._arrayChunks[chunkIdx];
                 }
                 var chunk = {
@@ -243,14 +243,14 @@ define( function(require) {
                     indicesArray : null
                 };
 
-                for(var name in attributes){
+                for (var name in attributes) {
                     chunk.attributeArrays[name] = null;
                 }
 
-                for(var name in cursors){
+                for (var name in cursors) {
                     cursors[name] = 0;
                 }
-                for(var i = 0; i < verticesNumber; i++){
+                for (var i = 0; i < verticesNumber; i++) {
                     verticesReorganizedMap[i] = -1;
                 }
                 
@@ -262,7 +262,7 @@ define( function(require) {
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
-            if( verticesNumber > this.chunkSize && this.useFaces ){
+            if (verticesNumber > this.chunkSize && this.useFaces) {
                 var vertexCursor = 0,
                     chunkIdx = 0,
                     currentChunk;
@@ -270,13 +270,13 @@ define( function(require) {
                 var chunkFaceStart = [0];
                 var vertexUseCount = [];
 
-                for(i = 0; i < verticesNumber; i++){
+                for (i = 0; i < verticesNumber; i++) {
                     vertexUseCount[i] = -1;
                     verticesReorganizedMap[i] = -1;
                 }
-                if( isFacesDirty ){
-                    if( this._reorganizedFaces.length !== this.faces.length){
-                        for( i = 0; i < this.faces.length; i++){
+                if (isFacesDirty) {
+                    if (this._reorganizedFaces.length !== this.faces.length) {
+                        for (i = 0; i < this.faces.length; i++) {
                             this._reorganizedFaces[i] = [0, 0, 0];
                         }
                     }
@@ -284,12 +284,12 @@ define( function(require) {
 
                 currentChunk = newChunk(chunkIdx);
 
-                for(var i = 0; i < this.faces.length; i++){
+                for (var i = 0; i < this.faces.length; i++) {
                     var face = this.faces[i];
                     var reorganizedFace = this._reorganizedFaces[i];
                     var i1 = face[0], i2 = face[1], i3 = face[2];
                     // newChunk
-                    if( vertexCursor+3 > this.chunkSize){
+                    if (vertexCursor+3 > this.chunkSize) {
                         chunkIdx++;
                         chunkFaceStart[chunkIdx] = i;
                         vertexCursor = 0;
@@ -299,130 +299,130 @@ define( function(require) {
                     var newI2 = verticesReorganizedMap[i2] === -1;
                     var newI3 = verticesReorganizedMap[i3] === -1;
 
-                    for(var k = 0; k < attribNameList.length; k++){
+                    for (var k = 0; k < attribNameList.length; k++) {
                         var name = attribNameList[k],
                             attribArray = currentChunk.attributeArrays[name],
                             values = attributes[name].value,
                             size = attributes[name].size;
-                        if( ! attribArray){
+                        if (! attribArray) {
                             // Here use array to put data temporary because i can't predict
                             // the size of chunk precisely.
                             attribArray = currentChunk.attributeArrays[name] = [];
                         }
-                        if( size === 1){
-                            if( newI1 ){
-                                attribArray[ cursors[name]++ ] = values[i1];
+                        if (size === 1) {
+                            if (newI1) {
+                                attribArray[cursors[name]++] = values[i1];
                             }
-                            if( newI2 ){
-                                attribArray[ cursors[name]++ ] = values[i2];
+                            if (newI2) {
+                                attribArray[cursors[name]++] = values[i2];
                             }
-                            if( newI3 ){
-                                attribArray[ cursors[name]++ ] = values[i3];
+                            if (newI3) {
+                                attribArray[cursors[name]++] = values[i3];
                             }
                         }
-                        else{
-                            if( newI1 ){
-                                for(var j = 0; j < size; j++){
-                                    attribArray[ cursors[name]++ ] = values[i1][j];
+                        else {
+                            if (newI1) {
+                                for (var j = 0; j < size; j++) {
+                                    attribArray[cursors[name]++] = values[i1][j];
                                 }
                             }
-                            if( newI2 ){
-                                for(var j = 0; j < size; j++){
-                                    attribArray[ cursors[name]++ ] = values[i2][j];
+                            if (newI2) {
+                                for (var j = 0; j < size; j++) {
+                                    attribArray[cursors[name]++] = values[i2][j];
                                 }
                             }
-                            if( newI3 ){
-                                for(var j = 0; j < size; j++){
-                                    attribArray[ cursors[name]++ ] = values[i3][j];
+                            if (newI3) {
+                                for (var j = 0; j < size; j++) {
+                                    attribArray[cursors[name]++] = values[i3][j];
                                 }
                             }
                         }
                     }
-                    if( newI1 ){
+                    if (newI1) {
                         verticesReorganizedMap[i1] = vertexCursor;
                         reorganizedFace[0] = vertexCursor;
                         vertexCursor++;
-                    }else{
+                    } else {
                         reorganizedFace[0] = verticesReorganizedMap[i1];
                     }
-                    if( newI2 ){
+                    if (newI2) {
                         verticesReorganizedMap[i2] = vertexCursor;
                         reorganizedFace[1] = vertexCursor;
                         vertexCursor++;
-                    }else{
+                    } else {
                         reorganizedFace[1] = verticesReorganizedMap[i2];
                     }
-                    if( newI3 ){
+                    if (newI3) {
                         verticesReorganizedMap[i3] = vertexCursor;
                         reorganizedFace[2] = vertexCursor;
                         vertexCursor++
-                    }else{
+                    } else {
                         reorganizedFace[2] = verticesReorganizedMap[i3];
                     }
                 }
                 //Create typedArray from existed array
-                for(var c = 0; c < this._arrayChunks.length; c++){
+                for (var c = 0; c < this._arrayChunks.length; c++) {
                     var chunk = this._arrayChunks[c];
-                    for(var name in chunk.attributeArrays){
+                    for (var name in chunk.attributeArrays) {
                         var array = chunk.attributeArrays[name];
-                        if( array instanceof Array){
+                        if (array instanceof Array) {
                             chunk.attributeArrays[name] = new ArrayConstructors[name](array);
                         }
                     }
                 }
 
-                if( isFacesDirty ){
+                if (isFacesDirty) {
                     var chunkStart, chunkEnd, cursor, chunk;
-                    for(var c = 0; c < this._arrayChunks.length; c++){
+                    for (var c = 0; c < this._arrayChunks.length; c++) {
                         chunkStart = chunkFaceStart[c];
                         chunkEnd = chunkFaceStart[c+1] || this.faces.length;
                         cursor = 0;
                         chunk = this._arrayChunks[c];
                         var indicesArray = chunk.indicesArray;
-                        if( ! indicesArray){
-                            indicesArray = chunk.indicesArray = new Uint16Array( (chunkEnd-chunkStart)*3 );
+                        if (! indicesArray) {
+                            indicesArray = chunk.indicesArray = new Uint16Array((chunkEnd-chunkStart)*3);
                         }
 
-                        for(var i = chunkStart; i < chunkEnd; i++){
+                        for (var i = chunkStart; i < chunkEnd; i++) {
                             indicesArray[cursor++] = this._reorganizedFaces[i][0];
                             indicesArray[cursor++] = this._reorganizedFaces[i][1];
                             indicesArray[cursor++] = this._reorganizedFaces[i][2];
                         }
                     }
                 }
-            }else{
+            } else {
                 var chunk = newChunk(0);
                 // Use faces
-                if( this.useFaces ){
+                if (this.useFaces) {
                     var indicesArray = chunk.indicesArray;
-                    if( ! indicesArray){
+                    if (! indicesArray) {
                         indicesArray = chunk.indicesArray = new Uint16Array(this.faces.length*3);
                     }
                     var cursor = 0;
-                    for(var i = 0; i < this.faces.length; i++){
+                    for (var i = 0; i < this.faces.length; i++) {
                         indicesArray[cursor++] = this.faces[i][0];
                         indicesArray[cursor++] = this.faces[i][1];
                         indicesArray[cursor++] = this.faces[i][2];
                     }
                 }
-                for(var name in attributes){
+                for (var name in attributes) {
                     var values = attributes[name].value,
                         type = attributes[name].type,
                         size = attributes[name].size,
                         attribArray = chunk.attributeArrays[name];
                     
-                    if( ! attribArray){
+                    if (! attribArray) {
                         attribArray = chunk.attributeArrays[name] = new ArrayConstructors[name](verticesNumber*size);
                     }
 
-                    if( size === 1){
-                        for(var i = 0; i < values.length; i++){
+                    if (size === 1) {
+                        for (var i = 0; i < values.length; i++) {
                             attribArray[i] = values[i];
                         }
-                    }else{
+                    } else {
                         var cursor = 0;
-                        for(var i = 0; i < values.length; i++){
-                            for(var j = 0; j < size; j++){
+                        for (var i = 0; i < values.length; i++) {
+                            for (var j = 0; j < size; j++) {
                                 attribArray[cursor++] = values[i][j];
                             }
                         }
@@ -432,13 +432,13 @@ define( function(require) {
 
         },
 
-        _updateBuffer : function( _gl, dirtyAttributes, isFacesDirty ) {
+        _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
 
             var chunks = this.cache.get("chunks");
-            if( ! chunks){
+            if (! chunks) {
                 chunks = [];
                 // Intialize
-                for(var i = 0; i < this._arrayChunks.length; i++){
+                for (var i = 0; i < this._arrayChunks.length; i++) {
                     chunks[i] = {
                         attributeBuffers : {},
                         indicesBuffer : null
@@ -446,9 +446,9 @@ define( function(require) {
                 }
                 this.cache.put("chunks", chunks);
             }
-            for(var i = 0; i < chunks.length; i++){
+            for (var i = 0; i < chunks.length; i++) {
                 var chunk = chunks[i];
-                if( ! chunk){
+                if (! chunk) {
                     chunk = chunks[i] = {
                         attributeBuffers : {},
                         indicesBuffer : null
@@ -460,7 +460,7 @@ define( function(require) {
                     attributeArrays = arrayChunk.attributeArrays,
                     indicesArray = arrayChunk.indicesArray;
 
-                for(var name in dirtyAttributes){
+                for (var name in dirtyAttributes) {
                     var attribute = dirtyAttributes[name],
                         value = attribute.value,
                         type = attribute.type,
@@ -469,14 +469,14 @@ define( function(require) {
 
                     var bufferInfo = attributeBuffers[name],
                         buffer;
-                    if( bufferInfo ){
+                    if (bufferInfo) {
                         buffer = bufferInfo.buffer
-                    }else{
+                    } else {
                         buffer = _gl.createBuffer();
                     }
                     //TODO: Use BufferSubData?
-                    _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-                    _gl.bufferData( _gl.ARRAY_BUFFER, attributeArrays[name], _gl[ this.hint ] );
+                    _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                    _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], _gl[this.hint]);
 
                     attributeBuffers[name] = {
                         type : type,
@@ -485,15 +485,15 @@ define( function(require) {
                         semantic : semantic,
                     }
                 } 
-                if( isFacesDirty && this.useFaces ){
-                    if( ! indicesBuffer ){
+                if (isFacesDirty && this.useFaces) {
+                    if (! indicesBuffer) {
                         indicesBuffer = chunk.indicesBuffer = {
                             buffer : _gl.createBuffer(),
                             count : indicesArray.length
                         }
                     }
-                    _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer );
-                    _gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl[ this.hint ] );   
+                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                    _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl[this.hint]);   
                 }
             }
         },
@@ -508,15 +508,15 @@ define( function(require) {
                 v12 = vec3.create(), v23 = vec3.create();
 
             var difference = positions.length - normals.length;
-            for(var i = 0; i < normals.length; i++){
+            for (var i = 0; i < normals.length; i++) {
                 vec3.set(normals[i], 0.0, 0.0, 0.0);
             }
-            for(var i = normals.length; i < positions.length; i++){
+            for (var i = normals.length; i < positions.length; i++) {
                 //Use array instead of Float32Array
                 normals[i] = [0.0, 0.0, 0.0];
             }
 
-            for(var f = 0; f < this.faces.length; f++){
+            for (var f = 0; f < this.faces.length; f++) {
 
                 var face = faces[f],
                     i1 = face[0],
@@ -526,16 +526,16 @@ define( function(require) {
                     p2 = positions[i2],
                     p3 = positions[i3];
 
-                vec3.sub( v12, p1, p2 );
-                vec3.sub( v23, p2, p3 );
+                vec3.sub(v12, p1, p2);
+                vec3.sub(v23, p2, p3);
                 // Left Hand Cartesian Coordinate System
-                vec3.cross( normal, v12, v23 );
+                vec3.cross(normal, v12, v23);
                 // Weighted by the triangle area
                 vec3.add(normals[i1], normals[i1], normal);
                 vec3.add(normals[i2], normals[i2], normal);
                 vec3.add(normals[i3], normals[i3], normal);
             }
-            for(var i = 0; i < normals.length; i++){
+            for (var i = 0; i < normals.length; i++) {
                 vec3.normalize(normals[i], normals[i]);
             }
 
@@ -543,7 +543,7 @@ define( function(require) {
         },
 
         generateFaceNormals : function() {
-            if( ! this.isUniqueVertex() ){
+            if (! this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
 
@@ -559,7 +559,7 @@ define( function(require) {
             //   p1
             //  /  \
             // p3---p2
-            for(var i = 0; i < len; i++){
+            for (var i = 0; i < len; i++) {
                 var face = faces[i],
                     i1 = face[0],
                     i2 = face[1],
@@ -568,16 +568,16 @@ define( function(require) {
                     p2 = positions[i2],
                     p3 = positions[i3];
 
-                vec3.sub( v12, p1, p2 );
-                vec3.sub( v23, p2, p3 );
+                vec3.sub(v12, p1, p2);
+                vec3.sub(v23, p2, p3);
                 // Left Hand Cartesian Coordinate System
-                vec3.cross( normal, v12, v23 );
+                vec3.cross(normal, v12, v23);
 
-                if( isCopy ){
+                if (isCopy) {
                     vec3.copy(normals[i1], normal);
                     vec3.copy(normals[i2], normal);
                     vec3.copy(normals[i3], normal);
-                }else{
+                } else {
                     normals[i1] = normals[i2] = normals[i3] = arrSlice.call(normal);
                 }
             }
@@ -596,14 +596,14 @@ define( function(require) {
 
             var tan1 = [], tan2 = [],
                 verticesNumber = this.getVerticesNumber();
-            for(var i = 0; i < verticesNumber; i++){
+            for (var i = 0; i < verticesNumber; i++) {
                 tan1[i] = [0.0, 0.0, 0.0];
                 tan2[i] = [0.0, 0.0, 0.0];
             }
 
             var sdir = [0.0, 0.0, 0.0];
             var tdir = [0.0, 0.0, 0.0];
-            for(var i = 0; i < this.faces.length; i++){
+            for (var i = 0; i < this.faces.length; i++) {
                 var face = this.faces[i],
                     i1 = face[0],
                     i2 = face[1],
@@ -647,7 +647,7 @@ define( function(require) {
             }
             var tmp = [0, 0, 0, 0];
             var nCrossT = [0, 0, 0];
-            for(var i = 0; i < verticesNumber; i++){
+            for (var i = 0; i < verticesNumber; i++) {
                 var n = normals[i];
                 var t = tan1[i];
 
@@ -657,26 +657,26 @@ define( function(require) {
                 vec3.normalize(tmp, tmp);
                 // Calculate handedness.
                 vec3.cross(nCrossT, n, t);
-                tmp[3] = vec3.dot( nCrossT, tan2[i] ) < 0.0 ? -1.0 : 1.0;
+                tmp[3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? -1.0 : 1.0;
                 tangents[i] = tmp.slice();
             }
         },
 
         isUniqueVertex : function() {
-            if( this.faces.length && this.useFaces ){
+            if (this.faces.length && this.useFaces) {
                 return this.getVerticesNumber() === this.faces.length * 3;
-            }else{
+            } else {
                 return true;
             }
         },
 
-        generateUniqueVertex : function(){
+        generateUniqueVertex : function() {
 
             var vertexUseCount = [];
             // Intialize with empty value, read undefined value from array
             // is slow
             // http://jsperf.com/undefined-array-read
-            for(var i = 0; i < this.getVerticesNumber(); i++){
+            for (var i = 0; i < this.getVerticesNumber(); i++) {
                 vertexUseCount[i] = 0;
             }
 
@@ -684,33 +684,33 @@ define( function(require) {
                 attributes = this._getEnabledAttributes(),
                 faces = this.faces;
 
-            function cloneAttribute( idx ){
-                for(var name in attributes ){
+            function cloneAttribute(idx) {
+                for (var name in attributes) {
                     var array = attributes[name].value;
                     var size = array[0].length || 1;
-                    if( size === 1){
-                        array.push( array[idx] );
-                    }else{
-                        array.push( arrSlice.call(array[idx]) );
+                    if (size === 1) {
+                        array.push(array[idx]);
+                    } else {
+                        array.push(arrSlice.call(array[idx]));
                     }
                 }
             }
-            for(var i = 0; i < faces.length; i++){
+            for (var i = 0; i < faces.length; i++) {
                 var face = faces[i],
                     i1 = face[0],
                     i2 = face[1],
                     i3 = face[2];
-                if( vertexUseCount[i1] > 0 ){
+                if (vertexUseCount[i1] > 0) {
                     cloneAttribute(i1);
                     face[0] = cursor;
                     cursor++;
                 }
-                if( vertexUseCount[i2] > 0 ){
+                if (vertexUseCount[i2] > 0) {
                     cloneAttribute(i2);
                     face[1] = cursor;
                     cursor++;
                 }
-                if( vertexUseCount[i3] > 0 ){
+                if (vertexUseCount[i3] > 0) {
                     cloneAttribute(i3);
                     face[2] = cursor;
                     cursor++;
@@ -725,23 +725,23 @@ define( function(require) {
 
         // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
         // http://en.wikipedia.org/wiki/Barycentric_coordinate_system_(mathematics)
-        generateBarycentric : (function(){
+        generateBarycentric : (function() {
             var a = [1, 0, 0],
                 b = [0, 0, 1],
                 c = [0, 1, 0];
-            return function(){
+            return function() {
 
-                if( ! this.isUniqueVertex() ){
+                if (! this.isUniqueVertex()) {
                     this.generateUniqueVertex();
                 }
 
                 var array = this.attributes.barycentric.value;
                 // Already existed;
-                if( array.length == this.faces.length * 3){
+                if (array.length == this.faces.length * 3) {
                     return;
                 }
                 var i1, i2, i3, face;
-                for(var i = 0; i < this.faces.length; i++){
+                for (var i = 0; i < this.faces.length; i++) {
                     face = this.faces[i];
                     i1 = face[0];
                     i2 = face[1];
@@ -753,28 +753,28 @@ define( function(require) {
             }
         })(),
         // TODO : tangent
-        applyMatrix : function( matrix ) {
+        applyMatrix : function(matrix) {
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
 
             matrix = matrix._array;
-            for ( var i = 0; i < positions.length; i++) {
-                vec3.transformMat4( positions[i], positions[i], matrix );
+            for (var i = 0; i < positions.length; i++) {
+                vec3.transformMat4(positions[i], positions[i], matrix);
             }
             // Normal Matrix
             var inverseTransposeMatrix = mat4.create();
-            mat4.invert( inverseTransposeMatrix, matrix );
-            mat4.transpose( inverseTransposeMatrix, inverseTransposeMatrix );
+            mat4.invert(inverseTransposeMatrix, matrix);
+            mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
-            for( var i = 0; i < normals.length; i++) {
-                vec3.transformMat4( normals[i], normals[i], inverseTransposeMatrix );
+            for (var i = 0; i < normals.length; i++) {
+                vec3.transformMat4(normals[i], normals[i], inverseTransposeMatrix);
             }
         },
 
         dispose : function(_gl) {
             
         }
-    } )
+    })
 
     return Geometry;
-} )
+})

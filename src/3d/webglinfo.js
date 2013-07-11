@@ -1,7 +1,7 @@
 /**
  * @export{class} WebGLInfo
  */
-define( function(){
+define(function() {
 
 
     // http://www.khronos.org/registry/webgl/extensions/
@@ -21,23 +21,23 @@ define( function(){
 
     var WebGLInfo = {
 
-        initialize : function( _gl ){
+        initialize : function(_gl) {
 
-            if(initialized[_gl.__GUID__]){
+            if (initialized[_gl.__GUID__]) {
                 return;
             }
             // Basic info
 
             // Get webgl extension
-            for(var i = 0; i < EXTENSION_LIST.length; i++){
+            for (var i = 0; i < EXTENSION_LIST.length; i++) {
                 var extName = EXTENSION_LIST[i];
 
                 var ext = _gl.getExtension(extName);
                 // Try vendors
-                if( ! ext){
+                if (! ext) {
                     ext = _gl.getExtension("MOZ_" + extName);
                 }
-                if( ! ext){
+                if (! ext) {
                     ext = _gl.getExtension("WEBKIT_" + extName);
                 }
 
@@ -56,4 +56,4 @@ define( function(){
     }
 
     return WebGLInfo;
-} )
+})

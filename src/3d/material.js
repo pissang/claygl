@@ -1,4 +1,4 @@
-define( function(require){
+define(function(require) {
 
     var Base = require("core/base");
     var Shader = require("./shader");
@@ -8,7 +8,7 @@ define( function(require){
     var TextureCube = require('./texture/texturecube');
     var _ = require("_");
 
-    var Material = Base.derive( function(){
+    var Material = Base.derive(function() {
 
         var id = util.genGUID();
 
@@ -39,116 +39,116 @@ define( function(require){
             // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
             //
             // Example :
-            // function( _gl ){
-            //  _gl.blendEquation( _gl.FUNC_ADD );
-            //  _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+            // function(_gl) {
+            //  _gl.blendEquation(_gl.FUNC_ADD);
+            //  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
             // }
             blend : null,
 
             // Binding lights in the renderer automatically
             autoBindingLights : true
         }
-    }, function(){
-        if( this.shader ){
-            this.attachShader( this.shader );
+    }, function() {
+        if (this.shader) {
+            this.attachShader(this.shader);
         }
     }, {
 
-        bind : function( _gl ){
+        bind : function(_gl) {
 
             var slot = 0;
 
             // Set uniforms
-            _.each( this.uniforms, function( uniform, symbol ){
-                if( uniform.value === null ){
+            _.each(this.uniforms, function(uniform, symbol) {
+                if (uniform.value === null) {
                     return;
                 }
-                else if(uniform.value instanceof Array
-                    && ! uniform.value.length){
+                else if (uniform.value instanceof Array
+                    && ! uniform.value.length) {
                     return;
                 }
-                if( uniform.value.instanceof &&
-                    uniform.value.instanceof( Texture) ){
+                if (uniform.value.instanceof &&
+                    uniform.value.instanceof(Texture)) {
                 
                     var texture = uniform.value;
                     // Maybe texture is not loaded yet;
-                    if( ! texture.isRenderable() ){
+                    if (! texture.isRenderable()) {
                         return;
                     }
 
-                    _gl.activeTexture( _gl.TEXTURE0 + slot );
-                    texture.bind( _gl );
+                    _gl.activeTexture(_gl.TEXTURE0 + slot);
+                    texture.bind(_gl);
 
-                    this.shader.setUniform( _gl, '1i', symbol, slot );
+                    this.shader.setUniform(_gl, '1i', symbol, slot);
 
                     slot++;
                 }
-                else if( uniform.value instanceof Array ){
+                else if (uniform.value instanceof Array) {
                     // Texture Array
                     var exampleValue = uniform.value[0];
 
-                    if( exampleValue && 
+                    if (exampleValue && 
                         exampleValue.instanceof && 
-                        exampleValue.instanceof(Texture) ){
+                        exampleValue.instanceof(Texture)) {
 
                         var res = [];
-                        for( var i = 0; i < uniform.value.length; i++){
+                        for (var i = 0; i < uniform.value.length; i++) {
                             var texture = uniform.value[i];
                             // Maybe texture is not loaded yet;
-                            if( ! texture.isRenderable() ){
+                            if (! texture.isRenderable()) {
                                 continue;
                             }
 
-                            _gl.activeTexture( _gl.TEXTURE0 + slot );
+                            _gl.activeTexture(_gl.TEXTURE0 + slot);
                             texture.bind(_gl);
 
                             res.push(slot++);
                         }
-                        this.shader.setUniform( _gl, '1iv', symbol, res );
+                        this.shader.setUniform(_gl, '1iv', symbol, res);
 
-                    }else{
-                        this.shader.setUniform( _gl, uniform.type, symbol, uniform.value );
+                    } else {
+                        this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                     }
                 }
                 else{
                     
-                    this.shader.setUniform( _gl, uniform.type, symbol, uniform.value );
+                    this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                 }
 
-            }, this );
+            }, this);
         },
 
-        setUniform : function( symbol, value ){
+        setUniform : function(symbol, value) {
             var uniform = this.uniforms[symbol];
-            if( uniform ){
+            if (uniform) {
                 uniform.value = value;
-            }else{
+            } else {
                 // console.warn('Uniform "'+symbol+'" not exist');
             }
         },
 
-        setUniforms : function(obj){
-            for( var symbol in obj){
+        setUniforms : function(obj) {
+            for (var symbol in obj) {
                 var value = obj[symbol];
-                this.setUniform( symbol, value );
+                this.setUniform(symbol, value);
             }
         },
 
-        getUniform : function(symbol){
+        getUniform : function(symbol) {
             var uniform = this.uniforms[symbol];
-            if( uniform ){
+            if (uniform) {
                 return uniform.value;
-            }else{
+            } else {
                 // console.warn('Uniform '+symbol+' not exist');
             }
         },
 
-        attachShader : function( shader ){
+        attachShader : function(shader) {
             this.uniforms = shader.createUniforms();
             this.shader = shader;
         },
 
-        detachShader : function(){
+        detachShader : function() {
             this.shader = null;
             this.uniforms = {};
         }
@@ -156,4 +156,4 @@ define( function(require){
     })
 
     return Material;
-} )
+})

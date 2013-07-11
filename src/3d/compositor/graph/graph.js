@@ -1,44 +1,44 @@
-define( function( require ){
+define( function( require ) {
 
     var Base = require("core/base");
     var _ = require("_");
 
-    var Graph = Base.derive( function(){
+    var Graph = Base.derive( function() {
         return {
             nodes : []
         }
     }, {
 
         
-        add : function( node ){
+        add : function(node) {
 
-            this.nodes.push( node );
+            this.nodes.push(node);
 
             this.dirty("graph");
         },
 
-        remove : function( node ){
-            _.without( this.nodes, node );
+        remove : function(node) {
+            _.without(this.nodes, node);
             this.dirty("graph");
         },
 
-        update : function(){
-            for(var i = 0; i < this.nodes.length; i++){
+        update : function() {
+            for (var i = 0; i < this.nodes.length; i++) {
                 this.nodes[i].clear();
             }
             // Traverse all the nodes and build the graph
-            for(var i = 0; i < this.nodes.length; i++){
+            for (var i = 0; i < this.nodes.length; i++) {
                 var node = this.nodes[i];
 
-                if( ! node.inputs){
+                if (!node.inputs) {
                     continue;
                 }
-                for(var inputName in node.inputs){
-                    var fromPinInfo = node.inputs[ inputName ];
+                for (var inputName in node.inputs) {
+                    var fromPinInfo = node.inputs[inputName];
 
-                    var fromPin = this.findPin( fromPinInfo );
-                    if( fromPin ){
-                        node.link( inputName, fromPin.node, fromPin.pin );
+                    var fromPin = this.findPin(fromPinInfo);
+                    if (fromPin) {
+                        node.link(inputName, fromPin.node, fromPin.pin);
                     }else{
                         console.warn("Pin of "+fromPinInfo.node+"."+fromPinInfo.pin+" not exist");
                     }
@@ -47,20 +47,20 @@ define( function( require ){
 
         },
 
-        findPin : function( info ){
+        findPin : function( info ) {
             var node;
-            if( typeof(info.node) === 'string'){
-                for( var i = 0; i < this.nodes.length; i++){
+            if (typeof(info.node) === 'string') {
+                for (var i = 0; i < this.nodes.length; i++) {
                     var tmp = this.nodes[i];
-                    if( tmp.name === info.node ){
+                    if (tmp.name === info.node) {
                         node = tmp;
                     }
                 }
             }else{
                 node = info.node;
             }
-            if( node ){
-                if( node.outputs[info.pin] ){
+            if (node) {
+                if (node.outputs[info.pin]) {
                     return {
                         node : node,
                         pin : info.pin
@@ -69,7 +69,7 @@ define( function( require ){
             }
         },
 
-        fromJSON : function( json ){
+        fromJSON : function( json ) {
 
         }
     })
