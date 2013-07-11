@@ -3,8 +3,12 @@ define( function(require){
 	var exportsObject =  {
 	"2d": {
 		"Camera": require('2d/camera'),
+		"Gradient": require('2d/gradient'),
 		"Layer": require('2d/layer'),
+		"LinearGradient": require('2d/lineargradient'),
 		"Node": require('2d/node'),
+		"Pattern": require('2d/pattern'),
+		"RadialGradient": require('2d/radialgradient'),
 		"shape": {
 			"Arc": require('2d/shape/arc'),
 			"Circle": require('2d/shape/circle'),

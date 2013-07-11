@@ -61,12 +61,12 @@ define(function(require) {
 
             this.cache.use(_gl.__GUID__);
 
-            if(this.cache.miss("webgl_texture")) {
+            if (this.cache.miss("webgl_texture")) {
                 // In a new gl context, create new texture and set dirty true
                 this.cache.put("webgl_texture", _gl.createTexture());
                 this.cache.put("dirty", true);
             }
-            if(this.cache.get("dirty")) {
+            if (this.cache.get("dirty")) {
                 this.update(_gl);
                 this.cache.put("dirty", false);
             }
@@ -79,8 +79,8 @@ define(function(require) {
         
         // Overwrite the dirty method
         dirty : function() {
-            for(var contextId in this.cache._caches) {
-                this.cache._caches[ contextId ][ "dirty" ] = true;
+            for (var contextId in this.cache._caches) {
+                this.cache._caches[contextId]["dirty"] = true;
             }
         },
 
@@ -102,11 +102,11 @@ define(function(require) {
             
             var isPowerOfTwo = this.isPowerOfTwo();
 
-            if(this.format === "DEPTH_COMPONENT") {
+            if (this.format === "DEPTH_COMPONENT") {
                 this.generateMipmaps = false;
             }
 
-            if(! isPowerOfTwo || ! this.generateMipmaps) {
+            if (! isPowerOfTwo || ! this.generateMipmaps) {
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore
@@ -115,13 +115,13 @@ define(function(require) {
                 this._wrapSOriginal = this.wrapS;
                 this._wrapTOriginal = this.wrapT;
 
-                if(this.minFilter.indexOf("NEAREST") == 0) {
+                if (this.minFilter.indexOf("NEAREST") == 0) {
                     this.minFilter = 'NEAREST';
                 } else {
                     this.minFilter = 'LINEAR'
                 }
 
-                if(this.magFilter.indexOf("NEAREST") == 0) {
+                if (this.magFilter.indexOf("NEAREST") == 0) {
                     this.magFilter = 'NEAREST';
                 } else {
                     this.magFilter = 'LINEAR'
@@ -130,16 +130,16 @@ define(function(require) {
                 this.wrapS = 'CLAMP_TO_EDGE';
                 this.wrapT = 'CLAMP_TO_EDGE';
             } else {
-                if(this._minFilterOriginal) {
+                if (this._minFilterOriginal) {
                     this.minFilter = this._minFilterOriginal;
                 }
-                if(this._magFilterOriginal) {
+                if (this._magFilterOriginal) {
                     this.magFilter = this._magFilterOriginal;
                 }
-                if(this._wrapSOriginal) {
+                if (this._wrapSOriginal) {
                     this.wrapS = this._wrapSOriginal;
                 }
-                if(this._wrapTOriginal) {
+                if (this._wrapTOriginal) {
                     this.wrapT = this._wrapTOriginal;
                 }
             }

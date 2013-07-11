@@ -17,6 +17,9 @@ define(function(require) {
     var Polygon = require("2d/shape/polygon");
     var TextBox = require("2d/shape/textbox");
     var SVGPath = require("2d/shape/svgpath");
+    var LinearGradient = require("2d/lineargradient");
+    var RadialGradient = require("2d/radialgradient");
+    var Pattern = require("2d/pattern");
     var _ = require("_");
 
     var Style = require("2d/style");
@@ -25,7 +28,7 @@ define(function(require) {
 
     var Loader = Base.derive(function() {
         return {
-
+            _defs : []
         };
     }, {
         load : function(url) {
@@ -50,6 +53,9 @@ define(function(require) {
                 var parser = new DOMParser();
                 var doc = parser.parseFromString(xml, 'text/xml');
                 var svg = doc.firstChild;
+                while (svg.nodeName.toLowerCase() !== 'svg') {
+                    svg = svg.nextSibling;
+                }
             } else {
                 var svg = xml;
             }
@@ -203,6 +209,23 @@ define(function(require) {
             path.description = d;
 
             return path;
+        },
+
+        'linearGradient' : function(xmlNode) {
+            var x1 = parseInt(xmlNode.getAttribute("x1") || 0);
+            var y1 = parseInt(xmlNode.getAttribute("y1") || 0);
+            var x2 = parseInt(xmlNode.getAttribute("x2") || 100);
+            var y2 = parseInt(xmlNode.getAttribute("y2") || 0);
+
+            var stop = xmlNode.firstChild;
+
+            while (stop) {
+
+            }
+        },
+
+        'radialGradient' : function(xmlNode) {
+
         }
     }
 
