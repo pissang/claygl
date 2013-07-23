@@ -4,10 +4,10 @@
 define(function(require) {
 
     var Node = require("./node");
-    var Pass = require("../pass");
-    var FrameBuffer = require("../../framebuffer");
+    var Pass = require("./pass");
+    var FrameBuffer = require("../framebuffer");
     var texturePool = require("./texturepool");
-    var WebGLInfo = require('../../webglinfo');
+    var WebGLInfo = require('../webglinfo');
 
     var SceneNode = Node.derive(function() {
         return {
@@ -22,6 +22,8 @@ define(function(require) {
     }, {
         render : function(renderer) {
             
+            this._rendering = true;
+
             var _gl = renderer.gl;
 
             if (! this.outputs) {
@@ -33,7 +35,7 @@ define(function(require) {
                 for (var name in this.outputs) {
                     var outputInfo = this.outputs[name];
                     var texture = texturePool.get(outputInfo.parameters || {});
-                    this._textures[name] = texture;
+                    this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
@@ -60,11 +62,15 @@ define(function(require) {
                 if (this.material) {
                     this.scene.material = this.material;
                 }
+
                 renderer.render(this.scene, this.camera);
+                
                 this.scene.material = null;
 
                 frameBuffer.unbind(renderer);
             }
+
+            this._rendering = false;
         }
     })
 

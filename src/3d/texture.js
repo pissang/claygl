@@ -32,7 +32,7 @@ define(function(require) {
             wrapT : 'CLAMP_TO_EDGE',
             // Texture min and mag filter
             // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
-            // NEARST
+            // NEAREST
             // LINEAR
             // NEAREST_MIPMAP_NEAREST
             // NEAREST_MIPMAP_LINEAR

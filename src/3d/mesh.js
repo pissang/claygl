@@ -14,6 +14,10 @@ define(function(require) {
             geometry : null,
 
             // Draw mode
+            // POINTS
+            // LINES
+            // TRIANGLES
+            // ...
             mode : "TRIANGLES",
             
             receiveShadow : true,
@@ -84,7 +88,7 @@ define(function(require) {
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                     _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
                 } else {
-                    _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
+                    _gl.drawArrays(glDrawMode, 0, geometry.getVerticesNumber());
                 }
             }
 
@@ -96,15 +100,7 @@ define(function(require) {
             this.trigger('afterrender', _gl, drawInfo);
 
             return drawInfo;
-        },
-
-        bindGeometry : function(_gl) {
-
-            var shader = this.material.shader;
-            var geometry = this.geometry;
-
         }
-
     });
 
     // Called when material is changed

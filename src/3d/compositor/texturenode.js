@@ -4,9 +4,9 @@
 define(function(require) {
 
     var Node = require("./node");
-    var FrameBuffer = require("../../framebuffer");
+    var FrameBuffer = require("../framebuffer");
     var texturePool = require("./texturepool");
-    var Shader = require("../../shader");
+    var Shader = require("../shader");
 
     var TextureNode = Node.derive(function() {
         return {
@@ -17,6 +17,9 @@ define(function(require) {
         }
     }, {
         render : function(renderer) {
+
+            this._rendering = true;
+
             var _gl = renderer.gl;
             this.pass.setUniform("texture", this.texture);
             
@@ -32,7 +35,7 @@ define(function(require) {
                     var outputInfo = this.outputs[name];
 
                     var texture = texturePool.get(outputInfo.parameters || {});
-                    this._textures[name] = texture;
+                    this._outputTexture[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
@@ -44,6 +47,8 @@ define(function(require) {
 
                 this.pass.render(renderer, this.frameBuffer);
             }
+
+            this._rendering = false;
         }
     })
 

@@ -3,7 +3,7 @@
  */
 define(function(require) {
     
-    var Texture2D = require("../../texture/texture2d");
+    var Texture2D = require("../texture/texture2d");
     var _ = require("_");
 
     var pool = {};

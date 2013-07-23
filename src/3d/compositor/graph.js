@@ -8,7 +8,6 @@ define( function( require ) {
             nodes : []
         }
     }, {
-
         
         add : function(node) {
 

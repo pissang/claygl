@@ -23,8 +23,8 @@
             require(['qtek'], function(qtek){
                 var qtek3d = qtek['3d'],
                     Shader = qtek3d.Shader,
-                    pp_Node = qtek3d.compositor.graph.Node,
-                    pp_SceneNode = qtek3d.compositor.graph.SceneNode,
+                    pp_Node = qtek3d.compositor.Node,
+                    pp_SceneNode = qtek3d.compositor.SceneNode,
                     compositor = new qtek3d.Compositor();
 
                 var renderer = new qtek3d.Renderer({

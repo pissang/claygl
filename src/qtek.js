@@ -38,15 +38,13 @@ define( function(require){
 		},
 		"Compositor": require('3d/compositor'),
 		"compositor": {
-			"graph": {
-				"Graph": require('3d/compositor/graph/graph'),
-				"Group": require('3d/compositor/graph/group'),
-				"Node": require('3d/compositor/graph/node'),
-				"SceneNode": require('3d/compositor/graph/scenenode'),
-				"TextureNode": require('3d/compositor/graph/texturenode'),
-				"TexturePool": require('3d/compositor/graph/texturepool')
-			},
-			"Pass": require('3d/compositor/pass')
+			"Graph": require('3d/compositor/graph'),
+			"Group": require('3d/compositor/group'),
+			"Node": require('3d/compositor/node'),
+			"Pass": require('3d/compositor/pass'),
+			"SceneNode": require('3d/compositor/scenenode'),
+			"TextureNode": require('3d/compositor/texturenode'),
+			"TexturePool": require('3d/compositor/texturepool')
 		},
 		"debug": {
 			"Pointlight": require('3d/debug/pointlight'),

@@ -101,7 +101,7 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
     grunt.registerTask('default', ['requirejs:all', 'uglify:all']);
-    grunt.registerTask('webgl', ['requirejs:webgl', 'uglify:webgl']);
-    grunt.registerTask('canvas', ['requirejs:canvas', 'uglify:canvas']);
-    grunt.registerTask('image', ['requirejs:image', 'uglify:image']);
+    // grunt.registerTask('webgl', ['requirejs:webgl', 'uglify:webgl']);
+    // grunt.registerTask('canvas', ['requirejs:canvas', 'uglify:canvas']);
+    // grunt.registerTask('image', ['requirejs:image', 'uglify:image']);
 }

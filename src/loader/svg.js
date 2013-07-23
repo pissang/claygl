@@ -28,11 +28,14 @@ define(function(require) {
 
     var Loader = Base.derive(function() {
         return {
-            _defs : []
+            defs : {},
+            root : null
         };
     }, {
         load : function(url) {
+
             var self = this;
+            this.defs = {};
 
             request.get({
                 url : url,
@@ -60,7 +63,7 @@ define(function(require) {
                 var svg = xml;
             }
             var root = new Node();
-            
+            this.root = root;
             // parse view port
             var viewBox = svg.getAttribute("viewBox") || '';
             var viewBoxArr = viewBox.split(/\s+/);
@@ -88,16 +91,40 @@ define(function(require) {
 
         _parseNode : function(xmlNode, parent) {
             var nodeName = xmlNode.nodeName.toLowerCase();
-            var nodeParser = nodeParsers[nodeName];
-            if (nodeParser) {
-                var node = nodeParser(xmlNode, parent);
-                parent.add(node);
 
-                var child = xmlNode.firstChild;
-                while (child) {
-                    this._parseNode(child, node);
-                    child = child.nextSibling;
+            if (nodeName === 'defs') {
+                // define flag
+                this._isDefine = true;
+            }
+
+            if (this._isDefine) {
+                var parser = defineParsers[nodeName];
+                if (parser) {
+                    var def = parser.call(this, xmlNode);
+                    var id = xmlNode.getAttribute("id");
+                    if (id) {
+                        this.defs[id] = def;
+                    }
                 }
+            } else {
+                var parser = nodeParsers[nodeName];
+                if (parser) {
+                    var node = parser.call(this, xmlNode, parent);
+                    parent.add(node);
+                }
+            }
+
+            var child = xmlNode.firstChild;
+            while (child) {
+                if (child.nodeType === 1){
+                    this._parseNode(child, node);
+                }
+                child = child.nextSibling;
+            }
+
+            // Quit define
+            if (nodeName === 'defs') {
+                this._isDefine = false;
             }
         }
     });
@@ -105,14 +132,18 @@ define(function(require) {
     var nodeParsers = {
         "g" : function(xmlNode, parentNode) {
             var node = new Node();
-            _inheritStyle(parentNode, node);
-            _parseAttributes(xmlNode, node);
+            if (parentNode) {
+                _inheritStyle(parentNode, node);
+            }
+            _parseAttributes(xmlNode, node, this.defs);
             return node;
         },
         "rect" : function(xmlNode, parentNode) {
             var rect = new Rectangle();
-            _inheritStyle(parentNode, rect);
-            _parseAttributes(xmlNode, rect);
+            if (parentNode) {
+                _inheritStyle(parentNode, rect);
+            }
+            _parseAttributes(xmlNode, rect, this.defs);
 
             var x = parseFloat(xmlNode.getAttribute("x") || 0);
             var y = parseFloat(xmlNode.getAttribute("y") || 0);
@@ -125,8 +156,10 @@ define(function(require) {
         },
         "circle" : function(xmlNode, parentNode) {
             var circle = new Circle();
-            _inheritStyle(parentNode, circle);
-            _parseAttributes(xmlNode, circle);
+            if (parentNode) {
+                _inheritStyle(parentNode, circle);
+            }
+            _parseAttributes(xmlNode, circle, this.defs);
 
             var cx = parseFloat(xmlNode.getAttribute("cx") || 0);
             var cy = parseFloat(xmlNode.getAttribute("cy") || 0);
@@ -138,8 +171,10 @@ define(function(require) {
         },
         'line' : function(xmlNode, parentNode){
             var line = new Line();
-            _inheritStyle(parentNode, line);
-            _parseAttributes(xmlNode, line);
+            if (parentNode) {
+                _inheritStyle(parentNode, line);
+            }
+            _parseAttributes(xmlNode, line, this.defs);
 
             var x1 = parseFloat(xmlNode.getAttribute("x1") || 0);
             var y1 = parseFloat(xmlNode.getAttribute("y1") || 0);
@@ -152,8 +187,10 @@ define(function(require) {
         },
         "ellipse" : function(xmlNode, parentNode) {
             var ellipse = new Ellipse();
-            _inheritStyle(parentNode, ellipse);
-            _parseAttributes(xmlNode, ellipse);
+            if (parentNode) {
+                _inheritStyle(parentNode, ellipse);
+            }
+            _parseAttributes(xmlNode, ellipse, this.defs);
 
             var cx = parseFloat(xmlNode.getAttribute("cx") || 0);
             var cy = parseFloat(xmlNode.getAttribute("cy") || 0);
@@ -172,15 +209,19 @@ define(function(require) {
             var polygon = new Polygon({
                 points : points
             });
-            _inheritStyle(parentNode, polygon);
-            _parseAttributes(xmlNode, polygon);
+            if (parentNode) {
+                _inheritStyle(parentNode, polygon);
+            }
+            _parseAttributes(xmlNode, polygon, this.defs);
 
             return polygon;
         },
         'polyline' : function(xmlNode, parentNode) {
             var path = new Path();
-            _inheritStyle(parentNode, path);
-            _parseAttributes(xmlNode, path);
+            if (parentNode) {
+                _inheritStyle(parentNode, path);
+            }
+            _parseAttributes(xmlNode, path, this.defs);
 
             var points = xmlNode.getAttribute("points");
             if (points) {
@@ -194,12 +235,14 @@ define(function(require) {
 
         },
         'text' : function(xmlNode, parentNode) {
-
+            
         },
         "path" : function(xmlNode, parentNode) {
             var path = new SVGPath();
-            _inheritStyle(parentNode, path);
-            _parseAttributes(xmlNode, path);
+            if (parentNode) {
+                _inheritStyle(parentNode, path);
+            }
+            _parseAttributes(xmlNode, path, this.defs);
 
             // TODO svg fill rule
             // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill-rule
@@ -209,23 +252,51 @@ define(function(require) {
             path.description = d;
 
             return path;
-        },
+        }
+    }
 
-        'linearGradient' : function(xmlNode) {
+    var defineParsers = {
+
+        'lineargradient' : function(xmlNode) {
             var x1 = parseInt(xmlNode.getAttribute("x1") || 0);
             var y1 = parseInt(xmlNode.getAttribute("y1") || 0);
-            var x2 = parseInt(xmlNode.getAttribute("x2") || 100);
+            var x2 = parseInt(xmlNode.getAttribute("x2") || 10);
             var y2 = parseInt(xmlNode.getAttribute("y2") || 0);
 
-            var stop = xmlNode.firstChild;
+            var gradient = new LinearGradient();
+            gradient.start.set(x1, y1);
+            gradient.end.set(x2, y2);
 
-            while (stop) {
+            _parseGradientColorStops(xmlNode, gradient);
 
-            }
+            return gradient;
         },
 
-        'radialGradient' : function(xmlNode) {
+        'radialgradient' : function(xmlNode) {
 
+        }
+    }
+
+    function _parseGradientColorStops(xmlNode, gradient){
+
+        var stop = xmlNode.firstChild;
+
+        while (stop) {
+            if (stop.nodeType === 1) {
+                var offset = stop.getAttribute("offset");
+                if (offset.indexOf("%") > 0) {  // percentage
+                    offset = parseInt(offset) / 100;
+                } else if(offset) {    // number from 0 to 1
+                    offset = parseFloat(offset);
+                } else {
+                    offset = 0;
+                }
+
+                var stopColor = stop.getAttribute("stop-color") || '#000000';
+
+                gradient.addColorStop(offset, stopColor);
+            }
+            stop = stop.nextSibling;
         }
     }
 
@@ -246,7 +317,7 @@ define(function(require) {
         return points;
     }
 
-    function _parseAttributes(xmlNode, node) {
+    function _parseAttributes(xmlNode, node, defs) {
         _parseTransformAttribute(xmlNode, node);
 
         var styleList = {
@@ -264,8 +335,8 @@ define(function(require) {
         _.extend(styleList, _parseStyleAttribute(xmlNode));
 
         node.style = new Style({
-            fill : _getPaint(styleList.fill),
-            stroke : _getPaint(styleList.stroke),
+            fill : _getPaint(styleList.fill, defs),
+            stroke : _getPaint(styleList.stroke, defs),
             lineWidth : parseFloat(styleList.lineWidth),
             opacity : parseFloat(styleList.opacity),
             lineDashOffset : styleList.lineDashOffset,
@@ -284,7 +355,14 @@ define(function(require) {
     }
 
 
-    function _getPaint(str) {
+    var urlRegex = /url\(\s*#(.*?)\)/;
+    function _getPaint(str, defs) {
+        var urlMatch = urlRegex.exec(str);
+        if (urlMatch) {
+            var url = urlMatch[1].trim();
+            var def = defs[url];
+            return def;
+        }
         return str;
     }
 

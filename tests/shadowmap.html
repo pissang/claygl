@@ -30,7 +30,7 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-                
+
                 var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
                 var scene = new qtek3d.Scene,
@@ -38,7 +38,7 @@
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 100
                     });
-                
+
                 var light = new qtek3d.light.Spot({
                     position : new Vector3(0, 4, 4),
                     intensity : 4.0,
@@ -61,7 +61,7 @@
                 });
                 var data = JSON.parse(modelData);
                 var meshList = loader.parse(data);
-                
+
                 var root = new qtek3d.Node();
 
                 _.each(meshList, function(mesh){
@@ -98,7 +98,7 @@
                 }, 20);
 
             })
-            
+
         </script>
     </body>
 </html>

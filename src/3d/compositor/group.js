@@ -10,7 +10,7 @@ define(function(require) {
         return {
             nodes : [],
 
-            _textures : {}
+            _outputTextures : {}
         }
     }, {
         add : function(node) {
@@ -63,7 +63,7 @@ define(function(require) {
                 }
             }
             for (var name in this.groupOutputs) {
-                if ( ! this._textures[name]) {
+                if ( ! this._outputTextures[name]) {
                     console.error('Group output pin "' + name + '" is not attached');
                 }
             }
@@ -88,7 +88,7 @@ define(function(require) {
             for (var name in node.groupOutputs) {
                 var groupOutputPinName = node.groupOutputs[name];
                 var texture = node.getOutput(renderer, name);
-                this._textures[groupOutputPinName] = texture;
+                this._outputTextures[groupOutputPinName] = texture;
             }
         }
     });

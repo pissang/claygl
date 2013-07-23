@@ -189,7 +189,8 @@ define(function(require) {
             var dirtyAttributes = this._getDirtyAttributes();
 
             var isFacesDirty = this.cache.get("dirty_faces") || this.cache.miss("dirty_faces");
-
+            isFacesDirty = isFacesDirty && this.faces.length && this.useFaces;
+            
             if (dirtyAttributes) {
                 this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
                 this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
@@ -393,7 +394,7 @@ define(function(require) {
             } else {
                 var chunk = newChunk(0);
                 // Use faces
-                if (this.useFaces) {
+                if (isFacesDirty) {
                     var indicesArray = chunk.indicesArray;
                     if (! indicesArray) {
                         indicesArray = chunk.indicesArray = new Uint16Array(this.faces.length*3);
@@ -485,7 +486,7 @@ define(function(require) {
                         semantic : semantic,
                     }
                 } 
-                if (isFacesDirty && this.useFaces) {
+                if (isFacesDirty) {
                     if (! indicesBuffer) {
                         indicesBuffer = chunk.indicesBuffer = {
                             buffer : _gl.createBuffer(),

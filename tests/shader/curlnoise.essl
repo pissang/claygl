@@ -1,0 +1,222 @@
+@export curlnoise.snoise
+//
+// Description : Array and textureless GLSL 2D simplex noise function.
+//      Author : Ian McEwan, Ashima Arts.
+//  Maintainer : ijm
+//     Lastmod : 20110822 (ijm)
+//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+//               Distributed under the MIT License. See LICENSE file.
+//               https://github.com/ashima/webgl-noise
+// 
+
+vec3 mod289(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec2 mod289(vec2 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec3 permute(vec3 x) {
+    return mod289(((x*34.0)+1.0)*x);
+}
+
+float snoise(vec2 v)
+{
+    const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+                  0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+                 -0.577350269189626,  // -1.0 + 2.0 * C.x
+                  0.024390243902439); // 1.0 / 41.0
+    // First corner
+    vec2 i  = floor(v + dot(v, C.yy) );
+    vec2 x0 = v -   i + dot(i, C.xx);
+
+    // Other corners
+    vec2 i1;
+    //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
+    //i1.y = 1.0 - i1.x;
+    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    // x0 = x0 - 0.0 + 0.0 * C.xx ;
+    // x1 = x0 - i1 + 1.0 * C.xx ;
+    // x2 = x0 - 1.0 + 2.0 * C.xx ;
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+
+    // Permutations
+    i = mod289(i); // Avoid truncation effects in permutation
+    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m ;
+    m = m*m ;
+
+    // Gradients: 41 points uniformly over a line, mapped onto a diamond.
+    // The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
+
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+
+    // Normalise gradients implicitly by scaling m
+    // Approximation of: m *= inversesqrt( a0*a0 + h*h );
+    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+
+    // Compute final noise value at P
+    vec3 g;
+    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+}
+@end
+
+
+///////////////////////////////////////////////////////////
+@export curlnoise.noise
+uniform float elapsedTime;
+
+uniform vec2 turbulence : [0.103, 0.12];
+uniform float persistence : 0.707;
+
+varying vec2 v_Texcoord;
+
+@import curlnoise.snoise
+
+float fBm_noise(vec2 x){
+    float y = snoise(x);
+    y += snoise(2.0 * x) * pow(persistence, 2.0);
+    y += snoise(4.0 * x) * pow(persistence, 4.0);
+    y += snoise(8.0 * x) * pow(persistence, 8.0);
+    return y/1.875;
+}
+
+void main()
+{
+    vec2 p = (v_Texcoord * 2.0 -1.0) * 2.0;
+    p.x += sin(elapsedTime * turbulence.x);
+    p.y += cos(elapsedTime * turbulence.y);
+
+    vec3 f = vec3(0.0);
+    f.x = fBm_noise(p);
+    f.y = fBm_noise(p + 79.263);
+    f.z = fBm_noise(p + 108.54);
+
+    gl_FragColor = vec4(f, 1.0);
+}
+@end
+
+
+///////////////////////////////////////////////////////////
+@export curlnoise.particle
+
+uniform float particleTextureSize : 256;
+uniform float noiseTextureSize : 256;
+uniform float deltaTime;
+uniform float elapsedTime;
+
+uniform sampler2D noiseTexture;
+uniform sampler2D spawnTexture;
+uniform sampler2D particleTexture;
+
+varying vec2 v_Texcoord;
+
+void main(){
+    vec4 particle = texture2D(particleTexture, v_Texcoord);
+
+    if(particle.w > 0.0){
+        vec3 p = particle.xyz * 0.5 + 0.5;    //??????
+        float d = 1.0 / noiseTextureSize;
+
+        float fx = texture2D(noiseTexture, p.yz).x;
+        float fy = texture2D(noiseTexture, p.xz).y;
+        float fz = texture2D(noiseTexture, p.xy).z;
+
+        float fxdy = texture2D(noiseTexture, p.yz + vec2(d, 0)).x - fx;
+        float fxdz = texture2D(noiseTexture, p.yz + vec2(0, d)).x - fx;
+
+        float fydx = texture2D(noiseTexture, p.xz + vec2(d, 0)).y - fy;
+        float fydz = texture2D(noiseTexture, p.xz + vec2(0, d)).y - fy;
+
+        float fzdx = texture2D(noiseTexture, p.xy + vec2(d, 0)).z - fz;
+        float fzdy = texture2D(noiseTexture, p.xy + vec2(0, d)).z - fz;
+
+        vec3 v = vec3(fzdy - fydz, fxdz - fzdx, fydx - fxdy) * 0.005 * noiseTextureSize;
+
+        particle.xyz += v * deltaTime;
+        particle.w -= deltaTime;
+    }
+    else{
+        particle = texture2D(spawnTexture, v_Texcoord);
+    }
+
+    gl_FragColor = particle;
+}
+
+@end
+
+///////////////////////////////////////////////////////////
+@export curlnoise.spawn
+
+uniform vec3 spawnPosition : [0, 0, 0];
+uniform float elapsedTime;
+
+uniform float spawnSize : 0.2;
+
+varying vec2 v_Texcoord;
+
+@import curlnoise.snoise
+
+void main(){
+    vec2 p = v_Texcoord * 2.0 -1.0;
+
+    float x = spawnPosition.x + snoise(50.0*p + elapsedTime) * spawnSize;
+    float y = spawnPosition.y + snoise(61.0*p + elapsedTime) * spawnSize;
+    float z = spawnPosition.z + snoise(72.0*p + elapsedTime) * spawnSize;
+    float t = snoise(83.0*p + elapsedTime) * 6.0+4.0;
+
+    gl_FragColor = vec4(x/10.0, y/10.0, z/10.0, t);
+}
+
+@end
+
+///////////////////////////////////////////////////////////
+@export curlnoise.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform sampler2D particleTexture;
+
+attribute vec3 position : POSITION;
+varying float life;
+
+void main(){
+
+    vec4 p = texture2D(particleTexture, position.xy);
+
+    if(p.w > 0.0){
+        gl_Position = worldViewProjection * vec4(p.xyz, 1.0);
+    }
+    else{
+        gl_Position = worldViewProjection * vec4(1000.0, 1000.0, 1000.0, 1.0);
+    }
+
+    life = 1.0 - p.w / 6.0; 
+    gl_PointSize = 4.0;
+
+}
+
+@end
+
+///////////////////////////////////////////////////////////
+@export curlnoise.fragment
+
+varying float life;
+
+uniform sampler2D spiritTexture;
+uniform vec3 color : [0.0, 0.0, 0.0];
+
+void main(){
+    float a = texture2D(spiritTexture, gl_PointCoord).x;
+    gl_FragColor = vec4(color, a * (1.0-life));
+}
+
+@end

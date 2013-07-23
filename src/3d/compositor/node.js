@@ -37,9 +37,9 @@
 define(function(require) {
 
     var Base = require("core/base");
-    var Pass = require("../pass");
-    var FrameBuffer = require("../../framebuffer");
-    var Shader = require("../../shader");
+    var Pass = require("./pass");
+    var FrameBuffer = require("../framebuffer");
+    var Shader = require("../shader");
     var texturePool = require("./texturepool");
 
     var Node = Base.derive(function() {
@@ -65,14 +65,16 @@ define(function(require) {
             // }]
             outputLinks : {},
 
-            _textures : {},
 
             pass : null,
 
+            _outputTextures : {},
             //{
             //  name : 2
             //}
-            _outputReferences : {}
+            _outputReferences : {},
+
+            _rendering : false
         }
     }, function() {
         if (this.shader) {
@@ -89,7 +91,11 @@ define(function(require) {
     }, {
 
         render : function(renderer) {
+            
+            this._rendering = true;
+
             var _gl = renderer.gl;
+
             for (var inputName in this.inputLinks) {
                 var link = this.inputLinks[inputName];
                 var inputTexture = link.node.getOutput(renderer, link.pin);
@@ -107,22 +113,25 @@ define(function(require) {
                     var outputInfo = this.outputs[name];
 
                     var texture = texturePool.get(outputInfo.parameters || {});
-                    this._textures[name] = texture;
+                    this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
                         attachment = _gl[attachment];
                     }
-                    this.pass.outputs[ attachment ] = texture;
+                    this.pass.outputs[attachment] = texture;
                 }
 
                 this.pass.render(renderer, this.frameBuffer);
+
             }
             
             for (var inputName in this.inputLinks) {
                 var link = this.inputLinks[inputName];
                 link.node.removeReference(link.pin);
             }
+
+            this._rendering = false;
         },
 
         setParameter : function(name, value) {
@@ -140,14 +149,19 @@ define(function(require) {
             if (! outputInfo) {
                 return ;
             }
-            if (this._textures[name]) {
+            if (this._outputTextures[name]) {
                 // Already been rendered in this frame
-                return this._textures[name];
+                return this._outputTextures[name];
+            } else if(this._rendering) {
+                // Solve circular reference
+                var texture = texturePool.get(outputInfo.parameters || {});
+                this._outputTextures[name] = texture;
+                return texture;
             }
 
             this.render(renderer);
             
-            return this._textures[name];
+            return this._outputTextures[name];
         },
 
         removeReference : function(name) {
@@ -155,8 +169,8 @@ define(function(require) {
             if (this._outputReferences[name] === 0) {
                 // Output of this node have alreay been used by all other nodes
                 // Put the texture back to the pool.
-                texturePool.put(this._textures[name]);
-                this._textures[name] = null;
+                texturePool.put(this._outputTextures[name]);
+                this._outputTextures[name] = null;
             }
         },
 

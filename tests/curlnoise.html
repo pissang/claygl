@@ -1,0 +1,197 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+</head>
+<body style="margin:0px;">
+    <canvas id="Main"></canvas>
+    <script type="text/javascript">
+        requirejs.config({
+            'baseUrl' : '../src',
+            'paths' : {
+                '_' : '../thirdparty/lodash.compat',
+                'glmatrix' : '../thirdparty/gl-matrix'
+            },
+            'shim' : {
+                '_' : {
+                    exports : '_'
+                }
+            }
+        })
+
+        require(['qtek',
+                'text!../tests/shader/curlnoise.essl'], function(qtek, shaderStr){
+            
+            var qtek3d = qtek['3d'];
+            var Shader = qtek3d.Shader;
+            var pp_Node = qtek3d.compositor.Node;
+            var compositor = new qtek3d.Compositor();
+
+            var SIZE = 256;
+
+            var renderer = new qtek3d.Renderer({
+                canvas : document.getElementById( "Main"),
+                devicePixelRatio : 1.0
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+
+            Shader.import(shaderStr);
+
+            var parameters = {
+                width : SIZE,
+                height : SIZE,
+                type : 'FLOAT',
+                minFilter : 'NEAREST',
+                magFilter : 'NEAREST'
+            };
+
+            var spawnNode = new pp_Node({
+                shader : Shader.source("curlnoise.spawn"),
+                outputs : {
+                    'position' : {
+                        parameters : parameters
+                    }
+                }
+            });
+
+            var noiseNode = new pp_Node({
+                shader : Shader.source("curlnoise.noise"),
+                outputs : {
+                    'noise' : {
+                        parameters : parameters
+                    }
+                }
+            });
+
+            var particleNode = new pp_Node({
+                shader : Shader.source("curlnoise.particle"),
+                inputs : {
+                    'spawnTexture' : {
+                        node : spawnNode,
+                        pin : 'position'
+                    },
+                    'noiseTexture' : {
+                        node : noiseNode,
+                        pin : 'noise'
+                    }
+                }
+            });
+
+            compositor.add(spawnNode);
+            compositor.add(noiseNode);
+            compositor.add(particleNode);
+
+            var sourceTexture = new qtek3d.texture.Texture2D(parameters);
+            var targetTexture = new qtek3d.texture.Texture2D(parameters);
+
+            var frameBuffer = new qtek3d.FrameBuffer();
+
+            function swapParticleTexture(){
+                var tmp = sourceTexture;
+                sourceTexture = targetTexture;
+                targetTexture = tmp;
+            }
+
+            particleNode.pass.on("beforerender", function(renderer){
+                frameBuffer.attach(renderer.gl, targetTexture);
+                frameBuffer.bind(renderer);
+                particleNode.setParameter('particleTexture', sourceTexture);
+            });
+            particleNode.pass.on("afterrender", function(renderer){
+                frameBuffer.unbind(renderer);
+            });
+
+            particleNode.setParameters({
+                particleTextureSize : SIZE,
+                noiseTextureSize : SIZE
+            })
+
+            // Particles
+            var geo = new qtek3d.Geometry({
+                useFaces : false
+            });
+            for (var i = 0; i < SIZE; i++) {
+                for (var j = 0; j < SIZE; j++) {
+                    geo.attributes.position.value.push([i / SIZE, j / SIZE, 0]);
+                }
+            }
+            var mat = new qtek3d.Material({
+                shader : new qtek3d.Shader({
+                    vertex : Shader.source("curlnoise.vertex"),
+                    fragment : Shader.source("curlnoise.fragment")
+                })
+            });
+            var particleSystem = new qtek3d.Mesh({
+                geometry : geo,
+                material : mat,
+                mode : 'POINTS'
+            });
+            var scene = new qtek3d.Scene();
+            scene.add(particleSystem);
+            var camera = new qtek3d.camera.Perspective();
+            camera.position.z = 0.6;
+
+            var spiritTexture = new qtek3d.texture.Texture2D();
+            spiritTexture.image = generateSprite();
+            mat.setUniform("spiritTexture", spiritTexture);
+
+            var control = new qtek3d.plugin.OrbitControl({
+                camera : camera,
+                canvas : renderer.canvas,
+                sensitivity : 0.4
+            });
+            control.enable();
+
+            var time = new Date().getTime();
+            var elapsedTime = 0;
+
+            function update(){
+                var currentTime = new Date().getTime();
+                var deltaTime = (currentTime - time) / 1000;
+                elapsedTime += deltaTime;
+                time = currentTime;
+
+                spawnNode.setParameter("elapsedTime", elapsedTime);
+                noiseNode.setParameter("elapsedTime", elapsedTime);
+                particleNode.setParameter("elapsedTime", elapsedTime);
+                particleNode.setParameter("deltaTime", deltaTime);
+                compositor.render(renderer);
+
+                mat.setUniform("particleTexture", targetTexture);
+                renderer.render(scene, camera);
+
+                swapParticleTexture();
+
+                setTimeout(update, 20);
+            }
+            setTimeout(update, 20);
+
+            function generateSprite(){
+                var canvas = document.createElement('canvas');
+                canvas.width = 128;
+                canvas.height = 128;
+
+                var context = canvas.getContext( '2d' );
+
+                context.beginPath();
+                context.arc( 64, 64, 60, 0, Math.PI * 2, false) ;
+                context.closePath();
+
+                context.restore();
+
+                var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+
+                gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+                gradient.addColorStop( 1, 'rgba(255,255,255,0.0)' );
+
+                context.fillStyle = gradient;
+
+                context.fill();
+
+                return canvas;
+            }
+        });
+    </script>
+</body>
+</html>

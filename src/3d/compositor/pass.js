@@ -95,7 +95,9 @@ define(function(require) {
                 ext.drawBuffersEXT(bufs);
             }
 
+            this.trigger("beforerender", renderer);
             renderer.render(scene, camera, true);
+            this.trigger("afterrender", renderer);
 
             if (frameBuffer) {
                 this.unbind(renderer, frameBuffer);
