@@ -23,7 +23,7 @@ void main(){
 uniform vec3 color : [0.0, 0.0, 0.0];
 
 uniform float alpha : 1.0;
-uniform float lineWidth : 1.5;
+uniform float lineWidth : 1.0;
 
 varying vec3 v_Barycentric;
 

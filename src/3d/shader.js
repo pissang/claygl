@@ -364,7 +364,7 @@ define(function(require) {
          * Example Usage:
          * enableAttributes(_gl, "position", "texcoords")
          * OR
-         * enableAttributes(_gl, ["position", "texcoors"])
+         * enableAttributes(_gl, ["position", "texcoords"])
          */
         enableAttributes : function(_gl, attribList) {
             
@@ -380,8 +380,17 @@ define(function(require) {
             if (! enabledAttributeListInContext) {
                 enabledAttributeListInContext = enabledAttributeList[_gl.__GUID__] = [];
             }
-
-            for (var symbol in this.attributeTemplates) {
+            for (var i = 0; i < enabledAttributeListInContext.length; i++) {
+                if (enabledAttributeListInContext[i]) {
+                    _gl.disableVertexAttribArray(i);
+                    enabledAttributeListInContext[i] = false;
+                }
+            }
+            for (var i = 0; i < attribList.length; i++) {
+                var symbol = attribList[i];
+                if (!this.attributeTemplates[symbol]) {
+                    continue;
+                }
                 var location = locationsMap[symbol];                        
                 if (typeof(location) === "undefined") {
                     location = _gl.getAttribLocation(program, symbol);
@@ -391,18 +400,8 @@ define(function(require) {
                     }
                     locationsMap[symbol] = location;
                 }
-
-                if (attribList.indexOf(symbol) >= 0) {
-                    if (! enabledAttributeListInContext[location]) {
-                        _gl.enableVertexAttribArray(location);
-                        enabledAttributeListInContext[location] = true;
-                    }
-                }else{
-                    if (enabledAttributeListInContext[location]) {
-                        _gl.disableVertexAttribArray(location);
-                        enabledAttributeListInContext[location] = false;
-                    }
-                }
+                _gl.enableVertexAttribArray(location);
+                enabledAttributeListInContext[location] = true;
             }
         },
 

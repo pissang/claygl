@@ -47,7 +47,9 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(xmlString) {
-                    self.parse(xmlString);
+                    self.parse(xmlString, function(root){
+                        self.trigger('load', root);
+                    });
                 }
             })
         },

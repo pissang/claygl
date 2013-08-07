@@ -172,7 +172,7 @@ void main(){
     float x = spawnPosition.x + snoise(50.0*p + elapsedTime) * spawnSize;
     float y = spawnPosition.y + snoise(61.0*p + elapsedTime) * spawnSize;
     float z = spawnPosition.z + snoise(72.0*p + elapsedTime) * spawnSize;
-    float t = snoise(83.0*p + elapsedTime) * 6.0+4.0;
+    float t = snoise(83.0*p + elapsedTime) * 6.0+6.0;
 
     gl_FragColor = vec4(x/10.0, y/10.0, z/10.0, t);
 }
@@ -200,7 +200,7 @@ void main(){
     }
 
     life = 1.0 - p.w / 6.0; 
-    gl_PointSize = 4.0;
+    gl_PointSize = 20.0;
 
 }
 
@@ -215,8 +215,10 @@ uniform sampler2D spiritTexture;
 uniform vec3 color : [0.0, 0.0, 0.0];
 
 void main(){
-    float a = texture2D(spiritTexture, gl_PointCoord).x;
-    gl_FragColor = vec4(color, a * (1.0-life));
+
+    gl_FragColor = texture2D(spiritTexture, gl_PointCoord);
+    gl_FragColor.xyz *= color;
+    gl_FragColor.a *= (1.0 - life) * 0.8;
 }
 
 @end

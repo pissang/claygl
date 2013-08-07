@@ -35,7 +35,7 @@ define(function(require) {
                     var outputInfo = this.outputs[name];
 
                     var texture = texturePool.get(outputInfo.parameters || {});
-                    this._outputTexture[name] = texture;
+                    this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {

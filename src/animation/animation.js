@@ -127,6 +127,8 @@ define(function(require) {
 
         this._controllerCount = 0;
 
+        this._delay = 0;
+
         this._doneList = [];
 
         this._onframeList = [];
@@ -137,17 +139,17 @@ define(function(require) {
     Deferred.prototype = {
         when : function(time /* ms */, props, easing) {
             for (var propName in props) {
-                if (! this._tracks[ propName ]) {
-                    this._tracks[ propName ] = [];
+                if (! this._tracks[propName]) {
+                    this._tracks[propName] = [];
                     // Initialize value
-                    this._tracks[ propName ].push({
+                    this._tracks[propName].push({
                         time : 0,
                         value : this._getter(this._target, propName)
                     });
                 }
-                this._tracks[ propName ].push({
+                this._tracks[propName].push({
                     time : time,
-                    value : props[ propName ],
+                    value : props[propName],
                     easing : easing
                 });
             }
@@ -163,6 +165,7 @@ define(function(require) {
             var track;
             var trackMaxTime;
             var value;
+            var setter = this._setter;
 
             function createOnframe(now, next, propName) {
                 var prevValue = now.value;
@@ -181,16 +184,16 @@ define(function(require) {
                 if (self._controllerCount === 0) {
                     var len = self._doneList.length;
                     for (var i = 0; i < len; i++) {
-                        self._doneList[i]();
+                        self._doneList[i].call(self);
                     }
                 }
             }
 
             for (var propName in this._tracks) {
-                delay = 0;
-                track = this._tracks[ propName ];
+                delay = this._delay;
+                track = this._tracks[propName];
                 if (track.length) {
-                    trackMaxTime = track[ track.length-1].time;
+                    trackMaxTime = track[track.length-1].time;
                 }else{
                     continue;
                 }
@@ -211,7 +214,7 @@ define(function(require) {
                     this._controllerList.push(controller);
 
                     this._controllerCount++;
-                    delay = next.time;
+                    delay = next.time + this._delay;
 
                     self.animation.add(controller);
                 }
@@ -223,6 +226,10 @@ define(function(require) {
                 var controller = this._controllerList[i];
                 this.animation.remove(controller);
             }
+        },
+        delay : function(time){
+            this._delay = time;
+            return this;
         },
         done : function(func) {
             this._doneList.push(func);

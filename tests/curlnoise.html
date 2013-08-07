@@ -5,7 +5,7 @@
     <script type="text/javascript" src="../thirdparty/require.js"></script>
 </head>
 <body style="margin:0px;">
-    <canvas id="Main"></canvas>
+    <canvas id="Main" style="background-color:#06b3db;"></canvas>
     <script type="text/javascript">
         requirejs.config({
             'baseUrl' : '../src',
@@ -18,21 +18,21 @@
                     exports : '_'
                 }
             }
-        })
+        });
 
         require(['qtek',
-                'text!../tests/shader/curlnoise.essl'], function(qtek, shaderStr){
+                'text!../tests/shader/curlnoise.essl',
+                'text!../tests/assets/models/LeePerrySmith/LeePerrySmith.js'], function(qtek, shaderStr, modelData){
             
             var qtek3d = qtek['3d'];
             var Shader = qtek3d.Shader;
             var pp_Node = qtek3d.compositor.Node;
             var compositor = new qtek3d.Compositor();
 
-            var SIZE = 256;
+            var SIZE = 512;
 
             var renderer = new qtek3d.Renderer({
-                canvas : document.getElementById( "Main"),
-                devicePixelRatio : 1.0
+                canvas : document.getElementById( "Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -43,17 +43,18 @@
                 height : SIZE,
                 type : 'FLOAT',
                 minFilter : 'NEAREST',
-                magFilter : 'NEAREST'
+                magFilter : 'NEAREST',
+                generateMipmaps : false
             };
 
-            var spawnNode = new pp_Node({
-                shader : Shader.source("curlnoise.spawn"),
-                outputs : {
-                    'position' : {
-                        parameters : parameters
-                    }
-                }
-            });
+            // var spawnNode = new pp_Node({
+            //     shader : Shader.source("curlnoise.spawn"),
+            //     outputs : {
+            //         'position' : {
+            //             parameters : parameters
+            //         }
+            //     }
+            // });
 
             var noiseNode = new pp_Node({
                 shader : Shader.source("curlnoise.noise"),
@@ -67,10 +68,10 @@
             var particleNode = new pp_Node({
                 shader : Shader.source("curlnoise.particle"),
                 inputs : {
-                    'spawnTexture' : {
-                        node : spawnNode,
-                        pin : 'position'
-                    },
+                    // 'spawnTexture' : {
+                    //     node : spawnNode,
+                    //     pin : 'position'
+                    // },
                     'noiseTexture' : {
                         node : noiseNode,
                         pin : 'noise'
@@ -78,7 +79,7 @@
                 }
             });
 
-            compositor.add(spawnNode);
+            // compositor.add(spawnNode);
             compositor.add(noiseNode);
             compositor.add(particleNode);
 
@@ -107,9 +108,10 @@
                 noiseTextureSize : SIZE
             })
 
-            // Particles
+            // Scene
             var geo = new qtek3d.Geometry({
-                useFaces : false
+                useFaces : false,
+                hint : 'DYNAMIC_DRAW'
             });
             for (var i = 0; i < SIZE; i++) {
                 for (var j = 0; j < SIZE; j++) {
@@ -120,7 +122,14 @@
                 shader : new qtek3d.Shader({
                     vertex : Shader.source("curlnoise.vertex"),
                     fragment : Shader.source("curlnoise.fragment")
-                })
+                }),
+                transparent : true,
+                // depthTest : false,
+                depthWrite : false,
+                blend : function(_gl){
+                    _gl.blendEquation(_gl.FUNC_ADD);
+                    _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
+                }
             });
             var particleSystem = new qtek3d.Mesh({
                 geometry : geo,
@@ -129,12 +138,17 @@
             });
             var scene = new qtek3d.Scene();
             scene.add(particleSystem);
-            var camera = new qtek3d.camera.Perspective();
-            camera.position.z = 0.6;
+            var camera = new qtek3d.camera.Perspective({
+                aspect : window.innerWidth / window.innerHeight
+            });
+            camera.position.z = 0.3;
+            camera.position.y = 0.3;
+            camera.lookAt(scene.position);
 
             var spiritTexture = new qtek3d.texture.Texture2D();
             spiritTexture.image = generateSprite();
             mat.setUniform("spiritTexture", spiritTexture);
+            mat.setUniform("color", [0.5, 0.3, 0.1]);
 
             var control = new qtek3d.plugin.OrbitControl({
                 camera : camera,
@@ -142,6 +156,50 @@
                 sensitivity : 0.4
             });
             control.enable();
+
+            // Dragon
+            var data = JSON.parse(modelData);
+            var loader = new qtek.loader.three.Model();
+            var meshList = loader.parse(data);
+            var root = new qtek3d.Node();
+            var material = new qtek3d.Material({
+                shader : qtek3d.shader.library.get('buildin.wireframe'),
+                transparent : true
+            });
+            meshList[0].geometry = new qtek3d.geometry.Sphere({
+                radius : 0.2
+            });
+            root.scale.set(0.50, 0.50, 0.50);
+            material.setUniform('color', [1.0, 1.0, 1.0]);
+            material.setUniform('lineWidth', 0.7);
+            meshList.forEach(function(mesh) {
+                mesh.geometry.generateBarycentric();
+                mesh.material = material;
+                root.add(mesh);
+            });
+            scene.add(root);
+            var light = new qtek3d.light.Directional();
+            light.position.set(0, 0.3, 0.3);
+            light.lookAt(scene.position);
+            scene.add(light);
+
+            // 
+            var spawnTexture = new qtek3d.texture.Texture2D(parameters);
+            var pixels = new Float32Array(SIZE * SIZE * 4);
+            var positions = meshList[0].geometry.attributes.position.value;
+            var cursor = 0;
+            var len = positions.length;
+            for (var i = 0; i < SIZE * SIZE; i++) {
+                pixels[cursor++] = positions[i % len][0] * 0.50;
+                pixels[cursor++] = positions[i % len][1] * 0.50;
+                pixels[cursor++] = positions[i % len][2] * 0.50;
+                pixels[cursor++] = Math.random() * 4;
+            }
+            spawnTexture.width = SIZE;
+            spawnTexture.height = SIZE;
+            spawnTexture.pixels = pixels;
+            particleNode.setParameter("spawnTexture", spawnTexture);
+
 
             var time = new Date().getTime();
             var elapsedTime = 0;
@@ -152,7 +210,7 @@
                 elapsedTime += deltaTime;
                 time = currentTime;
 
-                spawnNode.setParameter("elapsedTime", elapsedTime);
+                // spawnNode.setParameter("elapsedTime", elapsedTime);
                 noiseNode.setParameter("elapsedTime", elapsedTime);
                 particleNode.setParameter("elapsedTime", elapsedTime);
                 particleNode.setParameter("deltaTime", deltaTime);
@@ -163,9 +221,9 @@
 
                 swapParticleTexture();
 
-                setTimeout(update, 20);
+                setTimeout(update, 50);
             }
-            setTimeout(update, 20);
+            setTimeout(update, 50);
 
             function generateSprite(){
                 var canvas = document.createElement('canvas');
@@ -188,7 +246,6 @@
                 context.fillStyle = gradient;
 
                 context.fill();
-
                 return canvas;
             }
         });

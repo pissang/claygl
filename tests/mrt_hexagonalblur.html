@@ -38,12 +38,8 @@
 
                 renderer.resize(window.innerWidth, window.innerHeight);
 
-                var ext = qtek3d.WebGLInfo.getExtension("EXT_draw_buffers");
 
                 var gl = renderer.gl;
-                var maxDrawingBuffers = gl.getParameter(ext.MAX_DRAW_BUFFERS_EXT);
-                var maxColorAttachments = gl.getParameter(ext.MAX_COLOR_ATTACHMENTS_EXT);
-                
 
                 var texture = new qtek3d.texture.Texture2D({
                     image : new Image

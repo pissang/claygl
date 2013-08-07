@@ -20,10 +20,10 @@ define(function(require) {
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             devicePixelRatio : window.devicePixelRatio || 1.0,
 
-            color : [1.0, 1.0, 1.0, 0.0],
+            color : [0.0, 0.0, 0.0, 0.0],
             
-            // _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT
-            clear : 16640,  
+            // _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
+            clear : 17664,  
 
             // Settings when getting context
             // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -174,7 +174,7 @@ define(function(require) {
                 this.trigger("beforerender:opaque", opaqueQueue);
             }
 
-            _gl.enable(_gl.DEPTH_TEST);
+            // _gl.enable(_gl.DEPTH_TEST);
             _gl.disable(_gl.BLEND);
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
@@ -183,11 +183,11 @@ define(function(require) {
                 this.trigger("beforerender:transparent", transparentQueue);
             }
 
-            _gl.disable(_gl.DEPTH_TEST);
+            // _gl.disable(_gl.DEPTH_TEST);
             _gl.enable(_gl.BLEND);
             // Default blend function
-            _gl.blendEquation(_gl.FUNC_ADD);
-            _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+            _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
+            _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
 
             this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
@@ -254,6 +254,9 @@ define(function(require) {
             var _gl = this.gl;
             var scene = this._scene;
             
+            var depthTest;
+            var depthWrite;
+
             for (var i =0; i < queue.length; i++) {
                 var object = queue[i];
                 var material = globalMaterial || object.material;
@@ -285,6 +288,16 @@ define(function(require) {
                     prevShaderID = shader.__GUID__;
                 }
                 if (prevMaterialID !== material.__GUID__) {
+                    if (material.depthTest !== depthTest) {
+                        material.depthTest ? 
+                            _gl.enable(_gl.DEPTH_TEST) : 
+                            _gl.disable(_gl.DEPTH_TEST);
+                        depthTest = material.depthTest;
+                    }
+                    if (material.depthWrite !== depthWrite) {
+                        _gl.depthMask(material.depthWrite);
+                        depthWrite = material.depthWrite;
+                    }
 
                     material.bind(_gl);
                     prevMaterialID = material.__GUID__;
@@ -353,8 +366,8 @@ define(function(require) {
                 }
                 // Restore the default blend function
                 if (customBlend) {
-                    _gl.blendEquation(_gl.FUNC_ADD);
-                    _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);    
+                    _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
+                    _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);   
                 }
 
             }

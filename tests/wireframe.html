@@ -53,7 +53,8 @@
                 var shader = qtek3d.shader.library.get('buildin.wireframe');
                 var material = new qtek3d.Material({
                     shader : shader,
-                    transparent : true
+                    transparent : true,
+                    depthTest : false
                 })
                 material.setUniform("lineWidth", 2);
 
