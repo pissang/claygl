@@ -8,6 +8,7 @@ define( function(require){
 		"LinearGradient": require('2d/lineargradient'),
 		"Node": require('2d/node'),
 		"Pattern": require('2d/pattern'),
+		"Picker": require('2d/picker'),
 		"RadialGradient": require('2d/radialgradient'),
 		"shape": {
 			"Arc": require('2d/shape/arc'),
@@ -118,10 +119,10 @@ define( function(require){
 		"Vector4": require('core/vector4')
 	},
 	"loader": {
+		"Gltf": require('loader/gltf'),
 		"SVG": require('loader/svg'),
 		"three": {
-			"Model": require('loader/three/model'),
-			"Scene": require('loader/three/scene')
+			"Model": require('loader/three/model')
 		}
 	},
 	"util": {
