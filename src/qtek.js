@@ -8,7 +8,9 @@ define( function(require){
 		"LinearGradient": require('2d/lineargradient'),
 		"Node": require('2d/node'),
 		"Pattern": require('2d/pattern'),
-		"Picker": require('2d/picker'),
+		"picking": {
+			"Pixel": require('2d/picking/pixel')
+		},
 		"RadialGradient": require('2d/radialgradient'),
 		"shape": {
 			"Arc": require('2d/shape/arc'),

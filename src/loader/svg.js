@@ -359,6 +359,9 @@ define(function(require) {
 
     var urlRegex = /url\(\s*#(.*?)\)/;
     function _getPaint(str, defs) {
+        // if (str === 'none') {
+        //     return;
+        // }
         var urlMatch = urlRegex.exec(str);
         if (urlMatch) {
             var url = urlMatch[1].trim();
