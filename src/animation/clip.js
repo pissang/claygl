@@ -2,7 +2,7 @@ define(function(require) {
 
     var Easing = require('./easing');
 
-    var Controller = function(options) {
+    var Clip = function(options) {
 
         this._targetPool = options.target || {};
         if (this._targetPool.constructor != Array) {
@@ -39,7 +39,7 @@ define(function(require) {
         this.onrestart = options.onrestart || null;
     };
 
-    Controller.prototype = {
+    Clip.prototype = {
         step : function(time) {
             var percent = (time - this._startTime) / this._life;
 
@@ -66,7 +66,7 @@ define(function(require) {
                     this._currentLoop--;
                     return 'restart';
                 }else{
-                    // Mark this controller to be deleted
+                    // Mark this clip to be deleted
                     // In the animation.update
                     this._needsRemove = true;
 
@@ -87,7 +87,7 @@ define(function(require) {
             }
         }
     };
-    Controller.prototype.constructor = Controller;
+    Clip.prototype.constructor = Clip;
 
-    return Controller;
+    return Clip;
 });

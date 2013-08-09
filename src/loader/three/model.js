@@ -4,7 +4,7 @@
  * Format specification : https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
  * @export{class} Model
  */
-define( function(require) {
+define(function(require) {
 
     var Base = require('core/base');
 

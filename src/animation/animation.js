@@ -1,6 +1,6 @@
 define(function(require) {
     
-    var Controller = require('./controller');
+    var Clip = require('./clip');
     var _ = require("_");
 
     var requrestAnimationFrame = window.requrestAnimationFrame
@@ -16,46 +16,46 @@ define(function(require) {
         this.onframe = options.onframe || function() {};
 
         // private properties
-        this._controllerPool = [];
+        this._clips = [];
 
         this._running = false;
     };
 
     Animation.prototype = {
-        add : function(controller) {
-            this._controllerPool.push(controller);
+        add : function(clip) {
+            this._clips.push(clip);
         },
-        remove : function(controller) {
-            var idx = this._controllerPool.indexOf(controller);
+        remove : function(clip) {
+            var idx = this._clips.indexOf(clip);
             if (idx >= 0) {
-                this._controllerPool.splice(idx, 1);
+                this._clips.splice(idx, 1);
             }
         },
         update : function() {
             var time = new Date().getTime();
-            var cp = this._controllerPool;
+            var cp = this._clips;
             var len = cp.length;
 
             var deferredEvents = [];
-            var deferredCtls = [];
+            var deferredClips = [];
             for (var i = 0; i < len; i++) {
-                var controller = cp[i];
-                var e = controller.step(time);
+                var clip = cp[i];
+                var e = clip.step(time);
                 // Throw out the events need to be called after
                 // stage.update, like destroy
-                if ( e ) {
+                if (e) {
                     deferredEvents.push(e);
-                    deferredCtls.push(controller);
+                    deferredClips.push(clip);
                 }
             }
             if (this.stage
                 && this.stage.render
-                && this._controllerPool.length
+                && this._clips.length
             ) {
                 this.stage.render();
             }
 
-            // Remove the finished controller
+            // Remove the finished clip
             var newArray = [];
             for (var i = 0; i < len; i++) {
                 if (!cp[i]._needsRemove) {
@@ -63,11 +63,11 @@ define(function(require) {
                     cp[i]._needsRemove = false;
                 }
             }
-            this._controllerPool = newArray;
+            this._clips = newArray;
 
             len = deferredEvents.length;
             for (var i = 0; i < len; i++) {
-                deferredCtls[i].fire( deferredEvents[i] );
+                deferredClips[i].fire( deferredEvents[i] );
             }
 
             this.onframe();
@@ -91,7 +91,7 @@ define(function(require) {
             this._running = false;
         },
         clear : function() {
-            this._controllerPool = [];
+            this._clips = [];
         },
         animate : function(options) {
             var deferred = new Deferred(options.target, 
@@ -125,7 +125,7 @@ define(function(require) {
         this._setter = setter || _defaultSetter;
         this._interpolate = interpolate || _defaultInterpolate;
 
-        this._controllerCount = 0;
+        this._clipCount = 0;
 
         this._delay = 0;
 
@@ -133,7 +133,7 @@ define(function(require) {
 
         this._onframeList = [];
 
-        this._controllerList = [];
+        this._clipList = [];
     }
 
     Deferred.prototype = {
@@ -180,8 +180,8 @@ define(function(require) {
             }
 
             function ondestroy() {
-                self._controllerCount--;
-                if (self._controllerCount === 0) {
+                self._clipCount--;
+                if (self._clipCount === 0) {
                     var len = self._doneList.length;
                     for (var i = 0; i < len; i++) {
                         self._doneList[i].call(self);
@@ -201,7 +201,7 @@ define(function(require) {
                     var now = track[i],
                         next = track[i+1];
 
-                    var controller = new Controller({
+                    var clip = new Clip({
                         target : self._target,
                         life : next.time - now.time,
                         delay : delay,
@@ -211,20 +211,20 @@ define(function(require) {
                         onframe : createOnframe(now, next, propName),
                         ondestroy : ondestroy
                     });
-                    this._controllerList.push(controller);
+                    this._clipList.push(clip);
 
-                    this._controllerCount++;
+                    this._clipCount++;
                     delay = next.time + this._delay;
 
-                    self.animation.add(controller);
+                    self.animation.add(clip);
                 }
             }
             return this;
         },
         stop : function() {
-            for (var i = 0; i < this._controllerList.length; i++) {
-                var controller = this._controllerList[i];
-                this.animation.remove(controller);
+            for (var i = 0; i < this._clipList.length; i++) {
+                var clip = this._clipList[i];
+                this.animation.remove(clip);
             }
         },
         delay : function(time){

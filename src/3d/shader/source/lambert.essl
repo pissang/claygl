@@ -31,6 +31,7 @@ varying vec3 v_Barycentric;
 void main(){
 
     vec3 skinnedPosition = position;
+    vec3 skinnedNormal = normal;
     #ifdef SKINNING
         mat4 skinMatrix;
         if(boneIndex.x >= 0.0){
@@ -48,13 +49,12 @@ void main(){
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
 
         skinnedNormal = (skinMatrix * vec4(normal, 0.0)).xyz;
-        skinnedTangent = (skinMatrix * vec4(tangent.xyz, 0.0)).xyz;
     #endif
 
     gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );
 
     v_Texcoord = texcoord * uvRepeat;
-    v_Normal = normalize( ( worldInverseTranspose * vec4(normal, 0.0) ).xyz );
+    v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );
     v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;
 
     v_Barycentric = barycentric;

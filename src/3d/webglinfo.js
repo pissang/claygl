@@ -15,19 +15,16 @@ define(function() {
                             "EXT_texture_filter_anisotropic",
                             "EXT_draw_buffers"];
 
-    var initialized = {};
-
     var extensions = {};
 
     var WebGLInfo = {
 
         initialize : function(_gl) {
 
-            if (initialized[_gl.__GUID__]) {
+            if (extensions[_gl.__GUID__]) {
                 return;
             }
-            // Basic info
-
+            extensions[_gl.__GUID__] = {};
             // Get webgl extension
             for (var i = 0; i < EXTENSION_LIST.length; i++) {
                 var extName = EXTENSION_LIST[i];
@@ -41,10 +38,8 @@ define(function() {
                     ext = _gl.getExtension("WEBKIT_" + extName);
                 }
 
-                extensions[extName] = ext;
+                extensions[_gl.__GUID__][extName] = ext;
             }
-
-            initialized[_gl.__GUID__] = true;
         },
 
         getExtension : function(_gl, name) {

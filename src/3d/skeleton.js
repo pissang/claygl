@@ -79,6 +79,13 @@ define(function(require) {
                 this.bones[i].setPose(time);
             }
             this.update();
+        },
+
+        getClipTime : function() {
+            var poses = this.bones[0].poses;
+            if (poses.length) {
+                return poses[poses.length-1].time;
+            }
         }
     });
 

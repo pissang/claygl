@@ -124,8 +124,8 @@
                     fragment : Shader.source("curlnoise.fragment")
                 }),
                 transparent : true,
-                // depthTest : false,
-                depthWrite : false,
+                depthTest : false,
+                // depthWrite : false,
                 blend : function(_gl){
                     _gl.blendEquation(_gl.FUNC_ADD);
                     _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
@@ -163,15 +163,15 @@
             var meshList = loader.parse(data);
             var root = new qtek3d.Node();
             var material = new qtek3d.Material({
-                shader : qtek3d.shader.library.get('buildin.wireframe'),
-                transparent : true
+                shader : qtek3d.shader.library.get('buildin.lambert'),
+                // transparent : true
             });
-            meshList[0].geometry = new qtek3d.geometry.Sphere({
-                radius : 0.2
-            });
+            // meshList[0].geometry = new qtek3d.geometry.Sphere({
+            //     radius : 0.1
+            // });
             root.scale.set(0.50, 0.50, 0.50);
-            material.setUniform('color', [1.0, 1.0, 1.0]);
-            material.setUniform('lineWidth', 0.7);
+            // material.setUniform('color', [1.0, 1.0, 1.0]);
+            // material.setUniform('lineWidth', 0.7);
             meshList.forEach(function(mesh) {
                 mesh.geometry.generateBarycentric();
                 mesh.material = material;

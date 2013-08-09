@@ -9,6 +9,7 @@ define( function(require){
 		"Node": require('2d/node'),
 		"Pattern": require('2d/pattern'),
 		"picking": {
+			"Box": require('2d/picking/box'),
 			"Pixel": require('2d/picking/pixel')
 		},
 		"RadialGradient": require('2d/radialgradient'),
@@ -98,7 +99,7 @@ define( function(require){
 	},
 	"animation": {
 		"Animation": require('animation/animation'),
-		"Controller": require('animation/controller'),
+		"Clip": require('animation/clip'),
 		"Easing": require('animation/easing')
 	},
 	"core": {
@@ -121,7 +122,7 @@ define( function(require){
 		"Vector4": require('core/vector4')
 	},
 	"loader": {
-		"Gltf": require('loader/gltf'),
+		"GLTF": require('loader/gltf'),
 		"SVG": require('loader/svg'),
 		"three": {
 			"Model": require('loader/three/model')
