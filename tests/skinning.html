@@ -39,6 +39,9 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
+
+                var shadowMapPass = new qtek3d.prepass.ShadowMap();
+
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -66,8 +69,6 @@
                     mesh.material.shader.disableTexturesAll();
                     root.add(mesh);
                 });
-                material.setUniform("lineWidth", 0.7);
-                material.setUniform("lineColor", [0.7, 0.7, 0.7]);
 
                 camera.position.set(0, 10, 20);
                 camera.lookAt(root.position);
@@ -87,9 +88,11 @@
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
-                var light = new qtek3d.light.Directional();
-                light.intensity = 1.2;
-                light.position.set(10, 10, 10);
+                var light = new qtek3d.light.Directional({
+                    shadowResolution : 1024
+                });
+                light.intensity = 1.0;
+                light.position.set(6, 20, 10);
                 light.lookAt(root.position);
                 scene.add(light);
 
@@ -100,14 +103,19 @@
                 });
                 control.enable();
 
+                shadowMapPass.render(renderer, scene);
                 renderer.render(scene, camera);
 
                 var timeline = document.getElementById("Timeline");
                 timeline.max = skeleton.getClipTime();
 
+                setInterval(function(){
+                    shadowMapPass.render(renderer, scene);
+                    renderer.render(scene, camera);
+                }, 30)
+
                 timeline.onchange = function(){
                     skeleton.setPose(timeline.value);
-                    renderer.render(scene, camera);
                 }
             })
             

@@ -92,8 +92,8 @@
                 var upAxis = new Vector3(0, 1, 0);
                 setInterval( function(){
                     light.rotateAround(zeroVector, upAxis, 0.01);
-                    light.lookAt(zeroVector)
-                    shadowMapPass.render( renderer, scene );
+                    light.lookAt(zeroVector);
+                    shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
                 }, 20);
 

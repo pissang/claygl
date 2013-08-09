@@ -17,7 +17,10 @@ define(function(require) {
             //  rotation :
             //  scale :
             //}
-            poses : []
+            poses : [],
+
+            _prevKey : 0,
+            _prevTime : 0
         }
     }, {
 
@@ -34,6 +37,7 @@ define(function(require) {
                 len = poses.length,
                 start,
                 end;
+
             for (var i = 0; i < len; i++) {
                 if (poses[i].time <= time && poses[i][fieldName]) {
                     start = poses[i];

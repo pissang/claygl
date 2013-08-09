@@ -86,6 +86,10 @@ define(function(require) {
             if (poses.length) {
                 return poses[poses.length-1].time;
             }
+        },
+        
+        getBoneNumber : function() {
+            return this.bones.length;
         }
     });
 

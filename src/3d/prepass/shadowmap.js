@@ -37,11 +37,8 @@ define(function(require) {
                 'DIRECTIONAL_LIGHT' : 0,
                 'SPOT_LIGHT' : 0
             },
-            _shadowMapOrder : {
-                'SPOT_LIGHT' : 0,
-                'DIRECTIONAL_LIGHT' : 1,
-                'SPOT_LIGHT' : 2
-            }
+
+            _materialPreserve : {}
 
         }
     }, function() {
@@ -53,16 +50,73 @@ define(function(require) {
         });
         // Point light write the distance instance of depth projected
         // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
-        this._pointLightDepthMaterial = new Material({
+        this._distanceMaterial = new Material({
             shader : new Shader({
                 vertex : Shader.source("buildin.sm.distance.vertex"),
                 fragment : Shader.source("buildin.sm.distance.fragment")
             })
-        })
+        });
     }, {
 
         render : function(renderer, scene) {
             this._renderShadowPass(renderer, scene);
+        },
+
+        _bindDepthMaterial : function(renderQueue) {
+            for (var i = 0; i < renderQueue.length; i++) {
+                var mesh = renderQueue[i];
+
+                if (!mesh._depthMaterial) {
+                    // Skinned mesh
+                    if (mesh.skeleton) {
+                        mesh._depthMaterial = new Material({
+                            shader : new Shader({
+                                vertex : Shader.source("buildin.sm.depth.vertex"),
+                                fragment : Shader.source("buildin.sm.depth.fragment")
+                            })
+                        });
+                        mesh._depthMaterial.shader.vertexDefines['SKINNING'] = true;
+                        mesh._depthMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                    } else {
+                        mesh._depthMaterial = this._depthMaterial;
+                    }
+                }
+
+                this._materialPreserve[mesh.__GUID__] = mesh.material;
+                mesh.material = mesh._depthMaterial;
+            }
+        },
+
+        _bindDistanceMaterial : function(renderQueue) {
+            for (var i = 0; i < renderQueue.length; i++) {
+                var mesh = renderQueue[i];
+
+                if (!mesh._distanceMaterial) {
+                    // Skinned mesh
+                    if (mesh.skeleton) {
+                        mesh._distanceMaterial = new Material({
+                            shader : new Shader({
+                                vertex : Shader.source("buildin.sm.distance.vertex"),
+                                fragment : Shader.source("buildin.sm.distance.fragment")
+                            })
+                        });
+                        mesh._distanceMaterial.shader.vertexDefines['SKINNING'] = true;
+                        mesh._distanceMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                    } else {
+                        mesh._distanceMaterial = this._distanceMaterial;
+                    }
+                }
+
+                this._materialPreserve[mesh.__GUID__] = mesh.material;
+                mesh.material = mesh._depthMaterial;
+            }
+        },
+
+        _restoreMaterial : function(renderQueue) {
+            for (var i = 0; i < renderQueue.length; i++) {
+                var mesh = renderQueue[i];
+                mesh.material = this._materialPreserve[mesh.__GUID__];
+            }
         },
 
         _renderShadowPass : function(renderer, scene) {
@@ -87,7 +141,6 @@ define(function(require) {
                     }
                     if (node.receiveShadow) {
                         meshReceiveShadow.push(node);
-
                         node.material.setUniform("shadowEnabled", 1);
                     }else{
                         node.material.setUniform("shadowEnabled", 0);
@@ -119,11 +172,6 @@ define(function(require) {
                 directionalLightMatrices = [],
                 pointLightShadowMaps = [];
 
-            var order = this._shadowMapOrder;
-            // Store the shadow map in order
-            lightCastShadow.sort(function(a, b) {
-                return order[a] - order[b];
-            })
             // reset
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
@@ -134,6 +182,8 @@ define(function(require) {
                 if (light.instanceof(SpotLight) ||
                     light.instanceof(DirectionalLight)) {
                     
+                    this._bindDepthMaterial(renderQueue);
+
                     var texture = this._getTexture(light.__GUID__, light);
                     var camera = this._getCamera(light.__GUID__, light);
 
@@ -143,7 +193,7 @@ define(function(require) {
                     _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                     renderer._scene = scene;
-                    renderer.renderQueue(renderQueue, camera, this._depthMaterial, true);
+                    renderer.renderQueue(renderQueue, camera, null, true);
 
                     frameBuffer.unbind(renderer);
         
@@ -165,6 +215,7 @@ define(function(require) {
                     var texture = this._getTexture(light.__GUID__, light);
                     pointLightShadowMaps.push(texture);
 
+                    this._bindDistanceMaterial(renderQueue);
                     for (var i = 0; i < 6; i++) {
                         var target = targets[i];
                         var camera = this._getCamera(light.__GUID__, light, target);
@@ -176,7 +227,8 @@ define(function(require) {
 
                         renderer._scene = scene;
                         this._pointLightDepthMaterial.setUniform("lightPosition", light.position._array);
-                        renderer.renderQueue(renderQueue, camera, this._pointLightDepthMaterial, true);
+
+                        renderer.renderQueue(renderQueue, camera, null, true);
 
                         frameBuffer.unbind(renderer);
                     }
@@ -185,6 +237,8 @@ define(function(require) {
 
                 this._shadowMapNumber[ light.type ] ++;
             }, this);
+
+            this._restoreMaterial(renderQueue);
 
             for (var i = 0; i < meshReceiveShadow.length; i++) {
                 var mesh = meshReceiveShadow[i],
