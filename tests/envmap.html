@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                var texture = new qtek3d.texture.TextureCube({
+                    flipY : false
+                });
+                texture.load({
+                    px : 'assets/textures/cube/skybox/px.jpg',
+                    nx : 'assets/textures/cube/skybox/nx.jpg',
+                    py : 'assets/textures/cube/skybox/py.jpg',
+                    ny : 'assets/textures/cube/skybox/ny.jpg',
+                    pz : 'assets/textures/cube/skybox/pz.jpg',
+                    nz : 'assets/textures/cube/skybox/nz.jpg',
+                });
+
+                var material = new qtek3d.Material({
+                    shader : qtek3d.shader.library.get("buildin.phong", "environmentMap")
+                });
+                material.setUniform("environmentMap", texture);
+
+                var data = JSON.parse(modelData);
+                var loader = new qtek.loader.three.Model({
+                    textureRootPath : "assets/models/nanosuit/tex"
+                });
+                var meshList = loader.parse(data);
+                var root = new qtek3d.Node();
+                meshList.forEach(function(mesh) {
+                    mesh.material = material;
+                    root.add(mesh);
+                });
+                scene.add(root);
+
+                var skybox = new qtek3d.object.Skybox();
+                skybox.material.setUniform("environmentMap", texture);
+                camera.skybox = skybox;
+
+                camera.position.set(0, 4, 5);
+                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                control.enable();
+
+                setInterval(function(){
+                    renderer.render(scene, camera);
+                }, 50);
+            })
+            
+        </script>
+    </body>
+</html>

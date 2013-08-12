@@ -76,6 +76,17 @@ define(function(require) {
         unbind : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
+        load : function(src) {
+            var image = new Image();
+            var self = this;
+            image.onload = function() {
+                self.dirty();
+                self.trigger("load");
+                image.onload = null;
+            }
+            image.src = src;
+            this.image = image;
+        }
     })
 
     return Texture2D;

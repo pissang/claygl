@@ -29,7 +29,7 @@
             var pp_Node = qtek3d.compositor.Node;
             var compositor = new qtek3d.Compositor();
 
-            var SIZE = 512;
+            var SIZE = 256;
 
             var renderer = new qtek3d.Renderer({
                 canvas : document.getElementById( "Main")
@@ -221,9 +221,9 @@
 
                 swapParticleTexture();
 
-                setTimeout(update, 50);
+                setTimeout(update, 100);
             }
-            setTimeout(update, 50);
+            setTimeout(update, 500);
 
             function generateSprite(){
                 var canvas = document.createElement('canvas');

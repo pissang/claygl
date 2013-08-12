@@ -86,7 +86,7 @@ uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
-uniform sampler2D environmentMap;
+uniform samplerCube environmentMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
@@ -125,6 +125,9 @@ void main(){
     
     vec4 finalColor = vec4(color, alpha);
 
+    vec3 eyePos = viewInverse[3].xyz;
+    vec3 viewDirection = normalize(eyePos - v_WorldPosition);
+
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D( diffuseMap, v_Texcoord );
         finalColor.rgb *= tex.rgb;
@@ -142,9 +145,6 @@ void main(){
     // Specular part of all lights
     vec3 specularColor = vec3(0.0, 0.0, 0.0);
     
-    vec3 eyePos = viewInverse[3].xyz;
-    vec3 viewDirection = normalize(eyePos - v_WorldPosition);
-
     #ifdef AMBIENT_LIGHT_NUMBER
         for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++){
             diffuseColor += ambientLightColor[i];
@@ -287,6 +287,11 @@ void main(){
 
     finalColor.rgb *= diffuseColor;
     finalColor.rgb += specularColor;
+
+    #ifdef ENVIRONMENTMAP_ENABLED
+        vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+        finalColor.rgb = envTex;
+    #endif
 
     if( lineWidth > 0.01){
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));

@@ -109,10 +109,16 @@
                 var timeline = document.getElementById("Timeline");
                 timeline.max = skeleton.getClipTime();
 
+                var time = 0;
                 setInterval(function(){
                     shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
-                }, 30)
+
+                    skeleton.setPose(time);
+                    timeline.value = time;
+
+                    time = (time + 0.02) % skeleton.getClipTime();
+                }, 20)
 
                 timeline.onchange = function(){
                     skeleton.setPose(timeline.value);

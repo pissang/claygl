@@ -53,6 +53,9 @@ define(function(require) {
             unpackAlignment : 4,
             premultiplyAlpha : false,
 
+            // Dynamic option for texture like video
+            dynamic : false,
+
             NPOT : false
         }
     }, {
@@ -66,7 +69,10 @@ define(function(require) {
                 this.cache.put("webgl_texture", _gl.createTexture());
                 this.cache.put("dirty", true);
             }
-            if (this.cache.get("dirty")) {
+            if (this.dynamic) {
+                this.update(_gl);
+            }
+            else if (this.cache.get("dirty")) {
                 this.update(_gl);
                 this.cache.put("dirty", false);
             }

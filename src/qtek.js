@@ -2,7 +2,6 @@ define( function(require){
 	
 	var exportsObject =  {
 	"2d": {
-		"Camera": require('2d/camera'),
 		"Gradient": require('2d/gradient'),
 		"Layer": require('2d/layer'),
 		"LinearGradient": require('2d/lineargradient'),
@@ -71,11 +70,15 @@ define( function(require){
 		"Material": require('3d/material'),
 		"Mesh": require('3d/mesh'),
 		"Node": require('3d/node'),
+		"object": {
+			"Skybox": require('3d/object/skybox')
+		},
 		"plugin": {
 			"FirstPersonControl": require('3d/plugin/firstpersoncontrol'),
 			"OrbitControl": require('3d/plugin/orbitcontrol')
 		},
 		"prepass": {
+			"Reflection": require('3d/prepass/reflection'),
 			"ShadowMap": require('3d/prepass/shadowmap')
 		},
 		"Renderer": require('3d/renderer'),
@@ -87,8 +90,6 @@ define( function(require){
 		"Skeleton": require('3d/skeleton'),
 		"Texture": require('3d/texture'),
 		"texture": {
-			"Compressed2d": require('3d/texture/compressed2d'),
-			"Compressedcube": require('3d/texture/compressedcube'),
 			"Texture2D": require('3d/texture/texture2d'),
 			"TextureCube": require('3d/texture/texturecube')
 		},

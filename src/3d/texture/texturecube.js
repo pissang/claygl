@@ -101,6 +101,24 @@ define(function(require) {
             } else {
                 return this.width && this.height;
             }
+        },
+        load : function(imageList) {
+            var loading = 0;
+            var self = this;
+            _.each(imageList, function(src, name){
+                var image = new Image();
+                image.onload = function() {
+                    loading -- ;
+                    if (loading === 0){
+                        self.dirty();
+                        self.trigger("load");
+                    }
+                    image.onload = null;
+                }
+                loading++;
+                image.src = src;
+                self.image[name] = image;
+            });
         }
     });
 
