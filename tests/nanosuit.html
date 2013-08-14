@@ -45,16 +45,14 @@
                 });
                 loader.on('load:texture', function(){
                 })
-                console.profile("parse");
                 var meshList = loader.parse(data);
-                console.profileEnd("parse");
                 
                 var shader = qtek3d.shader.library.get("buildin.lambert", "diffuseMap");
 
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                material.setUniform("color", [0.2, 0.2, 0.2]);
+                material.set("color", [0.2, 0.2, 0.2]);
                 var image = new Image;
                 image.src = "assets/textures/ground_tile.jpg";
                 var texture = new qtek3d.texture.Texture2D({
@@ -65,16 +63,16 @@
                 image.onload = function(){
                     texture.dirty();
                 };
-                material.setUniform("diffuseMap", texture);
-                material.setUniform("uvRepeat", [10, 10]);
+                material.set("diffuseMap", texture);
+                material.set("uvRepeat", [10, 10]);
 
 
                 var root = new qtek3d.Node();
 
                 _.each(meshList, function(mesh){
-                    mesh.material.setUniform("shininess", 50);
+                    mesh.material.set("shininess", 50);
                     mesh.material.shader.disableTexture("normalMap");
-                    mesh.material.setUniform("specular", [0.6, 0.6, 0.6]);
+                    mesh.material.set("specular", [0.6, 0.6, 0.6]);
                     root.add(mesh);
                 });
 

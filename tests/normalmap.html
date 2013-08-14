@@ -42,9 +42,9 @@
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                material.setUniform("normalMap", loadTexture("assets/textures/normal_map.jpg"));
-                material.setUniform("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
-                material.setUniform("shininess", 100);
+                material.set("normalMap", loadTexture("assets/textures/normal_map.jpg"));
+                material.set("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
+                material.set("shininess", 100);
 
                 camera.position.set(0, 0, 4);
                 camera.lookAt( scene.position );

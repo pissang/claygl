@@ -45,11 +45,6 @@
                     nz : 'assets/textures/cube/skybox/nz.jpg',
                 });
 
-                var material = new qtek3d.Material({
-                    shader : qtek3d.shader.library.get("buildin.phong", "environmentMap")
-                });
-                material.setUniform("environmentMap", texture);
-
                 var data = JSON.parse(modelData);
                 var loader = new qtek.loader.three.Model({
                     textureRootPath : "assets/models/nanosuit/tex"
@@ -57,17 +52,28 @@
                 var meshList = loader.parse(data);
                 var root = new qtek3d.Node();
                 meshList.forEach(function(mesh) {
-                    mesh.material = material;
+                    var material = mesh.material;
+                    material.shader.disableTexture("normalMap");
+                    material.shader.enableTexture("environmentMap");
+                    material.set("environmentMap", texture);
+                    material.set("reflectivity", 0.4);
                     root.add(mesh);
                 });
                 scene.add(root);
 
                 var skybox = new qtek3d.object.Skybox();
-                skybox.material.setUniform("environmentMap", texture);
+                skybox.material.set("environmentMap", texture);
                 camera.skybox = skybox;
 
                 camera.position.set(0, 4, 5);
                 camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
+
+                var light = new qtek3d.light.Directional({
+                    intensity : 4.0,
+                    position : new qtek.core.Vector3(2, 2, 2)
+                });
+                light.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
+                scene.add(light);
 
                 var control = new qtek3d.plugin.OrbitControl({
                     camera : camera,

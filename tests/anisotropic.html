@@ -51,8 +51,8 @@
                 image.onload = function(){
                     texture.dirty();
                 };
-                material.setUniform("diffuseMap", texture);
-                material.setUniform("uvRepeat", [10, 10])
+                material.set("diffuseMap", texture);
+                material.set("uvRepeat", [10, 10])
 
                 var root = new qtek3d.Node();
 

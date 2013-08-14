@@ -52,7 +52,7 @@
                     texture.dirty();
                 }
                 texture.image.src = "assets/textures/crate.gif";
-                material.setUniform("diffuseMap", texture );
+                material.set("diffuseMap", texture );
                 var mesh = new qtek3d.Mesh({
                     material : material,
                     geometry : cube

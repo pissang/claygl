@@ -7,14 +7,14 @@ define(function() {
     // http://www.khronos.org/registry/webgl/extensions/
     var EXTENSION_LIST = [
                             "OES_texture_float",
-                            // "OES_texture_half_float",
+                            "OES_texture_half_float",
                             "OES_standard_derivatives",
-                            // "OES_vertex_array_object",
-                            // "OES_element_index_uint",
-                            // "WEBGL_compressed_texture_s3tc",
+                            "OES_vertex_array_object",
+                            "OES_element_index_uint",
+                            "WEBGL_compressed_texture_s3tc",
                             'WEBGL_depth_texture',
-                            // "EXT_texture_filter_anisotropic",
-                            // "EXT_draw_buffers"
+                            "EXT_texture_filter_anisotropic",
+                            "EXT_draw_buffers"
                         ];
 
     var extensions = {};

@@ -118,23 +118,23 @@ define(function(require) {
             }, this);
         },
 
-        setUniform : function(symbol, value) {
-            var uniform = this.uniforms[symbol];
-            if (uniform) {
-                uniform.value = value;
+        set : function(symbol, value) {
+            if (symbol instanceof Object) {
+                for (var symbol in value) {
+                    var value = value[symbol];
+                    this.set(symbol, value);
+                }
             } else {
-                // console.warn('Uniform "'+symbol+'" not exist');
+                var uniform = this.uniforms[symbol];
+                if (uniform) {
+                    uniform.value = value;
+                } else {
+                    // console.warn('Uniform "'+symbol+'" not exist');
+                }
             }
         },
 
-        setUniforms : function(obj) {
-            for (var symbol in obj) {
-                var value = obj[symbol];
-                this.setUniform(symbol, value);
-            }
-        },
-
-        getUniform : function(symbol) {
+        get : function(symbol) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
                 return uniform.value;

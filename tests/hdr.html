@@ -1,0 +1,174 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <style type="text/css">
+            #Exposure{
+                left:100px;
+                right:100px;
+                position: absolute;
+            }
+            #Wrapper{
+                position: absolute;
+                bottom:100px;
+                left: 0px;
+                right:0px;
+
+                background-color: rgba(255,255,255,0.5);
+                height:30px;
+                padding-top: 5px;
+            }
+        </style>
+    </head>
+    <body style="margin:0px">
+        <canvas id="Main"></canvas>
+        <div id="Wrapper">
+            <input id="Exposure" type="range" min="-4" max="4" value="0" step="0.01" />
+        </div>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek',
+                    'text!../tests/assets/models/nanosuit/nanosuit.js',
+                    'text!../tests/shader/hdr.essl'], function(qtek, modelData, hdrShader){
+
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader,
+                    pp_Node = qtek3d.compositor.Node,
+                    pp_TextureNode = qtek3d.compositor.TextureNode,
+                    compositor = new qtek3d.Compositor();
+
+                Shader.import(hdrShader);
+                var _ = require("_");
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+
+                renderer.resize(window.innerWidth, window.innerHeight);
+
+
+                var gl = renderer.gl;
+
+                var texture = new qtek3d.texture.Texture2D({
+                    image : new Image
+                })
+                texture.image.onload = function(){
+                    texture.dirty();
+                    // renderer.resize(texture.image.width, texture.image.height);
+                    compositor.render(renderer);
+                }
+                texture.image.src = "assets/textures/hdr/hdr_test.png";
+                // Post processing
+                var textureNode = new pp_TextureNode({
+                    texture : texture,
+                    outputs : {
+                        "color" : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : {
+                                width : 1024,
+                                height : 1024
+                            }
+                        }
+                    }
+                });
+                var floatTextureParam = {
+                    width : 1024,
+                    height : 1024,
+                    type : 'FLOAT'
+                }
+
+                var hdr = new qtek3d.compositor.Node({
+                    shader : Shader.source("hdr.decode_rgbm"),
+                    inputs : {
+                        "texture" : {
+                            node : textureNode,
+                            pin : "color"
+                        }
+                    },
+                    // outputs : {
+                    //     "color" : {
+                    //         parameters : floatTextureParam
+                    //     }
+                    // }
+                });
+
+                var blurPass1 = new qtek3d.compositor.Node({
+                    shader : Shader.source("buildin.compositor.hexagonal_blur_1"),
+                    inputs : {
+                        "texture" : {
+                            node : hdr,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+
+                var blurPass2 = new qtek3d.compositor.Node({
+                    shader : Shader.source("buildin.compositor.hexagonal_blur_2"),
+                    inputs : {
+                        "texture" : {
+                            node : hdr,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+
+                var blurPass3 = new qtek3d.compositor.Node({
+                    shader : Shader.source("buildin.compositor.hexagonal_blur_3"),
+                    inputs : {
+                        "texture1" : {
+                            node : blurPass1,
+                            pin : "color"
+                        },
+                        "texture2" : {
+                            node : blurPass2,
+                            pin : "color"
+                        }
+                    }
+                });
+
+                // blurPass1.setParameter("blurSize", 1.0);
+                // blurPass2.setParameter("blurSize", 1.0);
+                // blurPass3.setParameter("blurSize", 1.0);
+
+                compositor.add( textureNode );
+                compositor.add( hdr )
+                // compositor.add( blurPass1 );
+                // compositor.add( blurPass2 );
+                // compositor.add( blurPass3 );
+
+                // setInterval( function(){
+                //     compositor.render( renderer );
+                // }, 1000);
+
+                document.getElementById("Exposure").onchange = function() {
+                    hdr.setParameter("exposure", this.value);
+                    compositor.render(renderer);
+                }
+            })
+            
+        </script>
+    </body>
+</html>

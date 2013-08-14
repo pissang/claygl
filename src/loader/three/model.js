@@ -460,12 +460,12 @@ define(function(require) {
                 shader : shader
             });
             if (mConfig.colorDiffuse) {
-                material.setUniform("color", mConfig.colorDiffuse );
+                material.set("color", mConfig.colorDiffuse );
             } else if (mConfig.DbgColor) {
-                material.setUniform("color", hex2rgb(mConfig.DbgColor));
+                material.set("color", hex2rgb(mConfig.DbgColor));
             }
             if (mConfig.colorSpecular) {
-                material.setUniform("specular", mConfig.colorSpecular );
+                material.set("specular", mConfig.colorSpecular );
             }
             if (mConfig.transparent !== undefined && mConfig.transparent) {
                 material.transparent = true;
@@ -478,21 +478,21 @@ define(function(require) {
             }
             
             if (mConfig.transparency && mConfig.transparency < 1) {
-                material.setUniform("opacity", mConfig.transparency);
+                material.set("opacity", mConfig.transparency);
             }
             if (mConfig.specularCoef) {
-                material.setUniform("shininess", mConfig.specularCoef);
+                material.set("shininess", mConfig.specularCoef);
             }
 
             // Textures
             if (mConfig.mapDiffuse) {
-                material.setUniform("diffuseMap", this.loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
+                material.set("diffuseMap", this.loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
             }
             if (mConfig.mapBump) {
-                material.setUniform("normalMap", this.loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
+                material.set("normalMap", this.loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
             }
             if (mConfig.mapNormal) {
-                material.setUniform("normalMap", this.loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
+                material.set("normalMap", this.loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
             }
 
             return material;

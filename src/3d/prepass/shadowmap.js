@@ -141,9 +141,9 @@ define(function(require) {
                     }
                     if (node.receiveShadow) {
                         meshReceiveShadow.push(node);
-                        node.material.setUniform("shadowEnabled", 1);
+                        node.material.set("shadowEnabled", 1);
                     }else{
-                        node.material.setUniform("shadowEnabled", 0);
+                        node.material.set("shadowEnabled", 0);
                     }
                 };
             });
@@ -226,7 +226,7 @@ define(function(require) {
                         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                         renderer._scene = scene;
-                        this._pointLightDepthMaterial.setUniform("lightPosition", light.position._array);
+                        this._pointLightDepthMaterial.set("lightPosition", light.position._array);
 
                         renderer.renderQueue(renderQueue, camera, null, true);
 
@@ -261,7 +261,7 @@ define(function(require) {
                     shader.update();
                 }
 
-                material.setUniforms({
+                material.set({
                     "spotLightShadowMap" : spotLightShadowMaps,
                     "directionalLightShadowMap" : directionalLightShadowMaps,
                     "directionalLightMatrix" : directionalLightMatrices,

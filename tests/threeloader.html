@@ -53,8 +53,8 @@
                     mesh.geometry.generateBarycentric();
                     root.add(mesh);
                 });
-                material.setUniform("lineWidth", 1.0);
-                material.setUniform("lineColor", [0.4, 0.4, 0.4]);
+                material.set("lineWidth", 1.0);
+                material.set("lineColor", [0.4, 0.4, 0.4]);
 
                 camera.position.set(0, 10, 20);
                 camera.lookAt(root.position);
