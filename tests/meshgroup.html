@@ -48,17 +48,17 @@
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                material.setUniform("lineWidth", 0.7);
-                material.setUniform("color", [0.2, 0.2, 0.2]);
-                material.setUniform("lineColor", [0.7, 0.7, 0.7]);
+                material.set("lineWidth", 0.7);
+                material.set("color", [0.2, 0.2, 0.2]);
+                material.set("lineColor", [0.7, 0.7, 0.7]);
 
                 var root = new qtek3d.Node();
 
                 var nodeTpl = new qtek3d.Node();
                 _.each(meshList, function(mesh){
                     mesh.geometry.generateTangents();
-                    mesh.material.setUniform("shininess", 100);
-                    mesh.material.setUniform("specular", [0.6, 0.6, 0.6]);
+                    mesh.material.set("shininess", 100);
+                    mesh.material.set("specular", [0.6, 0.6, 0.6]);
                     nodeTpl.add(mesh);
                 });
                 for(var i = 0; i < 5; i++){

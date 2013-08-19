@@ -1,0 +1,69 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+</head>
+<body style="margin:0px">
+    <canvas id="Main"></canvas>
+
+    <script type="text/javascript">
+        requirejs.config({
+            'baseUrl' : '../src',
+            'paths' : {
+                '_' : '../thirdparty/lodash.compat',
+                'glmatrix' : '../thirdparty/gl-matrix'
+            },
+            'shim' : {
+                '_' : {
+                    exports : '_'
+                }
+            }
+        });
+
+        require(['qtek'], function(qtek) {
+            var qtek3d = qtek['3d'];
+
+            var renderer = new qtek3d.Renderer({
+                canvas : document.getElementById("Main")
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            // var shadowMapPass = new qtek3d.prepass.ShadowMap();
+
+            var GLTFLoader = new qtek.loader.GLTF();
+
+            GLTFLoader.load("assets/scenes/gltf/scene.json");
+
+            GLTFLoader.on("load", function(scene, cameras) {
+                var camera = cameras[Object.keys(cameras)[0]];
+                if (!camera) {
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                    camera.position.set(1, 1, 1);
+                    camera.lookAt(scene.position);
+                }
+                camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                // z up
+                control.up.set(0, 0, 1);
+                control.enable();
+
+                scene.getNode("Spot-light").range = 50;
+
+                setInterval(function() {
+                    // shadowMapPass.render(renderer, scene);
+                    renderer.render(scene, camera);
+                }, 50)
+            });
+        });
+    </script>
+</body>
+</html>

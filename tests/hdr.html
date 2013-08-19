@@ -3,10 +3,10 @@
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <style type="text/css">
-            #Exposure{
-                left:100px;
-                right:100px;
-                position: absolute;
+            #Exposure,
+            #Contrast,
+            #BlurSize{
+                width: 100%;
             }
             #Wrapper{
                 position: absolute;
@@ -15,8 +15,6 @@
                 right:0px;
 
                 background-color: rgba(255,255,255,0.5);
-                height:30px;
-                padding-top: 5px;
             }
         </style>
     </head>
@@ -24,6 +22,8 @@
         <canvas id="Main"></canvas>
         <div id="Wrapper">
             <input id="Exposure" type="range" min="-4" max="4" value="0" step="0.01" />
+            <input id="Contrast" type="range" min="0" max="4" value="2.96" step="0.01" />
+            <input id="BlurSize" type="range" min="0" max="4" value="1.0" step="0.01" />
         </div>
         <script type="text/javascript">
             requirejs.config({
@@ -53,11 +53,11 @@
                 var _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main"),
+                    canvas : document.getElementById("Main"),
                     devicePixelRatio : 1.0
                 });
 
-                renderer.resize(window.innerWidth, window.innerHeight);
+                renderer.resize(500, 500);
 
 
                 var gl = renderer.gl;
@@ -67,10 +67,10 @@
                 })
                 texture.image.onload = function(){
                     texture.dirty();
-                    // renderer.resize(texture.image.width, texture.image.height);
+                    renderer.resize(texture.image.width, texture.image.height);
                     compositor.render(renderer);
                 }
-                texture.image.src = "assets/textures/hdr/hdr_test.png";
+                texture.image.src = "assets/textures/hdr/nave.png";
                 // Post processing
                 var textureNode = new pp_TextureNode({
                     texture : texture,
@@ -78,15 +78,15 @@
                         "color" : {
                             attachment : "COLOR_ATTACHMENT0",
                             parameters : {
-                                width : 1024,
-                                height : 1024
+                                width : 512,
+                                height : 512
                             }
                         }
                     }
                 });
                 var floatTextureParam = {
-                    width : 1024,
-                    height : 1024,
+                    width : 512,
+                    height : 512,
                     type : 'FLOAT'
                 }
 
@@ -98,18 +98,50 @@
                             pin : "color"
                         }
                     },
-                    // outputs : {
-                    //     "color" : {
-                    //         parameters : floatTextureParam
-                    //     }
-                    // }
+                    outputs : {
+                        "color" : {
+                            parameters : floatTextureParam
+                        }
+                    }
                 });
+
+                var gammaCorr = new qtek3d.compositor.Node({
+                    shader : Shader.source("buildin.compositor.gamma"),
+                    inputs : {
+                        "texture" : {
+                            node : hdr,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+                gammaCorr.setParameter("gamma", 1 / 2.2);
+
+                var contrast = new qtek3d.compositor.Node({
+                    shader : Shader.source("buildin.compositor.contrast"),
+                    inputs : {
+                        "texture" : {
+                            node : gammaCorr,
+                            pin : "color"
+                        }
+                    },
+                    outputs : {
+                        "color" : {
+                            parameters : floatTextureParam
+                        }
+                    }
+                });
+                contrast.setParameter("contrast", 2.96)
 
                 var blurPass1 = new qtek3d.compositor.Node({
                     shader : Shader.source("buildin.compositor.hexagonal_blur_1"),
                     inputs : {
                         "texture" : {
-                            node : hdr,
+                            node : contrast,
                             pin : "color"
                         }
                     },
@@ -124,7 +156,7 @@
                     shader : Shader.source("buildin.compositor.hexagonal_blur_2"),
                     inputs : {
                         "texture" : {
-                            node : hdr,
+                            node : contrast,
                             pin : "color"
                         }
                     },
@@ -149,22 +181,28 @@
                     }
                 });
 
-                // blurPass1.setParameter("blurSize", 1.0);
-                // blurPass2.setParameter("blurSize", 1.0);
-                // blurPass3.setParameter("blurSize", 1.0);
-
                 compositor.add( textureNode );
-                compositor.add( hdr )
-                // compositor.add( blurPass1 );
-                // compositor.add( blurPass2 );
-                // compositor.add( blurPass3 );
-
-                // setInterval( function(){
-                //     compositor.render( renderer );
-                // }, 1000);
+                compositor.add( hdr );
+                compositor.add( gammaCorr );
+                compositor.add( contrast );
+                compositor.add( blurPass1 );
+                compositor.add( blurPass2 );
+                compositor.add( blurPass3 );
 
                 document.getElementById("Exposure").onchange = function() {
                     hdr.setParameter("exposure", this.value);
+                    compositor.render(renderer);
+                }
+                document.getElementById("Contrast").onchange = function() {
+                    contrast.setParameter("contrast", this.value);
+                    compositor.render(renderer);
+                }
+                document.getElementById("BlurSize").onchange = function() {
+                    var blurSize = this.value;
+                    blurPass1.setParameter("blurSize", blurSize);
+                    blurPass2.setParameter("blurSize", blurSize);
+                    blurPass3.setParameter("blurSize", blurSize);
+
                     compositor.render(renderer);
                 }
             })

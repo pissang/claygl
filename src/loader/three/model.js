@@ -29,15 +29,19 @@ define(function(require) {
 
     var Loader = Base.derive(function() {
         return {
+            rootPath : "",
             textureRootPath : "",
-
             textureNumber : 0
         };
     }, {
         load : function(url) {
             var self = this;
-
             this.textureNumber = 0;
+
+            if (!this.rootPath) {
+                this.rootPath = url.slice(0, url.lastIndexOf("/"));
+            }
+
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
@@ -474,7 +478,7 @@ define(function(require) {
                 material.depthTest = mConfig.depthTest;
             }
             if ( ! _.isUndefined(mConfig.depthWrite)) {
-                material.depthTest = mConfig.depthWrite;
+                material.depthMask = mConfig.depthWrite;
             }
             
             if (mConfig.transparency && mConfig.transparency < 1) {
@@ -515,7 +519,11 @@ define(function(require) {
                 self.trigger("load:texture", texture);
                 texture.dirty();
             }
-            img.src = this.textureRootPath + "/" + path;
+            var root = this.textureRootPath || this.rootPath
+            if (root) {
+                path = root + "/" + path;
+            }
+            img.src = path;
 
             return texture;
         }

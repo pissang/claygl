@@ -1,12 +1,12 @@
-define( function(require){
+define(function(require){
 
 	return {
-		genGUID : (function(){
+		genGUID : (function() {
 			var guid = 0;
 			
-			return function(){
+			return function() {
 				return ++guid;
 			}
 		})()
 	}
-} )
+})

@@ -2,11 +2,14 @@ define(function(require) {
     
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
+    var BoundingBox = require("./boundingbox");
     var Quaternion = require("core/quaternion");
     var Matrix4 = require("core/matrix4");
     var Matrix3 = require("core/matrix3");
     var util = require("util/util");
     var _ = require("_");
+
+    var _repository = {};
 
     var Node = Base.derive(function() {
 
@@ -38,6 +41,7 @@ define(function(require) {
             worldMatrix : new Matrix4(),
             matrix : new Matrix4(),
 
+            boundingBox : new BoundingBox()
         }
     }, {
 
@@ -47,11 +51,37 @@ define(function(require) {
             }
             this.children.push(node);
             node.parent = this;
+
+            var scene = this.getScene();
+
+            if (scene) {
+                node.traverse(function(n) {
+                    scene.addToScene(n);
+                });   
+            }
         },
 
         remove : function(node) {
             _.without(this.children, node);
             node.parent = null;
+
+            var scene = this.getScene();
+
+            if (scene) {
+                node.traverse(function(n) {
+                    scene.removeFromScene(n);
+                });
+            }
+        },
+
+        getScene : function() {
+            var root = this;
+            while(root.parent) {
+                root = root.parent;
+            }
+            if (root.addToScene) {
+                return root;
+            }
         },
 
         traverse : function(callback) {
@@ -199,7 +229,6 @@ define(function(require) {
         })(),
 
     });
-
 
     return Node;
 })

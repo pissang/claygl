@@ -262,7 +262,7 @@ define(function(require) {
             var scene = this._scene;
             
             var depthTest;
-            var depthWrite;
+            var depthMask;
 
             for (var i =0; i < queue.length; i++) {
                 var object = queue[i];
@@ -301,9 +301,9 @@ define(function(require) {
                             _gl.disable(_gl.DEPTH_TEST);
                         depthTest = material.depthTest;
                     }
-                    if (material.depthWrite !== depthWrite) {
-                        _gl.depthMask(material.depthWrite);
-                        depthWrite = material.depthWrite;
+                    if (material.depthMask !== depthMask) {
+                        _gl.depthMask(material.depthMask);
+                        depthMask = material.depthMask;
                     }
 
                     material.bind(_gl);

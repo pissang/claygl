@@ -8,7 +8,6 @@ varying vec2 v_Texcoord;
 
 void main(){
     vec4 rgbm = texture2D(texture, v_Texcoord);
-    // MaxRange = 65535 / 255
     vec3 color = rgbm.rgb * rgbm.a;
     color = color * pow(2.0, exposure);
     gl_FragColor = vec4(color, 1.0);

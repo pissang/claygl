@@ -65,50 +65,52 @@ define(function(require) {
         _bindDepthMaterial : function(renderQueue) {
             for (var i = 0; i < renderQueue.length; i++) {
                 var mesh = renderQueue[i];
-
-                if (!mesh._depthMaterial) {
-                    // Skinned mesh
-                    if (mesh.skeleton) {
-                        mesh._depthMaterial = new Material({
-                            shader : new Shader({
-                                vertex : Shader.source("buildin.sm.depth.vertex"),
-                                fragment : Shader.source("buildin.sm.depth.fragment")
-                            })
-                        });
-                        mesh._depthMaterial.shader.vertexDefines['SKINNING'] = true;
-                        mesh._depthMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
-                    } else {
-                        mesh._depthMaterial = this._depthMaterial;
+                if (mesh.material !== mesh._depthMaterial) {
+                    if (!mesh._depthMaterial) {
+                        // Skinned mesh
+                        if (mesh.skeleton) {
+                            mesh._depthMaterial = new Material({
+                                shader : new Shader({
+                                    vertex : Shader.source("buildin.sm.depth.vertex"),
+                                    fragment : Shader.source("buildin.sm.depth.fragment")
+                                })
+                            });
+                            mesh._depthMaterial.shader.vertexDefines['SKINNING'] = true;
+                            mesh._depthMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                        } else {
+                            mesh._depthMaterial = this._depthMaterial;
+                        }
                     }
-                }
 
-                this._materialPreserve[mesh.__GUID__] = mesh.material;
-                mesh.material = mesh._depthMaterial;
+                    this._materialPreserve[mesh.__GUID__] = mesh.material;
+                    mesh.material = mesh._depthMaterial;
+                }
             }
         },
 
         _bindDistanceMaterial : function(renderQueue) {
             for (var i = 0; i < renderQueue.length; i++) {
                 var mesh = renderQueue[i];
-
-                if (!mesh._distanceMaterial) {
-                    // Skinned mesh
-                    if (mesh.skeleton) {
-                        mesh._distanceMaterial = new Material({
-                            shader : new Shader({
-                                vertex : Shader.source("buildin.sm.distance.vertex"),
-                                fragment : Shader.source("buildin.sm.distance.fragment")
-                            })
-                        });
-                        mesh._distanceMaterial.shader.vertexDefines['SKINNING'] = true;
-                        mesh._distanceMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
-                    } else {
-                        mesh._distanceMaterial = this._distanceMaterial;
+                if (mesh.material !== mesh._distanceMaterial) {
+                    if (!mesh._distanceMaterial) {
+                        // Skinned mesh
+                        if (mesh.skeleton) {
+                            mesh._distanceMaterial = new Material({
+                                shader : new Shader({
+                                    vertex : Shader.source("buildin.sm.distance.vertex"),
+                                    fragment : Shader.source("buildin.sm.distance.fragment")
+                                })
+                            });
+                            mesh._distanceMaterial.shader.vertexDefines['SKINNING'] = true;
+                            mesh._distanceMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                        } else {
+                            mesh._distanceMaterial = this._distanceMaterial;
+                        }
                     }
-                }
 
-                this._materialPreserve[mesh.__GUID__] = mesh.material;
-                mesh.material = mesh._depthMaterial;
+                    this._materialPreserve[mesh.__GUID__] = mesh.material;
+                    mesh.material = mesh._depthMaterial;
+                }
             }
         },
 

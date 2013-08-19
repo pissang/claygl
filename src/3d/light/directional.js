@@ -35,7 +35,7 @@ define(function(require) {
                     var z = new Vector3();
                     return function(instance) {
                         // Direction is target to eye
-                        return z.copy(instance.matrix.forward).negate()._array;
+                        return z.copy(instance.worldMatrix.forward).negate()._array;
                     }
                 })()
             },

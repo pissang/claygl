@@ -34,6 +34,7 @@ define( function(require){
 	},
 	"3d": {
 		"Bone": require('3d/bone'),
+		"BoundingBox": require('3d/boundingbox'),
 		"Camera": require('3d/camera'),
 		"camera": {
 			"Orthographic": require('3d/camera/orthographic'),
@@ -113,7 +114,6 @@ define( function(require){
 		"Matrix4": require('core/matrix4'),
 		"mixin": {
 			"derive": require('core/mixin/derive'),
-			"Dirty": require('core/mixin/dirty'),
 			"notifier": require('core/mixin/notifier')
 		},
 		"Quaternion": require('core/quaternion'),
@@ -124,6 +124,7 @@ define( function(require){
 	},
 	"loader": {
 		"GLTF": require('loader/gltf'),
+		"InstantGeometry": require('loader/instantgeometry'),
 		"SVG": require('loader/svg'),
 		"three": {
 			"Model": require('loader/three/model')

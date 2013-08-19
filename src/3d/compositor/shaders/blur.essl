@@ -209,8 +209,8 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
 
-uniform float imageWidth : 1.0;
-uniform float imageHeight : 1.0;
+uniform float imageWidth : 512.0;
+uniform float imageHeight : 512.0;
 
 void main(void){
    vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);

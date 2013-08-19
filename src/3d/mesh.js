@@ -1,6 +1,7 @@
 define(function(require) {
 
     var Node = require("./node");
+    var Vector3 = require("core/vector3");
     var _ = require("_");
 
     var prevDrawID = 0;
@@ -84,7 +85,7 @@ define(function(require) {
                     }
                 }
                 //Do drawing
-                if (geometry.useFaces) {
+                if (geometry.isUseFace()) {
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                     _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
                 } else {
@@ -93,9 +94,9 @@ define(function(require) {
             }
 
             var drawInfo = {
-                faceNumber : geometry.faces.length,
-                vertexNumber : geometry.getVerticesNumber(),
-                drawcallNumber : chunks.length
+                // faceNumber : geometry.faces.length,
+                // vertexNumber : geometry.getVerticesNumber(),
+                // drawcallNumber : chunks.length
             };
             this.trigger('afterrender', _gl, drawInfo);
 

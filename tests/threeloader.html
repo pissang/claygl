@@ -20,8 +20,7 @@
             })
 
             require(['qtek',
-                    // 'text!../tests/assets/models/leeperrysmith/leeperrysmith.js'], function(qtek, modelData){
-                    'text!../tests/assets/models/dragon.js'], function(qtek, modelData){
+                    'text!../tests/assets/models/leeperrysmith/leeperrysmith.js'], function(qtek, modelData){
                 var qtek3d = qtek['3d'],
                     Shader = qtek3d.Shader,
                     _ = require("_");
@@ -56,23 +55,10 @@
                 material.set("lineWidth", 1.0);
                 material.set("lineColor", [0.4, 0.4, 0.4]);
 
-                camera.position.set(0, 10, 20);
+                camera.position.set(0, 0.2, 0.4);
                 camera.lookAt(root.position);
 
                 scene.add( root );
-                // Add Plane
-                var plane = new qtek3d.geometry.Plane({
-                    widthSegments : 20,
-                    heightSegments : 20
-                });
-                plane.generateBarycentric();
-                var planeMesh = new qtek3d.Mesh({
-                    geometry : plane,
-                    material : material
-                });
-                planeMesh.scale.set(60, 60, 60);
-                planeMesh.rotation.rotateX(-Math.PI/2);
-                root.add(planeMesh);
 
                 var light = new qtek3d.light.Directional();
                 light.intensity = 1.2;
@@ -80,8 +66,8 @@
                 light.lookAt(root.position);
                 scene.add(light);
 
-                setInterval( function(){
-                    renderer.render( scene, camera );
+                setInterval(function(){
+                    renderer.render(scene, camera);
                     
                     root.rotation.rotateY(Math.PI/500);
                 }, 20);

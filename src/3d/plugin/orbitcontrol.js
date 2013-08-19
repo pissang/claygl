@@ -8,8 +8,6 @@ define(function(require) {
     var Matrix4 = require("core/matrix4");
     var Quaternion = require("core/quaternion");
 
-    var upVector = new Vector3(0, 1, 0);
-
     var OrbitControl = Base.derive(function() {
         return {
             
@@ -20,6 +18,7 @@ define(function(require) {
 
             origin : new Vector3(),
 
+            up : new Vector3(0, 1, 0),
             // Rotate around origin
             _offsetPitch : 0,
             _offsetRoll : 0,
@@ -115,7 +114,7 @@ define(function(require) {
 
             if (this._op === 0) {
                 // Rotate
-                camera.rotateAround(this.origin, upVector, -this._offsetPitch);            
+                camera.rotateAround(this.origin, this.up, -this._offsetPitch);            
                 var xAxis = camera.matrix.right;
                 camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
                 this._offsetRoll = this._offsetPitch = 0;

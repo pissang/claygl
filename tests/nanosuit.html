@@ -26,7 +26,7 @@
                     _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main"),
+                    canvas : document.getElementById("Main"),
                     devicePixelRatio : 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
@@ -66,7 +66,6 @@
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10]);
 
-
                 var root = new qtek3d.Node();
 
                 _.each(meshList, function(mesh){
@@ -79,7 +78,7 @@
                 camera.position.set(0, 4, 5);
                 camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
 
-                scene.add( root );
+                scene.add(root);
                 root.scale.set(0.2, 0.2, 0.2);
                 // Add Plane
                 var plane = new qtek3d.geometry.Plane({
@@ -134,8 +133,8 @@
                 control.enable();
 
                 setInterval( function(){
-                    shadowMapPass.render( renderer, scene );
-                    renderer.render( scene, camera );
+                    shadowMapPass.render(renderer, scene);
+                    renderer.render(scene, camera);
                 }, 20);
             })
             

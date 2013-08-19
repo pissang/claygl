@@ -110,7 +110,6 @@
 
             // Scene
             var geo = new qtek3d.Geometry({
-                useFaces : false,
                 hint : 'DYNAMIC_DRAW'
             });
             for (var i = 0; i < SIZE; i++) {
@@ -125,7 +124,6 @@
                 }),
                 transparent : true,
                 depthTest : false,
-                // depthWrite : false,
                 blend : function(_gl){
                     _gl.blendEquation(_gl.FUNC_ADD);
                     _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);

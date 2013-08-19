@@ -15,10 +15,26 @@ define(function(require){
             // Filter function.
             // Called each render pass to omit the mesh don't want
             // to be rendered on the screen
-            filter : null
+            filter : null,
+
+            _nodeRepository : {}
         }
     },{
-        
+        addToScene : function(node) {
+            if (node.name) {
+                this._nodeRepository[node.name] = node;
+            }
+        },
+
+        removeFromScene : function(node) {
+            if (node.name) {
+                this._nodeRepository[node.name] = null;
+            }
+        },
+
+        getNode : function(name) {
+            return this._nodeRepository[name];
+        }
     });
 
     return Scene;

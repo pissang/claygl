@@ -157,11 +157,11 @@ define(function(require) {
                 "attriblocations" : {}
             });
 
-            if (this.cache.get("dirty") || this.cache.miss("program")) {
+            if (this.cache.isDirty("program")) {
                 
                 this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
             
-                this.cache.put("dirty", false);
+                this.cache.fresh("program")
             }
 
             _gl.useProgram(this.cache.get("program"));
@@ -378,14 +378,11 @@ define(function(require) {
 
             var enabledAttributeListInContext = enabledAttributeList[_gl.__GUID__];
             if (! enabledAttributeListInContext) {
-                enabledAttributeListInContext = enabledAttributeList[_gl.__GUID__] = [];
+                enabledAttributeListInContext 
+                    = enabledAttributeList[_gl.__GUID__] 
+                    = [];
             }
-            for (var i = 0; i < enabledAttributeListInContext.length; i++) {
-                if (enabledAttributeListInContext[i]) {
-                    _gl.disableVertexAttribArray(i);
-                    enabledAttributeListInContext[i] = false;
-                }
-            }
+
             for (var i = 0; i < attribList.length; i++) {
                 var symbol = attribList[i];
                 if (!this.attributeTemplates[symbol]) {
@@ -400,9 +397,32 @@ define(function(require) {
                     }
                     locationsMap[symbol] = location;
                 }
-                _gl.enableVertexAttribArray(location);
-                enabledAttributeListInContext[location] = true;
+                // 2 is going to enable(not enabled yet), 
+                // 3 has beend enabled, and marked not to be disable
+                if (!enabledAttributeListInContext[location]) {
+                    enabledAttributeListInContext[location] = 2;
+                } else {
+                    enabledAttributeListInContext[location] = 3;
+                }
             }
+
+            for (var i = 0; i < enabledAttributeListInContext.length; i++) {
+                switch(enabledAttributeListInContext[i]){
+                    case 2:
+                        _gl.enableVertexAttribArray(i);
+                        enabledAttributeListInContext[i] = 1;
+                        break;
+                    case 3:
+                        enabledAttributeListInContext[i] = 1;
+                        break;
+                    // Expired
+                    case 1:
+                        _gl.disableVertexAttribArray(i);
+                        enabledAttributeListInContext[i] = 0;
+                        break;
+                }
+            }
+
         },
 
         setMeshAttribute : function(_gl, symbol, type, size) {

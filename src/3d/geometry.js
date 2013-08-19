@@ -6,6 +6,8 @@
 define(function(require) {
 
     var Base = require("core/base");
+    var Vector3 = require("core/vector3");
+    var BoundingBox = require("./boundingbox");
     var util = require("util/util");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
@@ -82,7 +84,9 @@ define(function(require) {
                  }
             },
 
-            useFaces : true,
+            boundingBox : new BoundingBox(),
+
+            useFace : true,
             // Face is list of triangles, each face
             // is an array of the vertex indices of triangle
             faces : [],
@@ -93,8 +97,6 @@ define(function(require) {
             chunkSize : 65535,
 
             _enabledAttributes : null,
-
-            _verticesNumber : 0,
 
             // Save the normal type, can have face normal or vertex normal
             // Normally vertex normal is more smooth
@@ -113,6 +115,9 @@ define(function(require) {
         }
     }, {
 
+        computeBoundingBox : function() {
+
+        },
         // Overwrite the dirty method
         dirty : function(field) {
             if (! field) {
@@ -122,16 +127,17 @@ define(function(require) {
                 }
                 return;
             }
-            for (var contextId in this.cache._caches) {
-                this.cache._caches[contextId]["dirty_"+field] = true;
-            }
-
+            this.cache.dirtyAll(field);
+            
             this._enabledAttributes = null;
         },
 
         getVerticesNumber : function() {
-            this._verticesNumber = this.attributes.position.value.length;
-            return this._verticesNumber;
+            return this.attributes.position.value.length;
+        },
+
+        isUseFace : function() {
+            return this.useFace && this.faces.length > 0;
         },
 
         _getEnabledAttributes : function() {
@@ -188,8 +194,8 @@ define(function(require) {
             var isDirty = this.cache.getContext();
             var dirtyAttributes = this._getDirtyAttributes();
 
-            var isFacesDirty = this.cache.get("dirty_faces") || this.cache.miss("dirty_faces");
-            isFacesDirty = isFacesDirty && this.faces.length && this.useFaces;
+            var isFacesDirty = this.cache.get("dirty_face") || this.cache.miss("dirty_face");
+            isFacesDirty = isFacesDirty && this.isUseFace();
             
             if (dirtyAttributes) {
                 this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
@@ -198,7 +204,7 @@ define(function(require) {
                 for (var name in dirtyAttributes) {
                     isDirty["dirty_"+name] = false ;
                 }
-                isDirty['dirty_faces'] = false;
+                isDirty['dirty_face'] = false;
             }
             return this.cache.get("chunks");
         },
@@ -210,7 +216,6 @@ define(function(require) {
                 verticesNumber = this.getVerticesNumber();
             
             var verticesReorganizedMap = this._verticesReorganizedMap;
-
 
             var ArrayConstructors = {};
             for (var name in attributes) {
@@ -263,7 +268,7 @@ define(function(require) {
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
-            if (verticesNumber > this.chunkSize && this.useFaces) {
+            if (verticesNumber > this.chunkSize && this.isUseFace()) {
                 var vertexCursor = 0,
                     chunkIdx = 0,
                     currentChunk;
@@ -463,7 +468,6 @@ define(function(require) {
 
                 for (var name in dirtyAttributes) {
                     var attribute = dirtyAttributes[name],
-                        value = attribute.value,
                         type = attribute.type,
                         semantic = attribute.semantic,
                         size = attribute.size;
@@ -664,7 +668,7 @@ define(function(require) {
         },
 
         isUniqueVertex : function() {
-            if (this.faces.length && this.useFaces) {
+            if (this.isUseFace()) {
                 return this.getVerticesNumber() === this.faces.length * 3;
             } else {
                 return true;

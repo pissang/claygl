@@ -67,14 +67,13 @@ define(function(require) {
             if (this.cache.miss("webgl_texture")) {
                 // In a new gl context, create new texture and set dirty true
                 this.cache.put("webgl_texture", _gl.createTexture());
-                this.cache.put("dirty", true);
             }
             if (this.dynamic) {
                 this.update(_gl);
             }
-            else if (this.cache.get("dirty")) {
+            else if (this.cache.isDirty()) {
                 this.update(_gl);
-                this.cache.put("dirty", false);
+                this.cache.fresh();
             }
 
             return this.cache.get("webgl_texture");
@@ -85,9 +84,7 @@ define(function(require) {
         
         // Overwrite the dirty method
         dirty : function() {
-            for (var contextId in this.cache._caches) {
-                this.cache._caches[contextId]["dirty"] = true;
-            }
+            this.cache.dirtyAll();
         },
 
         update : function(_gl) {},

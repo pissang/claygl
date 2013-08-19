@@ -28,7 +28,10 @@ define(function(require) {
 
             
             depthTest : true,
-            depthWrite : true,
+            depthMask : true,
+
+            //TODO
+            cullFace : false,
 
             transparent : false,
             // Blend func is a callback function when the material 
@@ -119,10 +122,10 @@ define(function(require) {
         },
 
         set : function(symbol, value) {
-            if (symbol instanceof Object) {
-                for (var symbol in value) {
-                    var value = value[symbol];
-                    this.set(symbol, value);
+            if (typeof(symbol) === 'object') {
+                for (var key in symbol) {
+                    var val = symbol[key];
+                    this.set(key, val);
                 }
             } else {
                 var uniform = this.uniforms[symbol];

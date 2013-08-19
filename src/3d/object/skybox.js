@@ -12,7 +12,7 @@ define(function(require) {
 
         var material = new Material({
             shader : skyboxShader,
-            depthWrite : false
+            depthMask : false
         });
         
         return {
