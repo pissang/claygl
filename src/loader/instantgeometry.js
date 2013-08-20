@@ -46,7 +46,8 @@ define(function(require) {
         getBufferChunks : function(_gl) {
             this.cache.use(_gl.__GUID__);
             if (this.cache.isDirty("chunks")) {
-                this._updateBuffer(_gl);    
+                this._updateBuffer(_gl);
+                this.cache.fresh("chunks");
             }
             return this.cache.get("chunks");
         },

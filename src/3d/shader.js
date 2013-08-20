@@ -138,17 +138,17 @@ define(function(require) {
         }
     }, function() {
 
-        this.update();
+        this.updateShaderString();
 
     }, {
 
         setVertex : function(str) {
             this.vertex = str;
-            this.update();
+            this.dirty();
         },
         setFragment : function(str) {
             this.fragment = str;_caches
-            this.update();
+            this.dirty();
         },
         bind : function(_gl) {
 
@@ -157,26 +157,25 @@ define(function(require) {
                 "attriblocations" : {}
             });
 
-            if (this.cache.isDirty("program")) {
-                
+            if (this.cache.isDirty()) {
+                this.updateShaderString();
                 this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
-            
-                this.cache.fresh("program")
+                this.cache.fresh();
             }
 
             _gl.useProgram(this.cache.get("program"));
         },
-        // Overwrite the dirty method
+
         dirty : function() {
+            this.cache.dirty();
             for (var contextId in this.cache._caches) {
                 var context = this.cache._caches[contextId];
-                context["dirty"] = true;
                 context["locations"] = {};
                 context["attriblocations"] = {};
             }
         },
 
-        update : function(force) {
+        updateShaderString : function(force) {
 
             if (this.vertex !== this._vertexPrev ||
                 this.fragment !== this._fragmentPrev || force) {
@@ -193,11 +192,70 @@ define(function(require) {
                 this._fragmentPrev = this.fragment;
             }
             this._addDefine();
-
-            this.dirty();
         },
 
-        enableTexture : function(symbol, autoUpdate) {
+        define : function(type, key, val) {
+            val = val || null;
+            switch(type) {
+                case "vertex":
+                    if (this.vertexDefines[key] !== val) {
+                        this.vertexDefines[key] = val;
+                        // Mark as dirty
+                        this.dirty();
+                    }
+                    break;
+                case "fragment":
+                    if (this.fragmentDefines[key] !== val) {
+                        this.fragmentDefines[key] = val;
+                        // Mark as dirty
+                        this.dirty();
+                    }
+                    break;
+                default:
+                    console.warn("Define type must be vertex or fragment");
+            }
+        },
+
+        unDefine : function(type, key) {
+            switch(type) {
+                case "vertex":
+                    if (this.isDefined('vertex', key)) {
+                        delete this.vertexDefines[key];
+                        // Mark as dirty
+                        this.dirty();
+                    }
+                    break;
+                case "fragment":
+                    if (this.isDefined('fragment', key)) {
+                        delete this.fragmentDefines[key];
+                        // Mark as dirty
+                        this.dirty();
+                    }
+                    break;
+                default:
+                    console.warn("Define type must be vertex or fragment");
+            }
+        },
+
+        isDefined : function(type, key) {
+            switch(type) {
+                case "vertex":
+                    return this.vertexDefines[key] !== undefined;
+                case "fragment":
+                    return this.fragmentDefines[key] !== undefined;
+            }
+        },
+
+        getDefine : function(type, key) {
+            switch(type) {
+                case "vertex":
+                    return this.vertexDefines[key];
+                case "fragment":
+                    return this.fragmentDefines[key];
+            }
+        },
+
+        enableTexture : function(symbol) {
             var status = this._textureStatus[ symbol ];
             if (status) {
                 var isEnabled = status.enabled;
@@ -206,27 +264,20 @@ define(function(require) {
                     return;
                 }else{
                     status.enabled = true;
-
-                    var autoUpdate = typeof(autoUpdate)==="undefined" || true;
-                    if (autoUpdate) {
-                        this.update();
-                    }
+                    this.dirty();
                 }
             }
         },
 
-        enableTexturesAll : function(autoUpdate) {
+        enableTexturesAll : function() {
             for (var symbol in this._textureStatus) {
                 this._textureStatus[symbol].enabled = true;
             }
 
-            var autoUpdate = typeof(autoUpdate)==="undefined" || true;
-            if (autoUpdate) {
-                this.update();
-            }
+            this.dirty();
         },
 
-        disableTexture : function(symbol, autoUpdate) {
+        disableTexture : function(symbol) {
             var status = this._textureStatus[ symbol ];
             if (status) {
                 var isDisabled = ! status.enabled;
@@ -236,23 +287,17 @@ define(function(require) {
                 }else{
                     status.enabled = false;
 
-                    var autoUpdate = typeof(autoUpdate)==="undefined" || true;
-                    if (autoUpdate) {
-                        this.update();
-                    }
+                    this.dirty();
                 }
             }
         },
 
-        disableTexturesAll : function(symbol, autoUpdate) {
+        disableTexturesAll : function(symbol) {
             for (var symbol in this._textureStatus) {
                 this._textureStatus[symbol].enabled = false;
             }
 
-            var autoUpdate = typeof(autoUpdate)==="undefined" || true;
-            if (autoUpdate) {
-                this.update();
-            }
+            this.dirty();
         },
 
         setUniform : function(_gl, type, symbol, value) {

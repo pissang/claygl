@@ -4,8 +4,10 @@ define(function(require) {
     var _ = require("_");
 
     var requrestAnimationFrame = window.requrestAnimationFrame
+                                || window.msRequestAnimationFrame
                                 || window.mozRequestAnimationFrame
-                                || window.webkitRequestAnimationFrame;
+                                || window.webkitRequestAnimationFrame
+                                || function(func){setTimeout(func, 16)};
 
     var Animation = function(options) {
 

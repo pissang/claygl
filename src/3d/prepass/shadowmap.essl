@@ -1,9 +1,7 @@
 /**
- *  Variance Shadow Mapping
- * http://www.punkuser.net/vsm/vsm_paper.pdf
- * http://developer.download.nvidia.com/SDK/10/direct3d/Source/VarianceShadowMapping/Doc/VarianceShadowMapping.pdf
+ * NORMAL
  */
-@export buildin.vsm.depth.vertex
+@export buildin.sm.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -18,7 +16,7 @@ uniform mat4 boneMatrices[ BONE_MATRICES_NUMBER ];
 
 varying vec4 v_ViewPosition;
 void main(){
-
+    
     vec3 skinnedPosition = position;
     #ifdef SKINNING
         mat4 skinMatrix;
@@ -39,24 +37,46 @@ void main(){
 
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
     gl_Position = v_ViewPosition;
+
 }
 @end
-
-
-@export buildin.vsm.depth.fragment
+////////////////////////////////////////////////////////////////
+@export buildin.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
 
-void main(){
-    float z = v_ViewPosition.z / v_ViewPosition.w;
+#ifdef USE_VSM
+#extension GL_OES_standard_derivatives : enable
+#endif
 
-    gl_FragColor = vec4(z, z*z, 0.0, 0.0);
+@import buildin.util.pack_depth
+
+void main(){
+    // Whats the difference between gl_FragCoord.z and this v_ViewPosition
+    // gl_FragCoord consider the polygon offset ?
+    float depth = v_ViewPosition.z / v_ViewPosition.w;
+
+    #ifdef USE_VSM
+        depth = depth * 0.5 + 0.5;
+
+        float moment1 = depth;
+        float moment2 = depth * depth;
+
+        // Adjusting moments using partial derivative
+        float dx = dFdx(depth);
+        float dy = dFdy(depth);
+        moment2 += 0.25*(dx*dx+dy*dy);
+
+        gl_FragColor = vec4(moment1, moment2, 0.0, 0.0);
+    #else
+        gl_FragColor = packDepth((depth + 1.0) / 2.0);
+    #endif
 }
 @end
 
-// Point light shadow mapping
-// http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
-@export buildin.vsm.distance.vertex
+
+
+@export buildin.sm.distance.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 world : WORLD;
@@ -98,21 +118,25 @@ void main(){
 
 @end
 
-@export buildin.vsm.distance.fragment
+@export buildin.sm.distance.fragment
 
 uniform vec3 lightPosition;
 
 varying vec3 v_WorldPosition;
 
+@import buildin.util.pack_depth
+
 void main(){
-
     float dist = distance(lightPosition, v_WorldPosition);
-
-    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
+    #ifdef USE_VSM
+        gl_FragColor = packDepth(dist);
+    #else
+        gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
+    #endif
 }
 @end
 
-
+////////////////////////////////////////////////////////////////
 @export buildin.plugin.compute_shadow_map
 
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
@@ -133,48 +157,54 @@ uniform samplerCube pointLightShadowMap[ POINT_LIGHT_SHADOWMAP_NUMBER ];
 
 uniform bool shadowEnabled : true;
 
+// Normal
+@import buildin.util.unpack_depth
+
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
-vec4 vsmBoxFilter(sampler2D texture, vec2 uv){
-    vec4 tex = texture2D(texture, uv);
-    float offset = 1.0/512.0;
-    tex += texture2D(texture, uv+vec2(offset, 0.0) );
-    tex += texture2D(texture, uv+vec2(offset, offset) );
-    tex += texture2D(texture, uv+vec2(-offset, offset) );
-    tex += texture2D(texture, uv+vec2(0.0, offset) );
-    tex += texture2D(texture, uv+vec2(-offset, 0.0) );
-    tex += texture2D(texture, uv+vec2(-offset, -offset) );
-    tex += texture2D(texture, uv+vec2(offset, -offset) );
-    tex += texture2D(texture, uv+vec2(0.0, -offset) );
-
-    tex /= 9.0;
-    return tex;
+float shadowContrib(sampler2D map, vec2 uv, float z){
+    vec4 tex = texture2D(map, uv);
+    return (unpackDepth(tex) * 2.0 - 1.0) + 0.0002 < z ? 0.0 : 1.0;
 }
 
-float computeShadowFalloff( sampler2D map, mat4 lightVPM, vec3 position){
-    vec4 posInLightSpace = ( lightVPM * vec4(position, 1.0) );
-    posInLightSpace.xyz /= posInLightSpace.w;
+float pcf(sampler2D map, vec2 uv, float z){
 
+    float shadowFalloff = shadowContrib(map, uv, z);
+    float offset = 1.0/512.0;
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, 0.0), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(0.0, offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, 0.0), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(-offset, -offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(offset, -offset), z);
+    shadowFalloff += shadowContrib(map, uv+vec2(0.0, -offset), z);
+
+    return shadowFalloff / 9.0;
+}
+
+float computeShadowFalloff(sampler2D map, mat4 lightVPM, vec3 position){
+    
+    vec4 posInLightSpace = lightVPM * vec4(v_WorldPosition, 1.0);
+    posInLightSpace.xyz /= posInLightSpace.w;
     float z = posInLightSpace.z;
     // In frustum
-    if( all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
-        all(lessThan(posInLightSpace.xyz, vec3(1.0))) ){
-        
+    if(all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
+        all(lessThan(posInLightSpace.xyz, vec3(1.0)))){
         // To texture uv
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
-        // vec2 moments = texture2D( map, uv ).xy;
-        vec2 moments = vsmBoxFilter( map, uv ).xy;
-        
-        float variance = moments.y - moments.x * moments.x;
 
-        float mD = moments.x - z;
-        float p = variance / (variance + mD * mD);
-
-        if(moments.x + 0.002 < z){
-            return clamp(p, 0.0, 1.0);
-        }else{
-            return 1.0;
-        }
+        #ifdef USE_VSM
+            vec2 moments = texture2D(map, uv).xy;
+            float variance = moments.y - moments.x * moments.x;
+            variance = max(variance, 0.);
+            z = z * 0.5 + 0.5;
+            float mD = moments.x - z;
+            float p_max = variance / (variance + mD * mD);
+            return clamp(p_max, 0., 1.0);
+        #else
+            return pcf(map, uv, z);
+        #endif
     }
     return 1.0;
 }
@@ -183,39 +213,29 @@ float computeShadowFalloff( sampler2D map, mat4 lightVPM, vec3 position){
 
 #ifdef POINT_LIGHT_SHADOWMAP_NUMBER
 
-vec4 vsmBoxFilterCube(samplerCube texture, vec3 direction){
-    vec4 tex = textureCube(texture, direction);
-    float offset = 0.05;
-    tex += textureCube(texture, direction + vec3(offset, 0.0, 0.0) );
-    tex += textureCube(texture, direction + vec3(offset, offset, 0.0) );
-    tex += textureCube(texture, direction + vec3(-offset, offset, 0.0) );
-    tex += textureCube(texture, direction + vec3(0.0, offset, 0.0) );
-    tex += textureCube(texture, direction + vec3(-offset, 0.0, 0.0) );
-    tex += textureCube(texture, direction + vec3(-offset, -offset, 0.0) );
-    tex += textureCube(texture, direction + vec3(offset, -offset, 0.0) );
-    tex += textureCube(texture, direction + vec3(0.0, -offset, 0.0) );
-
-    tex /= 9.0;
-    return tex;
-}
-
 float computeShadowFallOfCube( samplerCube map, vec3 direction ){
-    
-    vec2 moments = vsmBoxFilterCube( map, direction).xy;
-
-    float variance = moments.y - moments.x * moments.x;
-
+    vec4 shadowTex = textureCube(map, direction);
     float dist = length(direction);
-    float mD = moments.x - dist;
-    float p = variance / (variance + mD * mD);
 
-    if(moments.x + 0.001 < dist){
-        return clamp(p, 0.0, 1.0);
-    }else{
-        return 1.0;
-    }
+    #ifdef USE_VSM
+        vec2 moments = shadowTex.xy;
+        float variance = moments.y - moments.x * moments.x;
+        float dist = length(direction);
+        float mD = moments.x - dist;
+        float p = variance / (variance + mD * mD);
+        if(moments.x + 0.001 < dist){
+            return clamp(p, 0.0, 1.0);
+        }else{
+            return 1.0;
+        }
+    #else
+        if(unpackDepth(shadowTex) + 0.002 < dist){
+            return 0.0;
+        }else{
+            return 1.0;
+        }
+    #endif
 }
-
 #endif
 
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
@@ -255,7 +275,7 @@ void computeShadowFallOfPointLights( vec3 position, inout float shadowFalloffs[P
 void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFalloffs[DIRECTIONAL_LIGHT_NUMBER] ){
     for( int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
         float shadowFalloff = computeShadowFalloff( directionalLightShadowMap[i], directionalLightMatrix[i], position );
-        shadowFalloffs[ i ] = shadowFalloff;
+        shadowFalloffs[i] = shadowFalloff;
     }
     // set default fallof of rest lights
     for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){

@@ -456,8 +456,8 @@ define(function(require) {
                 for (var i = 0; i < enabledTextures; i++) {
                     shader.enableTexture(enabledTextures[i]);
                 }
-                shader.vertexDefines["SKINNING"] = null;
-                shader.vertexDefines["BONE_MATRICES_NUMBER"] = boneNumber;
+                shader.define('vertex', "SKINNING");
+                shader.define('vertex', "BONE_MATRICES_NUMBER", boneNumber);
             }
 
             var material = new Material({

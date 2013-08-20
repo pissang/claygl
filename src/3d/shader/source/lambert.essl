@@ -158,7 +158,7 @@ void main(){
     #ifdef DIRECTIONAL_LIGHT_NUMBER
         #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
             float shadowFallOffs[DIRECTIONAL_LIGHT_NUMBER];
-            if( shadowEnabled ){
+            if(shadowEnabled){
                 computeShadowFallOfDirectionalLights( v_WorldPosition, shadowFallOffs );
             }
         #endif
@@ -206,16 +206,10 @@ void main(){
             float lightDirectCosine = dot(spotLightDirection, lightDirection);
 
             float falloff;
-            if( lightDirectCosine < penumbraAngleCosine ){
-                falloff = 1.0;
-            }else if( lightDirectCosine > umbraAngleCosine ){
-                falloff = 0.0;
-            }else{
-                falloff = (lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine);
-                falloff = pow(falloff, falloffFactor);
-            }
+            falloff = clamp((lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine), 0.0, 1.0);
+            falloff = pow(falloff, falloffFactor);
 
-            float ndl = dot( v_Normal, lightDirection );
+            float ndl = dot(v_Normal, lightDirection);
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowFallOff = 1.0;

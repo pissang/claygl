@@ -255,16 +255,10 @@ void main(){
 
             float falloff;
             // Fomular from real-time-rendering
-            if( lightDirectCosine < penumbraAngleCosine ){
-                falloff = 1.0;
-            }else if( lightDirectCosine > umbraAngleCosine ){
-                falloff = 0.0;
-            }else{
-                falloff = (lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine);
-                falloff = pow(falloff, falloffFactor);
-            }
+            falloff = clamp((lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine), 0.0, 1.0);
+            falloff = pow(falloff, falloffFactor);
 
-            vec3 halfVector = normalize( lightDirection + viewDirection );
+            vec3 halfVector = normalize(lightDirection + viewDirection);
 
             float ndh = dot( normal, halfVector );
             ndh = clamp(ndh, 0.0, 1.0);
@@ -282,7 +276,6 @@ void main(){
             diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowFallOff;
 
             specularColor += specular * pow( ndh, shininess ) * attenuation * (1.0-falloff) * shadowFallOff;
-
         }
     #endif
 

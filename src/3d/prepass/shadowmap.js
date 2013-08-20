@@ -18,13 +18,15 @@ define(function(require) {
     var PerspectiveCamera = require("../camera/perspective");
     var OrthoCamera = require("../camera/orthographic");
 
+    var Pass = require("../compositor/pass");
+
     var Matrix4 = require("core/matrix4");
 
     var _ = require("_");
 
     var frameBuffer = new FrameBuffer();
 
-    Shader.import(require('text!./sm.essl'));
+    Shader.import(require('text!./shadowmap.essl'));
 
     var ShadowMapPlugin = Base.derive(function() {
         return {
@@ -38,10 +40,12 @@ define(function(require) {
                 'SPOT_LIGHT' : 0
             },
 
-            _materialPreserve : {}
+            _materialPreserve : {},
 
+            useVSM : false
         }
     }, function() {
+
         this._depthMaterial =  new Material({
             shader : new Shader({
                 vertex : Shader.source("buildin.sm.depth.vertex"),
@@ -75,8 +79,8 @@ define(function(require) {
                                     fragment : Shader.source("buildin.sm.depth.fragment")
                                 })
                             });
-                            mesh._depthMaterial.shader.vertexDefines['SKINNING'] = true;
-                            mesh._depthMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                            mesh._depthMaterial.shader.define('vertex', 'SKINNING');
+                            mesh._depthMaterial.shader.define('vertex', 'BONE_MATRICES_NUMBER', mesh.skeleton.getBoneNumber());
                         } else {
                             mesh._depthMaterial = this._depthMaterial;
                         }
@@ -84,6 +88,12 @@ define(function(require) {
 
                     this._materialPreserve[mesh.__GUID__] = mesh.material;
                     mesh.material = mesh._depthMaterial;
+
+                    if (this.useVSM) {
+                        mesh._depthMaterial.shader.define("fragment", "USE_VSM");
+                    } else {
+                        mesh._depthMaterial.shader.unDefine("fragment", "USE_VSM");
+                    }
                 }
             }
         },
@@ -101,15 +111,21 @@ define(function(require) {
                                     fragment : Shader.source("buildin.sm.distance.fragment")
                                 })
                             });
-                            mesh._distanceMaterial.shader.vertexDefines['SKINNING'] = true;
-                            mesh._distanceMaterial.shader.vertexDefines['BONE_MATRICES_NUMBER'] = mesh.skeleton.getBoneNumber();
+                            mesh._distanceMaterial.shader.define('vertex', 'SKINNING');
+                            mesh._distanceMaterial.shader.define('vertex', 'BONE_MATRICES_NUMBER', mesh.skeleton.getBoneNumber());
                         } else {
                             mesh._distanceMaterial = this._distanceMaterial;
                         }
                     }
 
                     this._materialPreserve[mesh.__GUID__] = mesh.material;
-                    mesh.material = mesh._depthMaterial;
+                    mesh.material = mesh._distanceMaterial;
+
+                    if (this.useVSM) {
+                        mesh._distanceMaterial.shader.define("fragment", "USE_VSM");
+                    } else {
+                        mesh._distanceMaterial.shader.unDefine("fragment", "USE_VSM");
+                    }
                 }
             }
         },
@@ -122,7 +138,7 @@ define(function(require) {
         },
 
         _renderShadowPass : function(renderer, scene) {
-
+            var self = this;
             var renderQueue = [],
                 lightCastShadow = [],
                 meshReceiveShadow = [];
@@ -146,6 +162,11 @@ define(function(require) {
                         node.material.set("shadowEnabled", 1);
                     }else{
                         node.material.set("shadowEnabled", 0);
+                    }
+                    if (self.useVSM) {
+                        node.material.shader.define("fragment", "USE_VSM");
+                    } else {
+                        node.material.shader.unDefine("fragment", "USE_VSM");
                     }
                 };
             });
@@ -260,7 +281,7 @@ define(function(require) {
                     }
                 }
                 if (shaderNeedsUpdate) {
-                    shader.update();
+                    shader.dirty();
                 }
 
                 material.set({
@@ -293,7 +314,6 @@ define(function(require) {
                         minFilter : "NEAREST",
                         magFilter : "NEAREST",
                         generateMipmaps : false
-                        // type : 'FLOAT'
                     });
                 } else {
                     texture = new Texture2d({
@@ -303,8 +323,10 @@ define(function(require) {
                         minFilter : "NEAREST",
                         magFilter : "NEAREST",
                         generateMipmaps : false
-                        // type : 'FLOAT'
                     });
+                }
+                if (this.useVSM) {
+                    texture.type = "FLOAT";
                 }
                 this._textures[key] = texture;
             }
@@ -384,13 +406,5 @@ define(function(require) {
     var pz = new Vector3(0, 0, 1);
     var nz = new Vector3(0, 0, -1);
 
-
-    function createEmptyArray(size, value) {
-        var arr = [];
-        for (var i = 0; i < size; i++) {
-            arr.push(value);
-        }
-        return arr;
-    }
     return ShadowMapPlugin;
 })

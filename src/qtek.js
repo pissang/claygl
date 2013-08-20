@@ -122,6 +122,7 @@ define( function(require){
 		"Vector3": require('core/vector3'),
 		"Vector4": require('core/vector4')
 	},
+	"Engine": require('engine'),
 	"loader": {
 		"GLTF": require('loader/gltf'),
 		"InstantGeometry": require('loader/instantgeometry'),

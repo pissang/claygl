@@ -180,7 +180,11 @@ define(function(require) {
                 this.trigger("beforerender:opaque", opaqueQueue);
             }
 
-            // _gl.enable(_gl.DEPTH_TEST);
+            // Cull Face
+            _gl.frontFace(_gl.CCW);
+            _gl.cullFace(_gl.BACK);
+            _gl.enable(_gl.CULL_FACE);
+
             _gl.disable(_gl.BLEND);
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
@@ -190,7 +194,6 @@ define(function(require) {
             }
 
             // Render Transparent Queue
-            // _gl.disable(_gl.DEPTH_TEST);
             _gl.enable(_gl.BLEND);
             // Default blend function
             _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
@@ -219,7 +222,7 @@ define(function(require) {
 
                     var uniformTpl = light.uniformTemplates[symbol];
                     if (! lightUniforms[symbol]) {
-                        lightUniforms[ symbol] = {
+                        lightUniforms[symbol] = {
                             type : "",
                             value : []
                         }
@@ -279,10 +282,10 @@ define(function(require) {
                     }
                     if (lightNumberChanged) {
                         for (var type in scene.lightNumber) {
-                            var number = scene.lightNumber[ type ];
-                            shader.lightNumber[ type ] = number;
+                            var number = scene.lightNumber[type];
+                            shader.lightNumber[type] = number;
                         }
-                        shader.update();
+                        shader.dirty();
                     }
 
                     shader.bind(_gl);

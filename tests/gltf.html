@@ -28,7 +28,7 @@
                 canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            // var shadowMapPass = new qtek3d.prepass.ShadowMap();
+            var shadowMapPass = new qtek3d.prepass.ShadowMap();
 
             var GLTFLoader = new qtek.loader.GLTF();
 
@@ -56,10 +56,15 @@
                 control.up.set(0, 0, 1);
                 control.enable();
 
-                scene.getNode("Spot-light").range = 50;
+                var light = scene.getNode("Spot-light");
+                // light.lookAt(scene.position);
+                light.range = 30;
+                light.umbraAngle = 10;
+                light.penumbraAngle = 25;
+                light.shadowResolution = 1024;
 
                 setInterval(function() {
-                    // shadowMapPass.render(renderer, scene);
+                    shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
                 }, 50)
             });
