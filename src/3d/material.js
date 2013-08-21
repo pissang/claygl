@@ -49,7 +49,7 @@ define(function(require) {
             blend : null,
 
             // Binding lights in the renderer automatically
-            autoBindingLights : true
+            // autoBindingLights : true
         }
     }, function() {
         if (this.shader) {

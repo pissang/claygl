@@ -41,14 +41,17 @@ define(function(require) {
                 _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
             }           
         
-            if (! this.NPOT && this.generateMipmaps) {
+            if (! this.NPOT && this.useMipmap) {
                 _gl.generateMipmap(_gl.TEXTURE_2D);
             }
             
             _gl.bindTexture(_gl.TEXTURE_2D, null);
 
         },
-        
+        generateMipmap : function(_gl) {
+            _gl.bindTexture(_gl.TEXTURE_2D, this.cache.get("webgl_texture"));
+            _gl.generateMipmap(_gl.TEXTURE_2D);    
+        },
         isPowerOfTwo : function() {
             if (this.image) {
                 var width = this.image.width,

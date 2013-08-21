@@ -63,11 +63,15 @@ define(function(require) {
                     _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target]);
             }, this);
 
-            if (!this.NPOT && this.generateMipmaps) {
+            if (!this.NPOT && this.useMipmap) {
                 _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
             }
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+        },
+        generateMipmap : function(_gl) {
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture"));
+            _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);    
         },
         bind : function(_gl) {
 

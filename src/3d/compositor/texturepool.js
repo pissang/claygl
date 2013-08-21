@@ -52,7 +52,7 @@ define(function(require) {
             wrapT : "CLAMP_TO_EDGE",
             minFilter : "LINEAR_MIPMAP_LINEAR",
             magFilter : "LINEAR",
-            generateMipmaps : true,
+            useMipmap : true,
             anisotropy : 1,
             flipY : true,
             unpackAlignment : 4,
@@ -79,10 +79,10 @@ define(function(require) {
         var IPOT = isPowerOfTwo(target.width, target.height);
 
         if (target.format === "DEPTH_COMPONENT") {
-            target.generateMipmaps = false;
+            target.useMipmap = false;
         }
 
-        if (!IPOT || !target.generateMipmaps) {
+        if (!IPOT || !target.useMipmap) {
             if (target.minFilter.indexOf("NEAREST") == 0) {
                 target.minFilter = 'NEAREST';
             } else {

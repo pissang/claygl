@@ -75,7 +75,7 @@ define(function(require) {
             // Here update the mipmaps of texture each time after rendered;
             for (var attachment in this._attachedTextures) {
                 var texture = this._attachedTextures[attachment];
-                if (! texture.NPOT && texture.generateMipmaps) {
+                if (! texture.NPOT && texture.useMipmap) {
                     var target = texture.instanceof(TextureCube) ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                     _gl.generateMipmap(target);
@@ -101,9 +101,6 @@ define(function(require) {
                 console.error("The texture attached to color buffer is not a valid.");
                 return;
             }
-            if (this._renderBuffer && this.depthBuffer && (this._width !== texture.width || this.height !== texture.height)) {
-                console.warn("Attached texture has different width or height, it will cause the render buffer recreate a storage ");
-            }
 
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
 
@@ -117,7 +114,7 @@ define(function(require) {
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
             attachment = attachment || _gl.COLOR_ATTACHMENT0;
             
-            if (attachment === 'DEPTH_ATTACHMENT') {
+            if (attachment === _gl.DEPTH_ATTACHMENT) {
 
                 var extension = WebGLInfo.getExtension(_gl, "WEBGL_depth_texture");
 

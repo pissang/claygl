@@ -22,7 +22,8 @@ define(function(require) {
                 bottom : -20,
                 near : 0,
                 far : 100
-            }
+            },
+            shadowBias : 0.0002
         }
     }, {
 

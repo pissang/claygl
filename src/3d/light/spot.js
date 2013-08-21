@@ -22,7 +22,9 @@ define(function(require) {
             range : 20,
             umbraAngle : 30,
             penumbraAngle : 45,
-            falloffFactor : 2.0
+            falloffFactor : 2.0,
+            
+            shadowBias : 0.0002
         }
     },{
 

@@ -43,7 +43,7 @@ define(function(require) {
             // LINEAR
             magFilter : 'LINEAR',
 
-            generateMipmaps : true,
+            useMipmap : true,
 
             // http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
             anisotropic : 1,
@@ -106,10 +106,10 @@ define(function(require) {
             var isPowerOfTwo = this.isPowerOfTwo();
 
             if (this.format === "DEPTH_COMPONENT") {
-                this.generateMipmaps = false;
+                this.useMipmap = false;
             }
 
-            if (! isPowerOfTwo || ! this.generateMipmaps) {
+            if (! isPowerOfTwo || ! this.useMipmap) {
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore

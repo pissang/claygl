@@ -19,6 +19,7 @@ define(function(require) {
     var OrthoCamera = require("../camera/orthographic");
 
     var Pass = require("../compositor/pass");
+    var texturePool = require("../compositor/texturepool");
 
     var Matrix4 = require("core/matrix4");
 
@@ -60,6 +61,16 @@ define(function(require) {
                 fragment : Shader.source("buildin.sm.distance.fragment")
             })
         });
+
+        // Gaussian filter pass for VSM
+        this._gaussianPassH = new Pass({
+            fragment : Shader.source('buildin.compositor.gaussian_blur_h')
+        });
+        this._gaussianPassV = new Pass({
+            fragment : Shader.source('buildin.compositor.gaussian_blur_v')
+        });
+        this._gaussianPassH.setUniform("blurSize", 3.0);
+        this._gaussianPassV.setUniform("blurSize", 3.0);
     }, {
 
         render : function(renderer, scene) {
@@ -191,9 +202,12 @@ define(function(require) {
             // Shadow uniforms
             var spotLightShadowMaps = [],
                 spotLightMatrices = [],
+                spotLightBiases = [],
                 directionalLightShadowMaps = [],
                 directionalLightMatrices = [],
-                pointLightShadowMaps = [];
+                directionalLightBiases = [],
+                pointLightShadowMaps = [],
+                pointLightRanges = [];
 
             // reset
             for (var name in this._shadowMapNumber) {
@@ -219,6 +233,11 @@ define(function(require) {
                     renderer.renderQueue(renderQueue, camera, null, true);
 
                     frameBuffer.unbind(renderer);
+
+                    // Filter for VSM
+                    if (this.useVSM) {
+                        this._gaussianFilter(renderer, texture, 512);
+                    }
         
                     var matrix = new Matrix4();
                     matrix.copy(camera.worldMatrix)
@@ -228,15 +247,18 @@ define(function(require) {
                     if (light.instanceof(SpotLight)) {
                         spotLightShadowMaps.push(texture);
                         spotLightMatrices.push(matrix._array);
+                        spotLightBiases.push(light.shadowBias);
                     } else {
                         directionalLightShadowMaps.push(texture);
                         directionalLightMatrices.push(matrix._array);
+                        directionalLightBiases.push(light.shadowBias);
                     }
 
                 } else if (light.instanceof(PointLight)) {
                     
                     var texture = this._getTexture(light.__GUID__, light);
                     pointLightShadowMaps.push(texture);
+                    pointLightRanges.push(light.range * 5);
 
                     this._bindDistanceMaterial(renderQueue);
                     for (var i = 0; i < 6; i++) {
@@ -249,7 +271,8 @@ define(function(require) {
                         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                         renderer._scene = scene;
-                        this._pointLightDepthMaterial.set("lightPosition", light.position._array);
+                        this._distanceMaterial.set("lightPosition", light.position._array);
+                        this._distanceMaterial.set("range", light.range * 5);
 
                         renderer.renderQueue(renderQueue, camera, null, true);
 
@@ -285,13 +308,40 @@ define(function(require) {
                 }
 
                 material.set({
-                    "spotLightShadowMap" : spotLightShadowMaps,
-                    "directionalLightShadowMap" : directionalLightShadowMaps,
-                    "directionalLightMatrix" : directionalLightMatrices,
-                    "pointLightShadowMap" : pointLightShadowMaps,
-                    "spotLightMatrix" : spotLightMatrices,
+                    "spotLightShadowMaps" : spotLightShadowMaps,
+                    "spotLightMatrices" : spotLightMatrices,
+                    "spotLightBiases" : spotLightBiases,
+                    "directionalLightShadowMaps" : directionalLightShadowMaps,
+                    "directionalLightBiases" : directionalLightBiases,
+                    "directionalLightMatrices" : directionalLightMatrices,
+                    "pointLightShadowMaps" : pointLightShadowMaps,
+                    "pointLightRanges" : pointLightRanges
                 });
             }
+        },
+
+        _gaussianFilter : function(renderer, texture, size) {
+            var parameter = {
+                width : size,
+                height : size,
+                type : "FLOAT"
+            };
+            var _gl = renderer.gl;
+            var tmpTexture = texturePool.get(parameter);
+            
+            frameBuffer.attach(_gl, tmpTexture);
+            frameBuffer.bind(renderer);
+            this._gaussianPassH.setUniform("texture", texture);
+            this._gaussianPassH.render(renderer);
+            frameBuffer.unbind(renderer);
+
+            frameBuffer.attach(_gl, texture);
+            frameBuffer.bind(renderer);
+            this._gaussianPassV.setUniform("texture", tmpTexture);
+            this._gaussianPassV.render(renderer);
+            frameBuffer.unbind(renderer);
+
+            texturePool.put(tmpTexture);
         },
 
         _getTexture : function(key, light) {
@@ -313,7 +363,7 @@ define(function(require) {
                         height : resolution,
                         minFilter : "NEAREST",
                         magFilter : "NEAREST",
-                        generateMipmaps : false
+                        useMipmap : false
                     });
                 } else {
                     texture = new Texture2d({
@@ -322,7 +372,7 @@ define(function(require) {
                         
                         minFilter : "NEAREST",
                         magFilter : "NEAREST",
-                        generateMipmaps : false
+                        useMipmap : false
                     });
                 }
                 if (this.useVSM) {

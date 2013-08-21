@@ -83,7 +83,7 @@
                         shader : rttShader
                     })
                 });
-                rttMesh.material.setUniform("diffuseMap", rtt);
+                rttMesh.material.set("diffuseMap", rtt);
                 var rttScene = new qtek3d.Scene();
                 rttScene.add( rttMesh );
 

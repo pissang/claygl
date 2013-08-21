@@ -31,7 +31,9 @@
                     devicePixelRatio : 1.0
                 });
 
-                var shadowMapPass = new qtek3d.prepass.ShadowMap();
+                var shadowMapPass = new qtek3d.prepass.ShadowMap({
+                    // useVSM : true
+                });
 
                 var scene = new qtek3d.Scene,
                     camera = new qtek3d.camera.Perspective({
@@ -42,6 +44,7 @@
                 var light = new qtek3d.light.Spot({
                     position : new Vector3(0, 4, 4),
                     intensity : 4.0,
+                    shadowBias : 0.002,
                     shadowResolution : 1024
                 });
                 scene.add(light);

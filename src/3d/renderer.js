@@ -181,9 +181,9 @@ define(function(require) {
             }
 
             // Cull Face
-            _gl.frontFace(_gl.CCW);
-            _gl.cullFace(_gl.BACK);
-            _gl.enable(_gl.CULL_FACE);
+            // _gl.frontFace(_gl.CCW);
+            // _gl.cullFace(_gl.BACK);
+            // _gl.enable(_gl.CULL_FACE);
 
             _gl.disable(_gl.BLEND);
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
