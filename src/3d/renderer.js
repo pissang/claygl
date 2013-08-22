@@ -170,11 +170,6 @@ define(function(require) {
             opaqueQueue.sort(this._materialSortFunc);
             transparentQueue.sort(this._materialSortFunc);
 
-            // Render Skybox
-            if (camera.skybox) {
-                this.renderQueue([camera.skybox], camera, null, true);
-            }
-
             // Render Opaque queue
             if (! silent) {
                 this.trigger("beforerender:opaque", opaqueQueue);

@@ -30,9 +30,9 @@ define(function(require) {
         },
 
         render : function(renderer) {
-            if (this.isDirty("graph")) {
+            if(this._dirty) {
                 this.update();
-                this.fresh("graph");
+                this._dirty = false;
             }
             
             var groupInputTextures = {};

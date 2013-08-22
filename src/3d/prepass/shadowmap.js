@@ -183,6 +183,7 @@ define(function(require) {
             });
 
             _gl.enable(_gl.DEPTH_TEST);
+            _gl.depthMask(true);
             _gl.disable(_gl.BLEND);
 
             _gl.clearColor(0.0, 0.0, 0.0, 0.0);

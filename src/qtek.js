@@ -71,12 +71,11 @@ define( function(require){
 		"Material": require('3d/material'),
 		"Mesh": require('3d/mesh'),
 		"Node": require('3d/node'),
-		"object": {
-			"Skybox": require('3d/object/skybox')
-		},
 		"plugin": {
 			"FirstPersonControl": require('3d/plugin/firstpersoncontrol'),
-			"OrbitControl": require('3d/plugin/orbitcontrol')
+			"OrbitControl": require('3d/plugin/orbitcontrol'),
+			"Skybox": require('3d/plugin/skybox'),
+			"Skydome": require('3d/plugin/skydome')
 		},
 		"prepass": {
 			"Reflection": require('3d/prepass/reflection'),

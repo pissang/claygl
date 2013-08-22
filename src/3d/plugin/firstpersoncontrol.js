@@ -8,8 +8,6 @@ define(function(require) {
     var Matrix4 = require("core/matrix4");
     var Quaternion = require("core/quaternion");
 
-    var upVector = new Vector3(0, 1, 0);
-
     var FirstPersonControl = Base.derive(function() {
         return {
             camera : null,
@@ -17,6 +15,8 @@ define(function(require) {
 
             sensitivity : 1,
             speed : 0.4,
+
+            up : new Vector3(0, 1, 0),
 
             _moveForward : false,
             _moveBackward : false,
@@ -102,7 +102,7 @@ define(function(require) {
                 }
 
 
-                camera.rotateAround(camera.position, upVector, -this._offsetPitch * Math.PI / 180);
+                camera.rotateAround(camera.position, this.up, -this._offsetPitch * Math.PI / 180);
                 var xAxis = camera.matrix.right;
                 camera.rotateAround(camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
 

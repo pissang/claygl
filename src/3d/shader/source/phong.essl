@@ -95,7 +95,7 @@ uniform float shininess : 30;
 
 uniform vec3 specular : [1.0, 1.0, 1.0];
 
-uniform float reflectivity : 1.0;
+uniform float reflectivity : 0.5;
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
@@ -284,7 +284,7 @@ void main(){
 
     #ifdef ENVIRONMENTMAP_ENABLED
         vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
-        finalColor.rgb = mix(finalColor.rgb, envTex, reflectivity);
+        finalColor.rgb = finalColor.rgb + envTex * reflectivity;
     #endif
 
     if( lineWidth > 0.01){

@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            requirejs.config({
+                'baseUrl' : '../src',
+                'paths' : {
+                    '_' : '../thirdparty/lodash.compat',
+                    'glmatrix' : '../thirdparty/gl-matrix'
+                },
+                'shim' : {
+                    '_' : {
+                        exports : '_'
+                    }
+                }
+            })
+
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'],
+                    Shader = qtek3d.Shader;
+
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById( "Main")
+                });
+                var scene = new qtek3d.Scene,
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                camera.position.set(0, 1, 2);
+
+                var texture = new qtek3d.texture.Texture2D({
+                    flipY : false
+                });
+                // Sky texture 
+                // http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
+                texture.load("assets/textures/Parking_Lot_Bg.jpg");
+
+                var skydome = new qtek3d.plugin.Skydome({
+                    camera : camera,
+                    renderer : renderer                    
+                });
+                skydome.material.set("diffuseMap", texture);
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                control.enable();
+
+                setInterval(function(){
+                    renderer.render(scene, camera);
+                }, 50);
+            })
+            
+        </script>
+    </body>
+</html>

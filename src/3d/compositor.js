@@ -9,9 +9,9 @@ define(function(require){
         }
     }, {
         render : function(renderer) {
-            if(this.isDirty("graph")) {
+            if(this._dirty) {
                 this.update();
-                this.fresh("graph");
+                this._dirty = false;
             }
             for (var i = 0; i < this.nodes.length; i++) {
                 var node = this.nodes[i];

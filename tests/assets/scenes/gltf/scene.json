@@ -324,6 +324,9 @@
     "images": {
         "image_0": {
             "path": "photo.jpg"
+        },
+        "image_1": {
+            "path": "photo.hdr"
         }
     },
     "indices": {
@@ -389,7 +392,7 @@
                 "fallOffAngle": 45,
                 "fallOffExponent": 0.15,
                 "linearAttenuation": 0,
-                "quadraticAttenuation": 0.00159997
+                "quadraticAttenuation": 0.0025
             },
             "type": "spot"
         }
@@ -397,7 +400,7 @@
     "materials": {
         "Material-effect": {
             "instanceTechnique": {
-                "technique": "technique1",
+                "technique": "technique2",
                 "values": [
                     {
                         "parameter": "ambient",
@@ -443,54 +446,6 @@
             },
             "name": "Material"
         },
-        "Material_001-effect": {
-            "instanceTechnique": {
-                "technique": "technique1",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": [
-                            0.00669618,
-                            0.0819801,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 50
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            0.25,
-                            0.25,
-                            0.25,
-                            1
-                        ]
-                    }
-                ]
-            },
-            "name": "Material_001"
-        },
         "Material_002-effect": {
             "instanceTechnique": {
                 "technique": "technique1",
@@ -534,6 +489,10 @@
                             0.5,
                             1
                         ]
+                    },
+                    {
+                        "parameter": "transparency",
+                        "value": 0.5
                     }
                 ]
             },
@@ -541,7 +500,7 @@
         },
         "Material_003-effect": {
             "instanceTechnique": {
-                "technique": "technique2",
+                "technique": "technique3",
                 "values": [
                     {
                         "parameter": "ambient",
@@ -584,7 +543,7 @@
         },
         "Material_004-effect": {
             "instanceTechnique": {
-                "technique": "technique1",
+                "technique": "technique2",
                 "values": [
                     {
                         "parameter": "ambient",
@@ -620,15 +579,63 @@
                     {
                         "parameter": "specular",
                         "value": [
-                            0.556,
-                            0.556,
-                            0.556,
+                            0.588235,
+                            0.588235,
+                            0.588235,
                             1
                         ]
                     }
                 ]
             },
             "name": "Material_004"
+        },
+        "Mirror-effect": {
+            "instanceTechnique": {
+                "technique": "technique2",
+                "values": [
+                    {
+                        "parameter": "ambient",
+                        "value": [
+                            0,
+                            0,
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "parameter": "diffuse",
+                        "value": [
+                            0.177327,
+                            0.177327,
+                            0.177327,
+                            1
+                        ]
+                    },
+                    {
+                        "parameter": "emission",
+                        "value": [
+                            0,
+                            0,
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "parameter": "shininess",
+                        "value": 49
+                    },
+                    {
+                        "parameter": "specular",
+                        "value": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ]
+                    }
+                ]
+            },
+            "name": "Mirror"
         }
     },
     "meshes": {
@@ -693,7 +700,7 @@
             "primitives": [
                 {
                     "indices": "indices_16",
-                    "material": "Material_001-effect",
+                    "material": "Material_002-effect",
                     "primitive": "TRIANGLES",
                     "semantics": {
                         "NORMAL": "attribute_20",
@@ -736,7 +743,7 @@
             "primitives": [
                 {
                     "indices": "indices_143",
-                    "material": "Material-effect",
+                    "material": "Mirror-effect",
                     "primitive": "TRIANGLES",
                     "semantics": {
                         "NORMAL": "attribute_147",
@@ -1005,6 +1012,10 @@
         "program_1": {
             "fragmentShader": "scene2FS",
             "vertexShader": "scene2VS"
+        },
+        "program_2": {
+            "fragmentShader": "scene4FS",
+            "vertexShader": "scene4VS"
         }
     },
     "samplers": {
@@ -1044,11 +1055,107 @@
         },
         "scene2VS": {
             "path": "scene2VS.glsl"
+        },
+        "scene4FS": {
+            "path": "scene4FS.glsl"
+        },
+        "scene4VS": {
+            "path": "scene4VS.glsl"
         }
     },
     "skins": {},
     "techniques": {
         "technique1": {
+            "parameters": {
+                "ambient": {
+                    "type": "FLOAT_VEC4"
+                },
+                "diffuse": {
+                    "type": "FLOAT_VEC4"
+                },
+                "emission": {
+                    "type": "FLOAT_VEC4"
+                },
+                "light0Color": {
+                    "type": "FLOAT_VEC3",
+                    "value": [
+                        2,
+                        2,
+                        2
+                    ]
+                },
+                "light0Transform": {
+                    "source": "Spot",
+                    "type": "FLOAT_MAT4"
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": "FLOAT_VEC3"
+                },
+                "normalMatrix": {
+                    "semantic": "WORLDVIEWINVERSETRANSPOSE",
+                    "type": "FLOAT_MAT3"
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": "FLOAT_VEC3"
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": "FLOAT_MAT4"
+                },
+                "shininess": {
+                    "type": "FLOAT"
+                },
+                "specular": {
+                    "type": "FLOAT_VEC4"
+                },
+                "transparency": {
+                    "type": "FLOAT"
+                },
+                "worldViewMatrix": {
+                    "semantic": "WORLDVIEW",
+                    "type": "FLOAT_MAT4"
+                }
+            },
+            "pass": "defaultPass",
+            "passes": {
+                "defaultPass": {
+                    "instanceProgram": {
+                        "attributes": {
+                            "a_normal": "normal",
+                            "a_position": "position"
+                        },
+                        "program": "program_0",
+                        "uniforms": {
+                            "u_ambient": "ambient",
+                            "u_diffuse": "diffuse",
+                            "u_emission": "emission",
+                            "u_light0Color": "light0Color",
+                            "u_light0Transform": "light0Transform",
+                            "u_normalMatrix": "normalMatrix",
+                            "u_projectionMatrix": "projectionMatrix",
+                            "u_shininess": "shininess",
+                            "u_specular": "specular",
+                            "u_transparency": "transparency",
+                            "u_worldViewMatrix": "worldViewMatrix"
+                        }
+                    },
+                    "states": {
+                        "blendEnable": true,
+                        "blendEquation": "FUNC_ADD",
+                        "blendFunc": {
+                            "dfactor": "ONE_MINUS_SRC_ALPHA",
+                            "sfactor": "SRC_ALPHA"
+                        },
+                        "cullFaceEnable": false,
+                        "depthMask": false,
+                        "depthTestEnable": true
+                    }
+                }
+            }
+        },
+        "technique2": {
             "parameters": {
                 "ambient": {
                     "type": "FLOAT_VEC4"
@@ -1106,7 +1213,7 @@
                             "a_normal": "normal",
                             "a_position": "position"
                         },
-                        "program": "program_0",
+                        "program": "program_1",
                         "uniforms": {
                             "u_ambient": "ambient",
                             "u_diffuse": "diffuse",
@@ -1129,7 +1236,7 @@
                 }
             }
         },
-        "technique2": {
+        "technique3": {
             "parameters": {
                 "ambient": {
                     "type": "FLOAT_VEC4"
@@ -1192,7 +1299,7 @@
                             "a_position": "position",
                             "a_texcoord0": "texcoord0"
                         },
-                        "program": "program_1",
+                        "program": "program_2",
                         "uniforms": {
                             "u_ambient": "ambient",
                             "u_diffuse": "diffuse",

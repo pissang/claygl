@@ -13,12 +13,13 @@ define( function( require ) {
 
             this.nodes.push(node);
 
-            this.dirty("graph");
+            this._dirty = true;
         },
 
         remove : function(node) {
             _.without(this.nodes, node);
-            this.dirty("graph");
+
+            this._dirty = true;
         },
 
         update : function() {

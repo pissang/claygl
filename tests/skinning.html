@@ -89,7 +89,8 @@
                 root.add(planeMesh);
 
                 var light = new qtek3d.light.Directional({
-                    shadowResolution : 1024
+                    shadowResolution : 1024,
+                    shadowBias : 0.006
                 });
                 light.intensity = 1.0;
                 light.position.set(6, 20, 10);

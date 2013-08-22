@@ -6,8 +6,6 @@ define(function(require) {
     var Camera = Node.derive(function() {
         return {
             projectionMatrix : new Matrix4(),
-
-            skybox : null
         }
     }, function() {
         this.update();
@@ -17,11 +15,6 @@ define(function(require) {
             Node.prototype.update.call(this, _gl);
             
             this.updateProjectionMatrix();
-            
-            if (this.skybox) {
-                this.skybox.position.copy(this.getWorldPosition());
-                this.skybox.update();
-            }
         }
     });
 

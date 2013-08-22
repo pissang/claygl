@@ -188,12 +188,12 @@ define(function(require) {
             for (var name in json.techniques) {
                 var techniqueInfo = json.techniques[name];
                 // Default phong shader
-                var shader = new Shader({
-                    vertex : Shader.source("buildin.phong.vertex"),
-                    fragment : Shader.source("buildin.phong.fragment")
-                });
+                // var shader = new Shader({
+                //     vertex : Shader.source("buildin.phong.vertex"),
+                //     fragment : Shader.source("buildin.phong.fragment")
+                // });
                 techniques[name] = {
-                    shader : shader,
+                    // shader : shader,
                     pass : techniqueInfo.passes[techniqueInfo.pass]
                 }
             }
@@ -215,7 +215,13 @@ define(function(require) {
                 });
                 var material = new Material({
                     name : materialInfo.name,
-                    shader : technique.shader
+                    // shader : technique.shader
+                    // Techniques of glTF is not classified well
+                    // So here use a shader per material
+                    shader : new Shader({
+                        vertex : Shader.source("buildin.phong.vertex"),
+                        fragment : Shader.source("buildin.phong.fragment")
+                    })
                 });
                 if (pass.states.depthMask !== undefined) {
                     material.depthMask = pass.states.depthMask;
@@ -224,9 +230,9 @@ define(function(require) {
                     material.depthTest = pass.states.depthTestEnable;
                 }
                 material.cullFace = pass.states.cullFaceEnable || false;
-                // TODO
-                if (material.blendEnable) {
+                if (pass.states.blendEnable) {
                     material.transparent = true;
+                    // TODO blend Func and blend Equation
                 }
 
                 if (uniforms['diffuse']) {
@@ -247,6 +253,9 @@ define(function(require) {
                 }
                 if (uniforms["specular"]) {
                     material.set("specular", uniforms["specular"].slice(0, 3));
+                }
+                if (uniforms["transparency"]) {
+                    material.set("alpha", uniforms["transparency"]);
                 }
 
                 materials[name] = material;
@@ -330,10 +339,7 @@ define(function(require) {
                 var material = this._materials[meshInfo.primitives[0].material];
 
                 var mesh = new Mesh({
-                    // Because the node contains this mesh will use the 
-                    // same name, so here use the key as mesh name
-                    // which has a '-mesh' postfix
-                    name : name,
+                    name : meshInfo.name,
                     geometry : geometry,
                     material : material
                 });

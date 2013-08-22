@@ -102,6 +102,8 @@ define(function(require) {
             document.removeEventListener("mousemove", bindOnce(this._mouseMove, this));
             document.removeEventListener("mouseup", bindOnce(this._mouseUp, this));
             document.removeEventListener("mouseout", bindOnce(this._mouseOut, this));
+
+            this._op = -1;
         },
 
         _mouseOut : function() {

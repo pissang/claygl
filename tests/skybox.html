@@ -61,9 +61,11 @@
                 });
                 scene.add(root);
 
-                var skybox = new qtek3d.object.Skybox();
+                var skybox = new qtek3d.plugin.Skybox({
+                    camera : camera,
+                    renderer : renderer                    
+                });
                 skybox.material.set("environmentMap", texture);
-                camera.skybox = skybox;
 
                 camera.position.set(0, 4, 5);
                 camera.lookAt( new qtek.core.Vector3(0, 0, 0) );

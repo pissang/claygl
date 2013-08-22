@@ -17,9 +17,26 @@ define(function(require) {
         
         return {
             geometry : new CubeGeometry(),
-            material : material
+            material : material,
+
+            renderer : null,
+            camera : null
         }
-    }, {
+    }, function() {
+        var skybox = this;
+        var camera = this.camera;
+        var renderer = this.renderer;
+        if (renderer) {
+            renderer.on("beforerender:opaque", function() {
+                this.renderQueue([skybox], camera, null, true);
+            });
+        }
+        if (camera) {
+            camera.on("afterupdate", function() {
+                skybox.position.copy(this.getWorldPosition());
+                skybox.update();
+            });
+        }
     });
 
     return Skybox;

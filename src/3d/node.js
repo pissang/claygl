@@ -156,9 +156,6 @@ define(function(require) {
                 this.trigger('beforeupdate', _gl);
             }
             this.updateWorldMatrix();
-            if(! silent) {
-                this.trigger('afterupdate', _gl);
-            }
             
             for(var i = 0; i < this.children.length; i++) {
                 var child = this.children[i];
@@ -166,6 +163,10 @@ define(function(require) {
                 if(child.visible) {
                     child.update(_gl);
                 }
+            }
+            
+            if(! silent) {
+                this.trigger('afterupdate', _gl);
             }
         },
 

@@ -105,7 +105,8 @@
                         bottom : -5,
                         near : 0,
                         far : 30
-                    }
+                    },
+                    shadowBias : 0.003,
                 });
                 light.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
                 scene.add(light);
@@ -120,7 +121,8 @@
                         bottom : -5,
                         near : 0,
                         far : 30
-                    }
+                    },
+                    shadowBias : 0.006
                 });
                 aidLight.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
                 scene.add(aidLight);

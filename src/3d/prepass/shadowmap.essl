@@ -232,7 +232,6 @@ float computeShadowFallOfCube(samplerCube map, vec3 direction, float range){
     #ifdef USE_VSM
         vec2 moments = shadowTex.xy;
         float variance = moments.y - moments.x * moments.x;
-        float dist = length(direction);
         float mD = moments.x - dist;
         float p = variance / (variance + mD * mD);
         if(moments.x + 0.001 < dist){
