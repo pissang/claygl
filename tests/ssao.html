@@ -1,0 +1,159 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+</head>
+<body style="margin:0px">
+    <canvas id="Main"></canvas>
+
+    <script type="text/javascript">
+        requirejs.config({
+            'baseUrl' : '../src',
+            'paths' : {
+                '_' : '../thirdparty/lodash.compat',
+                'glmatrix' : '../thirdparty/gl-matrix'
+            },
+            'shim' : {
+                '_' : {
+                    exports : '_'
+                }
+            }
+        });
+
+        require(['qtek',
+                'text!../tests/shader/ssao.essl',
+                'text!../tests/shader/fxaa.essl'], function(qtek, SSAOShader, FXAAShader) {
+            var qtek3d = qtek['3d'];
+
+            var renderer = new qtek3d.Renderer({
+                canvas : document.getElementById("Main")
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var shadowMapPass = new qtek3d.prepass.ShadowMap();
+            var compositor = new qtek3d.Compositor();
+
+            var GLTFLoader = new qtek.loader.GLTF();
+
+            GLTFLoader.load("assets/scenes/magicavoxel/castle.json");
+
+            GLTFLoader.on("load", function(scene, cameras) {
+                var camera = cameras[Object.keys(cameras)[0]];
+                if (!camera) {
+                    camera = new qtek3d.camera.Perspective({
+                        aspect : renderer.canvas.width/renderer.canvas.height,
+                        far : 500
+                    });
+
+                    camera.position.set(1, 1, 1);
+                    camera.lookAt(scene.position);
+                }
+                camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                // z up
+                control.up.set(0, 0, 1);
+                control.enable();
+
+                var light = scene.getNode("Sun-light");
+                light.shadowResolution = 1024;
+                light.shadowCamera = {
+                    left : -4,
+                    right : 4,
+                    top : 4, 
+                    bottom : -4,
+                    near : 0,
+                    far : 100
+                };
+                light.shadowBias = 0.002;
+
+                scene.add(new qtek3d.light.Ambient({
+                    intensity : 0.4
+                }));
+
+                var sceneNode = new qtek3d.compositor.SceneNode({
+                    scene : scene,
+                    camera : camera,
+                    outputs : {
+                        depth : {
+                            attachment : "DEPTH_ATTACHMENT",
+                            parameters : {
+                                format : "DEPTH_COMPONENT",
+                                type : "UNSIGNED_SHORT",
+                                width : window.innerWidth,
+                                height : window.innerHeight
+                            }
+                        },
+                        color : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : {
+                                width : window.innerWidth,
+                                height : window.innerHeight
+                            }
+                        }
+                    }
+                });
+                var SSAO = new qtek3d.compositor.Node({
+                    shader : SSAOShader,
+                    inputs : {
+                        depthTexture : {
+                            pin : "depth",
+                            node : sceneNode
+                        },
+                        renderedTexture : {
+                            pin : "color",
+                            node : sceneNode
+                        }
+                    },
+                    outputs : {
+                        color : {
+                            attachment : "COLOR_ATTACHMENT0",
+                            parameters : {
+                                width : window.innerWidth,
+                                height : window.innerHeight
+                            }
+                        }
+                    }
+                });
+                var FXAA = new qtek3d.compositor.Node({
+                    shader : FXAAShader,
+                    inputs : {
+                        texture : {
+                            pin : "color",
+                            node : SSAO
+                        }
+                    }
+                });
+                FXAA.setParameters({
+                    resolution : [1/renderer.canvas.width, 1/renderer.canvas.height]
+                })
+                SSAO.setParameters({
+                    znear : camera.near,
+                    zfar : camera.far,
+                    renderedTextureWidth : window.innerWidth,
+                    renderedTextureHeight : window.innerHeight,
+                    radius : 4.0,
+                    lumInfluence : 0.6
+                });
+                compositor.add(sceneNode);
+                compositor.add(SSAO);
+                compositor.add(FXAA);
+
+                // SSAO.pass.material.shader.define("fragment", "OUTPUT_AO");
+
+                var mat = qtek3d.Material.getMaterial("Material");
+                mat.set("color", [0.7, 0.9, 0.3]);
+
+                setInterval(function() {
+                    shadowMapPass.render(renderer, scene);
+                    compositor.render(renderer);
+                }, 50)
+            });
+        });
+    </script>
+</body>
+</html>

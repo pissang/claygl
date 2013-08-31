@@ -48,7 +48,7 @@ define(function(require) {
                 u = i / widthSegments;
                 v = j / heightSegments;
 
-                x = - radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
+                x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
                 y = radius * Math.cos(thetaStart + v * thetaLength);
                 z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
 

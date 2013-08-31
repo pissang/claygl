@@ -111,7 +111,9 @@ define(function(require) {
                 _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl[this.hint]);
             }
         },
+        convertToGeometry : function() {
 
+        },
         dispose : function() {
 
         }

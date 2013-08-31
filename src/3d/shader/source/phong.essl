@@ -86,7 +86,12 @@ uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
+
+#ifdef SPHERE_ENVIRONMENT_MAPPING
+uniform sampler2D environmentMap;
+#else
 uniform samplerCube environmentMap;
+#endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
@@ -283,8 +288,12 @@ void main(){
     finalColor.rgb += specularColor;
 
     #ifdef ENVIRONMENTMAP_ENABLED
-        vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
-        finalColor.rgb = finalColor.rgb + envTex * reflectivity;
+        #ifdef SPHERE_ENVIRONMENT_MAPPING
+            // Blinn and Newell's Method
+        #else
+            vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+            finalColor.rgb = finalColor.rgb + envTex * reflectivity;
+        #endif
     #endif
 
     if( lineWidth > 0.01){

@@ -21,8 +21,8 @@ define(function(require) {
         
         return {
             geometry : new SphereGeometry({
-                widthSegments : 50,
-                heightSegments : 50,
+                widthSegments : 30,
+                heightSegments : 30,
                 // thetaLength : Math.PI / 2
             }),
             material : material,

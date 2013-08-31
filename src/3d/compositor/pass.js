@@ -28,7 +28,7 @@ define(function(require) {
 
             outputs : null,
 
-            _material : null
+            material : null
 
         }
     }, function() {
@@ -42,13 +42,13 @@ define(function(require) {
         });
         shader.enableTexturesAll();
 
-        this._material = material;
+        this.material = material;
 
     }, {
 
         setUniform : function(name, value) {
             
-            var uniform = this._material.uniforms[name];
+            var uniform = this.material.uniforms[name];
             if (uniform) {
                 uniform.value = value;
             } else {
@@ -75,7 +75,7 @@ define(function(require) {
 
             var _gl = renderer.gl;
 
-            mesh.material = this._material;
+            mesh.material = this.material;
 
             if (frameBuffer) {
                 this.bind(renderer, frameBuffer);

@@ -41,12 +41,12 @@
                 if (!camera) {
                     camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
+                        far : 100
                     });
 
-                    camera.position.set(1, 1, 1);
-                    camera.lookAt(scene.position);
+                    camera.position.set(0, 0, 10);
                 }
+                camera.lookAt(scene.position);
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
                 var control = new qtek3d.plugin.OrbitControl({
@@ -55,16 +55,17 @@
                     sensitivity : 0.4
                 });
                 // z up
-                control.up.set(0, 0, 1);
+                // control.up.set(0, 0, 1);
                 control.enable();
 
-                var light = scene.getNode("Spot-light");
-                light.lookAt(scene.position);
+                var light = scene.getNode("Spot").children[0];
                 light.range = 30;
                 light.umbraAngle = 10;
                 light.penumbraAngle = 25;
                 light.shadowResolution = 1024;
 
+                scene.getNode("Spot").lookAt(scene.position)
+                
                 setInterval(function() {
                     shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
