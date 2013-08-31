@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+</head>
+<body style="margin:0px">
+    <canvas id="Main"></canvas>
+
+    <script type="text/javascript">
+        requirejs.config({
+            'baseUrl' : '../src',
+            'paths' : {
+                '_' : '../thirdparty/lodash.compat',
+                'glmatrix' : '../thirdparty/gl-matrix'
+            },
+            'shim' : {
+                '_' : {
+                    exports : '_'
+                }
+            }
+        });
+
+        require(['qtek'], function(qtek) {
+            var qtek3d = qtek['3d'];
+
+            var renderer = new qtek3d.Renderer({
+                canvas : document.getElementById("Main")
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var shadowMapPass = new qtek3d.prepass.ShadowMap({
+                // useVSM : true
+            });
+
+            var GLTFLoader = new qtek.loader.GLTF();
+
+            GLTFLoader.load("assets/scenes/fbx/Robot Kyle.json");
+
+            GLTFLoader.on("load", function(scene, cameras) {
+                var camera = cameras[Object.keys(cameras)[0]];
+
+                camera = new qtek3d.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 100
+                });
+
+                camera.position.set(0, 4, 10);
+                camera.lookAt(new qtek.core.Vector3(0, 4, 0));
+
+                camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    camera : camera,
+                    canvas : renderer.canvas,
+                    sensitivity : 0.4
+                });
+                // z up
+                control.enable();
+
+                scene.scale.set(0.1, 0.1, 0.1)
+
+                light = new qtek3d.light.Directional({
+                })
+                light.position.set(1, 1, 1)
+                light.lookAt(scene.position)
+                scene.add(light)
+
+                scene.add(new qtek3d.light.Ambient({
+                    intensity : 0.4
+                }))
+                
+                setInterval(function() {
+                    // shadowMapPass.render(renderer, scene);
+                    renderer.render(scene, camera);
+                }, 50)
+            });
+        });
+    </script>
+</body>
+</html>

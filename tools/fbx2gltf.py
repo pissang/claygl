@@ -116,7 +116,6 @@ def CreateGLTFMesh(pName):
     return {'name' : pName, 'primitives' : []}
 
 # PENDING : Hash mechanism may be different from COLLADA2GLTF
-# TODO Transparent PNG ?
 # TODO Cull face
 # TODO Blending equation and function
 def HashTechnique(pMaterial):
@@ -189,7 +188,7 @@ def CreateTechnique(pMaterial):
 
 #PENDING Use base name as key ?
 def CreateImage(pPath):
-    lImageKey = [img.path for img in lib_images if img.path == pPath]
+    lImageKey = [img['path'] for img in lib_images.values() if img['path'] == pPath]
     if len(lImageKey):
         return lImageKey[0]
         
@@ -343,8 +342,7 @@ def ConvertVertexLayer(pMesh, pLayer, pOutput):
 
     if lMappingMode == FbxLayerElement.eByControlPoint:
         if lReferenceMode == FbxLayerElement.eDirect:
-            lDirectArray = pLayer.GetDirectArray()
-            for vec in lDirectArray:
+            for vec in pLayer.GetDirectArray():
                 pOutput.append(vec)
         elif lReferenceMode == FbxLayerElement.eIndexToDirect:
             lIndexArray = pLayer.GetIndexArray()
@@ -355,7 +353,8 @@ def ConvertVertexLayer(pMesh, pLayer, pOutput):
         return False
     elif lMappingMode == FbxLayerElement.eByPolygonVertex:
         if lReferenceMode == FbxLayerElement.eDirect:
-            print("oops")
+            for vec in pLayer.GetDirectArray():
+                pOutput.append(vec)
         # Need to split vertex
         # TODO: Normal per vertex will still have ByPolygonVertex in COLLADA
         elif lReferenceMode == FbxLayerElement.eIndexToDirect:
@@ -544,7 +543,7 @@ def TraverseSceneNode(pNode):
         elif lNodeAttribute.__class__ == FbxLight:
             lLightKey = ConvertLight(lNodeAttribute)
             lGLTFNode['lights'] = [lLightKey]
-        
+
     lGLTFNode['children'] = []
     for i in range(pNode.GetChildCount()):
         lChildNodeName = TraverseSceneNode(pNode.GetChild(i))
@@ -556,6 +555,9 @@ def TraverseScene(pScene):
     lRoot = pScene.GetRootNode()
 
     lSceneName = pScene.GetName()
+    if lSceneName == "":
+        lSceneName = "scene_" + str(len(lib_scenes.keys()))
+
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
     for i in range(lRoot.GetChildCount()):
         lNodeName = TraverseSceneNode(lRoot.GetChild(i))
