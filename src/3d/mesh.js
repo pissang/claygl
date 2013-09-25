@@ -25,7 +25,12 @@ define(function(require) {
             castShadow : true,
 
             // Skinned Mesh
-            skeleton : null
+            skeleton : null,
+            // Joints indices
+            // Meshes can share the one skeleton instance
+            // and each mesh can use one part of joints
+            // Joints indeces indicate the index of joint in the skeleton instance
+            joints : []
         }
     }, {
 
@@ -43,7 +48,7 @@ define(function(require) {
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
-                var invMatricesArray = this.skeleton.getInvBindMatricesArray();
+                var invMatricesArray = this.skeleton.getSubInvBindMatrices(this.__GUID__, this.joints);
                 shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
             }
             // Draw each chunk

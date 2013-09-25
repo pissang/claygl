@@ -773,6 +773,19 @@ define(function(require) {
             return shader;
         },
 
+        clone : function() {
+            var shader = new Shader({
+                vertex : this.vertex,
+                fragment : this.fragment,
+                vertexDefines : Object.create(this.vertexDefines),
+                fragmentDefines : Object.create(this.fragmentDefines)
+            });
+            for (var name in this._textureStatus) {
+                shader._textureStatus[name] = Object.create(this._textureStatus[name]);
+            }
+            return shader;
+        },
+
         dispose : function() {
             
         }

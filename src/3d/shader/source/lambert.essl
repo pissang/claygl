@@ -20,7 +20,7 @@ attribute vec3 barycentric;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 invBindMatrix[ BONE_MATRICES_NUMBER ] : INV_BIND_MATRIX;
+uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
 #endif
 
 varying vec2 v_Texcoord;

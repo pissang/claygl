@@ -39,7 +39,9 @@ define(function(require) {
     var semanticAttributeMap = {
         'NORMAL' : 'normal',
         'POSITION' : 'position',
-        'TEXCOORD_0' : 'texcoord0'
+        'TEXCOORD_0' : 'texcoord0',
+        'WEIGHT' : 'weight',
+        'JOINT' : 'joint'
     }
 
     var Loader = Base.derive(function() {
@@ -52,6 +54,10 @@ define(function(require) {
             _materials : {},
             _textures : {},
             _meshes : {},
+
+            _joints : {},
+            _skins : {},
+            _skeleton : null,
 
             _cameras : {},
             _nodes : {}
@@ -74,8 +80,8 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    self.parse(JSON.parse(data), function(scene, cameras) {
-                        self.trigger("load", scene, cameras);
+                    self.parse(JSON.parse(data), function(scene, cameras, skeleton) {
+                        self.trigger("load", scene, cameras, skeleton);
                     });
                 }
             })
@@ -104,22 +110,25 @@ define(function(require) {
             this._buffers = buffers;
 
             function afterLoadBuffer() {
+                self._parseSkins(json);
                 self._parseTextures(json);
                 self._parseMaterials(json);
                 self._parseMeshes(json);
-
                 self._parseNodes(json);
 
-                //Build scene
+                // Build scene
                 var scene = new Scene();
                 var sceneInfo = json.scenes[json.scene];
-
                 for (var i = 0; i < sceneInfo.nodes.length; i++) {
+                    if (self._joints[sceneInfo.nodes[i]]) {
+                        // Skip joint node
+                        continue;
+                    }
                     var node = self._nodes[sceneInfo.nodes[i]];
                     scene.add(node);
                 }
 
-                callback && callback(scene, self._cameras);
+                callback && callback(scene, self._cameras, self._skeleton);
             }
 
         },
@@ -141,6 +150,70 @@ define(function(require) {
             });
         },
 
+         _parseSkins : function(json) {
+            var self = this;
+            // Build skeleton
+            var skeleton = new Skeleton();
+            var rootJoints = {};
+
+            var createJoint = function(nodeName, parentIndex) {
+                // Have been created
+                if (self._joints[nodeName]) {
+                    return;
+                }
+                var nodeInfo = json.nodes[nodeName];
+                nodeInfo._isJoint = true;
+                // Cast node to joint
+                var joint = new Joint();
+                if (nodeInfo.matrix) {
+                    for (var i = 0; i < 16; i++) {
+                        joint.matrix._array[i] = nodeInfo.matrix[i];
+                    }
+                    joint.decomposeMatrix();
+                }
+
+                joint.index = skeleton.joints.length;
+                joint.parentIndex = parentIndex;
+
+                skeleton.joints.push(joint);
+                self._joints[nodeName] = joint;
+                
+                for (var i = 0; i < nodeInfo.children.length; i++) {
+                    var child = createJoint(nodeInfo.children[i], joint.index);
+                    if (child) {
+                        joint.add(child);
+                    }
+                }
+                return joint;
+            }
+
+            for (var name in json.skins) {
+                var skinInfo = json.skins[name]
+                for (var i = 0; i < skinInfo.roots.length; i++) {
+                    var rootJointName = skinInfo.roots[i];
+                    var rootJoint = createJoint(rootJointName);
+                    if (rootJoint) {
+                        skeleton.roots.push(rootJoint);
+                    }
+                }
+            }
+
+            for (var name in json.skins) {
+                var skinInfo = json.skins[name];
+                var jointIndices = [];
+                for (var i = 0; i < skinInfo.joints.length; i++) {
+                    var joint = self._joints[skinInfo.joints[i]];
+                    jointIndices.push(joint.index);
+                }
+                this._skins[name] = {
+                    joints : jointIndices
+                }
+            }
+            skeleton.updateJointMatrices();
+            skeleton.update();
+            this._skeleton = skeleton;
+        },
+
         _parseTextures : function(json) {
             var textures = {};
             _.each(json.textures, function(textureInfo, name){
@@ -160,7 +233,7 @@ define(function(require) {
                 } else if(textureInfo.target === "TEXTURE_CUBE_MAP") {
                     // TODO
                 }
-            }, this)
+            }, this);
             this._textures = textures;
             return textures;
         },
@@ -334,15 +407,24 @@ define(function(require) {
                 }
 
                 // Material
-                // Support all primitives have the same material
+                // All primitives have the same material and skin
                 // TODO;
                 var material = this._materials[meshInfo.primitives[0].material];
-
                 var mesh = new Mesh({
-                    name : meshInfo.name,
                     geometry : geometry,
                     material : material
                 });
+                if (meshInfo.name) {
+                    mesh.name = meshInfo.name;
+                }
+                var skinName = meshInfo.primitives[0].skin
+                if (skinName) {
+                    mesh.joints = this._skins[skinName].joints;
+                    mesh.skeleton = this._skeleton;
+                    material.shader = material.shader.clone();
+                    material.shader.define('vertex', 'SKINNING');
+                    material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
+                }
 
                 meshes[name] = mesh;
             }
@@ -355,6 +437,10 @@ define(function(require) {
 
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
+                if (nodeInfo._isJoint) {
+                    // Skip joint node
+                    continue;
+                }
                 var node;
                 if (nodeInfo.camera) {
                     var cameraInfo = json.cameras[nodeInfo.camera];
@@ -408,13 +494,17 @@ define(function(require) {
             // Build hierarchy
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
+                if (nodeInfo._isJoint) {
+                    // Skip joint node
+                    continue;
+                }
                 var node = nodes[name];
                 if (nodeInfo.children) {
                     for (var i = 0; i < nodeInfo.children.length; i++) {
                         var childName = nodeInfo.children[i];
                         var child = nodes[childName];
                         node.add(child);
-                    }       
+                    }
                 }
             }
 

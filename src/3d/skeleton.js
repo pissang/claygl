@@ -18,11 +18,9 @@ define(function(require) {
             // still in model space not world space
             _invBindMatrices : [],
 
-            _invBindMatricesArray : null
+            _invBindMatricesArray : null,
+            _subInvBindMatricesArray : {}
         }
-    }, function() {
-        this.updateHierarchy();
-        this.updateJointMatrices();
     }, {
 
         updateHierarchy : function() {
@@ -54,7 +52,9 @@ define(function(require) {
             for (var i = 0; i < this.roots.length; i++) {
                 this.roots[i].update();
             }
-            var invBindMatricesArray = this.getInvBindMatricesArray();
+            if (! this._invBindMatricesArray) {
+                this._invBindMatricesArray = new Float32Array(this.joints.length * 16);
+            }
             var cursor = 0;
             for (var i = 0; i < this.joints.length; i++) {
                 var matrixCurrentPose = this.joints[i].worldMatrix;
@@ -62,16 +62,26 @@ define(function(require) {
 
                 for (var j = 0; j < 16; j++) {
                     var array = this._invBindMatrices[i]._array;
-                    invBindMatricesArray[cursor++] = array[j];
+                    this._invBindMatricesArray[cursor++] = array[j];
                 }
             }
         },
 
-        getInvBindMatricesArray : function() {
-            if (! this._invBindMatricesArray) {
-                this._invBindMatricesArray = new Float32Array(this.joints.length * 16);
+        getSubInvBindMatrices : function(meshId, joints) {
+            var subArray = this._subInvBindMatricesArray[meshId]
+            if (!subArray) {
+                subArray 
+                    = this._subInvBindMatricesArray[meshId]
+                    = new Float32Array(joints.length * 16);
             }
-            return this._invBindMatricesArray;
+            var cursor = 0;
+            for (var i = 0; i < joints.length; i++) {
+                var idx = joints[i];
+                for (var j = 0; j < 16; j++) {
+                    subArray[cursor++] = this._invBindMatricesArray[idx * 16 + j];
+                }
+            }
+            return subArray;
         },
 
         setPose : function(time) {

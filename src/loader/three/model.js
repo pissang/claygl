@@ -91,8 +91,12 @@ define(function(require) {
                         geometry : geometryList[i],
                         material : material
                     }) ;
-                    if ( skinned) {
+                    if (skinned) {
                         mesh.skeleton = skeleton;
+                        for (var i = 0; i < skeleton.joints.length; i++) {
+                            // Use all the joints of skeleton
+                            mesh.joints[i] = i;
+                        }
                     }
                     meshList.push(mesh);
                 }
@@ -402,6 +406,8 @@ define(function(require) {
             var skeleton = new Skeleton({
                 joints : joints
             });
+            skeleton.updateHierarchy();
+            skeleton.updateJointMatrices();
             skeleton.update();
 
             if (data.animation) {
@@ -457,7 +463,7 @@ define(function(require) {
                     shader.enableTexture(enabledTextures[i]);
                 }
                 shader.define('vertex', "SKINNING");
-                shader.define('vertex', "BONE_MATRICES_NUMBER", jointNumber);
+                shader.define('vertex', "JOINT_NUMBER", jointNumber);
             }
 
             var material = new Material({

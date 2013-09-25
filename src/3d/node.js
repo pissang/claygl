@@ -84,12 +84,13 @@ define(function(require) {
             }
         },
 
-        traverse : function(callback) {
-            var stopTraverse = callback && callback(this);
+        // pre-order traverse
+        traverse : function(callback, parent) {
+            var stopTraverse = callback && callback(this, parent);
             if(! stopTraverse) {
                 var children = this.children;
                 for(var i = 0, len = children.length; i < len; i++) {
-                    children[i].traverse(callback);
+                    children[i].traverse(callback, this);
                 }
             }
         },

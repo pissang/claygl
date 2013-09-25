@@ -25,6 +25,9 @@ lib_buffer_views = {}
 lib_buffers = {}
 lib_scenes = {}
 
+lib_skins = {}
+lib_joints = {}
+
 # FbxConverter
 converter = None
 
@@ -112,8 +115,6 @@ def CreateIndicesBuffer(pList):
 
     return lKey
 
-def CreateGLTFMesh(pName):
-    return {'name' : pName, 'primitives' : []}
 
 # PENDING : Hash mechanism may be different from COLLADA2GLTF
 # TODO Cull face
@@ -367,15 +368,33 @@ def ConvertVertexLayer(pMesh, pLayer, pOutput):
 
         return True
 
+def CreateSkin():
+    lSkinName = "skin_" + str(len(lib_skins.keys()))
+    # https://github.com/KhronosGroup/glTF/issues/100
+    lib_skins[lSkinName] = {
+        # 'bindShapeMatrix' : [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        'bindShapeMatrix' : [],
+        'inverseBindMatrices' : {},
+        'joints' : [],
+        'roots' : []
+    }
+
+    return lSkinName
+
 def ConvertMesh(pMesh, pNode):
     lGLTFPrimitive = {}
     lPositions = []
     lNormals = []
     lTexcoords = []
     lIndices = []
+
+    lWeights = []
+    lJoints = []
+    # Count joint number of each vertex
+    lJointCounts = []
+
     # Only consider layer 0
     lLayer = pMesh.GetLayer(0)
-
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
@@ -399,10 +418,53 @@ def ConvertMesh(pMesh, pNode):
             lUVSPlitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
         else:
             lUVSPlitted = False
+
+        hasSkin = False;
+        ## Handle Skinning data
+        if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
+            hasSkin = True;
+            lControlPointsCount = pMesh.GetControlPointsCount()
+            for i in range(lControlPointsCount):
+                lWeights.append([0, 0, 0, 0])
+                lJoints.append([-1, -1, -1, -1])
+                lJointCounts.append(0)
+
+            for i in range(pMesh.GetDeformerCount(FbxDeformer.eSkin)):
+                lDeformer = pMesh.GetDeformer(i, FbxDeformer.eSkin)
+                lGLTFSkinName = CreateSkin()
+                lGLTFSkin = lib_skins[lGLTFSkinName]
+                # Put instance skin in primitive
+                # Because eache primitive is a single draw call. So it is necessary to put skin and 
+                # vertex data(jointIndices) in one primitive to keep the joint indices consistent
+                # PENDING in https://github.com/KhronosGroup/glTF/issues/100 put the instanceSkin in node
+                lGLTFPrimitive['skin'] = lGLTFSkinName
+
+                for i2 in range(lDeformer.GetClusterCount()):
+                    lCluster = lDeformer.GetCluster(i2)
+                    lLink = lCluster.GetLink()
+                    lGLTFSkin['joints'].append(lLink.GetName())
+                    if (lLink.GetNodeAttribute().IsSkeletonRoot()):
+                        lGLTFSkin['roots'].append(lLink.GetName())
+                    lControlPointIndices = lCluster.GetControlPointIndices()
+                    lControlPointWeights = lCluster.GetControlPointWeights()
+                    for i3 in range(lCluster.GetControlPointIndicesCount()):
+                        lControlPointIndex = lControlPointIndices[i3]
+                        lControlPointWeight = lControlPointWeights[i3]
+                        lJointCount = lJointCounts[lControlPointIndex]
+                        # At most binding four joint per vertex
+                        if lJointCount <= 3:
+                            # Joint index
+                            lJoints[lControlPointIndex][lJointCount] = i2
+                            # Joint weight
+                            lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
+                            lJointCounts[lControlPointIndex] += 1
+
         if lNormalSplitted or lUVSPlitted:
             lCount = 0
             lNormalsTmp = []
             lTexcoordsTmp = []
+            lJointsTmp = []
+            lWeightsTmp = []
             for idx in pMesh.GetPolygonVertices():
                 lPositions.append(pMesh.GetControlPointAt(idx))
                 if not lNormalSplitted:
@@ -410,13 +472,19 @@ def ConvertMesh(pMesh, pNode):
                     lNormalsTmp.append(lNormals[idx])
                 if not lUVSPlitted:
                     # Split uv data
-                    lTexcoordsTmp.append(lNormals[idx])
+                    lTexcoordsTmp.append(lTexcoords[idx])
+                if hasSkin:
+                    lJointsTmp.append(lJoints[idx])
+                    lWeightsTmp.append(lWeights[idx])
                 lIndices.append(lCount)
-                lCount+=1
+                lCount += 1
             if not lNormalSplitted:
                 lNormals = lNormalsTmp
             if not lUVSPlitted:
                 lTexcoords = lTexcoordsTmp
+            if hasSkin:
+                lWeights = lWeightsTmp
+                lJoints = lJointsTmp
         else:
             lIndices = pMesh.GetPolygonVertices()
             lPositions = pMesh.GetControlPoints()
@@ -426,6 +494,10 @@ def ConvertMesh(pMesh, pNode):
         lGLTFPrimitive['semantics']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
         if not lLayerUV == None:
             lGLTFPrimitive['semantics']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
+        if hasSkin:
+            # PENDING Joint indices use other data type ?
+            lGLTFPrimitive['semantics']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)
+            lGLTFPrimitive['semantics']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 4)
 
         lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices)
 
@@ -495,12 +567,22 @@ def ConvertCamera(pCamera):
     lGLTFCamera['zfar'] = pCamera.FarPlane.Get()
 
     # In fbx camera's name is empty ?
-    if pCamera.GetName() == "":
+    if pCamera.GetName() == '':
         lCameraName = 'camera_' + str(len(lib_cameras.keys()))
     else:
         lCameraName = pCamera.GetName() + '-camera'
     lib_cameras[lCameraName] = lGLTFCamera
     return lCameraName
+
+def FindSkeletonNodes(pNode):
+    lAttribute = pNode.GetNodeAttribute()
+    lAttributeType = lAttribute.GetAttributeType()
+    lNodeName = pNode.GetName()
+    if lAttributeType == FbxNodeAttribute.eSkeleton:
+        lib_joints[lNodeName] = pNode
+
+    for i in range(pNode.GetChildCount()):
+        FindSkeletonNodes(pNode.GetChild(i))
 
 def TraverseSceneNode(pNode):
     lGLTFNode = {}
@@ -521,7 +603,10 @@ def TraverseSceneNode(pNode):
     if lGeometry:
         lMeshKey = lNodeName + '-mesh'
         lMeshName = lGeometry.GetName()
-        lGLTFMesh = lib_meshes[lMeshKey] = CreateGLTFMesh(lMeshName)
+        if lMeshName == '':
+            lMeshName = lMeshKey
+
+        lGLTFMesh = lib_meshes[lMeshKey] = {'name' : lMeshName, 'primitives' : []}
 
         lGeometry = converter.Triangulate(lGeometry, True)
         lResult = converter.SplitMeshPerMaterial(lGeometry, True)
@@ -537,10 +622,11 @@ def TraverseSceneNode(pNode):
     else:
         # Camera and light node attribute
         lNodeAttribute = pNode.GetNodeAttribute()
-        if lNodeAttribute.__class__ == FbxCamera:
+        lAttributeType = lNodeAttribute.GetAttributeType()
+        if lAttributeType == FbxNodeAttribute.eCamera:
             lCameraKey = ConvertCamera(lNodeAttribute)
             lGLTFNode['camera'] = lCameraKey
-        elif lNodeAttribute.__class__ == FbxLight:
+        elif lAttributeType == FbxNodeAttribute.eLight:
             lLightKey = ConvertLight(lNodeAttribute)
             lGLTFNode['lights'] = [lLightKey]
 
@@ -559,9 +645,15 @@ def TraverseScene(pScene):
         lSceneName = "scene_" + str(len(lib_scenes.keys()))
 
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
+
+    for i in range(lRoot.GetChildCount()):
+        FindSkeletonNodes(lRoot.GetChild(i))
+
     for i in range(lRoot.GetChildCount()):
         lNodeName = TraverseSceneNode(lRoot.GetChild(i))
-        lGLTFScene['nodes'].append(lNodeName)
+        # Node is not a joint
+        if lNodeName not in lib_joints:
+            lGLTFScene['nodes'].append(lNodeName)
 
     return lSceneName
 
@@ -657,6 +749,7 @@ if __name__ == "__main__":
             'lights' : lib_lights,
             'scenes' : lib_scenes,
             'meshes' : lib_meshes,
+            'skins' : lib_skins,
             #Default scene
             'scene' : lSceneName
         }

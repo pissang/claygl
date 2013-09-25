@@ -91,7 +91,7 @@ define(function(require) {
                                 })
                             });
                             mesh._depthMaterial.shader.define('vertex', 'SKINNING');
-                            mesh._depthMaterial.shader.define('vertex', 'BONE_MATRICES_NUMBER', mesh.skeleton.getBoneNumber());
+                            mesh._depthMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.skeleton.getBoneNumber());
                         } else {
                             mesh._depthMaterial = this._depthMaterial;
                         }
@@ -123,7 +123,7 @@ define(function(require) {
                                 })
                             });
                             mesh._distanceMaterial.shader.define('vertex', 'SKINNING');
-                            mesh._distanceMaterial.shader.define('vertex', 'BONE_MATRICES_NUMBER', mesh.skeleton.getBoneNumber());
+                            mesh._distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.skeleton.getBoneNumber());
                         } else {
                             mesh._distanceMaterial = this._distanceMaterial;
                         }
