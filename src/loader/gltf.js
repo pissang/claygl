@@ -17,7 +17,7 @@ define(function(require) {
     var TextureCube = require("3d/texture/texturecube");
     var shaderLibrary = require("3d/shader/library");
     var Skeleton = require("3d/skeleton");
-    var Bone = require("3d/bone");
+    var Joint = require("3d/joint");
     var PerspectiveCamera = require("3d/camera/perspective");
     var OrthographicCamera = require("3d/camera/orthographic");
     var PointLight = require("3d/light/point");

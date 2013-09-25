@@ -33,7 +33,7 @@ define(function(require) {
 
             var _gl = renderer.gl;
 
-            this.trigger('beforerender', _gl);
+            this.trigger('beforerender', this, _gl);
             
             var material = globalMaterial || this.material;
             var shader = material.shader;
@@ -43,8 +43,8 @@ define(function(require) {
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
-                var skinMatricesArray = this.skeleton.getBoneMatricesArray();
-                shader.setUniform(_gl, "m4v", "boneMatrices", skinMatricesArray);
+                var invMatricesArray = this.skeleton.getInvBindMatricesArray();
+                shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
             }
             // Draw each chunk
             var chunks = geometry.getBufferChunks(_gl);
@@ -98,7 +98,7 @@ define(function(require) {
                 // vertexNumber : geometry.getVerticesNumber(),
                 // drawcallNumber : chunks.length
             };
-            this.trigger('afterrender', _gl, drawInfo);
+            this.trigger('afterrender', this, _gl, drawInfo);
 
             return drawInfo;
         }

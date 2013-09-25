@@ -17,10 +17,10 @@ attribute vec3 normal : NORMAL;
 attribute vec3 barycentric;
 
 #ifdef SKINNING
-attribute vec3 boneWeight;
-attribute vec4 boneIndex;
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
 
-uniform mat4 boneMatrices[ BONE_MATRICES_NUMBER ];
+uniform mat4 invBindMatrix[ BONE_MATRICES_NUMBER ] : INV_BIND_MATRIX;
 #endif
 
 varying vec2 v_Texcoord;
@@ -32,22 +32,23 @@ void main(){
 
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
+
     #ifdef SKINNING
         mat4 skinMatrix;
-        if(boneIndex.x >= 0.0){
-            skinMatrix = boneMatrices[int(boneIndex.x)] * boneWeight.x;
+        if (joint.x >= 0.0){
+            skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
         }
-        if(boneIndex.y >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.y)] * boneWeight.y;
+        if (joint.y >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
         }
-        if(boneIndex.z >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.z)] * boneWeight.z;
+        if (joint.z >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
         }
-        if(boneIndex.w >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.w)] * (1.0-boneWeight.x-boneWeight.y-boneWeight.z);
+        if (joint.w >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
         }
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
-
+        // Normal matrix ???
         skinnedNormal = (skinMatrix * vec4(normal, 0.0)).xyz;
     #endif
 
@@ -123,9 +124,9 @@ void main(){
     // Compute point light color
     #ifdef POINT_LIGHT_NUMBER
         #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-            float shadowFallOffs[POINT_LIGHT_NUMBER];
+            float shadowContribs[POINT_LIGHT_NUMBER];
             if( shadowEnabled ){
-                computeShadowFallOfPointLights( v_WorldPosition, shadowFallOffs );
+                computeShadowOfPointLights( v_WorldPosition, shadowContribs );
             }
         #endif
         for(int i = 0; i < POINT_LIGHT_NUMBER; i++){
@@ -145,21 +146,21 @@ void main(){
 
             float ndl = dot( v_Normal, lightDirection );
 
-            float shadowFallOff = 1.0;
+            float shadowContrib = 1.0;
             #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
                 if( shadowEnabled ){
-                    shadowFallOff = shadowFallOffs[i];
+                    shadowContrib = shadowContribs[i];
                 }
             #endif
 
-            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowFallOff;
+            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;
         }
     #endif
     #ifdef DIRECTIONAL_LIGHT_NUMBER
         #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-            float shadowFallOffs[DIRECTIONAL_LIGHT_NUMBER];
+            float shadowContribs[DIRECTIONAL_LIGHT_NUMBER];
             if(shadowEnabled){
-                computeShadowFallOfDirectionalLights( v_WorldPosition, shadowFallOffs );
+                computeShadowOfDirectionalLights( v_WorldPosition, shadowContribs );
             }
         #endif
         for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++){
@@ -168,22 +169,22 @@ void main(){
             
             float ndl = dot( v_Normal, normalize( lightDirection ) );
 
-            float shadowFallOff = 1.0;
+            float shadowContrib = 1.0;
             #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
                 if( shadowEnabled ){
-                    shadowFallOff = shadowFallOffs[i];
+                    shadowContrib = shadowContribs[i];
                 }
             #endif
 
-            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowFallOff;
+            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;
         }
     #endif
     
     #ifdef SPOT_LIGHT_NUMBER
         #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-            float shadowFallOffs[SPOT_LIGHT_NUMBER];
+            float shadowContribs[SPOT_LIGHT_NUMBER];
             if( shadowEnabled ){
-                computeShadowFallOfSpotLights( v_WorldPosition, shadowFallOffs );
+                computeShadowOfSpotLights( v_WorldPosition, shadowContribs );
             }
         #endif
         for(int i = 0; i < SPOT_LIGHT_NUMBER; i++){
@@ -212,14 +213,14 @@ void main(){
             float ndl = dot(v_Normal, lightDirection);
             ndl = clamp(ndl, 0.0, 1.0);
 
-            float shadowFallOff = 1.0;
+            float shadowContrib = 1.0;
             #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
                 if( shadowEnabled ){
-                    shadowFallOff = shadowFallOffs[i];
+                    shadowContrib = shadowContribs[i];
                 }
             #endif
 
-            diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowFallOff;
+            diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
 
         }
     #endif

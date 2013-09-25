@@ -5,9 +5,9 @@ define(function(require) {
 
     var Skeleton = Base.derive(function() {
         return {
-            // Root bones
+            // Root joints
             roots : [],
-            bones : [],
+            joints : [],
             // Poses stored in arrays
 
             // Matrix to joint space(inverse of indentity bone world matrix)
@@ -16,9 +16,9 @@ define(function(require) {
             // jointMatrix * currentPoseMatrix
             // worldMatrix is relative to the root bone
             // still in model space not world space
-            _boneMatrices : [],
+            _invBindMatrices : [],
 
-            _boneMatricesArray : null
+            _invBindMatricesArray : null
         }
     }, function() {
         this.updateHierarchy();
@@ -27,11 +27,11 @@ define(function(require) {
 
         updateHierarchy : function() {
             this.roots = [];
-            var bones = this.bones;
-            for (var i = 0; i < bones.length; i++) {
-                var bone = bones[i];
+            var joints = this.joints;
+            for (var i = 0; i < joints.length; i++) {
+                var bone = joints[i];
                 if (bone.parentIndex >= 0) {
-                    var parent = bones[bone.parentIndex];
+                    var parent = joints[bone.parentIndex];
                     parent.add(bone);
                 }else{
                     this.roots.push(bone);
@@ -43,10 +43,10 @@ define(function(require) {
             for (var i = 0; i < this.roots.length; i++) {
                 this.roots[i].update();
             }
-            for (var i = 0; i < this.bones.length; i++) {
-                var bone = this.bones[i];
+            for (var i = 0; i < this.joints.length; i++) {
+                var bone = this.joints[i];
                 this._jointMatrices[i] = (new Matrix4()).copy(bone.worldMatrix).invert();
-                this._boneMatrices[i] = new Matrix4();
+                this._invBindMatrices[i] = new Matrix4();
             }
         },
 
@@ -54,42 +54,42 @@ define(function(require) {
             for (var i = 0; i < this.roots.length; i++) {
                 this.roots[i].update();
             }
-            var boneMatricesArray = this.getBoneMatricesArray();
+            var invBindMatricesArray = this.getInvBindMatricesArray();
             var cursor = 0;
-            for (var i = 0; i < this.bones.length; i++) {
-                var matrixCurrentPose = this.bones[i].worldMatrix;
-                this._boneMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
+            for (var i = 0; i < this.joints.length; i++) {
+                var matrixCurrentPose = this.joints[i].worldMatrix;
+                this._invBindMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
 
                 for (var j = 0; j < 16; j++) {
-                    var array = this._boneMatrices[i]._array;
-                    boneMatricesArray[cursor++] = array[j];
+                    var array = this._invBindMatrices[i]._array;
+                    invBindMatricesArray[cursor++] = array[j];
                 }
             }
         },
 
-        getBoneMatricesArray : function() {
-            if (! this._boneMatricesArray) {
-                this._boneMatricesArray = new Float32Array(this.bones.length * 16);
+        getInvBindMatricesArray : function() {
+            if (! this._invBindMatricesArray) {
+                this._invBindMatricesArray = new Float32Array(this.joints.length * 16);
             }
-            return this._boneMatricesArray;
+            return this._invBindMatricesArray;
         },
 
         setPose : function(time) {
-            for (var i = 0; i < this.bones.length; i++) {
-                this.bones[i].setPose(time);
+            for (var i = 0; i < this.joints.length; i++) {
+                this.joints[i].setPose(time);
             }
             this.update();
         },
 
         getClipTime : function() {
-            var poses = this.bones[0].poses;
+            var poses = this.joints[0].poses;
             if (poses.length) {
                 return poses[poses.length-1].time;
             }
         },
         
         getBoneNumber : function() {
-            return this.bones.length;
+            return this.joints.length;
         }
     });
 

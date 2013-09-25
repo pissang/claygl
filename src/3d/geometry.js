@@ -61,25 +61,27 @@ define(function(require) {
                     size : 3,
                     value : []
                  },
+                 // Skinning attributes
+                 // Each vertex can be bind to 4 bones, because the 
+                 // sum of weights is 1, so the weights is stored in vec3 and the last
+                 // can be calculated by 1-w.x-w.y-w.z
+                 weight : {
+                    type : 'float',
+                    semantic : 'WEIGHT',
+                    size : 3,
+                    value : []
+                 },
+                 joint : {
+                    type : 'float',
+                    semantic : 'JOINT',
+                    size : 4,
+                    value : []
+                 },
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
                  barycentric : {
                     type : 'float',
                     size : 3,
-                    value : []
-                 },
-                 // Skinning attributes
-                 // Each vertex can be bind to 4 bones, because the 
-                 // sum of weights is 1, so the weights is stored in vec3 and the last
-                 // can be calculated by 1-w.x-w.y-w.z
-                 boneWeight : {
-                    type : 'float',
-                    size : 3,
-                    value : []
-                 },
-                 boneIndex : {
-                    type : 'float',
-                    size : 4,
                     value : []
                  }
             },
@@ -137,7 +139,7 @@ define(function(require) {
         },
 
         isUseFace : function() {
-            return this.useFace && this.faces.length > 0;
+            return this.useFace && (this.faces.length > 0);
         },
 
         _getEnabledAttributes : function() {

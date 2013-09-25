@@ -97,7 +97,7 @@ define(function(require) {
             
             if (! silent) {
                 // Render plugin like shadow mapping must set the silent true
-                this.trigger("beforerender", scene, camera);
+                this.trigger("beforerender", this, scene, camera);
             }
 
             var color = this.color;
@@ -147,7 +147,7 @@ define(function(require) {
                         opaqueQueue.push(node);
                     }
                 }
-            })
+            });
     
             if (scene.filter) {
                 opaqueQueue = _.filter(opaqueQueue, scene.filter);
@@ -172,7 +172,7 @@ define(function(require) {
 
             // Render Opaque queue
             if (! silent) {
-                this.trigger("beforerender:opaque", opaqueQueue);
+                this.trigger("beforerender:opaque", this, opaqueQueue);
             }
 
             // Cull Face
@@ -184,8 +184,8 @@ define(function(require) {
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:opaque", opaqueQueue);
-                this.trigger("beforerender:transparent", transparentQueue);
+                this.trigger("afterrender:opaque", this, opaqueQueue);
+                this.trigger("beforerender:transparent", this, transparentQueue);
             }
 
             // Render Transparent Queue
@@ -197,8 +197,8 @@ define(function(require) {
             this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:transparent", transparentQueue);
-                this.trigger("afterrender", scene, camera);
+                this.trigger("afterrender:transparent", this, transparentQueue);
+                this.trigger("afterrender", this, scene, camera);
             }
         },
 
@@ -344,7 +344,8 @@ define(function(require) {
                     mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
 
-                for (var semantic in matrices) {
+                for (var j = 0; j < matrixSemantics.length; j++) {
+                    var semantic = matrixSemantics[j];
 
                     if (shader.semantics.hasOwnProperty(semantic)) {
                         var matrix = matrices[semantic];
@@ -353,21 +354,21 @@ define(function(require) {
                     }
 
                     var semanticTranspose = semantic + "TRANSPOSE";
-                    if (shader.semantics.hasOwnProperty(semantic + "TRANSPOSE")) {
-                        var matrixTranspose = matrices[semantic+'TRANSPOSE'];
+                    if (shader.semantics.hasOwnProperty(semanticTranspose)) {
+                        var matrixTranspose = matrices[semanticTranspose];
                         var matrix = matrices[semantic];
-                        var semanticTransposeInfo = shader.semantics[semantic+"TRANSPOSE"];
+                        var semanticTransposeInfo = shader.semantics[semanticTranspose];
                         mat4.transpose(matrixTranspose, matrix);
                         shader.setUniform(_gl, semanticTransposeInfo.type, semanticTransposeInfo.symbol, matrixTranspose );
                     }
                 }
 
                 if (! silent) {
-                    this.trigger("beforerender:mesh", object);
+                    this.trigger("beforerender:mesh", this, object);
                 }
                 var drawInfo = object.render(this, globalMaterial);
                 if (! silent) {
-                    this.trigger("afterrender:mesh", object, drawInfo);
+                    this.trigger("afterrender:mesh", this, object, drawInfo);
                 }
                 // Restore the default blend function
                 if (customBlend) {
@@ -415,6 +416,7 @@ define(function(require) {
         'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
+    var matrixSemantics = Object.keys(matrices);
 
     return Renderer;
 })

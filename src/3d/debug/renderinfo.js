@@ -51,7 +51,7 @@ define(function(require) {
             this.frameTime = endTime - this._startTime;
         },
 
-        _afterRenderMesh : function(_gl, drawInfo) {
+        _afterRenderMesh : function(renderer, _gl, drawInfo) {
             this.vertexNumber += drawInfo.vertexNumber;
             this.faceNumber += drawInfo.faceNumber;
             this.drawcallNumber += drawInfo.drawcallNumber;

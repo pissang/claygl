@@ -33,7 +33,6 @@ define( function(require){
 		"util": require('2d/util')
 	},
 	"3d": {
-		"Bone": require('3d/bone'),
 		"BoundingBox": require('3d/boundingbox'),
 		"Camera": require('3d/camera'),
 		"camera": {
@@ -61,6 +60,7 @@ define( function(require){
 			"Plane": require('3d/geometry/plane'),
 			"Sphere": require('3d/geometry/sphere')
 		},
+		"Joint": require('3d/joint'),
 		"Light": require('3d/light'),
 		"light": {
 			"Ambient": require('3d/light/ambient'),

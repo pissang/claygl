@@ -150,10 +150,10 @@ define(function(require) {
         },
         
         // Update the node status in each frame
-        update : function(_gl, silent) {
+        update : function(silent) {
 
             if(! silent) {
-                this.trigger('beforeupdate', _gl);
+                this.trigger('beforeupdate', this);
             }
             this.updateWorldMatrix();
             
@@ -161,12 +161,12 @@ define(function(require) {
                 var child = this.children[i];
                 // Skip the hidden nodes
                 if(child.visible) {
-                    child.update(_gl);
+                    child.update();
                 }
             }
             
             if(! silent) {
-                this.trigger('afterupdate', _gl);
+                this.trigger('afterupdate', this);
             }
         },
 

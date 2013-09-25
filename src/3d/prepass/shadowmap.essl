@@ -8,29 +8,30 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 attribute vec3 position : POSITION;
 
 #ifdef SKINNING
-attribute vec3 boneWeight;
-attribute vec4 boneIndex;
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
 
-uniform mat4 boneMatrices[ BONE_MATRICES_NUMBER ];
+uniform mat4 invBindMatrix[ BONE_MATRICES_NUMBER ] : INV_BIND_MATRIX;
 #endif
 
 varying vec4 v_ViewPosition;
 void main(){
     
     vec3 skinnedPosition = position;
+    
     #ifdef SKINNING
         mat4 skinMatrix;
-        if(boneIndex.x >= 0.0){
-            skinMatrix = boneMatrices[int(boneIndex.x)] * boneWeight.x;
+        if (joint.x >= 0.0){
+            skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
         }
-        if(boneIndex.y >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.y)] * boneWeight.y;
+        if (joint.y >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
         }
-        if(boneIndex.z >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.z)] * boneWeight.z;
+        if (joint.z >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
         }
-        if(boneIndex.w >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.w)] * (1.0-boneWeight.x-boneWeight.y-boneWeight.z);
+        if (joint.w >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
         }
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
     #endif
@@ -167,25 +168,25 @@ uniform bool shadowEnabled : true;
 
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
-float shadowContrib(sampler2D map, vec2 uv, float z, float bias){
+float tapShadowMap(sampler2D map, vec2 uv, float z, float bias){
     vec4 tex = texture2D(map, uv);
     return (unpackDepth(tex) * 2.0 - 1.0) + bias < z ? 0.0 : 1.0;
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float bias){
 
-    float shadowFalloff = shadowContrib(map, uv, z, bias);
+    float shadowContrib = tapShadowMap(map, uv, z, bias);
     float offset = 1.0/512.0;
-    shadowFalloff += shadowContrib(map, uv+vec2(offset, 0.0), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(offset, offset), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(-offset, offset), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(0.0, offset), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(-offset, 0.0), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(-offset, -offset), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(offset, -offset), z, bias);
-    shadowFalloff += shadowContrib(map, uv+vec2(0.0, -offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, 0.0), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, -offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, -offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset), z, bias);
 
-    return shadowFalloff / 9.0;
+    return shadowContrib / 9.0;
 }
 float chebyshevUpperBound(vec2 moments, float z){
     float p = 0.0;
@@ -200,7 +201,7 @@ float chebyshevUpperBound(vec2 moments, float z){
     float p_max = variance / (variance + mD * mD);
     return max(p_max, p);
 }
-float computeShadowFalloff(sampler2D map, mat4 lightVPM, vec3 position, float bias){
+float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bias){
     
     vec4 posInLightSpace = lightVPM * vec4(v_WorldPosition, 1.0);
     posInLightSpace.xyz /= posInLightSpace.w;
@@ -225,7 +226,7 @@ float computeShadowFalloff(sampler2D map, mat4 lightVPM, vec3 position, float bi
 
 #ifdef POINT_LIGHT_SHADOWMAP_NUMBER
 
-float computeShadowFallOfCube(samplerCube map, vec3 direction, float range){
+float computeShadowOfCube(samplerCube map, vec3 direction, float range){
     vec4 shadowTex = textureCube(map, direction);
     float dist = length(direction);
 
@@ -251,14 +252,14 @@ float computeShadowFallOfCube(samplerCube map, vec3 direction, float range){
 
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowFallOfSpotLights( vec3 position, inout float shadowFalloffs[SPOT_LIGHT_NUMBER]  ){
+void computeShadowOfSpotLights( vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER]  ){
     for( int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
-        float shadowFalloff = computeShadowFalloff( spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i] );
-        shadowFalloffs[ i ] = shadowFalloff;
+        float shadowContrib = computeShadowContrib( spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i] );
+        shadowContribs[ i ] = shadowContrib;
     }
     // set default fallof of rest lights
     for( int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
-        shadowFalloffs[i] = 1.0;
+        shadowContribs[i] = 1.0;
     }
 }
 
@@ -267,14 +268,14 @@ void computeShadowFallOfSpotLights( vec3 position, inout float shadowFalloffs[SP
 
 #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFalloffs[DIRECTIONAL_LIGHT_NUMBER] ){
+void computeShadowOfDirectionalLights( vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER] ){
     for( int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
-        float shadowFalloff = computeShadowFalloff(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightBiases[i]);
-        shadowFalloffs[i] = shadowFalloff;
+        float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightBiases[i]);
+        shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
     for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
-        shadowFalloffs[i] = 1.0;
+        shadowContribs[i] = 1.0;
     }
 }
 
@@ -283,14 +284,14 @@ void computeShadowFallOfDirectionalLights( vec3 position, inout float shadowFall
 
 #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowFallOfPointLights( vec3 position, inout float shadowFalloffs[POINT_LIGHT_NUMBER]  ){
+void computeShadowOfPointLights( vec3 position, inout float shadowContribs[POINT_LIGHT_NUMBER]  ){
     for( int i = 0; i < POINT_LIGHT_SHADOWMAP_NUMBER; i++){
         vec3 lightPosition = pointLightPosition[i];
         vec3 direction = position - lightPosition;
-        shadowFalloffs[i] = computeShadowFallOfCube(pointLightShadowMaps[i], direction, pointLightRanges[i]);
+        shadowContribs[i] = computeShadowOfCube(pointLightShadowMaps[i], direction, pointLightRanges[i]);
     }
     for( int i = POINT_LIGHT_SHADOWMAP_NUMBER; i < POINT_LIGHT_NUMBER; i++){
-        shadowFalloffs[i] = 1.0;
+        shadowContribs[i] = 1.0;
     }
 }
 

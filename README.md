@@ -1,5 +1,4 @@
 #QTEK
-___
 
 Qtek is a graphic library for both canvas2d and webgl drawing. It is still an experiment version.
 

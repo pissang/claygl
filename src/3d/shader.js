@@ -57,38 +57,45 @@ define(function(require) {
         'array' : function() {return [];}
     }
     var availableSemantics = [
-            'POSITION', 
-            'NORMAL',
-            'BINORMAL',
-            'TANGENT',
-            'TEXCOORD',
-            'TEXCOORD_0',
-            'TEXCOORD_1',
-            'COLOR',
-            'WORLD',
-            'VIEW',
-            'PROJECTION',
-            'WORLDVIEW',
-            'VIEWPROJECTION',
-            'WORLDVIEWPROJECTION',
-            'WORLDINVERSE',
-            'VIEWINVERSE',
-            'PROJECTIONINVERSE',
-            'WORLDVIEWINVERSE',
-            'VIEWPROJECTIONINVERSE',
-            'WORLDVIEWPROJECTIONINVERSE',
-            'WORLDTRANSPOSE',
-            'VIEWTRANSPOSE',
-            'PROJECTIONTRANSPOSE',
-            'WORLDVIEWTRANSPOSE',
-            'VIEWPROJECTIONTRANSPOSE',
-            'WORLDVIEWPROJECTIONTRANSPOSE',
-            'WORLDINVERSETRANSPOSE',
-            'VIEWINVERSETRANSPOSE',
-            'PROJECTIONINVERSETRANSPOSE',
-            'WORLDVIEWINVERSETRANSPOSE',
-            'VIEWPROJECTIONINVERSETRANSPOSE',
-            'WORLDVIEWPROJECTIONINVERSETRANSPOSE'];
+        'POSITION', 
+        'NORMAL',
+        'BINORMAL',
+        'TANGENT',
+        'TEXCOORD',
+        'TEXCOORD_0',
+        'TEXCOORD_1',
+        'COLOR',
+        'WORLD',
+        'VIEW',
+        'PROJECTION',
+        'WORLDVIEW',
+        'VIEWPROJECTION',
+        'WORLDVIEWPROJECTION',
+        'WORLDINVERSE',
+        'VIEWINVERSE',
+        'PROJECTIONINVERSE',
+        'WORLDVIEWINVERSE',
+        'VIEWPROJECTIONINVERSE',
+        'WORLDVIEWPROJECTIONINVERSE',
+        'WORLDTRANSPOSE',
+        'VIEWTRANSPOSE',
+        'PROJECTIONTRANSPOSE',
+        'WORLDVIEWTRANSPOSE',
+        'VIEWPROJECTIONTRANSPOSE',
+        'WORLDVIEWPROJECTIONTRANSPOSE',
+        'WORLDINVERSETRANSPOSE',
+        'VIEWINVERSETRANSPOSE',
+        'PROJECTIONINVERSETRANSPOSE',
+        'WORLDVIEWINVERSETRANSPOSE',
+        'VIEWPROJECTIONINVERSETRANSPOSE',
+        'WORLDVIEWPROJECTIONINVERSETRANSPOSE',
+
+        // Skinning
+        // https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#semantics
+        'JOINT',
+        'WEIGHT',
+        'INV_BIND_MATRIX'
+    ];
     
     var errorShader = {};
 
@@ -403,6 +410,14 @@ define(function(require) {
                     }
                     break;
             }
+        },
+
+        setUniformBySemantic : function(_gl, semantic, val) {
+            var semanticInfo = this.semantics[semantic];
+            if (semanticInfo) {
+                return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
+            }
+            return false;
         },
         /**
          * Enable the attributes passed in and disable the rest

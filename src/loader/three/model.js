@@ -18,7 +18,7 @@ define(function(require) {
     var TextureCube = require("3d/texture/texturecube");
     var shaderLibrary = require("3d/shader/library");
     var Skeleton = require("3d/skeleton");
-    var Bone = require("3d/bone");
+    var Joint = require("3d/joint");
     var Vector3 = require("core/vector3");
     var Quaternion = require("core/quaternion");
     var _ = require("_");
@@ -67,16 +67,16 @@ define(function(require) {
 
             if (skinned) {
                 var skeleton = this.parseSkeleton(data);
-                var boneNumber = skeleton.bones.length;
+                var jointNumber = skeleton.joints.length;
             }else{
-                var boneNumber = 0;
+                var jointNumber = 0;
             }
 
             if (skinned) {
                 var skeleton = this.parseSkeleton(data);
-                var boneNumber = skeleton.bones.length;
+                var jointNumber = skeleton.joints.length;
             }else{
-                var boneNumber = 0;
+                var jointNumber = 0;
             }
 
             var meshList = [];
@@ -86,7 +86,7 @@ define(function(require) {
                     && geometry.faces.length 
                     && geometry.attributes.position.value.length) {
 
-                    var material = this.parseMaterial(data.materials[i], boneNumber);
+                    var material = this.parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],
                         material : material
@@ -133,8 +133,8 @@ define(function(require) {
                 texcoords = [attributes.texcoord0.value,
                             attributes.texcoord1.value],
                 colors = attributes.color.value,
-                boneIndices = attributes.boneIndex.value,
-                boneWeights = attributes.boneWeight.value,
+                jointIndices = attributes.joint.value,
+                jointWeights = attributes.weight.value,
                 faces = geometry.faces;
 
             var nUvLayers = 0;
@@ -169,8 +169,8 @@ define(function(require) {
                     texcoords = [attributes.texcoord0.value,
                                 attributes.texcoord1.value];
                     colors = attributes.color.value;
-                    boneWeights = attributes.boneWeight.value;
-                    boneIndices = attributes.boneIndex.value;
+                    jointWeights = attributes.weight.value;
+                    jointIndices = attributes.joint.value;
 
                     isNew[faceIndex] = false;
                     return newIndexMap[oi];
@@ -179,8 +179,8 @@ define(function(require) {
                     positions.push([dVertices[oi*3], dVertices[oi*3+1], dVertices[oi*3+2]]);
                     //Skin data
                     if (skinned) {
-                        boneWeights.push([dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0]);
-                        boneIndices.push([dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1]);
+                        jointWeights.push([dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0]);
+                        jointIndices.push([dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1]);
                     }
 
                     newIndexMap[oi] = cursorList[materialIndex];
@@ -228,8 +228,8 @@ define(function(require) {
                     texcoords = [attributes.texcoord0.value,
                                 attributes.texcoord1.value];
                     colors = attributes.color.value;
-                    boneWeights = attributes.boneWeight.value;
-                    boneIndices = attributes.boneIndex.value;
+                    jointWeights = attributes.weight.value;
+                    jointIndices = attributes.joint.value;
                     faces = geometry.faces;
                 }
                 if (isQuad) {
@@ -385,36 +385,36 @@ define(function(require) {
         },
 
         parseSkeleton : function(data) {
-            var bones = [];
+            var joints = [];
             var dBones = data.bones;
             for ( var i = 0; i < dBones.length; i++) {
                 var dBone = dBones[i];
-                var bone = new Bone({
+                var joint = new Joint({
                     parentIndex : dBone.parent,
                     name : dBone.name,
                     position : new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
                     rotation : new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
                     scale : new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
                 });
-                bones.push(bone);
+                joints.push(joint);
             }
 
             var skeleton = new Skeleton({
-                bones : bones
+                joints : joints
             });
             skeleton.update();
 
-            if ( data.animation) {
+            if (data.animation) {
                 var dFrames = data.animation.hierarchy;
 
                 // Parse Animations
                 for (var i = 0; i < dFrames.length; i++) {
                     var channel = dFrames[i];
-                    var bone = bones[i];
+                    var joint = joints[i];
                     for (var j = 0; j < channel.keys.length; j++) {
                         var key = channel.keys[j];
-                        bone.poses[j] = {};
-                        var pose = bone.poses[j];
+                        joint.poses[j] = {};
+                        var pose = joint.poses[j];
                         pose.time = parseFloat(key.time);
                         if (key.pos) {
                             pose.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
@@ -432,7 +432,7 @@ define(function(require) {
             return skeleton;
         },
 
-        parseMaterial : function(mConfig, boneNumber) {
+        parseMaterial : function(mConfig, jointNumber) {
             var shaderName = "buildin.lambert";
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
             if (shading === "phong" || shading === "lambert") {
@@ -445,7 +445,7 @@ define(function(require) {
             if (mConfig.mapNormal || mConfig.mapBump) {
                 enabledTextures.push('normalMap');
             }
-            if (boneNumber == 0) {
+            if (jointNumber == 0) {
                 var shader = shaderLibrary.get(shaderName, enabledTextures);
             } else {
                 // Shader for skinned mesh
@@ -457,7 +457,7 @@ define(function(require) {
                     shader.enableTexture(enabledTextures[i]);
                 }
                 shader.define('vertex', "SKINNING");
-                shader.define('vertex', "BONE_MATRICES_NUMBER", boneNumber);
+                shader.define('vertex', "BONE_MATRICES_NUMBER", jointNumber);
             }
 
             var material = new Material({
