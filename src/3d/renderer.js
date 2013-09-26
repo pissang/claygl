@@ -247,10 +247,10 @@ define(function(require) {
         renderQueue : function(queue, camera, globalMaterial, silent) {
 
             // Calculate view and projection matrix
-            mat4.invert(matrices['VIEW'],  camera.worldMatrix._array);
+            mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
             mat4.copy(matrices['PROJECTION'], camera.projectionMatrix._array);
             mat4.multiply(matrices['VIEWPROJECTION'], camera.projectionMatrix._array, matrices['VIEW']);
-            mat4.copy(matrices['VIEWINVERSE'], camera.worldMatrix._array);
+            mat4.copy(matrices['VIEWINVERSE'], camera.worldTransform._array);
             mat4.invert(matrices['PROJECTIONINVERSE'], matrices['PROJECTION']);
             mat4.invert(matrices['VIEWPROJECTIONINVERSE'], matrices['VIEWPROJECTION']);
 
@@ -314,7 +314,7 @@ define(function(require) {
                     customBlend(_gl);
                 }
 
-                var worldM = object.worldMatrix._array;
+                var worldM = object.worldTransform._array;
 
                 // All matrices ralated to world matrix will be updated on demand;
                 if (shader.semantics.hasOwnProperty('WORLD') ||

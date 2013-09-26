@@ -71,7 +71,7 @@ define(function(require) {
                         // Transform position, normal and tangent
                         if (name === "position") {
                             var newValue = cloneValue(currentAttr.value[i]);
-                            vec3.transformMat4(newValue, newValue, mesh.matrix._array);
+                            vec3.transformMat4(newValue, newValue, mesh.localTransform._array);
                             targetAttr.value.push(newValue);   
                         }
                         else if (name === "normal") {

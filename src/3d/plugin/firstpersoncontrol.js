@@ -84,8 +84,8 @@ define(function(require) {
                 var camera = this.camera;
 
                 var position = this.camera.position,
-                    xAxis = camera.matrix.right.normalize(),
-                    zAxis = camera.matrix.forward.normalize();
+                    xAxis = camera.localTransform.right.normalize(),
+                    zAxis = camera.localTransform.forward.normalize();
 
                 if (this._moveForward) {
                     // Opposite direction of z
@@ -103,7 +103,7 @@ define(function(require) {
 
 
                 camera.rotateAround(camera.position, this.up, -this._offsetPitch * Math.PI / 180);
-                var xAxis = camera.matrix.right;
+                var xAxis = camera.localTransform.right;
                 camera.rotateAround(camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
 
                 this._offsetRoll = this._offsetPitch = 0;

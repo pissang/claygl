@@ -14,7 +14,7 @@ define(function(require) {
             _jointMatrices : [],
 
             // jointMatrix * currentPoseMatrix
-            // worldMatrix is relative to the root bone
+            // worldTransform is relative to the root bone
             // still in model space not world space
             _invBindMatrices : [],
 
@@ -43,7 +43,7 @@ define(function(require) {
             }
             for (var i = 0; i < this.joints.length; i++) {
                 var bone = this.joints[i];
-                this._jointMatrices[i] = (new Matrix4()).copy(bone.worldMatrix).invert();
+                this._jointMatrices[i] = (new Matrix4()).copy(bone.worldTransform).invert();
                 this._invBindMatrices[i] = new Matrix4();
             }
         },
@@ -57,7 +57,7 @@ define(function(require) {
             }
             var cursor = 0;
             for (var i = 0; i < this.joints.length; i++) {
-                var matrixCurrentPose = this.joints[i].worldMatrix;
+                var matrixCurrentPose = this.joints[i].worldTransform;
                 this._invBindMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
 
                 for (var j = 0; j < 16; j++) {

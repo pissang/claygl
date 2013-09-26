@@ -38,8 +38,9 @@ define(function(require) {
 
             parent : null,
 
-            worldMatrix : new Matrix4(),
-            matrix : new Matrix4(),
+            worldTransform : new Matrix4(),
+
+            localTransform : new Matrix4(),
 
             boundingBox : new BoundingBox()
         }
@@ -95,7 +96,7 @@ define(function(require) {
             }
         },
 
-        updateMatrix : function() {
+        updateLocalTransform : function() {
             // TODO 
             // use defineSetter to set dirty when the position, rotation, scale is changed ??
             if(! this.position._dirty &&
@@ -107,7 +108,7 @@ define(function(require) {
                 }
             }
 
-            var m = this.matrix;
+            var m = this.localTransform;
 
             m.identity();
 
@@ -129,7 +130,7 @@ define(function(require) {
         },
 
         decomposeMatrix : function() {
-            this.matrix.decomposeMatrix(this.scale, this.rotation, this.position);
+            this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
             if(! this.useEuler) {
                 this.eulerAngle.setEulerFromQuaternion(this.rotation);
             }
@@ -140,13 +141,12 @@ define(function(require) {
             this.eulerAngle._dirty = false;
         },
 
-        updateWorldMatrix : function() {
-
-            this.updateMatrix();
+        updateWorldTransform : function() {
+            this.updateLocalTransform();
             if(this.parent) {
-                this.worldMatrix.copy(this.parent.worldMatrix).multiply(this.matrix);
+                this.worldTransform.copy(this.parent.worldTransform).multiply(this.localTransform);
             }else{
-                this.worldMatrix.copy(this.matrix);
+                this.worldTransform.copy(this.localTransform);
             }
         },
         
@@ -156,7 +156,7 @@ define(function(require) {
             if(! silent) {
                 this.trigger('beforeupdate', this);
             }
-            this.updateWorldMatrix();
+            this.updateWorldTransform();
             
             for(var i = 0; i < this.children.length; i++) {
                 var child = this.children[i];
@@ -173,20 +173,20 @@ define(function(require) {
 
         getWorldPosition : function() {
             
-            var m = this.worldMatrix._array;
+            var m = this.worldTransform._array;
 
             return new Vector3(m[12], m[13], m[14]);
         },
 
         translate : function(v) {
-            this.updateMatrix();
+            this.updateLocalTransform();
             this.translate(v);
             this.decomposeMatrix();
         },
 
         rotate : function(angle, axis) {
-            this.updateMatrix();
-            this.matrix.rotate(angle, axis);
+            this.updateLocalTransform();
+            this.localTransform.rotate(angle, axis);
             this.decomposeMatrix();
         },
         // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
@@ -199,10 +199,10 @@ define(function(require) {
 
                 v.copy(this.position).subtract(point);
 
-                this.matrix.identity();
+                this.localTransform.identity();
                 // parent joint
-                this.matrix.translate(point);
-                this.matrix.rotate(angle, axis);
+                this.localTransform.translate(point);
+                this.localTransform.rotate(angle, axis);
 
                 // Transform self
                 if(this.useEuler) {
@@ -212,8 +212,8 @@ define(function(require) {
                     this.rotation.rotateZ(this.eulerAngle.z);
                 }
                 RTMatrix.fromRotationTranslation(this.rotation, v);
-                this.matrix.multiply(RTMatrix);
-                this.matrix.scale(this.scale);
+                this.localTransform.multiply(RTMatrix);
+                this.localTransform.scale(this.scale);
 
                 this.decomposeMatrix();
             }
@@ -223,7 +223,7 @@ define(function(require) {
             var m = new Matrix4();
             var scaleVector = new Vector3();
             return function(target, up) {
-                m.lookAt(this.position, target, up || this.matrix.up).invert();
+                m.lookAt(this.position, target, up || this.localTransform.up).invert();
 
                 m.decomposeMatrix(scaleVector, this.rotation, this.position);
 

@@ -241,7 +241,7 @@ define(function(require) {
                     }
         
                     var matrix = new Matrix4();
-                    matrix.copy(camera.worldMatrix)
+                    matrix.copy(camera.worldTransform)
                         .invert()
                         .multiplyLeft(camera.projectionMatrix);
 
@@ -442,7 +442,7 @@ define(function(require) {
                 camera.update();
 
             }else{
-                camera.worldMatrix.copy(light.worldMatrix);
+                camera.worldTransform.copy(light.worldTransform);
             }
             camera.updateProjectionMatrix();
 

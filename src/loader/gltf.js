@@ -165,9 +165,10 @@ define(function(require) {
                 nodeInfo._isJoint = true;
                 // Cast node to joint
                 var joint = new Joint();
+                joint.name = nodeName;
                 if (nodeInfo.matrix) {
                     for (var i = 0; i < 16; i++) {
-                        joint.matrix._array[i] = nodeInfo.matrix[i];
+                        joint.localTransform._array[i] = nodeInfo.matrix[i];
                     }
                     joint.decomposeMatrix();
                 }
@@ -483,7 +484,7 @@ define(function(require) {
                 }
                 if (nodeInfo.matrix) {
                     for (var i = 0; i < 16; i++) {
-                        node.matrix._array[i] = nodeInfo.matrix[i];
+                        node.localTransform._array[i] = nodeInfo.matrix[i];
                     }
                     node.decomposeMatrix();
                 }

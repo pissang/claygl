@@ -117,20 +117,20 @@ define(function(require) {
             if (this._op === 0) {
                 // Rotate
                 camera.rotateAround(this.origin, this.up, -this._offsetPitch);            
-                var xAxis = camera.matrix.right;
+                var xAxis = camera.localTransform.right;
                 camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
                 this._offsetRoll = this._offsetPitch = 0;
             } else if (this._op === 1) {
                 // Pan
-                var xAxis = camera.matrix.right.normalize().scale(-this._panX);
-                var yAxis = camera.matrix.up.normalize().scale(this._panY);
+                var xAxis = camera.localTransform.right.normalize().scale(-this._panX);
+                var yAxis = camera.localTransform.up.normalize().scale(this._panY);
                 camera.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;
             }
             
             // Zoom
-            var zAxis = camera.matrix.forward.normalize();
+            var zAxis = camera.localTransform.forward.normalize();
             var distance = camera.position.distance(this.origin);
             camera.position.scaleAndAdd(zAxis, distance * this._forward / 2000);
             this._forward = 0;
