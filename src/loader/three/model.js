@@ -21,6 +21,7 @@ define(function(require) {
     var Joint = require("3d/joint");
     var Vector3 = require("core/vector3");
     var Quaternion = require("core/quaternion");
+    var glenum = require('3d/glenum');
     var _ = require("_");
 
     var glMatrix = require("glmatrix");
@@ -518,8 +519,8 @@ define(function(require) {
             this.textureNumber++;
 
             if (wrap && wrap.length) {
-                texture.wrapS = wrap[0].toUpperCase();
-                texture.wrapT = wrap[1].toUpperCase();
+                texture.wrapS = glenum[wrap[0].toUpperCase()];
+                texture.wrapT = glenum[wrap[1].toUpperCase()];
             }
             img.onload = function() {
                 self.trigger("load:texture", texture);

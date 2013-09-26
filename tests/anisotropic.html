@@ -44,8 +44,8 @@
                 image.src = "assets/textures/ground_tile.jpg";
                 var texture = new qtek3d.texture.Texture2D({
                     image : image,
-                    wrapS : 'REPEAT',
-                    wrapT : 'REPEAT',
+                    wrapS : qtek3d.Texture.REPEAT,
+                    wrapT : qtek3d.Texture.REPEAT,
                     anisotropic : 16
                 });
                 image.onload = function(){

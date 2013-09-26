@@ -1,6 +1,7 @@
 define(function(require) {
 
     var Node = require("./node");
+    var glenum = require("./glenum");
     var Vector3 = require("core/vector3");
     var _ = require("_");
 
@@ -19,7 +20,7 @@ define(function(require) {
             // LINES
             // TRIANGLES
             // ...
-            mode : "TRIANGLES",
+            mode : glenum.TRIANGLES,
             
             receiveShadow : true,
             castShadow : true,
@@ -44,7 +45,7 @@ define(function(require) {
             var shader = material.shader;
             var geometry = this.geometry;
 
-            var glDrawMode = _gl[this.mode.toUpperCase()];
+            var glDrawMode = this.mode;
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
@@ -115,6 +116,15 @@ define(function(require) {
     Mesh.materialChanged = function() {
         prevDrawID = 0;
     }
+
+    // Enums
+    Mesh.POINTS = glenum.POINTS;
+    Mesh.LINES = glenum.LINES;
+    Mesh.LINE_LOOP = glenum.LINE_LOOP;
+    Mesh.LINE_STRIP = glenum.LINE_STRIP;
+    Mesh.TRIANGLES = glenum.TRIANGLES;
+    Mesh.TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
+    Mesh.TRIANGLE_FAN = glenum.TRIANGLE_FAN
 
     return Mesh;
 })

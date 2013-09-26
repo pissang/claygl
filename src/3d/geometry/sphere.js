@@ -31,20 +31,18 @@ define(function(require) {
             i, j;
         var normal;
 
-        var heightSegments = this.heightSegments,
-            widthSegments = this.widthSegments,
-            radius = this.radius,
-            phiStart = this.phiStart,
-            phiLength = this.phiLength,
-            thetaStart = this.thetaStart,
-            thetaLength = this.thetaLength,
-            radius = this.radius;
+        var heightSegments = this.heightSegments;
+        var widthSegments = this.widthSegments;
+        var radius = this.radius;
+        var phiStart = this.phiStart;
+        var phiLength = this.phiLength;
+        var thetaStart = this.thetaStart;
+        var thetaLength = this.thetaLength;
+        var radius = this.radius;
 
 
         for (j = 0; j <= heightSegments; j ++) {
-
             for (i = 0; i <= widthSegments; i ++) {
-
                 u = i / widthSegments;
                 v = j / heightSegments;
 
@@ -57,9 +55,7 @@ define(function(require) {
 
                 normal = vec3.fromValues(x, y, z);
                 normals.push(vec3.normalize(normal, normal));
-
             }
-
         }
 
         var p1, p2, p3,
@@ -69,9 +65,7 @@ define(function(require) {
         var len = widthSegments+1;
 
         for (j = 0; j < heightSegments; j ++) {
-
             for (i = 0; i < widthSegments; i ++) {
-
                 i1 = j * len + i;
                 i2 = j * len + i + 1;
                 i3 = (j + 1) * len + i + 1;

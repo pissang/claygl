@@ -41,9 +41,9 @@
             var parameters = {
                 width : SIZE,
                 height : SIZE,
-                type : 'FLOAT',
-                minFilter : 'NEAREST',
-                magFilter : 'NEAREST',
+                type : qtek3d.Texture.FLOAT,
+                minFilter : qtek3d.Texture.NEAREST,
+                magFilter : qtek3d.Texture.NEAREST,
                 useMipmap : false
             };
 
@@ -109,9 +109,7 @@
             })
 
             // Scene
-            var geo = new qtek3d.Geometry({
-                hint : 'DYNAMIC_DRAW'
-            });
+            var geo = new qtek3d.Geometry();
             for (var i = 0; i < SIZE; i++) {
                 for (var j = 0; j < SIZE; j++) {
                     geo.attributes.position.value.push([i / SIZE, j / SIZE, 0]);
@@ -132,7 +130,7 @@
             var particleSystem = new qtek3d.Mesh({
                 geometry : geo,
                 material : mat,
-                mode : 'POINTS'
+                mode : qtek3d.Mesh.POINTS
             });
             var scene = new qtek3d.Scene();
             scene.add(particleSystem);

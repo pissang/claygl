@@ -3,8 +3,9 @@
  */
 define(function(require) {
     
-    var Texture2D = require("../texture/texture2d");
-    var _ = require("_");
+    var Texture2D = require('../texture/texture2d');
+    var glenum = require('../glenum');
+    var _ = require('_');
 
     var pool = {};
 
@@ -46,12 +47,12 @@ define(function(require) {
         var defaultParams = {
             width : 512,
             height : 512,
-            type : 'UNSIGNED_BYTE',
-            format : "RGBA",
-            wrapS : "CLAMP_TO_EDGE",
-            wrapT : "CLAMP_TO_EDGE",
-            minFilter : "LINEAR_MIPMAP_LINEAR",
-            magFilter : "LINEAR",
+            type : glenum.UNSIGNED_BYTE,
+            format : glenum.RGBA,
+            wrapS : glenum.CLAMP_TO_EDGE,
+            wrapT : glenum.CLAMP_TO_EDGE,
+            minFilter : glenum.LINEAR_MIPMAP_LINEAR,
+            magFilter : glenum.LINEAR,
             useMipmap : true,
             anisotropy : 1,
             flipY : true,
@@ -62,7 +63,7 @@ define(function(require) {
         _.defaults(parameters, defaultParams);
         fallBack(parameters);
 
-        var key = "";
+        var key = '';
         for (var name in defaultParams) {
             if (parameters[name]) {
                 var chunk = parameters[name].toString();
@@ -78,24 +79,23 @@ define(function(require) {
 
         var IPOT = isPowerOfTwo(target.width, target.height);
 
-        if (target.format === "DEPTH_COMPONENT") {
+        if (target.format === glenum.DEPTH_COMPONENT) {
             target.useMipmap = false;
         }
 
         if (!IPOT || !target.useMipmap) {
-            if (target.minFilter.indexOf("NEAREST") == 0) {
-                target.minFilter = 'NEAREST';
-            } else {
-                target.minFilter = 'LINEAR'
+            if (this.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
+                this.minFilter == glenum.NEAREST_MIPMAP_LINEAR) {
+                this.minFilter = glenum.NEAREST;
+            } else if (
+                this.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
+                this.minFilter == glenum.LINEAR_MIPMAP_NEAREST
+            ) {
+                this.minFilter = glenum.LINEAR
             }
 
-            if (target.magFilter.indexOf("NEAREST") == 0) {
-                target.magFilter = 'NEAREST';
-            } else {
-                target.magFilter = 'LINEAR'
-            }
-            target.wrapS = 'CLAMP_TO_EDGE';
-            target.wrapT = 'CLAMP_TO_EDGE';
+            target.wrapS = glenum.CLAMP_TO_EDGE;
+            target.wrapT = glenum.CLAMP_TO_EDGE;
         }
     }
 

@@ -15,6 +15,7 @@ define(function(require) {
     var FrameBuffer = require("../framebuffer");
     var Texture2d = require("../texture/texture2d");
     var TextureCube = require("../texture/texturecube");
+    var glenum = require("../glenum");
     var PerspectiveCamera = require("../camera/perspective");
     var OrthoCamera = require("../camera/orthographic");
 
@@ -325,7 +326,7 @@ define(function(require) {
             var parameter = {
                 width : size,
                 height : size,
-                type : "FLOAT"
+                type : glenum.FLOAT
             };
             var _gl = renderer.gl;
             var tmpTexture = texturePool.get(parameter);
@@ -362,8 +363,8 @@ define(function(require) {
                     texture = new TextureCube({
                         width : resolution,
                         height : resolution,
-                        minFilter : "NEAREST",
-                        magFilter : "NEAREST",
+                        minFilter : glenum.NEAREST,
+                        magFilter : glenum.NEAREST,
                         useMipmap : false
                     });
                 } else {
@@ -371,13 +372,13 @@ define(function(require) {
                         width : resolution,
                         height : resolution,
                         
-                        minFilter : "NEAREST",
-                        magFilter : "NEAREST",
+                        minFilter : glenum.NEAREST,
+                        magFilter : glenum.NEAREST,
                         useMipmap : false
                     });
                 }
                 if (this.useVSM) {
-                    texture.type = "FLOAT";
+                    texture.type = glenum.FLOAT;
                 }
                 this._textures[key] = texture;
             }

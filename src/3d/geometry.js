@@ -8,6 +8,7 @@ define(function(require) {
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
     var BoundingBox = require("./boundingbox");
+    var glenum = require("./glenum");
     var util = require("util/util");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
@@ -93,7 +94,7 @@ define(function(require) {
             // is an array of the vertex indices of triangle
             faces : [],
 
-            hint : 'STATIC_DRAW',
+            hint : glenum.STATIC_DRAW,
 
             //Max Value of Uint16, i.e. 0xfff
             chunkSize : 65535,
@@ -483,7 +484,7 @@ define(function(require) {
                     }
                     //TODO: Use BufferSubData?
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                    _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], _gl[this.hint]);
+                    _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], this.hint);
 
                     attributeBuffers[name] = {
                         type : type,
@@ -500,7 +501,7 @@ define(function(require) {
                         }
                     }
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                    _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl[this.hint]);   
+                    _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, this.hint);   
                 }
             }
         },
@@ -781,7 +782,11 @@ define(function(require) {
         dispose : function(_gl) {
             
         }
-    })
-
+    });
+    
+    Geometry.STATIC_DRAW = glenum.STATIC_DRAW;
+    Geometry.DYNAMIC_DRAW = glenum.DYNAMIC_DRAW;
+    Geometry.STREAM_DRAW = glenum.STREAM_DRAW;
+    
     return Geometry;
 })

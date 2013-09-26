@@ -17,8 +17,6 @@ define(function(require) {
 
             useFace : true,
 
-            hint : 'STATIC_DRAW',
-
             _normalType : 'vertex',
 
             // Typed Array of each geometry chunk
@@ -92,7 +90,7 @@ define(function(require) {
                     }
                     //TODO: Use BufferSubData?
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.array, _gl[this.hint]);
+                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.array, _gl.STATIC_DRAW);
 
                     attributeBuffers[name] = {
                         type : attribute.type,
@@ -108,7 +106,7 @@ define(function(require) {
                     }
                 }
                 _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl[this.hint]);
+                _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, _gl.STATIC_DRAW);
             }
         },
         convertToGeometry : function() {

@@ -16,9 +16,9 @@
     },
     outputs : {
             diffuse : {
-                attachment : "COLOR_ATTACHMENT0"
+                attachment : FrameBuffer.COLOR_ATTACHMENT0
                 parameters : {
-                    format : "RGBA",
+                    format : Texture.RGBA,
                     width : 512,
                     height : 512
                 }
@@ -181,8 +181,8 @@ define(function(require) {
                 node : fromNode,
                 pin : fromPinName
             }
-            if (! fromNode.outputLinks[ fromPinName ]) {
-                fromNode.outputLinks[ fromPinName ] = [];
+            if (! fromNode.outputLinks[fromPinName]) {
+                fromNode.outputLinks[fromPinName] = [];
             }
             fromNode.outputLinks[ fromPinName ].push({
                 node : this,

@@ -60,6 +60,7 @@ define( function(require){
 			"Plane": require('3d/geometry/plane'),
 			"Sphere": require('3d/geometry/sphere')
 		},
+		"glenum": require('3d/glenum'),
 		"Joint": require('3d/joint'),
 		"Light": require('3d/light'),
 		"light": {

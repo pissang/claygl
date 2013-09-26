@@ -55,7 +55,7 @@ define(function(require) {
                 var mesh = meshes[k];  
                 var currentGeo = mesh.geometry;
 
-                mesh.updateMatrix();
+                mesh.updateLocalTransform();
                 var vertexCount = currentGeo.getVerticesNumber();
 
                 for (var name in currentGeo.attributes) {

@@ -19,14 +19,14 @@ define(function(require) {
             
             this.beforeUpdate( _gl);
 
-            var glFormat = _gl[this.format.toUpperCase()],
-                glType = _gl[this.type.toUpperCase()];
+            var glFormat = this.format;
+            var glType = this.type;
 
-            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl[this.wrapS.toUpperCase()]);
-            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl[this.wrapT.toUpperCase()]);
+            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, this.wrapS);
+            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, this.wrapT);
 
-            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl[this.magFilter.toUpperCase()]);
-            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl[this.minFilter.toUpperCase()]);
+            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.magFilter);
+            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.minFilter);
             
             var anisotropicExt = WebGLInfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
             if (anisotropicExt && this.anisotropic > 1) {

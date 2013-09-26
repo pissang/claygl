@@ -7,6 +7,7 @@ define(function(require) {
     var Texture2D = require("./texture/texture2d");
     var TextureCube = require("./texture/texturecube");
     var WebGLInfo = require('./webglinfo');
+    var glenum = require("./glenum");
 
     var FrameBuffer = Base.derive(function() {
 
@@ -122,7 +123,7 @@ define(function(require) {
                     console.error(" Depth texture is not supported by the browser ");
                     return;
                 }
-                if (texture.format !== "DEPTH_COMPONENT") {
+                if (texture.format !== glenum.DEPTH_COMPONENT) {
                     console.error("The texture attached to depth buffer is not a valid.");
                     return;
                 }
@@ -140,7 +141,6 @@ define(function(require) {
         detach : function() {},
 
         dispose : function(_gl) {
-
             this.cache.use(_gl.__GUID__);
 
             if (this.cache.get("renderbuffer"))
@@ -149,9 +149,13 @@ define(function(require) {
                 _gl.deleteFramebuffer(this.cache.get("framebuffer"));
 
             this.cache.clearContext();
-
         }
-    })
+    });
+
+    FrameBuffer.COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
+    FrameBuffer.DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
+    FrameBuffer.STENCIL_ATTACHMENT = glenum.STENCIL_ATTACHMENT;
+    FrameBuffer.DEPTH_STENCIL_ATTACHMENT = glenum.DEPTH_STENCIL_ATTACHMENT;
 
     return FrameBuffer;
 })

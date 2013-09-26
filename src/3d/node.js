@@ -42,6 +42,8 @@ define(function(require) {
 
             localTransform : new Matrix4(),
 
+            autoUpdateLocalTransform : true,
+
             boundingBox : new BoundingBox()
         }
     }, {
@@ -142,7 +144,9 @@ define(function(require) {
         },
 
         updateWorldTransform : function() {
-            this.updateLocalTransform();
+            if (this.autoUpdateLocalTransform) {
+                this.updateLocalTransform();
+            }
             if(this.parent) {
                 this.worldTransform.copy(this.parent.worldTransform).multiply(this.localTransform);
             }else{
