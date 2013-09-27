@@ -101,11 +101,11 @@ define(function(require) {
         updateLocalTransform : function() {
             // TODO 
             // use defineSetter to set dirty when the position, rotation, scale is changed ??
-            if(! this.position._dirty &&
+            if (! this.position._dirty &&
                 ! this.scale._dirty) {
-                if(this.useEuler && ! this.eulerAngle._dirty) {
+                if (this.useEuler && ! this.eulerAngle._dirty) {
                     return;
-                }else if(! this.rotation._dirty) {
+                } else if(! this.rotation._dirty) {
                     return;
                 }
             }
@@ -116,9 +116,9 @@ define(function(require) {
 
             if(this.useEuler) {
                 this.rotation.identity();
-                this.rotation.rotateX(this.eulerAngle.x);
-                this.rotation.rotateY(this.eulerAngle.y);
                 this.rotation.rotateZ(this.eulerAngle.z);
+                this.rotation.rotateY(this.eulerAngle.y);
+                this.rotation.rotateX(this.eulerAngle.x);
             }
             // Transform order, scale->rotation->position
             m.fromRotationTranslation(this.rotation, this.position);
@@ -175,11 +175,16 @@ define(function(require) {
             }
         },
 
-        getWorldPosition : function() {
-            
+        getWorldPosition : function(out) {
             var m = this.worldTransform._array;
-
-            return new Vector3(m[12], m[13], m[14]);
+            if (out) {
+                out._array[0] = m[12];
+                out._array[1] = m[13];
+                out._array[2] = m[14];
+                return out;
+            } else {
+                return new Vector3(m[12], m[13], m[14]);
+            }
         },
 
         translate : function(v) {

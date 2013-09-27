@@ -27,6 +27,7 @@ varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
 varying vec3 v_Barycentric;
+varying vec3 v_Weight;
 
 void main(){
 
@@ -59,6 +60,11 @@ void main(){
     v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;
 
     v_Barycentric = barycentric;
+    #ifdef SKINNING
+        v_Weight = weight;
+    #else
+        v_Weight = vec3(0.0);
+    #endif
 }
 
 @end
@@ -71,6 +77,7 @@ void main(){
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
+varying vec3 v_Weight;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
@@ -106,6 +113,15 @@ varying vec3 v_Barycentric;
 
 void main(){
     
+    #ifdef RENDER_WEIGHT
+        gl_FragColor = vec4(v_Weight, 1.0);
+        return;
+    #endif
+    #ifdef RENDER_NORMAL
+        gl_FragColor = vec4(v_Normal, 1.0);
+        return;
+    #endif
+
     gl_FragColor = vec4(color, alpha);
 
     #ifdef DIFFUSEMAP_ENABLED

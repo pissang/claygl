@@ -19,16 +19,15 @@ define(function(require) {
             //}
             poses : [],
 
-            _cacheKey : 0
+            _cacheKey : 0,
+            _cacheTime : 0
         }
     }, {
 
         setPose : function(time) {
-
             this._interpolateField(time, 'position');
             this._interpolateField(time, 'rotation');
             this._interpolateField(time, 'scale');
-
         },
 
         _interpolateField : function(time, fieldName) {
@@ -37,13 +36,28 @@ define(function(require) {
             var start;
             var end;
 
-            for (var i = this._cacheKey; i < len; i++) {
-                if (poses[i].time <= time && poses[i][fieldName]) {
-                    start = poses[i];
-                    this._cacheKey = i;
-                } else if (poses[i][fieldName]) {
-                    end = poses[i];
-                    break;
+            if (time < this._cacheTime) {
+                var start = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
+                for (var i = start; i >= 0; i--) {
+                    if (poses[i].time <= time && poses[i][fieldName]) {
+                        start = poses[i];
+                        this._cacheKey = i;
+                        this._cacheTime = time;
+                    } else if (poses[i][fieldName]) {
+                        end = poses[i];
+                        break;
+                    }
+                }
+            } else {
+                for (var i = this._cacheKey; i < len; i++) {
+                    if (poses[i].time <= time && poses[i][fieldName]) {
+                        start = poses[i];
+                        this._cacheKey = i;
+                        this._cacheTime = time;
+                    } else if (poses[i][fieldName]) {
+                        end = poses[i];
+                        break;
+                    }
                 }
             }
 
@@ -57,6 +71,7 @@ define(function(require) {
                 }
             } else {
                 this._cacheKey = 0;
+                this._cacheTime = 0;
             }
         }
     });

@@ -213,7 +213,7 @@ define(function(require) {
 
             var m3 = mat3.create();
             
-            return function( scale, rotation, position ) {
+            return function(scale, rotation, position) {
 
                 var el = this._array;
                 vec3.set(x, el[0], el[1], el[2]);

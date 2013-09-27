@@ -38,3 +38,5 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 [Sponza](http://pissang.github.io/qtek/sponza/)
 
 [Minicooper](http://pissang.github.io/qtek/minicooper/)
+
+[DOTA2 Hero Viewer](http://pissang.github.io/qtek/dota2hero/)

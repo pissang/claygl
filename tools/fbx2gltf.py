@@ -417,7 +417,7 @@ def ConvertMesh(pMesh, pNode):
         if not lLayerUV == None:
             lUVSPlitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
         else:
-            lUVSPlitted = False
+            lUVSPlitted = True
 
         hasSkin = False;
         ## Handle Skinning data
@@ -425,7 +425,7 @@ def ConvertMesh(pMesh, pNode):
             hasSkin = True;
             lControlPointsCount = pMesh.GetControlPointsCount()
             for i in range(lControlPointsCount):
-                lWeights.append([0, 0, 0, 0])
+                lWeights.append([0, 0, 0])
                 lJoints.append([-1, -1, -1, -1])
                 lJointCounts.append(0)
 
@@ -455,8 +455,9 @@ def ConvertMesh(pMesh, pNode):
                         if lJointCount <= 3:
                             # Joint index
                             lJoints[lControlPointIndex][lJointCount] = i2
-                            # Joint weight
-                            lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
+                            # Weight is FLOAT_3 because it is normalized
+                            if lJointCount < 3:
+                                lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
                             lJointCounts[lControlPointIndex] += 1
 
         if lNormalSplitted or lUVSPlitted:
@@ -497,7 +498,7 @@ def ConvertMesh(pMesh, pNode):
         if hasSkin:
             # PENDING Joint indices use other data type ?
             lGLTFPrimitive['semantics']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)
-            lGLTFPrimitive['semantics']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 4)
+            lGLTFPrimitive['semantics']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 3)
 
         lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices)
 

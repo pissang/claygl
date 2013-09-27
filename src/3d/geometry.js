@@ -175,8 +175,7 @@ define(function(require) {
             var noDirtyAttributes = true;
             for (var name in attributes) {
                 var attrib = attributes[name];
-                if (this.cache.get("dirty_"+name) ||
-                    this.cache.miss("dirty_"+name)) {
+                if (this.cache.isDirty(name)) {
                     result[name] = attributes[name];
                     noDirtyAttributes = false;
                 }
@@ -194,10 +193,9 @@ define(function(require) {
 
             this.cache.use(_gl.__GUID__);
 
-            var isDirty = this.cache.getContext();
             var dirtyAttributes = this._getDirtyAttributes();
 
-            var isFacesDirty = this.cache.get("dirty_face") || this.cache.miss("dirty_face");
+            var isFacesDirty = this.cache.isDirty('indices');
             isFacesDirty = isFacesDirty && this.isUseFace();
             
             if (dirtyAttributes) {
@@ -205,9 +203,9 @@ define(function(require) {
                 this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
                 for (var name in dirtyAttributes) {
-                    isDirty["dirty_"+name] = false ;
+                    this.cache.fresh(name);
                 }
-                isDirty['dirty_face'] = false;
+                this.cache.fresh('indices');
             }
             return this.cache.get("chunks");
         },

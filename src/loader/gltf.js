@@ -23,6 +23,7 @@ define(function(require) {
     var PointLight = require("3d/light/point");
     var SpotLight = require("3d/light/spot");
     var DirectionalLight = require("3d/light/directional");
+    var glenum = require("3d/glenum");
 
     var Vector3 = require("core/vector3");
     var Quaternion = require("core/quaternion");
@@ -174,8 +175,10 @@ define(function(require) {
                 }
 
                 joint.index = skeleton.joints.length;
-                joint.parentIndex = parentIndex;
-
+                if (parentIndex !== undefined) {
+                    joint.parentIndex = parentIndex;
+                }
+                
                 skeleton.joints.push(joint);
                 self._joints[nodeName] = joint;
                 
@@ -220,9 +223,12 @@ define(function(require) {
             _.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
                 var parameters = {
-                    format : textureInfo.format    
+                    format : glenum[textureInfo.format || 'RGBA'],
+                    wrapS : glenum[samplerInfo.wrapS || 'REPEAT'],
+                    wrapT : glenum[samplerInfo.wrapT || 'REPEAT'],
+                    magFilter : glenum[samplerInfo.magFilter || 'LINEAR'],
+                    minFilter : glenum[samplerInfo.minFilter || 'LINEAR_MIPMAP_LINEAR'],
                 }
-                _.extend(parameters, samplerInfo);
 
                 if (textureInfo.target === "TEXTURE_2D") {
                     var texture = new Texture2D(parameters);

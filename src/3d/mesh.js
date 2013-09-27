@@ -15,12 +15,9 @@ define(function(require) {
 
             geometry : null,
 
-            // Draw mode
-            // POINTS
-            // LINES
-            // TRIANGLES
-            // ...
             mode : glenum.TRIANGLES,
+            // Only if mode is LINES
+            lineWidth : 1,
             
             receiveShadow : true,
             castShadow : true,
@@ -89,6 +86,9 @@ define(function(require) {
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                         shader.setMeshAttribute(_gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size);
                     }
+                }
+                if (glDrawMode === glenum.LINES) {
+                    _gl.lineWidth(this.lineWidth);
                 }
                 //Do drawing
                 if (geometry.isUseFace()) {

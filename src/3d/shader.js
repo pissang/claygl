@@ -8,13 +8,13 @@
  */
 define(function(require) {
     
-    var Base = require("core/base"),
-        glMatrix = require("glmatrix"),
-        mat2 = glMatrix.mat2
-        mat3 = glMatrix.mat3,
-        mat4 = glMatrix.mat4,
-        util = require("util/util"),
-        _ = require("_");
+    var Base = require("core/base");
+    var glMatrix = require("glmatrix");
+    var mat2 = glMatrix.mat2;
+    var mat3 = glMatrix.mat3;
+    var mat4 = glMatrix.mat4;
+    var util = require("util/util");
+    var _ = require("_");
 
     var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+(\w+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
     var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
@@ -203,23 +203,19 @@ define(function(require) {
 
         define : function(type, key, val) {
             val = val || null;
-            switch(type) {
-                case "vertex":
-                    if (this.vertexDefines[key] !== val) {
-                        this.vertexDefines[key] = val;
-                        // Mark as dirty
-                        this.dirty();
-                    }
-                    break;
-                case "fragment":
-                    if (this.fragmentDefines[key] !== val) {
-                        this.fragmentDefines[key] = val;
-                        // Mark as dirty
-                        this.dirty();
-                    }
-                    break;
-                default:
-                    console.warn("Define type must be vertex or fragment");
+            if (type == 'vertex' || type == 'both') {
+                if (this.vertexDefines[key] !== val) {
+                    this.vertexDefines[key] = val;
+                    // Mark as dirty
+                    this.dirty();
+                }
+            }
+            if (type == 'fragment' || type == 'both') {
+                if (this.fragmentDefines[key] !== val) {
+                    this.fragmentDefines[key] = val;
+                    // Mark as dirty
+                    this.dirty();
+                }
             }
         },
 
@@ -777,11 +773,11 @@ define(function(require) {
             var shader = new Shader({
                 vertex : this.vertex,
                 fragment : this.fragment,
-                vertexDefines : Object.create(this.vertexDefines),
-                fragmentDefines : Object.create(this.fragmentDefines)
+                vertexDefines : _.clone(this.vertexDefines),
+                fragmentDefines : _.clone(this.fragmentDefines)
             });
             for (var name in this._textureStatus) {
-                shader._textureStatus[name] = Object.create(this._textureStatus[name]);
+                shader._textureStatus[name] = _.clone(this._textureStatus[name]);
             }
             return shader;
         },

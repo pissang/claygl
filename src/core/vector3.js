@@ -51,6 +51,7 @@ define(function(require) {
             // if the matrix is updated to latest
             _dirty : {
                 configurable : false,
+                writable : true,
                 value : true
             }
         })

@@ -68,7 +68,7 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
     sub.__initialize__ = initialize;
 
     // extend prototype function
-    _.extend( sub.prototype, _super.prototype, extendedProto, proto);
+    _.extend(sub.prototype, _super.prototype, extendedProto, proto);
 
     sub.prototype.constructor = sub;
     

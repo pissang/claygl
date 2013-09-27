@@ -62,7 +62,11 @@ module.exports = function(grunt){
             all : {
                 files : {
                     'dist/qtek.min.js' : ['dist/qtek.js']
-                }
+                },
+                // options : {
+                //     sourceMap : 'dist/qtek.min.map',
+                //     sourceMappingUrl : 'qtek.min.map'
+                // }
             },
             webgl : {
                 files : {

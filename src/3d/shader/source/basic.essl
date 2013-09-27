@@ -4,9 +4,8 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 uniform vec2 uvRepeat : [1.0, 1.0];
 
-attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
-attribute vec3 normal : NORMAL;
+attribute vec3 position : POSITION;
 
 attribute vec3 barycentric;
 

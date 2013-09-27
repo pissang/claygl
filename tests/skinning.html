@@ -28,6 +28,55 @@
                     }
                 }
             })
+            function createSkeletonDebugScene(skeleton, qtek) {
+                var qtek3d = qtek['3d'];
+                var scene = new qtek3d.Scene();
+                var sphereGeo = new qtek3d.geometry.Sphere({
+                    radius : 0.1
+                });
+                var sphereMat = new qtek3d.Material({
+                    shader : new qtek3d.Shader({
+                        vertex : qtek3d.Shader.source("buildin.basic.vertex"),
+                        fragment : qtek3d.Shader.source("buildin.basic.fragment")
+                    })
+                });
+                sphereMat.set("color", [0.3, 0.3, 0.3]);
+
+                var jointDebugSpheres = [];
+                skeleton.joints.forEach(function(joint) {
+
+                    var parentJoint = skeleton.joints[joint.parentIndex];
+                    var sphere = new qtek3d.Mesh({
+                        geometry : sphereGeo,
+                        material : sphereMat,
+                        autoUpdateLocalTransform : false
+                    });
+                    scene.add(sphere);
+
+                    var lineGeo = new qtek3d.Geometry();
+                    var lineGeoVertices = lineGeo.attributes.position.value;
+                    lineGeoVertices.push([0, 0, 0], [0, 0, 0]);
+                    var line = new qtek3d.Mesh({
+                        geometry : lineGeo,
+                        material : sphereMat,
+                        mode : qtek3d.Mesh.LINES,
+                        lineWidth : 2
+                    });
+                    scene.add(line);
+
+                    joint.on("afterupdate", function() {
+                        sphere.localTransform.copy(joint.worldTransform);
+                        if (parentJoint) {
+                            lineGeoVertices[0] = joint.getWorldPosition()._array;
+                            lineGeoVertices[1] = parentJoint.getWorldPosition()._array;
+                        }
+                        lineGeo.dirty('position');
+                    });
+                    joint.trigger('afterupdate');
+                });
+
+                return scene;
+            }
 
             require(['qtek',
                     'text!../tests/assets/models/knight.js'], function(qtek, modelData){
@@ -111,9 +160,15 @@
                 timeline.max = skeleton.getClipTime();
 
                 var time = 0;
+                var skeletonDebugScene = createSkeletonDebugScene(skeleton, qtek);
+                var clearAll = renderer.clear;
+                skeletonDebugScene.position.x -= 6;
                 setInterval(function(){
                     shadowMapPass.render(renderer, scene);
+                    renderer.clear = clearAll
                     renderer.render(scene, camera);
+                    renderer.clear = 0;
+                    renderer.render(skeletonDebugScene, camera);
 
                     skeleton.setPose(time);
                     timeline.value = time;

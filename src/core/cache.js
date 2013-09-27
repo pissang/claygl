@@ -42,12 +42,12 @@ define(function() {
             var key = "__dirty__" + field;
             this.put(key, true)
         },
-
+        
         dirtyAll : function(field) {
             field = field || "";
             var key = "__dirty__" + field;
             for (var contextId in this._caches) {
-                this._caches[key] = true;
+                this._caches[contextId][key] = true;
             }
         },
 
@@ -61,7 +61,7 @@ define(function() {
             field = field || "";
             var key = "__dirty__" + field;
             for (var contextId in this._caches) {
-                this._caches[key] = false;
+                this._caches[contextId][key] = false;
             }
         },
 
