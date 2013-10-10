@@ -5,6 +5,8 @@
  */
 define(function(require) {
 
+    'use strict'
+
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
     var BoundingBox = require("./boundingbox");
@@ -107,7 +109,9 @@ define(function(require) {
 
             // Typed Array of each geometry chunk
             // [{
-            //     attributeArrays:{},
+            //     attributeArrays:{
+            //         position : TypedArray
+            //     },
             //     indicesArray : null
             // }]
             _arrayChunks : [],
@@ -511,7 +515,7 @@ define(function(require) {
                 normals = this.attributes.normal.value,
                 normal = vec3.create();
 
-                v12 = vec3.create(), v23 = vec3.create();
+            var v12 = vec3.create(), v23 = vec3.create();
 
             var difference = positions.length - normals.length;
             for (var i = 0; i < normals.length; i++) {
@@ -522,7 +526,7 @@ define(function(require) {
                 normals[i] = [0.0, 0.0, 0.0];
             }
 
-            for (var f = 0; f < this.faces.length; f++) {
+            for (var f = 0; f < len; f++) {
 
                 var face = faces[f],
                     i1 = face[0],
@@ -534,7 +538,6 @@ define(function(require) {
 
                 vec3.sub(v12, p1, p2);
                 vec3.sub(v23, p2, p3);
-                // Left Hand Cartesian Coordinate System
                 vec3.cross(normal, v12, v23);
                 // Weighted by the triangle area
                 vec3.add(normals[i1], normals[i1], normal);
@@ -559,7 +562,7 @@ define(function(require) {
                 normals = this.attributes.normal.value,
                 normal = vec3.create();
 
-                v12 = vec3.create(), v23 = vec3.create();
+            var v12 = vec3.create(), v23 = vec3.create();
 
             var isCopy = normals.length === positions.length;
             //   p1
@@ -576,7 +579,6 @@ define(function(require) {
 
                 vec3.sub(v12, p1, p2);
                 vec3.sub(v23, p2, p3);
-                // Left Hand Cartesian Coordinate System
                 vec3.cross(normal, v12, v23);
 
                 if (isCopy) {
@@ -778,7 +780,19 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            
+            this.cache.use(_gl.__GUID__);
+            var chunks = this.cache.get('chunks');
+            if (chunks) {
+                for (var c = 0; c < chunks.length; c++) {
+                    var chunk = chunks[c];
+
+                    for (var name in chunk.attributeBuffers) {
+                        var attribs = chunk.attributeBuffers[name];
+                        _gl.deleteBuffer(attribs.buffer);
+                    }
+                }
+            }
+            this.cache.deleteContext(_gl.__GUID__);
         }
     });
     

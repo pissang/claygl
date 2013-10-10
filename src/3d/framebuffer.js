@@ -148,7 +148,7 @@ define(function(require) {
             if (this.cache.get("framebuffer"))
                 _gl.deleteFramebuffer(this.cache.get("framebuffer"));
 
-            this.cache.clearContext();
+            this.cache.deleteContext(_gl.__GUID__);
         }
     });
 

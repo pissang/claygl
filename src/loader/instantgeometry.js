@@ -4,10 +4,14 @@
  */
 define(function(require) {
 
+    'use strict';
+
     var Base = require("core/base");
     var util = require("util/util");
     var BoundingBox = require("3d/boundingbox");
     var Geometry = require("3d/geometry");
+    var glMatrix = require("glmatrix");
+    var vec3 = glMatrix.vec3;
 
     var InstantGeometry = Base.derive(function() {
         return {
@@ -110,7 +114,49 @@ define(function(require) {
             }
         },
         convertToGeometry : function() {
+            var geometry = new Geometry();
 
+            var offset = 0;
+            for (var c = 0; c < this._arrayChunks.length; c++) {
+                var chunk = this._arrayChunks[c],
+                    indicesArr = chunk.indices;
+
+                for (var i = 0; i < indicesArr.length; i+=3) {
+                    geometry.faces.push(
+                        [
+                            indicesArr[i] + offset,
+                            indicesArr[i+1] + offset, 
+                            indicesArr[i+2] + offset
+                        ]
+                    );
+                }
+
+                for (var name in chunk.attributes) {
+                    var attrib = chunk.attributes[name];
+                    var geoAttrib;
+                    for (var n in geometry.attributes) {
+                        if (geometry.attributes[n].semantic === attrib.semantic) {
+                            geoAttrib = geometry.attributes[n];
+                        }
+                    }
+                    if (geoAttrib) {
+                        for (var i = 0; i < attrib.array.length; i+= attrib.size) {
+                            if (attrib.size === 1) {
+                                geoAttrib.value.push(attrib.array[i]);
+                            } else {
+                                var item = [];
+                                for (var j = 0; j < attrib.size; j++) {
+                                    item[j] = attrib.array[i+j];
+                                }
+                                geoAttrib.value.push(item);
+                            }
+                        }
+                    }
+                }
+                offset += chunk.attributes.position / 3;
+            }
+
+            return geometry;
         },
         dispose : function() {
 

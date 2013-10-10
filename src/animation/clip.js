@@ -16,6 +16,7 @@ define(function(require) {
         this._startTime = new Date().getTime() + this._delay;
 
         this._endTime = this._startTime + this._life*1000;
+        this._needsRemove = false;
 
         this.loop = typeof(options.loop) == 'undefined'
                     ? false : options.loop;
@@ -80,9 +81,10 @@ define(function(require) {
             this._startTime = new Date().getTime() + this.gap;
         },
         fire : function(eventType, arg) {
+            var eventName = 'on' + eventType;
             for(var i = 0, len = this._targetPool.length; i < len; i++) {
-                if (this['on' + eventType]) {
-                    this['on' + eventType](this._targetPool[i], arg);
+                if (this[eventName]) {
+                    this[eventName](this._targetPool[i], arg);
                 }
             }
         }

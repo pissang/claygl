@@ -76,6 +76,11 @@ define(function() {
             this._context = {};
         },
 
+        deleteContext : function(contextId) {
+            delete this._caches[contextId];
+            this._context = {};
+        },
+
         'delete' : function(key) {
             delete this._context[key];
         },

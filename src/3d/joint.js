@@ -37,8 +37,8 @@ define(function(require) {
             var end;
 
             if (time < this._cacheTime) {
-                var start = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
-                for (var i = start; i >= 0; i--) {
+                var s = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
+                for (var i = s; i >= 0; i--) {
                     if (poses[i].time <= time && poses[i][fieldName]) {
                         start = poses[i];
                         this._cacheKey = i;

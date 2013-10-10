@@ -758,5 +758,3 @@ if __name__ == "__main__":
         out = open(lRoot + ".json", 'w')
         out.write(json.dumps(lOutput, indent=4, sort_keys = True, separators=(',', ': ')))
         out.close()
-
-        SaveScene(lSdkManager, lScene, "test_output.fbx")

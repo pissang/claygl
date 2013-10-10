@@ -216,9 +216,9 @@ define(function(require) {
                 // Transform self
                 if(this.useEuler) {
                     this.rotation.identity();
-                    this.rotation.rotateX(this.eulerAngle.x);
-                    this.rotation.rotateY(this.eulerAngle.y);
                     this.rotation.rotateZ(this.eulerAngle.z);
+                    this.rotation.rotateY(this.eulerAngle.y);
+                    this.rotation.rotateX(this.eulerAngle.x);
                 }
                 RTMatrix.fromRotationTranslation(this.rotation, v);
                 this.localTransform.multiply(RTMatrix);
@@ -233,9 +233,7 @@ define(function(require) {
             var scaleVector = new Vector3();
             return function(target, up) {
                 m.lookAt(this.position, target, up || this.localTransform.up).invert();
-
                 m.decomposeMatrix(scaleVector, this.rotation, this.position);
-
             }
         })(),
 

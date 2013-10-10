@@ -142,7 +142,10 @@ define(function(require) {
 
         dispose : function(_gl) {
             this.cache.use(_gl.__GUID__);
-            _gl.deleteTexture(this.cache.get("webgl_texture"));
+            if (this.cache.get("webgl_texture")){
+                _gl.deleteTexture(this.cache.get("webgl_texture"));
+            }
+            this.cache.deleteContext(_gl.__GUID__);
         },
 
         isRenderable : function() {},

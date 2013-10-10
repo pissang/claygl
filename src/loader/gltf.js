@@ -91,6 +91,16 @@ define(function(require) {
             var buffers = {};
             var self = this;
             var loading = 0;
+            // reset
+            this._buffers = {};
+            this._materials = {};
+            this._textures = {};
+            this._meshes = {};
+            this._joints = {};
+            this._skins = {};
+            this._skeleton = null;
+            this._cameras = {};
+            this._nodes = {};
             // Load buffers
             _.each(json.buffers, function(bufferInfo, name) {
                 loading++;

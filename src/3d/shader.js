@@ -782,8 +782,13 @@ define(function(require) {
             return shader;
         },
 
-        dispose : function() {
-            
+        dispose : function(_gl) {
+            this.cache.use(_gl.__GUID__);
+            if (program) {
+                var program = this.cache.get('program');
+            }
+            _gl.deleteProgram(program);
+            this.cache.deleteContext(_gl.__GUID__);
         }
     });
         

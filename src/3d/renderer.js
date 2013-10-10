@@ -7,6 +7,7 @@ define(function(require) {
     var util = require("util/util");
     var Light = require("./light");
     var Mesh = require("./mesh");
+    var Texture = require("./texture");
     var WebGLInfo = require('./webglinfo');
 
     var Renderer = Base.derive(function() {
@@ -375,8 +376,46 @@ define(function(require) {
                     _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
                     _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);   
                 }
-
             }
+        },
+
+        disposeScene : function(scene) {
+            var materials = {};
+            scene.traverse(function(node) {
+                if (node.geometry) {
+                    node.geometry.dispose(this.gl);
+                }
+                if (node.material) {
+                    materials[node.material.__GUID__] = node.material;
+                }
+            });
+            for (var guid in materials) {
+                var mat = materials[guid];
+                mat.shader.dispose(this.gl);
+                for (var name in mat.uniforms) {
+                    var val = mat.uniforms[name].value;
+                    if (!val ) {
+                        continue;
+                    }
+                    if (val.instanceof &&
+                        val.instanceof(Texture)) {
+                        val.dispose(this.gl);
+                    }
+                    else if (val instanceof Array) {
+                        for (var i = 0; i < val.length; i++) {
+                            if (val[i] && val[i].instanceof && val[i].instanceof(Texture)) {
+                                val[i].dispose(this.gl);
+                            }
+                        }
+                    }
+                }
+                mat.dispose();
+            }
+            scene.lightNumber = {};
+            scene.lightUniforms = {};
+            scene.material = {};
+            scene._nodeRepository = {};
+            scene.children = [];
         },
 
         _materialSortFunc : function(x, y) {

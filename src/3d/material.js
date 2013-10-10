@@ -68,13 +68,14 @@ define(function(require) {
             var slot = 0;
 
             // Set uniforms
-            _.each(this.uniforms, function(uniform, symbol) {
+            for (var symbol in this.uniforms) {
+                var uniform = this.uniforms[symbol];
                 if (uniform.value === null) {
-                    return;
+                    continue;
                 }
                 else if (uniform.value instanceof Array
                     && ! uniform.value.length) {
-                    return;
+                    continue;
                 }
                 if (uniform.value.instanceof &&
                     uniform.value.instanceof(Texture)) {
@@ -82,7 +83,7 @@ define(function(require) {
                     var texture = uniform.value;
                     // Maybe texture is not loaded yet;
                     if (! texture.isRenderable()) {
-                        return;
+                        continue;
                     }
 
                     _gl.activeTexture(_gl.TEXTURE0 + slot);
@@ -124,7 +125,7 @@ define(function(require) {
                     this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                 }
 
-            }, this);
+            }
         },
 
         set : function(symbol, value) {
