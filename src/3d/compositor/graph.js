@@ -47,7 +47,7 @@ define( function( require ) {
 
         },
 
-        findPin : function( info ) {
+        findPin : function(info) {
             var node;
             if (typeof(info.node) === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {

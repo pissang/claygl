@@ -1,5 +1,5 @@
 /**
- *  @export{object} requester
+ *  @export{object} request
  */
 define(function(require) {
 
@@ -10,7 +10,7 @@ define(function(require) {
         xhr.open("get", options.url);
         // With response type set browser can get and put binary data
         // https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Sending_and_Receiving_Binary_Data
-        // Defautl is text, and it can be set
+        // Default is text, and it can be set
         // arraybuffer, blob, document, json, text
         xhr.responseType = options.responseType || "text";
 

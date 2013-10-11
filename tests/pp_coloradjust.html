@@ -97,11 +97,11 @@
                 // colorAdjustNode.setParameter("gamma", 1.3);
                 compositor.add( colorAdjustNode );
 
-                setInterval( function(){
-                    compositor.render( renderer );
-                    
+                setInterval(function(){
+                    // compositor.render(renderer);
+                    renderer.render(scene, camera);
                     mesh.rotation.rotateY(Math.PI/500);
-                }, 20 )
+                }, 20);
             })
             
         </script>

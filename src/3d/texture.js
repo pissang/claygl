@@ -6,12 +6,13 @@ define(function(require) {
 
     var Base = require("core/base");
     var glenum = require("./glenum");
+    var util = require("util/util");
     var _ = require("_");
 
     var Texture = Base.derive(function() {
 
         return {
-
+            __GUID__ : util.genGUID(),
             // Width and height is used when the image is null and want
             // to use it as a texture attach to framebuffer(RTT)
             width : 512,

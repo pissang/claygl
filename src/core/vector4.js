@@ -1,5 +1,7 @@
 define( function(require) {
 
+    'use strict';
+
     var glMatrix = require("glmatrix");
     var vec4 = glMatrix.vec4;
 

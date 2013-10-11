@@ -1,4 +1,6 @@
-define( function(require) {
+define(function(require) {
+
+    'use strict';
 
     var glMatrix = require("glmatrix");
     var quat = glMatrix.quat;
@@ -60,6 +62,7 @@ define( function(require) {
             },
             _dirty : {
                 configurable : false,
+                writable : true,
                 value : false
             }
         })

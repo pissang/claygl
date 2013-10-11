@@ -158,8 +158,20 @@ define(function(require) {
 
             return geometry;
         },
-        dispose : function() {
+        dispose : function(_gl) {
+            this.cache.use(_gl.__GUID__);
+            var chunks = this.cache.get('chunks');
+            if (chunks) {
+                for (var c = 0; c < chunks.length; c++) {
+                    var chunk = chunks[c];
 
+                    for (var name in chunk.attributeBuffers) {
+                        var attribs = chunk.attributeBuffers[name];
+                        _gl.deleteBuffer(attribs.buffer);
+                    }
+                }
+            }
+            this.cache.deleteContext(_gl.__GUID__);
         }
     });
 

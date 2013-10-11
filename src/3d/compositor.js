@@ -1,5 +1,7 @@
 define(function(require){
 
+    'use strict';
+
     var Graph = require("./compositor/graph");
 
     var Compositor = Graph.derive(function() {
@@ -30,11 +32,11 @@ define(function(require){
             }
         },
 
-        setOutput : function(node) {
+        addOutput : function(node) {
             this._outputs.push(node);
         },
 
-        unsetOutput : function(node) {
+        removeOutput : function(node) {
             this._outputs.splice(this._outputs.indexOf(node), 1);
         }
     })

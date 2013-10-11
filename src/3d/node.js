@@ -1,5 +1,7 @@
 define(function(require) {
     
+    'use strict';
+
     var Base = require("core/base");
     var Vector3 = require("core/vector3");
     var BoundingBox = require("./boundingbox");
@@ -46,6 +48,36 @@ define(function(require) {
 
             boundingBox : new BoundingBox()
         }
+    }, function() {
+        // Prevent multiple nodes use the same vector and 
+        // have problem in dirty checking
+        var position = this.position;
+        var rotation = this.rotation;
+        var scale = this.scale;
+        Object.defineProperty(this, 'position', {
+            set : function(v) {
+                position.copy(v);
+            },
+            get : function() {
+                return position;
+            }
+        });
+        Object.defineProperty(this, 'rotation', {
+            set : function(v) {
+                rotation.copy(v);
+            },
+            get : function() {
+                return rotation;
+            }
+        });
+        Object.defineProperty(this, 'scale', {
+            set : function(v) {
+                scale.copy(v);
+            },
+            get : function() {
+                return scale;
+            }
+        });
     }, {
 
         add : function(node) {

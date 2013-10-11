@@ -380,10 +380,20 @@ define(function(require) {
         },
 
         disposeScene : function(scene) {
+            this.disposeNode(scene);
+            scene.lightNumber = {};
+            scene.lightUniforms = {};
+            scene.material = {};
+            scene._nodeRepository = {};
+            scene.children = [];
+        },
+
+        disposeNode : function(root) {
             var materials = {};
-            scene.traverse(function(node) {
+            var _gl = this.gl;
+            root.traverse(function(node) {
                 if (node.geometry) {
-                    node.geometry.dispose(this.gl);
+                    node.geometry.dispose(_gl);
                 }
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
@@ -391,7 +401,7 @@ define(function(require) {
             });
             for (var guid in materials) {
                 var mat = materials[guid];
-                mat.shader.dispose(this.gl);
+                mat.shader.dispose(_gl);
                 for (var name in mat.uniforms) {
                     var val = mat.uniforms[name].value;
                     if (!val ) {
@@ -399,23 +409,18 @@ define(function(require) {
                     }
                     if (val.instanceof &&
                         val.instanceof(Texture)) {
-                        val.dispose(this.gl);
+                        val.dispose(_gl);
                     }
                     else if (val instanceof Array) {
                         for (var i = 0; i < val.length; i++) {
                             if (val[i] && val[i].instanceof && val[i].instanceof(Texture)) {
-                                val[i].dispose(this.gl);
+                                val[i].dispose(_gl);
                             }
                         }
                     }
                 }
                 mat.dispose();
             }
-            scene.lightNumber = {};
-            scene.lightUniforms = {};
-            scene.material = {};
-            scene._nodeRepository = {};
-            scene.children = [];
         },
 
         _materialSortFunc : function(x, y) {

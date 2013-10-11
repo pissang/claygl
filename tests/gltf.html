@@ -35,7 +35,7 @@
             var GLTFLoader = new qtek.loader.GLTF();
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
-
+            
             GLTFLoader.on("load", function(scene, cameras) {
                 var camera = cameras[Object.keys(cameras)[0]];
                 if (!camera) {
@@ -71,9 +71,9 @@
                     renderer.render(scene, camera);
                 }, 50);
 
-                setTimeout(function() {
-                    renderer.disposeScene(scene);
-                }, 1000)
+                // setTimeout(function() {
+                //     renderer.disposeScene(scene);
+                // }, 1000)
             });
         });
     </script>

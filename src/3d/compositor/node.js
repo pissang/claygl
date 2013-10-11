@@ -2,11 +2,11 @@
  * Example
  * {
  *  name : "xxx",
-    shader : shader,
+ *  shader : shader,
  *  inputs :{ 
-        "texture" : {
-            node : "xxx",
-            pin : "diffuse"
+ *      "texture" : {
+ *          node : "xxx",
+ *          pin : "diffuse"
         }
     },
     // Optional, only use for the node in group
@@ -30,11 +30,13 @@
         // Node output pin name : group output pin name
         "diffuse" : "diffuse"
     }
- * Multiple outputs is reserved for MRT support
+ * Multiple outputs is reserved for MRT support in WebGL2.0
  *
  * TODO blending 
  */
 define(function(require) {
+
+    'use strict';
 
     var Base = require("core/base");
     var Pass = require("./pass");
@@ -52,29 +54,42 @@ define(function(require) {
             outputs : null,
 
             shader : '',
-            // Example:
-            // inputName : {
-            //  node : [Node],
-            //  pin : 'xxxx'    
-            // }
+            /**
+             * Input links, will be auto updated by the graph
+             * Example:
+             * inputName : {
+             *     node : [Node],
+             *     pin : 'xxxx'    
+             * }
+             * @type {Object}
+             */
             inputLinks : {},
-            // Example:
-            // outputName : [{
-            //  node : [Node],
-            //  pin : 'xxxx'    
-            // }]
+            /**
+             * Output links, will be auto updated by the graph
+             * Example:
+             * outputName : {
+             *     node : [Node],
+             *     pin : 'xxxx'    
+             * }
+             * @type {Object}
+             */
             outputLinks : {},
-
-
+            /**
+             * @type {qtek3d.compositor.Pass}
+             */
             pass : null,
 
+            // Save the output texture of previous frame
+            // Will be used when there exist a circular reference
+            _prevOutputTextures : {},
             _outputTextures : {},
             //{
             //  name : 2
             //}
             _outputReferences : {},
 
-            _rendering : false
+            _rendering : false,
+            _circularReference : {}
         }
     }, function() {
         if (this.shader) {
@@ -89,7 +104,10 @@ define(function(require) {
             })
         }
     }, {
-
+        /**
+         * Do rendering
+         * @param  {qtek3d.Renderer} renderer
+         */
         render : function(renderer) {
             
             this._rendering = true;
@@ -111,9 +129,24 @@ define(function(require) {
                 for (var name in this.outputs) {
 
                     var outputInfo = this.outputs[name];
-
-                    var texture = texturePool.get(outputInfo.parameters || {});
-                    this._outputTextures[name] = texture;
+                    var texture;
+                    // It is special when handling circular reference
+                    // Input will use the output texture of previous pass.
+                    // So the texture of current pass and previous pass are both needed
+                    // and be swapped each render pass
+                    if (this._circularReference[name]) {
+                        // Swap the texture
+                        if (!this._outputTextures[name]) {
+                            this._outputTextures[name] = texturePool.get(outputInfo.parameters || {});
+                        }
+                        var tmp = this._prevOutputTextures[name];
+                        this._prevOutputTextures[name] = this._outputTextures[name];
+                        this._outputTextures[name] = tmp;
+                        texture = tmp;
+                    } else {
+                        texture = texturePool.get(outputInfo.parameters || {});
+                        this._outputTextures[name] = texture;
+                    }
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
@@ -153,10 +186,13 @@ define(function(require) {
                 // Already been rendered in this frame
                 return this._outputTextures[name];
             } else if(this._rendering) {
+                if (!this._prevOutputTextures[name]) {
+                    // Create a blank texture at first pass
+                    this._prevOutputTextures[name] = texturePool.get(outputInfo.parameters || {});
+                }
+                this._circularReference[name] = true;
                 // Solve circular reference
-                var texture = texturePool.get(outputInfo.parameters || {});
-                this._outputTextures[name] = texture;
-                return texture;
+                return this._prevOutputTextures[name];
             }
 
             this.render(renderer);
@@ -169,15 +205,17 @@ define(function(require) {
             if (this._outputReferences[name] === 0) {
                 // Output of this node have alreay been used by all other nodes
                 // Put the texture back to the pool.
-                texturePool.put(this._outputTextures[name]);
-                this._outputTextures[name] = null;
+                if (!this._circularReference[name]) {
+                    texturePool.put(this._outputTextures[name]);
+                    this._outputTextures[name] = null;
+                }
             }
         },
 
         link : function(inputPinName, fromNode, fromPinName) {
 
             // The relationship from output pin to input pin is one-on-multiple
-            this.inputLinks[ inputPinName ] = {
+            this.inputLinks[inputPinName] = {
                 node : fromNode,
                 pin : fromPinName
             }
@@ -197,7 +235,7 @@ define(function(require) {
 
         updateReference : function() {
             for (var name in this.outputLinks) {
-                this._outputReferences[ name ] = this.outputLinks[name].length;
+                this._outputReferences[name] = this.outputLinks[name].length;
             }
         }
     })

@@ -29,10 +29,10 @@
             var pp_Node = qtek3d.compositor.Node;
             var compositor = new qtek3d.Compositor();
 
-            var SIZE = 256;
+            var SIZE = 32;
 
             var renderer = new qtek3d.Renderer({
-                canvas : document.getElementById( "Main")
+                canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -47,14 +47,14 @@
                 useMipmap : false
             };
 
-            // var spawnNode = new pp_Node({
-            //     shader : Shader.source("curlnoise.spawn"),
-            //     outputs : {
-            //         'position' : {
-            //             parameters : parameters
-            //         }
-            //     }
-            // });
+            var spawnNode = new pp_Node({
+                shader : Shader.source("curlnoise.spawn"),
+                outputs : {
+                    'position' : {
+                        parameters : parameters
+                    }
+                }
+            });
 
             var noiseNode = new pp_Node({
                 shader : Shader.source("curlnoise.noise"),
@@ -66,42 +66,33 @@
             });
 
             var particleNode = new pp_Node({
+                name : 'particle',
                 shader : Shader.source("curlnoise.particle"),
                 inputs : {
-                    // 'spawnTexture' : {
-                    //     node : spawnNode,
-                    //     pin : 'position'
-                    // },
+                    'particleTexture' : {
+                        node : 'particle',
+                        pin : 'position'
+                    },
+                    'spawnTexture' : {
+                        node : spawnNode,
+                        pin : 'position'
+                    },
                     'noiseTexture' : {
                         node : noiseNode,
                         pin : 'noise'
                     }
+                },
+                outputs : {
+                    'position' : {
+                        parameters : parameters
+                    }
                 }
             });
 
-            // compositor.add(spawnNode);
+            compositor.add(spawnNode);
             compositor.add(noiseNode);
             compositor.add(particleNode);
-
-            var sourceTexture = new qtek3d.texture.Texture2D(parameters);
-            var targetTexture = new qtek3d.texture.Texture2D(parameters);
-
-            var frameBuffer = new qtek3d.FrameBuffer();
-
-            function swapParticleTexture(){
-                var tmp = sourceTexture;
-                sourceTexture = targetTexture;
-                targetTexture = tmp;
-            }
-
-            particleNode.pass.on("beforerender", function(renderer){
-                frameBuffer.attach(renderer.gl, targetTexture);
-                frameBuffer.bind(renderer);
-                particleNode.setParameter('particleTexture', sourceTexture);
-            });
-            particleNode.pass.on("afterrender", function(renderer){
-                frameBuffer.unbind(renderer);
-            });
+            compositor.addOutput(particleNode);
 
             particleNode.setParameters({
                 particleTextureSize : SIZE,
@@ -153,50 +144,6 @@
             });
             control.enable();
 
-            // Dragon
-            var data = JSON.parse(modelData);
-            var loader = new qtek.loader.three.Model();
-            var meshList = loader.parse(data);
-            var root = new qtek3d.Node();
-            var material = new qtek3d.Material({
-                shader : qtek3d.shader.library.get('buildin.lambert'),
-                // transparent : true
-            });
-            // meshList[0].geometry = new qtek3d.geometry.Sphere({
-            //     radius : 0.1
-            // });
-            root.scale.set(0.50, 0.50, 0.50);
-            // material.set('color', [1.0, 1.0, 1.0]);
-            // material.set('lineWidth', 0.7);
-            meshList.forEach(function(mesh) {
-                mesh.geometry.generateBarycentric();
-                mesh.material = material;
-                root.add(mesh);
-            });
-            scene.add(root);
-            var light = new qtek3d.light.Directional();
-            light.position.set(0, 0.3, 0.3);
-            light.lookAt(scene.position);
-            scene.add(light);
-
-            // 
-            var spawnTexture = new qtek3d.texture.Texture2D(parameters);
-            var pixels = new Float32Array(SIZE * SIZE * 4);
-            var positions = meshList[0].geometry.attributes.position.value;
-            var cursor = 0;
-            var len = positions.length;
-            for (var i = 0; i < SIZE * SIZE; i++) {
-                pixels[cursor++] = positions[i % len][0] * 0.50;
-                pixels[cursor++] = positions[i % len][1] * 0.50;
-                pixels[cursor++] = positions[i % len][2] * 0.50;
-                pixels[cursor++] = Math.random() * 4;
-            }
-            spawnTexture.width = SIZE;
-            spawnTexture.height = SIZE;
-            spawnTexture.pixels = pixels;
-            particleNode.setParameter("spawnTexture", spawnTexture);
-
-
             var time = new Date().getTime();
             var elapsedTime = 0;
 
@@ -206,16 +153,16 @@
                 elapsedTime += deltaTime;
                 time = currentTime;
 
-                // spawnNode.setParameter("elapsedTime", elapsedTime);
+                spawnNode.setParameter("elapsedTime", elapsedTime);
                 noiseNode.setParameter("elapsedTime", elapsedTime);
                 particleNode.setParameter("elapsedTime", elapsedTime);
                 particleNode.setParameter("deltaTime", deltaTime);
                 compositor.render(renderer);
 
-                mat.set("particleTexture", targetTexture);
+                mat.set("particleTexture", particleNode._outputTextures['position']);
                 renderer.render(scene, camera);
 
-                swapParticleTexture();
+                // swapParticleTexture();
 
                 setTimeout(update, 100);
             }
