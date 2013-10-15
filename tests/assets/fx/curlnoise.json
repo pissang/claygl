@@ -1,0 +1,68 @@
+{
+    "meta" : {},
+    "shaders" : {
+        "curlnoise" : "#url(curlnoise.essl)"
+    },
+    "parameters" : {
+        "common" : {
+            "width" : 32,
+            "height" : 32,
+            "type" : "FLOAT",
+            "minFilter" : "NEAREST",
+            "magFilter" : "NEAREST",
+            "useMipmap" : false
+        }
+    },
+    "textures" : {},
+    "nodes" : [
+        {
+            "name" : "spawn",
+            "shader" : "#source(curlnoise.spawn)",
+            "type" : "processor",
+            "outputs" : {
+                "position" : {
+                    "parameters" : "#common"
+                }
+            }
+        },
+        {
+            "name" : "noise",
+            "shader" : "#source(curlnoise.noise)",
+            "type" : "processor",
+            "outputs" : {
+                "noise" : {
+                    "parameters" : "#common"
+                }
+            }
+        },
+        {
+            "name" : "particle",
+            "shader" : "#source(curlnoise.particle)",
+            "type" : "processor",
+            "output" : true,
+            "parameters" : {
+                "particleTextureSize" : 32,
+                "noiseTextureSize" : 32
+            },
+            "inputs" : {
+                "particleTexture" : {
+                    "node" : "particle",
+                    "pin" : "position"
+                },
+                "spawnTexture" : {
+                    "node" : "spawn",
+                    "pin" : "position"
+                },
+                "noiseTexture" : {
+                    "node" : "noise",
+                    "pin" : "noise"
+                }
+            },
+            "outputs" : {
+                "position" : {
+                    "parameters" : "#common"
+                }
+            }
+        }
+    ]
+}

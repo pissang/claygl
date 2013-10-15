@@ -25,6 +25,10 @@ define(function(require) {
             return Graph.prototype.update.call(this);
         },
 
+        findNode : function(name) {
+            return Graph.prototype.findNode.call(this);
+        },
+
         findPin : function(info) {
             return Graph.prototype.findPin.call(this, info);
         },

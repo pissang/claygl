@@ -47,12 +47,16 @@ define(function(require) {
     }, {
 
         setUniform : function(name, value) {
-            
             var uniform = this.material.uniforms[name];
             if (uniform) {
                 uniform.value = value;
-            } else {
-                // console.warn('Unkown uniform "' + name + '"');
+            }
+        },
+
+        getUniform : function(name) {
+            var uniform = this.material.uniforms[name];
+            if (uniform) {
+                return uniform.value;
             }
         },
 
@@ -95,9 +99,9 @@ define(function(require) {
                 ext.drawBuffersEXT(bufs);
             }
 
-            this.trigger("beforerender", renderer);
+            this.trigger("beforerender", this, renderer);
             renderer.render(scene, camera, true);
-            this.trigger("afterrender", renderer);
+            this.trigger("afterrender", this, renderer);
 
             if (frameBuffer) {
                 this.unbind(renderer, frameBuffer);

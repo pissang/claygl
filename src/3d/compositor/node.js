@@ -109,7 +109,7 @@ define(function(require) {
          * @param  {qtek3d.Renderer} renderer
          */
         render : function(renderer) {
-            
+                        
             this._rendering = true;
 
             var _gl = renderer.gl;
@@ -156,7 +156,6 @@ define(function(require) {
                 }
 
                 this.pass.render(renderer, this.frameBuffer);
-
             }
             
             for (var inputName in this.inputLinks) {
@@ -171,13 +170,24 @@ define(function(require) {
             this.pass.setUniform(name, value);
         },
 
+        getParameter : function(name) {
+            return this.pass.getUniform(name);
+        },
+
         setParameters : function(obj) {
             for (var name in obj) {
                 this.setParameter(name, obj[name]);
             }
         },
 
-        getOutput : function(renderer, name) {
+
+        getOutput : function(renderer /*optional*/, name) {
+            if (name === undefined) {
+                // Return the output texture without rendering
+                name = renderer;
+                return this._outputTextures[name];
+            }
+            
             var outputInfo = this.outputs[name];
             if (! outputInfo) {
                 return ;

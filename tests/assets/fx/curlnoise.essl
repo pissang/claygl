@@ -105,6 +105,30 @@ void main()
 }
 @end
 
+///////////////////////////////////////////////////////////
+@export curlnoise.spawn
+
+uniform vec3 spawnPosition : [0, 0, 0];
+uniform float elapsedTime;
+
+uniform float spawnSize : 0.2;
+
+varying vec2 v_Texcoord;
+
+@import curlnoise.snoise
+
+void main(){
+    vec2 p = v_Texcoord * 2.0 -1.0;
+
+    float x = spawnPosition.x + snoise(50.0*p + elapsedTime) * spawnSize;
+    float y = spawnPosition.y + snoise(61.0*p + elapsedTime) * spawnSize;
+    float z = spawnPosition.z + snoise(72.0*p + elapsedTime) * spawnSize;
+    float t = snoise(83.0*p + elapsedTime) * 6.0+6.0;
+
+    gl_FragColor = vec4(x/10.0, y/10.0, z/10.0, t);
+}
+
+@end
 
 ///////////////////////////////////////////////////////////
 @export curlnoise.particle
@@ -150,31 +174,6 @@ void main(){
     }
 
     gl_FragColor = particle;
-}
-
-@end
-
-///////////////////////////////////////////////////////////
-@export curlnoise.spawn
-
-uniform vec3 spawnPosition : [0, 0, 0];
-uniform float elapsedTime;
-
-uniform float spawnSize : 0.2;
-
-varying vec2 v_Texcoord;
-
-@import curlnoise.snoise
-
-void main(){
-    vec2 p = v_Texcoord * 2.0 -1.0;
-
-    float x = spawnPosition.x + snoise(50.0*p + elapsedTime) * spawnSize;
-    float y = spawnPosition.y + snoise(61.0*p + elapsedTime) * spawnSize;
-    float z = spawnPosition.z + snoise(72.0*p + elapsedTime) * spawnSize;
-    float t = snoise(83.0*p + elapsedTime) * 6.0+6.0;
-
-    gl_FragColor = vec4(x/10.0, y/10.0, z/10.0, t);
 }
 
 @end

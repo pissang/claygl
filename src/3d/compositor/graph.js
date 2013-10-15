@@ -22,6 +22,14 @@ define( function( require ) {
             this._dirty = true;
         },
 
+        findNode : function(name) {
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].name === name) {
+                    return this.nodes[i];
+                }
+            }
+        },
+
         update : function() {
             for (var i = 0; i < this.nodes.length; i++) {
                 this.nodes[i].clear();

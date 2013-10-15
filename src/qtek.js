@@ -117,13 +117,14 @@ define( function(require){
 			"notifier": require('core/mixin/notifier')
 		},
 		"Quaternion": require('core/quaternion'),
-		"requester": require('core/request'),
+		"request": require('core/request'),
 		"Vector2": require('core/vector2'),
 		"Vector3": require('core/vector3'),
 		"Vector4": require('core/vector4')
 	},
 	"Engine": require('engine'),
 	"loader": {
+		"FX": require('loader/fx'),
 		"GLTF": require('loader/gltf'),
 		"InstantGeometry": require('loader/instantgeometry'),
 		"SVG": require('loader/svg'),

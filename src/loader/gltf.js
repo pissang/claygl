@@ -49,19 +49,7 @@ define(function(require) {
         return {
             rootPath : "",
             textureRootPath : "",
-            bufferRootPath : "",
-
-            _buffers : {},
-            _materials : {},
-            _textures : {},
-            _meshes : {},
-
-            _joints : {},
-            _skins : {},
-            _skeleton : null,
-
-            _cameras : {},
-            _nodes : {}
+            bufferRootPath : ""
         };
     }, {
         load : function(url) {
@@ -85,27 +73,28 @@ define(function(require) {
                         self.trigger("load", scene, cameras, skeleton);
                     });
                 }
-            })
+            });
         },
         parse : function(json, callback) {
-            var buffers = {};
             var self = this;
             var loading = 0;
-            // reset
-            this._buffers = {};
-            this._materials = {};
-            this._textures = {};
-            this._meshes = {};
-            this._joints = {};
-            this._skins = {};
-            this._skeleton = null;
-            this._cameras = {};
-            this._nodes = {};
+
+            var lib = {
+                buffers : {},
+                materials : {},
+                textures : {},
+                meshes : {},
+                joints : {},
+                skins : {},
+                skeleton : null,
+                cameras : {},
+                nodes : {}
+            };
             // Load buffers
             _.each(json.buffers, function(bufferInfo, name) {
                 loading++;
                 self._loadBuffer(bufferInfo.path, function(buffer) {
-                    buffers[name] = buffer;
+                    lib.buffers[name] = buffer;
                     loading--;
                     if (loading === 0) {
                         afterLoadBuffer();
@@ -118,30 +107,27 @@ define(function(require) {
                 });
             });
 
-            this._buffers = buffers;
-
             function afterLoadBuffer() {
-                self._parseSkins(json);
-                self._parseTextures(json);
-                self._parseMaterials(json);
-                self._parseMeshes(json);
-                self._parseNodes(json);
+                self._parseSkins(json, lib);
+                self._parseTextures(json, lib);
+                self._parseMaterials(json, lib);
+                self._parseMeshes(json, lib);
+                self._parseNodes(json, lib);
 
                 // Build scene
                 var scene = new Scene();
                 var sceneInfo = json.scenes[json.scene];
                 for (var i = 0; i < sceneInfo.nodes.length; i++) {
-                    if (self._joints[sceneInfo.nodes[i]]) {
+                    if (lib.joints[sceneInfo.nodes[i]]) {
                         // Skip joint node
                         continue;
                     }
-                    var node = self._nodes[sceneInfo.nodes[i]];
+                    var node = lib.nodes[sceneInfo.nodes[i]];
                     scene.add(node);
                 }
 
-                callback && callback(scene, self._cameras, self._skeleton);
+                callback && callback(scene, lib.cameras, lib.skeleton);
             }
-
         },
 
         _loadBuffer : function(path, onsuccess, onerror) {
@@ -161,7 +147,7 @@ define(function(require) {
             });
         },
 
-         _parseSkins : function(json) {
+         _parseSkins : function(json, lib) {
             var self = this;
             // Build skeleton
             var skeleton = new Skeleton();
@@ -169,7 +155,7 @@ define(function(require) {
 
             var createJoint = function(nodeName, parentIndex) {
                 // Have been created
-                if (self._joints[nodeName]) {
+                if (lib.joints[nodeName]) {
                     return;
                 }
                 var nodeInfo = json.nodes[nodeName];
@@ -190,7 +176,7 @@ define(function(require) {
                 }
                 
                 skeleton.joints.push(joint);
-                self._joints[nodeName] = joint;
+                lib.joints[nodeName] = joint;
                 
                 for (var i = 0; i < nodeInfo.children.length; i++) {
                     var child = createJoint(nodeInfo.children[i], joint.index);
@@ -216,20 +202,19 @@ define(function(require) {
                 var skinInfo = json.skins[name];
                 var jointIndices = [];
                 for (var i = 0; i < skinInfo.joints.length; i++) {
-                    var joint = self._joints[skinInfo.joints[i]];
+                    var joint = lib.joints[skinInfo.joints[i]];
                     jointIndices.push(joint.index);
                 }
-                this._skins[name] = {
+                lib.skins[name] = {
                     joints : jointIndices
                 }
             }
             skeleton.updateJointMatrices();
             skeleton.update();
-            this._skeleton = skeleton;
+            lib.skeleton = skeleton;
         },
 
-        _parseTextures : function(json) {
-            var textures = {};
+        _parseTextures : function(json, lib) {
             _.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
                 var parameters = {
@@ -246,13 +231,11 @@ define(function(require) {
                     texture.image = this._loadImage(imageInfo.path, function() {
                         texture.dirty();
                     });
-                    textures[name] = texture;
+                    lib.textures[name] = texture;
                 } else if(textureInfo.target === "TEXTURE_CUBE_MAP") {
                     // TODO
                 }
             }, this);
-            this._textures = textures;
-            return textures;
         },
 
         _loadImage : function(path, onsuccess) {
@@ -270,9 +253,8 @@ define(function(require) {
         },
         // Only phong material is support yet
         // TODO : support custom material
-        _parseMaterials : function(json) {
+        _parseMaterials : function(json, lib) {
             var self = this;
-            var materials = {};
             var techniques = {};
             // Parse techniques
             for (var name in json.techniques) {
@@ -296,8 +278,8 @@ define(function(require) {
                 var uniforms = {};
                 instanceTechniqueInfo.values.forEach(function(item){
                     if (typeof(item.value) === "string" &&
-                        self._textures[item.value]) {
-                        var value = self._textures[item.value]
+                        lib.textures[item.value]) {
+                        var value = lib.textures[item.value]
                     } else {
                         var value = item.value;
                     }
@@ -348,15 +330,11 @@ define(function(require) {
                     material.set("alpha", uniforms["transparency"]);
                 }
 
-                materials[name] = material;
+                lib.materials[name] = material;
             }
-
-            this._materials = materials;
-            return materials;
         },
 
-        _parseMeshes : function(json) {
-            var meshes = {};
+        _parseMeshes : function(json, lib) {
             var self = this;
 
             for (var name in json.meshes) {
@@ -373,7 +351,7 @@ define(function(require) {
                     // Parse indices
                     var indicesInfo = json.indices[primitiveInfo.indices];
                     var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
-                    var buffer = this._buffers[bufferViewInfo.buffer];
+                    var buffer = lib.buffers[bufferViewInfo.buffer];
                     var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
 
                     var byteLength = indicesInfo.count * 2; //two byte each index
@@ -384,7 +362,7 @@ define(function(require) {
                         var attributeInfo = json.attributes[primitiveInfo.semantics[semantic]];
                         var attributeName = semanticAttributeMap[semantic];
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
-                        var buffer = this._buffers[bufferViewInfo.buffer];
+                        var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
                         var byteLength = attributeInfo.count * attributeInfo.byteStride;
                         // TODO : Support more types
@@ -426,7 +404,7 @@ define(function(require) {
                 // Material
                 // All primitives have the same material and skin
                 // TODO;
-                var material = this._materials[meshInfo.primitives[0].material];
+                var material = lib.materials[meshInfo.primitives[0].material];
                 var mesh = new Mesh({
                     geometry : geometry,
                     material : material
@@ -436,22 +414,18 @@ define(function(require) {
                 }
                 var skinName = meshInfo.primitives[0].skin
                 if (skinName) {
-                    mesh.joints = this._skins[skinName].joints;
-                    mesh.skeleton = this._skeleton;
+                    mesh.joints = lib.skins[skinName].joints;
+                    mesh.skeleton = lib.skeleton;
                     material.shader = material.shader.clone();
                     material.shader.define('vertex', 'SKINNING');
                     material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
                 }
 
-                meshes[name] = mesh;
+                lib.meshes[name] = mesh;
             }
-            this._meshes = meshes;
-            return meshes;
         },
 
-        _parseNodes : function(json) {
-            var nodes = {};
-
+        _parseNodes : function(json, lib) {
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
                 if (nodeInfo._isJoint) {
@@ -475,7 +449,7 @@ define(function(require) {
                         node = new OrthographicCamera();
                         console.warn("TODO:Orthographic camera")
                     }
-                    this._cameras[nodeInfo.name] = node;
+                    lib.cameras[nodeInfo.name] = node;
                 } else {
                     node = new Node({
                         name : nodeInfo.name
@@ -492,7 +466,7 @@ define(function(require) {
                 }
                 if (nodeInfo.meshes) {
                     for (var i = 0; i < nodeInfo.meshes.length; i++) {
-                        var mesh = this._meshes[nodeInfo.meshes[i]];
+                        var mesh = lib.meshes[nodeInfo.meshes[i]];
                         if (mesh) {
                             node.add(mesh);
                         }
@@ -505,7 +479,7 @@ define(function(require) {
                     node.decomposeMatrix();
                 }
 
-                nodes[name] = node;
+                lib.nodes[name] = node;
             }
 
             // Build hierarchy
@@ -515,18 +489,15 @@ define(function(require) {
                     // Skip joint node
                     continue;
                 }
-                var node = nodes[name];
+                var node = lib.nodes[name];
                 if (nodeInfo.children) {
                     for (var i = 0; i < nodeInfo.children.length; i++) {
                         var childName = nodeInfo.children[i];
-                        var child = nodes[childName];
+                        var child = lib.nodes[childName];
                         node.add(child);
                     }
                 }
             }
-
-            this._nodes = nodes;
-            return nodes;
          },
 
         _parseLight : function(lightInfo) {

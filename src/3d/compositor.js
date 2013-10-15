@@ -11,7 +11,7 @@ define(function(require){
         }
     }, {
         render : function(renderer) {
-            if(this._dirty) {
+            if (this._dirty) {
                 this.update();
                 this._dirty = false;
             }

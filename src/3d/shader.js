@@ -817,7 +817,6 @@ define(function(require) {
     var exportRegex = /(@export)\s*([0-9a-zA-Z_\-\.]*)\s*\n([\s\S]*?)@end/g;
     // Import the shader to library and chunks
     Shader.import = function(shaderStr) {
-
         shaderStr.replace(exportRegex, function(str, exportSymbol, exportName, code) {
             _source[ exportName ] = code;
             return code;
