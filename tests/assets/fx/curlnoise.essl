@@ -133,10 +133,8 @@ void main(){
 ///////////////////////////////////////////////////////////
 @export curlnoise.particle
 
-uniform float particleTextureSize : 256;
 uniform float noiseTextureSize : 256;
 uniform float deltaTime;
-uniform float elapsedTime;
 
 uniform sampler2D noiseTexture;
 uniform sampler2D spawnTexture;

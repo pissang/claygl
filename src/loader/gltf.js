@@ -316,12 +316,18 @@ define(function(require) {
                         material.set("diffuseMap", uniforms["diffuse"]);
                     }
                 }
+                if (uniforms['normalMap']) {
+                    material.shader.enableTexture("normalMap");
+                    material.set("normalMap", uniforms["normalMap"]);
+                }
                 if (uniforms['emission']) {
                     var diffuseColor = material.get('color');
                     vec4.add(diffuseColor, diffuseColor, uniforms['emission']);
                 }
                 if (uniforms['shininess']) {
                     material.set("shininess", uniforms["shininess"]);
+                } else {
+                    material.set("shininess", 0);
                 }
                 if (uniforms["specular"]) {
                     material.set("specular", uniforms["specular"].slice(0, 3));

@@ -8,6 +8,8 @@
  */
 define(function(require) {
     
+    'use strict';
+
     var Base = require("core/base");
     var glMatrix = require("glmatrix");
     var mat2 = glMatrix.mat2;
@@ -145,16 +147,18 @@ define(function(require) {
         }
     }, function() {
 
-        this.updateShaderString();
+        this._updateShaderString();
 
     }, {
 
         setVertex : function(str) {
             this.vertex = str;
+            this._updateShaderString();
             this.dirty();
         },
         setFragment : function(str) {
-            this.fragment = str;_caches
+            this.fragment = str;
+            this._updateShaderString();
             this.dirty();
         },
         bind : function(_gl) {
@@ -165,7 +169,7 @@ define(function(require) {
             });
 
             if (this.cache.isDirty()) {
-                this.updateShaderString();
+                this._updateShaderString();
                 this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
                 this.cache.fresh();
             }
@@ -182,7 +186,7 @@ define(function(require) {
             }
         },
 
-        updateShaderString : function(force) {
+        _updateShaderString : function(force) {
 
             if (this.vertex !== this._vertexPrev ||
                 this.fragment !== this._fragmentPrev || force) {

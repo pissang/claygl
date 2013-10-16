@@ -4,10 +4,10 @@ define(function(require) {
     var Shader = require('../shader');
     var Vector3 = require('core/vector3');
 
-    var SHADER_STR = [ '@export buildin.header.directional_light',
+    var SHADER_STR = ['@export buildin.header.directional_light',
                         'uniform vec3 directionalLightDirection[ DIRECTIONAL_LIGHT_NUMBER ] : unconfigurable;',
                         'uniform vec3 directionalLightColor[ DIRECTIONAL_LIGHT_NUMBER ] : unconfigurable;',
-                        '@end;' ].join('\n');
+                        '@end;'].join('\n');
 
     Shader.import(SHADER_STR);
 
@@ -45,7 +45,7 @@ define(function(require) {
                 value : function(instance) {
                     var color = instance.color,
                         intensity = instance.intensity;
-                    return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];
+                    return [color[0]*intensity, color[1]*intensity, color[1]*intensity];
                 }
             }
         }

@@ -28,7 +28,6 @@ define(function(require) {
 
             shader : null,
 
-            
             depthTest : true,
             depthMask : true,
 

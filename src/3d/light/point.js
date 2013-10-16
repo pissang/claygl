@@ -4,7 +4,6 @@ define(function(require) {
         Shader = require('../shader');
 
     var SHADER_STR = [ '@export buildin.header.point_light',
-                        
                         'uniform vec3 pointLightPosition[ POINT_LIGHT_NUMBER ] : unconfigurable;',
                         'uniform float pointLightRange[ POINT_LIGHT_NUMBER ] : unconfigurable;',
                         'uniform vec3 pointLightColor[ POINT_LIGHT_NUMBER ] : unconfigurable;',

@@ -170,26 +170,21 @@ define(function(require) {
             if (!paramInfo) {
                 return param;
             }
-            if (paramInfo.width !== undefined) {
-                param.width = paramInfo.width;
-            }
-            if (paramInfo.height !== undefined) {
-                param.height = paramInfo.height;
-            }
-            if (paramInfo.type !== undefined) {
-                param.type = Texture[paramInfo.type];
-            }
-            if (paramInfo.minFilter !== undefined) {
-                param.minFilter = Texture[paramInfo.minFilter];
-            }
-            if (paramInfo.magFilter !== undefined) {
-                param.magFilter = Texture[paramInfo.magFilter];
-            }
-            if (paramInfo.useMipmap !== undefined) {
-                param.useMipmap = paramInfo.useMipmap;
-            }
+            ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT']
+                .forEach(function(name) {
+                    if (paramInfo[name] !== undefined) {
+                        param[name] = Texture[paramInfo[name]];
+                    }
+                });
+            ['width', 'height', 'useMipmap']
+                .forEach(function(name) {
+                    if (paramInfo[name] !== undefined) {
+                        param[name] = paramInfo[name];
+                    }
+                });
             return param;
         },
+        
         _loadShaders : function(json, callback) {
             if (!json.shaders) {
                 return {};
@@ -222,6 +217,7 @@ define(function(require) {
                 callback(shaders);
             }
         },
+
         _loadTextures : function(json, lib, callback) {
             if (!json.textures) {
                 return {};

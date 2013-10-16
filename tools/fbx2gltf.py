@@ -128,8 +128,8 @@ def HashTechnique(pMaterial):
     # If enable diffuse map
     lHashStr.append(str(pMaterial.Diffuse.GetSrcObjectCount() > 0))
     # If enable normal map
-    # TODO: Bump map?
     lHashStr.append(str(pMaterial.NormalMap.GetSrcObjectCount() > 0))
+    lHashStr.append(str(pMaterial.Bump.GetSrcObjectCount() > 0))
     # If enable alpha map
     lHashStr.append(str(pMaterial.TransparentColor.GetSrcObjectCount() > 0))
 
@@ -189,7 +189,7 @@ def CreateTechnique(pMaterial):
 
 #PENDING Use base name as key ?
 def CreateImage(pPath):
-    lImageKey = [img['path'] for img in lib_images.values() if img['path'] == pPath]
+    lImageKey = [name for name in lib_images.keys() if lib_images[name]['path'] == pPath]
     if len(lImageKey):
         return lImageKey[0]
         
@@ -265,8 +265,10 @@ def CreateTexture(pProperty):
         return None
 
 def ConvertMaterial(pMaterial):
+    if pMaterial.ShadingModel.Get() == '':
+        return
     lMaterialName = pMaterial.GetName()
-    lKey = lMaterialName + '-effect'
+    lKey = lMaterialName
     if lKey in lib_materials.keys():
         return lKey
 
@@ -310,7 +312,14 @@ def ConvertMaterial(pMaterial):
             'value' : list(pMaterial.Diffuse.Get())
         })
 
-    # TODO Bump map ?
+    if pMaterial.Bump.GetSrcObjectCount() > 0:
+        # FIXME 3dsmax use the normal map as bump map ?
+        lTextureName = CreateTexture(pMaterial.Bump)
+        if not lTextureName == None:
+            lValues.append({
+                'parameter' : 'normalMap',
+                'value' : lTextureName
+            })
     if pMaterial.NormalMap.GetSrcObjectCount() > 0:
         lTextureName = CreateTexture(pMaterial.NormalMap)
         if not lTextureName == None:
@@ -319,7 +328,7 @@ def ConvertMaterial(pMaterial):
                 'value' : lTextureName
             })
 
-    if lShading == 'Phong':
+    if lShading == 'phong':
         lValues.append({
             'parameter' : 'shininess',
             'value' : pMaterial.Shininess.Get()
@@ -413,7 +422,7 @@ def ConvertMesh(pMesh, pNode):
         lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
 
         ## Handle uvs
-        lLayerUV = lLayer.GetUVs(FbxLayerElement.eTextureDiffuse)
+        lLayerUV = lLayer.GetUVs()
         if not lLayerUV == None:
             lUVSPlitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
         else:

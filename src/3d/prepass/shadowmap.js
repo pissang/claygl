@@ -202,14 +202,14 @@ define(function(require) {
             var cursor = 0;
 
             // Shadow uniforms
-            var spotLightShadowMaps = [],
-                spotLightMatrices = [],
-                spotLightBiases = [],
-                directionalLightShadowMaps = [],
-                directionalLightMatrices = [],
-                directionalLightBiases = [],
-                pointLightShadowMaps = [],
-                pointLightRanges = [];
+            var spotLightShadowMaps = [];
+            var spotLightMatrices = [];
+            var spotLightBiases = [];
+            var directionalLightShadowMaps = [];
+            var directionalLightMatrices = [];
+            var directionalLightBiases = [];
+            var pointLightShadowMaps = [];
+            var pointLightRanges = [];
 
             // reset
             for (var name in this._shadowMapNumber) {

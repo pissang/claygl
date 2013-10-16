@@ -166,13 +166,13 @@ void main(){
     #endif
 
     // Diffuse part of all lights
-    vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
+    vec3 diffuseItem = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
-    vec3 specularColor = vec3(0.0, 0.0, 0.0);
+    vec3 specularItem = vec3(0.0, 0.0, 0.0);
     
     #ifdef AMBIENT_LIGHT_NUMBER
         for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++){
-            diffuseColor += ambientLightColor[i];
+            diffuseItem += ambientLightColor[i];
         }
     #endif
     #ifdef POINT_LIGHT_NUMBER
@@ -211,9 +211,11 @@ void main(){
                 }
             #endif
 
-            diffuseColor += lightColor * ndl * attenuation * shadowContrib;
+            diffuseItem += lightColor * ndl * attenuation * shadowContrib;
 
-            specularColor += specular * pow( ndh, shininess ) * attenuation * shadowContrib;
+            if (shininess > 0.0) {
+                specularItem += lightColor * pow(ndh, shininess ) * attenuation * shadowContrib;
+            }
 
         }
     #endif
@@ -245,9 +247,11 @@ void main(){
                 }
             #endif
 
-            diffuseColor += lightColor * ndl * shadowContrib;
+            diffuseItem += lightColor * ndl * shadowContrib;
 
-            specularColor += specular * pow( ndh, shininess ) * shadowContrib;
+            if (shininess > 0.0) {
+                specularItem += lightColor * pow( ndh, shininess ) * shadowContrib;
+            }
         }
     #endif
 
@@ -297,14 +301,16 @@ void main(){
                 }
             #endif
 
-            diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
+            diffuseItem += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
 
-            specularColor += specular * pow( ndh, shininess ) * attenuation * (1.0-falloff) * shadowContrib;
+            if (shininess > 0.0) {
+                specularItem += lightColor * pow(ndh, shininess) * attenuation * (1.0-falloff) * shadowContrib;
+            }
         }
     #endif
 
-    finalColor.rgb *= diffuseColor;
-    finalColor.rgb += specularColor;
+    finalColor.rgb *= diffuseItem;
+    finalColor.rgb += specularItem * specular;
 
     #ifdef ENVIRONMENTMAP_ENABLED
         #ifdef SPHERE_ENVIRONMENT_MAPPING

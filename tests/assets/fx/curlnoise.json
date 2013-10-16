@@ -1,5 +1,7 @@
 {
-    "meta" : {},
+    "meta" : {
+        "name" : "Curl Noise"
+    },
     "shaders" : {
         "curlnoise" : "#url(curlnoise.essl)"
     },
@@ -41,7 +43,6 @@
             "type" : "processor",
             "output" : true,
             "parameters" : {
-                "particleTextureSize" : 32,
                 "noiseTextureSize" : 32
             },
             "inputs" : {
