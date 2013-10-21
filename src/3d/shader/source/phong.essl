@@ -147,6 +147,10 @@ void main(){
         gl_FragColor = vec4(v_LocalNormal, 1.0);
         return;
     #endif
+    #ifdef RENDER_TEXCOORD
+        gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
+        return;
+    #endif
 
     vec4 finalColor = vec4(color, alpha);
 

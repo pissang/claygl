@@ -55,9 +55,9 @@ define(function(require) {
             for (var c = 0; c < chunks.length; c++) {
                 currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__ + "_" + c;
 
-                var chunk = chunks[c],
-                    attributeBuffers = chunk.attributeBuffers,
-                    indicesBuffer = chunk.indicesBuffer;
+                var chunk = chunks[c];
+                var attributeBuffers = chunk.attributeBuffers;
+                var indicesBuffer = chunk.indicesBuffer;
 
                 if (currentDrawID !== prevDrawID) {
                     prevDrawID = currentDrawID;

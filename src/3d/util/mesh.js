@@ -6,10 +6,15 @@ define(function(require) {
     
     var Geometry = require("../geometry");
     var Mesh = require("../mesh");
+    var Node = require("../node");
+    var Material = require("../material");
+    var Shader = require("../shader");
     var glMatrix = require("glmatrix");
     var _ = require("_");
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
+
+    var arraySlice = Array.prototype.slice;
 
     var ret = {
         /**
@@ -48,8 +53,8 @@ define(function(require) {
             }
 
 
-            var faceOffset = 0,
-                useFaces = templateGeo.faces.length !== 0;
+            var faceOffset = 0;
+            var useFaces = templateGeo.faces.length !== 0;
                 
             for (var k = 0; k < meshes.length; k++) {
                 var mesh = meshes[k];  
@@ -115,6 +120,176 @@ define(function(require) {
                 material : material,
                 geometry : geometry
             });
+        },
+
+        splitByJoints : function(mesh, maxJointNumber, inPlace) {
+            var geometry = mesh.geometry;
+            var skeleton = mesh.skeleton;
+            var material = mesh.material;
+            var shader = material.shader;
+            var joints = mesh.joints;
+            if (!geometry || !skeleton || !joints.length) {
+                return;
+            }
+            if (joints.length < maxJointNumber) {
+                return mesh;
+            }
+            var shaders = {};
+
+            var faces = geometry.faces;
+            
+            var meshNumber = Math.ceil(joints.length / maxJointNumber);
+            var faceLen = geometry.faces.length;
+            var rest = faceLen;
+            var isFaceAdded = [];
+            var jointValues = geometry.attributes.joint.value;
+            for (var i = 0; i < faceLen; i++) {
+                isFaceAdded[i] = false;
+            }
+            var addedJointIdxPerFace = [];
+
+            var buckets = [];
+            while(rest > 0) {
+                var bucketFaces = [];
+                var bucketJointReverseMap = [];
+                var bucketJoints = [];
+                var subJointNumber = 0;
+                for (var i = 0; i < joints.length; i++) {
+                    bucketJointReverseMap[i] = -1;
+                }
+                for (var f = 0; f < faceLen; f++) {
+                    if (isFaceAdded[f]) {
+                        continue;
+                    }
+                    var face = faces[f];
+
+                    var canAddToBucket = true;
+                    var addedNumber = 0;
+                    for (var i = 0; i < 3; i++) {
+                        var idx = face[i];
+                        for (var j = 0; j < 4; j++) {
+                            var jointIdx = jointValues[idx][j];
+                            if (jointIdx >= 0) {
+                                if (bucketJointReverseMap[jointIdx] === -1) {
+                                    if (subJointNumber < maxJointNumber) {
+                                        bucketJointReverseMap[jointIdx] = subJointNumber;
+                                        bucketJoints[subJointNumber++] = jointIdx;
+                                        addedJointIdxPerFace[addedNumber++] = jointIdx;
+                                    } else {
+                                        canAddToBucket = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!canAddToBucket) {
+                        // Reverse operation
+                        for (var i = 0; i < addedNumber; i++) {
+                            bucketJointReverseMap[addedJointIdxPerFace[i]] = -1;
+                            bucketJoints.pop();
+                            subJointNumber--;
+                        }
+                    } else {
+                        bucketFaces.push(face);
+                        isFaceAdded[f] = true;
+                        rest--;
+                    }
+                }
+                buckets.push({
+                    faces : bucketFaces,
+                    joints : bucketJoints.map(function(idx){return joints[idx];}),
+                    jointReverseMap : bucketJointReverseMap
+                })
+            }
+
+            var root = new Node({
+                name : mesh.name
+            });
+            var attribNames = Object.keys(geometry.getEnabledAttributes());
+            attribNames.splice(attribNames.indexOf('joint'), 1);
+            // Map from old vertex index to new vertex index
+            var newIndices = [];
+            for (var b = 0; b < buckets.length; b++) {
+                var bucket = buckets[b];
+                var jointReverseMap = bucket.jointReverseMap;
+                var subJointNumber = bucket.joints.length;
+                var subShader = shaders[subJointNumber];
+                if (!subShader) {
+                    subShader = shader.clone();
+                    subShader.define('vertex', 'JOINT_NUMBER', subJointNumber);
+                    shaders[subJointNumber] = subShader;
+                }
+                var subMat = new Material({
+                    name : [material.name, i].join('-'),
+                    shader : subShader
+                });
+                for (var name in material.uniforms) {
+                    var uniform = material.uniforms[name];
+                    subMat.set(name, uniform.value);
+                }
+                var subGeo = new Geometry();
+                var subMesh = new Mesh({
+                    name : [mesh.name, i].join('-'),
+                    material : subMat,
+                    geometry : subGeo,
+                    skeleton : skeleton,
+                    joints : bucket.joints.slice()
+                });
+                var vertexNumber = 0;
+                for (var i = 0; i < geometry.getVerticesNumber(); i++) {
+                    newIndices[i] = -1;
+                }
+                for (var f = 0; f < bucket.faces.length; f++) {
+                    var face = bucket.faces[f];
+                    var newFace = [];
+                    for (var i = 0; i < 3; i++) {
+                        var idx = face[i];
+                        if (newIndices[idx] === -1) {
+                            newIndices[idx] = vertexNumber;
+                            for (var a = 0; a < attribNames.length; a++) {
+                                var attribName = attribNames[a];
+                                var attrib = geometry.attributes[attribName];
+                                var subAttrib = subGeo.attributes[attribName];
+                                if (attrib.size === 1) {
+                                    subAttrib.value[vertexNumber] = attrib.value[idx];
+                                } else {
+                                    subAttrib.value[vertexNumber] = arraySlice.call(attrib.value[idx]);
+                                }
+                            }
+                            var newJoints = subGeo.attributes.joint.value[vertexNumber] = [-1, -1, -1, -1];
+                            // joints
+                            for (var j = 0; j < 4; j++) {
+                                var jointIdx = geometry.attributes.joint.value[idx][j];
+                                if (jointIdx >= 0) {
+                                    newJoints[j] = jointReverseMap[jointIdx];
+                                }
+                            }
+                            vertexNumber++;
+                        }
+                        newFace.push(newIndices[idx]);
+                    }
+                    subGeo.faces.push(newFace);
+                }
+
+                root.add(subMesh);
+            }
+            var children = mesh.children();
+            for (var i = 0; i < children.length; i++) {
+                root.add(children[i]);
+            }
+            root.position.copy(mesh.position);
+            root.rotation.copy(mesh.rotation);
+            root.scale.copy(mesh.scale);
+
+            material.dispose();
+            if (inPlace) {
+                if (mesh.parent) {
+                    var parent = mesh.parent;
+                    parent.remove(mesh);
+                    parent.add(root);
+                }
+            }
+            return root;
         }
     }
 

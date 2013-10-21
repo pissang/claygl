@@ -1,6 +1,4 @@
-/**
- * NORMAL
- */
+
 @export buildin.sm.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
@@ -41,7 +39,7 @@ void main(){
 
 }
 @end
-////////////////////////////////////////////////////////////////
+
 @export buildin.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
@@ -64,9 +62,9 @@ void main(){
         float moment2 = depth * depth;
 
         // Adjusting moments using partial derivative
-        float dx = dFdx(depth);
-        float dy = dFdy(depth);
-        moment2 += 0.25*(dx*dx+dy*dy);
+        // float dx = dFdx(depth);
+        // float dy = dFdy(depth);
+        // moment2 += 0.25*(dx*dx+dy*dy);
 
         gl_FragColor = vec4(moment1, moment2, 0.0, 0.0);
     #else
@@ -75,6 +73,24 @@ void main(){
 }
 @end
 
+@export buildin.sm.debug_depth
+
+uniform sampler2D depthMap;
+varying vec2 v_Texcoord;
+
+@import buildin.util.unpack_depth
+
+void main() {
+    vec4 tex = texture2D(depthMap, v_Texcoord);
+    #ifdef USE_VSM
+        float depth = tex.x;
+    #else
+        float depth = unpackDepth(tex);
+    #endif
+    gl_FragColor = vec4(depth, depth, depth, 1.0);
+}
+
+@end
 
 
 @export buildin.sm.distance.vertex
@@ -88,7 +104,7 @@ attribute vec3 position : POSITION;
 attribute vec3 boneWeight;
 attribute vec4 boneIndex;
 
-uniform mat4 boneMatrices[ BONE_MATRICES_NUMBER ];
+uniform mat4 boneMatrices[BONE_MATRICES_NUMBER];
 #endif
 
 varying vec3 v_WorldPosition;
@@ -139,7 +155,6 @@ void main(){
 }
 @end
 
-////////////////////////////////////////////////////////////////
 @export buildin.plugin.compute_shadow_map
 
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
@@ -163,7 +178,6 @@ uniform float pointLightRanges[POINT_LIGHT_SHADOWMAP_NUMBER];
 
 uniform bool shadowEnabled : true;
 
-// Normal
 @import buildin.util.unpack_depth
 
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
@@ -176,7 +190,7 @@ float tapShadowMap(sampler2D map, vec2 uv, float z, float bias){
 float pcf(sampler2D map, vec2 uv, float z, float bias){
 
     float shadowContrib = tapShadowMap(map, uv, z, bias);
-    float offset = 1.0/512.0;
+    float offset = 1.0/1024.0;
     shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z, bias);
     shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z, bias);
     shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z, bias);

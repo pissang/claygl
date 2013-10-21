@@ -8,6 +8,8 @@ define(function(require) {
     var Quaternion = require("core/quaternion");
     var Matrix4 = require("core/matrix4");
     var Matrix3 = require("core/matrix3");
+    var glMatrix = require('glmatrix');
+    var mat4 = glMatrix.mat4;
     var util = require("util/util");
     var _ = require("_");
 
@@ -36,7 +38,7 @@ define(function(require) {
             eulerAngle : new Vector3(),
             useEuler : false,
 
-            children : [],
+            _children : [],
 
             parent : null,
 
@@ -81,11 +83,14 @@ define(function(require) {
     }, {
 
         add : function(node) {
-            if(this.children.indexOf(node) >= 0) {
+            if(this._children.indexOf(node) >= 0) {
                 return;
             }
-            this.children.push(node);
+            if (node.parent) {
+                node.parent.remove(node);
+            }
             node.parent = this;
+            this._children.push(node);
 
             var scene = this.getScene();
 
@@ -97,7 +102,7 @@ define(function(require) {
         },
 
         remove : function(node) {
-            _.without(this.children, node);
+            this._children.splice(this._children.indexOf(node), 1);
             node.parent = null;
 
             var scene = this.getScene();
@@ -107,6 +112,15 @@ define(function(require) {
                     scene.removeFromScene(n);
                 });
             }
+        },
+
+        children : function() {
+            // get the copy of children array
+            return this._children.slice();
+        },
+
+        childAt : function(idx) {
+            return this._children[idx];
         },
 
         getScene : function() {
@@ -123,16 +137,14 @@ define(function(require) {
         traverse : function(callback, parent) {
             var stopTraverse = callback && callback(this, parent);
             if(! stopTraverse) {
-                var children = this.children;
-                for(var i = 0, len = children.length; i < len; i++) {
-                    children[i].traverse(callback, this);
+                var _children = this._children;
+                for(var i = 0, len = _children.length; i < len; i++) {
+                    _children[i].traverse(callback, this);
                 }
             }
         },
 
         updateLocalTransform : function() {
-            // TODO 
-            // use defineSetter to set dirty when the position, rotation, scale is changed ??
             if (! this.position._dirty &&
                 ! this.scale._dirty) {
                 if (this.useEuler && ! this.eulerAngle._dirty) {
@@ -180,7 +192,11 @@ define(function(require) {
                 this.updateLocalTransform();
             }
             if(this.parent) {
-                this.worldTransform.copy(this.parent.worldTransform).multiply(this.localTransform);
+                mat4.multiply(
+                    this.worldTransform._array,
+                    this.parent.worldTransform._array,
+                    this.localTransform._array
+                );
             }else{
                 this.worldTransform.copy(this.localTransform);
             }
@@ -194,8 +210,8 @@ define(function(require) {
             }
             this.updateWorldTransform();
             
-            for(var i = 0; i < this.children.length; i++) {
-                var child = this.children[i];
+            for(var i = 0; i < this._children.length; i++) {
+                var child = this._children[i];
                 // Skip the hidden nodes
                 if(child.visible) {
                     child.update();

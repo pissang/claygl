@@ -741,7 +741,10 @@ define(function(require) {
                 var fragmentShader = this._compileShader(_gl, "fragment", fragmentShaderString);
                 _gl.attachShader(program, vertexShader);
                 _gl.attachShader(program, fragmentShader);
-
+                // Force the position bind to index 0;
+                if (this.semantics['POSITION']) {
+                    _gl.bindAttribLocation(program, 0, this.semantics['POSITION'].symbol);
+                }
                 _gl.linkProgram(program);
 
                 if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {

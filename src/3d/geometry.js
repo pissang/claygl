@@ -147,7 +147,7 @@ define(function(require) {
             return this.useFace && (this.faces.length > 0);
         },
 
-        _getEnabledAttributes : function() {
+        getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {
                 return this._enabledAttributes;
@@ -174,7 +174,7 @@ define(function(require) {
         _getDirtyAttributes : function() {
 
             var result = {};
-            var attributes = this._getEnabledAttributes();
+            var attributes = this.getEnabledAttributes();
             
             var noDirtyAttributes = true;
             for (var name in attributes) {
@@ -311,10 +311,10 @@ define(function(require) {
                     var newI3 = verticesReorganizedMap[i3] === -1;
 
                     for (var k = 0; k < attribNameList.length; k++) {
-                        var name = attribNameList[k],
-                            attribArray = currentChunk.attributeArrays[name],
-                            values = attributes[name].value,
-                            size = attributes[name].size;
+                        var name = attribNameList[k];
+                        var attribArray = currentChunk.attributeArrays[name];
+                        var values = attributes[name].value;
+                        var size = attributes[name].size;
                         if (! attribArray) {
                             // Here use array to put data temporary because i can't predict
                             // the size of chunk precisely.
@@ -689,7 +689,7 @@ define(function(require) {
             }
 
             var cursor = this.getVerticesNumber(),
-                attributes = this._getEnabledAttributes(),
+                attributes = this.getEnabledAttributes(),
                 faces = this.faces;
 
             function cloneAttribute(idx) {

@@ -82,6 +82,13 @@ define(function(require) {
 
         setViewport : function(x, y, width, height) {
 
+            if (typeof(x) === "object") {
+                var obj = x;
+                x = obj.x;
+                y = obj.y;
+                width = obj.width;
+                height = obj.height;
+            }
             this.gl.viewport(x, y, width, height);
 
             this.viewportInfo = {
@@ -304,7 +311,6 @@ define(function(require) {
                         _gl.depthMask(material.depthMask);
                         depthMask = material.depthMask;
                     }
-
                     material.bind(_gl);
                     prevMaterialID = material.__GUID__;
 
@@ -385,7 +391,6 @@ define(function(require) {
             scene.lightUniforms = {};
             scene.material = {};
             scene._nodeRepository = {};
-            scene.children = [];
         },
 
         disposeNode : function(root) {
@@ -421,6 +426,7 @@ define(function(require) {
                 }
                 mat.dispose();
             }
+            root._children = [];
         },
 
         _materialSortFunc : function(x, y) {

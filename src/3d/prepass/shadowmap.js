@@ -72,10 +72,28 @@ define(function(require) {
         });
         this._gaussianPassH.setUniform("blurSize", 3.0);
         this._gaussianPassV.setUniform("blurSize", 3.0);
+
+        this._outputDepthPass = new Pass({
+            fragment : Shader.source('buildin.sm.debug_depth')
+        })
     }, {
 
         render : function(renderer, scene) {
             this._renderShadowPass(renderer, scene);
+        },
+
+        renderDebug : function(renderer) {
+            var viewportInfo = renderer.viewportInfo;
+            var x = 0, y = 0;
+            var width = viewportInfo.width / 4;
+            var height = width;
+            for (var name in this._textures) {
+                renderer.setViewport(x, y, width, height);
+                this._outputDepthPass.setUniform('depthMap', this._textures[name]);
+                this._outputDepthPass.render(renderer);
+                x += width;
+            }
+            renderer.setViewport(viewportInfo);
         },
 
         _bindDepthMaterial : function(renderQueue) {

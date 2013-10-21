@@ -100,9 +100,7 @@
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.three.Model();
-                console.profile("parse");
                 var meshList = loader.parse(data);
-                console.profileEnd("parse");
                 
                 var shader = qtek3d.shader.library.get("buildin.lambert");
 
@@ -116,7 +114,7 @@
                     skeleton = mesh.skeleton;
                     mesh.geometry.generateVertexNormals();
                     mesh.material.shader.disableTexturesAll();
-                    root.add(mesh);
+                    root.add(qtek3d.util.mesh.splitByJoints(mesh, 20));
                 });
 
                 camera.position.set(0, 10, 20);
@@ -153,7 +151,7 @@
                 });
                 control.enable();
 
-                shadowMapPass.render(renderer, scene);
+                // shadowMapPass.render(renderer, scene);
                 renderer.render(scene, camera);
 
                 var timeline = document.getElementById("Timeline");

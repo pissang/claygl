@@ -110,20 +110,16 @@ define(function(require) {
 
                             _gl.activeTexture(_gl.TEXTURE0 + slot);
                             texture.bind(_gl);
-
                             res.push(slot++);
                         }
                         this.shader.setUniform(_gl, '1iv', symbol, res);
-
                     } else {
                         this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                     }
                 }
                 else{
-                    
                     this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                 }
-
             }
         },
 

@@ -1,11 +1,3 @@
-interface QTek{
+declare module QTek{
 
-}
-
-interface QTek2D{
-
-}
-
-interface QTek3D{
-    
 }
