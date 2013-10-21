@@ -20,7 +20,6 @@ define(function(require) {
         var id = util.genGUID();
 
         return {
-            
             __GUID__ : id,
 
             name : 'NODE_' + id,
@@ -38,9 +37,8 @@ define(function(require) {
             eulerAngle : new Vector3(),
             useEuler : false,
 
-            _children : [],
-
             parent : null,
+            scene : null,
 
             worldTransform : new Matrix4(),
 
@@ -48,14 +46,17 @@ define(function(require) {
 
             autoUpdateLocalTransform : true,
 
-            boundingBox : new BoundingBox()
+            boundingBox : new BoundingBox(),
+
+            _children : [],
         }
     }, function() {
-        // Prevent multiple nodes use the same vector and 
+        // In case multiple nodes use the same vector and 
         // have problem in dirty checking
         var position = this.position;
         var rotation = this.rotation;
         var scale = this.scale;
+        var name = this.name;
         Object.defineProperty(this, 'position', {
             set : function(v) {
                 position.copy(v);
@@ -80,6 +81,18 @@ define(function(require) {
                 return scale;
             }
         });
+        Object.defineProperty(this, 'name', {
+            set : function(newName) {
+                if (this.scene) {
+                    this.scene._nodeRepository[name] = null;
+                    this.scene._nodeRepository[newName] = this;
+                }
+                name = newName;
+            },
+            get : function() {
+                return name;
+            }
+        })
     }, {
 
         add : function(node) {
@@ -92,12 +105,13 @@ define(function(require) {
             node.parent = this;
             this._children.push(node);
 
-            var scene = this.getScene();
+            var scene = this.scene;
 
             if (scene) {
                 node.traverse(function(n) {
                     scene.addToScene(n);
-                });   
+                    n.scene = scene;
+                });
             }
         },
 
@@ -105,11 +119,12 @@ define(function(require) {
             this._children.splice(this._children.indexOf(node), 1);
             node.parent = null;
 
-            var scene = this.getScene();
+            var scene = this.scene;
 
             if (scene) {
                 node.traverse(function(n) {
                     scene.removeFromScene(n);
+                    n.scene = null;
                 });
             }
         },
@@ -123,12 +138,13 @@ define(function(require) {
             return this._children[idx];
         },
 
-        getScene : function() {
+        findScene : function() {
             var root = this;
             while(root.parent) {
                 root = root.parent;
             }
             if (root.addToScene) {
+                this._scene = root;
                 return root;
             }
         },

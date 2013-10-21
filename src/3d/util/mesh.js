@@ -220,7 +220,7 @@ define(function(require) {
                     shaders[subJointNumber] = subShader;
                 }
                 var subMat = new Material({
-                    name : [material.name, i].join('-'),
+                    name : [material.name, b].join('-'),
                     shader : subShader
                 });
                 for (var name in material.uniforms) {

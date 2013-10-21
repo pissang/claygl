@@ -7,8 +7,8 @@
     },
     "parameters" : {
         "common" : {
-            "width" : 32,
-            "height" : 32,
+            "width" : 256,
+            "height" : 256,
             "type" : "FLOAT",
             "minFilter" : "NEAREST",
             "magFilter" : "NEAREST",
@@ -43,7 +43,7 @@
             "type" : "processor",
             "output" : true,
             "parameters" : {
-                "noiseTextureSize" : 32
+                "noiseTextureSize" : 256
             },
             "inputs" : {
                 "particleTexture" : {

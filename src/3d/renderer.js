@@ -403,6 +403,13 @@ define(function(require) {
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
                 }
+                // Dispose the resource in shadow mapping
+                if (node._depthMaterial) {
+                    materials[node._depthMaterial.__GUID__] = node._depthMaterial;
+                }
+                if (node._distanceMaterial) {
+                    materials[node._distanceMaterial.__GUID__] = node._distanceMaterial;
+                }
             });
             for (var guid in materials) {
                 var mat = materials[guid];

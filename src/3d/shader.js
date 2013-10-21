@@ -148,7 +148,7 @@ define(function(require) {
     }, function() {
 
         this._updateShaderString();
-
+        
     }, {
 
         setVertex : function(str) {

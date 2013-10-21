@@ -5,6 +5,8 @@ define(function(require){
     var Scene = Node.derive(function(){
         return {
 
+            scene : null,
+
             // Global material of scene
             material : null,
 
@@ -18,8 +20,12 @@ define(function(require){
             filter : null,
 
             _nodeRepository : {}
+
         }
-    },{
+    }, function() {
+        this.scene = this;
+    }, {
+
         addToScene : function(node) {
             if (node.name) {
                 this._nodeRepository[node.name] = node;
