@@ -6,10 +6,10 @@ define(function(require) {
 
     'use strict';
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
     var util = require("util/util");
-    var BoundingBox = require("3d/boundingbox");
-    var Geometry = require("3d/geometry");
+    var BoundingBox = require("3d/BoundingBox");
+    var Geometry = require("3d/Geometry");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
 
@@ -153,7 +153,7 @@ define(function(require) {
                         }
                     }
                 }
-                offset += chunk.attributes.position / 3;
+                offset += chunk.attributes.position.length / 3;
             }
 
             return geometry;

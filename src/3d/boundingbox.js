@@ -1,11 +1,7 @@
-/**
- *
- * @export{class} BoundingBox
- */
 define(function(require) {
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
 
     var BoundingBox = Base.derive(function() {
         return {

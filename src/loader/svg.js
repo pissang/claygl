@@ -1,25 +1,24 @@
 /**
- * @export{class} SVG
  * shapes : circle, line, polygon, rect, polyline, ellipse, path
  */
 define(function(require) {
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
 
     var request = require("core/request");
 
-    var Node = require("2d/node");
-    var Circle = require("2d/shape/circle");
-    var Rectangle = require("2d/shape/rectangle");
-    var Ellipse = require("2d/shape/ellipse");
-    var Line = require("2d/shape/line");
-    var Path = require("2d/shape/path");
-    var Polygon = require("2d/shape/polygon");
-    var TextBox = require("2d/shape/textbox");
-    var SVGPath = require("2d/shape/svgpath");
-    var LinearGradient = require("2d/lineargradient");
-    var RadialGradient = require("2d/radialgradient");
-    var Pattern = require("2d/pattern");
+    var Node = require("2d/Node");
+    var Circle = require("2d/shape/Circle");
+    var Rectangle = require("2d/shape/Rectangle");
+    var Ellipse = require("2d/shape/Ellipse");
+    var Line = require("2d/shape/Line");
+    var Path = require("2d/shape/Path");
+    var Polygon = require("2d/shape/Polygon");
+    var TextBox = require("2d/shape/TextBox");
+    var SVGPath = require("2d/shape/SVGPath");
+    var LinearGradient = require("2d/LinearGradient");
+    var RadialGradient = require("2d/RadialGradient");
+    var Pattern = require("2d/Pattern");
     var _ = require("_");
 
     var Style = require("2d/style");

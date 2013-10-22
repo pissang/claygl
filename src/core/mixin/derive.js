@@ -49,8 +49,8 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
         if (this.constructor == sub) {
             // find the base class, and the initialize function will be called 
             // in the order of inherit
-            var base = sub,
-                initializeChain = [initialize];
+            var base = sub;
+            var initializeChain = [initialize];
             while (base.__super__) {
                 base = base.__super__;
                 initializeChain.unshift( base.__initialize__ );

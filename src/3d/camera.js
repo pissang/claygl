@@ -1,7 +1,7 @@
 define(function(require) {
 
-    var Node = require("./node");
-    var Matrix4 = require("core/matrix4");
+    var Node = require("./Node");
+    var Matrix4 = require("core/Matrix4");
 
     var Camera = Node.derive(function() {
         return {

@@ -1,9 +1,4 @@
-/**
- * @export{class} WebGLInfo
- */
 define(function() {
-
-
     // http://www.khronos.org/registry/webgl/extensions/
     var EXTENSION_LIST = [
                             "OES_texture_float",

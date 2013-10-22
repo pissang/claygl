@@ -3,8 +3,8 @@
  */
 define(function(require) {
 
-    var Node = require("./node");
-    var Graph = require("./graph");
+    var Node = require("./Node");
+    var Graph = require("./Graph");
 
     var Group = Node.derive(function() {
         return {

@@ -13,11 +13,6 @@
             'paths' : {
                 '_' : '../thirdparty/lodash.compat',
                 'glmatrix' : '../thirdparty/gl-matrix'
-            },
-            'shim' : {
-                '_' : {
-                    exports : '_'
-                }
             }
         });
 
@@ -63,17 +58,12 @@
                 light.penumbraAngle = 25;
                 light.shadowResolution = 1024;
 
-                // scene.getNode('Suzanne.001').geometry
-                //     = scene.getNode('Suzanne.001').geometry.convertToGeometry();
-                
                 setInterval(function() {
                     shadowMapPass.render(renderer, scene);
+                    console.time('render');
                     renderer.render(scene, camera);
+                    console.timeEnd('render');
                 }, 50);
-
-                // setTimeout(function() {
-                //     renderer.disposeScene(scene);
-                // }, 1000)
             });
         });
     </script>

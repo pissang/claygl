@@ -3,7 +3,7 @@
  */
 define(function(require) {
 
-    var Shader = require("../shader");
+    var Shader = require("../Shader");
     var _ = require("_");
 
     _library = {};
@@ -11,24 +11,51 @@ define(function(require) {
     _pool = {};
 
     // Example
-    // ShaderLibrary.get("buildin.phong", "diffuse", "normal");
+    // ShaderLibrary.get("buildin.phong", "diffuseMap", "normalMap");
     // Or
-    // ShaderLibrary.get("buildin.phong", ["diffuse", "normal"]);
-    function get(name, enabledTextures) {
-        if (!enabledTextures) {
-            enabledTextures = [];
-        } 
-        else if (typeof(enabledTextures) === "string") {
+    // ShaderLibrary.get("buildin.phong", ["diffuseMap", "normalMap"]);
+    // Or
+    // ShaderLibrary.get("buildin.phong", {
+    //      textures : ["diffuseMap"],
+    //      vertexDefines : {},
+    //      fragmentDefines : {}
+    // })
+    function get(name, config) {
+        var enabledTextures = [];
+        var vertexDefines = {};
+        var fragmentDefines = {};
+        if (typeof(config) === "string") {
             enabledTextures = Array.prototype.slice.call(arguments, 1);
         }
-        // Sort as first letter in increase order
-        // And merge with name as a key string
-        var key = name + "_" + enabledTextures.sort().join(",");
+        else if (toString.call(config) == '[object Object]') {
+            enabledTextures = config.textures || [];
+            vertexDefines = config.vertexDefines || {};
+            fragmentDefines = config.fragmentDefines || {};
+        } 
+        else if(config instanceof Array) {
+            enabledTextures = config;
+        }
+        var vertexDefineKeys = Object.keys(vertexDefines);
+        var fragmentDefineKeys = Object.keys(fragmentDefines);
+        enabledTextures.sort(); 
+        vertexDefineKeys.sort();
+        fragmentDefineKeys.sort();
+
+        var keyArr = [];
+        keyArr = keyArr.concat(enabledTextures);
+        for (var i = 0; i < vertexDefineKeys.length; i++) {
+            keyArr.push(vertexDefines[vertexDefineKeys[i]]);
+        }
+        for (var i = 0; i < fragmentDefineKeys.length; i++) {
+            keyArr.push(fragmentDefines[fragmentDefineKeys[i]]);
+        }
+        var key = keyArr.join('_');
+
         if (_pool[key]) {
             return _pool[key];
         } else {
             var source = _library[name];
-            if (! source) {
+            if (!source) {
                 console.error('Shader "'+name+'"'+' is not in the library');
                 return;
             }
@@ -39,6 +66,12 @@ define(function(require) {
             _.each(enabledTextures, function(symbol) {
                 shader.enableTexture(symbol);
             });
+            for (var name in vertexDefines) {
+                shader.define('vertex', name, vertexDefines[name]);
+            }
+            for (var name in fragmentDefines) {
+                shader.define('fragment', name, fragmentDefines[name]);
+            }
             _pool[key] = shader;
             return shader;
         }

@@ -4,7 +4,7 @@
  */
 define(function(require) {
 
-	var Geometry = require('../geometry');
+	var Geometry = require('../Geometry');
 
 	var Plane = Geometry.derive(function() {
 

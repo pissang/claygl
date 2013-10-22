@@ -1,14 +1,15 @@
 define(function(require) {
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
+    var util = require("util/util");
+    var Light = require("./Light");
+    var Mesh = require("./Mesh");
+    var Texture = require("./Texture");
+    var WebGLInfo = require('./WebGLInfo');
     var _ = require("_");
     var glMatrix = require("glmatrix");
     var mat4 = glMatrix.mat4;
-    var util = require("util/util");
-    var Light = require("./light");
-    var Mesh = require("./mesh");
-    var Texture = require("./texture");
-    var WebGLInfo = require('./webglinfo');
+    var vec3 = glMatrix.vec3;
 
     var Renderer = Base.derive(function() {
         return {
@@ -174,19 +175,11 @@ define(function(require) {
             this.updateLightUnforms(lights);
 
             // Sort material to reduce the cost of setting uniform in material
-            // PENDING : sort geometry ??
             opaqueQueue.sort(this._materialSortFunc);
-            transparentQueue.sort(this._materialSortFunc);
-
             // Render Opaque queue
             if (! silent) {
                 this.trigger("beforerender:opaque", this, opaqueQueue);
             }
-
-            // Cull Face
-            // _gl.frontFace(_gl.CCW);
-            // _gl.cullFace(_gl.BACK);
-            // _gl.enable(_gl.CULL_FACE);
 
             _gl.disable(_gl.BLEND);
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
@@ -202,6 +195,19 @@ define(function(require) {
             _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
             _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
 
+            // Calculate the object depth
+            if (transparentQueue.length > 0) {
+                var modelViewMat = mat4.create();
+                var posViewSpace = vec3.create();
+                mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
+                for (var i = 0; i < transparentQueue.length; i++) {
+                    var node = transparentQueue[i];
+                    mat4.multiply(modelViewMat, matrices['VIEW'], node.worldTransform._array);
+                    vec3.transformMat4(posViewSpace, node.position._array, modelViewMat);
+                    node._depth = posViewSpace[2];
+                }
+            }
+            transparentQueue = transparentQueue.sort(this._depthSortFunc);
             this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
@@ -262,19 +268,21 @@ define(function(require) {
             mat4.invert(matrices['PROJECTIONINVERSE'], matrices['PROJECTION']);
             mat4.invert(matrices['VIEWPROJECTIONINVERSE'], matrices['VIEWPROJECTION']);
 
-            var prevMaterialID;
-            var prevShaderID;
             var _gl = this.gl;
             var scene = this._scene;
             
-            var depthTest;
-            var depthMask;
+            var prevMaterialID;
+            var prevShaderID;
+            
+            // Status 
+            var depthTest, depthMask;
+            var culling, cullFace, frontFace;
 
             for (var i =0; i < queue.length; i++) {
-                var object = queue[i];
-                var material = globalMaterial || object.material;
+                var mesh = queue[i];
+                var material = globalMaterial || mesh.material;
                 var shader = material.shader;
-                var geometry = object.geometry;
+                var geometry = mesh.geometry;
                 var customBlend = material.transparent && material.blend;
 
                 if (prevShaderID !== shader.__GUID__) {
@@ -321,33 +329,33 @@ define(function(require) {
                     customBlend(_gl);
                 }
 
-                var worldM = object.worldTransform._array;
+                var worldM = mesh.worldTransform._array;
 
                 // All matrices ralated to world matrix will be updated on demand;
-                if (shader.semantics.hasOwnProperty('WORLD') ||
-                    shader.semantics.hasOwnProperty('WORLDTRANSPOSE')) {
+                if (shader.semantics['WORLD'] ||
+                    shader.semantics['WORLDTRANSPOSE']) {
                     mat4.copy(matrices['WORLD'], worldM);
                 }
-                if (shader.semantics.hasOwnProperty('WORLDVIEW') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE')) {
+                if (shader.semantics['WORLDVIEW'] ||
+                    shader.semantics['WORLDVIEWINVERSE'] ||
+                    shader.semantics['WORLDVIEWINVERSETRANSPOSE']) {
                     mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
                 }
-                if (shader.semantics.hasOwnProperty('WORLDVIEWPROJECTION') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE')) {
+                if (shader.semantics['WORLDVIEWPROJECTION'] ||
+                    shader.semantics['WORLDVIEWPROJECTIONINVERSE'] ||
+                    shader.semantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
                     mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
                 }
-                if (shader.semantics.hasOwnProperty('WORLDINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDINVERSETRANSPOSE')) {
+                if (shader.semantics['WORLDINVERSE'] ||
+                    shader.semantics['WORLDINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDINVERSE'], worldM);
                 }
-                if (shader.semantics.hasOwnProperty('WORLDVIEWINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWINVERSETRANSPOSE')) {
+                if (shader.semantics['WORLDVIEWINVERSE'] ||
+                    shader.semantics['WORLDVIEWINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
                 }
-                if (shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSE') ||
-                    shader.semantics.hasOwnProperty('WORLDVIEWPROJECTIONINVERSETRANSPOSE')) {
+                if (shader.semantics['WORLDVIEWPROJECTIONINVERSE'] ||
+                    shader.semantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
 
@@ -371,11 +379,23 @@ define(function(require) {
                 }
 
                 if (! silent) {
-                    this.trigger("beforerender:mesh", this, object);
+                    this.trigger("beforerender:mesh", this, mesh);
                 }
-                var drawInfo = object.render(this, globalMaterial);
+                if (mesh.cullFace !== cullFace) {
+                    cullFace = mesh.cullFace;
+                    _gl.cullFace(cullFace);
+                }
+                if (mesh.frontFace !== frontFace) {
+                    frontFace = mesh.frontFace;
+                    _gl.frontFace(frontFace);
+                }
+                if (mesh.culling !== culling) {
+                    culling = mesh.culling;
+                    culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
+                }
+                var drawInfo = mesh.render(_gl, globalMaterial);
                 if (! silent) {
-                    this.trigger("afterrender:mesh", this, object, drawInfo);
+                    this.trigger("afterrender:mesh", this, mesh, drawInfo);
                 }
                 // Restore the default blend function
                 if (customBlend) {
@@ -402,13 +422,6 @@ define(function(require) {
                 }
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
-                }
-                // Dispose the resource in shadow mapping
-                if (node._depthMaterial) {
-                    materials[node._depthMaterial.__GUID__] = node._depthMaterial;
-                }
-                if (node._distanceMaterial) {
-                    materials[node._distanceMaterial.__GUID__] = node._distanceMaterial;
                 }
             });
             for (var guid in materials) {
@@ -441,6 +454,17 @@ define(function(require) {
                 return x.material.__GUID__ - y.material.__GUID__;
             }
             return x.material.shader.__GUID__ - y.material.__GUID__;
+        },
+        _depthSortFunc : function(x, y) {
+            if (x._depth === y._depth) {
+                if (x.material.shader == y.material.shader) {
+                    return x.material.__GUID__ - y.material.__GUID__;
+                }
+                return x.material.shader.__GUID__ - y.material.__GUID__;
+            }
+            // Depth is negative because of right hand coord
+            // So farther object has smaller depth value
+            return x._depth - y._depth
         }
     })
 

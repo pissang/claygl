@@ -10,7 +10,7 @@ define(function(require) {
     
     'use strict';
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
     var glMatrix = require("glmatrix");
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;
@@ -140,10 +140,7 @@ define(function(require) {
             _textureStatus : {},
 
             _vertexProcessed : "",
-            _fragmentProcessed : "",
-
-            _program : null,
-
+            _fragmentProcessed : ""
         }
     }, function() {
 
@@ -305,6 +302,10 @@ define(function(require) {
             }
 
             this.dirty();
+        },
+
+        isTextureEnabled : function(symbol) {
+            return this._textureStatus[symbol].enabled;
         },
 
         setUniform : function(_gl, type, symbol, value) {

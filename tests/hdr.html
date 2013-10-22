@@ -31,11 +31,6 @@
                 'paths' : {
                     '_' : '../thirdparty/lodash.compat',
                     'glmatrix' : '../thirdparty/gl-matrix'
-                },
-                'shim' : {
-                    '_' : {
-                        exports : '_'
-                    }
                 }
             })
 
@@ -43,11 +38,11 @@
                     'text!../tests/assets/models/nanosuit/nanosuit.js',
                     'text!../tests/shader/hdr.essl'], function(qtek, modelData, hdrShader){
 
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    pp_Node = qtek3d.compositor.Node,
-                    pp_TextureNode = qtek3d.compositor.TextureNode,
-                    compositor = new qtek3d.Compositor();
+                var qtek3d = qtek['3d'];
+                var Shader = qtek3d.Shader;
+                var pp_Node = qtek3d.compositor.Node;
+                var pp_TextureNode = qtek3d.compositor.TextureNode;
+                var compositor = new qtek3d.Compositor();
 
                 Shader.import(hdrShader);
                 var _ = require("_");
@@ -181,13 +176,13 @@
                     }
                 });
 
-                compositor.add( textureNode );
-                compositor.add( hdr );
-                compositor.add( gammaCorr );
-                compositor.add( contrast );
-                compositor.add( blurPass1 );
-                compositor.add( blurPass2 );
-                compositor.add( blurPass3 );
+                compositor.add(textureNode);
+                compositor.add(hdr);
+                compositor.add(gammaCorr);
+                compositor.add(contrast);
+                compositor.add(blurPass1);
+                compositor.add(blurPass2);
+                compositor.add(blurPass3);
 
                 document.getElementById("Exposure").onchange = function() {
                     hdr.setParameter("exposure", this.value);

@@ -1,12 +1,9 @@
-/**
- * @export{class} TextureNode
- */
 define(function(require) {
 
-    var Node = require("./node");
-    var FrameBuffer = require("../framebuffer");
-    var texturePool = require("./texturepool");
-    var Shader = require("../shader");
+    var Node = require("./Node");
+    var FrameBuffer = require("../FrameBuffer");
+    var texturePool = require("./texturePool");
+    var Shader = require("../Shader");
 
     var TextureNode = Node.derive(function() {
         return {

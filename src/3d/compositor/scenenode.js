@@ -1,13 +1,10 @@
-/**
- * @export{class} SceneNode
- */
 define(function(require) {
 
-    var Node = require("./node");
-    var Pass = require("./pass");
-    var FrameBuffer = require("../framebuffer");
-    var texturePool = require("./texturepool");
-    var WebGLInfo = require('../webglinfo');
+    var Node = require("./Node");
+    var Pass = require("./Pass");
+    var FrameBuffer = require("../FrameBuffer");
+    var texturePool = require("./texturePool");
+    var WebGLInfo = require('../WebGLInfo');
 
     var SceneNode = Node.derive(function() {
         return {

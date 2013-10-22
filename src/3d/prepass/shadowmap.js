@@ -1,26 +1,23 @@
-/**
- * @export{class} ShadowMap
- */
 define(function(require) {
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
-    var Shader = require("../shader");
-    var Light = require("../light");
-    var SpotLight = require("../light/spot");
-    var DirectionalLight = require("../light/directional");
-    var PointLight = require("../light/point");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
+    var Shader = require("../Shader");
+    var Light = require("../Light");
+    var SpotLight = require("../light/Spot");
+    var DirectionalLight = require("../light/Directional");
+    var PointLight = require("../light/Point");
     var shaderLibrary = require("../shader/library");
-    var Material = require("../material");
-    var FrameBuffer = require("../framebuffer");
-    var Texture2d = require("../texture/texture2d");
-    var TextureCube = require("../texture/texturecube");
+    var Material = require("../Material");
+    var FrameBuffer = require("../FrameBuffer");
+    var Texture2d = require("../texture/Texture2D");
+    var TextureCube = require("../texture/TextureCube");
     var glenum = require("../glenum");
-    var PerspectiveCamera = require("../camera/perspective");
-    var OrthoCamera = require("../camera/orthographic");
+    var PerspectiveCamera = require("../camera/Perspective");
+    var OrthoCamera = require("../camera/Orthographic");
 
-    var Pass = require("../compositor/pass");
-    var texturePool = require("../compositor/texturepool");
+    var Pass = require("../compositor/Pass");
+    var texturePool = require("../compositor/texturePool");
 
     var Matrix4 = require("core/matrix4");
 
@@ -42,29 +39,13 @@ define(function(require) {
                 'SPOT_LIGHT' : 0
             },
 
-            _materialPreserve : {},
+            _meshMaterials : {},
             _depthMaterials : {},
             _distanceMaterials : {},
 
             useVSM : false
         }
     }, function() {
-
-        this._defaultDepthMaterial =  new Material({
-            shader : new Shader({
-                vertex : Shader.source("buildin.sm.depth.vertex"),
-                fragment : Shader.source("buildin.sm.depth.fragment")
-            })
-        });
-        // Point light write the distance instance of depth projected
-        // http://http.developer.nvidia.com/GPUGems/gpugems_ch12.html
-        this._defaultDistanceMaterial = new Material({
-            shader : new Shader({
-                vertex : Shader.source("buildin.sm.distance.vertex"),
-                fragment : Shader.source("buildin.sm.distance.fragment")
-            })
-        });
-
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_h')
@@ -101,26 +82,24 @@ define(function(require) {
         _bindDepthMaterial : function(renderQueue) {
             for (var i = 0; i < renderQueue.length; i++) {
                 var mesh = renderQueue[i];
-                var depthMaterial = this._depthMaterials[mesh.__GUID__];
+                var depthMaterial = this._depthMaterials[mesh.joints.length];
                 if (mesh.material !== depthMaterial) {
                     if (!depthMaterial) {
                         // Skinned mesh
+                        depthMaterial = new Material({
+                            shader : new Shader({
+                                vertex : Shader.source("buildin.sm.depth.vertex"),
+                                fragment : Shader.source("buildin.sm.depth.fragment")
+                            })
+                        });
                         if (mesh.skeleton) {
-                            depthMaterial = new Material({
-                                shader : new Shader({
-                                    vertex : Shader.source("buildin.sm.depth.vertex"),
-                                    fragment : Shader.source("buildin.sm.depth.fragment")
-                                })
-                            });
                             depthMaterial.shader.define('vertex', 'SKINNING');
-                            depthMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
-                        } else {
-                            depthMaterial = this._defaultDepthMaterial;
+                            depthMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
                         }
-                        this._depthMaterials[mesh.__GUID__] = depthMaterial;
+                        this._depthMaterials[mesh.joints.length] = depthMaterial;
                     }
 
-                    this._materialPreserve[mesh.__GUID__] = mesh.material;
+                    this._meshMaterials[mesh.__GUID__] = mesh.material;
                     mesh.material = depthMaterial;
 
                     if (this.useVSM) {
@@ -135,26 +114,24 @@ define(function(require) {
         _bindDistanceMaterial : function(renderQueue, light) {
             for (var i = 0; i < renderQueue.length; i++) {
                 var mesh = renderQueue[i];
-                var distanceMaterial = this._distanceMaterials[mesh.__GUID__];
+                var distanceMaterial = this._distanceMaterials[mesh.joints.length];
                 if (mesh.material !== distanceMaterial) {
                     if (!distanceMaterial) {
                         // Skinned mesh
+                        distanceMaterial = new Material({
+                            shader : new Shader({
+                                vertex : Shader.source("buildin.sm.distance.vertex"),
+                                fragment : Shader.source("buildin.sm.distance.fragment")
+                            })
+                        });
                         if (mesh.skeleton) {
-                            distanceMaterial = new Material({
-                                shader : new Shader({
-                                    vertex : Shader.source("buildin.sm.distance.vertex"),
-                                    fragment : Shader.source("buildin.sm.distance.fragment")
-                                })
-                            });
                             distanceMaterial.shader.define('vertex', 'SKINNING');
-                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.skeleton.getBoneNumber());
-                        } else {
-                            distanceMaterial = this._defaultDistanceMaterial;
+                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
                         }
-                        this._distanceMaterials[mesh.__GUID__] = distanceMaterial;
+                        this._distanceMaterials[mesh.joints.length] = distanceMaterial;
                     }
 
-                    this._materialPreserve[mesh.__GUID__] = mesh.material;
+                    this._meshMaterials[mesh.__GUID__] = mesh.material;
                     mesh.material = distanceMaterial;
 
                     if (this.useVSM) {
@@ -171,7 +148,7 @@ define(function(require) {
         _restoreMaterial : function(renderQueue) {
             for (var i = 0; i < renderQueue.length; i++) {
                 var mesh = renderQueue[i];
-                mesh.material = this._materialPreserve[mesh.__GUID__];
+                mesh.material = this._meshMaterials[mesh.__GUID__];
             }
         },
 
@@ -499,7 +476,7 @@ define(function(require) {
                 'DIRECTIONAL_LIGHT' : 0,
                 'SPOT_LIGHT' : 0
             };
-            this._materialPreserve = {};
+            this._meshMaterials = {};
 
         }
     });

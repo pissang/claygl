@@ -38,11 +38,11 @@ define(function(require) {
 
     'use strict';
 
-    var Base = require("core/base");
-    var Pass = require("./pass");
-    var FrameBuffer = require("../framebuffer");
-    var Shader = require("../shader");
-    var texturePool = require("./texturepool");
+    var Base = require("core/Base");
+    var Pass = require("./Pass");
+    var FrameBuffer = require("../FrameBuffer");
+    var Shader = require("../Shader");
+    var texturePool = require("./texturePool");
 
     var Node = Base.derive(function() {
         return {

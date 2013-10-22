@@ -2,12 +2,12 @@ define(function(require) {
     
     'use strict';
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
-    var BoundingBox = require("./boundingbox");
-    var Quaternion = require("core/quaternion");
-    var Matrix4 = require("core/matrix4");
-    var Matrix3 = require("core/matrix3");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
+    var BoundingBox = require("./BoundingBox");
+    var Quaternion = require("core/Quaternion");
+    var Matrix4 = require("core/Matrix4");
+    var Matrix3 = require("core/Matrix3");
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var util = require("util/util");
@@ -49,6 +49,9 @@ define(function(require) {
             boundingBox : new BoundingBox(),
 
             _children : [],
+
+            // Its for transparent queue sorting
+            _depth : 0
         }
     }, function() {
         // In case multiple nodes use the same vector and 

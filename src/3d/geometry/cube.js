@@ -1,10 +1,10 @@
 
 define(function(require) {
 
-    var Geometry = require('../geometry');
-    var Plane = require('./plane');
-    var Matrix4 = require('core/matrix4');
-    var Vector3 = require('core/vector3');
+    var Geometry = require('../Geometry');
+    var Plane = require('./Plane');
+    var Matrix4 = require('core/Matrix4');
+    var Vector3 = require('core/Vector3');
     var _ = require('_');
 
     var planeMatrix = new Matrix4();

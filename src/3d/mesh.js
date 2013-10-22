@@ -1,8 +1,8 @@
 define(function(require) {
 
-    var Node = require("./node");
+    var Node = require("./Node");
     var glenum = require("./glenum");
-    var Vector3 = require("core/vector3");
+    var Vector3 = require("core/Vector3");
     var _ = require("_");
 
     var prevDrawID = 0;
@@ -18,6 +18,11 @@ define(function(require) {
             mode : glenum.TRIANGLES,
             // Only if mode is LINES
             lineWidth : 1,
+
+            // Culling
+            culling : true,
+            cullFace : glenum.BACK,
+            frontFace : glenum.CCW,
             
             receiveShadow : true,
             castShadow : true,
@@ -32,12 +37,10 @@ define(function(require) {
         }
     }, {
 
-        render : function(renderer, globalMaterial) {
-
-            var _gl = renderer.gl;
+        render : function(_gl, globalMaterial) {
 
             this.trigger('beforerender', this, _gl);
-            
+
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
@@ -124,7 +127,13 @@ define(function(require) {
     Mesh.LINE_STRIP = glenum.LINE_STRIP;
     Mesh.TRIANGLES = glenum.TRIANGLES;
     Mesh.TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
-    Mesh.TRIANGLE_FAN = glenum.TRIANGLE_FAN
+    Mesh.TRIANGLE_FAN = glenum.TRIANGLE_FAN;
+
+    Mesh.BACK = glenum.BACK;
+    Mesh.FRONT = glenum.FRONT;
+    Mesh.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
+    Mesh.CW = glenum.CW;
+    Mesh.CCW = glenum.CCW;
 
     return Mesh;
 })

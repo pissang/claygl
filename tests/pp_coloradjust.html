@@ -12,13 +12,8 @@
                 'paths' : {
                     '_' : '../thirdparty/lodash.compat',
                     'glmatrix' : '../thirdparty/gl-matrix'
-                },
-                'shim' : {
-                    '_' : {
-                        exports : '_'
-                    }
                 }
-            })
+            });
 
             require(['qtek'], function(qtek){
                 var qtek3d = qtek['3d'],
@@ -32,12 +27,12 @@
                     devicePixelRatio : 1.0
                 });
                 //Create scene
-                var scene = new qtek3d.Scene,
+                var scene = new qtek3d.Scene(),
                     camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     }),
-                    cube = new qtek3d.geometry.Cube;
+                    cube = new qtek3d.geometry.Cube();
                 var shader = new Shader({
                     vertex : Shader.source("buildin.lambert.vertex"),
                     fragment : Shader.source("buildin.lambert.fragment")
@@ -46,8 +41,8 @@
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D;
-                texture.image = new Image;
+                var texture = new qtek3d.texture.Texture2D();
+                texture.image = new Image();
                 texture.image.onload = function(){
                     texture.dirty();
                 }

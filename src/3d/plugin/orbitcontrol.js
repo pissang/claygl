@@ -1,12 +1,9 @@
-/**
- * @export{class} OrbitControl
- */
 define(function(require) {
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
-    var Matrix4 = require("core/matrix4");
-    var Quaternion = require("core/quaternion");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
+    var Matrix4 = require("core/Matrix4");
+    var Quaternion = require("core/Quaternion");
 
     var OrbitControl = Base.derive(function() {
         return {
