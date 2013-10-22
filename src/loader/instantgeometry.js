@@ -153,7 +153,7 @@ define(function(require) {
                         }
                     }
                 }
-                offset += chunk.attributes.position / 3;
+                offset += chunk.attributes.position.length / 3;
             }
 
             return geometry;

@@ -3,6 +3,7 @@ define(function(require) {
     var Base = require("core/base");
     var Shader = require("./shader");
     var util = require("util/util");
+    var glenum = require("./glenum");
     var Texture = require('./texture');
     var Texture2D = require('./texture/texture2d');
     var TextureCube = require('./texture/texturecube');
@@ -30,9 +31,6 @@ define(function(require) {
 
             depthTest : true,
             depthMask : true,
-
-            //TODO
-            cullFace : false,
 
             transparent : false,
             // Blend func is a callback function when the material 

@@ -63,9 +63,6 @@
                 light.penumbraAngle = 25;
                 light.shadowResolution = 1024;
 
-                // scene.getNode('Suzanne.001').geometry
-                //     = scene.getNode('Suzanne.001').geometry.convertToGeometry();
-                
                 setInterval(function() {
                     shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);

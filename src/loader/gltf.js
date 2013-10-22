@@ -346,9 +346,10 @@ define(function(require) {
             for (var name in json.meshes) {
                 var meshInfo = json.meshes[name];
 
+                lib.meshes[name] = [];
                 // Geometry
-                var geometry = new InstantGeometry();
                 for (var i = 0; i < meshInfo.primitives.length; i++) {
+                    var geometry = new InstantGeometry();
                     var chunk = {
                         attributes : {},
                         indices : null
@@ -405,29 +406,28 @@ define(function(require) {
                         };
                     }
                     geometry.addChunk(chunk);
-                }
 
-                // Material
-                // All primitives have the same material and skin
-                // TODO;
-                var material = lib.materials[meshInfo.primitives[0].material];
-                var mesh = new Mesh({
-                    geometry : geometry,
-                    material : material
-                });
-                if (meshInfo.name) {
-                    mesh.name = meshInfo.name;
-                }
-                var skinName = meshInfo.primitives[0].skin
-                if (skinName) {
-                    mesh.joints = lib.skins[skinName].joints;
-                    mesh.skeleton = lib.skeleton;
-                    material.shader = material.shader.clone();
-                    material.shader.define('vertex', 'SKINNING');
-                    material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
-                }
+                    var material = lib.materials[primitiveInfo.material];
+                    var mesh = new Mesh({
+                        geometry : geometry,
+                        material : material
+                    });
 
-                lib.meshes[name] = mesh;
+                    var skinName = primitiveInfo.skin;
+                    if (skinName) {
+                        mesh.joints = lib.skins[skinName].joints;
+                        mesh.skeleton = lib.skeleton;
+                        material.shader = material.shader.clone();
+                        material.shader.define('vertex', 'SKINNING');
+                        material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
+                    }
+
+                    if (meshInfo.name) {
+                        mesh.name = [meshInfo.name, i].join('-');
+                    }
+
+                    lib.meshes[name].push(mesh);
+                }
             }
         },
 
@@ -472,9 +472,9 @@ define(function(require) {
                 }
                 if (nodeInfo.meshes) {
                     for (var i = 0; i < nodeInfo.meshes.length; i++) {
-                        var mesh = lib.meshes[nodeInfo.meshes[i]];
-                        if (mesh) {
-                            node.add(mesh);
+                        var primitives = lib.meshes[nodeInfo.meshes[i]];
+                        for (var j = 0; j < primitives.length; j++) {                            
+                            node.add(primitives[j]);
                         }
                     }
                 }
