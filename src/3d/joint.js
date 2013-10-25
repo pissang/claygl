@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Node = require("./node");
-    var Quaternion = require("core/quaternion");
-    var Vector3 = require("core/vector3");
-    var Matrix4 = require("core/matrix4");
+    var Node = require("./Node");
+    var Quaternion = require("core/Quaternion");
+    var Vector3 = require("core/Vector3");
+    var Matrix4 = require("core/Matrix4");
     
     var Joint = Node.derive(function() {
         return {

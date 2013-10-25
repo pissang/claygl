@@ -1,15 +1,15 @@
 define(function(require) {
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
+    var util = require("util/util");
+    var Light = require("./Light");
+    var Mesh = require("./Mesh");
+    var Texture = require("./Texture");
+    var WebGLInfo = require('./WebGLInfo');
     var _ = require("_");
     var glMatrix = require("glmatrix");
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
-    var util = require("util/util");
-    var Light = require("./light");
-    var Mesh = require("./mesh");
-    var Texture = require("./texture");
-    var WebGLInfo = require('./webglinfo');
 
     var Renderer = Base.derive(function() {
         return {

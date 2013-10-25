@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Mesh = require('../mesh');
-    var CubeGeometry = require('../geometry/cube');
-    var Shader = require('../shader');
-    var Material = require('../material');
+    var Mesh = require('../Mesh');
+    var CubeGeometry = require('../geometry/Cube');
+    var Shader = require('../Shader');
+    var Material = require('../Material');
     var shaderLibrary = require('../shader/library');
 
     var skyboxShader = shaderLibrary.get("buildin.skybox", "environmentMap");

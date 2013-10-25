@@ -1,28 +1,27 @@
 /**
  * glTF Loader
  * Specification : https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
- * @export{class} GLTF
  */
 define(function(require) {
 
-    var Base = require('core/base');
+    var Base = require('core/Base');
 
     var request = require("core/request");
-    var Scene = require('3d/scene');
-    var Shader = require("3d/shader");
-    var Material = require("3d/material");
-    var Mesh = require("3d/mesh");
-    var Node = require("3d/node");
-    var Texture2D = require("3d/texture/texture2d");
-    var TextureCube = require("3d/texture/texturecube");
+    var Scene = require('3d/Scene');
+    var Shader = require("3d/Shader");
+    var Material = require("3d/Material");
+    var Mesh = require("3d/Mesh");
+    var Node = require("3d/Node");
+    var Texture2D = require("3d/texture/Texture2D");
+    var TextureCube = require("3d/texture/TextureCube");
     var shaderLibrary = require("3d/shader/library");
-    var Skeleton = require("3d/skeleton");
-    var Joint = require("3d/joint");
-    var PerspectiveCamera = require("3d/camera/perspective");
-    var OrthographicCamera = require("3d/camera/orthographic");
-    var PointLight = require("3d/light/point");
-    var SpotLight = require("3d/light/spot");
-    var DirectionalLight = require("3d/light/directional");
+    var Skeleton = require("3d/Skeleton");
+    var Joint = require("3d/Joint");
+    var PerspectiveCamera = require("3d/camera/Perspective");
+    var OrthographicCamera = require("3d/camera/Orthographic");
+    var PointLight = require("3d/light/Point");
+    var SpotLight = require("3d/light/Spot");
+    var DirectionalLight = require("3d/light/Directional");
     var glenum = require("3d/glenum");
 
     var Vector3 = require("core/vector3");

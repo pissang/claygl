@@ -1,12 +1,9 @@
-/**
- * @export{class} FrameBuffer
- */
 define(function(require) {
     
-    var Base = require("core/base");
-    var Texture2D = require("./texture/texture2d");
-    var TextureCube = require("./texture/texturecube");
-    var WebGLInfo = require('./webglinfo');
+    var Base = require("core/Base");
+    var Texture2D = require("./texture/Texture2d");
+    var TextureCube = require("./texture/TextureCube");
+    var WebGLInfo = require('./WebGLInfo');
     var glenum = require("./glenum");
 
     var FrameBuffer = Base.derive(function() {

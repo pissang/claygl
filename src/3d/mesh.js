@@ -1,8 +1,8 @@
 define(function(require) {
 
-    var Node = require("./node");
+    var Node = require("./Node");
     var glenum = require("./glenum");
-    var Vector3 = require("core/vector3");
+    var Vector3 = require("core/Vector3");
     var _ = require("_");
 
     var prevDrawID = 0;

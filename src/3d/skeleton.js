@@ -1,7 +1,7 @@
 define(function(require) {
 
-    var Base = require("core/base");
-    var Matrix4 = require("core/matrix4");
+    var Base = require("core/Base");
+    var Matrix4 = require("core/Matrix4");
 
     var Skeleton = Base.derive(function() {
         return {

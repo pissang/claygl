@@ -6,21 +6,21 @@
  */
 define(function(require) {
 
-    var Base = require('core/base');
+    var Base = require('core/Base');
 
     var request = require("core/request");
-    var Shader = require("3d/shader");
-    var Material = require("3d/material");
-    var Geometry = require("3d/geometry");
-    var Mesh = require("3d/mesh");
-    var Node = require("3d/node");
-    var Texture2D = require("3d/texture/texture2d");
-    var TextureCube = require("3d/texture/texturecube");
+    var Shader = require("3d/Shader");
+    var Material = require("3d/Material");
+    var Geometry = require("3d/Geometry");
+    var Mesh = require("3d/Mesh");
+    var Node = require("3d/Node");
+    var Texture2D = require("3d/texture/Texture2D");
+    var TextureCube = require("3d/texture/TextureCube");
     var shaderLibrary = require("3d/shader/library");
-    var Skeleton = require("3d/skeleton");
-    var Joint = require("3d/joint");
-    var Vector3 = require("core/vector3");
-    var Quaternion = require("core/quaternion");
+    var Skeleton = require("3d/Skeleton");
+    var Joint = require("3d/Joint");
+    var Vector3 = require("core/Vector3");
+    var Quaternion = require("core/Quaternion");
     var glenum = require('3d/glenum');
     var _ = require("_");
 

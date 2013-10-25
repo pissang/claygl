@@ -7,9 +7,9 @@ define(function(require) {
 
     'use strict'
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
-    var BoundingBox = require("./boundingbox");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
+    var BoundingBox = require("./BoundingBox");
     var glenum = require("./glenum");
     var util = require("util/util");
     var glMatrix = require("glmatrix");

@@ -1,16 +1,16 @@
 define(function(require) {
 
-    var Base = require("core/base");
-    var Scene = require("../scene");
-    var OrthoCamera = require('../camera/orthographic');
-    var Plane = require('../geometry/plane');
-    var Shader = require('../shader');
-    var Material = require('../material');
-    var Mesh = require('../mesh');
-    var Scene = require('../scene');
+    var Base = require("core/Base");
+    var Scene = require("../Scene");
+    var OrthoCamera = require('../camera/Orthographic');
+    var Plane = require('../geometry/Plane');
+    var Shader = require('../Shader');
+    var Material = require('../Material');
+    var Mesh = require('../Mesh');
+    var Scene = require('../Scene');
     var vertexShaderString = require("text!./shaders/vertex.essl");
-    var Texture = require('../texture');
-    var WebGLInfo = require('../webglinfo');
+    var Texture = require('../Texture');
+    var WebGLInfo = require('../WebGLInfo');
 
     var planeGeo = new Plane();
     var mesh = new Mesh({

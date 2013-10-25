@@ -1,7 +1,7 @@
 define(function(require) {
 
-    var Base = require("core/base");
-    var Vector4 = require("core/vector4");
+    var Base = require("core/Base");
+    var Vector4 = require("core/Vector4");
 
     var ReflectionPass = Base.derive(function() {
         // Vector4

@@ -1,13 +1,7 @@
 define(function(require) {
 
-    var Light = require('../light'),
-        Shader = require('../shader');
-
-    var SHADER_STR = [ '@export buildin.header.ambient_light',
-                        'uniform vec3 ambientLightColor[ AMBIENT_LIGHT_NUMBER ] : unconfigurable;',
-                        '@end;' ].join('\n');
-
-    Shader.import(SHADER_STR);
+    var Light = require('../Light');
+    var Shader = require('../Shader');
 
     var AmbientLight = Light.derive(function() {
         return {

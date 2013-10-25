@@ -3,7 +3,7 @@
  */
 define(function(require) {
 
-    var Shader = require("../shader");
+    var Shader = require("../Shader");
     var _ = require("_");
 
     _library = {};

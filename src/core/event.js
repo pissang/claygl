@@ -1,6 +1,6 @@
 define( function(require) {
 
-    var Base = require('./base');
+    var Base = require('./Base');
 
     var QEvent = Base.derive({
         cancelBubble : false

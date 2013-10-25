@@ -2,6 +2,7 @@
     "meta" : {
         "name" : "Curl Noise"
     },
+    "type" : "compositor",
     "shaders" : {
         "curlnoise" : "#url(curlnoise.essl)"
     },

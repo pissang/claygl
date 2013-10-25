@@ -1,11 +1,7 @@
-/**
- *
- * @export{class} TextureCube
- */
 define(function(require) {
 
-    var Texture = require('../texture');
-    var WebGLInfo = require('../webglinfo');
+    var Texture = require('../Texture');
+    var WebGLInfo = require('../WebGLInfo');
     var _ = require('_');
 
     var targetMap = {

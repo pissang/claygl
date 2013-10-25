@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Mesh = require('../mesh');
-    var SphereGeometry = require('../geometry/sphere');
-    var Shader = require('../shader');
-    var Material = require('../material');
+    var Mesh = require('../Mesh');
+    var SphereGeometry = require('../geometry/Sphere');
+    var Shader = require('../Shader');
+    var Material = require('../Material');
     var shaderLibrary = require('../shader/library');
 
     var skydomeShader = new Shader({

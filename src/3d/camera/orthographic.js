@@ -1,6 +1,6 @@
 define(function(require) {
 
-    var Camera = require('../camera');
+    var Camera = require('../Camera');
 
     var Orthographic = Camera.derive(function() {
         return {

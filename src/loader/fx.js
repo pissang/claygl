@@ -1,21 +1,18 @@
-/**
- * @export{class} FX
- */
 define(function(require) {
     
     'use strict';
 
-    var Base = require('core/base');
+    var Base = require('core/Base');
     var request = require('core/request');
-    var Compositor = require('3d/compositor');
-    var CompoNode = require('3d/compositor/node');
-    var CompoGroup = require('3d/compositor/group');
-    var CompoSceneNode = require('3d/compositor/scenenode');
-    var CompoTextureNode = require('3d/compositor/texturenode');
-    var Shader = require('3d/shader');
-    var Texture = require('3d/texture');
-    var Texture2D = require('3d/texture/texture2d');
-    var TextureCube = require('3d/texture/texturecube');
+    var Compositor = require('3d/Compositor');
+    var CompoNode = require('3d/compositor/Node');
+    var CompoGroup = require('3d/compositor/Group');
+    var CompoSceneNode = require('3d/compositor/SceneNode');
+    var CompoTextureNode = require('3d/compositor/TextureNode');
+    var Shader = require('3d/Shader');
+    var Texture = require('3d/Texture');
+    var Texture2D = require('3d/texture/Texture2D');
+    var TextureCube = require('3d/texture/TextureCube');
     var _ = require('_');
 
     var shaderSourceReg = /#source\((.*?)\)/;

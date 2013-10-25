@@ -4,11 +4,11 @@
  */
 define(function(require) {
     
-    var Geometry = require("../geometry");
-    var Mesh = require("../mesh");
-    var Node = require("../node");
-    var Material = require("../material");
-    var Shader = require("../shader");
+    var Geometry = require("../Geometry");
+    var Mesh = require("../Mesh");
+    var Node = require("../Node");
+    var Material = require("../Material");
+    var Shader = require("../Shader");
     var glMatrix = require("glmatrix");
     var _ = require("_");
     var mat4 = glMatrix.mat4;

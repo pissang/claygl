@@ -2,7 +2,7 @@ define(function(require) {
     
     'use strict';
 
-    var Clip = require('./clip');
+    var Clip = require('./Clip');
     var _ = require("_");
 
     var requrestAnimationFrame = window.requrestAnimationFrame

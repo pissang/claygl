@@ -1,6 +1,7 @@
 define(function(require){
 
-    var Node = require("./node");
+    var Node = require("./Node");
+    var Shader = require("./Shader");
 
     var Light = Node.derive(function(){
         return {
@@ -13,6 +14,8 @@ define(function(require){
         }
     }, {
     });
+
+    Shader.import(require('text!./light/light.essl'));
 
     return Light;
 })

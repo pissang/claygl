@@ -1,26 +1,23 @@
-/**
- * @export{class} ShadowMap
- */
 define(function(require) {
 
-    var Base = require("core/base");
-    var Vector3 = require("core/vector3");
-    var Shader = require("../shader");
-    var Light = require("../light");
-    var SpotLight = require("../light/spot");
-    var DirectionalLight = require("../light/directional");
-    var PointLight = require("../light/point");
+    var Base = require("core/Base");
+    var Vector3 = require("core/Vector3");
+    var Shader = require("../Shader");
+    var Light = require("../Light");
+    var SpotLight = require("../light/Spot");
+    var DirectionalLight = require("../light/Directional");
+    var PointLight = require("../light/Point");
     var shaderLibrary = require("../shader/library");
-    var Material = require("../material");
-    var FrameBuffer = require("../framebuffer");
-    var Texture2d = require("../texture/texture2d");
-    var TextureCube = require("../texture/texturecube");
+    var Material = require("../Material");
+    var FrameBuffer = require("../FrameBuffer");
+    var Texture2d = require("../texture/Texture2D");
+    var TextureCube = require("../texture/TextureCube");
     var glenum = require("../glenum");
-    var PerspectiveCamera = require("../camera/perspective");
-    var OrthoCamera = require("../camera/orthographic");
+    var PerspectiveCamera = require("../camera/Perspective");
+    var OrthoCamera = require("../camera/Orthographic");
 
-    var Pass = require("../compositor/pass");
-    var texturePool = require("../compositor/texturepool");
+    var Pass = require("../compositor/Pass");
+    var texturePool = require("../compositor/texturePool");
 
     var Matrix4 = require("core/matrix4");
 

@@ -1,12 +1,12 @@
 define(function(require) {
 
-    var Base = require("core/base");
-    var Shader = require("./shader");
+    var Base = require("core/Base");
+    var Shader = require("./Shader");
     var util = require("util/util");
     var glenum = require("./glenum");
-    var Texture = require('./texture');
-    var Texture2D = require('./texture/texture2d');
-    var TextureCube = require('./texture/texturecube');
+    var Texture = require('./Texture');
+    var Texture2D = require('./texture/texture2D');
+    var TextureCube = require('./texture/TextureCube');
     var _ = require("_");
 
     _repository = [];

@@ -10,7 +10,7 @@ define(function(require) {
     
     'use strict';
 
-    var Base = require("core/base");
+    var Base = require("core/Base");
     var glMatrix = require("glmatrix");
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;

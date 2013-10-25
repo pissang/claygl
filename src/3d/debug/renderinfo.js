@@ -1,6 +1,3 @@
-/**
- * @export{class} RenderInfo
- */
 define(function(require) {
 
     var Base = require("core/base");
