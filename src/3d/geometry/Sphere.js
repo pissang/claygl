@@ -1,6 +1,6 @@
 define(function(require) {
 
-	var Geometry = require('../geometry');
+	var Geometry = require('../Geometry');
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;

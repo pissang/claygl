@@ -1,6 +1,6 @@
 define(function(require) {
 
-    var Camera = require('../camera');
+    var Camera = require('../Camera');
 
     var Perspective = Camera.derive(function() {
         return {

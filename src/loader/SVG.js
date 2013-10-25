@@ -19,11 +19,9 @@ define(function(require) {
     var LinearGradient = require("2d/LinearGradient");
     var RadialGradient = require("2d/RadialGradient");
     var Pattern = require("2d/Pattern");
+    var Style = require("2d/Style");
+    var Vector2 = require("core/Vector2");
     var _ = require("_");
-
-    var Style = require("2d/style");
-
-    var Vector2 = require("core/vector2");
 
     var Loader = Base.derive(function() {
         return {

@@ -1,7 +1,7 @@
 define(function(require) {
     
     var Base = require("core/Base");
-    var Texture2D = require("./texture/Texture2d");
+    var Texture2D = require("./texture/Texture2D");
     var TextureCube = require("./texture/TextureCube");
     var WebGLInfo = require('./WebGLInfo');
     var glenum = require("./glenum");

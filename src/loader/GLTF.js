@@ -24,12 +24,12 @@ define(function(require) {
     var DirectionalLight = require("3d/light/Directional");
     var glenum = require("3d/glenum");
 
-    var Vector3 = require("core/vector3");
-    var Quaternion = require("core/quaternion");
+    var Vector3 = require("core/Vector3");
+    var Quaternion = require("core/Quaternion");
     
     var _ = require("_");
 
-    var InstantGeometry = require("./instantgeometry");
+    var InstantGeometry = require("./InstantGeometry");
 
     var glMatrix = require("glmatrix");
     var vec4 = glMatrix.vec4;

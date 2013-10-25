@@ -1,6 +1,6 @@
 define(function(require) {
     
-    var Texture2D = require('../texture/texture2d');
+    var Texture2D = require('../texture/Texture2D');
     var glenum = require('../glenum');
     var _ = require('_');
 

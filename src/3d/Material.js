@@ -5,7 +5,7 @@ define(function(require) {
     var util = require("util/util");
     var glenum = require("./glenum");
     var Texture = require('./Texture');
-    var Texture2D = require('./texture/texture2D');
+    var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
     var _ = require("_");
 

@@ -10,7 +10,7 @@ define(function(require) {
     var shaderLibrary = require("../shader/library");
     var Material = require("../Material");
     var FrameBuffer = require("../FrameBuffer");
-    var Texture2d = require("../texture/Texture2D");
+    var Texture2D = require("../texture/Texture2D");
     var TextureCube = require("../texture/TextureCube");
     var glenum = require("../glenum");
     var PerspectiveCamera = require("../camera/Perspective");
@@ -19,7 +19,7 @@ define(function(require) {
     var Pass = require("../compositor/Pass");
     var texturePool = require("../compositor/texturePool");
 
-    var Matrix4 = require("core/matrix4");
+    var Matrix4 = require("core/Matrix4");
 
     var _ = require("_");
 
@@ -369,7 +369,7 @@ define(function(require) {
                         useMipmap : false
                     });
                 } else {
-                    texture = new Texture2d({
+                    texture = new Texture2D({
                         width : resolution,
                         height : resolution,
                         
