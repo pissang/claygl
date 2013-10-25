@@ -143,10 +143,6 @@ void main(){
         gl_FragColor = vec4(v_Weight.xyz, 1.0);
         return;
     #endif
-    #ifdef RENDER_NORMAL
-        gl_FragColor = vec4(v_LocalNormal, 1.0);
-        return;
-    #endif
     #ifdef RENDER_TEXCOORD
         gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
         return;
@@ -167,6 +163,11 @@ void main(){
         normal = texture2D( normalMap, v_Texcoord ).xyz * 2.0 - 1.0;
         mat3 tbn = mat3( v_Tangent, v_Bitangent, v_Normal );
         normal = normalize( tbn * normal );
+    #endif
+
+    #ifdef RENDER_NORMAL
+        gl_FragColor = vec4(normal, 1.0);
+        return;
     #endif
 
     // Diffuse part of all lights
@@ -218,7 +219,7 @@ void main(){
             diffuseItem += lightColor * ndl * attenuation * shadowContrib;
 
             if (shininess > 0.0) {
-                specularItem += lightColor * pow(ndh, shininess ) * attenuation * shadowContrib;
+                specularItem += lightColor * ndl * pow(ndh, shininess ) * attenuation * shadowContrib;
             }
 
         }
@@ -254,7 +255,7 @@ void main(){
             diffuseItem += lightColor * ndl * shadowContrib;
 
             if (shininess > 0.0) {
-                specularItem += lightColor * pow( ndh, shininess ) * shadowContrib;
+                specularItem += lightColor * ndl * pow( ndh, shininess ) * shadowContrib;
             }
         }
     #endif
@@ -308,7 +309,7 @@ void main(){
             diffuseItem += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
 
             if (shininess > 0.0) {
-                specularItem += lightColor * pow(ndh, shininess) * attenuation * (1.0-falloff) * shadowContrib;
+                specularItem += lightColor * ndl * pow(ndh, shininess) * attenuation * (1.0-falloff) * shadowContrib;
             }
         }
     #endif

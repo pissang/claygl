@@ -49,6 +49,9 @@ define(function(require) {
             boundingBox : new BoundingBox(),
 
             _children : [],
+
+            // Its for transparent queue sorting
+            _depth : 0
         }
     }, function() {
         // In case multiple nodes use the same vector and 

@@ -140,10 +140,7 @@ define(function(require) {
             _textureStatus : {},
 
             _vertexProcessed : "",
-            _fragmentProcessed : "",
-
-            _program : null,
-
+            _fragmentProcessed : ""
         }
     }, function() {
 
@@ -305,6 +302,10 @@ define(function(require) {
             }
 
             this.dirty();
+        },
+
+        isTextureEnabled : function(symbol) {
+            return this._textureStatus[symbol].enabled;
         },
 
         setUniform : function(_gl, type, symbol, value) {

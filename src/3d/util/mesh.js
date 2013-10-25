@@ -199,7 +199,7 @@ define(function(require) {
                     faces : bucketFaces,
                     joints : bucketJoints.map(function(idx){return joints[idx];}),
                     jointReverseMap : bucketJointReverseMap
-                })
+                });
             }
 
             var root = new Node({
@@ -221,7 +221,11 @@ define(function(require) {
                 }
                 var subMat = new Material({
                     name : [material.name, b].join('-'),
-                    shader : subShader
+                    shader : subShader,
+                    transparent : material.transparent,
+                    depthTest : material.depthTest,
+                    depthMask : material.depthMask,
+                    blend : material.blend
                 });
                 for (var name in material.uniforms) {
                     var uniform = material.uniforms[name];

@@ -65,12 +65,10 @@
 
                 setInterval(function() {
                     shadowMapPass.render(renderer, scene);
+                    console.time('render');
                     renderer.render(scene, camera);
+                    console.timeEnd('render');
                 }, 50);
-
-                // setTimeout(function() {
-                //     renderer.disposeScene(scene);
-                // }, 1000)
             });
         });
     </script>

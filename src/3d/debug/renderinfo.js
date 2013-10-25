@@ -42,11 +42,11 @@ define(function(require) {
         _beforeRender : function() {
             this.clear();
 
-            this._startTime = new Date().getTime();
+            this._startTime = performance.now();
         },
 
         _afterRender : function() {
-            var endTime = new Date().getTime();
+            var endTime = performance.now();
 
             this.frameTime = endTime - this._startTime;
         },

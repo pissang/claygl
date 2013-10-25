@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require("_");
     var glMatrix = require("glmatrix");
     var mat4 = glMatrix.mat4;
+    var vec3 = glMatrix.vec3;
     var util = require("util/util");
     var Light = require("./light");
     var Mesh = require("./mesh");
@@ -174,10 +175,7 @@ define(function(require) {
             this.updateLightUnforms(lights);
 
             // Sort material to reduce the cost of setting uniform in material
-            // PENDING : sort geometry ??
             opaqueQueue.sort(this._materialSortFunc);
-            transparentQueue.sort(this._materialSortFunc);
-
             // Render Opaque queue
             if (! silent) {
                 this.trigger("beforerender:opaque", this, opaqueQueue);
@@ -197,6 +195,19 @@ define(function(require) {
             _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
             _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
 
+            // Calculate the object depth
+            if (transparentQueue.length > 0) {
+                var modelViewMat = mat4.create();
+                var posViewSpace = vec3.create();
+                mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
+                for (var i = 0; i < transparentQueue.length; i++) {
+                    var node = transparentQueue[i];
+                    mat4.multiply(modelViewMat, matrices['VIEW'], node.worldTransform._array);
+                    vec3.transformMat4(posViewSpace, node.position._array, modelViewMat);
+                    node._depth = posViewSpace[2];
+                }
+            }
+            transparentQueue = transparentQueue.sort(this._depthSortFunc);
             this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
@@ -412,13 +423,6 @@ define(function(require) {
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
                 }
-                // Dispose the resource in shadow mapping
-                if (node._depthMaterial) {
-                    materials[node._depthMaterial.__GUID__] = node._depthMaterial;
-                }
-                if (node._distanceMaterial) {
-                    materials[node._distanceMaterial.__GUID__] = node._distanceMaterial;
-                }
             });
             for (var guid in materials) {
                 var mat = materials[guid];
@@ -450,6 +454,17 @@ define(function(require) {
                 return x.material.__GUID__ - y.material.__GUID__;
             }
             return x.material.shader.__GUID__ - y.material.__GUID__;
+        },
+        _depthSortFunc : function(x, y) {
+            if (x._depth === y._depth) {
+                if (x.material.shader == y.material.shader) {
+                    return x.material.__GUID__ - y.material.__GUID__;
+                }
+                return x.material.shader.__GUID__ - y.material.__GUID__;
+            }
+            // Depth is negative because of right hand coord
+            // So farther object has smaller depth value
+            return x._depth - y._depth
         }
     })
 
