@@ -84,9 +84,9 @@ define( function(require){
 			"Skybox": require('3d/plugin/Skybox'),
 			"Skydome": require('3d/plugin/Skydome')
 		},
-		"prepass": {
-			"Reflection": require('3d/prepass/Reflection'),
-			"ShadowMap": require('3d/prepass/ShadowMap')
+		"prePass": {
+			"Reflection": require('3d/prePass/Reflection'),
+			"ShadowMap": require('3d/prePass/ShadowMap')
 		},
 		"shader": {
 			"library": require('3d/shader/library')
