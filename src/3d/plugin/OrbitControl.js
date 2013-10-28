@@ -8,8 +8,8 @@ define(function(require) {
     var OrbitControl = Base.derive(function() {
         return {
             
-            camera : null,
-            canvas : null,
+            target : null,
+            domElement : null,
 
             sensitivity : 1,
 
@@ -36,19 +36,17 @@ define(function(require) {
     }, {
 
         enable : function() {
-
-            this.camera.on("beforeupdate", this._beforeUpdateCamera, this);
-
-            this.canvas.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
-            this.canvas.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
-            this.canvas.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
+            this.target.on("beforeupdate", this._beforeUpdateCamera, this);
+            this.domElement.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
+            this.domElement.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
+            this.domElement.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
         },
 
         disable : function() {
-            this.camera.off("beforeupdate", this._beforeUpdateCamera);
-            this.canvas.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
-            this.canvas.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
-            this.canvas.removeEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this));
+            this.target.off("beforeupdate", this._beforeUpdateCamera);
+            this.domElement.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
+            this.domElement.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
+            this.domElement.removeEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this));
             this._mouseUp();
         },
 
@@ -84,8 +82,8 @@ define(function(require) {
                 this._offsetPitch += dx * this.sensitivity / 100;
                 this._offsetRoll += dy * this.sensitivity / 100;
             } else if (this._op === 1) {
-                var len = this.origin.distance(this.camera.position);
-                var tmp = Math.sin(this.camera.fov/2) / 100;
+                var len = this.origin.distance(this.target.position);
+                var tmp = Math.sin(this.target.fov/2) / 100;
                 this._panX -= dx * this.sensitivity * len * tmp;
                 this._panY -= dy * this.sensitivity * len * tmp;
             }
@@ -109,27 +107,27 @@ define(function(require) {
 
         _beforeUpdateCamera : function() {
 
-            var camera = this.camera;
+            var target = this.target;
 
             if (this._op === 0) {
                 // Rotate
-                camera.rotateAround(this.origin, this.up, -this._offsetPitch);            
-                var xAxis = camera.localTransform.right;
-                camera.rotateAround(this.origin, xAxis, -this._offsetRoll);
+                target.rotateAround(this.origin, this.up, -this._offsetPitch);            
+                var xAxis = target.localTransform.right;
+                target.rotateAround(this.origin, xAxis, -this._offsetRoll);
                 this._offsetRoll = this._offsetPitch = 0;
             } else if (this._op === 1) {
                 // Pan
-                var xAxis = camera.localTransform.right.normalize().scale(-this._panX);
-                var yAxis = camera.localTransform.up.normalize().scale(this._panY);
-                camera.position.add(xAxis).add(yAxis);
+                var xAxis = target.localTransform.right.normalize().scale(-this._panX);
+                var yAxis = target.localTransform.up.normalize().scale(this._panY);
+                target.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;
             }
             
             // Zoom
-            var zAxis = camera.localTransform.forward.normalize();
-            var distance = camera.position.distance(this.origin);
-            camera.position.scaleAndAdd(zAxis, distance * this._forward / 2000);
+            var zAxis = target.localTransform.forward.normalize();
+            var distance = target.position.distance(this.origin);
+            target.position.scaleAndAdd(zAxis, distance * this._forward / 2000);
             this._forward = 0;
 
         }

@@ -6,7 +6,10 @@ define(function(require) {
     var Material = require('../Material');
     var shaderLibrary = require('../shader/library');
 
-    var skyboxShader = shaderLibrary.get("buildin.skybox", "environmentMap");
+    var skyboxShader = new Shader({
+        vertex : Shader.source("buildin.skybox.vertex"), 
+        fragment : Shader.source("buildin.skybox.fragment")
+    });
 
     var Skybox = Mesh.derive(function() {
 
@@ -20,7 +23,9 @@ define(function(require) {
             material : material,
 
             renderer : null,
-            camera : null
+            camera : null,
+
+            culling : false
         }
     }, function() {
         var camera = this.camera;

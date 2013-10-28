@@ -75,8 +75,8 @@
                 mat.set("color", [0.5, 0.3, 0.1]);
 
                 var control = new qtek3d.plugin.OrbitControl({
-                    camera : camera,
-                    canvas : renderer.canvas,
+                    target : camera,
+                    domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
                 control.enable();

@@ -140,8 +140,8 @@
                 scene.add(light);
 
                 var control = new qtek3d.plugin.OrbitControl({
-                    camera : camera,
-                    canvas : renderer.canvas,
+                    target : camera,
+                    domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
                 control.enable();

@@ -472,8 +472,10 @@ define(function(require) {
                 if (nodeInfo.meshes) {
                     for (var i = 0; i < nodeInfo.meshes.length; i++) {
                         var primitives = lib.meshes[nodeInfo.meshes[i]];
-                        for (var j = 0; j < primitives.length; j++) {                            
-                            node.add(primitives[j]);
+                        if (primitives) {
+                            for (var j = 0; j < primitives.length; j++) {                            
+                                node.add(primitives[j]);
+                            }
                         }
                     }
                 }

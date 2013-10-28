@@ -7,8 +7,8 @@ define(function(require) {
 
     var FirstPersonControl = Base.derive(function() {
         return {
-            camera : null,
-            canvas : null,
+            target : null,
+            domElement : null,
 
             sensitivity : 1,
             speed : 0.4,
@@ -25,12 +25,12 @@ define(function(require) {
         }
     }, {
         enable : function() {
-            this.camera.on("beforeupdate", this._beforeUpdateCamera, this);
+            this.target.on("beforeupdate", this._beforeUpdateCamera, this);
 
-            this.camera.eulerOrder = ["Y", "X", "Z"];
+            this.target.eulerOrder = ["Y", "X", "Z"];
             // Use pointer lock
             // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
-            var el = this.canvas;
+            var el = this.domElement;
 
             //Must request pointer lock after click event, can't not do it directly
             //Why ? ?
@@ -46,9 +46,9 @@ define(function(require) {
 
         disable : function() {
 
-            this.camera.off('beforeupdate', this._beforeUpdateCamera);
+            this.target.off('beforeupdate', this._beforeUpdateCamera);
 
-            var el = this.canvas;
+            var el = this.domElement;
 
             el.exitPointerLock = el.exitPointerLock ||
                                     el.mozExitPointerLock ||
@@ -78,11 +78,11 @@ define(function(require) {
             
             return function() {
                 
-                var camera = this.camera;
+                var target = this.target;
 
-                var position = this.camera.position,
-                    xAxis = camera.localTransform.right.normalize(),
-                    zAxis = camera.localTransform.forward.normalize();
+                var position = this.target.position,
+                    xAxis = target.localTransform.right.normalize(),
+                    zAxis = target.localTransform.forward.normalize();
 
                 if (this._moveForward) {
                     // Opposite direction of z
@@ -99,9 +99,9 @@ define(function(require) {
                 }
 
 
-                camera.rotateAround(camera.position, this.up, -this._offsetPitch * Math.PI / 180);
-                var xAxis = camera.localTransform.right;
-                camera.rotateAround(camera.position, xAxis, -this._offsetRoll * Math.PI / 180);
+                target.rotateAround(target.position, this.up, -this._offsetPitch * Math.PI / 180);
+                var xAxis = target.localTransform.right;
+                target.rotateAround(target.position, xAxis, -this._offsetRoll * Math.PI / 180);
 
                 this._offsetRoll = this._offsetPitch = 0;
             }
@@ -109,9 +109,9 @@ define(function(require) {
         })(),
 
         _lockChange : function() {
-            if (document.pointerlockElement === this.canvas ||
-                document.mozPointerlockElement === this.canvas ||
-                document.webkitPointerLockElement === this.canvas) {
+            if (document.pointerlockElement === this.domElement ||
+                document.mozPointerlockElement === this.domElement ||
+                document.webkitPointerLockElement === this.domElement) {
 
                 document.addEventListener('mousemove', bindOnce(this._mouseMove, this), false);
             }else{
