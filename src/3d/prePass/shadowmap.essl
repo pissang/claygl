@@ -54,21 +54,21 @@ void main(){
     // Whats the difference between gl_FragCoord.z and this v_ViewPosition
     // gl_FragCoord consider the polygon offset ?
     float depth = v_ViewPosition.z / v_ViewPosition.w;
+    // float depth = gl_FragCoord.z / gl_FragCoord.w;
 
     #ifdef USE_VSM
         depth = depth * 0.5 + 0.5;
-
         float moment1 = depth;
         float moment2 = depth * depth;
 
         // Adjusting moments using partial derivative
-        // float dx = dFdx(depth);
-        // float dy = dFdy(depth);
-        // moment2 += 0.25*(dx*dx+dy*dy);
+        float dx = dFdx(depth);
+        float dy = dFdy(depth);
+        moment2 += 0.25*(dx*dx+dy*dy);
 
-        gl_FragColor = vec4(moment1, moment2, 0.0, 0.0);
+        gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
     #else
-        gl_FragColor = packDepth((depth + 1.0) / 2.0);
+        gl_FragColor = packDepth(depth * 0.5 + 0.5);
     #endif
 }
 @end
@@ -83,11 +83,11 @@ varying vec2 v_Texcoord;
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
     #ifdef USE_VSM
-        float depth = tex.x;
+        gl_FragColor = vec4(tex.rgb, 1.0);
     #else
         float depth = unpackDepth(tex);
+        gl_FragColor = vec4(depth, depth, depth, 1.0);
     #endif
-    gl_FragColor = vec4(depth, depth, depth, 1.0);
 }
 
 @end
@@ -160,15 +160,15 @@ void main(){
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
 
 #ifdef SPOT_LIGHT_SHADOWMAP_NUMBER
-uniform sampler2D spotLightShadowMaps[ SPOT_LIGHT_SHADOWMAP_NUMBER ];
-uniform mat4 spotLightMatrices[ SPOT_LIGHT_SHADOWMAP_NUMBER ];
-uniform float spotLightBiases[ SPOT_LIGHT_SHADOWMAP_NUMBER ];
+uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_NUMBER];
+uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_NUMBER];
+uniform float spotLightBiases[SPOT_LIGHT_SHADOWMAP_NUMBER];
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
-uniform sampler2D directionalLightShadowMaps[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
-uniform mat4 directionalLightMatrices[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
-uniform float directionalLightBiases[ DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER ];
+uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
+uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
+uniform float directionalLightBiases[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
 #endif
 
 #ifdef POINT_LIGHT_SHADOWMAP_NUMBER
@@ -204,16 +204,20 @@ float pcf(sampler2D map, vec2 uv, float z, float bias){
 }
 float chebyshevUpperBound(vec2 moments, float z){
     float p = 0.0;
-    // if (z >= moments.x) {
-    //     p = 1.0;
-    // }
-    float variance = moments.y - moments.x * moments.x;
-    variance = max(variance, 0.000000001);
     z = z * 0.5 + 0.5;
+    if (z <= moments.x) {
+        p = 1.0;
+    }
+    float variance = moments.y - moments.x * moments.x;
+    // http://fabiensanglard.net/shadowmappingVSM/
+    variance = max(variance, 0.0000001);
     // Compute probabilistic upper bound. 
     float mD = moments.x - z;
-    float p_max = variance / (variance + mD * mD);
-    return max(p_max, p);
+    float pMax = variance / (variance + mD * mD);
+    // Now reduce light-bleeding by removing the [0, x] tail and linearly rescaling (x, 1]
+    // TODO : bleedBias parameter ?
+    pMax = clamp((pMax-0.5)/(1.0-0.5), 0.0, 1.0);
+    return max(p, pMax);
 }
 float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bias){
     
@@ -269,7 +273,7 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
 void computeShadowOfSpotLights( vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER]  ){
     for( int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
         float shadowContrib = computeShadowContrib( spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i] );
-        shadowContribs[ i ] = shadowContrib;
+        shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
     for( int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){

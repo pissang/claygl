@@ -1,7 +1,3 @@
-/**
- *  http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
- */
-
 @export buildin.compositor.gaussian_blur_v
 
 uniform sampler2D texture; // the texture with the scene you want to blur
@@ -20,7 +16,7 @@ void main(void)
    sum += texture2D(texture, vec2(v_Texcoord.x - 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
    sum += texture2D(texture, vec2(v_Texcoord.x - 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
    sum += texture2D(texture, vec2(v_Texcoord.x - blurSize/imageWidth, v_Texcoord.y)) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.16;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
    sum += texture2D(texture, vec2(v_Texcoord.x + blurSize/imageWidth, v_Texcoord.y)) * 0.15;
    sum += texture2D(texture, vec2(v_Texcoord.x + 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
    sum += texture2D(texture, vec2(v_Texcoord.x + 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
@@ -49,7 +45,7 @@ void main(void)
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 3.0*blurSize/imageHeight)) * 0.09;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 2.0*blurSize/imageHeight)) * 0.12;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - blurSize/imageHeight)) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.16;
+   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + blurSize/imageHeight)) * 0.15;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 2.0*blurSize/imageHeight)) * 0.12;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 3.0*blurSize/imageHeight)) * 0.09;
@@ -84,7 +80,8 @@ void main(void){
    tex += texture2D(texture, v_Texcoord + vec2(0.0, -offset.y) );
 
    tex /= 9.0;
-   return tex;
+
+   gl_FragColor = tex;
 }
 
 @end

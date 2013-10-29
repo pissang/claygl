@@ -66,8 +66,8 @@ void main(){
     v_Barycentric = barycentric;
 
     v_LocalNormal = skinnedNormal;
-    v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );
-    v_Tangent = normalize( (worldInverseTranspose * vec4(skinnedTangent, 0.0) ).xyz );
+    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz );
+    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz );
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
 
     #ifdef SKINNING

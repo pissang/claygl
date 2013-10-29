@@ -8,6 +8,7 @@ define(function(require) {
     var WebGLInfo = require('./WebGLInfo');
     var _ = require("_");
     var glMatrix = require("glmatrix");
+    var glenum = require('./glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
@@ -498,6 +499,10 @@ define(function(require) {
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
     var matrixSemantics = Object.keys(matrices);
+
+    Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT
+    Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT
+    Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT
 
     return Renderer;
 })

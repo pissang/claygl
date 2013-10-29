@@ -53,12 +53,15 @@ define(function(require) {
         this._gaussianPassV = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_v')
         });
-        this._gaussianPassH.setUniform("blurSize", 3.0);
-        this._gaussianPassV.setUniform("blurSize", 3.0);
+        this._gaussianPassH.setUniform("blurSize", 0.5);
+        this._gaussianPassV.setUniform("blurSize", 0.5);
 
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
-        })
+        });
+        if (this.useVSM) {
+            this._outputDepthPass.material.shader.define("fragment", "USE_VSM");
+        }
     }, {
 
         render : function(renderer, scene) {
@@ -284,7 +287,7 @@ define(function(require) {
 
                 }
 
-                this._shadowMapNumber[ light.type ] ++;
+                this._shadowMapNumber[light.type] ++;
             }, this);
 
             this._restoreMaterial(renderQueue);
@@ -327,7 +330,9 @@ define(function(require) {
             var parameter = {
                 width : size,
                 height : size,
-                type : glenum.FLOAT
+                type : glenum.FLOAT,
+                wrapS : glenum.MIRRORED_REPEAT,
+                wrapT : glenum.MIRRORED_REPEAT
             };
             var _gl = renderer.gl;
             var tmpTexture = texturePool.get(parameter);
@@ -335,12 +340,14 @@ define(function(require) {
             frameBuffer.attach(_gl, tmpTexture);
             frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform("texture", texture);
+            this._gaussianPassH.setUniform("imageHeight", size);
             this._gaussianPassH.render(renderer);
             frameBuffer.unbind(renderer);
 
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
             this._gaussianPassV.setUniform("texture", tmpTexture);
+            this._gaussianPassV.setUniform("imageWidth", size);
             this._gaussianPassV.render(renderer);
             frameBuffer.unbind(renderer);
 
@@ -348,7 +355,7 @@ define(function(require) {
         },
 
         _getTexture : function(key, light) {
-            var texture = this._textures[ key ];
+            var texture = this._textures[key];
             var resolution = light.shadowResolution || 512;
             var needsUpdate = false;
             if (texture) {
@@ -361,25 +368,20 @@ define(function(require) {
             }
             if (needsUpdate) {
                 if (light.instanceof(PointLight)) {
-                    texture = new TextureCube({
-                        width : resolution,
-                        height : resolution,
-                        minFilter : glenum.NEAREST,
-                        magFilter : glenum.NEAREST,
-                        useMipmap : false
-                    });
+                    texture = new TextureCube();
                 } else {
-                    texture = new Texture2D({
-                        width : resolution,
-                        height : resolution,
-                        
-                        minFilter : glenum.NEAREST,
-                        magFilter : glenum.NEAREST,
-                        useMipmap : false
-                    });
+                    texture = new Texture2D();
                 }
+                texture.width = resolution;
+                texture.height = resolution;
                 if (this.useVSM) {
+                    texture.wrapT = glenum.MIRRORED_REPEAT;
+                    texture.wrapS = glenum.MIRRORED_REPEAT;
                     texture.type = glenum.FLOAT;
+                } else {
+                    texture.minFilter = glenum.NEAREST;
+                    texture.magFilter = glenum.NEAREST;
+                    texture.useMipmap = false;
                 }
                 this._textures[key] = texture;
             }
@@ -388,7 +390,7 @@ define(function(require) {
         },
 
         _getCamera : function(key, light, target) {
-            var camera = this._cameras[ key ];
+            var camera = this._cameras[key];
             if (target && !camera) {
                 camera = this._cameras[key] = {};
             }

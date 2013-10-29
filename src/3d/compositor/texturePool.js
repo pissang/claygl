@@ -40,33 +40,29 @@ define(function(require) {
         }
     }
 
-    function generateKey(parameters) {
-        var defaultParams = {
-            width : 512,
-            height : 512,
-            type : glenum.UNSIGNED_BYTE,
-            format : glenum.RGBA,
-            wrapS : glenum.CLAMP_TO_EDGE,
-            wrapT : glenum.CLAMP_TO_EDGE,
-            minFilter : glenum.LINEAR_MIPMAP_LINEAR,
-            magFilter : glenum.LINEAR,
-            useMipmap : true,
-            anisotropy : 1,
-            flipY : true,
-            unpackAlignment : 4,
-            premultiplyAlpha : false
-        }
+    var defaultParams = {
+        width : 512,
+        height : 512,
+        type : glenum.UNSIGNED_BYTE,
+        format : glenum.RGBA,
+        wrapS : glenum.CLAMP_TO_EDGE,
+        wrapT : glenum.CLAMP_TO_EDGE,
+        minFilter : glenum.LINEAR_MIPMAP_LINEAR,
+        magFilter : glenum.LINEAR,
+        useMipmap : true,
+        anisotropic : 1,
+        flipY : true,
+        unpackAlignment : 4,
+        premultiplyAlpha : false
+    }
 
+    function generateKey(parameters) {
         _.defaults(parameters, defaultParams);
         fallBack(parameters);
 
         var key = '';
         for (var name in defaultParams) {
-            if (parameters[name]) {
-                var chunk = parameters[name].toString();
-            }else{
-                var chunk = defaultParams[name].toString();
-            }
+            var chunk = parameters[name].toString();
             key += chunk;
         }
         return key;

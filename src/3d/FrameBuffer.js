@@ -12,7 +12,14 @@ define(function(require) {
             depthBuffer : true,
 
             //Save attached texture and target
-            _attachedTextures : {}
+            _attachedTextures : {},
+
+            _width : 0,
+            _height : 0,
+            _depthTextureAttached : false,
+
+            _renderBufferWidth : 0,
+            _renderBufferHeight : 0
         }
     }, {
 
@@ -23,27 +30,27 @@ define(function(require) {
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
 
             this.cache.put("viewport", renderer.viewportInfo);
-            renderer.setViewport(0, 0, this.cache.get('width'), this.cache.get('height'));
+            renderer.setViewport(0, 0, this._width, this._height);
 
             // Create a new render buffer
-            if (this.cache.miss("renderbuffer") && this.depthBuffer && ! this.cache.get("depth_texture")) {
+            if (this.cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
                 this.cache.put("renderbuffer", _gl.createRenderbuffer());
             }
 
-            if (! this.cache.get("depth_texture") && this.depthBuffer) {
+            if (! this._depthTextureAttached && this.depthBuffer) {
 
-                var width = this.cache.get("width"),
-                    height = this.cache.get("height"),
-                    renderbuffer = this.cache.get('renderbuffer');
+                var width = this._width;
+                var height = this._height;
+                var renderbuffer = this.cache.get('renderbuffer');
 
-                if (width !== this.cache.get("renderbuffer_width")
-                     || height !== this.cache.get("renderbuffer_height")) {
+                if (width !== this._renderBufferWidth
+                     || height !== this._renderBufferHeight) {
 
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, renderbuffer);
                     
                     _gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, width, height);
-                    this.cache.put("renderbuffer_width", width);
-                    this.cache.put("renderbuffer_height", height);
+                    this._renderBufferWidth = width;
+                    this._renderBUfferHeight = height;
 
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
                 }
@@ -102,8 +109,8 @@ define(function(require) {
 
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
 
-            this.cache.put("width", texture.width);
-            this.cache.put("height", texture.height);
+            this._width = texture.width;
+            this._height = texture.height;
 
             target = target || _gl.TEXTURE_2D;
 
@@ -125,7 +132,7 @@ define(function(require) {
                     return;
                 }
                 this.cache.put("renderbuffer_attached", false);
-                this.cache.put("depth_texture", true);
+                this._depthTextureAttached = true;
             }
 
             this._attachedTextures[ attachment ] = texture;
