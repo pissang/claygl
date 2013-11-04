@@ -10,14 +10,13 @@
 define(function() {
 
     return{
-        trigger : function(name) {
+        trigger : function(name, params) {
             if (! this.hasOwnProperty('__handlers__')) {
                 return;
             }
             if (!this.__handlers__.hasOwnProperty(name)) {
                 return;
             }
-            var params = Array.prototype.slice.call(arguments, 1);
 
             var handlers = this.__handlers__[name];
             for (var i = 0; i < handlers.length; i+=2) {

@@ -137,9 +137,9 @@ define(function(require) {
             var renderStart = performance.now();
             if (!silent) {
                 // Render plugin like shadow mapping must set the silent true
-                this.trigger("beforerender", this, scene, camera);
+                this.trigger("beforerender", [this, scene, camera]);
             }
-            
+
             this._scene = scene;
 
             var color = this.color;
@@ -175,15 +175,15 @@ define(function(require) {
             opaqueQueue.sort(this._materialSortFunc);
             // Render Opaque queue
             if (! silent) {
-                this.trigger("beforerender:opaque", this, opaqueQueue);
+                this.trigger("beforerender:opaque", [this, opaqueQueue]);
             }
 
             _gl.disable(_gl.BLEND);
             this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:opaque", this, opaqueQueue);
-                this.trigger("beforerender:transparent", this, transparentQueue);
+                this.trigger("afterrender:opaque", [this, opaqueQueue]);
+                this.trigger("beforerender:transparent", [this, transparentQueue]);
             }
 
             // Render Transparent Queue
@@ -205,8 +205,8 @@ define(function(require) {
             this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:transparent", this, transparentQueue);
-                this.trigger("afterrender", this, scene, camera);
+                this.trigger("afterrender:transparent", [this, transparentQueue]);
+                this.trigger("afterrender", [this, scene, camera]);
             }
         },
 

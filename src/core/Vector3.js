@@ -13,7 +13,7 @@ define(function(require) {
 
         this._array = vec3.fromValues(x, y, z);
         // Dirty flag is used by the Node to determine
-        // if the matrix is updated to latest
+        // if the localTransform is updated to latest
         this._dirty = true;
     }
 

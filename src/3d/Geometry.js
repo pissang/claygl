@@ -176,18 +176,18 @@ define(function(require) {
 
         _getDirtyAttributes : function() {
 
-            var result = {};
             var attributes = this.getEnabledAttributes();
             
             var noDirtyAttributes = true;
 
-            if (this.hint = glenum.STATIC_DRAW) {
+            if (this.hint === glenum.STATIC_DRAW) {
                 if (this.cache.miss('chunks')) {
                     return attributes;
                 } else {
                     return null;
                 }
             } else {
+                var result = {};
                 for (var name in attributes) {
                     var attrib = attributes[name];
                     if (this.cache.isDirty(name)) {
@@ -195,9 +195,9 @@ define(function(require) {
                         noDirtyAttributes = false;
                     }
                 }   
-            }
-            if (! noDirtyAttributes) {
-                return result;
+                if (! noDirtyAttributes) {
+                    return result;
+                }
             }
         },
 
@@ -568,11 +568,11 @@ define(function(require) {
                 this.generateUniqueVertex();
             }
 
-            var faces = this.faces,
-                len = faces.length,
-                positions = this.attributes.position.value,
-                normals = this.attributes.normal.value,
-                normal = vec3.create();
+            var faces = this.faces;
+            var len = faces.length;
+            var positions = this.attributes.position.value;
+            var normals = this.attributes.normal.value;
+            var normal = vec3.create();
 
             var v12 = vec3.create(), v23 = vec3.create();
 

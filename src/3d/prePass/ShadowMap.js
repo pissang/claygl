@@ -71,9 +71,9 @@ define(function(require) {
     }, {
 
         render : function(renderer, scene) {
-            this.trigger('beforerender', this, renderer, scene);
+            this.trigger('beforerender', [this, renderer, scene]);
             this._renderShadowPass(renderer, scene);
-            this.trigger('afterrender', this, renderer, scene);
+            this.trigger('afterrender', [this, renderer, scene]);
         },
 
         renderDebug : function(renderer) {

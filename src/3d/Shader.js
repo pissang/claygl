@@ -142,10 +142,8 @@ define(function(require) {
             _textureStatus : {},
 
             _vertexProcessed : "",
-            _fragmentProcessed : "",
+            _fragmentProcessed : ""
 
-            // Assume shader in all context will get the same location
-            _locations : {}
         }
     }, function() {
 
@@ -166,6 +164,7 @@ define(function(require) {
         bind : function(_gl) {
 
             this.cache.use(_gl.__GUID__ , {
+                "locations" : {},
                 "attriblocations" : {}
             });
 
@@ -182,6 +181,7 @@ define(function(require) {
             this.cache.dirty();
             for (var contextId in this.cache._caches) {
                 var context = this.cache._caches[contextId];
+                context["locations"] = {};
                 context["attriblocations"] = {};
             }
             this._locations = {};
@@ -317,7 +317,7 @@ define(function(require) {
 
             var program = this.cache.get("program");            
 
-            var locationsMap = this._locations;
+            var locationsMap = this.cache.get("locations");
             var location = locationsMap[symbol];
             // Uniform is not existed in the shader
             if (location === null) {

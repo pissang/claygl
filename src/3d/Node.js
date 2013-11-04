@@ -170,10 +170,13 @@ define(function(require) {
         // Update the node status in each frame
         update : function(force) {
             
-            this.trigger('beforeupdate', this);
+            this.trigger('beforeupdate', [this]);
 
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
+            } else {
+                // Transform is manually setted
+                force = true;
             }
 
             if (force || this._needsUpdateWorldTransform) {
@@ -199,7 +202,7 @@ define(function(require) {
                 }
             }
 
-            this.trigger('beforeupdate', this);
+            this.trigger('afterupdate', [this]);
         },
 
         getWorldPosition : function(out) {

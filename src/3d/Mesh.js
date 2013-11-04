@@ -111,21 +111,22 @@ define(function(require) {
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                         shader.setMeshAttribute(_gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size);
                     }
+                    if (glDrawMode === glenum.LINES) {
+                        _gl.lineWidth(this.lineWidth);
+                    }
+                    
+                    prevDrawIsUseFace = geometry.isUseFace();
+                    prevDrawIndicesBuffer = indicesBuffer;
+                    //Do drawing
+                    if (prevDrawIsUseFace) {
+                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                        _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
+                        faceNumber += indicesBuffer.count;
+                    } else {
+                        _gl.drawArrays(glDrawMode, 0, vertexNumber);
+                    }
+                    drawCallNumber++;
                 }
-                if (glDrawMode === glenum.LINES) {
-                    _gl.lineWidth(this.lineWidth);
-                }
-                prevDrawIsUseFace = geometry.isUseFace();
-                prevDrawIndicesBuffer = indicesBuffer;
-                //Do drawing
-                if (prevDrawIsUseFace) {
-                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                    _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
-                    faceNumber += indicesBuffer.count;
-                } else {
-                    _gl.drawArrays(glDrawMode, 0, vertexNumber);
-                }
-                drawCallNumber++;
             }
 
             var drawInfo = {

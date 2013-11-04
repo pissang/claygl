@@ -48,7 +48,9 @@
                     });
                     scene.add(sphere);
 
-                    var lineGeo = new qtek3d.Geometry();
+                    var lineGeo = new qtek3d.Geometry({
+                        hint : qtek3d.Geometry.DYNAMIC_DRAW
+                    });
                     var lineGeoVertices = lineGeo.attributes.position.value;
                     lineGeoVertices.push([0, 0, 0], [0, 0, 0]);
                     var line = new qtek3d.Mesh({
