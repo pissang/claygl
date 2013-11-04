@@ -41,6 +41,10 @@ define(function(require) {
 
             viewportInfo : {},
 
+            _scene : null,
+            _transparentQueue : [],
+            _opaqueQueue : [],
+            _lights : []
         }
     }, function() {
         if (! this.canvas) {
@@ -101,68 +105,60 @@ define(function(require) {
             }
         },
 
+        // Traverse the scene and add the renderable
+        // object to the render queue;
+        _updateRenderQueue : function(parent, sceneMaterialTransparent) {
+            for (var i = 0; i < parent._children.length; i++) {
+                var child = parent._children[i];
+                if (!child.visible) {
+                    continue;
+                }
+                if (child instanceof Light) {
+                    this._lights.push(child);
+                }
+                // A node have render method and material property
+                // is treat as a renderable object
+                if (child.render && child.geometry && child.material && child.material.shader ) {
+                    if (child.material.transparent || sceneMaterialTransparent) {
+                        this._transparentQueue.push(child);
+                    } else {
+                        this._opaqueQueue.push(child);
+                    }
+                }
+                if (child._children.length > 0) {
+                    this._updateRenderQueue(child);
+                }
+            }
+        },
+
         render : function(scene, camera, silent) {
-            
             var _gl = this.gl;
             
-            if (! silent) {
+            var renderStart = performance.now();
+            if (!silent) {
                 // Render plugin like shadow mapping must set the silent true
                 this.trigger("beforerender", this, scene, camera);
             }
+            
+            this._scene = scene;
 
             var color = this.color;
             _gl.clearColor(color[0], color[1], color[2], color[3]);
             _gl.clear(this.clear);
 
-            var opaqueQueue = [];
-            var transparentQueue = [];
-            var lights = [];
+            camera.update(false);
+            scene.update(false);
 
-            camera.update();
-            scene.update();
-
-            this._scene = scene;
+            var opaqueQueue = this._opaqueQueue;
+            var transparentQueue = this._transparentQueue;
+            var lights = this._lights;
             var sceneMaterial = scene.material;
+            var sceneMaterialTransparent = sceneMaterial && sceneMaterial.transparent;
+            transparentQueue.length = 0;
+            opaqueQueue.length = 0;
+            lights.length = 0;
 
-            // Traverse the scene and add the renderable
-            // object to the render queue;
-            scene.traverse(function(node) {
-                if (! node.visible) {
-                    return true;
-                }
-                if (node.instanceof(Light)) {
-                    lights.push(node);
-                }
-                // A node have render method and material property
-                // can be rendered on the scene
-                if (! node.render) {
-                    return;
-                }
-                if (sceneMaterial) {
-                    if (sceneMaterial.transparent) {
-                        transparentQueue.push(node);
-                    }else{
-                        opaqueQueue.push(node);
-                    }
-                }else{
-                    if (! node.material || ! node.material.shader) {
-                        return;
-                    }
-                    if (! node.geometry) {
-                        return;
-                    }
-                    if (node.material.transparent) {
-                        transparentQueue.push(node);
-                    }else{
-                        opaqueQueue.push(node);
-                    }
-                }
-            });
-    
-            if (scene.filter) {
-                opaqueQueue = _.filter(opaqueQueue, scene.filter);
-                transparentQueue = _.filter(transparentQueue, scene.filter);
-            }
+            this._updateRenderQueue(scene, sceneMaterialTransparent);
 
             var lightNumber = {};
             for (var i = 0; i < lights.length; i++) {
@@ -192,9 +188,6 @@ define(function(require) {
 
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
-            // Default blend function
-            _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
-            _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
 
             // Calculate the object depth
             if (transparentQueue.length > 0) {
@@ -216,7 +209,6 @@ define(function(require) {
                 this.trigger("afterrender", this, scene, camera);
             }
         },
-
 
         updateLightUnforms : function(lights) {
             
@@ -260,7 +252,6 @@ define(function(require) {
         },
 
         renderQueue : function(queue, camera, globalMaterial, silent) {
-
             // Calculate view and projection matrix
             mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
             mat4.copy(matrices['PROJECTION'], camera.projectionMatrix._array);
@@ -284,7 +275,6 @@ define(function(require) {
                 var material = globalMaterial || mesh.material;
                 var shader = material.shader;
                 var geometry = mesh.geometry;
-                var customBlend = material.transparent && material.blend;
 
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
@@ -323,65 +313,47 @@ define(function(require) {
                     material.bind(_gl);
                     prevMaterialID = material.__GUID__;
 
-                    Mesh.materialChanged();
-                }
+                    if (material.transparent) {
+                        if (material.blend) {
+                            material.blend(_gl);
+                        } else {    // Default blend function
+                            _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
+                            _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
+                        } 
+                    }
 
-                if (customBlend) {
-                    customBlend(_gl);
+                    Mesh.materialChanged();
                 }
 
                 var worldM = mesh.worldTransform._array;
 
                 // All matrices ralated to world matrix will be updated on demand;
-                if (shader.semantics['WORLD'] ||
-                    shader.semantics['WORLDTRANSPOSE']) {
-                    mat4.copy(matrices['WORLD'], worldM);
-                }
-                if (shader.semantics['WORLDVIEW'] ||
-                    shader.semantics['WORLDVIEWINVERSE'] ||
-                    shader.semantics['WORLDVIEWINVERSETRANSPOSE']) {
-                    mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
-                }
-                if (shader.semantics['WORLDVIEWPROJECTION'] ||
-                    shader.semantics['WORLDVIEWPROJECTIONINVERSE'] ||
-                    shader.semantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
-                    mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
-                }
-                if (shader.semantics['WORLDINVERSE'] ||
-                    shader.semantics['WORLDINVERSETRANSPOSE']) {
+                mat4.copy(matrices['WORLD'], worldM);
+                mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
+                mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
+                if (shader.matrixSemantics['WORLDINVERSE'] ||
+                    shader.matrixSemantics['WORLDINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDINVERSE'], worldM);
                 }
-                if (shader.semantics['WORLDVIEWINVERSE'] ||
-                    shader.semantics['WORLDVIEWINVERSETRANSPOSE']) {
+                if (shader.matrixSemantics['WORLDVIEWINVERSE'] ||
+                    shader.matrixSemantics['WORLDVIEWINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
                 }
-                if (shader.semantics['WORLDVIEWPROJECTIONINVERSE'] ||
-                    shader.semantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
+                if (shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSE'] ||
+                    shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
                     mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
 
-                for (var j = 0; j < matrixSemantics.length; j++) {
-                    var semantic = matrixSemantics[j];
-
-                    if (shader.semantics.hasOwnProperty(semantic)) {
-                        var matrix = matrices[semantic];
-                        var semanticInfo = shader.semantics[semantic];
-                        shader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
+                for (var semantic in shader.matrixSemantics) {
+                    var semanticInfo = shader.matrixSemantics[semantic];
+                    var matrix = matrices[semantic];
+                    if (semanticInfo.isTranspose) {
+                        var matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
+                        mat4.transpose(matrix, matrixNoTranspose);
                     }
-
-                    var semanticTranspose = semantic + "TRANSPOSE";
-                    if (shader.semantics.hasOwnProperty(semanticTranspose)) {
-                        var matrixTranspose = matrices[semanticTranspose];
-                        var matrix = matrices[semantic];
-                        var semanticTransposeInfo = shader.semantics[semanticTranspose];
-                        mat4.transpose(matrixTranspose, matrix);
-                        shader.setUniform(_gl, semanticTransposeInfo.type, semanticTransposeInfo.symbol, matrixTranspose );
-                    }
+                    shader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
                 }
 
-                if (! silent) {
-                    this.trigger("beforerender:mesh", this, mesh);
-                }
                 if (mesh.cullFace !== cullFace) {
                     cullFace = mesh.cullFace;
                     _gl.cullFace(cullFace);
@@ -395,14 +367,6 @@ define(function(require) {
                     culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
                 }
                 var drawInfo = mesh.render(_gl, globalMaterial);
-                if (! silent) {
-                    this.trigger("afterrender:mesh", this, mesh, drawInfo);
-                }
-                // Restore the default blend function
-                if (customBlend) {
-                    _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
-                    _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);   
-                }
             }
         },
 
@@ -433,13 +397,12 @@ define(function(require) {
                     if (!val ) {
                         continue;
                     }
-                    if (val.instanceof &&
-                        val.instanceof(Texture)) {
+                    if (val instanceof Texture) {
                         val.dispose(_gl);
                     }
                     else if (val instanceof Array) {
                         for (var i = 0; i < val.length; i++) {
-                            if (val[i] && val[i].instanceof && val[i].instanceof(Texture)) {
+                            if (val[i] instanceof Texture) {
                                 val[i].dispose(_gl);
                             }
                         }
@@ -451,17 +414,17 @@ define(function(require) {
         },
 
         _materialSortFunc : function(x, y) {
-            if (x.material.shader == y.material.shader) {
+            if (x.material.shader === y.material.shader) {
                 return x.material.__GUID__ - y.material.__GUID__;
             }
-            return x.material.shader.__GUID__ - y.material.__GUID__;
+            return x.material.shader.__GUID__ - y.material.shader.__GUID__;
         },
         _depthSortFunc : function(x, y) {
             if (x._depth === y._depth) {
-                if (x.material.shader == y.material.shader) {
+                if (x.material.shader === y.material.shader) {
                     return x.material.__GUID__ - y.material.__GUID__;
                 }
-                return x.material.shader.__GUID__ - y.material.__GUID__;
+                return x.material.shader.__GUID__ - y.material.shader.__GUID__;
             }
             // Depth is negative because of right hand coord
             // So farther object has smaller depth value
@@ -498,7 +461,6 @@ define(function(require) {
         'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
-    var matrixSemantics = Object.keys(matrices);
 
     Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT
     Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT

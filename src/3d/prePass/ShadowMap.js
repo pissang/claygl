@@ -4,6 +4,7 @@ define(function(require) {
     var Vector3 = require("core/Vector3");
     var Shader = require("../Shader");
     var Light = require("../Light");
+    var Mesh = require("../Mesh");
     var SpotLight = require("../light/Spot");
     var DirectionalLight = require("../light/Directional");
     var PointLight = require("../light/Point");
@@ -29,6 +30,8 @@ define(function(require) {
 
     var ShadowMapPlugin = Base.derive(function() {
         return {
+            useVSM : false,
+
             _textures : {},
 
             _cameras : {},
@@ -43,7 +46,10 @@ define(function(require) {
             _depthMaterials : {},
             _distanceMaterials : {},
 
-            useVSM : false
+            _meshCastShadow : [],
+            _lightCastShadow : [],
+            _meshReceiveShadow : []
+
         }
     }, function() {
         // Gaussian filter pass for VSM
@@ -65,7 +71,9 @@ define(function(require) {
     }, {
 
         render : function(renderer, scene) {
+            this.trigger('beforerender', this, renderer, scene);
             this._renderShadowPass(renderer, scene);
+            this.trigger('afterrender', this, renderer, scene);
         },
 
         renderDebug : function(renderer) {
@@ -155,39 +163,56 @@ define(function(require) {
             }
         },
 
+        _update : function(parent) {
+            for (var i = 0; i < parent._children.length; i++) {
+                var child = parent._children[i];
+                if (!child.visible) {
+                    continue;
+                }
+                if (child.material && child.material.shader) {
+                    if (child.castShadow) {
+                        this._meshCastShadow.push(child);
+                    }
+                    if (child.receiveShadow) {
+                        this._meshReceiveShadow.push(child);
+                        child.material.set('shadowEnabled', 1);
+                    } else {
+                        child.material.set('shadowEnabled', 0);
+                    }
+                    if (this.useVSM) {
+                        child.material.shader.define('fragment', 'USE_VSM');
+                    } else {
+                        child.material.shader.unDefine('fragment', 'USE_VSM');
+                    }
+                } else if (child instanceof Light) {
+                    if (child.castShadow) {
+                        this._lightCastShadow.push(child);
+                    }
+                }
+
+                if (child._children.length > 0) {
+                    this._update(child);
+                }
+            }
+        },
+
         _renderShadowPass : function(renderer, scene) {
             var self = this;
-            var renderQueue = [],
-                lightCastShadow = [],
-                meshReceiveShadow = [];
+
+            // reset
+            for (var name in this._shadowMapNumber) {
+                this._shadowMapNumber[name] = 0;
+            }
+            this._lightCastShadow.length = 0;
+            this._meshCastShadow.length = 0;
+            this._meshReceiveShadow.length = 0;
+            var renderQueue = this._meshCastShadow;
 
             var _gl = renderer.gl;
 
             scene.update();
 
-            scene.traverse(function(node) {
-                if (node.instanceof(Light)) {
-                    if (node.castShadow) {
-                        lightCastShadow.push(node);
-                    }
-                }
-                if (node.material && node.material.shader) {
-                    if (node.castShadow) {
-                        renderQueue.push(node);
-                    }
-                    if (node.receiveShadow) {
-                        meshReceiveShadow.push(node);
-                        node.material.set("shadowEnabled", 1);
-                    }else{
-                        node.material.set("shadowEnabled", 0);
-                    }
-                    if (self.useVSM) {
-                        node.material.shader.define("fragment", "USE_VSM");
-                    } else {
-                        node.material.shader.unDefine("fragment", "USE_VSM");
-                    }
-                };
-            });
+            this._update(scene);
 
             _gl.enable(_gl.DEPTH_TEST);
             _gl.depthMask(true);
@@ -217,15 +242,11 @@ define(function(require) {
             var pointLightShadowMaps = [];
             var pointLightRanges = [];
 
-            // reset
-            for (var name in this._shadowMapNumber) {
-                this._shadowMapNumber[name] = 0;
-            }
             // Create textures for shadow map
-            _.each(lightCastShadow, function(light) {
-
-                if (light.instanceof(SpotLight) ||
-                    light.instanceof(DirectionalLight)) {
+            for (var i = 0; i < this._lightCastShadow.length; i++) {
+                var light = this._lightCastShadow[i];
+                if (light instanceof SpotLight ||
+                    light instanceof DirectionalLight) {
                     
                     this._bindDepthMaterial(renderQueue);
 
@@ -252,7 +273,7 @@ define(function(require) {
                         .invert()
                         .multiplyLeft(camera.projectionMatrix);
 
-                    if (light.instanceof(SpotLight)) {
+                    if (light instanceof SpotLight) {
                         spotLightShadowMaps.push(texture);
                         spotLightMatrices.push(matrix._array);
                         spotLightBiases.push(light.shadowBias);
@@ -262,7 +283,7 @@ define(function(require) {
                         directionalLightBiases.push(light.shadowBias);
                     }
 
-                } else if (light.instanceof(PointLight)) {
+                } else if (light instanceof PointLight) {
                     
                     var texture = this._getTexture(light.__GUID__, light);
                     pointLightShadowMaps.push(texture);
@@ -287,14 +308,14 @@ define(function(require) {
 
                 }
 
-                this._shadowMapNumber[light.type] ++;
-            }, this);
+                this._shadowMapNumber[light.type]++;
+            };
 
             this._restoreMaterial(renderQueue);
 
-            for (var i = 0; i < meshReceiveShadow.length; i++) {
-                var mesh = meshReceiveShadow[i],
-                    material = mesh.material;
+            for (var i = 0; i < this._meshReceiveShadow.length; i++) {
+                var mesh = this._meshReceiveShadow[i];
+                var material = mesh.material;
 
                 var shader = material.shader;
 
@@ -367,7 +388,7 @@ define(function(require) {
                 needsUpdate = true;
             }
             if (needsUpdate) {
-                if (light.instanceof(PointLight)) {
+                if (light instanceof PointLight) {
                     texture = new TextureCube();
                 } else {
                     texture = new Texture2D();
@@ -398,12 +419,12 @@ define(function(require) {
                 camera = camera[target];   
             }
             if (!camera) {
-                if (light.instanceof(SpotLight) ||
-                    light.instanceof(PointLight)) {
+                if (light instanceof SpotLight ||
+                    light instanceof PointLight) {
                     camera = new PerspectiveCamera({
                         near : 0.1
                     });
-                } else if (light.instanceof(DirectionalLight)) {
+                } else if (light instanceof DirectionalLight) {
                     camera = new OrthoCamera(light.shadowCamera);
                 }
                 if (target) {
@@ -412,12 +433,12 @@ define(function(require) {
                     this._cameras[key] = camera;
                 }
             }
-            if (light.instanceof(SpotLight)) {
+            if (light instanceof SpotLight) {
                 // Update properties
                 camera.fov = light.penumbraAngle * 2;
                 camera.far = light.range;
             }
-            if (light.instanceof(PointLight)) {
+            if (light instanceof PointLight) {
                 camera.far = light.range;
                 camera.fov = 90;
 

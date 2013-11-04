@@ -14,10 +14,6 @@ define(function(require){
             // Will be set in the render function
             lightNumber : {},
             lightUniforms : {},
-            // Filter function.
-            // Called each render pass to omit the mesh don't want
-            // to be rendered on the screen
-            filter : null,
 
             _nodeRepository : {}
 

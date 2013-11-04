@@ -24,7 +24,7 @@
             });
             renderer.resize(window.innerWidth, window.innerHeight);
             var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                useVSM : true
+                // useVSM : true
             });
 
             var GLTFLoader = new qtek.loader.GLTF();
@@ -59,7 +59,7 @@
                 light.shadowResolution = 512;
 
                 setInterval(function() {
-                    shadowMapPass.render(renderer, scene);
+                    // shadowMapPass.render(renderer, scene);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     renderer.render(scene, camera);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;

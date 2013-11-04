@@ -4,7 +4,7 @@ define(function(require) {
 
     var Base = require('core/Base');
     var request = require('core/request');
-    var Compositor = require('3d/Compositor');
+    var Compositor = require('3d/compositor/Compositor');
     var CompoNode = require('3d/compositor/Node');
     var CompoGroup = require('3d/compositor/Group');
     var CompoSceneNode = require('3d/compositor/SceneNode');

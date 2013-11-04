@@ -35,7 +35,6 @@ define( function(require){
 	"3d": {
 		"BoundingBox": require('3d/BoundingBox'),
 		"Camera": require('3d/Camera'),
-		"Compositor": require('3d/Compositor'),
 		"FrameBuffer": require('3d/FrameBuffer'),
 		"Geometry": require('3d/Geometry'),
 		"Joint": require('3d/Joint'),
@@ -54,6 +53,7 @@ define( function(require){
 			"Perspective": require('3d/camera/Perspective')
 		},
 		"compositor": {
+			"Compositor": require('3d/compositor/Compositor'),
 			"Graph": require('3d/compositor/Graph'),
 			"Group": require('3d/compositor/Group'),
 			"Node": require('3d/compositor/Node'),
@@ -78,6 +78,10 @@ define( function(require){
 			"Point": require('3d/light/Point'),
 			"Spot": require('3d/light/Spot')
 		},
+		"particleSystem": {
+			"Particle": require('3d/particleSystem/Particle'),
+			"ParticleSystem": require('3d/particleSystem/ParticleSystem')
+		},
 		"plugin": {
 			"FirstPersonControl": require('3d/plugin/FirstPersonControl'),
 			"OrbitControl": require('3d/plugin/OrbitControl'),
@@ -99,7 +103,6 @@ define( function(require){
 			"mesh": require('3d/util/mesh')
 		}
 	},
-	"Engine": require('Engine'),
 	"animation": {
 		"Animation": require('animation/Animation'),
 		"Clip": require('animation/Clip'),

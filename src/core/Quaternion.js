@@ -10,68 +10,53 @@ define(function(require) {
         x = x || 0;
         y = y || 0;
         z = z || 0;
-        w = typeof(w) === "undefined" ? 1 : w;
-                
-        return Object.create(QuaternionProto, {
+        w = w === undefined ? 1 : w;
 
-            x : {
-                configurable : false,
-                set : function(value) {
-                    this._array[0] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[0];
-                }
-            },
-            y : {
-                configurable : false,
-                set : function(value) {
-                    this._array[1] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[1];
-                }
-            },
-            z : {
-                configurable : false,
-                set : function(value) {
-                    this._array[2] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[2];
-                }
-            },
-            w : {
-                configurable : false,
-                set : function(value) {
-                    this._array[2] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[2];
-                }
-            },
-
-            _array :{
-                writable : false,
-                configurable : false,
-                value : quat.fromValues(x, y, z, w)
-            },
-            _dirty : {
-                configurable : false,
-                writable : true,
-                value : false
-            }
-        })
-
+        this._array = quat.fromValues(x, y, z, w);
+        // Dirty flag is used by the Node to determine
+        // if the matrix is updated to latest
+        this._dirty = true;
     }
 
-    var QuaternionProto = {
+    Quaternion.prototype = {
 
         constructor : Quaternion,
+
+        get x() {
+            return this._array[0];
+        },
+
+        set x(value) {
+            this._array[0] = value;
+            this._dirty = true;
+        },
+
+        get y() {
+            this._array[1] = value;
+            this._dirty = true;
+        },
+
+        set y(value) {
+            return this._array[1];
+        },
+
+        get z() {
+            return this._array[2];
+        },
+
+        set z(value) {
+            this._array[2] = value;
+            this._dirty = true;
+        },
+
+        get w() {
+            return this._array[3];
+        },
+
+        set w(value) {
+            this._array[3] = value;
+            this._dirty = true;
+        },
 
         add : function(b) {
             quat.add( this._array, this._array, b._array );

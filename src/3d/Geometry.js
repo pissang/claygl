@@ -123,7 +123,6 @@ define(function(require) {
     }, {
 
         computeBoundingBox : function() {
-
         },
         // Overwrite the dirty method
         dirty : function(field) {
@@ -145,6 +144,10 @@ define(function(require) {
 
         isUseFace : function() {
             return this.useFace && (this.faces.length > 0);
+        },
+
+        isSplitted : function() {
+            return this.getVerticesNumber() > this.chunkSize;
         },
 
         getEnabledAttributes : function() {
@@ -177,12 +180,21 @@ define(function(require) {
             var attributes = this.getEnabledAttributes();
             
             var noDirtyAttributes = true;
-            for (var name in attributes) {
-                var attrib = attributes[name];
-                if (this.cache.isDirty(name)) {
-                    result[name] = attributes[name];
-                    noDirtyAttributes = false;
+
+            if (this.hint = glenum.STATIC_DRAW) {
+                if (this.cache.miss('chunks')) {
+                    return attributes;
+                } else {
+                    return null;
                 }
+            } else {
+                for (var name in attributes) {
+                    var attrib = attributes[name];
+                    if (this.cache.isDirty(name)) {
+                        result[name] = attributes[name];
+                        noDirtyAttributes = false;
+                    }
+                }   
             }
             if (! noDirtyAttributes) {
                 return result;
@@ -216,9 +228,9 @@ define(function(require) {
 
         _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
 
-            var self = this,
-                cursors = {},
-                verticesNumber = this.getVerticesNumber();
+            var self = this
+            var cursors = {};
+            var verticesNumber = this.getVerticesNumber();
             
             var verticesReorganizedMap = this._verticesReorganizedMap;
 
@@ -472,13 +484,13 @@ define(function(require) {
                     indicesArray = arrayChunk.indicesArray;
 
                 for (var name in dirtyAttributes) {
-                    var attribute = dirtyAttributes[name],
-                        type = attribute.type,
-                        semantic = attribute.semantic,
-                        size = attribute.size;
+                    var attribute = dirtyAttributes[name];
+                    var type = attribute.type;
+                    var semantic = attribute.semantic;
+                    var size = attribute.size;
 
-                    var bufferInfo = attributeBuffers[name],
-                        buffer;
+                    var bufferInfo = attributeBuffers[name];
+                    var buffer;
                     if (bufferInfo) {
                         buffer = bufferInfo.buffer
                     } else {
@@ -509,11 +521,11 @@ define(function(require) {
         },
 
         generateVertexNormals : function() {
-            var faces = this.faces,
-                len = faces.length,
-                positions = this.attributes.position.value,
-                normals = this.attributes.normal.value,
-                normal = vec3.create();
+            var faces = this.faces
+            var len = faces.length
+            var positions = this.attributes.position.value
+            var normals = this.attributes.normal.value
+            var normal = vec3.create();
 
             var v12 = vec3.create(), v23 = vec3.create();
 

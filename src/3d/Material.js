@@ -74,8 +74,7 @@ define(function(require) {
                     && ! uniform.value.length) {
                     continue;
                 }
-                if (uniform.value.instanceof &&
-                    uniform.value.instanceof(Texture)) {
+                if (uniform.value instanceof Texture) {
                 
                     var texture = uniform.value;
                     // Maybe texture is not loaded yet;
@@ -94,9 +93,7 @@ define(function(require) {
                     // Texture Array
                     var exampleValue = uniform.value[0];
 
-                    if (exampleValue && 
-                        exampleValue.instanceof && 
-                        exampleValue.instanceof(Texture)) {
+                    if (exampleValue instanceof Texture) {
 
                         var res = [];
                         for (var i = 0; i < uniform.value.length; i++) {

@@ -1,6 +1,6 @@
 /**
- * @export{class} InstantGeometry
  * InstantGeometry can not be changed once they've been setup
+ * PENDING : Remove it ?
  */
 define(function(require) {
 
@@ -36,10 +36,12 @@ define(function(require) {
             //      },
             //     indices : array
             // }]
-            _arrayChunks : []
+            _arrayChunks : [],
+            _verticesNumber : 0
         }
     }, {
         addChunk : function(chunk) {
+            this._verticesNumber += chunk.attributes.position.array.length / 3;
             this._arrayChunks.push(chunk);
         },
         dirty : function() {
@@ -52,6 +54,9 @@ define(function(require) {
                 this.cache.fresh("chunks");
             }
             return this.cache.get("chunks");
+        },
+        getVerticesNumber : function() {
+            return this._verticesNumber;
         },
         isUseFace : function() {
             return this.useFace;
@@ -77,10 +82,10 @@ define(function(require) {
                         indicesBuffer : null
                     }
                 }
-                var attributeBuffers = chunk.attributeBuffers,
-                    indicesBuffer = chunk.indicesBuffer;
-                var arrayChunk = this._arrayChunks[i],
-                    indicesArray = arrayChunk.indices;
+                var attributeBuffers = chunk.attributeBuffers;
+                var indicesBuffer = chunk.indicesBuffer;
+                var arrayChunk = this._arrayChunks[i];
+                var indicesArray = arrayChunk.indices;
 
                 for (var name in arrayChunk.attributes) {
                     var attribute = arrayChunk.attributes[name];

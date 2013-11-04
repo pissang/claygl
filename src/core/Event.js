@@ -8,7 +8,7 @@ define( function(require) {
         stopPropagation : function() {
             this.cancelBubble = true;
         }
-    })
+    });
 
     QEvent.throw = function(eventType, target, props) {
         

@@ -2,7 +2,7 @@ define(function(require){
 
     'use strict';
 
-    var Graph = require("./compositor/Graph");
+    var Graph = require("./Graph");
 
     var Compositor = Graph.derive(function() {
         return {

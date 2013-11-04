@@ -5,7 +5,6 @@ define(function(require) {
     var Plane = require('./Plane');
     var Matrix4 = require('core/Matrix4');
     var Vector3 = require('core/Vector3');
-    var _ = require('_');
 
     var planeMatrix = new Matrix4();
     
@@ -28,8 +27,9 @@ define(function(require) {
             "nz" : createPlane("nz", this.widthSegments, this.heightSegments),
         };
         var cursor = 0;
+        var self = this;
         for (var pos in planes) {
-            _.each(['position', 'texcoord0', 'normal'], function(attrName) {
+            ['position', 'texcoord0', 'normal'].forEach(function(attrName) {
                 var attrArray = planes[pos].attributes[attrName].value;
                 for (var i = 0; i < attrArray.length; i++) {
                     var value = attrArray[i];
@@ -38,14 +38,14 @@ define(function(require) {
                         value[1] = -value[1];
                         value[2] = -value[2];
                     }
-                    this.attributes[attrName].value.push(value);
+                    self.attributes[attrName].value.push(value);
                 }
                 var plane = planes[pos];
                 for (var i = 0; i < plane.faces.length; i++) {
                     var face = plane.faces[i];
-                    this.faces.push([ face[0]+cursor, face[1]+cursor, face[2]+cursor ]);
+                    self.faces.push([face[0]+cursor, face[1]+cursor, face[2]+cursor]);
                 }
-            }, this)
+            });
             cursor += planes[pos].getVerticesNumber();
         }
     })

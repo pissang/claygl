@@ -16,12 +16,12 @@
             })
 
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    pp_Node = qtek3d.compositor.Node,
-                    pp_SceneNode = qtek3d.compositor.SceneNode,
-                    pp_Group = qtek3d.compositor.Group,
-                    compositor = new qtek3d.Compositor();
+                var qtek3d = qtek['3d'];
+                var Shader = qtek3d.Shader;
+                var pp_Node = qtek3d.compositor.Node;
+                var pp_SceneNode = qtek3d.compositor.SceneNode;
+                var pp_Group = qtek3d.compositor.Group;
+                var compositor = new qtek3d.compositor.Compositor();
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main"),

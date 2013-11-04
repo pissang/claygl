@@ -15,13 +15,15 @@
             })
 
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    Material = qtek3d.Material,
-                    Mesh = qtek3d.Mesh,
-                    Cube = qtek3d.geometry.Cube,
-                    meshUtil = qtek3d.util.mesh,
-                    shaderLibrary = qtek3d.shader.library;
+                var qtek3d = qtek['3d']
+                var Shader = qtek3d.Shader
+                var Material = qtek3d.Material
+                var Mesh = qtek3d.Mesh
+                var Cube = qtek3d.geometry.Cube
+                var meshUtil = qtek3d.util.mesh
+                var shaderLibrary = qtek3d.shader.library;
+                var animation = new qtek.animation.Animation;
+                animation.start();
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById("Main"),
@@ -35,7 +37,8 @@
                     });
 
                 var cube = new Cube();
-                var shader = shaderLibrary.get('buildin.lambert', "diffuseMap");
+                var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
+                shader.define('fragment', 'RENDER_NORMAL');
                 var material = new Material({
                     shader : shader
                 });
@@ -48,43 +51,40 @@
                 var uniforms = material.uniforms;
                 uniforms.diffuseMap.value = texture;
 
-                var meshList = [];
-                for( var i = 0; i < 20; i++){
-                    for(var j = 0; j < 20; j++){
-                        for( var k = 0; k < 20; k++){
-
+                var root = new qtek3d.Node({
+                    name : 'ROOT'
+                });
+                scene.add(root);
+                for( var i = 0; i < 10; i++){
+                    for(var j = 0; j < 10; j++){
+                        for( var k = 0; k < 50; k++){
                             var mesh = new Mesh({
                                 geometry : cube,
-                                material : material
+                                material : material,
                             });
-                            mesh.position.x = 40-Math.random()*80;
-                            mesh.position.y = 40-Math.random()*80;
-                            mesh.position.z = 40-Math.random()*80;
-                            meshList.push( mesh );  
+                            mesh.position.set(20-Math.random()*40, 20-Math.random()*40, 20-Math.random()*40);
+                            root.add(mesh);
                         }
                     }
                 }
-                var root = new qtek3d.Node();
-                console.profile("merge");
-                var cubes = meshUtil.merge( meshList );
-                console.profileEnd("merge");
-                root.add(cubes);
-                scene.add(root);
 
                 camera.position.set(0, 2, 10);
-                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
+                camera.lookAt(new qtek.core.Vector3(0, 0, 0), new qtek.core.Vector3(0, 1, 0));
 
                 var light = new qtek3d.light.Point({
                     color : [1.5, 1.5, 1.5]
                 })
                 light.position.set(0, 0, 0);
                 light.range = 30;
-                scene.add( light );
+                scene.add(light);
 
-                setInterval( function(){
-                    renderer.render( scene, camera );
-                    root.rotation.rotateY( Math.PI/500 );
-                }, 20);
+                animation.onframe = function() {
+                    var start = performance.now();
+                    renderer.render(scene, camera);
+                    var end = performance.now();
+                    console.log(end - start);
+                    root.rotation.rotateY(Math.PI/500);
+                }
             })
             
         </script>

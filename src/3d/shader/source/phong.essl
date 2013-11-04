@@ -59,15 +59,15 @@ void main(){
         skinnedTangent = (skinMatrix * vec4(tangent.xyz, 0.0)).xyz;
     #endif
 
-    gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 
     v_Texcoord = texcoord * uvRepeat;
-    v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;
+    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
     v_Barycentric = barycentric;
 
     v_LocalNormal = skinnedNormal;
-    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz );
-    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz );
+    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
+    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
 
     #ifdef SKINNING
@@ -154,15 +154,15 @@ void main(){
     vec3 viewDirection = normalize(eyePos - v_WorldPosition);
 
     #ifdef DIFFUSEMAP_ENABLED
-        vec4 tex = texture2D( diffuseMap, v_Texcoord );
+        vec4 tex = texture2D(diffuseMap, v_Texcoord);
         finalColor.rgb *= tex.rgb;
     #endif
 
     vec3 normal = v_Normal;
     #ifdef NORMALMAP_ENABLED
-        normal = texture2D( normalMap, v_Texcoord ).xyz * 2.0 - 1.0;
-        mat3 tbn = mat3( v_Tangent, v_Bitangent, v_Normal );
-        normal = normalize( tbn * normal );
+        normal = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+        normal = normalize(tbn * normal);
     #endif
 
     #ifdef RENDER_NORMAL
@@ -183,8 +183,8 @@ void main(){
     #ifdef POINT_LIGHT_NUMBER
         #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[POINT_LIGHT_NUMBER];
-            if( shadowEnabled ){
-                computeShadowOfPointLights( v_WorldPosition, shadowContribs );
+            if(shadowEnabled){
+                computeShadowOfPointLights(v_WorldPosition, shadowContribs);
             }
         #endif
         for(int i = 0; i < POINT_LIGHT_NUMBER; i++){
@@ -201,17 +201,17 @@ void main(){
 
             // Normalize vectors
             lightDirection /= dist;
-            vec3 halfVector = normalize( lightDirection + viewDirection );
+            vec3 halfVector = normalize(lightDirection + viewDirection);
 
-            float ndh = dot( normal, halfVector );
+            float ndh = dot(normal, halfVector);
             ndh = clamp(ndh, 0.0, 1.0);
 
-            float ndl = dot( normal,  lightDirection );
+            float ndl = dot(normal,  lightDirection);
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled ){
+                if(shadowEnabled){
                     shadowContrib = shadowContribs[i];
                 }
             #endif
@@ -219,7 +219,7 @@ void main(){
             diffuseItem += lightColor * ndl * attenuation * shadowContrib;
 
             if (shininess > 0.0) {
-                specularItem += lightColor * ndl * pow(ndh, shininess ) * attenuation * shadowContrib;
+                specularItem += lightColor * ndl * pow(ndh, shininess) * attenuation * shadowContrib;
             }
 
         }
@@ -228,26 +228,26 @@ void main(){
     #ifdef DIRECTIONAL_LIGHT_NUMBER
         #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[DIRECTIONAL_LIGHT_NUMBER];
-            if( shadowEnabled ){
-                computeShadowOfDirectionalLights( v_WorldPosition, shadowContribs );
+            if(shadowEnabled){
+                computeShadowOfDirectionalLights(v_WorldPosition, shadowContribs);
             }
         #endif
         for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++){
 
-            vec3 lightDirection = -normalize( directionalLightDirection[i] );
+            vec3 lightDirection = -normalize(directionalLightDirection[i]);
             vec3 lightColor = directionalLightColor[i];
 
-            vec3 halfVector = normalize( lightDirection + viewDirection );
+            vec3 halfVector = normalize(lightDirection + viewDirection);
 
-            float ndh = dot( normal, halfVector );
+            float ndh = dot(normal, halfVector);
             ndh = clamp(ndh, 0.0, 1.0);
 
-            float ndl = dot( normal, lightDirection );
+            float ndl = dot(normal, lightDirection);
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled ){
+                if(shadowEnabled){
                     shadowContrib = shadowContribs[i];
                 }
             #endif
@@ -255,7 +255,7 @@ void main(){
             diffuseItem += lightColor * ndl * shadowContrib;
 
             if (shininess > 0.0) {
-                specularItem += lightColor * ndl * pow( ndh, shininess ) * shadowContrib;
+                specularItem += lightColor * ndl * pow(ndh, shininess) * shadowContrib;
             }
         }
     #endif
@@ -263,13 +263,13 @@ void main(){
     #ifdef SPOT_LIGHT_NUMBER
         #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[SPOT_LIGHT_NUMBER];
-            if( shadowEnabled ){
-                computeShadowOfSpotLights( v_WorldPosition, shadowContribs );
+            if(shadowEnabled){
+                computeShadowOfSpotLights(v_WorldPosition, shadowContribs);
             }
         #endif
         for(int i = 0; i < SPOT_LIGHT_NUMBER; i++){
             vec3 lightPosition = spotLightPosition[i];
-            vec3 spotLightDirection = -normalize( spotLightDirection[i] );
+            vec3 spotLightDirection = -normalize(spotLightDirection[i]);
             vec3 lightColor = spotLightColor[i];
             float range = spotLightRange[i];
             float umbraAngleCosine = spotLightUmbraAngleCosine[i];
@@ -293,15 +293,15 @@ void main(){
 
             vec3 halfVector = normalize(lightDirection + viewDirection);
 
-            float ndh = dot( normal, halfVector );
+            float ndh = dot(normal, halfVector);
             ndh = clamp(ndh, 0.0, 1.0);
 
-            float ndl = dot( normal, lightDirection );
+            float ndl = dot(normal, lightDirection);
             ndl = clamp(ndl, 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled ){
+                if(shadowEnabled){
                     shadowContrib = shadowContribs[i];
                 }
             #endif
@@ -326,7 +326,7 @@ void main(){
         #endif
     #endif
 
-    if( lineWidth > 0.01){
+    if(lineWidth > 0.01){
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 

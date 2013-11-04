@@ -22,8 +22,8 @@
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek3d.Scene;
+                var camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
@@ -58,15 +58,18 @@
 
                 var sphereMesh = new qtek3d.Mesh({
                     geometry : sphere,
-                    material : material
+                    material : material,
+                    culling : false
                 });
                 var cubeMesh = new qtek3d.Mesh({
                     geometry : cube,
-                    material : material
+                    material : material,
+                    culling : false
                 });
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
-                    material : material
+                    material : material,
+                    culling : false
                 })
                 sphereMesh.position.x = -1.5;
                 cubeMesh.position.x = 1.5;

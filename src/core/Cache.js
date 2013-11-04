@@ -29,7 +29,6 @@ define(function() {
         },
 
         put : function(key, value) {
-
             this._context[key] = value;
         },
 
@@ -68,7 +67,8 @@ define(function() {
         isDirty : function(field) {
             field = field || "";
             var key = "__dirty__" + field;
-            return this.get(key) || this.miss(key);
+            return  !this._context.hasOwnProperty(key)
+                    || this._context[key] === true
         },
 
         clearContext : function() {

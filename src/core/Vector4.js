@@ -12,65 +12,51 @@ define( function(require) {
         z = z || 0;
         w = w || 0;
 
-        return Object.create(Vector4Proto, {
-
-            x : {
-                configurable : false,
-                set : function(value) {
-                    this._array[0] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[0];
-                }
-            },
-            y : {
-                configurable : false,
-                set : function(value) {
-                    this._array[1] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[1];
-                }
-            },
-            z : {
-                configurable : false,
-                set : function(value) {
-                    this._array[2] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[2];
-                }
-            },
-            w : {
-                configurable : false,
-                set : function(value) {
-                    this._array[2] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[2];
-                }
-            },
-
-            _array :{
-                writable : false,
-                configurable : false,
-                value : vec4.fromValues(x, y, z, w)
-            },
-            _dirty : {
-                configurable : false,
-                value : false
-            }
-        })
-
+        this._array = vec4.fromValues(x, y, z, w);
+        // Dirty flag is used by the Node to determine
+        // if the matrix is updated to latest
+        this._dirty = true;
     }
 
-    var Vector4Proto = {
+    Vector4.prototype = {
 
         constructor : Vector4,
+
+        get x() {
+            return this._array[0];
+        },
+
+        set x(value) {
+            this._array[0] = value;
+            this._dirty = true;
+        },
+
+        get y() {
+            this._array[1] = value;
+            this._dirty = true;
+        },
+
+        set y(value) {
+            return this._array[1];
+        },
+
+        get z() {
+            return this._array[2];
+        },
+
+        set z(value) {
+            this._array[2] = value;
+            this._dirty = true;
+        },
+
+        get w() {
+            return this._array[3];
+        },
+
+        set w(value) {
+            this._array[3] = value;
+            this._dirty = true;
+        },
 
         add : function(b) {
             vec4.add( this._array, this._array, b._array );

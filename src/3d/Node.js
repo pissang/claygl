@@ -49,57 +49,22 @@ define(function(require) {
             boundingBox : new BoundingBox(),
 
             _children : [],
-
+            _needsUpdateWorldTransform : true,
             // Its for transparent queue sorting
             _depth : 0
         }
-    }, function() {
-        // In case multiple nodes use the same vector and 
-        // have problem in dirty checking
-        var position = this.position;
-        var rotation = this.rotation;
-        var scale = this.scale;
-        var name = this.name;
-        Object.defineProperty(this, 'position', {
-            set : function(v) {
-                position.copy(v);
-            },
-            get : function() {
-                return position;
-            }
-        });
-        Object.defineProperty(this, 'rotation', {
-            set : function(v) {
-                rotation.copy(v);
-            },
-            get : function() {
-                return rotation;
-            }
-        });
-        Object.defineProperty(this, 'scale', {
-            set : function(v) {
-                scale.copy(v);
-            },
-            get : function() {
-                return scale;
-            }
-        });
-        Object.defineProperty(this, 'name', {
-            set : function(newName) {
-                if (this.scene) {
-                    this.scene._nodeRepository[name] = null;
-                    this.scene._nodeRepository[newName] = this;
-                }
-                name = newName;
-            },
-            get : function() {
-                return name;
-            }
-        })
     }, {
 
+        setName : function(name) {
+            if (this.scene) {
+                this.scene._nodeRepository[name] = null;
+                this.scene._nodeRepository[newName] = this;
+            }
+            name = newName;
+        },
+
         add : function(node) {
-            if(this._children.indexOf(node) >= 0) {
+            if (node.parent === this) {
                 return;
             }
             if (node.parent) {
@@ -133,7 +98,6 @@ define(function(require) {
         },
 
         children : function() {
-            // get the copy of children array
             return this._children.slice();
         },
 
@@ -141,57 +105,15 @@ define(function(require) {
             return this._children[idx];
         },
 
-        findScene : function() {
-            var root = this;
-            while(root.parent) {
-                root = root.parent;
-            }
-            if (root.addToScene) {
-                this._scene = root;
-                return root;
-            }
-        },
-
         // pre-order traverse
         traverse : function(callback, parent) {
-            var stopTraverse = callback && callback(this, parent);
-            if(! stopTraverse) {
+            var stopTraverse = callback(this, parent);
+            if(!stopTraverse) {
                 var _children = this._children;
                 for(var i = 0, len = _children.length; i < len; i++) {
                     _children[i].traverse(callback, this);
                 }
             }
-        },
-
-        updateLocalTransform : function() {
-            if (! this.position._dirty &&
-                ! this.scale._dirty) {
-                if (this.useEuler && ! this.eulerAngle._dirty) {
-                    return;
-                } else if(! this.rotation._dirty) {
-                    return;
-                }
-            }
-
-            var m = this.localTransform;
-
-            m.identity();
-
-            if(this.useEuler) {
-                this.rotation.identity();
-                this.rotation.rotateZ(this.eulerAngle.z);
-                this.rotation.rotateY(this.eulerAngle.y);
-                this.rotation.rotateX(this.eulerAngle.x);
-            }
-            // Transform order, scale->rotation->position
-            m.fromRotationTranslation(this.rotation, this.position);
-
-            m.scale(this.scale);
-
-            this.rotation._dirty = false;
-            this.scale._dirty = false;
-            this.position._dirty = false;
-            this.eulerAngle._dirty = false;
         },
 
         decomposeMatrix : function() {
@@ -206,40 +128,78 @@ define(function(require) {
             this.eulerAngle._dirty = false;
         },
 
-        updateWorldTransform : function() {
+        updateLocalTransform : function() {
+            var position = this.position;
+            var rotation = this.rotation;
+            var scale = this.scale;
+            var eulerAngle = this.eulerAngle;
+
+            var needsUpdate = false;
+            if (position._dirty || scale._dirty) {
+                needsUpdate = true;
+            } else {
+                if (this.useEuler && eulerAngle._dirty) {
+                    needsUpdate = true;
+                } else if (rotation._dirty) {
+                    needsUpdate = true;
+                }
+            }
+            if (needsUpdate) {
+                var m = this.localTransform._array;
+
+                if(this.useEuler) {
+                    rotation.identity();
+                    rotation.rotateZ(eulerAngle.z);
+                    rotation.rotateY(eulerAngle.y);
+                    rotation.rotateX(eulerAngle.x);
+                    eulerAngle._dirty = false;
+                }
+                // Transform order, scale->rotation->position
+                mat4.fromRotationTranslation(m, rotation._array, position._array);
+
+                mat4.scale(m, m, scale._array);
+
+                rotation._dirty = false;
+                scale._dirty = false;
+                position._dirty = false;
+
+                this._needsUpdateWorldTransform = true;
+            }
+        },
+
+        // Update the node status in each frame
+        update : function(force) {
+            
+            this.trigger('beforeupdate', this);
+
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
             }
-            if(this.parent) {
-                mat4.multiply(
-                    this.worldTransform._array,
-                    this.parent.worldTransform._array,
-                    this.localTransform._array
-                );
-            }else{
-                this.worldTransform.copy(this.localTransform);
-            }
-        },
-        
-        // Update the node status in each frame
-        update : function(silent) {
 
-            if(! silent) {
-                this.trigger('beforeupdate', this);
+            if (force || this._needsUpdateWorldTransform) {
+                if (this.parent) {
+                    mat4.multiply(
+                        this.worldTransform._array,
+                        this.parent.worldTransform._array,
+                        this.localTransform._array
+                    );
+                }
+                else {
+                    mat4.copy(this.worldTransform._array, this.localTransform._array);
+                }
+                force = true;
+                this._needsUpdateWorldTransform = false;
             }
-            this.updateWorldTransform();
             
             for(var i = 0; i < this._children.length; i++) {
                 var child = this._children[i];
                 // Skip the hidden nodes
                 if(child.visible) {
-                    child.update();
+                    child.update(force);
                 }
             }
-            
-            if(! silent) {
-                this.trigger('afterupdate', this);
-            }
+
+            this.trigger('beforeupdate', this);
         },
 
         getWorldPosition : function(out) {
@@ -254,20 +214,8 @@ define(function(require) {
             }
         },
 
-        translate : function(v) {
-            this.updateLocalTransform();
-            this.translate(v);
-            this.decomposeMatrix();
-        },
-
-        rotate : function(angle, axis) {
-            this.updateLocalTransform();
-            this.localTransform.rotate(angle, axis);
-            this.decomposeMatrix();
-        },
         // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
         rotateAround : (function() {
-            
             var v = new Vector3();
             var RTMatrix = new Matrix4();
 
@@ -292,7 +240,9 @@ define(function(require) {
                 this.localTransform.scale(this.scale);
 
                 this.decomposeMatrix();
+                this._needsUpdateWorldTransform = true;
             }
+            
         })(),
 
         lookAt : (function() {
@@ -302,8 +252,7 @@ define(function(require) {
                 m.lookAt(this.position, target, up || this.localTransform.up).invert();
                 m.decomposeMatrix(scaleVector, this.rotation, this.position);
             }
-        })(),
-
+        })()
     });
 
     return Node;

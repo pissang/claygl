@@ -16,9 +16,9 @@
 
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    _ = require("_");
+                var qtek3d = qtek['3d']
+                var Shader = qtek3d.Shader
+                var _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById("Main"),
@@ -26,22 +26,28 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                    useVSM : true
-                });
+                var animation = new qtek.animation.Animation;
+                animation.start();
+                var shadowMapPass = new qtek3d.prePass.ShadowMap();
 
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek3d.Scene();
+                var camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 100
                     });
+
+                var renderInfo = new qtek3d.debug.RenderInfo({
+                    shadowPass : shadowMapPass,
+                    renderer : renderer,
+                    scene : scene
+                });
+                // renderInfo.enable();
+                
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.three.Model({
                     textureRootPath : "assets/models/nanosuit/tex"
                 });
-                loader.on('load:texture', function(){
-                })
                 var meshList = loader.parse(data);
                 
                 var shader = qtek3d.shader.library.get("buildin.lambert", "diffuseMap");
@@ -49,17 +55,11 @@
                 var material = new qtek3d.Material({
                     shader : shader
                 });
-                material.set("color", [0.2, 0.2, 0.2]);
-                var image = new Image();
-                image.src = "assets/textures/ground_tile.jpg";
                 var texture = new qtek3d.texture.Texture2D({
-                    image : image,
                     wrapS : qtek3d.Texture.REPEAT,
                     wrapT : qtek3d.Texture.REPEAT
                 });
-                image.onload = function(){
-                    texture.dirty();
-                };
+                texture.load("assets/textures/ground_tile.jpg");
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10]);
 
@@ -69,6 +69,7 @@
                     mesh.material.set("shininess", 50);
                     mesh.material.shader.disableTexture("normalMap");
                     mesh.material.set("specular", [0.6, 0.6, 0.6]);
+                    mesh.material.set("color", [4.0, 4.0, 4.0]);
                     root.add(mesh);
                 });
 
@@ -93,7 +94,7 @@
                 scene.add(planeMesh);
 
                 var light = new qtek3d.light.Directional({
-                    intensity : 4.0,
+                    intensity : 1.0,
                     position : new qtek.core.Vector3(2, 2, 2),
                     shadowCamera : {
                         left : -5,
@@ -105,12 +106,12 @@
                     },
                     shadowBias : 0.003,
                 });
-                light.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
+                light.lookAt(root.position);
                 scene.add(light);
 
                 var aidLight = new qtek3d.light.Directional({
-                    intensity : 2.0,
-                    position : new qtek.core.Vector3(2, 4, -2),
+                    intensity : 1.0,
+                    position : new qtek.core.Vector3(2, 2, -1),
                     shadowCamera : {
                         left : -5,
                         right : 5,
@@ -119,9 +120,9 @@
                         near : 0,
                         far : 30
                     },
-                    shadowBias : 0.006
+                    shadowBias : 0.003
                 });
-                aidLight.lookAt(root.position, new qtek.core.Vector3(0, 1, 0));
+                aidLight.lookAt(root.position);
                 scene.add(aidLight);
 
                 var control = new qtek3d.plugin.OrbitControl({
@@ -131,10 +132,15 @@
                 });
                 control.enable();
 
-                setInterval( function(){
+                animation.onframe = function() {
+                    renderInfo.clear();
                     shadowMapPass.render(renderer, scene);
+                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     renderer.render(scene, camera);
-                }, 20);
+                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    // shadowMapPass.renderDebug(renderer);
+                    renderInfo.draw();
+                }
             })
             
         </script>

@@ -10,62 +10,46 @@ define(function(require) {
         x = x || 0;
         y = y || 0;
         z = z || 0;
-        
-        return Object.create(Vector3Proto, {
 
-            x : {
-                configurable : false,
-                set : function(value) {
-                    this._array[0] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[0];
-                }
-            },
-            y : {
-                configurable : false,
-                set : function(value) {
-                    this._array[1] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[1];
-                }
-            },
-            z : {
-                configurable : false,
-                set : function(value) {
-                    this._array[2] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[2];
-                }
-            },
-
-            _array : {
-                writable : false,
-                configurable : false,
-                value : vec3.fromValues(x, y, z)
-            },
-            // Dirty flag is used by the Node to determine
-            // if the matrix is updated to latest
-            _dirty : {
-                configurable : false,
-                writable : true,
-                value : true
-            }
-        })
-
+        this._array = vec3.fromValues(x, y, z);
+        // Dirty flag is used by the Node to determine
+        // if the matrix is updated to latest
+        this._dirty = true;
     }
 
-    var Vector3Proto = {
+    Vector3.prototype= {
 
         constructor : Vector3,
 
+        get x() {
+            return this._array[0];
+        },
+
+        set x(value) {
+            this._array[0] = value;
+            this._dirty = true;
+        },
+
+        get y() {
+            return this._array[1];
+        },
+
+        set y(value) {
+            this._array[1] = value;
+            this._dirty = true;
+        },
+
+        get z() {
+            return this._array[2];
+        },
+
+        set z(value) {
+            this._array[2] = value;
+            this._dirty = true;
+        },
+
         add : function(b) {
-            vec3.add( this._array, this._array, b._array );
+            vec3.add(this._array, this._array, b._array);
             this._dirty = true;
             return this;
         },
@@ -253,7 +237,6 @@ define(function(require) {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         },
     }
-
 
     function clamp( x ) {
         return Math.min( Math.max( x, -1 ), 1 );

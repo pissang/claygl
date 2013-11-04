@@ -20,24 +20,7 @@ define(function(require) {
 
     var Matrix3 = function() {
 
-        return Object.create(Matrix3Proto, {
-
-            m00 : makeProperty(0),
-            m01 : makeProperty(1),
-            m02 : makeProperty(2),
-            m10 : makeProperty(3),
-            m11 : makeProperty(4),
-            m12 : makeProperty(5),
-            m20 : makeProperty(6),
-            m21 : makeProperty(7),
-            m22 : makeProperty(8),
-            
-            _array : {
-                writable : false,
-                configurable : false,
-                value : mat3.create()
-            }
-        })
+        this._array = mat3.create();
     };
 
     var Matrix3Proto = {

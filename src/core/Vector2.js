@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var glMatrix = require("glmatrix");
     var vec2 = glMatrix.vec2;
 
@@ -7,49 +9,34 @@ define(function(require) {
         
         x = x || 0;
         y = y || 0;
-        
-        return Object.create(Vector2Proto, {
 
-            x : {
-                configurable : false,
-                set : function(value) {
-                    this._array[0] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[0];
-                }
-            },
-            y : {
-                configurable : false,
-                set : function(value) {
-                    this._array[1] = value;
-                    this._dirty = true;
-                },
-                get : function() {
-                    return this._array[1];
-                }
-            },
-
-            _array : {
-                writable : false,
-                configurable : false,
-                value : vec2.fromValues(x, y)
-            },
-            // Dirty flag is used by the Node to determine
-            // if the matrix is updated to latest
-            _dirty : {
-                configurable : false,
-                writable : true,
-                value : true
-            }
-        })
-
+        this._array = vec2.fromValues(x, y);
+        // Dirty flag is used by the Node to determine
+        // if the matrix is updated to latest
+        this._dirty = true;
     }
 
-    var Vector2Proto = {
+    Vector2.prototype = {
 
         constructor : Vector2,
+
+        get x() {
+            return this._array[0];
+        },
+
+        set x(value) {
+            this._array[0] = value;
+            this._dirty = true;
+        },
+
+        get y() {
+            return this._array[1];
+        },
+
+        set y(value) {
+            this._array[1] = value;
+            this._dirty = true;
+        },
 
         add : function(b) {
             vec2.add(this._array, this._array, b._array);

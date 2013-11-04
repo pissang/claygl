@@ -36,8 +36,8 @@ define(function(require) {
             'directionalLightColor' : {
                 type : '3f',
                 value : function(instance) {
-                    var color = instance.color,
-                        intensity = instance.intensity;
+                    var color = instance.color;
+                    var intensity = instance.intensity;
                     return [color[0]*intensity, color[1]*intensity, color[1]*intensity];
                 }
             }

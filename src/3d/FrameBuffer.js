@@ -81,7 +81,7 @@ define(function(require) {
             for (var attachment in this._attachedTextures) {
                 var texture = this._attachedTextures[attachment];
                 if (! texture.NPOT && texture.useMipmap) {
-                    var target = texture.instanceof(TextureCube) ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+                    var target = texture instanceof TextureCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                     _gl.generateMipmap(target);
                     _gl.bindTexture(target, null);

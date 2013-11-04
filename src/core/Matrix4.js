@@ -11,7 +11,6 @@ define(function(require) {
 
     function makeProperty(n) {
         return {
-            configurable : false,
             set : function(value) {
                 this._array[n] = value;
                 this._dirty = true;
@@ -23,94 +22,60 @@ define(function(require) {
     }
     var Matrix4 = function() {
 
-        var axisX = new Vector3(),
-            axisY = new Vector3(),
-            axisZ = new Vector3();
+        this._axisX = new Vector3();
+        this._axisY = new Vector3();
+        this._axisZ = new Vector3();
 
-        return Object.create(Matrix4Proto, {
-
-            m00 : makeProperty(0),
-            m01 : makeProperty(1),
-            m02 : makeProperty(2),
-            m03 : makeProperty(3),
-            m10 : makeProperty(4),
-            m11 : makeProperty(5),
-            m12 : makeProperty(6),
-            m13 : makeProperty(7),
-            m20 : makeProperty(8),
-            m21 : makeProperty(9),
-            m22 : makeProperty(10),
-            m23 : makeProperty(11),
-            m30 : makeProperty(12),
-            m31 : makeProperty(13),
-            m32 : makeProperty(14),
-            m33 : makeProperty(15),
-
-            // Forward axis of local matrix, i.e. z axis
-            forward : {
-                configurable : false,
-                get : function() {
-                    var el = this._array;
-                    axisZ.set(el[8], el[9], el[10]);
-                    return axisZ;
-                },
-                // TODO Here has a problem
-                // If only set an item of vector will not work
-                set : function(v) {
-                    var el = this._array,
-                        v = v._array;
-                    el[8] = v[8];
-                    el[9] = v[9];
-                    el[10] = v[10];
-                }
-            },
-
-            // Up axis of local matrix, i.e. y axis
-            up : {
-                configurable : false,
-                enumerable : true,
-                get : function() {
-                    var el = this._array;
-                    axisY.set(el[4], el[5], el[6]);
-                    return axisY;
-                },
-                set : function(v) {
-                    var el = this._array,
-                        v = v._array;
-                    el[4] = v[4];
-                    el[5] = v[5];
-                    el[6] = v[6];
-                }
-            },
-
-            // Right axis of local matrix, i.e. x axis
-            right : {
-                configurable : false,
-                get : function() {
-                    var el = this._array;
-                    axisX.set(el[0], el[1], el[2]);
-                    return axisX;
-                },
-                set : function(v) {
-                    var el = this._array,
-                        v = v._array;
-                    el[0] = v[0];
-                    el[1] = v[1];
-                    el[2] = v[2];
-                }
-            },
-            
-            _array : {
-                writable : false,
-                configurable : false,
-                value : mat4.create()
-            }
-        })
+        this._array = mat4.create();
     };
 
-    var Matrix4Proto = {
+    Matrix4.prototype = {
 
         constructor : Matrix4,
+
+        get forward() {
+            var el = this._array;
+            this._axisZ.set(el[8], el[9], el[10]);
+            return this._axisZ;
+        },
+
+        // TODO Here has a problem
+        // If only set an item of vector will not work
+        set forward(v) {
+            var el = this._array;
+            v = v._array;
+            el[8] = v[8];
+            el[9] = v[9];
+            el[10] = v[10];
+        },
+
+        get up() {
+            var el = this._array;
+            this._axisY.set(el[4], el[5], el[6]);
+            return this._axisY;
+        },
+
+        set up(v) {
+            var el = this._array;
+            v = v._array;
+            el[4] = v[4];
+            el[5] = v[5];
+            el[6] = v[6];
+        },
+
+        get right() {
+            var el = this._array;
+            this._axisX.set(el[0], el[1], el[2]);
+            return this._axisX;
+        },
+
+        set right(v) {
+            var el = this._array;
+            v = v._array;
+            el[0] = v[0];
+            el[1] = v[1];
+            el[2] = v[2];
+        },
 
         adjoint : function() {
             mat4.adjoint(this._array, this._array);
@@ -253,6 +218,23 @@ define(function(require) {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         }
     }
+
+    // Object.defineProperty(Matrix4.prototype, 'm00', makeProperty(0));
+    // Object.defineProperty(Matrix4.prototype, 'm01', makeProperty(1));
+    // Object.defineProperty(Matrix4.prototype, 'm02', makeProperty(2));
+    // Object.defineProperty(Matrix4.prototype, 'm03', makeProperty(3));
+    // Object.defineProperty(Matrix4.prototype, 'm10', makeProperty(4));
+    // Object.defineProperty(Matrix4.prototype, 'm11', makeProperty(5));
+    // Object.defineProperty(Matrix4.prototype, 'm12', makeProperty(6));
+    // Object.defineProperty(Matrix4.prototype, 'm13', makeProperty(7));
+    // Object.defineProperty(Matrix4.prototype, 'm20', makeProperty(8));
+    // Object.defineProperty(Matrix4.prototype, 'm21', makeProperty(9));
+    // Object.defineProperty(Matrix4.prototype, 'm22', makeProperty(10));
+    // Object.defineProperty(Matrix4.prototype, 'm23', makeProperty(11));
+    // Object.defineProperty(Matrix4.prototype, 'm30', makeProperty(12));
+    // Object.defineProperty(Matrix4.prototype, 'm31', makeProperty(13));
+    // Object.defineProperty(Matrix4.prototype, 'm32', makeProperty(14));
+    // Object.defineProperty(Matrix4.prototype, 'm33', makeProperty(15));
 
     return Matrix4;
 })
