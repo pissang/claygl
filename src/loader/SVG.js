@@ -37,15 +37,15 @@ define(function(require) {
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", percent, loaded, total);
+                    self.trigger("progress", [percent, loaded, total]);
                 },
                 onerror : function(e) {
-                    self.trigger("error", e);
+                    self.trigger("error", [e]);
                 },
                 responseType : "text",
                 onload : function(xmlString) {
                     self.parse(xmlString, function(root){
-                        self.trigger('load', root);
+                        self.trigger('load', [root]);
                     });
                 }
             })

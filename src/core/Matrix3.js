@@ -23,7 +23,7 @@ define(function(require) {
         this._array = mat3.create();
     };
 
-    var Matrix3Proto = {
+    Matrix3.prototype = {
 
         constructor : Matrix3,
 

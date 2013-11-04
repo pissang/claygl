@@ -15,13 +15,13 @@
             })
 
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    Material = qtek3d.Material,
-                    Mesh = qtek3d.Mesh,
-                    Cube = qtek3d.geometry.Cube,
-                    meshUtil = qtek3d.util.mesh,
-                    shaderLibrary = qtek3d.shader.library;
+                var qtek3d = qtek['3d'];
+                var Shader = qtek3d.Shader;
+                var Material = qtek3d.Material;
+                var Mesh = qtek3d.Mesh;
+                var Cube = qtek3d.geometry.Cube;
+                var meshUtil = qtek3d.util.mesh;
+                var shaderLibrary = qtek3d.shader.library;
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main"),

@@ -23,7 +23,7 @@ define(function(require) {
         this._array = mat2d.create();
     };
 
-    var Matrix2dProto = {
+    Matrix2d.prototype = {
 
         constructor : Matrix2d,
 
