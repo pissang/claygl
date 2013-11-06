@@ -78,13 +78,13 @@
                 light.range = 30;
                 scene.add(light);
 
-                animation.onframe = function() {
+                animation.on('frame', function() {
                     var start = performance.now();
                     renderer.render(scene, camera);
                     var end = performance.now();
                     console.log(end - start);
                     root.rotation.rotateY(Math.PI/500);
-                }
+                });
             })
             
         </script>

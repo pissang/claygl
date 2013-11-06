@@ -6,7 +6,6 @@ define(function(require) {
     var Mesh = require("./Mesh");
     var Texture = require("./Texture");
     var WebGLInfo = require('./WebGLInfo');
-    var _ = require("_");
     var glMatrix = require("glmatrix");
     var glenum = require('./glenum');
     var mat4 = glMatrix.mat4;
@@ -134,7 +133,6 @@ define(function(require) {
         render : function(scene, camera, silent) {
             var _gl = this.gl;
             
-            var renderStart = performance.now();
             if (!silent) {
                 // Render plugin like shadow mapping must set the silent true
                 this.trigger("beforerender", [this, scene, camera]);
@@ -160,15 +158,15 @@ define(function(require) {
 
             this._updateRenderQueue(scene, sceneMaterialTransparent);
 
-            var lightNumber = {};
+            var lightNumber = scene.lightNumber;
+            // reset
+            for (type in lightNumber) {
+                lightNumber[type] = 0;
+            }
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
-                if (! lightNumber[light.type]) {
-                    lightNumber[light.type] = 0;
-                }
                 lightNumber[light.type]++;
             }
-            scene.lightNumber = lightNumber;
             this.updateLightUnforms(lights);
 
             // Sort material to reduce the cost of setting uniform in material
@@ -179,10 +177,10 @@ define(function(require) {
             }
 
             _gl.disable(_gl.BLEND);
-            this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
+            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:opaque", [this, opaqueQueue]);
+                this.trigger("afterrender:opaque", [this, opaqueQueue, opaqueRenderInfo]);
                 this.trigger("beforerender:transparent", [this, transparentQueue]);
             }
 
@@ -202,11 +200,17 @@ define(function(require) {
                 }
             }
             transparentQueue = transparentQueue.sort(this._depthSortFunc);
-            this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
+            var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:transparent", [this, transparentQueue]);
-                this.trigger("afterrender", [this, scene, camera]);
+                this.trigger("afterrender:transparent", [this, transparentQueue, transparentRenderInfo]);
+            }
+            var renderInfo = {}
+            for (name in opaqueRenderInfo) {
+                renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
+            }
+            if (! silent) {
+                this.trigger("afterrender", [this, scene, camera, renderInfo]);
             }
         },
 
@@ -252,6 +256,12 @@ define(function(require) {
         },
 
         renderQueue : function(queue, camera, globalMaterial, silent) {
+            var renderInfo = {
+                faceNumber : 0,
+                vertexNumber : 0,
+                drawCallNumber : 0
+            };
+
             // Calculate view and projection matrix
             mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
             mat4.copy(matrices['PROJECTION'], camera.projectionMatrix._array);
@@ -265,7 +275,7 @@ define(function(require) {
             
             var prevMaterialID;
             var prevShaderID;
-            
+                
             // Status 
             var depthTest, depthMask;
             var culling, cullFace, frontFace;
@@ -279,8 +289,10 @@ define(function(require) {
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
                     var lightNumberChanged = false;
-                    if (! _.isEqual(shader.lightNumber, scene.lightNumber)) {
-                        lightNumberChanged = true;
+                    for (var type in scene.lightNumber) {
+                        if (shader.lightNumber[type] !== scene.lightNumber[type]) {
+                            lightNumberChanged = true;
+                        }
                     }
                     if (lightNumberChanged) {
                         for (var type in scene.lightNumber) {
@@ -366,8 +378,15 @@ define(function(require) {
                     culling = mesh.culling;
                     culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
                 }
-                var drawInfo = mesh.render(_gl, globalMaterial);
+
+                var meshRenderInfo = mesh.render(_gl, globalMaterial);
+
+                renderInfo.faceNumber += meshRenderInfo.faceNumber;
+                renderInfo.vertexNumber += meshRenderInfo.vertexNumber;
+                renderInfo.drawCallNumber += meshRenderInfo.drawCallNumber;
             }
+
+            return renderInfo
         },
 
         disposeScene : function(scene) {

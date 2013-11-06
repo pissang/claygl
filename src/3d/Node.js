@@ -11,9 +11,6 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var util = require("util/util");
-    var _ = require("_");
-
-    var _repository = {};
 
     var Node = Base.derive(function() {
 

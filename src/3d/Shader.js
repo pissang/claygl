@@ -16,7 +16,7 @@ define(function(require) {
     var mat3 = glMatrix.mat3;
     var mat4 = glMatrix.mat4;
     var util = require("util/util");
-    var _ = require("_");
+    var _ = require('_');
 
     var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+(\w+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
     var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
@@ -187,10 +187,10 @@ define(function(require) {
             this._locations = {};
         },
 
-        _updateShaderString : function(force) {
+        _updateShaderString : function() {
 
             if (this.vertex !== this._vertexPrev ||
-                this.fragment !== this._fragmentPrev || force) {
+                this.fragment !== this._fragmentPrev) {
 
                 this._parseImport();
                 
@@ -242,7 +242,7 @@ define(function(require) {
                     }
                     break;
                 default:
-                    console.warn("Define type must be vertex or fragment");
+                    throw new Error("Define type must be vertex or fragment");
             }
         },
 
@@ -538,46 +538,54 @@ define(function(require) {
         _addDefine : function() {
 
             // Add defines
+            // VERTEX
             var defineStr = [];
-            _.each(this.lightNumber, function(count, lightType) {
-                if (count) {
+            for (var lightType in this.lightNumber) {
+                var count = this.lightNumber[lightType];
+                if (count > 0) {
                     defineStr.push("#define "+lightType.toUpperCase()+"_NUMBER "+count);
                 }
-            });
-            _.each(this._textureStatus, function(status, symbol) {
+            }
+            for (var symbol in this._textureStatus) {
+                var status = this._textureStatus[symbol];
                 if (status.enabled && status.shaderType === "vertex") {
                     defineStr.push("#define "+symbol.toUpperCase()+"_ENABLED");
                 }
-            });
+            }
             // Custom Defines
-            _.each(this.vertexDefines, function(value, symbol) {
+            for (var symbol in this.vertexDefines) {
+                var value = this.vertexDefines[symbol];
                 if (value === null) {
                     defineStr.push("#define "+symbol);
                 }else{
                     defineStr.push("#define "+symbol+" "+value.toString());
                 }
-            })
+            }
             this._vertexProcessed = defineStr.join("\n") + "\n" + this._vertexProcessedWithoutDefine;
 
+            // FRAGMENT
             defineStr = [];
-            _.each(this.lightNumber, function(count, lightType) {
-                if (count) {
-                    defineStr.push("#define "+lightType+"_NUMBER "+count);
+            for (var lightType in this.lightNumber) {
+                var count = this.lightNumber[lightType];
+                if (count > 0) {
+                    defineStr.push("#define "+lightType.toUpperCase()+"_NUMBER "+count);
                 }
-            });
-            _.each(this._textureStatus, function(status, symbol) {
+            }
+            for (var symbol in this._textureStatus) {
+                var status = this._textureStatus[symbol];
                 if (status.enabled && status.shaderType === "fragment") {
                     defineStr.push("#define "+symbol.toUpperCase()+"_ENABLED");
                 }
-            });
+            }
             // Custom Defines
-            _.each(this.fragmentDefines, function(value, symbol) {
+            for (var symbol in this.fragmentDefines) {
+                var value = this.fragmentDefines[symbol];
                 if (value === null) {
                     defineStr.push("#define "+symbol);
                 }else{
                     defineStr.push("#define "+symbol+" "+value.toString());
                 }
-            })
+            }
             var tmp = defineStr.join("\n") + "\n" + this._fragmentProcessedWithoutDefine;
             
             // Add precision
@@ -585,8 +593,8 @@ define(function(require) {
         },
 
         _parseUniforms : function() {
-            var uniforms = {},
-                self = this;
+            var uniforms = {};
+            var self = this;
             var shaderType = "vertex";
             this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
             shaderType = "fragment";
@@ -639,7 +647,7 @@ define(function(require) {
                                 }else{
                                     var defaultValueFunc = self._parseDefaultValue(type, semantic);
                                     if (! defaultValueFunc)
-                                        console.warn('Unkown semantic "' + semantic + '"');
+                                        throw new Error('Unkown semantic "' + semantic + '"');
                                     else
                                         semantic = "";
                                 }
@@ -692,13 +700,13 @@ define(function(require) {
         createUniforms : function() {
             var uniforms = {};
             
-            _.each(this.uniformTemplates, function(uniformTpl, symbol) {
-                uniforms[ symbol ] = {
+            for (var symbol in this.uniformTemplates){
+                var uniformTpl = this.uniformTemplates[symbol];
+                uniforms[symbol] = {
                     type : uniformTpl.type,
                     value : uniformTpl.value()
                 }
-            })
-
+            }
             return uniforms;
         },
 
@@ -734,7 +742,7 @@ define(function(require) {
 
                     if (semantic) {
                         if (attribSemantics.indexOf(semantic) < 0) {
-                            console.warn('Unkown semantic "' + semantic + '"');
+                            throw new Error('Unkown semantic "' + semantic + '"');
                         }else{
                             self.attribSemantics[semantic] = {
                                 symbol : symbol,
@@ -859,7 +867,7 @@ define(function(require) {
     Shader.source = function(name) {
         var shaderStr = _source[name];
         if (! shaderStr) {
-            console.error('Shader "' + name + '" not existed in library');
+            console.warn('Shader "' + name + '" not existed in library');
             return;
         }
         return shaderStr;

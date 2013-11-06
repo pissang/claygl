@@ -21,8 +21,7 @@
                 var _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById("Main"),
-                    devicePixelRatio : 1.0
+                    canvas : document.getElementById("Main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -36,12 +35,6 @@
                         far : 100
                     });
 
-                var renderInfo = new qtek3d.debug.RenderInfo({
-                    shadowPass : shadowMapPass,
-                    renderer : renderer,
-                    scene : scene
-                });
-                // renderInfo.enable();
                 
                 var data = JSON.parse(modelData);
 
@@ -123,7 +116,7 @@
                     shadowBias : 0.003
                 });
                 aidLight.lookAt(root.position);
-                scene.add(aidLight);
+                // scene.add(aidLight);
 
                 var control = new qtek3d.plugin.OrbitControl({
                     target : camera,
@@ -132,15 +125,13 @@
                 });
                 control.enable();
 
-                animation.onframe = function() {
-                    renderInfo.clear();
+                animation.on('frame', function() {
                     shadowMapPass.render(renderer, scene);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     renderer.render(scene, camera);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
                     // shadowMapPass.renderDebug(renderer);
-                    renderInfo.draw();
-                }
+                });
             })
             
         </script>

@@ -5,7 +5,6 @@ define(function(require) {
     var Node = require("./Node");
     var glenum = require("./glenum");
     var Vector3 = require("core/Vector3");
-    var _ = require("_");
 
     // Cache
     var prevDrawID = 0;
@@ -27,7 +26,7 @@ define(function(require) {
             culling : true,
             cullFace : glenum.BACK,
             frontFace : glenum.CCW,
-            
+
             receiveShadow : true,
             castShadow : true,
 
@@ -41,7 +40,7 @@ define(function(require) {
         }
     }, {
 
-        render : function(_gl, globalMaterial, silence) {
+        render : function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
@@ -73,7 +72,7 @@ define(function(require) {
                 if (prevDrawIsUseFace) {
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, prevDrawIndicesBuffer.buffer);
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
-                    faceNumber = prevDrawIndicesBuffer.count;
+                    faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
                     _gl.drawArrays(glDrawMode, 0, vertexNumber);
@@ -121,7 +120,7 @@ define(function(require) {
                     if (prevDrawIsUseFace) {
                         _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
-                        faceNumber += indicesBuffer.count;
+                        faceNumber += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, vertexNumber);
                     }
@@ -129,12 +128,12 @@ define(function(require) {
                 }
             }
 
-            var drawInfo = {
+            var renderInfo = {
                 faceNumber : faceNumber,
                 vertexNumber : vertexNumber,
                 drawCallNumber : drawCallNumber
             };
-            return drawInfo;
+            return renderInfo;
         }
     });
 

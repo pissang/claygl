@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     var Clip = require('./Clip');
-    var _ = require("_");
+    var Base = require('core/Base');
 
     var requrestAnimationFrame = window.requrestAnimationFrame
                                 || window.msRequestAnimationFrame
@@ -13,23 +13,17 @@ define(function(require) {
 
     var arraySlice = Array.prototype.slice;
 
-    var Animation = function(options) {
+    var Animation = Base.derive(function() {
+        return {
+            stage : null,
 
-        options = options || {};
+            _clips : [],
 
-        this.stage = options.stage || {};
-
-        this.onframe = options.onframe || function() {};
-
-        // private properties
-        this._clips = [];
-
-        this._running = false;
-
-        this._time = 0;
-    };
-
-    Animation.prototype = {
+            _running : false,
+            
+            _time : 0  
+        }
+    }, {
         add : function(clip) {
             this._clips.push(clip);
         },
@@ -40,6 +34,7 @@ define(function(require) {
             }
         },
         update : function() {
+            
             var time = new Date().getTime();
             var delta = time - this._time;
             var clips = this._clips;
@@ -65,21 +60,24 @@ define(function(require) {
             }
 
             // Remove the finished clip
-            var newArray = [];
-            for (var i = 0; i < len; i++) {
-                if (!clips[i]._needsRemove) {
-                    newArray.push(clips[i]);
+            for (var i = 0; i < len;) {
+                if (clips[i]._needsRemove) {
+                    clips[i] = clips[len-1];
+                    clips.pop();
+                    len--;
+                } else {
+                    i++;
                 }
             }
-            this._clips = newArray;
 
             len = deferredEvents.length;
             for (var i = 0; i < len; i++) {
                 deferredClips[i].fire(deferredEvents[i]);
             }
 
-            this.onframe(delta);
             this._time = time;
+
+            this.trigger('frame', [delta]);
         },
         start : function() {
             var self = this;
@@ -113,8 +111,7 @@ define(function(require) {
             deferred.animation = this;
             return deferred;
         }
-    };
-    Animation.prototype.constructor = Animation;
+    });
 
     function _defaultGetter(target, key) {
         return target[key];

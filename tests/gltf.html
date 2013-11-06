@@ -26,6 +26,8 @@
             var shadowMapPass = new qtek3d.prePass.ShadowMap({
                 // useVSM : true
             });
+            var animation = new qtek.animation.Animation();
+            animation.start();
 
             var GLTFLoader = new qtek.loader.GLTF();
 
@@ -58,13 +60,13 @@
                 light.penumbraAngle = 25;
                 light.shadowResolution = 512;
 
-                setInterval(function() {
-                    // shadowMapPass.render(renderer, scene);
+                animation.on('frame', function() {
+                    shadowMapPass.render(renderer, scene);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     renderer.render(scene, camera);
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.renderDebug(renderer);
-                }, 50);
+                });
             });
         });
     </script>

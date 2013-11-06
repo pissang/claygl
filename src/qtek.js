@@ -63,8 +63,7 @@ define( function(require){
 			"texturePool": require('3d/compositor/texturePool')
 		},
 		"debug": {
-			"PointLight": require('3d/debug/PointLight'),
-			"RenderInfo": require('3d/debug/RenderInfo')
+			"PointLight": require('3d/debug/PointLight')
 		},
 		"geometry": {
 			"Cube": require('3d/geometry/Cube'),
@@ -79,6 +78,9 @@ define( function(require){
 			"Spot": require('3d/light/Spot')
 		},
 		"particleSystem": {
+			"Emitter": require('3d/particleSystem/Emitter'),
+			"ForceField": require('3d/particleSystem/ForceField'),
+			"GravityField": require('3d/particleSystem/GravityField'),
 			"Particle": require('3d/particleSystem/Particle'),
 			"ParticleSystem": require('3d/particleSystem/ParticleSystem')
 		},
@@ -117,6 +119,7 @@ define( function(require){
 		"Matrix3": require('core/Matrix3'),
 		"Matrix4": require('core/Matrix4'),
 		"Quaternion": require('core/Quaternion'),
+		"Value": require('core/Value'),
 		"Vector2": require('core/Vector2'),
 		"Vector3": require('core/Vector3'),
 		"Vector4": require('core/Vector4'),

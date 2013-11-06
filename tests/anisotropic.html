@@ -15,9 +15,9 @@
             })
 
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    _ = require("_");
+                var qtek3d = qtek['3d']
+                var Shader = qtek3d.Shader
+                var _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main"),
@@ -69,7 +69,7 @@
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
-                setInterval( function(){
+                setInterval(function(){
                     renderer.render( scene, camera );
                 }, 20);
             })

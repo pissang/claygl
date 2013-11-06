@@ -7,7 +7,6 @@ define(function(require) {
     var Texture = require('./Texture');
     var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
-    var _ = require("_");
 
     _repository = [];
 

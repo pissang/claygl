@@ -17,7 +17,6 @@ define(function(require) {
     var vec2 = glMatrix.vec2;
     var mat2 = glMatrix.mat2;
     var mat4 = glMatrix.mat4;
-    var _ = require("_");
 
     var arrSlice = Array.prototype.slice;
 
@@ -157,13 +156,13 @@ define(function(require) {
             }
 
             var result = {};
-            var verticesNumber = this.getVerticesNumber();
+            var vertexNumber = this.getVerticesNumber();
 
             for (var name in this.attributes) {
                 var attrib = this.attributes[name];
                 if (attrib.value &&
                     attrib.value.length) {
-                    if (attrib.value.length === verticesNumber) {
+                    if (attrib.value.length === vertexNumber) {
                         result[name] = attrib;
                     }
                 }
@@ -230,7 +229,7 @@ define(function(require) {
 
             var self = this
             var cursors = {};
-            var verticesNumber = this.getVerticesNumber();
+            var vertexNumber = this.getVerticesNumber();
             
             var verticesReorganizedMap = this._verticesReorganizedMap;
 
@@ -273,7 +272,7 @@ define(function(require) {
                 for (var name in cursors) {
                     cursors[name] = 0;
                 }
-                for (var i = 0; i < verticesNumber; i++) {
+                for (var i = 0; i < vertexNumber; i++) {
                     verticesReorganizedMap[i] = -1;
                 }
                 
@@ -285,15 +284,15 @@ define(function(require) {
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
-            if (verticesNumber > this.chunkSize && this.isUseFace()) {
-                var vertexCursor = 0,
-                    chunkIdx = 0,
-                    currentChunk;
+            if (vertexNumber > this.chunkSize && this.isUseFace()) {
+                var vertexCursor = 0;
+                var chunkIdx = 0;
+                var currentChunk;
 
                 var chunkFaceStart = [0];
                 var vertexUseCount = [];
 
-                for (i = 0; i < verticesNumber; i++) {
+                for (i = 0; i < vertexNumber; i++) {
                     vertexUseCount[i] = -1;
                     verticesReorganizedMap[i] = -1;
                 }
@@ -429,13 +428,15 @@ define(function(require) {
                     }
                 }
                 for (var name in attributes) {
-                    var values = attributes[name].value,
-                        type = attributes[name].type,
-                        size = attributes[name].size,
-                        attribArray = chunk.attributeArrays[name];
+                    var values = attributes[name].value;
+                    var type = attributes[name].type;
+                    var size = attributes[name].size;
+                    var attribArray = chunk.attributeArrays[name];
                     
-                    if (! attribArray) {
-                        attribArray = chunk.attributeArrays[name] = new ArrayConstructors[name](verticesNumber*size);
+                    var arrSize = vertexNumber * size;
+                    if (! attribArray || attribArray.length !== arrSize) {
+                        attribArray = new ArrayConstructors[name](arrSize);
+                        chunk.attributeArrays[name] = attribArray;
                     }
 
                     if (size === 1) {
@@ -477,11 +478,11 @@ define(function(require) {
                         indicesBuffer : null
                     }
                 }
-                var attributeBuffers = chunk.attributeBuffers,
-                    indicesBuffer = chunk.indicesBuffer;
-                var arrayChunk = this._arrayChunks[i],
-                    attributeArrays = arrayChunk.attributeArrays,
-                    indicesArray = arrayChunk.indicesArray;
+                var attributeBuffers = chunk.attributeBuffers;
+                var indicesBuffer = chunk.indicesBuffer;
+                var arrayChunk = this._arrayChunks[i];
+                var attributeArrays = arrayChunk.attributeArrays;
+                var indicesArray = arrayChunk.indicesArray;
 
                 for (var name in dirtyAttributes) {
                     var attribute = dirtyAttributes[name];
@@ -540,13 +541,13 @@ define(function(require) {
 
             for (var f = 0; f < len; f++) {
 
-                var face = faces[f],
-                    i1 = face[0],
-                    i2 = face[1],
-                    i3 = face[2],
-                    p1 = positions[i1],
-                    p2 = positions[i2],
-                    p3 = positions[i3];
+                var face = faces[f];
+                var i1 = face[0];
+                var i2 = face[1];
+                var i3 = face[2];
+                var p1 = positions[i1];
+                var p2 = positions[i2];
+                var p3 = positions[i3];
 
                 vec3.sub(v12, p1, p2);
                 vec3.sub(v23, p2, p3);
@@ -581,13 +582,13 @@ define(function(require) {
             //  /  \
             // p3---p2
             for (var i = 0; i < len; i++) {
-                var face = faces[i],
-                    i1 = face[0],
-                    i2 = face[1],
-                    i3 = face[2],
-                    p1 = positions[i1],
-                    p2 = positions[i2],
-                    p3 = positions[i3];
+                var face = faces[i];
+                var i1 = face[0];
+                var i2 = face[1];
+                var i3 = face[2];
+                var p1 = positions[i1];
+                var p2 = positions[i2];
+                var p3 = positions[i3];
 
                 vec3.sub(v12, p1, p2);
                 vec3.sub(v23, p2, p3);
@@ -609,14 +610,14 @@ define(function(require) {
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
         generateTangents : function() {
             
-            var texcoords = this.attributes.texcoord0.value,
-                positions = this.attributes.position.value,
-                tangents = this.attributes.tangent.value,
-                normals = this.attributes.normal.value;
+            var texcoords = this.attributes.texcoord0.value;
+            var positions = this.attributes.position.value;
+            var tangents = this.attributes.tangent.value;
+            var normals = this.attributes.normal.value;
 
             var tan1 = [], tan2 = [],
-                verticesNumber = this.getVerticesNumber();
-            for (var i = 0; i < verticesNumber; i++) {
+                vertexNumber = this.getVerticesNumber();
+            for (var i = 0; i < vertexNumber; i++) {
                 tan1[i] = [0.0, 0.0, 0.0];
                 tan2[i] = [0.0, 0.0, 0.0];
             }
@@ -667,7 +668,7 @@ define(function(require) {
             }
             var tmp = [0, 0, 0, 0];
             var nCrossT = [0, 0, 0];
-            for (var i = 0; i < verticesNumber; i++) {
+            for (var i = 0; i < vertexNumber; i++) {
                 var n = normals[i];
                 var t = tan1[i];
 
@@ -700,9 +701,9 @@ define(function(require) {
                 vertexUseCount[i] = 0;
             }
 
-            var cursor = this.getVerticesNumber(),
-                attributes = this.getEnabledAttributes(),
-                faces = this.faces;
+            var cursor = this.getVerticesNumber();
+            var attributes = this.getEnabledAttributes();
+            var faces = this.faces;
 
             function cloneAttribute(idx) {
                 for (var name in attributes) {
@@ -716,10 +717,10 @@ define(function(require) {
                 }
             }
             for (var i = 0; i < faces.length; i++) {
-                var face = faces[i],
-                    i1 = face[0],
-                    i2 = face[1],
-                    i3 = face[2];
+                var face = faces[i];
+                var i1 = face[0];
+                var i2 = face[1];
+                var i3 = face[2];
                 if (vertexUseCount[i1] > 0) {
                     cloneAttribute(i1);
                     face[0] = cursor;

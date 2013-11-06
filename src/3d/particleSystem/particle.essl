@@ -1,0 +1,42 @@
+@export buildin.particle.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+attribute float age;   // [0-1]
+attribute float spriteSize;
+
+varying float v_Age;
+
+void main() {
+
+    v_Age = age;
+    gl_PointSize = spriteSize;
+
+    gl_Position = worldViewProjection * vec4(position, 1.0);
+}
+
+@end
+
+@export buildin.particle.fragment
+
+uniform sampler2D sprite;
+uniform sampler2D gradient;
+uniform vec3 color : [1.0, 1.0, 1.0];
+uniform float alpha : 1.0;
+
+varying float v_Age;
+
+void main() {
+    vec4 color = vec4(color, alpha);
+    #ifdef SPRITE_ENABLED
+        color = texture2D(sprite, gl_PointCoord);
+    #endif
+    #ifdef GRADIENT_ENABLED
+        color *= texture2D(gradient, vec2(v_Age, 0.5));
+    #endif
+
+    gl_FragColor = color;
+}
+
+@end

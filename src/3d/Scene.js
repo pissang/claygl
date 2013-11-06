@@ -12,7 +12,12 @@ define(function(require){
 
             // Properties to save the light information in the scene
             // Will be set in the render function
-            lightNumber : {},
+            lightNumber : {
+                'POINT_LIGHT' : 0,
+                'DIRECTIONAL_LIGHT' : 0,
+                'SPOT_LIGHT' : 0,
+                'AMBIENT_LIGHT' : 0
+            },
             lightUniforms : {},
 
             _nodeRepository : {}

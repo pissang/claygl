@@ -34,7 +34,7 @@ varying vec3 v_Bitangent;
 
 varying vec3 v_Weight;
 
-void main(){
+void main() {
     
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;

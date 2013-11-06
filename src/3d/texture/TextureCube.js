@@ -31,7 +31,6 @@ define(function(require) {
             nz : null
         }
     }, {
-
         update : function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.cache.get("webgl_texture"));
@@ -52,12 +51,15 @@ define(function(require) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
 
-            _.each(this.image, function(img, target) {
-                if (img)
+            for (var target in this.image) {
+                var img = this.image[target];
+                if (img) {
                     _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, glFormat, glType, img);
-                else
+                }
+                else {
                     _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target]);
-            }, this);
+                }
+            }
 
             if (!this.NPOT && this.useMipmap) {
                 _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
@@ -105,7 +107,7 @@ define(function(require) {
         load : function(imageList) {
             var loading = 0;
             var self = this;
-            _.each(imageList, function(src, name){
+            _.each(imageList, function(src, target){
                 var image = new Image();
                 image.onload = function() {
                     loading -- ;
@@ -117,7 +119,7 @@ define(function(require) {
                 }
                 loading++;
                 image.src = src;
-                self.image[name] = image;
+                self.image[target] = image;
             });
         }
     });

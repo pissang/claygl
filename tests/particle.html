@@ -18,14 +18,41 @@
             var qtek3d = qtek['3d'];
             var Shader = qtek3d.Shader;
 
-
             var renderer = new qtek3d.Renderer({
                 canvas : document.getElementById("Main")
             });
+            var animation = new qtek.animation.Animation();
+            animation.start();
 
             renderer.resize(window.innerWidth, window.innerHeight);
             
-            
+            var Value = qtek.core.Value;
+            var Vector3 = qtek.core.Vector3;
+            var particleSystem = new qtek3d.particleSystem.ParticleSystem({
+                emitter : new qtek3d.particleSystem.Emitter({
+                    max : 10000,
+                    amount : 20,
+                    life : Value.constant(2),
+                    spriteSize : Value.constant(4),
+                    position : Value.random3D(new Vector3(-4, -1, -4), new Vector3(4, -2, 4)),
+                    velocity : Value.random3D(new Vector3(-0.01, 0., -0.01), new Vector3(0.01, 0.01, 0.01))
+                })
+            });
+            particleSystem.material.set('color', [1.0, 0, 0]);
+
+            var scene = new qtek3d.Scene();
+            var camera = new qtek3d.camera.Perspective({
+                fov : window.innerWidth / window.innerHeight,
+                far : 1000,
+                near : 1
+            });
+            camera.position.set(0, 0, 100);
+
+            scene.add(particleSystem);
+            animation.on('frame', function(deltaTime) {
+                particleSystem.update(deltaTime);
+                renderer.render(scene, camera);
+            });
         });
     </script>
 </body>
