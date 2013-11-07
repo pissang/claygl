@@ -2,7 +2,7 @@ define(function(require) {
 
     var Vector3 = require('core/Vector3');
     var Base = require('core/base');
-    var Particle = require('./particle');
+    var Particle = require('./Particle');
     var Value = require('core/Value');
     var glMatrix = require('glmatrix');
     var vec3 =  glMatrix.vec3;
@@ -19,12 +19,15 @@ define(function(require) {
             velocity : Value.vector(new Vector3()),
             angularVelocity : Value.constant(0),
             spriteSize : Value.constant(1),
+            weight : Value.constant(1),
 
             _particlePool : []
         }
     }, function() {
         for (var i = 0; i < this.max; i++) {
-            this._particlePool.push(new Particle());
+            var particle = new Particle();
+            particle.emitter = this;
+            this._particlePool.push(particle);
         }
     }, {
 
@@ -45,6 +48,7 @@ define(function(require) {
                 particle.angularVelocity = this.angularVelocity.get();
                 particle.life = this.life.get();
                 particle.spriteSize = this.spriteSize.get();
+                particle.weight = this.weight.get();
                 particle.age = 0;
 
                 out.push(particle);

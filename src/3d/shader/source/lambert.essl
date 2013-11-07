@@ -250,7 +250,6 @@ void main(){
     if( lineWidth > 0.01){
         gl_FragColor.xyz = gl_FragColor.xyz * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
-
 }
 
 @end

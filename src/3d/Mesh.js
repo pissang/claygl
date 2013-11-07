@@ -80,6 +80,9 @@ define(function(require) {
                 drawCallNumber = 1;
             } else {
                 var chunks = geometry.getBufferChunks(_gl);
+                if (!chunks) {  // Empty mesh
+                    return;
+                }
                 for (var c = 0; c < chunks.length; c++) {
 
                     var chunk = chunks[c];

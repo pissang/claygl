@@ -16,8 +16,6 @@ define(function(require) {
 
     var ParticleSystem = Node.derive(function() {
         return {
-            emitter : null,
-
             loop : true,
 
             duration : 1,
@@ -31,21 +29,11 @@ define(function(require) {
 
             _particles : [],
 
-            _fields : []
+            _fields : [],
 
+            _emitters : []
         }
     }, function(){
-        
-        this.geometry.attributes.age = {
-            type : 'float',
-            size : 1,
-            value : []
-        }
-        this.geometry.attributes.spriteSize = {
-            type : 'float',
-            size : 1,
-            value : []
-        }
 
         var particleShader = new Shader({
             vertex : Shader.source('buildin.particle.vertex'),
@@ -63,6 +51,14 @@ define(function(require) {
         }
     }, {
 
+        addEmitter : function(emitter) {
+            this._emitters.push(emitter);
+        },
+
+        removeEmitter : function(emitter) {
+            this._emitters.splice(this._emitters.indexOf(emitter), 1);
+        },
+
         addField : function(field) {
             this._fields.push(field);
         },
@@ -71,12 +67,14 @@ define(function(require) {
             this._fields.splice(this._fields.indexOf(field), 1);
         },
 
-        update : function(deltaTime) {
+        updateParticles : function(deltaTime) {
             // MS => Seconds
             deltaTime /= 1000;
             var particles = this._particles;
 
-            this.emitter.emit(particles);
+            for (var i = 0; i < this._emitters.length; i++) {
+                this._emitters[i].emit(particles);
+            }
 
             // Aging
             var len = particles.length;
@@ -84,7 +82,7 @@ define(function(require) {
                 var p = particles[i];
                 p.age += deltaTime;
                 if (p.age >= p.life) {
-                    this.emitter.kill(p);
+                    p.emitter.kill(p);
                     particles[i] = particles[len-1];
                     particles.pop();
                     len--;
@@ -109,22 +107,23 @@ define(function(require) {
             var particles = this._particles;
             var geometry = this.geometry;
             var positions = geometry.attributes.position.value;
-            var ages = geometry.attributes.age.value;
-            var spriteSizes = geometry.attributes.spriteSize.value;
+            // Put particle status in normal
+            var normals = geometry.attributes.normal.value;
             var len = this._particles.length;
             for (var i = 0; i < len; i++) {
                 var particle = this._particles[i];
                 positions[i] = particle.position._array;
-                ages[i] = particle.age / particle.life;
-                spriteSizes[i] = particle.spriteSize;
+                if (!normals[i]) {
+                    normals[i] = [];
+                }
+                normals[i][0] = particle.age / particle.life;
+                normals[i][1] = particle.rotation;
+                normals[i][2] = particle.spriteSize;
             }
-            ages.length = len;
-            spriteSizes.length = len;
             positions.length = len;
 
             geometry.dirty('position');
-            geometry.dirty('age');
-            geometry.dirty('spriteSize');
+            geometry.dirty('normal');
             
             return Mesh.prototype.render.call(this, _gl);
         }

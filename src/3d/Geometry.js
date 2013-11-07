@@ -160,8 +160,7 @@ define(function(require) {
 
             for (var name in this.attributes) {
                 var attrib = this.attributes[name];
-                if (attrib.value &&
-                    attrib.value.length) {
+                if (attrib.value.length) {
                     if (attrib.value.length === vertexNumber) {
                         result[name] = attrib;
                     }

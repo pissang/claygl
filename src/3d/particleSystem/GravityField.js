@@ -8,7 +8,9 @@ define(function(require) {
         gravity : 0
     }, {
         applyTo : function(velocity, position, weight, deltaTime) {
-            velocity._array[1] -= this.gravity * deltaTime / weight;
+            if (weight > 0) {
+                velocity._array[1] -= this.gravity * deltaTime / weight;
+            }
         }
     });
 

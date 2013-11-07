@@ -281,10 +281,10 @@ define(function(require) {
             var culling, cullFace, frontFace;
 
             for (var i =0; i < queue.length; i++) {
-                var mesh = queue[i];
-                var material = globalMaterial || mesh.material;
+                var renderable = queue[i];
+                var material = globalMaterial || renderable.material;
                 var shader = material.shader;
-                var geometry = mesh.geometry;
+                var geometry = renderable.geometry;
 
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
@@ -337,7 +337,7 @@ define(function(require) {
                     Mesh.materialChanged();
                 }
 
-                var worldM = mesh.worldTransform._array;
+                var worldM = renderable.worldTransform._array;
 
                 // All matrices ralated to world matrix will be updated on demand;
                 mat4.copy(matrices['WORLD'], worldM);
@@ -366,24 +366,25 @@ define(function(require) {
                     shader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
                 }
 
-                if (mesh.cullFace !== cullFace) {
-                    cullFace = mesh.cullFace;
+                if (renderable.cullFace !== cullFace) {
+                    cullFace = renderable.cullFace;
                     _gl.cullFace(cullFace);
                 }
-                if (mesh.frontFace !== frontFace) {
-                    frontFace = mesh.frontFace;
+                if (renderable.frontFace !== frontFace) {
+                    frontFace = renderable.frontFace;
                     _gl.frontFace(frontFace);
                 }
-                if (mesh.culling !== culling) {
-                    culling = mesh.culling;
+                if (renderable.culling !== culling) {
+                    culling = renderable.culling;
                     culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
                 }
 
-                var meshRenderInfo = mesh.render(_gl, globalMaterial);
-
-                renderInfo.faceNumber += meshRenderInfo.faceNumber;
-                renderInfo.vertexNumber += meshRenderInfo.vertexNumber;
-                renderInfo.drawCallNumber += meshRenderInfo.drawCallNumber;
+                var objectRenderInfo = renderable.render(_gl, globalMaterial);
+                if (objectRenderInfo) {
+                    renderInfo.faceNumber += objectRenderInfo.faceNumber;
+                    renderInfo.vertexNumber += objectRenderInfo.vertexNumber;
+                    renderInfo.drawCallNumber += objectRenderInfo.drawCallNumber;
+                }
             }
 
             return renderInfo

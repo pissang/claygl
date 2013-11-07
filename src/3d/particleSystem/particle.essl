@@ -1,19 +1,21 @@
 @export buildin.particle.vertex
 
-uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldView : WORLDVIEW;
+uniform mat4 projection : PROJECTION;
 
 attribute vec3 position : POSITION;
-attribute float age;   // [0-1]
-attribute float spriteSize;
+attribute vec3 normal : NORMAL;
 
 varying float v_Age;
 
 void main() {
+    v_Age = normal.x;
+    float rotation = normal.y;
 
-    v_Age = age;
-    gl_PointSize = spriteSize;
-
-    gl_Position = worldViewProjection * vec4(position, 1.0);
+    vec4 worldViewPosition = worldView * vec4(position, 1.0);
+    gl_PointSize = -normal.z / worldViewPosition.z;
+    gl_Position = projection * worldViewPosition;
+    
 }
 
 @end
@@ -30,7 +32,7 @@ varying float v_Age;
 void main() {
     vec4 color = vec4(color, alpha);
     #ifdef SPRITE_ENABLED
-        color = texture2D(sprite, gl_PointCoord);
+        color *= texture2D(sprite, gl_PointCoord);
     #endif
     #ifdef GRADIENT_ENABLED
         color *= texture2D(gradient, vec2(v_Age, 0.5));

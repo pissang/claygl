@@ -20,11 +20,14 @@ define(function(require) {
 
         this.spriteSize = 1;
 
-        this.weight = 0;
+        this.weight = 1;
+
+        this.emitter = null;
     }
 
     Particle.prototype.update = function(deltaTime) {
-        vec3.add(this.position._array, this.position._array, this.velocity._array);
+        vec3.scaleAndAdd(this.position._array, this.position._array, this.velocity._array, deltaTime);
+        this.rotation += this.angularVelocity;
     }
 
     return Particle;
