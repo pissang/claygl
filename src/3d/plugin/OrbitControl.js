@@ -5,6 +5,8 @@ define(function(require) {
     var Matrix4 = require("core/Matrix4");
     var Quaternion = require("core/Quaternion");
 
+    var tmpMatrix = new Matrix4();
+
     var OrbitControl = Base.derive(function() {
         return {
             
@@ -16,6 +18,13 @@ define(function(require) {
             origin : new Vector3(),
 
             up : new Vector3(0, 1, 0),
+
+            minDistance : 0,
+            maxDistance : Infinity,
+
+            minRollAngle : -Math.PI / 2, // [-Math.PI/2, 0]
+            maxRollAngle : Math.PI / 2, // [0, Math.PI/2]
+
             // Rotate around origin
             _offsetPitch : 0,
             _offsetRoll : 0,
@@ -75,8 +84,8 @@ define(function(require) {
         },
 
         _mouseMove : function(e) {
-            var dx = e.pageX - this._offsetX,
-                dy = e.pageY - this._offsetY;
+            var dx = e.pageX - this._offsetX;
+            var dy = e.pageY - this._offsetY;
 
             if (this._op === 0) {
                 this._offsetPitch += dx * this.sensitivity / 100;
@@ -108,12 +117,25 @@ define(function(require) {
         _beforeUpdateCamera : function() {
 
             var target = this.target;
-
+            var zAxis = target.localTransform.forward.normalize();
             if (this._op === 0) {
                 // Rotate
-                target.rotateAround(this.origin, this.up, -this._offsetPitch);            
+                target.rotateAround(this.origin, this.up, -this._offsetPitch);
+                this.up.normalize();
+                tmpMatrix.copy(target.localTransform);
                 var xAxis = target.localTransform.right;
                 target.rotateAround(this.origin, xAxis, -this._offsetRoll);
+                var yAxis = target.localTransform.up.normalize();
+                var phi = Math.acos(this.up.dot(yAxis));
+                var isUp = this.up.dot(zAxis) > 0;
+                if (
+                    (isUp && phi > this.maxRollAngle)
+                    || (!isUp && phi > -this.minRollAngle)
+                ) {
+                    // Rool back
+                    target.localTransform.copy(tmpMatrix);
+                    target.decomposeLocalTransform();
+                }
                 this._offsetRoll = this._offsetPitch = 0;
             } else if (this._op === 1) {
                 // Pan
@@ -122,13 +144,16 @@ define(function(require) {
                 target.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;
+            } else if (this._forward !== 0) {
+                // Zoom
+                var direction = target.position.clone().sub(this.origin);
+                var distance = direction.length();
+                direction.scale(1/distance);
+                distance += this._forward * distance / 5000;
+                distance = Math.max(Math.min(this.maxDistance, distance), this.minDistance);
+                target.position.copy(this.origin).scaleAndAdd(direction, distance);
+                this._forward = 0;
             }
-            
-            // Zoom
-            var zAxis = target.localTransform.forward.normalize();
-            var distance = target.position.distance(this.origin);
-            target.position.scaleAndAdd(zAxis, distance * this._forward / 2000);
-            this._forward = 0;
 
         }
     });

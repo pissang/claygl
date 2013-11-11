@@ -129,8 +129,8 @@ void main(){
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
     #endif
 
-    gl_Position = worldViewProjection * vec4( skinnedPosition , 1.0 );
-    v_WorldPosition = ( world * vec4(skinnedPosition, 1.0) ).xyz;
+    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);
+    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 }
 
 @end
@@ -270,13 +270,13 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
 
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowOfSpotLights( vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER]  ){
-    for( int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
-        float shadowContrib = computeShadowContrib( spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i] );
+void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER] ){
+    for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i]);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
-    for( int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
+    for(int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
         shadowContribs[i] = 1.0;
     }
 }
@@ -286,13 +286,13 @@ void computeShadowOfSpotLights( vec3 position, inout float shadowContribs[SPOT_L
 
 #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowOfDirectionalLights( vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER] ){
-    for( int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
+    for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
         float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightBiases[i]);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
-    for( int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
         shadowContribs[i] = 1.0;
     }
 }
@@ -302,13 +302,13 @@ void computeShadowOfDirectionalLights( vec3 position, inout float shadowContribs
 
 #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
 
-void computeShadowOfPointLights( vec3 position, inout float shadowContribs[POINT_LIGHT_NUMBER]  ){
-    for( int i = 0; i < POINT_LIGHT_SHADOWMAP_NUMBER; i++){
+void computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_NUMBER] ){
+    for(int i = 0; i < POINT_LIGHT_SHADOWMAP_NUMBER; i++){
         vec3 lightPosition = pointLightPosition[i];
         vec3 direction = position - lightPosition;
         shadowContribs[i] = computeShadowOfCube(pointLightShadowMaps[i], direction, pointLightRanges[i]);
     }
-    for( int i = POINT_LIGHT_SHADOWMAP_NUMBER; i < POINT_LIGHT_NUMBER; i++){
+    for(int i = POINT_LIGHT_SHADOWMAP_NUMBER; i < POINT_LIGHT_NUMBER; i++){
         shadowContribs[i] = 1.0;
     }
 }

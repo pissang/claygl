@@ -212,6 +212,7 @@ define(function(require) {
             if (! silent) {
                 this.trigger("afterrender", [this, scene, camera, renderInfo]);
             }
+            return renderInfo;
         },
 
         updateLightUnforms : function(lights) {
@@ -259,7 +260,8 @@ define(function(require) {
             var renderInfo = {
                 faceNumber : 0,
                 vertexNumber : 0,
-                drawCallNumber : 0
+                drawCallNumber : 0,
+                meshNumber : 0
             };
 
             // Calculate view and projection matrix
@@ -384,6 +386,7 @@ define(function(require) {
                     renderInfo.faceNumber += objectRenderInfo.faceNumber;
                     renderInfo.vertexNumber += objectRenderInfo.vertexNumber;
                     renderInfo.drawCallNumber += objectRenderInfo.drawCallNumber;
+                    renderInfo.meshNumber ++;
                 }
             }
 

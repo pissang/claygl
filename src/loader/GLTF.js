@@ -166,7 +166,7 @@ define(function(require) {
                     for (var i = 0; i < 16; i++) {
                         joint.localTransform._array[i] = nodeInfo.matrix[i];
                     }
-                    joint.decomposeMatrix();
+                    joint.decomposeLocalTransform();
                 }
 
                 joint.index = skeleton.joints.length;
@@ -483,7 +483,7 @@ define(function(require) {
                     for (var i = 0; i < 16; i++) {
                         node.localTransform._array[i] = nodeInfo.matrix[i];
                     }
-                    node.decomposeMatrix();
+                    node.decomposeLocalTransform();
                 }
 
                 lib.nodes[name] = node;

@@ -11,7 +11,9 @@ define(function(require) {
         }
     }, {
         applyTo : function(velocity, position, weight, deltaTime) {
-            vec3.scaleAndAdd(velocity._array, velocity._array, this.force._array, deltaTime / weight);
+            if (weight > 0) {
+                vec3.scaleAndAdd(velocity._array, velocity._array, this.force._array, deltaTime / weight);
+            }
         }
     });
 

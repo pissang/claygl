@@ -113,7 +113,7 @@ define(function(require) {
             }
         },
 
-        decomposeMatrix : function() {
+        decomposeLocalTransform : function() {
             this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
             if(! this.useEuler) {
                 this.eulerAngle.setEulerFromQuaternion(this.rotation);
@@ -224,7 +224,7 @@ define(function(require) {
                 v.copy(this.position).subtract(point);
 
                 this.localTransform.identity();
-                // parent joint
+                // parent node
                 this.localTransform.translate(point);
                 this.localTransform.rotate(angle, axis);
 
@@ -239,7 +239,7 @@ define(function(require) {
                 this.localTransform.multiply(RTMatrix);
                 this.localTransform.scale(this.scale);
 
-                this.decomposeMatrix();
+                this.decomposeLocalTransform();
                 this._needsUpdateWorldTransform = true;
             }
             

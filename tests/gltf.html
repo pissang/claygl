@@ -48,7 +48,9 @@
                 var control = new qtek3d.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
-                    sensitivity : 0.4
+                    sensitivity : 0.4,
+                    maxRollAngle : Math.PI / 4,
+                    minRollAngle : -0.1
                 });
                 // z up
                 control.up.set(0, 0, 1);
