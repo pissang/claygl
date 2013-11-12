@@ -40,7 +40,7 @@ define(function(require) {
             // Zoom with mouse wheel
             _forward : 0,
 
-            _op : 0  //0 : ROTATE, 1 : PAN
+            _op : -1  //0 : ROTATE, 1 : PAN
         }
     }, {
 
@@ -144,14 +144,14 @@ define(function(require) {
                 target.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;
-            } else if (this._forward !== 0) {
+            } 
+            if (this._forward !== 0) {
                 // Zoom
-                var direction = target.position.clone().sub(this.origin);
-                var distance = direction.length();
-                direction.scale(1/distance);
-                distance += this._forward * distance / 5000;
-                distance = Math.max(Math.min(this.maxDistance, distance), this.minDistance);
-                target.position.copy(this.origin).scaleAndAdd(direction, distance);
+                var distance = target.position.distance(this.origin);
+                var nextDistance = distance + this._forward * distance / 5000;
+                if (nextDistance < this.maxDistance && nextDistance > this.minDistance) {
+                    target.position.scaleAndAdd(zAxis, this._forward * distance / 5000);
+                }
                 this._forward = 0;
             }
 

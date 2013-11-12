@@ -242,7 +242,7 @@ define(function(require) {
                     }
                     break;
                 default:
-                    throw new Error("Define type must be vertex or fragment");
+                    throw new Error("Undefine type must be vertex or fragment");
             }
         },
 

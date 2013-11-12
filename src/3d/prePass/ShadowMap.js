@@ -475,7 +475,7 @@ define(function(require) {
         },
 
         dispose : function(renderer) {
-            var _gl = renderer;
+            var _gl = renderer.gl;
     
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
@@ -505,9 +505,9 @@ define(function(require) {
                 var mesh = this._meshReceiveShadow[i];
                 var material = mesh.material;
                 var shader = material.shader;
-                shader.unDefine('POINT_LIGHT_SHADOW_NUMBER');
-                shader.unDefine('DIRECTIONAL_LIGHT_SHADOW_NUMBER');
-                shader.unDefine('AMBIENT_LIGHT_SHADOW_NUMBER');
+                shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
+                shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_NUMBER');
+                shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_NUMBER');
                 material.set('shadowEnabled', 0);
             }
 
