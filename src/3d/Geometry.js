@@ -88,7 +88,7 @@ define(function(require) {
                  }
             },
 
-            boundingBox : new BoundingBox(),
+            boundingBox : null,
 
             useFace : true,
             // Face is list of triangles, each face
@@ -120,8 +120,11 @@ define(function(require) {
             _reorganizedFaces : []
         }
     }, {
-
         computeBoundingBox : function() {
+            if (!this.boundingBox) {
+                this.boundingBox = new BoundingBox();
+            }
+            this.boundingBox.updateFromVertices(this.attributes.position.value);
         },
         // Overwrite the dirty method
         dirty : function(field) {

@@ -259,7 +259,7 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
             return 1.0;
         }
     #else
-        if(unpackDepth(shadowTex) * range + 0.002 < dist){
+        if((unpackDepth(shadowTex) + 0.0002) * range < dist){
             return 0.0;
         }else{
             return 1.0;

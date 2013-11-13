@@ -22,11 +22,13 @@
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main")
                 });
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek3d.Scene;
+                var camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
+                var animation = new qtek.animation.Animation();
+                animation.start();
 
                 var texture = new qtek3d.texture.TextureCube({
                     flipY : false
@@ -48,6 +50,12 @@
                 var root = new qtek3d.Node();
                 meshList.forEach(function(mesh) {
                     var material = mesh.material;
+                    mesh.geometry.generateTangents();
+                    var normalMap = material.get('normalMap');
+                    if (normalMap) {
+                        normalMap.wrapT = qtek3d.Texture.REPEAT;
+                        normalMap.wrapS = qtek3d.Texture.REPEAT;
+                    }
                     material.shader.disableTexture("normalMap");
                     material.shader.enableTexture("environmentMap");
                     material.set("environmentMap", texture);
@@ -79,9 +87,15 @@
                 });
                 control.enable();
 
-                setInterval(function(){
+                renderer.render(scene, camera);
+                animation.on('frame', function() {
+                // setInterval(function() {
+                    // scene.childAt(0).material.get('diffuseMap').dirty();
+                    // scene.childAt(0).material.get('normalMap').dirty();
+                    // scene.childAt(0).material.get('environmentMap').dirty();
                     renderer.render(scene, camera);
-                }, 50);
+                });
+                // }, 1000);
             })
             
         </script>

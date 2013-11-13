@@ -120,7 +120,6 @@ define(function(require) {
         },
         convertToGeometry : function() {
             var geometry = new Geometry();
-
             var offset = 0;
             for (var c = 0; c < this._arrayChunks.length; c++) {
                 var chunk = this._arrayChunks[c],
@@ -160,7 +159,9 @@ define(function(require) {
                 }
                 offset += chunk.attributes.position.length / 3;
             }
-
+            geometry.boundingBox = new BoundingBox();
+            geometry.boundingBox.min.copy(this.boundingBox.min);
+            geometry.boundingBox.max.copy(this.boundingBox.max);
             return geometry;
         },
         dispose : function(_gl) {

@@ -103,7 +103,7 @@ define(function(require) {
                                 fragment : Shader.source("buildin.sm.depth.fragment")
                             })
                         });
-                        if (mesh.skeleton) {
+                        if (mesh.joints.length > 0) {
                             depthMaterial.shader.define('vertex', 'SKINNING');
                             depthMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
                         }
@@ -135,7 +135,7 @@ define(function(require) {
                                 fragment : Shader.source("buildin.sm.distance.fragment")
                             })
                         });
-                        if (mesh.skeleton) {
+                        if (mesh.joints.length > 0) {
                             distanceMaterial.shader.define('vertex', 'SKINNING');
                             distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
                         }
@@ -324,8 +324,7 @@ define(function(require) {
                     var number = this._shadowMapNumber[lightType];
                     var key = lightType + "_SHADOWMAP_NUMBER";
 
-                    if (shader.fragmentDefines[key] !== number &&
-                        number > 0) {
+                    if (shader.fragmentDefines[key] !== number && number > 0) {
                         shader.fragmentDefines[key] = number;
                         shaderNeedsUpdate = true;
                     }
@@ -378,16 +377,7 @@ define(function(require) {
         _getTexture : function(key, light) {
             var texture = this._textures[key];
             var resolution = light.shadowResolution || 512;
-            var needsUpdate = false;
-            if (texture) {
-                if (texture.width !== resolution) {
-                    texture.dispose();
-                    needsUpdate = true;
-                }
-            } else{
-                needsUpdate = true;
-            }
-            if (needsUpdate) {
+            if (!texture) {
                 if (light instanceof PointLight) {
                     texture = new TextureCube();
                 } else {

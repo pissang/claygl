@@ -92,14 +92,14 @@ varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 varying vec3 v_Weight;
 
+#ifdef SPHERE_ENVIRONMENT_MAPPING
+uniform sampler2D environmentMap;
+#else
 uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
 
-#ifdef SPHERE_ENVIRONMENT_MAPPING
-uniform sampler2D environmentMap;
-#else
 uniform samplerCube environmentMap;
 #endif
 

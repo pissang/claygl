@@ -403,6 +403,17 @@ define(function(require) {
                             semantic : semantic,
                             array : new arrayConstructor(buffer.slice(byteOffset, byteOffset+byteLength))
                         };
+                        if (semantic === 'POSITION') {
+                            // Bounding Box
+                            var min = attributeInfo.min;
+                            var max = attributeInfo.max;
+                            if (min) {
+                                geometry.boundingBox.min.set(min[0], min[1], min[2]);
+                            }
+                            if (max) {
+                                geometry.boundingBox.max.set(max[0], max[1], max[2]);
+                            }
+                        }
                     }
                     geometry.addChunk(chunk);
 

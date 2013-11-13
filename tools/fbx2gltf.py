@@ -43,11 +43,21 @@ def GetId():
     return _id
 
 def CreateAttributeBuffer(pList, pType, pStride):
-    
     lGLTFAttribute = {}
 
-    lType = '<' + pType*pStride
+    lType = '<' + pType * pStride
     lData = []
+    if len(pList) > 0:
+        if pStride == 1:
+            lMin = pList[0]
+            lMax = pList[0]
+        else:
+            lMin = list(pList[0])
+            lMax = list(pList[0])
+    else:
+        lMax = [0] * pStride
+        lMin = [0] * pStride
+    lRange = range(pStride)
     #TODO: Other method to write binary buffer ?
     for item in pList:
         if pStride == 1:
@@ -58,6 +68,13 @@ def CreateAttributeBuffer(pList, pType, pStride):
             lData.append(struct.pack(lType, item[0], item[1], item[2]))
         elif pStride == 4:
             lData.append(struct.pack(lType, item[0], item[1], item[2], item[3]))
+        if pStride == 1:
+            lMin = min(lMin, item)
+            lMax = max(lMin, item)
+        else:
+            for i in lRange:
+                lMin[i] = min(lMin[i], item[i])
+                lMax[i] = max(lMax[i], item[i])
     try:
         lData = b''.join(lData)
         lByteOffset = len(attribute_bin)
@@ -80,8 +97,8 @@ def CreateAttributeBuffer(pList, pType, pStride):
     lGLTFAttribute['byteOffset'] = lByteOffset
     lGLTFAttribute['byteStride'] = lByteStride
     lGLTFAttribute['count'] = lCount
-    lGLTFAttribute['max'] = [1, 1, 1]
-    lGLTFAttribute['min'] = [0, 0, 0]
+    lGLTFAttribute['max'] = lMax
+    lGLTFAttribute['min'] = lMin
 
     lib_attributes[lKey] = lGLTFAttribute
 

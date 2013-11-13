@@ -5,6 +5,7 @@ define(function(require) {
     var Plane = require('./Plane');
     var Matrix4 = require('core/Matrix4');
     var Vector3 = require('core/Vector3');
+    var BoundingBox = require('../BoundingBox');
 
     var planeMatrix = new Matrix4();
     
@@ -48,6 +49,10 @@ define(function(require) {
             });
             cursor += planes[pos].getVerticesNumber();
         }
+
+        this.boundingBox = new BoundingBox();
+        this.boundingBox.max.set(1, 1, 1);
+        this.boundingBox.min.set(-1, -1, -1);
     })
 
     function createPlane(pos, widthSegments, heightSegments) {

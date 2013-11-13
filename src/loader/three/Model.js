@@ -86,7 +86,7 @@ define(function(require) {
                 if (geometry 
                     && geometry.faces.length 
                     && geometry.attributes.position.value.length) {
-
+                    geometry.computeBoundingBox();
                     var material = this.parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],
@@ -120,27 +120,27 @@ define(function(require) {
 
             var faceMaterial = data.materials && data.materials.length > 1;
 
-            var dFaces = data.faces,
-                dVertices = data.vertices,
-                dNormals = data.normals,
-                dColors = data.colors,
-                dSkinIndices = data.skinIndices,
-                dSkinWeights = data.skinWeights,
-                dUvs = data.uvs;
+            var dFaces = data.faces;
+            var dVertices = data.vertices;
+            var dNormals = data.normals;
+            var dColors = data.colors;
+            var dSkinIndices = data.skinIndices;
+            var dSkinWeights = data.skinWeights;
+            var dUvs = data.uvs;
 
             var skinned = dSkinIndices && dSkinIndices.length
                         && dSkinWeights && dSkinWeights.length;
 
-            var geometry = geometryList[0],
-                attributes = geometry.attributes,
-                positions = attributes.position.value,
-                normals = attributes.normal.value,
-                texcoords = [attributes.texcoord0.value,
-                            attributes.texcoord1.value],
-                colors = attributes.color.value,
-                jointIndices = attributes.joint.value,
-                jointWeights = attributes.weight.value,
-                faces = geometry.faces;
+            var geometry = geometryList[0];
+            var attributes = geometry.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
+            var texcoords = [attributes.texcoord0.value,
+                            attributes.texcoord1.value];
+            var colors = attributes.color.value;
+            var jointIndices = attributes.joint.value;
+            var jointWeights = attributes.weight.value;
+            var faces = geometry.faces;
 
             var nUvLayers = 0;
             if (dUvs[0] && dUvs[0].length) {

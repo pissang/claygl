@@ -74,13 +74,11 @@ define(function(require) {
                     continue;
                 }
                 if (uniform.value instanceof Texture) {
-                
                     var texture = uniform.value;
                     // Maybe texture is not loaded yet;
                     if (! texture.isRenderable()) {
                         continue;
                     }
-
                     _gl.activeTexture(_gl.TEXTURE0 + slot);
                     texture.bind(_gl);
 

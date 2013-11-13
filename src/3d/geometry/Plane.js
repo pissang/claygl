@@ -1,7 +1,3 @@
-/*
- * From lightgl
- * https://github.com/evanw/lightgl.js/blob/master/src/mesh.js
- */
 define(function(require) {
 
 	var Geometry = require('../Geometry');
@@ -14,12 +10,12 @@ define(function(require) {
 		}
 	}, function() {
 
-		var heightSegments = this.heightSegments,
-			widthSegments = this.widthSegments,
-			positions = this.attributes.position.value,
-			texcoords = this.attributes.texcoord0.value,
-			normals = this.attributes.normal.value,
-			faces = this.faces;			
+		var heightSegments = this.heightSegments;
+		var widthSegments = this.widthSegments;
+		var positions = this.attributes.position.value;
+		var texcoords = this.attributes.texcoord0.value;
+		var normals = this.attributes.normal.value;
+		var faces = this.faces;			
 
 		for (var y = 0; y <= heightSegments; y++) {
 			var t = y / heightSegments;

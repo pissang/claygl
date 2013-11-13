@@ -26,6 +26,8 @@ define(function(require) {
             culling : true,
             cullFace : glenum.BACK,
             frontFace : glenum.CCW,
+            // Software frustum culling
+            frustumCulling : true,
 
             receiveShadow : true,
             castShadow : true,

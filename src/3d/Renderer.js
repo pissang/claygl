@@ -10,6 +10,8 @@ define(function(require) {
     var glenum = require('./glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
+    var BoundingBox = require('./BoundingBox');
+    var Matrix4 = require('core/Matrix4');
 
     var Renderer = Base.derive(function() {
         return {
@@ -189,13 +191,13 @@ define(function(require) {
 
             // Calculate the object depth
             if (transparentQueue.length > 0) {
-                var modelViewMat = mat4.create();
+                var worldViewMat = mat4.create();
                 var posViewSpace = vec3.create();
                 mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
                 for (var i = 0; i < transparentQueue.length; i++) {
                     var node = transparentQueue[i];
-                    mat4.multiply(modelViewMat, matrices['VIEW'], node.worldTransform._array);
-                    vec3.transformMat4(posViewSpace, node.position._array, modelViewMat);
+                    mat4.multiply(worldViewMat, matrices['VIEW'], node.worldTransform._array);
+                    vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
                     node._depth = posViewSpace[2];
                 }
             }
@@ -288,6 +290,40 @@ define(function(require) {
                 var shader = material.shader;
                 var geometry = renderable.geometry;
 
+                var worldM = renderable.worldTransform._array;
+                // All matrices ralated to world matrix will be updated on demand;
+                mat4.copy(matrices['WORLD'], worldM);
+                mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
+                mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
+                if (shader.matrixSemantics['WORLDINVERSE'] ||
+                    shader.matrixSemantics['WORLDINVERSETRANSPOSE']) {
+                    mat4.invert(matrices['WORLDINVERSE'], worldM);
+                }
+                if (shader.matrixSemantics['WORLDVIEWINVERSE'] ||
+                    shader.matrixSemantics['WORLDVIEWINVERSETRANSPOSE']) {
+                    mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
+                }
+                if (shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSE'] ||
+                    shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
+                    mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
+                }
+                // Frustum culling
+                if (geometry.boundingBox && renderable.frustumCulling) {
+                    cullingMatrix._array = matrices['WORLDVIEWPROJECTION'];
+                    cullingBoundingBox.copy(geometry.boundingBox);
+                    cullingBoundingBox.applyTransform(cullingMatrix);
+
+                    var min = cullingBoundingBox.min._array;
+                    var max = cullingBoundingBox.max._array;
+                    if (
+                        max[0] < -1 || min[0] > 1
+                        || max[1] < -1 || min[1] > 1
+                        || max[2] < -1 || min[2] > 1
+                    ) {
+                        continue;
+                    }
+                }
+                
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
                     var lightNumberChanged = false;
@@ -337,25 +373,6 @@ define(function(require) {
                     }
 
                     Mesh.materialChanged();
-                }
-
-                var worldM = renderable.worldTransform._array;
-
-                // All matrices ralated to world matrix will be updated on demand;
-                mat4.copy(matrices['WORLD'], worldM);
-                mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
-                mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
-                if (shader.matrixSemantics['WORLDINVERSE'] ||
-                    shader.matrixSemantics['WORLDINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDINVERSE'], worldM);
-                }
-                if (shader.matrixSemantics['WORLDVIEWINVERSE'] ||
-                    shader.matrixSemantics['WORLDVIEWINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
-                }
-                if (shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSE'] ||
-                    shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
 
                 for (var semantic in shader.matrixSemantics) {
@@ -455,7 +472,7 @@ define(function(require) {
         }
     })
 
-
+    // Temporary variables
     var matrices = {
         'WORLD' : mat4.create(),
         'VIEW' : mat4.create(),
@@ -484,6 +501,8 @@ define(function(require) {
         'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
+    var cullingBoundingBox = new BoundingBox();
+    var cullingMatrix = new Matrix4();
 
     Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT
     Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT

@@ -4,6 +4,7 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
+    var BoundingBox = require('../BoundingBox');
 
 	// From three.js SphereGeometry
 	var Sphere = Geometry.derive(function() {
@@ -40,7 +41,6 @@ define(function(require) {
         var thetaLength = this.thetaLength;
         var radius = this.radius;
 
-
         for (j = 0; j <= heightSegments; j ++) {
             for (i = 0; i <= widthSegments; i ++) {
                 u = i / widthSegments;
@@ -75,6 +75,10 @@ define(function(require) {
                 faces.push(vec3.fromValues(i3, i4, i1));
             }
         }
+
+        this.boundingBox = new BoundingBox();
+        this.boundingBox.max.set(radius, radius, radius);
+        this.boundingBox.min.set(-radius, -radius, -radius);
 	})
 
     return Sphere;
