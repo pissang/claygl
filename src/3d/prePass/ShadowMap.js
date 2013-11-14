@@ -214,6 +214,10 @@ define(function(require) {
 
             this._update(scene);
 
+            if (!this._lightCastShadow.length) {
+                return;
+            }
+
             _gl.enable(_gl.DEPTH_TEST);
             _gl.depthMask(true);
             _gl.disable(_gl.BLEND);
@@ -389,6 +393,7 @@ define(function(require) {
                     texture.wrapT = glenum.MIRRORED_REPEAT;
                     texture.wrapS = glenum.MIRRORED_REPEAT;
                     texture.type = glenum.FLOAT;
+                    texture.anisotropic = 4;
                 } else {
                     texture.minFilter = glenum.NEAREST;
                     texture.magFilter = glenum.NEAREST;

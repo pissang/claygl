@@ -375,7 +375,9 @@ define(function(require) {
                     Mesh.materialChanged();
                 }
 
-                for (var semantic in shader.matrixSemantics) {
+                var matrixSemanticKeys = shader.matrixSemanticKeys;
+                for (var k = 0; k < matrixSemanticKeys.length; k++) {
+                    var semantic = matrixSemanticKeys[k];
                     var semanticInfo = shader.matrixSemantics[semantic];
                     var matrix = matrices[semantic];
                     if (semanticInfo.isTranspose) {

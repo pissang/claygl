@@ -160,9 +160,13 @@ def HashTechnique(pMaterial):
 
 _techniqueHashMap = {}
 def CreateTechnique(pMaterial):
-    lHashKey = HashTechnique(pMaterial)
-    if lHashKey in _techniqueHashMap.keys():
-        return _techniqueHashMap[lHashKey]
+    if pMaterial.ShadingModel.Get() == 'unknown':
+        print('Shading model of ' + pMaterial.GetName() + ' is unknown')
+        lHashKey = 'technique_unknown'
+    else:
+        lHashKey = HashTechnique(pMaterial)
+        if lHashKey in _techniqueHashMap.keys():
+            return _techniqueHashMap[lHashKey]
 
     lTechniqueName = 'technique_' + str(len(lib_techniques.keys()))
     _techniqueHashMap[lHashKey] = lTechniqueName
@@ -189,18 +193,21 @@ def CreateTechnique(pMaterial):
         }
     }
     # Enable blend
-    if pMaterial.TransparencyFactor.Get() > 0:
-        lStates = lGLTFTechnique['passes']['defaultPass']['states']
-        lStates['blendEnable'] = True
-        lStates['blendEquation'] = 'FUNC_ADD'
-        lStates['blendFunc'] = {
-            'dfactor' : 'ONE_MINUS_SRC_ALPHA',
-            'sfactor' : 'SRC_ALPHA'
-        }
-        lStates['depthMask'] = False
-        lStates['depthTestEnable'] = True
+    try :
+        if pMaterial.TransparencyFactor.Get() > 0:
+            lStates = lGLTFTechnique['passes']['defaultPass']['states']
+            lStates['blendEnable'] = True
+            lStates['blendEquation'] = 'FUNC_ADD'
+            lStates['blendFunc'] = {
+                'dfactor' : 'ONE_MINUS_SRC_ALPHA',
+                'sfactor' : 'SRC_ALPHA'
+            }
+            lStates['depthMask'] = False
+            lStates['depthTestEnable'] = True
 
-    lib_techniques[lTechniqueName] = lGLTFTechnique
+        lib_techniques[lTechniqueName] = lGLTFTechnique
+    except:
+        pass
 
     return lTechniqueName
 
@@ -247,6 +254,7 @@ def CreateSampler(pTexture):
         return lSamplerName
 
 _textureHashMap = {}
+_repeatTextureCount = {}
 def CreateTexture(pProperty):
     lTextureList = []
     lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
@@ -265,6 +273,13 @@ def CreateTexture(pProperty):
                     lTextureList.append(_textureHashMap[lHashKey])
                 else:
                     lTextureName = lTexture.GetName()
+                    # Map name may be repeat
+                    if lTextureName in lib_textures.keys():
+                        if not lTextureName in _repeatTextureCount.keys():
+                            _repeatTextureCount[lTextureName] = 0;
+                        else:
+                            _repeatTextureCount[lTextureName]+=1;
+                        lTextureName = lTextureName + '_' + str(_repeatTextureCount[lTextureName])
                     lib_textures[lTextureName] ={
                         'format' : 'RGBA',
                         'internalFormat' : 'RGBA',
@@ -288,6 +303,7 @@ def ConvertMaterial(pMaterial):
         return lKey
 
     lGLTFMaterial = {"name" : lMaterialName}
+
     # PENDING Multiple techniques ?
     lTechniqueName = CreateTechnique(pMaterial)
     lGLTFMaterial["instanceTechnique"] = {
@@ -297,6 +313,10 @@ def ConvertMaterial(pMaterial):
     lValues = lGLTFMaterial['instanceTechnique']['values']
 
     lShading = pMaterial.ShadingModel.Get()
+
+    if (lShading == 'unknown'):
+        lib_materials[lKey] = lGLTFMaterial
+        return lKey
 
     lValues.append({
         'parameter' : 'ambient',
@@ -652,7 +672,7 @@ def TraverseSceneNode(pNode):
 
         lGeometry = converter.Triangulate(lGeometry, True)
         # FIXME SplitMeshPerMaterial may loss deformer in mesh
-        # lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
 
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
@@ -749,6 +769,7 @@ if __name__ == "__main__":
     # Load the scene.
     if len(sys.argv) > 1:
         lResult = LoadScene(lSdkManager, lScene, sys.argv[1])
+
     else:
         lResult = False
         print("\n\nUsage: fbx2gltf <FBX file name>\n")

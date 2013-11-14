@@ -315,23 +315,23 @@ define(function(require) {
                         material.set("diffuseMap", uniforms["diffuse"]);
                     }
                 }
-                if (uniforms['normalMap']) {
+                if (uniforms['normalMap'] !== undefined) {
                     material.shader.enableTexture("normalMap");
                     material.set("normalMap", uniforms["normalMap"]);
                 }
-                if (uniforms['emission']) {
+                if (uniforms['emission'] !== undefined) {
                     var diffuseColor = material.get('color');
                     vec4.add(diffuseColor, diffuseColor, uniforms['emission']);
                 }
-                if (uniforms['shininess']) {
+                if (uniforms['shininess'] !== undefined) {
                     material.set("shininess", uniforms["shininess"]);
                 } else {
                     material.set("shininess", 0);
                 }
-                if (uniforms["specular"]) {
+                if (uniforms["specular"] !== undefined) {
                     material.set("specular", uniforms["specular"].slice(0, 3));
                 }
-                if (uniforms["transparency"]) {
+                if (uniforms["transparency"] !== undefined) {
                     material.set("alpha", uniforms["transparency"]);
                 }
 
@@ -416,7 +416,7 @@ define(function(require) {
                         }
                     }
                     geometry.addChunk(chunk);
-
+                    
                     var material = lib.materials[primitiveInfo.material];
                     var mesh = new Mesh({
                         geometry : geometry,

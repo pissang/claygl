@@ -11,6 +11,10 @@ define(function(require) {
     var prevDrawIndicesBuffer = null;
     var prevDrawIsUseFace = true;
 
+    var vertexNumber, faceNumber, drawCallNumber;
+    var needsBindAttributes;
+    var currentDrawID;
+
     var Mesh = Node.derive(function() {
         return {
             
@@ -55,15 +59,15 @@ define(function(require) {
                 shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
             }
 
-            var vertexNumber = geometry.getVerticesNumber();
-            var faceNumber = 0;
-            var drawCallNumber = 0;
+            vertexNumber = geometry.getVerticesNumber();
+            faceNumber = 0;
+            drawCallNumber = 0;
             // Draw each chunk
-            var needsBindAttributes = false;
+            needsBindAttributes = false;
             if (vertexNumber > geometry.chunkSize) {
                 needsBindAttributes = true;
             } else {
-                var currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__;
+                currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__;
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                     prevDrawID = currentDrawID;
