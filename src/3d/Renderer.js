@@ -198,7 +198,7 @@ define(function(require) {
                     var node = transparentQueue[i];
                     mat4.multiply(worldViewMat, matrices['VIEW'], node.worldTransform._array);
                     vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
-                    node._depth = posViewSpace[2];
+                    node.__depth = posViewSpace[2];
                 }
             }
             transparentQueue = transparentQueue.sort(this._depthSortFunc);
@@ -462,7 +462,7 @@ define(function(require) {
             return x.material.shader.__GUID__ - y.material.shader.__GUID__;
         },
         _depthSortFunc : function(x, y) {
-            if (x._depth === y._depth) {
+            if (x.__depth === y.__depth) {
                 if (x.material.shader === y.material.shader) {
                     return x.material.__GUID__ - y.material.__GUID__;
                 }
@@ -470,7 +470,7 @@ define(function(require) {
             }
             // Depth is negative because of right hand coord
             // So farther object has smaller depth value
-            return x._depth - y._depth
+            return x.__depth - y.__depth
         }
     })
 

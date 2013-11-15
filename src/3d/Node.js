@@ -47,8 +47,9 @@ define(function(require) {
 
             _children : [],
             _needsUpdateWorldTransform : true,
-            // Its for transparent queue sorting
-            _depth : 0
+
+            // Depth for transparent queue sorting
+            __depth : 0
         }
     }, {
 

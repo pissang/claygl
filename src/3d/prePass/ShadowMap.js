@@ -175,6 +175,8 @@ define(function(require) {
                     }
                     if (child.receiveShadow) {
                         this._meshReceiveShadow.push(child);
+                        child.material.__shadowUniformUpdated = false;
+                        child.material.shader.__shadowDefineUpdated = false;
                         child.material.set('shadowEnabled', 1);
                     } else {
                         child.material.set('shadowEnabled', 0);
@@ -320,33 +322,37 @@ define(function(require) {
             for (var i = 0; i < this._meshReceiveShadow.length; i++) {
                 var mesh = this._meshReceiveShadow[i];
                 var material = mesh.material;
-
+                if (material.__shadowUniformUpdated) {
+                    continue;
+                }
                 var shader = material.shader;
 
-                var shaderNeedsUpdate = false;
-                for (var lightType in this._shadowMapNumber) {
-                    var number = this._shadowMapNumber[lightType];
-                    var key = lightType + "_SHADOWMAP_NUMBER";
+                if (!shader.__shadowDefineUpdated) {
+                    var shaderNeedsUpdate = false;
+                    for (var lightType in this._shadowMapNumber) {
+                        var number = this._shadowMapNumber[lightType];
+                        var key = lightType + "_SHADOWMAP_NUMBER";
 
-                    if (shader.fragmentDefines[key] !== number && number > 0) {
-                        shader.fragmentDefines[key] = number;
-                        shaderNeedsUpdate = true;
+                        if (shader.fragmentDefines[key] !== number && number > 0) {
+                            shader.fragmentDefines[key] = number;
+                            shaderNeedsUpdate = true;
+                        }
                     }
-                }
-                if (shaderNeedsUpdate) {
-                    shader.dirty();
+                    if (shaderNeedsUpdate) {
+                        shader.dirty();
+                    }
+                    shader.__shadowDefineUpdated = true;
                 }
 
-                material.set({
-                    "spotLightShadowMaps" : spotLightShadowMaps,
-                    "spotLightMatrices" : spotLightMatrices,
-                    "spotLightBiases" : spotLightBiases,
-                    "directionalLightShadowMaps" : directionalLightShadowMaps,
-                    "directionalLightBiases" : directionalLightBiases,
-                    "directionalLightMatrices" : directionalLightMatrices,
-                    "pointLightShadowMaps" : pointLightShadowMaps,
-                    "pointLightRanges" : pointLightRanges
-                });
+                material.setUniform("spotLightShadowMaps", spotLightShadowMaps);
+                material.setUniform("spotLightMatrices", spotLightMatrices);
+                material.setUniform("spotLightBiases", spotLightBiases);
+                material.setUniform("directionalLightShadowMaps", directionalLightShadowMaps);
+                material.setUniform("directionalLightBiases", directionalLightBiases);
+                material.setUniform("directionalLightMatrices", directionalLightMatrices);
+                material.setUniform("pointLightShadowMaps", pointLightShadowMaps);
+                material.setUniform("pointLightRanges", pointLightRanges);
+                material.__shadowUniformUpdated = true;
             }
         },
 

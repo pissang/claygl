@@ -115,6 +115,21 @@ define(function(require) {
             }
         },
 
+        setUniform : function(symbol, value) {
+            var uniform = this.uniforms[symbol];
+            if (uniform) {
+                uniform.value = value;
+            }
+        },
+
+        setUniforms : function(object) {
+            for (var key in symbol) {
+                var val = symbol[key];
+                this.setUniform(key, val);
+            }
+        },
+
+        // Alias of setUniform and setUniforms
         set : function(symbol, value) {
             if (typeof(symbol) === 'object') {
                 for (var key in symbol) {
@@ -125,8 +140,6 @@ define(function(require) {
                 var uniform = this.uniforms[symbol];
                 if (uniform) {
                     uniform.value = value;
-                } else {
-                    // console.warn('Uniform "'+symbol+'" not exist');
                 }
             }
         },

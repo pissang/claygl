@@ -272,7 +272,7 @@ def CreateTexture(pProperty):
             if lTexture and lTexture.__class__ == FbxFileTexture:
                 lImageName = CreateImage(lTexture.GetFileName())
                 lSamplerName = CreateSampler(lTexture)
-                lHashKey = lImageName + lSamplerName
+                lHashKey = (lImageName, lSamplerName)
                 if lHashKey in _textureHashMap.keys():
                     lTextureList.append(_textureHashMap[lHashKey])
                 else:
@@ -386,7 +386,7 @@ def ConvertMaterial(pMaterial):
     for lValue in lValues:
         lHashKey.append(lValue['parameter'])
         lHashKey.append(str(lValue['value']))
-    lHashKey = ':'.join(lHashKey)
+    lHashKey = tuple(lHashKey)
     if lHashKey in _materialHashMap.keys():
         return lMaterialName
 
