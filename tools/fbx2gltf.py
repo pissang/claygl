@@ -137,6 +137,9 @@ def CreateIndicesBuffer(pList):
 # TODO Cull face
 # TODO Blending equation and function
 def HashTechnique(pMaterial):
+    if (pMaterial.ShadingModel.Get() == 'unknown'):
+        return ''
+
     lHashStr = []
     # Is Transparent
     lHashStr.append(str(pMaterial.TransparencyFactor.Get() > 0))
@@ -229,7 +232,7 @@ def HashSampler(pTexture):
     lHashStr.append(str(pTexture.WrapModeU.Get()))
     # Wrap T
     lHashStr.append(str(pTexture.WrapModeV.Get()))
-    return ''.join(lHashStr)
+    return ' '.join(lHashStr)
 
 def ConvertWrapMode(pWrap):
     if pWrap == FbxTexture.eRepeat:
@@ -251,10 +254,11 @@ def CreateSampler(pTexture):
             'minFilter' : 'LINEAR_MIPMAP_LINEAR',
             'magFilter' : 'LINEAR'
         }
+        _samplerHashMap[lHashKey] = lSamplerName
         return lSamplerName
 
 _textureHashMap = {}
-_repeatTextureCount = {}
+_repeatedTextureCount = {}
 def CreateTexture(pProperty):
     lTextureList = []
     lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
@@ -274,12 +278,12 @@ def CreateTexture(pProperty):
                 else:
                     lTextureName = lTexture.GetName()
                     # Map name may be repeat
-                    if lTextureName in lib_textures.keys():
-                        if not lTextureName in _repeatTextureCount.keys():
-                            _repeatTextureCount[lTextureName] = 0;
+                    while lTextureName in lib_textures.keys():
+                        if not lTextureName in _repeatedTextureCount.keys():
+                            _repeatedTextureCount[lTextureName] = 0
                         else:
-                            _repeatTextureCount[lTextureName]+=1;
-                        lTextureName = lTextureName + '_' + str(_repeatTextureCount[lTextureName])
+                            _repeatedTextureCount[lTextureName] += 1
+                        lTextureName = lTextureName + '_' + str(_repeatedTextureCount[lTextureName])
                     lib_textures[lTextureName] ={
                         'format' : 'RGBA',
                         'internalFormat' : 'RGBA',
@@ -296,11 +300,10 @@ def CreateTexture(pProperty):
     else:
         return None
 
+_materialHashMap = {}
+_repeatedMaterialCount = {}
 def ConvertMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
-    lKey = lMaterialName
-    if lKey in lib_materials.keys():
-        return lKey
 
     lGLTFMaterial = {"name" : lMaterialName}
 
@@ -315,8 +318,8 @@ def ConvertMaterial(pMaterial):
     lShading = pMaterial.ShadingModel.Get()
 
     if (lShading == 'unknown'):
-        lib_materials[lKey] = lGLTFMaterial
-        return lKey
+        lib_materials[lMaterialName] = lGLTFMaterial
+        return lMaterialName
 
     lValues.append({
         'parameter' : 'ambient',
@@ -378,8 +381,26 @@ def ConvertMaterial(pMaterial):
                 'value' : list(pMaterial.Specular.Get())
             })
 
-    lib_materials[lKey] = lGLTFMaterial
-    return lKey
+    # Material name of different material may be same after SplitMeshByMaterial
+    lHashKey = [lMaterialName]
+    for lValue in lValues:
+        lHashKey.append(lValue['parameter'])
+        lHashKey.append(str(lValue['value']))
+    lHashKey = ':'.join(lHashKey)
+    if lHashKey in _materialHashMap.keys():
+        return lMaterialName
+
+    while lMaterialName in lib_materials.keys():
+        if not lMaterialName in _repeatedMaterialCount.keys():
+            _repeatedMaterialCount[lMaterialName] = 0
+        else:
+            _repeatedMaterialCount[lMaterialName] += 1
+        lMaterialName = lMaterialName + '_' + str(_repeatedMaterialCount[lMaterialName])
+    _materialHashMap[lHashKey] =  lMaterialName
+
+    lGLTFMaterial['name'] = lMaterialName
+    lib_materials[lMaterialName] = lGLTFMaterial
+    return lMaterialName
 
 def ConvertVertexLayer(pMesh, pLayer, pOutput):
     lMappingMode = pLayer.GetMappingMode()
