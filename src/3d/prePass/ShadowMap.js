@@ -28,7 +28,17 @@ define(function(require) {
 
     Shader.import(require('text!./shadowmap.essl'));
 
-    var ShadowMapPlugin = Base.derive(function() {
+    var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+    var targetMap = {
+        'px' : glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
+        'py' : glenum.TEXTURE_CUBE_MAP_POSITIVE_Y,
+        'pz' : glenum.TEXTURE_CUBE_MAP_POSITIVE_Z,
+        'nx' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
+        'ny' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+    }
+
+    var ShadowMapPass = Base.derive(function() {
         return {
             useVSM : false,
 
@@ -227,15 +237,6 @@ define(function(require) {
             _gl.clearColor(0.0, 0.0, 0.0, 0.0);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
-            var targetMap = {
-                'px' : _gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-                'py' : _gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-                'pz' : _gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-                'nx' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-                'ny' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-                'nz' : _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-            }
             var cursor = 0;
 
             // Shadow uniforms
@@ -446,22 +447,22 @@ define(function(require) {
                 camera.position.set(0, 0, 0);
                 switch (target) {
                     case 'px':
-                        camera.lookAt(px, ny);
+                        camera.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
                         break;
                     case 'nx':
-                        camera.lookAt(nx, ny);
+                        camera.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
                         break;
                     case 'py':
-                        camera.lookAt(py, pz);
+                        camera.lookAt(Vector3.POSITIVE_Y, Vector3.POSITIVE_Z);
                         break;
                     case 'ny':
-                        camera.lookAt(ny, nz);
+                        camera.lookAt(Vector3.NEGATIVE_Y, Vector3.NEGATIVE_Z);
                         break;
                     case 'pz':
-                        camera.lookAt(pz, ny);
+                        camera.lookAt(Vector3.POSITIVE_Z, Vector3.NEGATIVE_Y);
                         break;
                     case 'nz':
-                        camera.lookAt(nz, ny);
+                        camera.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
                         break;
                 }
                 camera.position.copy(light.position);
@@ -518,12 +519,5 @@ define(function(require) {
         }
     });
     
-    var px = new Vector3(1, 0, 0);
-    var nx = new Vector3(-1, 0, 0);
-    var py = new Vector3(0, 1, 0);
-    var ny = new Vector3(0, -1, 0);
-    var pz = new Vector3(0, 0, 1);
-    var nz = new Vector3(0, 0, -1);
-
-    return ShadowMapPlugin;
+    return ShadowMapPass;
 })

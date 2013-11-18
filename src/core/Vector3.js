@@ -242,6 +242,14 @@ define(function(require) {
         return Math.min( Math.max( x, -1 ), 1 );
     }
 
-    return Vector3;
+    Vector3.POSITIVE_X = new Vector3(1, 0, 0);
+    Vector3.NEGATIVE_X = new Vector3(-1, 0, 0);
+    Vector3.POSITIVE_Y = new Vector3(0, 1, 0);
+    Vector3.NEGATIVE_Y = new Vector3(0, -1, 0);
+    Vector3.POSITIVE_Z = new Vector3(0, 0, 1);
+    Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
 
+    Vector3.UP = new Vector3(0, 1, 0);
+
+    return Vector3;
 } )

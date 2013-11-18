@@ -42,10 +42,7 @@ define(function(require) {
 
             viewportInfo : {},
 
-            _scene : null,
-            _transparentQueue : [],
-            _opaqueQueue : [],
-            _lights : []
+            _scene : null
         }
     }, function() {
         if (! this.canvas) {
@@ -106,32 +103,6 @@ define(function(require) {
             }
         },
 
-        // Traverse the scene and add the renderable
-        // object to the render queue;
-        _updateRenderQueue : function(parent, sceneMaterialTransparent) {
-            for (var i = 0; i < parent._children.length; i++) {
-                var child = parent._children[i];
-                if (!child.visible) {
-                    continue;
-                }
-                if (child instanceof Light) {
-                    this._lights.push(child);
-                }
-                // A node have render method and material property
-                // is treat as a renderable object
-                if (child.render && child.geometry && child.material && child.material.shader ) {
-                    if (child.material.transparent || sceneMaterialTransparent) {
-                        this._transparentQueue.push(child);
-                    } else {
-                        this._opaqueQueue.push(child);
-                    }
-                }
-                if (child._children.length > 0) {
-                    this._updateRenderQueue(child);
-                }
-            }
-        },
-
         render : function(scene, camera, silent) {
             var _gl = this.gl;
             
@@ -149,30 +120,26 @@ define(function(require) {
             camera.update(false);
             scene.update(false);
 
-            var opaqueQueue = this._opaqueQueue;
-            var transparentQueue = this._transparentQueue;
-            var lights = this._lights;
+            var opaqueQueue = scene.opaqueQueue;
+            var transparentQueue = scene.transparentQueue;
             var sceneMaterial = scene.material;
-            var sceneMaterialTransparent = sceneMaterial && sceneMaterial.transparent;
-            transparentQueue.length = 0;
-            opaqueQueue.length = 0;
-            lights.length = 0;
 
-            this._updateRenderQueue(scene, sceneMaterialTransparent);
-
-            var lightNumber = scene.lightNumber;
-            // reset
-            for (type in lightNumber) {
-                lightNumber[type] = 0;
+            // Sort render queue
+            // Calculate the object depth
+            if (transparentQueue.length > 0) {
+                var worldViewMat = mat4.create();
+                var posViewSpace = vec3.create();
+                mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
+                for (var i = 0; i < transparentQueue.length; i++) {
+                    var node = transparentQueue[i];
+                    mat4.multiply(worldViewMat, matrices['VIEW'], node.worldTransform._array);
+                    vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
+                    node.__depth = posViewSpace[2];
+                }
             }
-            for (var i = 0; i < lights.length; i++) {
-                var light = lights[i];
-                lightNumber[light.type]++;
-            }
-            this.updateLightUnforms(lights);
+            opaqueQueue.sort(_materialSortFunc);
+            transparentQueue.sort(_depthSortFunc);
 
-            // Sort material to reduce the cost of setting uniform in material
-            opaqueQueue.sort(this._materialSortFunc);
             // Render Opaque queue
             if (! silent) {
                 this.trigger("beforerender:opaque", [this, opaqueQueue]);
@@ -188,20 +155,6 @@ define(function(require) {
 
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
-
-            // Calculate the object depth
-            if (transparentQueue.length > 0) {
-                var worldViewMat = mat4.create();
-                var posViewSpace = vec3.create();
-                mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
-                for (var i = 0; i < transparentQueue.length; i++) {
-                    var node = transparentQueue[i];
-                    mat4.multiply(worldViewMat, matrices['VIEW'], node.worldTransform._array);
-                    vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
-                    node.__depth = posViewSpace[2];
-                }
-            }
-            transparentQueue = transparentQueue.sort(this._depthSortFunc);
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
@@ -215,47 +168,6 @@ define(function(require) {
                 this.trigger("afterrender", [this, scene, camera, renderInfo]);
             }
             return renderInfo;
-        },
-
-        updateLightUnforms : function(lights) {
-            
-            var lightUniforms = this._scene.lightUniforms;
-            for (var symbol in lightUniforms) {
-                lightUniforms[symbol].value.length = 0;
-            }
-            for (var i = 0; i < lights.length; i++) {
-                
-                var light = lights[i];
-                
-                for (symbol in light.uniformTemplates) {
-
-                    var uniformTpl = light.uniformTemplates[symbol];
-                    if (! lightUniforms[symbol]) {
-                        lightUniforms[symbol] = {
-                            type : "",
-                            value : []
-                        }
-                    }
-                    var value = uniformTpl.value(light);
-                    var lu = lightUniforms[symbol];
-                    lu.type = uniformTpl.type + "v";
-                    switch (uniformTpl.type) {
-                        case "1i":
-                        case "1f":
-                            lu.value.push(value);
-                            break;
-                        case "2f":
-                        case "3f":
-                        case "4f":
-                            for (var j =0; j < value.length; j++) {
-                                lu.value.push(value[j]);
-                            }
-                            break;
-                        default:
-                            console.error("Unkown light uniform type "+uniformTpl.type);
-                    }
-                }
-            }
         },
 
         renderQueue : function(queue, camera, globalMaterial, silent) {
@@ -414,10 +326,7 @@ define(function(require) {
 
         disposeScene : function(scene) {
             this.disposeNode(scene);
-            scene.lightNumber = {};
-            scene.lightUniforms = {};
-            scene.material = {};
-            scene._nodeRepository = {};
+            scene.dispose();
         },
 
         disposeNode : function(root) {
@@ -453,26 +362,26 @@ define(function(require) {
                 mat.dispose();
             }
             root._children = [];
-        },
+        }
+    })
 
-        _materialSortFunc : function(x, y) {
+    function _materialSortFunc(x, y) {
+        if (x.material.shader === y.material.shader) {
+            return x.material.__GUID__ - y.material.__GUID__;
+        }
+        return x.material.shader.__GUID__ - y.material.shader.__GUID__;
+    }
+    function _depthSortFunc(x, y) {
+        if (x.__depth === y.__depth) {
             if (x.material.shader === y.material.shader) {
                 return x.material.__GUID__ - y.material.__GUID__;
             }
             return x.material.shader.__GUID__ - y.material.shader.__GUID__;
-        },
-        _depthSortFunc : function(x, y) {
-            if (x.__depth === y.__depth) {
-                if (x.material.shader === y.material.shader) {
-                    return x.material.__GUID__ - y.material.__GUID__;
-                }
-                return x.material.shader.__GUID__ - y.material.shader.__GUID__;
-            }
-            // Depth is negative because of right hand coord
-            // So farther object has smaller depth value
-            return x.__depth - y.__depth
         }
-    })
+        // Depth is negative because of right hand coord
+        // So farther object has smaller depth value
+        return x.__depth - y.__depth
+    }
 
     // Temporary variables
     var matrices = {

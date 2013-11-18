@@ -62,10 +62,10 @@ define(function(require) {
             var shader = new Shader({
                 "vertex" : source.vertex,
                 "fragment" : source.fragment
-            })
-            _.each(enabledTextures, function(symbol) {
-                shader.enableTexture(symbol);
             });
+            for (var i = 0; i < enabledTextures.length; i++) {
+                shader.enableTexture(enabledTextures[i]);
+            }
             for (var name in vertexDefines) {
                 shader.define('vertex', name, vertexDefines[name]);
             }

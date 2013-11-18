@@ -153,9 +153,14 @@ define(function(require) {
             }
         },
 
-        attachShader : function(shader) {
+        attachShader : function(shader, keepUniform) {
+            var originalUniforms = this.uniforms;
             this.uniforms = shader.createUniforms();
             this.shader = shader;
+            
+            if (keepUniform) {
+                this.setUniforms(originalUniforms);
+            }
         },
 
         detachShader : function() {

@@ -12,6 +12,7 @@ define(function(require) {
     var Material = require("3d/Material");
     var Mesh = require("3d/Mesh");
     var Node = require("3d/Node");
+    var Texture = require('3d/Texture');
     var Texture2D = require("3d/texture/Texture2D");
     var TextureCube = require("3d/texture/TextureCube");
     var shaderLibrary = require("3d/shader/library");
@@ -284,15 +285,16 @@ define(function(require) {
                     }
                     uniforms[item.parameter] = value;
                 });
+                var enabledTextures = [];
+                if (uniforms['diffuse'] instanceof Texture2D) {
+                    enabledTextures.push('diffuseMap');
+                }
+                if (uniforms['normalMap'] instanceof Texture2D) {
+                    enabledTextures.push('normalMap');
+                }
                 var material = new Material({
                     name : materialInfo.name,
-                    // shader : technique.shader
-                    // Techniques of glTF is not classified well
-                    // So here use a shader per material
-                    shader : new Shader({
-                        vertex : Shader.source("buildin.phong.vertex"),
-                        fragment : Shader.source("buildin.phong.fragment")
-                    })
+                    shader : shaderLibrary.get('buildin.phong', enabledTextures)
                 });
                 if (pass.states.depthMask !== undefined) {
                     material.depthMask = pass.states.depthMask;
@@ -311,12 +313,10 @@ define(function(require) {
                     if (uniforms['diffuse'] instanceof Array) {
                         material.set("color", uniforms['diffuse'].slice(0, 3));
                     } else { // Texture
-                        material.shader.enableTexture("diffuseMap");
                         material.set("diffuseMap", uniforms["diffuse"]);
                     }
                 }
                 if (uniforms['normalMap'] !== undefined) {
-                    material.shader.enableTexture("normalMap");
                     material.set("normalMap", uniforms["normalMap"]);
                 }
                 if (uniforms['emission'] !== undefined) {
@@ -416,7 +416,7 @@ define(function(require) {
                         }
                     }
                     geometry.addChunk(chunk);
-                    
+
                     var material = lib.materials[primitiveInfo.material];
                     var mesh = new Mesh({
                         geometry : geometry,
@@ -431,9 +431,13 @@ define(function(require) {
                         material.shader.define('vertex', 'SKINNING');
                         material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
                     }
-
                     if (meshInfo.name) {
-                        mesh.name = [meshInfo.name, i].join('-');
+                        if (meshInfo.primitives.length > 1) {
+                            mesh.name = [meshInfo.name, i].join('-');
+                        }
+                        else {
+                            mesh.name = meshInfo.name;
+                        }
                     }
 
                     lib.meshes[name].push(mesh);
