@@ -2,6 +2,7 @@
     <head>
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
         <style type="text/css">
 
             #Timeline{
@@ -16,13 +17,6 @@
         <canvas id="Main"></canvas>
         <input type="range" id="Timeline" min="0" value="0" step="0.01"/>
         <script type="text/javascript">
-            requirejs.config({
-                'baseUrl' : '../src',
-                'paths' : {
-                    '_' : '../thirdparty/lodash.compat',
-                    'glmatrix' : '../thirdparty/gl-matrix'
-                }
-            })
             function createSkeletonDebugScene(skeleton, qtek) {
                 var qtek3d = qtek['3d'];
                 var scene = new qtek3d.Scene();

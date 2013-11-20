@@ -216,7 +216,7 @@ float chebyshevUpperBound(vec2 moments, float z){
     float pMax = variance / (variance + mD * mD);
     // Now reduce light-bleeding by removing the [0, x] tail and linearly rescaling (x, 1]
     // TODO : bleedBias parameter ?
-    pMax = clamp((pMax-0.5)/(1.0-0.5), 0.0, 1.0);
+    pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);
     return max(p, pMax);
 }
 float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bias){
@@ -225,8 +225,8 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bi
     posInLightSpace.xyz /= posInLightSpace.w;
     float z = posInLightSpace.z;
     // In frustum
-    if(all(greaterThan(posInLightSpace.xyz, vec3(-1.0))) &&
-        all(lessThan(posInLightSpace.xyz, vec3(1.0)))){
+    if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&
+        all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){
         // To texture uv
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
 

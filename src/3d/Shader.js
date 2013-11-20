@@ -772,6 +772,9 @@ define(function(require) {
                 }
                 _gl.linkProgram(program);
 
+                if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
+                    throw new Error("Could not initialize shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]");
+                }
                 // Cache uniform locations
                 for (var i = 0; i < this._uniformList.length; i++) {
                     var uniformSymbol = this._uniformList[i];
@@ -779,9 +782,6 @@ define(function(require) {
                     locationsMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
                 }
 
-                if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-                    throw new Error("Could not initialize shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]");
-                }
             } catch(e) {
                 if (errorShader[this.__GUID__]) {
                     return;

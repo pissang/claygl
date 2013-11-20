@@ -2,18 +2,11 @@
     <head>
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
-            requirejs.config({
-                'baseUrl' : '../src',
-                'paths' : {
-                    '_' : '../thirdparty/lodash.compat',
-                    'glmatrix' : '../thirdparty/gl-matrix'
-                }
-            })
-
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
                 var qtek3d = qtek['3d'];
@@ -89,13 +82,8 @@
 
                 renderer.render(scene, camera);
                 animation.on('frame', function() {
-                // setInterval(function() {
-                    // scene.childAt(0).material.get('diffuseMap').dirty();
-                    // scene.childAt(0).material.get('normalMap').dirty();
-                    // scene.childAt(0).material.get('environmentMap').dirty();
                     renderer.render(scene, camera);
                 });
-                // }, 1000);
             })
             
         </script>

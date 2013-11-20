@@ -31,12 +31,10 @@ define(function(require) {
 
             this.cache.put("viewport", renderer.viewportInfo);
             renderer.setViewport(0, 0, this._width, this._height);
-
             // Create a new render buffer
             if (this.cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
                 this.cache.put("renderbuffer", _gl.createRenderbuffer());
             }
-
             if (! this._depthTextureAttached && this.depthBuffer) {
 
                 var width = this._width;
@@ -45,13 +43,10 @@ define(function(require) {
 
                 if (width !== this._renderBufferWidth
                      || height !== this._renderBufferHeight) {
-
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, renderbuffer);
-                    
                     _gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, width, height);
                     this._renderBufferWidth = width;
-                    this._renderBUfferHeight = height;
-
+                    this._renderBufferHeight = height;
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
                 }
                 if (! this.cache.get("renderbuffer_attached")) {
@@ -80,7 +75,7 @@ define(function(require) {
             // Here update the mipmaps of texture each time after rendered;
             for (var attachment in this._attachedTextures) {
                 var texture = this._attachedTextures[attachment];
-                if (! texture.NPOT && texture.useMipmap) {
+                if (! texture.NPOT && texture.useMipmaps) {
                     var target = texture instanceof TextureCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                     _gl.generateMipmap(target);
@@ -135,7 +130,7 @@ define(function(require) {
                 this._depthTextureAttached = true;
             }
 
-            this._attachedTextures[ attachment ] = texture;
+            this._attachedTextures[attachment] = texture;
 
             _gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), 0)
 

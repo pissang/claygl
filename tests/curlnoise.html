@@ -3,18 +3,11 @@
     <title></title>
     <meta charset="utf-8">
     <script type="text/javascript" src="../thirdparty/require.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
 </head>
 <body style="margin:0px;">
     <canvas id="Main" style="background-color:#06b3db;"></canvas>
     <script type="text/javascript">
-        requirejs.config({
-            'baseUrl' : '../src',
-            'paths' : {
-                '_' : '../thirdparty/lodash.compat',
-                'glmatrix' : '../thirdparty/gl-matrix'
-            }
-        });
-
         require(['qtek'], function(qtek){
             
             var qtek3d = qtek['3d'];

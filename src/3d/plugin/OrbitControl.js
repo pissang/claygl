@@ -129,7 +129,7 @@ define(function(require) {
                 var phi = Math.acos(this.up.dot(yAxis));
                 var isUp = this.up.dot(zAxis) > 0;
                 if (
-                    (isUp && phi > this.maxRollAngle)
+                    (isUp && (phi > this.maxRollAngle || phi < this.minRollAngle))
                     || (!isUp && phi > -this.minRollAngle)
                 ) {
                     // Rool back

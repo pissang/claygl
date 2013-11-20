@@ -92,16 +92,9 @@ varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 varying vec3 v_Weight;
 
-#ifdef SPHERE_ENVIRONMENT_MAPPING
-uniform sampler2D environmentMap;
-#else
 uniform sampler2D diffuseMap;
-uniform sampler2D alphaMap;
 uniform sampler2D normalMap;
-uniform sampler2D specularMap;
-
 uniform samplerCube environmentMap;
-#endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
@@ -156,6 +149,10 @@ void main(){
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D(diffuseMap, v_Texcoord);
         finalColor.rgb *= tex.rgb;
+
+        #ifdef DIFFUSEMAP_USE_ALPHA
+            finalColor.a *= tex.a;
+        #endif
     #endif
 
     vec3 normal = v_Normal;
@@ -318,12 +315,8 @@ void main(){
     finalColor.rgb += specularItem * specular;
 
     #ifdef ENVIRONMENTMAP_ENABLED
-        #ifdef SPHERE_ENVIRONMENT_MAPPING
-            // Blinn and Newell's Method
-        #else
-            vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
-            finalColor.rgb = finalColor.rgb + envTex * reflectivity;
-        #endif
+        vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+        finalColor.rgb = finalColor.rgb + envTex * reflectivity;
     #endif
 
     if(lineWidth > 0.01){

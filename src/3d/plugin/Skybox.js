@@ -19,12 +19,11 @@ define(function(require) {
         });
         
         return {
-            geometry : new CubeGeometry(),
-            material : material,
-
             renderer : null,
             camera : null,
 
+            geometry : new CubeGeometry(),
+            material : material,
             culling : false
         }
     }, function() {
@@ -38,6 +37,10 @@ define(function(require) {
         }
     }, {
         attachRenderer : function(renderer) {
+            if (this.renderer) {
+                this.renderer.off('afterupdate', this._afterUpdateCamera);
+            }
+            this.renderer = renderer;
             renderer.on("beforerender:opaque", this._beforeRenderOpaque, this);
         },
 
@@ -46,6 +49,10 @@ define(function(require) {
         },
 
         attachCamera : function(camera) {
+            if (this.camera) {
+                this.camera.off('afterupdate', this._afterUpdateCamera);
+            }
+            this.camera = camera;
             camera.on('afterupdate', this._afterUpdateCamera, this);
         },
 

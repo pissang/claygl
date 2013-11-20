@@ -3,11 +3,12 @@ define(function(require) {
     var Texture = require('../Texture');
     var WebGLInfo = require('../WebGLInfo');
 
-    var Texture2D = Texture.derive({
-        
-        image : null,
+    var Texture2D = Texture.derive(function() {
+        return {
+            image : null,
 
-        pixels : null,
+            pixels : null
+        }
     }, {
         update : function(_gl) {
 
@@ -37,7 +38,7 @@ define(function(require) {
                 _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
             }           
         
-            if (! this.NPOT && this.useMipmap) {
+            if (! this.NPOT && this.useMipmaps) {
                 _gl.generateMipmap(_gl.TEXTURE_2D);
             }
             

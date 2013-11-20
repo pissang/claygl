@@ -12,15 +12,15 @@ void main(void)
  
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
-   sum += texture2D(texture, vec2(v_Texcoord.x - 4.0*blurSize/imageWidth, v_Texcoord.y)) * 0.05;
-   sum += texture2D(texture, vec2(v_Texcoord.x - 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x - 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x - blurSize/imageWidth, v_Texcoord.y)) * 0.15;
+   sum += texture2D(texture, vec2(max(v_Texcoord.x - 4.0*blurSize/imageWidth, 0.0), v_Texcoord.y)) * 0.05;
+   sum += texture2D(texture, vec2(max(v_Texcoord.x - 3.0*blurSize/imageWidth, 0.0), v_Texcoord.y)) * 0.09;
+   sum += texture2D(texture, vec2(max(v_Texcoord.x - 2.0*blurSize/imageWidth, 0.0), v_Texcoord.y)) * 0.12;
+   sum += texture2D(texture, vec2(max(v_Texcoord.x - blurSize/imageWidth, 0.0), v_Texcoord.y)) * 0.15;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += texture2D(texture, vec2(v_Texcoord.x + blurSize/imageWidth, v_Texcoord.y)) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x + 2.0*blurSize/imageWidth, v_Texcoord.y)) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x + 3.0*blurSize/imageWidth, v_Texcoord.y)) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x + 4.0*blurSize/imageWidth, v_Texcoord.y)) * 0.05;
+   sum += texture2D(texture, vec2(min(v_Texcoord.x + blurSize/imageWidth, 1.0), v_Texcoord.y)) * 0.15;
+   sum += texture2D(texture, vec2(min(v_Texcoord.x + 2.0*blurSize/imageWidth, 1.0), v_Texcoord.y)) * 0.12;
+   sum += texture2D(texture, vec2(min(v_Texcoord.x + 3.0*blurSize/imageWidth, 1.0), v_Texcoord.y)) * 0.09;
+   sum += texture2D(texture, vec2(min(v_Texcoord.x + 4.0*blurSize/imageWidth, 1.0), v_Texcoord.y)) * 0.05;
  
    gl_FragColor = sum;
 }
@@ -41,15 +41,15 @@ void main(void)
  
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 4.0*blurSize/imageHeight)) * 0.05;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 3.0*blurSize/imageHeight)) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - 2.0*blurSize/imageHeight)) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y - blurSize/imageHeight)) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurSize/imageHeight, 0.0))) * 0.05;
+   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 3.0*blurSize/imageHeight, 0.0))) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 2.0*blurSize/imageHeight, 0.0))) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - blurSize/imageHeight, 0.0))) * 0.15;
    sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + blurSize/imageHeight)) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 2.0*blurSize/imageHeight)) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 3.0*blurSize/imageHeight)) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y + 4.0*blurSize/imageHeight)) * 0.05;
+   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + blurSize/imageHeight, 1.0))) * 0.15;
+   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 2.0*blurSize/imageHeight, 1.0))) * 0.12;
+   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 3.0*blurSize/imageHeight, 1.0))) * 0.09;
+   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 4.0*blurSize/imageHeight, 1.0))) * 0.05;
  
    gl_FragColor = sum;
 }

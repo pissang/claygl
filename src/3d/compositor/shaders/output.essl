@@ -1,4 +1,3 @@
-
 @export buildin.compositor.output
 
 varying vec2 v_Texcoord;

@@ -29,7 +29,7 @@ define(function(require) {
 
             magFilter : glenum.LINEAR,
 
-            useMipmap : true,
+            useMipmaps : true,
 
             // http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
             anisotropic : 1,
@@ -92,10 +92,10 @@ define(function(require) {
             var isPowerOfTwo = this.isPowerOfTwo();
 
             if (this.format === glenum.DEPTH_COMPONENT) {
-                this.useMipmap = false;
+                this.useMipmaps = false;
             }
 
-            if (! isPowerOfTwo || ! this.useMipmap) {
+            if (! isPowerOfTwo || ! this.useMipmaps) {
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore

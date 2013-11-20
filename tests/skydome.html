@@ -2,18 +2,11 @@
     <head>
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas id="Main"></canvas>
         <script type="text/javascript">
-            requirejs.config({
-                'baseUrl' : '../src',
-                'paths' : {
-                    '_' : '../thirdparty/lodash.compat',
-                    'glmatrix' : '../thirdparty/gl-matrix'
-                }
-            })
-
             require(['qtek'], function(qtek){
                 var qtek3d = qtek['3d'],
                     Shader = qtek3d.Shader;
@@ -21,11 +14,12 @@
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById( "Main")
                 });
-                var scene = new qtek3d.Scene,
+                var scene = new qtek3d.Scene;
                     camera = new qtek3d.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
+                renderer.resize(window.innerWidth, window.innerHeight);
 
                 camera.position.set(0, 1, 2);
 

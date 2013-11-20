@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="Main"></canvas>
+        <script type="text/javascript">
+            require(['qtek',
+                    'text!../tests/shader/IBL.essl'], function(qtek, IBLShader) {
+                var qtek3d = qtek['3d'];
+                var renderer = new qtek3d.Renderer({
+                    canvas : document.getElementById('Main'),
+                    devicePixelRatio : 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var camera = new qtek3d.camera.Perspective({
+                    aspect : window.innerWidth / window.innerHeight
+                });
+                camera.position.set(0, 0, 10);
+
+                var scene = new qtek3d.Scene();
+                var sphereGeo = new qtek3d.geometry.Sphere({
+                    // widthSegments : 30,
+                    // heightSegments : 30
+                });
+                sphereGeo.generateVertexNormals();
+
+                qtek3d.Shader.import(IBLShader);
+                var shader = new qtek3d.Shader({
+                    vertex : qtek3d.Shader.source('buildin.phong.vertex'),
+                    fragment : qtek3d.Shader.source('IBL.fragment')
+                });
+                var mipmaps = [];
+                var envMap = new qtek3d.texture.TextureCube({
+                    flipY : false
+                });
+                envMap.load({
+                    px : 'assets/textures/cube/skybox/px.jpg',
+                    nx : 'assets/textures/cube/skybox/nx.jpg',
+                    py : 'assets/textures/cube/skybox/py.jpg',
+                    ny : 'assets/textures/cube/skybox/ny.jpg',
+                    pz : 'assets/textures/cube/skybox/pz.jpg',
+                    nz : 'assets/textures/cube/skybox/nz.jpg'
+                });
+                var GGXLookup = generateGGXLookup();
+                // Extracting mipmaps
+                mipmaps[0] = envMap;
+                mipmapLevel = 1;
+                envMap.on('load', function() {
+                    var environmentMapPass = new qtek3d.prePass.EnvironmentMap();
+                    var size = envMap.image.px.width;
+                    var emptyScene = new qtek3d.Scene();
+                    skybox.material.set('environmentMap', envMap);
+                    while (size > 4) {
+                        size /= 2;
+                        var mipmap = new qtek3d.texture.TextureCube({
+                            useMipmaps : false,
+                            width : size,
+                            height : size
+                        });
+                        mipmaps[mipmapLevel++] = mipmap;
+                        environmentMapPass.texture = mipmap;
+                        environmentMapPass.position.copy(camera.position);
+                        environmentMapPass.render(renderer, emptyScene, skybox);
+                    }
+                    skybox.material.set('environmentMap', mipmaps[4]);
+                    for (var i = 0; i < 10; i++) {
+                        var material = new qtek3d.Material({
+                            shader : shader
+                        });
+                        var mesh = new qtek3d.Mesh({
+                            geometry : sphereGeo,
+                            material : material
+                        });
+                        material.set('GGXLookup', GGXLookup);
+                        material.set('environmentMap', mipmaps[i] || mipmaps[mipmaps.length-1]);
+                        material.set('roughness', i / 10);
+                        mesh.position.x = i * 3 - 15;
+                        scene.add(mesh);
+                    }
+                });
+
+                var control = new qtek3d.plugin.OrbitControl({
+                    target : camera,
+                    domElement : renderer.canvas
+                });
+                control.enable();
+
+                var skybox = new qtek3d.plugin.Skybox({
+                    camera : camera,
+                    renderer : renderer
+                });
+                skybox.material.set("environmentMap", envMap);
+
+                var debugPass = new qtek3d.compositor.Pass({
+                    fragment : qtek3d.Shader.source('buildin.compositor.output')
+                });
+                debugPass.setUniform('texture', GGXLookup);
+                var viewportInfo = renderer.viewportInfo;
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function(deltaTime) {
+                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
+                    renderer.render(scene, camera);
+
+                    var x = 0, y = 0;
+                    var width = viewportInfo.width / 6;
+                    var height = width;
+                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.setViewport(x, y, width, height);
+                    debugPass.render(renderer);
+                    renderer.setViewport(viewportInfo);
+                    console.log(deltaTime);
+                });
+
+                function generateGGXLookup() {
+                    // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+                    // GLSL not support bit operation, use lookup instead
+                    // V -> i / N, U -> roughness
+                    var ROUGHNESS_LEVELS = 512;
+                    var SAMPLE_SIZE = 512;
+
+                    var GGXLookup = new qtek3d.texture.Texture2D({
+                        width : ROUGHNESS_LEVELS,
+                        height : SAMPLE_SIZE,
+                        type : qtek3d.Texture.FLOAT,
+                        minFilter : qtek3d.Texture.NEAREST,
+                        magFilter : qtek3d.Texture.NEAREST,
+                        useMipmaps : false
+                    });
+                    var pixels = new Float32Array(SAMPLE_SIZE * ROUGHNESS_LEVELS * 4);
+                    for (var i = 0; i < SAMPLE_SIZE; i++) {
+                        var x = i / SAMPLE_SIZE;
+                        // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+                        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators
+                        // http://stackoverflow.com/questions/1908492/unsigned-integer-in-javascript
+                        // http://stackoverflow.com/questions/1822350/what-is-the-javascript-operator-and-how-do-you-use-it
+                        var y = (i << 16 | i >>> 16) >>> 0;
+                        y = ((y & 1431655765) << 1 | (y & 2863311530) >>> 1) >>> 0;
+                        y = ((y & 858993459) << 2 | (y & 3435973836) >>> 2) >>> 0;
+                        y = ((y & 252645135) << 4 | (y & 4042322160) >>> 4) >>> 0;
+                        y = (((y & 16711935) << 8 | (y & 4278255360) >>> 8) >>> 0) / 4294967296;
+
+                        for (var j = 0; j < ROUGHNESS_LEVELS; j++) {
+                            var roughness = j / ROUGHNESS_LEVELS;
+                            var a = roughness * roughness;
+                            var phi = 2.0 * Math.PI * x;
+                            // CDF
+                            var cosTheta = Math.sqrt((1 - y) / (1 + (a*a - 1.0) * y));
+                            var sinTheta = Math.sqrt(1.0 - cosTheta * cosTheta);
+                            var offset = (i * ROUGHNESS_LEVELS + j) * 4;
+                            pixels[offset] = sinTheta * Math.cos(phi);
+                            pixels[offset+1] = sinTheta * Math.sin(phi);
+                            pixels[offset+2] = cosTheta;
+                            pixels[offset+3] = 1.0;
+                        }
+                    }
+                    GGXLookup.pixels = pixels;
+
+                    return GGXLookup;
+                }
+            });
+        </script>
+</html>

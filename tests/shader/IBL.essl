@@ -1,0 +1,138 @@
+// http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
+// http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
+@export IBL.fragment
+
+#define PI 3.14159265358979
+
+#define SAMPLE_NUMBER 512
+
+uniform mat4 viewInverse : VIEWINVERSE;
+
+varying vec2 v_Texcoord;
+varying vec3 v_LocalNormal;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+varying vec3 v_Weight;
+
+uniform sampler2D diffuseMap;
+uniform sampler2D normalMap;
+uniform sampler2D GGXLookup;
+uniform samplerCube environmentMap;
+
+uniform vec3 color : [1.0, 1.0, 1.0];
+uniform float alpha : 1.0;
+
+uniform vec3 specularColor : [0.56, 0.57, 0.58];
+uniform float roughness : 0.5;
+
+@import buildin.plugin.compute_shadow_map
+
+// vec2 hammersley(uint i, uint n) {
+//     i = (i << 16u) | (i >> 16u);
+//     i = ((i & 0x55555555u) << 1u) | ((i & 0xAAAAAAAAu) >> 1u);
+//     i = ((i & 0x33333333u) << 2u) | ((i & 0xCCCCCCCCu) >> 2u);
+//     i = ((i & 0x0F0F0F0Fu) << 4u) | ((i & 0xF0F0F0F0u) >> 4u);
+//     i = ((i & 0x00FF00FFu) << 8u) | ((i & 0xFF00FF00u) >> 8u);
+//     return vec2(float(i)/float(n), float(i) * 2.3283064365386963e-10); // / 0x100000000
+// }
+
+vec3 importanceSampleGGX(float i, float roughness, vec3 N) {
+    // float a = roughness * roughness;
+
+    // float phi = 2.0 * PI * xi.x;
+    // // GGX Normal distribution
+    // float cosTheta = sqrt((1.0 - xi.y) / (1.0 + (a*a - 1.0) * xi.y));
+    // float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+    // vec3 H;
+    // H.x = sinTheta * cos(phi);
+    // H.y = sinTheta * sin(phi);
+    // H.z = cosTheta;
+    vec3 H = texture2D(GGXLookup, vec2(roughness, i)).rgb;
+
+    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+    vec3 tangentX = normalize(cross(upVector, N));
+    vec3 tangentY = cross(N, tangentX);
+    // Tangent to world space
+    return tangentX * H.x + tangentY * H.y + N * H.z;
+}
+
+vec3 importanceSamplePhong(vec2 xi, vec3 N) {
+    return vec3(0.0, 0.0, 0.0);
+}
+
+float G_Smith(float roughness, float NoV, float NoL) {
+    // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
+    float k = roughness * roughness / 2.0;
+    float G1V = NoV / (NoV * (1.0 - k) + k);
+    float G1L = NoL / (NoL * (1.0 - k) + k);
+    return G1L * G1V;
+}
+
+vec3 specularIBL(vec3 specularColor, float roughness, vec3 N, vec3 V) {
+    vec3 specularLighting = vec3(0.0, 0.0, 0.0);
+    for (int i = 0; i < SAMPLE_NUMBER; i++) {
+        // vec2 xi = hammersley(i, SAMPLE_NUMBER);
+        // vec3 H = importanceSampleGGX(xi, roughness, N);
+        vec3 H = importanceSampleGGX(float(i) / float(SAMPLE_NUMBER), roughness, N); // Half Vector
+
+        vec3 L = reflect(-V, H);
+        float NoV = clamp(dot(N, V), 0.0, 1.0);
+        float NoL = clamp(dot(N, L), 0.0, 1.0);
+        float NoH = clamp(dot(N, H), 0.0, 1.0);
+        float VoH = clamp(dot(V, H), 0.0, 1.0);
+
+        // if (NoL > 0.0) {
+            // Sample the same L can be fast because of cache
+            vec3 sampleColor = textureCube(environmentMap, L).rgb;
+            // Fresnel term
+            vec3 F = specularColor +  (vec3(1.0) - specularColor) * pow(1.0 - VoH, 5.0);
+            float G = G_Smith(roughness, NoV, NoL);
+
+            // Incident light = SampleColor * NoL
+            // Microfacet specular = D*G*F / (4*NoL*NoV)
+            // pdf = D * NoH / (4 * VoH)
+            #ifdef RENDER_FRESNEL
+                specularLighting += F;
+            #elif defined(RENDER_GEOMETRY)
+                specularLighting += G;
+            #else
+                specularLighting += sampleColor * F * G * VoH / (NoH * NoV);
+                // specularLighting += G;
+            #endif
+        // }
+    }
+
+    return specularLighting / float(SAMPLE_NUMBER);
+}
+
+void main(){
+
+    vec4 finalColor = vec4(color, alpha);
+
+    vec3 eyePos = viewInverse[3].xyz;
+    vec3 V = normalize(eyePos - v_WorldPosition);
+
+    #ifdef DIFFUSEMAP_ENABLED
+        vec4 tex = texture2D(diffuseMap, v_Texcoord);
+        finalColor.rgb *= tex.rgb;
+
+        #ifdef DIFFUSEMAP_USE_ALPHA
+            finalColor.a *= tex.a;
+        #endif
+    #endif
+
+    vec3 normal = v_Normal;
+    #ifdef NORMALMAP_ENABLED
+        normal = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+        normal = normalize(tbn * normal);
+    #endif
+
+    gl_FragColor.rgb = finalColor.rgb * specularIBL(specularColor, roughness, normal, V);
+    gl_FragColor.a = 1.0;
+}
+
+@end

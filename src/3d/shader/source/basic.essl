@@ -47,6 +47,10 @@ void main(){
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D( diffuseMap, v_Texcoord );
         gl_FragColor.rgb *= tex.rgb;
+
+        #ifdef DIFFUSEMAP_USE_ALPHA
+            gl_FragColor.a *= tex.a;
+        #endif
     #endif
     
     if( lineWidth > 0.01){

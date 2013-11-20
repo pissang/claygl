@@ -7,8 +7,6 @@ define(function (require) {
     var FrameBuffer = require("../FrameBuffer");
     var TextureCube = require("../texture/TextureCube");
 
-    var frameBuffer = new FrameBuffer();
-
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     var targetMap = {
         'px' : glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -24,7 +22,8 @@ define(function (require) {
             position : new Vector3(),
             far : 1000,
             near : 0.1,
-            texture : null
+            texture : null,
+            frameBuffer : new FrameBuffer()
         }
         ret._cameras = {
             'px' : new PerspectiveCamera({fov : 90}),
@@ -43,10 +42,13 @@ define(function (require) {
 
         return ret;
     }, {
-        render : function(renderer, scene) {
+        render : function(renderer, scene, skybox) {
             var _gl = renderer.gl;
             scene.autoUpdate = false;
             scene.update(true);
+            if (skybox) {
+                var sceneCamera = skybox.camera;
+            }
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._cameras[target];
@@ -54,15 +56,22 @@ define(function (require) {
                 camera.far = this.far;
                 camera.near = this.near;
 
-                frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
-                frameBuffer.bind(renderer);
+                this.frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
+                this.frameBuffer.bind(renderer);
+                // a bit ugly
+                if (skybox) {
+                    skybox.attachCamera(camera);
+                }
                 renderer.render(scene, camera);
-                frameBuffer.unbind(renderer);
+                this.frameBuffer.unbind(renderer);
+            }
+            if (skybox) {
+                skybox.attachCamera(sceneCamera);
             }
             scene.autoUpdate = true;
         },
         dispose : function(renderer) {
-            this._texture.dispose(renderer._gl);
+            this.frameBuffer.dispose(renderer._gl);
         }
     });
 

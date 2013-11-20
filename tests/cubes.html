@@ -2,18 +2,11 @@
     <head>
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
-            requirejs.config({
-                'baseUrl' : '../src',
-                'paths' : {
-                    '_' : '../thirdparty/lodash.compat',
-                    'glmatrix' : '../thirdparty/gl-matrix'
-                }
-            })
-
             require(['qtek'], function(qtek){
                 var qtek3d = qtek['3d']
                 var Shader = qtek3d.Shader
@@ -67,12 +60,6 @@
                         }
                     }
                 }
-                // var cube = new Mesh({
-                //     geometry : cube,
-                //     material : material
-                // });
-                // cube.position.set(0, 0, 100);
-                // scene.add(cube);
 
                 camera.position.set(0, 2, 10);
                 camera.lookAt(new qtek.core.Vector3(0, 0, 0), new qtek.core.Vector3(0, 1, 0));

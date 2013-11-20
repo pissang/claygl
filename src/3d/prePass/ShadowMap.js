@@ -69,8 +69,8 @@ define(function(require) {
         this._gaussianPassV = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_v')
         });
-        this._gaussianPassH.setUniform("blurSize", 0.5);
-        this._gaussianPassV.setUniform("blurSize", 0.5);
+        this._gaussianPassH.setUniform("blurSize", 1.0);
+        this._gaussianPassV.setUniform("blurSize", 1.0);
 
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
@@ -87,6 +87,8 @@ define(function(require) {
         },
 
         renderDebug : function(renderer) {
+            var prevClear = renderer.clear;
+            renderer.clear = glenum.DEPTH_BUFFER_BIT
             var viewportInfo = renderer.viewportInfo;
             var x = 0, y = 0;
             var width = viewportInfo.width / 4;
@@ -98,6 +100,7 @@ define(function(require) {
                 x += width;
             }
             renderer.setViewport(viewportInfo);
+            renderer.clear = prevClear;
         },
 
         _bindDepthMaterial : function(renderQueue) {
@@ -361,9 +364,7 @@ define(function(require) {
             var parameter = {
                 width : size,
                 height : size,
-                type : glenum.FLOAT,
-                wrapS : glenum.MIRRORED_REPEAT,
-                wrapT : glenum.MIRRORED_REPEAT
+                type : glenum.FLOAT
             };
             var _gl = renderer.gl;
             var tmpTexture = texturePool.get(parameter);
@@ -404,7 +405,7 @@ define(function(require) {
                 } else {
                     texture.minFilter = glenum.NEAREST;
                     texture.magFilter = glenum.NEAREST;
-                    texture.useMipmap = false;
+                    texture.useMipmaps = false;
                 }
                 this._textures[key] = texture;
             }

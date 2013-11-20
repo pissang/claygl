@@ -388,7 +388,7 @@ def ConvertMaterial(pMaterial):
         lHashKey.append(str(lValue['value']))
     lHashKey = tuple(lHashKey)
     if lHashKey in _materialHashMap.keys():
-        return lMaterialName
+        return _materialHashMap[lHashKey];
 
     while lMaterialName in lib_materials.keys():
         if not lMaterialName in _repeatedMaterialCount.keys():

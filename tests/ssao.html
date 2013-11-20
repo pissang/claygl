@@ -3,19 +3,12 @@
     <title></title>
     <meta charset="utf-8">
     <script type="text/javascript" src="../thirdparty/require.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
 </head>
 <body style="margin:0px">
     <canvas id="Main"></canvas>
 
     <script type="text/javascript">
-        requirejs.config({
-            'baseUrl' : '../src',
-            'paths' : {
-                '_' : '../thirdparty/lodash.compat',
-                'glmatrix' : '../thirdparty/gl-matrix'
-            }
-        });
-
         require(['qtek',
                 'text!../tests/shader/ssao.essl',
                 'text!../tests/shader/fxaa.essl'], function(qtek, SSAOShader, FXAAShader) {

@@ -13,23 +13,25 @@ define(function(require) {
         'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
     }
 
-    var TextureCube = Texture.derive({
-        image : {
-            px : null,
-            nx : null,
-            py : null,
-            ny : null,
-            pz : null,
-            nz : null
-        },
-        pixels : {
-            px : null,
-            nx : null,
-            py : null,
-            ny : null,
-            pz : null,
-            nz : null
-        }
+    var TextureCube = Texture.derive(function() {
+        return {
+            image : {
+                px : null,
+                nx : null,
+                py : null,
+                ny : null,
+                pz : null,
+                nz : null
+            },
+            pixels : {
+                px : null,
+                nx : null,
+                py : null,
+                ny : null,
+                pz : null,
+                nz : null
+            }
+       }
     }, {
         update : function(_gl) {
 
@@ -61,7 +63,7 @@ define(function(require) {
                 }
             }
 
-            if (!this.NPOT && this.useMipmap) {
+            if (!this.NPOT && this.useMipmaps) {
                 _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
             }
 

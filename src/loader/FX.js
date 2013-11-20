@@ -35,7 +35,7 @@ define(function(require) {
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", percent, loaded, total);
+                    self.trigger("progress", [percent, loaded, total]);
                 },
                 onerror : function(e) {
                     self.trigger("error", e);
@@ -43,7 +43,7 @@ define(function(require) {
                 responseType : "text",
                 onload : function(data) {
                     self.parse(JSON.parse(data), function(compositor) {
-                        self.trigger("load", compositor);
+                        self.trigger("load", [compositor]);
                     });
                 }
             });
@@ -173,7 +173,7 @@ define(function(require) {
                         param[name] = Texture[paramInfo[name]];
                     }
                 });
-            ['width', 'height', 'useMipmap']
+            ['width', 'height', 'useMipmaps']
                 .forEach(function(name) {
                     if (paramInfo[name] !== undefined) {
                         param[name] = paramInfo[name];
