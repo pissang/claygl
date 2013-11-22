@@ -18,6 +18,13 @@ define(function(require) {
             this.renderer.render(this.scene, this.camera);
         },
 
+        setPicking : function(picking) {
+            this.picking = picking;
+            if (this.renderer) {
+                picking.resize(this.renderer.width, this.renderer.height);
+            }
+        },
+
         resize : function(width, height) {
             if (this.renderer) {
                 this.renderer.resize(width, height);

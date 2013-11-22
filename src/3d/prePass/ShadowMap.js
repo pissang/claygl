@@ -477,9 +477,7 @@ define(function(require) {
             return camera;
         },
 
-        dispose : function(renderer) {
-            var _gl = renderer.gl;
-    
+        dispose : function(_gl) {
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
                 mat.dispose();

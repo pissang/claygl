@@ -9,8 +9,8 @@ define(function(require) {
     var Scene2D = require('2d/Scene');
     var Renderer3D = require('3d/Renderer');
     var Renderer2D = require('2d/Renderer');
-    var Camera3D = require('3d/camera');
-    var Camera2D = require('2d/camera');
+    var Camera3D = require('3d/camera/Perspective');
+    var Camera2D = require('2d/Camera');
 
     var Stage = Base.derive(function() {
         return {
@@ -90,7 +90,11 @@ define(function(require) {
         create3DLayer : function(options) {
             options = options || {};
             options.renderer = options.renderer || new Renderer3D();
-            options.camera = options.camera || new Camera3D();
+            if (!options.camera) {
+                options.camera = new Camera3D();
+                options.camera.position.z = 1;
+                options.camera.aspect = this.width / this.height;
+            }
             options.scene = options.scene || new Scene3D();
 
             var layer = new Layer(options);
@@ -137,6 +141,9 @@ define(function(require) {
 
             for (var i = 0; i < this._layers.length; i++) {
                 this._layers[i].resize(width, height);
+                if (this._layers[i].camera instanceof Camera3D) {
+                    this._layers[i].camera.aspect = width / height;
+                }
             }
         },
 

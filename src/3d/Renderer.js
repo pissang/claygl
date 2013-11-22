@@ -19,6 +19,9 @@ define(function(require) {
             __GUID__ : util.genGUID(),
 
             canvas : null,
+
+            width : 100,
+            height : 100,
             // Device Pixel Ratio is for high defination disply
             // like retina display
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
@@ -47,6 +50,8 @@ define(function(require) {
     }, function() {
         if (! this.canvas) {
             this.canvas = document.createElement("canvas");
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
         }
         try {
             this.gl = this.canvas.getContext('experimental-webgl', {
@@ -59,7 +64,9 @@ define(function(require) {
             });
             this.gl.__GUID__ = this.__GUID__;
 
-            this.resize(this.canvas.width, this.canvas.height);
+            this.width = this.canvas.width; 
+            this.height = this.canvas.height;
+            this.resize(this.width, this.height);
 
             WebGLInfo.initialize(this.gl);
         }
@@ -81,7 +88,15 @@ define(function(require) {
             canvas.width = width * this.devicePixelRatio;
             canvas.height = height * this.devicePixelRatio;
 
+            this.width = width;
+            this.height = height;
+
             this.setViewport(0, 0, canvas.width, canvas.height);
+        },
+
+        setDevicePixelRatio : function(devicePixelRatio) {
+            this.devicePixelRatio = devicePixelRatio;
+            this.resize(this.width, this.height);
         },
 
         setViewport : function(x, y, width, height) {

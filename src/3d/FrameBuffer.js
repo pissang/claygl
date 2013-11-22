@@ -98,7 +98,7 @@ define(function(require) {
         attach : function(_gl, texture, attachment, target) {
 
             if (! texture.width) {
-                console.error("The texture attached to color buffer is not a valid.");
+                throw new Error("The texture attached to color buffer is not a valid.");
                 return;
             }
 

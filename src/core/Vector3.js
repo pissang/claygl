@@ -250,6 +250,7 @@ define(function(require) {
     Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
 
     Vector3.UP = new Vector3(0, 1, 0);
+    Vector3.ZERO = new Vector3(0, 0, 0);
 
     return Vector3;
 } )

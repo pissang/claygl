@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <div id="Main"></div>
+        <script>
+            require(['qtek'], function(qtek) {
+                var qtek3d = qtek['3d'];
+                var stage = new qtek.Stage({
+                    container : document.getElementById('Main')
+                });
+                stage.resize(window.innerWidth, window.innerHeight);
+                var layer = stage.create3DLayer();
+                var camera = layer.camera;
+                var renderer = layer.renderer;
+                var scene = layer.scene;
+                renderer.setDevicePixelRatio(1.0);
+
+                var cubeGeo = new qtek3d.geometry.Cube();
+                for (var i = 0; i < 5; i++) {
+                    for (var j = 0; j < 5; j++) {
+                        var material = new qtek3d.Material({
+                            shader : qtek3d.shader.library.get('buildin.lambert')
+                        });
+                        material.set('color', [Math.random(), Math.random(), Math.random()]);
+                        var mesh = new qtek3d.Mesh({
+                            material : material,
+                            geometry : cubeGeo
+                        });
+                        mesh.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * -10)
+                        scene.add(mesh);
+                    }
+                }
+                camera.position.z = 10;
+                var light = new qtek3d.light.Directional();
+                light.position.set(4, 4, 0);
+                light.lookAt(qtek.core.Vector3.ZERO);
+                scene.add(light);
+                scene.add(new qtek3d.light.Ambient({
+                    intensity : 0.5
+                }));
+
+                var picking = new qtek3d.picking.Pixel({
+                    renderer : renderer
+                });
+                layer.setPicking(picking);
+                // picking.setPrecision(0.2);
+
+                scene.on('click', function(e) {
+                    e.target.material.set('color', [1.0, 0.0, 0.0]);
+                });
+
+                stage.on('frame', function() {
+                    stage.render();
+                });
+            });
+        </script>
+    </body>
+</html>

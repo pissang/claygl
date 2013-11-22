@@ -1,0 +1,49 @@
+@export buildin.picking.color.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
+#endif
+
+void main(){
+
+    vec3 skinnedPosition = position;
+
+    #ifdef SKINNING
+        mat4 skinMatrix;
+        if (joint.x >= 0.0){
+            skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
+        }
+        if (joint.y >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
+        }
+        if (joint.z >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
+        }
+        if (joint.w >= 0.0){
+            skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
+        }
+        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+    #endif
+
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+}
+
+@end
+
+@end
+@export buildin.picking.color.fragment
+
+uniform vec4 color : [1.0, 1.0, 1.0, 1.0];
+
+void main(){
+    gl_FragColor = color;
+}
+
+@end
