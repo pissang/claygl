@@ -123,8 +123,8 @@ define(function(require) {
         },
 
         setUniforms : function(object) {
-            for (var key in symbol) {
-                var val = symbol[key];
+            for (var key in object) {
+                var val = object[key];
                 this.setUniform(key, val);
             }
         },
@@ -159,7 +159,11 @@ define(function(require) {
             this.shader = shader;
             
             if (keepUniform) {
-                this.setUniforms(originalUniforms);
+                for (var key in originalUniforms) {
+                    if (this.uniforms[key]) {
+                        this.uniforms[key].value = originalUniforms[key].value;
+                    }
+                }
             }
         },
 

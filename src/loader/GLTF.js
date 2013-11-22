@@ -419,9 +419,14 @@ define(function(require) {
 
                     var material = lib.materials[primitiveInfo.material];
                     var mesh = new Mesh({
-                        geometry : geometry,
+                        geometry : geometry.convertToGeometry(),
                         material : material
                     });
+                    if (material.shader.isTextureEnabled('normalMap')) {
+                        if (!mesh.geometry.attributes.tangent.value.length) {
+                            mesh.geometry.generateTangents();
+                        }
+                    }
 
                     var skinName = primitiveInfo.skin;
                     if (skinName) {

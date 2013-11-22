@@ -65,7 +65,7 @@ define(function (require) {
                 renderer.render(scene, camera);
                 this.frameBuffer.unbind(renderer);
             }
-            if (skybox) {
+            if (sceneCamera) {
                 skybox.attachCamera(sceneCamera);
             }
             scene.autoUpdate = true;

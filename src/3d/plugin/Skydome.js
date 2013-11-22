@@ -28,7 +28,16 @@ define(function(require) {
             material : material,
 
             renderer : null,
-            camera : null
+            camera : null,
+
+            _beforeRenderOpaque : function(renderer, opaque) {
+                renderer.renderQueue([this], this.camera, null, true);
+            },
+
+            _afterUpdateCamera : function(camera) {
+                this.position.copy(camera.getWorldPosition());
+                this.update();
+            }
         }
     }, function() {
         var camera = this.camera;
@@ -54,15 +63,6 @@ define(function(require) {
 
         detachCamera : function(camera) {
             camera.off('afterupdate', this._afterUpdateCamera, this);
-        },
-
-        _beforeRenderOpaque : function(renderer, opaque) {
-            renderer.renderQueue([this], this.camera, null, true);
-        },
-
-        _afterUpdateCamera : function(camera) {
-            this.position.copy(camera.getWorldPosition());
-            this.update();
         }
     });
 

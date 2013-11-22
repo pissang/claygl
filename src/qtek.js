@@ -2,13 +2,14 @@ define( function(require){
 	
 	var exportsObject =  {
 	"2d": {
+		"Camera": require('2d/Camera'),
 		"Gradient": require('2d/Gradient'),
-		"Layer": require('2d/Layer'),
 		"LinearGradient": require('2d/LinearGradient'),
 		"Node": require('2d/Node'),
 		"Pattern": require('2d/Pattern'),
 		"RadialGradient": require('2d/RadialGradient'),
-		"Stage": require('2d/Stage'),
+		"Renderer": require('2d/Renderer'),
+		"Scene": require('2d/Scene'),
 		"Style": require('2d/Style'),
 		"picking": {
 			"Box": require('2d/picking/Box'),
@@ -84,6 +85,9 @@ define( function(require){
 			"Particle": require('3d/particleSystem/Particle'),
 			"ParticleSystem": require('3d/particleSystem/ParticleSystem')
 		},
+		"picking": {
+			"Pixel": require('3d/picking/Pixel')
+		},
 		"plugin": {
 			"FirstPersonControl": require('3d/plugin/FirstPersonControl'),
 			"OrbitControl": require('3d/plugin/OrbitControl'),
@@ -106,6 +110,8 @@ define( function(require){
 			"mesh": require('3d/util/mesh')
 		}
 	},
+	"Layer": require('Layer'),
+	"Stage": require('Stage'),
 	"animation": {
 		"Animation": require('animation/Animation'),
 		"Clip": require('animation/Clip'),
