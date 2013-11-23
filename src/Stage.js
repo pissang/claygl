@@ -154,10 +154,12 @@ define(function(require) {
         },
 
         _eventProxy : function(type, e) {
-            var el = this._findTrigger(e);
+            var e2 = this._assembleEvent(e);
+            var el = this._findTrigger(e2);
             if (el) {
-                QEvent.throw(type, el, this._assembleEvent(e));
+                QEvent.throw(type, el, e2);
             }
+            this.trigger(type, e2);
         },
 
         _mouseMoveHandler : function(e) {
@@ -185,9 +187,8 @@ define(function(require) {
 
         _findTrigger : function(e) {
             var container = this.container;
-            var clientRect = container.getBoundingClientRect();
-            var x = e.pageX - clientRect.left - document.body.scrollLeft;
-            var y = e.pageY - clientRect.top - document.body.scrollTop;
+            var x = e.x;
+            var y = e.y;
 
             for (var i = this._layersSorted.length - 1; i >= 0 ; i--) {
                 var layer = this._layersSorted[i];
@@ -199,9 +200,12 @@ define(function(require) {
         },
 
         _assembleEvent : function(e){
+            var clientRect = container.getBoundingClientRect();
             return {
                 pageX : e.pageX,
-                pageY : e.pageY
+                pageY : e.pageY,
+                x : e.pageX - clientRect.left - document.body.scrollLeft,
+                y : e.pageY - clientRect.top - document.body.scrollTop
             }
         }
 

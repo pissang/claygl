@@ -5,9 +5,8 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 #####Canvas 2D
 + Scene graph based management of all shapes
 + Common shapes drawing, rectangle, arc, circle, ellipse, line, path(paper.js), path(svg), polygon, roundedr rectangle, sector, text, textbox, image
-+ Per pixel picking
-+ Multiple layer support
 + Bounding box calculate for curves
++ Per pixel picking
 + SVG parser
 
 #####WebGL 
@@ -17,18 +16,22 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Point, directional, spot light
 + Orthographic, perspective camera
 + Graph based post processing
-+ Shadow Mapping with PCF or VSM soft shadows
++ Shadow Mapping with PCF or VSM soft shadows, omnilight shadow.
 + Geometory processing like normal and tangent generate
 + GPU based skinning
-+ First person camera, orbit camera
++ First person camera control, orbit camera control
 + Skybox, skydom
++ Particle System
++ GPU Picking
 + Loader
 	+ three.js model loader
 	+ glTF loader
 + FBX to glTF converter
 
-#####Animation
+#####Unified multiple layer
 
+#####Animation
++ Timeline based animation, support spline interpolation between keyframes.
 
 ###Examples
 
@@ -37,6 +40,22 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 
 [Sponza](http://pissang.github.io/qtek/sponza/)
 
++ Normal Mapping
++ Omnilight Shadow 
+
 [Minicooper](http://pissang.github.io/qtek/minicooper/)
 
++ Environment Map
+
 [DOTA2 Hero Viewer](http://pissang.github.io/qtek/dota2hero/)
+
++ GPU Skinning
++ Custom complex shader
++ [Full version](https://github.com/pissang/dota2hero)
+
+[Murcielago](http://pissang.github.io/qtek/murcielago)
+
++ Image based lighting
++ Physically based shading
++ Realtime atmosphere scattering
++ VSM

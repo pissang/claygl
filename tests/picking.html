@@ -49,8 +49,11 @@
                 layer.setPicking(picking);
                 // picking.setPrecision(0.2);
 
-                scene.on('click', function(e) {
-                    e.target.material.set('color', [1.0, 0.0, 0.0]);
+                scene.on('mousedown', function(e) {
+                    stage.on('mousemove', dragging, e.target);
+                });
+                scene.on('mouseup', function(e) {
+                    stage.off('mousemove', dragging);
                 });
 
                 stage.on('frame', function() {
