@@ -10,18 +10,20 @@ define(function(require) {
     var _min = vec3.create();
     var _max = vec3.create();
 
-    var BoundingBox = Base.derive(function() {
-        var ret = {
-            min : new Vector3(),
-            max : new Vector3(),
-            // Cube vertices
-            vertices : []
-        }
+    var BoundingBox = function(min, max) {
+        this.min = min || new Vector3();
+        this.max = max || new Vector3();
+        // Cube vertices
+        var vertices = [];
         for (var i = 0; i < 8; i++) {
-            ret.vertices[i] = vec4.fromValues(0, 0, 0, 1);
+            vertices[i] = vec4.fromValues(0, 0, 0, 1);
         }
-        return ret;
-    }, {
+        this.vertices = vertices;
+    }
+    BoundingBox.prototype = {
+        
+        constructor : BoundingBox,
+
         updateFromVertices : function(vertices) {
             if (vertices.length > 0) {
                 vec3.copy(_min, vertices[0]);
@@ -89,7 +91,7 @@ define(function(require) {
             this.min.copy(boundingBox.min);
             this.max.copy(boundingBox.max);
         }
-    });
+    };
 
     return BoundingBox;
 });

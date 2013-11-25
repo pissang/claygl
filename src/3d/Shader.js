@@ -18,8 +18,9 @@ define(function(require) {
     var util = require("util/util");
     var _ = require('_');
 
-    var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+(\w+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
+    var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\w\,]+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
     var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
+    var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*\n/g;
 
     var uniformTypeMap = {
         "bool" : "1i",
@@ -203,6 +204,7 @@ define(function(require) {
 
                 this._parseUniforms();
                 this._parseAttributes();
+                this._parseDefines();
 
                 this._vertexPrev = this.vertex;
                 this._fragmentPrev = this.fragment;
@@ -751,6 +753,23 @@ define(function(require) {
             }
 
             this.attributeTemplates = attributes;
+        },
+
+        _parseDefines : function() {
+            var self = this;
+            var shaderType = 'vertex';
+            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(defineRegex, _defineParser);
+            shaderType = 'fragment';
+            this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(defineRegex, _defineParser);
+
+            function _defineParser(str, symbol, value) {
+                var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
+                if (!defines[symbol]) { // Haven't been defined by user
+                    defines[symbol] = value ? parseFloat(value) : null;
+
+                }
+                return '';
+            }
         },
 
         _buildProgram : function(_gl, vertexShaderString, fragmentShaderString) {

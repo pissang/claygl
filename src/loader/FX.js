@@ -184,10 +184,12 @@ define(function(require) {
         
         _loadShaders : function(json, callback) {
             if (!json.shaders) {
-                return {};
+                callback({});
+                return;
             }
             var shaders = {};
             var loading = 0;
+            var cbd = false;
             _.each(json.shaders, function(shaderExp, name) {
                 var res = urlReg.exec(shaderExp);
                 if (res) {
@@ -202,6 +204,7 @@ define(function(require) {
                             loading--;
                             if (loading === 0) {
                                 callback(shaders);
+                                cbd = true;
                             }
                         }
                     })
@@ -210,18 +213,20 @@ define(function(require) {
                     Shader.import(shaderSource);
                 }
             }, this);
-            if (loading === 0) {
+            if (loading === 0 && !cbd) {
                 callback(shaders);
             }
         },
 
         _loadTextures : function(json, lib, callback) {
             if (!json.textures) {
-                return {};
+                callback({});
+                return;
             }
             var textures = {};
             var loading = 0;
 
+            var cbd = false;
             _.each(json.textures, function(textureInfo, name) {
                 var texture;
                 var path = textureInfo.path;
@@ -241,11 +246,12 @@ define(function(require) {
                     loading--;
                     if (loading === 0) {
                         callback(textures);
+                        cbd = true;
                     }
                 });
             }, this);
 
-            if (loading === 0) {
+            if (loading === 0 && !cbd) {
                 callback(textures);
             }
         }

@@ -115,6 +115,7 @@ define(function(require) {
     Shader.import(require('text!./shaders/grayscale.essl'));
     Shader.import(require('text!./shaders/lut.essl'));
     Shader.import(require('text!./shaders/output.essl'));
+    Shader.import(require('text!./shaders/fxaa.essl'));
 
     return Pass;
 })

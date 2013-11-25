@@ -4,7 +4,7 @@
 
 #define PI 3.14159265358979
 
-#define SAMPLE_NUMBER 512
+#define SAMPLE_NUMBER 32
 
 uniform mat4 viewInverse : VIEWINVERSE;
 
