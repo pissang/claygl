@@ -63,7 +63,7 @@ define(function(require) {
                 }
             }
 
-            if (!this.NPOT && this.useMipmaps) {
+            if (!this.NPOT && this.useMipmap) {
                 _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
             }
 

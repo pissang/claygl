@@ -42,13 +42,10 @@ define(function (require) {
 
         return ret;
     }, {
-        render : function(renderer, scene, skybox) {
+        render : function(renderer, scene) {
             var _gl = renderer.gl;
             scene.autoUpdate = false;
             scene.update(true);
-            if (skybox) {
-                var sceneCamera = skybox.camera;
-            }
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._cameras[target];
@@ -58,15 +55,8 @@ define(function (require) {
 
                 this.frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
                 this.frameBuffer.bind(renderer);
-                // a bit ugly
-                if (skybox) {
-                    skybox.attachCamera(camera);
-                }
                 renderer.render(scene, camera);
                 this.frameBuffer.unbind(renderer);
-            }
-            if (sceneCamera) {
-                skybox.attachCamera(sceneCamera);
             }
             scene.autoUpdate = true;
         },

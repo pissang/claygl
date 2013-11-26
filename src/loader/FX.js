@@ -173,7 +173,7 @@ define(function(require) {
                         param[name] = Texture[paramInfo[name]];
                     }
                 });
-            ['width', 'height', 'useMipmaps']
+            ['width', 'height', 'useMipmap']
                 .forEach(function(name) {
                     if (paramInfo[name] !== undefined) {
                         param[name] = paramInfo[name];

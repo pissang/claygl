@@ -405,7 +405,7 @@ define(function(require) {
                 } else {
                     texture.minFilter = glenum.NEAREST;
                     texture.magFilter = glenum.NEAREST;
-                    texture.useMipmaps = false;
+                    texture.useMipmap = false;
                 }
                 this._textures[key] = texture;
             }

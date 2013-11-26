@@ -20,49 +20,39 @@ define(function(require) {
         });
         
         return {
+            scene : null,
+
             geometry : new SphereGeometry({
                 widthSegments : 30,
                 heightSegments : 30,
                 // thetaLength : Math.PI / 2
             }),
             material : material,
+            culling : false,
 
-            renderer : null,
-            camera : null,
-
-            _beforeRenderOpaque : function(renderer, opaque) {
-                renderer.renderQueue([this], this.camera, null, true);
-            },
-
-            _afterUpdateCamera : function(camera) {
+            _beforeRenderScene : function(renderer, scene, camera) {
                 this.position.copy(camera.getWorldPosition());
                 this.update();
+                renderer.renderQueue([this], camera, null, true);
+                renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
             }
         }
     }, function() {
-        var camera = this.camera;
-        var renderer = this.renderer;
-        if (renderer) {
-            this.attachRenderer(renderer);
-        }
-        if (camera) {
-            this.attachCamera(camera);
+        var scene = this.scene;
+        if (scene) {
+            this.attachScene(scene);
         }
     }, {
-        attachRenderer : function(renderer) {
-            renderer.on("beforerender:opaque", this._beforeRenderOpaque, this);
+        attachScene : function(scene) {
+            if (this.scene) {
+                this.scene.off('beforerender', this._beforeRenderScene);
+            }
+            this.scene = scene;
+            scene.on("beforerender", this._beforeRenderScene, this);
         },
 
-        detachRenderer : function(renderer) {
-            renderer.off("beforerender:opaque", this._beforeRenderOpaque, this);  
-        },
-
-        attachCamera : function(camera) {
-            camera.on('afterupdate', this._afterUpdateCamera, this);
-        },
-
-        detachCamera : function(camera) {
-            camera.off('afterupdate', this._afterUpdateCamera, this);
+        detachScene : function(scene) {
+            scene.off("beforerender", this._beforeRenderScene, this);  
         }
     });
 

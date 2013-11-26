@@ -19,54 +19,35 @@ define(function(require) {
         });
         
         return {
-            renderer : null,
-            camera : null,
+            scene : null,
 
             geometry : new CubeGeometry(),
             material : material,
             culling : false,
 
-            _beforeRenderOpaque : function(renderer, opaque) {
-                renderer.renderQueue([this], this.camera, null, true);
-            },
-
-            _afterUpdateCamera : function(camera) {
+            _beforeRenderScene : function(renderer, scene, camera) {
                 this.position.copy(camera.getWorldPosition());
                 this.update();
+                renderer.renderQueue([this], camera, null, true);
+                renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
             }
         }
     }, function() {
-        var camera = this.camera;
-        var renderer = this.renderer;
-        if (renderer) {
-            this.attachRenderer(renderer);
-        }
-        if (camera) {
-            this.attachCamera(camera);
+        var scene = this.scene;
+        if (scene) {
+            this.attachScene(scene);
         }
     }, {
-        attachRenderer : function(renderer) {
-            if (this.renderer) {
-                this.renderer.off('afterupdate', this._afterUpdateCamera);
+        attachScene : function(scene) {
+            if (this.scene) {
+                this.scene.off('beforerender', this._beforeRenderScene);
             }
-            this.renderer = renderer;
-            renderer.on("beforerender:opaque", this._beforeRenderOpaque, this);
+            this.scene = scene;
+            scene.on("beforerender", this._beforeRenderScene, this);
         },
 
-        detachRenderer : function(renderer) {
-            renderer.off("beforerender:opaque", this._beforeRenderOpaque, this);  
-        },
-
-        attachCamera : function(camera) {
-            if (this.camera) {
-                this.camera.off('afterupdate', this._afterUpdateCamera);
-            }
-            this.camera = camera;
-            camera.on('afterupdate', this._afterUpdateCamera, this);
-        },
-
-        detachCamera : function(camera) {
-            camera.off('afterupdate', this._afterUpdateCamera, this);
+        detachScene : function(scene) {
+            scene.off("beforerender", this._beforeRenderScene, this);  
         }
     });
 

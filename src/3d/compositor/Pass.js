@@ -11,11 +11,12 @@ define(function(require) {
     var vertexShaderString = require("text!./shaders/vertex.essl");
     var Texture = require('../Texture');
     var WebGLInfo = require('../WebGLInfo');
+    var glenum = require('../glenum');
 
     var planeGeo = new Plane();
     var mesh = new Mesh({
-            geometry : planeGeo
-        });
+        geometry : planeGeo
+    });
     var scene = new Scene();
     var camera = new OrthoCamera();
         
@@ -60,14 +61,36 @@ define(function(require) {
             }
         },
 
+        attachOutput : function(texture, attachment) {
+            if (!this.outputs) {
+                this.outputs = {};
+            }
+            attachment = attachment || glenum.COLOR_ATTACHMENT0;
+            this.outputs[attachment] = texture;
+        },
+
+        detachOutput : function(texture) {
+            for (var attachment in this.outputs) {
+                if (this.outputs[attachment] === texture) {
+                    this.outputs[attachment] = null;
+                }
+            }
+        },
+
         bind : function(renderer, frameBuffer) {
             
             if (this.outputs) {
+                var haveAttachment = false;
                 for (var attachment in this.outputs) {
                     var texture = this.outputs[attachment];
-                    frameBuffer.attach(renderer.gl, texture, attachment);
+                    if (texture) {
+                        haveAttachment = true;
+                        frameBuffer.attach(renderer.gl, texture, attachment);
+                    }
                 }
-                frameBuffer.bind(renderer);
+                if (haveAttachment) {
+                    frameBuffer.bind(renderer);
+                }
             }
         },
 

@@ -36,9 +36,9 @@ define(function(require) {
             // Can be used as a blank texture when writing render to texture(RTT)
             else {
                 _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
-            }           
+            }
         
-            if (! this.NPOT && this.useMipmaps) {
+            if (! this.NPOT && this.useMipmap) {
                 _gl.generateMipmap(_gl.TEXTURE_2D);
             }
             

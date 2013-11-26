@@ -139,6 +139,9 @@ define(function(require) {
             var transparentQueue = scene.transparentQueue;
             var sceneMaterial = scene.material;
 
+            if (!silent) {
+                scene.trigger('beforerender', [this, scene, camera]);
+            }
             // Sort render queue
             // Calculate the object depth
             if (transparentQueue.length > 0) {
@@ -179,6 +182,9 @@ define(function(require) {
             for (name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
             }
+            if (!silent) {
+                scene.trigger('afterrender', [this, scene, camera]);
+            } 
             if (! silent) {
                 this.trigger("afterrender", [this, scene, camera, renderInfo]);
             }

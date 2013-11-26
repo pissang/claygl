@@ -49,7 +49,7 @@ define(function(require) {
         wrapT : glenum.CLAMP_TO_EDGE,
         minFilter : glenum.LINEAR_MIPMAP_LINEAR,
         magFilter : glenum.LINEAR,
-        useMipmaps : true,
+        useMipmap : true,
         anisotropic : 1,
         flipY : true,
         unpackAlignment : 4,
@@ -73,10 +73,10 @@ define(function(require) {
         var IPOT = isPowerOfTwo(target.width, target.height);
 
         if (target.format === glenum.DEPTH_COMPONENT) {
-            target.useMipmaps = false;
+            target.useMipmap = false;
         }
 
-        if (!IPOT || !target.useMipmaps) {
+        if (!IPOT || !target.useMipmap) {
             if (this.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
                 this.minFilter == glenum.NEAREST_MIPMAP_LINEAR) {
                 this.minFilter = glenum.NEAREST;

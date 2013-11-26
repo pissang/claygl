@@ -13,7 +13,7 @@
             "type" : "FLOAT",
             "minFilter" : "NEAREST",
             "magFilter" : "NEAREST",
-            "useMipmaps" : false
+            "useMipmap" : false
         }
     },
     "textures" : {},
