@@ -77,14 +77,14 @@ define(function(require) {
         }
 
         if (!IPOT || !target.useMipmap) {
-            if (this.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
-                this.minFilter == glenum.NEAREST_MIPMAP_LINEAR) {
-                this.minFilter = glenum.NEAREST;
+            if (target.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
+                target.minFilter == glenum.NEAREST_MIPMAP_LINEAR) {
+                target.minFilter = glenum.NEAREST;
             } else if (
-                this.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
-                this.minFilter == glenum.LINEAR_MIPMAP_NEAREST
+                target.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
+                target.minFilter == glenum.LINEAR_MIPMAP_NEAREST
             ) {
-                this.minFilter = glenum.LINEAR
+                target.minFilter = glenum.LINEAR
             }
 
             target.wrapS = glenum.CLAMP_TO_EDGE;
