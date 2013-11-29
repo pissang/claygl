@@ -6,13 +6,13 @@ define(function(require) {
     var Material = require('../Material');
     var shaderLibrary = require('../shader/library');
 
-    var skydomeShader = new Shader({
-        vertex : Shader.source("buildin.basic.vertex"),
-        fragment : Shader.source("buildin.basic.fragment")
-    });
-    skydomeShader.enableTexture("diffuseMap");
-
     var Skydome = Mesh.derive(function() {
+
+        var skydomeShader = new Shader({
+            vertex : Shader.source("buildin.basic.vertex"),
+            fragment : Shader.source("buildin.basic.fragment")
+        });
+        skydomeShader.enableTexture("diffuseMap");
 
         var material = new Material({
             shader : skydomeShader,

@@ -152,7 +152,7 @@ define(function(require) {
         isRenderable : function() {},
         
         isPowerOfTwo : function() {},
-    })
+    });
     
     /* DataType */
     Texture.BYTE = glenum.BYTE;
@@ -170,6 +170,12 @@ define(function(require) {
     Texture.RGBA = glenum.RGBA;
     Texture.LUMINANCE = glenum.LUMINANCE;
     Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
+
+    /* Compressed Texture */
+    Texture.COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
+    Texture.COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
+    Texture.COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
+    Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
 
     /* TextureMagFilter */
     Texture.NEAREST = glenum.NEAREST;

@@ -1,0 +1,184 @@
+{
+    "animations": {},
+    "asset": {},
+    "attributes": {
+        "attribute_1": {
+            "bufferView": "bufferView_4",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "count": 7958,
+            "max": [
+                1.330684,
+                0.9419556,
+                0.8228964,
+                1.0
+            ],
+            "min": [
+                -1.330684,
+                -0.9730834999999999,
+                -0.7838898,
+                1.0
+            ],
+            "type": "FLOAT_VEC3"
+        },
+        "attribute_2": {
+            "bufferView": "bufferView_4",
+            "byteOffset": 95496,
+            "byteStride": 12,
+            "count": 7958,
+            "max": [
+                0.9999389999999999,
+                0.9999389999999999,
+                0.9999695,
+                1.0
+            ],
+            "min": [
+                -0.9999389999999999,
+                -0.9994812,
+                -0.9999695,
+                1.0
+            ],
+            "type": "FLOAT_VEC3"
+        }
+    },
+    "bufferViews": {
+        "bufferView_4": {
+            "buffer": "suzanne.bin",
+            "byteLength": 190992,
+            "byteOffset": 0,
+            "target": "ARRAY_BUFFER"
+        },
+        "bufferView_5": {
+            "buffer": "suzanne.bin",
+            "byteLength": 94464,
+            "byteOffset": 190992,
+            "target": "ELEMENT_ARRAY_BUFFER"
+        }
+    },
+    "buffers": {
+        "suzanne.bin": {
+            "byteLength": 285456,
+            "path": "suzanne.bin"
+        }
+    },
+    "cameras": {},
+    "images": {},
+    "indices": {
+        "indices_3": {
+            "bufferView": "bufferView_5",
+            "byteOffset": 0,
+            "count": 47232,
+            "type": "UNSIGNED_SHORT"
+        }
+    },
+    "lights": {},
+    "materials": {
+        "suzanne": {
+            "instanceTechnique": {
+                "technique": "technique_0",
+                "values": [
+                    {
+                        "parameter": "ambient",
+                        "value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    {
+                        "parameter": "emission",
+                        "value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    {
+                        "parameter": "diffuse",
+                        "value": [
+                            0.64,
+                            0.64,
+                            0.64
+                        ]
+                    }
+                ]
+            },
+            "name": "suzanne"
+        }
+    },
+    "meshes": {
+        "Suzanne-mesh": {
+            "name": "Suzanne",
+            "primitives": [
+                {
+                    "indices": "indices_3",
+                    "material": "suzanne",
+                    "semantics": {
+                        "NORMAL": "attribute_2",
+                        "POSITION": "attribute_1"
+                    }
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "Suzanne": {
+            "children": [],
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -4.371139999386969e-08,
+                1.0,
+                0.0,
+                0.0,
+                -1.0,
+                -4.371139999386969e-08,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "meshes": [
+                "Suzanne-mesh"
+            ],
+            "name": "Suzanne"
+        }
+    },
+    "samplers": {},
+    "scene": "Scene",
+    "scenes": {
+        "Scene": {
+            "nodes": [
+                "Suzanne"
+            ]
+        }
+    },
+    "shaders": {},
+    "skins": {},
+    "techniques": {
+        "technique_0": {
+            "parameters": {},
+            "pass": "defaultPass",
+            "passes": {
+                "defaultPass": {
+                    "instanceProgram": {
+                        "attributes": {},
+                        "program": "",
+                        "uniforms": {}
+                    },
+                    "states": {
+                        "blendEnable": false,
+                        "cullFaceEnable": false,
+                        "depthMask": true,
+                        "depthTestEnable": true
+                    }
+                }
+            }
+        }
+    },
+    "textures": {}
+}

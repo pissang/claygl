@@ -6,8 +6,8 @@ define(function(require) {
     var Texture2D = Texture.derive(function() {
         return {
             image : null,
-
-            pixels : null
+            pixels : null,
+            mipmaps : []
         }
     }, {
         update : function(_gl) {
@@ -35,11 +35,44 @@ define(function(require) {
             }
             // Can be used as a blank texture when writing render to texture(RTT)
             else {
-                _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
+                if (
+                    glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT 
+                    && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
+                ) {
+                    _gl.compressedTexImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, this.pixels);
+                } else {
+                    _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
+                }
             }
-        
-            if (! this.NPOT && this.useMipmap) {
-                _gl.generateMipmap(_gl.TEXTURE_2D);
+            if (this.useMipmap) {
+                if (this.mipmaps.length) {
+                    if (this.image) {
+                        for (var i = 0; i < this.mipmaps.length; i++) {
+                            if (this.mipmaps[i]) {
+                                _gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, this.mipmaps[i]);
+                            }
+                        }
+                    } else if (this.pixels) {
+                        var width = this.width;
+                        var height = this.height;
+                        for (var i = 0; i < this.mipmaps.length; i++) {
+                            if (this.mipmaps[i]) {
+                                if (
+                                    glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
+                                    && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
+                                ) {
+                                    _gl.compressedTexImage2D(_gl.TEXTURE_2D, 0, glFormat, width, height, 0, this.mipmaps[i]);
+                                } else {
+                                    _gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, width, height, 0, glFormat, glType, this.mipmaps[i]);
+                                }
+                            }
+                            width /= 2;
+                            height /= 2;
+                        }
+                    }
+                } else if (!this.NPOT && !this.mipmaps.length) {
+                    _gl.generateMipmap(_gl.TEXTURE_2D);
+                }
             }
             
             _gl.bindTexture(_gl.TEXTURE_2D, null);
@@ -51,14 +84,15 @@ define(function(require) {
         },
         isPowerOfTwo : function() {
             if (this.image) {
-                var width = this.image.width,
-                    height = this.image.height;   
+                var width = this.image.width;
+                var height = this.image.height;   
             } else {
-                var width = this.width,
-                    height = this.height;
+                var width = this.width;
+                var height = this.height;
             }
-            return (width & (width-1)) === 0 &&
-                    (height & (height-1)) === 0;
+            return (width === height)
+                    && (width & (width-1)) === 0
+                    && (height & (height-1)) === 0;
         },
 
         isRenderable : function() {
@@ -87,7 +121,7 @@ define(function(require) {
             image.src = src;
             this.image = image;
         }
-    })
+    });
 
     return Texture2D;
 })

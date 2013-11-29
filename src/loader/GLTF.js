@@ -438,10 +438,10 @@ define(function(require) {
                     }
                     if (meshInfo.name) {
                         if (meshInfo.primitives.length > 1) {
-                            mesh.name = [meshInfo.name, i].join('-');
+                            mesh.name = [name, i].join('-');
                         }
                         else {
-                            mesh.name = meshInfo.name;
+                            mesh.name = name;
                         }
                     }
 

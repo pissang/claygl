@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body>
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script>
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d']
+                var Shader = qtek3d.Shader
+                var _ = require("_");
+
+                qtek.core.request.get({
+                    url : 'assets/textures/hdr/pisa.hdr',
+                    responseType : 'arraybuffer',
+                    onload : function(data) {
+                        var texture = qtek3d.util.hdr.parseRGBE(data);
+
+                        var renderer = new qtek3d.Renderer({
+                            canvas : document.getElementById('Main')
+                        });
+                        var pass = new qtek3d.compositor.Pass({
+                            fragment : qtek3d.Shader.source('buildin.compositor.output')
+                        });
+                        pass.setUniform('texture', texture);
+                        pass.render(renderer);
+                    }
+                })
+            });
+            
+        </script>
+    </body>
+</html>

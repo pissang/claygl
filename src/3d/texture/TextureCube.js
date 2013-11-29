@@ -83,11 +83,13 @@ define(function(require) {
         // Overwrite the isPowerOfTwo method
         isPowerOfTwo : function() {
             if (this.image.px) {
-                return isPowerOfTwo(this.image.px.width) &&
-                        isPowerOfTwo(this.image.px.height);
+                return (this.image.px.width === this.image.px.height)
+                        && isPowerOfTwo(this.image.px.width)
+                        && isPowerOfTwo(this.image.px.height);
             } else {
-                return isPowerOfTwo(this.width) &&
-                        isPowerOfTwo(this.height);
+                return (this.width === this.height)
+                        && isPowerOfTwo(this.width)
+                        && isPowerOfTwo(this.height);
             }
 
             function isPowerOfTwo(value) {

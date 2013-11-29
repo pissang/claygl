@@ -43,6 +43,7 @@ define( function(require){
 		"Material": require('3d/Material'),
 		"Mesh": require('3d/Mesh'),
 		"Node": require('3d/Node'),
+		"Ray": require('3d/Ray'),
 		"Renderer": require('3d/Renderer'),
 		"Scene": require('3d/Scene'),
 		"Shader": require('3d/Shader'),
@@ -107,6 +108,8 @@ define( function(require){
 			"TextureCube": require('3d/texture/TextureCube')
 		},
 		"util": {
+			"dds": require('3d/util/dds'),
+			"hdr": require('3d/util/hdr'),
 			"mesh": require('3d/util/mesh')
 		}
 	},
