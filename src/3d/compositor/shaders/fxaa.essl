@@ -10,7 +10,8 @@ varying vec2 v_Texcoord;
 #define FXAA_REDUCE_MUL   (1.0/8.0)
 #define FXAA_SPAN_MAX     8.0
 
-void main() {
+void main()
+{
     vec2 resolution = 1.0 / viewportSize;
     vec3 rgbNW = texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ).xyz;
     vec3 rgbNE = texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;
@@ -52,7 +53,8 @@ void main() {
 
     float lumaB = dot( rgbB, luma );
 
-    if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {
+    if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) )
+    {
 
         gl_FragColor = vec4( rgbA, opacity );
 

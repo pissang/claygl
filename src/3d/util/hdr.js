@@ -6,9 +6,9 @@ define(function(require) {
 
     var MINELEN = 8;
     var MAXELEN = 0x7fff;
-    function rgbe2float(rgbe, buffer, offset) {
+    function rgbe2float(rgbe, buffer, offset, exposure) {
         if (rgbe[3] > 0) {
-            var f = Math.pow(2.0, rgbe[3] - 128 - 8);
+            var f = Math.pow(2.0, rgbe[3] - 128 - 8 + exposure);
             buffer[offset + 0] = rgbe[0] * f;
             buffer[offset + 1] = rgbe[1] * f;
             buffer[offset + 2] = rgbe[2] * f;
@@ -100,7 +100,10 @@ define(function(require) {
         // http://www.graphics.cornell.edu/~bjw/rgbe.html
         // Blender source
         // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
-        parseRGBE : function(arrayBuffer) {
+        parseRGBE : function(arrayBuffer, exposure) {
+            if (exposure === undefined) {
+                exposure = 0;
+            }
             var data = new Uint8Array(arrayBuffer);
             var size = data.length;
             if (uint82string(data, 0, 2) !== '#?') {
@@ -151,7 +154,7 @@ define(function(require) {
                     return null;
                 }
                 for (var x = 0; x < width; x++) {
-                    rgbe2float(scanline[x], pixels, offset2);
+                    rgbe2float(scanline[x], pixels, offset2, exposure);
                     offset2 += 4;
                 }
             }

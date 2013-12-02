@@ -22,8 +22,8 @@ define(function(require) {
             minDistance : 0,
             maxDistance : Infinity,
 
-            minRollAngle : -Math.PI / 2, // [-Math.PI/2, 0]
-            maxRollAngle : Math.PI / 2, // [0, Math.PI/2]
+            minPolarAngle : 0, // [0, Math.PI/2]
+            maxPolarAngle : Math.PI, // [Math.PI/2, Math.PI]
 
             // Rotate around origin
             _offsetPitch : 0,
@@ -118,6 +118,7 @@ define(function(require) {
 
             var target = this.target;
             var zAxis = target.localTransform.forward.normalize();
+            var yAxis = target.localTransform.up.normalize();
             if (this._op === 0) {
                 // Rotate
                 target.rotateAround(this.origin, this.up, -this._offsetPitch);
@@ -125,12 +126,12 @@ define(function(require) {
                 tmpMatrix.copy(target.localTransform);
                 var xAxis = target.localTransform.right;
                 target.rotateAround(this.origin, xAxis, -this._offsetRoll);
+                var zAxis = target.localTransform.forward.normalize();
                 var yAxis = target.localTransform.up.normalize();
-                var phi = Math.acos(this.up.dot(yAxis));
-                var isUp = this.up.dot(zAxis) > 0;
+                var phi = Math.acos(this.up.dot(zAxis));
+                var isUp = this.up.dot(yAxis) >= 0;
                 if (
-                    (isUp && (phi > this.maxRollAngle || phi < this.minRollAngle))
-                    || (!isUp && phi > -this.minRollAngle)
+                    !(isUp && phi >= this.minPolarAngle && phi <= this.maxPolarAngle)
                 ) {
                     // Rool back
                     target.localTransform.copy(tmpMatrix);

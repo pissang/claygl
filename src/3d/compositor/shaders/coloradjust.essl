@@ -40,7 +40,8 @@ uniform sampler2D texture;
 
 uniform float brightness : 0.0;
 
-void main() {
+void main()
+{
     vec4 tex = texture2D( texture, v_Texcoord);
     vec3 color = tex.rgb + vec3(brightness);
     gl_FragColor = vec4(color, tex.a);
@@ -53,7 +54,8 @@ uniform sampler2D texture;
 
 uniform float contrast : 1.0;
 
-void main() {
+void main()
+{
     vec4 tex = texture2D( texture, v_Texcoord);
     vec3 color = (tex.rgb-vec3(0.5))*contrast+vec3(0.5);
     gl_FragColor = vec4(color, tex.a);
@@ -66,7 +68,8 @@ uniform sampler2D texture;
 
 uniform float exposure : 0.0;
 
-void main() {
+void main()
+{
     vec4 tex = texture2D(texture, v_Texcoord);
     vec3 color = tex.rgb * pow(2.0, exposure);
     gl_FragColor = vec4(color, tex.a);
@@ -79,7 +82,8 @@ uniform sampler2D texture;
 
 uniform float gamma : 1.0;
 
-void main() {
+void main()
+{
     vec4 tex = texture2D(texture, v_Texcoord);
     vec3 color = pow(tex.rgb, vec3(gamma));
     gl_FragColor = vec4(color, tex.a);
@@ -94,7 +98,8 @@ uniform float saturation : 1.0;
 
 const vec3 w = vec3(0.2125, 0.7154, 0.0721);
 
-void main() {
+void main()
+{
     vec4 tex = texture2D(texture, v_Texcoord);
     vec3 color = tex.rgb;
     float luminance = dot(color, w);

@@ -19,22 +19,27 @@ uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
 varying vec2 v_Texcoord;
 varying vec3 v_Barycentric;
 
-void main(){
+void main()
+{
 
     vec3 skinnedPosition = position;
 
     #ifdef SKINNING
         mat4 skinMatrix;
-        if (joint.x >= 0.0){
+        if (joint.x >= 0.0)
+        {
             skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
         }
-        if (joint.y >= 0.0){
+        if (joint.y >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
         }
-        if (joint.z >= 0.0){
+        if (joint.z >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
         }
-        if (joint.w >= 0.0){
+        if (joint.w >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
         }
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
@@ -66,36 +71,23 @@ varying vec3 v_Barycentric;
 #extension GL_OES_standard_derivatives : enable
 @import buildin.util.edge_factor
 
-void main(){
+void main()
+{
 
     gl_FragColor = vec4(color, alpha);
     
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D( diffuseMap, v_Texcoord );
 
-        #ifdef RGBE_ENCODING
-            // http://www.graphics.cornell.edu/~bjw/rgbe.html
-            // http://www.contrib.andrew.cmu.edu/~yihuang/radiance_pic/Real%20Pixels%20-%20Greg%20Ward.pdf
-            if (tex.a <= 0.) {
-                tex.rgb = vec3(0.0);
-            }
-            else {
-                float e = floor(tex.a * 255.0 + 0.5);
-                float f = pow(2.0, (e - 128.0));
-                tex.rgb += 0.5 / 256.0;
-                tex.rgb *= f;
-                tex.rgb /= 60.0;
-                tex.rgb = pow(tex.rgb, vec3(2.2));
-                // tex.rgb *= pow(2.0, -6.0);
-            }
-        #elif defined(DIFFUSEMAP_USE_ALPHA)
+        #if defined(DIFFUSEMAP_USE_ALPHA)
             gl_FragColor.a = tex.a;
         #endif
 
         gl_FragColor.rgb *= tex.rgb;
     #endif
 
-    if( lineWidth > 0.01){
+    if( lineWidth > 0.01)
+    {
         gl_FragColor.rgb = gl_FragColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 }

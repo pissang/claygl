@@ -4,7 +4,8 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
-void main(){
+void main()
+{
 
     gl_Position = worldViewProjection * vec4( position , 1.0 );
 }
@@ -15,7 +16,8 @@ void main(){
 uniform float far : 1000.0;
 uniform float near : 0.1;
 
-void main(){
+void main()
+{
 
     float q = far / (far - near);
     float depth = near * q /( q - gl_FragCoord.z);

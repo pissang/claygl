@@ -7,7 +7,8 @@ attribute vec3 position : POSITION;
 
 varying vec3 v_WorldPosition;
 
-void main(){
+void main()
+{
     v_WorldPosition = (world * vec4(position, 1.0)).xyz;
     gl_Position = worldViewProjection * vec4(position, 1.0);
 }
@@ -21,7 +22,8 @@ uniform samplerCube environmentMap;
 
 varying vec3 v_WorldPosition;
 
-void main(){
+void main()
+{
     
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);

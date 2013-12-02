@@ -4,9 +4,11 @@
 
 uniform float attenuationFactor : 5.0;
 
-float calculateAttenuation(float dist, float range){
+float calculateAttenuation(float dist, float range)
+{
     float attenuation = 1.0;
-    if( range > 0.0){
+    if( range > 0.0)
+    {
         attenuation = dist*dist/(range*range);
         float att_s = attenuationFactor;
         attenuation = 1.0/(attenuation*att_s+1.0);
@@ -22,7 +24,8 @@ float calculateAttenuation(float dist, float range){
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
 @export buildin.util.edge_factor
 
-float edgeFactor(float width){
+float edgeFactor(float width)
+{
     vec3 d = fwidth(v_Barycentric);
     vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
     return min(min(a3.x, a3.y), a3.z);
@@ -33,7 +36,8 @@ float edgeFactor(float width){
 // Pack depth
 // Float value can only be 0.0 - 1.0 ?
 @export buildin.util.pack_depth
-vec4 packDepth( const in float depth ){
+vec4 packDepth( const in float depth )
+{
 
     const vec4 bitShifts = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
 
@@ -46,14 +50,16 @@ vec4 packDepth( const in float depth ){
 @end
 
 @export buildin.util.unpack_depth
-float unpackDepth( const in vec4 colour ){
+float unpackDepth( const in vec4 colour )
+{
     const vec4 bitShifts = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
     return dot(colour, bitShifts);
 }
 @end
 
 @export buildin.util.pack_depth_half
-vec2 packDepthHalf( const in float depth ){
+vec2 packDepthHalf( const in float depth )
+{
     const vec2 bitShifts = vec2(256.0, 1.0);
     const vec4 bitMask = vec4(0.0, 1.0/256.0);
 
@@ -65,7 +71,8 @@ vec2 packDepthHalf( const in float depth ){
 @end
 
 @export buildin.util.unpack_depth_half
-float unpackDepthHalf( const in vec2 rg ){
+float unpackDepthHalf( const in vec2 rg )
+{
     const vec4 bitShifts = vec2(1.0/256.0, 1.0);
     return dot(rg, bitShifts);
 }

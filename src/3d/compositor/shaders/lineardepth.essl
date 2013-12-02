@@ -6,7 +6,8 @@ uniform float far : 1000.0;
 
 varying vec2 v_Texcoord;
 
-void main(){
+void main()
+{
 
     float z = texture2D(texture, v_Texcoord).x;
 

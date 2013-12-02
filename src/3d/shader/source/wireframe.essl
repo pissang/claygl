@@ -15,21 +15,26 @@ uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
 
 varying vec3 v_Barycentric;
 
-void main(){
+void main()
+{
 
     vec3 skinnedPosition = position;
     #ifdef SKINNING
         mat4 skinMatrix;
-        if (joint.x >= 0.0){
+        if (joint.x >= 0.0)
+        {
             skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
         }
-        if (joint.y >= 0.0){
+        if (joint.y >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
         }
-        if (joint.z >= 0.0){
+        if (joint.z >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
         }
-        if (joint.w >= 0.0){
+        if (joint.w >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
         }
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
@@ -56,7 +61,8 @@ varying vec3 v_Barycentric;
 
 @import buildin.util.edge_factor
 
-void main(){
+void main()
+{
 
     gl_FragColor.rgb = color;
     gl_FragColor.a = ( 1.0-edgeFactor(lineWidth) ) * alpha;

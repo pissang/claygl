@@ -34,23 +34,28 @@ varying vec3 v_Bitangent;
 
 varying vec3 v_Weight;
 
-void main() {
+void main()
+{
     
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
     vec3 skinnedTangent = tangent.xyz;
     #ifdef SKINNING
         mat4 skinMatrix;
-        if (joint.x >= 0.0){
+        if (joint.x >= 0.0)
+        {
             skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
         }
-        if (joint.y >= 0.0){
+        if (joint.y >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
         }
-        if (joint.z >= 0.0){
+        if (joint.z >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
         }
-        if (joint.w >= 0.0){
+        if (joint.w >= 0.0)
+        {
             skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
         }
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
@@ -130,7 +135,8 @@ varying vec3 v_Barycentric;
 
 @import buildin.plugin.compute_shadow_map
 
-void main(){
+void main()
+{
     
     #ifdef RENDER_WEIGHT
         gl_FragColor = vec4(v_Weight.xyz, 1.0);
@@ -173,18 +179,21 @@ void main(){
     vec3 specularItem = vec3(0.0, 0.0, 0.0);
     
     #ifdef AMBIENT_LIGHT_NUMBER
-        for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++){
+        for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+        {
             diffuseItem += ambientLightColor[i];
         }
     #endif
     #ifdef POINT_LIGHT_NUMBER
         #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[POINT_LIGHT_NUMBER];
-            if(shadowEnabled){
+            if(shadowEnabled)
+            {
                 computeShadowOfPointLights(v_WorldPosition, shadowContribs);
             }
         #endif
-        for(int i = 0; i < POINT_LIGHT_NUMBER; i++){
+        for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+        {
 
             vec3 lightPosition = pointLightPosition[i];
             vec3 lightColor = pointLightColor[i];
@@ -208,14 +217,16 @@ void main(){
 
             float shadowContrib = 1.0;
             #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-                if(shadowEnabled){
+                if(shadowEnabled)
+                {
                     shadowContrib = shadowContribs[i];
                 }
             #endif
 
             diffuseItem += lightColor * ndl * attenuation * shadowContrib;
 
-            if (shininess > 0.0) {
+            if (shininess > 0.0)
+            {
                 specularItem += lightColor * ndl * pow(ndh, shininess) * attenuation * shadowContrib;
             }
 
@@ -225,11 +236,13 @@ void main(){
     #ifdef DIRECTIONAL_LIGHT_NUMBER
         #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[DIRECTIONAL_LIGHT_NUMBER];
-            if(shadowEnabled){
+            if(shadowEnabled)
+            {
                 computeShadowOfDirectionalLights(v_WorldPosition, shadowContribs);
             }
         #endif
-        for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+        for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
+        {
 
             vec3 lightDirection = -normalize(directionalLightDirection[i]);
             vec3 lightColor = directionalLightColor[i];
@@ -244,14 +257,16 @@ void main(){
 
             float shadowContrib = 1.0;
             #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-                if(shadowEnabled){
+                if(shadowEnabled)
+                {
                     shadowContrib = shadowContribs[i];
                 }
             #endif
 
             diffuseItem += lightColor * ndl * shadowContrib;
 
-            if (shininess > 0.0) {
+            if (shininess > 0.0)
+            {
                 specularItem += lightColor * ndl * pow(ndh, shininess) * shadowContrib;
             }
         }
@@ -260,11 +275,13 @@ void main(){
     #ifdef SPOT_LIGHT_NUMBER
         #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
             float shadowContribs[SPOT_LIGHT_NUMBER];
-            if(shadowEnabled){
+            if(shadowEnabled)
+            {
                 computeShadowOfSpotLights(v_WorldPosition, shadowContribs);
             }
         #endif
-        for(int i = 0; i < SPOT_LIGHT_NUMBER; i++){
+        for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+        {
             vec3 lightPosition = spotLightPosition[i];
             vec3 spotLightDirection = -normalize(spotLightDirection[i]);
             vec3 lightColor = spotLightColor[i];
@@ -298,14 +315,16 @@ void main(){
 
             float shadowContrib = 1.0;
             #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-                if(shadowEnabled){
+                if (shadowEnabled)
+                {
                     shadowContrib = shadowContribs[i];
                 }
             #endif
 
             diffuseItem += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
 
-            if (shininess > 0.0) {
+            if (shininess > 0.0)
+            {
                 specularItem += lightColor * ndl * pow(ndh, shininess) * attenuation * (1.0-falloff) * shadowContrib;
             }
         }
@@ -319,7 +338,8 @@ void main(){
         finalColor.rgb = finalColor.rgb + envTex * reflectivity;
     #endif
 
-    if(lineWidth > 0.01){
+    if(lineWidth > 0.01)
+    {
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 

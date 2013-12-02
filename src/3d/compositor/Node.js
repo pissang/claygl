@@ -15,7 +15,7 @@
         "texture" : "texture"
     },
     outputs : {
-            diffuse : {
+            color : {
                 attachment : FrameBuffer.COLOR_ATTACHMENT0
                 parameters : {
                     format : Texture.RGBA,

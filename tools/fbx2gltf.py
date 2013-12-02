@@ -693,7 +693,7 @@ def TraverseSceneNode(pNode):
 
         lGeometry = converter.Triangulate(lGeometry, True)
         # FIXME SplitMeshPerMaterial may loss deformer in mesh
-        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        # lResult = converter.SplitMeshPerMaterial(lGeometry, True)
 
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
