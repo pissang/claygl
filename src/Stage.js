@@ -38,12 +38,12 @@ define(function(require) {
         if (this.width) {
             this.container.style.width = this.width + 'px';
         } else {
-            this.width = this.container.clientWidth;
+            this.width = Math.max(this.container.clientWidth, 1);
         }
         if (this.height) {
             this.container.style.height = this.height + 'px';
         } else {
-            this.height = this.container.clientHeight;
+            this.height = Math.max(this.container.clientHeight, 1);
         }
 
         this.container.addEventListener("click", this._eventProxy.bind(this, 'click'));
@@ -68,7 +68,7 @@ define(function(require) {
          * @param {qtek.2d.Camera} [camera]
          * @return {qtek.Layer}
          */
-        create2DLayer : function(options) {
+        createLayer2D : function(options) {
             options = options || {};
             options.renderer = options.renderer || new Renderer2D();
             options.camera = options.camera || new Camera2D();
@@ -87,7 +87,7 @@ define(function(require) {
          * @param {qtek.3d.Camera} [camera]
          * @return {qtek.Layer}
          */
-        create3DLayer : function(options) {
+        createLayer3D : function(options) {
             options = options || {};
             options.renderer = options.renderer || new Renderer3D();
             if (!options.camera) {
@@ -200,7 +200,7 @@ define(function(require) {
         },
 
         _assembleEvent : function(e){
-            var clientRect = container.getBoundingClientRect();
+            var clientRect = this.container.getBoundingClientRect();
             return {
                 pageX : e.pageX,
                 pageY : e.pageY,

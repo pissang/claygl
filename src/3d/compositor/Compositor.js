@@ -17,14 +17,16 @@ define(function(require){
             }
             for (var i = 0; i < this.nodes.length; i++) {
                 var node = this.nodes[i];
-                // Find output node
-                if ( ! this._outputs.length) {
-                    if( ! node.outputs){
-                        node.render(renderer);
-                    }
-                }
                 // Update the reference number of each output texture
-                node.updateReference();
+                node.beforeFrame();
+            }
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                var node = this.nodes[i];
+                // Find output node
+                if( ! node.outputs){
+                    node.render(renderer);
+                }
             }
 
             for (var i = 0; i < this._outputs.length; i++) {
@@ -33,7 +35,9 @@ define(function(require){
         },
 
         addOutput : function(node) {
-            this._outputs.push(node);
+            if (node.outputs) {
+                this._outputs.push(node);
+            }
         },
 
         removeOutput : function(node) {

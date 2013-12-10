@@ -135,9 +135,10 @@ define(function(require) {
     // Some build in shaders
     Shader.import(require('text!./shaders/coloradjust.essl'));
     Shader.import(require('text!./shaders/blur.essl'));
-    Shader.import(require('text!./shaders/grayscale.essl'));
+    Shader.import(require('text!./shaders/lum.essl'));
     Shader.import(require('text!./shaders/lut.essl'));
     Shader.import(require('text!./shaders/output.essl'));
+    Shader.import(require('text!./shaders/hdr.essl'));
     Shader.import(require('text!./shaders/fxaa.essl'));
 
     return Pass;

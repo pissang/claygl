@@ -46,6 +46,7 @@ define(function(require) {
             }
 
             this._rendering = false;
+            this._rendered = true;
         }
     })
 

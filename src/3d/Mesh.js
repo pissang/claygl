@@ -11,9 +11,14 @@ define(function(require) {
     var prevDrawIndicesBuffer = null;
     var prevDrawIsUseFace = true;
 
-    var vertexNumber, faceNumber, drawCallNumber;
     var needsBindAttributes;
     var currentDrawID;
+
+    var renderInfo = {
+        faceNumber : 0,
+        vertexNumber : 0,
+        drawCallNumber : 0
+    };
 
     var Mesh = Node.derive(function() {
         return {
@@ -59,15 +64,17 @@ define(function(require) {
                 shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
             }
 
-            vertexNumber = geometry.getVerticesNumber();
-            faceNumber = 0;
-            drawCallNumber = 0;
+            var vertexNumber = geometry.getVerticesNumber();
+            renderInfo.vertexNumber = vertexNumber;
+            renderInfo.faceNumber = 0;
+            renderInfo.drawCallNumber = 0;
             // Draw each chunk
             needsBindAttributes = false;
             if (vertexNumber > geometry.chunkSize) {
                 needsBindAttributes = true;
             } else {
-                currentDrawID = _gl.__GUID__ + "_" + geometry.__GUID__;
+                // Hash with shader id in case previous material has less attributes than next material
+                currentDrawID = [_gl.__GUID__, geometry.__GUID__, shader.__GUID__].join('_');
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                     prevDrawID = currentDrawID;
@@ -78,12 +85,12 @@ define(function(require) {
                 if (prevDrawIsUseFace) {
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, prevDrawIndicesBuffer.buffer);
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
-                    faceNumber = prevDrawIndicesBuffer.count / 3;
+                    renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
                     _gl.drawArrays(glDrawMode, 0, vertexNumber);
                 }
-                drawCallNumber = 1;
+                renderInfo.drawCallNumber = 1;
             } else {
                 var chunks = geometry.getBufferChunks(_gl);
                 if (!chunks) {  // Empty mesh
@@ -129,29 +136,17 @@ define(function(require) {
                     if (prevDrawIsUseFace) {
                         _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
-                        faceNumber += indicesBuffer.count / 3;
+                        renderInfo.faceNumber += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, vertexNumber);
                     }
-                    drawCallNumber++;
+                    renderInfo.drawCallNumber++;
                 }
             }
 
-            var renderInfo = {
-                faceNumber : faceNumber,
-                vertexNumber : vertexNumber,
-                drawCallNumber : drawCallNumber
-            };
             return renderInfo;
         }
     });
-
-    // Called when material is changed
-    // In case the material changed and geometry not changed
-    // And the previous material has less attributes than next material
-    Mesh.materialChanged = function() {
-        prevDrawID = 0;
-    }
 
     // Enums
     Mesh.POINTS = glenum.POINTS;

@@ -79,10 +79,10 @@ define(function(require) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
-            if (this.devicePixelRatio !== 1.0) {
+            // if (this.devicePixelRatio !== 1.0) {
                 canvas.style.width = width + "px";
                 canvas.style.height = height + "px";
-            }
+            // }
              
             // set the size of the drawingBuffer
             canvas.width = width * this.devicePixelRatio;
@@ -304,8 +304,6 @@ define(function(require) {
                             _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
                         } 
                     }
-
-                    Mesh.materialChanged();
                 }
 
                 var matrixSemanticKeys = shader.matrixSemanticKeys;
@@ -342,7 +340,7 @@ define(function(require) {
                 }
             }
 
-            return renderInfo
+            return renderInfo;
         },
 
         disposeScene : function(scene) {
@@ -383,6 +381,12 @@ define(function(require) {
                 mat.dispose();
             }
             root._children = [];
+        },
+
+        disposeTexture : function(texture) {
+            if (texture && texture.dispose) {
+                texture.dispose(this.gl);
+            }
         }
     })
 

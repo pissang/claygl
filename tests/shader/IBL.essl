@@ -134,8 +134,8 @@ varying vec3 v_Weight;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
-uniform samplerCube environmentMap1;
-uniform samplerCube environmentMap2;
+uniform samplerCube envMap1;
+uniform samplerCube envMap2;
 uniform sampler2D BRDFLookup;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -143,9 +143,21 @@ uniform float alpha : 1.0;
 
 uniform vec3 specularColor : [0.56, 0.57, 0.58];
 uniform float roughness : 0;
-uniform float lodLevel : 0;
+uniform float lodMix : 0;
+uniform float envMapSize : 128;
 
 @import buildin.plugin.compute_shadow_map
+
+vec3 edgeFixup(vec3 v)
+{
+    float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+    float scale = (envMapSize - 1.0) / envMapSize;
+    if (abs(v.x) != M) v.x *= scale;
+    if (abs(v.y) != M) v.y *= scale;
+    if (abs(v.z) != M) v.z *= scale;
+
+    return v;
+}
 
 void main(){
 
@@ -174,132 +186,13 @@ void main(){
 
     vec2 envBRDF = texture2D(BRDFLookup, vec2(roughness, NoV)).rg;
     vec3 L = reflect(-V, N);
-    vec3 color1 = textureCube(environmentMap1, L).rgb;
-    vec3 color2 = textureCube(environmentMap2, L).rgb;
+    L = edgeFixup(L);
+    vec3 color1 = textureCube(envMap1, L).rgb;
+    vec3 color2 = textureCube(envMap2, L).rgb;
 
-    vec3 prefilteredColor = mix(color1, color2, roughness - lodLevel);
+    vec3 prefilteredColor = mix(color1, color2, lodMix);
 
     gl_FragColor.rgb = prefilteredColor * (specularColor * envBRDF.x + envBRDF.y);
-    gl_FragColor.a = 1.0;
-}
-
-@end
-
-
-
-
-@export IBL.fragment
-
-#define PI 3.14159265358979
-
-#define SAMPLE_NUMBER 32
-
-uniform mat4 viewInverse : VIEWINVERSE;
-
-varying vec2 v_Texcoord;
-varying vec3 v_LocalNormal;
-varying vec3 v_Normal;
-varying vec3 v_WorldPosition;
-varying vec3 v_Tangent;
-varying vec3 v_Bitangent;
-varying vec3 v_Weight;
-
-uniform sampler2D diffuseMap;
-uniform sampler2D normalMap;
-uniform sampler2D GGXLookup;
-uniform samplerCube environmentMap;
-
-uniform vec3 color : [1.0, 1.0, 1.0];
-uniform float alpha : 1.0;
-
-uniform vec3 specularColor : [0.56, 0.57, 0.58];
-uniform float roughness : 0.5;
-
-@import buildin.plugin.compute_shadow_map
-
-vec3 importanceSampleGGX(float i, float roughness, vec3 N) {
-    vec3 H = texture2D(GGXLookup, vec2(roughness, i)).rgb;
-
-    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-    vec3 tangentX = normalize(cross(upVector, N));
-    vec3 tangentY = cross(N, tangentX);
-    // Tangent to world space
-    return tangentX * H.x + tangentY * H.y + N * H.z;
-}
-
-vec3 importanceSamplePhong(vec2 xi, vec3 N) {
-    return vec3(0.0, 0.0, 0.0);
-}
-
-float G_Smith(float roughness, float NoV, float NoL) {
-    // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
-    float k = roughness * roughness / 2.0;
-    float G1V = NoV / (NoV * (1.0 - k) + k);
-    float G1L = NoL / (NoL * (1.0 - k) + k);
-    return G1L * G1V;
-}
-
-vec3 specularIBL(vec3 specularColor, float roughness, vec3 N, vec3 V) {
-    vec3 specularLighting = vec3(0.0, 0.0, 0.0);
-    for (int i = 0; i < SAMPLE_NUMBER; i++) {
-        // vec2 xi = hammersley(i, SAMPLE_NUMBER);
-        // vec3 H = importanceSampleGGX(xi, roughness, N);
-        vec3 H = importanceSampleGGX(float(i) / float(SAMPLE_NUMBER), roughness, N); // Half Vector
-
-        vec3 L = reflect(-V, H);
-        float NoV = clamp(dot(N, V), 0.0, 1.0);
-        float NoL = clamp(dot(N, L), 0.0, 1.0);
-        float NoH = clamp(dot(N, H), 0.0, 1.0);
-        float VoH = clamp(dot(V, H), 0.0, 1.0);
-
-        if (NoL > 0.0) {
-            // Sample the same L can be fast because of cache
-            vec3 sampleColor = textureCube(environmentMap, L).rgb;
-            // Fresnel term
-            vec3 F = specularColor +  (vec3(1.0) - specularColor) * pow(1.0 - VoH, 5.0);
-            float G = G_Smith(roughness, NoV, NoL);
-
-            // Incident light = SampleColor * NoL
-            // Microfacet specular = D*G*F / (4*NoL*NoV)
-            // pdf = D * NoH / (4 * VoH)
-            #ifdef RENDER_FRESNEL
-                specularLighting += F;
-            #elif defined(RENDER_GEOMETRY)
-                specularLighting += G;
-            #else
-                specularLighting += sampleColor * F * G * VoH / (NoH * NoV);
-                // specularLighting += G;
-            #endif
-        }
-    }
-
-    return specularLighting / float(SAMPLE_NUMBER);
-}
-
-void main(){
-
-    vec4 finalColor = vec4(color, alpha);
-
-    vec3 eyePos = viewInverse[3].xyz;
-    vec3 V = normalize(eyePos - v_WorldPosition);
-
-    #ifdef DIFFUSEMAP_ENABLED
-        vec4 tex = texture2D(diffuseMap, v_Texcoord);
-        finalColor.rgb *= tex.rgb;
-
-        #ifdef DIFFUSEMAP_USE_ALPHA
-            finalColor.a *= tex.a;
-        #endif
-    #endif
-
-    vec3 normal = v_Normal;
-    #ifdef NORMALMAP_ENABLED
-        normal = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
-        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
-        normal = normalize(tbn * normal);
-    #endif
-
-    gl_FragColor.rgb = finalColor.rgb * specularIBL(specularColor, roughness, normal, V);
     gl_FragColor.a = 1.0;
 }
 

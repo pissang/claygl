@@ -21,7 +21,11 @@
                     format : Texture.RGBA,
                     width : 512,
                     height : 512
-                }
+                },
+                // Node will keep the texture rendered in last frame
+                keepLastFrame : true,
+                // Force the node output the texture rendered in last frame
+                outputLastFrame : true
             }
         }
     },
@@ -89,7 +93,8 @@ define(function(require) {
             _outputReferences : {},
 
             _rendering : false,
-            _circularReference : {}
+            // If rendered in this frame
+            _rendered : false
         }
     }, function() {
         if (this.shader) {
@@ -129,25 +134,8 @@ define(function(require) {
                 for (var name in this.outputs) {
 
                     var outputInfo = this.outputs[name];
-                    var texture;
-                    // It is special when handling circular reference
-                    // Input will use the output texture of previous pass.
-                    // So the texture of current pass and previous pass are both needed
-                    // and be swapped each render pass
-                    if (this._circularReference[name]) {
-                        // Swap the texture
-                        if (!this._outputTextures[name]) {
-                            this._outputTextures[name] = texturePool.get(outputInfo.parameters || {});
-                        }
-                        var tmp = this._prevOutputTextures[name];
-                        this._prevOutputTextures[name] = this._outputTextures[name];
-                        this._outputTextures[name] = tmp;
-                        texture = tmp;
-                    } else {
-                        texture = texturePool.get(outputInfo.parameters || {});
-                        this._outputTextures[name] = texture;
-                    }
-
+                    var texture = texturePool.get(outputInfo.parameters || {});
+                    this._outputTextures[name] = texture;
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
                         attachment = _gl[attachment];
@@ -164,6 +152,7 @@ define(function(require) {
             }
 
             this._rendering = false;
+            this._rendered = true;
         },
 
         setParameter : function(name, value) {
@@ -180,28 +169,27 @@ define(function(require) {
             }
         },
 
-
         getOutput : function(renderer /*optional*/, name) {
             if (name === undefined) {
                 // Return the output texture without rendering
                 name = renderer;
                 return this._outputTextures[name];
             }
-            
             var outputInfo = this.outputs[name];
             if (! outputInfo) {
                 return ;
             }
-            if (this._outputTextures[name]) {
+            if (this._rendered) {
                 // Already been rendered in this frame
                 return this._outputTextures[name];
-            } else if(this._rendering) {
+            } else if (
+                this._rendering   // Solve Circular Reference
+                || outputInfo.outputLastFrame // Force return texture in last frame
+            ) {
                 if (!this._prevOutputTextures[name]) {
                     // Create a blank texture at first pass
                     this._prevOutputTextures[name] = texturePool.get(outputInfo.parameters || {});
                 }
-                this._circularReference[name] = true;
-                // Solve circular reference
                 return this._prevOutputTextures[name];
             }
 
@@ -213,11 +201,16 @@ define(function(require) {
         removeReference : function(name) {
             this._outputReferences[name]--;
             if (this._outputReferences[name] === 0) {
-                // Output of this node have alreay been used by all other nodes
-                // Put the texture back to the pool.
-                if (!this._circularReference[name]) {
+                var outputInfo = this.outputs[name];
+                if (outputInfo.keepLastFrame) {
+                    if (this._prevOutputTextures[name]) {
+                        texturePool.put(this._prevOutputTextures[name]);
+                    }
+                    this._prevOutputTextures[name] = this._outputTextures[name];
+                } else {
+                    // Output of this node have alreay been used by all other nodes
+                    // Put the texture back to the pool.
                     texturePool.put(this._outputTextures[name]);
-                    this._outputTextures[name] = null;
                 }
             }
         },
@@ -243,7 +236,8 @@ define(function(require) {
             this.outputLinks = {};
         },
 
-        updateReference : function() {
+        beforeFrame : function() {
+            this._rendered = false;
             for (var name in this.outputLinks) {
                 this._outputReferences[name] = this.outputLinks[name].length;
             }

@@ -62,7 +62,8 @@
             },
             "outputs" : {
                 "position" : {
-                    "parameters" : "#common"
+                    "parameters" : "#common",
+                    "keepLastFrame" : true
                 }
             }
         }

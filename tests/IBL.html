@@ -11,7 +11,8 @@
                     'text!../tests/shader/IBL.essl'], function(qtek, IBLShader) {
                 var qtek3d = qtek['3d'];
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById('Main')
+                    canvas : document.getElementById('Main'),
+                    devicePixelRatio : 1.0 
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek3d.camera.Perspective({
@@ -41,16 +42,16 @@
                 var normalDistribution = generateNormalDistribution();
                 var BRDFLookup = integrateBRDF(normalDistribution);
                 qtek.core.request.get({
-                    url : 'assets/textures/hdr/pisa.hdr',
+                    url : 'assets/textures/hdr/path.hdr',
                     responseType : 'arraybuffer',
                     onload : function(data) {
-                        var envMap = qtek3d.util.hdr.parseRGBE(data);
+                        var envMap = qtek3d.util.hdr.parseRGBE(data, 2.0);
                         envMap.flipY = false;
                         prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
                             var skybox = new qtek3d.plugin.Skybox({
                                 scene : scene
                             });
-                            skybox.material.set('environmentMap', mipmaps[1]);
+                            skybox.material.set('environmentMap', mipmaps[0]);
                             for (var i = 0; i < 10; i++) {
                                 var material = new qtek3d.Material({
                                     shader : shader
@@ -122,59 +123,48 @@
                 });
                 var viewportInfo = renderer.viewportInfo;
 
-                var compositor = new qtek3d.compositor.Compositor();
-                var sceneNode = new qtek3d.compositor.SceneNode({
-                    scene : scene,
-                    camera : camera,
-                    outputs : {
-                        "color" : {
-                            parameters : {
-                                width : renderer.width,
-                                height : renderer.height,
-                                type : qtek3d.Texture.FLOAT   
+                var compositor;
+                var FXLoader = new qtek.loader.FX();
+                FXLoader.load('assets/fx/hdr.json');
+                FXLoader.on('load', function(_compositor) {
+                    compositor = _compositor;
+
+                    var sceneNode = new qtek3d.compositor.SceneNode({
+                        name : "scene",
+                        scene : scene,
+                        camera : camera,
+                        outputs : {
+                            "color" : {
+                                parameters : {
+                                    width : window.innerWidth,
+                                    height : window.innerHeight,
+                                    type : qtek3d.Texture.FLOAT   
+                                }
                             }
                         }
+                    });
+                    compositor.add(sceneNode);
+                    var FXAANode = compositor.findNode('FXAA');
+                    if (FXAANode) {
+                        FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
                     }
-                });
-                var gammaNode = new qtek3d.compositor.Node({
-                    shader : qtek3d.Shader.source('buildin.compositor.gamma'),
-                    inputs : {
-                        'texture' : {
-                            node : sceneNode,
-                            pin : "color"
-                        }
-                    },
-                    outputs : {
-                        "color" : {
-                            parameters : {
-                                width : renderer.width,
-                                height : renderer.height
-                            }
-                        }
+                    var tonemappingNode = compositor.findNode('tonemapping');
+                    if (tonemappingNode) {
+                        tonemappingNode.outputs.color.parameters.width = renderer.width;
+                        tonemappingNode.outputs.color.parameters.height = renderer.height;
                     }
-                });
-                var FXAANode = new qtek3d.compositor.Node({
-                    shader : qtek3d.Shader.source('buildin.compositor.fxaa'),
-                    inputs : {
-                        'texture' : {
-                            node : gammaNode,
-                            pin : "color"
-                        }
-                    }
-                });
-                compositor.add(sceneNode);
-                compositor.add(gammaNode);
-                compositor.add(FXAANode);
-                // Linear -> gamma2.2
-                gammaNode.setParameter('gamma', 1 / 2.2);
-                FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
+                })
 
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     // renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
-                    compositor.render(renderer);
+                    if (compositor) {
+                        compositor.render(renderer);
+                        var lumAdaptionNode = compositor.findNode('lum_adaption');
+                        var currentLumNode = compositor.findNode('avg_log_lum');
+                    }
 
                     var x = 0, y = 0;
                     var width = viewportInfo.width / 10;
@@ -183,12 +173,22 @@
                     renderer.setViewport(x, y, width, height);
                     debugPass.setUniform('texture', normalDistribution);
                     debugPass.render(renderer);
-                    renderer.setViewport(x + width + 10, y, width, height);
+                    x += width + 10;
+                    renderer.setViewport(x, y, width, height);
                     debugPass.setUniform('texture', BRDFLookup);
                     debugPass.render(renderer);
+
+                    if (lumAdaptionNode) {
+                        x += width + 10;
+                        renderer.setViewport(x, y, width, height);
+                        debugPass.setUniform('texture', lumAdaptionNode._outputTextures['color']);
+                        debugPass.render(renderer);
+                        x += width + 10;
+                        renderer.setViewport(x, y, width, height);
+                        debugPass.setUniform('texture', currentLumNode._outputTextures['color']);
+                        debugPass.render(renderer);
+                    }
                     renderer.setViewport(viewportInfo);
-
-
                 });
 
                 function generateNormalDistribution() {
@@ -259,35 +259,53 @@
 
                     var skybox = new qtek3d.plugin.Skybox({
                         scene : emptyScene
+                    });
+                    var prefilterMaterial = new qtek3d.Material({
+                        shader : new qtek3d.Shader({
+                            vertex : qtek3d.Shader.source('buildin.skybox.vertex'),
+                            fragment : qtek3d.Shader.source('split_sum.prefilter_envmap')
+                        })
                     })
-                    skybox.material.attachShader(new qtek3d.Shader({
-                        vertex : qtek3d.Shader.source('buildin.skybox.vertex'),
-                        fragment : qtek3d.Shader.source('split_sum.prefilter_envmap')
-                    }));
-                    skybox.material.set('environmentMap', mipmaps[0]);
-                    skybox.material.set('normalDistribution', normalDistribution);
+                    var downsampleMaterial = skybox.material;
+                    downsampleMaterial.set('environmentMap', mipmaps[0]);
+                    prefilterMaterial.set('normalDistribution', normalDistribution);
 
                     var mipmapLevel = 1;
+                    var downsampleTexture = null;
+
+                    // Down sample
+                    skybox.material = downsampleMaterial;
+                    downsampleTexture = new qtek3d.texture.TextureCube({
+                        width : 16,
+                        height : 16,
+                        type : qtek3d.Texture.FLOAT
+                    });
+                    environmentMapPass.texture = downsampleTexture;
+                    environmentMapPass.render(renderer, emptyScene);
 
                     function onFrame() {
 
                         if (size > 1) {
                             size /= 2;
+                            environmentMapPass.position.copy(camera.position);
+                            // Prefilter
+                            skybox.material = prefilterMaterial;
                             roughness = mipmapLevel / mipmapNum;
-                            skybox.material.set('roughness', roughness);
+                            prefilterMaterial.set('roughness', roughness);
+                            prefilterMaterial.set('environmentMap', downsampleTexture);
                             var mipmap = new qtek3d.texture.TextureCube({
                                 useMipmap : false,
-                                width : Math.max(size, 16),
-                                height : Math.max(size, 16),
+                                width : Math.max(size, 8),
+                                height : Math.max(size, 8),
                                 type : qtek3d.Texture.FLOAT
                             });
                             mipmaps[mipmapLevel++] = mipmap;
                             environmentMapPass.texture = mipmap;
-                            environmentMapPass.position.copy(camera.position);
                             environmentMapPass.render(renderer, emptyScene);
                         } else {
                             callback && callback(mipmaps);
                             animation.off('frame', onFrame);
+                            renderer.disposeTexture(downsampleTexture);
                         }
                     }
 
@@ -319,10 +337,11 @@
                 function applyMaterial(material, mipmaps, roughness) {
                     var lodLevel = Math.floor(roughness * (mipmaps.length-1));
                     material.set('BRDFLookup', BRDFLookup);
-                    material.set('environmentMap1', mipmaps[lodLevel]);
-                    material.set('environmentMap2', mipmaps[lodLevel+1] || mipmaps[mipmaps.length - 1]);
-                    material.set('lodLevel', lodLevel / (mipmaps.length-1));
+                    material.set('envMap1', mipmaps[lodLevel]);
+                    material.set('envMap2', mipmaps[lodLevel+1] || mipmaps[mipmaps.length - 1]);
+                    material.set('lodMix', roughness * (mipmaps.length-1) - lodLevel);
                     material.set('roughness', roughness);
+                    material.set('envMapSize', material.get('envMap2').width);
                 }
             });
         </script>

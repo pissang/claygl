@@ -20,7 +20,6 @@ define(function(require) {
         render : function(renderer) {
             
             this._rendering = true;
-
             var _gl = renderer.gl;
 
             if (! this.outputs) {
@@ -68,6 +67,7 @@ define(function(require) {
             }
 
             this._rendering = false;
+            this._rendered = true;
         }
     })
 

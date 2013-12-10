@@ -97,5 +97,5 @@ define(function(require) {
                 (height & (height-1)) === 0;
     }
 
-    return texturePool
+    return texturePool;
 })

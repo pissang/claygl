@@ -1,0 +1,299 @@
+{
+    "meta" : {},
+    "type" : "compositor",
+    "nodes" : [
+        {
+            "name" : "bright",
+            "shader" : "#source(buildin.compositor.hdr.bright)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "scene",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 256,
+                        "height" : 256,
+                        "type" : "FLOAT"
+                    }
+                }
+            }
+        },
+        {
+            "name" : "blur_h_1",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "bright",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 256,
+                        "height" : 256,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "blur_v_1",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "blur_h_1",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 256,
+                        "height" : 256,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "blur_h_2",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "bright",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "blur_v_2",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "blur_h_2",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "blur_h_3",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "bright",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 64,
+                        "height" : 64,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "blur_v_3",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "blur_h_3",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 64,
+                        "height" : 64,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1
+            }
+        },
+        {
+            "name" : "bloom",
+            "shader" : "#source(buildin.compositor.hdr.bloom)",
+            "type" : "processor",
+            "inputs" : {
+                "texture1" : {
+                    "node" : "blur_v_1",
+                    "pin" : "color"
+                },
+                "texture2" : {
+                    "node" : "blur_v_2",
+                    "pin" : "color"
+                },
+                "texture3" : {
+                    "node" : "blur_v_3",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "scale" : 0.2
+            }
+        },
+        {
+            "name" : "tonemapping",
+            "shader" : "#source(buildin.compositor.hdr.tonemapping_eyeadaption)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "scene",
+                    "pin" : "color"
+                },
+                "bloom" : {
+                    "node" : "bloom",
+                    "pin" : "color"
+                },
+                "lum" : {
+                    "node" : "lum_adaption",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 1024,
+                        "height" : 1024
+                    }
+                }
+            }
+        },
+        {
+            "name" : "log_lum",
+            "shader" : "#source(buildin.compositor.hdr.log_lum)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "bloom",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            }
+        },
+        {
+            "name" : "avg_log_lum",
+            "shader" : "#source(buildin.compositor.output)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "log_lum",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 1,
+                        "height" : 1,
+                        "type" : "FLOAT"
+                    }
+                }
+            }
+        },
+        {
+            "name" : "lum_adaption",
+            "shader" : "#source(buildin.compositor.hdr.lum_adaption)",
+            "type" : "processor",
+            "inputs" : {
+                "adaptedLum" : {
+                    "node" : "lum_adaption",
+                    "pin" : "color"
+                },
+                "currentLum" : {
+                    "node" : "avg_log_lum",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 1,
+                        "height" : 1,
+                        "type" : "FLOAT"
+                    },
+                    "keepLastFrame" : true
+                }
+            },
+            "output" : true
+        },
+        {
+            "name" : "FXAA",
+            "shader" : "#source(buildin.compositor.fxaa)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "tonemapping",
+                    "pin" : "color"
+                }
+            }
+        }
+    ]
+}

@@ -127,6 +127,12 @@ define(function(require) {
                     if (outputInfo.attachment !== undefined) {
                         outputs[name].attachment = outputInfo.attachment;
                     }
+                    if (outputInfo.keepLastFrame !== undefined) {
+                        outputs[name].keepLastFrame = outputInfo.keepLastFrame;
+                    }
+                    if (outputInfo.outputLastFrame !== undefined) {
+                        outputs[name].outputLastFrame = outputInfo.outputLastFrame;
+                    }
                     if (typeof(outputInfo.parameters) === 'string') {
                         var paramExp = outputInfo.parameters;
                         if (paramExp.charAt(0) === '#') {
