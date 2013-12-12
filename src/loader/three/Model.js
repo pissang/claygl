@@ -53,8 +53,7 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    var meshList = self.parse(JSON.parse(data));
-                    this.trigger('success', meshList);
+                    return self.parse(JSON.parse(data));
                 }
             })
         },
@@ -104,6 +103,8 @@ define(function(require) {
                 }
             }
             
+            this.trigger('success', meshList);
+
             return meshList;
         },
 

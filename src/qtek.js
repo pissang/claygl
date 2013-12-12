@@ -110,7 +110,8 @@ define( function(require){
 		"util": {
 			"dds": require('3d/util/dds'),
 			"hdr": require('3d/util/hdr'),
-			"mesh": require('3d/util/mesh')
+			"mesh": require('3d/util/mesh'),
+			"texture": require('3d/util/texture')
 		}
 	},
 	"Layer": require('Layer'),

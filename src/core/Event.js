@@ -20,7 +20,7 @@ define( function(require) {
         // enable bubbling
         while (target && !e.cancelBubble ) {
             e.currentTarget = target;
-            target.trigger(eventType, [e]);
+            target.trigger(eventType, e);
 
             target = target.parent;
         }

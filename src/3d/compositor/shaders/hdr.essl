@@ -70,6 +70,7 @@ void main()
 
 uniform sampler2D texture;
 uniform sampler2D bloom;
+uniform sampler2D lensflare;
 uniform sampler2D lum;
 
 varying vec2 v_Texcoord;
@@ -100,6 +101,9 @@ void main()
 
     #ifdef BLOOM_ENABLED
         tex += texture2D(bloom, v_Texcoord).rgb * 0.25;
+    #endif
+
+    #ifdef LENSFLARE_ENABLED
     #endif
 
     // From KlayGE

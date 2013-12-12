@@ -16,7 +16,7 @@ define(function(require) {
 
     var arraySlice = Array.prototype.slice;
 
-    var ret = {
+    var meshUtil = {
         /**
          * Merge multiple meshes to one.
          * Note that these meshes must have the same material
@@ -297,5 +297,5 @@ define(function(require) {
         }
     }
 
-    return ret;
+    return meshUtil;
 })

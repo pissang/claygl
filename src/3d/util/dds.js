@@ -77,7 +77,7 @@ define(function(require) {
     var off_caps4 = 30;
 
     var ret = {
-        parse : function(arrayBuffer) {
+        parse : function(arrayBuffer, out) {
             var header = new Int32Array(arrayBuffer, 0, headerLengthInt);
             if (header[off_magic] !== DDS_MAGIC) {
                 return null;
@@ -140,8 +140,17 @@ define(function(require) {
                     textures[f].mipmaps = mipmaps;
                 }
             }
-
-            return isCubeMap ? textures : textures[0];
+            // TODO
+            // return isCubeMap ? textures : textures[0];
+            if (out) {
+                out.width = textures[0].width;
+                out.height = textures[0].height;
+                out.format = textures[0].format;
+                out.pixels = textures[0].pixels;
+                out.mipmaps = textures[0].mipmaps;
+            } else {
+                return textures[0];
+            }
         }
     }
 });

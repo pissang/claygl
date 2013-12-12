@@ -44,13 +44,11 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(xmlString) {
-                    self.parse(xmlString, function(root){
-                        self.trigger('success', root);
-                    });
+                    return self.parse(xmlString);
                 }
             })
         },
-        parse : function(xml, callback) {
+        parse : function(xml) {
             if (typeof(xml) === "string") {
                 var parser = new DOMParser();
                 var doc = parser.parseFromString(xml, 'text/xml');
@@ -82,8 +80,8 @@ define(function(require) {
                 this._parseNode(child, root);
                 child = child.nextSibling;
             }
-
-            callback && callback(root);
+            
+            this.trigger('success', root);
 
             return root;
         },

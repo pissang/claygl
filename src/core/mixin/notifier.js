@@ -63,7 +63,17 @@ define(function() {
             return handler;
         },
 
-        // once : function(name, )
+        once : function(name, action, context) {
+            if (!name || !action) {
+                return;
+            }
+            var self;
+            function wrapper() {
+                self.off(name, action);
+                action.apply(this, arguments);
+            }
+            return this.on(name, wrapper, context);
+        },
 
         // Alias of on('before')
         before : function(name, action, context/*optional*/) {
@@ -71,7 +81,7 @@ define(function() {
                 return;
             }
             name = 'before' + name;
-            this.on(name, action, context);
+            return this.on(name, action, context);
         },
 
         // Alias of on('after')
@@ -80,7 +90,17 @@ define(function() {
                 return;
             }
             name = 'after' + name;
-            this.on(name, action, context);
+            return this.on(name, action, context);
+        },
+
+        // Alias of once('success')
+        success : function(action, context/*optional*/) {
+            return this.once('success', action, context);
+        },
+
+        // Alias of once('error')
+        error : function() {
+            return this.once('error', action, context);
         },
 
         off : function(name, action) {

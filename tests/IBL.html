@@ -12,11 +12,11 @@
                 var qtek3d = qtek['3d'];
                 var renderer = new qtek3d.Renderer({
                     canvas : document.getElementById('Main'),
-                    devicePixelRatio : 1.0 
+                    devicePixelRatio : 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek3d.camera.Perspective({
-                    aspect : window.innerWidth / window.innerHeight
+                    aspect : renderer.width / renderer.height
                 });
                 camera.position.set(0, 0, 20);
 
@@ -32,25 +32,23 @@
                     fragment : qtek3d.Shader.source('split_sum.fragment')
                 });
 
-                var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load("assets/models/suzanne.json");
-                var suzanneGeometry;
-                GLTFLoader.on('success', function(_scene) {
-                    suzanneGeometry = _scene.getNode('Suzanne').childAt(0).geometry;
-                });
-
                 var normalDistribution = generateNormalDistribution();
                 var BRDFLookup = integrateBRDF(normalDistribution);
-                qtek.core.request.get({
-                    url : 'assets/textures/hdr/pisa.hdr',
-                    responseType : 'arraybuffer',
-                    onload : function(data) {
-                        var envMap = qtek3d.util.hdr.parseRGBE(data, 2.0);
+                var envMap = qtek3d.util.texture.loadTexture(
+                    'assets/textures/hdr/pisa.hdr',
+                    function () {
                         envMap.flipY = false;
                         prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
                             var skybox = new qtek3d.plugin.Skybox({
                                 scene : scene
                             });
+                            var GLTFLoader = new qtek.loader.GLTF();
+                            GLTFLoader.load("assets/models/suzanne.json");
+                            var suzanneGeometry;
+                            GLTFLoader.on('success', function(res) {
+                                suzanneGeometry = res.scene.getNode('Suzanne').childAt(0).geometry;
+                            });
+
                             skybox.material.set('environmentMap', mipmaps[0]);
                             for (var i = 0; i < 10; i++) {
                                 var material = new qtek3d.Material({
@@ -110,8 +108,7 @@
                             applyMaterial(monkeys[3].material, mipmaps, 0.2);
                         });
                     }
-                });
-
+                );
                 var control = new qtek3d.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas

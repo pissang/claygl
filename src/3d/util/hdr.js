@@ -100,7 +100,7 @@ define(function(require) {
         // http://www.graphics.cornell.edu/~bjw/rgbe.html
         // Blender source
         // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
-        parseRGBE : function(arrayBuffer, exposure) {
+        parseRGBE : function(arrayBuffer, texture, exposure) {
             if (exposure === undefined) {
                 exposure = 0;
             }
@@ -159,12 +159,13 @@ define(function(require) {
                 }
             }
 
-            var texture = new Texture2D({
-                width : width,
-                height : height,
-                pixels : pixels,
-                type : Texture.FLOAT
-            });
+            if (!texture) {
+                texture = new Texture2D();
+            }
+            texture.width = width;
+            texture.height = height;
+            texture.pixels = pixels;
+            texture.type = Texture.FLOAT;
             return texture;
         },
 

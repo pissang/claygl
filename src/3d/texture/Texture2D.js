@@ -115,9 +115,14 @@ define(function(require) {
             var self = this;
             image.onload = function() {
                 self.dirty();
-                self.trigger("load");
+                self.trigger("success", self);
                 image.onload = null;
             }
+            image.onerror = function() {
+                self.trigger('error', self);
+                image.onerror = null;
+            }
+
             image.src = src;
             this.image = image;
         }

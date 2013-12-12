@@ -69,13 +69,11 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    self.parse(JSON.parse(data), function(scene, cameras, skeleton) {
-                        self.trigger("success", scene, cameras, skeleton);
-                    });
+                    return self.parse(JSON.parse(data));
                 }
             });
         },
-        parse : function(json, callback) {
+        parse : function(json) {
             var self = this;
             var loading = 0;
 
@@ -90,6 +88,8 @@ define(function(require) {
                 cameras : {},
                 nodes : {}
             };
+            // Build scene
+            var scene = new Scene();
             // Load buffers
             _.each(json.buffers, function(bufferInfo, name) {
                 loading++;
@@ -114,8 +114,6 @@ define(function(require) {
                 self._parseMeshes(json, lib);
                 self._parseNodes(json, lib);
 
-                // Build scene
-                var scene = new Scene();
                 var sceneInfo = json.scenes[json.scene];
                 for (var i = 0; i < sceneInfo.nodes.length; i++) {
                     if (lib.joints[sceneInfo.nodes[i]]) {
@@ -126,7 +124,17 @@ define(function(require) {
                     scene.add(node);
                 }
 
-                callback && callback(scene, lib.cameras, lib.skeleton);
+                self.trigger("success", {
+                    scene : scene,
+                    cameras : lib.cameras,
+                    skeleton : lib.skeleton
+                });
+            }
+
+            return {
+                scene : scene,
+                cameras : lib.cameras,
+                skeleton : lib.skeleton
             }
         },
 

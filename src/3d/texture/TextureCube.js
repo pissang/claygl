@@ -114,13 +114,18 @@ define(function(require) {
             _.each(imageList, function(src, target){
                 var image = new Image();
                 image.onload = function() {
-                    loading -- ;
+                    loading --;
                     if (loading === 0){
                         self.dirty();
-                        self.trigger("load");
+                        self.trigger("success", self);
                     }
                     image.onload = null;
                 }
+                image.onerror = function() {
+                    loading --;
+                    image.onerror = null;
+                }
+                
                 loading++;
                 image.src = src;
                 self.image[target] = image;

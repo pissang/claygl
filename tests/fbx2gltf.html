@@ -24,10 +24,9 @@
 
             GLTFLoader.load("assets/scenes/fbx/Robot Kyle.json");
 
-            GLTFLoader.on('success', function(scene, cameras) {
-                var camera = cameras[Object.keys(cameras)[0]];
-
-                camera = new qtek3d.camera.Perspective({
+            GLTFLoader.on('success', function(res) {
+                var scene = res.scene;
+                var camera = new qtek3d.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height,
                     far : 100
                 });

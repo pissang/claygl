@@ -42,16 +42,15 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    self.parse(JSON.parse(data), function(compositor) {
-                        self.trigger("success", compositor);
-                    });
+                    return self.parse(JSON.parse(data));
                 }
             });
         },
 
-        parse : function(json, callback) {
+        parse : function(json) {
             var self = this;
             var compositor = new Compositor();
+
             var lib = {
                 textures : {},
                 shaders : {},
@@ -69,7 +68,7 @@ define(function(require) {
                     }
                 }
 
-                callback(compositor);
+                self.trigger('success', compositor);
             }
 
             for (var name in json.parameters) {
@@ -83,6 +82,8 @@ define(function(require) {
                     afterLoad();
                 });
             });
+
+            return compositor;
         },
 
         _createNode : function(nodeInfo, lib) {
