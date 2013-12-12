@@ -28,10 +28,9 @@ define(function(require) {
                 this.pass.outputs = {};
 
                 for (var name in this.outputs) {
-
+                    var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-
-                    var texture = texturePool.get(outputInfo.parameters || {});
+                    var texture = texturePool.get(parameters);
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;

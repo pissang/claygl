@@ -67,7 +67,7 @@ define(function() {
             if (!name || !action) {
                 return;
             }
-            var self;
+            var self = this;
             function wrapper() {
                 self.off(name, action);
                 action.apply(this, arguments);

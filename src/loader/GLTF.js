@@ -69,7 +69,7 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    return self.parse(JSON.parse(data));
+                    self.parse(JSON.parse(data));
                 }
             });
         },

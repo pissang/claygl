@@ -35,7 +35,7 @@
                 var normalDistribution = generateNormalDistribution();
                 var BRDFLookup = integrateBRDF(normalDistribution);
                 var envMap = qtek3d.util.texture.loadTexture(
-                    'assets/textures/hdr/pisa.hdr',
+                    'assets/textures/hdr/path.hdr',
                     function () {
                         envMap.flipY = false;
                         prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
@@ -118,14 +118,12 @@
                 var debugPass = new qtek3d.compositor.Pass({
                     fragment : qtek3d.Shader.source('buildin.compositor.output')
                 });
-                var viewportInfo = renderer.viewportInfo;
 
                 var compositor;
                 var FXLoader = new qtek.loader.FX();
                 FXLoader.load('assets/fx/hdr.json');
                 FXLoader.on('success', function(_compositor) {
                     compositor = _compositor;
-
                     var sceneNode = new qtek3d.compositor.SceneNode({
                         name : "scene",
                         scene : scene,
@@ -133,34 +131,31 @@
                         outputs : {
                             "color" : {
                                 parameters : {
-                                    width : window.innerWidth,
-                                    height : window.innerHeight,
+                                    width : function(renderer) {return renderer.width}, 
+                                    height : function(renderer) {return renderer.height},
                                     type : qtek3d.Texture.FLOAT   
                                 }
                             }
                         }
                     });
                     compositor.add(sceneNode);
-                    var FXAANode = compositor.findNode('FXAA');
-                    if (FXAANode) {
-                        FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
-                    }
-                    var tonemappingNode = compositor.findNode('tonemapping');
-                    if (tonemappingNode) {
-                        tonemappingNode.outputs.color.parameters.width = renderer.width;
-                        tonemappingNode.outputs.color.parameters.height = renderer.height;
-                    }
                 })
 
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
+                    var viewportInfo = renderer.viewportInfo;
                     // renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {
                         compositor.render(renderer);
                         var lumAdaptionNode = compositor.findNode('lum_adaption');
                         var currentLumNode = compositor.findNode('avg_log_lum');
+
+                        var FXAANode = compositor.findNode('FXAA');
+                        if (FXAANode) {
+                            FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
+                        }
                     }
 
                     var x = 0, y = 0;
@@ -339,6 +334,11 @@
                     material.set('lodMix', roughness * (mipmaps.length-1) - lodLevel);
                     material.set('roughness', roughness);
                     material.set('envMapSize', material.get('envMap2').width);
+                }
+
+                window.onresize = function() {
+                    renderer.resize(window.innerWidth, window.innerHeight);
+                    camera.aspect = renderer.width / renderer.height;
                 }
             });
         </script>

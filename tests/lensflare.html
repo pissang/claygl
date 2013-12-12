@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
+</head>
+<body style="margin:0px">
+    <canvas id="Main"></canvas>
+    <script type="text/javascript">
+        require(['qtek'], function(qtek) {
+            var qtek3d = qtek['3d'];
+            var renderer = new qtek3d.Renderer({
+                canvas : document.getElementById('Main'),
+                devicePixelRatio : 1.0
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+
+            var camera = new qtek3d.camera.Perspective({
+                aspect : renderer.width / renderer.height
+            });
+            camera.position.set(0, 0, 20);
+
+            var scene = new qtek3d.Scene();
+            var control = new qtek3d.plugin.OrbitControl({
+                domElement : renderer.canvas,
+                target : camera
+            });
+            control.enable();
+
+            var cubeMap = new qtek3d.texture.TextureCube({
+                width : 512,
+                height : 512,
+                type : qtek3d.Texture.FLOAT
+            });
+
+            qtek3d.util.texture.loadPanorama(
+                'assets/textures/hdr/grace-new.hdr',
+                cubeMap,
+                renderer
+            );
+
+            var skybox = new qtek3d.plugin.Skybox({
+                scene : scene
+            });
+            skybox.material.set('environmentMap', cubeMap);
+
+            var animation = new qtek.animation.Animation();
+            animation.start();
+
+            var FXLoader = new qtek.loader.FX();
+            FXLoader.load('assets/fx/hdr.json');
+            FXLoader.success(function(compositor) {
+                var sceneNode = new qtek3d.compositor.SceneNode({
+                    name : 'scene',
+                    scene : scene,
+                    camera : camera,
+                    outputs : {
+                        color : {
+                            parameters : {
+                                width : function(renderer) {
+                                    return renderer.width;
+                                },
+                                height : function(renderer) {
+                                    return renderer.height;
+                                },
+                                type : qtek3d.Texture.FLOAT
+                            }
+                        }
+                    }
+                });
+                compositor.add(sceneNode);
+
+                animation.on('frame', function() {
+                    compositor.render(renderer);
+
+                    var FXAANode = compositor.findNode('FXAA');
+                    if (FXAANode) {
+                        FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

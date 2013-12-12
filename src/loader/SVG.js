@@ -44,7 +44,7 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(xmlString) {
-                    return self.parse(xmlString);
+                    self.parse(xmlString);
                 }
             })
         },

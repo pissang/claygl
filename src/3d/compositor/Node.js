@@ -132,9 +132,9 @@ define(function(require) {
                 this.pass.outputs = {};
 
                 for (var name in this.outputs) {
-
+                    var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-                    var texture = texturePool.get(outputInfo.parameters || {});
+                    var texture = texturePool.get(parameters);
                     this._outputTextures[name] = texture;
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == "string") {
@@ -153,6 +153,45 @@ define(function(require) {
 
             this._rendering = false;
             this._rendered = true;
+        },
+
+        updateParameter : function(name, renderer) {
+            var outputInfo = this.outputs[name];
+            var parameters = outputInfo.parameters;
+            var parametersCopy = outputInfo._parametersCopy;
+            if (!parametersCopy) {
+                parametersCopy = outputInfo._parametersCopy = {};
+            }
+            if (parameters) {
+                for (var key in parameters) {
+                    if (key !== 'width' && key !== 'height') {
+                        parametersCopy[key] = parameters[key];
+                    }
+                }
+            }
+            var width, height;
+            if (parameters.width instanceof Function) {
+                width = parameters.width(renderer);
+            } else {
+                width = parameters.width;
+            }
+            if (parameters.height instanceof Function) {
+                height = parameters.height(renderer);
+            } else {
+                height = parameters.height;
+            }
+            if (
+                parametersCopy.width !== width
+                || parametersCopy.height !== height
+            ) {
+                if (this._outputTextures[name]) {
+                    this._outputTextures[name].dispose(renderer.gl);
+                }
+            }
+            parametersCopy.width = width;
+            parametersCopy.height = height;
+
+            return parametersCopy;
         },
 
         setParameter : function(name, value) {

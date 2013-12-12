@@ -8,6 +8,7 @@ define(function(require) {
 
     var SceneNode = Node.derive(function() {
         return {
+            name : 'scene',
             scene : null,
             camera : null,
             material : null
@@ -25,12 +26,11 @@ define(function(require) {
             if (! this.outputs) {
                 renderer.render(this.scene, this.camera);
             } else {
-                
                 var frameBuffer = this.frameBuffer;
-
                 for (var name in this.outputs) {
+                    var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-                    var texture = texturePool.get(outputInfo.parameters || {});
+                    var texture = texturePool.get(parameters);
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;

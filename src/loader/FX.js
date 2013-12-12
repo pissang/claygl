@@ -42,7 +42,7 @@ define(function(require) {
                 },
                 responseType : "text",
                 onload : function(data) {
-                    return self.parse(JSON.parse(data));
+                    self.parse(JSON.parse(data));
                 }
             });
         },
@@ -169,6 +169,7 @@ define(function(require) {
             }
             return node;
         },
+
         _convertParameter : function(paramInfo) {
             var param = {};
             if (!paramInfo) {
@@ -180,12 +181,27 @@ define(function(require) {
                         param[name] = Texture[paramInfo[name]];
                     }
                 });
-            ['width', 'height', 'useMipmap']
+            ['width', 'height']
                 .forEach(function(name) {
                     if (paramInfo[name] !== undefined) {
-                        param[name] = paramInfo[name];
+                        var val = paramInfo[name];
+                        if (typeof val === 'string') {
+                            val = val.trim();
+                            if (val.match(/%$/)) {
+                                if (name === 'width') {
+                                    param[name] = percentToWidth.bind(null, val);
+                                } else {
+                                    param[name] = percentToHeight.bind(null, val);
+                                }
+                            }
+                        } else {
+                            param[name] = val;
+                        }
                     }
                 });
+            if (paramInfo.useMipmap !== undefined) {
+                param.useMipmap = paramInfo.useMipmap;
+            }
             return param;
         },
         
@@ -263,6 +279,22 @@ define(function(require) {
             }
         }
     });
+
+    function percentToWidth(percentStr, renderer) {
+        var percent = parseFloat(percentStr.substr(0, percentStr.length-1));
+        return Math.max(
+            percent / 100 * renderer.width,
+            1
+        );
+    }
+
+    function percentToHeight(percentStr, renderer) {
+        var percent = parseFloat(percentStr.substr(0, percentStr.length-1));
+        return Math.max(
+            percent / 100 * renderer.height,
+            1
+        );
+    }
 
     return FXLoader;
 });

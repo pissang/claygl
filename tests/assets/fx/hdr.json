@@ -20,6 +20,9 @@
                         "type" : "FLOAT"
                     }
                 }
+            },
+            "parameters" : {
+                "threshold" : 2
             }
         },
         {
@@ -194,6 +197,69 @@
             }
         },
         {
+            "name" : "lensflare",
+            "shader" : "#source(buildin.compositor.lensflare)",
+            "type" : "processor",
+            "inputs" : {
+                "bright" : {
+                    "node" : "bright",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize" : [256, 256],
+                "dispersal" : 0.3
+            }
+        },
+        {
+            "name" : "lensflare_blur_h",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "lensflare",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128,
+                        "type" : "FLOAT"
+                    }
+                }
+            }
+        },
+        {
+            "name" : "lensflare_blur_v",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "lensflare_blur_h",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 128,
+                        "height" : 128
+                    }
+                }
+            }
+        },
+        {
             "name" : "tonemapping",
             "shader" : "#source(buildin.compositor.hdr.tonemapping)",
             "type" : "processor",
@@ -206,6 +272,10 @@
                     "node" : "bloom",
                     "pin" : "color"
                 },
+                "lensflare" : {
+                    "node" : "lensflare_blur_v",
+                    "pin" : "color"
+                },
                 "lum" : {
                     "node" : "lum_adaption",
                     "pin" : "color"
@@ -214,12 +284,13 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 1024,
-                        "height" : 1024
+                        "width" : "100%",
+                        "height" : "100%"
                     }
                 }
             }
         },
+
         {
             "name" : "log_lum",
             "shader" : "#source(buildin.compositor.hdr.log_lum)",

@@ -104,6 +104,7 @@ void main()
     #endif
 
     #ifdef LENSFLARE_ENABLED
+        tex += texture2D(lensflare, v_Texcoord).rgb;
     #endif
 
     // From KlayGE
