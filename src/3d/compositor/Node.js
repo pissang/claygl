@@ -97,12 +97,12 @@ define(function(require) {
             _rendered : false
         }
     }, function() {
-        if (this.shader) {
-            var pass = new Pass({
-                fragment : this.shader
-            });
-            this.pass = pass;   
-        }
+        
+        var pass = new Pass({
+            fragment : this.shader
+        });
+        this.pass = pass;
+
         if (this.outputs) {
             this.frameBuffer = new FrameBuffer({
                 depthBuffer : false
@@ -169,6 +169,12 @@ define(function(require) {
             }
         },
 
+        setShader : function(shaderStr) {
+            var material = this.pass.material;
+            material.shader.setFragment(shaderStr);
+            material.attachShader(shader, true);
+        },
+
         getOutput : function(renderer /*optional*/, name) {
             if (name === undefined) {
                 // Return the output texture without rendering
@@ -228,12 +234,18 @@ define(function(require) {
             fromNode.outputLinks[ fromPinName ].push({
                 node : this,
                 pin : inputPinName
-            })
+            });
+            // Enabled the pin texture in shader
+            var shader = this.pass.material.shader;
+            shader.enableTexture(inputPinName);
         },
 
         clear : function() {
             this.inputLinks = {};
             this.outputLinks = {};
+
+            var shader = this.pass.material.shader;
+            shader.disableTexturesAll();   
         },
 
         beforeFrame : function() {

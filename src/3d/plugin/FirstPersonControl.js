@@ -25,7 +25,7 @@ define(function(require) {
         }
     }, {
         enable : function() {
-            this.target.on("beforeupdate", this._beforeUpdateCamera, this);
+            this.target.before("update", this._beforeUpdateCamera, this);
 
             this.target.eulerOrder = ["Y", "X", "Z"];
             // Use pointer lock

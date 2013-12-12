@@ -88,6 +88,7 @@ uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
+uniform vec3 emission : [0.0, 0.0, 0.0];
 uniform float alpha : 1.0;
 
 // Uniforms for wireframe
@@ -266,10 +267,11 @@ void main()
         }
     #endif
 
-    gl_FragColor.xyz *= diffuseColor;
+    gl_FragColor.rgb *= diffuseColor;
+    gl_FragColor.rgb += emission;
     if(lineWidth > 0.01)
     {
-        gl_FragColor.xyz = gl_FragColor.xyz * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+        gl_FragColor.rgb = gl_FragColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 }
 

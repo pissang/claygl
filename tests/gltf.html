@@ -31,7 +31,7 @@
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
             
-            GLTFLoader.on("load", function(scene, cameras) {
+            GLTFLoader.on('success', function(scene, cameras) {
                 var camera = cameras[Object.keys(cameras)[0]];
                 if (!camera) {
                     camera = new qtek3d.camera.Perspective({

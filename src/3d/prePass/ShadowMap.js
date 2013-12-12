@@ -81,9 +81,9 @@ define(function(require) {
     }, {
 
         render : function(renderer, scene) {
-            this.trigger('beforerender', [this, renderer, scene]);
+            this.trigger('beforerender', this, renderer, scene);
             this._renderShadowPass(renderer, scene);
-            this.trigger('afterrender', [this, renderer, scene]);
+            this.trigger('afterrender', this, renderer, scene);
         },
 
         renderDebug : function(renderer) {
@@ -372,14 +372,14 @@ define(function(require) {
             frameBuffer.attach(_gl, tmpTexture);
             frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform("texture", texture);
-            this._gaussianPassH.setUniform("imageHeight", size);
+            this._gaussianPassH.setUniform("textureHeight", size);
             this._gaussianPassH.render(renderer);
             frameBuffer.unbind(renderer);
 
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
             this._gaussianPassV.setUniform("texture", tmpTexture);
-            this._gaussianPassV.setUniform("imageWidth", size);
+            this._gaussianPassV.setUniform("textureWidth", size);
             this._gaussianPassV.render(renderer);
             frameBuffer.unbind(renderer);
 

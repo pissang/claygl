@@ -139,6 +139,8 @@ define(function(require) {
     Shader.import(require('text!./shaders/lut.essl'));
     Shader.import(require('text!./shaders/output.essl'));
     Shader.import(require('text!./shaders/hdr.essl'));
+    Shader.import(require('text!./shaders/lensflare.essl'));
+    Shader.import(require('text!./shaders/blend.essl'));
     Shader.import(require('text!./shaders/fxaa.essl'));
 
     return Pass;

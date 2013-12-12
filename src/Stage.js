@@ -56,8 +56,8 @@ define(function(require) {
         this.animation = new Animation();
         this.animation.start();
 
-        this.animation.on('frame', function() {
-            this.trigger('frame');
+        this.animation.on('frame', function(frameTime) {
+            this.trigger('frame', frameTime);
         }, this);
     }, {
 

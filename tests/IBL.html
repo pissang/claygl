@@ -35,14 +35,14 @@
                 var GLTFLoader = new qtek.loader.GLTF();
                 GLTFLoader.load("assets/models/suzanne.json");
                 var suzanneGeometry;
-                GLTFLoader.on('load', function(_scene) {
+                GLTFLoader.on('success', function(_scene) {
                     suzanneGeometry = _scene.getNode('Suzanne').childAt(0).geometry;
                 });
 
                 var normalDistribution = generateNormalDistribution();
                 var BRDFLookup = integrateBRDF(normalDistribution);
                 qtek.core.request.get({
-                    url : 'assets/textures/hdr/path.hdr',
+                    url : 'assets/textures/hdr/pisa.hdr',
                     responseType : 'arraybuffer',
                     onload : function(data) {
                         var envMap = qtek3d.util.hdr.parseRGBE(data, 2.0);
@@ -126,7 +126,7 @@
                 var compositor;
                 var FXLoader = new qtek.loader.FX();
                 FXLoader.load('assets/fx/hdr.json');
-                FXLoader.on('load', function(_compositor) {
+                FXLoader.on('success', function(_compositor) {
                     compositor = _compositor;
 
                     var sceneNode = new qtek3d.compositor.SceneNode({

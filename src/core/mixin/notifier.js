@@ -1,16 +1,12 @@
-/**
- * Event interface
- *
- * @method on(eventName, handler[, context])
- * @method trigger(eventName[, arg1[, arg2]])
- * @method off(eventName[, handler])
- * @method has(eventName)
- * @export{object}
- */
 define(function() {
 
+    function Handler(action, context) {
+        this.action = action;
+        this.context = context;
+    }
+
     return{
-        trigger : function(name, params) {
+        trigger : function(name) {
             if (! this.hasOwnProperty('__handlers__')) {
                 return;
             }
@@ -18,58 +14,102 @@ define(function() {
                 return;
             }
 
-            var handlers = this.__handlers__[name];
-            for (var i = 0; i < handlers.length; i+=2) {
-                var handler = handlers[i];
-                var context = handlers[i+1];
-                handler.apply(context || this, params);
+            var hdls = this.__handlers__[name];
+            var l = hdls.length, i = -1, args = arguments;
+            // Optimize from backbone
+            switch (args.length) {
+                case 1: 
+                    while (++i < l)
+                        hdls[i].action.call(hdls[i].context);
+                    return;
+                case 2:
+                    while (++i < l)
+                        hdls[i].action.call(hdls[i].context, args[1]);
+                    return;
+                case 3:
+                    while (++i < l)
+                        hdls[i].action.call(hdls[i].context, args[1], args[2]);
+                    return;
+                case 4:
+                    while (++i < l)
+                        hdls[i].action.call(hdls[i].context, args[1], args[2], args[3]);
+                    return;
+                case 5:
+                    while (++i < l)
+                        hdls[i].action.call(hdls[i].context, args[1], args[2], args[3], args[4]);
+                    return;
+                default:
+                    while (++i < l)
+                        hdls[i].action.apply(hdls[i].context, Array.prototype.slice.call(args, 1));
+                    return;
             }
         },
         
-        on : function(target, handler, context/*optional*/) {
-            if (!target) {
+        on : function(name, action, context/*optional*/) {
+            if (!name || !action) {
                 return;
             }
             var handlers = this.__handlers__ || (this.__handlers__={});
-            if (! handlers[target]) {
-                handlers[target] = [];
+            if (! handlers[name]) {
+                handlers[name] = [];
+            } else {
+                if (this.has(name, action)) {
+                    return;
+                }   
             }
-            if (handlers[target].indexOf(handler) == -1) {
-                // structure in list
-                // [handler,context,handler,context,handler,context..]
-                handlers[target].push(handler);
-                handlers[target].push(context);
-            }
+            var handler = new Handler(action, context || this);
+            handlers[name].push(handler);
 
             return handler;
         },
 
-        off : function(target, handler) {
+        // once : function(name, )
+
+        // Alias of on('before')
+        before : function(name, action, context/*optional*/) {
+            if (!name || !action) {
+                return;
+            }
+            name = 'before' + name;
+            this.on(name, action, context);
+        },
+
+        // Alias of on('after')
+        after : function(name, action, context/*optional*/) {
+            if (!name || !action) {
+                return;
+            }
+            name = 'after' + name;
+            this.on(name, action, context);
+        },
+
+        off : function(name, action) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
-            if (handlers[target]) {
-                if (handler) {
-                    var arr = handlers[target];
-                    // remove handler and context
-                    var idx = arr.indexOf(handler);
-                    if(idx >= 0)
-                        arr.splice(idx, 2);
-                } else {
-                    handlers[target] = [];
+            if (handlers[name]) {
+                var hdls = handlers[name];
+                for (var i = 0; i < hdls.length; i++) {
+                    if (hdls[i].action === action) {
+                        hdls.splice(i, 1);
+                        return;
+                    }
                 }
-            }
+            } 
         },
 
-        has : function(target, handler) {
-            if (! this.__handlers__ ||
-                ! this.__handlers__[target]) {
+        has : function(name, action) {
+            var handlers = this.__handlers__;
+
+            if (! handlers ||
+                ! handlers[name]) {
                 return false;
             }
-            if (! handler) {
-                return this.__handlers__[target].length;
-            } else {
-                return this.__handlers__[target].indexOf(handler) !== -1;
+            var hdls = handlers[name];
+            for (var i = 0; i < hdls.length; i++) {
+                if (hdls[i].action === action) {
+                    return true;
+                }
             }
         }
     }

@@ -45,13 +45,13 @@ define(function(require) {
         'sampler2D' : function() {return null;},
         'samplerCube' : function() {return null;},
 
-        'vec2' : function() {return new Float32Array(2);},
-        'vec3' : function() {return new Float32Array(3);},
-        'vec4' : function() {return new Float32Array(4);},
+        'vec2' : function() {return [0, 0];},
+        'vec3' : function() {return [0, 0, 0];},
+        'vec4' : function() {return [0, 0, 0, 0];},
 
-        'ivec2' : function() {return new Int32Array(2);},
-        'ivec3' : function() {return new Int32Array(3);},
-        'ivec4' : function() {return new Int32Array(4);},
+        'ivec2' : function() {return [0, 0];},
+        'ivec3' : function() {return [0, 0, 0];},
+        'ivec4' : function() {return [0, 0, 0, 0];},
 
         'mat2' : function() {return mat2.create();},
         'mat3' : function() {return mat3.create();},

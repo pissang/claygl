@@ -4,12 +4,12 @@ uniform sampler2D texture; // the texture with the scene you want to blur
 varying vec2 v_Texcoord;
  
 uniform float blurSize : 2.0; 
-uniform float imageWidth : 512.0;
+uniform float textureWidth : 512.0;
 
 void main(void)
 {
    vec4 sum = vec4(0.0);
-   float blurOffset = blurSize / imageWidth;
+   float blurOffset = blurSize / textureWidth;
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
    sum += texture2D(texture, vec2(max(v_Texcoord.x - 4.0*blurOffset, 0.0), v_Texcoord.y)) * 0.05;
@@ -33,12 +33,12 @@ uniform sampler2D texture;
 varying vec2 v_Texcoord;
  
 uniform float blurSize : 2.0;
-uniform float imageHeight : 512.0;
+uniform float textureHeight : 512.0;
  
 void main(void)
 {
    vec4 sum = vec4(0.0);
-   float blurOffset = blurSize / imageHeight;
+   float blurOffset = blurSize / textureHeight;
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
    sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurOffset, 0.0))) * 0.05;
@@ -62,13 +62,12 @@ uniform sampler2D texture;
 varying vec2 v_Texcoord;
 
 uniform float blurSize : 3.0;
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
 
    vec4 tex = texture2D(texture, v_Texcoord);
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    tex += texture2D(texture, v_Texcoord + vec2(offset.x, 0.0) );
    tex += texture2D(texture, v_Texcoord + vec2(offset.x, offset.y) );
@@ -90,7 +89,7 @@ void main(void){
 @export buildin.compositor.hexagonal_blur_mrt_1
 
 // MRT in chrome
-// https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+// https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/webgl-draw-buffers.html
 #extension GL_EXT_draw_buffers : require
 
 uniform sampler2D texture;
@@ -98,11 +97,10 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 2.0;
 
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    vec4 color = vec4(0.0);
    // Top
@@ -129,11 +127,10 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 2.0;
 
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    vec4 color1 = vec4(0.0);
    // Down left
@@ -159,11 +156,10 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
 
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    vec4 color = vec4(0.0);
    // Top
@@ -182,11 +178,10 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
 
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    vec4 color = vec4(0.0);
    // Down left
@@ -206,11 +201,10 @@ varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
 
-uniform float imageWidth : 512.0;
-uniform float imageHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = vec2(blurSize/imageWidth, blurSize/imageHeight);
+   vec2 offset = blurSize / textureSize;
 
    vec4 color1 = vec4(0.0);
    // Down left

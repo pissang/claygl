@@ -77,7 +77,7 @@ define(function(require) {
 
             this._time = time;
 
-            this.trigger('frame', [delta]);
+            this.trigger('frame', delta);
         },
         start : function() {
             var self = this;

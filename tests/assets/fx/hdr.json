@@ -162,7 +162,7 @@
         },
         {
             "name" : "bloom",
-            "shader" : "#source(buildin.compositor.hdr.bloom)",
+            "shader" : "#source(buildin.compositor.blend)",
             "type" : "processor",
             "inputs" : {
                 "texture1" : {
@@ -188,12 +188,14 @@
                 }
             },
             "parameters" : {
-                "scale" : 0.2
+                "weight1" : 0.5,
+                "weight2" : 0.3,
+                "weight3" : 0.1
             }
         },
         {
             "name" : "tonemapping",
-            "shader" : "#source(buildin.compositor.hdr.tonemapping_eyeadaption)",
+            "shader" : "#source(buildin.compositor.hdr.tonemapping)",
             "type" : "processor",
             "inputs" : {
                 "texture" : {

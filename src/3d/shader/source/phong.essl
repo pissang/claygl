@@ -107,8 +107,10 @@ uniform float alpha : 1.0;
 uniform float shininess : 30;
 
 uniform vec3 specular : [1.0, 1.0, 1.0];
+uniform vec3 emission : [0.0, 0.0, 0.0];
 
 uniform float reflectivity : 0.5;
+
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
@@ -332,6 +334,7 @@ void main()
 
     finalColor.rgb *= diffuseItem;
     finalColor.rgb += specularItem * specular;
+    finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED
         vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;

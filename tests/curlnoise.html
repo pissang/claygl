@@ -22,7 +22,7 @@
 
             var fxLoader = new qtek.loader.FX();
             fxLoader.load('assets/fx/curlnoise.json');
-            fxLoader.on('load', function(compositor) {
+            fxLoader.on('success', function(compositor) {
                 var time = new Date().getTime();
                 var elapsedTime = 0;
                 var spawnNode = compositor.findNode('spawn');

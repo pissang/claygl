@@ -123,7 +123,7 @@ define(function(require) {
             
             if (!silent) {
                 // Render plugin like shadow mapping must set the silent true
-                this.trigger("beforerender", [this, scene, camera]);
+                this.trigger("beforerender", this, scene, camera);
             }
 
             this._scene = scene;
@@ -140,7 +140,7 @@ define(function(require) {
             var sceneMaterial = scene.material;
 
             if (!silent) {
-                scene.trigger('beforerender', [this, scene, camera]);
+                scene.trigger('beforerender', this, scene, camera);
             }
             // Sort render queue
             // Calculate the object depth
@@ -160,15 +160,15 @@ define(function(require) {
 
             // Render Opaque queue
             if (! silent) {
-                this.trigger("beforerender:opaque", [this, opaqueQueue]);
+                this.trigger("beforerender:opaque", this, opaqueQueue);
             }
 
             _gl.disable(_gl.BLEND);
             var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:opaque", [this, opaqueQueue, opaqueRenderInfo]);
-                this.trigger("beforerender:transparent", [this, transparentQueue]);
+                this.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
+                this.trigger("beforerender:transparent", this, transparentQueue);
             }
 
             // Render Transparent Queue
@@ -176,17 +176,17 @@ define(function(require) {
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:transparent", [this, transparentQueue, transparentRenderInfo]);
+                this.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
             }
             var renderInfo = {}
             for (name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
             }
             if (!silent) {
-                scene.trigger('afterrender', [this, scene, camera]);
+                scene.trigger('afterrender', this, scene, camera);
             } 
             if (! silent) {
-                this.trigger("afterrender", [this, scene, camera, renderInfo]);
+                this.trigger("afterrender", this, scene, camera, renderInfo);
             }
             return renderInfo;
         },

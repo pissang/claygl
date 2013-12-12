@@ -45,7 +45,7 @@ define(function(require) {
     }, {
 
         enable : function() {
-            this.target.on("beforeupdate", this._beforeUpdateCamera, this);
+            this.target.before("update", this._beforeUpdateCamera, this);
             this.domElement.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
             this.domElement.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
             this.domElement.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);

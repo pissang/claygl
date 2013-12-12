@@ -19,7 +19,7 @@
                 var _ = require("_");
 
                 var renderer = new qtek3d.Renderer({
-                    canvas : document.getElementById( "Main"),
+                    canvas : document.getElementById("Main"),
                     devicePixelRatio : 1.0
                 });
 
@@ -34,7 +34,7 @@
                 texture.image.onload = function(){
                     texture.dirty();
                     renderer.resize(texture.image.width, texture.image.height);
-                    compositor.render( renderer );
+                    compositor.render(renderer);
                 }
                 texture.image.src = "assets/textures/sunset.jpg";
                 // Post processing
@@ -129,15 +129,15 @@
                 hexagonalBlur1.setParameter("blurSize", 1.0);
                 hexagonalBlur2.setParameter("blurSize", 1.0);
 
-                compositor.add( textureNode );
-                compositor.add( colorAdjustNode );
-                compositor.add( colorAdjustNode2 );
-                compositor.add( hexagonalBlur1 );
-                compositor.add( hexagonalBlur2 );
+                compositor.add(textureNode);
+                compositor.add(colorAdjustNode);
+                compositor.add(colorAdjustNode2);
+                compositor.add(hexagonalBlur1);
+                compositor.add(hexagonalBlur2);
 
 
-                setInterval( function(){
-                    compositor.render( renderer );
+                setInterval(function(){
+                    compositor.render(renderer);
                 }, 1000);
             })
             

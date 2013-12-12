@@ -11,7 +11,7 @@ define(function() {
                             "WEBGL_compressed_texture_s3tc",
                             'WEBGL_depth_texture',
                             "EXT_texture_filter_anisotropic",
-                            "EXT_draw_buffers"
+                            "WEBGL_draw_buffers"
                         ];
 
     var extensions = {};

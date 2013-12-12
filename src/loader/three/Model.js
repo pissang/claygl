@@ -46,14 +46,15 @@ define(function(require) {
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", [percent, loaded, total]);
+                    self.trigger("progress", percent, loaded, total);
                 },
                 onerror : function(e) {
-                    self.trigger("error", [e]);
+                    self.trigger("error", e);
                 },
                 responseType : "text",
                 onload : function(data) {
-                    self.parse(JSON.parse(data))
+                    var meshList = self.parse(JSON.parse(data));
+                    this.trigger('success', meshList);
                 }
             })
         },
@@ -103,7 +104,6 @@ define(function(require) {
                 }
             }
             
-            this.trigger('load', [meshList]);
             return meshList;
         },
 

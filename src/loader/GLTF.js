@@ -62,15 +62,15 @@ define(function(require) {
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", [percent, loaded, total]);
+                    self.trigger("progress", percent, loaded, total);
                 },
                 onerror : function(e) {
-                    self.trigger("error", [e]);
+                    self.trigger("error", e);
                 },
                 responseType : "text",
                 onload : function(data) {
                     self.parse(JSON.parse(data), function(scene, cameras, skeleton) {
-                        self.trigger("load", [scene, cameras, skeleton]);
+                        self.trigger("success", scene, cameras, skeleton);
                     });
                 }
             });
@@ -320,8 +320,7 @@ define(function(require) {
                     material.set("normalMap", uniforms["normalMap"]);
                 }
                 if (uniforms['emission'] !== undefined) {
-                    var diffuseColor = material.get('color');
-                    vec4.add(diffuseColor, diffuseColor, uniforms['emission']);
+                    material.set('emission', uniforms['emission'].slice(0, 3));
                 }
                 if (uniforms['shininess'] !== undefined) {
                     material.set("shininess", uniforms["shininess"]);

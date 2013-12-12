@@ -1,0 +1,40 @@
+@export buildin.compositor.blend
+// Blend at most 4 textures
+#ifdef TEXTURE1_ENABLED
+uniform sampler2D texture1;
+uniform float weight1 : 1.0;
+#endif
+#ifdef TEXTURE2_ENABLED
+uniform sampler2D texture2;
+uniform float weight2 : 1.0;
+#endif
+#ifdef TEXTURE3_ENABLED
+uniform sampler2D texture3;
+uniform float weight3 : 1.0;
+#endif
+#ifdef TEXTURE4_ENABLED
+uniform sampler2D texture4;
+uniform float weight4 : 1.0;
+#endif
+
+varying vec2 v_Texcoord;
+
+void main()
+{
+    vec3 tex = vec3(0.0);
+    #ifdef TEXTURE1_ENABLED
+        tex += texture2D(texture1, v_Texcoord).rgb * weight1;
+    #endif
+    #ifdef TEXTURE2_ENABLED
+        tex += texture2D(texture2, v_Texcoord).rgb * weight2;
+    #endif
+    #ifdef TEXTURE3_ENABLED
+        tex += texture2D(texture3, v_Texcoord).rgb * weight3;
+    #endif
+    #ifdef TEXTURE4_ENABLED
+        tex += texture2D(texture4, v_Texcoord).rgb * weight4;
+    #endif
+
+    gl_FragColor = vec4(tex, 1.0);
+}
+@end
