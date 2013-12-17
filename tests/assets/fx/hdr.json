@@ -1,6 +1,11 @@
 {
     "meta" : {},
     "type" : "compositor",
+    "textures" : {
+        "lenscolor" : {
+            "path" : "../textures/lensflare/lenscolor.png"
+        }
+    },
     "nodes" : [
         {
             "name" : "bright",
@@ -22,7 +27,31 @@
                 }
             },
             "parameters" : {
-                "threshold" : 2
+                "threshold" : 1
+            }
+        },
+        {
+            "name" : "bright2",
+            "shader" : "#source(buildin.compositor.hdr.bright)",
+            "type" : "processor",
+            "inputs" : {
+                "texture" : {
+                    "node" : "scene",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 256,
+                        "height" : 256,
+                        "type" : "FLOAT"
+                    }
+                }
+            },
+            "parameters" : {
+                "threshold" : 50,
+                "scale" : 0.01
             }
         },
         {
@@ -201,8 +230,8 @@
             "shader" : "#source(buildin.compositor.lensflare)",
             "type" : "processor",
             "inputs" : {
-                "bright" : {
-                    "node" : "bright",
+                "texture" : {
+                    "node" : "bright2",
                     "pin" : "color"
                 }
             },
@@ -217,7 +246,7 @@
             },
             "parameters" : {
                 "textureSize" : [256, 256],
-                "dispersal" : 0.3
+                "lensColor" : "#lenscolor"
             }
         },
         {
@@ -238,6 +267,9 @@
                         "type" : "FLOAT"
                     }
                 }
+            },
+            "parameters" : {
+                "blurSize" : 2
             }
         },
         {
@@ -254,9 +286,13 @@
                 "color" : {
                     "parameters" : {
                         "width" : 128,
-                        "height" : 128
+                        "height" : 128,
+                        "type" : "FLOAT"
                     }
                 }
+            },
+            "parameters" : {
+                "blurSize" : 2
             }
         },
         {

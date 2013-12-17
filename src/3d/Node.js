@@ -29,11 +29,6 @@ define(function(require) {
 
             scale : new Vector3(1, 1, 1),
 
-            // Euler angles
-            // https://en.wikipedia.org/wiki/Rotation_matrix
-            eulerAngle : new Vector3(),
-            useEuler : false,
-
             parent : null,
             scene : null,
 
@@ -116,42 +111,20 @@ define(function(require) {
 
         decomposeLocalTransform : function() {
             this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
-            if(! this.useEuler) {
-                this.eulerAngle.setEulerFromQuaternion(this.rotation);
-            }
             
             this.rotation._dirty = false;
             this.scale._dirty = false;
             this.position._dirty = false;
-            this.eulerAngle._dirty = false;
         },
 
         updateLocalTransform : function() {
             var position = this.position;
             var rotation = this.rotation;
             var scale = this.scale;
-            var eulerAngle = this.eulerAngle;
 
-            var needsUpdate = false;
-            if (position._dirty || scale._dirty) {
-                needsUpdate = true;
-            } else {
-                if (this.useEuler && eulerAngle._dirty) {
-                    needsUpdate = true;
-                } else if (rotation._dirty) {
-                    needsUpdate = true;
-                }
-            }
-            if (needsUpdate) {
+            if (position._dirty || scale._dirty || rotation._dirty) {
                 var m = this.localTransform._array;
 
-                if(this.useEuler) {
-                    rotation.identity();
-                    rotation.rotateZ(eulerAngle.z);
-                    rotation.rotateY(eulerAngle.y);
-                    rotation.rotateX(eulerAngle.x);
-                    eulerAngle._dirty = false;
-                }
                 // Transform order, scale->rotation->position
                 mat4.fromRotationTranslation(m, rotation._array, position._array);
 
@@ -229,13 +202,6 @@ define(function(require) {
                 this.localTransform.translate(point);
                 this.localTransform.rotate(angle, axis);
 
-                // Transform self
-                if(this.useEuler) {
-                    this.rotation.identity();
-                    this.rotation.rotateZ(this.eulerAngle.z);
-                    this.rotation.rotateY(this.eulerAngle.y);
-                    this.rotation.rotateX(this.eulerAngle.x);
-                }
                 RTMatrix.fromRotationTranslation(this.rotation, v);
                 this.localTransform.multiply(RTMatrix);
                 this.localTransform.scale(this.scale);

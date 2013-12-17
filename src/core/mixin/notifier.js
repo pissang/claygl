@@ -107,6 +107,10 @@ define(function() {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
+            if (!action) {
+                handlers[name] = [];
+                return;
+            }
             if (handlers[name]) {
                 var hdls = handlers[name];
                 for (var i = 0; i < hdls.length; i++) {

@@ -23,6 +23,7 @@ define(function(require) {
     var Quaternion = require("core/Quaternion");
     var glenum = require('3d/glenum');
     var _ = require("_");
+    var util = require('util/util');
 
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
@@ -524,14 +525,10 @@ define(function(require) {
                 texture.wrapT = glenum[wrap[1].toUpperCase()];
             }
             img.onload = function() {
-                self.trigger("load:texture", texture);
                 texture.dirty();
             }
-            var root = this.textureRootPath || this.rootPath
-            if (root) {
-                path = root + "/" + path;
-            }
-            img.src = path;
+            var root = this.textureRootPath || this.rootPath;
+            img.src = util.relative2absolute(path, root);
 
             return texture;
         }

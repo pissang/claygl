@@ -146,6 +146,21 @@ define(function(require){
                 }
             }
         },
+
+        isShaderLightNumberChanged : function(shader) {
+            return shader.lightNumber.POINT_LIGHT !== this.lightNumber.POINT_LIGHT
+                || shader.lightNumber.DIRECTIONAL_LIGHT !== this.lightNumber.DIRECTIONAL_LIGHT
+                || shader.lightNumber.SPOT_LIGHT !== this.lightNumber.SPOT_LIGHT
+                || shader.lightNumber.AMBIENT_LIGHT !== this.lightNumber.AMBIENT_LIGHT
+        },
+
+        setShaderLightNumber : function(shader) {
+            for (var type in this.lightNumber) {
+                shader.lightNumber[type] = this.lightNumber[type];
+            }
+            shader.dirty();
+        },
+
         dispose : function() {
             this.lights = [];
             this.lightNumber = {};

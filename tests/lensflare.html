@@ -50,6 +50,11 @@
 
             var FXLoader = new qtek.loader.FX();
             FXLoader.load('assets/fx/hdr.json');
+
+            var debugPass = new qtek3d.compositor.Pass({
+                fragment : qtek3d.Shader.source('buildin.compositor.output')
+            });
+
             FXLoader.success(function(compositor) {
                 var sceneNode = new qtek3d.compositor.SceneNode({
                     name : 'scene',
@@ -78,6 +83,7 @@
                     if (FXAANode) {
                         FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
                     }
+
                 });
             });
         });

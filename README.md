@@ -43,10 +43,6 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Normal Mapping
 + Omnilight Shadow 
 
-[Minicooper](http://pissang.github.io/qtek/minicooper/)
-
-+ Environment Map
-
 [DOTA2 Hero Viewer](http://pissang.github.io/qtek/dota2hero/)
 
 + GPU Skinning

@@ -26,6 +26,7 @@ define(function(require) {
             //}
             uniforms : {},
 
+
             shader : null,
 
             depthTest : true,
@@ -46,8 +47,7 @@ define(function(require) {
             // }
             blend : null,
 
-            // Binding lights in the renderer automatically
-            // autoBindingLights : true
+            _enabledUniforms : [],
         }
     }, function() {
         if (this.shader) {
@@ -64,7 +64,8 @@ define(function(require) {
             var slot = 0;
 
             // Set uniforms
-            for (var symbol in this.uniforms) {
+            for (var u = 0; u < this._enabledUniforms.length; u++) {
+                var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
                 if (uniform.value === null) {
                     continue;
@@ -75,12 +76,14 @@ define(function(require) {
                 }
                 if (uniform.value instanceof Texture) {
                     var texture = uniform.value;
-                    // Maybe texture is not loaded yet;
-                    if (! texture.isRenderable()) {
-                        continue;
-                    }
                     _gl.activeTexture(_gl.TEXTURE0 + slot);
-                    texture.bind(_gl);
+                    // Maybe texture is not loaded yet;
+                    if (texture.isRenderable()) {
+                        texture.bind(_gl);
+                    } else {
+                        // Bind texture to null
+                        texture.unbind(_gl);
+                    }
 
                     this.shader.setUniform(_gl, '1i', symbol, slot);
 
@@ -95,13 +98,14 @@ define(function(require) {
                         var res = [];
                         for (var i = 0; i < uniform.value.length; i++) {
                             var texture = uniform.value[i];
+                            _gl.activeTexture(_gl.TEXTURE0 + slot);
                             // Maybe texture is not loaded yet;
-                            if (! texture.isRenderable()) {
-                                continue;
+                            if (texture.isRenderable()) {
+                                texture.bind(_gl);
+                            } else {
+                                texture.unbind(_gl);
                             }
 
-                            _gl.activeTexture(_gl.TEXTURE0 + slot);
-                            texture.bind(_gl);
                             res.push(slot++);
                         }
                         this.shader.setUniform(_gl, '1iv', symbol, res);
@@ -127,6 +131,23 @@ define(function(require) {
                 var val = object[key];
                 this.setUniform(key, val);
             }
+        },
+
+        enableUniform : function(name) {
+            if (this.uniforms[name] && !this.isUniformEnabled(name)) {
+                this._enabledUniforms.push(name);
+            }
+        },
+
+        disableUniform : function(name) {
+            var idx = this._enabledUniforms.indexOf(name);
+            if (idx >= 0) {
+                this._enabledUniforms.splice(idx, 1);
+            }
+        },
+
+        isUniformEnabled : function(name) {
+            return this._enabledUniforms.indexOf(name) >= 0;
         },
 
         // Alias of setUniform and setUniforms
@@ -158,6 +179,8 @@ define(function(require) {
             this.uniforms = shader.createUniforms();
             this.shader = shader;
             
+            this._enabledUniforms = Object.keys(this.uniforms);
+
             if (keepUniform) {
                 for (var key in originalUniforms) {
                     if (this.uniforms[key]) {

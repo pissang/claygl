@@ -10,8 +10,7 @@ define(function(require) {
         return {
             name : 'scene',
             scene : null,
-            camera : null,
-            material : null
+            camera : null
         }
     }, function() {
         if (this.frameBuffer) {
@@ -55,13 +54,7 @@ define(function(require) {
                     ext.drawBuffersEXT(bufs);
                 }
 
-                if (this.material) {
-                    this.scene.material = this.material;
-                }
-
                 renderer.render(this.scene, this.camera);
-                
-                this.scene.material = null;
 
                 frameBuffer.unbind(renderer);
             }

@@ -29,6 +29,7 @@ define(function(require) {
     var Quaternion = require("core/Quaternion");
     
     var _ = require("_");
+    var util = require('util/util');
 
     var InstantGeometry = require("./InstantGeometry");
 
@@ -248,15 +249,12 @@ define(function(require) {
 
         _loadImage : function(path, onsuccess) {
             var root = this.textureRootPath || this.rootPath;
-            if (root) {
-                path = root + "/" + path;
-            }
             var img = new Image();
             img.onload = function() {
                 onsuccess && onsuccess(img);
                 img.onload = null;
             }
-            img.src = path;
+            img.src = util.relative2absolute(path, root);
             return img;
         },
         // Only phong material is support yet

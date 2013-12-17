@@ -8,8 +8,8 @@ uniform sampler2D lensColor;
 
 uniform vec2 textureSize : [512, 512];
 
-uniform float dispersal : 0.25;
-uniform float haloWidth : 1.0;
+uniform float dispersal : 0.3;
+uniform float haloWidth : 0.4;
 uniform float distortion : 1.0;
 
 varying vec2 v_Texcoord;
@@ -48,7 +48,7 @@ void main()
         result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;
     }
 
-    // result *= texture2D(lensColor, length(vec2(0.5) - texcoord)) / length(vec2(0.5));
+    result *= texture2D(lensColor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));
     //Sample halo
     float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));
     weight = pow(1.0 - weight, 10.0);

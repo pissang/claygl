@@ -34,19 +34,20 @@
 
                 var normalDistribution = generateNormalDistribution();
                 var BRDFLookup = integrateBRDF(normalDistribution);
+
+                var GLTFLoader = new qtek.loader.GLTF();
+                GLTFLoader.load("assets/models/suzanne.json");
+                var suzanneGeometry;
+                GLTFLoader.on('success', function(res) {
+                    suzanneGeometry = res.scene.getNode('Suzanne').childAt(0).geometry;
+                });
                 var envMap = qtek3d.util.texture.loadTexture(
-                    'assets/textures/hdr/path.hdr',
+                    'assets/textures/hdr/old_industrial_hall.hdr',
                     function () {
                         envMap.flipY = false;
                         prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
                             var skybox = new qtek3d.plugin.Skybox({
                                 scene : scene
-                            });
-                            var GLTFLoader = new qtek.loader.GLTF();
-                            GLTFLoader.load("assets/models/suzanne.json");
-                            var suzanneGeometry;
-                            GLTFLoader.on('success', function(res) {
-                                suzanneGeometry = res.scene.getNode('Suzanne').childAt(0).geometry;
                             });
 
                             skybox.material.set('environmentMap', mipmaps[0]);
@@ -232,7 +233,7 @@
 
                 function prefilterEnvMap(envMap, normalDistribution, callback) {
                     var mipmaps = [];
-                    var size = 512;
+                    var size = 1024;
                     var mipmapNum = Math.log(size) / Math.log(2);
                     var emptyScene = new qtek3d.Scene();
                     var environmentMapPass = new qtek3d.prePass.EnvironmentMap();

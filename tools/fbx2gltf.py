@@ -1,8 +1,8 @@
 # ############################################
 # fbx to glTF converter
 # glTF spec : https://github.com/KhronosGroup/glTF
-# fbx version 2014.1
-#
+# fbx version 2014.2
+# TODO: support python2.7
 # http://github.com/pissang/
 # ############################################
 import sys
@@ -672,6 +672,7 @@ def TraverseSceneNode(pNode):
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = lNodeName
     lib_nodes[lNodeName] = lGLTFNode
+
     # Transform matrix
     m = pNode.EvaluateLocalTransform()
     lGLTFNode['matrix'] = [
@@ -693,7 +694,7 @@ def TraverseSceneNode(pNode):
 
         lGeometry = converter.Triangulate(lGeometry, True)
         # FIXME SplitMeshPerMaterial may loss deformer in mesh
-        # lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
 
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)

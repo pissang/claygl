@@ -3,6 +3,7 @@
 
 uniform sampler2D texture;
 uniform float threshold : 1;
+uniform float scale : 1.0;
 
 varying vec2 v_Texcoord;
 
@@ -16,7 +17,7 @@ void main()
     float lum = dot(tex, lumWeight);
     if (lum > threshold)
     {
-        gl_FragColor.rgb = clamp(tex, 0.0, 32.0);
+        gl_FragColor.rgb = tex * scale;
     }
     else
     {

@@ -259,18 +259,8 @@ define(function(require) {
                 
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
-                    var lightNumberChanged = false;
-                    for (var type in scene.lightNumber) {
-                        if (shader.lightNumber[type] !== scene.lightNumber[type]) {
-                            lightNumberChanged = true;
-                        }
-                    }
-                    if (lightNumberChanged) {
-                        for (var type in scene.lightNumber) {
-                            var number = scene.lightNumber[type];
-                            shader.lightNumber[type] = number;
-                        }
-                        shader.dirty();
+                    if (scene.isShaderLightNumberChanged(shader)) {
+                        scene.setShaderLightNumber(shader);
                     }
 
                     shader.bind(_gl);

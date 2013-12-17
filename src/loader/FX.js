@@ -14,6 +14,7 @@ define(function(require) {
     var Texture2D = require('3d/texture/Texture2D');
     var TextureCube = require('3d/texture/TextureCube');
     var _ = require('_');
+    var util = require('util/util');
 
     var shaderSourceReg = /#source\((.*?)\)/;
     var urlReg = /#url\((.*?)\)/;
@@ -213,11 +214,12 @@ define(function(require) {
             var shaders = {};
             var loading = 0;
             var cbd = false;
+            var shaderRootPath = this.shaderRootPath || this.rootPath;
             _.each(json.shaders, function(shaderExp, name) {
                 var res = urlReg.exec(shaderExp);
                 if (res) {
                     var path = res[1];
-                    path = this.shaderRootPath || this.rootPath + '/' + path;
+                    path = util.relative2absolute(path, shaderRootPath);
                     loading++;
                     request.get({
                         url : path,
@@ -250,13 +252,18 @@ define(function(require) {
             var loading = 0;
 
             var cbd = false;
+            var textureRootPath = this.textureRootPath || this.rootPath;
             _.each(json.textures, function(textureInfo, name) {
                 var texture;
                 var path = textureInfo.path;
                 var parameters = this._convertParameter(textureInfo.parameters);
                 if (typeof(path) === 'array' && path.length === 6) {
+                    path = path.map(function(item) {
+                        return util.relative2absolute(item, textureRootPath);
+                    })
                     texture = new TextureCube();
                 } else if(typeof(path) === 'string') {
+                    path = util.relative2absolute(path, textureRootPath);
                     texture = new Texture2D();
                 } else {
                     return;
@@ -264,7 +271,7 @@ define(function(require) {
 
                 texture.load(path);
                 loading++;
-                texture.on('load', function() {
+                texture.once('success', function() {
                     textures[name] = texture;
                     loading--;
                     if (loading === 0) {

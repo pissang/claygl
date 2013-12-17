@@ -21,7 +21,7 @@ define(function(require) {
 
             _running : false,
             
-            _time : 0  
+            _time : 0
         }
     }, {
         add : function(clip) {
