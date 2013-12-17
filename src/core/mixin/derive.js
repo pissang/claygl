@@ -28,8 +28,9 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
         // property in the object is fresh
         extend(this, typeof makeDefaultOpt == "function" ?
                         makeDefaultOpt.call(this) : makeDefaultOpt);
-
-        extend(this, options);
+        if (options) {
+            extend(this, options);
+        }
 
         if (this.constructor === sub) {
             // find the base class, and the initialize function will be called 
@@ -52,9 +53,9 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
     // initialize function will be called after all the super constructor is called
     sub.__initialize__ = initialize;
 
-    var Ghost = function() {};
-    Ghost.prototype = _super.prototype;
-    sub.prototype = new Ghost();
+    var Ctor = function() {};
+    Ctor.prototype = _super.prototype;
+    sub.prototype = new Ctor();
     sub.prototype.constructor = sub;
     extend(sub.prototype, proto);
     

@@ -6,6 +6,7 @@
     </head>
     <body style="margin:0px;">
         <canvas width="1200" height="640" id="Main"></canvas>
+        <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
                 var qtek3d = qtek['3d']
@@ -23,11 +24,11 @@
                     devicePixelRatio : 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+                var scene = new qtek3d.Scene;
+                var camera = new qtek3d.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
 
                 var cube = new Cube();
                 var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
@@ -71,11 +72,11 @@
                 light.range = 30;
                 scene.add(light);
 
-                animation.on('frame', function() {
+                animation.on('frame', function(deltaTime) {
                     var start = performance.now();
                     renderer.render(scene, camera);
-                    var end = performance.now();
-                    console.log(end - start);
+                    var renderTime = performance.now() - start;
+                    document.getElementById('time').innerHTML = Math.round(1000 / deltaTime) + '<br />' + renderTime;
                     root.rotation.rotateY(Math.PI/500);
                 });
             })

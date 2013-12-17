@@ -266,6 +266,7 @@ define(function(require) {
                     shader.bind(_gl);
 
                     // Set lights uniforms
+                    // TODO needs optimized
                     for (var symbol in scene.lightUniforms) {
                         var lu = scene.lightUniforms[symbol];
                         shader.setUniform(_gl, lu.type, symbol, lu.value);

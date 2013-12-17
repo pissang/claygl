@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <div id="time" style="position:absolute;left:10px;top:10px;"></div>
+        <script type="text/javascript">
+            require(['qtek'], function(qtek){
+                var qtek3d = qtek['3d'];
+                var Shader = qtek3d.Shader;
+                var Material = qtek3d.Material;
+                var Mesh = qtek3d.Mesh;
+                var Cube = qtek3d.geometry.Cube;
+                var shaderLibrary = qtek3d.shader.library;
+                var animation = new qtek.animation.Animation;
+                animation.start();
+
+                var scene = new qtek3d.Scene;
+
+                var cube = new Cube();
+                var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
+                shader.define('fragment', 'RENDER_NORMAL');
+                var material = new Material({
+                    shader : shader
+                });
+                var root = new qtek3d.Node({
+                    name : 'ROOT'
+                });
+                scene.add(root);
+                var meshList = [];
+                for( var i = 0; i < 10; i++){
+                    for(var j = 0; j < 20; j++){
+                        for( var k = 0; k < 50; k++){
+                            var mesh = new qtek3d.Mesh({
+                                geometry : cube,
+                                material : material,
+                            });
+                            mesh.position.set(20-Math.random()*40, 20-Math.random()*40, 20-Math.random()*40);
+                            root.add(mesh);
+                        }
+                    }
+                }
+                setInterval(function() {
+                    var start = performance.now();
+                    root.update();
+                    var end = performance.now();
+                    var time = end - start
+                    document.getElementById('time').innerHTML = time;
+                    root.rotation.rotateY(Math.PI/500);
+                }, 1000);
+            });
+            
+        </script>
+    </body>
+</html>

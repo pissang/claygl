@@ -51,6 +51,10 @@ define(function(require) {
         }
     }, {
 
+        isRenderable : function() {
+            return true;
+        },
+
         addEmitter : function(emitter) {
             this._emitters.push(emitter);
         },

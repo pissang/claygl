@@ -28,6 +28,9 @@ define(function(require){
             transparentQueue : [],
             lights : [],
 
+            _opaqueObjectCount : 0,
+            _transparentObjectCount : 0,
+
             autoUpdate : true,
 
             _nodeRepository : {}
@@ -62,11 +65,16 @@ define(function(require){
             var opaqueQueue = this.opaqueQueue;
             var transparentQueue = this.transparentQueue;
             var sceneMaterialTransparent = this.material && this.material.transparent;
-            transparentQueue.length = 0;
-            opaqueQueue.length = 0;
+
+            this._opaqueObjectCount = 0;
+            this._transparentObjectCount = 0;
+
             lights.length = 0;
 
             this._updateRenderQueue(this, sceneMaterialTransparent);
+
+            this.opaqueQueue.length = this._opaqueObjectCount;
+            this.transparentQueue.length = this._transparentObjectCount;
 
             // reset
             for (type in this.lightNumber) {
@@ -90,13 +98,11 @@ define(function(require){
                 if (child instanceof Light) {
                     this.lights.push(child);
                 }
-                // A node have render method and material property
-                // is treat as a renderable object
-                if (child.render && child.geometry && child.material && child.material.shader ) {
+                if (child.isRenderable()) {
                     if (child.material.transparent || sceneMaterialTransparent) {
-                        this.transparentQueue.push(child);
+                        this.transparentQueue[this._transparentObjectCount++] = child;
                     } else {
-                        this.opaqueQueue.push(child);
+                        this.opaqueQueue[this._opaqueObjectCount++] = child;
                     }
                 }
                 if (child._children.length > 0) {

@@ -26,22 +26,10 @@ define(function(require) {
             material : null,
 
             geometry : null,
-
+            
             mode : glenum.TRIANGLES,
-            // Only if mode is LINES
-            lineWidth : 1,
 
-            // Culling
-            culling : true,
-            cullFace : glenum.BACK,
-            frontFace : glenum.CCW,
-            // Software frustum culling
-            frustumCulling : true,
-
-            receiveShadow : true,
-            castShadow : true,
-
-            // Skinned Mesh
+            // // Skinned Mesh
             skeleton : null,
             // Joints indices
             // Meshes can share the one skeleton instance
@@ -50,6 +38,23 @@ define(function(require) {
             joints : []
         }
     }, {
+
+        // Only if mode is LINES
+        lineWidth : 1,
+        // Culling
+        culling : true,
+        cullFace : glenum.BACK,
+        frontFace : glenum.CCW,
+
+        // Software frustum culling
+        frustumCulling : true,
+
+        receiveShadow : true,
+        castShadow : true,
+
+        isRenderable : function() {
+            return this.geometry && this.material && this.material.shader;
+        },
 
         render : function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;

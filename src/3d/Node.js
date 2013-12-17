@@ -4,7 +4,6 @@ define(function(require) {
 
     var Base = require("core/Base");
     var Vector3 = require("core/Vector3");
-    var BoundingBox = require("./BoundingBox");
     var Quaternion = require("core/Quaternion");
     var Matrix4 = require("core/Matrix4");
     var Matrix3 = require("core/Matrix3");
@@ -21,8 +20,6 @@ define(function(require) {
 
             name : 'NODE_' + id,
 
-            visible : true,
-
             position : new Vector3(),
 
             rotation : new Quaternion(),
@@ -38,15 +35,20 @@ define(function(require) {
 
             autoUpdateLocalTransform : true,
 
-            boundingBox : new BoundingBox(),
-
             _children : [],
+
             _needsUpdateWorldTransform : true,
 
             // Depth for transparent queue sorting
             __depth : 0
         }
     }, {
+
+        visible : true,
+
+        isRenderable : function() {
+            return false;
+        },
 
         setName : function(name) {
             if (this.scene) {
@@ -165,7 +167,7 @@ define(function(require) {
                 this._needsUpdateWorldTransform = false;
             }
             
-            for(var i = 0; i < this._children.length; i++) {
+            for(var i = 0, len = this._children.length; i < len; i++) {
                 var child = this._children[i];
                 // Skip the hidden nodes
                 if(child.visible) {
