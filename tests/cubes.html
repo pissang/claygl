@@ -56,7 +56,7 @@
                                 geometry : cube,
                                 material : material,
                             });
-                            mesh.position.set(20-Math.random()*40, 20-Math.random()*40, 20-Math.random()*40);
+                            mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
                             root.add(mesh);
                         }
                     }
@@ -74,9 +74,12 @@
 
                 animation.on('frame', function(deltaTime) {
                     var start = performance.now();
-                    renderer.render(scene, camera);
+                    var drawInfo = renderer.render(scene, camera);
                     var renderTime = performance.now() - start;
-                    document.getElementById('time').innerHTML = Math.round(1000 / deltaTime) + '<br />' + renderTime;
+                    document.getElementById('time').innerHTML = 
+                            Math.round(1000 / deltaTime) + '<br />' 
+                            + renderTime + '<br />'
+                            + drawInfo.drawCallNumber + '(' + 5000 + ')';
                     root.rotation.rotateY(Math.PI/500);
                 });
             })

@@ -2,25 +2,22 @@ define(function() {
 
     var Cache = function() {
 
-        this._contextId = "",
+        this._contextId = 0;
 
-        this._caches = {},
+        this._caches = [];
 
-        this._context = {}
-
+        this._context = {};
     }
 
     Cache.prototype = {
 
         use : function(contextId, documentSchema) {
 
-            if (! this._caches.hasOwnProperty(contextId)) {
+            if (! this._caches[contextId]) {
                 this._caches[contextId] = {};
 
                 if (documentSchema) {
-                    for (var name in documentSchema) {
-                        this._caches[contextId][name] = documentSchema[name];
-                    }   
+                    this._caches[contextId] = documentSchema();
                 }
             }
             this._contextId = contextId;
@@ -45,8 +42,10 @@ define(function() {
         dirtyAll : function(field) {
             field = field || "";
             var key = "__dirty__" + field;
-            for (var contextId in this._caches) {
-                this._caches[contextId][key] = true;
+            for (var i = 0; i < this._caches.length; i++) {
+                if (this._caches[i]) {
+                    this._caches[i][key] = true;
+                }
             }
         },
 
@@ -59,8 +58,10 @@ define(function() {
         freshAll : function(field) {
             field = field || "";
             var key = "__dirty__" + field;
-            for (var contextId in this._caches) {
-                this._caches[contextId][key] = false;
+            for (var i = 0; i < this._caches.length; i++) {
+                if (this._caches[i]) {
+                    this._caches[i][key] = false;
+                }
             }
         },
 
@@ -77,7 +78,7 @@ define(function() {
         },
 
         deleteContext : function(contextId) {
-            delete this._caches[contextId];
+            this._caches[contextId] = {};
             this._context = {};
         },
 

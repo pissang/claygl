@@ -150,9 +150,7 @@ define(function(require) {
 
         }
     }, function() {
-
         this._updateShaderString();
-        
     }, {
 
         setVertex : function(str) {
@@ -167,10 +165,7 @@ define(function(require) {
         },
         bind : function(_gl) {
 
-            this.cache.use(_gl.__GUID__ , {
-                "locations" : {},
-                "attriblocations" : {}
-            });
+            this.cache.use(_gl.__GLID__, getCacheSchema);
 
             if (this.cache.isDirty()) {
                 this._updateShaderString();
@@ -183,12 +178,13 @@ define(function(require) {
 
         dirty : function() {
             this.cache.dirty();
-            for (var contextId in this.cache._caches) {
-                var context = this.cache._caches[contextId];
-                context["locations"] = {};
-                context["attriblocations"] = {};
+            for (var i = 0; i < this.cache._caches.length; i++) {
+                if (this.cache._caches[i]) {
+                    var context = this.cache._caches[i];
+                    context["locations"] = {};
+                    context["attriblocations"] = {};
+                }
             }
-            this._locations = {};
         },
 
         _updateShaderString : function() {
@@ -841,16 +837,23 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             if (program) {
                 var program = this.cache.get('program');
             }
             _gl.deleteProgram(program);
-            this.cache.deleteContext(_gl.__GUID__);
+            this.cache.deleteContext(_gl.__GLID__);
             this._locations = {};
         }
     });
-        
+    
+    function getCacheSchema() {
+        return {
+            "locations" : {},
+            "attriblocations" : {}
+        }
+    }
+
     // some util functions
     function addLineNumbers(string) {
         var chunks = string.split("\n");

@@ -50,7 +50,7 @@ define(function(require) {
             for (var i = 0; i < this.nodes.length; i++) {
                 var node = this.nodes[i];
                 // Update the reference number of each output texture
-                node.updateReference();
+                node.beforeFrame();
                 // Set the input texture to portal node of group
                 if (node.groupInputs) {
                     this._updateGroupInputs(node, groupInputTextures);

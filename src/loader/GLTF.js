@@ -226,22 +226,36 @@ define(function(require) {
         _parseTextures : function(json, lib) {
             _.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
-                var parameters = {
-                    format : glenum[textureInfo.format || 'RGBA'],
-                    wrapS : glenum[samplerInfo.wrapS || 'REPEAT'],
-                    wrapT : glenum[samplerInfo.wrapT || 'REPEAT'],
-                    magFilter : glenum[samplerInfo.magFilter || 'LINEAR'],
-                    minFilter : glenum[samplerInfo.minFilter || 'LINEAR_MIPMAP_LINEAR'],
-                }
+                var parameters = {};
+                ['wrapS', 'wrapT', 'magFilter', 'minFilter']
+                .forEach(function(name) {
+                    var value = samplerInfo[name];
+                    if (value !== undefined) {
+                        if (typeof(value) === 'string') {
+                            // DEPRECATED, sampler parameter now use gl enum instead of string
+                            value = glenum[value];
+                        }
+                        parameters[name] = value;   
+                    }
+                });
 
-                if (textureInfo.target === "TEXTURE_2D") {
+                var target = textureInfo.target;
+                var format = textureInfo.format;
+                if (typeof(target) === 'string') {
+                    // DEPRECATED
+                    target = glenum[target];
+                    format = glenum[format];
+                }
+                parameters.format = format;
+
+                if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
                     var imageInfo = json.images[textureInfo.source];
                     texture.image = this._loadImage(imageInfo.path, function() {
                         texture.dirty();
                     });
                     lib.textures[name] = texture;
-                } else if(textureInfo.target === "TEXTURE_CUBE_MAP") {
+                } else if(target === glenum.TEXTURE_CUBE_MAP) {
                     // TODO
                 }
             }, this);
@@ -282,15 +296,23 @@ define(function(require) {
                 var technique = techniques[instanceTechniqueInfo.technique];
                 var pass = technique.pass;
                 var uniforms = {};
-                instanceTechniqueInfo.values.forEach(function(item){
-                    if (typeof(item.value) === "string" &&
-                        lib.textures[item.value]) {
-                        var value = lib.textures[item.value]
-                    } else {
-                        var value = item.value;
+                // DEPRECATED
+                // https://github.com/KhronosGroup/glTF/issues/108
+                // https://github.com/KhronosGroup/glTF/issues/110
+                if (instanceTechniqueInfo.values instanceof Array) {
+                    instanceTechniqueInfo.values.forEach(function(item){
+                        uniforms[item.parameter] = item.value;
+                    });
+                } else {
+                    uniforms = instanceTechniqueInfo.values;
+                }
+                for (var symbol in uniforms) {
+                    var value = uniforms[symbol];
+                    // TODO: texture judgement should be more robust
+                    if (typeof(value) === 'string' && lib.textures[value]) {
+                        uniforms[symbol] = lib.textures[value];
                     }
-                    uniforms[item.parameter] = value;
-                });
+                }
                 var enabledTextures = [];
                 if (uniforms['diffuse'] instanceof Texture2D) {
                     enabledTextures.push('diffuseMap');
@@ -360,7 +382,13 @@ define(function(require) {
                     };
                     var primitiveInfo = meshInfo.primitives[i];
                     // Parse indices
-                    var indicesInfo = json.indices[primitiveInfo.indices];
+                    if (json.indices) {
+                        // DEPRECATED
+                        // https://github.com/KhronosGroup/glTF/issues/161
+                        var indicesInfo = json.indices[primitiveInfo.indices];
+                    } else {
+                        var indicesInfo = json.accessors[primitiveInfo.indices];
+                    }
                     var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
                     var buffer = lib.buffers[bufferViewInfo.buffer];
                     var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
@@ -368,32 +396,50 @@ define(function(require) {
                     var byteLength = indicesInfo.count * 2; //two byte each index
                     chunk.indices = new Uint16Array(buffer.slice(byteOffset, byteOffset+byteLength));
 
+                    // DEPRECATED
+                    // https://github.com/KhronosGroup/glTF/issues/162
+                    if (primitiveInfo.semantics) {
+                        primitiveInfo.attributes = primitiveInfo.semantics
+                    }
                     // Parse attributes
-                    for (var semantic in primitiveInfo.semantics) {
-                        var attributeInfo = json.attributes[primitiveInfo.semantics[semantic]];
+                    for (var semantic in primitiveInfo.attributes) {
+                        var accessorName = primitiveInfo.attributes[semantic];
+                        if (json.attributes) {
+                            // DEPRECATED
+                            // https://github.com/KhronosGroup/glTF/issues/161
+                            var attributeInfo = json.attributes[accessorName];
+                        } else {
+                            var attributeInfo = json.accessors[accessorName];
+                        }
                         var attributeName = semanticAttributeMap[semantic];
+                        var attributeType = attributeInfo.type;
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
                         var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
                         var byteLength = attributeInfo.count * attributeInfo.byteStride;
+
+                        if (typeof(attributeType) === 'string') {
+                            // DEPRECATED
+                            attributeType = glenum[attributeType];
+                        }
                         // TODO : Support more types
-                        switch(attributeInfo.type) {
-                            case "FLOAT_VEC2":
+                        switch(attributeType) {
+                            case glenum.FLOAT_VEC2:
                                 var size = 2;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case "FLOAT_VEC3":
+                            case glenum.FLOAT_VEC3:
                                 var size = 3;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case "FLOAT_VEC4":
+                            case glenum.FLOAT_VEC4:
                                 var size = 4;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case "FLOAT":
+                            case glenum.FLOAT:
                                 var size = 1;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;

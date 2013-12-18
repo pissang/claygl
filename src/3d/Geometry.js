@@ -208,7 +208,7 @@ define(function(require) {
 
         getBufferChunks : function(_gl) {
 
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
 
             var dirtyAttributes = this._getDirtyAttributes();
 
@@ -455,7 +455,6 @@ define(function(require) {
                     }
                 }
             }
-
         },
 
         _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
@@ -466,7 +465,7 @@ define(function(require) {
                 // Intialize
                 for (var i = 0; i < this._arrayChunks.length; i++) {
                     chunks[i] = {
-                        attributeBuffers : {},
+                        attributeBuffers : [],
                         indicesBuffer : null
                     }
                 }
@@ -476,7 +475,7 @@ define(function(require) {
                 var chunk = chunks[i];
                 if (! chunk) {
                     chunk = chunks[i] = {
-                        attributeBuffers : {},
+                        attributeBuffers : [],
                         indicesBuffer : null
                     }
                 }
@@ -503,12 +502,13 @@ define(function(require) {
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                     _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], this.hint);
 
-                    attributeBuffers[name] = {
+                    attributeBuffers.push({
+                        name : name,
                         type : type,
                         buffer : buffer,
                         size : size,
                         semantic : semantic,
-                    }
+                    })
                 } 
                 if (isFacesDirty) {
                     if (! indicesBuffer) {
@@ -795,7 +795,7 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             var chunks = this.cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
@@ -807,7 +807,7 @@ define(function(require) {
                     }
                 }
             }
-            this.cache.deleteContext(_gl.__GUID__);
+            this.cache.deleteContext(_gl.__GLID__);
         }
     });
     

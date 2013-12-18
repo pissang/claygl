@@ -13,6 +13,7 @@ define(function(require) {
     var BoundingBox = require('./BoundingBox');
     var Matrix4 = require('core/Matrix4');
 
+    var glid = 0;
     var Renderer = Base.derive(function() {
         return {
 
@@ -48,6 +49,7 @@ define(function(require) {
             _scene : null
         }
     }, function() {
+
         if (! this.canvas) {
             this.canvas = document.createElement("canvas");
             this.canvas.width = this.width;
@@ -62,7 +64,7 @@ define(function(require) {
                 premultipliedAlpha : this.premultipliedAlpha,
                 preserveDrawingBuffer : this.preserveDrawingBuffer,
             });
-            this.gl.__GUID__ = this.__GUID__;
+            this.gl.__GLID__ = glid++;
 
             this.width = this.canvas.width; 
             this.height = this.canvas.height;
@@ -382,14 +384,22 @@ define(function(require) {
     })
 
     function _materialSortFunc(x, y) {
+        // Priority shader -> material -> geometry
         if (x.material.shader === y.material.shader) {
+            if (x.material === y.material) {
+                return x.geometry.__GUID__ - y.geometry.__GUID__;
+            }
             return x.material.__GUID__ - y.material.__GUID__;
         }
         return x.material.shader.__GUID__ - y.material.shader.__GUID__;
     }
     function _depthSortFunc(x, y) {
+        // Priority depth -> shader -> material -> geometry
         if (x.__depth === y.__depth) {
             if (x.material.shader === y.material.shader) {
+                if (x.material === y.material) {
+                    return x.geometry.__GUID__ - y.geometry.__GUID__;
+                }
                 return x.material.__GUID__ - y.material.__GUID__;
             }
             return x.material.shader.__GUID__ - y.material.shader.__GUID__;

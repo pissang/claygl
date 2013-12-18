@@ -64,7 +64,7 @@ define(function(require) {
             
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
 
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             var viewportInfo = this.cache.get("viewport");
             // Reset viewport;
             if (viewportInfo) {
@@ -86,7 +86,7 @@ define(function(require) {
 
         getFrameBuffer : function(_gl) {
 
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
 
             if (this.cache.miss("framebuffer")) {
                 this.cache.put("framebuffer", _gl.createFramebuffer());
@@ -140,14 +140,14 @@ define(function(require) {
         detach : function() {},
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
 
             if (this.cache.get("renderbuffer"))
                 _gl.deleteRenderbuffer(this.cache.get("renderbuffer"));
             if (this.cache.get("framebuffer"))
                 _gl.deleteFramebuffer(this.cache.get("framebuffer"));
 
-            this.cache.deleteContext(_gl.__GUID__);
+            this.cache.deleteContext(_gl.__GLID__);
         }
     });
 

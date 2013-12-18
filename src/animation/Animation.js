@@ -87,8 +87,10 @@ define(function(require) {
 
             function step() {
                 if (self._running) {
-                    self.update();
+                    
                     requrestAnimationFrame(step);
+
+                    self.update();
                 }
             }
 

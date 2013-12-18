@@ -7,9 +7,6 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;
 
-    var _min = vec3.create();
-    var _max = vec3.create();
-
     var BoundingBox = function(min, max) {
         this.min = min || new Vector3();
         this.max = max || new Vector3();
@@ -26,6 +23,8 @@ define(function(require) {
 
         updateFromVertices : function(vertices) {
             if (vertices.length > 0) {
+                var _min = this.min._array;
+                var _max = this.max._array;
                 vec3.copy(_min, vertices[0]);
                 vec3.copy(_max, vertices[0]);
                 for (var i = 1; i < vertices.length; i++) {
@@ -39,8 +38,6 @@ define(function(require) {
                     _max[1] = Math.max(vertex[1], _max[1]);
                     _max[2] = Math.max(vertex[2], _max[2]);
                 }
-                vec3.copy(this.min._array, _min);
-                vec3.copy(this.max._array, _max);
             }
         },
 
@@ -52,6 +49,8 @@ define(function(require) {
             }
 
             var m4 = matrix._array;
+            var _min = this.min._array;
+            var _max = this.max._array;
             vec3.set(_min, 99, 99, 99);
             vec3.set(_max, -99, -99, -99);
             for (var i = 0; i < 8; i++) {
@@ -69,8 +68,6 @@ define(function(require) {
                 _max[1] = Math.max(v[1], _max[1]);
                 _max[2] = Math.max(v[2], _max[2]);
             }
-            vec3.copy(this.min._array, _min);
-            vec3.copy(this.max._array, _max);
         },
 
         updateVertices : function() {

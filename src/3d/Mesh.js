@@ -38,9 +38,9 @@ define(function(require) {
             joints : []
         }
     }, {
-
         // Only if mode is LINES
         lineWidth : 1,
+        
         // Culling
         culling : true,
         cullFace : glenum.BACK,
@@ -102,14 +102,15 @@ define(function(require) {
                     return;
                 }
                 for (var c = 0; c < chunks.length; c++) {
-
                     var chunk = chunks[c];
                     var attributeBuffers = chunk.attributeBuffers;
                     var indicesBuffer = chunk.indicesBuffer;
 
-                    var availableAttributes = {};
-                    for (var name in attributeBuffers) {
-                        var attributeBufferInfo = attributeBuffers[name];
+                    var availableAttributes = [];
+                    var availableAttributeSymbols = [];
+                    for (var a = 0; a < attributeBuffers.length; a++) {
+                        var attributeBufferInfo = attributeBuffers[a];
+                        var name = attributeBufferInfo.name;
                         var semantic = attributeBufferInfo.semantic;
 
                         if (semantic) {
@@ -119,14 +120,16 @@ define(function(require) {
                             var symbol = name;
                         }
                         if (symbol && shader.attributeTemplates[symbol]) {
-                            availableAttributes[symbol] = attributeBufferInfo;
+                            availableAttributes.push(attributeBufferInfo);
+                            availableAttributeSymbols.push(symbol);
                         }
                     }
-                    shader.enableAttributes(_gl, Object.keys(availableAttributes));
+                    shader.enableAttributes(_gl, availableAttributeSymbols);
                     // Setting attributes;
-                    for (var symbol in availableAttributes) {
-                        var attributeBufferInfo = availableAttributes[symbol];
+                    for (var a = 0; a < availableAttributes.length; a++) {
+                        var attributeBufferInfo = availableAttributes[a];
                         var buffer = attributeBufferInfo.buffer;
+                        var symbol = availableAttributeSymbols[a];
 
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                         shader.setMeshAttribute(_gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size);

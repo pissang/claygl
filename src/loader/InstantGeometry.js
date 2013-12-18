@@ -68,7 +68,7 @@ define(function(require) {
                 // Intialize
                 for (var i = 0; i < this._arrayChunks.length; i++) {
                     chunks[i] = {
-                        attributeBuffers : {},
+                        attributeBuffers : [],
                         indicesBuffer : null
                     }
                 }
@@ -78,7 +78,7 @@ define(function(require) {
                 var chunk = chunks[i];
                 if (! chunk) {
                     chunk = chunks[i] = {
-                        attributeBuffers : {},
+                        attributeBuffers : [],
                         indicesBuffer : null
                     }
                 }
@@ -101,12 +101,13 @@ define(function(require) {
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                     _gl.bufferData(_gl.ARRAY_BUFFER, attribute.array, _gl.STATIC_DRAW);
 
-                    attributeBuffers[name] = {
+                    attributeBuffers.push({
+                        name : name,
                         type : attribute.type,
                         buffer : buffer,
                         size : attribute.size,
                         semantic : attribute.semantic,
-                    }
+                    });
                 }
                 if (! indicesBuffer) {
                     indicesBuffer = chunk.indicesBuffer = {

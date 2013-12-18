@@ -32,8 +32,8 @@
                 scene.add(root);
                 var meshList = [];
                 for( var i = 0; i < 10; i++){
-                    for(var j = 0; j < 20; j++){
-                        for( var k = 0; k < 50; k++){
+                    for(var j = 0; j < 10; j++){
+                        for( var k = 0; k < 100; k++){
                             var mesh = new qtek3d.Mesh({
                                 geometry : cube,
                                 material : material,
@@ -45,7 +45,7 @@
                 }
                 setInterval(function() {
                     var start = performance.now();
-                    root.update();
+                    scene.update();
                     var end = performance.now();
                     var time = end - start
                     document.getElementById('time').innerHTML = time;

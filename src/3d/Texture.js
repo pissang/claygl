@@ -48,7 +48,7 @@ define(function(require) {
 
         getWebGLTexture : function(_gl) {
 
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
 
             if (this.cache.miss("webgl_texture")) {
                 // In a new gl context, create new texture and set dirty true
@@ -142,11 +142,11 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             if (this.cache.get("webgl_texture")){
                 _gl.deleteTexture(this.cache.get("webgl_texture"));
             }
-            this.cache.deleteContext(_gl.__GUID__);
+            this.cache.deleteContext(_gl.__GLID__);
         },
 
         isRenderable : function() {},
