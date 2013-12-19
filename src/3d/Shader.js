@@ -424,7 +424,7 @@ define(function(require) {
             
             var program = this.cache.get("program");
 
-            var locationsMap = this.cache.get("attriblocations");
+            var locationMap = this.cache.get("attriblocations");
 
             if (typeof(attribList) === "string") {
                 attribList = Array.prototype.slice.call(arguments, 1);
@@ -436,21 +436,24 @@ define(function(require) {
                     = enabledAttributeList[_gl.__GLID__] 
                     = [];
             }
-
+            var locationList = [];
             for (var i = 0; i < attribList.length; i++) {
                 var symbol = attribList[i];
                 if (!this.attributeTemplates[symbol]) {
+                    locationList[i] = -1;
                     continue;
                 }
-                var location = locationsMap[symbol];                        
+                var location = locationMap[symbol];
                 if (location === undefined) {
                     location = _gl.getAttribLocation(program, symbol);
                     // Attrib location is a number from 0 to ...
                     if (location === -1) {
+                        locationList[i] = -1;
                         continue;
                     }
-                    locationsMap[symbol] = location;
+                    locationMap[symbol] = location;
                 }
+                locationList[i] = location;
                 // 2 is going to enable(not enabled yet), 
                 // 3 has beend enabled, and marked not to be disable
                 if (!enabledAttributeListInContext[location]) {
@@ -477,43 +480,7 @@ define(function(require) {
                 }
             }
 
-        },
-
-        setMeshAttribute : function(_gl, symbol, type, size) {
-            var glType;
-            switch (type) {
-                case "byte":
-                    glType = _gl.BYTE;
-                    break;
-                case "ubyte":
-                    glType = _gl.UNSIGNED_BYTE;
-                    break;
-                case "short":
-                    glType = _gl.SHORT;
-                    break;
-                case "ushort":
-                    glType = _gl.UNSIGNED_SHORT;
-                    break;
-                default:
-                    glType = _gl.FLOAT;
-                    break;
-            }
-
-            var program = this.cache.get("program");            
-
-            var locationsMap = this.cache.get("attriblocations");
-            var location = locationsMap[symbol];
-
-            if (typeof(location) === "undefined") {
-                location = _gl.getAttribLocation(program, symbol);
-                // Attrib location is a number from 0 to ...
-                if (location === -1) {
-                    return;
-                }
-                locationsMap[symbol] = location;
-            }
-
-            _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
+            return locationList;
         },
 
         _parseImport : function() {

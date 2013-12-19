@@ -91,7 +91,7 @@ define(function(require) {
                 needsBindAttributes = true;
             } else {
                 // Hash with shader id in case previous material has less attributes than next material
-                currentDrawID = [_gl.__GLID__, geometry.__GUID__, shader.__GUID__].join('_');
+                currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                     prevDrawID = currentDrawID;
@@ -149,27 +149,54 @@ define(function(require) {
                         );
                         drawDetails.push(drawDetail);
                     }
-                    if (geometry.hint = glenum.STATIC_DRAW) {
+                    if (geometry.hint === glenum.STATIC_DRAW) {
                         this._drawCache[currentDrawID] = drawDetails;
                     }
                 }
 
                 for (var i = 0; i < drawDetails.length; i++) {
                     var drawDetail = drawDetails[i];
-                    var availableAttributes = drawDetail.availableAttributes
+                    var availableAttributes = drawDetail.availableAttributes;
                     var availableAttributeSymbols = drawDetail.availableAttributeSymbols;
                     var indicesBuffer = drawDetail.indicesBuffer;
 
-                    shader.enableAttributes(_gl, availableAttributeSymbols);
+                    var locationList = shader.enableAttributes(_gl, availableAttributeSymbols);
                     // Setting attributes;
                     for (var a = 0; a < availableAttributes.length; a++) {
+                        var location = locationList[a];
+                        if (location === -1) {
+                            continue;
+                        }
                         var attributeBufferInfo = availableAttributes[a];
                         var buffer = attributeBufferInfo.buffer;
                         var symbol = availableAttributeSymbols[a];
+                        var size = attributeBufferInfo.size;
+                        var glType;
+                        switch (attributeBufferInfo.type) {
+                            case "float":
+                                glType = _gl.FLOAT;
+                                break;
+                            case "byte":
+                                glType = _gl.BYTE;
+                                break;
+                            case "ubyte":
+                                glType = _gl.UNSIGNED_BYTE;
+                                break;
+                            case "short":
+                                glType = _gl.SHORT;
+                                break;
+                            case "ushort":
+                                glType = _gl.UNSIGNED_SHORT;
+                                break;
+                            default:
+                                glType = _gl.FLOAT;
+                                break;
+                        }
 
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                        shader.setMeshAttribute(_gl, symbol, attributeBufferInfo.type, attributeBufferInfo.size);
+                        _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
                     }
+                    
                     if (glDrawMode === glenum.LINES) {
                         _gl.lineWidth(this.lineWidth);
                     }

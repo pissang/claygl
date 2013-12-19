@@ -27,6 +27,8 @@ define(function(require) {
 
             mode : Mesh.POINTS,
 
+            _drawCache : {},
+
             _particles : [],
 
             _fields : [],
