@@ -430,10 +430,10 @@ define(function(require) {
                 attribList = Array.prototype.slice.call(arguments, 1);
             }
 
-            var enabledAttributeListInContext = enabledAttributeList[_gl.__GUID__];
+            var enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
             if (! enabledAttributeListInContext) {
                 enabledAttributeListInContext
-                    = enabledAttributeList[_gl.__GUID__] 
+                    = enabledAttributeList[_gl.__GLID__] 
                     = [];
             }
 
@@ -817,8 +817,7 @@ define(function(require) {
             _gl.compileShader(shader);
 
             if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
-                throw new Error([_gl.getShaderInfoLog(shader),
-                                    addLineNumbers(shaderString)].join("\n"));
+                throw new Error([_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join("\n"));
             }
             return shader;
         },

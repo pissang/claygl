@@ -20,6 +20,24 @@ define(function(require) {
 
     var arrSlice = Array.prototype.slice;
 
+    function AttributeBuffer(name, type, buffer, size, semantic) {
+        this.name = name;
+        this.type = type;
+        this.buffer = buffer;
+        this.size = size;
+        this.semantic = semantic;
+
+        // To be set in mesh
+        // symbol in the shader
+        this.symbol = '';
+    }
+
+    function IndicesBuffer(buffer, count) {
+        this.buffer = buffer;
+        this.count = count;
+    }
+
+
     var Geometry = Base.derive(function() {
 
         return {
@@ -502,20 +520,12 @@ define(function(require) {
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                     _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], this.hint);
 
-                    attributeBuffers.push({
-                        name : name,
-                        type : type,
-                        buffer : buffer,
-                        size : size,
-                        semantic : semantic,
-                    })
+                    attributeBuffers.push(new AttributeBuffer(name, type, buffer, size, semantic));
                 } 
                 if (isFacesDirty) {
                     if (! indicesBuffer) {
-                        indicesBuffer = chunk.indicesBuffer = {
-                            buffer : _gl.createBuffer(),
-                            count : indicesArray.length
-                        }
+                        indicesBuffer = new IndicesBuffer(_gl.createBuffer(), indicesArray.length);
+                        chunk.indicesBuffer = indicesBuffer;
                     }
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                     _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, this.hint);   

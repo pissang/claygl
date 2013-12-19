@@ -20,6 +20,16 @@ define(function(require) {
         drawCallNumber : 0
     };
 
+    function DrawDetail(
+        availableAttributes,
+        availableAttributeSymbols,
+        indicesBuffer
+    ) {
+        this.availableAttributes = availableAttributes;
+        this.availableAttributeSymbols = availableAttributeSymbols;
+        this.indicesBuffer = indicesBuffer;
+    }
+
     var Mesh = Node.derive(function() {
         return {
             
@@ -35,7 +45,9 @@ define(function(require) {
             // Meshes can share the one skeleton instance
             // and each mesh can use one part of joints
             // Joints indeces indicate the index of joint in the skeleton instance
-            joints : []
+            joints : [],
+
+            _drawCache : {}
         }
     }, {
         // Only if mode is LINES
@@ -79,7 +91,7 @@ define(function(require) {
                 needsBindAttributes = true;
             } else {
                 // Hash with shader id in case previous material has less attributes than next material
-                currentDrawID = [_gl.__GUID__, geometry.__GUID__, shader.__GUID__].join('_');
+                currentDrawID = [_gl.__GLID__, geometry.__GUID__, shader.__GUID__].join('_');
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                     prevDrawID = currentDrawID;
@@ -97,33 +109,57 @@ define(function(require) {
                 }
                 renderInfo.drawCallNumber = 1;
             } else {
-                var chunks = geometry.getBufferChunks(_gl);
-                if (!chunks) {  // Empty mesh
-                    return;
-                }
-                for (var c = 0; c < chunks.length; c++) {
-                    var chunk = chunks[c];
-                    var attributeBuffers = chunk.attributeBuffers;
-                    var indicesBuffer = chunk.indicesBuffer;
-
-                    var availableAttributes = [];
-                    var availableAttributeSymbols = [];
-                    for (var a = 0; a < attributeBuffers.length; a++) {
-                        var attributeBufferInfo = attributeBuffers[a];
-                        var name = attributeBufferInfo.name;
-                        var semantic = attributeBufferInfo.semantic;
-
-                        if (semantic) {
-                            var semanticInfo = shader.attribSemantics[semantic];
-                            var symbol = semanticInfo && semanticInfo.symbol;
-                        } else {
-                            var symbol = name;
-                        }
-                        if (symbol && shader.attributeTemplates[symbol]) {
-                            availableAttributes.push(attributeBufferInfo);
-                            availableAttributeSymbols.push(symbol);
-                        }
+                // Use the cache in STATIC_DRAW mode
+                // TODO : machanism to change to the DYNAMIC_DRAW mode automatically
+                // when the geometry is not static any more
+                var drawDetails = this._drawCache[currentDrawID];
+                if (!drawDetails) {
+                    var chunks = geometry.getBufferChunks(_gl);
+                    if (!chunks) {  // Empty mesh
+                        return;
                     }
+                    drawDetails = [];
+                    for (var c = 0; c < chunks.length; c++) {
+                        var chunk = chunks[c];
+                        var attributeBuffers = chunk.attributeBuffers;
+                        var indicesBuffer = chunk.indicesBuffer;
+
+                        var availableAttributes = [];
+                        var availableAttributeSymbols = [];
+                        for (var a = 0; a < attributeBuffers.length; a++) {
+                            var attributeBufferInfo = attributeBuffers[a];
+                            var name = attributeBufferInfo.name;
+                            var semantic = attributeBufferInfo.semantic;
+
+                            if (semantic) {
+                                var semanticInfo = shader.attribSemantics[semantic];
+                                var symbol = semanticInfo && semanticInfo.symbol;
+                            } else {
+                                var symbol = name;
+                            }
+                            if (symbol && shader.attributeTemplates[symbol]) {
+                                availableAttributes.push(attributeBufferInfo);
+                                availableAttributeSymbols.push(symbol);
+                            }
+                        }
+                        var drawDetail = new DrawDetail(
+                            availableAttributes,
+                            availableAttributeSymbols,
+                            indicesBuffer
+                        );
+                        drawDetails.push(drawDetail);
+                    }
+                    if (geometry.hint = glenum.STATIC_DRAW) {
+                        this._drawCache[currentDrawID] = drawDetails;
+                    }
+                }
+
+                for (var i = 0; i < drawDetails.length; i++) {
+                    var drawDetail = drawDetails[i];
+                    var availableAttributes = drawDetail.availableAttributes
+                    var availableAttributeSymbols = drawDetail.availableAttributeSymbols;
+                    var indicesBuffer = drawDetail.indicesBuffer;
+
                     shader.enableAttributes(_gl, availableAttributeSymbols);
                     // Setting attributes;
                     for (var a = 0; a < availableAttributes.length; a++) {

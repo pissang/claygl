@@ -20,10 +20,10 @@ define(function() {
 
         initialize : function(_gl) {
 
-            if (extensions[_gl.__GUID__]) {
+            if (extensions[_gl.__GLID__]) {
                 return;
             }
-            extensions[_gl.__GUID__] = {};
+            extensions[_gl.__GLID__] = {};
             // Get webgl extension
             for (var i = 0; i < EXTENSION_LIST.length; i++) {
                 var extName = EXTENSION_LIST[i];
@@ -37,12 +37,12 @@ define(function() {
                     ext = _gl.getExtension("WEBKIT_" + extName);
                 }
 
-                extensions[_gl.__GUID__][extName] = ext;
+                extensions[_gl.__GLID__][extName] = ext;
             }
         },
 
         getExtension : function(_gl, name) {
-            var guid = _gl.__GUID__;
+            var guid = _gl.__GLID__;
             if (extensions[guid]) {
                 return extensions[guid][name];
             }

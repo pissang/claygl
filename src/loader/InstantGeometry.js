@@ -48,7 +48,7 @@ define(function(require) {
             this.cache.dirtyAll("chunks");
         },
         getBufferChunks : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             if (this.cache.isDirty("chunks")) {
                 this._updateBuffer(_gl);
                 this.cache.fresh("chunks");
@@ -166,7 +166,7 @@ define(function(require) {
             return geometry;
         },
         dispose : function(_gl) {
-            this.cache.use(_gl.__GUID__);
+            this.cache.use(_gl.__GLID__);
             var chunks = this.cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
@@ -178,7 +178,7 @@ define(function(require) {
                     }
                 }
             }
-            this.cache.deleteContext(_gl.__GUID__);
+            this.cache.deleteContext(_gl.__GLID__);
         }
     });
 
