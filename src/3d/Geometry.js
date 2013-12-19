@@ -489,7 +489,7 @@ define(function(require) {
                 }
                 this.cache.put("chunks", chunks);
             }
-            for (var i = 0; i < chunks.length; i++) {
+            for (var i = 0; i < this._arrayChunks.length; i++) {
                 var chunk = chunks[i];
                 if (! chunk) {
                     chunk = chunks[i] = {
@@ -503,6 +503,7 @@ define(function(require) {
                 var attributeArrays = arrayChunk.attributeArrays;
                 var indicesArray = arrayChunk.indicesArray;
 
+                var count = 0;
                 for (var name in dirtyAttributes) {
                     var attribute = dirtyAttributes[name];
                     var type = attribute.type;
@@ -520,8 +521,10 @@ define(function(require) {
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                     _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], this.hint);
 
-                    attributeBuffers.push(new AttributeBuffer(name, type, buffer, size, semantic));
-                } 
+                    attributeBuffers[count++] = new AttributeBuffer(name, type, buffer, size, semantic);
+                }
+                attributeBuffers.length = count;
+
                 if (isFacesDirty) {
                     if (! indicesBuffer) {
                         indicesBuffer = new IndicesBuffer(_gl.createBuffer(), indicesArray.length);
