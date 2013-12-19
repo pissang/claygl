@@ -315,8 +315,8 @@ define(function(require) {
         },
 
         setUniform : function(_gl, type, symbol, value) {
-            var locationsMap = this.cache.get("locations");
-            var location = locationsMap[symbol];
+            var locationMap = this.cache.get("locations");
+            var location = locationMap[symbol];
             // Uniform is not existed in the shader
             if (location === null || location === undefined) {
                 return;
@@ -760,8 +760,8 @@ define(function(require) {
                 // Cache uniform locations
                 for (var i = 0; i < this._uniformList.length; i++) {
                     var uniformSymbol = this._uniformList[i];
-                    var locationsMap = this.cache.get("locations");
-                    locationsMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
+                    var locationMap = this.cache.get("locations");
+                    locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
                 }
 
             } catch(e) {

@@ -10,6 +10,7 @@ define(function(require) {
     var glenum = require('./glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
+    var vec4 = glMatrix.vec4;
     var BoundingBox = require('./BoundingBox');
     var Matrix4 = require('core/Matrix4');
 
@@ -243,13 +244,17 @@ define(function(require) {
                     mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
                 }
                 // Frustum culling
+                // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
                 if (geometry.boundingBox && renderable.frustumCulling) {
-                    cullingMatrix._array = matrices['WORLDVIEWPROJECTION'];
+                    cullingMatrix._array = matrices['WORLDVIEW'];
                     cullingBoundingBox.copy(geometry.boundingBox);
                     cullingBoundingBox.applyTransform(cullingMatrix);
+                    cullingMatrix._array = matrices['PROJECTION'];
+                    cullingBoundingBox.applyProjection(cullingMatrix);
 
                     var min = cullingBoundingBox.min._array;
                     var max = cullingBoundingBox.max._array;
+                    
                     if (
                         max[0] < -1 || min[0] > 1
                         || max[1] < -1 || min[1] > 1

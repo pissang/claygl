@@ -89,7 +89,7 @@ define(function(require) {
                 planeMatrix.rotateY(Math.PI);
                 break;
         }
-        plane.applyMatrix(planeMatrix);
+        plane.applyTransform(planeMatrix);
         return plane;
     }
 

@@ -5,7 +5,7 @@ define(function(require) {
     var Clip = require('./Clip');
     var Base = require('core/Base');
 
-    var requrestAnimationFrame = window.requrestAnimationFrame
+    var requestAnimationFrame = window.requestAnimationFrame
                                 || window.msRequestAnimationFrame
                                 || window.mozRequestAnimationFrame
                                 || window.webkitRequestAnimationFrame
@@ -88,13 +88,13 @@ define(function(require) {
             function step() {
                 if (self._running) {
                     
-                    requrestAnimationFrame(step);
+                    requestAnimationFrame(step);
 
                     self.update();
                 }
             }
 
-            requrestAnimationFrame(step);
+            requestAnimationFrame(step);
         },
         stop : function() {
             this._running = false;

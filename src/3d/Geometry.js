@@ -789,7 +789,7 @@ define(function(require) {
             }
         })(),
         // TODO : tangent
-        applyMatrix : function(matrix) {
+        applyTransform : function(matrix) {
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
 
