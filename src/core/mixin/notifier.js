@@ -69,7 +69,7 @@ define(function() {
             }
             var self = this;
             function wrapper() {
-                self.off(name, action);
+                self.off(name, wrapper);
                 action.apply(this, arguments);
             }
             return this.on(name, wrapper, context);
@@ -103,7 +103,7 @@ define(function() {
             return this.once('error', action, context);
         },
 
-        off : function(name, action) {
+        off : function(name, action, context) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
@@ -113,12 +113,17 @@ define(function() {
             }
             if (handlers[name]) {
                 var hdls = handlers[name];
+                // Splice is evil!!
+                var retains = [];
                 for (var i = 0; i < hdls.length; i++) {
-                    if (hdls[i].action === action) {
-                        hdls.splice(i, 1);
-                        return;
+                    if (
+                        (action && hdls[i].action !== action)
+                         && (context && hdls[i].context !== context)
+                    ) {
+                        retains.push(hdls[i]);
                     }
                 }
+                handlers[name] = retains;
             } 
         },
 

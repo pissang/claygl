@@ -40,6 +40,7 @@ define(function(require) {
 
     var ShadowMapPass = Base.derive(function() {
         return {
+            
             useVSM : false,
 
             _textures : {},

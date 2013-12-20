@@ -127,6 +127,7 @@ define(function(require) {
                 normals[i][2] = particle.spriteSize;
             }
             positions.length = len;
+            normals.length = len;
 
             geometry.dirty('position');
             geometry.dirty('normal');

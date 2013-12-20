@@ -90,8 +90,7 @@ define(function(require) {
                 var width = this.width;
                 var height = this.height;
             }
-            return (width === height)
-                    && (width & (width-1)) === 0
+            return (width & (width-1)) === 0
                     && (height & (height-1)) === 0;
         },
 
