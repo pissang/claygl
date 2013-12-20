@@ -1,15 +1,15 @@
 define(function(require) {
 
-	var Geometry = require('../Geometry');
+    var Geometry = require('../Geometry');
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
     var BoundingBox = require('../BoundingBox');
 
 	// From three.js SphereGeometry
-	var Sphere = Geometry.derive(function() {
+    var Sphere = Geometry.derive(function() {
 
-		return {
+        return {
             widthSegments : 20,
             heightSegments : 20,
 
@@ -20,8 +20,8 @@ define(function(require) {
             thetaLength : Math.PI,
 
             radius : 1
-		}
-	}, function() {
+        }
+    }, function() {
         
         var positions = this.attributes.position.value;
         var texcoords = this.attributes.texcoord0.value;
@@ -80,7 +80,7 @@ define(function(require) {
         this.boundingBox = new BoundingBox();
         this.boundingBox.max.set(radius, radius, radius);
         this.boundingBox.min.set(-radius, -radius, -radius);
-	})
+    })
 
     return Sphere;
 })

@@ -113,7 +113,7 @@ define(function(require) {
             var min = this.min._array;
             var max = this.max._array;
             var vertices = this.vertices;
-            //--- new z
+            //--- near z
             // min x
             vec3.set(vertices[0], min[0], min[1], min[2]);
             vec3.set(vertices[1], min[0], max[1], min[2]);

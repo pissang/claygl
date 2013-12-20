@@ -18,7 +18,10 @@ define(function(require) {
             var texture;
             if (typeof(path) === 'string') {
                 if (path.match(/.hdr$/)) {
-                    texture = new Texture2D();
+                    texture = new Texture2D({
+                        width : 0,
+                        height : 0
+                    });
                     textureUtil._fetchTexture(
                         path,
                         function (data) {
@@ -30,7 +33,10 @@ define(function(require) {
                     );
                     return texture;
                 } else if (path.match(/.dds$/)) {
-                    texture = new Texture2D();
+                    texture = new Texture2D({
+                        width : 0,
+                        height : 0
+                    });
                     textureUtil._fetchTexture(
                         path,
                         function (data) {

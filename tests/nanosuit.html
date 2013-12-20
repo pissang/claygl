@@ -6,6 +6,7 @@
     </head>
     <body style="margin:0px">
         <canvas id="Main"></canvas>
+        <div id="time" style="position:absolute;left:10px;top:10px;"></div>
         <script type="text/javascript">
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
@@ -20,7 +21,9 @@
 
                 var animation = new qtek.animation.Animation;
                 animation.start();
-                var shadowMapPass = new qtek3d.prePass.ShadowMap();
+                var shadowMapPass = new qtek3d.prePass.ShadowMap({
+                    useVSM : true
+                });
 
                 var scene = new qtek3d.Scene();
                 var camera = new qtek3d.camera.Perspective({
@@ -50,14 +53,26 @@
                 material.set("uvRepeat", [10, 10]);
 
                 var root = new qtek3d.Node();
-
-                _.each(meshList, function(mesh){
-                    mesh.material.set("shininess", 50);
-                    mesh.material.shader.disableTexture("normalMap");
-                    mesh.material.set("specular", [0.6, 0.6, 0.6]);
-                    mesh.material.set("color", [4.0, 4.0, 4.0]);
-                    root.add(mesh);
-                });
+                var meshNumber = 0;
+                for (var i = 0; i < 10; i++) {
+                    for (var j = 0; j < 10; j++) {
+                        var nanosuit = new qtek3d.Node();
+                        _.each(meshList, function(_mesh){
+                            var mesh = new qtek3d.Mesh({
+                                geometry : _mesh.geometry,
+                                material : _mesh.material
+                            });
+                            mesh.material.set("shininess", 50);
+                            mesh.material.shader.disableTexture("normalMap");
+                            mesh.material.set("specular", [0.6, 0.6, 0.6]);
+                            mesh.material.set("color", [4.0, 4.0, 4.0]);
+                            nanosuit.add(mesh);
+                            meshNumber++;
+                        });
+                        nanosuit.position.set((5 - i) * 6, 0, (5 - j) * 6);
+                        root.add(nanosuit);
+                    }
+                }
 
                 camera.position.set(0, 4, 5);
                 camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
@@ -81,14 +96,14 @@
 
                 var light = new qtek3d.light.Directional({
                     intensity : 1.0,
-                    position : new qtek.core.Vector3(2, 2, 2),
+                    position : new qtek.core.Vector3(6, 6, 6),
                     shadowCamera : {
-                        left : -5,
-                        right : 5,
-                        top : 5,
-                        bottom : -5,
+                        left : -10,
+                        right : 10,
+                        top : 10,
+                        bottom : -10,
                         near : 0,
-                        far : 30
+                        far : 40
                     },
                     shadowBias : 0.003,
                 });
@@ -118,12 +133,18 @@
                 });
                 control.enable();
 
-                animation.on('frame', function() {
+                animation.on('frame', function(deltaTime) {
+                    var start = performance.now();
                     shadowMapPass.render(renderer, scene);
-                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
-                    renderer.render(scene, camera);
-                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
-                    // shadowMapPass.renderDebug(renderer);
+                    var drawInfo = renderer.render(scene, camera);
+                    var renderTime = performance.now() - start;
+
+                    document.getElementById('time').innerHTML = 
+                            'fps: ' + Math.round(1000 / deltaTime) + '<br />' 
+                            + 'render time : ' + Math.round(renderTime) + '<br />'
+                            + 'draw call: ' +  drawInfo.drawCallNumber + '(' + (meshNumber+1) + ')'+ '<br />'
+                            + 'vertices: ' + drawInfo.vertexNumber+ '<br />'
+                            + 'faces: ' + drawInfo.faceNumber;
                 });
             })
             
