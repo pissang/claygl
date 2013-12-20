@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var Node = require('../Node');
     var Vector3 = require('core/Vector3');
     var Value = require('core/Value');

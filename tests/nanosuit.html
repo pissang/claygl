@@ -54,8 +54,8 @@
 
                 var root = new qtek3d.Node();
                 var meshNumber = 0;
-                for (var i = 0; i < 10; i++) {
-                    for (var j = 0; j < 10; j++) {
+                for (var i = 0; i < 20; i++) {
+                    for (var j = 0; j < 20; j++) {
                         var nanosuit = new qtek3d.Node();
                         _.each(meshList, function(_mesh){
                             var mesh = new qtek3d.Mesh({
@@ -69,7 +69,7 @@
                             nanosuit.add(mesh);
                             meshNumber++;
                         });
-                        nanosuit.position.set((5 - i) * 6, 0, (5 - j) * 6);
+                        nanosuit.position.set((10 - i) * 8, 0, (10 - j) * 8);
                         root.add(nanosuit);
                     }
                 }
@@ -90,20 +90,20 @@
                 });
                 planeMesh.position.y = -0.1;
                 planeMesh.rotation.rotateX(-Math.PI/2);
-                planeMesh.scale.set(10, 10, 10);
+                planeMesh.scale.set(20, 20, 20);
 
                 scene.add(planeMesh);
 
                 var light = new qtek3d.light.Directional({
                     intensity : 1.0,
-                    position : new qtek.core.Vector3(6, 6, 6),
+                    position : new qtek.core.Vector3(10, 10, 10),
                     shadowCamera : {
-                        left : -10,
-                        right : 10,
-                        top : 10,
-                        bottom : -10,
+                        left : -20,
+                        right : 20,
+                        top : 20,
+                        bottom : -20,
                         near : 0,
-                        far : 40
+                        far : 100
                     },
                     shadowBias : 0.003,
                 });

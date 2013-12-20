@@ -167,13 +167,15 @@ define(function(require) {
             }
 
             _gl.disable(_gl.BLEND);
-            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
 
+            // Reset the scene bounding box;
+            scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+            scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
             if (! silent) {
                 this.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
                 this.trigger("beforerender:transparent", this, transparentQueue);
             }
-
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
@@ -249,6 +251,9 @@ define(function(require) {
                     cullingMatrix._array = matrices['WORLDVIEW'];
                     cullingBoundingBox.copy(geometry.boundingBox);
                     cullingBoundingBox.applyTransform(cullingMatrix);
+                    // Passingly update the scene bounding box
+                    scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
+
                     cullingMatrix._array = matrices['PROJECTION'];
                     cullingBoundingBox.applyProjection(cullingMatrix);
 

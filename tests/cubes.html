@@ -62,8 +62,7 @@
                     }
                 }
 
-                camera.position.set(0, 2, 10);
-                camera.lookAt(new qtek.core.Vector3(0, 0, 0), new qtek.core.Vector3(0, 1, 0));
+                camera.position.set(0, 0, 10);
 
                 var light = new qtek3d.light.Point({
                     color : [1.5, 1.5, 1.5]
@@ -80,6 +79,8 @@
                             Math.round(1000 / deltaTime) + '<br />' 
                             + renderTime + '<br />'
                             + drawInfo.drawCallNumber + '(' + 5000 + ')';
+                    // near z is larger than far z in view space !!
+                    camera.far = Math.max(camera.near, -scene.viewBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);
                 });
             })

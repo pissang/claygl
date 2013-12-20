@@ -7,14 +7,16 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
 
     var BoundingBox = function(min, max) {
-        this.min = min || new Vector3();
-        this.max = max || new Vector3();
+        this.min = min || new Vector3(Infinity, Infinity, Infinity);
+        this.max = max || new Vector3(-Infinity, -Infinity, -Infinity);
         // Cube vertices
         var vertices = [];
         for (var i = 0; i < 8; i++) {
             vertices[i] = vec3.fromValues(0, 0, 0, 1);
         }
         this.vertices = vertices;
+
+        this._dirty = true;
     }
     BoundingBox.prototype = {
         
@@ -40,6 +42,13 @@ define(function(require) {
                 this.min._dirty = true;
                 this.max._dirty = true;
             }
+        },
+
+        union : function(boundingBox) {
+            vec3.min(this.min._array, this.min._array, boundingBox.min._array);
+            vec3.max(this.max._array, this.max._array, boundingBox.max._array);
+            this.min._dirty = true;
+            this.max._dirty = true;
         },
 
         applyTransform : function(matrix) {
@@ -129,8 +138,16 @@ define(function(require) {
         },
 
         copy : function(boundingBox) {
-            this.min.copy(boundingBox.min);
-            this.max.copy(boundingBox.max);
+            vec3.copy(this.min._array, boundingBox.min._array);
+            vec3.copy(this.max._array, boundingBox.max._array);
+            this.min._dirty = true;
+            this.max._dirty = true;
+        },
+
+        clone : function() {
+            var boundingBox = new BoundingBox();
+            boundingBox.copy(this);
+            return boundingBox;
         }
     };
 

@@ -3,16 +3,18 @@ define(function(require){
     var Node = require('./Node');
     var Light = require('./Light');
     var glMatrix = require("glmatrix");
+    var BoundingBox = require('./BoundingBox');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
     var Scene = Node.derive(function(){
         return {
-
-            scene : null,
             // Global material of scene
             material : null,
+            autoUpdate : true,
 
+            // Properties auto updated by self
+            scene : null,
             lights : {},
             // Properties to save the light information in the scene
             // Will be set in the render function
@@ -28,10 +30,17 @@ define(function(require){
             transparentQueue : [],
             lights : [],
 
+            // Scene bounding box in view space
+            // mainly for the camera to adujst the near and far plane,
+            // so that the view frustum contains the visible objects as tightly as possible.
+            // Notice:
+            //  updated after rendering (in the step of frustum culling passingly)
+            //  So may be not so accurate, but saved a lot of calculation !!
+            viewBoundingBoxLastFrame : new BoundingBox(),
+
             _opaqueObjectCount : 0,
             _transparentObjectCount : 0,
 
-            autoUpdate : true,
 
             _nodeRepository : {}
         }

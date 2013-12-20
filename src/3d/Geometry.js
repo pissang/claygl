@@ -156,6 +156,8 @@ define(function(require) {
             this.cache.dirtyAll(field);
             
             this._enabledAttributes = null;
+
+            // PENDING : Change to dynamic geometry
         },
 
         getVerticesNumber : function() {
