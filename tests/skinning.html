@@ -80,7 +80,9 @@
                     devicePixelRatio : 1.0
                 });
 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap();
+                var shadowMapPass = new qtek3d.prePass.ShadowMap({
+                    softShadow : qtek3d.prePass.ShadowMap.VSM
+                });
 
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek3d.Scene,
@@ -153,7 +155,7 @@
                 var clearAll = renderer.clear;
                 skeletonDebugScene.position.x -= 6;
                 setInterval(function(){
-                    shadowMapPass.render(renderer, scene);
+                    shadowMapPass.render(renderer, scene, camera);
                     renderer.clear = clearAll
                     renderer.render(scene, camera);
                     renderer.clear = 0;

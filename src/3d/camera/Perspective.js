@@ -10,7 +10,7 @@ define(function(require) {
             aspect : 1,
             
             near : 0.1,
-            
+
             far : 2000
         }
     }, {

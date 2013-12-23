@@ -1,6 +1,7 @@
 define(function(require) {
 
     var Geometry = require('../Geometry');
+    var BoundingBox = require('../BoundingBox');
 
     var Plane = Geometry.derive(function() {
 
@@ -37,6 +38,9 @@ define(function(require) {
             }
         }
 
+        this.boundingBox = new BoundingBox();
+        this.boundingBox.min.set(-1, -1, 0);
+        this.boundingBox.max.set(1, 1, 0);
     })
 
     return Plane;

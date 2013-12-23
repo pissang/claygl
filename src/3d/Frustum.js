@@ -3,13 +3,23 @@ define(function(require) {
     var Vector3 = require('core/Vector3');
     var glmatrix = require('glmatrix');
     var Plane = require('./Plane');
+    var BoundingBox = require('./BoundingBox');
+
     var vec3 = glmatrix.vec3;
 
     var Frustum = function() {
+
         this.planes = [];
 
         for (var i = 0; i < 6; i++) {
-            this.planes.push(new Plane);
+            this.planes.push(new Plane());
+        }
+
+        this.boundingBox = new BoundingBox();
+
+        this.vertices = [];
+        for (var i = 0; i < 8; i++) {
+            this.vertices[i] = vec3.fromValues(0, 0, 0);
         }
     };
 
@@ -25,6 +35,7 @@ define(function(require) {
             var m8 = m[8], m9 = m[9], m10 = m[10], m11 = m[11];
             var m12 = m[12], m13 = m[13], m14 = m[14], m15 = m[15];
 
+            // Update planes
             vec3.set(planes[0].normal._array, m3 - m0, m7 - m4, m11 - m8);
             planes[0].distance = m15 - m12;
             planes[0].normalize();
@@ -48,14 +59,82 @@ define(function(require) {
             vec3.set(planes[5].normal._array, m3 + m2, m7 + m6, m11 + m10);
             planes[5].distance = m15 + m14;
             planes[5].normalize();
-            
+
+            // Perspective projection
+            if (m15 === 0)  {
+                var aspect = m5 / m0;
+                var zNear = -m14 / (m10 - 1);
+                var zFar = -m14 / (m10 + 1);
+                var farY = -zFar / m5;
+                var nearY = -zNear / m5;
+                // Update bounding box
+                this.boundingBox.min.set(-farY * aspect, -farY, zFar);
+                this.boundingBox.max.set(farY * aspect, farY, zNear);
+                // update vertices
+                var vertices = this.vertices;
+                //--- min z
+                // min x
+                vec3.set(vertices[0], -farY * aspect, -farY, zFar);
+                vec3.set(vertices[1], -farY * aspect, farY, zFar);
+                // max x
+                vec3.set(vertices[2], farY * aspect, -farY, zFar);
+                vec3.set(vertices[3], farY * aspect, farY, zFar);
+                //-- max z
+                vec3.set(vertices[4], -nearY * aspect, -nearY, zNear);
+                vec3.set(vertices[5], -nearY * aspect, nearY, zNear);
+                vec3.set(vertices[6], nearY * aspect, -nearY, zNear);
+                vec3.set(vertices[7], nearY * aspect, nearY, zNear);
+            } else { // Orthographic projection
+                var left = (-1 - m12) / m0;
+                var right = (1 - m12) / m0;
+                var top = (1 - m13) / m5;
+                var bottom = (-1 - m13) / m5;
+                var near = (-1 - m14) / m10;
+                var far = (1 - m14) / m10;
+
+                this.boundingBox.min.set(left, bottom, far);
+                this.boundingBox.max.set(right, top, near);
+                // Copy the vertices from bounding box directly
+                for (var i = 0; i < 8; i++) {
+                    vec3.copy(this.vertices[i], this.boundingBox.vertices[i]);
+                }
+            }
+
             return this;
         },
 
-        intersectBoundingBox : function() {
+        getTransformedBoundingBox : (function() {
+            
+            var tmpVec3 = vec3.create();
 
-        }
+            return function(bbox, matrix) {
+                var vertices = this.vertices;
+
+                var m4 = matrix._array;
+                var _min = bbox.min._array;
+                var _max = bbox.max._array;
+                var v = vertices[0];
+                vec3.transformMat4(tmpVec3, v, m4);
+                vec3.copy(_min, tmpVec3);
+                vec3.copy(_max, tmpVec3);
+
+                for (var i = 1; i < 8; i++) {
+                    v = vertices[i];
+                    vec3.transformMat4(tmpVec3, v, m4);
+
+                    _min[0] = Math.min(tmpVec3[0], _min[0]);
+                    _min[1] = Math.min(tmpVec3[1], _min[1]);
+                    _min[2] = Math.min(tmpVec3[2], _min[2]);
+
+                    _max[0] = Math.max(tmpVec3[0], _max[0]);
+                    _max[1] = Math.max(tmpVec3[1], _max[1]);
+                    _max[2] = Math.max(tmpVec3[2], _max[2]);
+                }
+
+                bbox.min._dirty = true;
+                bbox.max._dirty = true;
+            };
+        }) ()
     }
-
     return Frustum;
 });

@@ -140,6 +140,22 @@ define(function(require) {
             }
         },
 
+        // Update world transform individually
+        // Assume its parent world transform have been updated
+        updateWorldTransform : function() {
+            if (this.parent) {
+                mat4.multiply(
+                    this.worldTransform._array,
+                    this.parent.worldTransform._array,
+                    this.localTransform._array
+                )
+            } else {
+                mat4.copy(
+                    this.worldTransform._array, this.localTransform._array 
+                )
+            }
+        },
+
         // Update the node status in each frame
         update : function(force) {
             
@@ -153,16 +169,7 @@ define(function(require) {
             }
 
             if (force || this._needsUpdateWorldTransform) {
-                if (this.parent) {
-                    mat4.multiply(
-                        this.worldTransform._array,
-                        this.parent.worldTransform._array,
-                        this.localTransform._array
-                    );
-                }
-                else {
-                    mat4.copy(this.worldTransform._array, this.localTransform._array);
-                }
+                this.updateWorldTransform();
                 force = true;
                 this._needsUpdateWorldTransform = false;
             }

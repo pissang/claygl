@@ -16,7 +16,10 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Point, directional, spot light
 + Orthographic, perspective camera
 + Graph based post processing
-+ Shadow Mapping with PCF or VSM soft shadows, omnilight shadow.
++ High quality shadow
+    + PCF or VSM soft shadow
+    + PSSM for sun light in large scene
+    + Omni light shadow support
 + Geometory processing like normal and tangent generate
 + GPU based skinning
 + First person camera control, orbit camera control
@@ -50,7 +53,7 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + [Full version](https://github.com/pissang/dota2hero)
 
 [Murcielago](http://pissang.github.io/qtek/murcielago)
-
++ [Simple material editor](http://pissang.github.io/qtek/murcielago/editor.html)
 + Image based lighting
 + Physically based shading
 + Realtime atmosphere scattering

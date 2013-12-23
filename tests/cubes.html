@@ -80,7 +80,7 @@
                             + renderTime + '<br />'
                             + drawInfo.drawCallNumber + '(' + 5000 + ')';
                     // near z is larger than far z in view space !!
-                    camera.far = Math.max(camera.near, -scene.viewBoundingBoxLastFrame.min.z);
+                    camera.far = Math.max(camera.near, -camera.sceneBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);
                 });
             })

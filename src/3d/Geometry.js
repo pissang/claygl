@@ -138,7 +138,7 @@ define(function(require) {
             _reorganizedFaces : []
         }
     }, {
-        computeBoundingBox : function() {
+        updateBoundingBox : function() {
             if (!this.boundingBox) {
                 this.boundingBox = new BoundingBox();
             }

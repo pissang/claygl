@@ -87,7 +87,7 @@ define(function(require) {
                 if (geometry 
                     && geometry.faces.length 
                     && geometry.attributes.position.value.length) {
-                    geometry.computeBoundingBox();
+                    geometry.updateBoundingBox();
                     var material = this.parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],

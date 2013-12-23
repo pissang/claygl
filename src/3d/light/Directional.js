@@ -7,16 +7,10 @@ define(function(require) {
     var DirectionalLight = Light.derive(function() {
 
         return {
-            // Config of orthographic camera for shadow mapping generate
-            shadowCamera : {
-                left : -20,
-                right : 20,
-                top : 20,
-                bottom : -20,
-                near : 0,
-                far : 100
-            },
-            shadowBias : 0.0002
+
+            shadowCascade : 1,
+            
+            shadowBias : 0.005
         }
     }, {
 
@@ -28,7 +22,6 @@ define(function(require) {
                 value : (function() {
                     var z = new Vector3();
                     return function(instance) {
-                        // Direction is target to eye
                         return z.copy(instance.worldTransform.forward).negate()._array;
                     }
                 })()

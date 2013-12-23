@@ -22,7 +22,7 @@
                 var animation = new qtek.animation.Animation;
                 animation.start();
                 var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                    useVSM : true
+                    softShadow : qtek3d.prePass.ShadowMap.VSM
                 });
 
                 var scene = new qtek3d.Scene();
@@ -46,7 +46,8 @@
                 });
                 var texture = new qtek3d.texture.Texture2D({
                     wrapS : qtek3d.Texture.REPEAT,
-                    wrapT : qtek3d.Texture.REPEAT
+                    wrapT : qtek3d.Texture.REPEAT,
+                    anisotropic : 8
                 });
                 texture.load("assets/textures/ground_tile.jpg");
                 material.set("diffuseMap", texture);
@@ -54,8 +55,8 @@
 
                 var root = new qtek3d.Node();
                 var meshNumber = 0;
-                for (var i = 0; i < 20; i++) {
-                    for (var j = 0; j < 20; j++) {
+                for (var i = 0; i < 10; i++) {
+                    for (var j = 0; j < 10; j++) {
                         var nanosuit = new qtek3d.Node();
                         _.each(meshList, function(_mesh){
                             var mesh = new qtek3d.Mesh({
@@ -69,7 +70,7 @@
                             nanosuit.add(mesh);
                             meshNumber++;
                         });
-                        nanosuit.position.set((10 - i) * 8, 0, (10 - j) * 8);
+                        nanosuit.position.set((5 - i) * 8, 0, (5 - j) * 8);
                         root.add(nanosuit);
                     }
                 }
@@ -86,42 +87,27 @@
                 });
                 var planeMesh = new qtek3d.Mesh({
                     geometry : plane,
-                    material : material
+                    material : material,
+                    name : "plane"
                 });
                 planeMesh.position.y = -0.1;
                 planeMesh.rotation.rotateX(-Math.PI/2);
-                planeMesh.scale.set(20, 20, 20);
+                planeMesh.scale.set(10, 10, 10);
 
                 scene.add(planeMesh);
 
                 var light = new qtek3d.light.Directional({
                     intensity : 1.0,
                     position : new qtek.core.Vector3(10, 10, 10),
-                    shadowCamera : {
-                        left : -20,
-                        right : 20,
-                        top : 20,
-                        bottom : -20,
-                        near : 0,
-                        far : 100
-                    },
-                    shadowBias : 0.003,
+                    shadowResolution : 1024,
+                    shadowBias : 0.007
                 });
                 light.lookAt(root.position);
                 scene.add(light);
 
                 var aidLight = new qtek3d.light.Directional({
                     intensity : 1.0,
-                    position : new qtek.core.Vector3(2, 2, -1),
-                    shadowCamera : {
-                        left : -5,
-                        right : 5,
-                        top : 5,
-                        bottom : -5,
-                        near : 0,
-                        far : 30
-                    },
-                    shadowBias : 0.003
+                    position : new qtek.core.Vector3(2, 2, -1)
                 });
                 aidLight.lookAt(root.position);
                 // scene.add(aidLight);
@@ -135,9 +121,13 @@
 
                 animation.on('frame', function(deltaTime) {
                     var start = performance.now();
-                    shadowMapPass.render(renderer, scene);
+                    renderer.clear = qtek3d.Renderer.COLOR_BUFFER_BIT | qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    shadowMapPass.render(renderer, scene, camera);
                     var drawInfo = renderer.render(scene, camera);
                     var renderTime = performance.now() - start;
+
+                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    shadowMapPass.renderDebug(renderer);
 
                     document.getElementById('time').innerHTML = 
                             'fps: ' + Math.round(1000 / deltaTime) + '<br />' 

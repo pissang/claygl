@@ -47,7 +47,7 @@ define(function(require) {
 
             viewportInfo : {},
 
-            _scene : null
+            _sceneRendering : null
         }
     }, function() {
 
@@ -123,13 +123,8 @@ define(function(require) {
 
         render : function(scene, camera, silent) {
             var _gl = this.gl;
-            
-            if (!silent) {
-                // Render plugin like shadow mapping must set the silent true
-                this.trigger("beforerender", this, scene, camera);
-            }
 
-            this._scene = scene;
+            this._sceneRendering = scene;
 
             var color = this.color;
             _gl.clearColor(color[0], color[1], color[2], color[3]);
@@ -163,35 +158,32 @@ define(function(require) {
 
             // Render Opaque queue
             if (! silent) {
-                this.trigger("beforerender:opaque", this, opaqueQueue);
+                scene.trigger("beforerender:opaque", this, opaqueQueue);
             }
 
             _gl.disable(_gl.BLEND);
 
             // Reset the scene bounding box;
-            scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
-            scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+            camera.sceneBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+            camera.sceneBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
             var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
             if (! silent) {
-                this.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
-                this.trigger("beforerender:transparent", this, transparentQueue);
+                scene.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
+                scene.trigger("beforerender:transparent", this, transparentQueue);
             }
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
 
             if (! silent) {
-                this.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
+                scene.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
             }
             var renderInfo = {}
             for (name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
             }
             if (!silent) {
-                scene.trigger('afterrender', this, scene, camera);
-            } 
-            if (! silent) {
-                this.trigger("afterrender", this, scene, camera, renderInfo);
+                scene.trigger('afterrender', this, scene, camera, renderInfo);
             }
             return renderInfo;
         },
@@ -205,15 +197,15 @@ define(function(require) {
             };
 
             // Calculate view and projection matrix
-            mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
-            mat4.copy(matrices['PROJECTION'], camera.projectionMatrix._array);
-            mat4.multiply(matrices['VIEWPROJECTION'], camera.projectionMatrix._array, matrices['VIEW']);
-            mat4.copy(matrices['VIEWINVERSE'], camera.worldTransform._array);
-            mat4.invert(matrices['PROJECTIONINVERSE'], matrices['PROJECTION']);
-            mat4.invert(matrices['VIEWPROJECTIONINVERSE'], matrices['VIEWPROJECTION']);
+            mat4.invert(matrices.VIEW,  camera.worldTransform._array);
+            mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
+            mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix._array, matrices.VIEW);
+            mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
+            mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
+            mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
             var _gl = this.gl;
-            var scene = this._scene;
+            var scene = this._sceneRendering;
             
             var prevMaterialID;
             var prevShaderID;
@@ -230,48 +222,61 @@ define(function(require) {
 
                 var worldM = renderable.worldTransform._array;
                 // All matrices ralated to world matrix will be updated on demand;
-                mat4.copy(matrices['WORLD'], worldM);
-                mat4.multiply(matrices['WORLDVIEW'], matrices['VIEW'] , worldM);
-                mat4.multiply(matrices['WORLDVIEWPROJECTION'], matrices['VIEWPROJECTION'] , worldM);
-                if (shader.matrixSemantics['WORLDINVERSE'] ||
-                    shader.matrixSemantics['WORLDINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDINVERSE'], worldM);
+                mat4.copy(matrices.WORLD, worldM);
+                mat4.multiply(matrices.WORLDVIEW, matrices.VIEW , worldM);
+                mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+                if (shader.matrixSemantics.WORLDINVERSE ||
+                    shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDINVERSE, worldM);
                 }
-                if (shader.matrixSemantics['WORLDVIEWINVERSE'] ||
-                    shader.matrixSemantics['WORLDVIEWINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDVIEWINVERSE'], matrices['WORLDVIEW']);
+                if (shader.matrixSemantics.WORLDVIEWINVERSE ||
+                    shader.matrixSemantics.WORLDVIEWINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
                 }
-                if (shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSE'] ||
-                    shader.matrixSemantics['WORLDVIEWPROJECTIONINVERSETRANSPOSE']) {
-                    mat4.invert(matrices['WORLDVIEWPROJECTIONINVERSE'], matrices['WORLDVIEWPROJECTION']);
+                if (shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSE ||
+                    shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
                 }
                 // Frustum culling
                 // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
-                if (geometry.boundingBox && renderable.frustumCulling) {
-                    cullingMatrix._array = matrices['WORLDVIEW'];
+                if (geometry.boundingBox) {
+                    cullingMatrix._array = matrices.WORLDVIEW;
                     cullingBoundingBox.copy(geometry.boundingBox);
                     cullingBoundingBox.applyTransform(cullingMatrix);
                     // Passingly update the scene bounding box
-                    scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
+                    camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
+                    if (renderable.frustumCulling)  {
+                        if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
+                            continue;
+                        }
 
-                    cullingMatrix._array = matrices['PROJECTION'];
-                    cullingBoundingBox.applyProjection(cullingMatrix);
+                        cullingMatrix._array = matrices.PROJECTION;
+                        if (
+                            cullingBoundingBox.max._array[2] > 0 &&
+                            cullingBoundingBox.min._array[2] < 0
+                        ) {
+                            // Clip in the near plane
+                            cullingBoundingBox.max._array[2] = -1e-20;
+                        }
+                        
+                        cullingBoundingBox.applyProjection(cullingMatrix);
 
-                    var min = cullingBoundingBox.min._array;
-                    var max = cullingBoundingBox.max._array;
-                    
-                    if (
-                        max[0] < -1 || min[0] > 1
-                        || max[1] < -1 || min[1] > 1
-                        || max[2] < -1 || min[2] > 1
-                    ) {
-                        continue;
+                        var min = cullingBoundingBox.min._array;
+                        var max = cullingBoundingBox.max._array;
+                        
+                        if (
+                            max[0] < -1 || min[0] > 1
+                            || max[1] < -1 || min[1] > 1
+                            || max[2] < -1 || min[2] > 1
+                        ) {
+                            continue;
+                        }   
                     }
                 }
                 
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
-                    if (scene.isShaderLightNumberChanged(shader)) {
+                    if (scene && scene.isShaderLightNumberChanged(shader)) {
                         scene.setShaderLightNumber(shader);
                     }
 
@@ -279,9 +284,11 @@ define(function(require) {
 
                     // Set lights uniforms
                     // TODO needs optimized
-                    for (var symbol in scene.lightUniforms) {
-                        var lu = scene.lightUniforms[symbol];
-                        shader.setUniform(_gl, lu.type, symbol, lu.value);
+                    if (scene) {
+                        for (var symbol in scene.lightUniforms) {
+                            var lu = scene.lightUniforms[symbol];
+                            shader.setUniform(_gl, lu.type, symbol, lu.value);
+                        }
                     }
                     prevShaderID = shader.__GUID__;
                 }

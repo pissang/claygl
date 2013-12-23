@@ -30,17 +30,8 @@ define(function(require){
             transparentQueue : [],
             lights : [],
 
-            // Scene bounding box in view space
-            // mainly for the camera to adujst the near and far plane,
-            // so that the view frustum contains the visible objects as tightly as possible.
-            // Notice:
-            //  updated after rendering (in the step of frustum culling passingly)
-            //  So may be not so accurate, but saved a lot of calculation !!
-            viewBoundingBoxLastFrame : new BoundingBox(),
-
             _opaqueObjectCount : 0,
             _transparentObjectCount : 0,
-
 
             _nodeRepository : {}
         }
@@ -97,7 +88,7 @@ define(function(require){
         },
 
         // Traverse the scene and add the renderable
-        // object to the render queue;
+        // object to the render queue
         _updateRenderQueue : function(parent, sceneMaterialTransparent) {
             for (var i = 0; i < parent._children.length; i++) {
                 var child = parent._children[i];
