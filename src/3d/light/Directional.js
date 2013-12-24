@@ -8,9 +8,7 @@ define(function(require) {
 
         return {
 
-            shadowCascade : 1,
-            
-            shadowBias : 0.005
+            shadowBias : 0.0002
         }
     }, {
 

@@ -103,7 +103,7 @@ define(function() {
             return this.once('error', action, context);
         },
 
-        off : function(name, action, context) {
+        off : function(name, action) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
@@ -116,10 +116,7 @@ define(function() {
                 // Splice is evil!!
                 var retains = [];
                 for (var i = 0; i < hdls.length; i++) {
-                    if (
-                        (action && hdls[i].action !== action)
-                         && (context && hdls[i].context !== context)
-                    ) {
+                    if (action && hdls[i].action !== action) {
                         retains.push(hdls[i]);
                     }
                 }

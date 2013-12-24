@@ -50,7 +50,7 @@
                 });
                 scene.add(root);
                 for( var i = 0; i < 10; i++){
-                    for(var j = 0; j < 10; j++){
+                    for(var j = 0; j < 20; j++){
                         for( var k = 0; k < 50; k++){
                             var mesh = new Mesh({
                                 geometry : cube,
@@ -72,13 +72,13 @@
                 scene.add(light);
 
                 animation.on('frame', function(deltaTime) {
-                    var start = performance.now();
+                    var start = new Date().getTime();
                     var drawInfo = renderer.render(scene, camera);
-                    var renderTime = performance.now() - start;
+                    var renderTime = new Date().getTime() - start;
                     document.getElementById('time').innerHTML = 
                             Math.round(1000 / deltaTime) + '<br />' 
                             + renderTime + '<br />'
-                            + drawInfo.drawCallNumber + '(' + 5000 + ')';
+                            + drawInfo.drawCallNumber + '(' + 10000 + ')';
                     // near z is larger than far z in view space !!
                     camera.far = Math.max(camera.near, -camera.sceneBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);

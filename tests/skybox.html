@@ -77,10 +77,10 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                control.enable();
 
                 renderer.render(scene, camera);
-                animation.on('frame', function() {
+                animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
                     renderer.render(scene, camera);
                 });
             })

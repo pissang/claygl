@@ -40,11 +40,13 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                control.enable();
 
-                setInterval(function(){
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
                     renderer.render(scene, camera);
-                }, 50);
+                });
             })
             
         </script>

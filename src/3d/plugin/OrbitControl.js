@@ -42,17 +42,19 @@ define(function(require) {
 
             _op : -1  //0 : ROTATE, 1 : PAN
         }
+    }, function() {
+        if (this.domElement) {
+            this.enable();
+        }
     }, {
 
         enable : function() {
-            this.target.before("update", this._beforeUpdateCamera, this);
             this.domElement.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
             this.domElement.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
             this.domElement.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
         },
 
         disable : function() {
-            this.target.off("beforeupdate", this._beforeUpdateCamera);
             this.domElement.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
             this.domElement.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
             this.domElement.removeEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this));
@@ -114,8 +116,7 @@ define(function(require) {
             this._mouseUp();
         },
 
-        _beforeUpdateCamera : function() {
-
+        update : function(delataTime) {
             var target = this.target;
             var zAxis = target.localTransform.forward.normalize();
             var yAxis = target.localTransform.up.normalize();

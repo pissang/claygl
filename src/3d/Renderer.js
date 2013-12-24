@@ -121,7 +121,7 @@ define(function(require) {
             }
         },
 
-        render : function(scene, camera, silent) {
+        render : function(scene, camera, notUpdateScene) {
             var _gl = this.gl;
 
             this._sceneRendering = scene;
@@ -131,15 +131,17 @@ define(function(require) {
             _gl.clear(this.clear);
 
             camera.update(false);
-            scene.update(false);
+            // If the scene have been updated in the prepass like shadow map
+            // There is no need to update it again
+            if (!notUpdateScene) {
+                scene.update(false);
+            }
 
             var opaqueQueue = scene.opaqueQueue;
             var transparentQueue = scene.transparentQueue;
             var sceneMaterial = scene.material;
 
-            if (!silent) {
-                scene.trigger('beforerender', this, scene, camera);
-            }
+            scene.trigger('beforerender', this, scene, camera);
             // Sort render queue
             // Calculate the object depth
             if (transparentQueue.length > 0) {
@@ -157,38 +159,33 @@ define(function(require) {
             transparentQueue.sort(_depthSortFunc);
 
             // Render Opaque queue
-            if (! silent) {
-                scene.trigger("beforerender:opaque", this, opaqueQueue);
-            }
+            scene.trigger("beforerender:opaque", this, opaqueQueue);
 
             _gl.disable(_gl.BLEND);
 
             // Reset the scene bounding box;
             camera.sceneBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
             camera.sceneBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
-            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, silent);
-            if (! silent) {
-                scene.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
-                scene.trigger("beforerender:transparent", this, transparentQueue);
-            }
+            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial);
+
+            scene.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
+            scene.trigger("beforerender:transparent", this, transparentQueue);
+
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
-            var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial, silent);
+            var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial);
 
-            if (! silent) {
-                scene.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
-            }
+            scene.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
             var renderInfo = {}
             for (name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
             }
-            if (!silent) {
-                scene.trigger('afterrender', this, scene, camera, renderInfo);
-            }
+
+            scene.trigger('afterrender', this, scene, camera, renderInfo);
             return renderInfo;
         },
 
-        renderQueue : function(queue, camera, globalMaterial, silent) {
+        renderQueue : function(queue, camera, globalMaterial) {
             var renderInfo = {
                 faceNumber : 0,
                 vertexNumber : 0,
@@ -197,7 +194,7 @@ define(function(require) {
             };
 
             // Calculate view and projection matrix
-            mat4.invert(matrices.VIEW,  camera.worldTransform._array);
+            mat4.invert(matrices.VIEW, camera.worldTransform._array);
             mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
             mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix._array, matrices.VIEW);
             mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
@@ -244,6 +241,7 @@ define(function(require) {
                     cullingBoundingBox.copy(geometry.boundingBox);
                     cullingBoundingBox.applyTransform(cullingMatrix);
                     // Passingly update the scene bounding box
+                    // TODO : exclude very large mesh like ground plane or terrain ?
                     camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
                     if (renderable.frustumCulling)  {
                         if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {

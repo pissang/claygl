@@ -84,7 +84,7 @@
                 setInterval( function(){
                     light.rotateAround(zeroVector, upAxis, 0.01);
                     light.lookAt(zeroVector);
-                    shadowMapPass.render(renderer, scene);
+                    shadowMapPass.render(renderer, scene, camera);
                     renderer.render(scene, camera);
                 }, 20);
 

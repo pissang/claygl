@@ -158,9 +158,6 @@ define(function(require) {
 
         // Update the node status in each frame
         update : function(force) {
-            
-            this.trigger('beforeupdate', this);
-
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
             } else {
@@ -181,8 +178,6 @@ define(function(require) {
                     child.update(force);
                 }
             }
-
-            this.trigger('afterupdate', this);
         },
 
         getWorldPosition : function(out) {

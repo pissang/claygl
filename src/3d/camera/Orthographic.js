@@ -6,7 +6,7 @@ define(function(require) {
         return {
             left : -1,
             right : 1,
-            near : 0,
+            near : -1,
             far : 1,
             top : 1,
             bottom : -1,

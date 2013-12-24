@@ -23,10 +23,10 @@ define(function(require) {
             _offsetPitch : 0,
             _offsetRoll : 0
         }
+    }, function() {
+        this.enable();
     }, {
         enable : function() {
-            this.target.before("update", this._beforeUpdateCamera, this);
-
             this.target.eulerOrder = ["Y", "X", "Z"];
             // Use pointer lock
             // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
@@ -72,11 +72,11 @@ define(function(require) {
             el.requestPointerLock();
         },
 
-        _beforeUpdateCamera : (function() {
+        update : (function() {
 
             var rotateQuat = new Quaternion();
             
-            return function() {
+            return function(deltaTime) {
                 
                 var target = this.target;
 

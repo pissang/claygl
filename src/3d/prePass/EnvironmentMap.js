@@ -42,10 +42,12 @@ define(function (require) {
 
         return ret;
     }, {
-        render : function(renderer, scene) {
+        render : function(renderer, scene, notUpdateScene) {
             var _gl = renderer.gl;
             scene.autoUpdate = false;
-            scene.update(true);
+            if (!notUpdateScene) {
+                scene.update(true);
+            }
             // Tweak fov
             // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
             var n = this.texture.width;
@@ -60,7 +62,7 @@ define(function (require) {
 
                 this.frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
                 this.frameBuffer.bind(renderer);
-                renderer.render(scene, camera);
+                renderer.render(scene, camera, true);
                 this.frameBuffer.unbind(renderer);
             }
             scene.autoUpdate = true;

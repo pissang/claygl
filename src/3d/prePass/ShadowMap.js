@@ -17,6 +17,7 @@ define(function(require) {
     var PerspectiveCamera = require("../camera/Perspective");
     var OrthoCamera = require("../camera/Orthographic");
     var BoundingBox = require("../BoundingBox");
+    var Frustum = require("../Frustum");
 
     var Pass = require("../compositor/Pass");
     var texturePool = require("../compositor/texturePool");
@@ -43,9 +44,11 @@ define(function(require) {
         return {
             
             softShadow : ShadowMapPass.PCF,
+            blurSize : 1.0,
+
+            shadowCascade : 1,
 
             _textures : {},
-
             _shadowMapNumber : {
                 'POINT_LIGHT' : 0,
                 'DIRECTIONAL_LIGHT' : 0,
@@ -56,9 +59,9 @@ define(function(require) {
             _depthMaterials : {},
             _distanceMaterials : {},
 
-            _meshCastShadow : [],
-            _lightCastShadow : [],
-            _meshReceiveShadow : [],
+            _opaqueCasters : [],
+            _receivers : [],
+            _lightsCastShadow : [],
 
             _lightCameras : {}
         }
@@ -70,8 +73,8 @@ define(function(require) {
         this._gaussianPassV = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_v')
         });
-        this._gaussianPassH.setUniform("blurSize", 1.0);
-        this._gaussianPassV.setUniform("blurSize", 1.0);
+        this._gaussianPassH.setUniform("blurSize", this.blurSize);
+        this._gaussianPassV.setUniform("blurSize", this.blurSize);
 
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
@@ -87,12 +90,12 @@ define(function(require) {
             this.trigger('afterrender', this, renderer, scene, sceneCamera);
         },
 
-        renderDebug : function(renderer) {
+        renderDebug : function(renderer, size) {
             var prevClear = renderer.clear;
             renderer.clear = glenum.DEPTH_BUFFER_BIT
             var viewportInfo = renderer.viewportInfo;
             var x = 0, y = 0;
-            var width = viewportInfo.width / 4;
+            var width = size || viewportInfo.width / 4;
             var height = width;
             for (var name in this._textures) {
                 renderer.setViewport(x, y, width, height);
@@ -104,9 +107,9 @@ define(function(require) {
             renderer.clear = prevClear;
         },
 
-        _bindDepthMaterial : function(casts) {
-            for (var i = 0; i < casts.length; i++) {
-                var mesh = casts[i];
+        _bindDepthMaterial : function(casters, bias) {
+            for (var i = 0; i < casters.length; i++) {
+                var mesh = casters[i];
                 var depthMaterial = this._depthMaterials[mesh.joints.length];
                 if (mesh.material !== depthMaterial) {
                     if (!depthMaterial) {
@@ -132,13 +135,15 @@ define(function(require) {
                     } else {
                         depthMaterial.shader.unDefine("fragment", "USE_VSM");
                     }
+
+                    depthMaterial.setUniform('bias', bias);
                 }
             }
         },
 
-        _bindDistanceMaterial : function(casts, light) {
-            for (var i = 0; i < casts.length; i++) {
-                var mesh = casts[i];
+        _bindDistanceMaterial : function(casters, light) {
+            for (var i = 0; i < casters.length; i++) {
+                var mesh = casters[i];
                 var distanceMaterial = this._distanceMaterials[mesh.joints.length];
                 if (mesh.material !== distanceMaterial) {
                     if (!distanceMaterial) {
@@ -170,44 +175,38 @@ define(function(require) {
             }
         },
 
-        _restoreMaterial : function(casts) {
-            for (var i = 0; i < casts.length; i++) {
-                var mesh = casts[i];
+        _restoreMaterial : function(casters) {
+            for (var i = 0; i < casters.length; i++) {
+                var mesh = casters[i];
                 mesh.material = this._meshMaterials[mesh.__GUID__];
             }
         },
 
-        _update : function(parent) {
-            for (var i = 0; i < parent._children.length; i++) {
-                var child = parent._children[i];
-                if (!child.visible) {
-                    continue;
+        _update : function(scene) {
+            for (var i = 0; i < scene.opaqueQueue.length; i++) {
+                var mesh = scene.opaqueQueue[i];
+                if (mesh.castShadow) {
+                    this._opaqueCasters.push(mesh);
                 }
-                if (child.material && child.material.shader) {
-                    if (child.castShadow) {
-                        this._meshCastShadow.push(child);
-                    }
-                    if (child.receiveShadow) {
-                        this._meshReceiveShadow.push(child);
-                        child.material.__shadowUniformUpdated = false;
-                        child.material.shader.__shadowDefineUpdated = false;
-                        child.material.set('shadowEnabled', 1);
-                    } else {
-                        child.material.set('shadowEnabled', 0);
-                    }
-                    if (this.softShadow === ShadowMapPass.VSM) {
-                        child.material.shader.define('fragment', 'USE_VSM');
-                    } else {
-                        child.material.shader.unDefine('fragment', 'USE_VSM');
-                    }
-                } else if (child instanceof Light) {
-                    if (child.castShadow) {
-                        this._lightCastShadow.push(child);
-                    }
+                if (mesh.receiveShadow) {
+                    this._receivers.push(mesh);
+                    mesh.material.__shadowUniformUpdated = false;
+                    mesh.material.shader.__shadowDefineUpdated = false;
+                    mesh.material.set('shadowEnabled', 1);
+                } else {
+                    mesh.material.set('shadowEnabled', 0);
                 }
-
-                if (child._children.length > 0) {
-                    this._update(child);
+                if (this.softShadow === ShadowMapPass.VSM) {
+                    mesh.material.shader.define('fragment', 'USE_VSM');
+                } else {
+                    mesh.material.shader.unDefine('fragment', 'USE_VSM');
+                }
+            }
+            // TODO transparent queue
+            for (var i = 0; i < scene.lights.length; i++) {
+                var light = scene.lights[i];
+                if (light.castShadow) {
+                    this._lightsCastShadow.push(light)
                 }
             }
         },
@@ -219,9 +218,9 @@ define(function(require) {
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
             }
-            this._lightCastShadow.length = 0;
-            this._meshCastShadow.length = 0;
-            this._meshReceiveShadow.length = 0;
+            this._lightsCastShadow.length = 0;
+            this._opaqueCasters.length = 0;
+            this._receivers.length = 0;
 
             var _gl = renderer.gl;
 
@@ -229,7 +228,7 @@ define(function(require) {
 
             this._update(scene);
 
-            if (!this._lightCastShadow.length) {
+            if (!this._lightsCastShadow.length) {
                 return;
             }
 
@@ -245,16 +244,15 @@ define(function(require) {
             // Shadow uniforms
             var spotLightShadowMaps = [];
             var spotLightMatrices = [];
-            var spotLightBiases = [];
             var directionalLightShadowMaps = [];
             var directionalLightMatrices = [];
-            var directionalLightBiases = [];
+            var shadowCascadeClips = [];
             var pointLightShadowMaps = [];
             var pointLightRanges = [];
 
             // Create textures for shadow map
-            for (var i = 0; i < this._lightCastShadow.length; i++) {
-                var light = this._lightCastShadow[i];
+            for (var i = 0; i < this._lightsCastShadow.length; i++) {
+                var light = this._lightsCastShadow[i];
                 if (light instanceof DirectionalLight) {
                     this._renderDirectionalLightShadow
                     (
@@ -262,8 +260,8 @@ define(function(require) {
                         light,
                         scene,
                         sceneCamera,
-                        this._meshCastShadow, 
-                        directionalLightBiases,
+                        this._opaqueCasters,
+                        shadowCascadeClips,
                         directionalLightMatrices,
                         directionalLightShadowMaps
                     );
@@ -272,8 +270,7 @@ define(function(require) {
                     (
                         renderer,
                         light,
-                        this._meshCastShadow, 
-                        spotLightBiases,
+                        this._opaqueCasters, 
                         spotLightMatrices,
                         spotLightShadowMaps
                     );
@@ -282,7 +279,7 @@ define(function(require) {
                     (
                         renderer,
                         light,
-                        this._meshCastShadow,
+                        this._opaqueCasters,
                         pointLightRanges,
                         pointLightShadowMaps
                     )
@@ -290,11 +287,19 @@ define(function(require) {
 
                 this._shadowMapNumber[light.type]++;
             };
+            this._restoreMaterial(this._opaqueCasters);
 
-            this._restoreMaterial(this._meshCastShadow);
+            if (this.shadowCascade > 1 && this._shadowMapNumber.DIRECTIONAL_LIGHT > 1) {
+                console.warn('There is only one directional light can cast shadow when using cascaded shadow map');
+            }
 
-            for (var i = 0; i < this._meshReceiveShadow.length; i++) {
-                var mesh = this._meshReceiveShadow[i];
+            var shadowCascadeClipsNear = shadowCascadeClips.slice();
+            var shadowCascadeClipsFar = shadowCascadeClips.slice();
+            shadowCascadeClipsNear.pop();
+            shadowCascadeClipsFar.shift();
+
+            for (var i = 0; i < this._receivers.length; i++) {
+                var mesh = this._receivers[i];
                 var material = mesh.material;
                 if (material.__shadowUniformUpdated) {
                     continue;
@@ -315,55 +320,124 @@ define(function(require) {
                     if (shaderNeedsUpdate) {
                         shader.dirty();
                     }
+                    shader.define('fragment', 'SHADOW_CASCADE', this.shadowCascade || 1);
                     shader.__shadowDefineUpdated = true;
                 }
 
-                material.setUniform("spotLightShadowMaps", spotLightShadowMaps);
-                material.setUniform("spotLightMatrices", spotLightMatrices);
-                material.setUniform("spotLightBiases", spotLightBiases);
-                material.setUniform("directionalLightShadowMaps", directionalLightShadowMaps);
-                material.setUniform("directionalLightBiases", directionalLightBiases);
-                material.setUniform("directionalLightMatrices", directionalLightMatrices);
-                material.setUniform("pointLightShadowMaps", pointLightShadowMaps);
-                material.setUniform("pointLightRanges", pointLightRanges);
+                if (spotLightShadowMaps.length > 0) {
+                    material.setUniform("spotLightShadowMaps", spotLightShadowMaps);
+                    material.setUniform("spotLightMatrices", spotLightMatrices);   
+                }
+                if (directionalLightShadowMaps.length > 0) {
+                    material.setUniform("directionalLightShadowMaps", directionalLightShadowMaps);
+                    if (this.shadowCascade > 1) {
+                        material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
+                        material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
+                    }
+                    material.setUniform("directionalLightMatrices", directionalLightMatrices);   
+                }
+                if (pointLightShadowMaps.length > 0) {
+                    material.setUniform("pointLightShadowMaps", pointLightShadowMaps);
+                    material.setUniform("pointLightRanges", pointLightRanges);   
+                }
                 material.__shadowUniformUpdated = true;
             }
         },
 
-        _renderDirectionalLightShadow : function(renderer, light, scene, sceneCamera, casts, directionalLightBiases, directionalLightMatrices, directionalLightShadowMaps) {
-            this._bindDepthMaterial(casts);
+        _renderDirectionalLightShadow : (function() {
 
-            var texture = this._getTexture(light.__GUID__, light);
-            var camera = this._getDirectionalLightCamera(light, scene, sceneCamera);
-            var _gl = renderer.gl;
+            var splitFrustum = new Frustum();
+            var splitProjMatrix = new Matrix4();
+            var cropBBox = new BoundingBox();
+            var cropMatrix = new Matrix4();
+            var lightViewProjMatrix = new Matrix4();
+            var lightProjMatrix = new Matrix4();
 
-            frameBuffer.attach(_gl, texture);
-            frameBuffer.bind(renderer);
+            return function(renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
-            _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+                this._bindDepthMaterial(casters, light.shadowBias);
 
-            renderer.renderQueue(casts, camera, null, true);
+                // Adjust scene camera
+                var originalFar = sceneCamera.far;
+                // TODO: add a bias
+                sceneCamera.far = Math.min(sceneCamera.far, -sceneCamera.sceneBoundingBoxLastFrame.min.z);
+                sceneCamera.far = Math.max(sceneCamera.near, sceneCamera.far);
+                sceneCamera.updateProjectionMatrix();
+                sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
+                var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
-            frameBuffer.unbind(renderer);
+                lightViewProjMatrix
+                    .copy(lightCamera.worldTransform)
+                    .invert()
+                    .multiply(sceneCamera.worldTransform)
+                    .multiplyLeft(lightCamera.projectionMatrix);
 
-            // Filter for VSM
-            if (this.softShadow === ShadowMapPass.VSM) {
-                this._gaussianFilter(renderer, texture, texture.width);
+                lightProjMatrix.copy(lightCamera.projectionMatrix);
+
+                var clipPlanes = [];
+                var near = sceneCamera.near;
+                var far = sceneCamera.far;
+                var rad = sceneCamera.fov / 180 * Math.PI;
+                var aspect = sceneCamera.aspect;
+
+                var scaleZ = (near + originalFar) / (near - originalFar);
+                var offsetZ = 2 * near * originalFar / (near - originalFar);
+                for (var i = 0; i <= this.shadowCascade; i++) {
+                    var clog = near * Math.pow(far / near, i / this.shadowCascade);
+                    var cuni = near + (far - near) * i / this.shadowCascade;
+                    var c = (clog + cuni) / 2;
+                    clipPlanes.push(c);
+                    shadowCascadeClips.push(-(-c * scaleZ + offsetZ) / -c);
+                }
+                for (var i = 0; i < this.shadowCascade; i++) {
+                    var texture = this._getTexture(light.__GUID__ + '_' + i, light);
+
+                    // Get the splitted frustum
+                    var nearPlane = clipPlanes[i];
+                    var farPlane = clipPlanes[i+1];
+                    splitProjMatrix.perspective(rad, aspect, nearPlane, farPlane);
+                    splitFrustum.setFromProjection(splitProjMatrix);
+                    splitFrustum.getTransformedBoundingBox(cropBBox, lightViewProjMatrix);
+                    var _min = cropBBox.min._array;
+                    var _max = cropBBox.max._array;
+                    cropMatrix.ortho(_min[0], _max[0], _min[1], _max[1], 1, -1);
+                    lightCamera.projectionMatrix.multiplyLeft(cropMatrix);
+
+                    var _gl = renderer.gl;
+
+                    frameBuffer.attach(_gl, texture);
+                    frameBuffer.bind(renderer);
+
+                    _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+
+                    renderer.renderQueue(casters, lightCamera);
+
+                    frameBuffer.unbind(renderer);
+
+                    // Filter for VSM
+                    if (this.softShadow === ShadowMapPass.VSM) {
+                        this._gaussianFilter(renderer, texture, texture.width);
+                    }
+
+                    var matrix = new Matrix4();
+                    matrix.copy(lightCamera.worldTransform)
+                        .invert()
+                        .multiplyLeft(lightCamera.projectionMatrix);
+
+                    directionalLightShadowMaps.push(texture);
+                    directionalLightMatrices.push(matrix._array);
+
+                    lightCamera.projectionMatrix.copy(lightProjMatrix);
+                }
+
+                // set back
+                sceneCamera.far = originalFar;
             }
+        })(),
 
-            var matrix = new Matrix4();
-            matrix.copy(camera.worldTransform)
-                .invert()
-                .multiplyLeft(camera.projectionMatrix);
+        _renderSpotLightShadow : function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
-            directionalLightShadowMaps.push(texture);
-            directionalLightMatrices.push(matrix._array);
-            directionalLightBiases.push(light.shadowBias);
-        },
-
-        _renderSpotLightShadow : function(renderer, light, casts, spotLightBiases, spotLightMatrices, spotLightShadowMaps) {
-
-            this._bindDepthMaterial(casts);
+            this._bindDepthMaterial(casters, light.shadowBias);
 
             var texture = this._getTexture(light.__GUID__, light);
             var camera = this._getSpotLightCamera(light);
@@ -374,7 +448,7 @@ define(function(require) {
 
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderQueue(casts, camera, null, true);
+            renderer.renderQueue(casters, camera);
 
             frameBuffer.unbind(renderer);
 
@@ -390,16 +464,15 @@ define(function(require) {
 
             spotLightShadowMaps.push(texture);
             spotLightMatrices.push(matrix._array);
-            spotLightBiases.push(light.shadowBias);
         },
 
-        _renderPointLightShadow : function(renderer, light, casts, pointLightRanges, pointLightShadowMaps) {
+        _renderPointLightShadow : function(renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
             var texture = this._getTexture(light.__GUID__, light);
             var _gl = renderer.gl;
             pointLightShadowMaps.push(texture);
             pointLightRanges.push(light.range * 5);
 
-            this._bindDistanceMaterial(casts, light);
+            this._bindDistanceMaterial(casters, light);
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._getPointLightCamera(light, target);
@@ -409,7 +482,7 @@ define(function(require) {
 
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-                renderer.renderQueue(casts, camera, null, true);
+                renderer.renderQueue(casters, camera);
 
                 frameBuffer.unbind(renderer);
             }
@@ -453,8 +526,6 @@ define(function(require) {
                 texture.width = resolution;
                 texture.height = resolution;
                 if (this.softShadow === ShadowMapPass.VSM) {
-                    texture.wrapT = glenum.MIRRORED_REPEAT;
-                    texture.wrapS = glenum.MIRRORED_REPEAT;
                     texture.type = glenum.FLOAT;
                     texture.anisotropic = 4;
                 } else {
@@ -521,14 +592,6 @@ define(function(require) {
                     this._lightCameras.directional = new OrthoCamera();
                 }
                 var camera = this._lightCameras.directional;
-                // Adjust scene camera
-                var originalFar = sceneCamera.far;
-                // TODO: add a bias
-                sceneCamera.far = Math.max(camera.near, -sceneCamera.sceneBoundingBoxLastFrame.min.z);
-                sceneCamera.updateProjectionMatrix();
-                sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
-                // set back
-                sceneCamera.far = originalFar;
 
                 // Move to the center of frustum(in world space)
                 camera.position
@@ -552,6 +615,8 @@ define(function(require) {
                 var max = lightViewBBox.max._array;
 
                 // Move camera to adjust the near to 0
+                // TODO : some scene object cast shadow in view will also be culled
+                // add a bias?
                 camera.position.scaleAndAdd(camera.worldTransform.forward, max[2]);
                 camera.near = 0;
                 camera.far = -min[2]+max[2];
@@ -568,7 +633,7 @@ define(function(require) {
             }
         })(),
 
-        _getSpotLightCamera : function() {
+        _getSpotLightCamera : function(light) {
             if (!this._lightCameras.spot) {
                 this._lightCameras.spot = new PerspectiveCamera();
             }
@@ -578,6 +643,8 @@ define(function(require) {
             camera.far = light.range;
             camera.worldTransform.copy(light.worldTransform);
             camera.updateProjectionMatrix();
+
+            return camera
         },
 
         dispose : function(_gl) {
@@ -605,8 +672,8 @@ define(function(require) {
             };
             this._meshMaterials = {};
 
-            for (var i = 0; i < this._meshReceiveShadow.length; i++) {
-                var mesh = this._meshReceiveShadow[i];
+            for (var i = 0; i < this._receivers.length; i++) {
+                var mesh = this._receivers[i];
                 var material = mesh.material;
                 var shader = material.shader;
                 shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
@@ -615,9 +682,9 @@ define(function(require) {
                 material.set('shadowEnabled', 0);
             }
 
-            this._meshCastShadow = [];
-            this._meshReceiveShadow = [];
-            this._lightCastShadow = [];
+            this._opaqueCasters = [];
+            this._receivers = [];
+            this._lightsCastShadow = [];
         }
     });
 

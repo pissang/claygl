@@ -43,10 +43,9 @@ void main(){
 @export buildin.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
+uniform float bias : 0.001;
 
-#ifdef USE_VSM
 #extension GL_OES_standard_derivatives : enable
-#endif
 
 @import buildin.util.pack_depth
 
@@ -68,6 +67,9 @@ void main(){
 
         gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
     #else
+        // Add slope scaled bias using partial derivative
+        depth += max(dFdx(depth), dFdy(depth)) + bias;
+
         gl_FragColor = packDepth(depth * 0.5 + 0.5);
     #endif
 }
@@ -162,13 +164,18 @@ void main(){
 #ifdef SPOT_LIGHT_SHADOWMAP_NUMBER
 uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_NUMBER];
 uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_NUMBER];
-uniform float spotLightBiases[SPOT_LIGHT_SHADOWMAP_NUMBER];
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
+#if SHADOW_CASCADE > 1
+uniform sampler2D directionalLightShadowMaps[SHADOW_CASCADE];
+uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
+uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
+uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
+#else
 uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
 uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
-uniform float directionalLightBiases[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
+#endif
 #endif
 
 #ifdef POINT_LIGHT_SHADOWMAP_NUMBER
@@ -182,23 +189,23 @@ uniform bool shadowEnabled : true;
 
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
-float tapShadowMap(sampler2D map, vec2 uv, float z, float bias){
+float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
-    return (unpackDepth(tex) * 2.0 - 1.0) + bias < z ? 0.0 : 1.0;
+    return unpackDepth(tex) * 2.0 - 1.0< z ? 0.0 : 1.0;
 }
 
-float pcf(sampler2D map, vec2 uv, float z, float bias){
+float pcf(sampler2D map, vec2 uv, float z){
 
-    float shadowContrib = tapShadowMap(map, uv, z, bias);
+    float shadowContrib = tapShadowMap(map, uv, z);
     float offset = 1.0/1024.0;
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, 0.0), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, -offset), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, -offset), z, bias);
-    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset), z, bias);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, 0.0), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset, -offset), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset, -offset), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset), z);
 
     return shadowContrib / 9.0;
 }
@@ -219,7 +226,7 @@ float chebyshevUpperBound(vec2 moments, float z){
     pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);
     return max(p, pMax);
 }
-float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bias){
+float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position){
     
     vec4 posInLightSpace = lightVPM * vec4(v_WorldPosition, 1.0);
     posInLightSpace.xyz /= posInLightSpace.w;
@@ -234,7 +241,7 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float bi
             vec2 moments = texture2D(map, uv).xy;
             return chebyshevUpperBound(moments, z);
         #else
-            return pcf(map, uv, z, bias);
+            return pcf(map, uv, z);
         #endif
     }
     return 1.0;
@@ -272,7 +279,7 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
 
 void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER] ){
     for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
-        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightBiases[i]);
+        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
@@ -287,10 +294,26 @@ void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LI
 #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
 
 void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
-    for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
-        float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightBiases[i]);
-        shadowContribs[i] = shadowContrib;
-    }
+    #if SHADOW_CASCADE == 1
+        for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+            float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
+            shadowContribs[i] = shadowContrib;
+        }
+    #else
+        // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
+        float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
+                        / (gl_DepthRange.far - gl_DepthRange.near);
+        for (int i = 0; i < SHADOW_CASCADE; i++) {
+            if (
+                depth >= shadowCascadeClipsNear[i] &&
+                depth <= shadowCascadeClipsFar[i]
+            ) {
+                float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
+                shadowContribs[0] = shadowContrib;
+                // shadowContribs[0] = float(i) / float(SHADOW_CASCADE);
+            }
+        }
+    #endif
     // set default fallof of rest lights
     for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
         shadowContribs[i] = 1.0;

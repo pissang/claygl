@@ -22,7 +22,8 @@
                 var animation = new qtek.animation.Animation;
                 animation.start();
                 var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                    softShadow : qtek3d.prePass.ShadowMap.VSM
+                    // softShadow : qtek3d.prePass.ShadowMap.VSM
+                    shadowCascade : 4
                 });
 
                 var scene = new qtek3d.Scene();
@@ -99,15 +100,16 @@
                 var light = new qtek3d.light.Directional({
                     intensity : 1.0,
                     position : new qtek.core.Vector3(10, 10, 10),
-                    shadowResolution : 1024,
-                    shadowBias : 0.007
+                    shadowResolution : 512,
+                    shadowBias : 0.006
                 });
                 light.lookAt(root.position);
                 scene.add(light);
 
                 var aidLight = new qtek3d.light.Directional({
-                    intensity : 1.0,
-                    position : new qtek.core.Vector3(2, 2, -1)
+                    intensity : 0.3,
+                    position : new qtek.core.Vector3(2, 2, -1),
+                    castShadow : false
                 });
                 aidLight.lookAt(root.position);
                 // scene.add(aidLight);
@@ -117,17 +119,18 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                control.enable();
 
                 animation.on('frame', function(deltaTime) {
+                    control.update();
+
                     var start = performance.now();
                     renderer.clear = qtek3d.Renderer.COLOR_BUFFER_BIT | qtek3d.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.render(renderer, scene, camera);
-                    var drawInfo = renderer.render(scene, camera);
+                    var drawInfo = renderer.render(scene, camera, true);
                     var renderTime = performance.now() - start;
 
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
-                    shadowMapPass.renderDebug(renderer);
+                    shadowMapPass.renderDebug(renderer, 200);
 
                     document.getElementById('time').innerHTML = 
                             'fps: ' + Math.round(1000 / deltaTime) + '<br />' 

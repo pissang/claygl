@@ -114,7 +114,6 @@
                     target : camera,
                     domElement : renderer.canvas
                 });
-                control.enable();
 
                 var debugPass = new qtek3d.compositor.Pass({
                     fragment : qtek3d.Shader.source('buildin.compositor.output')
@@ -146,6 +145,7 @@
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
                     var viewportInfo = renderer.viewportInfo;
                     // renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {

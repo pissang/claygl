@@ -32,6 +32,8 @@
                 sphereMat.set("color", [0.3, 0.3, 0.3]);
 
                 var jointDebugSpheres = [];
+
+                var updates = [];
                 skeleton.joints.forEach(function(joint) {
 
                     var parentJoint = skeleton.joints[joint.parentIndex];
@@ -55,17 +57,22 @@
                     });
                     scene.add(line);
 
-                    joint.on("afterupdate", function() {
+                    updates.push(function() {
                         sphere.localTransform.copy(joint.worldTransform);
                         if (parentJoint) {
                             lineGeoVertices[0] = joint.getWorldPosition()._array;
                             lineGeoVertices[1] = parentJoint.getWorldPosition()._array;
-                        }
+                        }  
                         lineGeo.dirty('position');
                     });
-                    joint.trigger('afterupdate');
-                });
 
+                });
+                
+                scene.before('render', function() {
+                    for (var i = 0; i < updates.length; i++) {
+                        updates[i]();
+                    }
+                });
                 return scene;
             }
 
@@ -80,9 +87,7 @@
                     devicePixelRatio : 1.0
                 });
 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                    softShadow : qtek3d.prePass.ShadowMap.VSM
-                });
+                var shadowMapPass = new qtek3d.prePass.ShadowMap();
 
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek3d.Scene,
@@ -142,7 +147,6 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                control.enable();
 
                 // shadowMapPass.render(renderer, scene);
                 renderer.render(scene, camera);
@@ -155,6 +159,7 @@
                 var clearAll = renderer.clear;
                 skeletonDebugScene.position.x -= 6;
                 setInterval(function(){
+                    control.update();
                     shadowMapPass.render(renderer, scene, camera);
                     renderer.clear = clearAll
                     renderer.render(scene, camera);

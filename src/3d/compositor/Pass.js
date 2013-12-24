@@ -123,7 +123,7 @@ define(function(require) {
             }
 
             this.trigger("beforerender", this, renderer);
-            renderer.render(scene, camera, true);
+            renderer.render(scene, camera);
             this.trigger("afterrender", this, renderer);
 
             if (frameBuffer) {

@@ -33,15 +33,14 @@
             
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
-                var camera = res.cameras[Object.keys(res.cameras)[0]];
-                if (!camera) {
-                    camera = new qtek3d.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 100
-                    });
+                scene.rotation.rotateX(-Math.PI / 2);
+                var camera = new qtek3d.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 100
+                });
 
-                    camera.position.set(0, 0, 10);
-                }
+                camera.position.set(2, 2, 2);
+                camera.lookAt(scene.position);
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
                 var control = new qtek3d.plugin.OrbitControl({
@@ -51,9 +50,6 @@
                     maxPolarAngle : Math.PI / 1.8,
                     minPolarAngle : 0.1
                 });
-                // z up
-                control.up.set(0, 0, 1);
-                control.enable();
 
                 var light = scene.getNode("Spot").children()[0];
                 light.range = 30;
@@ -68,7 +64,8 @@
                 suzanneMaterial.shader.enableTexture('environmentMap');
                 suzanneMaterial.set('environmentMap', environmentMap);
 
-                animation.on('frame', function() {
+                animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
                     environmentMapPass.render(renderer, scene);
                     shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
