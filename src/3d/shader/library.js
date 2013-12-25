@@ -91,14 +91,14 @@ define(function(require) {
     Shader.import(require('text!./source/wireframe.essl'));
     Shader.import(require('text!./source/skybox.essl'));
     Shader.import(require('text!./source/util.essl'));
-    // Shader.import(require('text!3d/shader/source/depth.essl'));
+    Shader.import(require('text!./source/prez.essl'));
 
     put("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
     put("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
     put("buildin.phong", Shader.source("buildin.phong.vertex"), Shader.source("buildin.phong.fragment"));
     put("buildin.wireframe", Shader.source("buildin.wireframe.vertex"), Shader.source("buildin.wireframe.fragment"));
     put("buildin.skybox", Shader.source("buildin.skybox.vertex"), Shader.source("buildin.skybox.fragment"));
-    // put("buildin.depth", Shader.source("buildin.depth.vertex"), Shader.source("buildin.depth.fragment"));
+    put("buildin.prez", Shader.source("buildin.prez.vertex"), Shader.source("buildin.prez.fragment"));
 
     return {
         get : get,

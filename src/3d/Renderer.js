@@ -13,15 +13,23 @@ define(function(require) {
     var vec4 = glMatrix.vec4;
     var BoundingBox = require('./BoundingBox');
     var Matrix4 = require('core/Matrix4');
+    var Shader = require('./Shader');
+    var shaderLibrary = require('./shader/library');
+    var Material = require('./Material');
 
     var glid = 0;
+
+    var preZPassShader = shaderLibrary.get('buildin.prez');
+    var preZPassMaterial = new Material({
+        shader : preZPassShader
+    })
+
     var Renderer = Base.derive(function() {
         return {
 
             __GUID__ : util.genGUID(),
 
             canvas : null,
-
             width : 100,
             height : 100,
             // Device Pixel Ratio is for high defination disply
@@ -121,7 +129,7 @@ define(function(require) {
             }
         },
 
-        render : function(scene, camera, notUpdateScene) {
+        render : function(scene, camera, notUpdateScene, preZ) {
             var _gl = this.gl;
 
             this._sceneRendering = scene;
@@ -161,12 +169,13 @@ define(function(require) {
             // Render Opaque queue
             scene.trigger("beforerender:opaque", this, opaqueQueue);
 
-            _gl.disable(_gl.BLEND);
-
             // Reset the scene bounding box;
             camera.sceneBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
             camera.sceneBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
-            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial);
+
+            _gl.disable(_gl.BLEND);
+            _gl.enable(_gl.DEPTH_TEST);
+            var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, preZ);
 
             scene.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
             scene.trigger("beforerender:transparent", this, transparentQueue);
@@ -185,7 +194,7 @@ define(function(require) {
             return renderInfo;
         },
 
-        renderQueue : function(queue, camera, globalMaterial) {
+        renderQueue : function(queue, camera, globalMaterial, preZ) {
             var renderInfo = {
                 faceNumber : 0,
                 vertexNumber : 0,
@@ -211,8 +220,51 @@ define(function(require) {
             var depthTest, depthMask;
             var culling, cullFace, frontFace;
 
-            for (var i =0; i < queue.length; i++) {
-                var renderable = queue[i];
+            var culledRenderQueue;
+            if (preZ) {
+                culledRenderQueue = [];
+                preZPassShader.bind(_gl);
+                _gl.colorMask(false, false, false, false);
+                _gl.depthMask(true);
+                for (var i = 0; i < queue.length; i++) {
+                    var renderable = queue[i];
+                    var worldM = renderable.worldTransform._array;
+                    var geometry = renderable.geometry;
+                    mat4.multiply(matrices.WORLDVIEW, matrices.VIEW , worldM);
+                    mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+
+                    if (geometry.boundingBox) {
+                        if (!this._frustumCulling(renderable, camera)) {
+                            continue;
+                        }
+                    }
+                    if (renderable.cullFace !== cullFace) {
+                        cullFace = renderable.cullFace;
+                        _gl.cullFace(cullFace);
+                    }
+                    if (renderable.frontFace !== frontFace) {
+                        frontFace = renderable.frontFace;
+                        _gl.frontFace(frontFace);
+                    }
+                    if (renderable.culling !== culling) {
+                        culling = renderable.culling;
+                        culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
+                    }
+
+                    var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
+                    preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
+                    renderable.render(_gl, preZPassMaterial);
+                    culledRenderQueue.push(renderable);
+                }
+                _gl.depthFunc(_gl.LEQUAL);
+                _gl.colorMask(true, true, true, true);
+                _gl.depthMask(false);
+            } else {
+                culledRenderQueue = queue;
+            }
+
+            for (var i =0; i < culledRenderQueue.length; i++) {
+                var renderable = culledRenderQueue[i];
                 var material = globalMaterial || renderable.material;
                 var shader = material.shader;
                 var geometry = renderable.geometry;
@@ -236,42 +288,12 @@ define(function(require) {
                 }
                 // Frustum culling
                 // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
-                if (geometry.boundingBox) {
-                    cullingMatrix._array = matrices.WORLDVIEW;
-                    cullingBoundingBox.copy(geometry.boundingBox);
-                    cullingBoundingBox.applyTransform(cullingMatrix);
-                    // Passingly update the scene bounding box
-                    // TODO : exclude very large mesh like ground plane or terrain ?
-                    camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
-                    if (renderable.frustumCulling)  {
-                        if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
-                            continue;
-                        }
-
-                        cullingMatrix._array = matrices.PROJECTION;
-                        if (
-                            cullingBoundingBox.max._array[2] > 0 &&
-                            cullingBoundingBox.min._array[2] < 0
-                        ) {
-                            // Clip in the near plane
-                            cullingBoundingBox.max._array[2] = -1e-20;
-                        }
-                        
-                        cullingBoundingBox.applyProjection(cullingMatrix);
-
-                        var min = cullingBoundingBox.min._array;
-                        var max = cullingBoundingBox.max._array;
-                        
-                        if (
-                            max[0] < -1 || min[0] > 1
-                            || max[1] < -1 || min[1] > 1
-                            || max[2] < -1 || min[2] > 1
-                        ) {
-                            continue;
-                        }   
+                if (geometry.boundingBox && ! preZ) {
+                    if (!this._frustumCulling(renderable, camera)) {
+                        continue;
                     }
                 }
-                
+
                 if (prevShaderID !== shader.__GUID__) {
                     // Set lights number
                     if (scene && scene.isShaderLightNumberChanged(shader)) {
@@ -291,15 +313,17 @@ define(function(require) {
                     prevShaderID = shader.__GUID__;
                 }
                 if (prevMaterialID !== material.__GUID__) {
-                    if (material.depthTest !== depthTest) {
-                        material.depthTest ? 
-                            _gl.enable(_gl.DEPTH_TEST) : 
-                            _gl.disable(_gl.DEPTH_TEST);
-                        depthTest = material.depthTest;
-                    }
-                    if (material.depthMask !== depthMask) {
-                        _gl.depthMask(material.depthMask);
-                        depthMask = material.depthMask;
+                    if (!preZ) {
+                        if (material.depthTest !== depthTest) {
+                            material.depthTest ? 
+                                _gl.enable(_gl.DEPTH_TEST) : 
+                                _gl.disable(_gl.DEPTH_TEST);
+                            depthTest = material.depthTest;
+                        }
+                        if (material.depthMask !== depthMask) {
+                            _gl.depthMask(material.depthMask);
+                            depthMask = material.depthMask;
+                        }
                     }
                     material.bind(_gl);
                     prevMaterialID = material.__GUID__;
@@ -340,6 +364,7 @@ define(function(require) {
                 }
 
                 var objectRenderInfo = renderable.render(_gl, globalMaterial);
+
                 if (objectRenderInfo) {
                     renderInfo.faceNumber += objectRenderInfo.faceNumber;
                     renderInfo.vertexNumber += objectRenderInfo.vertexNumber;
@@ -350,6 +375,50 @@ define(function(require) {
 
             return renderInfo;
         },
+
+        _frustumCulling : (function() {
+            var cullingBoundingBox = new BoundingBox();
+            var cullingMatrix = new Matrix4();
+            return function(renderable, camera) {
+                var geoBBox = renderable.geometry.boundingBox;
+                cullingMatrix._array = matrices.WORLDVIEW;
+                cullingBoundingBox.copy(geoBBox);
+                cullingBoundingBox.applyTransform(cullingMatrix);
+
+                // Passingly update the scene bounding box
+                // TODO : exclude very large mesh like ground plane or terrain ?
+                camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
+
+                if (renderable.frustumCulling)  {
+                    if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
+                        return false;
+                    }
+
+                    cullingMatrix._array = matrices.PROJECTION;
+                    if (
+                        cullingBoundingBox.max._array[2] > 0 &&
+                        cullingBoundingBox.min._array[2] < 0
+                    ) {
+                        // Clip in the near plane
+                        cullingBoundingBox.max._array[2] = -1e-20;
+                    }
+                    
+                    cullingBoundingBox.applyProjection(cullingMatrix);
+
+                    var min = cullingBoundingBox.min._array;
+                    var max = cullingBoundingBox.max._array;
+                    
+                    if (
+                        max[0] < -1 || min[0] > 1
+                        || max[1] < -1 || min[1] > 1
+                        || max[2] < -1 || min[2] > 1
+                    ) {
+                        return false;
+                    }   
+                }
+                return true;
+            }
+        })(),
 
         disposeScene : function(scene) {
             this.disposeNode(scene);
@@ -453,8 +522,6 @@ define(function(require) {
         'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
-    var cullingBoundingBox = new BoundingBox();
-    var cullingMatrix = new Matrix4();
 
     Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT
     Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT

@@ -23,6 +23,9 @@ define(function(require) {
     var texturePool = require("../compositor/texturePool");
 
     var Matrix4 = require("core/Matrix4");
+    var glMatrix = require("glmatrix");
+    var mat4 = glMatrix.mat4;
+    var vec3 = glMatrix.vec3;
 
     var _ = require("_");
 
@@ -46,7 +49,7 @@ define(function(require) {
             softShadow : ShadowMapPass.PCF,
             blurSize : 1.0,
 
-            shadowCascade : 1,
+            cascadeSplitLogFactor : 0.2,
 
             _textures : {},
             _shadowMapNumber : {
@@ -366,11 +369,11 @@ define(function(require) {
                 sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
                 var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
-                lightViewProjMatrix
-                    .copy(lightCamera.worldTransform)
-                    .invert()
-                    .multiply(sceneCamera.worldTransform)
-                    .multiplyLeft(lightCamera.projectionMatrix);
+                var lvpMat4Arr = lightViewProjMatrix._array;
+                mat4.copy(lvpMat4Arr, lightCamera.worldTransform._array);
+                mat4.invert(lvpMat4Arr, lvpMat4Arr);
+                mat4.multiply(lvpMat4Arr, lightCamera.projectionMatrix._array, lvpMat4Arr);
+                mat4.multiply(lvpMat4Arr, lvpMat4Arr, sceneCamera.worldTransform._array);
 
                 lightProjMatrix.copy(lightCamera.projectionMatrix);
 
@@ -385,7 +388,7 @@ define(function(require) {
                 for (var i = 0; i <= this.shadowCascade; i++) {
                     var clog = near * Math.pow(far / near, i / this.shadowCascade);
                     var cuni = near + (far - near) * i / this.shadowCascade;
-                    var c = (clog + cuni) / 2;
+                    var c = clog * this.cascadeSplitLogFactor + cuni * (1 - this.cascadeSplitLogFactor);
                     clipPlanes.push(c);
                     shadowCascadeClips.push(-(-c * scaleZ + offsetZ) / -c);
                 }
@@ -395,7 +398,7 @@ define(function(require) {
                     // Get the splitted frustum
                     var nearPlane = clipPlanes[i];
                     var farPlane = clipPlanes[i+1];
-                    splitProjMatrix.perspective(rad, aspect, nearPlane, farPlane);
+                    mat4.perspective(splitProjMatrix._array, rad, aspect, nearPlane, farPlane);
                     splitFrustum.setFromProjection(splitProjMatrix);
                     splitFrustum.getTransformedBoundingBox(cropBBox, lightViewProjMatrix);
                     var _min = cropBBox.min._array;

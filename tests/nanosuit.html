@@ -28,9 +28,9 @@
 
                 var scene = new qtek3d.Scene();
                 var camera = new qtek3d.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 100
-                    });
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 100
+                });
 
                 
                 var data = JSON.parse(modelData);
@@ -56,8 +56,9 @@
 
                 var root = new qtek3d.Node();
                 var meshNumber = 0;
-                for (var i = 0; i < 10; i++) {
-                    for (var j = 0; j < 10; j++) {
+                var N = 10;
+                for (var i = 0; i < N; i++) {
+                    for (var j = 0; j < N; j++) {
                         var nanosuit = new qtek3d.Node();
                         _.each(meshList, function(_mesh){
                             var mesh = new qtek3d.Mesh({
@@ -71,7 +72,7 @@
                             nanosuit.add(mesh);
                             meshNumber++;
                         });
-                        nanosuit.position.set((5 - i) * 8, 0, (5 - j) * 8);
+                        nanosuit.position.set((N/2 - i) * 8, 0, (N/2 - j) * 8);
                         root.add(nanosuit);
                     }
                 }
@@ -121,12 +122,12 @@
                 });
 
                 animation.on('frame', function(deltaTime) {
-                    control.update();
+                    control.update(deltaTime);
 
                     var start = performance.now();
                     renderer.clear = qtek3d.Renderer.COLOR_BUFFER_BIT | qtek3d.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.render(renderer, scene, camera);
-                    var drawInfo = renderer.render(scene, camera, true);
+                    var drawInfo = renderer.render(scene, camera, true, false);
                     var renderTime = performance.now() - start;
 
                     renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
