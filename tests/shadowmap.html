@@ -10,26 +10,25 @@
             require(['qtek',
                     'glmatrix',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, glMatrix, modelData){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    Vector3 = qtek.core.Vector3;
+                var Shader = qtek.Shader;
+                var Vector3 = qtek.math.Vector3;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap({
+                var shadowMapPass = new qtek.prePass.ShadowMap({
                     // useVSM : true
                 });
 
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 100
                     });
 
-                var light = new qtek3d.light.Spot({
+                var light = new qtek.light.Spot({
                     position : new Vector3(0, 4, 4),
                     intensity : 4.0,
                     shadowBias : 0.002,
@@ -37,13 +36,13 @@
                 });
                 scene.add(light);
 
-                var plane = new qtek3d.geometry.Plane({
+                var plane = new qtek.geometry.Plane({
                     widthSegments : 1,
                     heightSegments : 1
                 })
-                var shader = qtek3d.shader.library.get('buildin.phong');
+                var shader = qtek.shader.library.get('buildin.phong');
 
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader
                 });
 
@@ -53,7 +52,7 @@
                 var data = JSON.parse(modelData);
                 var meshList = loader.parse(data);
 
-                var root = new qtek3d.Node();
+                var root = new qtek.Node();
 
                 _.each(meshList, function(mesh){
                     // mesh.material = material
@@ -67,7 +66,7 @@
                 camera.position.set(0, 4, 5);
                 camera.lookAt( new Vector3(0, 1, 0) );
 
-                var planeMesh = new qtek3d.Mesh({
+                var planeMesh = new qtek.Mesh({
                     geometry : plane,
                     material : material
                 });

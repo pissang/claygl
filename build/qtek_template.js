@@ -3,7 +3,7 @@ define( function(require){
 	var exportsObject =  {{$exportsObject}};
 
     var glMatrix = require('glmatrix');
-    exportsObject.math = glMatrix;
+    exportsObject.glMatrix = glMatrix;
     
     return exportsObject;
 })

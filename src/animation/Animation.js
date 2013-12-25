@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     var Clip = require('./Clip');
-    var Base = require('core/Base');
+    var Base = require('../core/Base');
 
     var requestAnimationFrame = window.requestAnimationFrame
                                 || window.msRequestAnimationFrame

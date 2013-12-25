@@ -9,27 +9,26 @@
         <script type="text/javascript">
             require(['qtek',
                     'text!../tests/shader/IBL.essl'], function(qtek, IBLShader) {
-                var qtek3d = qtek['3d'];
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById('Main'),
                     devicePixelRatio : 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek3d.camera.Perspective({
+                var camera = new qtek.camera.Perspective({
                     aspect : renderer.width / renderer.height
                 });
                 camera.position.set(0, 0, 20);
 
-                var scene = new qtek3d.Scene();
-                var sphereGeo = new qtek3d.geometry.Sphere({
+                var scene = new qtek.Scene();
+                var sphereGeo = new qtek.geometry.Sphere({
                     widthSegments : 50,
                     heightSegments : 50
                 });
 
-                qtek3d.Shader.import(IBLShader);
-                var shader = new qtek3d.Shader({
-                    vertex : qtek3d.Shader.source('buildin.phong.vertex'),
-                    fragment : qtek3d.Shader.source('split_sum.fragment')
+                qtek.Shader.import(IBLShader);
+                var shader = new qtek.Shader({
+                    vertex : qtek.Shader.source('buildin.phong.vertex'),
+                    fragment : qtek.Shader.source('split_sum.fragment')
                 });
 
                 var normalDistribution = generateNormalDistribution();
@@ -41,22 +40,22 @@
                 GLTFLoader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').childAt(0).geometry;
                 });
-                var envMap = qtek3d.util.texture.loadTexture(
+                var envMap = qtek.util.texture.loadTexture(
                     'assets/textures/hdr/old_industrial_hall.hdr',
                     function () {
                         envMap.flipY = false;
                         prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
-                            var skybox = new qtek3d.plugin.Skybox({
+                            var skybox = new qtek.plugin.Skybox({
                                 scene : scene
                             });
 
                             skybox.material.set('environmentMap', mipmaps[0]);
                             for (var i = 0; i < 10; i++) {
-                                var material = new qtek3d.Material({
+                                var material = new qtek.Material({
                                     shader : shader
                                 });
                                 var roughness = i / 9;
-                                var mesh = new qtek3d.Mesh({
+                                var mesh = new qtek.Mesh({
                                     geometry : sphereGeo,
                                     material : material
                                 });
@@ -69,11 +68,11 @@
                             }
 
                             for (var i = 0; i < 10; i++) {
-                                var material = new qtek3d.Material({
+                                var material = new qtek.Material({
                                     shader : shader
                                 });
                                 var roughness = i / 9;
-                                var mesh = new qtek3d.Mesh({
+                                var mesh = new qtek.Mesh({
                                     geometry : sphereGeo,
                                     material : material
                                 });
@@ -87,11 +86,11 @@
 
                             var monkeys = []
                             for (var i = 0; i < 4; i++) {
-                                var material = new qtek3d.Material({
+                                var material = new qtek.Material({
                                     shader : shader
                                 });
                                 var roughness = 0.4;
-                                var mesh = new qtek3d.Mesh({
+                                var mesh = new qtek.Mesh({
                                     geometry : suzanneGeometry,
                                     material : material
                                 });
@@ -110,13 +109,13 @@
                         });
                     }
                 );
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas
                 });
 
-                var debugPass = new qtek3d.compositor.Pass({
-                    fragment : qtek3d.Shader.source('buildin.compositor.output')
+                var debugPass = new qtek.compositor.Pass({
+                    fragment : qtek.Shader.source('buildin.compositor.output')
                 });
 
                 var compositor;
@@ -124,7 +123,7 @@
                 FXLoader.load('assets/fx/hdr.json');
                 FXLoader.on('success', function(_compositor) {
                     compositor = _compositor;
-                    var sceneNode = new qtek3d.compositor.SceneNode({
+                    var sceneNode = new qtek.compositor.SceneNode({
                         name : "scene",
                         scene : scene,
                         camera : camera,
@@ -133,7 +132,7 @@
                                 parameters : {
                                     width : function(renderer) {return renderer.width}, 
                                     height : function(renderer) {return renderer.height},
-                                    type : qtek3d.Texture.FLOAT   
+                                    type : qtek.Texture.FLOAT   
                                 }
                             }
                         }
@@ -147,7 +146,7 @@
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     var viewportInfo = renderer.viewportInfo;
-                    // renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT | qtek3d.Renderer.COLOR_BUFFER_BIT;
+                    // renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT | qtek.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {
                         compositor.render(renderer);
                         var lumAdaptionNode = compositor.findNode('lum_adaption');
@@ -162,7 +161,7 @@
                     var x = 0, y = 0;
                     var width = viewportInfo.width / 10;
                     var height = width;
-                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
                     renderer.setViewport(x, y, width, height);
                     debugPass.setUniform('texture', normalDistribution);
                     debugPass.render(renderer);
@@ -191,12 +190,12 @@
                     var ROUGHNESS_LEVELS = 256;
                     var SAMPLE_SIZE = 1024;
 
-                    var normalDistribution = new qtek3d.texture.Texture2D({
+                    var normalDistribution = new qtek.texture.Texture2D({
                         width : ROUGHNESS_LEVELS,
                         height : SAMPLE_SIZE,
-                        type : qtek3d.Texture.FLOAT,
-                        minFilter : qtek3d.Texture.NEAREST,
-                        magFilter : qtek3d.Texture.NEAREST,
+                        type : qtek.Texture.FLOAT,
+                        minFilter : qtek.Texture.NEAREST,
+                        magFilter : qtek.Texture.NEAREST,
                         useMipmap : false
                     });
                     var pixels = new Float32Array(SAMPLE_SIZE * ROUGHNESS_LEVELS * 4);
@@ -235,28 +234,28 @@
                     var mipmaps = [];
                     var size = 1024;
                     var mipmapNum = Math.log(size) / Math.log(2);
-                    var emptyScene = new qtek3d.Scene();
-                    var environmentMapPass = new qtek3d.prePass.EnvironmentMap();
-                    var skydome = new qtek3d.plugin.Skydome({
+                    var emptyScene = new qtek.Scene();
+                    var environmentMapPass = new qtek.prePass.EnvironmentMap();
+                    var skydome = new qtek.plugin.Skydome({
                         scene : emptyScene
                     });
                     skydome.material.set('diffuseMap', envMap);
-                    mipmaps[0] = new qtek3d.texture.TextureCube({
+                    mipmaps[0] = new qtek.texture.TextureCube({
                         width : size,
                         height : size,
-                        type : qtek3d.Texture.FLOAT
+                        type : qtek.Texture.FLOAT
                     });
                     environmentMapPass.texture = mipmaps[0];
                     environmentMapPass.render(renderer, emptyScene);
                     skydome.detachScene(emptyScene);
 
-                    var skybox = new qtek3d.plugin.Skybox({
+                    var skybox = new qtek.plugin.Skybox({
                         scene : emptyScene
                     });
-                    var prefilterMaterial = new qtek3d.Material({
-                        shader : new qtek3d.Shader({
-                            vertex : qtek3d.Shader.source('buildin.skybox.vertex'),
-                            fragment : qtek3d.Shader.source('split_sum.prefilter_envmap')
+                    var prefilterMaterial = new qtek.Material({
+                        shader : new qtek.Shader({
+                            vertex : qtek.Shader.source('buildin.skybox.vertex'),
+                            fragment : qtek.Shader.source('split_sum.prefilter_envmap')
                         })
                     })
                     var downsampleMaterial = skybox.material;
@@ -268,10 +267,10 @@
 
                     // Down sample
                     skybox.material = downsampleMaterial;
-                    downsampleTexture = new qtek3d.texture.TextureCube({
+                    downsampleTexture = new qtek.texture.TextureCube({
                         width : 16,
                         height : 16,
-                        type : qtek3d.Texture.FLOAT
+                        type : qtek.Texture.FLOAT
                     });
                     environmentMapPass.texture = downsampleTexture;
                     environmentMapPass.render(renderer, emptyScene);
@@ -286,11 +285,11 @@
                             roughness = mipmapLevel / mipmapNum;
                             prefilterMaterial.set('roughness', roughness);
                             prefilterMaterial.set('environmentMap', downsampleTexture);
-                            var mipmap = new qtek3d.texture.TextureCube({
+                            var mipmap = new qtek.texture.TextureCube({
                                 useMipmap : false,
                                 width : Math.max(size, 8),
                                 height : Math.max(size, 8),
-                                type : qtek3d.Texture.FLOAT
+                                type : qtek.Texture.FLOAT
                             });
                             mipmaps[mipmapLevel++] = mipmap;
                             environmentMapPass.texture = mipmap;
@@ -306,17 +305,17 @@
                 }
 
                 function integrateBRDF(normalDistribution) {
-                    var frameBuffer = new qtek3d.FrameBuffer();
-                    var pass = new qtek3d.compositor.Pass({
-                        fragment : qtek3d.Shader.source('split_sum.integrate_BRDF')
+                    var frameBuffer = new qtek.FrameBuffer();
+                    var pass = new qtek.compositor.Pass({
+                        fragment : qtek.Shader.source('split_sum.integrate_BRDF')
                     });
 
-                    var texture = new qtek3d.texture.Texture2D({
+                    var texture = new qtek.texture.Texture2D({
                         width : 512,
                         height : 256,
-                        type : qtek3d.Texture.FLOAT,
-                        minFilter : qtek3d.Texture.NEAREST,
-                        magFilter : qtek3d.Texture.NEAREST,
+                        type : qtek.Texture.FLOAT,
+                        minFilter : qtek.Texture.NEAREST,
+                        magFilter : qtek.Texture.NEAREST,
                         useMipmap : false
                     });
                     pass.setUniform('normalDistribution', normalDistribution);

@@ -10,12 +10,11 @@
     <script type="text/javascript">
         require(['qtek'], function(qtek){
             
-            var qtek3d = qtek['3d'];
-            var Shader = qtek3d.Shader;
+            var Shader = qtek.Shader;
 
             var SIZE = 256;
 
-            var renderer = new qtek3d.Renderer({
+            var renderer = new qtek.Renderer({
                 canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
@@ -30,14 +29,14 @@
                 var particleNode = compositor.findNode('particle');
 
                 // Scene
-                var geo = new qtek3d.Geometry();
+                var geo = new qtek.Geometry();
                 for (var i = 0; i < SIZE; i++) {
                     for (var j = 0; j < SIZE; j++) {
                         geo.attributes.position.value.push([i / SIZE, j / SIZE, 0]);
                     }
                 }
-                var mat = new qtek3d.Material({
-                    shader : new qtek3d.Shader({
+                var mat = new qtek.Material({
+                    shader : new qtek.Shader({
                         vertex : Shader.source("curlnoise.vertex"),
                         fragment : Shader.source("curlnoise.fragment")
                     }),
@@ -48,26 +47,26 @@
                         _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
                     }
                 });
-                var particleSystem = new qtek3d.Mesh({
+                var particleSystem = new qtek.Mesh({
                     geometry : geo,
                     material : mat,
-                    mode : qtek3d.Mesh.POINTS
+                    mode : qtek.Mesh.POINTS
                 });
-                var scene = new qtek3d.Scene();
+                var scene = new qtek.Scene();
                 scene.add(particleSystem);
-                var camera = new qtek3d.camera.Perspective({
+                var camera = new qtek.camera.Perspective({
                     aspect : window.innerWidth / window.innerHeight
                 });
                 camera.position.z = 0.3;
                 camera.position.y = 0.3;
                 camera.lookAt(scene.position);
 
-                var spiritTexture = new qtek3d.texture.Texture2D();
+                var spiritTexture = new qtek.texture.Texture2D();
                 spiritTexture.image = generateSprite();
                 mat.set("spiritTexture", spiritTexture);
                 mat.set("color", [0.5, 0.3, 0.1]);
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4

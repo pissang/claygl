@@ -8,24 +8,23 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'];
-                var Shader = qtek3d.Shader;
-                var Material = qtek3d.Material;
-                var Mesh = qtek3d.Mesh;
-                var Cube = qtek3d.geometry.Cube;
-                var meshUtil = qtek3d.util.mesh;
-                var shaderLibrary = qtek3d.shader.library;
+                var Shader = qtek.Shader;
+                var Material = qtek.Material;
+                var Mesh = qtek.Mesh;
+                var Cube = qtek.geometry.Cube;
+                var meshUtil = qtek.util.mesh;
+                var shaderLibrary = qtek.shader.library;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById("Main")
                 });
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap();
+                var shadowMapPass = new qtek.prePass.ShadowMap();
 
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
@@ -50,20 +49,20 @@
                         }
                     }
                 }
-                var root = new qtek3d.Node();
+                var root = new qtek.Node();
                 var cubes = meshUtil.merge(meshList);
                 root.add(cubes);
                 scene.add(root);
 
-                var bigCube = new qtek3d.Mesh({
-                    geometry : new qtek3d.geometry.Cube({
+                var bigCube = new qtek.Mesh({
+                    geometry : new qtek.geometry.Cube({
                         inside : true
                     }),
-                    material : new qtek3d.Material({
-                        shader : qtek3d.shader.library.get("buildin.lambert")
+                    material : new qtek.Material({
+                        shader : qtek.shader.library.get("buildin.lambert")
                     }),
                     culling : false,
-                    scale : new qtek.core.Vector3(10, 10, 10)
+                    scale : new qtek.math.Vector3(10, 10, 10)
                 });
                 for (var i = 0; i < bigCube.geometry.attributes.normal.value.length; i++){
                     var normal = bigCube.geometry.attributes.normal.value[i];
@@ -74,9 +73,9 @@
                 root.add(bigCube);
 
                 camera.position.set(0, 2, 10);
-                camera.lookAt(new qtek.core.Vector3(0, 0, 0));
+                camera.lookAt(new qtek.math.Vector3(0, 0, 0));
 
-                var light = new qtek3d.light.Point({
+                var light = new qtek.light.Point({
                     color : [1.5, 1.5, 1.5],
                     shadowResolution : 512,
                     range : 40,

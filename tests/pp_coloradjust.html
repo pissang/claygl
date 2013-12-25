@@ -9,39 +9,38 @@
 
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d']
-                var Shader = qtek3d.Shader
-                var pp_Node = qtek3d.compositor.Node
-                var pp_SceneNode = qtek3d.compositor.SceneNode
-                var compositor = new qtek3d.compositor.Compositor();
+                var Shader = qtek.Shader;
+                var pp_Node = qtek.compositor.Node;
+                var pp_SceneNode = qtek.compositor.SceneNode;
+                var compositor = new qtek.compositor.Compositor();
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
                 //Create scene
-                var scene = new qtek3d.Scene(),
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene(),
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     }),
-                    cube = new qtek3d.geometry.Cube();
+                    cube = new qtek.geometry.Cube();
                 var shader = new Shader({
                     vertex : Shader.source("buildin.lambert.vertex"),
                     fragment : Shader.source("buildin.lambert.fragment")
                 })
                 shader.enableTexture("diffuseMap");
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D();
+                var texture = new qtek.texture.Texture2D();
                 texture.image = new Image();
                 texture.image.onload = function(){
                     texture.dirty();
                 }
                 texture.image.src = "assets/textures/crate.gif";
                 material.set("diffuseMap", texture );
-                var mesh = new qtek3d.Mesh({
+                var mesh = new qtek.Mesh({
                     material : material,
                     geometry : cube
                 })
@@ -49,13 +48,13 @@
                 scene.add( mesh );
 
                 camera.position.set(0, 2, 2);
-                camera.lookAt( new qtek.core.Vector3() );
+                camera.lookAt( new qtek.math.Vector3() );
 
-                var light = new qtek3d.light.Directional({
+                var light = new qtek.light.Directional({
                     color : [1.5, 1.5, 1.5]
                 })
                 light.position.set(50, 50, 50);
-                light.lookAt(new qtek.core.Vector3());
+                light.lookAt(new qtek.math.Vector3());
                 scene.add( light );
 
                 compositor.add(new pp_SceneNode({

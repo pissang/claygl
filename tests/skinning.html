@@ -18,15 +18,14 @@
         <input type="range" id="Timeline" min="0" value="0" step="0.01"/>
         <script type="text/javascript">
             function createSkeletonDebugScene(skeleton, qtek) {
-                var qtek3d = qtek['3d'];
-                var scene = new qtek3d.Scene();
-                var sphereGeo = new qtek3d.geometry.Sphere({
+                var scene = new qtek.Scene();
+                var sphereGeo = new qtek.geometry.Sphere({
                     radius : 0.1
                 });
-                var sphereMat = new qtek3d.Material({
-                    shader : new qtek3d.Shader({
-                        vertex : qtek3d.Shader.source("buildin.basic.vertex"),
-                        fragment : qtek3d.Shader.source("buildin.basic.fragment")
+                var sphereMat = new qtek.Material({
+                    shader : new qtek.Shader({
+                        vertex : qtek.Shader.source("buildin.basic.vertex"),
+                        fragment : qtek.Shader.source("buildin.basic.fragment")
                     })
                 });
                 sphereMat.set("color", [0.3, 0.3, 0.3]);
@@ -37,22 +36,22 @@
                 skeleton.joints.forEach(function(joint) {
 
                     var parentJoint = skeleton.joints[joint.parentIndex];
-                    var sphere = new qtek3d.Mesh({
+                    var sphere = new qtek.Mesh({
                         geometry : sphereGeo,
                         material : sphereMat,
                         autoUpdateLocalTransform : false
                     });
                     scene.add(sphere);
 
-                    var lineGeo = new qtek3d.Geometry({
-                        hint : qtek3d.Geometry.DYNAMIC_DRAW
+                    var lineGeo = new qtek.Geometry({
+                        hint : qtek.Geometry.DYNAMIC_DRAW
                     });
                     var lineGeoVertices = lineGeo.attributes.position.value;
                     lineGeoVertices.push([0, 0, 0], [0, 0, 0]);
-                    var line = new qtek3d.Mesh({
+                    var line = new qtek.Mesh({
                         geometry : lineGeo,
                         material : sphereMat,
-                        mode : qtek3d.Mesh.LINES,
+                        mode : qtek.Mesh.LINES,
                         lineWidth : 2
                     });
                     scene.add(line);
@@ -78,20 +77,19 @@
 
             require(['qtek',
                     'text!../tests/assets/models/knight.js'], function(qtek, modelData){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    _ = require("_");
+                var Shader = qtek.Shader;
+                var _ = require("_");
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
 
-                var shadowMapPass = new qtek3d.prePass.ShadowMap();
+                var shadowMapPass = new qtek.prePass.ShadowMap();
 
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
@@ -100,19 +98,19 @@
                 var loader = new qtek.loader.three.Model();
                 var meshList = loader.parse(data);
                 
-                var shader = qtek3d.shader.library.get("buildin.lambert");
+                var shader = qtek.shader.library.get("buildin.lambert");
 
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader,
                 });
-                var root = new qtek3d.Node();
+                var root = new qtek.Node();
 
                 var skeleton;
                 _.each(meshList, function(mesh){
                     skeleton = mesh.skeleton;
                     mesh.geometry.generateVertexNormals();
                     mesh.material.shader.disableTexturesAll();
-                    root.add(qtek3d.util.mesh.splitByJoints(mesh, 20));
+                    root.add(qtek.util.mesh.splitByJoints(mesh, 20));
                 });
 
                 camera.position.set(0, 10, 20);
@@ -120,12 +118,12 @@
 
                 scene.add(root);
                 // Add Plane
-                var plane = new qtek3d.geometry.Plane({
+                var plane = new qtek.geometry.Plane({
                     widthSegments : 20,
                     heightSegments : 20
                 });
                 plane.generateBarycentric();
-                var planeMesh = new qtek3d.Mesh({
+                var planeMesh = new qtek.Mesh({
                     geometry : plane,
                     material : material
                 });
@@ -133,7 +131,7 @@
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
-                var light = new qtek3d.light.Directional({
+                var light = new qtek.light.Directional({
                     shadowResolution : 1024,
                     shadowBias : 0.006
                 });
@@ -142,7 +140,7 @@
                 light.lookAt(root.position);
                 scene.add(light);
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4

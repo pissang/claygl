@@ -9,22 +9,21 @@
         <canvas width="600" height="640" id="Renderer2" style="float:left"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    Material = qtek3d.Material,
-                    Mesh = qtek3d.Mesh,
-                    Cube = qtek3d.geometry.Cube,
-                    meshUtil = qtek3d.util.mesh,
-                    shaderLibrary = qtek3d.shader.library;
+                var Shader = qtek.Shader;
+                var Material = qtek.Material;
+                var Mesh = qtek.Mesh;
+                var Cube = qtek.geometry.Cube;
+                var meshUtil = qtek.util.mesh;
+                var shaderLibrary = qtek.shader.library;
 
-                var renderer1 = new qtek3d.Renderer({
+                var renderer1 = new qtek.Renderer({
                     canvas : document.getElementById( "Renderer1")
                 });
-                var renderer2 = new qtek3d.Renderer({
+                var renderer2 = new qtek.Renderer({
                     canvas : document.getElementById( "Renderer2")
                 });
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer1.canvas.width/renderer1.canvas.height,
                         far : 500
                     });
@@ -35,7 +34,7 @@
                 var material = new Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D;
+                var texture = new qtek.texture.Texture2D;
                 texture.image = new Image;
                 texture.image.onload = function(){
                     texture.dirty();
@@ -55,7 +54,7 @@
 
                 scene.add( mesh );
 
-                var light = new qtek3d.light.Directional({
+                var light = new qtek.light.Directional({
                     color : [1.5, 1.5, 1.5]
                 })
                 light.position.set(50, 50, 50);

@@ -8,26 +8,25 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader;
+                var Shader = qtek.Shader;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main")
                 });
-                var scene = new qtek3d.Scene;
-                var camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
-                var cube = new qtek3d.geometry.Cube({
+                var cube = new qtek.geometry.Cube({
                     widthSegments : 10,
                     heightSegments : 10
                 });
                 cube.generateUniqueVertex();
                 cube.generateTangents();
 
-                var shader = qtek3d.shader.library.get("buildin.phong", ["normalMap", "diffuseMap"]);
-                var material = new qtek3d.Material({
+                var shader = qtek.shader.library.get("buildin.phong", ["normalMap", "diffuseMap"]);
+                var material = new qtek.Material({
                     shader : shader
                 });
                 material.set("normalMap", loadTexture("assets/textures/normal_map.jpg"));
@@ -37,13 +36,13 @@
                 camera.position.set(0, 0, 4);
                 // camera.lookAt( scene.position );
 
-                var mesh = new qtek3d.Mesh({
+                var mesh = new qtek.Mesh({
                     geometry : cube,
                     material : material
                 });
                 scene.add( mesh );
-                var light = new qtek3d.light.Directional({
-                    position : new qtek.core.Vector3(10, 10, 10)
+                var light = new qtek.light.Directional({
+                    position : new qtek.math.Vector3(10, 10, 10)
                 })
                 light.lookAt(mesh.position);
                 scene.add(light);
@@ -55,7 +54,7 @@
 
 
                 function loadTexture(src){
-                    var texture = new qtek3d.texture.Texture2D({
+                    var texture = new qtek.texture.Texture2D({
                         image : new Image()
                     })
                     texture.image.onload = function(){

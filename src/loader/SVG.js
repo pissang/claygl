@@ -3,24 +3,24 @@
  */
 define(function(require) {
 
-    var Base = require("core/Base");
+    var Base = require("../core/Base");
 
-    var request = require("core/request");
+    var request = require("../core/request");
 
-    var Node = require("2d/Node");
-    var Circle = require("2d/shape/Circle");
-    var Rectangle = require("2d/shape/Rectangle");
-    var Ellipse = require("2d/shape/Ellipse");
-    var Line = require("2d/shape/Line");
-    var Path = require("2d/shape/Path");
-    var Polygon = require("2d/shape/Polygon");
-    var TextBox = require("2d/shape/TextBox");
-    var SVGPath = require("2d/shape/SVGPath");
-    var LinearGradient = require("2d/LinearGradient");
-    var RadialGradient = require("2d/RadialGradient");
-    var Pattern = require("2d/Pattern");
-    var Style = require("2d/Style");
-    var Vector2 = require("core/Vector2");
+    var Node = require("../2d/Node");
+    var Circle = require("../2d/shape/Circle");
+    var Rectangle = require("../2d/shape/Rectangle");
+    var Ellipse = require("../2d/shape/Ellipse");
+    var Line = require("../2d/shape/Line");
+    var Path = require("../2d/shape/Path");
+    var Polygon = require("../2d/shape/Polygon");
+    var TextBox = require("../2d/shape/TextBox");
+    var SVGPath = require("../2d/shape/SVGPath");
+    var LinearGradient = require("../2d/LinearGradient");
+    var RadialGradient = require("../2d/RadialGradient");
+    var Pattern = require("../2d/Pattern");
+    var Style = require("../2d/Style");
+    var Vector2 = require("../math/Vector2");
     var _ = require("_");
 
     var Loader = Base.derive(function() {

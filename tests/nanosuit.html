@@ -10,24 +10,23 @@
         <script type="text/javascript">
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
-                var qtek3d = qtek['3d']
-                var Shader = qtek3d.Shader
+                var Shader = qtek.Shader;
                 var _ = require("_");
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById("Main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
                 var animation = new qtek.animation.Animation;
                 animation.start();
-                var shadowMapPass = new qtek3d.prePass.ShadowMap({
-                    // softShadow : qtek3d.prePass.ShadowMap.VSM
+                var shadowMapPass = new qtek.prePass.ShadowMap({
+                    // softShadow : qtek.prePass.ShadowMap.VSM
                     shadowCascade : 4
                 });
 
-                var scene = new qtek3d.Scene();
-                var camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene();
+                var camera = new qtek.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height,
                     far : 100
                 });
@@ -40,28 +39,28 @@
                 });
                 var meshList = loader.parse(data);
                 
-                var shader = qtek3d.shader.library.get("buildin.lambert", "diffuseMap");
+                var shader = qtek.shader.library.get("buildin.lambert", "diffuseMap");
 
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D({
-                    wrapS : qtek3d.Texture.REPEAT,
-                    wrapT : qtek3d.Texture.REPEAT,
+                var texture = new qtek.texture.Texture2D({
+                    wrapS : qtek.Texture.REPEAT,
+                    wrapT : qtek.Texture.REPEAT,
                     anisotropic : 8
                 });
                 texture.load("assets/textures/ground_tile.jpg");
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10]);
 
-                var root = new qtek3d.Node();
+                var root = new qtek.Node();
                 var meshNumber = 0;
                 var N = 10;
                 for (var i = 0; i < N; i++) {
                     for (var j = 0; j < N; j++) {
-                        var nanosuit = new qtek3d.Node();
+                        var nanosuit = new qtek.Node();
                         _.each(meshList, function(_mesh){
-                            var mesh = new qtek3d.Mesh({
+                            var mesh = new qtek.Mesh({
                                 geometry : _mesh.geometry,
                                 material : _mesh.material
                             });
@@ -78,16 +77,16 @@
                 }
 
                 camera.position.set(0, 4, 5);
-                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
+                camera.lookAt( new qtek.math.Vector3(0, 0, 0) );
 
                 scene.add(root);
                 root.scale.set(0.2, 0.2, 0.2);
                 // Add Plane
-                var plane = new qtek3d.geometry.Plane({
+                var plane = new qtek.geometry.Plane({
                     widthSegments : 1,
                     heightSegments : 1
                 });
-                var planeMesh = new qtek3d.Mesh({
+                var planeMesh = new qtek.Mesh({
                     geometry : plane,
                     material : material,
                     name : "plane"
@@ -98,24 +97,24 @@
 
                 scene.add(planeMesh);
 
-                var light = new qtek3d.light.Directional({
+                var light = new qtek.light.Directional({
                     intensity : 1.0,
-                    position : new qtek.core.Vector3(10, 10, 10),
+                    position : new qtek.math.Vector3(10, 10, 10),
                     shadowResolution : 512,
                     shadowBias : 0.006
                 });
                 light.lookAt(root.position);
                 scene.add(light);
 
-                var aidLight = new qtek3d.light.Directional({
+                var aidLight = new qtek.light.Directional({
                     intensity : 0.3,
-                    position : new qtek.core.Vector3(2, 2, -1),
+                    position : new qtek.math.Vector3(2, 2, -1),
                     castShadow : false
                 });
                 aidLight.lookAt(root.position);
                 // scene.add(aidLight);
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4
@@ -125,12 +124,12 @@
                     control.update(deltaTime);
 
                     var start = performance.now();
-                    renderer.clear = qtek3d.Renderer.COLOR_BUFFER_BIT | qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clear = qtek.Renderer.COLOR_BUFFER_BIT | qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.render(renderer, scene, camera);
                     var drawInfo = renderer.render(scene, camera, true, false);
                     var renderTime = performance.now() - start;
 
-                    renderer.clear = qtek3d.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.renderDebug(renderer, 200);
 
                     document.getElementById('time').innerHTML = 

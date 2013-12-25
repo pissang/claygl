@@ -4,32 +4,32 @@
  */
 define(function(require) {
 
-    var Base = require('core/Base');
+    var Base = require('../core/Base');
+    var request = require("../core/request");
+    var util = require('../core/util');
 
-    var request = require("core/request");
-    var Scene = require('3d/Scene');
-    var Shader = require("3d/Shader");
-    var Material = require("3d/Material");
-    var Mesh = require("3d/Mesh");
-    var Node = require("3d/Node");
-    var Texture = require('3d/Texture');
-    var Texture2D = require("3d/texture/Texture2D");
-    var TextureCube = require("3d/texture/TextureCube");
-    var shaderLibrary = require("3d/shader/library");
-    var Skeleton = require("3d/Skeleton");
-    var Joint = require("3d/Joint");
-    var PerspectiveCamera = require("3d/camera/Perspective");
-    var OrthographicCamera = require("3d/camera/Orthographic");
-    var PointLight = require("3d/light/Point");
-    var SpotLight = require("3d/light/Spot");
-    var DirectionalLight = require("3d/light/Directional");
-    var glenum = require("3d/glenum");
+    var Scene = require('../Scene');
+    var Shader = require("../Shader");
+    var Material = require("../Material");
+    var Mesh = require("../Mesh");
+    var Node = require("../Node");
+    var Texture = require('../Texture');
+    var Texture2D = require("../texture/Texture2D");
+    var TextureCube = require("../texture/TextureCube");
+    var shaderLibrary = require("../shader/library");
+    var Skeleton = require("../Skeleton");
+    var Joint = require("../Joint");
+    var PerspectiveCamera = require("../camera/Perspective");
+    var OrthographicCamera = require("../camera/Orthographic");
+    var PointLight = require("../light/Point");
+    var SpotLight = require("../light/Spot");
+    var DirectionalLight = require("../light/Directional");
+    var glenum = require("../glenum");
 
-    var Vector3 = require("core/Vector3");
-    var Quaternion = require("core/Quaternion");
+    var Vector3 = require("../math/Vector3");
+    var Quaternion = require("../math/Quaternion");
     
     var _ = require("_");
-    var util = require('util/util');
 
     var InstantGeometry = require("./InstantGeometry");
 

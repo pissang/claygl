@@ -10,18 +10,16 @@
 
     <script type="text/javascript">
         require(['qtek'], function(qtek) {
-            var qtek3d = qtek['3d'];
-
-            var renderer = new qtek3d.Renderer({
+            var renderer = new qtek.Renderer({
                 canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var shadowMapPass = new qtek3d.prePass.ShadowMap();
-            var environmentMap = new qtek3d.texture.TextureCube({
+            var shadowMapPass = new qtek.prePass.ShadowMap();
+            var environmentMap = new qtek.texture.TextureCube({
                 width : 256,
                 height : 256
             });
-            var environmentMapPass = new qtek3d.prePass.EnvironmentMap({
+            var environmentMapPass = new qtek.prePass.EnvironmentMap({
                 texture : environmentMap
             });
             var animation = new qtek.animation.Animation();
@@ -34,7 +32,7 @@
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
                 scene.rotation.rotateX(-Math.PI / 2);
-                var camera = new qtek3d.camera.Perspective({
+                var camera = new qtek.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height,
                     far : 100
                 });
@@ -43,7 +41,7 @@
                 camera.lookAt(scene.position);
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4,
@@ -58,7 +56,7 @@
                 light.shadowResolution = 512;
 
                 var suzanne = scene.getNode('Suzanne');
-                var suzanneMaterial = qtek3d.Material.getMaterial('Mirror');
+                var suzanneMaterial = qtek.Material.getMaterial('Mirror');
                 environmentMapPass.position.copy(suzanne.position);
                 suzanneMaterial.shader = suzanneMaterial.shader.clone();
                 suzanneMaterial.shader.enableTexture('environmentMap');

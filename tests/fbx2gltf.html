@@ -10,13 +10,12 @@
 
     <script type="text/javascript">
         require(['qtek'], function(qtek) {
-            var qtek3d = qtek['3d'];
 
-            var renderer = new qtek3d.Renderer({
+            var renderer = new qtek.Renderer({
                 canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var shadowMapPass = new qtek3d.prePass.ShadowMap({
+            var shadowMapPass = new qtek.prePass.ShadowMap({
                 // useVSM : true
             });
 
@@ -26,17 +25,17 @@
 
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
-                var camera = new qtek3d.camera.Perspective({
+                var camera = new qtek.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height,
                     far : 100
                 });
 
                 camera.position.set(0, 4, 10);
-                camera.lookAt(new qtek.core.Vector3(0, 4, 0));
+                camera.lookAt(new qtek.math.Vector3(0, 4, 0));
 
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4
@@ -46,13 +45,13 @@
 
                 scene.scale.set(0.1, 0.1, 0.1)
 
-                light = new qtek3d.light.Directional({
+                light = new qtek.light.Directional({
                 })
                 light.position.set(1, 1, 1)
                 light.lookAt(scene.position)
                 scene.add(light)
 
-                scene.add(new qtek3d.light.Ambient({
+                scene.add(new qtek.light.Ambient({
                     intensity : 0.4
                 }))
                 

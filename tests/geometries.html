@@ -8,29 +8,28 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader;
+                var Shader = qtek.Shader;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
-                var scene = new qtek3d.Scene;
-                var camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
 
-                var sphere = new qtek3d.geometry.Sphere({
+                var sphere = new qtek.geometry.Sphere({
                     widthSegments : 20,
                     heightSegments : 20
                 });
-                var cube = new qtek3d.geometry.Cube({
+                var cube = new qtek.geometry.Cube({
                     widthSegments : 10,
                     heightSegments : 10,
                     depthSegments : 10
                 });
-                var plane = new qtek3d.geometry.Plane({
+                var plane = new qtek.geometry.Plane({
                     widthSegments : 10,
                     heightSegments : 10
                 })
@@ -38,8 +37,8 @@
                 cube.generateBarycentric();
                 plane.generateBarycentric();
 
-                var shader = qtek3d.shader.library.get('buildin.wireframe');
-                var material = new qtek3d.Material({
+                var shader = qtek.shader.library.get('buildin.wireframe');
+                var material = new qtek.Material({
                     shader : shader,
                     transparent : true,
                     depthTest : false
@@ -47,19 +46,19 @@
                 material.set("lineWidth", 2);
 
                 camera.position.set(0, 2, 3);
-                camera.lookAt( new qtek.core.Vector3() );
+                camera.lookAt( new qtek.math.Vector3() );
 
-                var sphereMesh = new qtek3d.Mesh({
+                var sphereMesh = new qtek.Mesh({
                     geometry : sphere,
                     material : material,
                     culling : false
                 });
-                var cubeMesh = new qtek3d.Mesh({
+                var cubeMesh = new qtek.Mesh({
                     geometry : cube,
                     material : material,
                     culling : false
                 });
-                var planeMesh = new qtek3d.Mesh({
+                var planeMesh = new qtek.Mesh({
                     geometry : plane,
                     material : material,
                     culling : false

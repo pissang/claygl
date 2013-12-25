@@ -8,32 +8,31 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script>
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d']
-                var Shader = qtek3d.Shader
+                var Shader = qtek.Shader
                 var _ = require("_");
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
 
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
 
-                var shader = qtek3d.shader.library.get("buildin.basic", "diffuseMap");
+                var shader = qtek.shader.library.get("buildin.basic", "diffuseMap");
 
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader
                 });
                 var image = new Image;
                 image.src = "assets/textures/ground_tile.jpg";
-                var texture = new qtek3d.texture.Texture2D({
+                var texture = new qtek.texture.Texture2D({
                     image : image,
-                    wrapS : qtek3d.Texture.REPEAT,
-                    wrapT : qtek3d.Texture.REPEAT,
+                    wrapS : qtek.Texture.REPEAT,
+                    wrapT : qtek.Texture.REPEAT,
                     anisotropic : 16
                 });
                 image.onload = function(){
@@ -42,21 +41,21 @@
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10])
 
-                var root = new qtek3d.Node();
+                var root = new qtek.Node();
 
                 camera.position.set(0, 4, 14);
-                camera.lookAt( new qtek.core.Vector3(0, 1, 0) );
+                camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
 
                 scene.add( root );
                 // Add Plane
-                var plane = new qtek3d.geometry.Plane({
+                var plane = new qtek.geometry.Plane({
                     widthSegments : 1,
                     heightSegments : 1
                 });
-                var planeMesh = new qtek3d.Mesh({
+                var planeMesh = new qtek.Mesh({
                     geometry : plane,
                     material : material,
-                    scale : new qtek.core.Vector3(60, 60, 60)
+                    scale : new qtek.math.Vector3(60, 60, 60)
                 });
                 planeMesh.position.y = -0.8;
                 planeMesh.rotation.rotateX(-Math.PI/2);

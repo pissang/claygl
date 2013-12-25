@@ -8,38 +8,37 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader,
-                    FrameBuffer = qtek3d.FrameBuffer,
-                    Cube = qtek3d.geometry.Cube,
-                    Plane = qtek3d.geometry.Plane;
+                var Shader = qtek.Shader;
+                var FrameBuffer = qtek.FrameBuffer;
+                var Cube = qtek.geometry.Cube;
+                var Plane = qtek.geometry.Plane;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main")
                 });
                 //Create scene
-                var scene = new qtek3d.Scene,
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene,
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     }),
-                    cube = new qtek3d.geometry.Cube;
+                    cube = new qtek.geometry.Cube;
                 var shader = new Shader({
                     vertex : Shader.source("buildin.phong.vertex"),
                     fragment : Shader.source("buildin.phong.fragment")
                 })
                 shader.enableTexture("diffuseMap");
-                var material = new qtek3d.Material({
+                var material = new qtek.Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D;
+                var texture = new qtek.texture.Texture2D;
                 texture.image = new Image;
                 texture.image.onload = function(){
                     texture.dirty();
                 }
                 texture.image.src = "assets/textures/crate.gif";
                 material.set("diffuseMap", texture );
-                var mesh = new qtek3d.Mesh({
+                var mesh = new qtek.Mesh({
                     material : material,
                     geometry : cube
                 })
@@ -47,35 +46,35 @@
                 scene.add( mesh );
 
                 camera.position.set(0, 1.5, 3);
-                camera.lookAt( new qtek.core.Vector3(0, 0, 0) );
+                camera.lookAt( new qtek.math.Vector3(0, 0, 0) );
 
-                var light = new qtek3d.light.Point({
+                var light = new qtek.light.Point({
                     color : [1.5, 1.5, 1.5]
                 })
                 light.position.set(0, 0, 3);
                 scene.add( light );
 
                 var frameBuffer = new FrameBuffer();
-                var rtt = new qtek3d.texture.Texture2D({
+                var rtt = new qtek.texture.Texture2D({
                     width : 1024,
                     height : 1024,
                 });
                 frameBuffer.attach( renderer.gl, rtt );
-                var rttShader = qtek3d.shader.library.get("buildin.basic", "diffuseMap");
-                var rttMesh = new qtek3d.Mesh({
+                var rttShader = qtek.shader.library.get("buildin.basic", "diffuseMap");
+                var rttMesh = new qtek.Mesh({
                     geometry : new Plane({
                         detailX : 100,
                         detailY : 100
                     }),
-                    material : new qtek3d.Material({
+                    material : new qtek.Material({
                         shader : rttShader
                     })
                 });
                 rttMesh.material.set("diffuseMap", rtt);
-                var rttScene = new qtek3d.Scene();
+                var rttScene = new qtek.Scene();
                 rttScene.add( rttMesh );
 
-                var orthCamera = new qtek3d.camera.Orthographic();
+                var orthCamera = new qtek.camera.Orthographic();
 
                 setInterval( function(){
                     frameBuffer.bind( renderer );

@@ -1,6 +1,11 @@
+var glob = require('glob');
+var fs = require('fs');
+
 module.exports = function(grunt){
 
-    function makeRequirejsConfig(special) {
+    includeList = [];
+
+    function makeRequirejsConfig(isAMD) {
         var common = {
             'baseUrl' : './src',
             'paths' : {
@@ -8,14 +13,7 @@ module.exports = function(grunt){
                 'glmatrix' : '../thirdparty/gl-matrix'
             },
             'exclude' : ['text'],
-            'name' : '../build/almond',
-            'include' : ["qtek"],
-
-            'out':"dist/qtek.js",
-            'wrap' : {
-                'startFile' : 'build/wrap/start.js',
-                'endFile' : 'build/wrap/end.js'
-            },
+            'name' : 'qtek',
             'optimize':"none",
             'onBuildWrite' : function(moduleName, path, content){
                 // Remove the text plugin and convert to a normal module
@@ -38,19 +36,27 @@ module.exports = function(grunt){
             }
         }
 
-        if( special === "webgl"){
-            common["include"] = ["qtek3d"];
-            common["wrap"]["endFile"] = "build/wrap/end.webgl.js";
-            common["out"] = "dist/qtek.webgl.js";
-        }else if( special === "canvas" ){
-            common["include"] = ["qtek2d"];
-            common["wrap"]["endFile"] = "build/wrap/end.canvas.js";
-            common["out"] = "dist/qtek.canvas.js";
-        }else if( special === "image"){
-            common["include"] = ["qtekimage"];
-            common["wrap"]["endFile"] = "build/wrap/end.image.js";
-            common["out"] = "dist/qtek.image.js";
+        if (isAMD) {
+            common.out = 'dist/qtek.amd.js';
+            common.include = includeList;
+            common.packages = [{
+                name : 'qtek',
+                location : '.',
+                main : '../build/qtek.amd'
+            }]
+        } else {
+            common.out = 'dist/qtek.js';
+            common.packages = [{
+                name : 'qtek',
+                location : '.',
+                main : 'qtek'
+            }]
+            common.wrap = {
+                'startFile' : ['build/wrap/start.js', 'build/almond.js'],
+                'endFile' : 'build/wrap/end.js'
+            }
         }
+
         return common;
     }
 
@@ -62,25 +68,11 @@ module.exports = function(grunt){
             all : {
                 files : {
                     'dist/qtek.min.js' : ['dist/qtek.js']
-                },
-                // options : {
-                //     sourceMap : 'dist/qtek.min.map',
-                //     sourceMappingUrl : 'qtek.min.map'
-                // }
-            },
-            webgl : {
-                files : {
-                    'dist/qtek.webgl.min.js' : ['dist/qtek.webgl.js']
                 }
             },
-            canvas : {
+            amd : {
                 files : {
-                    'dist/qtek.canvas.min.js' : ['dist/qtek.canvas.js']
-                }
-            },
-            image : {
-                files : {
-                    'dist/qtek.image.min.js' : ['dist/qtek.image.js']
+                    'dist/qtek.amd.min.js' : ['dist/qtek.amd.js']
                 }
             }
         },
@@ -88,14 +80,8 @@ module.exports = function(grunt){
             all : {
                 options : makeRequirejsConfig()
             },
-            webgl : {
-                options : makeRequirejsConfig("webgl")
-            },
-            canvas : {
-                options : makeRequirejsConfig("canvas")
-            },
-            image : {
-                options : makeRequirejsConfig("image")
+            amd : {
+                options : makeRequirejsConfig(true)
             }
         }
     })
@@ -105,7 +91,20 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
     grunt.registerTask('default', ['requirejs:all', 'uglify:all']);
-    // grunt.registerTask('webgl', ['requirejs:webgl', 'uglify:webgl']);
-    // grunt.registerTask('canvas', ['requirejs:canvas', 'uglify:canvas']);
-    // grunt.registerTask('image', ['requirejs:image', 'uglify:image']);
+    grunt.registerTask('amd', 'Building...', function() {
+        var done = this.async();
+        glob("**/*.js", {
+            cwd : './src'
+        }, function(err, files){
+            files.forEach(function(file){
+                if( file.match(/qtek.*?\.js/) || file === "text.js"){
+                    return;
+                }
+                includeList.push('qtek/' + file.replace(/\.js$/, ''))
+            });
+
+            grunt.task.run(['requirejs:amd', 'uglify:amd']);
+            done();
+        });
+    });
 }

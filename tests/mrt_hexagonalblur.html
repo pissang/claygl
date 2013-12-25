@@ -8,17 +8,15 @@
         <canvas id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-
-                var qtek3d = qtek['3d']
-                var Shader = qtek3d.Shader
-                var pp_Node = qtek3d.compositor.Node
-                var pp_SceneNode = qtek3d.compositor.SceneNode
-                var pp_TextureNode = qtek3d.compositor.TextureNode
-                var compositor = new qtek3d.compositor.Compositor();
+                var Shader = qtek.Shader;
+                var pp_Node = qtek.compositor.Node;
+                var pp_SceneNode = qtek.compositor.SceneNode;
+                var pp_TextureNode = qtek.compositor.TextureNode;
+                var compositor = new qtek.compositor.Compositor();
 
                 var _ = require("_");
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById("Main"),
                     devicePixelRatio : 1.0
                 });
@@ -28,7 +26,7 @@
 
                 var gl = renderer.gl;
 
-                var texture = new qtek3d.texture.Texture2D({
+                var texture = new qtek.texture.Texture2D({
                     image : new Image
                 })
                 texture.image.onload = function(){
@@ -53,7 +51,7 @@
                 var floatTextureParam = {
                     width : 256,
                     height : 256,
-                    type : qtek3d.Texture.FLOAT
+                    type : qtek.Texture.FLOAT
                 }
                 var colorAdjustNode = new pp_Node({
                     shader : Shader.source("buildin.compositor.coloradjust"),

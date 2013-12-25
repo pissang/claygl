@@ -9,38 +9,36 @@
     <canvas id="Main"></canvas>
     <script type="text/javascript">
         require(['qtek'], function(qtek) {
-            var qtek3d = qtek['3d'];
-            var renderer = new qtek3d.Renderer({
+            var renderer = new qtek.Renderer({
                 canvas : document.getElementById('Main'),
                 devicePixelRatio : 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
-            var camera = new qtek3d.camera.Perspective({
+            var camera = new qtek.camera.Perspective({
                 aspect : renderer.width / renderer.height
             });
             camera.position.set(0, 0, 20);
 
-            var scene = new qtek3d.Scene();
-            var control = new qtek3d.plugin.OrbitControl({
+            var scene = new qtek.Scene();
+            var control = new qtek.plugin.OrbitControl({
                 domElement : renderer.canvas,
                 target : camera
             });
-            control.enable();
 
-            var cubeMap = new qtek3d.texture.TextureCube({
+            var cubeMap = new qtek.texture.TextureCube({
                 width : 512,
                 height : 512,
-                type : qtek3d.Texture.FLOAT
+                type : qtek.Texture.FLOAT
             });
 
-            qtek3d.util.texture.loadPanorama(
-                'assets/textures/hdr/grace-new.hdr',
+            qtek.util.texture.loadPanorama(
+                'assets/textures/hdr/path.hdr',
                 cubeMap,
                 renderer
             );
 
-            var skybox = new qtek3d.plugin.Skybox({
+            var skybox = new qtek.plugin.Skybox({
                 scene : scene
             });
             skybox.material.set('environmentMap', cubeMap);
@@ -51,12 +49,12 @@
             var FXLoader = new qtek.loader.FX();
             FXLoader.load('assets/fx/hdr.json');
 
-            var debugPass = new qtek3d.compositor.Pass({
-                fragment : qtek3d.Shader.source('buildin.compositor.output')
+            var debugPass = new qtek.compositor.Pass({
+                fragment : qtek.Shader.source('buildin.compositor.output')
             });
 
             FXLoader.success(function(compositor) {
-                var sceneNode = new qtek3d.compositor.SceneNode({
+                var sceneNode = new qtek.compositor.SceneNode({
                     name : 'scene',
                     scene : scene,
                     camera : camera,
@@ -69,7 +67,7 @@
                                 height : function(renderer) {
                                     return renderer.height;
                                 },
-                                type : qtek3d.Texture.FLOAT
+                                type : qtek.Texture.FLOAT
                             }
                         }
                     }
@@ -78,6 +76,7 @@
 
                 animation.on('frame', function() {
                     compositor.render(renderer);
+                    control.update();
 
                     var FXAANode = compositor.findNode('FXAA');
                     if (FXAANode) {

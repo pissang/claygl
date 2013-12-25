@@ -8,14 +8,13 @@
         <canvas id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'],
-                    Shader = qtek3d.Shader;
+                var Shader = qtek.Shader;
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main")
                 });
-                var scene = new qtek3d.Scene;
-                    camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene;
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
@@ -23,19 +22,19 @@
 
                 camera.position.set(0, 1, 2);
 
-                var texture = new qtek3d.texture.Texture2D({
+                var texture = new qtek.texture.Texture2D({
                     flipY : false
                 });
                 // Sky texture 
                 // http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
                 texture.load("assets/textures/Parking_Lot_Bg.jpg");
 
-                var skydome = new qtek3d.plugin.Skydome({
+                var skydome = new qtek.plugin.Skydome({
                     scene : scene            
                 });
                 skydome.material.set("diffuseMap", texture);
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4

@@ -9,23 +9,22 @@
         <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d']
-                var Shader = qtek3d.Shader
-                var Material = qtek3d.Material
-                var Mesh = qtek3d.Mesh
-                var Cube = qtek3d.geometry.Cube
-                var meshUtil = qtek3d.util.mesh
-                var shaderLibrary = qtek3d.shader.library;
+                var Shader = qtek.Shader
+                var Material = qtek.Material
+                var Mesh = qtek.Mesh
+                var Cube = qtek.geometry.Cube
+                var meshUtil = qtek.util.mesh
+                var shaderLibrary = qtek.shader.library;
                 var animation = new qtek.animation.Animation;
                 animation.start();
 
-                var renderer = new qtek3d.Renderer({
+                var renderer = new qtek.Renderer({
                     canvas : document.getElementById("Main"),
                     devicePixelRatio : 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek3d.Scene;
-                var camera = new qtek3d.camera.Perspective({
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height,
                     far : 500
                 });
@@ -36,7 +35,7 @@
                 var material = new Material({
                     shader : shader
                 });
-                var texture = new qtek3d.texture.Texture2D;
+                var texture = new qtek.texture.Texture2D;
                 texture.image = new Image;
                 texture.image.onload = function(){
                     texture.dirty();
@@ -45,7 +44,7 @@
                 var uniforms = material.uniforms;
                 uniforms.diffuseMap.value = texture;
 
-                var root = new qtek3d.Node({
+                var root = new qtek.Node({
                     name : 'ROOT'
                 });
                 scene.add(root);
@@ -64,7 +63,7 @@
 
                 camera.position.set(0, 0, 10);
 
-                var light = new qtek3d.light.Point({
+                var light = new qtek.light.Point({
                     color : [1.5, 1.5, 1.5]
                 })
                 light.position.set(0, 0, 0);

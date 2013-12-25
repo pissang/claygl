@@ -8,7 +8,6 @@
         <div id="Main"></div>
         <script>
             require(['qtek'], function(qtek) {
-                var qtek3d = qtek['3d'];
                 var stage = new qtek.Stage({
                     container : document.getElementById('Main')
                 });
@@ -19,14 +18,14 @@
                 var scene = layer.scene;
                 renderer.setDevicePixelRatio(1.0);
 
-                var cubeGeo = new qtek3d.geometry.Cube();
+                var cubeGeo = new qtek.geometry.Cube();
                 for (var i = 0; i < 5; i++) {
                     for (var j = 0; j < 5; j++) {
-                        var material = new qtek3d.Material({
-                            shader : qtek3d.shader.library.get('buildin.lambert')
+                        var material = new qtek.Material({
+                            shader : qtek.shader.library.get('buildin.lambert')
                         });
                         material.set('color', [Math.random(), Math.random(), Math.random()]);
-                        var mesh = new qtek3d.Mesh({
+                        var mesh = new qtek.Mesh({
                             material : material,
                             geometry : cubeGeo
                         });
@@ -35,15 +34,15 @@
                     }
                 }
                 camera.position.z = 10;
-                var light = new qtek3d.light.Directional();
+                var light = new qtek.light.Directional();
                 light.position.set(4, 4, 0);
-                light.lookAt(qtek.core.Vector3.ZERO);
+                light.lookAt(qtek.math.Vector3.ZERO);
                 scene.add(light);
-                scene.add(new qtek3d.light.Ambient({
+                scene.add(new qtek.light.Ambient({
                     intensity : 0.5
                 }));
 
-                var picking = new qtek3d.picking.Pixel({
+                var picking = new qtek.picking.Pixel({
                     renderer : renderer
                 });
                 layer.setPicking(picking);

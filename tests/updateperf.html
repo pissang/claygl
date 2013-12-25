@@ -9,16 +9,15 @@
         <div id="time" style="position:absolute;left:10px;top:10px;"></div>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
-                var qtek3d = qtek['3d'];
-                var Shader = qtek3d.Shader;
-                var Material = qtek3d.Material;
-                var Mesh = qtek3d.Mesh;
-                var Cube = qtek3d.geometry.Cube;
-                var shaderLibrary = qtek3d.shader.library;
+                var Shader = qtek.Shader;
+                var Material = qtek.Material;
+                var Mesh = qtek.Mesh;
+                var Cube = qtek.geometry.Cube;
+                var shaderLibrary = qtek.shader.library;
                 var animation = new qtek.animation.Animation;
                 animation.start();
 
-                var scene = new qtek3d.Scene;
+                var scene = new qtek.Scene;
 
                 var cube = new Cube();
                 var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
@@ -26,7 +25,7 @@
                 var material = new Material({
                     shader : shader
                 });
-                var root = new qtek3d.Node({
+                var root = new qtek.Node({
                     name : 'ROOT'
                 });
                 scene.add(root);
@@ -34,7 +33,7 @@
                 for( var i = 0; i < 10; i++){
                     for(var j = 0; j < 10; j++){
                         for( var k = 0; k < 100; k++){
-                            var mesh = new qtek3d.Mesh({
+                            var mesh = new qtek.Mesh({
                                 geometry : cube,
                                 material : material,
                             });

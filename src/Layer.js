@@ -1,6 +1,6 @@
 define(function(require) {
 
-    var Base = require('core/Base');
+    var Base = require('./core/Base');
 
     var Layer = Base.derive(function() {
         return {

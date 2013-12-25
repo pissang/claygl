@@ -1,16 +1,17 @@
 define(function(require) {
 
-    var Base = require('core/Base');
+    var Base = require('./core/Base');
     var Layer = require('./Layer');
-    var Animation = require('animation/Animation');
-    var QEvent = require('core/Event');
+    var Animation = require('./animation/Animation');
+    var QEvent = require('./core/Event');
 
-    var Scene3D = require('3d/Scene');
-    var Scene2D = require('2d/Scene');
-    var Renderer3D = require('3d/Renderer');
-    var Renderer2D = require('2d/Renderer');
-    var Camera3D = require('3d/camera/Perspective');
-    var Camera2D = require('2d/Camera');
+    var Scene3D = require('./Scene');
+    var Renderer3D = require('./Renderer');
+    var Camera3D = require('./camera/Perspective');
+    
+    var Scene2D = require('./2d/Scene');
+    var Renderer2D = require('./2d/CanvasRenderer');
+    var Camera2D = require('./2d/Camera');
 
     var Stage = Base.derive(function() {
         return {

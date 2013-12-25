@@ -6,10 +6,10 @@ define(function(require) {
 
     'use strict';
 
-    var Base = require("core/Base");
-    var util = require("util/util");
-    var BoundingBox = require("3d/BoundingBox");
-    var Geometry = require("3d/Geometry");
+    var Base = require("../core/Base");
+    var util = require("../core/util");
+    var BoundingBox = require("../math/BoundingBox");
+    var Geometry = require("../Geometry");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
 

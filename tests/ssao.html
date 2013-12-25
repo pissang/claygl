@@ -12,13 +12,11 @@
         require(['qtek',
                 'text!../tests/shader/ssao.essl',
                 'text!../tests/shader/fxaa.essl'], function(qtek, SSAOShader, FXAAShader) {
-            var qtek3d = qtek['3d'];
-
-            var renderer = new qtek3d.Renderer({
+            var renderer = new qtek.Renderer({
                 canvas : document.getElementById("Main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var compositor = new qtek3d.compositor.Compositor();
+            var compositor = new qtek.compositor.Compositor();
 
             var GLTFLoader = new qtek.loader.GLTF();
 
@@ -27,7 +25,7 @@
             GLTFLoader.on('success', function(scene, cameras) {
                 var camera = cameras[Object.keys(cameras)[0]];
                 if (!camera) {
-                    camera = new qtek3d.camera.Perspective({
+                    camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
                         far : 500
                     });
@@ -37,7 +35,7 @@
                 }
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
-                var control = new qtek3d.plugin.OrbitControl({
+                var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4
@@ -48,19 +46,19 @@
 
                 var light = scene.getNode("Spot").children()[0];
 
-                scene.add(new qtek3d.light.Ambient({
+                scene.add(new qtek.light.Ambient({
                     intensity : 0.4
                 }));
 
-                var sceneNode = new qtek3d.compositor.SceneNode({
+                var sceneNode = new qtek.compositor.SceneNode({
                     scene : scene,
                     camera : camera,
                     outputs : {
                         depth : {
                             attachment : "DEPTH_ATTACHMENT",
                             parameters : {
-                                format : qtek3d.Texture.DEPTH_COMPONENT,
-                                type : qtek3d.Texture.UNSIGNED_SHORT,
+                                format : qtek.Texture.DEPTH_COMPONENT,
+                                type : qtek.Texture.UNSIGNED_SHORT,
                                 width : renderer.width,
                                 height : renderer.height
                             }
@@ -74,7 +72,7 @@
                         }
                     }
                 });
-                var SSAO = new qtek3d.compositor.Node({
+                var SSAO = new qtek.compositor.Node({
                     shader : SSAOShader,
                     inputs : {
                         depthTexture : {
@@ -96,7 +94,7 @@
                         }
                     }
                 });
-                var FXAA = new qtek3d.compositor.Node({
+                var FXAA = new qtek.compositor.Node({
                     shader : FXAAShader,
                     inputs : {
                         texture : {
