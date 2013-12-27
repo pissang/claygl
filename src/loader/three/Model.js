@@ -22,7 +22,7 @@ define(function(require) {
     var Joint = require("../../Joint");
     var Vector3 = require("../../math/Vector3");
     var Quaternion = require("../../math/Quaternion");
-    var glenum = require('../../glenum');
+    var glenum = require('../../core/glenum');
     var _ = require("_");
 
     var glMatrix = require("glmatrix");

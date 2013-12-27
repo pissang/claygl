@@ -16,7 +16,7 @@ define(function() {
 
     var extensions = {};
 
-    var WebGLInfo = {
+    var glinfo = {
 
         initialize : function(_gl) {
 
@@ -49,5 +49,5 @@ define(function() {
         }
     }
 
-    return WebGLInfo;
+    return glinfo;
 })

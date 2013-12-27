@@ -4,13 +4,15 @@ define(function(require) {
     var Pass = require("./Pass");
     var FrameBuffer = require("../FrameBuffer");
     var texturePool = require("./texturePool");
-    var WebGLInfo = require('../WebGLInfo');
+    var glinfo = require('../core/glinfo');
 
     var SceneNode = Node.derive(function() {
         return {
             name : 'scene',
             scene : null,
-            camera : null
+            camera : null,
+            autoUpdateScene : true,
+            preZ : false
         }
     }, function() {
         if (this.frameBuffer) {
@@ -42,7 +44,7 @@ define(function(require) {
 
                 // MRT Support in chrome
                 // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-                var ext = WebGLInfo.getExtension(_gl, "EXT_draw_buffers");
+                var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
                 if (ext) {
                     var bufs = [];
                     for (var attachment in this.outputs) {
@@ -54,7 +56,7 @@ define(function(require) {
                     ext.drawBuffersEXT(bufs);
                 }
 
-                renderer.render(this.scene, this.camera);
+                renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
 
                 frameBuffer.unbind(renderer);
             }

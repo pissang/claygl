@@ -24,7 +24,7 @@ define(function(require) {
     var PointLight = require("../light/Point");
     var SpotLight = require("../light/Spot");
     var DirectionalLight = require("../light/Directional");
-    var glenum = require("../glenum");
+    var glenum = require("../core/glenum");
 
     var Vector3 = require("../math/Vector3");
     var Quaternion = require("../math/Quaternion");
@@ -128,6 +128,8 @@ define(function(require) {
                 self.trigger("success", {
                     scene : scene,
                     cameras : lib.cameras,
+                    textures : lib.textures,
+                    materials : lib.materials,
                     skeleton : lib.skeleton
                 });
             }
@@ -135,6 +137,8 @@ define(function(require) {
             return {
                 scene : scene,
                 cameras : lib.cameras,
+                textures : lib.textures,
+                materials : lib.materials,
                 skeleton : lib.skeleton
             }
         },

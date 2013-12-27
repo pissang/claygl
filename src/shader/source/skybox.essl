@@ -24,12 +24,15 @@ varying vec3 v_WorldPosition;
 
 void main()
 {
-    
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);
 
-    vec3 color = textureCube(environmentMap, viewDirection).xyz;
+    vec3 tex = textureCube(environmentMap, viewDirection).xyz;
 
-    gl_FragColor = vec4(color, 1.0);
+    #ifdef SRGB_DECODE
+        tex.rgb = pow(tex.rgb, vec3(2.2));
+    #endif
+    
+    gl_FragColor = vec4(tex, 1.0);
 }
 @end

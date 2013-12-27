@@ -1,7 +1,7 @@
 define(function(require) {
     
     var Texture2D = require('../texture/Texture2D');
-    var glenum = require('../glenum');
+    var glenum = require('../core/glenum');
     var _ = require('_');
 
     var pool = {};

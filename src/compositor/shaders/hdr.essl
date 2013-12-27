@@ -52,14 +52,14 @@ varying vec2 v_Texcoord;
 uniform sampler2D adaptedLum;
 uniform sampler2D currentLum;
 
-uniform float frameTime : 0.05;
+uniform float frameTime : 0.02;
 
 void main()
 {
     float fAdaptedLum = texture2D(adaptedLum, vec2(0.5, 0.5)).r;
     float fCurrentLum = exp(texture2D(currentLum, vec2(0.5, 0.5)).r);
 
-    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));
+    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 60.0 * frameTime));
     gl_FragColor.rgb = vec3(fAdaptedLum);
     gl_FragColor.a = 1.0;
 }
@@ -111,7 +111,7 @@ void main()
     // From KlayGE
     #ifdef LUM_ENABLED
         float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
-        float adaptedLumDest = 1.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
+        float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
         float exposureBias = adaptedLumDest * 1.6;
     #else
         float exposureBias = 1.0;

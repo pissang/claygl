@@ -1,7 +1,7 @@
 define(function(require) {
 
     var Texture = require('../Texture');
-    var WebGLInfo = require('../WebGLInfo');
+    var glinfo = require('../core/glinfo');
     var _ = require('_');
 
     var targetMap = {
@@ -48,7 +48,7 @@ define(function(require) {
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.magFilter);
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.minFilter);
             
-            var anisotropicExt = WebGLInfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
+            var anisotropicExt = glinfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }

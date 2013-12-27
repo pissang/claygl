@@ -6,7 +6,7 @@ define(function(require) {
 
     var Base = require("./core/Base");
     var util = require("./core/util");
-    var glenum = require("./glenum");
+    var glenum = require("./core/glenum");
     var _ = require("_");
 
     var Texture = Base.derive(function() {

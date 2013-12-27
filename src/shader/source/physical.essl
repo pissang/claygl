@@ -1,0 +1,282 @@
+
+// http://blog.selfshadow.com/publications/s2013-shading-course/
+
+@export buildin.physical.vertex
+
+@import buildin.phong.vertex
+
+@end
+
+
+@export buildin.physical.fragment
+
+uniform mat4 viewInverse : VIEWINVERSE;
+
+varying vec2 v_Texcoord;
+varying vec3 v_LocalNormal;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+varying vec3 v_Weight;
+
+uniform sampler2D diffuseMap;
+uniform sampler2D normalMap;
+uniform samplerCube environmentMap;
+
+uniform vec3 color : [1.0, 1.0, 1.0];
+uniform float alpha : 1.0;
+
+uniform float glossiness : 0.2;
+
+uniform vec3 specularColor : [1.0, 1.0, 1.0];
+uniform vec3 emission : [0.0, 0.0, 0.0];
+
+uniform float reflectivity : 0.5;
+
+// Uniforms for wireframe
+uniform float lineWidth : 0.0;
+uniform vec3 lineColor : [0.0, 0.0, 0.0];
+varying vec3 v_Barycentric;
+
+#ifdef AMBIENT_LIGHT_NUMBER
+@import buildin.header.ambient_light
+#endif
+#ifdef POINT_LIGHT_NUMBER
+@import buildin.header.point_light
+#endif
+#ifdef DIRECTIONAL_LIGHT_NUMBER
+@import buildin.header.directional_light
+#endif
+#ifdef SPOT_LIGHT_NUMBER
+@import buildin.header.spot_light
+#endif
+
+#extension GL_OES_standard_derivatives : enable
+
+// Import util functions and uniforms needed
+@import buildin.util.calculate_attenuation
+
+@import buildin.util.edge_factor
+
+@import buildin.plugin.compute_shadow_map
+
+
+float G_Smith(float roughness, float NoV, float NoL)
+{
+    // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
+    float k = roughness * roughness / 2.0;
+    float G1V = NoV / (NoV * (1.0 - k) + k);
+    float G1L = NoL / (NoL * (1.0 - k) + k);
+    return G1L * G1V;
+}
+
+float F_Schlick(float NoL) {
+    return specularColor + (1.0 - specularColor) * pow(1.0 - NoL, 5.0);
+}
+
+float D_Phong() {
+
+}
+
+float D_GGX() {
+    
+}
+
+void main()
+{
+    #ifdef RENDER_WEIGHT
+        gl_FragColor = vec4(v_Weight.xyz, 1.0);
+        return;
+    #endif
+    #ifdef RENDER_TEXCOORD
+        gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
+        return;
+    #endif
+
+    vec4 finalColor = vec4(color, alpha);
+
+    vec3 eyePos = viewInverse[3].xyz;
+    vec3 V = normalize(eyePos - v_WorldPosition);
+
+    #ifdef DIFFUSEMAP_ENABLED
+        vec4 tex = texture2D(diffuseMap, v_Texcoord);
+        #ifdef SRGB_DECODE
+            tex.rgb = pow(tex.rgb, vec3(2.2));
+        #endif
+        finalColor.rgb *= tex.rgb;
+        #ifdef DIFFUSEMAP_USE_ALPHA
+            finalColor.a *= tex.a;
+        #endif
+    #endif
+
+    vec3 N = v_Normal;
+    #ifdef NORMALMAP_ENABLED
+        N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+        N = normalize(tbn * N);
+    #endif
+
+    #ifdef RENDER_NORMAL
+        gl_FragColor = vec4(normal, 1.0);
+        return;
+    #endif
+
+    float NoV = dot(N, V);
+
+    // Diffuse part of all lights
+    vec3 diffuseItem = vec3(0.0, 0.0, 0.0);
+    // Specular part of all lights
+    vec3 specularItem = vec3(0.0, 0.0, 0.0);
+    
+    #ifdef AMBIENT_LIGHT_NUMBER
+        for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+        {
+            diffuseItem += ambientLightColor[i];
+        }
+    #endif
+    #ifdef POINT_LIGHT_NUMBER
+        #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+            float shadowContribs[POINT_LIGHT_NUMBER];
+            if(shadowEnabled)
+            {
+                computeShadowOfPointLights(v_WorldPosition, shadowContribs);
+            }
+        #endif
+        for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+        {
+
+            vec3 lightPosition = pointLightPosition[i];
+            vec3 lightColor = pointLightColor[i];
+            float range = pointLightRange[i];
+
+            vec3 L = lightPosition - v_WorldPosition;
+
+            // Calculate point light attenuation
+            float dist = length(L);
+            float attenuation = calculateAttenuation(dist, range); 
+
+            // Normalize vectors
+            L /= dist;
+
+            float shadowContrib = 1.0;
+            #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+                if(shadowEnabled)
+                {
+                    shadowContrib = shadowContribs[i];
+                }
+            #endif
+
+            diffuseItem += lightColor * ndl * attenuation * shadowContrib;
+
+            if (glossiness > 0.0)
+            {
+                specularItem += lightColor * ndl * pow(ndh, glossiness) * attenuation * shadowContrib;
+            }
+        }
+    #endif
+
+    #ifdef DIRECTIONAL_LIGHT_NUMBER
+        #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+            float shadowContribs[DIRECTIONAL_LIGHT_NUMBER];
+            if(shadowEnabled)
+            {
+                computeShadowOfDirectionalLights(v_WorldPosition, shadowContribs);
+            }
+        #endif
+        for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
+        {
+
+            vec3 L = -normalize(directionalLightDirection[i]);
+            vec3 lightColor = directionalLightColor[i];
+
+            vec3 H = normalize(L + V);
+
+            float shadowContrib = 1.0;
+            #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+                if(shadowEnabled)
+                {
+                    shadowContrib = shadowContribs[i];
+                }
+            #endif
+
+            diffuseItem += lightColor * ndl * shadowContrib;
+
+            if (glossiness > 0.0)
+            {
+                specularItem += lightColor * ndl * pow(ndh, glossiness) * shadowContrib;
+            }
+        }
+    #endif
+
+    #ifdef SPOT_LIGHT_NUMBER
+        #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+            float shadowContribs[SPOT_LIGHT_NUMBER];
+            if(shadowEnabled)
+            {
+                computeShadowOfSpotLights(v_WorldPosition, shadowContribs);
+            }
+        #endif
+        for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+        {
+            vec3 lightPosition = spotLightPosition[i];
+            vec3 spotLightDirection = -normalize(spotLightDirection[i]);
+            vec3 lightColor = spotLightColor[i];
+            float range = spotLightRange[i];
+            float umbraAngleCosine = spotLightUmbraAngleCosine[i];
+            float penumbraAngleCosine = spotLightPenumbraAngleCosine[i];
+            float falloffFactor = spotLightFalloffFactor[i];
+
+            vec3 lightDirection = lightPosition - v_WorldPosition;
+            // Calculate attenuation
+            float dist = length(lightDirection);
+            float attenuation = calculateAttenuation(dist, range); 
+
+            // Normalize light direction
+            lightDirection /= dist;
+            // Calculate spot light fall off
+            float lightDirectCosine = dot(spotLightDirection, lightDirection);
+
+            float falloff;
+            // Fomular from real-time-rendering
+            falloff = clamp((lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine), 0.0, 1.0);
+            falloff = pow(falloff, falloffFactor);
+
+            vec3 halfVector = normalize(lightDirection + viewDirection);
+
+
+            float shadowContrib = 1.0;
+            #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+                if (shadowEnabled)
+                {
+                    shadowContrib = shadowContribs[i];
+                }
+            #endif
+
+            diffuseItem += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
+
+            if (glossiness > 0.0)
+            {
+                specularItem += lightColor * ndl * pow(ndh, glossiness) * attenuation * (1.0-falloff) * shadowContrib;
+            }
+        }
+    #endif
+
+    finalColor.rgb *= diffuseItem;
+    finalColor.rgb += specularItem * specular;
+    finalColor.rgb += emission;
+
+    #ifdef ENVIRONMENTMAP_ENABLED
+        vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+        finalColor.rgb = finalColor.rgb + envTex * reflectivity;
+    #endif
+
+    if(lineWidth > 0.01)
+    {
+        finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+    }
+
+    gl_FragColor = finalColor;
+}
+
+@end

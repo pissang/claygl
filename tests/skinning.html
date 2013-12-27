@@ -88,11 +88,11 @@
                 var shadowMapPass = new qtek.prePass.ShadowMap();
 
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek.Scene,
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.three.Model();

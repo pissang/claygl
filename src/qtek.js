@@ -48,7 +48,6 @@ define( function(require){
 	"Skeleton": require('Skeleton'),
 	"Stage": require('Stage'),
 	"Texture": require('Texture'),
-	"WebGLInfo": require('WebGLInfo'),
 	"animation": {
 		"Animation": require('animation/Animation'),
 		"Clip": require('animation/Clip'),
@@ -72,7 +71,10 @@ define( function(require){
 		"Base": require('core/Base'),
 		"Cache": require('core/Cache'),
 		"Event": require('core/Event'),
+		"async": require('core/async'),
 		"color": require('core/color'),
+		"glenum": require('core/glenum'),
+		"glinfo": require('core/glinfo'),
 		"mixin": {
 			"derive": require('core/mixin/derive'),
 			"notifier": require('core/mixin/notifier')
@@ -88,7 +90,6 @@ define( function(require){
 		"Plane": require('geometry/Plane'),
 		"Sphere": require('geometry/Sphere')
 	},
-	"glenum": require('glenum'),
 	"light": {
 		"Ambient": require('light/Ambient'),
 		"Directional": require('light/Directional'),

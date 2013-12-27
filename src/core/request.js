@@ -34,12 +34,7 @@ define(function(require) {
         xhr.send(null);
     }
 
-    function put(options) {
-
-    }
-
     return {
-        get : get,
-        put : put
+        get : get
     }
 })

@@ -3,8 +3,8 @@ define(function(require) {
     var Base = require("./core/Base");
     var Texture2D = require("./texture/Texture2D");
     var TextureCube = require("./texture/TextureCube");
-    var WebGLInfo = require('./WebGLInfo');
-    var glenum = require("./glenum");
+    var glinfo = require('./core/glinfo');
+    var glenum = require("./core/glenum");
 
     var FrameBuffer = Base.derive(function() {
 
@@ -116,7 +116,7 @@ define(function(require) {
             
             if (attachment === _gl.DEPTH_ATTACHMENT) {
 
-                var extension = WebGLInfo.getExtension(_gl, "WEBGL_depth_texture");
+                var extension = glinfo.getExtension(_gl, "WEBGL_depth_texture");
 
                 if (!extension) {
                     console.error(" Depth texture is not supported by the browser ");

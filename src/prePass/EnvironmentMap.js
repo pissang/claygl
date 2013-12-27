@@ -3,7 +3,7 @@ define(function (require) {
     var Base = require('../core/Base');
     var Vector3 = require('../math/Vector3');
     var PerspectiveCamera = require('../camera/Perspective');
-    var glenum = require("../glenum");
+    var glenum = require("../core/glenum");
     var FrameBuffer = require("../FrameBuffer");
     var TextureCube = require("../texture/TextureCube");
 

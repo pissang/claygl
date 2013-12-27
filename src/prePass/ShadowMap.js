@@ -1,6 +1,7 @@
 define(function(require) {
 
     var Base = require("../core/Base");
+    var glenum = require("../core/glenum");
     var Vector3 = require("../math/Vector3");
     var BoundingBox = require("../math/BoundingBox");
     var Frustum = require("../math/Frustum");
@@ -16,7 +17,6 @@ define(function(require) {
     var FrameBuffer = require("../FrameBuffer");
     var Texture2D = require("../texture/Texture2D");
     var TextureCube = require("../texture/TextureCube");
-    var glenum = require("../glenum");
     var PerspectiveCamera = require("../camera/Perspective");
     var OrthoCamera = require("../camera/Orthographic");
 

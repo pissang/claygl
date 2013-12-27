@@ -36,23 +36,9 @@ void main()
     vec3 skinnedNormal = normal;
 
     #ifdef SKINNING
-        mat4 skinMatrix;
-        if (joint.x >= 0.0)
-        {
-            skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
-        }
-        if (joint.y >= 0.0)
-        {
-            skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
-        }
-        if (joint.z >= 0.0)
-        {
-            skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
-        }
-        if (joint.w >= 0.0)
-        {
-            skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
-        }
+        
+        @import buildin.chunk.skin_matrix
+
         skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
         // Normal matrix ???
         skinnedNormal = (skinMatrix * vec4(normal, 0.0)).xyz;
@@ -133,16 +119,16 @@ void main()
         return;
     #endif
 
-
     gl_FragColor = vec4(color, alpha);
 
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D( diffuseMap, v_Texcoord );
-        // http://freesdk.crydev.net/display/SDKDOC3/Specular+Maps
+        #ifdef SRGB_DECODE
+            tex.rgb = pow(tex.rgb, vec3(2.2));
+        #endif
         gl_FragColor.rgb *= tex.rgb;
-        
         #ifdef DIFFUSEMAP_USE_ALPHA
-            finalColor.a *= tex.a;
+            gl_FragColor.a *= tex.a;
         #endif
     #endif
 

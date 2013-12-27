@@ -5,8 +5,8 @@ define(function(require) {
     var Light = require("./Light");
     var Mesh = require("./Mesh");
     var Texture = require("./Texture");
-    var WebGLInfo = require('./WebGLInfo');
-    var glenum = require('./glenum');
+    var glinfo = require('./core/glinfo');
+    var glenum = require('./core/glenum');
     var BoundingBox = require('./math/BoundingBox');
     var Matrix4 = require('./math/Matrix4');
     var Shader = require('./Shader');
@@ -80,7 +80,7 @@ define(function(require) {
             this.height = this.canvas.height;
             this.resize(this.width, this.height);
 
-            WebGLInfo.initialize(this.gl);
+            glinfo.initialize(this.gl);
         }
         catch(e) {
             throw "Error creating WebGL Context";

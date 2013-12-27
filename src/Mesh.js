@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     var Node = require("./Node");
-    var glenum = require("./glenum");
+    var glenum = require("./core/glenum");
     var Vector3 = require("./math/Vector3");
 
     // Cache

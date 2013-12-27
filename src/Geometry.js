@@ -11,7 +11,7 @@ define(function(require) {
     var util = require("./core/util");
     var Vector3 = require("./math/Vector3");
     var BoundingBox = require("./math/BoundingBox");
-    var glenum = require("./glenum");
+    var glenum = require("./core/glenum");
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
