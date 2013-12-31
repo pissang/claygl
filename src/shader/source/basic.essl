@@ -70,7 +70,7 @@ void main()
             tex.rgb = pow(tex.rgb, vec3(2.2));
         #endif
         
-        #if defined(DIFFUSEMAP_USE_ALPHA)
+        #if defined(DIFFUSEMAP_ALPHA_ALPHA)
             gl_FragColor.a = tex.a;
         #endif
 

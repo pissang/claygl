@@ -127,7 +127,7 @@ void main()
             tex.rgb = pow(tex.rgb, vec3(2.2));
         #endif
         gl_FragColor.rgb *= tex.rgb;
-        #ifdef DIFFUSEMAP_USE_ALPHA
+        #ifdef DIFFUSEMAP_ALPHA_ALPHA
             gl_FragColor.a *= tex.a;
         #endif
     #endif
@@ -160,7 +160,7 @@ void main()
 
             // Calculate point light attenuation
             float dist = length(lightDirection);
-            float attenuation = calculateAttenuation(dist, range);
+            float attenuation = lightAttenuation(dist, range);
 
             // Normalize vectors
             lightDirection /= dist;
@@ -219,22 +219,22 @@ void main()
             vec3 spotLightDirection = -normalize( spotLightDirection[i] );
             vec3 lightColor = spotLightColor[i];
             float range = spotLightRange[i];
-            float umbraAngleCosine = spotLightUmbraAngleCosine[i];
-            float penumbraAngleCosine = spotLightPenumbraAngleCosine[i];
+            float a = spotLightUmbraAngleCosine[i];
+            float b = spotLightPenumbraAngleCosine[i];
             float falloffFactor = spotLightFalloffFactor[i];
 
             vec3 lightDirection = lightPosition - v_WorldPosition;
             // Calculate attenuation
             float dist = length(lightDirection);
-            float attenuation = calculateAttenuation(dist, range); 
+            float attenuation = lightAttenuation(dist, range); 
 
             // Normalize light direction
             lightDirection /= dist;
             // Calculate spot light fall off
-            float lightDirectCosine = dot(spotLightDirection, lightDirection);
+            float c = dot(spotLightDirection, lightDirection);
 
             float falloff;
-            falloff = clamp((lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine), 0.0, 1.0);
+            falloff = clamp((c - a) /( b - a), 0.0, 1.0);
             falloff = pow(falloff, falloffFactor);
 
             float ndl = dot(v_Normal, lightDirection);

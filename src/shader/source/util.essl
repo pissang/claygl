@@ -4,7 +4,7 @@
 
 uniform float attenuationFactor : 5.0;
 
-float calculateAttenuation(float dist, float range)
+float lightAttenuation(float dist, float range)
 {
     float attenuation = 1.0;
     if( range > 0.0)

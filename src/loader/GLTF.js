@@ -28,10 +28,11 @@ define(function(require) {
 
     var Vector3 = require("../math/Vector3");
     var Quaternion = require("../math/Quaternion");
+    var BoundingBox = require('../math/BoundingBox');
     
     var _ = require("_");
 
-    var InstantGeometry = require("./InstantGeometry");
+    var StaticGeometry = require("../StaticGeometry");
 
     var glMatrix = require("glmatrix");
     var vec4 = glMatrix.vec4;
@@ -43,7 +44,8 @@ define(function(require) {
         'POSITION' : 'position',
         'TEXCOORD_0' : 'texcoord0',
         'WEIGHT' : 'weight',
-        'JOINT' : 'joint'
+        'JOINT' : 'joint',
+        'COLOR' : 'color'
     }
 
     var Loader = Base.derive(function() {
@@ -373,18 +375,18 @@ define(function(require) {
         _parseMeshes : function(json, lib) {
             var self = this;
 
-            for (var name in json.meshes) {
+            var meshKeys = Object.keys(json.meshes);
+            for (var nn = 0; nn < meshKeys.length; nn++) {
+                var name = meshKeys[nn];
                 var meshInfo = json.meshes[name];
 
                 lib.meshes[name] = [];
                 // Geometry
-                for (var i = 0; i < meshInfo.primitives.length; i++) {
-                    var geometry = new InstantGeometry();
-                    var chunk = {
-                        attributes : {},
-                        indices : null
-                    };
-                    var primitiveInfo = meshInfo.primitives[i];
+                for (var pp = 0; pp < meshInfo.primitives.length; pp++) {
+                    var primitiveInfo = meshInfo.primitives[pp];
+                    var geometry = new StaticGeometry({
+                        boundingBox : new BoundingBox()
+                    });
                     // Parse indices
                     if (json.indices) {
                         // DEPRECATED
@@ -397,8 +399,7 @@ define(function(require) {
                     var buffer = lib.buffers[bufferViewInfo.buffer];
                     var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
 
-                    var byteLength = indicesInfo.count * 2; //two byte each index
-                    chunk.indices = new Uint16Array(buffer.slice(byteOffset, byteOffset+byteLength));
+                    geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);
 
                     // DEPRECATED
                     // https://github.com/KhronosGroup/glTF/issues/162
@@ -406,7 +407,9 @@ define(function(require) {
                         primitiveInfo.attributes = primitiveInfo.semantics
                     }
                     // Parse attributes
-                    for (var semantic in primitiveInfo.attributes) {
+                    var semantics = Object.keys(primitiveInfo.attributes);
+                    for (var ss = 0; ss < semantics.length; ss++) {
+                        var semantic = semantics[ss];
                         var accessorName = primitiveInfo.attributes[semantic];
                         if (json.attributes) {
                             // DEPRECATED
@@ -416,34 +419,35 @@ define(function(require) {
                             var attributeInfo = json.accessors[accessorName];
                         }
                         var attributeName = semanticAttributeMap[semantic];
+                        if (!attributeName) {
+                            continue;
+                        }
                         var attributeType = attributeInfo.type;
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
                         var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
-                        var byteLength = attributeInfo.count * attributeInfo.byteStride;
 
                         if (typeof(attributeType) === 'string') {
                             // DEPRECATED
                             attributeType = glenum[attributeType];
                         }
-                        // TODO : Support more types
                         switch(attributeType) {
-                            case glenum.FLOAT_VEC2:
+                            case 0x8B50:     // FLOAT_VEC2
                                 var size = 2;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case glenum.FLOAT_VEC3:
+                            case 0x8B51:     // FLOAT_VEC3
                                 var size = 3;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case glenum.FLOAT_VEC4:
+                            case 0x8B52:     // FLOAT_VEC4
                                 var size = 4;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
                                 break;
-                            case glenum.FLOAT:
+                            case 0x1406:     // FLOAT
                                 var size = 1;
                                 var type = 'float';
                                 var arrayConstructor = Float32Array;
@@ -452,12 +456,8 @@ define(function(require) {
                                 console.warn("Attribute type "+attributeInfo.type+" not support yet");
                                 break;
                         }
-                        chunk.attributes[attributeName] = {
-                            type : type,
-                            size : size,
-                            semantic : semantic,
-                            array : new arrayConstructor(buffer.slice(byteOffset, byteOffset+byteLength))
-                        };
+                        var attributeArray = new arrayConstructor(buffer, byteOffset, attributeInfo.count * size);
+                        geometry.attributes[attributeName].value = attributeArray;
                         if (semantic === 'POSITION') {
                             // Bounding Box
                             var min = attributeInfo.min;
@@ -470,15 +470,14 @@ define(function(require) {
                             }
                         }
                     }
-                    geometry.addChunk(chunk);
 
                     var material = lib.materials[primitiveInfo.material];
                     var mesh = new Mesh({
-                        geometry : geometry.convertToGeometry(),
+                        geometry : geometry,
                         material : material
                     });
                     if (material.shader.isTextureEnabled('normalMap')) {
-                        if (!mesh.geometry.attributes.tangent.value.length) {
+                        if (!mesh.geometry.attributes.tangent.value) {
                             mesh.geometry.generateTangents();
                         }
                     }
@@ -493,9 +492,10 @@ define(function(require) {
                     }
                     if (meshInfo.name) {
                         if (meshInfo.primitives.length > 1) {
-                            mesh.name = [name, i].join('-');
+                            mesh.name = [name, pp].join('-');
                         }
                         else {
+                            // PENDING name or meshInfo.name ?
                             mesh.name = name;
                         }
                     }

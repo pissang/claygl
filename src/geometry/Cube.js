@@ -1,7 +1,7 @@
 
 define(function(require) {
 
-    var Geometry = require('../Geometry');
+    var DynamicGeometry = require('../DynamicGeometry');
     var Plane = require('./Plane');
     var Matrix4 = require('../math/Matrix4');
     var Vector3 = require('../math/Vector3');
@@ -9,7 +9,7 @@ define(function(require) {
 
     var planeMatrix = new Matrix4();
     
-    var Cube = Geometry.derive(function() {
+    var Cube = DynamicGeometry.derive(function() {
 
         return {
             widthSegments : 1,
@@ -47,7 +47,7 @@ define(function(require) {
                     self.faces.push([face[0]+cursor, face[1]+cursor, face[2]+cursor]);
                 }
             });
-            cursor += planes[pos].getVerticesNumber();
+            cursor += planes[pos].getVertexNumber();
         }
 
         this.boundingBox = new BoundingBox();

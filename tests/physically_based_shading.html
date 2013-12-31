@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="Main"></canvas>
+        <script>
+            require(['qtek'], function(qtek) {
+                var renderer = new qtek.Renderer({
+                    canvas : document.getElementById('Main')
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.width / renderer.height
+                });
+                camera.position.set(0, 0, 10);
+
+                var scene = new qtek.Scene();
+                scene.add(camera);
+
+                sphereGeo = new qtek.geometry.Sphere({
+                    widthSegments : 100,
+                    heightSegments : 100
+                });
+
+                for (var i = 0; i < 10; i++) {
+                    var material = new qtek.Material({
+                        shader : qtek.shader.library.get('buildin.physical')
+                    });
+                    material.set('color', [0.7, 0.0, 0.0]);
+                    material.set('specularColor', [0.1, 0.1, 0.1]);
+                    material.set('gloss', (i+1) / 10);
+                    var mesh = new qtek.Mesh({
+                        material : material,
+                        geometry :sphereGeo
+                    });
+                    mesh.position.set((i - 5) * 2.1, 0, 0);
+                    scene.add(mesh);
+                }
+                var light = new qtek.light.Directional();
+                light.position.set(1, 4, 4);
+                light.lookAt(qtek.math.Vector3.ZERO);
+                scene.add(light);
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function() {
+                    renderer.render(scene, camera);
+                });
+            });
+        </script>
+    </body>
+</html>

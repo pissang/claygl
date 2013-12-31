@@ -34,6 +34,7 @@ define( function(require){
 		"util": require('2d/util')
 	},
 	"Camera": require('Camera'),
+	"DynamicGeometry": require('DynamicGeometry'),
 	"FrameBuffer": require('FrameBuffer'),
 	"Geometry": require('Geometry'),
 	"Joint": require('Joint'),
@@ -47,6 +48,7 @@ define( function(require){
 	"Shader": require('Shader'),
 	"Skeleton": require('Skeleton'),
 	"Stage": require('Stage'),
+	"StaticGeometry": require('StaticGeometry'),
 	"Texture": require('Texture'),
 	"animation": {
 		"Animation": require('animation/Animation'),
@@ -68,10 +70,10 @@ define( function(require){
 		"texturePool": require('compositor/texturePool')
 	},
 	"core": {
+		"Async": require('core/Async'),
 		"Base": require('core/Base'),
 		"Cache": require('core/Cache'),
 		"Event": require('core/Event'),
-		"async": require('core/async'),
 		"color": require('core/color'),
 		"glenum": require('core/glenum'),
 		"glinfo": require('core/glinfo'),
@@ -99,7 +101,6 @@ define( function(require){
 	"loader": {
 		"FX": require('loader/FX'),
 		"GLTF": require('loader/GLTF'),
-		"InstantGeometry": require('loader/InstantGeometry'),
 		"SVG": require('loader/SVG'),
 		"three": {
 			"Model": require('loader/three/Model')

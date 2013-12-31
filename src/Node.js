@@ -40,7 +40,12 @@ define(function(require) {
             _needsUpdateWorldTransform : true,
 
             // Depth for transparent queue sorting
-            __depth : 0
+            __depth : 0,
+
+            // __matrices : {
+            //     worldView : mat4.create(),
+            //     worldViewProjection : mat4.create()
+            // }
         }
     }, {
 
@@ -68,13 +73,8 @@ define(function(require) {
             node.parent = this;
             this._children.push(node);
 
-            var scene = this.scene;
-
-            if (scene) {
-                node.traverse(function(n) {
-                    scene.addToScene(n);
-                    n.scene = scene;
-                });
+            if (this.scene !== node.scene) {
+                node.traverse(this._addSelfToScene, this);
             }
         },
 
@@ -82,14 +82,30 @@ define(function(require) {
             this._children.splice(this._children.indexOf(node), 1);
             node.parent = null;
 
-            var scene = this.scene;
-
-            if (scene) {
-                node.traverse(function(n) {
-                    scene.removeFromScene(n);
-                    n.scene = null;
-                });
+            if (this.scene) {
+                node.traverse(this._removeSelfFromScene, this);
             }
+        },
+
+        _removeSelfFromScene : function(descendant) {
+            descendant.scene.removeFromScene(descendant);
+            descendant.scene = null;
+        },
+
+        _addSelfToScene : function(descendant, parent) {
+            parent.scene.addToScene(descendant);
+            descendant.scene = parent.scene;
+        },
+
+        isAscendant : function(node) {
+            var parent = node.parent;
+            while(parent) {
+                if (parent === this) {
+                    return true;
+                }
+                parent = parent.parent;
+            }
+            return false;
         },
 
         children : function() {

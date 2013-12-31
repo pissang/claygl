@@ -5,7 +5,7 @@ define(function(require) {
     var Node = require('../Node');
     var Vector3 = require('../math/Vector3');
 
-    var Geometry = require('../Geometry');
+    var DynamicGeometry = require('../DynamicGeometry');
     var Mesh = require('../Mesh');
     var Material = require('../Material');
     var Shader = require('../Shader');
@@ -21,9 +21,7 @@ define(function(require) {
 
             duration : 1,
 
-            geometry : new Geometry({
-                hint : Geometry.DYNAMIC_DRAW
-            }),
+            geometry : new DynamicGeometry(),
             material : null,
 
             mode : Mesh.POINTS,

@@ -5,6 +5,7 @@ define(function(require) {
     var Node = require("./Node");
     var glenum = require("./core/glenum");
     var Vector3 = require("./math/Vector3");
+    var StaticGeometry = require('./StaticGeometry');
 
     // Cache
     var prevDrawID = 0;
@@ -81,7 +82,7 @@ define(function(require) {
                 shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
             }
 
-            var vertexNumber = geometry.getVerticesNumber();
+            var vertexNumber = geometry.getVertexNumber();
             renderInfo.vertexNumber = vertexNumber;
             renderInfo.faceNumber = 0;
             renderInfo.drawCallNumber = 0;
@@ -109,8 +110,8 @@ define(function(require) {
                 }
                 renderInfo.drawCallNumber = 1;
             } else {
-                // Use the cache in STATIC_DRAW mode
-                // TODO : machanism to change to the DYNAMIC_DRAW mode automatically
+                // Use the cache of StaticGeometry
+                // TODO : machanism to change to the DynamicGeometry automatically
                 // when the geometry is not static any more
                 var drawDetails = this._drawCache[currentDrawID];
                 if (!drawDetails) {
@@ -149,7 +150,7 @@ define(function(require) {
                         );
                         drawDetails.push(drawDetail);
                     }
-                    if (geometry.hint === glenum.STATIC_DRAW) {
+                    if (geometry instanceof StaticGeometry) {
                         this._drawCache[currentDrawID] = drawDetails;
                     }
                 }

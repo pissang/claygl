@@ -21,12 +21,11 @@ define(function(require) {
          * Merge multiple meshes to one.
          * Note that these meshes must have the same material
          */
-        merge : function(meshes, clone) {
+        merge : function(meshes, applyWorldTransform) {
 
             if (! meshes.length) {
                 return;
             }
-            var clone = typeof(clone) === "undefined" ? true : clone;
 
             var templateMesh = meshes[0];
             var templateGeo = templateMesh.geometry;
@@ -38,10 +37,16 @@ define(function(require) {
                 console.warn("Material of meshes to merge is not the same, program will use the material of first mesh by default");
             }
 
-            var geometry = new Geometry,
-                faces = geometry.faces;
+            var geometry = new Geometry;
+            var faces = geometry.faces;
 
-            for (var name in templateGeo.attributes) {
+            var attributeNames = Object.keys(templateGeo.attributes);
+            attributeNames = attributeNames.filter(function(key) {
+                return templateGeo.attributes[key].value.length > 0
+            });
+
+            for (var i = 0; i < attributeNames.length; i++) {
+                var name = attributeNames[i];
                 var attr = templateGeo.attributes[name];
                 // Extend custom attributes
                 if (! geometry.attributes[name]) {
@@ -52,19 +57,21 @@ define(function(require) {
                 }
             }
 
-
             var faceOffset = 0;
             var useFaces = templateGeo.faces.length !== 0;
-                
+            
+            var inverseTransposeMatrix = mat4.create();
             for (var k = 0; k < meshes.length; k++) {
                 var mesh = meshes[k];  
                 var currentGeo = mesh.geometry;
 
-                mesh.updateLocalTransform();
-                var vertexCount = currentGeo.getVerticesNumber();
+                var vertexCount = currentGeo.getVertexNumber();
 
-                for (var name in currentGeo.attributes) {
-
+                var matrix = applyWorldTransform ? mesh.worldTransform._array : mesh.localTransform._array;
+                mat4.invert(inverseTransposeMatrix, matrix);
+                mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
+                for (var n = 0; n < attributeNames.length; n++) {
+                    var name = attributeNames[n];
                     var currentAttr = currentGeo.attributes[name];
                     var targetAttr = geometry.attributes[name];
                     // Skip the unused attributes;
@@ -72,22 +79,23 @@ define(function(require) {
                         continue;
                     }
                     for (var i = 0; i < vertexCount; i++) {
-
                         // Transform position, normal and tangent
                         if (name === "position") {
-                            var newValue = cloneValue(currentAttr.value[i]);
-                            vec3.transformMat4(newValue, newValue, mesh.localTransform._array);
+                            var newValue = vec3.create();
+                            vec3.transformMat4(newValue, currentAttr.value[i], matrix);
                             targetAttr.value.push(newValue);   
                         }
                         else if (name === "normal") {
-                            var newValue = cloneValue(currentAttr.value[i]);
-                            targetAttr.value.push(newValue);
+                            var newValue = vec3.create();
+                            vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
+                            targetAttr.value.push(newValue);   
                         }
                         else if (name === "tangent") {
-                            var newValue = cloneValue(currentAttr.value[i]);
-                            targetAttr.value.push(newValue);
-                        }else{
-                            targetAttr.value.push(cloneValue(currentAttr.value[i]));
+                            var newValue = vec3.create();
+                            vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
+                            targetAttr.value.push(newValue);   
+                        } else {
+                            targetAttr.value.push(currentAttr.value[i]);
                         }
 
                     }
@@ -107,13 +115,6 @@ define(function(require) {
                 }
 
                 faceOffset += vertexCount;
-            }
-
-            function cloneValue(val) {
-                if (! clone) {
-                    return val;
-                }
-                return val && Array.prototype.slice.call(val);
             }
 
             return new Mesh({
@@ -240,7 +241,7 @@ define(function(require) {
                     joints : bucket.joints.slice()
                 });
                 var vertexNumber = 0;
-                for (var i = 0; i < geometry.getVerticesNumber(); i++) {
+                for (var i = 0; i < geometry.getVertexNumber(); i++) {
                     newIndices[i] = -1;
                 }
                 for (var f = 0; f < bucket.faces.length; f++) {

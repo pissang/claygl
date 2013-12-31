@@ -1,13 +1,13 @@
 define(function(require) {
 
-    var Geometry = require('../Geometry');
+    var DynamicGeometry = require('../DynamicGeometry');
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
     var BoundingBox = require('../math/BoundingBox');
 
 	// From three.js SphereGeometry
-    var Sphere = Geometry.derive(function() {
+    var Sphere = DynamicGeometry.derive(function() {
 
         return {
             widthSegments : 20,

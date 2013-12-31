@@ -10,6 +10,8 @@
 
 @export buildin.physical.fragment
 
+#define PI 3.14159265358979
+
 uniform mat4 viewInverse : VIEWINVERSE;
 
 varying vec2 v_Texcoord;
@@ -27,9 +29,9 @@ uniform samplerCube environmentMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
-uniform float glossiness : 0.2;
+uniform float gloss : 0.2;
 
-uniform vec3 specularColor : [1.0, 1.0, 1.0];
+uniform vec3 specularColor : [0.1, 0.1, 0.1];
 uniform vec3 emission : [0.0, 0.0, 0.0];
 
 uniform float reflectivity : 0.5;
@@ -62,25 +64,31 @@ varying vec3 v_Barycentric;
 @import buildin.plugin.compute_shadow_map
 
 
-float G_Smith(float roughness, float NoV, float NoL)
+float G_Smith(float gloss, float ndv, float ndl)
 {
     // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
+    float roughness = 1.0 - gloss;
     float k = roughness * roughness / 2.0;
-    float G1V = NoV / (NoV * (1.0 - k) + k);
-    float G1L = NoL / (NoL * (1.0 - k) + k);
+    float G1V = ndv / (ndv * (1.0 - k) + k);
+    float G1L = ndl / (ndl * (1.0 - k) + k);
     return G1L * G1V;
 }
 
-float F_Schlick(float NoL) {
-    return specularColor + (1.0 - specularColor) * pow(1.0 - NoL, 5.0);
+vec3 F_Schlick(float ldn) {
+    return specularColor + (1.0 - specularColor) * pow(1.0 - ldn, 5.0);
 }
 
-float D_Phong() {
-
+float D_Phong(float g, float ndh) {
+    // from black ops 2
+    float a = pow(8192.0, g);
+    return (a + 2.0) / 8.0 * pow(ndh, a);
 }
 
-float D_GGX() {
-    
+float D_GGX(float g, float ndh) {
+    float r = 1.0 - g;
+    float a = r * r;
+    float tmp = ndh * ndh * (a - 1.0) + 1.0;
+    return a / (PI * tmp * tmp);
 }
 
 void main()
@@ -98,6 +106,7 @@ void main()
 
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
+    float g = gloss;
 
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D(diffuseMap, v_Texcoord);
@@ -105,8 +114,11 @@ void main()
             tex.rgb = pow(tex.rgb, vec3(2.2));
         #endif
         finalColor.rgb *= tex.rgb;
-        #ifdef DIFFUSEMAP_USE_ALPHA
+        #ifdef DIFFUSEMAP_ALPHA_ALPHA
             finalColor.a *= tex.a;
+        #endif
+        #ifdef DIFFUSEMAP_ALPHA_GLOSS
+            g = tex.a;
         #endif
     #endif
 
@@ -122,17 +134,17 @@ void main()
         return;
     #endif
 
-    float NoV = dot(N, V);
+    float ndv = dot(N, V);
 
     // Diffuse part of all lights
-    vec3 diffuseItem = vec3(0.0, 0.0, 0.0);
+    vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
-    vec3 specularItem = vec3(0.0, 0.0, 0.0);
+    vec3 specularTerm = vec3(0.0, 0.0, 0.0);
     
     #ifdef AMBIENT_LIGHT_NUMBER
         for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
         {
-            diffuseItem += ambientLightColor[i];
+            diffuseTerm += ambientLightColor[i];
         }
     #endif
     #ifdef POINT_LIGHT_NUMBER
@@ -147,17 +159,19 @@ void main()
         {
 
             vec3 lightPosition = pointLightPosition[i];
-            vec3 lightColor = pointLightColor[i];
+            vec3 lc = pointLightColor[i];
             float range = pointLightRange[i];
 
             vec3 L = lightPosition - v_WorldPosition;
 
             // Calculate point light attenuation
             float dist = length(L);
-            float attenuation = calculateAttenuation(dist, range); 
-
-            // Normalize vectors
+            float attenuation = lightAttenuation(dist, range); 
             L /= dist;
+            vec3 H = normalize(L + V);
+            float ndl = clamp(dot(N, L), 0.0, 1.0);
+            float ndh = clamp(dot(N, H), 0.0, 1.0);
+            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
@@ -167,12 +181,9 @@ void main()
                 }
             #endif
 
-            diffuseItem += lightColor * ndl * attenuation * shadowContrib;
-
-            if (glossiness > 0.0)
-            {
-                specularItem += lightColor * ndl * pow(ndh, glossiness) * attenuation * shadowContrib;
-            }
+            vec3 li = lc * ndl * attenuation * shadowContrib;
+            diffuseTerm += li;
+            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
         }
     #endif
 
@@ -188,9 +199,12 @@ void main()
         {
 
             vec3 L = -normalize(directionalLightDirection[i]);
-            vec3 lightColor = directionalLightColor[i];
+            vec3 lc = directionalLightColor[i];
 
             vec3 H = normalize(L + V);
+            float ndl = clamp(dot(N, L), 0.0, 1.0);
+            float ndh = clamp(dot(N, H), 0.0, 1.0);
+            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
@@ -200,12 +214,10 @@ void main()
                 }
             #endif
 
-            diffuseItem += lightColor * ndl * shadowContrib;
+            vec3 li = lc * ndl * shadowContrib;
 
-            if (glossiness > 0.0)
-            {
-                specularItem += lightColor * ndl * pow(ndh, glossiness) * shadowContrib;
-            }
+            diffuseTerm += li;
+            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
         }
     #endif
 
@@ -221,29 +233,31 @@ void main()
         {
             vec3 lightPosition = spotLightPosition[i];
             vec3 spotLightDirection = -normalize(spotLightDirection[i]);
-            vec3 lightColor = spotLightColor[i];
+            vec3 lc = spotLightColor[i];
             float range = spotLightRange[i];
-            float umbraAngleCosine = spotLightUmbraAngleCosine[i];
-            float penumbraAngleCosine = spotLightPenumbraAngleCosine[i];
+            float a = spotLightUmbraAngleCosine[i];
+            float b = spotLightPenumbraAngleCosine[i];
             float falloffFactor = spotLightFalloffFactor[i];
 
-            vec3 lightDirection = lightPosition - v_WorldPosition;
+            vec3 L = lightPosition - v_WorldPosition;
             // Calculate attenuation
-            float dist = length(lightDirection);
-            float attenuation = calculateAttenuation(dist, range); 
+            float dist = length(L);
+            float attenuation = lightAttenuation(dist, range); 
 
             // Normalize light direction
-            lightDirection /= dist;
+            L /= dist;
             // Calculate spot light fall off
-            float lightDirectCosine = dot(spotLightDirection, lightDirection);
+            float c = dot(spotLightDirection, L);
 
             float falloff;
             // Fomular from real-time-rendering
-            falloff = clamp((lightDirectCosine-umbraAngleCosine)/(penumbraAngleCosine-umbraAngleCosine), 0.0, 1.0);
+            falloff = clamp((c - a) /( b - a), 0.0, 1.0);
             falloff = pow(falloff, falloffFactor);
 
-            vec3 halfVector = normalize(lightDirection + viewDirection);
-
+            vec3 H = normalize(L + V);
+            float ndl = clamp(dot(N, L), 0.0, 1.0);
+            float ndh = clamp(dot(N, H), 0.0, 1.0);
+            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
@@ -253,17 +267,15 @@ void main()
                 }
             #endif
 
-            diffuseItem += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
+            vec3 li = lc * attenuation * (1.0-falloff) * shadowContrib * ndl;
 
-            if (glossiness > 0.0)
-            {
-                specularItem += lightColor * ndl * pow(ndh, glossiness) * attenuation * (1.0-falloff) * shadowContrib;
-            }
+            diffuseTerm += li;
+            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
         }
     #endif
 
-    finalColor.rgb *= diffuseItem;
-    finalColor.rgb += specularItem * specular;
+    finalColor.rgb *= diffuseTerm;
+    finalColor.rgb += specularTerm;
     finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED
@@ -271,7 +283,7 @@ void main()
         finalColor.rgb = finalColor.rgb + envTex * reflectivity;
     #endif
 
-    if(lineWidth > 0.01)
+    if(lineWidth > 0.)
     {
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }

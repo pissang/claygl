@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Geometry = require('../Geometry');
+    var DynamicGeometry = require('../DynamicGeometry');
     var BoundingBox = require('../math/BoundingBox');
 
-    var Plane = Geometry.derive(function() {
+    var Plane = DynamicGeometry.derive(function() {
 
         return {
             widthSegments : 1,
