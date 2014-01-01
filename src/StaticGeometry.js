@@ -10,6 +10,7 @@ define(function(require) {
     var BoundingBox = require("./math/BoundingBox");
     var glMatrix = require("glmatrix");
     var glenum = require("./core/glenum");
+    var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
     var StaticGeometry = Geometry.derive(function() {
@@ -387,8 +388,29 @@ define(function(require) {
             return geometry;
         },
 
-        applyTransform : function() {
-            console.warn('Static Geometry doesn\'t support applyTransform');
+        applyTransform : function(matrix) {
+
+            if (this.boundingBox) {
+                this.boundingBox.applyTransform(matrix);
+            }
+
+            var positions = this.attributes.position.value;
+            var normals = this.attributes.normal.value;
+            var tangents = this.attributes.tangent.value;
+
+            matrix = matrix._array;
+            // Normal Matrix
+            var inverseTransposeMatrix = mat4.create();
+            mat4.invert(inverseTransposeMatrix, matrix);
+            mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
+
+            vec3.forEach(positions, 3, 0, null, vec3.transformMat4, matrix);
+            if (normals) {
+                vec3.forEach(normals, 3, 0, null, vec3.transformMat4, inverseTransposeMatrix);
+            }
+            if (tangents) {
+                vec3.forEach(tangents, 4, 0, null, vec3.transformMat4, inverseTransposeMatrix);   
+            }
         },
 
         dispose : function(_gl) {

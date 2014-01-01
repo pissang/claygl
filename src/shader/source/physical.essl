@@ -29,12 +29,10 @@ uniform samplerCube environmentMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
-uniform float gloss : 0.2;
+uniform float gloss : 0.5;
 
 uniform vec3 specularColor : [0.1, 0.1, 0.1];
 uniform vec3 emission : [0.0, 0.0, 0.0];
-
-uniform float reflectivity : 0.5;
 
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
@@ -118,7 +116,7 @@ void main()
             finalColor.a *= tex.a;
         #endif
         #ifdef DIFFUSEMAP_ALPHA_GLOSS
-            g = tex.a;
+            g *= tex.a;
         #endif
     #endif
 
@@ -280,7 +278,7 @@ void main()
 
     #ifdef ENVIRONMENTMAP_ENABLED
         vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
-        finalColor.rgb = finalColor.rgb + envTex * reflectivity;
+        finalColor.rgb = finalColor.rgb + envTex * g;
     #endif
 
     if(lineWidth > 0.)

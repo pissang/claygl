@@ -44,7 +44,6 @@ define(function (require) {
     }, {
         render : function(renderer, scene, notUpdateScene) {
             var _gl = renderer.gl;
-            scene.autoUpdate = false;
             if (!notUpdateScene) {
                 scene.update(true);
             }

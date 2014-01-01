@@ -65,7 +65,7 @@
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     environmentMapPass.render(renderer, scene);
-                    shadowMapPass.render(renderer, scene);
+                    // shadowMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
                     shadowMapPass.renderDebug(renderer);
                 });

@@ -782,6 +782,11 @@ define(function(require) {
         },
 
         applyTransform : function(matrix) {
+            
+            if (this.boundingBox) {
+                this.boundingBox.applyTransform(matrix);
+            }
+
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
             var tangents = this.attributes.tangent.value;

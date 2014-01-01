@@ -5,11 +5,14 @@
 define(function(require) {
     
     var Geometry = require("../Geometry");
+    var DynamicGeometry = require("../DynamicGeometry");
+    var StaticGeometry = require("../StaticGeometry");
     var Mesh = require("../Mesh");
     var Node = require("../Node");
     var Material = require("../Material");
     var Shader = require("../Shader");
     var glMatrix = require("glmatrix");
+    var BoundingBox = require('../math/BoundingBox');
     var _ = require("_");
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
@@ -30,20 +33,13 @@ define(function(require) {
             var templateMesh = meshes[0];
             var templateGeo = templateMesh.geometry;
             var material = templateMesh.material;
+            var isStatic = templateGeo instanceof StaticGeometry;
 
-            if (_.any(meshes, function(mesh) {
-                return mesh.material !== material;  
-            })) {
-                console.warn("Material of meshes to merge is not the same, program will use the material of first mesh by default");
-            }
-
-            var geometry = new Geometry;
+            var geometry = isStatic ? new StaticGeometry() : new DynamicGeometry();
+            geometry.boundingBox = new BoundingBox();
             var faces = geometry.faces;
 
-            var attributeNames = Object.keys(templateGeo.attributes);
-            attributeNames = attributeNames.filter(function(key) {
-                return templateGeo.attributes[key].value.length > 0
-            });
+            var attributeNames = Object.keys(templateGeo.getEnabledAttributes());
 
             for (var i = 0; i < attributeNames.length; i++) {
                 var name = attributeNames[i];
@@ -51,18 +47,42 @@ define(function(require) {
                 // Extend custom attributes
                 if (! geometry.attributes[name]) {
                     geometry.attributes[name] = {
-                        value : [],
+                        value : isStatic ? null : [],
                         type : attr.type
                     }
                 }
             }
 
-            var faceOffset = 0;
-            var useFaces = templateGeo.faces.length !== 0;
-            
             var inverseTransposeMatrix = mat4.create();
-            for (var k = 0; k < meshes.length; k++) {
-                var mesh = meshes[k];  
+            // Initialize the array data and merge bounding box
+            if (isStatic) {
+                var vertexCount = 0;
+                var faceCount = 0;
+                for (var k = 0; k < meshes.length; k++) {
+                    var currentGeo = meshes[k].geometry;
+                    if (currentGeo.boundingBox) {
+                        currentGeo.boundingBox.applyTransform(applyWorldTransform ? meshes[k].worldTransform : meshes[k].localTransform);
+                        geometry.boundingBox.union(currentGeo.boundingBox);
+                    }
+                    vertexCount += currentGeo.getVertexNumber();
+                    faceCount += currentGeo.getFaceNumber();
+                }
+                for (var n = 0; n < attributeNames.length; n++) {
+                    var name = attributeNames[n];
+                    var attrib = geometry.attributes[name];
+                    // TODO other type
+                    attrib.value = new Float32Array(vertexCount * attrib.size);
+                }
+                // TODO Uint32Array
+                geometry.faces = new Uint16Array(faceCount * 3);
+            }
+
+            var vertexOffset = 0;
+            var faceOffset = 0;
+            var useFaces = templateGeo.isUseFace();
+            
+            for (var mm = 0; mm < meshes.length; mm++) {
+                var mesh = meshes[mm];  
                 var currentGeo = mesh.geometry;
 
                 var vertexCount = currentGeo.getVertexNumber();
@@ -70,51 +90,69 @@ define(function(require) {
                 var matrix = applyWorldTransform ? mesh.worldTransform._array : mesh.localTransform._array;
                 mat4.invert(inverseTransposeMatrix, matrix);
                 mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
-                for (var n = 0; n < attributeNames.length; n++) {
-                    var name = attributeNames[n];
+
+                for (var nn = 0; nn < attributeNames.length; nn++) {
+                    var name = attributeNames[nn];
                     var currentAttr = currentGeo.attributes[name];
                     var targetAttr = geometry.attributes[name];
                     // Skip the unused attributes;
                     if (!currentAttr.value.length) {
                         continue;
                     }
-                    for (var i = 0; i < vertexCount; i++) {
+                    if (isStatic) {
+                        var len = currentAttr.value.length;
+                        var size = currentAttr.size;
+                        var offset = vertexOffset * size;
+                        var count = len / size;
+                        for (var i = 0; i < len; i++) {
+                            targetAttr.value[offset + i] = currentAttr.value[i];
+                        }
                         // Transform position, normal and tangent
-                        if (name === "position") {
-                            var newValue = vec3.create();
-                            vec3.transformMat4(newValue, currentAttr.value[i], matrix);
-                            targetAttr.value.push(newValue);   
+                        if (name === 'position') {
+                            vec3.forEach(targetAttr.value, size, offset, count, vec3.transformMat4, matrix);
+                        } else if (name === 'normal' || name === 'tangent') {
+                            vec3.forEach(targetAttr.value, size, offset, count, vec3.transformMat4, inverseTransposeMatrix);
                         }
-                        else if (name === "normal") {
-                            var newValue = vec3.create();
-                            vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
-                            targetAttr.value.push(newValue);   
+                    } else {
+                        for (var i = 0; i < vertexCount; i++) {
+                            // Transform position, normal and tangent
+                            if (name === "position") {
+                                var newValue = vec3.create();
+                                vec3.transformMat4(newValue, currentAttr.value[i], matrix);
+                                targetAttr.value.push(newValue);
+                            }
+                            else if (name === "normal" || name === 'tangent') {
+                                var newValue = vec3.create();
+                                vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
+                                targetAttr.value.push(newValue);
+                            } else {
+                                targetAttr.value.push(currentAttr.value[i]);
+                            }
                         }
-                        else if (name === "tangent") {
-                            var newValue = vec3.create();
-                            vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
-                            targetAttr.value.push(newValue);   
-                        } else {
-                            targetAttr.value.push(currentAttr.value[i]);
-                        }
-
                     }
                 }
 
                 if (useFaces) {
                     var len = currentGeo.faces.length;
-                    for (i =0; i < len; i++) {
-                        var newFace = [];
-                        var face = currentGeo.faces[i];
-                        newFace[0] = face[0] + faceOffset;
-                        newFace[1] = face[1] + faceOffset;
-                        newFace[2] = face[2] + faceOffset;
+                    if (isStatic) {
+                        for (var i = 0; i < len; i++) {
+                            geometry.faces[i + faceOffset] = currentGeo.faces[i] + vertexOffset;
+                        }
+                        faceOffset += len;
+                    } else {
+                        for (var i = 0; i < len; i++) {
+                            var newFace = [];
+                            var face = currentGeo.faces[i];
+                            newFace[0] = face[0] + vertexOffset;
+                            newFace[1] = face[1] + vertexOffset;
+                            newFace[2] = face[2] + vertexOffset;
 
-                        faces.push(newFace);
+                            faces.push(newFace);
+                        }   
                     }
                 }
 
-                faceOffset += vertexCount;
+                vertexOffset += vertexCount;
             }
 
             return new Mesh({
@@ -232,7 +270,7 @@ define(function(require) {
                     var uniform = material.uniforms[name];
                     subMat.set(name, uniform.value);
                 }
-                var subGeo = new Geometry();
+                var subGeo = new DynamicGeometry();
                 var subMesh = new Mesh({
                     name : [mesh.name, i].join('-'),
                     material : subMat,

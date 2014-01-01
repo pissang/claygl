@@ -38,7 +38,7 @@
                 GLTFLoader.load("assets/models/suzanne.json");
                 var suzanneGeometry;
                 GLTFLoader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').childAt(0).geometry;
+                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
                 });
                 var envMap = qtek.util.texture.loadTexture(
                     'assets/textures/hdr/old_industrial_hall.hdr',

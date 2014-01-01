@@ -230,6 +230,7 @@ define(function(require) {
         },
 
         _parseTextures : function(json, lib) {
+            var root = this.textureRootPath || this.rootPath;
             _.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
                 var parameters = {};
@@ -257,9 +258,7 @@ define(function(require) {
                 if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
                     var imageInfo = json.images[textureInfo.source];
-                    texture.image = this._loadImage(imageInfo.path, function() {
-                        texture.dirty();
-                    });
+                    texture.load(util.relative2absolute(imageInfo.path, root));
                     lib.textures[name] = texture;
                 } else if(target === glenum.TEXTURE_CUBE_MAP) {
                     // TODO
@@ -267,16 +266,6 @@ define(function(require) {
             }, this);
         },
 
-        _loadImage : function(path, onsuccess) {
-            var root = this.textureRootPath || this.rootPath;
-            var img = new Image();
-            img.onload = function() {
-                onsuccess && onsuccess(img);
-                img.onload = null;
-            }
-            img.src = util.relative2absolute(path, root);
-            return img;
-        },
         // Only phong material is support yet
         // TODO : support custom material
         _parseMaterials : function(json, lib) {
@@ -492,11 +481,11 @@ define(function(require) {
                     }
                     if (meshInfo.name) {
                         if (meshInfo.primitives.length > 1) {
-                            mesh.name = [name, pp].join('-');
+                            mesh.name = [meshInfo.name, pp].join('-');
                         }
                         else {
                             // PENDING name or meshInfo.name ?
-                            mesh.name = name;
+                            mesh.name = meshInfo.name;
                         }
                     }
 
@@ -545,11 +534,19 @@ define(function(require) {
                     }
                 }
                 if (nodeInfo.meshes) {
-                    for (var i = 0; i < nodeInfo.meshes.length; i++) {
-                        var primitives = lib.meshes[nodeInfo.meshes[i]];
+                    // TODO one node have multiple meshes ?
+                    var meshName = nodeInfo.meshes[0];
+                    if (meshName) {
+                        var primitives = lib.meshes[meshName];
                         if (primitives) {
-                            for (var j = 0; j < primitives.length; j++) {                            
-                                node.add(primitives[j]);
+                            if (primitives.length === 1) {
+                                // Replace the node with mesh directly
+                                node = primitives[0];
+                                node.name = nodeInfo.name;
+                            } else {
+                                for (var j = 0; j < primitives.length; j++) {                            
+                                    node.add(primitives[j]);
+                                }   
                             }
                         }
                     }

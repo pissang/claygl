@@ -2,7 +2,6 @@
  * Load three.js JSON Format model
  *
  * Format specification : https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
- * @export{class} Model
  */
 define(function(require) {
 
@@ -12,7 +11,7 @@ define(function(require) {
     var util = require('../../core/util');
     var Shader = require("../../Shader");
     var Material = require("../../Material");
-    var Geometry = require("../../Geometry");
+    var DynamicGeometry = require("../../DynamicGeometry");
     var Mesh = require("../../Mesh");
     var Node = require("../../Node");
     var Texture2D = require("../../texture/Texture2D");
@@ -118,7 +117,7 @@ define(function(require) {
                 geometryList[i] = null;
                 cursorList[i] = 0;
             }
-            geometryList[0] = new Geometry;
+            geometryList[0] = new DynamicGeometry();
 
             var faceMaterial = data.materials && data.materials.length > 1;
 
@@ -226,7 +225,7 @@ define(function(require) {
                 if (hasMaterial) {
                     materialIndex = dFaces[ offset+ (isQuad ? 4 : 3) ];
                     if ( ! geometryList[materialIndex] ) {
-                        geometryList[materialIndex] = new Geometry;
+                        geometryList[materialIndex] = new DynamicGeometry();
                     }
                     geometry = geometryList[materialIndex];
                     attributes = geometry.attributes;

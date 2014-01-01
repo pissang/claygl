@@ -39,7 +39,7 @@ define(function(require) {
 
             useFace : true,
 
-            //Max Value of Uint16, i.e. 0xfff
+            //Max Value of Uint16, i.e. 0xffff
             chunkSize : 65535,
         }
     }, {
