@@ -503,7 +503,7 @@ define(function(require) {
             }
             for (var symbol in this._textureStatus) {
                 var status = this._textureStatus[symbol];
-                if (status.enabled && status.shaderType === "vertex") {
+                if (status.enabled) {
                     defineStr.push("#define "+symbol.toUpperCase()+"_ENABLED");
                 }
             }
@@ -528,7 +528,7 @@ define(function(require) {
             }
             for (var symbol in this._textureStatus) {
                 var status = this._textureStatus[symbol];
-                if (status.enabled && status.shaderType === "fragment") {
+                if (status.enabled) {
                     defineStr.push("#define "+symbol.toUpperCase()+"_ENABLED");
                 }
             }

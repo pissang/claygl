@@ -3,12 +3,17 @@ define(function(require) {
     var Base = require("./core/Base");
     var Matrix4 = require("./math/Matrix4");
 
+    var glMatrix = require("glmatrix");
+    var quat = glMatrix.quat;
+    var vec3 = glMatrix.vec3;
+
     var Skeleton = Base.derive(function() {
         return {
             // Root joints
             roots : [],
             joints : [],
-            // Poses stored in arrays
+
+            clips : [],
 
             // Matrix to joint space(inverse of indentity bone world matrix)
             _jointMatrices : [],
@@ -84,20 +89,35 @@ define(function(require) {
             return subArray;
         },
 
-        setPose : function(time) {
+        setPose : function(clipIndex) {
+            var clip = this.clips[clipIndex];
             for (var i = 0; i < this.joints.length; i++) {
-                this.joints[i].setPose(time);
+                var joint = this.joints[i];
+                var pose = clip.jointPoses[i];
+
+                joint.position.copy(pose.position);
+                joint.rotation.copy(pose.rotation);
+                joint.scale.copy(pose.scale);
             }
             this.update();
         },
 
-        getClipTime : function() {
-            var poses = this.joints[0].poses;
-            if (poses.length) {
-                return poses[poses.length-1].time;
+        blendPose : function(clip1idx, clip2idx, weight) {
+            var clip1 = this.clips[clip1idx];
+            var clip2 = this.clips[clip2idx];
+
+            for (var i = 0; i < this.joints.length; i++) {
+                var joint = this.joints[i];
+                var pose = clip.jointPoses[i];
+
+                joint.position.lerp(clip1.position, clip2.position, weight);
+                joint.rotation.slerp(clip1.rotation, clip2.rotation, weight);
+                joint.scale.lerp(clip1.scale, clip2.scale, weight);
             }
+            
+            this.update();
         },
-        
+
         getBoneNumber : function() {
             return this.joints.length;
         }

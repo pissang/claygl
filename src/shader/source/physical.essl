@@ -15,12 +15,17 @@
 uniform mat4 viewInverse : VIEWINVERSE;
 
 varying vec2 v_Texcoord;
-varying vec3 v_LocalNormal;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
+
+#ifdef NORMALMAP_ENABLED
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
+#endif
+
+#ifdef SKINNING
 varying vec3 v_Weight;
+#endif
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;

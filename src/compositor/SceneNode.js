@@ -24,9 +24,14 @@ define(function(require) {
             this._rendering = true;
             var _gl = renderer.gl;
 
+            this.trigger('beforerender');
+
             if (! this.outputs) {
-                renderer.render(this.scene, this.camera);
+                
+                var renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+
             } else {
+
                 var frameBuffer = this.frameBuffer;
                 for (var name in this.outputs) {
                     var parameters = this.updateParameter(name, renderer);
@@ -56,10 +61,12 @@ define(function(require) {
                     ext.drawBuffersEXT(bufs);
                 }
 
-                renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+                var renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
 
                 frameBuffer.unbind(renderer);
             }
+
+            this.trigger('afterrender', renderInfo);
 
             this._rendering = false;
             this._rendered = true;

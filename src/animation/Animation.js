@@ -24,14 +24,13 @@ define(function(require) {
             _time : 0
         }
     }, {
-        add : function(clip) {
+        addClip : function(clip) {
             this._clips.push(clip);
         },
-        remove : function(clip) {
+        removeClip : function(clip) {
             var idx = this._clips.indexOf(clip);
-            if (idx >= 0) {
-                this._clips.splice(idx, 1);
-            }
+            clip = this._clips.pop();
+            this._clips[idx] = clip;
         },
         update : function() {
             
@@ -383,7 +382,7 @@ define(function(require) {
                 }
                 self._clipList.push(clip);
                 self._clipCount++;
-                self.animation.add(clip);
+                self.animation.addClip(clip);
             }
 
 
@@ -395,7 +394,7 @@ define(function(require) {
         stop : function() {
             for (var i = 0; i < this._clipList.length; i++) {
                 var clip = this._clipList[i];
-                this.animation.remove(clip);
+                this.animation.removeClip(clip);
             }
             this._clipList = [];
         },

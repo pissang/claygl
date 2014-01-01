@@ -18,29 +18,43 @@ define(function(require) {
         this._endTime = this._startTime + this._life*1000;
         this._needsRemove = false;
 
-        this.loop = typeof(options.loop) == 'undefined'
-                    ? false : options.loop;
-
-        if (this.loop) {
-            if (typeof(this.loop) == 'number') {
-                this._currentLoop = this.loop;
-            } else {
-                this._currentLoop = 9999999;
-            }
-        }
+        this._loop = options.loop === undefined ? false : options.loop;
+        this.setLoop(this._loop);
 
         this.gap = options.gap || 0;
 
-        this.easing = options.easing || 'Linear';
+        this.easing = options.easing;
+        if (typeof(this.easing) === 'string') {
+            this.easing = Easing[this.easing];
+        }
 
-        this.onframe = options.onframe || null;
+        if (options.onframe !== undefined) {
+            this.onframe = options.onframe;
+        }
 
-        this.ondestroy = options.ondestroy || null;
+        if (options.ondestroy !== undefined) {
+            this.ondestroy = options.ondestroy;
+        }
 
-        this.onrestart = options.onrestart || null;
+        if (options.onrestart !== undefined) {
+            this.onrestart = options.onrestart;
+        }
+
     };
 
     Clip.prototype = {
+
+        setLoop : function(loop) {
+            this._loop = loop;
+            if (loop) {
+                if (typeof(loop) == 'number') {
+                    this._loopRemained = loop;
+                } else {
+                    this._loopRemained = Number.MAX_VALUE;
+                }   
+            }
+        },
+
         step : function(time) {
             var percent = (time - this._startTime) / this._life;
 
@@ -50,21 +64,18 @@ define(function(require) {
 
             percent = Math.min(percent, 1);
 
-            var easingFunc = typeof(this.easing) == 'string'
-                             ? Easing[this.easing]
-                             : this.easing;
             var schedule;
-            if (typeof easingFunc === 'function') {
-                schedule = easingFunc(percent);
+            if (this.easing) {
+                schedule = this.easing(percent);
             }else{
                 schedule = percent;
             }
             this.fire('frame', schedule);
 
             if (percent == 1) {
-                if (this.loop && this._currentLoop) {
+                if (this._loop && this._loopRemained > 0) {
                     this.restart();
-                    this._currentLoop--;
+                    this._loopRemained--;
                     return 'restart';
                 }else{
                     // Mark this clip to be deleted

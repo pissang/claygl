@@ -15,7 +15,6 @@
     </head>
     <body style="margin:0px">
         <canvas id="Main"></canvas>
-        <input type="range" id="Timeline" min="0" value="0" step="0.01"/>
         <script type="text/javascript">
             function createSkeletonDebugScene(skeleton, qtek) {
                 var scene = new qtek.Scene();
@@ -147,30 +146,25 @@
                 // shadowMapPass.render(renderer, scene);
                 renderer.render(scene, camera);
 
-                var timeline = document.getElementById("Timeline");
-                timeline.max = skeleton.getClipTime();
-
                 var time = 0;
                 var skeletonDebugScene = createSkeletonDebugScene(skeleton, qtek);
                 var clearAll = renderer.clear;
                 skeletonDebugScene.position.x -= 6;
-                setInterval(function(){
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.addClip(skeleton.clips[0]);
+                skeleton.clips[0].setLoop(true);
+                animation.on('frame', function() {
                     control.update();
                     shadowMapPass.render(renderer, scene, camera);
-                    renderer.clear = clearAll
+                    renderer.clear = clearAll;
                     renderer.render(scene, camera);
                     renderer.clear = 0;
                     renderer.render(skeletonDebugScene, camera);
 
-                    skeleton.setPose(time);
-                    timeline.value = time;
-
-                    time = (time + 0.02) % skeleton.getClipTime();
+                    skeleton.setPose(0);
                 }, 20)
-
-                timeline.onchange = function(){
-                    skeleton.setPose(timeline.value);
-                }
             })
             
         </script>

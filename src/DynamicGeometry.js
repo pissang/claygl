@@ -473,13 +473,29 @@ define(function(require) {
                 var indicesArray = arrayChunk.indicesArray;
 
                 var count = 0;
+                var prevSearchIdx = 0;
                 for (var name in dirtyAttributes) {
                     var attribute = dirtyAttributes[name];
                     var type = attribute.type;
                     var semantic = attribute.semantic;
                     var size = attribute.size;
 
-                    var bufferInfo = attributeBuffers[name];
+                    var bufferInfo;
+                    for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
+                        if (attributeBuffers[i].name === name) {
+                            bufferInfo = attributeBuffers[i];
+                            prevSearchIdx = i + 1;
+                            break;
+                        }
+                    }
+                    for (var i = prevSearchIdx - 1; i >= 0; i--) {
+                        if (attributeBuffers[i].name === name) {
+                            bufferInfo = attributeBuffers[i];
+                            prevSearchIdx = i;
+                            break;
+                        }
+                    }
+
                     var buffer;
                     if (bufferInfo) {
                         buffer = bufferInfo.buffer

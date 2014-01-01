@@ -22,6 +22,7 @@ define(function(require) {
     var Vector3 = require("../../math/Vector3");
     var Quaternion = require("../../math/Quaternion");
     var glenum = require('../../core/glenum');
+    var SkinningClip = require('../../animation/SkinningClip');
     var _ = require("_");
 
     var glMatrix = require("glmatrix");
@@ -415,26 +416,35 @@ define(function(require) {
             if (data.animation) {
                 var dFrames = data.animation.hierarchy;
 
+                var jointPoses = [];
                 // Parse Animations
                 for (var i = 0; i < dFrames.length; i++) {
                     var channel = dFrames[i];
-                    var joint = joints[i];
+                    var jointPose = jointPoses[i] = {
+                        keyFrames : []
+                    };
                     for (var j = 0; j < channel.keys.length; j++) {
                         var key = channel.keys[j];
-                        joint.poses[j] = {};
-                        var pose = joint.poses[j];
-                        pose.time = parseFloat(key.time);
+                        jointPose.keyFrames[j] = {};
+                        var kf = jointPose.keyFrames[j];
+                        kf.time = parseFloat(key.time) * 1000;
                         if (key.pos) {
-                            pose.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
+                            kf.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
                         }
                         if (key.rot) {
-                            pose.rotation = new Quaternion(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
+                            kf.rotation = new Quaternion(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
                         }
                         if (key.scl) {
-                            pose.scale = new Vector3(key.scl[0], key.scl[1], key.scl[2]);
+                            kf.scale = new Vector3(key.scl[0], key.scl[1], key.scl[2]);
                         }
                     }
                 }
+
+                var skinningClip = new SkinningClip({
+                    jointPoses : jointPoses
+                });
+
+                skeleton.clips.push(skinningClip);
             }
 
             return skeleton;

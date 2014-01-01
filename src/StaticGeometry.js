@@ -156,7 +156,22 @@ define(function(require) {
                     continue;
                 }
 
-                var bufferInfo = attributeBuffers[name];
+                var bufferInfo;
+                for (var i = idx; i < attributeBuffers.length; i++) {
+                    if (attributeBuffers[i].name === name) {
+                        bufferInfo = attributeBuffers[i];
+                        idx = i + 1;
+                        break;
+                    }
+                }
+                for (var i = idx - 1; i >= 0; i--) {
+                    if (attributeBuffers[i].name === name) {
+                        bufferInfo = attributeBuffers[i];
+                        idx = i;
+                        break;
+                    }
+                }
+                
                 var buffer;
                 if (bufferInfo) {
                     buffer = bufferInfo.buffer;
@@ -306,24 +321,22 @@ define(function(require) {
                 attributes[name].value = expandedArray;
             }
 
-            for (var i = 0; i < faces.length;) {
-                for (var j = 0; j < 3; j++) {
-                    var ii = faces[i++];
-                    if (vertexUseCount[ii] > 0) {
-                        for (var a = 0; a < attributeNameList.length; a++) {
-                            var name = attributeNameList[a];
-                            var array = attributes[name].value;
-                            var size = attributes[name].size;
+            for (var i = 0; i < faces.length; i++) {
+                var ii = faces[i];
+                if (vertexUseCount[ii] > 0) {
+                    for (var a = 0; a < attributeNameList.length; a++) {
+                        var name = attributeNameList[a];
+                        var array = attributes[name].value;
+                        var size = attributes[name].size;
 
-                            for (var k = 0; k < size; k++) {
-                                array[cursor * size + k] = array[ii * size + k];
-                            }
+                        for (var k = 0; k < size; k++) {
+                            array[cursor * size + k] = array[ii * size + k];
                         }
-                        face[i + j] = cursor;
-                        cursor++;
                     }
-                    vertexUseCount[ii]++;
+                    faces[i] = cursor;
+                    cursor++;
                 }
+                vertexUseCount[ii]++;
             }
         },
 
@@ -335,9 +348,10 @@ define(function(require) {
 
             var array = this.attributes.barycentric.value;
             // Already existed;
-            if (array.length == this.faces.length * 3) {
+            if (array && array.length === this.faces.length * 3) {
                 return;
             }
+            array = this.attributes.barycentric.value = new Float32Array(this.faces.length * 3);
             var i1, i2, i3, face;
             for (var i = 0; i < this.faces.length;) {
                 for (var j = 0; j < 3; j++) {
