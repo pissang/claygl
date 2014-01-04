@@ -28,6 +28,7 @@ define(function(require) {
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
+    var quat = glMatrix.quat;
 
     var Loader = Base.derive(function() {
         return {
@@ -397,12 +398,16 @@ define(function(require) {
             for ( var i = 0; i < dBones.length; i++) {
                 var dBone = dBones[i];
                 var joint = new Joint({
+                    index : i,
                     parentIndex : dBone.parent,
+                    name : dBone.name
+                });
+                joint.node = new Node({
                     name : dBone.name,
                     position : new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
                     rotation : new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
                     scale : new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
-                });
+                })
                 joints.push(joint);
             }
 
@@ -416,35 +421,36 @@ define(function(require) {
             if (data.animation) {
                 var dFrames = data.animation.hierarchy;
 
-                var jointPoses = [];
+                var jointClips = [];
                 // Parse Animations
                 for (var i = 0; i < dFrames.length; i++) {
                     var channel = dFrames[i];
-                    var jointPose = jointPoses[i] = {
+                    var jointPose = jointClips[i] = {
                         keyFrames : []
                     };
+                    jointPose.name = joints[i].name;
                     for (var j = 0; j < channel.keys.length; j++) {
                         var key = channel.keys[j];
                         jointPose.keyFrames[j] = {};
                         var kf = jointPose.keyFrames[j];
                         kf.time = parseFloat(key.time) * 1000;
                         if (key.pos) {
-                            kf.position = new Vector3(key.pos[0], key.pos[1], key.pos[2]);
+                            kf.position = vec3.fromValues(key.pos[0], key.pos[1], key.pos[2]);
                         }
                         if (key.rot) {
-                            kf.rotation = new Quaternion(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
+                            kf.rotation = quat.fromValues(key.rot[0], key.rot[1], key.rot[2], key.rot[3]);
                         }
                         if (key.scl) {
-                            kf.scale = new Vector3(key.scl[0], key.scl[1], key.scl[2]);
+                            kf.scale = vec3.fromValues(key.scl[0], key.scl[1], key.scl[2]);
                         }
                     }
                 }
 
                 var skinningClip = new SkinningClip({
-                    jointPoses : jointPoses
+                    jointClips : jointClips
                 });
 
-                skeleton.clips.push(skinningClip);
+                skeleton.addClip(skinningClip);
             }
 
             return skeleton;

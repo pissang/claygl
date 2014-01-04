@@ -167,6 +167,12 @@ define(function(require) {
                         node.setParameter(name, val);
                     }
                 }
+                if (nodeInfo.defines) {
+                    for (var name in nodeInfo.defines) {
+                        var val = nodeInfo.defines[name];
+                        node.pass.material.shader.define('fragment', name, val);
+                    }
+                }
             }
             return node;
         },
@@ -178,8 +184,13 @@ define(function(require) {
             }
             ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT']
                 .forEach(function(name) {
-                    if (paramInfo[name] !== undefined) {
-                        param[name] = Texture[paramInfo[name]];
+                    var val = paramInfo[name];
+                    if (val !== undefined) {
+                        // Convert string to enum
+                        if (typeof(val) === 'string') {
+                            val = Texture[val];
+                        }
+                        param[name] = val;
                     }
                 });
             ['width', 'height']

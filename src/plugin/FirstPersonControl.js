@@ -15,6 +15,8 @@ define(function(require) {
 
             up : new Vector3(0, 1, 0),
 
+            verticalMoveLock : false,
+
             _moveForward : false,
             _moveBackward : false,
             _moveLeft : false,
@@ -80,9 +82,13 @@ define(function(require) {
                 
                 var target = this.target;
 
-                var position = this.target.position,
-                    xAxis = target.localTransform.right.normalize(),
-                    zAxis = target.localTransform.forward.normalize();
+                var position = this.target.position;
+                var xAxis = target.localTransform.right.normalize();
+                var zAxis = target.localTransform.forward.normalize();
+
+                if (this.verticalMoveLock) {
+                    zAxis.y = 0;
+                }
 
                 if (this._moveForward) {
                     // Opposite direction of z

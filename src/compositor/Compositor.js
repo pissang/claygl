@@ -30,7 +30,9 @@ define(function(require){
             }
 
             for (var i = 0; i < this._outputs.length; i++) {
-                this._outputs[i].render(renderer);
+                if (!this._outputs[i]._rendered) {
+                    this._outputs[i].render(renderer);
+                }
             }
         },
 

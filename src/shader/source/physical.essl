@@ -133,7 +133,7 @@ void main()
     #endif
 
     #ifdef RENDER_NORMAL
-        gl_FragColor = vec4(normal, 1.0);
+        gl_FragColor = vec4(N, 1.0);
         return;
     #endif
 

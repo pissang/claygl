@@ -53,6 +53,7 @@ define( function(require){
 	"animation": {
 		"Animation": require('animation/Animation'),
 		"Clip": require('animation/Clip'),
+		"SkinningClip": require('animation/SkinningClip'),
 		"easing": require('animation/easing')
 	},
 	"camera": {
@@ -83,9 +84,6 @@ define( function(require){
 		},
 		"request": require('core/request'),
 		"util": require('core/util')
-	},
-	"debug": {
-		"PointLight": require('debug/PointLight')
 	},
 	"geometry": {
 		"Cube": require('geometry/Cube'),

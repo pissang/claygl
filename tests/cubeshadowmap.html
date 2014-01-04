@@ -35,7 +35,7 @@
                     shader : shader
                 });
 
-                var meshList = [];
+                var root = new qtek.Node();
                 for(var i = 0; i < 2; i++){
                     for(var j = 0; j < 2; j++){
                         for(var k = 0; k < 2; k++){
@@ -45,13 +45,10 @@
                             });
                             mesh.scale.set(0.5, 0.5, 0.5);
                             mesh.position.set((i-0.5) * 5, (j-0.5) * 5, (k-0.5)*5);
-                            meshList.push(mesh);
+                            root.add(mesh)
                         }
                     }
                 }
-                var root = new qtek.Node();
-                var cubes = meshUtil.merge(meshList);
-                root.add(cubes);
                 scene.add(root);
 
                 var bigCube = new qtek.Mesh({

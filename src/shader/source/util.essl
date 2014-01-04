@@ -35,8 +35,8 @@ float edgeFactor(float width)
 
 // Pack depth
 // Float value can only be 0.0 - 1.0 ?
-@export buildin.util.pack_depth
-vec4 packDepth( const in float depth )
+@export buildin.util.encode_float
+vec4 encodeFloat( const in float depth )
 {
 
     const vec4 bitShifts = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
@@ -49,34 +49,32 @@ vec4 packDepth( const in float depth )
 }
 @end
 
-@export buildin.util.unpack_depth
-float unpackDepth( const in vec4 colour )
+@export buildin.util.decode_float
+float decodeFloat(const in vec4 colour)
 {
     const vec4 bitShifts = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
     return dot(colour, bitShifts);
 }
 @end
 
-@export buildin.util.pack_depth_half
-vec2 packDepthHalf( const in float depth )
-{
-    const vec2 bitShifts = vec2(256.0, 1.0);
-    const vec4 bitMask = vec4(0.0, 1.0/256.0);
-
-    vec2 rg = fract(depth*bitShifts);
-    rg -= rg.xx * bitMask;
-
-    return rg;
+// http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
+@export buildin.util.rgbm_decode
+vec3 RGBMDecode(vec4 rgbm, float range) {
+  return range * rgbm.rgb * rgbm.a;
 }
 @end
 
-@export buildin.util.unpack_depth_half
-float unpackDepthHalf( const in vec2 rg )
-{
-    const vec4 bitShifts = vec2(1.0/256.0, 1.0);
-    return dot(rg, bitShifts);
+@export buildin.util.rgbm_encode
+vec4 RGBMEncode(vec3 color, float range) {
+    vec4 rgbm;
+    color *= 1.0 / range;
+    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);
+    rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
+    rgbm.rgb = color / rgbm.a;
+    return rgbm;
 }
 @end
+
 
 @export buildin.chunk.skin_matrix
 mat4 skinMatrix;

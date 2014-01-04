@@ -42,7 +42,7 @@ module.exports = function(grunt){
             common.packages = [{
                 name : 'qtek',
                 location : '.',
-                main : '../build/qtek.amd'
+                main : 'qtek.amd'
             }]
         } else {
             common.out = 'dist/qtek.js';

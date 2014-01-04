@@ -54,10 +54,10 @@
                     scene.add(line);
 
                     updates.push(function() {
-                        sphere.localTransform.copy(joint.worldTransform);
+                        sphere.localTransform.copy(joint.node.worldTransform);
                         if (parentJoint) {
-                            lineGeoVertices[0] = joint.getWorldPosition()._array;
-                            lineGeoVertices[1] = parentJoint.getWorldPosition()._array;
+                            lineGeoVertices[0] = joint.node.getWorldPosition()._array;
+                            lineGeoVertices[1] = parentJoint.node.getWorldPosition()._array;
                         }  
                         lineGeo.dirty('position');
                     });
@@ -153,8 +153,8 @@
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
-                animation.addClip(skeleton.clips[0]);
-                skeleton.clips[0].setLoop(true);
+                animation.addClip(skeleton.getClip(0));
+                skeleton.getClip(0).setLoop(true);
                 animation.on('frame', function() {
                     control.update();
                     shadowMapPass.render(renderer, scene, camera);

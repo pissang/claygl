@@ -4,6 +4,8 @@
  */
 define(function(require) {
 
+    'use strict';
+
     var Base = require('../core/Base');
     var request = require("../core/request");
     var util = require('../core/util');
@@ -55,6 +57,7 @@ define(function(require) {
             bufferRootPath : ""
         };
     }, {
+        
         load : function(url) {
             var self = this;
 
@@ -76,6 +79,7 @@ define(function(require) {
                 }
             });
         },
+
         parse : function(json) {
             var self = this;
             var loading = 0;
@@ -86,8 +90,7 @@ define(function(require) {
                 textures : {},
                 meshes : {},
                 joints : {},
-                skins : {},
-                skeleton : null,
+                skeletons : {},
                 cameras : {},
                 nodes : {}
             };
@@ -111,7 +114,6 @@ define(function(require) {
             });
 
             function afterLoadBuffer() {
-                self._parseSkins(json, lib);
                 self._parseTextures(json, lib);
                 self._parseMaterials(json, lib);
                 self._parseMeshes(json, lib);
@@ -124,7 +126,21 @@ define(function(require) {
                         continue;
                     }
                     var node = lib.nodes[sceneInfo.nodes[i]];
+                    node.update();
                     scene.add(node);
+                }
+
+                var isOldVersion = false;
+                for (var name in json.skins) {
+                    if (json.skins[name].roots) {
+                        isOldVersion = true;
+                        break;
+                    }
+                }
+                if (isOldVersion) {
+                    self._parseSkins(json, lib);
+                } else {
+                    self._parseSkins2(json, lib);
                 }
 
                 self.trigger("success", {
@@ -132,7 +148,7 @@ define(function(require) {
                     cameras : lib.cameras,
                     textures : lib.textures,
                     materials : lib.materials,
-                    skeleton : lib.skeleton
+                    skeletons : lib.skeletons
                 });
             }
 
@@ -141,7 +157,7 @@ define(function(require) {
                 cameras : lib.cameras,
                 textures : lib.textures,
                 materials : lib.materials,
-                skeleton : lib.skeleton
+                skeletons : lib.skeletons
             }
         },
 
@@ -162,29 +178,111 @@ define(function(require) {
             });
         },
 
-         _parseSkins : function(json, lib) {
+        // https://github.com/KhronosGroup/glTF/issues/100
+        // https://github.com/KhronosGroup/glTF/issues/193
+        _parseSkins2 : function(json, lib) {
             var self = this;
-            // Build skeleton
-            var skeleton = new Skeleton();
-            var rootJoints = {};
 
-            var createJoint = function(nodeName, parentIndex) {
-                // Have been created
-                if (lib.joints[nodeName]) {
-                    return;
+            // Create skeletons and joints
+            for (var name in json.skins) {
+                var skinInfo = json.skins[name];
+                var skeleton = new Skeleton({
+                    name : name
+                });
+                for (var i = 0; i < skinInfo.joints.length; i++) {
+                    var jointId = skinInfo.joints[i];
+                    var joint = new Joint({
+                        name : jointId,
+                        index : skeleton.joints.length
+                    });
+                    skeleton.joints.push(joint);
                 }
+                lib.skeletons[name] = skeleton;
+            }
+
+            var bindNodeToJoint = function(jointsMap, nodeName, parentIndex) {
+                var node = lib.nodes[nodeName];
+                var nodeInfo = json.nodes[nodeName];
+                var joint = jointsMap[nodeInfo.jointId];
+                // TODO 
+                // collada2gltf may have jointId in node but corresponding skin doesn't have this jointId
+                // maybe because the joint has no weight on the skinned mesh, so converter removed it for optimization
+                // Skip it ??
+                // wired
+                if (joint) {
+                    // throw new Error('Joint bind to ' + nodeInfo.name + ' doesn\'t exist in skin');
+                    joint.node = node;
+                    joint.parentIndex = parentIndex;
+
+                    parentIndex = joint.index;
+                }
+
+                for (var i = 0; i < nodeInfo.children.length; i++) {
+                    bindNodeToJoint(jointsMap, nodeInfo.children[i], parentIndex);
+                }
+
+                return joint;
+            }
+
+            for (var name in json.nodes) {
+
+                var nodeInfo = json.nodes[name];
+
+                if (nodeInfo.instanceSkin) {
+                    var skinName = nodeInfo.instanceSkin.skin;
+                    var skeleton = lib.skeletons[skinName];
+
+                    var node = lib.nodes[name];
+                    var jointIndices = skeleton.joints.map(function(joint) {
+                        return joint.index;
+                    });
+                    if (node instanceof Mesh) {
+                        node.skeleton = skeleton;
+                        node.joints = jointIndices;
+                    } else {
+                        // Mesh have multiple primitives
+                        for (var i = 0; i < node._children.length; i++) {
+                            var child = node._children[i];
+                            if (child.skeleton) {
+                                child.skeleton = skeleton;
+                                child.joints = jointIndices;
+                            }
+                        }
+                    }
+
+                    var jointsMap = {};
+                    for (var i = 0; i < skeleton.joints.length; i++) {
+                        var joint = skeleton.joints[i];
+                        jointsMap[joint.name] = joint;
+                    }
+                    // Build up hierarchy from root nodes
+                    var rootNodes = nodeInfo.instanceSkin.skeletons;
+                    for (i = 0; i < rootNodes.length; i++) {
+                        var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1);
+                        skeleton.roots.push(rootJoint);
+                    }
+                }
+            }
+
+            for (var name in lib.skeletons) {
+                var skeleton = lib.skeletons[name];
+                skeleton.updateJointMatrices();
+                skeleton.update();
+            }
+        },     
+
+        // DEPRECATED
+        _parseSkins : function(json, lib) {
+            var self = this;
+
+            var createJoint = function(nodeName, parentIndex, skeleton) {
                 var nodeInfo = json.nodes[nodeName];
                 nodeInfo._isJoint = true;
                 // Cast node to joint
                 var joint = new Joint();
                 joint.name = nodeName;
-                if (nodeInfo.matrix) {
-                    for (var i = 0; i < 16; i++) {
-                        joint.localTransform._array[i] = nodeInfo.matrix[i];
-                    }
-                    joint.decomposeLocalTransform();
-                }
-
+                var node = lib.nodes[nodeName];
+                joint.node = node;
                 joint.index = skeleton.joints.length;
                 if (parentIndex !== undefined) {
                     joint.parentIndex = parentIndex;
@@ -194,39 +292,48 @@ define(function(require) {
                 lib.joints[nodeName] = joint;
                 
                 for (var i = 0; i < nodeInfo.children.length; i++) {
-                    var child = createJoint(nodeInfo.children[i], joint.index);
-                    if (child) {
-                        joint.add(child);
-                    }
+                    var child = createJoint(nodeInfo.children[i], joint.index, skeleton);
                 }
                 return joint;
             }
 
             for (var name in json.skins) {
-                var skinInfo = json.skins[name]
+                var skinInfo = json.skins[name];
+                var skeleton = new Skeleton({
+                    name : name
+                });
                 for (var i = 0; i < skinInfo.roots.length; i++) {
                     var rootJointName = skinInfo.roots[i];
-                    var rootJoint = createJoint(rootJointName);
+                    var rootJoint = createJoint(rootJointName, undefined, skeleton);
                     if (rootJoint) {
                         skeleton.roots.push(rootJoint);
                     }
                 }
+                if (skeleton.joints.length) {
+                    lib.skeletons[name] = skeleton;
+                    skeleton.updateJointMatrices();
+                    skeleton.update();
+                }
             }
 
-            for (var name in json.skins) {
-                var skinInfo = json.skins[name];
-                var jointIndices = [];
-                for (var i = 0; i < skinInfo.joints.length; i++) {
-                    var joint = lib.joints[skinInfo.joints[i]];
-                    jointIndices.push(joint.index);
-                }
-                lib.skins[name] = {
-                    joints : jointIndices
+            for (var name in lib.meshes) {
+                var meshList = lib.meshes[name];
+                for (var i = 0; i < meshList.length; i++) {
+                    var mesh = meshList[i];
+                    if (mesh.skeleton) {
+                        var material = mesh.material;
+                        mesh.skeleton = lib.skeletons[mesh.skeleton];
+                        if (mesh.skeleton) {
+                            for (var j = 0; j < mesh.skeleton.joints.length; j++) {
+                                mesh.joints.push(j);
+                            }
+                            material.shader = material.shader.clone();
+                            material.shader.define('vertex', 'SKINNING');
+                            material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);  
+                        } 
+                    }
                 }
             }
-            skeleton.updateJointMatrices();
-            skeleton.update();
-            lib.skeleton = skeleton;
         },
 
         _parseTextures : function(json, lib) {
@@ -471,13 +578,10 @@ define(function(require) {
                         }
                     }
 
+                    // DEPRECATED
                     var skinName = primitiveInfo.skin;
                     if (skinName) {
-                        mesh.joints = lib.skins[skinName].joints;
-                        mesh.skeleton = lib.skeleton;
-                        material.shader = material.shader.clone();
-                        material.shader.define('vertex', 'SKINNING');
-                        material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
+                        mesh.skeleton = skinName;
                     }
                     if (meshInfo.name) {
                         if (meshInfo.primitives.length > 1) {
@@ -497,10 +601,6 @@ define(function(require) {
         _parseNodes : function(json, lib) {
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
-                if (nodeInfo._isJoint) {
-                    // Skip joint node
-                    continue;
-                }
                 var node;
                 if (nodeInfo.camera) {
                     var cameraInfo = json.cameras[nodeInfo.camera];
@@ -533,11 +633,15 @@ define(function(require) {
                         }
                     }
                 }
-                if (nodeInfo.meshes) {
+                if (nodeInfo.meshes || nodeInfo.instanceSkin) {
                     // TODO one node have multiple meshes ?
-                    var meshName = nodeInfo.meshes[0];
-                    if (meshName) {
-                        var primitives = lib.meshes[meshName];
+                    if (nodeInfo.meshes) {
+                        var meshKey = nodeInfo.meshes[0];
+                    } else {
+                        var meshKey = nodeInfo.instanceSkin.sources[0];
+                    }
+                    if (meshKey) {
+                        var primitives = lib.meshes[meshKey];
                         if (primitives) {
                             if (primitives.length === 1) {
                                 // Replace the node with mesh directly
@@ -545,6 +649,9 @@ define(function(require) {
                                 node.name = nodeInfo.name;
                             } else {
                                 for (var j = 0; j < primitives.length; j++) {                            
+                                    if (nodeInfo.instanceSkin) {
+                                        primitives[j].skeleton = nodeInfo.instanceSkin.skin;
+                                    }
                                     node.add(primitives[j]);
                                 }   
                             }
@@ -564,10 +671,6 @@ define(function(require) {
             // Build hierarchy
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
-                if (nodeInfo._isJoint) {
-                    // Skip joint node
-                    continue;
-                }
                 var node = lib.nodes[name];
                 if (nodeInfo.children) {
                     for (var i = 0; i < nodeInfo.children.length; i++) {
@@ -606,6 +709,13 @@ define(function(require) {
 
             return light;
         },
+
+        _parseAnimations : function(json, lib) {
+            for (var name in json.animations) {
+                var animationInfo = json.animations[name];
+                
+            }
+        }
     });
 
     return Loader;

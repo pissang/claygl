@@ -47,7 +47,7 @@ uniform float bias : 0.001;
 
 #extension GL_OES_standard_derivatives : enable
 
-@import buildin.util.pack_depth
+@import buildin.util.encode_float
 
 void main(){
     // Whats the difference between gl_FragCoord.z and this v_ViewPosition
@@ -70,7 +70,7 @@ void main(){
         // Add slope scaled bias using partial derivative
         depth += max(dFdx(depth), dFdy(depth)) + bias;
 
-        gl_FragColor = packDepth(depth * 0.5 + 0.5);
+        gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
     #endif
 }
 @end
@@ -80,14 +80,14 @@ void main(){
 uniform sampler2D depthMap;
 varying vec2 v_Texcoord;
 
-@import buildin.util.unpack_depth
+@import buildin.util.decode_float
 
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
     #ifdef USE_VSM
         gl_FragColor = vec4(tex.rgb, 1.0);
     #else
-        float depth = unpackDepth(tex);
+        float depth = decodeFloat(tex);
         gl_FragColor = vec4(depth, depth, depth, 1.0);
     #endif
 }
@@ -144,7 +144,7 @@ uniform float range : 100;
 
 varying vec3 v_WorldPosition;
 
-@import buildin.util.pack_depth
+@import buildin.util.encode_float
 
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
@@ -152,7 +152,7 @@ void main(){
         gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
     #else
         dist = dist / range;
-        gl_FragColor = packDepth(dist);
+        gl_FragColor = encodeFloat(dist);
     #endif
 }
 @end
@@ -185,13 +185,13 @@ uniform float pointLightRanges[POINT_LIGHT_SHADOWMAP_NUMBER];
 
 uniform bool shadowEnabled : true;
 
-@import buildin.util.unpack_depth
+@import buildin.util.decode_float
 
 #if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
-    return unpackDepth(tex) * 2.0 - 1.0< z ? 0.0 : 1.0;
+    return decodeFloat(tex) * 2.0 - 1.0< z ? 0.0 : 1.0;
 }
 
 float pcf(sampler2D map, vec2 uv, float z){

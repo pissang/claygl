@@ -9,11 +9,13 @@ define(function(require) {
 
     var Skeleton = Base.derive(function() {
         return {
+            name : '',
+
             // Root joints
             roots : [],
             joints : [],
 
-            clips : [],
+            _clips : [],
 
             // Matrix to joint space(inverse of indentity bone world matrix)
             _jointMatrices : [],
@@ -32,37 +34,88 @@ define(function(require) {
             this.roots = [];
             var joints = this.joints;
             for (var i = 0; i < joints.length; i++) {
-                var bone = joints[i];
-                if (bone.parentIndex >= 0) {
-                    var parent = joints[bone.parentIndex];
-                    parent.add(bone);
+                var joint = joints[i];
+                if (joint.parentIndex >= 0) {
+                    var parent = joints[joint.parentIndex].node;
+                    parent.add(joint.node);
                 }else{
-                    this.roots.push(bone);
+                    this.roots.push(joint);
                 }
+            }
+        },
+
+        addClip : function(clip, mapRule) {
+
+            // Map the joint index in skeleton to joint pose index in clip
+            var maps = [];
+            // Create avatar
+            for (var i = 0; i < clip.jointClips.length; i++) {
+                for (var j = 0; j < this.joints.length; j++) {
+                    var joint = this.joints[j];
+                    var jointPose = clip.jointClips[i];
+                    var jointName = joint.name;
+                    if (mapRule) {
+                        jointName = mapRule[jointName];
+                    }
+                    if (jointPose.name === jointName) {
+                        maps[j] = i;
+                        break;
+                    }
+                }
+            }
+
+            this._clips.push({
+                maps : maps,
+                clip : clip
+            });
+        },
+
+        removeClip : function(clip) {
+            var idx = -1;
+            for (var i = 0; i < this._clips.length; i++) {
+                if (this._clips[i].clip === clip) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx > 0) {
+                this._clips.splice(idx, 1);
+            }
+        },
+
+        getClip : function(index) {
+            if (this._clips[index]) {
+                return this._clips[index].clip;
             }
         },
 
         updateJointMatrices : function() {
             for (var i = 0; i < this.roots.length; i++) {
-                this.roots[i].update();
+                // Update the transform if joint node not attached to the scene
+                if (!this.roots[i].node.scene) {
+                    this.roots[i].node.update();   
+                }
             }
             for (var i = 0; i < this.joints.length; i++) {
-                var bone = this.joints[i];
-                this._jointMatrices[i] = (new Matrix4()).copy(bone.worldTransform).invert();
+                var joint = this.joints[i];
+                this._jointMatrices[i] = (new Matrix4()).copy(joint.node.worldTransform).invert();
                 this._invBindMatrices[i] = new Matrix4();
             }
         },
 
         update : function() {
             for (var i = 0; i < this.roots.length; i++) {
-                this.roots[i].update();
+                // Update the transform if joint node not attached to the scene
+                if (!this.roots[i].node.scene) {
+                    this.roots[i].node.update();
+                }
             }
             if (! this._invBindMatricesArray) {
                 this._invBindMatricesArray = new Float32Array(this.joints.length * 16);
             }
             var cursor = 0;
             for (var i = 0; i < this.joints.length; i++) {
-                var matrixCurrentPose = this.joints[i].worldTransform;
+                var matrixCurrentPose = this.joints[i].node.worldTransform;
                 this._invBindMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
 
                 for (var j = 0; j < 16; j++) {
@@ -90,29 +143,47 @@ define(function(require) {
         },
 
         setPose : function(clipIndex) {
-            var clip = this.clips[clipIndex];
+            var clip = this._clips[clipIndex].clip;
+            var maps = this._clips[clipIndex].maps;
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
-                var pose = clip.jointPoses[i];
+                if (maps[i] === undefined) {
+                    continue;
+                }
+                var pose = clip.jointClips[maps[i]];
 
-                joint.position.copy(pose.position);
-                joint.rotation.copy(pose.rotation);
-                joint.scale.copy(pose.scale);
+                vec3.copy(joint.node.position._array, pose.position);
+                quat.copy(joint.node.rotation._array, pose.rotation);
+                vec3.copy(joint.node.scale._array, pose.scale);
+
+                joint.node.position._dirty = true;
+                joint.node.rotation._dirty = true;
+                joint.node.scale._dirty = true;
             }
             this.update();
         },
 
         blendPose : function(clip1idx, clip2idx, weight) {
-            var clip1 = this.clips[clip1idx];
-            var clip2 = this.clips[clip2idx];
+            var clip1 = this._clips[clip1idx].clip;
+            var clip2 = this._clips[clip2idx].clip;
+            var maps1 = this._clips[clip1idx].maps;
+            var maps2 = this._clips[clip2idx].maps;
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
-                var pose = clip.jointPoses[i];
+                if (maps1[i] === undefined || maps2[i] === undefined) {
+                    continue;
+                }
+                var pose1 = clip1.jointClips[maps1[i]];
+                var pose2 = clip2.jointClips[maps2[i]];
 
-                joint.position.lerp(clip1.position, clip2.position, weight);
-                joint.rotation.slerp(clip1.rotation, clip2.rotation, weight);
-                joint.scale.lerp(clip1.scale, clip2.scale, weight);
+                vec3.lerp(joint.node.position._array, pose1.position, pose2.position, weight);
+                quat.slerp(joint.node.rotation._array, pose1.rotation, pose2.rotation, weight);
+                vec3.lerp(joint.node.scale._array, pose1.scale, pose2.scale, weight);
+
+                joint.node.position._dirty = true;
+                joint.node.rotation._dirty = true;
+                joint.node.scale._dirty = true;
             }
             
             this.update();

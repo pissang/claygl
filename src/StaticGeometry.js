@@ -150,6 +150,7 @@ define(function(require) {
             var indicesBuffer = chunk.indicesBuffer;
 
             var attributes = this.getEnabledAttributes();
+            var prevSearchIdx = 0;
             for (var name in attributes) {
                 var attribute = attributes[name];
                 if (!attribute.value) {
@@ -157,21 +158,21 @@ define(function(require) {
                 }
 
                 var bufferInfo;
-                for (var i = idx; i < attributeBuffers.length; i++) {
+                for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
                     if (attributeBuffers[i].name === name) {
                         bufferInfo = attributeBuffers[i];
-                        idx = i + 1;
+                        prevSearchIdx = i + 1;
                         break;
                     }
                 }
-                for (var i = idx - 1; i >= 0; i--) {
+                for (var i = prevSearchIdx - 1; i >= 0; i--) {
                     if (attributeBuffers[i].name === name) {
                         bufferInfo = attributeBuffers[i];
-                        idx = i;
+                        prevSearchIdx = i;
                         break;
                     }
                 }
-                
+
                 var buffer;
                 if (bufferInfo) {
                     buffer = bufferInfo.buffer;
@@ -233,10 +234,10 @@ define(function(require) {
 
                     p1x = positions[i1 * 3],
                     p2x = positions[i2 * 3],
-                    p3x = positions[i3 * 3];
+                    p3x = positions[i3 * 3],
                     p1y = positions[i1 * 3 + 1],
                     p2y = positions[i2 * 3 + 1],
-                    p3y = positions[i3 * 3 + 1];
+                    p3y = positions[i3 * 3 + 1],
                     p1z = positions[i1 * 3 + 2],
                     p2z = positions[i2 * 3 + 2],
                     p3z = positions[i3 * 3 + 2];

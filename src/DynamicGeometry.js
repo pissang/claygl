@@ -458,17 +458,18 @@ define(function(require) {
                 }
                 this.cache.put("chunks", chunks);
             }
-            for (var i = 0; i < this._arrayChunks.length; i++) {
-                var chunk = chunks[i];
+            for (var cc = 0; cc < this._arrayChunks.length; cc++) {
+                var chunk = chunks[cc];
                 if (! chunk) {
-                    chunk = chunks[i] = {
+                    chunk = chunks[cc] = {
                         attributeBuffers : [],
                         indicesBuffer : null
                     }
                 }
                 var attributeBuffers = chunk.attributeBuffers;
                 var indicesBuffer = chunk.indicesBuffer;
-                var arrayChunk = this._arrayChunks[i];
+                
+                var arrayChunk = this._arrayChunks[cc];
                 var attributeArrays = arrayChunk.attributeArrays;
                 var indicesArray = arrayChunk.indicesArray;
 

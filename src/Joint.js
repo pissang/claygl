@@ -1,13 +1,19 @@
 define(function(require) {
 
     var Node = require("./Node");
+    var Base = require("./core/Base");
     
-    var Joint = Node.derive(function() {
+    var Joint = Base.derive(function() {
         return {
-            // Index of bone
+            // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576
+            name : '',
+            // Index of joint
             index : -1,
-            // Parent bone index
+            // Parent joint index
             parentIndex : -1,
+
+            // Scene node attached to
+            node : null
         }
     }, {
     });
