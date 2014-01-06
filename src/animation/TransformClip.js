@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+    
     var Clip = require('./Clip');
 
     var glMatrix = require("glmatrix");
@@ -11,7 +13,10 @@ define(function(require) {
     }
 
     var TransformClip = function(options) {
-        this.name = '';
+        
+        options = options || {};
+
+        this.name = options.name || '';
 
         Clip.call(this, options);
 
@@ -21,13 +26,10 @@ define(function(require) {
         //  rotation :  // optional
         //  scale :     // optional
         //}]
+        this.keyFrames = []
         if (options.keyFrames) {
-            this.keyFrames = options.keyFrames;
-        } else {
-            this.keyFrames = [];
+            this.addKeyFrames(options.keyFrames)
         }
-
-        this.keyFrames.sort(keyframeSort);
 
         this.position = vec3.create();
         this.rotation = quat.create();
@@ -49,6 +51,8 @@ define(function(require) {
             var deltaTime = time - this._startTime;
             this.setTime(deltaTime);
         }
+
+        return ret;
     }
 
     TransformClip.prototype.setTime = function(time) {
@@ -57,7 +61,7 @@ define(function(require) {
         this._interpolateField(time, 'scale');   
     }
 
-    TransformClip.prototype.addKeyframe = function(kf) {
+    TransformClip.prototype.addKeyFrame = function(kf) {
         for (var i = 0; i < this.keyFrames.length - 1; i++) {
             var prevFrame = this.keyFrames[i];
             var nextFrame = this.keyFrames[i+1];
@@ -67,11 +71,22 @@ define(function(require) {
             }
         }
 
+        this.life = kf.time;
         this.keyFrames.push(kf);
     }
 
-    TransformClip.prototype.getSubClip = function(startTime, endTime) {
+    TransformClip.prototype.addKeyFrames = function(kfs) {
+        for (var i = 0; i < kfs.length; i++) {
+            this.keyFrames.push(kfs[i]);
+        }
 
+        this.keyFrames.sort(keyframeSort);
+
+        this.life = this.keyFrames[this.keyFrames.length - 1].time;
+    }
+
+    TransformClip.prototype.getSubClip = function(startTime, endTime) {
+        // TODO
     }
 
     TransformClip.prototype._interpolateField = function(time, fieldName) {
@@ -80,6 +95,12 @@ define(function(require) {
         var start;
         var end;
 
+        if (!kfs.length) {
+            return;
+        }
+        if (time < kfs[0].time || time > kfs[kfs.length-1].time) {
+            return;
+        }
         if (time < this._cacheTime) {
             var s = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
             for (var i = s; i >= 0; i--) {

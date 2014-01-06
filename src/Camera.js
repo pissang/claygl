@@ -19,7 +19,7 @@ define(function(require) {
             // Notice:
             //  updated after rendering (in the step of frustum culling passingly)
             //  So may be not so accurate, but saved a lot of calculation !!
-            //  TODO : In case of on camera to multiple scenes
+            //  TODO : In case of one camera to multiple scenes
             sceneBoundingBoxLastFrame : new BoundingBox()
         }
     }, function() {

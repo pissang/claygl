@@ -32,7 +32,7 @@ define(function(require) {
     var Quaternion = require("../math/Quaternion");
     var BoundingBox = require('../math/BoundingBox');
 
-    var TransformClip = require("../animation/TransformClip");
+    var SamplerClip = require("../animation/SamplerClip");
     var SkinningClip = require("../animation/SkinningClip");
     
     var _ = require("_");
@@ -148,12 +148,20 @@ define(function(require) {
                     self._parseSkins2(json, lib);
                 }
 
+                var clip = self._parseAnimations(json, lib);
+                if (clip) {
+                    for (var name in lib.skeletons) {
+                        lib.skeletons[name].addClip(clip);
+                    }
+                }
+
                 self.trigger("success", {
                     scene : scene,
                     cameras : lib.cameras,
                     textures : lib.textures,
                     materials : lib.materials,
-                    skeletons : lib.skeletons
+                    skeletons : lib.skeletons,
+                    clip : clip
                 });
             }
 
@@ -162,7 +170,8 @@ define(function(require) {
                 cameras : lib.cameras,
                 textures : lib.textures,
                 materials : lib.materials,
-                skeletons : lib.skeletons
+                skeletons : lib.skeletons,
+                clip : null
             }
         },
 
@@ -189,6 +198,7 @@ define(function(require) {
             var self = this;
 
             // Create skeletons and joints
+            var haveInvBindMatrices = false;
             for (var name in json.skins) {
                 var skinInfo = json.skins[name];
                 var skeleton = new Skeleton({
@@ -201,6 +211,21 @@ define(function(require) {
                         index : skeleton.joints.length
                     });
                     skeleton.joints.push(joint);
+                }
+                if (skinInfo.inverseBindMatrices) {
+                    haveInvBindMatrices = true;
+                    var IBMInfo = skinInfo.inverseBindMatrices;
+                    var bufferViewName = IBMInfo.bufferView;
+                    var bufferViewInfo = json.bufferViews[bufferViewName];
+                    var buffer = lib.buffers[bufferViewInfo.buffer];
+
+                    var offset = IBMInfo.byteOffset + bufferViewInfo.byteOffset;
+                    var size = IBMInfo.count * 16;
+
+                    var array = new Float32Array(buffer, offset, size);
+
+                    skeleton._invBindPoseMatricesArray = array;
+                    skeleton._skinMatricesArray = new Float32Array(array.length);
                 }
                 lib.skeletons[name] = skeleton;
             }
@@ -279,7 +304,11 @@ define(function(require) {
 
             for (var name in lib.skeletons) {
                 var skeleton = lib.skeletons[name];
-                skeleton.updateJointMatrices();
+                if (haveInvBindMatrices) {
+                    skeleton.updateMatricesSubArrays();
+                } else {
+                    skeleton.updateJointMatrices();
+                }
                 skeleton.update();
             }
         },     
@@ -566,7 +595,18 @@ define(function(require) {
                                 break;
                         }
                         var attributeArray = new arrayConstructor(buffer, byteOffset, attributeInfo.count * size);
-                        geometry.attributes[attributeName].value = attributeArray;
+                        if (semantic === 'WEIGHT' && size === 4) {
+                            // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
+                            var weightArray = new arrayConstructor(attributeInfo.count * 3);
+                            for (var i = 0; i < attributeInfo.count; i++) {
+                                weightArray[i * 3] = attributeArray[i * 4];
+                                weightArray[i * 3 + 1] = attributeArray[i * 4 + 1];
+                                weightArray[i * 3 + 2] = attributeArray[i * 4 + 2];
+                            }
+                            geometry.attributes[attributeName].value = weightArray;
+                        } else {
+                            geometry.attributes[attributeName].value = attributeArray;
+                        }
                         if (semantic === 'POSITION') {
                             // Bounding Box
                             var min = attributeInfo.min;
@@ -738,9 +778,88 @@ define(function(require) {
         },
 
         _parseAnimations : function(json, lib) {
-            for (var name in json.animations) {
-                var animationInfo = json.animations[name];
+            // TODO Only support nodes animation now
+            var clip = new SkinningClip();
+            var haveAnimation = false;
 
+            var jointClips = {};
+
+            var quatTmp = quat.create();
+
+            for (var name in json.animations) {
+                haveAnimation = true;
+                var animationInfo = json.animations[name];
+                var parameters = {};
+
+                for (var name in animationInfo.parameters) {
+                    var accessorName = animationInfo.parameters[name];
+                    var accessorInfo = json.accessors[accessorName];
+
+                    var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+                    var buffer = lib.buffers[bufferViewInfo.buffer];
+                    var byteOffset = bufferViewInfo.byteOffset + accessorInfo.byteOffset;
+                    switch(accessorInfo.type) {
+                        case 0x8B50:     // FLOAT_VEC2
+                            var size = 2;
+                            break;
+                        case 0x8B51:     // FLOAT_VEC3
+                            var size = 3;
+                            break;
+                        case 0x8B52:     // FLOAT_VEC4
+                            var size = 4;
+                            break;
+                        case 0x1406:     // FLOAT
+                            var size = 1;
+                            break;
+                    }
+                    parameters[name] = new Float32Array(buffer, byteOffset, size * accessorInfo.count);
+                }
+
+                if (!parameters.TIME) {
+                    continue;
+                }
+
+                // Use the first channels target
+                var targetNode = lib.nodes[animationInfo.channels[0].target.id];
+
+                // glTF use axis angle in rotation, convert to quaternion
+                // https://github.com/KhronosGroup/glTF/issues/144
+                var rotationArr = parameters.rotation;
+                for (i = 0; i < parameters.TIME.length; i++) {
+                    parameters.TIME[i] *= 1000;
+                    var offset = i * 4;
+                    if (rotationArr) {
+                        quatTmp[0] = rotationArr[offset];
+                        quatTmp[1] = rotationArr[offset + 1];
+                        quatTmp[2] = rotationArr[offset + 2];
+                        quat.setAxisAngle(quatTmp, quatTmp, rotationArr[offset + 3]);
+                        parameters.rotation[offset] = quatTmp[0];
+                        parameters.rotation[offset + 1] = quatTmp[1];
+                        parameters.rotation[offset + 2] = quatTmp[2];
+                        parameters.rotation[offset + 3] = quatTmp[3];
+                    }
+                }
+
+                if (jointClips[targetNode.name]) {
+                    // Why ?? 
+                    continue;
+                }
+                jointClips[targetNode.name] = new SamplerClip({
+                    name : targetNode.name
+                });
+                var jointClip = jointClips[targetNode.name];
+                jointClip.channels.time = parameters.TIME;
+                jointClip.channels.rotation = parameters.rotation;
+                jointClip.channels.position = parameters.translation;
+                jointClip.channels.scale = parameters.scale;
+                jointClip.life = parameters.TIME[parameters.TIME.length - 1];
+                clip.addJointClip(jointClip);
+            }
+
+            if (haveAnimation) {
+                return clip;
+            } else {
+                return null;
             }
         }
     });

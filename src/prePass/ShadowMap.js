@@ -357,14 +357,23 @@ define(function(require) {
             var lightViewProjMatrix = new Matrix4();
             var lightProjMatrix = new Matrix4();
 
+            var prevDepth = 0;
+            var deltaDepth = 0;
             return function(renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
                 this._bindDepthMaterial(casters, light.shadowBias);
 
                 // Adjust scene camera
                 var originalFar = sceneCamera.far;
+
+                // Considering moving speed since the bounding box is from last frame
+                // verlet integration ?
+                var depth = -sceneCamera.sceneBoundingBoxLastFrame.min.z;
+                deltaDepth = Math.max(depth - prevDepth, 0);
+                prevDepth = depth;
+                depth += deltaDepth;
                 // TODO: add a bias
-                sceneCamera.far = Math.min(sceneCamera.far, -sceneCamera.sceneBoundingBoxLastFrame.min.z);
+                sceneCamera.far = Math.min(sceneCamera.far, depth);
                 sceneCamera.far = Math.max(sceneCamera.near, sceneCamera.far);
                 sceneCamera.updateProjectionMatrix();
                 sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
