@@ -378,7 +378,7 @@ define(function(require) {
                 });
 
                 if (easing && easing !== 'spline') {
-                    clip.easing = easing;
+                    clip.setEasing(easing);
                 }
                 self._clipList.push(clip);
                 self._clipCount++;

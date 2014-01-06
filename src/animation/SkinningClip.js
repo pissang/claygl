@@ -24,7 +24,7 @@ define(function(require) {
 
             var kfs = options.jointClips[0].keyFrames;
             if (kfs.length) {
-                this._life = kfs[kfs.length-1].time;
+                this.life = kfs[kfs.length-1].time;
             }
         }
     }
@@ -43,6 +43,14 @@ define(function(require) {
                 this.jointClips[i].setTime(deltaTime);
             }
         }
+    }
+
+    SkinningClip.prototype.addJointClip = function(jointClip) {
+        this.jointClips.push(jointClip);
+    }
+
+    SkinningClip.prototype.removeJointClip = function(jointClip) {
+        this.jointClips.splice(this.jointClips.indexOf(jointClip), 1);
     }
 
     return SkinningClip;

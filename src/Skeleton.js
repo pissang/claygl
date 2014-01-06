@@ -6,6 +6,7 @@ define(function(require) {
     var glMatrix = require("glmatrix");
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
+    var mat4 = glMatrix.mat4;
 
     var Skeleton = Base.derive(function() {
         return {
@@ -18,15 +19,20 @@ define(function(require) {
             _clips : [],
 
             // Matrix to joint space(inverse of indentity bone world matrix)
-            _jointMatrices : [],
+            _jointMatricesArray : null,
+
+            // Use subarray instead of copy back each time computing matrix
+            // http://jsperf.com/subarray-vs-copy-for-array-transform/5
+            _jointMatricesSubArrays : [],
 
             // jointMatrix * currentPoseMatrix
             // worldTransform is relative to the root bone
             // still in model space not world space
-            _invBindMatrices : [],
+            _skinMatricesArray : null,
 
-            _invBindMatricesArray : null,
-            _subInvBindMatricesArray : {}
+            _skinMatricesSubArrays : [],
+
+            _subSkinMatricesArray : {}
         }
     }, {
 
@@ -89,54 +95,71 @@ define(function(require) {
             }
         },
 
-        updateJointMatrices : function() {
-            for (var i = 0; i < this.roots.length; i++) {
-                // Update the transform if joint node not attached to the scene
-                if (!this.roots[i].node.scene) {
-                    this.roots[i].node.update();   
+        updateJointMatrices : (function() {
+
+            var m4 = mat4.create();
+            
+            return function() {
+                for (var i = 0; i < this.roots.length; i++) {
+                    // Update the transform if joint node not attached to the scene
+                    if (!this.roots[i].node.scene) {
+                        this.roots[i].node.update();
+                    }
+                }
+                this._jointMatricesArray = new Float32Array(this.joints.length * 16);
+                this._skinMatricesArray = new Float32Array(this.joints.length * 16);
+
+                for (var i = 0; i < this.joints.length; i++) {
+                    var joint = this.joints[i];
+                    mat4.copy(m4, joint.node.worldTransform._array);
+                    mat4.invert(m4, m4);
+                    var offset = i * 16;
+                    for (var j = 0; j < 16; j++) {
+                        this._jointMatricesArray[offset + j] = m4[j];
+                    }
+                    this._jointMatricesSubArrays[i] = this._jointMatricesArray.subarray(i * 16, (i+1) * 16);
+                    this._skinMatricesSubArrays[i] = this._skinMatricesArray.subarray(i * 16, (i+1) * 16);
                 }
             }
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                this._jointMatrices[i] = (new Matrix4()).copy(joint.node.worldTransform).invert();
-                this._invBindMatrices[i] = new Matrix4();
-            }
-        },
+        })(),
 
-        update : function() {
-            for (var i = 0; i < this.roots.length; i++) {
-                // Update the transform if joint node not attached to the scene
-                if (!this.roots[i].node.scene) {
-                    this.roots[i].node.update();
+        update : (function() {
+
+            var m4 = mat4.create();
+            var m4j = mat4.create();
+            
+            return function() {
+                for (var i = 0; i < this.roots.length; i++) {
+                    // Update the transform if joint node not attached to the scene
+                    if (!this.roots[i].node.scene) {
+                        this.roots[i].node.update();
+                    }
+                }
+
+                for (var i = 0; i < this.joints.length; i++) {
+                    mat4.copy(m4, this.joints[i].node.worldTransform._array);
+
+                    mat4.multiply(
+                        this._skinMatricesSubArrays[i],
+                        this.joints[i].node.worldTransform._array,
+                        this._jointMatricesSubArrays[i]
+                    );
                 }
             }
-            if (! this._invBindMatricesArray) {
-                this._invBindMatricesArray = new Float32Array(this.joints.length * 16);
-            }
-            var cursor = 0;
-            for (var i = 0; i < this.joints.length; i++) {
-                var matrixCurrentPose = this.joints[i].node.worldTransform;
-                this._invBindMatrices[i].copy(matrixCurrentPose).multiply(this._jointMatrices[i]);
+        })(),
 
-                for (var j = 0; j < 16; j++) {
-                    var array = this._invBindMatrices[i]._array;
-                    this._invBindMatricesArray[cursor++] = array[j];
-                }
-            }
-        },
-
-        getSubInvBindMatrices : function(meshId, joints) {
-            var subArray = this._subInvBindMatricesArray[meshId]
+        getSubSkinMatrices : function(meshId, joints) {
+            var subArray = this._subSkinMatricesArray[meshId]
             if (!subArray) {
                 subArray 
-                    = this._subInvBindMatricesArray[meshId]
+                    = this._subSkinMatricesArray[meshId]
                     = new Float32Array(joints.length * 16);
             }
             var cursor = 0;
             for (var i = 0; i < joints.length; i++) {
                 var idx = joints[i];
                 for (var j = 0; j < 16; j++) {
-                    subArray[cursor++] = this._invBindMatricesArray[idx * 16 + j];
+                    subArray[cursor++] = this._skinMatricesArray[idx * 16 + j];
                 }
             }
             return subArray;

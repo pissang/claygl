@@ -51,6 +51,14 @@ define(function(require) {
             return this;
         },
 
+        setArray : function(arr) {
+            this._array[0] = arr[0];
+            this._array[1] = arr[1];
+
+            this._dirty = true;
+            return this;
+        },
+
         clone : function() {
             return new Vector2(this.x, this.y);
         },

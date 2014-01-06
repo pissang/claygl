@@ -4,28 +4,27 @@ define(function(require) {
 
     var Clip = function(options) {
 
-        this._targetPool = options.target || {};
-        if (this._targetPool.constructor != Array) {
-            this._targetPool = [this._targetPool];
+        this.target = options.target;
+
+        if (options.life !== undefined) {
+            this.life = options.life;
         }
-
-        this._life = options.life || 1000;
-
-        this._delay = options.delay || 0;
+        if (options.delay !== undefined) {
+            this.delay = options.delay;
+        }
+        if (options.gap !== undefined) {
+            this.gap = options.gap;
+        }
         
-        this._startTime = new Date().getTime() + this._delay;
+        this._startTime = new Date().getTime() + this.delay;
 
-        this._endTime = this._startTime + this._life*1000;
-        this._needsRemove = false;
+        this._endTime = this._startTime + this.life;
 
         this._loop = options.loop === undefined ? false : options.loop;
         this.setLoop(this._loop);
 
-        this.gap = options.gap || 0;
-
-        this.easing = options.easing;
-        if (typeof(this.easing) === 'string') {
-            this.easing = Easing[this.easing];
+        if (options.easing !== undefined) {
+            this.setEasing(options.easing);
         }
 
         if (options.onframe !== undefined) {
@@ -44,6 +43,14 @@ define(function(require) {
 
     Clip.prototype = {
 
+        gap : 0,
+
+        life : 1000,
+
+        delay : 0,
+
+        gap : 0,
+
         setLoop : function(loop) {
             this._loop = loop;
             if (loop) {
@@ -55,8 +62,15 @@ define(function(require) {
             }
         },
 
+        setEasing : function(easing) {
+            if (typeof(easing) === 'string') {
+                easing = Easing[easing];
+            }
+            this.easing = easing;
+        },
+
         step : function(time) {
-            var percent = (time - this._startTime) / this._life;
+            var percent = (time - this._startTime) / this.life;
 
             if (percent < 0) {
                 return;
@@ -93,10 +107,8 @@ define(function(require) {
         },
         fire : function(eventType, arg) {
             var eventName = 'on' + eventType;
-            for(var i = 0, len = this._targetPool.length; i < len; i++) {
-                if (this[eventName]) {
-                    this[eventName](this._targetPool[i], arg);
-                }
+            if (this[eventName]) {
+                this[eventName](this.target, arg);
             }
         }
     };

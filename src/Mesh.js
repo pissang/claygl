@@ -78,8 +78,8 @@ define(function(require) {
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
-                var invMatricesArray = this.skeleton.getSubInvBindMatrices(this.__GUID__, this.joints);
-                shader.setUniformBySemantic(_gl, "INV_BIND_MATRIX", invMatricesArray);
+                var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
+                shader.setUniformBySemantic(_gl, "SKIN_MATRIX", skinMatricesArray);
             }
 
             var vertexNumber = geometry.getVertexNumber();

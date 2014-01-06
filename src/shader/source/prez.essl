@@ -9,7 +9,7 @@ attribute vec3 position : POSITION;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
 void main()
@@ -21,7 +21,7 @@ void main()
         
         @import buildin.chunk.skin_matrix
         
-        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);

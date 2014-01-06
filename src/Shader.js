@@ -72,7 +72,7 @@ define(function(require) {
         // https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#semantics
         'JOINT',
         'WEIGHT',
-        'INV_BIND_MATRIX'
+        'SKIN_MATRIX'
     ];
     var matrixSemantics = [
         'WORLD',
@@ -576,7 +576,7 @@ define(function(require) {
                             uniformType += 'v';
                         }
                         if (semantic) {
-                            // This case is only for INV_BIND_MATRIX
+                            // This case is only for SKIN_MATRIX
                             if (attribSemantics.indexOf(semantic) >= 0) {
                                 self.attribSemantics[semantic] = {
                                     symbol : symbol,

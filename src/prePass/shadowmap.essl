@@ -9,7 +9,7 @@ attribute vec3 position : POSITION;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
 varying vec4 v_ViewPosition;
@@ -18,20 +18,10 @@ void main(){
     vec3 skinnedPosition = position;
     
     #ifdef SKINNING
-        mat4 skinMatrix;
-        if (joint.x >= 0.0){
-            skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
-        }
-        if (joint.y >= 0.0){
-            skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
-        }
-        if (joint.z >= 0.0){
-            skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
-        }
-        if (joint.w >= 0.0){
-            skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
-        }
-        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+
+        @import buildin.chunk.skin_matrix
+
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
 
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
@@ -106,7 +96,7 @@ attribute vec3 position : POSITION;
 attribute vec3 boneWeight;
 attribute vec4 boneIndex;
 
-uniform mat4 boneMatrices[BONE_MATRICES_NUMBER];
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
 varying vec3 v_WorldPosition;
@@ -115,20 +105,9 @@ void main(){
 
     vec3 skinnedPosition = position;
     #ifdef SKINNING
-        mat4 skinMatrix;
-        if(boneIndex.x >= 0.0){
-            skinMatrix = boneMatrices[int(boneIndex.x)] * boneWeight.x;
-        }
-        if(boneIndex.y >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.y)] * boneWeight.y;
-        }
-        if(boneIndex.z >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.z)] * boneWeight.z;
-        }
-        if(boneIndex.w >= 0.0){
-            skinMatrix += boneMatrices[int(boneIndex.w)] * (1.0-boneWeight.x-boneWeight.y-boneWeight.z);
-        }
-        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+        @import buildin.chunk.skin_matrix
+
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);

@@ -77,21 +77,23 @@ vec4 RGBMEncode(vec3 color, float range) {
 
 
 @export buildin.chunk.skin_matrix
-mat4 skinMatrix;
+
+// Weighted Sum Skinning Matrix
+mat4 skinMatrixWS;
 if (joint.x >= 0.0)
 {
-    skinMatrix = invBindMatrix[int(joint.x)] * weight.x;
+    skinMatrixWS = skinMatrix[int(joint.x)] * weight.x;
 }
 if (joint.y >= 0.0)
 {
-    skinMatrix += invBindMatrix[int(joint.y)] * weight.y;
+    skinMatrixWS += skinMatrix[int(joint.y)] * weight.y;
 }
 if (joint.z >= 0.0)
 {
-    skinMatrix += invBindMatrix[int(joint.z)] * weight.z;
+    skinMatrixWS += skinMatrix[int(joint.z)] * weight.z;
 }
 if (joint.w >= 0.0)
 {
-    skinMatrix += invBindMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
+    skinMatrixWS += skinMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
 }
 @end

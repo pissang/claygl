@@ -31,6 +31,9 @@ define(function(require) {
     var Vector3 = require("../math/Vector3");
     var Quaternion = require("../math/Quaternion");
     var BoundingBox = require('../math/BoundingBox');
+
+    var TransformClip = require("../animation/TransformClip");
+    var SkinningClip = require("../animation/SkinningClip");
     
     var _ = require("_");
 
@@ -39,7 +42,7 @@ define(function(require) {
     var glMatrix = require("glmatrix");
     var vec4 = glMatrix.vec4;
     var vec3 = glMatrix.vec3;
-    var vec2 = glMatrix.vec2;
+    var quat = glMatrix.quat;
 
     var semanticAttributeMap = {
         'NORMAL' : 'normal',
@@ -54,7 +57,9 @@ define(function(require) {
         return {
             rootPath : "",
             textureRootPath : "",
-            bufferRootPath : ""
+            bufferRootPath : "",
+
+            shaderName : 'buildin.phong'
         };
     }, {
         
@@ -239,6 +244,10 @@ define(function(require) {
                     if (node instanceof Mesh) {
                         node.skeleton = skeleton;
                         node.joints = jointIndices;
+                        var material = node.material;
+                        material.shader = material.shader.clone();
+                        material.shader.define('vertex', 'SKINNING');
+                        material.shader.define('vertex', 'JOINT_NUMBER', jointIndices.length);
                     } else {
                         // Mesh have multiple primitives
                         for (var i = 0; i < node._children.length; i++) {
@@ -246,6 +255,10 @@ define(function(require) {
                             if (child.skeleton) {
                                 child.skeleton = skeleton;
                                 child.joints = jointIndices;
+                                var material = child.material;
+                                material.shader = material.shader.clone();
+                                material.shader.define('vertex', 'SKINNING');
+                                material.shader.define('vertex', 'JOINT_NUMBER', jointIndices.length);
                             }
                         }
                     }
@@ -329,7 +342,7 @@ define(function(require) {
                             }
                             material.shader = material.shader.clone();
                             material.shader.define('vertex', 'SKINNING');
-                            material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);  
+                            material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
                         } 
                     }
                 }
@@ -424,7 +437,7 @@ define(function(require) {
                 }
                 var material = new Material({
                     name : materialInfo.name,
-                    shader : shaderLibrary.get('buildin.phong', enabledTextures)
+                    shader : shaderLibrary.get(this.shaderName, enabledTextures)
                 });
                 if (pass.states.depthMask !== undefined) {
                     material.depthMask = pass.states.depthMask;
@@ -599,6 +612,7 @@ define(function(require) {
         },
 
         _parseNodes : function(json, lib) {
+
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
                 var node;
@@ -663,6 +677,19 @@ define(function(require) {
                         node.localTransform._array[i] = nodeInfo.matrix[i];
                     }
                     node.decomposeLocalTransform();
+                } else {
+                    if (nodeInfo.translation) {
+                        node.position.setArray(nodeInfo.translation);
+                    }
+                    if (nodeInfo.rotation) {
+                        // glTF use axis angle in rotation
+                        // https://github.com/KhronosGroup/glTF/issues/144
+                        quat.setAxisAngle(node.rotation._array, nodeInfo.rotation.slice(0, 3), nodeInfo.rotation[3]);
+                        node.rotation._dirty = true;
+                    }
+                    if (nodeInfo.scale) {
+                        node.scale.setArray(nodeInfo.scale);
+                    }
                 }
 
                 lib.nodes[name] = node;
@@ -713,7 +740,7 @@ define(function(require) {
         _parseAnimations : function(json, lib) {
             for (var name in json.animations) {
                 var animationInfo = json.animations[name];
-                
+
             }
         }
     });

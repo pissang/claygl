@@ -23,10 +23,6 @@ varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 #endif
 
-#ifdef SKINNING
-varying vec3 v_Weight;
-#endif
-
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
 uniform samplerCube environmentMap;
@@ -96,10 +92,6 @@ float D_GGX(float g, float ndh) {
 
 void main()
 {
-    #ifdef RENDER_WEIGHT
-        gl_FragColor = vec4(v_Weight.xyz, 1.0);
-        return;
-    #endif
     #ifdef RENDER_TEXCOORD
         gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
         return;

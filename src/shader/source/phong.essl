@@ -24,7 +24,7 @@ attribute vec3 barycentric;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 invBindMatrix[JOINT_NUMBER] : INV_BIND_MATRIX;
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
 varying vec2 v_Texcoord;
@@ -35,10 +35,6 @@ varying vec3 v_Barycentric;
 #ifdef NORMALMAP_ENABLED
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
-#endif
-
-#ifdef SKINNING
-varying vec3 v_Weight;
 #endif
 
 #ifdef VERTEX_COLOR
@@ -55,10 +51,10 @@ void main()
         
         @import buildin.chunk.skin_matrix
 
-        skinnedPosition = (skinMatrix * vec4(position, 1.0)).xyz;
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
         // Normal matrix ???
-        skinnedNormal = (skinMatrix * vec4(normal, 0.0)).xyz;
-        skinnedTangent = (skinMatrix * vec4(tangent.xyz, 0.0)).xyz;
+        skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
+        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
     #endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
@@ -72,10 +68,6 @@ void main()
     #ifdef NORMALMAP_ENABLED
         v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
         v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
-    #endif
-
-    #ifdef SKINNING
-        v_Weight = weight;
     #endif
 
     #ifdef VERTEX_COLOR
@@ -97,10 +89,6 @@ varying vec3 v_WorldPosition;
 #ifdef NORMALMAP_ENABLED
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
-#endif
-
-#ifdef SKINNING
-varying vec3 v_Weight;
 #endif
 
 uniform sampler2D diffuseMap;
@@ -145,10 +133,6 @@ varying vec3 v_Barycentric;
 
 void main()
 {
-    #ifdef RENDER_WEIGHT
-        gl_FragColor = vec4(v_Weight.xyz, 1.0);
-        return;
-    #endif
     #ifdef RENDER_TEXCOORD
         gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
         return;
