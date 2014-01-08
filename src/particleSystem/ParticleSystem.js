@@ -52,8 +52,10 @@ define(function(require) {
         }
     }, {
 
+        visible : true,
+
         isRenderable : function() {
-            return true;
+            return this.visible;
         },
 
         addEmitter : function(emitter) {

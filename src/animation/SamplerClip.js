@@ -150,9 +150,5 @@ define(function(require) {
         }
     }
 
-    SamplerClip.prototype.getSubClip = function(startTime, endTime) {
-        // TODO
-    }
-
     return SamplerClip;
 });

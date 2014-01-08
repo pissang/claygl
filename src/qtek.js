@@ -35,6 +35,7 @@ define( function(require){
 	},
 	"Camera": require('Camera'),
 	"DynamicGeometry": require('DynamicGeometry'),
+	"Entity": require('Entity'),
 	"FrameBuffer": require('FrameBuffer'),
 	"Geometry": require('Geometry'),
 	"Joint": require('Joint'),
@@ -53,7 +54,9 @@ define( function(require){
 	"animation": {
 		"Animation": require('animation/Animation'),
 		"Clip": require('animation/Clip'),
+		"SamplerClip": require('animation/SamplerClip'),
 		"SkinningClip": require('animation/SkinningClip'),
+		"TransformClip": require('animation/TransformClip'),
 		"easing": require('animation/easing')
 	},
 	"camera": {

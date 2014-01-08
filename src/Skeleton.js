@@ -98,6 +98,10 @@ define(function(require) {
             }
         },
 
+        getClipNumber : function() {
+            return this._clips.length;
+        },
+
         updateJointMatrices : (function() {
 
             var m4 = mat4.create();
@@ -121,6 +125,8 @@ define(function(require) {
                         this._invBindPoseMatricesArray[offset + j] = m4[j];
                     }
                 }
+
+                this.updateMatricesSubArrays();
             }
         })(),
 

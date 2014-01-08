@@ -67,6 +67,9 @@ define(function(require) {
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
+                if (uniform.value === undefined) {
+                    throw new Error('Uniform value "' + symbol + '" is undefined');
+                }
                 if (uniform.value === null) {
                     continue;
                 }

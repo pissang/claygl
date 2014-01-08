@@ -34,6 +34,7 @@ void main(){
 
 varying vec4 v_ViewPosition;
 uniform float bias : 0.001;
+uniform float slopeScale : 1.0;
 
 #extension GL_OES_standard_derivatives : enable
 
@@ -58,7 +59,9 @@ void main(){
         gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
     #else
         // Add slope scaled bias using partial derivative
-        depth += max(dFdx(depth), dFdy(depth)) + bias;
+        float dx = dFdx(depth);
+        float dy = dFdy(depth);
+        depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
 
         gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
     #endif

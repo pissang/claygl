@@ -8,7 +8,8 @@ define(function(require) {
 
         return {
 
-            shadowBias : 0.0002
+            shadowBias : 0.0002,
+            shadowSlopeScale : 2.0
         }
     }, {
 

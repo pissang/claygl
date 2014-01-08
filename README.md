@@ -46,11 +46,10 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Normal Mapping
 + Omnilight Shadow 
 
-[DOTA2 Hero Viewer](http://pissang.github.io/qtek/dota2hero/)
+[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 + GPU Skinning
 + Custom complex shader
-+ [Full version](https://github.com/pissang/dota2hero)
 
 [Murcielago](http://pissang.github.io/qtek/murcielago)
 + [Simple material editor](http://pissang.github.io/qtek/murcielago/editor.html)

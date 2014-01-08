@@ -92,9 +92,7 @@ define(function(require){
         _updateRenderQueue : function(parent, sceneMaterialTransparent) {
             for (var i = 0; i < parent._children.length; i++) {
                 var child = parent._children[i];
-                if (!child.visible) {
-                    continue;
-                }
+                
                 if (child instanceof Light) {
                     this.lights.push(child);
                 }

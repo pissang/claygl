@@ -12,7 +12,8 @@ define(function(require) {
             penumbraAngle : 45,
             falloffFactor : 2.0,
             
-            shadowBias : 0.0002
+            shadowBias : 0.0002,
+            shadowSlopeScale : 2.0
         }
     },{
 

@@ -100,7 +100,7 @@ uniform float alpha : 1.0;
 
 uniform float shininess : 30;
 
-uniform vec3 specular : [1.0, 1.0, 1.0];
+uniform vec3 specularColor : [1.0, 1.0, 1.0];
 uniform vec3 emission : [0.0, 0.0, 0.0];
 
 uniform float reflectivity : 0.5;
@@ -187,7 +187,6 @@ void main()
         #endif
         for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
         {
-
             vec3 lightPosition = pointLightPosition[i];
             vec3 lightColor = pointLightColor[i];
             float range = pointLightRange[i];
@@ -327,7 +326,7 @@ void main()
     #endif
 
     finalColor.rgb *= diffuseTerm;
-    finalColor.rgb += specularTerm * specular;
+    finalColor.rgb += specularTerm * specularColor;
     finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED
@@ -339,6 +338,10 @@ void main()
     {
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
+
+    #ifdef GAMMA_ENCODE
+        finalColor.rgb = pow(finalColor.rgb, vec3(1 / 2.2));
+    #endif
 
     gl_FragColor = finalColor;
 }

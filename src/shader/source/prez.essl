@@ -23,7 +23,7 @@ void main()
         
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
-
+    
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 }
 

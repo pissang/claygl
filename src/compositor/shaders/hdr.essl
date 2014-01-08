@@ -90,18 +90,25 @@ uniform sampler2D lum;
 
 varying vec2 v_Texcoord;
 
-const float A = 0.22;
-const float B = 0.30;
-const float C = 0.10;
-const float D = 0.20;
-const float E = 0.01;
-const float F = 0.30;
-const vec3 W = vec3(11.2);
+const float A = 0.22;   // Shoulder Strength
+const float B = 0.30;   // Linear Strength
+const float C = 0.10;   // Linear Angle
+const float D = 0.20;   // Toe Strength
+const float E = 0.01;   // Toe Numerator
+const float F = 0.30;   // Toe Denominator
+const vec3 whiteScale = vec3(11.2);
 
-vec3 uncharted2Tonemap(vec3 x)
+vec3 uncharted2ToneMap(vec3 x)
 {
     return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
+
+vec3 filmicToneMap(vec3 color)
+{
+    vec3 x = max(vec3(0.0), color - 0.004);
+    return (x*(6.2*x+0.5))/(x*(6.2*x+1.7)+0.06);
+}
+
 float eyeAdaption(float fLum)
 {
     return mix(0.2, fLum, 0.5);
@@ -122,23 +129,24 @@ void main()
         tex += texture2D(lensflare, v_Texcoord).rgb;
     #endif
 
+    // Adjust exposure
     // From KlayGE
     #ifdef LUM_ENABLED
         float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
         float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
-        float exposureBias = adaptedLumDest * 1.6;
+        float exposureBias = adaptedLumDest;
     #else
         float exposureBias = 1.0;
     #endif
-    vec3 curr = uncharted2Tonemap(exposureBias * tex);
+    tex *= exposureBias;
 
-    vec3 whiteScale = 1.0 / uncharted2Tonemap(W);
-    vec3 color = curr * whiteScale;
-
-    color = pow(color, vec3(1.0/2.2));
+    // Do tone mapping
+    // vec3 color = uncharted2ToneMap(tex) / uncharted2ToneMap(whiteScale);
+    // color = pow(color, vec3(1.0/2.2));
+    vec3 color = filmicToneMap(tex);
 
     #ifdef RGBM_ENCODE
-        gl_FragColor.rgba = RGBMEncode(gl_FragColor.rgb);
+        gl_FragColor.rgba = RGBMEncode(color);
     #else
         gl_FragColor = vec4(color, 1.0);
     #endif

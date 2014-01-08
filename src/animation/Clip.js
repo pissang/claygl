@@ -51,6 +51,10 @@ define(function(require) {
 
         gap : 0,
 
+        // Start and end time if it is a sub clip
+        subStart : 0,
+        subEnd : 1000,
+
         setLoop : function(loop) {
             this._loop = loop;
             if (loop) {

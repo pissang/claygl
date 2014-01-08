@@ -20,34 +20,41 @@
                 var scene = new qtek.Scene();
                 scene.add(camera);
 
-                sphereGeo = new qtek.geometry.Sphere({
-                    widthSegments : 100,
-                    heightSegments : 100
+                var GLTFLoader = new qtek.loader.GLTF();
+                GLTFLoader.load("assets/models/suzanne.json");
+                var control = new qtek.plugin.OrbitControl({
+                    target : camera,
+                    domElement : renderer.canvas
                 });
 
-                for (var i = 0; i < 10; i++) {
-                    var material = new qtek.Material({
-                        shader : qtek.shader.library.get('buildin.physical')
-                    });
-                    material.set('color', [0.7, 0.0, 0.0]);
-                    material.set('specularColor', [0.1, 0.1, 0.1]);
-                    material.set('gloss', (i+1) / 10);
-                    var mesh = new qtek.Mesh({
-                        material : material,
-                        geometry :sphereGeo
-                    });
-                    mesh.position.set((i - 5) * 2.1, 0, 0);
-                    scene.add(mesh);
-                }
-                var light = new qtek.light.Directional();
-                light.position.set(1, 4, 4);
-                light.lookAt(qtek.math.Vector3.ZERO);
-                scene.add(light);
+                GLTFLoader.on('success', function(res) {
+                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                    for (var i = 0; i < 10; i++) {
+                        var material = new qtek.Material({
+                            shader : qtek.shader.library.get('buildin.physical')
+                        });
+                        material.set('color', [0.7, 0.0, 0.0]);
+                        material.set('specularColor', [0.1, 0.1, 0.1]);
+                        material.set('glossiness', (i+1) / 12);
+                        var mesh = new qtek.Mesh({
+                            material : material,
+                            geometry :suzanneGeometry
+                        });
+                        mesh.position.set((i - 5) * 2.1, 0, 0);
+                        scene.add(mesh);
+                    }
 
-                var animation = new qtek.animation.Animation();
-                animation.start();
-                animation.on('frame', function() {
-                    renderer.render(scene, camera);
+                    var light = new qtek.light.Directional();
+                    light.position.set(1, 4, 4);
+                    light.lookAt(qtek.math.Vector3.ZERO);
+                    scene.add(light);
+
+                    var animation = new qtek.animation.Animation();
+                    animation.start();
+                    animation.on('frame', function() {
+                        control.update();
+                        renderer.render(scene, camera);
+                    });
                 });
             });
         </script>

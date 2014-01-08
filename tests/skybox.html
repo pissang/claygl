@@ -42,6 +42,8 @@
                 var root = new qtek.Node();
                 meshList.forEach(function(mesh) {
                     var material = mesh.material;
+                    material.shader.enableTexture('environmentMap');
+                    material.shader.disableTexture('normalMap');
                     material.set("environmentMap", texture);
                     material.set("reflectivity", 0.4);
                     root.add(mesh);

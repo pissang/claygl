@@ -23,7 +23,7 @@ define(function(require) {
     var preZPassShader = shaderLibrary.get('buildin.prez');
     var preZPassMaterial = new Material({
         shader : preZPassShader
-    })
+    });
 
     var Renderer = Base.derive(function() {
         return {
@@ -55,6 +55,9 @@ define(function(require) {
             gl : null,
 
             viewportInfo : {},
+
+            _viewportSettings : [],
+            _clearSettings : [],
 
             _sceneRendering : null
         }
@@ -127,6 +130,26 @@ define(function(require) {
                 y : y,
                 width : width,
                 height : height
+            }
+        },
+
+        saveViewport : function() {
+            this._viewportSettings.push(this.viewportInfo);
+        },
+
+        restoreViewport : function() {
+            if (this._viewportSettings.length > 0) {
+                this.setViewport(this._viewportSettings.pop());
+            }
+        },
+
+        saveClear : function() {
+            this._clearSettings.push(this.clear);
+        },
+
+        restoreClear : function() {
+            if (this._clearSettings.length > 0) {
+                this.clear = this._clearSettings.pop();   
             }
         },
 
@@ -238,6 +261,9 @@ define(function(require) {
                         if (!this._frustumCulling(renderable, camera)) {
                             continue;
                         }
+                    }
+                    if (renderable.skeleton) {  // Skip skinned mesh
+                        continue;
                     }
                     if (renderable.cullFace !== cullFace) {
                         cullFace = renderable.cullFace;

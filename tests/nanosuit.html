@@ -126,7 +126,7 @@
                     var start = performance.now();
                     renderer.clear = qtek.Renderer.COLOR_BUFFER_BIT | qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.render(renderer, scene, camera);
-                    var drawInfo = renderer.render(scene, camera, true, false);
+                    var drawInfo = renderer.render(scene, camera, true, true);
                     var renderTime = performance.now() - start;
 
                     renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;

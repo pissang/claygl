@@ -1,7 +1,7 @@
 define(function(require) {
 
     'use strict';
-    
+
     var Clip = require('./Clip');
 
     var TransformClip = require('./TransformClip');
@@ -26,10 +26,7 @@ define(function(require) {
                 jointClip.name = jointPoseCfg.name || '';
                 this.jointClips[j] = jointClip;
 
-                var kfs = jointClip.keyFrames;
-                if (kfs.length) {
-                    this.life = Math.max(kfs[kfs.length-1].time, this.life);
-                }
+                this.life = Math.max(jointClip.life, this.life);
             }
         }
     }
@@ -44,12 +41,16 @@ define(function(require) {
 
         if (ret !== 'destroy') {
             var deltaTime = time - this._startTime;
-            for (var i = 0; i < this.jointClips.length; i++) {
-                this.jointClips[i].setTime(deltaTime);
-            }
+            this.setTime(deltaTime);
         }
 
         return ret;
+    }
+
+    SkinningClip.prototype.setTime = function(time) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            this.jointClips[i].setTime(time);
+        }
     }
 
     SkinningClip.prototype.addJointClip = function(jointClip) {

@@ -111,7 +111,7 @@ define(function(require) {
             renderer.clear = prevClear;
         },
 
-        _bindDepthMaterial : function(casters, bias) {
+        _bindDepthMaterial : function(casters, bias, slopeScale) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var depthMaterial = this._depthMaterials[mesh.joints.length];
@@ -141,6 +141,7 @@ define(function(require) {
                     }
 
                     depthMaterial.setUniform('bias', bias);
+                    depthMaterial.setUniform('slopeScale', slopeScale);
                 }
             }
         },
@@ -361,7 +362,7 @@ define(function(require) {
             var deltaDepth = 0;
             return function(renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
-                this._bindDepthMaterial(casters, light.shadowBias);
+                this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
 
                 // Adjust scene camera
                 var originalFar = sceneCamera.far;
@@ -450,7 +451,7 @@ define(function(require) {
 
         _renderSpotLightShadow : function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
-            this._bindDepthMaterial(casters, light.shadowBias);
+            this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
 
             var texture = this._getTexture(light.__GUID__, light);
             var camera = this._getSpotLightCamera(light);

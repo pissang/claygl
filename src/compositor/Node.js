@@ -238,6 +238,8 @@ define(function(require) {
                 return this._prevOutputTextures[name];
             }
 
+            this._outputReferences[name] ++;
+
             this.render(renderer);
             
             return this._outputTextures[name];
@@ -289,8 +291,21 @@ define(function(require) {
 
         beforeFrame : function() {
             this._rendered = false;
+
+            // Put back all the textures to pool
             for (var name in this.outputLinks) {
-                this._outputReferences[name] = this.outputLinks[name].length;
+                if (this._outputReferences[name] > 0) {
+                    var outputInfo = this.outputs[name];
+                    if (outputInfo.keepLastFrame) {
+                        if (this._prevOutputTextures[name]) {
+                            texturePool.put(this._prevOutputTextures[name]);
+                        }
+                        this._prevOutputTextures[name] = this._outputTextures[name];
+                    } else {
+                        texturePool.put(this._outputTextures[name]);
+                    }
+                }
+                this._outputReferences[name] = 0;
             }
         }
     })

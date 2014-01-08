@@ -6,6 +6,8 @@ define(function(require) {
 
     var pool = {};
 
+    var allocatedTextures = [];
+
     var texturePool = {
 
         get : function(parameters) {
@@ -16,6 +18,7 @@ define(function(require) {
             var list = pool[key];
             if (!list.length) {
                 var texture = new Texture2D(parameters);
+                allocatedTextures.push(texture);
                 return texture;
             }
             return list.pop();
@@ -31,12 +34,11 @@ define(function(require) {
         },
 
         clear : function(gl) {
-            for (name in pool) {
-                for (var i = 0; i < pool[name].length; i++) {
-                    pool[name][i].dispose(gl);
-                }
+            for (i = 0; i < allocatedTextures.length; i++) {
+                allocatedTextures[i].dispose(gl);
             }
             pool = {};
+            allocatedTextures = [];
         }
     }
 

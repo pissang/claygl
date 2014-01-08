@@ -85,10 +85,6 @@ define(function(require) {
         this.life = this.keyFrames[this.keyFrames.length - 1].time;
     }
 
-    TransformClip.prototype.getSubClip = function(startTime, endTime) {
-        // TODO
-    }
-
     TransformClip.prototype._interpolateField = function(time, fieldName) {
         var kfs = this.keyFrames;
         var len = kfs.length;

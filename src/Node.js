@@ -48,9 +48,6 @@ define(function(require) {
             // }
         }
     }, {
-
-        visible : true,
-
         isRenderable : function() {
             return false;
         },
@@ -188,11 +185,7 @@ define(function(require) {
             }
             
             for(var i = 0, len = this._children.length; i < len; i++) {
-                var child = this._children[i];
-                // Skip the hidden nodes
-                if(child.visible) {
-                    child.update(force);
-                }
+                this._children[i].update(force);
             }
         },
 

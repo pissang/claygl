@@ -51,6 +51,9 @@ define(function(require) {
             _drawCache : {}
         }
     }, {
+
+        visible : true,
+
         // Only if mode is LINES
         lineWidth : 1,
         
@@ -66,7 +69,7 @@ define(function(require) {
         castShadow : true,
 
         isRenderable : function() {
-            return this.geometry && this.material && this.material.shader;
+            return this.geometry && this.material && this.material.shader && this.visible;
         },
 
         render : function(_gl, globalMaterial) {

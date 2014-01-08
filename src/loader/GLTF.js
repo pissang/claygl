@@ -59,7 +59,7 @@ define(function(require) {
             textureRootPath : "",
             bufferRootPath : "",
 
-            shaderName : 'buildin.phong'
+            shaderName : 'buildin.physical'
         };
     }, {
         
@@ -495,12 +495,14 @@ define(function(require) {
                     material.set('emission', uniforms['emission'].slice(0, 3));
                 }
                 if (uniforms['shininess'] !== undefined) {
+                    material.set("glossiness", Math.log(uniforms["shininess"]) / Math.log(8192));
                     material.set("shininess", uniforms["shininess"]);
                 } else {
-                    material.set("shininess", 0);
+                    material.set("glossiness", 0.5);
+                    material.set("shininess", 0.5);
                 }
                 if (uniforms["specular"] !== undefined) {
-                    material.set("specular", uniforms["specular"].slice(0, 3));
+                    material.set("specularColor", uniforms["specular"].slice(0, 3));
                 }
                 if (uniforms["transparency"] !== undefined) {
                     material.set("alpha", uniforms["transparency"]);
@@ -786,13 +788,13 @@ define(function(require) {
 
             var quatTmp = quat.create();
 
-            for (var name in json.animations) {
+            for (var animName in json.animations) {
                 haveAnimation = true;
-                var animationInfo = json.animations[name];
+                var animationInfo = json.animations[animName];
                 var parameters = {};
 
-                for (var name in animationInfo.parameters) {
-                    var accessorName = animationInfo.parameters[name];
+                for (var paramName in animationInfo.parameters) {
+                    var accessorName = animationInfo.parameters[paramName];
                     var accessorInfo = json.accessors[accessorName];
 
                     var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
@@ -812,7 +814,7 @@ define(function(require) {
                             var size = 1;
                             break;
                     }
-                    parameters[name] = new Float32Array(buffer, byteOffset, size * accessorInfo.count);
+                    parameters[paramName] = new Float32Array(buffer, byteOffset, size * accessorInfo.count);
                 }
 
                 if (!parameters.TIME) {
@@ -820,7 +822,8 @@ define(function(require) {
                 }
 
                 // Use the first channels target
-                var targetNode = lib.nodes[animationInfo.channels[0].target.id];
+                var targetId = animationInfo.channels[0].target.id;
+                var targetNode = lib.nodes[targetId];
 
                 // glTF use axis angle in rotation, convert to quaternion
                 // https://github.com/KhronosGroup/glTF/issues/144
@@ -840,20 +843,23 @@ define(function(require) {
                     }
                 }
 
-                if (jointClips[targetNode.name]) {
-                    // Why ?? 
-                    continue;
-                }
-                jointClips[targetNode.name] = new SamplerClip({
+                // TODO
+                // if (jointClips[targetId]) {
+                //     continue;
+                // }
+                jointClips[targetId] = new SamplerClip({
                     name : targetNode.name
                 });
-                var jointClip = jointClips[targetNode.name];
+                var jointClip = jointClips[targetId];
                 jointClip.channels.time = parameters.TIME;
                 jointClip.channels.rotation = parameters.rotation;
                 jointClip.channels.position = parameters.translation;
                 jointClip.channels.scale = parameters.scale;
                 jointClip.life = parameters.TIME[parameters.TIME.length - 1];
-                clip.addJointClip(jointClip);
+            }
+
+            for (var targetId in jointClips) {
+                clip.addJointClip(jointClips[targetId]);
             }
 
             if (haveAnimation) {

@@ -30,7 +30,7 @@ uniform samplerCube environmentMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
-uniform float gloss : 0.5;
+uniform float glossiness : 0.5;
 
 uniform vec3 specularColor : [0.1, 0.1, 0.1];
 uniform vec3 emission : [0.0, 0.0, 0.0];
@@ -63,10 +63,10 @@ varying vec3 v_Barycentric;
 @import buildin.plugin.compute_shadow_map
 
 
-float G_Smith(float gloss, float ndv, float ndl)
+float G_Smith(float glossiness, float ndv, float ndl)
 {
     // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
-    float roughness = 1.0 - gloss;
+    float roughness = 1.0 - glossiness;
     float k = roughness * roughness / 2.0;
     float G1V = ndv / (ndv * (1.0 - k) + k);
     float G1L = ndl / (ndl * (1.0 - k) + k);
@@ -101,7 +101,7 @@ void main()
 
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
-    float g = gloss;
+    float g = glossiness;
 
     #ifdef DIFFUSEMAP_ENABLED
         vec4 tex = texture2D(diffuseMap, v_Texcoord);
@@ -274,7 +274,7 @@ void main()
     finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED
-        vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+        vec3 envTex = textureCube(environmentMap, reflect(-V, N)).xyz;
         finalColor.rgb = finalColor.rgb + envTex * g;
     #endif
 
@@ -283,6 +283,9 @@ void main()
         finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 
+    #ifdef GAMMA_ENCODE
+        finalColor.rgb = pow(finalColor.rgb, vec3(1 / 2.2));
+    #endif
     gl_FragColor = finalColor;
 }
 
