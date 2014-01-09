@@ -16,9 +16,8 @@ define(function(require){
                 this._dirty = false;
             }
             for (var i = 0; i < this.nodes.length; i++) {
-                var node = this.nodes[i];
                 // Update the reference number of each output texture
-                node.beforeFrame();
+                this.nodes[i].beforeFrame();
             }
 
             for (var i = 0; i < this.nodes.length; i++) {
@@ -33,6 +32,11 @@ define(function(require){
                 if (!this._outputs[i]._rendered) {
                     this._outputs[i].render(renderer);
                 }
+            }
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                // Clear up
+                this.nodes[i].afterFrame();
             }
         },
 

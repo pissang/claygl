@@ -73,8 +73,9 @@ void main()
     float fAdaptedLum = texture2D(adaptedLum, vec2(0.5, 0.5)).r;
     float fCurrentLum = exp(texture2D(currentLum, vec2(0.5, 0.5)).r);
 
-    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 60.0 * frameTime));
+    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));
     gl_FragColor.rgb = vec3(fAdaptedLum);
+    // gl_FragColor.rgb = vec3(fCurrentLum);
     gl_FragColor.a = 1.0;
 }
 @end
@@ -87,6 +88,8 @@ uniform sampler2D texture;
 uniform sampler2D bloom;
 uniform sampler2D lensflare;
 uniform sampler2D lum;
+
+uniform float exposure : 1.0;
 
 varying vec2 v_Texcoord;
 
@@ -134,9 +137,9 @@ void main()
     #ifdef LUM_ENABLED
         float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
         float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
-        float exposureBias = adaptedLumDest;
+        float exposureBias = adaptedLumDest * exposure;
     #else
-        float exposureBias = 1.0;
+        float exposureBias = exposure;
     #endif
     tex *= exposureBias;
 

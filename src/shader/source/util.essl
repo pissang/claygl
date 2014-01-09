@@ -34,7 +34,7 @@ float edgeFactor(float width)
 @end
 
 // Pack depth
-// Float value can only be 0.0 - 1.0 ?
+// Float value can only be [0.0 - 1.0) ?
 @export buildin.util.encode_float
 vec4 encodeFloat( const in float depth )
 {

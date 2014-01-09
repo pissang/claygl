@@ -224,10 +224,14 @@ define(function(require) {
             if (! outputInfo) {
                 return ;
             }
+
+            this._outputReferences[name] ++;
+
             if (this._rendered) {
                 // Already been rendered in this frame
                 return this._outputTextures[name];
             } else if (
+                // TODO
                 this._rendering   // Solve Circular Reference
                 || outputInfo.outputLastFrame // Force return texture in last frame
             ) {
@@ -237,8 +241,6 @@ define(function(require) {
                 }
                 return this._prevOutputTextures[name];
             }
-
-            this._outputReferences[name] ++;
 
             this.render(renderer);
             
@@ -292,6 +294,12 @@ define(function(require) {
         beforeFrame : function() {
             this._rendered = false;
 
+            for (var name in this.outputLinks) {
+                this._outputReferences[name] = 0;
+            }
+        },
+
+        afterFrame : function() {
             // Put back all the textures to pool
             for (var name in this.outputLinks) {
                 if (this._outputReferences[name] > 0) {
@@ -305,7 +313,6 @@ define(function(require) {
                         texturePool.put(this._outputTextures[name]);
                     }
                 }
-                this._outputReferences[name] = 0;
             }
         }
     })

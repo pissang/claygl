@@ -187,8 +187,8 @@ define(function(require) {
                     node.__depth = posViewSpace[2];
                 }
             }
-            opaqueQueue.sort(_materialSortFunc);
-            transparentQueue.sort(_depthSortFunc);
+            opaqueQueue.sort(Renderer.opaqueSortFunc);
+            transparentQueue.sort(Renderer.transparentSortFunc);
 
             // Render Opaque queue
             scene.trigger("beforerender:opaque", this, opaqueQueue);
@@ -494,7 +494,7 @@ define(function(require) {
         }
     })
 
-    function _materialSortFunc(x, y) {
+    Renderer.opaqueSortFunc = function(x, y) {
         // Priority shader -> material -> geometry
         if (x.material.shader === y.material.shader) {
             if (x.material === y.material) {
@@ -504,7 +504,7 @@ define(function(require) {
         }
         return x.material.shader.__GUID__ - y.material.shader.__GUID__;
     }
-    function _depthSortFunc(x, y) {
+    Renderer.transparentSortFunc = function(x, y) {
         // Priority depth -> shader -> material -> geometry
         if (x.__depth === y.__depth) {
             if (x.material.shader === y.material.shader) {

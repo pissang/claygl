@@ -146,8 +146,9 @@ define(function(require) {
             _textureStatus : {},
 
             _vertexProcessed : "",
-            _fragmentProcessed : ""
+            _fragmentProcessed : "",
 
+            _currentLocationsMap : {}
         }
     }, function() {
         this._updateShaderString();
@@ -166,6 +167,8 @@ define(function(require) {
         bind : function(_gl) {
 
             this.cache.use(_gl.__GLID__, getCacheSchema);
+
+            this._currentLocationsMap = this.cache.get('locations');
 
             if (this.cache.isDirty()) {
                 this._updateShaderString();
@@ -314,12 +317,21 @@ define(function(require) {
             return this._textureStatus[symbol].enabled;
         },
 
+        hasUniform : function(symbol) {
+            var location = this._currentLocationsMap[symbol];
+            if (location === null || location === undefined) {
+                return false;
+            } else {
+                return true;
+            }
+        },
+
         setUniform : function(_gl, type, symbol, value) {
-            var locationMap = this.cache.get("locations");
+            var locationMap = this._currentLocationsMap;
             var location = locationMap[symbol];
             // Uniform is not existed in the shader
             if (location === null || location === undefined) {
-                return;
+                return false;
             }
             switch (type) {
                 case 'm4':
@@ -404,6 +416,7 @@ define(function(require) {
                     }
                     break;
             }
+            return true
         },
 
         setUniformBySemantic : function(_gl, semantic, val) {

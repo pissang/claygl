@@ -29,7 +29,6 @@ define(function(require) {
                 this.position.copy(camera.getWorldPosition());
                 this.update();
                 renderer.renderQueue([this], camera);
-                renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
             }
         }
     }, function() {

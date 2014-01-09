@@ -5,6 +5,10 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
+#ifdef SHADOW_TRANSPARENT 
+attribute vec2 texcoord : TEXCOORD_0;
+#endif
+
 #ifdef SKINNING
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
@@ -13,6 +17,11 @@ uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
 varying vec4 v_ViewPosition;
+
+#ifdef SHADOW_TRANSPARENT
+varying vec2 v_Texcoord;
+#endif
+
 void main(){
     
     vec3 skinnedPosition = position;
@@ -27,14 +36,26 @@ void main(){
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
     gl_Position = v_ViewPosition;
 
+    #ifdef SHADOW_TRANSPARENT
+        v_Texcoord = texcoord;
+    #endif
 }
 @end
 
 @export buildin.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
+
+#ifdef SHADOW_TRANSPARENT
+varying vec2 v_Texcoord;
+#endif
+
 uniform float bias : 0.001;
 uniform float slopeScale : 1.0;
+
+#ifdef SHADOW_TRANSPARENT
+uniform sampler2D transparentMap;
+#endif
 
 #extension GL_OES_standard_derivatives : enable
 
@@ -62,6 +83,14 @@ void main(){
         float dx = dFdx(depth);
         float dy = dFdy(depth);
         depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
+
+        #ifdef SHADOW_TRANSPARENT
+            if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {
+                // Hi-Z
+                gl_FragColor = encodeFloat(0.99);
+                return;
+            }
+        #endif
 
         gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
     #endif
@@ -248,7 +277,7 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
             return 1.0;
         }
     #else
-        if((unpackDepth(shadowTex) + 0.0002) * range < dist){
+        if((decodeFloat(shadowTex) + 0.0002) * range < dist){
             return 0.0;
         }else{
             return 1.0;
@@ -292,7 +321,6 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
             ) {
                 float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
                 shadowContribs[0] = shadowContrib;
-                // shadowContribs[0] = float(i) / float(SHADOW_CASCADE);
             }
         }
     #endif

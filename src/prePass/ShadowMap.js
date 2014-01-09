@@ -6,6 +6,7 @@ define(function(require) {
     var BoundingBox = require("../math/BoundingBox");
     var Frustum = require("../math/Frustum");
     var Matrix4 = require("../math/Matrix4");
+    var Renderer = require('../Renderer');
     var Shader = require("../Shader");
     var Light = require("../Light");
     var Mesh = require("../Mesh");
@@ -61,6 +62,7 @@ define(function(require) {
 
             _meshMaterials : {},
             _depthMaterials : {},
+            _depthShaders : {},
             _distanceMaterials : {},
 
             _opaqueCasters : [],
@@ -114,34 +116,55 @@ define(function(require) {
         _bindDepthMaterial : function(casters, bias, slopeScale) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
-                var depthMaterial = this._depthMaterials[mesh.joints.length];
-                if (mesh.material !== depthMaterial) {
+                var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
+                var transparentMap = mesh.material.shadowTransparentMap;
+                if (isShadowTransparent) {
+                    var matHashKey = mesh.joints.length + '-' + transparentMap.__GUID__;
+                    var shaderHashKey = mesh.joints.length + 's';
+                } else {
+                    var matHashKey = mesh.joints.length;
+                    var shaderHashKey = mesh.joints.length;
+                }
+                var depthMaterial = this._depthMaterials[matHashKey];
+                var depthShader = this._depthShaders[shaderHashKey];
+
+                if (mesh.material !== depthMaterial) {  // Not binded yet
+                    if (!depthShader) {
+                        depthShader = new Shader({
+                            vertex : Shader.source("buildin.sm.depth.vertex"),
+                            fragment : Shader.source("buildin.sm.depth.fragment")
+                        });
+                        if (mesh.joints.length > 0) {
+                            depthShader.define('vertex', 'SKINNING');
+                            depthShader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
+                        }
+                        if (isShadowTransparent) {
+                            depthShader.define('both', 'SHADOW_TRANSPARENT');
+                        }
+                        this._depthShaders[shaderHashKey] = depthShader;
+                    }
                     if (!depthMaterial) {
                         // Skinned mesh
                         depthMaterial = new Material({
-                            shader : new Shader({
-                                vertex : Shader.source("buildin.sm.depth.vertex"),
-                                fragment : Shader.source("buildin.sm.depth.fragment")
-                            })
+                            shader : depthShader
                         });
-                        if (mesh.joints.length > 0) {
-                            depthMaterial.shader.define('vertex', 'SKINNING');
-                            depthMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
-                        }
-                        this._depthMaterials[mesh.joints.length] = depthMaterial;
+                        this._depthMaterials[matHashKey] = depthMaterial;
                     }
 
                     this._meshMaterials[mesh.__GUID__] = mesh.material;
                     mesh.material = depthMaterial;
 
                     if (this.softShadow === ShadowMapPass.VSM) {
-                        depthMaterial.shader.define("fragment", "USE_VSM");
+                        depthShader.define("fragment", "USE_VSM");
                     } else {
-                        depthMaterial.shader.unDefine("fragment", "USE_VSM");
+                        depthShader.unDefine("fragment", "USE_VSM");
                     }
 
                     depthMaterial.setUniform('bias', bias);
                     depthMaterial.setUniform('slopeScale', slopeScale);
+                    if (isShadowTransparent) {
+                        depthMaterial.set('shadowTransparentMap', transparentMap);
+                    }
                 }
             }
         },
@@ -187,27 +210,34 @@ define(function(require) {
             }
         },
 
+        _updateCaster : function(mesh) {
+            if (mesh.castShadow) {
+                this._opaqueCasters.push(mesh);
+            }
+            if (mesh.receiveShadow) {
+                this._receivers.push(mesh);
+                mesh.material.__shadowUniformUpdated = false;
+                mesh.material.shader.__shadowDefineUpdated = false;
+                mesh.material.set('shadowEnabled', 1);
+            } else {
+                mesh.material.set('shadowEnabled', 0);
+            }
+            if (this.softShadow === ShadowMapPass.VSM) {
+                mesh.material.shader.define('fragment', 'USE_VSM');
+            } else {
+                mesh.material.shader.unDefine('fragment', 'USE_VSM');
+            }
+        },
+
         _update : function(scene) {
             for (var i = 0; i < scene.opaqueQueue.length; i++) {
-                var mesh = scene.opaqueQueue[i];
-                if (mesh.castShadow) {
-                    this._opaqueCasters.push(mesh);
-                }
-                if (mesh.receiveShadow) {
-                    this._receivers.push(mesh);
-                    mesh.material.__shadowUniformUpdated = false;
-                    mesh.material.shader.__shadowDefineUpdated = false;
-                    mesh.material.set('shadowEnabled', 1);
-                } else {
-                    mesh.material.set('shadowEnabled', 0);
-                }
-                if (this.softShadow === ShadowMapPass.VSM) {
-                    mesh.material.shader.define('fragment', 'USE_VSM');
-                } else {
-                    mesh.material.shader.unDefine('fragment', 'USE_VSM');
-                }
+                this._updateCaster(scene.opaqueQueue[i]);
             }
-            // TODO transparent queue
+            for (var i = 0; i < scene.transparentQueue.length; i++) {
+                // TODO Transparent object receive shadow will be very slow
+                // in stealth demo, still not find the reason
+                // this._updateCaster(scene.transparentQueue[i]);
+            }
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 if (light.castShadow) {
@@ -364,6 +394,8 @@ define(function(require) {
 
                 this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
 
+                casters.sort(Renderer.opaqueSortFunc);
+
                 // Adjust scene camera
                 var originalFar = sceneCamera.far;
 
@@ -452,6 +484,7 @@ define(function(require) {
         _renderSpotLightShadow : function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
             this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
+            casters.sort(Renderer.opaqueSortFunc);
 
             var texture = this._getTexture(light.__GUID__, light);
             var camera = this._getSpotLightCamera(light);
@@ -514,14 +547,14 @@ define(function(require) {
             frameBuffer.attach(_gl, tmpTexture);
             frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform("texture", texture);
-            this._gaussianPassH.setUniform("textureHeight", size);
+            this._gaussianPassH.setUniform("textureWidth", size);
             this._gaussianPassH.render(renderer);
             frameBuffer.unbind(renderer);
 
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
             this._gaussianPassV.setUniform("texture", tmpTexture);
-            this._gaussianPassV.setUniform("textureWidth", size);
+            this._gaussianPassV.setUniform("textureHeight", size);
             this._gaussianPassV.render(renderer);
             frameBuffer.unbind(renderer);
 
@@ -631,9 +664,9 @@ define(function(require) {
                 // Move camera to adjust the near to 0
                 // TODO : some scene object cast shadow in view will also be culled
                 // add a bias?
-                camera.position.scaleAndAdd(camera.worldTransform.forward, max[2]);
+                camera.position.scaleAndAdd(camera.worldTransform.forward, max[2] + 10);
                 camera.near = 0;
-                camera.far = -min[2]+max[2];
+                camera.far = -min[2] + max[2] + 10;
                 camera.left = min[0];
                 camera.right = max[0];
                 camera.top = max[1];

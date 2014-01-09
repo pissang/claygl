@@ -10,8 +10,7 @@
 
     <script type="text/javascript">
         require(['qtek',
-                'text!../tests/shader/ssao.essl',
-                'text!../tests/shader/fxaa.essl'], function(qtek, SSAOShader, FXAAShader) {
+                'text!../tests/shader/ssao.essl'], function(qtek, SSAOShader) {
             var renderer = new qtek.Renderer({
                 canvas : document.getElementById("Main")
             });
@@ -22,17 +21,16 @@
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
 
-            GLTFLoader.on('success', function(scene, cameras) {
-                var camera = cameras[Object.keys(cameras)[0]];
-                if (!camera) {
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+            GLTFLoader.on('success', function(res) {
+                var scene = res.scene;
+                scene.rotation.rotateX(-Math.PI / 2);
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
 
-                    camera.position.set(1, 1, 1);
-                    camera.lookAt(scene.position);
-                }
+                camera.position.set(2, 2, 2);
+                camera.lookAt(scene.position);
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
                 var control = new qtek.plugin.OrbitControl({
@@ -40,8 +38,6 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                // z up
-                control.up.set(0, 0, 1);
                 control.enable();
 
                 var light = scene.getNode("Spot").children()[0];
@@ -95,7 +91,7 @@
                     }
                 });
                 var FXAA = new qtek.compositor.Node({
-                    shader : FXAAShader,
+                    shader : qtek.Shader.source('buildin.compositor.fxaa'),
                     inputs : {
                         texture : {
                             pin : "color",
@@ -104,23 +100,25 @@
                     }
                 });
                 FXAA.setParameters({
-                    resolution : [1/renderer.canvas.width, 1/renderer.canvas.height]
+                    viewportSize : [renderer.canvas.width, renderer.canvas.height]
                 })
                 SSAO.setParameters({
                     znear : camera.near,
                     zfar : camera.far,
                     renderedTextureWidth : renderer.width,
                     renderedTextureHeight : renderer.height,
-                    radius : 4.0,
-                    lumInfluence : 0.6
+                    radius : 2.0,
+                    lumInfluence : 0.7
                 });
                 compositor.add(sceneNode);
                 compositor.add(SSAO);
                 compositor.add(FXAA);
 
-                // SSAO.pass.material.shader.define("fragment", "OUTPUT_AO");
+                SSAO.pass.material.shader.define("fragment", "OUTPUT_AO");
 
                 setInterval(function() {
+                    var a = SSAO;
+                    control.update();
                     compositor.render(renderer);
                 }, 50)
             });

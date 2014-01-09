@@ -26,7 +26,6 @@ define(function(require) {
             //}
             uniforms : {},
 
-
             shader : null,
 
             depthTest : true,
@@ -46,6 +45,8 @@ define(function(require) {
             //  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
             // }
             blend : null,
+
+            // shadowTransparentMap : null
 
             _enabledUniforms : [],
         }
@@ -68,16 +69,21 @@ define(function(require) {
                 var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
                 if (uniform.value === undefined) {
-                    throw new Error('Uniform value "' + symbol + '" is undefined');
+                    console.warn('Uniform value "' + symbol + '" is undefined');
+                    continue;
                 }
-                if (uniform.value === null) {
+                else if (uniform.value === null) {
                     continue;
                 }
                 else if (uniform.value instanceof Array
                     && ! uniform.value.length) {
                     continue;
                 }
-                if (uniform.value instanceof Texture) {
+                else if (uniform.value instanceof Texture) {
+                    var res = this.shader.setUniform(_gl, '1i', symbol, slot);
+                    if (!res) { // Texture is not enabled
+                        continue;
+                    }
                     var texture = uniform.value;
                     _gl.activeTexture(_gl.TEXTURE0 + slot);
                     // Maybe texture is not loaded yet;
@@ -88,17 +94,21 @@ define(function(require) {
                         texture.unbind(_gl);
                     }
 
-                    this.shader.setUniform(_gl, '1i', symbol, slot);
-
                     slot++;
                 }
                 else if (uniform.value instanceof Array) {
+                    if (uniform.value.length === 0) {
+                        continue;
+                    }
                     // Texture Array
                     var exampleValue = uniform.value[0];
 
                     if (exampleValue instanceof Texture) {
+                        if (!this.shader.hasUniform(symbol)) {
+                            continue;
+                        }
 
-                        var res = [];
+                        var arr = [];
                         for (var i = 0; i < uniform.value.length; i++) {
                             var texture = uniform.value[i];
                             _gl.activeTexture(_gl.TEXTURE0 + slot);
@@ -109,9 +119,10 @@ define(function(require) {
                                 texture.unbind(_gl);
                             }
 
-                            res.push(slot++);
+                            arr.push(slot++);
                         }
-                        this.shader.setUniform(_gl, '1iv', symbol, res);
+
+                        this.shader.setUniform(_gl, '1iv', symbol, arr);
                     } else {
                         this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
                     }
@@ -136,21 +147,21 @@ define(function(require) {
             }
         },
 
-        enableUniform : function(name) {
-            if (this.uniforms[name] && !this.isUniformEnabled(name)) {
-                this._enabledUniforms.push(name);
+        enableUniform : function(symbol) {
+            if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
+                this._enabledUniforms.push(symbol);
             }
         },
 
-        disableUniform : function(name) {
-            var idx = this._enabledUniforms.indexOf(name);
+        disableUniform : function(symbol) {
+            var idx = this._enabledUniforms.indexOf(symbol);
             if (idx >= 0) {
                 this._enabledUniforms.splice(idx, 1);
             }
         },
 
-        isUniformEnabled : function(name) {
-            return this._enabledUniforms.indexOf(name) >= 0;
+        isUniformEnabled : function(symbol) {
+            return this._enabledUniforms.indexOf(symbol) >= 0;
         },
 
         // Alias of setUniform and setUniforms
@@ -185,9 +196,9 @@ define(function(require) {
             this._enabledUniforms = Object.keys(this.uniforms);
 
             if (keepUniform) {
-                for (var key in originalUniforms) {
-                    if (this.uniforms[key]) {
-                        this.uniforms[key].value = originalUniforms[key].value;
+                for (var symbol in originalUniforms) {
+                    if (this.uniforms[symbol]) {
+                        this.uniforms[symbol].value = originalUniforms[symbol].value;
                     }
                 }
             }

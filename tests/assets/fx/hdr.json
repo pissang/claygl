@@ -332,7 +332,7 @@
             "type" : "processor",
             "inputs" : {
                 "texture" : {
-                    "node" : "bloom",
+                    "node" : "scene",
                     "pin" : "color"
                 }
             },
