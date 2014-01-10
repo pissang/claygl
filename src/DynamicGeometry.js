@@ -151,12 +151,12 @@ define(function(require) {
             }
 
             var result = {};
-            var vertexNumber = this.getVertexNumber();
+            var nVertex = this.getVertexNumber();
 
             for (var name in this.attributes) {
                 var attrib = this.attributes[name];
                 if (attrib.value.length) {
-                    if (attrib.value.length === vertexNumber) {
+                    if (attrib.value.length === nVertex) {
                         result[name] = attrib;
                     }
                 }
@@ -218,7 +218,7 @@ define(function(require) {
 
             var self = this
             var cursors = {};
-            var vertexNumber = this.getVertexNumber();
+            var nVertex = this.getVertexNumber();
             
             var verticesReorganizedMap = this._verticesReorganizedMap;
 
@@ -261,7 +261,7 @@ define(function(require) {
                 for (var name in cursors) {
                     cursors[name] = 0;
                 }
-                for (var i = 0; i < vertexNumber; i++) {
+                for (var i = 0; i < nVertex; i++) {
                     verticesReorganizedMap[i] = -1;
                 }
                 
@@ -273,7 +273,7 @@ define(function(require) {
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
-            if (vertexNumber > this.chunkSize && this.isUseFace()) {
+            if (nVertex > this.chunkSize && this.isUseFace()) {
                 var vertexCursor = 0;
                 var chunkIdx = 0;
                 var currentChunk;
@@ -281,7 +281,7 @@ define(function(require) {
                 var chunkFaceStart = [0];
                 var vertexUseCount = [];
 
-                for (i = 0; i < vertexNumber; i++) {
+                for (i = 0; i < nVertex; i++) {
                     vertexUseCount[i] = -1;
                     verticesReorganizedMap[i] = -1;
                 }
@@ -422,7 +422,7 @@ define(function(require) {
                     var size = attributes[name].size;
                     var attribArray = chunk.attributeArrays[name];
                     
-                    var arrSize = vertexNumber * size;
+                    var arrSize = nVertex * size;
                     if (! attribArray || attribArray.length !== arrSize) {
                         attribArray = new ArrayConstructors[name](arrSize);
                         chunk.attributeArrays[name] = attribArray;
@@ -614,8 +614,8 @@ define(function(require) {
 
             var tan1 = [];
             var tan2 = [];
-            var vertexNumber = this.getVertexNumber();
-            for (var i = 0; i < vertexNumber; i++) {
+            var nVertex = this.getVertexNumber();
+            for (var i = 0; i < nVertex; i++) {
                 tan1[i] = [0.0, 0.0, 0.0];
                 tan2[i] = [0.0, 0.0, 0.0];
             }
@@ -666,7 +666,7 @@ define(function(require) {
             }
             var tmp = [0, 0, 0, 0];
             var nCrossT = [0, 0, 0];
-            for (var i = 0; i < vertexNumber; i++) {
+            for (var i = 0; i < nVertex; i++) {
                 var n = normals[i];
                 var t = tan1[i];
 
@@ -761,7 +761,7 @@ define(function(require) {
         })(),
 
         convertToStatic : function(geometry) {
-            this._updateAttributesAndIndicesArrays();
+            this._updateAttributesAndIndicesArrays(this.getEnabledAttributes(), true);
 
             if (this._arrayChunks.length > 1) {
                 console.warn('Large geometry will discard chunks when convert to StaticGeometry');

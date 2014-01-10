@@ -56,25 +56,25 @@ define(function(require) {
             var inverseTransposeMatrix = mat4.create();
             // Initialize the array data and merge bounding box
             if (isStatic) {
-                var vertexCount = 0;
-                var faceCount = 0;
+                var nVertex = 0;
+                var nFace = 0;
                 for (var k = 0; k < meshes.length; k++) {
                     var currentGeo = meshes[k].geometry;
                     if (currentGeo.boundingBox) {
                         currentGeo.boundingBox.applyTransform(applyWorldTransform ? meshes[k].worldTransform : meshes[k].localTransform);
                         geometry.boundingBox.union(currentGeo.boundingBox);
                     }
-                    vertexCount += currentGeo.getVertexNumber();
-                    faceCount += currentGeo.getFaceNumber();
+                    nVertex += currentGeo.getVertexNumber();
+                    nFace += currentGeo.getFaceNumber();
                 }
                 for (var n = 0; n < attributeNames.length; n++) {
                     var name = attributeNames[n];
                     var attrib = geometry.attributes[name];
                     // TODO other type
-                    attrib.value = new Float32Array(vertexCount * attrib.size);
+                    attrib.value = new Float32Array(nVertex * attrib.size);
                 }
                 // TODO Uint32Array
-                geometry.faces = new Uint16Array(faceCount * 3);
+                geometry.faces = new Uint16Array(nFace * 3);
             }
 
             var vertexOffset = 0;
@@ -85,7 +85,7 @@ define(function(require) {
                 var mesh = meshes[mm];  
                 var currentGeo = mesh.geometry;
 
-                var vertexCount = currentGeo.getVertexNumber();
+                var nVertex = currentGeo.getVertexNumber();
 
                 var matrix = applyWorldTransform ? mesh.worldTransform._array : mesh.localTransform._array;
                 mat4.invert(inverseTransposeMatrix, matrix);
@@ -114,7 +114,7 @@ define(function(require) {
                             vec3.forEach(targetAttr.value, size, offset, count, vec3.transformMat4, inverseTransposeMatrix);
                         }
                     } else {
-                        for (var i = 0; i < vertexCount; i++) {
+                        for (var i = 0; i < nVertex; i++) {
                             // Transform position, normal and tangent
                             if (name === "position") {
                                 var newValue = vec3.create();
@@ -152,7 +152,7 @@ define(function(require) {
                     }
                 }
 
-                vertexOffset += vertexCount;
+                vertexOffset += nVertex;
             }
 
             return new Mesh({
@@ -173,12 +173,14 @@ define(function(require) {
             if (joints.length < maxJointNumber) {
                 return mesh;
             }
+            var isStatic = geometry instanceof StaticGeometry;
+
             var shaders = {};
 
             var faces = geometry.faces;
             
             var meshNumber = Math.ceil(joints.length / maxJointNumber);
-            var faceLen = geometry.faces.length;
+            var faceLen = geometry.getFaceNumber();
             var rest = faceLen;
             var isFaceAdded = [];
             var jointValues = geometry.attributes.joint.value;
@@ -200,14 +202,18 @@ define(function(require) {
                     if (isFaceAdded[f]) {
                         continue;
                     }
-                    var face = faces[f];
-
                     var canAddToBucket = true;
                     var addedNumber = 0;
                     for (var i = 0; i < 3; i++) {
-                        var idx = face[i];
+                        
+                        var idx = isStatic ? faces[f * 3 + i] : faces[f][i];
+                        
                         for (var j = 0; j < 4; j++) {
-                            var jointIdx = jointValues[idx][j];
+                            if (isStatic) {
+                                var jointIdx = jointValues[idx * 4 + j];
+                            } else {
+                                var jointIdx = jointValues[idx][j];
+                            }
                             if (jointIdx >= 0) {
                                 if (bucketJointReverseMap[jointIdx] === -1) {
                                     if (subJointNumber < maxJointNumber) {
@@ -229,7 +235,11 @@ define(function(require) {
                             subJointNumber--;
                         }
                     } else {
-                        bucketFaces.push(face);
+                        if (isStatic) {
+                            bucketFaces.push(faces.subarray(f * 3, (f + 1) * 3));
+                        } else {
+                            bucketFaces.push(faces[f]);
+                        }
                         isFaceAdded[f] = true;
                         rest--;
                     }
@@ -270,7 +280,11 @@ define(function(require) {
                     var uniform = material.uniforms[name];
                     subMat.set(name, uniform.value);
                 }
-                var subGeo = new DynamicGeometry();
+                if (isStatic) {
+                    var subGeo = new StaticGeometry();
+                } else {
+                    var subGeo = new DynamicGeometry();
+                }
                 var subMesh = new Mesh({
                     name : [mesh.name, i].join('-'),
                     material : subMat,
@@ -278,40 +292,99 @@ define(function(require) {
                     skeleton : skeleton,
                     joints : bucket.joints.slice()
                 });
-                var vertexNumber = 0;
-                for (var i = 0; i < geometry.getVertexNumber(); i++) {
+                var nVertex = 0;
+                var nVertex2 = geometry.getVertexNumber();
+                for (var i = 0; i < nVertex2; i++) {
                     newIndices[i] = -1;
                 }
+                // Count sub geo number
                 for (var f = 0; f < bucket.faces.length; f++) {
                     var face = bucket.faces[f];
-                    var newFace = [];
                     for (var i = 0; i < 3; i++) {
                         var idx = face[i];
                         if (newIndices[idx] === -1) {
-                            newIndices[idx] = vertexNumber;
+                            newIndices[idx] = nVertex;
+                            nVertex++;
+                        }
+                    }
+                }
+                if (isStatic) {
+                    for (var a = 0; a < attribNames.length; a++) {
+                        var attribName = attribNames[a];
+                        var subAttrib = subGeo.attributes[attribName];
+                        // TODO other type
+                        subAttrib.value = new Float32Array(nVertex * subAttrib.size);
+                    }
+                    subGeo.attributes.joint.value = new Float32Array(nVertex * 4);
+                    subGeo.faces = new Uint16Array(bucket.faces.length * 3);
+                }
+
+                var faceOffset = 0;
+                nVertex = 0;
+                for (var i = 0; i < nVertex2; i++) {
+                    newIndices[i] = -1;
+                }
+
+                for (var f = 0; f < bucket.faces.length; f++) {
+                    if (!isStatic) {
+                        var newFace = [];
+                    }
+                    var face = bucket.faces[f];
+                    for (var i = 0; i < 3; i++) {
+                        
+                        var idx = face[i];
+
+                        if (newIndices[idx] === -1) {
+                            newIndices[idx] = nVertex;
                             for (var a = 0; a < attribNames.length; a++) {
                                 var attribName = attribNames[a];
                                 var attrib = geometry.attributes[attribName];
                                 var subAttrib = subGeo.attributes[attribName];
-                                if (attrib.size === 1) {
-                                    subAttrib.value[vertexNumber] = attrib.value[idx];
+                                var size = attrib.size;
+
+                                if (isStatic) {
+                                    for (var j = 0; j < size; j++) {
+                                        subAttrib.value[nVertex * size + j] = attrib.value[idx * size + j];
+                                    }
                                 } else {
-                                    subAttrib.value[vertexNumber] = arraySlice.call(attrib.value[idx]);
+                                    if (attrib.size === 1) {
+                                        subAttrib.value[nVertex] = attrib.value[idx];
+                                    } else {
+                                        subAttrib.value[nVertex] = arraySlice.call(attrib.value[idx]);
+                                    }   
                                 }
                             }
-                            var newJoints = subGeo.attributes.joint.value[vertexNumber] = [-1, -1, -1, -1];
-                            // joints
-                            for (var j = 0; j < 4; j++) {
-                                var jointIdx = geometry.attributes.joint.value[idx][j];
-                                if (jointIdx >= 0) {
-                                    newJoints[j] = jointReverseMap[jointIdx];
+                            if (isStatic) {
+                                for (var j = 0; j < 4; j++) {
+                                    var jointIdx = geometry.attributes.joint.value[idx * 4 + j];
+                                    var offset = nVertex * 4 + j
+                                    if (jointIdx >= 0) {
+                                        subGeo.attributes.joint.value[offset] = jointReverseMap[jointIdx];
+                                    } else {
+                                        subGeo.attributes.joint.value[offset] = -1;
+                                    }
+                                }
+                            } else {
+                                var newJoints = subGeo.attributes.joint.value[nVertex] = [-1, -1, -1, -1];
+                                // joints
+                                for (var j = 0; j < 4; j++) {
+                                    var jointIdx = geometry.attributes.joint.value[idx][j];
+                                    if (jointIdx >= 0) {
+                                        newJoints[j] = jointReverseMap[jointIdx];
+                                    }
                                 }
                             }
-                            vertexNumber++;
+                            nVertex++;
                         }
-                        newFace.push(newIndices[idx]);
+                        if (isStatic) {
+                            subGeo.faces[faceOffset++] = newIndices[idx];
+                        } else {
+                            newFace.push(newIndices[idx]);
+                        }
                     }
-                    subGeo.faces.push(newFace);
+                    if (!isStatic) {
+                        subGeo.faces.push(newFace);
+                    }
                 }
 
                 root.add(subMesh);

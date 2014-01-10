@@ -26,8 +26,8 @@ define(function(require) {
         this.update();
     }, {
         
-        update : function() {
-            Node.prototype.update.call(this);
+        update : function(force) {
+            Node.prototype.update.call(this, force);
             
             this.updateProjectionMatrix();
             this.frustum.setFromProjection(this.projectionMatrix);

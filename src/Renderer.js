@@ -162,11 +162,13 @@ define(function(require) {
             _gl.clearColor(color[0], color[1], color[2], color[3]);
             _gl.clear(this.clear);
 
-            camera.update(false);
             // If the scene have been updated in the prepass like shadow map
             // There is no need to update it again
             if (!notUpdateScene) {
                 scene.update(false);
+            }
+            if (!camera.scene) {
+                camera.update(true);
             }
 
             var opaqueQueue = scene.opaqueQueue;

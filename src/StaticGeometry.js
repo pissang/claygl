@@ -109,12 +109,12 @@ define(function(require) {
             }
 
             var result = {};
-            var vertexNumber = this.getVertexNumber();
+            var nVertex = this.getVertexNumber();
 
             for (var name in this.attributes) {
                 var attrib = this.attributes[name];
                 if (attrib.value) {
-                    if (attrib.value.length === vertexNumber * attrib.size) {
+                    if (attrib.value.length === nVertex * attrib.size) {
                         result[name] = attrib;
                     }
                 }
@@ -202,9 +202,9 @@ define(function(require) {
         },
 
         generateTangents : function() {
-            var vertexNumber = this.getVertexNumber();
+            var nVertex = this.getVertexNumber();
             if (!this.attributes.tangent.value) {
-                this.attributes.tangent.value = new Float32Array(vertexNumber * 4);
+                this.attributes.tangent.value = new Float32Array(nVertex * 4);
             }
             var texcoords = this.attributes.texcoord0.value;
             var positions = this.attributes.position.value;
@@ -213,7 +213,7 @@ define(function(require) {
 
             var tan1 = [];
             var tan2 = [];
-            for (var i = 0; i < vertexNumber; i++) {
+            for (var i = 0; i < nVertex; i++) {
                 tan1[i] = [0.0, 0.0, 0.0];
                 tan2[i] = [0.0, 0.0, 0.0];
             }
@@ -273,7 +273,7 @@ define(function(require) {
             var tmp = vec3.create();
             var nCrossT = vec3.create();
             var n = vec3.create();
-            for (var i = 0; i < vertexNumber; i++) {
+            for (var i = 0; i < nVertex; i++) {
                 n[0] = normals[i * 3];
                 n[1] = normals[i * 3 + 1];
                 n[2] = normals[i * 3 + 2];

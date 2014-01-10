@@ -355,7 +355,11 @@ define(function(require) {
                     if (shaderNeedsUpdate) {
                         shader.dirty();
                     }
-                    shader.define('fragment', 'SHADOW_CASCADE', this.shadowCascade || 1);
+                    if (this.shadowCascade > 1) {
+                        shader.define('fragment', 'SHADOW_CASCADE', this.shadowCascade);
+                    } else {
+                        shader.unDefine('fragment', 'SHADOW_CASCADE');
+                    }
                     shader.__shadowDefineUpdated = true;
                 }
 
@@ -406,8 +410,9 @@ define(function(require) {
                 prevDepth = depth;
                 depth += deltaDepth;
                 // TODO: add a bias
-                sceneCamera.far = Math.min(sceneCamera.far, depth);
-                sceneCamera.far = Math.max(sceneCamera.near, sceneCamera.far);
+                if (depth > sceneCamera.near) {
+                    sceneCamera.far = Math.min(sceneCamera.far, depth);   
+                }
                 sceneCamera.updateProjectionMatrix();
                 sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
                 var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);

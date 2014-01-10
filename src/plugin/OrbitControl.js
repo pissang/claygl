@@ -123,7 +123,6 @@ define(function(require) {
             if (this._op === 0) {
                 // Rotate
                 target.rotateAround(this.origin, this.up, -this._offsetPitch);
-                this.up.normalize();
                 tmpMatrix.copy(target.localTransform);
                 var xAxis = target.localTransform.right;
                 target.rotateAround(this.origin, xAxis, -this._offsetRoll);

@@ -4,6 +4,8 @@ define(function(require) {
 
     var Clip = function(options) {
 
+        options = options || {};
+
         this.target = options.target;
 
         if (options.life !== undefined) {
@@ -51,9 +53,8 @@ define(function(require) {
 
         gap : 0,
 
-        // Start and end time if it is a sub clip
+        // Start time if it is a sub clip
         subStart : 0,
-        subEnd : 1000,
 
         setLoop : function(loop) {
             this._loop = loop;
@@ -106,14 +107,28 @@ define(function(require) {
                 return null;
             }
         },
+
         restart : function() {
             this._startTime = new Date().getTime() + this.gap;
         },
+        
         fire : function(eventType, arg) {
             var eventName = 'on' + eventType;
             if (this[eventName]) {
                 this[eventName](this.target, arg);
             }
+        },
+
+        getSubClip : function(startTime, endTime) {
+            var Ctor = this.constructor;
+            var subClip = new Ctor();
+
+            startTime = Math.min(Math.max(startTime, 0), this.life);
+            endTime = Math.min(Math.max(endTime, 0), this.life);
+            subClip.subStart = subClip.subStart + startTime;
+            subClip.life = Math.max(endTime - startTime, 0);
+
+            return subClip;
         }
     };
     Clip.prototype.constructor = Clip;

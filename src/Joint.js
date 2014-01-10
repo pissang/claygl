@@ -13,7 +13,9 @@ define(function(require) {
             parentIndex : -1,
 
             // Scene node attached to
-            node : null
+            node : null,
+
+            rootNode : null
         }
     }, {
     });

@@ -121,7 +121,7 @@ define(function(require) {
 
                 document.addEventListener('mousemove', bindOnce(this._mouseMove, this), false);
             }else{
-                document.removeEventListener('mousemove', bindOnce(this._mouseMove, this), false);
+                document.removeEventListener('mousemove', bindOnce(this._mouseMove, this));
             }
         },
 
@@ -160,24 +160,10 @@ define(function(require) {
         },
 
         _keyUp : function(e) {
-            switch(e.keyCode) {
-                case 87: //w
-                case 37: //up arrow
-                    this._moveForward = false;
-                    break;
-                case 83: //s
-                case 40: //down arrow
-                    this._moveBackward = false;
-                    break;
-                case 65: //a
-                case 37: //left arrow
-                    this._moveLeft = false;
-                    break;
-                case 68: //d
-                case 39: //right arrow
-                    this._moveRight = false;
-                    break; 
-            }
+            this._moveForward = false;
+            this._moveBackward = false;
+            this._moveLeft = false;
+            this._moveRight = false;
         }
     })
 

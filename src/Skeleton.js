@@ -18,7 +18,7 @@ define(function(require) {
 
             _clips : [],
 
-            // Matrix to joint space
+            // Matrix to joint space (relative to root joint)
             _invBindPoseMatricesArray : null,
 
             // Use subarray instead of copy back each time computing matrix
@@ -105,21 +105,31 @@ define(function(require) {
         updateJointMatrices : (function() {
 
             var m4 = mat4.create();
-            
+
             return function() {
                 for (var i = 0; i < this.roots.length; i++) {
-                    // Update the transform if joint node not attached to the scene
-                    // if (!this.roots[i].node.scene) {
-                        this.roots[i].node.update(true);
-                    // }
+                    this.roots[i].node.update(true);
                 }
                 this._invBindPoseMatricesArray = new Float32Array(this.joints.length * 16);
                 this._skinMatricesArray = new Float32Array(this.joints.length * 16);
 
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
-                    mat4.copy(m4, joint.node.worldTransform._array);
-                    mat4.invert(m4, m4);
+                    // Joint space is relative to root joint's parent, if have
+                    if (joint.rootNode) {
+                        mat4.invert(m4, joint.rootNode.worldTransform._array);
+                        // TODO is the order right?
+                        mat4.multiply(
+                            m4,
+                            m4,
+                            joint.node.worldTransform._array
+                        );   
+                        mat4.invert(m4, m4);
+                    } else {
+                        mat4.copy(m4, joint.node.worldTransform._array);
+                        mat4.invert(m4, m4);
+                    }
+
                     var offset = i * 16;
                     for (var j = 0; j < 16; j++) {
                         this._invBindPoseMatricesArray[offset + j] = m4[j];
@@ -137,22 +147,37 @@ define(function(require) {
             }
         },
 
-        update : function() {
-            for (var i = 0; i < this.roots.length; i++) {
-                // Update the transform if joint node not attached to the scene
-                // if (!this.roots[i].node.scene) {
-                    this.roots[i].node.update(true);
-                // }
-            }
+        update : (function() {
+            var m4 = mat4.create();
+            return function() {
+                for (var i = 0; i < this.roots.length; i++) {
+                    // Update the transform if joint node not attached to the scene
+                    if (!this.roots[i].node.scene) {
+                        this.roots[i].node.update(true);
+                    }
+                }
 
-            for (var i = 0; i < this.joints.length; i++) {
-                mat4.multiply(
-                    this._skinMatricesSubArrays[i],
-                    this.joints[i].node.worldTransform._array,
-                    this._jointMatricesSubArrays[i]
-                );
+                for (var i = 0; i < this.joints.length; i++) {
+                    var joint = this.joints[i];
+                    mat4.multiply(
+                        this._skinMatricesSubArrays[i],
+                        joint.node.worldTransform._array,
+                        this._jointMatricesSubArrays[i]
+                    );
+
+                    // Joint space is relative to root joint's parent, if have
+                    // PENDING
+                    if (joint.rootNode) {
+                        mat4.invert(m4, joint.rootNode.worldTransform._array);
+                        mat4.multiply(
+                            this._skinMatricesSubArrays[i],
+                            m4,
+                            this._skinMatricesSubArrays[i]
+                        );
+                    }
+                }
             }
-        },
+        })(),
 
         getSubSkinMatrices : function(meshId, joints) {
             var subArray = this._subSkinMatricesArray[meshId]

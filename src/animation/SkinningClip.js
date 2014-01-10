@@ -40,7 +40,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime;
+            var deltaTime = time - this._startTime + this.subStart;
             this.setTime(deltaTime);
         }
 
@@ -60,6 +60,14 @@ define(function(require) {
 
     SkinningClip.prototype.removeJointClip = function(jointClip) {
         this.jointClips.splice(this.jointClips.indexOf(jointClip), 1);
+    }
+
+    SkinningClip.prototype.getSubClip = function(startTime, endTime) {
+        var subClip = Clip.prototype.getSubClip.call(this, startTime, endTime);
+
+        subClip.jointClips = this.jointClips;      
+
+        return subClip; 
     }
 
     return SkinningClip;

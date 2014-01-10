@@ -39,13 +39,10 @@ define(function(require) {
 
             _needsUpdateWorldTransform : true,
 
-            // Depth for transparent queue sorting
-            __depth : 0,
+            _inIterating : false,
 
-            // __matrices : {
-            //     worldView : mat4.create(),
-            //     worldViewProjection : mat4.create()
-            // }
+            // Depth for transparent queue sorting
+            __depth : 0
         }
     }, {
         isRenderable : function() {
@@ -61,6 +58,9 @@ define(function(require) {
         },
 
         add : function(node) {
+            if (this._inIterating) {
+                console.warn('Do add operation can cause unpredictable error when in iterating');
+            }
             if (node.parent === this) {
                 return;
             }
@@ -76,6 +76,10 @@ define(function(require) {
         },
 
         remove : function(node) {
+            if (this._inIterating) {
+                console.warn('Do remove operation can cause unpredictable error when in iterating');
+            }
+
             this._children.splice(this._children.indexOf(node), 1);
             node.parent = null;
 
@@ -115,6 +119,9 @@ define(function(require) {
 
         // pre-order traverse
         traverse : function(callback, parent) {
+            
+            this._inIterating = true;
+
             var stopTraverse = callback(this, parent);
             if(!stopTraverse) {
                 var _children = this._children;
@@ -122,6 +129,8 @@ define(function(require) {
                     _children[i].traverse(callback, this);
                 }
             }
+
+            this._inIterating = false;
         },
 
         decomposeLocalTransform : function() {

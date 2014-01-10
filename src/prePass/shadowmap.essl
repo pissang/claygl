@@ -178,7 +178,7 @@ uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_NUMBER];
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
-#if SHADOW_CASCADE > 1
+#if defined(SHADOW_CASCADE)
 uniform sampler2D directionalLightShadowMaps[SHADOW_CASCADE];
 uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
 uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
@@ -304,31 +304,41 @@ void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LI
 
 #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
 
+#ifdef SHADOW_CASCADE
+
 void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
-    #if SHADOW_CASCADE == 1
-        for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+    // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
+    float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
+                    / (gl_DepthRange.far - gl_DepthRange.near);
+
+    for (int i = 0; i < SHADOW_CASCADE; i++) {
+        if (
+            depth >= shadowCascadeClipsNear[i] &&
+            depth <= shadowCascadeClipsFar[i]
+        ) {
             float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
-            shadowContribs[i] = shadowContrib;
+            // TODO Will get a sampler needs to be be uniform error in native gl
+            shadowContribs[0] = shadowContrib;
         }
-    #else
-        // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
-        float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
-                        / (gl_DepthRange.far - gl_DepthRange.near);
-        for (int i = 0; i < SHADOW_CASCADE; i++) {
-            if (
-                depth >= shadowCascadeClipsNear[i] &&
-                depth <= shadowCascadeClipsFar[i]
-            ) {
-                float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
-                shadowContribs[0] = shadowContrib;
-            }
-        }
-    #endif
+    }
     // set default fallof of rest lights
     for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
         shadowContribs[i] = 1.0;
     }
 }
+
+#else
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
+    for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+        float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
+        shadowContribs[i] = shadowContrib;
+    }
+    // set default fallof of rest lights
+    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+        shadowContribs[i] = 1.0;
+    }
+}
+#endif
 
 #endif
 

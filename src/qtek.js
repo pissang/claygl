@@ -35,7 +35,6 @@ define( function(require){
 	},
 	"Camera": require('Camera'),
 	"DynamicGeometry": require('DynamicGeometry'),
-	"Entity": require('Entity'),
 	"FrameBuffer": require('FrameBuffer'),
 	"Geometry": require('Geometry'),
 	"Joint": require('Joint'),

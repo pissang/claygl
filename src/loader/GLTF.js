@@ -230,7 +230,7 @@ define(function(require) {
                 lib.skeletons[name] = skeleton;
             }
 
-            var bindNodeToJoint = function(jointsMap, nodeName, parentIndex) {
+            var bindNodeToJoint = function(jointsMap, nodeName, parentIndex, rootNode) {
                 var node = lib.nodes[nodeName];
                 var nodeInfo = json.nodes[nodeName];
                 var joint = jointsMap[nodeInfo.jointId];
@@ -243,12 +243,12 @@ define(function(require) {
                     // throw new Error('Joint bind to ' + nodeInfo.name + ' doesn\'t exist in skin');
                     joint.node = node;
                     joint.parentIndex = parentIndex;
-
+                    joint.rootNode = rootNode;
                     parentIndex = joint.index;
                 }
 
                 for (var i = 0; i < nodeInfo.children.length; i++) {
-                    bindNodeToJoint(jointsMap, nodeInfo.children[i], parentIndex);
+                    bindNodeToJoint(jointsMap, nodeInfo.children[i], parentIndex, rootNode);
                 }
 
                 return joint;
@@ -296,7 +296,8 @@ define(function(require) {
                     // Build up hierarchy from root nodes
                     var rootNodes = nodeInfo.instanceSkin.skeletons;
                     for (i = 0; i < rootNodes.length; i++) {
-                        var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1);
+                        var rootNode = lib.nodes[rootNodes[i]];
+                        var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1, rootNode.parent);
                         skeleton.roots.push(rootJoint);
                     }
                 }

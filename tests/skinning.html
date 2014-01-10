@@ -104,8 +104,11 @@
 
                 var skeleton;
                 _.each(meshList, function(mesh){
+                    var staticGeo = new qtek.StaticGeometry();
                     skeleton = mesh.skeleton;
                     mesh.geometry.generateVertexNormals();
+                    mesh.geometry.convertToStatic(staticGeo);
+                    mesh.geometry = staticGeo;
                     mesh.material.shader.disableTexturesAll();
                     root.add(qtek.util.mesh.splitByJoints(mesh, 20));
                 });
