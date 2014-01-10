@@ -44,9 +44,9 @@ define(function(require) {
         set forward(v) {
             var el = this._array;
             v = v._array;
-            el[8] = v[8];
-            el[9] = v[9];
-            el[10] = v[10];
+            el[8] = v[0];
+            el[9] = v[1];
+            el[10] = v[2];
         },
 
         get up() {
@@ -58,9 +58,9 @@ define(function(require) {
         set up(v) {
             var el = this._array;
             v = v._array;
-            el[4] = v[4];
-            el[5] = v[5];
-            el[6] = v[6];
+            el[4] = v[0];
+            el[5] = v[1];
+            el[6] = v[2];
         },
 
         get right() {

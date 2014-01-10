@@ -47,14 +47,11 @@ define(function(require) {
 
         gap : 0,
 
-        life : 1000,
+        life : 0,
 
         delay : 0,
 
         gap : 0,
-
-        // Start time if it is a sub clip
-        subStart : 0,
 
         setLoop : function(loop) {
             this._loop = loop;
@@ -117,18 +114,6 @@ define(function(require) {
             if (this[eventName]) {
                 this[eventName](this.target, arg);
             }
-        },
-
-        getSubClip : function(startTime, endTime) {
-            var Ctor = this.constructor;
-            var subClip = new Ctor();
-
-            startTime = Math.min(Math.max(startTime, 0), this.life);
-            endTime = Math.min(Math.max(endTime, 0), this.life);
-            subClip.subStart = subClip.subStart + startTime;
-            subClip.life = Math.max(endTime - startTime, 0);
-
-            return subClip;
         }
     };
     Clip.prototype.constructor = Clip;

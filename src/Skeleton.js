@@ -92,6 +92,10 @@ define(function(require) {
             }
         },
 
+        removeClipsAll : function() {
+            this._clips = [];
+        },
+
         getClip : function(index) {
             if (this._clips[index]) {
                 return this._clips[index].clip;

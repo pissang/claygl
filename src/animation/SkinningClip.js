@@ -40,7 +40,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime + this.subStart;
+            var deltaTime = time - this._startTime;
             this.setTime(deltaTime);
         }
 
@@ -62,10 +62,19 @@ define(function(require) {
         this.jointClips.splice(this.jointClips.indexOf(jointClip), 1);
     }
 
-    SkinningClip.prototype.getSubClip = function(startTime, endTime) {
-        var subClip = Clip.prototype.getSubClip.call(this, startTime, endTime);
+    SkinningClip.prototype.getSubClip = function(startTime, endTime, isLoop) {
+        var subClip = new SkinningClip({
+            name : this.name
+        });
 
-        subClip.jointClips = this.jointClips;      
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var subJointClip = this.jointClips[i].getSubClip(startTime, endTime);
+            subClip.addJointClip(subJointClip);
+        }
+
+        if (isLoop !== undefined) {
+            subClip.setLoop(isLoop);
+        }
 
         return subClip; 
     }

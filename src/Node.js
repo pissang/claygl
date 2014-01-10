@@ -211,6 +211,7 @@ define(function(require) {
         },
 
         // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
+        // TODO improve performance
         rotateAround : (function() {
             var v = new Vector3();
             var RTMatrix = new Matrix4();

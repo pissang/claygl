@@ -98,7 +98,7 @@ define(function(require) {
         stop : function() {
             this._running = false;
         },
-        clear : function() {
+        removeClipsAll : function() {
             this._clips = [];
         },
         animate : function(target, options) {

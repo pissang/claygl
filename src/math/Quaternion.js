@@ -152,9 +152,6 @@ define(function(require) {
             return quat.length(this._array);
         },
 
-        /**
-         * Perform linear interpolation between a and b
-         */
         lerp : function(a, b, t) {
             quat.lerp(this._array, a._array, b._array, t);
             this._dirty = true;
@@ -167,8 +164,20 @@ define(function(require) {
             return this;
         },
 
+        mulLeft : function() {
+            quat.multiply(this._array, a._array, this._array);
+            this._dirty = true;
+            return this;
+        },
+
         multiply : function(b) {
             quat.multiply(this._array, this._array, b._array);
+            this._dirty = true;
+            return this;
+        },
+
+        multiplyLeft : function(a) {
+            quat.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
         },
@@ -193,6 +202,12 @@ define(function(require) {
 
         rotateZ : function(rad) {
             quat.rotateZ(this._array, this._array, rad);
+            this._dirty = true;
+            return this;
+        },
+
+        rotationTo : function(a, b) {
+            quat.rotationTo(this._array, a._array, b._array);
             this._dirty = true;
             return this;
         },

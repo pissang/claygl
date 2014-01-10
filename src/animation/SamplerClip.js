@@ -113,7 +113,7 @@ define(function(require) {
         if (time < this._cacheTime) {
             var s = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
             for (var i = s; i >= 1; i--) {
-                if (channels.time[i-1] <= time && channels.time[i] >= time) {
+                if (channels.time[i-1] <= time && channels.time[i] > time) {
                     start = i-1;
                     end = i;
                     this._cacheKey = i-1;
@@ -123,7 +123,7 @@ define(function(require) {
             }
         } else {
             for (var i = this._cacheKey; i < len-1; i++) {
-                if (channels.time[i] <= time && channels.time[i+1] >= time) {
+                if (channels.time[i] <= time && channels.time[i+1] > time) {
                     start = i;
                     end = i+1;
                     this._cacheKey = i;
@@ -148,6 +148,88 @@ define(function(require) {
                 vec3lerp(this.scale, channels.scale, channels.scale, percent, start * 3, end * 3);
             }
         }
+    }
+
+    SamplerClip.prototype.getSubClip = function(startTime, endTime) {
+
+        var subClip = new SamplerClip({
+            name : this.name
+        });
+        var minTime = this.channels.time[0];
+        startTime = Math.min(Math.max(startTime, minTime), this.life);
+        endTime = Math.min(Math.max(endTime, minTime), this.life);
+            
+        var rangeStart = this._findRange(startTime);
+        var rangeEnd = this._findRange(endTime);
+
+        var count = rangeEnd[0] - rangeStart[0] + 1;
+        if (rangeStart[1] === 0 && rangeEnd[1] === 0) {
+            count -= 1;
+        }
+        if (this.channels.rotation) {
+            subClip.channels.rotation = new Float32Array(count * 4);
+        }
+        if (this.channels.position) {
+            subClip.channels.position = new Float32Array(count * 3);
+        }
+        if (this.channels.scale) {
+            subClip.channels.scale = new Float32Array(count * 3);
+        }
+        if (this.channels.time) {
+            subClip.channels.time = new Float32Array(count);
+        }
+        // Clip at the start
+        this.setTime(startTime);
+        for (var i = 0; i < 3; i++) {
+            subClip.channels.rotation[i] = this.rotation[i];
+            subClip.channels.position[i] = this.position[i];
+            subClip.channels.scale[i] = this.scale[i];
+        }
+        subClip.channels.time[0] = 0;
+        subClip.channels.rotation[3] = this.rotation[3];
+
+        for (var i = 1; i < count-1; i++) {
+            for (var j = 0; j < 3; j++) {
+                var i2 = rangeStart[0] + i;
+                subClip.channels.rotation[i * 4 + j] = this.channels.rotation[i2 * 4 + j];
+                subClip.channels.position[i * 3 + j] = this.channels.position[i2 * 3 + j];
+                subClip.channels.scale[i * 3 + j] = this.channels.scale[i2 * 3 + j];
+            }   
+            subClip.channels.time[i] = this.channels.time[i2] - startTime;
+            subClip.channels.rotation[i * 4 + 3] = this.channels.rotation[i2 * 4 + 3];
+        }
+        // Clip at the end
+        this.setTime(endTime);
+        for (var i = 0; i < 3; i++) {
+            subClip.channels.rotation[(count - 1) * 4 + i] = this.rotation[i];
+            subClip.channels.position[(count - 1) * 3 + i] = this.position[i];
+            subClip.channels.scale[(count - 1) * 3 + i] = this.scale[i];
+        }
+        subClip.channels.time[(count - 1)] = endTime - startTime;
+        subClip.channels.rotation[(count - 1) * 4 + 3] = this.rotation[3];
+
+        // TODO set back ?
+        subClip.life = endTime - startTime;
+        return subClip;
+    },
+
+    SamplerClip.prototype._findRange = function(time) {
+        var channels = this.channels;
+        var len = channels.time.length;
+        var start = -1;
+        for (var i = 0; i < len - 1; i++) {
+            if (channels.time[i] <= time && channels.time[i+1] > time) {
+                start = i;
+            }
+        }
+        var percent = 0;
+        if (start >= 0) {
+            var startTime = channels.time[start];
+            var endTime = channels.time[start+1];
+            var percent = (time-startTime) / (endTime-startTime);
+        }
+        // Percent [0, 1)
+        return [start, percent];
     }
 
     return SamplerClip;
