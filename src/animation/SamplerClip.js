@@ -108,32 +108,29 @@ define(function(require) {
         }
         var channels = this.channels;
         var len = channels.time.length;
-        var start = -1;
-        var end = -1;
+        var key = -1;
         if (time < this._cacheTime) {
-            var s = this._cacheKey >= len-1 ? len-1 : this._cacheKey+1;
-            for (var i = s; i >= 1; i--) {
+            var s = Math.min(len-2, this._cacheKey);
+            for (var i = s; i >= 0; i--) {
                 if (channels.time[i-1] <= time && channels.time[i] > time) {
-                    start = i-1;
-                    end = i;
-                    this._cacheKey = i-1;
-                    this._cacheTime = time;
+                    key = i;
                     break;
                 }
             }
         } else {
             for (var i = this._cacheKey; i < len-1; i++) {
                 if (channels.time[i] <= time && channels.time[i+1] > time) {
-                    start = i;
-                    end = i+1;
-                    this._cacheKey = i;
-                    this._cacheTime = time;
+                    key = i;
                     break;
                 }
             }
         }
 
-        if (start > -1 && end > -1) {
+        if (key > -1) {
+            this._cacheKey = i;
+            this._cacheTime = time;
+            var start = key;
+            var end = key+1;
             var startTime = channels.time[start];
             var endTime = channels.time[end];
             var percent = (time-startTime) / (endTime-startTime);

@@ -6,6 +6,10 @@ define(function(require) {
 
     var TransformClip = require('./TransformClip');
 
+    var glMatrix = require("glmatrix");
+    var quat = glMatrix.quat;
+    var vec3 = glMatrix.vec3;
+
     var SkinningClip = function(options) {
 
         options = options || {};
@@ -77,6 +81,29 @@ define(function(require) {
         }
 
         return subClip; 
+    }
+
+    SkinningClip.prototype.blend1D = function(clip1, clip2, w) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var c1 = clip1.jointClips[i];
+            var c2 = clip2.jointClips[i];
+            var tClip = this.jointClips[i];
+
+            vec3.lerp(tClip.position, c1.position, c2.position, w);
+            vec3.lerp(tClip.scale, c1.scale, c2.scale, w);
+            quat.slerp(tClip.rotation, c1.rotation, c2.rotation, w);
+        }
+    }
+
+    SkinningClip.prototype.copy = function(clip) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var sClip = clip.jointClips[i];
+            var tClip = this.jointClips[i];
+
+            vec3.copy(tClip.position, sClip.position);
+            vec3.copy(tClip.scale, sClip.scale);
+            quat.copy(tClip.rotation, sClip.rotation);
+        }
     }
 
     return SkinningClip;

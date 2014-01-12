@@ -1,6 +1,7 @@
 define(function(require) {
 
     var Base = require("./core/Base");
+    var util = require("./core/util");
     var Matrix4 = require("./math/Matrix4");
 
     var glMatrix = require("glmatrix");
@@ -9,7 +10,11 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
 
     var Skeleton = Base.derive(function() {
+
         return {
+        
+            __GUID__ : util.genGUID(),
+
             name : '',
 
             // Root joints
@@ -77,6 +82,8 @@ define(function(require) {
                 maps : maps,
                 clip : clip
             });
+
+            return this._clips.length - 1;
         },
 
         removeClip : function(clip) {
@@ -219,36 +226,6 @@ define(function(require) {
                 joint.node.scale._dirty = true;
             }
             this.update();
-        },
-
-        blendPose : function(clip1idx, clip2idx, weight) {
-            var clip1 = this._clips[clip1idx].clip;
-            var clip2 = this._clips[clip2idx].clip;
-            var maps1 = this._clips[clip1idx].maps;
-            var maps2 = this._clips[clip2idx].maps;
-
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                if (maps1[i] === -1 || maps2[i] === -1) {
-                    continue;
-                }
-                var pose1 = clip1.jointClips[maps1[i]];
-                var pose2 = clip2.jointClips[maps2[i]];
-
-                vec3.lerp(joint.node.position._array, pose1.position, pose2.position, weight);
-                quat.slerp(joint.node.rotation._array, pose1.rotation, pose2.rotation, weight);
-                vec3.lerp(joint.node.scale._array, pose1.scale, pose2.scale, weight);
-
-                joint.node.position._dirty = true;
-                joint.node.rotation._dirty = true;
-                joint.node.scale._dirty = true;
-            }
-            
-            this.update();
-        },
-
-        getBoneNumber : function() {
-            return this.joints.length;
         }
     });
 

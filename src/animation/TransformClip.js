@@ -137,7 +137,7 @@ define(function(require) {
     }
 
     TransformClip.prototype.getSubClip = function(startTime, endTime) {
-        // TODO
+        
     }
 
     return TransformClip;

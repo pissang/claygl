@@ -59,7 +59,7 @@ define(function(require) {
                 if (typeof(loop) == 'number') {
                     this._loopRemained = loop;
                 } else {
-                    this._loopRemained = Number.MAX_VALUE;
+                    this._loopRemained = 1e8;
                 }   
             }
         },
@@ -104,6 +104,8 @@ define(function(require) {
                 return null;
             }
         },
+
+        setTime : function(time) {console.warn('set time is not implented in Clip')},
 
         restart : function() {
             this._startTime = new Date().getTime() + this.gap;

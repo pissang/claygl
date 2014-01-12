@@ -52,6 +52,8 @@ define( function(require){
 	"Texture": require('Texture'),
 	"animation": {
 		"Animation": require('animation/Animation'),
+		"Blend1DClip": require('animation/Blend1DClip'),
+		"Blend2DClip": require('animation/Blend2DClip'),
 		"Clip": require('animation/Clip'),
 		"SamplerClip": require('animation/SamplerClip'),
 		"SkinningClip": require('animation/SkinningClip'),
