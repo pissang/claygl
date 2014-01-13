@@ -85,13 +85,13 @@ define(function(require) {
                 shader.setUniformBySemantic(_gl, "SKIN_MATRIX", skinMatricesArray);
             }
 
-            var vertexNumber = geometry.getVertexNumber();
-            renderInfo.vertexNumber = vertexNumber;
+            var nVertex = geometry.getVertexNumber();
+            renderInfo.vertexNumber = nVertex;
             renderInfo.faceNumber = 0;
             renderInfo.drawCallNumber = 0;
             // Draw each chunk
             needsBindAttributes = false;
-            if (vertexNumber > geometry.chunkSize) {
+            if (nVertex > geometry.chunkSize) {
                 needsBindAttributes = true;
             } else {
                 // Hash with shader id in case previous material has less attributes than next material
@@ -109,7 +109,7 @@ define(function(require) {
                     renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
-                    _gl.drawArrays(glDrawMode, 0, vertexNumber);
+                    _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
                 renderInfo.drawCallNumber = 1;
             } else {
@@ -213,7 +213,7 @@ define(function(require) {
                         _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
                         renderInfo.faceNumber += indicesBuffer.count / 3;
                     } else {
-                        _gl.drawArrays(glDrawMode, 0, vertexNumber);
+                        _gl.drawArrays(glDrawMode, 0, nVertex);
                     }
                     renderInfo.drawCallNumber++;
                 }

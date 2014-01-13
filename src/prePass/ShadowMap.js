@@ -396,7 +396,8 @@ define(function(require) {
             var deltaDepth = 0;
             return function(renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
-                this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
+                var shadowBias = light.shadowBias;
+                this._bindDepthMaterial(casters, shadowBias, light.shadowSlopeScale);
 
                 casters.sort(Renderer.opaqueSortFunc);
 
@@ -460,6 +461,14 @@ define(function(require) {
                     frameBuffer.bind(renderer);
 
                     _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+
+                    // Set bias seperately for each cascade
+                    // TODO Simply divide 2 ?
+                    for (var key in this._depthMaterials) {
+                        this._depthMaterials[key].set('shadowBias', shadowBias);
+                    }
+                    shadowBias /= 2;
+
 
                     renderer.renderQueue(casters, lightCamera);
 

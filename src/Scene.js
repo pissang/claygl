@@ -84,7 +84,7 @@ define(function(require){
                 var light = lights[i];
                 this.lightNumber[light.type]++;
             }
-            this._updateLightUnforms();
+            this._updateLightUniforms();
         },
 
         // Traverse the scene and add the renderable
@@ -109,14 +109,10 @@ define(function(require){
             }
         },
 
-        _updateLightUnforms : function() {
+        _updateLightUniforms : function() {
             var lights = this.lights;
             // Put the light cast shadow before the light not cast shadow
-            lights.sort(function(a, b) {
-                if (b.castShadow && !a.castShadow) {
-                    return true;
-                }
-            });
+            lights.sort(lightSortFunc);
 
             var lightUniforms = this.lightUniforms;
             for (var symbol in lightUniforms) {
@@ -182,6 +178,12 @@ define(function(require){
             this._nodeRepository = {};
         }
     });
+
+    function lightSortFunc(a, b) {
+        if (b.castShadow && !a.castShadow) {
+            return true;
+        }
+    }
 
     return Scene;
 })

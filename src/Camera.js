@@ -23,7 +23,7 @@ define(function(require) {
             sceneBoundingBoxLastFrame : new BoundingBox()
         }
     }, function() {
-        this.update();
+        this.update(true);
     }, {
         
         update : function(force) {

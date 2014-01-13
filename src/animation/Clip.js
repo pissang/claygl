@@ -72,7 +72,10 @@ define(function(require) {
         },
 
         step : function(time) {
-            var percent = (time - this._startTime) / this.life;
+            
+            this._elapsedTime = time - this._startTime;
+
+            var percent = this._elapsedTime / this.life;
 
             if (percent < 0) {
                 return;

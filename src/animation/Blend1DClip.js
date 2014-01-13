@@ -60,8 +60,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime;
-            this.setTime(deltaTime);
+            this.setTime(this._elapsedTime);
         }
 
         return ret;
@@ -77,11 +76,21 @@ define(function(require) {
         if (position <= min) {
             var clip = inputs[0].clip;
             clip.setTime(time % clip.life);
-            this.output.copy(clip);
+            // Input clip is a blend clip
+            // PENDING
+            if (clip.output instanceof Clip) {
+                this.output.copy(clip.output);
+            } else {
+                this.output.copy(clip);
+            }
         } else if (position >= max) {
             var clip = inputs[len-1].clip;
             clip.setTime(time % clip.life);
-            this.output.copy(clip);
+            if (clip.output instanceof Clip) {
+                this.output.copy(clip.output);
+            } else {
+                this.output.copy(clip);
+            }
         } else {
             var key = this._findKey(position);
             var input1 = inputs[key];
@@ -92,7 +101,10 @@ define(function(require) {
             clip2.setTime(time % clip2.life);
 
             var w = (this.position - input1.position) / (input2.position - input1.position);
-            this.output.blend1D(clip1, clip2, w);
+
+            var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
+            var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
+            this.output.blend1D(c1, c2, w);
         }
     }
 

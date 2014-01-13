@@ -153,6 +153,7 @@ define( function(require){
 	},
 	"util": {
 		"dds": require('util/dds'),
+		"delaunay": require('util/delaunay'),
 		"hdr": require('util/hdr'),
 		"mesh": require('util/mesh'),
 		"texture": require('util/texture')

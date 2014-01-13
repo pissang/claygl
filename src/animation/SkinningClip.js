@@ -44,8 +44,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime;
-            this.setTime(deltaTime);
+            this.setTime(this._elapsedTime);
         }
 
         return ret;
@@ -89,9 +88,18 @@ define(function(require) {
             var c2 = clip2.jointClips[i];
             var tClip = this.jointClips[i];
 
-            vec3.lerp(tClip.position, c1.position, c2.position, w);
-            vec3.lerp(tClip.scale, c1.scale, c2.scale, w);
-            quat.slerp(tClip.rotation, c1.rotation, c2.rotation, w);
+            tClip.blend1D(c1, c2, w);
+        }
+    }
+
+    SkinningClip.prototype.blend2D = function(clip1, clip2, clip3, f, g) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var c1 = clip1.jointClips[i];
+            var c2 = clip2.jointClips[i];
+            var c3 = clip3.jointClips[i];
+            var tClip = this.jointClips[i];
+
+            tClip.blend2D(c1, c2, c3, f, g);
         }
     }
 

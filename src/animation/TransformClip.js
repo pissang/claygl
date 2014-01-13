@@ -48,8 +48,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime;
-            this.setTime(deltaTime);
+            this.setTime(this._elapsedTime);
         }
 
         return ret;
@@ -136,8 +135,41 @@ define(function(require) {
         }
     }
 
+    TransformClip.prototype.blend1D = function(c1, c2, w) {
+        vec3.lerp(this.position, c1.position, c2.position, w);
+        vec3.lerp(this.scale, c1.scale, c2.scale, w);
+        quat.slerp(this.rotation, c1.rotation, c2.rotation, w);
+    }
+
+    TransformClip.prototype.blend2D = (function() {
+        var q1 = quat.create();
+        var q2 = quat.create();
+        return function(c1, c2, c3, f, g) {
+            var a = 1 - f - g;
+
+            this.position[0] = c1.position[0] * a + c2.position[0] * f + c3.position[0] * g;
+            this.position[1] = c1.position[1] * a + c2.position[1] * f + c3.position[1] * g;
+            this.position[2] = c1.position[2] * a + c2.position[2] * f + c3.position[2] * g;
+
+            this.scale[0] = c1.scale[0] * a + c2.scale[0] * f + c3.scale[0] * g;
+            this.scale[1] = c1.scale[1] * a + c2.scale[1] * f + c3.scale[1] * g;
+            this.scale[2] = c1.scale[2] * a + c2.scale[2] * f + c3.scale[2] * g;
+
+            // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205403(v=vs.85).aspx
+            // http://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.quaternion.xmquaternionbarycentric(v=vs.85).aspx
+            var s = f + g;
+            if (s === 0) {
+                quat.copy(this.rotation, c1.rotation);
+            } else {
+                quat.slerp(q1, c1.rotation, c2.rotation, s);
+                quat.slerp(q2, c1.rotation, c3.rotation, s);
+                quat.slerp(this.rotation, q1, q2, g / s);
+            }
+        }
+    })(),
+
     TransformClip.prototype.getSubClip = function(startTime, endTime) {
-        
+        // TODO
     }
 
     return TransformClip;

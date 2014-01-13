@@ -328,6 +328,7 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
 }
 
 #else
+
 void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
     for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
         float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);

@@ -5,6 +5,7 @@ define(function(require) {
     'use strict';
 
     var Clip = require('./Clip');
+    var TransformClip = require('./TransformClip');
 
     var glMatrix = require("glmatrix");
     var quat = glMatrix.quat;
@@ -95,8 +96,7 @@ define(function(require) {
         var ret = Clip.prototype.step.call(this, time);
 
         if (ret !== 'destroy') {
-            var deltaTime = time - this._startTime;
-            this.setTime(deltaTime);
+            this.setTime(this._elapsedTime);
         }
 
         return ret;
@@ -228,6 +228,9 @@ define(function(require) {
         // Percent [0, 1)
         return [start, percent];
     }
+
+    SamplerClip.prototype.blend1D = TransformClip.prototype.blend1D;
+    SamplerClip.prototype.blend2D = TransformClip.prototype.blend2D;
 
     return SamplerClip;
 });

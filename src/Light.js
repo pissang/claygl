@@ -12,7 +12,6 @@ define(function(require){
             castShadow : true,
             shadowResolution : 512
         }
-    }, {
     });
 
     Shader.import(require('text!./light/light.essl'));

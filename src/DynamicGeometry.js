@@ -99,11 +99,7 @@ define(function(require) {
             //     },
             //     indicesArray : null
             // }]
-            _arrayChunks : [],
-
-            // Map of re organized vertices data
-            _verticesReorganizedMap : [],
-            _reorganizedFaces : []
+            _arrayChunks : []
         }
     }, {
         updateBoundingBox : function() {
@@ -217,10 +213,10 @@ define(function(require) {
         _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
 
             var self = this
-            var cursors = {};
             var nVertex = this.getVertexNumber();
             
-            var verticesReorganizedMap = this._verticesReorganizedMap;
+            var verticesReorganizedMap = [];
+            var reorganizedFaces = [];
 
             var ArrayConstructors = {};
             for (var name in attributes) {
@@ -242,7 +238,6 @@ define(function(require) {
                         ArrayConstructors[name] = Float32Array;
                         break;
                 }
-                cursors[name] = 0;
             }
 
             var newChunk = function(chunkIdx) {
@@ -258,9 +253,6 @@ define(function(require) {
                     chunk.attributeArrays[name] = null;
                 }
 
-                for (var name in cursors) {
-                    cursors[name] = 0;
-                }
                 for (var i = 0; i < nVertex; i++) {
                     verticesReorganizedMap[i] = -1;
                 }
@@ -286,89 +278,56 @@ define(function(require) {
                     verticesReorganizedMap[i] = -1;
                 }
                 if (isFacesDirty) {
-                    if (this._reorganizedFaces.length !== this.faces.length) {
-                        for (i = 0; i < this.faces.length; i++) {
-                            this._reorganizedFaces[i] = [0, 0, 0];
-                        }
+                    for (i = 0; i < this.faces.length; i++) {
+                        reorganizedFaces[i] = [0, 0, 0];
                     }
                 }
 
                 currentChunk = newChunk(chunkIdx);
 
+                var vertexCount = 0;
                 for (var i = 0; i < this.faces.length; i++) {
                     var face = this.faces[i];
-                    var reorganizedFace = this._reorganizedFaces[i];
-                    var i1 = face[0], i2 = face[1], i3 = face[2];
+                    var reorganizedFace = reorganizedFaces[i];
+
                     // newChunk
-                    if (vertexCursor+3 > this.chunkSize) {
+                    if (vertexCount+3 > this.chunkSize) {
                         chunkIdx++;
                         chunkFaceStart[chunkIdx] = i;
-                        vertexCursor = 0;
+                        vertexCount = 0;
                         currentChunk = newChunk(chunkIdx);
                     }
-                    var newI1 = verticesReorganizedMap[i1] === -1;
-                    var newI2 = verticesReorganizedMap[i2] === -1;
-                    var newI3 = verticesReorganizedMap[i3] === -1;
 
-                    for (var k = 0; k < attribNameList.length; k++) {
-                        var name = attribNameList[k];
-                        var attribArray = currentChunk.attributeArrays[name];
-                        var values = attributes[name].value;
-                        var size = attributes[name].size;
-                        if (! attribArray) {
-                            // Here use array to put data temporary because i can't predict
-                            // the size of chunk precisely.
-                            attribArray = currentChunk.attributeArrays[name] = [];
-                        }
-                        if (size === 1) {
-                            if (newI1) {
-                                attribArray[cursors[name]++] = values[i1];
+                    for (var f = 0; f < 3; f++) {
+                        var ii = face[f];
+                        var isNew = verticesReorganizedMap[ii] === -1; 
+
+                        for (var k = 0; k < attribNameList.length; k++) {
+                            var name = attribNameList[k];
+                            var attribArray = currentChunk.attributeArrays[name];
+                            var values = attributes[name].value;
+                            var size = attributes[name].size;
+                            if (! attribArray) {
+                                // Here use array to put data temporary because i can't predict
+                                // the size of chunk precisely.
+                                attribArray = currentChunk.attributeArrays[name] = [];
                             }
-                            if (newI2) {
-                                attribArray[cursors[name]++] = values[i2];
-                            }
-                            if (newI3) {
-                                attribArray[cursors[name]++] = values[i3];
-                            }
-                        }
-                        else {
-                            if (newI1) {
-                                for (var j = 0; j < size; j++) {
-                                    attribArray[cursors[name]++] = values[i1][j];
+                            if (isNew) {
+                                if (size === 1) {
+                                    attribArray[vertexCount] = values[ii];
                                 }
-                            }
-                            if (newI2) {
                                 for (var j = 0; j < size; j++) {
-                                    attribArray[cursors[name]++] = values[i2][j];
-                                }
-                            }
-                            if (newI3) {
-                                for (var j = 0; j < size; j++) {
-                                    attribArray[cursors[name]++] = values[i3][j];
+                                    attribArray[vertexCount * size + j] = values[ii][j];
                                 }
                             }
                         }
-                    }
-                    if (newI1) {
-                        verticesReorganizedMap[i1] = vertexCursor;
-                        reorganizedFace[0] = vertexCursor;
-                        vertexCursor++;
-                    } else {
-                        reorganizedFace[0] = verticesReorganizedMap[i1];
-                    }
-                    if (newI2) {
-                        verticesReorganizedMap[i2] = vertexCursor;
-                        reorganizedFace[1] = vertexCursor;
-                        vertexCursor++;
-                    } else {
-                        reorganizedFace[1] = verticesReorganizedMap[i2];
-                    }
-                    if (newI3) {
-                        verticesReorganizedMap[i3] = vertexCursor;
-                        reorganizedFace[2] = vertexCursor;
-                        vertexCursor++
-                    } else {
-                        reorganizedFace[2] = verticesReorganizedMap[i3];
+                        if (isNew) {
+                            verticesReorganizedMap[ii] = vertexCount;
+                            reorganizedFace[f] = vertexCount;
+                            vertexCount++;
+                        } else {
+                            reorganizedFace[f] = verticesReorganizedMap[ii];
+                        }
                     }
                 }
                 //Create typedArray from existed array
@@ -395,9 +354,9 @@ define(function(require) {
                         }
 
                         for (var i = chunkStart; i < chunkEnd; i++) {
-                            indicesArray[cursor++] = this._reorganizedFaces[i][0];
-                            indicesArray[cursor++] = this._reorganizedFaces[i][1];
-                            indicesArray[cursor++] = this._reorganizedFaces[i][2];
+                            indicesArray[cursor++] = reorganizedFaces[i][0];
+                            indicesArray[cursor++] = reorganizedFaces[i][1];
+                            indicesArray[cursor++] = reorganizedFaces[i][2];
                         }
                     }
                 }

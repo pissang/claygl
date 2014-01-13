@@ -151,7 +151,7 @@ void main(void)
         
         if (mist)
         {
-        ao = mix(ao, 1.0,doMist());
+            ao = mix(ao, 1.0,doMist());
         }
         
         vec3 color = texture2D(renderedTexture, v_Texcoord).rgb;
