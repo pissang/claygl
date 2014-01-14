@@ -179,7 +179,7 @@ define(function(require) {
             var z = vec3.create();
 
             var m3 = mat3.create();
-            
+
             return function(scale, rotation, position) {
 
                 var el = this._array;
@@ -210,7 +210,11 @@ define(function(require) {
                 m3[8] /= scale.z;
 
                 quat.fromMat3(rotation._array, m3);
-                rotation.normalize();
+                quat.normalize(rotation._array, rotation._array);
+
+                scale._dirty = true;
+                rotation._dirty = true;
+                position._dirty = true;
             }
         })(),
 

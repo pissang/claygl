@@ -11,39 +11,44 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
 
-    var Node = Base.derive(function() {
+    var Node = Base.derive({
+        
+        parent : null,
+        
+        scene : null,
 
-        var id = util.genGUID();
+        autoUpdateLocalTransform : true,
 
-        return {
-            __GUID__ : id,
+        _needsUpdateWorldTransform : true,
 
-            name : 'NODE_' + id,
+        _inIterating : false,
 
-            position : new Vector3(),
+        // Depth for transparent queue sorting
+        __depth : 0
 
-            rotation : new Quaternion(),
+    }, function() {
 
-            scale : new Vector3(1, 1, 1),
+        this.__GUID__ = util.genGUID();
 
-            parent : null,
-            scene : null,
-
-            worldTransform : new Matrix4(),
-
-            localTransform : new Matrix4(),
-
-            autoUpdateLocalTransform : true,
-
-            _children : [],
-
-            _needsUpdateWorldTransform : true,
-
-            _inIterating : false,
-
-            // Depth for transparent queue sorting
-            __depth : 0
+        if (!this.name) {
+            this.name = 'NODE_' + this.__GUID__;
         }
+
+        if (!this.position) {
+            this.position = new Vector3();
+        }
+        if (!this.rotation) {
+            this.rotation = new Quaternion();
+        }
+        if (!this.scale) {
+            this.scale = new Vector3(1, 1, 1);
+        }
+
+        this.worldTransform = new Matrix4();
+        this.localTransform = new Matrix4();
+
+        this._children = [];
+
     }, {
         isRenderable : function() {
             return false;
@@ -133,13 +138,35 @@ define(function(require) {
             this._inIterating = false;
         },
 
+        setLocalTransform : function(matrix) {
+            mat4.copy(this.localTransform._array, matrix._array);
+            this.decomposeLocalTransform();
+        },
+
         decomposeLocalTransform : function() {
             this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
-            
-            this.rotation._dirty = false;
-            this.scale._dirty = false;
-            this.position._dirty = false;
         },
+
+        setWorldTransform : function(matrix) {
+            mat4.copy(this.worldTransform._array, matrix._array);
+            this.decomposeWorldTransform();
+        },
+
+        decomposeWorldTransform : (function() {
+            
+            var tmp = mat4.create();
+
+            return function(matrix) {
+                // Assume world transform is updated
+                if (this.parent) {
+                    mat4.invert(tmp, this.parent.worldTransform._array);
+                    mat4.multiply(this.localTransform._array, tmp, this.worldTransform._array);
+                } else {
+                    mat4.copy(this.localTransform._array, matrix._array);
+                }
+                this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
+            }
+        })(),
 
         updateLocalTransform : function() {
             var position = this.position;
