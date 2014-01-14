@@ -19,6 +19,7 @@ define(function(require) {
         // {
         //  position : 
         //  clip : 
+        //  offset : 0
         // }
         this.inputs = opts.inputs || [];
 
@@ -33,10 +34,11 @@ define(function(require) {
     Blend1DClip.prototype = new Clip();
     Blend1DClip.prototype.constructor = Blend1DClip;
 
-    Blend1DClip.prototype.addInput = function(position, inputClip) {
+    Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {
             position : position,
-            clip : inputClip
+            clip : inputClip,
+            offset : offset || 0
         }
         if (!this.inputs.length) {
             this.inputs.push(obj);
@@ -73,9 +75,11 @@ define(function(require) {
         var min = inputs[0].position;
         var max = inputs[len-1].position;
 
-        if (position <= min) {
-            var clip = inputs[0].clip;
-            clip.setTime(time % clip.life);
+        if (position <= min || position >= max) {
+            var in0 = position <= min ? inputs[0] : inputs[len-1];
+            var clip = in0.clip;
+            var offset = in0.offset;
+            clip.setTime((time + offset) % clip.life);
             // Input clip is a blend clip
             // PENDING
             if (clip.output instanceof Clip) {
@@ -83,24 +87,16 @@ define(function(require) {
             } else {
                 this.output.copy(clip);
             }
-        } else if (position >= max) {
-            var clip = inputs[len-1].clip;
-            clip.setTime(time % clip.life);
-            if (clip.output instanceof Clip) {
-                this.output.copy(clip.output);
-            } else {
-                this.output.copy(clip);
-            }
         } else {
             var key = this._findKey(position);
-            var input1 = inputs[key];
-            var input2 = inputs[key + 1];
-            var clip1 = input1.clip;
-            var clip2 = input2.clip;
-            clip1.setTime(time % clip1.life);
-            clip2.setTime(time % clip2.life);
+            var in1 = inputs[key];
+            var in2 = inputs[key + 1];
+            var clip1 = in1.clip;
+            var clip2 = in2.clip;
+            clip1.setTime((time + in1.offset) % clip1.life);
+            clip2.setTime((time + in2.offset) % clip2.life);
 
-            var w = (this.position - input1.position) / (input2.position - input1.position);
+            var w = (this.position - in1.position) / (in2.position - in1.position);
 
             var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
             var c2 = clip2.output instanceof Clip ? clip2.output : clip2;

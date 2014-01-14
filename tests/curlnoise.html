@@ -29,7 +29,7 @@
                 var particleNode = compositor.findNode('particle');
 
                 // Scene
-                var geo = new qtek.Geometry();
+                var geo = new qtek.DynamicGeometry();
                 for (var i = 0; i < SIZE; i++) {
                     for (var j = 0; j < SIZE; j++) {
                         geo.attributes.position.value.push([i / SIZE, j / SIZE, 0]);
@@ -71,9 +71,9 @@
                     domElement : renderer.canvas,
                     sensitivity : 0.4
                 });
-                control.enable();
 
                 function update(){
+                    control.update();
                     var currentTime = new Date().getTime();
                     var deltaTime = (currentTime - time) / 1000;
                     elapsedTime += deltaTime;

@@ -22,6 +22,7 @@ define(function(require) {
         // {
         //  position : Vector2()
         //  clip : 
+        //  offset : 0
         // }
         this.inputs = opts.inputs || [];
 
@@ -37,10 +38,11 @@ define(function(require) {
     Blend2DClip.prototype = new Clip();
     Blend2DClip.prototype.constructor = Blend2DClip;
 
-    Blend2DClip.prototype.addInput = function(position, inputClip) {
+    Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
         this.inputs.push({
             position : position,
-            clip : inputClip
+            clip : inputClip,
+            offset : offset || 0
         });
         this.life = Math.max(inputClip.life, this.life);
         // TODO Change to incrementally adding
@@ -77,13 +79,16 @@ define(function(require) {
 
         var tri = res[0];
 
-        var clip1 = this.inputs[tri.indices[0]].clip;
-        var clip2 = this.inputs[tri.indices[1]].clip;
-        var clip3 = this.inputs[tri.indices[2]].clip;
+        var in1 = this.inputs[tri.indices[0]];
+        var in2 = this.inputs[tri.indices[1]];
+        var in3 = this.inputs[tri.indices[2]];
+        var clip1 = in1.clip;
+        var clip2 = in2.clip;
+        var clip3 = in3.clip;
 
-        clip1.setTime(time % clip1.life);
-        clip2.setTime(time % clip2.life);
-        clip3.setTime(time % clip3.life);
+        clip1.setTime((time + in1.offset) % clip1.life);
+        clip2.setTime((time + in2.offset) % clip2.life);
+        clip3.setTime((time + in3.offset) % clip3.life);
 
         var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
         var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
