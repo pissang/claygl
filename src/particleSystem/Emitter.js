@@ -1,34 +1,58 @@
 define(function(require) {
 
-    var Base = require('../core/base');
+    var Base = require('../core/Base');
     var Vector3 = require('../math/Vector3');
     var Particle = require('./Particle');
     var Value = require('../math/Value');
     var glMatrix = require('glmatrix');
     var vec3 =  glMatrix.vec3;
 
-    var Emitter = Base.derive(function() {
-        return {
-            max : 1000,
-            amount : 20,
+    var Emitter = Base.derive({
 
-            // Init status for each particle
-            life : Value.constant(1),
-            position : Value.vector(new Vector3()),
-            rotation : Value.constant(0),
-            velocity : Value.vector(new Vector3()),
-            angularVelocity : Value.constant(0),
-            spriteSize : Value.constant(1),
-            weight : Value.constant(1),
+        max : 1000,
+        amount : 20,
 
-            _particlePool : []
-        }
+        // Init status for each particle
+        life : null,
+        position : null,
+        rotation : null,
+        velocity : null,
+        angularVelocity : null,
+        spriteSize : null,
+        weight : null
+        
     }, function() {
+        
+        this._particlePool = [];
+
         for (var i = 0; i < this.max; i++) {
             var particle = new Particle();
             particle.emitter = this;
             this._particlePool.push(particle);
         }
+        
+        if (!this.life) {
+            this.life = Value.constant(1);
+        }
+        if (!this.position) {
+            this.position = Value.vector(new Vector3());
+        }
+        if (!this.rotation) {
+            this.rotation = Value.constant(0);
+        }
+        if (!this.velocity) {
+            this.velocity = Value.vector(new Vector3());
+        }
+        if (!this.angularVelocity) {
+            this.angularVelocity = Value.constant(0);
+        }
+        if (!this.spriteSize) {
+            this.spriteSize = Value.constant(1);
+        }
+        if (!this.weight) {
+            this.weight = Value.constant(1);
+        }
+
     }, {
 
         emit : function(out) {

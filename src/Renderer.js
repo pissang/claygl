@@ -28,8 +28,6 @@ define(function(require) {
     var Renderer = Base.derive(function() {
         return {
 
-            __GUID__ : util.genGUID(),
-
             canvas : null,
             width : 100,
             height : 100,

@@ -7,6 +7,7 @@ define(function(require) {
     var TextureCube = require("./texture/TextureCube");
     var glinfo = require('./core/glinfo');
     var glenum = require("./core/glenum");
+    var Cache = require("./core/Cache");
 
     var FrameBuffer = Base.derive(function() {
 
@@ -23,6 +24,9 @@ define(function(require) {
             _renderBufferWidth : 0,
             _renderBufferHeight : 0
         }
+    }, function() {
+        // Use cache
+        this.cache = new Cache();
     }, {
 
         bind : function(renderer) {

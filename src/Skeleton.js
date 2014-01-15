@@ -12,9 +12,6 @@ define(function(require) {
     var Skeleton = Base.derive(function() {
 
         return {
-        
-            __GUID__ : util.genGUID(),
-
             name : '',
 
             // Root joints

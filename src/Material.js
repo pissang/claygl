@@ -10,46 +10,41 @@ define(function(require) {
 
     _repository = [];
 
-    var Material = Base.derive(function() {
+    var nameId = 0;
 
-        var id = util.genGUID();
+    var Material = Base.derive({
+        name : 'MATERIAL_' + nameId++,
 
-        return {
-            __GUID__ : id,
+        //{
+        // type
+        // value
+        // semantic
+        //}
+        uniforms : null,
 
-            name : 'MATERIAL_' + id,
+        shader : null,
 
-            //{
-            // type
-            // value
-            // semantic
-            //}
-            uniforms : {},
+        depthTest : true,
+        depthMask : true,
 
-            shader : null,
+        transparent : false,
+        // Blend func is a callback function when the material 
+        // have custom blending
+        // The gl context will be the only argument passed in tho the
+        // blend function
+        // Detail of blend function in WebGL:
+        // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
+        //
+        // Example :
+        // function(_gl) {
+        //  _gl.blendEquation(_gl.FUNC_ADD);
+        //  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+        // }
+        blend : null,
 
-            depthTest : true,
-            depthMask : true,
+        // shadowTransparentMap : null
 
-            transparent : false,
-            // Blend func is a callback function when the material 
-            // have custom blending
-            // The gl context will be the only argument passed in tho the
-            // blend function
-            // Detail of blend function in WebGL:
-            // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
-            //
-            // Example :
-            // function(_gl) {
-            //  _gl.blendEquation(_gl.FUNC_ADD);
-            //  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-            // }
-            blend : null,
-
-            // shadowTransparentMap : null
-
-            _enabledUniforms : [],
-        }
+        _enabledUniforms : null,
     }, function() {
         if (this.shader) {
             this.attachShader(this.shader);

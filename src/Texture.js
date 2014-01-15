@@ -7,43 +7,42 @@ define(function(require) {
     var Base = require("./core/Base");
     var util = require("./core/util");
     var glenum = require("./core/glenum");
+    var Cache = require("./core/Cache");
     var _ = require("_");
 
-    var Texture = Base.derive(function() {
+    var Texture = Base.derive({
+        // Width and height is used when the image is null and want
+        // to use it as a texture attach to framebuffer(RTT)
+        width : 512,
+        height : 512,
 
-        return {
-            __GUID__ : util.genGUID(),
-            // Width and height is used when the image is null and want
-            // to use it as a texture attach to framebuffer(RTT)
-            width : 512,
-            height : 512,
+        type : glenum.UNSIGNED_BYTE,
 
-            type : glenum.UNSIGNED_BYTE,
+        format : glenum.RGBA,
 
-            format : glenum.RGBA,
+        wrapS : glenum.CLAMP_TO_EDGE,
+        wrapT : glenum.CLAMP_TO_EDGE,
 
-            wrapS : glenum.CLAMP_TO_EDGE,
-            wrapT : glenum.CLAMP_TO_EDGE,
+        minFilter : glenum.LINEAR_MIPMAP_LINEAR,
 
-            minFilter : glenum.LINEAR_MIPMAP_LINEAR,
+        magFilter : glenum.LINEAR,
 
-            magFilter : glenum.LINEAR,
+        useMipmap : true,
 
-            useMipmap : true,
+        // http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
+        anisotropic : 1,
+        // pixelStorei parameters
+        // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
+        flipY : true,
+        unpackAlignment : 4,
+        premultiplyAlpha : false,
 
-            // http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
-            anisotropic : 1,
-            // pixelStorei parameters
-            // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
-            flipY : true,
-            unpackAlignment : 4,
-            premultiplyAlpha : false,
+        // Dynamic option for texture like video
+        dynamic : false,
 
-            // Dynamic option for texture like video
-            dynamic : false,
-
-            NPOT : false
-        }
+        NPOT : false
+    }, function() {
+        this.cache = new Cache();
     }, {
 
         getWebGLTexture : function(_gl) {

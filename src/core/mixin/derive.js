@@ -1,5 +1,7 @@
 define(function(require) {
 
+'use strict';
+
 /**
  * derive a sub class from base class
  * @makeDefaultOpt [Object|Function] default option of this sub class, 
@@ -18,40 +20,55 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 
     var _super = this;
 
+    var propList;
+    if (! (makeDefaultOpt instanceof Function)) {
+        // Optimize the property iterate if it have been fixed
+        propList = [];
+        for (var propName in makeDefaultOpt) {
+            if (makeDefaultOpt.hasOwnProperty(propName)) {
+                propList.push(propName);
+            }
+        }
+    }
+
     var sub = function(options) {
 
         // call super constructor
         _super.call(this);
 
-        // call defaultOpt generate function each time
-        // if it is a function, So we can make sure each 
-        // property in the object is fresh
-        extend(this, typeof makeDefaultOpt == "function" ?
-                        makeDefaultOpt.call(this) : makeDefaultOpt);
+        if (makeDefaultOpt instanceof Function) {
+            // call defaultOpt generate function each time
+            // if it is a function, So we can make sure each 
+            // property in the object is fresh
+            extend(this, makeDefaultOpt.call(this));
+        } else {
+            extendWithPropList(this, makeDefaultOpt, propList);
+        }
+        
         if (options) {
             extend(this, options);
         }
 
         if (this.constructor === sub) {
-            // find the base class, and the initialize function will be called 
-            // in the order of inherit
+            // initialize function will be called in the order of inherit
             var base = sub;
-            var initializeChain = [];
-            while (base) {
-                if (base.__initialize__) {
-                    initializeChain.push(base.__initialize__);
-                }
-                base = base.__super__;
-            }
-            for (var i = initializeChain.length - 1; i >= 0; i--) {
-                initializeChain[i].call(this);
+            var initializers = sub.__initializer__;
+            for (var i = 0; i < initializers.length; i++) {
+                initializers[i].call(this);
             }
         }
     };
     // save super constructor
     sub.__super__ = _super;
     // initialize function will be called after all the super constructor is called
-    sub.__initialize__ = initialize;
+    if (!_super.__initializer__) {
+        sub.__initializer__ = [];
+    } else {
+        sub.__initializer__ = _super.__initializer__.slice();
+    }
+    if (initialize) {
+        sub.__initializer__.push(initialize);
+    }
 
     var Ctor = function() {};
     Ctor.prototype = _super.prototype;
@@ -66,11 +83,21 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 }
 
 function extend(target, source) {
+    if (!source) {
+        return;
+    }
     for (var name in source) {
         if (source.hasOwnProperty(name)) {
             target[name] = source[name];
         }
     }
+}
+
+function extendWithPropList(target, source, propList) {
+    for (var i = 0; i < propList.length; i++) {
+        var propName = propList[i];
+        target[propName] = source[propName];
+    }   
 }
 
 return {

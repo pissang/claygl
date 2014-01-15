@@ -15,26 +15,20 @@ define(function(require) {
 
     Shader.import(require('text!./particle.essl'));
 
-    var ParticleSystem = Node.derive(function() {
-        return {
-            loop : true,
+    var ParticleSystem = Node.derive({
+        
+        loop : true,
 
-            duration : 1,
+        duration : 1,
 
-            geometry : new DynamicGeometry(),
-            material : null,
+        geometry : null,
+        material : null,
 
-            mode : Mesh.POINTS,
+        mode : Mesh.POINTS
 
-            _drawCache : {},
-
-            _particles : [],
-
-            _fields : [],
-
-            _emitters : []
-        }
     }, function(){
+
+        this.geometry = new DynamicGeometry();
 
         var particleShader = new Shader({
             vertex : Shader.source('buildin.particle.vertex'),
@@ -50,6 +44,12 @@ define(function(require) {
                 depthMask : false
             });
         }
+
+        this._drawCache = {};
+        this._particles = [];
+        this._fields = [];
+        this._emitters = [];
+
     }, {
 
         visible : true,

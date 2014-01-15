@@ -2,11 +2,11 @@ define(function(require){
 
     var deriveMixin = require("./mixin/derive");
     var notifierMixin = require("./mixin/notifier");
-    var Cache = require("./Cache");
+    var util = require("./util");
     var _ = require("_");
 
     var Base = function(){
-        this.cache = new Cache();
+        this.__GUID__ = util.genGUID();
     }
     _.extend(Base, deriveMixin);
     _.extend(Base.prototype, notifierMixin);

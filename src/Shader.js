@@ -12,6 +12,7 @@ define(function(require) {
 
     var Base = require("./core/Base");
     var util = require("./core/util");
+    var Cache = require("./core/Cache");
     var glMatrix = require("glmatrix");
     var _ = require('_');
     var mat2 = glMatrix.mat2;
@@ -111,9 +112,6 @@ define(function(require) {
     var Shader = Base.derive(function() {
 
         return {
-
-            __GUID__ : util.genGUID(),
-
             vertex : "",
             
             fragment : "",
@@ -151,6 +149,9 @@ define(function(require) {
             _currentLocationsMap : {}
         }
     }, function() {
+        
+        this.cache = new Cache();
+
         this._updateShaderString();
     }, {
 

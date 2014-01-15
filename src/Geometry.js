@@ -5,6 +5,7 @@ define(function(require) {
     var Base = require("./core/Base");
     var util = require("./core/util");
     var glenum = require("./core/glenum");
+    var Cache = require("./core/Cache");
 
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
@@ -30,9 +31,7 @@ define(function(require) {
     var Geometry = Base.derive(function() {
         return {     
             boundingBox : null,
-
-            __GUID__ : util.genGUID(),
-
+            
             attributes : {},
 
             faces : null,
@@ -42,6 +41,9 @@ define(function(require) {
             //Max Value of Uint16, i.e. 0xffff
             chunkSize : 65535,
         }
+    }, function() {
+        // Use cache
+        this.cache = new Cache();
     }, {
         dirty : notImplementedWarn,
         getVertexNumber : notImplementedWarn,

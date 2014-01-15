@@ -11,6 +11,8 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
 
+    var nameId = 0;
+
     var Node = Base.derive({
         
         parent : null,
@@ -28,10 +30,8 @@ define(function(require) {
 
     }, function() {
 
-        this.__GUID__ = util.genGUID();
-
         if (!this.name) {
-            this.name = 'NODE_' + this.__GUID__;
+            this.name = 'NODE_' + (nameId++);
         }
 
         if (!this.position) {
