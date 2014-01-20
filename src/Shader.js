@@ -851,6 +851,9 @@ define(function(require) {
             if (_source[importName]) {
                 // Recursively parse
                 return Shader.parseImport(_source[importName]);
+            } else {
+                console.warn('Shader chunk "' + importName + '" not existed in library');
+                return '';
             }
         })
         return shaderStr;

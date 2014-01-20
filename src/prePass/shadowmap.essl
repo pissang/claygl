@@ -87,7 +87,7 @@ void main(){
         #ifdef SHADOW_TRANSPARENT
             if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {
                 // Hi-Z
-                gl_FragColor = encodeFloat(0.99);
+                gl_FragColor = encodeFloat(0.);
                 return;
             }
         #endif

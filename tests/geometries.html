@@ -7,18 +7,19 @@
     <body>
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek){
+            require(['qtek/qtek'], function(qtek){
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
+                renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
 
                 var sphere = new qtek.geometry.Sphere({
                     widthSegments : 20,
@@ -33,9 +34,17 @@
                     widthSegments : 10,
                     heightSegments : 10
                 })
+                var cone = new qtek.geometry.Cone({
+                    heightSegments : 10
+                });
+                var cylinder = new qtek.geometry.Cylinder({
+                    heightSegments : 10
+                });
                 sphere.generateBarycentric();
                 cube.generateBarycentric();
                 plane.generateBarycentric();
+                cone.generateBarycentric();
+                cylinder.generateBarycentric();
 
                 var shader = qtek.shader.library.get('buildin.wireframe');
                 var material = new qtek.Material({
@@ -45,8 +54,7 @@
                 })
                 material.set("lineWidth", 2);
 
-                camera.position.set(0, 2, 3);
-                camera.lookAt( new qtek.math.Vector3() );
+                camera.position.set(0, 0, 7);
 
                 var sphereMesh = new qtek.Mesh({
                     geometry : sphere,
@@ -62,19 +70,35 @@
                     geometry : plane,
                     material : material,
                     culling : false
+                });
+                var coneMesh = new qtek.Mesh({
+                    geometry : cone,
+                    material : material,
+                    culling : false
                 })
-                sphereMesh.position.x = -1.5;
-                cubeMesh.position.x = 1.5;
+                var cylinderMesh = new qtek.Mesh({
+                    geometry : cylinder,
+                    material : material,
+                    culling : false
+                })
+                sphereMesh.position.x = -3;
+                cubeMesh.position.x = -1.5;
                 cubeMesh.scale.set(0.7, 0.7, 0.7);
+                coneMesh.position.x = 1.5;
+                cylinderMesh.position.x = 3;
                 scene.add( sphereMesh );
                 scene.add( planeMesh );
                 scene.add( cubeMesh );
+                scene.add( coneMesh );
+                scene.add( cylinderMesh );
 
                 setInterval( function(){
                     renderer.render( scene, camera );
                     cubeMesh.rotation.rotateY(Math.PI/500);
                     planeMesh.rotation.rotateY(Math.PI/500);
                     sphereMesh.rotation.rotateY(Math.PI/500);
+                    coneMesh.rotation.rotateY(Math.PI/500);
+                    cylinderMesh.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
             
