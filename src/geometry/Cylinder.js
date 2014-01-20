@@ -18,13 +18,15 @@ define(function(require) {
                 topRadius : this.radius,
                 bottomRadius : this.radius,
                 capSegments : this.capSegments,
-                heightSegments : this.heightSegments
+                heightSegments : this.heightSegments,
             });
 
             this.attributes.position.value = cone.attributes.position.value;
             this.attributes.normal.value = cone.attributes.normal.value;
             this.attributes.texcoord0.value = cone.attributes.texcoord0.value;
             this.faces = cone.faces;
+
+            this.boundingBox = cone.boundingBox;
         }
     })
 

@@ -47,8 +47,6 @@ define(function(require) {
                 z = r2 * Math.cos(theta);
                 bottomCap.push(vec3.fromValues(x, -y, z));
             }
-            topCap.push(vec3.clone(topCap[0]));
-            bottomCap.push(vec3.clone(bottomCap[0]));
 
             // Build top cap
             positions.push(c1);
@@ -59,10 +57,8 @@ define(function(require) {
                 positions.push(topCap[i]);
                 // TODO
                 texcoords.push(vec2.fromValues(i / n, 0));
-                faces.push([0, i+2, i+1]);
+                faces.push([0, i+1, (i+1) % n + 1]);
             }
-            positions.push(topCap[i]);
-            texcoords.push(vec2.fromValues(1, 0));
 
             // Build bottom cap
             var offset = positions.length;
@@ -71,37 +67,37 @@ define(function(require) {
             for (var i = 0; i < n; i++) {
                 positions.push(bottomCap[i]);
                 // TODO
-                texcoords.push(vec2.fromValues((i+1) / n, 1));
-                faces.push([offset, offset+i+2, offset+i+1]);
+                texcoords.push(vec2.fromValues(i / n, 1));
+                faces.push([offset, offset+((i+1) % n + 1), offset+i+1]);
             }
-            positions.push(bottomCap[i]);
-            texcoords.push(vec2.fromValues(1, 0));
 
-            // Build side
+            // // Build side
             offset = positions.length;
             var n2 = this.heightSegments;
-            for (var i =0 ; i < n; i++) {
-                for (var j = 0; j < n2; j++) {
+            for (var i =0; i < n; i++) {
+                for (var j = 0; j < n2+1; j++) {
                     var v = j / n2;
-                    var v2 = (j + 1) / n2;
                     positions.push(vec3.lerp(vec3.create(), topCap[i], bottomCap[i], v));
-                    positions.push(vec3.lerp(vec3.create(), topCap[i+1], bottomCap[i+1], v));
-                    positions.push(vec3.lerp(vec3.create(), topCap[i+1], bottomCap[i+1], v2));
-                    positions.push(vec3.lerp(vec3.create(), topCap[i], bottomCap[i], v2));
-
                     texcoords.push(vec2.fromValues(i / n, v));
-                    texcoords.push(vec2.fromValues((i+1) / n, v));
-                    texcoords.push(vec2.fromValues((i+1) / n, v2));
-                    texcoords.push(vec2.fromValues(i / n, v));
-
-                    faces.push([offset, offset+1, offset+2]);
-                    faces.push([offset+2, offset+3, offset]);
-
-                    offset+=4;
+                }
+            }
+            for (var i = 0; i < n; i++) {
+                for (var j = 0; j < n2; j++) {
+                    var i1 = i * (n2 + 1) + j;
+                    var i2 = ((i + 1) % n) * (n2 + 1) + j;
+                    var i3 = ((i + 1) % n) * (n2 + 1) + j + 1;
+                    var i4 = i * (n2 + 1) + j + 1;
+                    faces.push([offset+i2, offset+i1, offset+i4]);
+                    faces.push([offset+i4, offset+i3, offset+i2]);
                 }
             }
 
             this.generateVertexNormals();
+
+            this.boundingBox = new BoundingBox();
+            var r = Math.max(this.topRadius, this.bottomRadius);
+            this.boundingBox.min.set(-r, -this.height/2, -r);
+            this.boundingBox.max.set(r, this.height/2, r);
         }
     });
 
