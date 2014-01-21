@@ -12,7 +12,10 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 #####WebGL 
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
++ Basic primitive geometry procedural generate
+    + Cube, sphere, cylinder, cone, plane
 + Phong and lambert buildin shaders which support normal map and environment map
++ Physically based shader
 + Point, directional, spot light
 + Orthographic, perspective camera
 + Graph based post processing
@@ -22,6 +25,7 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
     + Omni light shadow support
 + Geometory processing like normal and tangent generate
 + GPU based skinning
+    + Support 1D and 2D animation blending with blend tree
 + First person camera control, orbit camera control
 + Skybox, skydom
 + Particle System
@@ -56,9 +60,9 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Image based lighting
 + Physically based shading
 + Realtime atmosphere scattering
-+ VSM
++ Variance shadow map
 + HDR pipeline
     + Bloom
     + Eye adaption tone mapping
-    + Linear Space
+    + Linear space
 + FXAA

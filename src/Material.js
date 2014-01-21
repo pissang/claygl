@@ -13,7 +13,7 @@ define(function(require) {
     var nameId = 0;
 
     var Material = Base.derive({
-        name : 'MATERIAL_' + nameId++,
+        name : 'MATERIAL_' + (nameId++),
 
         //{
         // type
