@@ -14,7 +14,6 @@ define(function(require) {
     var Texture = require('../Texture');
     var Texture2D = require('../texture/Texture2D');
     var TextureCube = require('../texture/TextureCube');
-    var _ = require('_');
 
     var shaderSourceReg = /#source\((.*?)\)/;
     var urlReg = /#url\((.*?)\)/;
@@ -226,7 +225,7 @@ define(function(require) {
             var loading = 0;
             var cbd = false;
             var shaderRootPath = this.shaderRootPath || this.rootPath;
-            _.each(json.shaders, function(shaderExp, name) {
+            util.each(json.shaders, function(shaderExp, name) {
                 var res = urlReg.exec(shaderExp);
                 if (res) {
                     var path = res[1];
@@ -264,7 +263,7 @@ define(function(require) {
 
             var cbd = false;
             var textureRootPath = this.textureRootPath || this.rootPath;
-            _.each(json.textures, function(textureInfo, name) {
+            util.each(json.textures, function(textureInfo, name) {
                 var texture;
                 var path = textureInfo.path;
                 var parameters = this._convertParameter(textureInfo.parameters);

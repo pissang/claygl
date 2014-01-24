@@ -14,7 +14,6 @@ define(function(require) {
     var util = require("./core/util");
     var Cache = require("./core/Cache");
     var glMatrix = require("glmatrix");
-    var _ = require('_');
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;
     var mat4 = glMatrix.mat4;
@@ -807,11 +806,11 @@ define(function(require) {
             var shader = new Shader({
                 vertex : this.vertex,
                 fragment : this.fragment,
-                vertexDefines : _.clone(this.vertexDefines),
-                fragmentDefines : _.clone(this.fragmentDefines)
+                vertexDefines : util.clone(this.vertexDefines),
+                fragmentDefines : util.clone(this.fragmentDefines)
             });
             for (var name in this._textureStatus) {
-                shader._textureStatus[name] = _.clone(this._textureStatus[name]);
+                shader._textureStatus[name] = util.clone(this._textureStatus[name]);
             }
             return shader;
         },

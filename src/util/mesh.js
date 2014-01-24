@@ -13,7 +13,6 @@ define(function(require) {
     var Shader = require("../Shader");
     var glMatrix = require("glmatrix");
     var BoundingBox = require('../math/BoundingBox');
-    var _ = require("_");
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 

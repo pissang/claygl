@@ -225,15 +225,17 @@ define(function(require) {
                 return ;
             }
 
-            this._outputReferences[name] ++;
-
+            // Already been rendered in this frame
             if (this._rendered) {
-                // Already been rendered in this frame
-                return this._outputTextures[name];
+                // Force return texture in last frame
+                if (outputInfo.outputLastFrame) {
+                    return this._prevOutputTextures[name];
+                } else {
+                    return this._outputTextures[name];
+                }
             } else if (
                 // TODO
                 this._rendering   // Solve Circular Reference
-                || outputInfo.outputLastFrame // Force return texture in last frame
             ) {
                 if (!this._prevOutputTextures[name]) {
                     // Create a blank texture at first pass
@@ -289,6 +291,20 @@ define(function(require) {
 
             var shader = this.pass.material.shader;
             shader.disableTexturesAll();   
+        },
+
+        updateReference : function(name) {
+            if (!this._rendering) {
+                this._rendering = true;
+                for (var inputName in this.inputLinks) {
+                    var link = this.inputLinks[inputName];
+                    link.node.updateReference(link.pin);
+                }
+                this._rendering = false;
+            }
+            if (name) {
+                this._outputReferences[name] ++;
+            }
         },
 
         beforeFrame : function() {

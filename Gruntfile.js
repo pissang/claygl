@@ -9,7 +9,6 @@ module.exports = function(grunt){
         var common = {
             'baseUrl' : './src',
             'paths' : {
-                '_' : '../thirdparty/lodash.compat',
                 'glmatrix' : '../thirdparty/gl-matrix'
             },
             'exclude' : ['text'],

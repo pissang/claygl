@@ -8,7 +8,6 @@ define(function(require) {
     var util = require("./core/util");
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
-    var _ = require("_");
 
     var Texture = Base.derive({
         // Width and height is used when the image is null and want

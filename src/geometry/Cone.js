@@ -51,9 +51,10 @@ define(function(require) {
             // Build top cap
             positions.push(c1);
             // TODO
-            texcoords.push(vec2.fromValues(0, 0));
+            texcoords.push(vec2.fromValues(0, 1));
             var n = this.capSegments;
             for (var i = 0; i < n; i++) {
+                positions.push(topCap[i]);
                 positions.push(topCap[i]);
                 // TODO
                 texcoords.push(vec2.fromValues(i / n, 0));
@@ -67,7 +68,7 @@ define(function(require) {
             for (var i = 0; i < n; i++) {
                 positions.push(bottomCap[i]);
                 // TODO
-                texcoords.push(vec2.fromValues(i / n, 1));
+                texcoords.push(vec2.fromValues(i / n, 0));
                 faces.push([offset, offset+((i+1) % n + 1), offset+i+1]);
             }
 

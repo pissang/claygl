@@ -23,7 +23,6 @@ define(function(require) {
     var Quaternion = require("../../math/Quaternion");
     var glenum = require('../../core/glenum');
     var SkinningClip = require('../../animation/SkinningClip');
-    var _ = require("_");
 
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;

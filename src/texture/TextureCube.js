@@ -2,7 +2,7 @@ define(function(require) {
 
     var Texture = require('../Texture');
     var glinfo = require('../core/glinfo');
-    var _ = require('_');
+    var util = require('../core/util');
 
     var targetMap = {
         'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
@@ -109,7 +109,7 @@ define(function(require) {
         load : function(imageList) {
             var loading = 0;
             var self = this;
-            _.each(imageList, function(src, target){
+            util.each(imageList, function(src, target){
                 var image = new Image();
                 image.onload = function() {
                     loading --;

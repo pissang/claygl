@@ -28,8 +28,6 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
-    var _ = require("_");
-
     var frameBuffer = new FrameBuffer();
 
     Shader.import(require('text!./shadowmap.essl'));

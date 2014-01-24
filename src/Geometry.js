@@ -49,6 +49,7 @@ define(function(require) {
         getVertexNumber : notImplementedWarn,
         getFaceNumber : notImplementedWarn,
         isUseFace : notImplementedWarn,
+        isStatic : notImplementedWarn,
         getEnabledAttributes : notImplementedWarn,
         getBufferChunks : notImplementedWarn,
         generateVertexNormals : notImplementedWarn,

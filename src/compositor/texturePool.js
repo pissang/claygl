@@ -2,7 +2,7 @@ define(function(require) {
     
     var Texture2D = require('../texture/Texture2D');
     var glenum = require('../core/glenum');
-    var _ = require('_');
+    var util = require('../core/util');
 
     var pool = {};
 
@@ -58,12 +58,15 @@ define(function(require) {
         premultiplyAlpha : false
     }
 
+    var defaultParamPropList = Object.keys(defaultParams);
+
     function generateKey(parameters) {
-        _.defaults(parameters, defaultParams);
+        util.defaultsWithPropList(parameters, defaultParams, defaultParamPropList);
         fallBack(parameters);
 
         var key = '';
-        for (var name in defaultParams) {
+        for (var i = 0; i < defaultParamPropList.length; i++) {
+            var name = defaultParamPropList[i];
             var chunk = parameters[name].toString();
             key += chunk;
         }

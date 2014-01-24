@@ -102,6 +102,10 @@ define(function(require) {
             return this.useFace && this.faces.length;
         },
 
+        isStatic : function() {
+            return true;
+        },
+
         getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {

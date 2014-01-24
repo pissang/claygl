@@ -10,6 +10,13 @@ define(function(require){
             _outputs : []
         }
     }, {
+        add : function(node) {
+            Graph.prototype.add.call(this, node);
+            if (!node.outputs) {
+                this.addOutput(node);
+            }
+        },
+
         render : function(renderer) {
             if (this._dirty) {
                 this.update();
@@ -20,18 +27,11 @@ define(function(require){
                 this.nodes[i].beforeFrame();
             }
 
-            for (var i = 0; i < this.nodes.length; i++) {
-                var node = this.nodes[i];
-                // Find output node
-                if( ! node.outputs){
-                    node.render(renderer);
-                }
-            }
-
             for (var i = 0; i < this._outputs.length; i++) {
-                if (!this._outputs[i]._rendered) {
-                    this._outputs[i].render(renderer);
-                }
+                this._outputs[i].updateReference();
+            }
+            for (var i = 0; i < this._outputs.length; i++) {
+                this._outputs[i].render(renderer);
             }
 
             for (var i = 0; i < this.nodes.length; i++) {
@@ -41,7 +41,7 @@ define(function(require){
         },
 
         addOutput : function(node) {
-            if (node.outputs) {
+            if (this._outputs.indexOf(node) < 0) {
                 this._outputs.push(node);
             }
         },

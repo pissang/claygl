@@ -64,7 +64,7 @@ define(function(require) {
 
         add : function(node) {
             if (this._inIterating) {
-                console.warn('Do add operation can cause unpredictable error when in iterating');
+                console.warn('Add operation can cause unpredictable error when in iterating');
             }
             if (node.parent === this) {
                 return;
@@ -82,7 +82,7 @@ define(function(require) {
 
         remove : function(node) {
             if (this._inIterating) {
-                console.warn('Do remove operation can cause unpredictable error when in iterating');
+                console.warn('Remove operation can cause unpredictable error when in iterating');
             }
 
             this._children.splice(this._children.indexOf(node), 1);

@@ -139,6 +139,10 @@ define(function(require) {
         isSplitted : function() {
             return this.getVertexNumber() > this.chunkSize;
         },
+        
+        isStatic : function() {
+            return false;
+        },
 
         getEnabledAttributes : function() {
             // Cache

@@ -1,7 +1,6 @@
 define( function( require ) {
 
     var Base = require("../core/Base");
-    var _ = require("_");
 
     var Graph = Base.derive( function() {
         return {
@@ -17,7 +16,7 @@ define( function( require ) {
         },
 
         remove : function(node) {
-            _.without(this.nodes, node);
+            this.nodes.splice(this.nodes.indexOf(node), 1);
 
             this._dirty = true;
         },
@@ -52,7 +51,6 @@ define( function( require ) {
                     }
                 }
             }
-
         },
 
         findPin : function(info) {

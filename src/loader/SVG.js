@@ -21,7 +21,6 @@ define(function(require) {
     var Pattern = require("../2d/Pattern");
     var Style = require("../2d/Style");
     var Vector2 = require("../math/Vector2");
-    var _ = require("_");
 
     var Loader = Base.derive(function() {
         return {

@@ -1,6 +1,6 @@
 define(function(require) {
 
-    var _  = require('_');
+    var util  = require('./util');
     var notifier = require('./mixin/notifier');
     var request = require('./request');
     
@@ -11,7 +11,7 @@ define(function(require) {
     Task.prototype.reject = function(err) {
         this.trigger('error', err);
     }
-    _.extend(Task.prototype, notifier);
+    util.extend(Task.prototype, notifier);
 
 
     var Async = function() {};
@@ -112,7 +112,7 @@ define(function(require) {
         return new Task(obj);
     }
 
-    _.extend(Async.prototype, notifier);
+    util.extend(Async.prototype, notifier);
 
     return Async;
 });

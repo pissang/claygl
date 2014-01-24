@@ -34,8 +34,6 @@ define(function(require) {
 
     var SamplerClip = require("../animation/SamplerClip");
     var SkinningClip = require("../animation/SkinningClip");
-    
-    var _ = require("_");
 
     var StaticGeometry = require("../StaticGeometry");
 
@@ -102,7 +100,7 @@ define(function(require) {
             // Build scene
             var scene = new Scene();
             // Load buffers
-            _.each(json.buffers, function(bufferInfo, name) {
+            util.each(json.buffers, function(bufferInfo, name) {
                 loading++;
                 self._loadBuffer(bufferInfo.path, function(buffer) {
                     lib.buffers[name] = buffer;
@@ -381,7 +379,7 @@ define(function(require) {
 
         _parseTextures : function(json, lib) {
             var root = this.textureRootPath || this.rootPath;
-            _.each(json.textures, function(textureInfo, name){
+            util.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
                 var parameters = {};
                 ['wrapS', 'wrapT', 'magFilter', 'minFilter']
@@ -624,6 +622,12 @@ define(function(require) {
                     }
 
                     var material = lib.materials[primitiveInfo.material];
+                    //Collada export from blender may not have default material
+                    if (!material) {
+                        material = new Material({
+                            shader : shaderLibrary.get(self.shaderName)
+                        })
+                    }
                     var mesh = new Mesh({
                         geometry : geometry,
                         material : material
