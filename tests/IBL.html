@@ -145,7 +145,7 @@
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
-                    var viewportInfo = renderer.viewportInfo;
+                    var viewport = renderer.viewport;
                     // renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT | qtek.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {
                         compositor.render(renderer);
@@ -159,7 +159,7 @@
                     }
 
                     var x = 0, y = 0;
-                    var width = viewportInfo.width / 10;
+                    var width = viewport.width / 10;
                     var height = width;
                     renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
                     renderer.setViewport(x, y, width, height);
@@ -180,7 +180,7 @@
                         debugPass.setUniform('texture', currentLumNode._outputTextures['color']);
                         debugPass.render(renderer);
                     }
-                    renderer.setViewport(viewportInfo);
+                    renderer.setViewport(viewport);
                 });
 
                 function generateNormalDistribution() {

@@ -97,9 +97,9 @@ define(function(require) {
         renderDebug : function(renderer, size) {
             var prevClear = renderer.clear;
             renderer.clear = glenum.DEPTH_BUFFER_BIT
-            var viewportInfo = renderer.viewportInfo;
+            var viewport = renderer.viewport;
             var x = 0, y = 0;
-            var width = size || viewportInfo.width / 4;
+            var width = size || viewport.width / 4;
             var height = width;
             for (var name in this._textures) {
                 renderer.setViewport(x, y, width, height);
@@ -107,7 +107,7 @@ define(function(require) {
                 this._outputDepthPass.render(renderer);
                 x += width;
             }
-            renderer.setViewport(viewportInfo);
+            renderer.setViewport(viewport);
             renderer.clear = prevClear;
         },
 

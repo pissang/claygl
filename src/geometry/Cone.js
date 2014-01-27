@@ -55,7 +55,6 @@ define(function(require) {
             var n = this.capSegments;
             for (var i = 0; i < n; i++) {
                 positions.push(topCap[i]);
-                positions.push(topCap[i]);
                 // TODO
                 texcoords.push(vec2.fromValues(i / n, 0));
                 faces.push([0, i+1, (i+1) % n + 1]);

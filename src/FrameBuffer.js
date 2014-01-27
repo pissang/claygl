@@ -35,7 +35,7 @@ define(function(require) {
 
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
 
-            this.cache.put("viewport", renderer.viewportInfo);
+            this.cache.put("viewport", renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height);
             // Create a new render buffer
             if (this.cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
@@ -71,10 +71,10 @@ define(function(require) {
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
 
             this.cache.use(_gl.__GLID__);
-            var viewportInfo = this.cache.get("viewport");
+            var viewport = this.cache.get("viewport");
             // Reset viewport;
-            if (viewportInfo) {
-                renderer.setViewport(viewportInfo.x, viewportInfo.y, viewportInfo.width, viewportInfo.height);
+            if (viewport) {
+                renderer.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
             }
 
             // Because the data of texture is changed over time,

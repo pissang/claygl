@@ -19,6 +19,10 @@ define(function(require) {
 
         intersectTriangle : function() {
             
+        },
+
+        unProject : function() {
+            
         }
     };
 

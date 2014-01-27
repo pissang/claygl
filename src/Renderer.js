@@ -12,6 +12,8 @@ define(function(require) {
     var Shader = require('./Shader');
     var shaderLibrary = require('./shader/library');
     var Material = require('./Material');
+    var Vector3 = require('./math/Vector3');
+    var Vector2 = require('./math/Vector2');
 
     var glMatrix = require("glmatrix");
     var mat4 = glMatrix.mat4;
@@ -52,7 +54,7 @@ define(function(require) {
 
             gl : null,
 
-            viewportInfo : {},
+            viewport : {},
 
             _viewportSettings : [],
             _clearSettings : [],
@@ -123,7 +125,7 @@ define(function(require) {
             }
             this.gl.viewport(x, y, width, height);
 
-            this.viewportInfo = {
+            this.viewport = {
                 x : x,
                 y : y,
                 width : width,
@@ -132,7 +134,7 @@ define(function(require) {
         },
 
         saveViewport : function() {
-            this._viewportSettings.push(this.viewportInfo);
+            this._viewportSettings.push(this.viewport);
         },
 
         restoreViewport : function() {
@@ -179,10 +181,9 @@ define(function(require) {
             if (transparentQueue.length > 0) {
                 var worldViewMat = mat4.create();
                 var posViewSpace = vec3.create();
-                mat4.invert(matrices['VIEW'],  camera.worldTransform._array);
                 for (var i = 0; i < transparentQueue.length; i++) {
                     var node = transparentQueue[i];
-                    mat4.multiply(worldViewMat, matrices['VIEW'], node.worldTransform._array);
+                    mat4.multiply(worldViewMat, camera.viewMatrix._array, node.worldTransform._array);
                     vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
                     node.__depth = posViewSpace[2];
                 }
@@ -227,7 +228,7 @@ define(function(require) {
             };
 
             // Calculate view and projection matrix
-            mat4.invert(matrices.VIEW, camera.worldTransform._array);
+            mat4.copy(matrices.VIEW, camera.viewMatrix._array);
             mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
             mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix._array, matrices.VIEW);
             mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
@@ -491,6 +492,21 @@ define(function(require) {
             if (texture && texture.dispose) {
                 texture.dispose(this.gl);
             }
+        },
+
+        screenToNdc : function(x, y, out) {
+            if (!out) {
+                out = new Vector2();
+            }
+            // Invert y;
+            y = this.height - y;
+
+            out._array[0] = (x - this.viewport.x) / this.viewport.width;
+            out._array[0] = out._array[0] * 2 - 1;
+            out._array[1] = (y - this.viewport.y) / this.viewport.height;
+            out._array[1] = out._array[1] * 2 - 1;
+
+            return out;
         }
     })
 
