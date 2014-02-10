@@ -4,7 +4,7 @@
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
     </head>
-    <body>
+    <body style="margin:0px;">
         <canvas id="Main"></canvas>
         <script type="text/javascript">
             require(['qtek/qtek'], function(qtek){
@@ -22,17 +22,24 @@
 
                 camera.position.set(0, 1, 2);
 
-                var texture = new qtek.texture.Texture2D({
-                    flipY : false
+                var plane = new qtek.plugin.InfinitePlane({
+                    camera : camera,
+                    material : new qtek.Material({
+                        shader : qtek.shader.library.get('buildin.wireframe'),
+                        transparent : true
+                    }),
+                    culling : false
                 });
-                // Sky texture 
-                // http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
-                texture.load("assets/textures/Parking_Lot_Bg.jpg");
-
-                var skydome = new qtek.plugin.Skydome({
-                    scene : scene            
+                plane.plane.distance = -1;
+                scene.add(plane);
+                var cube = new qtek.Mesh({
+                    material : new qtek.Material({
+                        shader : qtek.shader.library.get('buildin.basic', 'diffuseMap')
+                    }),
+                    geometry : new qtek.geometry.Cube()
                 });
-                skydome.material.set("diffuseMap", texture);
+                cube.material.set('diffuseMap', qtek.util.texture.createChessboard());
+                scene.add(cube);
 
                 var control = new qtek.plugin.OrbitControl({
                     target : camera,
@@ -44,6 +51,9 @@
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
+                    camera.update(true);
+                    plane.updateGeometry();
+                    plane.geometry.generateBarycentric();
                     renderer.render(scene, camera);
                 });
             })

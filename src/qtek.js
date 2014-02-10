@@ -138,6 +138,7 @@ define( function(require){
 	},
 	"plugin": {
 		"FirstPersonControl": require('qtek/plugin/FirstPersonControl'),
+		"InfinitePlane": require('qtek/plugin/InfinitePlane'),
 		"OrbitControl": require('qtek/plugin/OrbitControl'),
 		"Skybox": require('qtek/plugin/Skybox'),
 		"Skydome": require('qtek/plugin/Skydome')

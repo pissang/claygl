@@ -237,6 +237,18 @@ define(function(require) {
             }
         },
 
+        clone : function() {
+            var node = new this.constructor();
+            node.position.copy(this.position);
+            node.rotation.copy(this.rotation);
+            node.scale.copy(this.scale);
+
+            for (var i = 0; i < this._children.length; i++) {
+                node.add(this._children[i].clone());
+            }
+            return node;
+        },
+
         // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
         // TODO improve performance
         rotateAround : (function() {
@@ -259,7 +271,6 @@ define(function(require) {
                 this.decomposeLocalTransform();
                 this._needsUpdateWorldTransform = true;
             }
-            
         })(),
 
         lookAt : (function() {

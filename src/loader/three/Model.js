@@ -497,10 +497,10 @@ define(function(require) {
             if (mConfig.transparent !== undefined && mConfig.transparent) {
                 material.transparent = true;
             }
-            if ( ! _.isUndefined(mConfig.depthTest)) {
+            if (mConfig.depthTest !== undefined) {
                 material.depthTest = mConfig.depthTest;
             }
-            if ( ! _.isUndefined(mConfig.depthWrite)) {
+            if (mConfig.depthWrite !== undefined) {
                 material.depthMask = mConfig.depthWrite;
             }
             

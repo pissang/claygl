@@ -49,21 +49,24 @@ define(function(require) {
 
         castRay : (function() {
             var v4 = vec4.create();
-            return function(ndc) {
-                var ray = new Ray();
-                
-                vec4.set(v4, ndc._array[0], ndc._array[1], -1, 1);
+            return function(ndc, out) {
+                var ray = out !== undefined ? out : new Ray();
+                var x = ndc._array[0];
+                var y = ndc._array[1];
+                vec4.set(v4, x, y, -1, 1);
                 vec4.transformMat4(v4, v4, this.invProjectionMatrix._array);
                 vec4.transformMat4(v4, v4, this.worldTransform._array);
                 vec3.scale(ray.origin._array, v4, 1 / v4[3]);
 
-                vec4.set(v4, ndc._array[0], ndc._array[1], 1, 1);
+                vec4.set(v4, x, y, 1, 1);
                 vec4.transformMat4(v4, v4, this.invProjectionMatrix._array);
                 vec4.transformMat4(v4, v4, this.worldTransform._array);
-                vec3.scale(ray.direction._array, v4, 1 / v4[3]);
-                vec3.sub(ray.direction._array, ray.direction._array, ray.origin._array);
+                vec3.scale(v4, v4, 1 / v4[3]);
+                vec3.sub(ray.direction._array, v4, ray.origin._array);
 
                 vec3.normalize(ray.direction._array, ray.direction._array);
+                ray.direction._dirty = true;
+                ray.origin._dirty = true;
                 
                 return ray;
             }

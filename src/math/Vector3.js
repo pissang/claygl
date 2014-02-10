@@ -226,7 +226,27 @@ define(function(require) {
             vec3.transformQuat(this._array, this._array, q._array);
             this._dirty = true;
             return this;
-        },     
+        },
+
+        applyProjection : function(m) {
+            var v = this._array;
+            m = m._array;
+
+            // Perspective projection
+            if (m[15] === 0) {
+                var w = -1 / v[2];
+                v[0] = m[0] * v[0] * w;
+                v[1] = m[5] * v[1] * w;
+                v[2] = (m[10] * v[2] + m[14]) * w;
+            } else {
+                v[0] = m[0] * v[0] + m[12];
+                v[1] = m[5] * v[1] + m[13];
+                v[2] = m[10] * v[2] + m[14];
+            }
+            this._dirty = true;
+
+            return this;
+        },
         /**
          * Set euler angle from queternion
          */

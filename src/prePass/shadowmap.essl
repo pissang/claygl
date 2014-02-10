@@ -208,7 +208,7 @@ float tapShadowMap(sampler2D map, vec2 uv, float z){
 float pcf(sampler2D map, vec2 uv, float z){
 
     float shadowContrib = tapShadowMap(map, uv, z);
-    float offset = 1.0/1024.0;
+    float offset = 1.0 / 2048.0;
     shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z);
     shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z);
     shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z);

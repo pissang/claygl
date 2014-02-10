@@ -46,7 +46,7 @@ define(function(require) {
         return {
             
             softShadow : ShadowMapPass.PCF,
-            blurSize : 1.0,
+            shadowBlur : 1.0,
 
             shadowCascade  : 1,
             cascadeSplitLogFactor : 0.2,
@@ -77,8 +77,8 @@ define(function(require) {
         this._gaussianPassV = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_v')
         });
-        this._gaussianPassH.setUniform("blurSize", this.blurSize);
-        this._gaussianPassV.setUniform("blurSize", this.blurSize);
+        this._gaussianPassH.setUniform("blurSize", this.shadowBlur);
+        this._gaussianPassV.setUniform("blurSize", this.shadowBlur);
 
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
@@ -461,11 +461,11 @@ define(function(require) {
                     _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                     // Set bias seperately for each cascade
-                    // TODO Simply divide 2 ?
+                    // TODO Simply divide 1.5 ?
                     for (var key in this._depthMaterials) {
                         this._depthMaterials[key].set('shadowBias', shadowBias);
                     }
-                    shadowBias /= 2;
+                    shadowBias /= 1.5;
 
 
                     renderer.renderQueue(casters, lightCamera);
@@ -610,7 +610,6 @@ define(function(require) {
                 };
             }
             var camera = this._lightCameras.point[target];
-            camera.worldTransform.copy(light.worldTransform);
 
             camera.far = light.range;
             camera.fov = 90;
@@ -683,10 +682,7 @@ define(function(require) {
                 camera.right = max[0];
                 camera.top = max[1];
                 camera.bottom = min[1];
-                camera.updateLocalTransform();
-                camera.updateWorldTransform();
-                camera.updateProjectionMatrix();
-                camera.frustum.setFromProjection(camera.projectionMatrix);
+                camera.update(true);
 
                 return camera;
             }
@@ -702,6 +698,7 @@ define(function(require) {
             camera.far = light.range;
             camera.worldTransform.copy(light.worldTransform);
             camera.updateProjectionMatrix();
+            mat4.invert(camera.viewMatrix._array, camera.worldTransform._array);
 
             return camera
         },

@@ -50,6 +50,8 @@ define(function(require) {
         this._fields = [];
         this._emitters = [];
 
+        this._renderInfo = new Mesh.RenderInfo();
+
     }, {
 
         visible : true,

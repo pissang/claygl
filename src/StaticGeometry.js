@@ -16,65 +16,21 @@ define(function(require) {
     var StaticGeometry = Geometry.derive(function() {
         return {
             attributes : {
-                 position : {
-                    type : 'float',
-                    semantic : "POSITION",
-                    size : 3,
-                    value : null
-                 },
-                 texcoord0 : {
-                    type : 'float',
-                    semantic : "TEXCOORD_0",
-                    size : 2,
-                    value : null
-                 },
-                 texcoord1 : {
-                    type : 'float',
-                    semantic : "TEXCOORD_1",
-                    size : 2,
-                    value : null
-                 },
-                 normal : {
-                    type : 'float',
-                    semantic : "NORMAL",
-                    size : 3,
-                    value : null
-                 },
-                 tangent : {
-                    type : 'float',
-                    semantic : "TANGENT",
-                    size : 4,
-                    value : null
-                 },
-                 color : {
-                    type : 'float',
-                    semantic : "COLOR",
-                    size : 4,
-                    value : null
-                 },
+                 position : new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
+                 texcoord0 : new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
+                 texcoord1 : new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
+                 normal : new Geometry.Attribute('normal', 'float', 3, 'NORMAL', false),
+                 tangent : new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', false),
+                 color : new Geometry.Attribute('color', 'float', 4, 'COLOR', false),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the 
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight : {
-                    type : 'float',
-                    semantic : 'WEIGHT',
-                    size : 3,
-                    value : null
-                 },
-                 joint : {
-                    type : 'float',
-                    semantic : 'JOINT',
-                    size : 4,
-                    value : null
-                 },
+                 weight : new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', false),
+                 joint : new Geometry.Attribute('joint', 'float', 4, 'JOINT', false),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric : {
-                    type : 'float',
-                    size : 3,
-                    value : null
-                 }
+                 barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, false),
             },
 
             hint : glenum.STATIC_DRAW,

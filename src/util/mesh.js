@@ -45,10 +45,7 @@ define(function(require) {
                 var attr = templateGeo.attributes[name];
                 // Extend custom attributes
                 if (! geometry.attributes[name]) {
-                    geometry.attributes[name] = {
-                        value : isStatic ? null : [],
-                        type : attr.type
-                    }
+                    geometry.attributes[name] = attr.clone(false)
                 }
             }
 

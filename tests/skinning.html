@@ -75,7 +75,6 @@
             require(['qtek/qtek',
                     'text!../tests/assets/models/knight.js'], function(qtek, modelData){
                 var Shader = qtek.Shader;
-                var _ = require("_");
 
                 var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
@@ -103,7 +102,7 @@
                 var root = new qtek.Node();
 
                 var skeleton;
-                _.each(meshList, function(mesh){
+                qtek.core.util.each(meshList, function(mesh){
                     var staticGeo = new qtek.StaticGeometry();
                     skeleton = mesh.skeleton;
                     mesh.geometry.generateVertexNormals();

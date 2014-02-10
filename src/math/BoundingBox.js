@@ -97,6 +97,8 @@ define(function(require) {
 
             this.min._dirty = true;
             this.max._dirty = true;
+
+            return this;
         },
 
         applyProjection : function(matrix) {
@@ -140,6 +142,8 @@ define(function(require) {
             }
             this.min._dirty = true;
             this.max._dirty = true;
+
+            return this;
         },
 
         updateVertices : function() {
@@ -166,6 +170,8 @@ define(function(require) {
             vec3Copy(this.max._array, boundingBox.max._array);
             this.min._dirty = true;
             this.max._dirty = true;
+
+            return this;
         },
 
         clone : function() {

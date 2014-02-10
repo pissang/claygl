@@ -314,8 +314,6 @@ define(function(require) {
                     shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE) {
                     mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
                 }
-                // Frustum culling
-                // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
                 if (geometry.boundingBox && ! preZ) {
                     if (!this._frustumCulling(renderable, camera)) {
                         continue;
@@ -405,6 +403,8 @@ define(function(require) {
         },
 
         _frustumCulling : (function() {
+            // Frustum culling
+            // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
             var cullingBoundingBox = new BoundingBox();
             var cullingMatrix = new Matrix4();
             return function(renderable, camera) {

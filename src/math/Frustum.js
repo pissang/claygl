@@ -37,27 +37,27 @@ define(function(require) {
 
             // Update planes
             vec3.set(planes[0].normal._array, m3 - m0, m7 - m4, m11 - m8);
-            planes[0].distance = m15 - m12;
+            planes[0].distance = -(m15 - m12);
             planes[0].normalize();
 
             vec3.set(planes[1].normal._array, m3 + m0, m7 + m4, m11 + m8);
-            planes[1].distance = m15 + m12;
+            planes[1].distance = -(m15 + m12);
             planes[1].normalize();
             
             vec3.set(planes[2].normal._array, m3 + m1, m7 + m5, m11 + m9);
-            planes[2].distance = m15 + m13;
+            planes[2].distance = -(m15 + m13);
             planes[2].normalize();
             
             vec3.set(planes[3].normal._array, m3 - m1, m7 - m5, m11 - m9);
-            planes[3].distance = m15 - m13;
+            planes[3].distance = -(m15 - m13);
             planes[3].normalize();
             
             vec3.set(planes[4].normal._array, m3 - m2, m7 - m6, m11 - m10);
-            planes[4].distance = m15 - m14;
+            planes[4].distance = -(m15 - m14);
             planes[4].normalize();
             
             vec3.set(planes[5].normal._array, m3 + m2, m7 + m6, m11 + m10);
-            planes[5].distance = m15 + m14;
+            planes[5].distance = -(m15 + m14);
             planes[5].normalize();
 
             // Perspective projection

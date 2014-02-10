@@ -7,6 +7,30 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
 
+    function Attribute(name, type, size, semantic, isDynamic) {
+        this.name = name;
+        this.type = type;
+        this.size = size;
+        if (semantic) {
+            this.semantic = semantic;
+        }
+        if (isDynamic) {
+            this._isDynamic = true;
+            this.value = [];
+        } else {
+            this._isDynamic = false;
+            this.value = null
+        }
+
+    }
+
+    Attribute.prototype.clone = function(copyValue) {
+        var ret = new Attribute(this.name, this.type, this.size, this.semantic, this._isDynamic);
+        if (copyValue) {
+            console.warn('todo');
+        }
+    }
+
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
         this.type = type;
@@ -68,6 +92,7 @@ define(function(require) {
 
     Geometry.AttributeBuffer = AttributeBuffer;
     Geometry.IndicesBuffer = IndicesBuffer;
+    Geometry.Attribute = Attribute;
 
     return Geometry
 });

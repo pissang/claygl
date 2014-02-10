@@ -19,6 +19,7 @@ define(function(require) {
                 bottomRadius : this.radius,
                 capSegments : this.capSegments,
                 heightSegments : this.heightSegments,
+                height : this.height
             });
 
             this.attributes.position.value = cone.attributes.position.value;

@@ -21,7 +21,7 @@ define(function(require) {
 
         // {
         //  position : Vector2()
-        //  clip : 
+        //  clip : Clip()
         //  offset : 0
         // }
         this.inputs = opts.inputs || [];
@@ -89,6 +89,11 @@ define(function(require) {
         clip1.setTime((time + in1.offset) % clip1.life);
         clip2.setTime((time + in2.offset) % clip2.life);
         clip3.setTime((time + in3.offset) % clip3.life);
+        // PENDING update all input clip ?
+        // for (var i = 0; i < this.inputs.length; i++) {
+        //     var in_ = this.inputs[i];
+        //     in_.clip.setTime((time + in_.offset) % in_.clip.life);
+        // }
 
         var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
         var c2 = clip2.output instanceof Clip ? clip2.output : clip2;

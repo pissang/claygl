@@ -44,6 +44,10 @@ define(function(require) {
             this.scene = scene;
             scene.on("beforerender", this._beforeRenderScene, this);
         },
+        
+        render : function() {
+            return this._renderInfo();
+        },
 
         detachScene : function(scene) {
             scene.off("beforerender", this._beforeRenderScene, this);  

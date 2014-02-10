@@ -15,11 +15,11 @@ define(function(require) {
     var needsBindAttributes;
     var currentDrawID;
 
-    var renderInfo = {
-        faceNumber : 0,
-        vertexNumber : 0,
-        drawCallNumber : 0
-    };
+    var RenderInfo = function() {
+        this.faceNumber = 0;
+        this.vertexNumber = 0;
+        this.drawCallNumber = 0;
+    }
 
     function DrawDetail(
         availableAttributes,
@@ -48,7 +48,9 @@ define(function(require) {
             // Joints indeces indicate the index of joint in the skeleton instance
             joints : [],
 
-            _drawCache : {}
+            _drawCache : {},
+
+            _renderInfo : new RenderInfo()
         }
     }, {
 
@@ -86,6 +88,7 @@ define(function(require) {
             }
 
             var nVertex = geometry.getVertexNumber();
+            var renderInfo = this._renderInfo;
             renderInfo.vertexNumber = nVertex;
             renderInfo.faceNumber = 0;
             renderInfo.drawCallNumber = 0;
@@ -113,7 +116,7 @@ define(function(require) {
                 }
                 renderInfo.drawCallNumber = 1;
             } else {
-                // Use the cache of StaticGeometry
+                // Use the cache of static geometry
                 // TODO : machanism to change to the DynamicGeometry automatically
                 // when the geometry is not static any more
                 var drawDetails = this._drawCache[currentDrawID];
@@ -153,7 +156,7 @@ define(function(require) {
                         );
                         drawDetails.push(drawDetail);
                     }
-                    if (geometry instanceof StaticGeometry) {
+                    if (geometry.hint == glenum.STATIC_DRAW) {
                         this._drawCache[currentDrawID] = drawDetails;
                     }
                 }
@@ -220,6 +223,15 @@ define(function(require) {
             }
 
             return renderInfo;
+        },
+
+        clone : function() {
+            var mesh = Node.prototype.clone.call(this);
+
+            mesh.geometry = this.geometry;
+            mesh.material = this.material;
+
+            return mesh;
         }
     });
 
@@ -237,6 +249,8 @@ define(function(require) {
     Mesh.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
     Mesh.CW = glenum.CW;
     Mesh.CCW = glenum.CCW;
+
+    Mesh.RenderInfo = RenderInfo;
 
     return Mesh;
 })
