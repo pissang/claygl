@@ -3,6 +3,7 @@
 # glTF spec : https://github.com/KhronosGroup/glTF
 # fbx version 2014.2
 # TODO: support python2.7
+# TODO: 2014.2 python3.3 LoadScene is too slow
 # http://github.com/pissang/
 # ############################################
 import sys
@@ -34,8 +35,9 @@ converter = None
 
 # Only python 3 support bytearray ?
 # http://dabeaz.blogspot.jp/2010/01/few-useful-bytearray-tricks.html
-attribute_bin = bytearray()
-indices_bin = bytearray()
+attributeBuffer = bytearray()
+indicesBuffer = bytearray()
+invBindMatricesBuffer = bytearray()
 
 GL_RGBA = 0x1908
 GL_FLOAT = 0x1406
@@ -101,7 +103,7 @@ def CreateAttributeBuffer(pList, pType, pStride):
                 lMax[i] = max(lMax[i], item[i])
     try:
         lData = b''.join(lData)
-        lByteOffset = len(attribute_bin)
+        lByteOffset = len(attributeBuffer)
     except:
         print(lData[0])
 
@@ -131,7 +133,7 @@ def CreateAttributeBuffer(pList, pType, pStride):
 
     lib_attributes[lKey] = lGLTFAttribute
 
-    attribute_bin.extend(lData)
+    attributeBuffer.extend(lData)
 
     return lKey
 
@@ -147,9 +149,9 @@ def CreateIndicesBuffer(pList):
         lData.append(struct.pack(lType, item))
 
     lData = b''.join(lData)
-    lByteOffset = len(indices_bin)
+    lByteOffset = len(indicesBuffer)
     lCount = int(len(lData) / 2)
-    indices_bin.extend(lData)
+    indicesBuffer.extend(lData)
 
     lKey = "accessor_" + str(GetId())
     
@@ -365,7 +367,7 @@ def ConvertMaterial(pMaterial):
         lValues['diffuse'] = list(pMaterial.Diffuse.Get())
 
     if pMaterial.Bump.GetSrcObjectCount() > 0:
-        # FIXME 3dsmax use the normal map as bump map ?
+        # TODO 3dsmax use the normal map as bump map ?
         lTextureName = CreateTexture(pMaterial.Bump)
         if not lTextureName == None:
             lValues['normalMap'] = lTextureName
@@ -444,14 +446,17 @@ def CreateSkin():
         # TODO
         'bindShapeMatrix' : [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
         # 'bindShapeMatrix' : [],
-        # 'inverseBindMatrices' : {},
+        'inverseBindMatrices' : {
+            "count" : 0,
+            "byteOffset" : len(invBindMatricesBuffer),
+            "type" : GL_FLOAT
+        },
         'joints' : [],
-        'roots' : []
     }
 
     return lSkinName
 
-def ConvertMesh(pMesh, pNode):
+def ConvertMesh(pMesh, pNode, pSkin, pClusters):
     lGLTFPrimitive = {}
     lPositions = []
     lNormals = []
@@ -501,20 +506,18 @@ def ConvertMesh(pMesh, pNode):
 
             for i in range(pMesh.GetDeformerCount(FbxDeformer.eSkin)):
                 lDeformer = pMesh.GetDeformer(i, FbxDeformer.eSkin)
-                lGLTFSkinName = CreateSkin()
-                lGLTFSkin = lib_skins[lGLTFSkinName]
-                # Put instance skin in primitive
-                # Because eache primitive is a single draw call. So it is necessary to put skin and 
-                # vertex data(jointIndices) in one primitive to keep the joint indices consistent
-                # PENDING in https://github.com/KhronosGroup/glTF/issues/100 put the instanceSkin in node
-                lGLTFPrimitive['skin'] = lGLTFSkinName
 
-                lLinks = {}
                 for i2 in range(lDeformer.GetClusterCount()):
                     lCluster = lDeformer.GetCluster(i2)
-                    lLink = lCluster.GetLink()
-                    lGLTFSkin['joints'].append(lLink.GetName())
-                    lLinks[lLink.GetName()] = lLink
+                    lNode = lCluster.GetLink()
+                    lJointIndex = -1
+                    if not lNode.GetName() in pSkin['joints']:
+                        lJointIndex = len(pSkin['joints'])
+                        pSkin['joints'].append(lNode.GetName())
+
+                        pClusters[lNode.GetName()] = lCluster
+                    else:
+                        lJointIndex = pSkin['joints'].index(lNode.GetName())
 
                     lControlPointIndices = lCluster.GetControlPointIndices()
                     lControlPointWeights = lCluster.GetControlPointWeights()
@@ -525,21 +528,11 @@ def ConvertMesh(pMesh, pNode):
                         # At most binding four joint per vertex
                         if lJointCount <= 3:
                             # Joint index
-                            lJoints[lControlPointIndex][lJointCount] = i2
+                            lJoints[lControlPointIndex][lJointCount] = lJointIndex
                             # Weight is FLOAT_3 because it is normalized
                             if lJointCount < 3:
                                 lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
                             lJointCounts[lControlPointIndex] += 1
-
-                # Find Root
-                # which do not have a parent or its parent is not in skin
-                # TODO IsSkeletonRoot not works well
-                for lJointName in lGLTFSkin['joints']:
-                    lLink = lLinks[lJointName]
-                    lParent = lLink.GetParent()
-                    if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
-                        if not lParent.GetName() in lGLTFSkin['roots']:
-                            lGLTFSkin['roots'].append(lLink.GetName())
 
         if lNormalSplitted or lUVSPlitted:
             lCount = 0
@@ -698,26 +691,75 @@ def TraverseSceneNode(pNode):
         lGLTFMesh = lib_meshes[lMeshKey] = {'name' : lMeshName, 'primitives' : []}
 
         lGeometry = converter.Triangulate(lGeometry, True)
-        # FIXME SplitMeshPerMaterial may loss deformer in mesh
-        # lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        # TODO SplitMeshPerMaterial may loss deformer in mesh
+        # FBX version 2014.2 seems have fixed it
+        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
 
-        lNodeAttribute = pNode.GetNodeAttribute()
-        if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
-            lPrimitive = ConvertMesh(lNodeAttribute, pNode)
-            if not lPrimitive == None:
-                lGLTFMesh["primitives"].append(lPrimitive)
-                # Have skinning data
-                if 'skin' in lPrimitive:
-                    lSkinName = lPrimitive['skin']
-                    lSkin = lib_skins[lSkinName]
-                    lPrimitive.pop('skin')
-                    lGLTFNode['instanceSkin'] = {
-                        'skeletons' : lSkin['roots'],
-                        'skin' : lSkinName,
-                        'sources' : [lMeshKey]
-                    }
-                else:
-                    lGLTFNode['meshes'] = [lMeshKey]
+        lHasSkin = False
+        lGLTFSkin = None
+        lClusters = {}
+        lSkinName = ''
+        for i in range(pNode.GetNodeAttributeCount()):
+            lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
+            if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
+                if (lNodeAttribute.GetDeformerCount(FbxDeformer.eSkin) > 0):
+                    lHasSkin = True
+        if lHasSkin:
+            lSkinName = CreateSkin()
+            lGLTFSkin = lib_skins[lSkinName]
+
+        for i in range(pNode.GetNodeAttributeCount()):
+            lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
+            if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
+                lPrimitive = ConvertMesh(lNodeAttribute, pNode, lGLTFSkin, lClusters)
+                if not lPrimitive == None:
+                    lGLTFMesh["primitives"].append(lPrimitive)
+
+        if lHasSkin:
+            roots = []
+            lGLTFNode['instanceSkin'] = {
+                'skeletons' : roots,
+                'skin' : lSkinName,
+                'sources' : [lMeshKey]
+            }
+            # Find Root
+            # which do not have a parent or its parent is not in skin
+            # TODO IsSkeletonRoot not works well
+            for lJointName in lGLTFSkin['joints']:
+                lCluster = lClusters[lJointName]
+                lLink = lCluster.GetLink()
+                lParent = lLink.GetParent()
+                if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
+                    if not lParent.GetName() in roots:
+                        roots.append(lLink.GetName())
+            # Mutiply the inverse of root node matrix
+            # Transform to the model space and invert it !
+            
+            #Find root
+            lRootCluster = lClusters[roots[0]]
+            lRootNode = lRootCluster.GetLink().GetParent()
+            lRootNodeTransform = lRootNode.EvaluateGlobalTransform()
+
+            lClusterGlobalInitMatrix = FbxAMatrix()
+            lReferenceGlobalInitMatrix = FbxAMatrix()
+            for i in range(len(lGLTFSkin['joints'])):
+                lJointName = lGLTFSkin['joints'][i]
+                lCluster = lClusters[lJointName]
+
+                lLink = lCluster.GetLink()
+                # Inverse Bind Pose Matrix
+                lCluster.GetTransformMatrix(lReferenceGlobalInitMatrix)
+                lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
+                # Matrix in fbx is column major
+                # (root-1 * reference-1 * cluster)-1 = cluster-1 * reference * root
+                # PENDING
+                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * lRootNodeTransform
+                invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
+                lGLTFSkin['inverseBindMatrices']['count'] += 1
+
+
+        else:
+            lGLTFNode['meshes'] = [lMeshKey]
                 
     else:
         # Camera and light node attribute
@@ -761,29 +803,47 @@ def ConvertScene(pScene):
     return TraverseScene(pScene)
 
 def CreateBufferViews(pBufferName):
+    lByteOffset = 0
     #Attribute buffer view
     lBufferViewName = 'bufferView_' + str(GetId())
     lBufferView = lib_buffer_views[lBufferViewName] = {}
     lBufferView['buffer'] = pBufferName
-    lBufferView['byteLength'] = len(attribute_bin)
-    lBufferView['byteOffset'] = 0
+    lBufferView['byteLength'] = len(attributeBuffer)
+    lBufferView['byteOffset'] = lByteOffset
     lBufferView['target'] = GL_ARRAY_BUFFER
 
     for lKey, lAttrib in lib_attributes.items():
         lAttrib['bufferView'] = lBufferViewName
         lib_accessors[lKey] = lAttrib
 
+    lByteOffset += len(attributeBuffer)
+
     #Indices buffer view
     lBufferViewName = 'bufferView_' + str(GetId())
     lBufferView = lib_buffer_views[lBufferViewName] = {}
     lBufferView['buffer'] = pBufferName
-    lBufferView['byteLength'] = len(indices_bin)
-    lBufferView['byteOffset'] = len(attribute_bin)
+    lBufferView['byteLength'] = len(indicesBuffer)
+    lBufferView['byteOffset'] = lByteOffset
     lBufferView['target'] = GL_ELEMENT_ARRAY_BUFFER
 
     for lKey, lIndices in lib_indices.items():
         lIndices['bufferView'] = lBufferViewName
         lib_accessors[lKey] = lIndices
+
+    lByteOffset += len(indicesBuffer)
+
+    #Inverse Bind Pose Matrices
+    lBufferViewName = 'bufferView_' + str(GetId())
+    lBufferView = lib_buffer_views[lBufferViewName] = {}
+    lBufferView['buffer'] = pBufferName
+    lBufferView['byteLength'] = len(invBindMatricesBuffer)
+    lBufferView['byteOffset'] = lByteOffset
+
+    for lSkin in lib_skins.values():
+        lSkin['inverseBindMatrices']['bufferView'] = lBufferViewName
+
+    lByteOffset += len(invBindMatricesBuffer)
+
 
 if __name__ == "__main__":
     try:
@@ -822,8 +882,9 @@ if __name__ == "__main__":
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
-        lBin.extend(attribute_bin)
-        lBin.extend(indices_bin)
+        lBin.extend(attributeBuffer)
+        lBin.extend(indicesBuffer)
+        lBin.extend(invBindMatricesBuffer)
         out = open(lRoot + ".bin", 'wb')
         out.write(lBin)
         out.close()
@@ -833,9 +894,6 @@ if __name__ == "__main__":
 
         CreateBufferViews(lBufferName)
 
-        # Remove roots property in lib_skin
-        for lSkinName in lib_skins.keys():
-            lib_skins[lSkinName].pop('roots')
         #Output json
         lOutput = {
             'animations' : {},

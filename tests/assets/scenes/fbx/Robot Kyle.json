@@ -110,11 +110,16 @@
             "byteLength": 36792,
             "byteOffset": 291240,
             "target": 34963
+        },
+        "bufferView_9": {
+            "buffer": "Robot Kyle.bin",
+            "byteLength": 3072,
+            "byteOffset": 328032
         }
     },
     "buffers": {
         "Robot Kyle.bin": {
-            "byteLength": 328032,
+            "byteLength": 331104,
             "path": "Robot Kyle.bin"
         }
     },
@@ -1451,6 +1456,12 @@
                 0,
                 1
             ],
+            "inverseBindMatrices": {
+                "bufferView": "bufferView_9",
+                "byteOffset": 0,
+                "count": 48,
+                "type": 5126
+            },
             "joints": [
                 "Ribs",
                 "Neck",
