@@ -16,7 +16,7 @@
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
                         aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
+                        far : 30
                     });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -25,7 +25,7 @@
                 var plane = new qtek.plugin.InfinitePlane({
                     camera : camera,
                     material : new qtek.Material({
-                        shader : qtek.shader.library.get('buildin.wireframe'),
+                        shader : qtek.shader.library.get('buildin.lambert'),
                         transparent : true
                     }),
                     culling : false
@@ -41,6 +41,11 @@
                 cube.material.set('diffuseMap', qtek.util.texture.createChessboard());
                 scene.add(cube);
 
+                var light = new qtek.light.Directional()
+                light.position.set(1, 1, 1);
+                light.lookAt(scene.position);
+                scene.add(light);
+
                 var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
@@ -49,6 +54,7 @@
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
+
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     camera.update(true);

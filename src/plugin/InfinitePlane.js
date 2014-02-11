@@ -51,6 +51,11 @@ define(function(require) {
             var faces = this.geometry.faces;
             var nVertices = 0;
             var normal = vec3.clone(this.plane.normal._array);
+
+            // if (this.gridSize > 0) {
+                // TODO
+
+            // } else {
             for (var i = 0; i < 6; i++) {
                 var idx = tris[i];
                 positions[nVertices] = coords[idx]._array;
@@ -61,6 +66,7 @@ define(function(require) {
             faces[0] = [0, 1, 2];
             faces[1] = [3, 4, 5];
             this.geometry.dirty();
+            // }
         },
 
         // http://fileadmin.cs.lth.se/graphics/theses/projects/projgrid/
@@ -78,6 +84,9 @@ define(function(require) {
 
             var points = [];
 
+            // 1----2
+            // |    |
+            // 0----3
             var coords = [];
             for (var i = 0; i < 4; i++) {
                 coords[i] = new Vector3(0, 0);

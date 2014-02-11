@@ -22,6 +22,7 @@
 
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
+                var skeleton = res.skeletons['skin_0'];
                 var camera = new qtek.camera.Perspective({
                     aspect : renderer.canvas.width/renderer.canvas.height
                 });
@@ -48,6 +49,7 @@
                 }));
                 
                 setInterval(function() {
+                    skeleton.update();
                     renderer.render(scene, camera);
                 }, 50)
             });

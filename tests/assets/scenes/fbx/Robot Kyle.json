@@ -1,8 +1,6 @@
 {
-    "animations": {},
-    "asset": {},
-    "attributes": {
-        "attribute_1": {
+    "accessors": {
+        "accessor_1": {
             "bufferView": "bufferView_7",
             "byteOffset": 0,
             "byteStride": 12,
@@ -19,9 +17,9 @@
                 -17.598716735839844,
                 0.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_2": {
+        "accessor_2": {
             "bufferView": "bufferView_7",
             "byteOffset": 58248,
             "byteStride": 12,
@@ -38,9 +36,9 @@
                 -1.0,
                 0.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_3": {
+        "accessor_3": {
             "bufferView": "bufferView_7",
             "byteOffset": 116496,
             "byteStride": 8,
@@ -53,9 +51,9 @@
                 0.004629373550415039,
                 0.006579550914466381
             ],
-            "type": "FLOAT_VEC2"
+            "type": 35664
         },
-        "attribute_4": {
+        "accessor_4": {
             "bufferView": "bufferView_7",
             "byteOffset": 155328,
             "byteStride": 16,
@@ -72,9 +70,9 @@
                 -1,
                 -1
             ],
-            "type": "FLOAT_VEC4"
+            "type": 35666
         },
-        "attribute_5": {
+        "accessor_5": {
             "bufferView": "bufferView_7",
             "byteOffset": 232992,
             "byteStride": 12,
@@ -89,21 +87,29 @@
                 0,
                 0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
+        },
+        "accessor_6": {
+            "bufferView": "bufferView_8",
+            "byteOffset": 0,
+            "count": 18396,
+            "type": 5123
         }
     },
+    "animations": {},
+    "asset": {},
     "bufferViews": {
         "bufferView_7": {
             "buffer": "Robot Kyle.bin",
             "byteLength": 291240,
             "byteOffset": 0,
-            "target": "ARRAY_BUFFER"
+            "target": 34962
         },
         "bufferView_8": {
             "buffer": "Robot Kyle.bin",
             "byteLength": 36792,
             "byteOffset": 291240,
-            "target": "ELEMENT_ARRAY_BUFFER"
+            "target": 34963
         }
     },
     "buffers": {
@@ -121,49 +127,25 @@
             "path": "Robot_Normal.png"
         }
     },
-    "indices": {
-        "indices_6": {
-            "bufferView": "bufferView_8",
-            "byteOffset": 0,
-            "count": 18396,
-            "type": "UNSIGNED_SHORT"
-        }
-    },
     "lights": {},
     "materials": {
         "Robot": {
             "instanceTechnique": {
                 "technique": "technique_0",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    },
-                    {
-                        "parameter": "transparency",
-                        "value": 1.0
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": "file1"
-                    },
-                    {
-                        "parameter": "normalMap",
-                        "value": "file2"
-                    }
-                ]
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": "file1",
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "normalMap": "file2"
+                }
             },
             "name": "Robot"
         }
@@ -173,16 +155,15 @@
             "name": "Robot2-mesh",
             "primitives": [
                 {
-                    "indices": "indices_6",
-                    "material": "Robot",
-                    "semantics": {
-                        "JOINT": "attribute_4",
-                        "NORMAL": "attribute_2",
-                        "POSITION": "attribute_1",
-                        "TEXCOORD_0": "attribute_3",
-                        "WEIGHT": "attribute_5"
+                    "attributes": {
+                        "JOINT": "accessor_4",
+                        "NORMAL": "accessor_2",
+                        "POSITION": "accessor_1",
+                        "TEXCOORD_0": "accessor_3",
+                        "WEIGHT": "accessor_5"
                     },
-                    "skin": "skin_0"
+                    "indices": "accessor_6",
+                    "material": "Robot"
                 }
             ]
         }
@@ -190,6 +171,7 @@
     "nodes": {
         "Head": {
             "children": [],
+            "jointId": "Head",
             "matrix": [
                 1.0,
                 0.0,
@@ -215,6 +197,7 @@
                 "Left_Thigh_Joint_01",
                 "Right_Thigh_Joint_01"
             ],
+            "jointId": "Hip",
             "matrix": [
                 -0.9971513565615077,
                 -0.07542660079537536,
@@ -239,6 +222,7 @@
             "children": [
                 "Left_Toe_Joint_01"
             ],
+            "jointId": "Left_Ankle_Joint_01",
             "matrix": [
                 0.5112065918678522,
                 -0.8594578642556336,
@@ -263,6 +247,7 @@
             "children": [
                 "Left_Wrist_Joint_01"
             ],
+            "jointId": "Left_Forearm_Joint_01",
             "matrix": [
                 0.5701722793945488,
                 0.8092852080430089,
@@ -287,6 +272,7 @@
             "children": [
                 "Left_Index_Finger_Joint_01b"
             ],
+            "jointId": "Left_Index_Finger_Joint_01a",
             "matrix": [
                 0.9997270325285482,
                 -0.023358685773176582,
@@ -311,6 +297,7 @@
             "children": [
                 "Left_Index_Finger_Joint_01c"
             ],
+            "jointId": "Left_Index_Finger_Joint_01b",
             "matrix": [
                 0.9997488079667142,
                 -0.022392640307707556,
@@ -333,6 +320,7 @@
         },
         "Left_Index_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Left_Index_Finger_Joint_01c",
             "matrix": [
                 0.9989527351126549,
                 0.045742937368542874,
@@ -357,6 +345,7 @@
             "children": [
                 "Left_Ankle_Joint_01"
             ],
+            "jointId": "Left_Knee_Joint_01",
             "matrix": [
                 0.9992921688266103,
                 -0.03761862998315271,
@@ -381,6 +370,7 @@
             "children": [
                 "Left_Middle_Finger_Joint_01b"
             ],
+            "jointId": "Left_Middle_Finger_Joint_01a",
             "matrix": [
                 0.9997689041965705,
                 -0.02149282647124349,
@@ -405,6 +395,7 @@
             "children": [
                 "Left_Middle_Finger_Joint_01c"
             ],
+            "jointId": "Left_Middle_Finger_Joint_01b",
             "matrix": [
                 0.9997872450147886,
                 -0.02060850442131598,
@@ -427,6 +418,7 @@
         },
         "Left_Middle_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Left_Middle_Finger_Joint_01c",
             "matrix": [
                 0.9991131691176759,
                 0.042095412392122,
@@ -451,6 +443,7 @@
             "children": [
                 "Left_Pinky_Finger_Joint_01b"
             ],
+            "jointId": "Left_Pinky_Finger_Joint_01a",
             "matrix": [
                 0.9995183265607852,
                 -0.031027489778859853,
@@ -475,6 +468,7 @@
             "children": [
                 "Left_Pinky_Finger_Joint_01c"
             ],
+            "jointId": "Left_Pinky_Finger_Joint_01b",
             "matrix": [
                 0.9995574123133765,
                 -0.02972221112853859,
@@ -497,6 +491,7 @@
         },
         "Left_Pinky_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Left_Pinky_Finger_Joint_01c",
             "matrix": [
                 0.9981535502209167,
                 0.0607257224958592,
@@ -521,6 +516,7 @@
             "children": [
                 "Left_Ring_Finger_Joint_01b"
             ],
+            "jointId": "Left_Ring_Finger_Joint_01a",
             "matrix": [
                 0.9996947913552985,
                 -0.024699483416945056,
@@ -545,6 +541,7 @@
             "children": [
                 "Left_Ring_Finger_Joint_01c"
             ],
+            "jointId": "Left_Ring_Finger_Joint_01b",
             "matrix": [
                 0.9997191607886381,
                 -0.023677074199482423,
@@ -567,6 +564,7 @@
         },
         "Left_Ring_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Left_Ring_Finger_Joint_01c",
             "matrix": [
                 0.9988291019162633,
                 0.04836609752401458,
@@ -591,6 +589,7 @@
             "children": [
                 "Left_Upper_Arm_Joint_01"
             ],
+            "jointId": "Left_Shoulder_Joint_01",
             "matrix": [
                 0.02267382680215661,
                 -0.2607490082247952,
@@ -615,6 +614,7 @@
             "children": [
                 "Left_Knee_Joint_01"
             ],
+            "jointId": "Left_Thigh_Joint_01",
             "matrix": [
                 0.9828388573743336,
                 -0.1844662040459289,
@@ -639,6 +639,7 @@
             "children": [
                 "Left_Thumb_Joint_01b"
             ],
+            "jointId": "Left_Thumb_Joint_01a",
             "matrix": [
                 0.7095696632037439,
                 -0.17502222765896336,
@@ -661,6 +662,7 @@
         },
         "Left_Thumb_Joint_01b": {
             "children": [],
+            "jointId": "Left_Thumb_Joint_01b",
             "matrix": [
                 0.7095696632037415,
                 -0.45014780165382773,
@@ -683,6 +685,7 @@
         },
         "Left_Toe_Joint_01": {
             "children": [],
+            "jointId": "Left_Toe_Joint_01",
             "matrix": [
                 4.857888742895686e-17,
                 3.7275878967763883e-17,
@@ -707,6 +710,7 @@
             "children": [
                 "Left_Forearm_Joint_01"
             ],
+            "jointId": "Left_Upper_Arm_Joint_01",
             "matrix": [
                 0.6132316894810101,
                 -0.7855470573357397,
@@ -735,6 +739,7 @@
                 "Left_Pinky_Finger_Joint_01a",
                 "Left_Thumb_Joint_01a"
             ],
+            "jointId": "Left_Wrist_Joint_01",
             "matrix": [
                 0.5873508782282545,
                 -0.8091944676198973,
@@ -759,6 +764,7 @@
             "children": [
                 "Head"
             ],
+            "jointId": "Neck",
             "matrix": [
                 0.9542628541973759,
                 0.29896890323088476,
@@ -785,6 +791,7 @@
                 "Left_Shoulder_Joint_01",
                 "Right_Shoulder_Joint_01"
             ],
+            "jointId": "Ribs",
             "matrix": [
                 0.9998242057157055,
                 0.018749871065118745,
@@ -809,6 +816,7 @@
             "children": [
                 "Right_Toe_Joint_01"
             ],
+            "jointId": "Right_Ankle_Joint_01",
             "matrix": [
                 0.5112065918678529,
                 0.8594578642556336,
@@ -833,6 +841,7 @@
             "children": [
                 "Right_Wrist_Joint_01"
             ],
+            "jointId": "Right_Forearm_Joint_01",
             "matrix": [
                 0.928848583475092,
                 -0.259417641401089,
@@ -857,6 +866,7 @@
             "children": [
                 "Right_Index_Finger_Joint_01b"
             ],
+            "jointId": "Right_Index_Finger_Joint_01a",
             "matrix": [
                 0.9998399313527324,
                 -0.003620039842894394,
@@ -881,6 +891,7 @@
             "children": [
                 "Right_Index_Finger_Joint_01c"
             ],
+            "jointId": "Right_Index_Finger_Joint_01b",
             "matrix": [
                 0.9997488079667144,
                 -0.022392640307702525,
@@ -903,6 +914,7 @@
         },
         "Right_Index_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Right_Index_Finger_Joint_01c",
             "matrix": [
                 0.9989527351126557,
                 0.04574293736853347,
@@ -927,6 +939,7 @@
             "children": [
                 "Right_Ankle_Joint_01"
             ],
+            "jointId": "Right_Knee_Joint_01",
             "matrix": [
                 0.9992921688266103,
                 0.037618629983152574,
@@ -951,6 +964,7 @@
             "children": [
                 "Right_Middle_Finger_Joint_01b"
             ],
+            "jointId": "Right_Middle_Finger_Joint_01a",
             "matrix": [
                 0.9998442582481165,
                 -0.0017537313692228091,
@@ -975,6 +989,7 @@
             "children": [
                 "Right_Middle_Finger_Joint_01c"
             ],
+            "jointId": "Right_Middle_Finger_Joint_01b",
             "matrix": [
                 0.9997872450147887,
                 -0.020608504421310448,
@@ -997,6 +1012,7 @@
         },
         "Right_Middle_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Right_Middle_Finger_Joint_01c",
             "matrix": [
                 0.9991131691176766,
                 0.04209541239211143,
@@ -1021,6 +1037,7 @@
             "children": [
                 "Right_Pinky_Finger_Joint_01b"
             ],
+            "jointId": "Right_Pinky_Finger_Joint_01a",
             "matrix": [
                 0.9997855499321869,
                 -0.011291412643197631,
@@ -1045,6 +1062,7 @@
             "children": [
                 "Right_Pinky_Finger_Joint_01c"
             ],
+            "jointId": "Right_Pinky_Finger_Joint_01b",
             "matrix": [
                 0.9995574123133766,
                 -0.029722211128535094,
@@ -1067,6 +1085,7 @@
         },
         "Right_Pinky_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Right_Pinky_Finger_Joint_01c",
             "matrix": [
                 0.9981535502209169,
                 0.06072572249585738,
@@ -1091,6 +1110,7 @@
             "children": [
                 "Right_Ring_Finger_Joint_01b"
             ],
+            "jointId": "Right_Ring_Finger_Joint_01a",
             "matrix": [
                 0.9998346704434864,
                 -0.004961202746062172,
@@ -1115,6 +1135,7 @@
             "children": [
                 "Right_Ring_Finger_Joint_01c"
             ],
+            "jointId": "Right_Ring_Finger_Joint_01b",
             "matrix": [
                 0.9997191607886385,
                 -0.02367707419948218,
@@ -1137,6 +1158,7 @@
         },
         "Right_Ring_Finger_Joint_01c": {
             "children": [],
+            "jointId": "Right_Ring_Finger_Joint_01c",
             "matrix": [
                 0.9988291019162635,
                 0.048366097524011976,
@@ -1161,6 +1183,7 @@
             "children": [
                 "Right_Upper_Arm_Joint_01"
             ],
+            "jointId": "Right_Shoulder_Joint_01",
             "matrix": [
                 -0.022673826802155874,
                 0.2607490082247951,
@@ -1185,6 +1208,7 @@
             "children": [
                 "Right_Knee_Joint_01"
             ],
+            "jointId": "Right_Thigh_Joint_01",
             "matrix": [
                 -0.9828388573743337,
                 0.18446620404592823,
@@ -1209,6 +1233,7 @@
             "children": [
                 "Right_Thumb_Joint_01b"
             ],
+            "jointId": "Right_Thumb_Joint_01a",
             "matrix": [
                 0.7004824458700021,
                 -0.16122436782894026,
@@ -1231,6 +1256,7 @@
         },
         "Right_Thumb_Joint_01b": {
             "children": [],
+            "jointId": "Right_Thumb_Joint_01b",
             "matrix": [
                 0.7827246519128532,
                 -0.5753354960150814,
@@ -1253,6 +1279,7 @@
         },
         "Right_Toe_Joint_01": {
             "children": [],
+            "jointId": "Right_Toe_Joint_01",
             "matrix": [
                 0.7933534381142283,
                 0.6087613015232928,
@@ -1277,6 +1304,7 @@
             "children": [
                 "Right_Forearm_Joint_01"
             ],
+            "jointId": "Right_Upper_Arm_Joint_01",
             "matrix": [
                 0.7317201198649324,
                 -0.6731494210372477,
@@ -1305,6 +1333,7 @@
                 "Right_Pinky_Finger_Joint_01a",
                 "Right_Thumb_Joint_01a"
             ],
+            "jointId": "Right_Wrist_Joint_01",
             "matrix": [
                 0.9994152365798167,
                 -0.03178307410576234,
@@ -1327,6 +1356,16 @@
         },
         "Robot2": {
             "children": [],
+            "instanceSkin": {
+                "skeletons": [
+                    "Ribs",
+                    "Hip"
+                ],
+                "skin": "skin_0",
+                "sources": [
+                    "Robot2-mesh"
+                ]
+            },
             "matrix": [
                 1.0,
                 0.0,
@@ -1345,9 +1384,6 @@
                 0.0,
                 1.0
             ],
-            "meshes": [
-                "Robot2-mesh"
-            ],
             "name": "Robot2"
         },
         "Root": {
@@ -1355,6 +1391,7 @@
                 "Ribs",
                 "Hip"
             ],
+            "jointId": "Root",
             "matrix": [
                 5.0251254849561345e-16,
                 0.9944411606572344,
@@ -1378,25 +1415,42 @@
     },
     "samplers": {
         "sampler_0": {
-            "magFilter": "LINEAR",
-            "minFilter": "LINEAR_MIPMAP_LINEAR",
-            "wrapS": "REPEAT",
-            "wrapT": "REPEAT"
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
         }
     },
     "scene": "scene_0",
     "scenes": {
         "scene_0": {
             "nodes": [
-                "Robot2"
+                "Robot2",
+                "Root"
             ]
         }
     },
     "shaders": {},
     "skins": {
         "skin_0": {
-            "bindShapeMatrix": [],
-            "inverseBindMatrices": {},
+            "bindShapeMatrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
             "joints": [
                 "Ribs",
                 "Neck",
@@ -1446,8 +1500,7 @@
                 "Right_Knee_Joint_01",
                 "Right_Ankle_Joint_01",
                 "Right_Toe_Joint_01"
-            ],
-            "roots": []
+            ]
         }
     },
     "techniques": {
@@ -1462,14 +1515,9 @@
                         "uniforms": {}
                     },
                     "states": {
-                        "blendEnable": true,
-                        "blendEquation": "FUNC_ADD",
-                        "blendFunc": {
-                            "dfactor": "ONE_MINUS_SRC_ALPHA",
-                            "sfactor": "SRC_ALPHA"
-                        },
+                        "blendEnable": false,
                         "cullFaceEnable": false,
-                        "depthMask": false,
+                        "depthMask": true,
                         "depthTestEnable": true
                     }
                 }
@@ -1478,18 +1526,18 @@
     },
     "textures": {
         "file1": {
-            "format": "RGBA",
-            "internalFormat": "RGBA",
+            "format": 6408,
+            "internalFormat": 6408,
             "sampler": "sampler_0",
             "source": "image_0",
-            "target": "TEXTURE_2D"
+            "target": 3553
         },
         "file2": {
-            "format": "RGBA",
-            "internalFormat": "RGBA",
+            "format": 6408,
+            "internalFormat": 6408,
             "sampler": "sampler_0",
             "source": "image_1",
-            "target": "TEXTURE_2D"
+            "target": 3553
         }
     }
 }

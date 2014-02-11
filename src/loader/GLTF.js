@@ -124,10 +124,6 @@ define(function(require) {
 
                 var sceneInfo = json.scenes[json.scene];
                 for (var i = 0; i < sceneInfo.nodes.length; i++) {
-                    if (lib.joints[sceneInfo.nodes[i]]) {
-                        // Skip joint node
-                        continue;
-                    }
                     var node = lib.nodes[sceneInfo.nodes[i]];
                     node.update();
                     scene.add(node);

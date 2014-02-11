@@ -19,8 +19,9 @@ lib_techniques = {}
 lib_images = {}
 lib_samplers = {}
 lib_textures = {}
-lib_indices = {}
 lib_attributes = {}
+lib_indices = {}
+lib_accessors = {}
 lib_buffer_views = {}
 lib_buffers = {}
 lib_scenes = {}
@@ -35,6 +36,29 @@ converter = None
 # http://dabeaz.blogspot.jp/2010/01/few-useful-bytearray-tricks.html
 attribute_bin = bytearray()
 indices_bin = bytearray()
+
+GL_RGBA = 0x1908
+GL_FLOAT = 0x1406
+GL_UNSIGNED_BYTE = 0x1401
+GL_UNSIGNED_SHORT = 0x1403
+GL_INT = 0x1404
+GL_REPEAT = 0x2901
+GL_FLOAT_VEC2 = 0x8B50
+GL_FLOAT_VEC3 = 0x8B51
+GL_FLOAT_VEC4 = 0x8B52
+GL_TEXTURE_2D = 0x0DE1
+GL_TEXTURE_CUBE_MAP = 0x8513
+GL_REPEAT = 0x2901
+GL_CLAMP_TO_EDGE = 0x812F
+GL_NEAREST = 0x2600
+GL_LINEAR = 0x2601
+GL_NEAREST_MIPMAP_NEAREST = 0x2700
+GL_LINEAR_MIPMAP_NEAREST = 0x2701
+GL_NEAREST_MIPMAP_LINEAR = 0x2702
+GL_LINEAR_MIPMAP_LINEAR = 0x2703
+
+GL_ARRAY_BUFFER = 0x8892
+GL_ELEMENT_ARRAY_BUFFER = 0x8893
 
 _id = 0
 def GetId():
@@ -81,15 +105,20 @@ def CreateAttributeBuffer(pList, pType, pStride):
     except:
         print(lData[0])
 
-    lKey = "attribute_" + str(GetId())
+    lKey = "accessor_" + str(GetId())
 
     if pType == 'f':
         lByteStride = pStride * 4
         lCount = int(len(lData) / lByteStride)
-        if not pStride == 1:
-            lGLTFAttribute['type'] = 'FLOAT_VEC' + str(pStride)
-        else:
-            lGLTFAttribute['type'] = 'FLOAT'
+        if pStride == 1:
+            lGLTFAttribute['type'] = GL_FLOAT
+        elif pStride == 2:
+            lGLTFAttribute['type'] = GL_FLOAT_VEC2
+        elif pStride == 3:
+            lGLTFAttribute['type'] = GL_FLOAT_VEC3
+        elif pStride == 4:
+            lGLTFAttribute['type'] = GL_FLOAT_VEC4
+
     else:
         print("Unsupported attribute type " + pType)
         return False
@@ -122,11 +151,11 @@ def CreateIndicesBuffer(pList):
     lCount = int(len(lData) / 2)
     indices_bin.extend(lData)
 
-    lKey = "indices_" + str(GetId())
+    lKey = "accessor_" + str(GetId())
     
     lGLTFIndices['byteOffset'] = lByteOffset
     lGLTFIndices['count'] = lCount
-    lGLTFIndices['type'] = 'UNSIGNED_SHORT'
+    lGLTFIndices['type'] = GL_UNSIGNED_SHORT
 
     lib_indices[lKey] = lGLTFIndices
 
@@ -168,7 +197,7 @@ def CreateTechnique(pMaterial):
         lHashKey = 'technique_unknown'
     else:
         lHashKey = HashTechnique(pMaterial)
-        if lHashKey in _techniqueHashMap.keys():
+        if lHashKey in _techniqueHashMap:
             return _techniqueHashMap[lHashKey]
 
     lTechniqueName = 'technique_' + str(len(lib_techniques.keys()))
@@ -197,7 +226,7 @@ def CreateTechnique(pMaterial):
     }
     # Enable blend
     try :
-        if pMaterial.TransparencyFactor.Get() > 0:
+        if pMaterial.TransparencyFactor.Get() < 1:
             lStates = lGLTFTechnique['passes']['defaultPass']['states']
             lStates['blendEnable'] = True
             lStates['blendEquation'] = 'FUNC_ADD'
@@ -236,14 +265,14 @@ def HashSampler(pTexture):
 
 def ConvertWrapMode(pWrap):
     if pWrap == FbxTexture.eRepeat:
-        return 'REPEAT'
+        return GL_REPEAT
     elif pWrap == FbxTexture.eClamp:
-        return 'CLAMP_TO_EDGE'
+        return GL_CLAMP_TO_EDGE
         
 _samplerHashMap = {}
 def CreateSampler(pTexture):
     lHashKey = HashSampler(pTexture)
-    if lHashKey in _samplerHashMap.keys():
+    if lHashKey in _samplerHashMap:
         return _samplerHashMap[lHashKey]
     else:
         lSamplerName = 'sampler_' + str(len(lib_samplers.keys()))
@@ -251,8 +280,8 @@ def CreateSampler(pTexture):
             'wrapS' : ConvertWrapMode(pTexture.WrapModeU.Get()),
             'wrapT' : ConvertWrapMode(pTexture.WrapModeV.Get()),
             # Texture filter in fbx ? 
-            'minFilter' : 'LINEAR_MIPMAP_LINEAR',
-            'magFilter' : 'LINEAR'
+            'minFilter' : GL_LINEAR_MIPMAP_LINEAR,
+            'magFilter' : GL_LINEAR
         }
         _samplerHashMap[lHashKey] = lSamplerName
         return lSamplerName
@@ -273,24 +302,24 @@ def CreateTexture(pProperty):
                 lImageName = CreateImage(lTexture.GetFileName())
                 lSamplerName = CreateSampler(lTexture)
                 lHashKey = (lImageName, lSamplerName)
-                if lHashKey in _textureHashMap.keys():
+                if lHashKey in _textureHashMap:
                     lTextureList.append(_textureHashMap[lHashKey])
                 else:
                     lTextureName = lTexture.GetName()
                     # Map name may be repeat
-                    while lTextureName in lib_textures.keys():
-                        if not lTextureName in _repeatedTextureCount.keys():
+                    while lTextureName in lib_textures:
+                        if not lTextureName in _repeatedTextureCount:
                             _repeatedTextureCount[lTextureName] = 0
                         else:
                             _repeatedTextureCount[lTextureName] += 1
                         lTextureName = lTextureName + '_' + str(_repeatedTextureCount[lTextureName])
                     lib_textures[lTextureName] ={
-                        'format' : 'RGBA',
-                        'internalFormat' : 'RGBA',
+                        'format' : GL_RGBA,
+                        'internalFormat' : GL_RGBA,
                         'sampler' : lSamplerName,
                         'source' : lImageName,
                         # TODO Texture Cube
-                        'target' : 'TEXTURE_2D'
+                        'target' : GL_TEXTURE_2D
                     }
                     _textureHashMap[lHashKey] = lTextureName
                     lTextureList.append(lTextureName)
@@ -311,7 +340,7 @@ def ConvertMaterial(pMaterial):
     lTechniqueName = CreateTechnique(pMaterial)
     lGLTFMaterial["instanceTechnique"] = {
         "technique" : lTechniqueName,
-        "values" : []
+        "values" : {}
     }
     lValues = lGLTFMaterial['instanceTechnique']['values']
 
@@ -321,77 +350,52 @@ def ConvertMaterial(pMaterial):
         lib_materials[lMaterialName] = lGLTFMaterial
         return lMaterialName
 
-    lValues.append({
-        'parameter' : 'ambient',
-        'value' : list(pMaterial.Ambient.Get())
-    })
-    lValues.append({
-        'parameter' : 'emission',
-        # TODO Emissive Factor ?
-        'value' : list(pMaterial.Emissive.Get())
-    })
-    if pMaterial.TransparencyFactor.Get() > 0:
-        lValues.append({
-            'parameter' : 'transparency',
-            'value' : 1 - pMaterial.TransparencyFactor.Get()
-        })
+    lValues['ambient'] = list(pMaterial.Ambient.Get())
+    lValues['emission'] = list(pMaterial.Emissive.Get())
+
+    if pMaterial.TransparencyFactor.Get() < 1:
+        lValues['transparency'] = pMaterial.TransparencyFactor.Get()
     # Use diffuse map
     # TODO Diffuse Factor ?
     if pMaterial.Diffuse.GetSrcObjectCount() > 0:
         lTextureName = CreateTexture(pMaterial.Diffuse)
         if not lTextureName == None:
-            lValues.append({
-                'parameter' : 'diffuse',
-                'value' : lTextureName
-            })
+            lValues['diffuse'] = lTextureName
     else:
-        lValues.append({
-            'parameter' : 'diffuse',
-            'value' : list(pMaterial.Diffuse.Get())
-        })
+        lValues['diffuse'] = list(pMaterial.Diffuse.Get())
 
     if pMaterial.Bump.GetSrcObjectCount() > 0:
         # FIXME 3dsmax use the normal map as bump map ?
         lTextureName = CreateTexture(pMaterial.Bump)
         if not lTextureName == None:
-            lValues.append({
-                'parameter' : 'normalMap',
-                'value' : lTextureName
-            })
+            lValues['normalMap'] = lTextureName
+
     if pMaterial.NormalMap.GetSrcObjectCount() > 0:
         lTextureName = CreateTexture(pMaterial.NormalMap)
         if not lTextureName == None:
-            lValues.append({
-                'parameter' : 'normalMap',
-                'value' : lTextureName
-            })
+            lValues['normalMap'] = lTextureName
 
     if lShading == 'phong':
-        lValues.append({
-            'parameter' : 'shininess',
-            'value' : pMaterial.Shininess.Get()
-        })
+        lValues['shininess'] = pMaterial.Shininess.Get();
         # Use specular map
         # TODO Specular Factor ?
         if pMaterial.Specular.GetSrcObjectCount() > 0:
             pass
         else:
-            lValues.append({
-                'parameter' : 'specular',
-                'value' : list(pMaterial.Specular.Get())
-            })
+            lValues['specular'] = list(pMaterial.Specular.Get())
 
     # Material name of different material may be same after SplitMeshByMaterial
     lHashKey = [lMaterialName]
-    for lValue in lValues:
-        lHashKey.append(lValue['parameter'])
-        lHashKey.append(str(lValue['value']))
+    for lKey in lValues.keys():
+        lValue = lValues[lKey];
+        lHashKey.append(lKey)
+        lHashKey.append(str(lValue))
     lHashKey = tuple(lHashKey)
-    if lHashKey in _materialHashMap.keys():
+    if lHashKey in _materialHashMap:
         return _materialHashMap[lHashKey];
 
-    while lMaterialName in lib_materials.keys():
-        if not lMaterialName in _repeatedMaterialCount.keys():
+    while lMaterialName in lib_materials:
+        if not lMaterialName in _repeatedMaterialCount:
             _repeatedMaterialCount[lMaterialName] = 0
         else:
             _repeatedMaterialCount[lMaterialName] += 1
@@ -437,9 +441,10 @@ def CreateSkin():
     lSkinName = "skin_" + str(len(lib_skins.keys()))
     # https://github.com/KhronosGroup/glTF/issues/100
     lib_skins[lSkinName] = {
-        # 'bindShapeMatrix' : [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
-        'bindShapeMatrix' : [],
-        'inverseBindMatrices' : {},
+        # TODO
+        'bindShapeMatrix' : [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        # 'bindShapeMatrix' : [],
+        # 'inverseBindMatrices' : {},
         'joints' : [],
         'roots' : []
     }
@@ -504,12 +509,13 @@ def ConvertMesh(pMesh, pNode):
                 # PENDING in https://github.com/KhronosGroup/glTF/issues/100 put the instanceSkin in node
                 lGLTFPrimitive['skin'] = lGLTFSkinName
 
+                lLinks = {}
                 for i2 in range(lDeformer.GetClusterCount()):
                     lCluster = lDeformer.GetCluster(i2)
                     lLink = lCluster.GetLink()
                     lGLTFSkin['joints'].append(lLink.GetName())
-                    if (lLink.GetNodeAttribute().IsSkeletonRoot()):
-                        lGLTFSkin['roots'].append(lLink.GetName())
+                    lLinks[lLink.GetName()] = lLink
+
                     lControlPointIndices = lCluster.GetControlPointIndices()
                     lControlPointWeights = lCluster.GetControlPointWeights()
                     for i3 in range(lCluster.GetControlPointIndicesCount()):
@@ -524,6 +530,16 @@ def ConvertMesh(pMesh, pNode):
                             if lJointCount < 3:
                                 lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
                             lJointCounts[lControlPointIndex] += 1
+
+                # Find Root
+                # which do not have a parent or its parent is not in skin
+                # TODO IsSkeletonRoot not works well
+                for lJointName in lGLTFSkin['joints']:
+                    lLink = lLinks[lJointName]
+                    lParent = lLink.GetParent()
+                    if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
+                        if not lParent.GetName() in lGLTFSkin['roots']:
+                            lGLTFSkin['roots'].append(lLink.GetName())
 
         if lNormalSplitted or lUVSPlitted:
             lCount = 0
@@ -571,15 +587,15 @@ def ConvertMesh(pMesh, pNode):
             lIndices = pMesh.GetPolygonVertices()
             lPositions = pMesh.GetControlPoints()
 
-        lGLTFPrimitive['semantics'] = {}
-        lGLTFPrimitive['semantics']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
-        lGLTFPrimitive['semantics']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
+        lGLTFPrimitive['attributes'] = {}
+        lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
+        lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
         if not lLayerUV == None:
-            lGLTFPrimitive['semantics']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
+            lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
         if hasSkin:
             # PENDING Joint indices use other data type ?
-            lGLTFPrimitive['semantics']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)
-            lGLTFPrimitive['semantics']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 3)
+            lGLTFPrimitive['attributes']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)
+            lGLTFPrimitive['attributes']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 3)
 
         lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices)
 
@@ -656,17 +672,6 @@ def ConvertCamera(pCamera):
     lib_cameras[lCameraName] = lGLTFCamera
     return lCameraName
 
-def FindSkeletonNodes(pNode):
-    lAttribute = pNode.GetNodeAttribute()
-    if not lAttribute == None:
-        lAttributeType = lAttribute.GetAttributeType()
-        lNodeName = pNode.GetName()
-        if lAttributeType == FbxNodeAttribute.eSkeleton:
-            lib_joints[lNodeName] = pNode
-
-    for i in range(pNode.GetChildCount()):
-        FindSkeletonNodes(pNode.GetChild(i))
-
 def TraverseSceneNode(pNode):
     lGLTFNode = {}
     lNodeName = pNode.GetName()
@@ -694,16 +699,26 @@ def TraverseSceneNode(pNode):
 
         lGeometry = converter.Triangulate(lGeometry, True)
         # FIXME SplitMeshPerMaterial may loss deformer in mesh
-        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        # lResult = converter.SplitMeshPerMaterial(lGeometry, True)
 
-        for i in range(pNode.GetNodeAttributeCount()):
-            lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
-            if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
-                lPrimitive = ConvertMesh(lNodeAttribute, pNode)
-                if not lPrimitive == None:
-                    lGLTFMesh["primitives"].append(lPrimitive)
-
-        lGLTFNode['meshes'] = [lMeshKey]
+        lNodeAttribute = pNode.GetNodeAttribute()
+        if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
+            lPrimitive = ConvertMesh(lNodeAttribute, pNode)
+            if not lPrimitive == None:
+                lGLTFMesh["primitives"].append(lPrimitive)
+                # Have skinning data
+                if 'skin' in lPrimitive:
+                    lSkinName = lPrimitive['skin']
+                    lSkin = lib_skins[lSkinName]
+                    lPrimitive.pop('skin')
+                    lGLTFNode['instanceSkin'] = {
+                        'skeletons' : lSkin['roots'],
+                        'skin' : lSkinName,
+                        'sources' : [lMeshKey]
+                    }
+                else:
+                    lGLTFNode['meshes'] = [lMeshKey]
+                
     else:
         # Camera and light node attribute
         lNodeAttribute = pNode.GetNodeAttribute()
@@ -715,6 +730,10 @@ def TraverseSceneNode(pNode):
             elif lAttributeType == FbxNodeAttribute.eLight:
                 lLightKey = ConvertLight(lNodeAttribute)
                 lGLTFNode['lights'] = [lLightKey]
+            elif lAttributeType == FbxNodeAttribute.eSkeleton:
+                # Use node name as joint id
+                lGLTFNode['jointId'] = lNodeName
+                lib_joints[lNodeName] = lGLTFNode
 
     lGLTFNode['children'] = []
     for i in range(pNode.GetChildCount()):
@@ -733,13 +752,8 @@ def TraverseScene(pScene):
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
 
     for i in range(lRoot.GetChildCount()):
-        FindSkeletonNodes(lRoot.GetChild(i))
-
-    for i in range(lRoot.GetChildCount()):
         lNodeName = TraverseSceneNode(lRoot.GetChild(i))
-        # Node is not a joint
-        if lNodeName not in lib_joints:
-            lGLTFScene['nodes'].append(lNodeName)
+        lGLTFScene['nodes'].append(lNodeName)
 
     return lSceneName
 
@@ -753,10 +767,11 @@ def CreateBufferViews(pBufferName):
     lBufferView['buffer'] = pBufferName
     lBufferView['byteLength'] = len(attribute_bin)
     lBufferView['byteOffset'] = 0
-    lBufferView['target'] = 'ARRAY_BUFFER'
+    lBufferView['target'] = GL_ARRAY_BUFFER
 
-    for name, lAttrib in lib_attributes.items():
+    for lKey, lAttrib in lib_attributes.items():
         lAttrib['bufferView'] = lBufferViewName
+        lib_accessors[lKey] = lAttrib
 
     #Indices buffer view
     lBufferViewName = 'bufferView_' + str(GetId())
@@ -764,10 +779,11 @@ def CreateBufferViews(pBufferName):
     lBufferView['buffer'] = pBufferName
     lBufferView['byteLength'] = len(indices_bin)
     lBufferView['byteOffset'] = len(attribute_bin)
-    lBufferView['target'] = 'ELEMENT_ARRAY_BUFFER'
+    lBufferView['target'] = GL_ELEMENT_ARRAY_BUFFER
 
-    for name, lIndices in lib_indices.items():
+    for lKey, lIndices in lib_indices.items():
         lIndices['bufferView'] = lBufferViewName
+        lib_accessors[lKey] = lIndices
 
 if __name__ == "__main__":
     try:
@@ -817,13 +833,15 @@ if __name__ == "__main__":
 
         CreateBufferViews(lBufferName)
 
+        # Remove roots property in lib_skin
+        for lSkinName in lib_skins.keys():
+            lib_skins[lSkinName].pop('roots')
         #Output json
         lOutput = {
             'animations' : {},
             'asset' : {},
             'shaders' : {},
-            'attributes' : lib_attributes,
-            'indices' : lib_indices,
+            'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,
             'textures' : lib_textures,
