@@ -33,12 +33,19 @@ Qtek is a graphic library for both canvas2d and webgl drawing. It is still an ex
 + Loader
 	+ three.js model loader
 	+ glTF loader
-+ FBX to glTF converter
-
-#####Unified multiple layer
 
 #####Animation
 + Timeline based animation, support spline interpolation between keyframes.
+
+#####FBX2GLTF Converter
+
+Have been updated to the latest glTF specification
+
++ Scene hierarchy
++ Mesh, light, camera
++ Material, texture
++ Skinning
++ Animation
 
 ###Examples
 

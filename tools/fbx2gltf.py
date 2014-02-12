@@ -10,34 +10,42 @@ import sys
 import struct
 import json
 import os.path
+import math
 
-lib_nodes = {}
-lib_lights = {}
-lib_cameras = {}
-lib_meshes = {}
 lib_materials = {}
 lib_techniques = {}
+
 lib_images = {}
 lib_samplers = {}
 lib_textures = {}
+
+# attributes, indices, anim_parameters will be merged in accessors
 lib_attributes = {}
 lib_indices = {}
+lib_parameters = {}
 lib_accessors = {}
+
 lib_buffer_views = {}
 lib_buffers = {}
+
+lib_lights = {}
+lib_cameras = {}
+lib_meshes = {}
+
+lib_nodes = {}
 lib_scenes = {}
 
 lib_skins = {}
 lib_joints = {}
 
-# FbxConverter
-converter = None
+lib_animations = {}
 
 # Only python 3 support bytearray ?
 # http://dabeaz.blogspot.jp/2010/01/few-useful-bytearray-tricks.html
 attributeBuffer = bytearray()
 indicesBuffer = bytearray()
 invBindMatricesBuffer = bytearray()
+animationBuffer = bytearray()
 
 GL_RGBA = 0x1908
 GL_FLOAT = 0x1406
@@ -68,22 +76,24 @@ def GetId():
     _id = _id + 1
     return _id
 
-def CreateAttributeBuffer(pList, pType, pStride):
-    lGLTFAttribute = {}
+def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
+    lGLTFAcessor = {}
 
     lType = '<' + pType * pStride
     lData = []
-    if len(pList) > 0:
-        if pStride == 1:
-            lMin = pList[0]
-            lMax = pList[0]
+
+    if minMax:
+        if len(pList) > 0:
+            if pStride == 1:
+                lMin = pList[0]
+                lMax = pList[0]
+            else:
+                lMin = list(pList[0])
+                lMax = list(pList[0])
         else:
-            lMin = list(pList[0])
-            lMax = list(pList[0])
-    else:
-        lMax = [0] * pStride
-        lMin = [0] * pStride
-    lRange = range(pStride)
+            lMax = [0] * pStride
+            lMin = [0] * pStride
+        lRange = range(pStride)
     #TODO: Other method to write binary buffer ?
     for item in pList:
         if pStride == 1:
@@ -94,75 +104,78 @@ def CreateAttributeBuffer(pList, pType, pStride):
             lData.append(struct.pack(lType, item[0], item[1], item[2]))
         elif pStride == 4:
             lData.append(struct.pack(lType, item[0], item[1], item[2], item[3]))
-        if pStride == 1:
-            lMin = min(lMin, item)
-            lMax = max(lMin, item)
-        else:
-            for i in lRange:
-                lMin[i] = min(lMin[i], item[i])
-                lMax[i] = max(lMax[i], item[i])
-    try:
-        lData = b''.join(lData)
-        lByteOffset = len(attributeBuffer)
-    except:
-        print(lData[0])
-
-    lKey = "accessor_" + str(GetId())
+        if minMax:
+            if pStride == 1:
+                lMin = min(lMin, item)
+                lMax = max(lMin, item)
+            else:
+                for i in lRange:
+                    lMin[i] = min(lMin[i], item[i])
+                    lMax[i] = max(lMax[i], item[i])
 
     if pType == 'f':
         lByteStride = pStride * 4
-        lCount = int(len(lData) / lByteStride)
         if pStride == 1:
-            lGLTFAttribute['type'] = GL_FLOAT
+            lGLTFAcessor['type'] = GL_FLOAT
         elif pStride == 2:
-            lGLTFAttribute['type'] = GL_FLOAT_VEC2
+            lGLTFAcessor['type'] = GL_FLOAT_VEC2
         elif pStride == 3:
-            lGLTFAttribute['type'] = GL_FLOAT_VEC3
+            lGLTFAcessor['type'] = GL_FLOAT_VEC3
         elif pStride == 4:
-            lGLTFAttribute['type'] = GL_FLOAT_VEC4
+            lGLTFAcessor['type'] = GL_FLOAT_VEC4
+    
+    # Unsigned Short
+    elif pType == 'H':
+        lByteStride = pStride * 2
+        lGLTFAcessor['type'] = GL_UNSIGNED_SHORT
 
-    else:
-        print("Unsupported attribute type " + pType)
-        return False
+    lGLTFAcessor['byteOffset'] = 0
+    lGLTFAcessor['byteStride'] = lByteStride
+    lGLTFAcessor['count'] = len(pList)
 
-    lGLTFAttribute['byteOffset'] = lByteOffset
-    lGLTFAttribute['byteStride'] = lByteStride
-    lGLTFAttribute['count'] = lCount
-    lGLTFAttribute['max'] = lMax
-    lGLTFAttribute['min'] = lMin
+    if minMax:
+        lGLTFAcessor['max'] = lMax
+        lGLTFAcessor['min'] = lMin
 
-    lib_attributes[lKey] = lGLTFAttribute
+    return b''.join(lData), lGLTFAcessor
 
+
+def CreateAttributeBuffer(pList, pType, pStride):
+    lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True)
+    lGLTFAttribute['byteOffset'] = len(attributeBuffer)
     attributeBuffer.extend(lData)
-
+    lKey = 'attrbute_' + str(GetId())
+    lib_attributes[lKey] = lGLTFAttribute
     return lKey
 
 
 def CreateIndicesBuffer(pList):
-
-    lGLTFIndices = {}
-
-    # Unsigned Short
-    lType = '<H'
-    lData = []
-    for item in pList:
-        lData.append(struct.pack(lType, item))
-
-    lData = b''.join(lData)
-    lByteOffset = len(indicesBuffer)
-    lCount = int(len(lData) / 2)
+    lData, lGLTFIndices = CreateAccessorBuffer(pList, 'H', 1, False)
+    lGLTFIndices['byteOffset'] = len(indicesBuffer)
     indicesBuffer.extend(lData)
-
-    lKey = "accessor_" + str(GetId())
-    
-    lGLTFIndices['byteOffset'] = lByteOffset
-    lGLTFIndices['count'] = lCount
-    lGLTFIndices['type'] = GL_UNSIGNED_SHORT
-
+    lKey = 'indices_' + str(GetId())
     lib_indices[lKey] = lGLTFIndices
-
+    lGLTFIndices.pop('byteStride')
     return lKey
 
+def CreateAnimationBuffer(pList, pType, pStride):
+    lData, lGLTFParameter = CreateAccessorBuffer(pList, pType, pStride, False)
+    lGLTFParameter['byteOffset'] = len(animationBuffer)
+    animationBuffer.extend(lData)
+    lKey = 'accessor_' + str(GetId())
+    lib_parameters[lKey] = lGLTFParameter
+    lGLTFParameter.pop('byteStride')
+    return lKey
+
+def QuaternionToAxisAngle(pQuat):
+    w = pQuat[3]
+    divider = 1 / math.sqrt((1 - w * w))
+    angle = 2 * math.acos(w)
+    x = pQuat[0] * divider
+    y = pQuat[1] * divider
+    z = pQuat[2] * divider
+
+    return [x, y, z, angle]
 
 # PENDING : Hash mechanism may be different from COLLADA2GLTF
 # TODO Cull face
@@ -665,7 +678,7 @@ def ConvertCamera(pCamera):
     lib_cameras[lCameraName] = lGLTFCamera
     return lCameraName
 
-def TraverseSceneNode(pNode):
+def ConvertSceneNode(pNode, fbxConverter):
     lGLTFNode = {}
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = lNodeName
@@ -682,7 +695,7 @@ def TraverseSceneNode(pNode):
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
     lGeometry = pNode.GetGeometry()
-    if lGeometry:
+    if not lGeometry == None:
         lMeshKey = lNodeName + '-mesh'
         lMeshName = lGeometry.GetName()
         if lMeshName == '':
@@ -690,15 +703,18 @@ def TraverseSceneNode(pNode):
 
         lGLTFMesh = lib_meshes[lMeshKey] = {'name' : lMeshName, 'primitives' : []}
 
-        lGeometry = converter.Triangulate(lGeometry, True)
+        fbxConverter.Triangulate(lGeometry, True)
         # TODO SplitMeshPerMaterial may loss deformer in mesh
         # FBX version 2014.2 seems have fixed it
-        lResult = converter.SplitMeshPerMaterial(lGeometry, True)
+        fbxConverter.SplitMeshPerMaterial(lGeometry, True)
 
         lHasSkin = False
         lGLTFSkin = None
         lClusters = {}
         lSkinName = ''
+
+        # If any attribute of this node have skinning data
+        # (Mesh splitted by material may have multiple MeshAttribute in one node)
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
             if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
@@ -732,9 +748,7 @@ def TraverseSceneNode(pNode):
                 if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
                     if not lParent.GetName() in roots:
                         roots.append(lLink.GetName())
-            # Mutiply the inverse of root node matrix
-            # Transform to the model space and invert it !
-            
+
             #Find root
             lRootCluster = lClusters[roots[0]]
             lRootNode = lRootCluster.GetLink().GetParent()
@@ -742,6 +756,7 @@ def TraverseSceneNode(pNode):
 
             lClusterGlobalInitMatrix = FbxAMatrix()
             lReferenceGlobalInitMatrix = FbxAMatrix()
+
             for i in range(len(lGLTFSkin['joints'])):
                 lJointName = lGLTFSkin['joints'][i]
                 lCluster = lClusters[lJointName]
@@ -752,12 +767,17 @@ def TraverseSceneNode(pNode):
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
                 # Matrix in fbx is column major
                 # (root-1 * reference-1 * cluster)-1 = cluster-1 * reference * root
-                # PENDING
                 m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * lRootNodeTransform
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
 
-
+            # PENDING
+            lGLTFNode['matrix'] = [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1,
+            ]
         else:
             lGLTFNode['meshes'] = [lMeshKey]
                 
@@ -779,12 +799,12 @@ def TraverseSceneNode(pNode):
 
     lGLTFNode['children'] = []
     for i in range(pNode.GetChildCount()):
-        lChildNodeName = TraverseSceneNode(pNode.GetChild(i))
+        lChildNodeName = ConvertSceneNode(pNode.GetChild(i), fbxConverter)
         lGLTFNode['children'].append(lChildNodeName)
 
     return lNodeName
 
-def TraverseScene(pScene):
+def ConvertScene(pScene, fbxConverter):
     lRoot = pScene.GetRootNode()
 
     lSceneName = pScene.GetName()
@@ -794,16 +814,117 @@ def TraverseScene(pScene):
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
 
     for i in range(lRoot.GetChildCount()):
-        lNodeName = TraverseSceneNode(lRoot.GetChild(i))
+        lNodeName = ConvertSceneNode(lRoot.GetChild(i), fbxConverter)
         lGLTFScene['nodes'].append(lNodeName)
 
     return lSceneName
 
-def ConvertScene(pScene):
-    return TraverseScene(pScene)
+def CreateAnimation():
+    lAnimName = 'animation_' + str(len(lib_animations.keys()))
+    lGLTFAnimation = {
+        'channels' : [],
+        'count' : 0,
+        'parameters' : {},
+        'samplers' : {} 
+    }
+    lib_animations[lAnimName] = lGLTFAnimation
+
+    return lAnimName, lGLTFAnimation
+
+_samplerChannels = ['rotation', 'scale', 'translation']
+def CreateTransformAnimation(nodeName):
+    lAnimName, lGLTFAnimation = CreateAnimation()
+
+    lGLTFAnimation['parameters'] = {
+        "TIME" : None,
+        "rotation" : None,
+        "scale" : None,
+        "translation" : None
+    }
+    #TODO Other interpolation methods
+    for path in _samplerChannels:
+        lSamplerName = lAnimName + '_' + path + '_sampler'
+        lGLTFAnimation['samplers'][lSamplerName] = {
+            "input": "TIME",
+            "interpolation": "LINEAR",
+            "output": path
+        }
+        lGLTFAnimation['channels'].append({
+            "sampler" : lSamplerName,
+            "target" : {
+                "id" : nodeName,
+                "path" : path
+            }
+        })
+
+    return lAnimName, lGLTFAnimation
+
+def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
+    lNodeName = pNode.GetName()
+
+    # Find start and end time of animation layer
+    # Use the time of X channel of translation curve
+    lAnimCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
+    if lAnimCurve == None:
+        return;
+
+    lTimeSpan = FbxTimeSpan()
+    lAnimCurve.GetTimeInterval(lTimeSpan)
+    lStartTimeDouble = lTimeSpan.GetStart().GetSecondDouble()
+    lEndTimeDouble = lTimeSpan.GetStop().GetSecondDouble()
+    lDuration = lEndTimeDouble - lStartTimeDouble
+
+    if lDuration > 1e-5:
+        lAnimName, lGLTFAnimation = CreateTransformAnimation(lNodeName)
+
+        lNumFrames = math.ceil(lDuration / pSampleRate)
+
+        lTime = FbxTime()
+
+        lTimeChannel = []
+        lTranslationChannel = []
+        lRotationChannel = []
+        lScaleChannel = []
+
+        lQuaternion = FbxQuaternion()
+        for i in range(lNumFrames):
+            lSecondDouble = min(lStartTimeDouble + pSampleRate * i, lEndTimeDouble)
+            lTime.SetSecondDouble(lSecondDouble)
+
+            lTransform = pNode.EvaluateLocalTransform(lTime)
+            lTranslation = lTransform.GetT()
+            lQuaternion = lTransform.GetQ()
+            lScale = lTransform.GetS()
+
+            #Convert quaternion to axis angle
+            lRotationChannel.append(QuaternionToAxisAngle(lQuaternion))
+
+            lTimeChannel.append(lSecondDouble)
+            lTranslationChannel.append(list(lTranslation))
+            lScaleChannel.append(list(lScale))
+
+        lGLTFAnimation['count'] = lNumFrames
+        lGLTFAnimation['parameters']['TIME'] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
+        lGLTFAnimation['parameters']['rotation'] = CreateAnimationBuffer(lRotationChannel, 'f', 4)
+        lGLTFAnimation['parameters']['translation'] = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
+        lGLTFAnimation['parameters']['scale'] = CreateAnimationBuffer(lScaleChannel, 'f', 3)
+
+    for i in range(pNode.GetChildCount()):
+        ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate)
+
+def ConvertAnimation(pScene, pSampleRate = 1 / 30):
+    lRoot = pScene.GetRootNode()
+    for i in range(pScene.GetSrcObjectCount(FbxAnimStack.ClassId)):
+        lAnimStack = pScene.GetSrcObject(FbxAnimStack.ClassId, i)
+        for j in range(lAnimStack.GetSrcObjectCount(FbxAnimLayer.ClassId)):
+            lAnimLayer = lAnimStack.GetSrcObject(FbxAnimLayer.ClassId, j)
+            for k in range(lRoot.GetChildCount()):
+                ConvertNodeAnimation(lAnimLayer, lRoot.GetChild(k), pSampleRate)
+
 
 def CreateBufferViews(pBufferName):
     lByteOffset = 0
+
     #Attribute buffer view
     lBufferViewName = 'bufferView_' + str(GetId())
     lBufferView = lib_buffer_views[lBufferViewName] = {}
@@ -816,7 +937,7 @@ def CreateBufferViews(pBufferName):
         lAttrib['bufferView'] = lBufferViewName
         lib_accessors[lKey] = lAttrib
 
-    lByteOffset += len(attributeBuffer)
+    lByteOffset += lBufferView['byteLength']
 
     #Indices buffer view
     lBufferViewName = 'bufferView_' + str(GetId())
@@ -830,47 +951,42 @@ def CreateBufferViews(pBufferName):
         lIndices['bufferView'] = lBufferViewName
         lib_accessors[lKey] = lIndices
 
-    lByteOffset += len(indicesBuffer)
+    lByteOffset += lBufferView['byteLength']
 
     #Inverse Bind Pose Matrices
-    lBufferViewName = 'bufferView_' + str(GetId())
-    lBufferView = lib_buffer_views[lBufferViewName] = {}
-    lBufferView['buffer'] = pBufferName
-    lBufferView['byteLength'] = len(invBindMatricesBuffer)
-    lBufferView['byteOffset'] = lByteOffset
+    if len(invBindMatricesBuffer) > 0:
+        lBufferViewName = 'bufferView_' + str(GetId())
+        lBufferView = lib_buffer_views[lBufferViewName] = {}
+        lBufferView['buffer'] = pBufferName
+        lBufferView['byteLength'] = len(invBindMatricesBuffer)
+        lBufferView['byteOffset'] = lByteOffset
 
-    for lSkin in lib_skins.values():
-        lSkin['inverseBindMatrices']['bufferView'] = lBufferViewName
+        for lSkin in lib_skins.values():
+            lSkin['inverseBindMatrices']['bufferView'] = lBufferViewName
 
-    lByteOffset += len(invBindMatricesBuffer)
+        lByteOffset += lBufferView['byteLength']
 
+    #Animations
+    if len(animationBuffer) > 0:
+        lBufferViewName = 'bufferView_' + str(GetId())
+        lBufferView = lib_buffer_views[lBufferViewName] = {}
+        lBufferView['buffer'] = pBufferName
+        lBufferView['byteLength'] = len(animationBuffer)
+        lBufferView['byteOffset'] = lByteOffset
 
-if __name__ == "__main__":
-    try:
-        from FbxCommon import *
-    except ImportError:
-        import platform
-        msg = 'You need to copy the content in compatible subfolder under /lib/python<version> into your python install folder such as '
-        if platform.system() == 'Windows' or platform.system() == 'Microsoft':
-            msg += '"Python26/Lib/site-packages"'
-        elif platform.system() == 'Linux':
-            msg += '"/usr/local/lib/python2.6/site-packages"'
-        elif platform.system() == 'Darwin':
-            msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'        
-        msg += ' folder.'
-        print(msg) 
-        sys.exit(1)
+        for lKey, lAccessor in lib_parameters.items():
+            lAccessor['bufferView'] = lBufferViewName
+            lib_accessors[lKey] = lAccessor
 
+        lByteOffset += lBufferView['byteLength']
+    
+
+def Convert(path):
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
-    converter = FbxGeometryConverter(lSdkManager)
+    fbxConverter = FbxGeometryConverter(lSdkManager)
     # Load the scene.
-    if len(sys.argv) > 1:
-        lResult = LoadScene(lSdkManager, lScene, sys.argv[1])
-
-    else:
-        lResult = False
-        print("\n\nUsage: fbx2gltf <FBX file name>\n")
+    lResult = LoadScene(lSdkManager, lScene, path)
 
     if not lResult:
         print("\n\nAn error occurred while loading the scene...")
@@ -878,13 +994,16 @@ if __name__ == "__main__":
         lBaseName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
         lRoot, lExt = os.path.splitext(sys.argv[1])
 
-        lSceneName = ConvertScene(lScene)
+        lSceneName = ConvertScene(lScene, fbxConverter)
+        ConvertAnimation(lScene)
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
         lBin.extend(attributeBuffer)
         lBin.extend(indicesBuffer)
         lBin.extend(invBindMatricesBuffer)
+        lBin.extend(animationBuffer)
+
         out = open(lRoot + ".bin", 'wb')
         out.write(lBin)
         out.close()
@@ -896,7 +1015,7 @@ if __name__ == "__main__":
 
         #Output json
         lOutput = {
-            'animations' : {},
+            'animations' : lib_animations,
             'asset' : {},
             'shaders' : {},
             'accessors' : lib_accessors,
@@ -918,5 +1037,26 @@ if __name__ == "__main__":
         }
 
         out = open(lRoot + ".json", 'w')
-        out.write(json.dumps(lOutput, indent=4, sort_keys = True, separators=(',', ': ')))
+        out.write(json.dumps(lOutput, indent = 4, sort_keys = True, separators=(',', ': ')))
         out.close()
+
+if __name__ == "__main__":
+    try:
+        from FbxCommon import *
+    except ImportError:
+        import platform
+        msg = 'You need to copy the content in compatible subfolder under /lib/python<version> into your python install folder such as '
+        if platform.system() == 'Windows' or platform.system() == 'Microsoft':
+            msg += '"Python26/Lib/site-packages"'
+        elif platform.system() == 'Linux':
+            msg += '"/usr/local/lib/python2.6/site-packages"'
+        elif platform.system() == 'Darwin':
+            msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'        
+        msg += ' folder.'
+        print(msg) 
+        sys.exit(1)
+
+    if len(sys.argv) > 1:
+        Convert(sys.argv[1])
+    else:
+        print("\n\nUsage: fbx2gltf <FBX file name>\n")

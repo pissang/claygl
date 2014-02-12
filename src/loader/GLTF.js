@@ -248,6 +248,8 @@ define(function(require) {
                 return joint;
             }
 
+            var instanceSkins = {};
+
             for (var name in json.nodes) {
 
                 var nodeInfo = json.nodes[name];
@@ -255,6 +257,7 @@ define(function(require) {
                 if (nodeInfo.instanceSkin) {
                     var skinName = nodeInfo.instanceSkin.skin;
                     var skeleton = lib.skeletons[skinName];
+                    instanceSkins[skinName] = skeleton;
 
                     var node = lib.nodes[name];
                     var jointIndices = skeleton.joints.map(function(joint) {
@@ -297,8 +300,8 @@ define(function(require) {
                 }
             }
 
-            for (var name in lib.skeletons) {
-                var skeleton = lib.skeletons[name];
+            for (var name in instanceSkins) {
+                var skeleton = instanceSkins[name];
                 if (haveInvBindMatrices) {
                     skeleton.updateMatricesSubArrays();
                 } else {
@@ -829,18 +832,20 @@ define(function(require) {
                 // glTF use axis angle in rotation, convert to quaternion
                 // https://github.com/KhronosGroup/glTF/issues/144
                 var rotationArr = parameters.rotation;
-                for (i = 0; i < parameters.TIME.length; i++) {
-                    parameters.TIME[i] *= 1000;
-                    var offset = i * 4;
-                    if (rotationArr) {
-                        quatTmp[0] = rotationArr[offset];
-                        quatTmp[1] = rotationArr[offset + 1];
-                        quatTmp[2] = rotationArr[offset + 2];
-                        quat.setAxisAngle(quatTmp, quatTmp, rotationArr[offset + 3]);
-                        parameters.rotation[offset] = quatTmp[0];
-                        parameters.rotation[offset + 1] = quatTmp[1];
-                        parameters.rotation[offset + 2] = quatTmp[2];
-                        parameters.rotation[offset + 3] = quatTmp[3];
+                if (rotationArr) {
+                    for (i = 0; i < parameters.TIME.length; i++) {
+                        parameters.TIME[i] *= 1000;
+                        var offset = i * 4;
+                        if (rotationArr) {
+                            quatTmp[0] = rotationArr[offset];
+                            quatTmp[1] = rotationArr[offset + 1];
+                            quatTmp[2] = rotationArr[offset + 2];
+                            quat.setAxisAngle(quatTmp, quatTmp, rotationArr[offset + 3]);
+                            parameters.rotation[offset] = quatTmp[0];
+                            parameters.rotation[offset + 1] = quatTmp[1];
+                            parameters.rotation[offset + 2] = quatTmp[2];
+                            parameters.rotation[offset + 3] = quatTmp[3];
+                        }
                     }
                 }
 
@@ -853,9 +858,9 @@ define(function(require) {
                 });
                 var jointClip = jointClips[targetId];
                 jointClip.channels.time = parameters.TIME;
-                jointClip.channels.rotation = parameters.rotation;
-                jointClip.channels.position = parameters.translation;
-                jointClip.channels.scale = parameters.scale;
+                jointClip.channels.rotation = parameters.rotation || null;
+                jointClip.channels.position = parameters.translation || null;
+                jointClip.channels.scale = parameters.scale || null;
                 jointClip.life = parameters.TIME[parameters.TIME.length - 1];
             }
 
