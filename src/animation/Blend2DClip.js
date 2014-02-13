@@ -39,14 +39,17 @@ define(function(require) {
     Blend2DClip.prototype.constructor = Blend2DClip;
 
     Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
-        this.inputs.push({
+        var obj = {
             position : position,
             clip : inputClip,
             offset : offset || 0
-        });
+        }
+        this.inputs.push(obj);
         this.life = Math.max(inputClip.life, this.life);
         // TODO Change to incrementally adding
         this.updateTriangles();
+
+        return obj;
     }
 
     // Delaunay triangulate

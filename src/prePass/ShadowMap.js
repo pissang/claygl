@@ -465,8 +465,6 @@ define(function(require) {
                     for (var key in this._depthMaterials) {
                         this._depthMaterials[key].set('shadowBias', shadowBias);
                     }
-                    shadowBias /= 1.5;
-
 
                     renderer.renderQueue(casters, lightCamera);
 

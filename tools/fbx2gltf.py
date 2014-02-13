@@ -169,6 +169,9 @@ def CreateAnimationBuffer(pList, pType, pStride):
 
 def QuaternionToAxisAngle(pQuat):
     w = pQuat[3]
+    if (w == 1):
+        return [1, 0, 0, 0]
+    
     divider = 1 / math.sqrt((1 - w * w))
     angle = 2 * math.acos(w)
     x = pQuat[0] * divider

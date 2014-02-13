@@ -294,7 +294,7 @@ define(function(require) {
                     var rootNodes = nodeInfo.instanceSkin.skeletons;
                     for (i = 0; i < rootNodes.length; i++) {
                         var rootNode = lib.nodes[rootNodes[i]];
-                        var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1, rootNode.parent);
+                        var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1, rootNode);
                         skeleton.roots.push(rootJoint);
                     }
                 }

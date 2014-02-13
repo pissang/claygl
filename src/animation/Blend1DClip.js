@@ -42,7 +42,7 @@ define(function(require) {
         }
         if (!this.inputs.length) {
             this.inputs.push(obj);
-            return;
+            return obj;
         }
         var len = this.inputs.length;
         if (this.inputs[0].position > position) {
@@ -55,6 +55,8 @@ define(function(require) {
         }
 
         this.life = Math.max(inputClip.life, this.life);
+
+        return obj;
     }
 
     Blend1DClip.prototype.step = function(time) {

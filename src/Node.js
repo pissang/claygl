@@ -122,6 +122,14 @@ define(function(require) {
             return this._children[idx];
         },
 
+        getChildByName : function(name) {
+            for (var i = 0; i < this._children.length; i++) {
+                if (this._children[i].name === name) {
+                    return this._children[i];
+                }
+            }
+        },
+
         // pre-order traverse
         traverse : function(callback, parent) {
             

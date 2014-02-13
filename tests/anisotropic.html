@@ -4,23 +4,23 @@
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
     </head>
-    <body>
+    <body style="margin:0px;">
         <canvas width="1200" height="640" id="Main"></canvas>
         <script>
             require(['qtek/qtek'], function(qtek){
                 var Shader = qtek.Shader
-                var _ = require("_");
 
                 var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main"),
                     devicePixelRatio : 1.0
                 });
+                renderer.resize(window.innerWidth, window.innerHeight);
 
-                var scene = new qtek.Scene,
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
 
                 var shader = qtek.shader.library.get("buildin.basic", "diffuseMap");
 

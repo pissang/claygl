@@ -10,7 +10,6 @@
             require(['qtek/qtek',
                     'text!../tests/assets/models/leeperrysmith/leeperrysmith.js'], function(qtek, modelData){
                 var Shader = qtek.Shader
-                var _ = require("_");
 
                 var renderer = new qtek.Renderer({
                     canvas : document.getElementById( "Main")
@@ -33,7 +32,7 @@
                     shader : shader,
                 });
                 var root = new qtek.Node();
-                _.each(meshList, function(mesh){
+                qtek.core.util.each(meshList, function(mesh){
                     mesh.material = material;
                     // mesh.geometry.generateVertexNormals();
                     mesh.geometry.generateBarycentric();

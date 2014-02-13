@@ -53,7 +53,7 @@
 
                 var root = new qtek.Node();
 
-                _.each(meshList, function(mesh){
+                qtek.core.util.each(meshList, function(mesh){
                     // mesh.material = material
                     mesh.material.shader.disableTexture("normalMap");
                     root.add(mesh);
