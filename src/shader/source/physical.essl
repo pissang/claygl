@@ -129,6 +129,11 @@ void main()
         return;
     #endif
 
+    #ifdef RENDER_GLOSSINESS
+        gl_FragColor = vec4(vec3(g), 1.0);
+        return;
+    #endif
+
     float ndv = dot(N, V);
 
     // Diffuse part of all lights
@@ -140,8 +145,8 @@ void main()
         for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
         {
             // Hemisphere ambient lighting from cryengine
-            // diffuseTerm += ambientLightColor[i] * (N.y * 0.7 + 0.3);
-            diffuseTerm += ambientLightColor[i];
+            diffuseTerm += ambientLightColor[i] * (clamp(N.y * 0.7, 0.0, 1.0) + 0.3);
+            // diffuseTerm += ambientLightColor[i];
         }
     #endif
     #ifdef POINT_LIGHT_NUMBER

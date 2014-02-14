@@ -49,9 +49,6 @@ Have been updated to the latest glTF specification
 
 ###Examples
 
-
-#####WebGL
-
 [Sponza](http://pissang.github.io/qtek/sponza/)
 
 + Normal Mapping

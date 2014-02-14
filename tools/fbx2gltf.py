@@ -171,7 +171,7 @@ def QuaternionToAxisAngle(pQuat):
     w = pQuat[3]
     if (w == 1):
         return [1, 0, 0, 0]
-    
+
     divider = 1 / math.sqrt((1 - w * w))
     angle = 2 * math.acos(w)
     x = pQuat[0] * divider
@@ -243,8 +243,9 @@ def CreateTechnique(pMaterial):
         }
     }
     # Enable blend
-    try :
-        if pMaterial.TransparencyFactor.Get() < 1:
+    try :  
+        # Old fbx version transparency is 0 if object is opaque
+        if pMaterial.TransparencyFactor.Get() < 1 and pMaterial.TransparencyFactor.Get() > 0:
             lStates = lGLTFTechnique['passes']['defaultPass']['states']
             lStates['blendEnable'] = True
             lStates['blendEquation'] = 'FUNC_ADD'
@@ -308,41 +309,51 @@ _textureHashMap = {}
 _repeatedTextureCount = {}
 def CreateTexture(pProperty):
     lTextureList = []
-    lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
+
+    lFileTextures = []
+    lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxLayeredTexture.ClassId)
     if lLayeredTextureCount > 0:
-        #TODO
+        for i in range(lLayeredTextureCount):
+            lLayeredTexture = pProperty.GetSrcObject(FbxLayeredTexture.ClassId, i)
+            for j in range(lLayeredTexture.GetSrcObjectCount(FbxTexture.ClassId)):
+                lTexture = lLayeredTexture.GetSrcObject(FbxTexture.ClassId, j)
+                if lTexture and lTexture.__class__ == FbxFileTexture:
+                    lFileTextures.append(lTexture)
         pass
     else:
-        lTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
+        lTextureCount = pProperty.GetSrcObjectCount(FbxTexture.ClassId)
         for t in range(lTextureCount):
-            lTexture = pProperty.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId), t)
+            lTexture = pProperty.GetSrcObject(FbxTexture.ClassId, t)
             if lTexture and lTexture.__class__ == FbxFileTexture:
-                lImageName = CreateImage(lTexture.GetFileName())
-                lSamplerName = CreateSampler(lTexture)
-                lHashKey = (lImageName, lSamplerName)
-                if lHashKey in _textureHashMap:
-                    lTextureList.append(_textureHashMap[lHashKey])
+                lFileTextures.append(lTexture)
+
+    for lTexture in lFileTextures:
+        lImageName = CreateImage(lTexture.GetFileName())
+        lSamplerName = CreateSampler(lTexture)
+        lHashKey = (lImageName, lSamplerName)
+        if lHashKey in _textureHashMap:
+            lTextureList.append(_textureHashMap[lHashKey])
+        else:
+            lTextureName = lTexture.GetName()
+            # Map name may be repeat
+            while lTextureName in lib_textures:
+                if not lTextureName in _repeatedTextureCount:
+                    _repeatedTextureCount[lTextureName] = 0
                 else:
-                    lTextureName = lTexture.GetName()
-                    # Map name may be repeat
-                    while lTextureName in lib_textures:
-                        if not lTextureName in _repeatedTextureCount:
-                            _repeatedTextureCount[lTextureName] = 0
-                        else:
-                            _repeatedTextureCount[lTextureName] += 1
-                        lTextureName = lTextureName + '_' + str(_repeatedTextureCount[lTextureName])
-                    lib_textures[lTextureName] ={
-                        'format' : GL_RGBA,
-                        'internalFormat' : GL_RGBA,
-                        'sampler' : lSamplerName,
-                        'source' : lImageName,
-                        # TODO Texture Cube
-                        'target' : GL_TEXTURE_2D
-                    }
-                    _textureHashMap[lHashKey] = lTextureName
-                    lTextureList.append(lTextureName)
+                    _repeatedTextureCount[lTextureName] += 1
+                lTextureName = lTextureName + '_' + str(_repeatedTextureCount[lTextureName])
+            lib_textures[lTextureName] ={
+                'format' : GL_RGBA,
+                'internalFormat' : GL_RGBA,
+                'sampler' : lSamplerName,
+                'source' : lImageName,
+                # TODO Texture Cube
+                'target' : GL_TEXTURE_2D
+            }
+            _textureHashMap[lHashKey] = lTextureName
+            lTextureList.append(lTextureName)
     # PENDING Return the first texture ?
-    if lTextureList[0]:
+    if len(lTextureList) > 0:
         return lTextureList[0]
     else:
         return None
@@ -373,6 +384,10 @@ def ConvertMaterial(pMaterial):
 
     if pMaterial.TransparencyFactor.Get() < 1:
         lValues['transparency'] = pMaterial.TransparencyFactor.Get()
+        # Old fbx version transparency is 0 if object is opaque
+        if (lValues['transparency'] == 0):
+            lValues['transparency'] = 1
+
     # Use diffuse map
     # TODO Diffuse Factor ?
     if pMaterial.Diffuse.GetSrcObjectCount() > 0:

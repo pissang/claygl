@@ -144,9 +144,9 @@ void main()
     tex *= exposureBias;
 
     // Do tone mapping
-    // vec3 color = uncharted2ToneMap(tex) / uncharted2ToneMap(whiteScale);
-    // color = pow(color, vec3(1.0/2.2));
-    vec3 color = filmicToneMap(tex);
+    vec3 color = uncharted2ToneMap(tex) / uncharted2ToneMap(whiteScale);
+    color = pow(color, vec3(1.0/2.2));
+    // vec3 color = filmicToneMap(tex);
 
     #ifdef RGBM_ENCODE
         gl_FragColor.rgba = RGBMEncode(color);

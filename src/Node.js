@@ -130,6 +130,20 @@ define(function(require) {
             }
         },
 
+        getDescendantByName : function(name) {
+            for (var i = 0; i < this._children.length; i++) {
+                var child = this._children[i];
+                if (child.name === name) {
+                    return child;
+                } else {
+                    var res = child.getDescendantByName(name);
+                    if (res) {
+                        return res;
+                    }
+                }
+            }
+        },
+
         // pre-order traverse
         traverse : function(callback, parent) {
             

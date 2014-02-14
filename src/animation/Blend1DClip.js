@@ -77,12 +77,6 @@ define(function(require) {
         var min = inputs[0].position;
         var max = inputs[len-1].position;
 
-        // PENDING update all input clip ?
-        // for (var i = 0; i < inputs.length; i++) {
-        //     var in_ = inputs[i];
-        //     in_.clip.setTime((time + in_.offset) % in_.clip.life);
-        // }
-        
         if (position <= min || position >= max) {
             var in0 = position <= min ? inputs[0] : inputs[len-1];
             var clip = in0.clip;
