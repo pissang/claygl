@@ -113,7 +113,7 @@ define(function(require) {
             var s = Math.min(len-2, this._cacheKey);
             for (var i = s; i >= 0; i--) {
                 if (channels.time[i-1] <= time && channels.time[i] > time) {
-                    key = i;
+                    key = i - 1;
                     break;
                 }
             }
@@ -144,6 +144,11 @@ define(function(require) {
             if (channels.scale) {
                 vec3lerp(this.scale, channels.scale, channels.scale, percent, start * 3, end * 3);
             }
+        }
+        // Loop handling
+        if (key == len - 2) {
+            this._cacheKey = 0;
+            this._cacheTime = 0;
         }
     }
 

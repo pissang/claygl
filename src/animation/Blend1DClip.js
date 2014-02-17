@@ -40,6 +40,8 @@ define(function(require) {
             clip : inputClip,
             offset : offset || 0
         }
+        this.life = Math.max(inputClip.life, this.life);
+
         if (!this.inputs.length) {
             this.inputs.push(obj);
             return obj;
@@ -53,8 +55,6 @@ define(function(require) {
             var key = this._findKey(position);
             this.inputs.splice(key, obj);
         }
-
-        this.life = Math.max(inputClip.life, this.life);
 
         return obj;
     }

@@ -23,6 +23,11 @@ define(function(require) {
             var count = tasks.length;
             var self = this;
             var data = [];
+            if (tasks.length == 0) {
+                setTimeout(function() {
+                    this.trigger('success', data);
+                });
+            }
             tasks.forEach(function(task, idx) {
                 task.once('success', function(res) {
                     count--;
@@ -43,6 +48,11 @@ define(function(require) {
             var success = false;
             var self = this;
             var data = [];
+            if (tasks.length == 0) {
+                setTimeout(function() {
+                    this.trigger('success', data);
+                });
+            }
             tasks.forEach(function(task, idx) {
                 task.once('success', function(res) {
                     count--;

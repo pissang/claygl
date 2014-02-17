@@ -930,7 +930,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
     for i in range(pNode.GetChildCount()):
         ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate)
 
-def ConvertAnimation(pScene, pSampleRate = 1 / 30):
+def ConvertAnimation(pScene, pSampleRate):
     lRoot = pScene.GetRootNode()
     for i in range(pScene.GetSrcObjectCount(FbxAnimStack.ClassId)):
         lAnimStack = pScene.GetSrcObject(FbxAnimStack.ClassId, i)
@@ -999,7 +999,7 @@ def CreateBufferViews(pBufferName):
         lByteOffset += lBufferView['byteLength']
     
 
-def Convert(path):
+def Convert(path, animFrameRate = 1 / 30):
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
@@ -1013,7 +1013,7 @@ def Convert(path):
         lRoot, lExt = os.path.splitext(sys.argv[1])
 
         lSceneName = ConvertScene(lScene, fbxConverter)
-        ConvertAnimation(lScene)
+        ConvertAnimation(lScene, animFrameRate)
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
@@ -1075,6 +1075,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if len(sys.argv) > 1:
-        Convert(sys.argv[1])
+        Convert(sys.argv[1], float(sys.argv[2]));
     else:
         print("\n\nUsage: fbx2gltf <FBX file name>\n")

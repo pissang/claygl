@@ -234,7 +234,7 @@ define(function(require) {
             for (var i = 0; i < scene.transparentQueue.length; i++) {
                 // TODO Transparent object receive shadow will be very slow
                 // in stealth demo, still not find the reason
-                // this._updateCaster(scene.transparentQueue[i]);
+                this._updateCaster(scene.transparentQueue[i]);
             }
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
