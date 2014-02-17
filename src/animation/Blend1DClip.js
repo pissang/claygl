@@ -105,7 +105,7 @@ define(function(require) {
             this.output.blend1D(c1, c2, w);
         }
     }
-
+    
     // Find the key where position in range [inputs[key].position, inputs[key+1].position)
     Blend1DClip.prototype._findKey = function(position) {
         var key = -1;

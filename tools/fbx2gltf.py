@@ -1075,6 +1075,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if len(sys.argv) > 1:
-        Convert(sys.argv[1], float(sys.argv[2]));
+        Convert(sys.argv[1]);
     else:
         print("\n\nUsage: fbx2gltf <FBX file name>\n")

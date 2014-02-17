@@ -60,6 +60,10 @@ define( function(require){
 		"TransformClip": require('qtek/animation/TransformClip'),
 		"easing": require('qtek/animation/easing')
 	},
+	"async": {
+		"Task": require('qtek/async/Task'),
+		"TaskGroup": require('qtek/async/TaskGroup')
+	},
 	"camera": {
 		"Orthographic": require('qtek/camera/Orthographic'),
 		"Perspective": require('qtek/camera/Perspective')
@@ -75,7 +79,6 @@ define( function(require){
 		"texturePool": require('qtek/compositor/texturePool')
 	},
 	"core": {
-		"Async": require('qtek/core/Async'),
 		"Base": require('qtek/core/Base'),
 		"Cache": require('qtek/core/Cache'),
 		"Event": require('qtek/core/Event'),
