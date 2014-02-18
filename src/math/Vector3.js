@@ -267,8 +267,144 @@ define(function(require) {
         },
     }
 
-    function clamp( x ) {
-        return Math.min( Math.max( x, -1 ), 1 );
+    // Supply methods that are not in place
+    Vector3.add = function(out, a, b) {
+        vec3.add(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.set = function(out, x, y, z) {
+        vec3.set(out._array, x, y, z);
+        out._dirty = true;
+    }
+
+    Vector3.copy = function(out, b) {
+        vec3.copy(out._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.cross = function(out, a, b) {
+        vec3.cross(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.dist = function(a, b) {
+        return vec3.distance(a._array, b._array);
+    }
+
+    Vector3.distance = Vector3.dist;
+
+    Vector3.div = function(out, a, b) {
+        vec3.divide(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.divide = Vector3.div;
+
+    Vector3.dot = function(a, b) {
+        return vec3.dot(a._array, b._array);
+    }
+
+    Vector3.len = function(b) {
+        return vec3.length(b._array);
+    }
+
+    Vector3.length = Vector3.len;
+
+    Vector3.lerp = function(out, a, b, t) {
+        vec3.lerp(out._array, a._array, b._array, t);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.min = function(out, a, b) {
+        vec3.min(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.max = function(out, a, b) {
+        vec3.max(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.mul = function(out, a, b) {
+        vec3.multiply(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.multiply = Vector3.mul;
+
+    Vector3.negate = function(out, a) {
+        vec3.negate(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.normalize = function(out, a) {
+        vec3.normalize(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.random = function(out, scale) {
+        vec3.random(out._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.scale = function(out, a, scale) {
+        vec3.scale(out._array, a._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.scaleAndAdd = function(out, a, b, scale) {
+        vec3.scale(out._array, a._array, b._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.sqrDist = function(a, b) {
+        return vec3.sqrDist(a._array, b._array);
+    }
+
+    Vector3.squaredDistance = Vector3.sqrDist;
+
+    Vector3.sqrLen = function(a) {
+        return vec3.sqrLen(a._array);
+    }
+    Vector3.squaredLength = Vector3.sqrLen;
+
+    Vector3.sub = function(out, a, b) {
+        vec3.subtract(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+    Vector3.subtract = Vector3.sub;
+
+    Vector3.transformMat3 = function(out, a, m) {
+        vec3.transformMat3(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.transformMat4 = function(out, a, m) {
+        vec3.transformMat4(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector3.transformQuat = function(out, a, q) {
+        vec3.transformQuat(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
     }
 
     Vector3.POSITIVE_X = new Vector3(1, 0, 0);

@@ -93,11 +93,6 @@ define( function(require) {
             return this;
         },
 
-        cross : function(out, b) {
-            vec4.cross(out._array, this._array, b._array);
-            return this;
-        },
-
         dist : function(b) {
             return vec4.dist(this._array, b._array);
         },
@@ -237,6 +232,134 @@ define( function(require) {
         toString : function() {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         }
+    }
+
+    // Supply methods that are not in place
+    Vector4.add = function(out, a, b) {
+        vec4.add(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.set = function(out, x, y, z, w) {
+        vec4.set(out._array, x, y, z, w);
+        out._dirty = true;
+    }
+
+    Vector4.copy = function(out, b) {
+        vec4.copy(out._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.dist = function(a, b) {
+        return vec4.distance(a._array, b._array);
+    }
+
+    Vector4.distance = Vector4.dist;
+
+    Vector4.div = function(out, a, b) {
+        vec4.divide(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.divide = Vector4.div;
+
+    Vector4.dot = function(a, b) {
+        return vec4.dot(a._array, b._array);
+    }
+
+    Vector4.len = function(b) {
+        return vec4.length(b._array);
+    }
+
+    Vector4.length = Vector4.len;
+
+    Vector4.lerp = function(out, a, b, t) {
+        vec4.lerp(out._array, a._array, b._array, t);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.min = function(out, a, b) {
+        vec4.min(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.max = function(out, a, b) {
+        vec4.max(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.mul = function(out, a, b) {
+        vec4.multiply(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.multiply = Vector4.mul;
+
+    Vector4.negate = function(out, a) {
+        vec4.negate(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.normalize = function(out, a) {
+        vec4.normalize(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.random = function(out, scale) {
+        vec4.random(out._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.scale = function(out, a, scale) {
+        vec4.scale(out._array, a._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.scaleAndAdd = function(out, a, b, scale) {
+        vec4.scale(out._array, a._array, b._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.sqrDist = function(a, b) {
+        return vec4.sqrDist(a._array, b._array);
+    }
+
+    Vector4.squaredDistance = Vector4.sqrDist;
+
+    Vector4.sqrLen = function(a) {
+        return vec4.sqrLen(a._array);
+    }
+    Vector4.squaredLength = Vector4.sqrLen;
+
+    Vector4.sub = function(out, a, b) {
+        vec4.subtract(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+    Vector4.subtract = Vector4.sub;
+
+    Vector4.transformMat4 = function(out, a, m) {
+        vec4.transformMat4(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector4.transformQuat = function(out, a, q) {
+        vec4.transformQuat(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
     }
 
     return Vector4;

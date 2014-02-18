@@ -224,9 +224,150 @@ define(function(require) {
         },
     }
 
+    // Supply methods that are not in place
+    Vector2.add = function(out, a, b) {
+        vec2.add(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
 
-    function clamp(x) {
-        return Math.min(Math.max(x, -1), 1);
+    Vector2.set = function(out, x, y) {
+        vec2.set(out._array, x, y);
+        out._dirty = true;
+    }
+
+    Vector2.copy = function(out, b) {
+        vec2.copy(out._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.cross = function(out, a, b) {
+        vec2.cross(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.dist = function(a, b) {
+        return vec2.distance(a._array, b._array);
+    }
+
+    Vector2.distance = Vector2.dist;
+
+    Vector2.div = function(out, a, b) {
+        vec2.divide(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.divide = Vector2.div;
+
+    Vector2.dot = function(a, b) {
+        return vec2.dot(a._array, b._array);
+    }
+
+    Vector2.len = function(b) {
+        return vec2.length(b._array);
+    }
+
+    Vector2.length = Vector2.len;
+
+    Vector2.lerp = function(out, a, b, t) {
+        vec2.lerp(out._array, a._array, b._array, t);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.min = function(out, a, b) {
+        vec2.min(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.max = function(out, a, b) {
+        vec2.max(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.mul = function(out, a, b) {
+        vec2.multiply(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.multiply = Vector2.mul;
+
+    Vector2.negate = function(out, a) {
+        vec2.negate(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.normalize = function(out, a) {
+        vec2.normalize(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.random = function(out, scale) {
+        vec2.random(out._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.scale = function(out, a, scale) {
+        vec2.scale(out._array, a._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.scaleAndAdd = function(out, a, b, scale) {
+        vec2.scale(out._array, a._array, b._array, scale);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.sqrDist = function(a, b) {
+        return vec2.sqrDist(a._array, b._array);
+    }
+
+    Vector2.squaredDistance = Vector2.sqrDist;
+
+    Vector2.sqrLen = function(a) {
+        return vec2.sqrLen(a._array);
+    }
+    Vector2.squaredLength = Vector2.sqrLen;
+
+    Vector2.sub = function(out, a, b) {
+        vec2.subtract(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+    Vector2.subtract = Vector2.sub;
+
+    Vector2.transformMat2 = function(out, a, m) {
+        vec2.transformMat2(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.transformMat2d = function(out, a, m) {
+        vec2.transformMat2d(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.transformMat3 = function(out, a, m) {
+        vec2.transformMat3(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Vector2.transformMat4 = function(out, a, m) {
+        vec2.transformMat4(out._array, a._array, m._array);
+        out._dirty = true;
+        return out;
     }
 
     return Vector2;

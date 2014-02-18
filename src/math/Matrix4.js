@@ -240,5 +240,96 @@ define(function(require) {
     // Object.defineProperty(Matrix4.prototype, 'm32', makeProperty(14));
     // Object.defineProperty(Matrix4.prototype, 'm33', makeProperty(15));
 
+    Matrix4.adjoint = function(out, a) {
+        mat4.adjoint(out._array, a._array);
+        return out;
+    }
+
+    Matrix4.copy = function(out, a) {
+        mat4.copy(out._array, a._array);
+        return out;
+    }
+
+    Matrix4.determinant = function(a) {
+        return mat4.determinant(a._array);
+    }
+
+    Matrix4.identity = function(out) {
+        mat4.identity(out._array);
+        return out;
+    }
+    
+    Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
+        mat4.ortho(out._array, left, right, bottom, top, near, far);
+        return out;
+    }
+
+    Matrix4.perspective = function(out, fovy, aspect, near, far) {
+        mat4.perspective(out._array, fovy, aspect, near, far);
+        return out;
+    }
+
+    Matrix4.lookAt = function(out, eye, center, up) {
+        mat4.lookAt(out._array, eye._array, center._array, up._array);
+        return out;
+    }
+
+    Matrix4.invert = function(out, a) {
+        mat4.invert(out._array, a._array);
+        return out;
+    }
+
+    Matrix4.mul = function(out, a, b) {
+        mat4.mul(out._array, a._array, b._array);
+        return out;
+    }
+
+    Matrix4.multiply = Matrix4.mul;
+
+    Matrix4.fromQuat = function(out, q) {
+        mat4.fromQuat(out._array, q._array);
+        return out;
+    }
+
+    Matrix4.fromRotationTranslation = function(out, q, v) {
+        mat4.fromRotationTranslation(out._array, q._array, v._array);
+        return out;
+    }
+
+    Matrix4.rotate = function(out, a, rad, axis) {
+        mat4.rotate(out._array, a._array, rad, axis._array);
+        return out;
+    }
+
+    Matrix4.rotateX = function(out, a, rad) {
+        mat4.rotateX(out._array, a._array, rad);
+        return out;
+    }
+
+    Matrix4.rotateY = function(out, a, rad) {
+        mat4.rotateY(out._array, a._array, rad);
+        return out;
+    }
+
+    Matrix4.rotateZ = function(out, a, rad) {
+        mat4.rotateZ(out._array, a._array, rad);
+        return out;
+    }
+
+    Matrix4.scale = function(out, a, v) {
+        mat4.scale(out._array, a._array, v._array);
+        return out;
+    }
+
+    Matrix4.transpose = function(out, a) {
+        mat4.transpose(out._array, a._array);
+        return out;
+    }
+
+    Matrix4.translate = function(out, a, v) {
+        mat4.translate(out._array, a._array, v._array);
+        return out;
+    }
+
     return Matrix4;
 })

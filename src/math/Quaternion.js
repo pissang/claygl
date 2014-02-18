@@ -124,7 +124,7 @@ define(function(require) {
             var m3 = mat3.create();
             return function(m) {
                 mat3.fromMat4(m3, m._array);
-                // Not like mat4, mat3 in glmatrix seems to be row-based
+                // TODO Not like mat4, mat3 in glmatrix seems to be row-based
                 mat3.transpose(m3, m3);
                 quat.fromMat3(this._array, m3);
                 this._dirty = true;
@@ -212,7 +212,13 @@ define(function(require) {
             return this;
         },
 
-        setAxisAngle : function(axis /*Vector3*/, rad) {
+        setAxes : function(view, right, up) {
+            quat.setAxes(this._array, view._array, right._array, up._array);
+            this._dirty = true;
+            return this;
+        },
+
+        setAxisAngle : function(axis, rad) {
             quat.setAxisAngle(this._array, axis._array, rad);
             this._dirty = true;
             return this;
@@ -241,6 +247,132 @@ define(function(require) {
         toString : function() {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";
         }
+    }
+
+    // Supply methods that are not in place
+    Quaternion.add = function(out, a, b) {
+        quat.add(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.set = function(out, x, y, z, w) {
+        quat.set(out._array, x, y, z, w);
+        out._dirty = true;
+    }
+
+    Quaternion.copy = function(out, b) {
+        quat.copy(out._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.calculateW = function(out, a) {
+        quat.calculateW(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.conjugate = function(out, a) {
+        quat.conjugate(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.identity = function(out) {
+        quat.identity(out._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.invert = function(out, a) {
+        quat.invert(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.dot = function(a, b) {
+        return quat.dot(a._array, b._array);
+    }
+
+    Quaternion.len = function(b) {
+        return quat.length(b._array);
+    }
+
+    Quaternion.length = Quaternion.len;
+
+    Quaternion.lerp = function(out, a, b, t) {
+        quat.lerp(out._array, a._array, b._array, t);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.slerp = function(out, a, b, t) {
+        quat.slerp(out._array, a._array, b._array, t);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.mul = function(out, a, b) {
+        quat.multiply(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.multiply = Quaternion.mul;
+
+    Quaternion.rotateX = function(out, a, rad) {
+        quat.rotateX(out._array, a._array, rad);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.rotateY = function(out, a, rad) {
+        quat.rotateY(out._array, a._array, rad);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.rotateZ = function(out, a, rad) {
+        quat.rotateZ(out._array, a._array, rad);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.setAxisAngle = function(out, axis, rad) {
+        quat.setAxisAngle(out._array, axis._array, rad);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.normalize = function(out, a) {
+        quat.normalize(out._array, a._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.sqrLen = function(a) {
+        return quat.sqrLen(a._array);
+    }
+
+    Quaternion.squaredLength = Quaternion.sqrLen;
+
+    Quaternion.fromMat3 = function(out, m) {
+        quat.fromMat3(out._array, m._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.setAxes = function(out, view, right, up) {
+        quat.setAxes(out._array, view._array, right._array, up._array);
+        out._dirty = true;
+        return out;
+    }
+
+    Quaternion.rotationTo = function(out, a, b) {
+        quat.rotationTo(out._array, a._array, b._array);
+        out._dirty = true;
+        return out;
     }
 
     return Quaternion;

@@ -76,5 +76,51 @@ define(function(require) {
         }
     }
 
+    Matrix2d.adjoint = function(out, a) {
+        mat2d.adjoint(out._array, a._array);
+        return out;
+    }
+
+    Matrix2d.copy = function(out, a) {
+        mat2d.copy(out._array, a._array);
+        return out;
+    }
+
+    Matrix2d.determinant = function(a) {
+        return mat2d.determinant(a._array);
+    }
+
+    Matrix2d.identity = function(out) {
+        mat2d.identity(out._array);
+        return out;
+    }
+
+    Matrix2d.invert = function(out, a) {
+        mat2d.invert(out._array, a._array);
+        return out;
+    }
+
+    Matrix2d.mul = function(out, a, b) {
+        mat2d.mul(out._array, a._array, b._array);
+        return out;
+    }
+
+    Matrix2d.multiply = Matrix2d.mul;
+
+    Matrix2d.rotate = function(out, a, rad) {
+        mat2d.rotate(out._array, a._array, rad);
+        return out;
+    }
+
+    Matrix2d.scale = function(out, a, v) {
+        mat2d.scale(out._array, a._array, v._array);
+        return out;
+    }
+
+    Matrix2d.translate = function(out, a, v) {
+        mat2d.translate(out._array, a._array, v._array);
+        return out;
+    }
+
     return Matrix2d;
 })
