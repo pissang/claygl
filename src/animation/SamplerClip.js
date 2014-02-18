@@ -236,6 +236,8 @@ define(function(require) {
 
     SamplerClip.prototype.blend1D = TransformClip.prototype.blend1D;
     SamplerClip.prototype.blend2D = TransformClip.prototype.blend2D;
+    SamplerClip.prototype.additiveBlend = TransformClip.prototype.additiveBlend;
+    SamplerClip.prototype.subtractiveBlend = TransformClip.prototype.subtractiveBlend;
 
     return SamplerClip;
 });

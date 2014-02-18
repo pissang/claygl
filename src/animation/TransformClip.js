@@ -168,8 +168,22 @@ define(function(require) {
         }
     })(),
 
+    TransformClip.prototype.additiveBlend = function(c1, c2) {
+        vec3.add(this.position, c1.position, c2.position);
+        vec3.add(this.scale, c1.scale, c2.scale);
+        quat.multiply(this.rotation, c2.rotation, c1.rotation);
+    }
+
+    TransformClip.prototype.subtractiveBlend = function(c1, c2) {
+        vec3.sub(this.position, c1.position, c2.position);
+        vec3.sub(this.scale, c1.scale, c2.scale);
+        quat.invert(this.rotation, c2.rotation);
+        quat.multiply(this.rotation, this.rotation, c1.rotation);
+    }
+
     TransformClip.prototype.getSubClip = function(startTime, endTime) {
         // TODO
+        console.warn('TODO');
     }
 
     return TransformClip;

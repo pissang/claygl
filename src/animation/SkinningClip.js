@@ -92,6 +92,26 @@ define(function(require) {
         }
     }
 
+    SkinningClip.prototype.additiveBlend = function(clip1, clip2) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var c1 = clip1.jointClips[i];
+            var c2 = clip2.jointClips[i];
+            var tClip = this.jointClips[i];
+
+            tClip.additiveBlend(c1, c2);
+        }
+    }
+
+    SkinningClip.prototype.subtractiveBlend = function(clip1, clip2) {
+        for (var i = 0; i < this.jointClips.length; i++) {
+            var c1 = clip1.jointClips[i];
+            var c2 = clip2.jointClips[i];
+            var tClip = this.jointClips[i];
+
+            tClip.subtractiveBlend(c1, c2);
+        }
+    }
+
     SkinningClip.prototype.blend2D = function(clip1, clip2, clip3, f, g) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var c1 = clip1.jointClips[i];
