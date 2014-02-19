@@ -313,7 +313,7 @@ define(function(require) {
         return vec3.length(b._array);
     }
 
-    Vector3.length = Vector3.len;
+    // Vector3.length = Vector3.len;
 
     Vector3.lerp = function(out, a, b, t) {
         vec3.lerp(out._array, a._array, b._array, t);

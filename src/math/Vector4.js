@@ -274,7 +274,7 @@ define( function(require) {
         return vec4.length(b._array);
     }
 
-    Vector4.length = Vector4.len;
+    // Vector4.length = Vector4.len;
 
     Vector4.lerp = function(out, a, b, t) {
         vec4.lerp(out._array, a._array, b._array, t);

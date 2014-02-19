@@ -299,7 +299,7 @@ define(function(require) {
         return quat.length(b._array);
     }
 
-    Quaternion.length = Quaternion.len;
+    // Quaternion.length = Quaternion.len;
 
     Quaternion.lerp = function(out, a, b, t) {
         quat.lerp(out._array, a._array, b._array, t);

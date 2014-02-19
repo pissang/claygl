@@ -4,8 +4,9 @@ define(function(require) {
 
     var Node = require('../Node');
     var Vector3 = require('../math/Vector3');
+    var glenum = require("../core/glenum");
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var Mesh = require('../Mesh');
     var Material = require('../Material');
     var Shader = require('../Shader');
@@ -24,11 +25,15 @@ define(function(require) {
         geometry : null,
         material : null,
 
-        mode : Mesh.POINTS
+        mode : Mesh.POINTS,
+
+        _elapsedTime : 0
 
     }, function(){
 
-        this.geometry = new DynamicGeometry();
+        this.geometry = new StaticGeometry({
+            hint : glenum.DYNAMIC_DRAW
+        });
 
         var particleShader = new Shader({
             vertex : Shader.source('buildin.particle.vertex'),
@@ -56,6 +61,15 @@ define(function(require) {
 
         visible : true,
 
+        culling : false,
+        cullFace : glenum.BACK,
+        frontFace : glenum.CCW,
+
+        frustumCulling : false,
+
+        castShadow : false,
+        receiveShadow : false,
+
         isRenderable : function() {
             return this.visible;
         },
@@ -77,8 +91,11 @@ define(function(require) {
         },
 
         updateParticles : function(deltaTime) {
+
             // MS => Seconds
             deltaTime /= 1000;
+            this._elapsedTime += deltaTime;
+
             var particles = this._particles;
 
             for (var i = 0; i < this._emitters.length; i++) {
@@ -112,30 +129,47 @@ define(function(require) {
             }
         },
 
-        render : function(_gl) {
+        _updateVertices : function() {
             var particles = this._particles;
             var geometry = this.geometry;
             var positions = geometry.attributes.position.value;
             // Put particle status in normal
             var normals = geometry.attributes.normal.value;
             var len = this._particles.length;
+            if (!positions || positions.length !== len * 3) {
+                positions = geometry.attributes.position.value = new Float32Array(len * 3);
+                normals = geometry.attributes.normal.value = new Float32Array(len * 3);
+            }
             for (var i = 0; i < len; i++) {
                 var particle = this._particles[i];
-                positions[i] = particle.position._array;
-                if (!normals[i]) {
-                    normals[i] = [];
+                var offset = i * 3;
+                for (var j = 0; j < 3; j++) {
+                    positions[offset + j] = particle.position._array[j];
+                    normals[offset] = particle.age / particle.life;
+                    normals[offset + 1] = particle.rotation;
+                    normals[offset + 2] = particle.spriteSize;
                 }
-                normals[i][0] = particle.age / particle.life;
-                normals[i][1] = particle.rotation;
-                normals[i][2] = particle.spriteSize;
             }
-            positions.length = len;
-            normals.length = len;
 
             geometry.dirty('position');
             geometry.dirty('normal');
-            
+        },
+
+        render : function(_gl) {
+            this._updateVertices();
             return Mesh.prototype.render.call(this, _gl);
+        },
+
+        isFinished : function() {
+            return this._elapsedTime > this.duration && !this.loop;
+        },
+
+        dispose : function() {
+            // Put all the particles back
+            for (var i = 0; i < this._particles.length; i++) {
+                var p = this._particles[i];
+                p.emitter.kill(p);
+            }
         }
     });
 

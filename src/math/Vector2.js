@@ -270,7 +270,7 @@ define(function(require) {
         return vec2.length(b._array);
     }
 
-    Vector2.length = Vector2.len;
+    // Vector2.length = Vector2.len;
 
     Vector2.lerp = function(out, a, b, t) {
         vec2.lerp(out._array, a._array, b._array, t);

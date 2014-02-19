@@ -55,7 +55,7 @@ define(function(require) {
         },
         
         isUseFace : function() {
-            return this.useFace && this.faces.length;
+            return this.useFace && this.faces;
         },
 
         isStatic : function() {
@@ -148,9 +148,9 @@ define(function(require) {
             if (! indicesBuffer && this.isUseFace()) {
                 indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer(), this.faces.length);
                 chunk.indicesBuffer = indicesBuffer;
+                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.faces, this.hint);
             }
-            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-            _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.faces, this.hint);
         },
 
         generateVertexNormals : function() {
