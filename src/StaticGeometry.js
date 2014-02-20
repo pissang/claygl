@@ -111,6 +111,7 @@ define(function(require) {
 
             var attributes = this.getEnabledAttributes();
             var prevSearchIdx = 0;
+            var count = 0;
             for (var name in attributes) {
                 var attribute = attributes[name];
                 if (!attribute.value) {
@@ -143,8 +144,10 @@ define(function(require) {
                 _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                 _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
 
-                attributeBuffers.push(new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic));
+                attributeBuffers[count++] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
             }
+            attributeBuffers.length = count;
+
             if (! indicesBuffer && this.isUseFace()) {
                 indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer(), this.faces.length);
                 chunk.indicesBuffer = indicesBuffer;

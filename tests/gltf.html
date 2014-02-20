@@ -56,7 +56,7 @@
                 light.shadowResolution = 512;
 
                 var suzanne = scene.getNode('Suzanne');
-                var suzanneMaterial = qtek.Material.getMaterial('Mirror');
+                var suzanneMaterial = suzanne.material;
                 environmentMapPass.position.copy(suzanne.position);
                 suzanneMaterial.shader = suzanneMaterial.shader.clone();
                 suzanneMaterial.shader.enableTexture('environmentMap');

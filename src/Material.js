@@ -8,8 +8,6 @@ define(function(require) {
     var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
 
-    _repository = [];
-
     var nameId = 0;
 
     var Material = Base.derive({
@@ -49,10 +47,6 @@ define(function(require) {
         if (this.shader) {
             this.attachShader(this.shader);
         }
-
-        // Registory to repository
-        _repository.push(this);
-
     }, {
 
         bind : function(_gl) {
@@ -205,17 +199,9 @@ define(function(require) {
         },
 
         dispose : function() {
-            _repository.splice(_repository.indexOf(this), 1);
+            //TODO
         }
     });
-
-    Material.getMaterial = function(name) {
-        for (var i = 0; i < _repository.length; i++) {
-            if (_repository[i].name === name) {
-                return _repository[i];
-            }
-        }
-    }
 
     return Material;
 })

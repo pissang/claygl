@@ -260,6 +260,7 @@ define(function(require) {
         },
 
         clone : function() {
+            // TODO Name
             var node = new this.constructor();
             node.position.copy(this.position);
             node.rotation.copy(this.rotation);

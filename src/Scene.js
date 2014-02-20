@@ -47,7 +47,7 @@ define(function(require){
 
         removeFromScene : function(node) {
             if (node.name) {
-                this._nodeRepository[node.name] = null;
+                delete this._nodeRepository[node.name];
             }
         },
 

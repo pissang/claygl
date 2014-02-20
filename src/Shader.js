@@ -165,7 +165,6 @@ define(function(require) {
             this.dirty();
         },
         bind : function(_gl) {
-
             this.cache.use(_gl.__GLID__, getCacheSchema);
 
             this._currentLocationsMap = this.cache.get('locations');
@@ -180,7 +179,7 @@ define(function(require) {
         },
 
         dirty : function() {
-            this.cache.dirty();
+            this.cache.dirtyAll();
             for (var i = 0; i < this.cache._caches.length; i++) {
                 if (this.cache._caches[i]) {
                     var context = this.cache._caches[i];
@@ -212,7 +211,7 @@ define(function(require) {
         },
 
         define : function(type, key, val) {
-            val = val || null;
+            val = val !== undefined ? val : null;
             if (type == 'vertex' || type == 'both') {
                 if (this.vertexDefines[key] !== val) {
                     this.vertexDefines[key] = val;
@@ -223,30 +222,28 @@ define(function(require) {
             if (type == 'fragment' || type == 'both') {
                 if (this.fragmentDefines[key] !== val) {
                     this.fragmentDefines[key] = val;
-                    // Mark as dirty
-                    this.dirty();
+                    if (type !== 'both') {
+                        this.dirty();
+                    }
                 }
             }
         },
 
         unDefine : function(type, key) {
-            switch(type) {
-                case "vertex":
-                    if (this.isDefined('vertex', key)) {
-                        delete this.vertexDefines[key];
-                        // Mark as dirty
+            if (type == 'vertex' || type == 'both') {
+                if (this.isDefined('vertex', key)) {
+                    delete this.vertexDefines[key];
+                    // Mark as dirty
+                    this.dirty();
+                }
+            }
+            if (type == 'fragment' || type == 'both') {
+                if (this.isDefined('fragment', key)) {
+                    delete this.fragmentDefines[key];
+                    if (type !== 'both') {
                         this.dirty();
                     }
-                    break;
-                case "fragment":
-                    if (this.isDefined('fragment', key)) {
-                        delete this.fragmentDefines[key];
-                        // Mark as dirty
-                        this.dirty();
-                    }
-                    break;
-                default:
-                    throw new Error("Undefine type must be vertex or fragment");
+                }
             }
         },
 
@@ -272,10 +269,7 @@ define(function(require) {
             var status = this._textureStatus[symbol];
             if (status) {
                 var isEnabled = status.enabled;
-                if (isEnabled) {
-                    // Do nothing
-                    return;
-                }else{
+                if (!isEnabled) {
                     status.enabled = true;
                     this.dirty();
                 }
@@ -294,12 +288,8 @@ define(function(require) {
             var status = this._textureStatus[symbol];
             if (status) {
                 var isDisabled = ! status.enabled;
-                if (isDisabled) {
-                    // Do nothing
-                    return;
-                }else{
+                if (!isDisabled) {
                     status.enabled = false;
-
                     this.dirty();
                 }
             }
@@ -319,11 +309,7 @@ define(function(require) {
 
         hasUniform : function(symbol) {
             var location = this._currentLocationsMap[symbol];
-            if (location === null || location === undefined) {
-                return false;
-            } else {
-                return true;
-            }
+            return location !== null && location !== undefined;
         },
 
         setUniform : function(_gl, type, symbol, value) {

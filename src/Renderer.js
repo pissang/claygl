@@ -483,7 +483,6 @@ define(function(require) {
                         }
                     }
                 }
-                mat.dispose();
             }
             root._children = [];
         },
