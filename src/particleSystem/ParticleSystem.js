@@ -187,9 +187,9 @@ define(function(require) {
                     var v = Math.floor(stage * invAnimTileX);
                     var u = stage - v * animTileX;
                     uvs[offset2] = u / animTileX;
-                    uvs[offset2 + 1] = v / animTileY;
+                    uvs[offset2 + 1] = 1 - v / animTileY;
                     uvs2[offset2] = (u + 1) / animTileX;
-                    uvs2[offset2 + 1] = (v + 1) / animTileY;
+                    uvs2[offset2 + 1] = 1 - (v + 1) / animTileY;
                 }
             }
 
@@ -243,6 +243,8 @@ define(function(require) {
             return particleSystem;
         }
     });
+
+    
 
     return ParticleSystem;
 });

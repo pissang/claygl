@@ -19,60 +19,58 @@ define(function(require) {
         velocity : null,
         angularVelocity : null,
         spriteSize : null,
-        weight : null
+        weight : null,
+
+        _particlePool : null
         
     }, function() {
         
         this._particlePool = [];
 
+        // TODO Reduce heap memory
         for (var i = 0; i < this.max; i++) {
             var particle = new Particle();
             particle.emitter = this;
             this._particlePool.push(particle);
-        }
-        
-        if (!this.life) {
-            this.life = Value.constant(1);
-        }
-        if (!this.position) {
-            this.position = Value.vector(new Vector3());
-        }
-        if (!this.rotation) {
-            this.rotation = Value.constant(0);
-        }
-        if (!this.velocity) {
-            this.velocity = Value.vector(new Vector3());
-        }
-        if (!this.angularVelocity) {
-            this.angularVelocity = Value.constant(0);
-        }
-        if (!this.spriteSize) {
-            this.spriteSize = Value.constant(1);
-        }
-        if (!this.weight) {
-            this.weight = Value.constant(1);
+
+            if (this.velocity) {
+                particle.velocity = new Vector3();
+            }
+            if (this.angularVelocity) {
+                particle.angularVelocity = new Vector3();
+            }
         }
 
     }, {
 
         emit : function(out) {
-            var amount;
-            if (this._particlePool.length > this.amount) {
-                amount = this.amount;
-            } else {
-                amount = this._particlePool.length;
-            }
+            var amount = Math.min(this._particlePool.length, this.amount);
+
             var particle;
             for (var i = 0; i < amount; i++) {
                 particle = this._particlePool.pop();
                 // Initialize particle status
-                this.position.get(particle.position);
-                particle.rotation = this.rotation.get();
-                this.velocity.get(particle.velocity);
-                particle.angularVelocity = this.angularVelocity.get();
-                particle.life = this.life.get();
-                particle.spriteSize = this.spriteSize.get();
-                particle.weight = this.weight.get();
+                if (this.position) {
+                    this.position.get(particle.position);
+                }
+                if (this.rotation) {
+                    this.rotation.get(particle.rotation);
+                }
+                if (this.velocity) {
+                    this.velocity.get(particle.velocity);
+                }
+                if (this.angularVelocity) {
+                    this.angularVelocity.get(particle.angularVelocity);
+                }
+                if (this.life) {
+                    particle.life = this.life.get();
+                }
+                if (this.spriteSize) {
+                    particle.spriteSize = this.spriteSize.get();
+                }
+                if (this.weight) {
+                    particle.weight = this.weight.get();
+                }
                 particle.age = 0;
 
                 out.push(particle);

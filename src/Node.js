@@ -75,7 +75,7 @@ define(function(require) {
             node.parent = this;
             this._children.push(node);
 
-            if (this.scene !== node.scene) {
+            if (this.scene && this.scene !== node.scene) {
                 node.traverse(this._addSelfToScene, this);
             }
         },

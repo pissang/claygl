@@ -8,13 +8,14 @@ define(function(require) {
         
         this.position = new Vector3();
 
-        this.rotation = 0;
+        // Use euler angle to represent rotation
+        this.rotation = new Vector3();
 
-        this.velocity = new Vector3();
+        this.velocity = null;
 
-        this.angularVelocity = 0;
+        this.angularVelocity = null;
 
-        this.life = 0;
+        this.life = 1;
 
         this.age = 0;
 
@@ -26,8 +27,12 @@ define(function(require) {
     }
 
     Particle.prototype.update = function(deltaTime) {
-        vec3.scaleAndAdd(this.position._array, this.position._array, this.velocity._array, deltaTime);
-        this.rotation += this.angularVelocity;
+        if (this.velocity) {
+            vec3.scaleAndAdd(this.position._array, this.position._array, this.velocity._array, deltaTime);
+        }
+        if (this.angularVelocity) {
+            vec3.scaleAndAdd(this.rotation._array, this.rotation._array, this.angularVelocity._array, deltaTime);
+        }
     }
 
     return Particle;

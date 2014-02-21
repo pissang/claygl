@@ -23,6 +23,7 @@ void main() {
     vec4 worldViewPosition = worldView * vec4(position, 1.0);
     gl_Position = projection * worldViewPosition;
     float w = gl_Position.w;
+    // TODO
     gl_PointSize = normal.z * projection[0].x / w;
 
     #ifdef UV_ANIMATION
