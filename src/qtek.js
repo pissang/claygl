@@ -82,7 +82,6 @@ define( function(require){
 		"Base": require('qtek/core/Base'),
 		"Cache": require('qtek/core/Cache'),
 		"Event": require('qtek/core/Event'),
-		"color": require('qtek/core/color'),
 		"glenum": require('qtek/core/glenum'),
 		"glinfo": require('qtek/core/glinfo'),
 		"mixin": {

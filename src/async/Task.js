@@ -4,13 +4,30 @@ define(function(require) {
     var request = require('../core/request');
     var util  = require('../core/util');
     
-    var Task = function() {}
+    var Task = function() {
+        this._fullfilled = false;
+        this._rejected = false;
+    }
     Task.prototype.resolve = function(data) {
+        this._fullfilled = true;
+        this._rejected = false;
         this.trigger('success', data);
     }
     Task.prototype.reject = function(err) {
+        this._rejected = true;
+        this._fullfilled = false;
         this.trigger('error', err);
     }
+    Task.prototype.isFullfilled = function() {
+        return this._fullfilled;
+    }
+    Task.prototype.isRejected = function() {
+        return this._rejected;
+    }
+    Task.prototype.isSettled = function() {
+        return this._fullfilled || this._rejected;
+    }
+    
     util.extend(Task.prototype, notifier);
 
     function makeRequestTask(url, responseType) {
@@ -28,7 +45,7 @@ define(function(require) {
         return task;
     };
 
-    Task.makeRequestTasks = function(url, responseType) {
+    Task.makeRequestTask = function(url, responseType) {
         var self = this;
         if (typeof url === 'string') {
             return makeRequestTask(url, responseType);

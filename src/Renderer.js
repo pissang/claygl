@@ -456,6 +456,7 @@ define(function(require) {
         disposeNode : function(root) {
             var materials = {};
             var _gl = this.gl;
+
             root.traverse(function(node) {
                 if (node.geometry) {
                     node.geometry.dispose(_gl);
@@ -487,10 +488,20 @@ define(function(require) {
             root._children = [];
         },
 
+        disposeShader : function(shader) {
+            shader.dispose(this.gl);
+        },
+
+        disposeGeometry : function(geometry) {
+            geometry.dispose(this.gl);
+        },
+
         disposeTexture : function(texture) {
-            if (texture && texture.dispose) {
-                texture.dispose(this.gl);
-            }
+            texture.dispose(this.gl);
+        },
+
+        disposeFrameBuffer : function(frameBuffer) {
+            frameBuffer.dispose(this.gl);
         },
 
         screenToNdc : function(x, y, out) {

@@ -6,14 +6,18 @@ define(function(require) {
     var texturePool = require("./texturePool");
     var glinfo = require('../core/glinfo');
 
-    var SceneNode = Node.derive(function() {
-        return {
-            name : 'scene',
-            scene : null,
-            camera : null,
-            autoUpdateScene : true,
-            preZ : false
-        }
+    var SceneNode = Node.derive({
+            
+        name : 'scene',
+        
+        scene : null,
+        
+        camera : null,
+        
+        autoUpdateScene : true,
+
+        preZ : false
+        
     }, function() {
         if (this.frameBuffer) {
             this.frameBuffer.depthBuffer = true;

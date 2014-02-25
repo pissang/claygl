@@ -75,7 +75,6 @@ void main()
 
     fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));
     gl_FragColor.rgb = vec3(fAdaptedLum);
-    // gl_FragColor.rgb = vec3(fCurrentLum);
     gl_FragColor.a = 1.0;
 }
 @end
