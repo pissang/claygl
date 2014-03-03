@@ -108,6 +108,7 @@ define(function (require) {
             var pixel = new Uint8Array(4);
             var _gl = renderer.gl;
             // TODO out of bounds ?
+            // preserveDrawingBuffer ?
             _gl.readPixels(x, y, 1, 1, _gl.RGBA, _gl.UNSIGNED_BYTE, pixel);
             this._frameBuffer.unbind(renderer);
             // Skip interpolated pixel because of anti alias

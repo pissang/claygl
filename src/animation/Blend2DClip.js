@@ -100,7 +100,6 @@ define(function(require) {
         this.output.blend2D(c1, c2, c3, a, b);
     }
 
-    // Find the key where position in range [inputs[key].position, inputs[key+1].position)
     Blend2DClip.prototype._findTriangle = function(position) {
         if (this._cacheTriangle) {
             var res = delaunay.contains(this._cacheTriangle.vertices, position._array);

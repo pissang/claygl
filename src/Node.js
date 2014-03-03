@@ -145,11 +145,13 @@ define(function(require) {
         },
 
         // pre-order traverse
-        traverse : function(callback, parent) {
+        traverse : function(callback, parent, ctor) {
             
             this._inIterating = true;
 
-            var stopTraverse = callback(this, parent);
+            if (ctor === undefined || this.constructor === ctor) {
+                var stopTraverse = callback(this, parent);
+            }
             if(!stopTraverse) {
                 var _children = this._children;
                 for(var i = 0, len = _children.length; i < len; i++) {

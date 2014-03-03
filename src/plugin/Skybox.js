@@ -47,6 +47,10 @@ define(function(require) {
         
         detachScene : function(scene) {
             scene.off("beforerender", this._beforeRenderScene, this);  
+        },
+
+        dispose : function(_gl) {
+            this.detachScene(this.scene);
         }
     });
 

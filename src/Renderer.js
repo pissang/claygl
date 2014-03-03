@@ -464,6 +464,9 @@ define(function(require) {
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
                 }
+                if (node.dispose) {
+                    node.dispose(_gl);
+                }
             });
             for (var guid in materials) {
                 var mat = materials[guid];
@@ -541,7 +544,7 @@ define(function(require) {
             }
             return x.material.shader.__GUID__ - y.material.shader.__GUID__;
         }
-        // Depth is negative because of right hand coord
+        // Depth is negative
         // So farther object has smaller depth value
         return x.__depth - y.__depth
     }
