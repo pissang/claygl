@@ -56,13 +56,13 @@ Have been updated to the latest glTF specification
 [DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 <a href="http://efe.baidu.com/webgl/dota2hero/#/heroes" target="_blank">
-<img src="http://d.pcs.baidu.com/thumbnail/3a0aedddb41715fc387b7f92491200ec?fid=2215764494-250528-649074891821195&time=1393829350&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-S2JeeOmjrDbrAA%2BsCgKLXpzbiZw%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMSi9urWA6/WDVOZJjW161c97pPFvBnDjJvo8Gcuo6pQpogOJnfqRidH27k9J0e2dzkmye5j3Whl2AAcnn80Hb97vFxQMiFwgORaeYyj8G4F48GIoCsFhKea/WLh/GJ5KldnT0FmIWjcIaLoOA1zPVLTxisYh+duuFB32F+3CHRP8VcUWDxuyGTBer3i6fMyABlH+b80j2kE0Vb67k+tHpLD3ZFiFsVu6BA==&r=396634700&size=c850_u580&quality=100" width="500px"></img>
+<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500px"></img>
 </a>
 
 [Bootcamp](https://github.com/pissang/qtek-bootcamp/)
 
 <a href="http://efe.baidu.com/webgl/bootcamp/" target="_blank">
-<img src="http://d.pcs.baidu.com/thumbnail/56c0ffd61c895290381c95c2cafba5cf?fid=2215764494-250528-1110279864986968&time=1393829018&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-98KtcMi4zLXtmvU6%2BqqTITLj4Vg%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMSi9urWA6/WDVOZJjW161c97pPFvBnDjJvo8Gcuo6pQpogOJnfqRidH27k9J0e2dzkmye5j3Whl2AAcnn80Hb97vFxQMiFwgORaeYyj8G4F48GIoCsFhKea/WLh/GJ5KldnT0FmIWjcIaLoOA1zPVLTxisYh+duuFB32F+3CHRP8VcUWDxuyGTBer3i6fMyABlH+b80j2kE0Vb67k+tHpLDWmYV+mZa0eA==&r=354985134&size=c850_u580&quality=100" width="500px"></img>
+<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
 </a>
 
 ####Other Examples

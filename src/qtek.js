@@ -1,38 +1,6 @@
 define( function(require){
 	
 	var exportsObject =  {
-	"2d": {
-		"Camera": require('qtek/2d/Camera'),
-		"CanvasRenderer": require('qtek/2d/CanvasRenderer'),
-		"Gradient": require('qtek/2d/Gradient'),
-		"LinearGradient": require('qtek/2d/LinearGradient'),
-		"Node": require('qtek/2d/Node'),
-		"Pattern": require('qtek/2d/Pattern'),
-		"RadialGradient": require('qtek/2d/RadialGradient'),
-		"Scene": require('qtek/2d/Scene'),
-		"Style": require('qtek/2d/Style'),
-		"picking": {
-			"Box": require('qtek/2d/picking/Box'),
-			"Pixel": require('qtek/2d/picking/Pixel')
-		},
-		"shape": {
-			"Arc": require('qtek/2d/shape/Arc'),
-			"Circle": require('qtek/2d/shape/Circle'),
-			"Ellipse": require('qtek/2d/shape/Ellipse'),
-			"HTML": require('qtek/2d/shape/HTML'),
-			"Image": require('qtek/2d/shape/Image'),
-			"Line": require('qtek/2d/shape/Line'),
-			"Path": require('qtek/2d/shape/Path'),
-			"Polygon": require('qtek/2d/shape/Polygon'),
-			"Rectangle": require('qtek/2d/shape/Rectangle'),
-			"RoundedRectangle": require('qtek/2d/shape/RoundedRectangle'),
-			"SVGPath": require('qtek/2d/shape/SVGPath'),
-			"Sector": require('qtek/2d/shape/Sector'),
-			"Text": require('qtek/2d/shape/Text'),
-			"TextBox": require('qtek/2d/shape/TextBox')
-		},
-		"util": require('qtek/2d/util')
-	},
 	"Camera": require('qtek/Camera'),
 	"DynamicGeometry": require('qtek/DynamicGeometry'),
 	"FrameBuffer": require('qtek/FrameBuffer'),
@@ -108,7 +76,6 @@ define( function(require){
 	"loader": {
 		"FX": require('qtek/loader/FX'),
 		"GLTF": require('qtek/loader/GLTF'),
-		"SVG": require('qtek/loader/SVG'),
 		"three": {
 			"Model": require('qtek/loader/three/Model')
 		}

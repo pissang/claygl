@@ -9,10 +9,6 @@ define(function(require) {
     var Renderer3D = require('./Renderer');
     var Camera3D = require('./camera/Perspective');
     
-    var Scene2D = require('./2d/Scene');
-    var Renderer2D = require('./2d/CanvasRenderer');
-    var Camera2D = require('./2d/Camera');
-
     var Stage = Base.derive(function() {
         return {
             container : null,
@@ -61,26 +57,6 @@ define(function(require) {
             this.trigger('frame', frameTime);
         }, this);
     }, {
-
-        /**
-         * Create a new 2d layer
-         * @param {qtek.2d.Renderer} [renderer]
-         * @param {qtek.2d.Scene} [scene]
-         * @param {qtek.2d.Camera} [camera]
-         * @return {qtek.Layer}
-         */
-        createLayer2D : function(options) {
-            options = options || {};
-            options.renderer = options.renderer || new Renderer2D();
-            options.camera = options.camera || new Camera2D();
-            options.scene = options.scene || new Scene2D();
-
-            var layer = new Layer(options);
-            this.addLayer(layer);
-
-            return layer;
-        },
-
         /**
          * Create a new 3d layer
          * @param {qtek.3d.Renderer} [renderer]
