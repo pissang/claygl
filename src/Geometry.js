@@ -52,19 +52,17 @@ define(function(require) {
         console.warn('Geometry doesn\'t implement this method, use DynamicGeometry or StaticGeometry instead');
     }
 
-    var Geometry = Base.derive(function() {
-        return {     
-            boundingBox : null,
-            
-            attributes : {},
+    var Geometry = Base.derive({
+        boundingBox : null,
+        
+        attributes : null,
 
-            faces : null,
+        faces : null,
 
-            useFace : true,
+        useFace : true,
 
-            //Max Value of Uint16, i.e. 0xffff
-            chunkSize : 65535,
-        }
+        //Max Value of Uint16, i.e. 0xffff
+        chunkSize : 65535,
     }, function() {
         // Use cache
         this.cache = new Cache();

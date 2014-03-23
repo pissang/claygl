@@ -150,13 +150,11 @@ define(function(require) {
             this._inIterating = true;
 
             if (ctor === undefined || this.constructor === ctor) {
-                var stopTraverse = callback(this, parent);
+                callback(this, parent);
             }
-            if(!stopTraverse) {
-                var _children = this._children;
-                for(var i = 0, len = _children.length; i < len; i++) {
-                    _children[i].traverse(callback, this);
-                }
+            var _children = this._children;
+            for(var i = 0, len = _children.length; i < len; i++) {
+                _children[i].traverse(callback, this, ctor);
             }
 
             this._inIterating = false;

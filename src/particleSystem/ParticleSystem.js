@@ -193,14 +193,7 @@ define(function(require) {
                 }
             }
 
-            geometry.dirty('position');
-            geometry.dirty('normal');
-
-            if (hasUvAnimation) {
-                geometry.dirty('texcoord0');
-                geometry.dirty('texcoord1');
-            }
-
+            geometry.dirty();
         },
 
         render : function(_gl) {

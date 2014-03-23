@@ -2,14 +2,7 @@
 
 Qtek is a graphic library for both canvas2d and webgl drawing. It is still an experiment version.
 
-#####Canvas 2D
-+ Scene graph based management of all shapes
-+ Common shapes drawing, rectangle, arc, circle, ellipse, line, path(paper.js), path(svg), polygon, roundedr rectangle, sector, text, textbox, image
-+ Bounding box calculate for curves
-+ Per pixel picking
-+ SVG parser
-
-#####WebGL 
+#####Features 
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
 + Basic primitive geometry procedural generate
@@ -50,6 +43,10 @@ Have been updated to the latest glTF specification
 #####Physics Component
 
 [https://github.com/pissang/qtek-physics](https://github.com/pissang/qtek-physics)
+
+#####2D Component
+
+[https://github.com/pissang/qtek-2d](https://github.com/pissang/qtek-2d)
 
 #####Feature Projects
 

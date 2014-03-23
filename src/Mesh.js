@@ -235,6 +235,10 @@ define(function(require) {
         }
     });
 
+    Mesh.beforeFrame = function() {
+        prevDrawID = 0;
+    }
+
     // Enums
     Mesh.POINTS = glenum.POINTS;
     Mesh.LINES = glenum.LINES;
