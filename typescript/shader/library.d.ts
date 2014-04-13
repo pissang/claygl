@@ -5,13 +5,13 @@ declare module qtek {
 
         interface IShaderLibraryOption {
             textures?: string[];
-            vertexDefines?: object;
-            fragmentDefines?: object;
+            vertexDefines?: Object;
+            fragmentDefines?: Object;
         }
 
         export module library {
 
-            export function get(name: string, string[]): Shader;
+            export function get(name: string, textures: string[]): Shader;
             export function get(name: string, ...args: string[]): Shader;
             export function get(name: string, option: IShaderLibraryOption): Shader;
             export function get(name: string): Shader;

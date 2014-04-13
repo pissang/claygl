@@ -9,7 +9,7 @@ declare module qtek{
                 context: any;
             }
 
-            export interface notifier {
+            export class notifier {
                 
                 trigger(name: string, ...args): void;
 

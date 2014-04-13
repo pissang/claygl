@@ -25,7 +25,7 @@ declare module qtek {
         barycentric: IDynamicGeometryAttribute;
     }
 
-    export class StaticGeometry extends Geometry {
+    export class DynamicGeometry extends Geometry {
 
         attributes: IDefaultDynamicGeometryAttributes;
 

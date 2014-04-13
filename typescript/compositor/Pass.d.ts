@@ -2,7 +2,7 @@
 ///<reference path="../Texture.d.ts" />
 ///<reference path="../Renderer.d.ts" />
 ///<reference path="../FrameBuffer.d.ts" />
-///<reference path="../container.d.ts" />
+///<reference path="../core/container.d.ts" />
 ///<reference path="../core/Base.d.ts" />
 declare module qtek {
 

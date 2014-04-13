@@ -3,8 +3,8 @@
 ///<reference path="animation/SkinningClip.d.ts" />
 declare module qtek {
 
-    ISkeletonClipEntry {
-        clip: Clip;
+    interface ISkeletonClipEntry {
+        clip: animation.SkinningClip;
         maps: number[]
     }
 
@@ -24,7 +24,7 @@ declare module qtek {
 
         update(): void;
 
-        getSubSkinMatrices(meshId: number; joints: number[]): Float32Array;
+        getSubSkinMatrices(meshId: number, joints: number[]): Float32Array;
 
         addClip(clip: animation.SkinningClip, mapRule?: object): number;
 

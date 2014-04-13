@@ -1,5 +1,5 @@
-///<reference path="math/Vector3.d.ts" />
-///<reference path="math/Vector4.d.ts" />
+///<reference path="../math/Vector3.d.ts" />
+///<reference path="../math/Vector4.d.ts" />
 ///<reference path="Emitter.d.ts" />
 declare module qtek {
 

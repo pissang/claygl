@@ -1,7 +1,7 @@
-///<reference path="core/Base.d.ts" />
-///<reference path="math/Value.d.ts" />
-///<reference path="math/Vector3.d.ts" />
-///<reference path="math/Vector2.d.ts" />
+///<reference path="../core/Base.d.ts" />
+///<reference path="../math/Value.d.ts" />
+///<reference path="../math/Vector3.d.ts" />
+///<reference path="../math/Vector2.d.ts" />
 ///<reference path="Particle.d.ts" />
 declare module qtek {
 

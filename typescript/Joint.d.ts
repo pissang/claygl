@@ -2,7 +2,7 @@
 ///<reference path="core/Base.d.ts" />
 declare module qtek {
 
-    export class Joint extends Base{
+    export class Joint extends core.Base{
 
         name: string;
 

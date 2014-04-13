@@ -3,7 +3,7 @@ declare module qtek {
 
     export module texture {
 
-        interface ITextureCubeImages = {
+        interface ITextureCubeImages {
             px: HTMLElement;
             py: HTMLElement;
             pz: HTMLElement;
@@ -12,7 +12,7 @@ declare module qtek {
             nz: HTMLElement;
         }
         
-        interface ITextureCubePixels = {
+        interface ITextureCubePixels {
             px: ArrayBufferView;
             py: ArrayBufferView;
             pz: ArrayBufferView;
@@ -21,7 +21,7 @@ declare module qtek {
             nz: ArrayBufferView;
         }
 
-        interface ITextureCubeImageSrc = {
+        interface ITextureCubeImageSrc {
             px: string;
             py: string;
             pz: string;

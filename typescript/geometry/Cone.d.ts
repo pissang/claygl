@@ -6,7 +6,7 @@ declare module qtek {
         interface IConeGeometryOption extends IGeometryOption {
             topRadius?: number;
             bottomRadius?: number;
-            height??: number;
+            height?: number;
 
             capSegments?: number;
             heightSegements?: number;

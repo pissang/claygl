@@ -61,7 +61,7 @@ declare module qtek {
 
             getParameter(name: string): any;
 
-            setParameters(IDictionary<any>): any;
+            setParameters(obj: IDictionary<any>): any;
 
             setShader(shader: string): void;
 
@@ -69,7 +69,7 @@ declare module qtek {
 
             getOutput(name: string): Texture;
 
-            removeReference(name: string)
+            removeReference(name: string): void;
         }
     }
 }

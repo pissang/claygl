@@ -3,7 +3,7 @@ declare module qtek {
 
     export module camera {
 
-        interface IOrthographicCameraOption: ICameraOption {
+        interface IOrthographicCameraOption extends ICameraOption {
             left?: number;
             right?: number;
             near?: number;

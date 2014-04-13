@@ -56,17 +56,17 @@ declare module qtek {
 
         clear: number;
 
-        alhpa: true;
+        alhpa: boolean;
 
-        depth: true;
+        depth: boolean;
 
-        stencil: false;
+        stencil: boolean;
 
-        antialias: true;
+        antialias: boolean;
 
-        premultipliedAlpha: true;
+        premultipliedAlpha: boolean;
 
-        preserveDrawingBuffer: false;
+        preserveDrawingBuffer: boolean;
 
         gl: WebGLRenderingContext;
 
@@ -107,19 +107,19 @@ declare module qtek {
         screenToNdc(x: number, y: number, out?: math.Vector2): math.Vector2;
 
         // Events
-        on(name: 'beforerender', (renderer: Renderer, scene: Scene, camera: Camera) => void, context?: any);
-        on(name: 'beforerender:opaque', (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
-        on(name: 'beforerender:transparent', (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
-        on(name: 'afterrender:opaque', (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
-        on(name: 'afterrender:transparent', (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
-        on(name: 'afterrender', (renderer: Renderer, scene: Scene, camera: Camera, renderInfo: IRenderInfo) => void, context?: any);
+        on(name: 'beforerender', handler: (renderer: Renderer, scene: Scene, camera: Camera) => void, context?: any);
+        on(name: 'beforerender:opaque', handler: (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
+        on(name: 'beforerender:transparent', handler: (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
+        on(name: 'afterrender:opaque', handler: (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
+        on(name: 'afterrender:transparent', handler: (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
+        on(name: 'afterrender', handler: (renderer: Renderer, scene: Scene, camera: Camera, renderInfo: IRenderInfo) => void, context?: any);
 
-        before(name: 'render', (renderer: Renderer, scene: Scene, camera: Camera) => void, context?: any);
-        before(name: 'render:opaque', (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
-        before(name: 'render:transparent', (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
-        after(name: 'render:opaque', (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
-        after(name: 'render:transparent', (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
-        after(name: 'render', (renderer: Renderer, scene: Scene, camera: Camera, renderInfo: IRenderInfo) => void, context?: any);
+        before(name: 'render', handler: (renderer: Renderer, scene: Scene, camera: Camera) => void, context?: any);
+        before(name: 'render:opaque', handler: (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
+        before(name: 'render:transparent', handler: (renderer: Renderer, queue: IRenderable[]) => void, context?: any);
+        after(name: 'render:opaque', handler: (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
+        after(name: 'render:transparent', handler: (renderer: Renderer, queue: IRenderable[], renderInfo: IRenderInfo) => void, context?: any);
+        after(name: 'render', handler: (renderer: Renderer, scene: Scene, camera: Camera, renderInfo: IRenderInfo) => void, context?: any);
 
         static opaqueSortFunc(x: IRenderable, y: IRenderable): boolean;
 

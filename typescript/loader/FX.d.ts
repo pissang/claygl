@@ -12,7 +12,7 @@ declare module qtek {
 
         export class FX extends core.Base {
 
-            constructor(option?: IFXLoaderOption): void;
+            constructor(option?: IFXLoaderOption);
 
             rootPath: string;
 
@@ -22,10 +22,10 @@ declare module qtek {
 
             load(string: url): void;
 
-            parse(json: object): Compositor;
+            parse(json: object): compositor.Compositor;
 
-            on(name: "success", (compositor: Compositor)=> void, context?: any);
-            success((compositor: Compositor)=> void, context?: any);
+            on(name: "success", handler: (compositor: compositor.Compositor) => void, context?: any);
+            success(handler: (compositor: compositor.Compositor) => void, context?: any);
         }
     }
 }

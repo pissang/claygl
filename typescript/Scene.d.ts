@@ -35,7 +35,7 @@ declare module qtek {
 
         getNode(name: string): Node;
 
-        isShaderLightNumberChanged:(shader: Shader): boolean;
+        isShaderLightNumberChanged(shader: Shader): boolean;
 
         setShaderLightNumber(shader: Shader): void;
 

@@ -10,7 +10,7 @@ declare module qtek {
 
         export class TextureNode extends Node {
 
-            constructor(option?: TextureNodeOption)
+            constructor(option?: TextureNodeOption);
 
             texture: Texture;
         }

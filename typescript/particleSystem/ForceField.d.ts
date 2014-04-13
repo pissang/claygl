@@ -10,7 +10,7 @@ declare module qtek {
 
         export class ForceField {
 
-            constructor(option: IParticleSystemForceFieldOption): void;
+            constructor(option: IParticleSystemForceFieldOption);
 
             force: math.Vector3;
 

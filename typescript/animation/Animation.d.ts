@@ -20,9 +20,9 @@ declare module qtek {
 
         interface IAnimationDeferred<T> {
 
-            when(time: number, props: object) : IAnimationDeferred;
+            when(time: number, props: Object) : IAnimationDeferred;
 
-            during(callback: (target: T, percent: number)): IAnimationDeferred;
+            during(callback: (target: T, percent: number)=> any): IAnimationDeferred;
 
             start(): IAnimationDeferred;
             start(easing: string): IAnimationDeferred;

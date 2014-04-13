@@ -12,12 +12,12 @@ declare module qtek {
             position?: math.Vector3;
             far?: number;
             near?: number;
-            texture?: texture.TextureCube;
+            texture?: qtek.texture.TextureCube;
         }
 
         export class EnvironmentMap extends core.Base {
 
-            constructor(option?: IEnvironmentMapOption): void;
+            constructor(option?: IEnvironmentMapOption);
 
             position: math.Vector3;
 

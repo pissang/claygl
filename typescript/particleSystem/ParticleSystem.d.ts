@@ -12,7 +12,7 @@ declare module qtek {
         interface IParticleSystemOption {
             loop?: boolean;
             oneshot?: boolean;
-            duration?: time;
+            duration?: number;
 
             spriteAnimationTileX?: number;
             spriteAnimationTileY?: number;

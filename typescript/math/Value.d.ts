@@ -12,15 +12,18 @@ declare module qtek {
             get(out: T): T;
         }
 
-        export interface Random1D(min: number, max: number) {
+        export interface Random1D {
+            constructor(min: number, max: number);
             get(): number;
         }
 
-        export interface Random2D(min: Vector2, max: Vector2) {
+        export interface Random2D {
+            constructor(min: Vector2, max: Vector2);
             get(out: Vector2): Vector2;
         }
 
-        export interface Random3D(min: Vector3, max: Vector3) {
+        export interface Random3D {
+            constructor (min: Vector3, max: Vector3)
             get(out: Vector3): Vector3;
         }
 

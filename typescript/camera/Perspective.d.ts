@@ -3,7 +3,7 @@ declare module qtek {
 
     export module camera {
 
-        interface IPerspectiveCameraOption: ICameraOption {
+        interface IPerspectiveCameraOption extends ICameraOption {
             fov?: number;
             aspect?: number;
             near?: number;

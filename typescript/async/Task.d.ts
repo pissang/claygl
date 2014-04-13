@@ -1,4 +1,4 @@
-///<reference path="core/mixin/notifier.d.ts" />
+///<reference path="../core/mixin/notifier.d.ts" />
 
 declare module qtek {
 
@@ -9,7 +9,7 @@ declare module qtek {
             responseType?: string;
         }
 
-        export class Task implements notifier{
+        export class Task extends core.mixin.notifier {
 
             resolve(data?: any): void;
 

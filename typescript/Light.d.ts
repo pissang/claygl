@@ -4,7 +4,7 @@ declare module qtek {
     interface ILightOption extends INodeOption {}
 
     interface ILightUniformTemplate<T> {
-        type: string,
+        type: string;
         value: (instance: Light) => T
     }
 

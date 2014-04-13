@@ -58,7 +58,7 @@ declare module qtek {
 
         skeleton: Skeleton;
 
-        isRenderable(): void;
+        isRenderable(): boolean;
 
         render(gl: WebGLRenderingContext, globalMaterial?: Material): IMeshRenderInfo;
 

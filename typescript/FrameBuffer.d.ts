@@ -17,13 +17,13 @@ declare module qtek {
 
         getFrameBuffer(gl: WebGLRenderingContext): WebGLFramebuffer;
 
-        attach(gl: WebGLRenderingContext, texture: Texture2D): void;
-        attach(gl: WebGLRenderingContext, texture: Texture2D, attachment: number): void;
-        attach(gl: WebGLRenderingContext, texture: Texture2D, attachment: number, target: number): void;
-        attach(gl: WebGLRenderingContext, texture: Texture2D, attachment: number, target: number, mipmapLevel: number): void;
+        attach(gl: WebGLRenderingContext, texture: texture.Texture2D): void;
+        attach(gl: WebGLRenderingContext, texture: texture.Texture2D, attachment: number): void;
+        attach(gl: WebGLRenderingContext, texture: texture.Texture2D, attachment: number, target: number): void;
+        attach(gl: WebGLRenderingContext, texture: texture.Texture2D, attachment: number, target: number, mipmapLevel: number): void;
 
-        attach(gl: WebGLRenderingContext, texture: TextureCube, attachment: number, target: number): void;
-        attach(gl: WebGLRenderingContext, texture: TextureCube, attachment: number, target: number, mipmapLevel: number): void;
+        attach(gl: WebGLRenderingContext, texture: texture.TextureCube, attachment: number, target: number): void;
+        attach(gl: WebGLRenderingContext, texture: texture.TextureCube, attachment: number, target: number, mipmapLevel: number): void;
 
         dispose(gl: WebGLRenderingContext): void;
 
