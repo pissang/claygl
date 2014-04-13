@@ -1,5 +1,4 @@
 ///<reference path="../Texture.d.ts" />
-///<reference path="../webgl.d.ts" />
 declare module qtek {
 
     export module compositor {

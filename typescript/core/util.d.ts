@@ -1,4 +1,3 @@
-///<reference path="../webgl.d.ts" />
 ///<reference path="container.d.ts" />
 declare module qtek {
 
@@ -11,7 +10,7 @@ declare module qtek {
             }
 
             interface DictionaryIterator<T, TResult> {
-                (item: T, key: string, obj: IDictionary): TResult;
+                (item: T, key: string, obj: IDictionary<T>): TResult;
             }
 
             export function genGUID(): number;

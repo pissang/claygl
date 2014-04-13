@@ -1,7 +1,6 @@
 ///<reference path="math/BoundingBox.d.ts" />
 ///<reference path="core/Base.d.ts" />
 ///<reference path="core/Cache.d.ts" />
-///<reference path="webgl.d.ts" />
 declare module qtek {
 
     interface IGeometryAttributeBuffer {

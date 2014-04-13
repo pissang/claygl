@@ -1,8 +1,6 @@
 ///<reference path="Material.d.ts" />
 ///<reference path="Shader.d.ts" />
 ///<reference path="Node.d.ts" />
-///<reference path="webgl.d.ts" />
-
 declare module qtek {
 
     interface IRenderable {

@@ -1,6 +1,5 @@
 ///<reference path="../Mesh.d.ts" />
 ///<reference path="../Scene.d.ts" />
-///<reference path="../webgl.d.ts" />
 declare module qtek {
 
     export module plugin {

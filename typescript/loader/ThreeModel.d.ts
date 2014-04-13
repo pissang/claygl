@@ -19,10 +19,11 @@ declare module qtek {
 
             load(url: string): void;
 
-            parse(data: object): Mesh[];
+            parse(data: Object): Mesh[];
 
-            on(name: "success", handler: (meshList: Mesh[])=> void, context?: any);
-            success(handler: (meshList: Mesh[])=> void, context?: any);
+            once(name: "success", handler: (meshList: Mesh[])=> void, context?: any): void;
+            once(name: string, handler: Function, context?: any): void;
+            success(handler: (meshList: Mesh[])=> void, context?: any): void;
         }
     }
 }

@@ -55,7 +55,7 @@ declare module qtek {
 
             render(renderer: Renderer): void;
 
-            updateParameter(outputName: string, renderer: Renderer): object;
+            updateParameter(outputName: string, renderer: Renderer): Object;
 
             setParameter(name: string, value: any): void;
 

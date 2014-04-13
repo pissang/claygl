@@ -10,7 +10,7 @@ declare module qtek {
             far?: number;
         }
 
-        export class Perspective {
+        export class Perspective extends Camera {
 
             constructor(option?: IPerspectiveCameraOption);
 

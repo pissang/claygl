@@ -90,7 +90,7 @@ define(function(require) {
         useFace : true,
 
         //Max Value of Uint16, i.e. 0xffff
-        chunkSize : 65535,
+        chunkSize : 65535
     }, function() {
         // Use cache
         this.cache = new Cache();

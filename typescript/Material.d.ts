@@ -1,10 +1,20 @@
 ///<reference path="core/Base.d.ts" />
 ///<reference path="Shader.d.ts" />
-///<reference path="webgl.d.ts" />
 declare module qtek {
 
+    interface IMaterialOption {
+        name?: string;
+        shader?: Shader;
+        depthTest?: boolean;
+        depthMask?: boolean;
+        transparent?: boolean;
+        blend?: (gl: WebGLRenderingContext) => void;
+    }
+
     export class Material extends core.Base {
-        
+
+        constructor(option?: IMaterialOption);
+
         name: string;
         
         uniforms: IDictionary<IShaderUniform>;
@@ -23,7 +33,7 @@ declare module qtek {
 
         setUniform(symbol: string, value: any): void;
 
-        setUniforms(object: object): void;
+        setUniforms(object: Object): void;
 
         enableUniform(symbol: string): void;
 
@@ -32,7 +42,7 @@ declare module qtek {
         isUniformEnabled(symbol: string): void;
 
         set(symbol: string, value: any): void;
-        set(object: object): void;
+        set(object: Object): void;
 
         get(symbol: string): any;
 

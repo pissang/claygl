@@ -105,7 +105,6 @@ define(function(require) {
 
             if (! texture.width) {
                 throw new Error("The texture attached to color buffer is not a valid.");
-                return;
             }
 
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
@@ -118,7 +117,7 @@ define(function(require) {
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
             attachment = attachment || _gl.COLOR_ATTACHMENT0;
             target = target || _gl.TEXTURE_2D;
-            mipmapLevel = mipmapLevel || 0
+            mipmapLevel = mipmapLevel || 0;
             
             if (attachment === _gl.DEPTH_ATTACHMENT) {
 
@@ -163,4 +162,4 @@ define(function(require) {
     FrameBuffer.DEPTH_STENCIL_ATTACHMENT = glenum.DEPTH_STENCIL_ATTACHMENT;
 
     return FrameBuffer;
-})
+});

@@ -9,7 +9,7 @@ declare module qtek {
             responseType?: string;
         }
 
-        export class Task extends core.mixin.notifier {
+        export class Task implements core.mixin.notifier {
 
             resolve(data?: any): void;
 
@@ -20,6 +20,16 @@ declare module qtek {
             isRejected(): boolean;
 
             isSettled(): boolean;
+
+            trigger(name: string, ...args): void;
+
+            on(name: string, action: Function, context?:any): void;
+
+            once(name: string, action: Function, context?:any): void;
+
+            off(name: string, action?: Function): void;
+
+            has(name: string, action: Function): void;
 
             static makeTask(): Task;
 

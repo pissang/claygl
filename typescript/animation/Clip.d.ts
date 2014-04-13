@@ -2,8 +2,8 @@ declare module qtek {
 
     export module animation {
 
-        interface IClipOption<T> {
-            target?: T;
+        interface IClipOption {
+            target?: any;
             life?: number;
             delay?: number;
             gap?: number;
@@ -15,12 +15,14 @@ declare module qtek {
                 string;
                 (percent: number): number;
             }
-            onframe?: (target: T, schedule: number) => void;
+            onframe?: (target: any, schedule: number) => void;
             onrestart?: () => void;
             ondestroy?: () => void;
         }
 
-        export class Clip<T> {
+        export class Clip {
+
+            constructor(option?: IClipOption);
 
             gap: number;
 
@@ -46,7 +48,7 @@ declare module qtek {
 
         export class BlendClip extends Clip {
             
-            blend1D(c1: Clip , c2: Clip, w: number): void;
+            blend1D(c1: Clip, c2: Clip, w: number): void;
 
             blend2D(c1: Clip, c2: Clip, c3: Clip, f: number, g: number): void;
 

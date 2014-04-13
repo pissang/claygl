@@ -52,7 +52,7 @@ declare module qtek {
 
         getDescendantByName(name: string): Node;
 
-        traverse(callback: (current: Node, parent: Node) => void, parent?: Node, ctor?: T): void;
+        traverse(callback: (current: Node, parent: Node) => void, parent?: Node, ctor?: Function): void;
 
         setLocalTransform(matrix: math.Matrix4): void;
 

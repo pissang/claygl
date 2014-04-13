@@ -35,7 +35,7 @@ declare module qtek {
             pixels?: ITextureCubePixels
         }
 
-        export class Texture2D extends Texture {
+        export class TextureCube extends Texture {
 
             constructor(option?: ITextureCubeOption);
 
@@ -56,6 +56,14 @@ declare module qtek {
             unbind(gl): boolean;
 
             load(imageList: ITextureCubeImageSrc): void;
+
+            once(name: "success", handler: Function, context?: any): void;
+            success(handler: Function, context?: any): void;
+
+            once(name: "error", handler: Function, context?: any): void;
+            error(handler: Function, context?: any): void;
+
+            once(name: string, handler: Function, context?: any): void;
         }
     }
 }

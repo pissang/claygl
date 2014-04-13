@@ -32,6 +32,14 @@ declare module qtek {
             unbind(gl): boolean;
 
             load(src: string): void;
+
+            once(name: "success", handler: Function, context?: any): void;
+            success(handler: Function, context?: any): void;
+
+            once(name: "error", handler: Function, context?: any): void;
+            error(handler: Function, context?: any): void;
+
+            once(name: string, handler: Function, context?: any): void;
         }
     }
 }

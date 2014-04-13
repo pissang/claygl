@@ -37,7 +37,7 @@ define(function(require) {
                  joint : new Geometry.Attribute('joint', 'float', 4, 'JOINT', true),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, true),
+                 barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, true)
             },
 
             hint : glenum.DYNAMIC_DRAW,

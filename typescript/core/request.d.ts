@@ -1,4 +1,3 @@
-///<reference path="../webgl.d.ts" />
 declare module qtek {
 
     export module core {

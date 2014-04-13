@@ -30,7 +30,7 @@ declare module qtek {
 
         export class GLTF extends core.Base {
 
-            constructor(option?: IGLTFLoaderOption): void;
+            constructor(option?: IGLTFLoaderOption);
 
             rootPath: string;
             textureRootPath: string;
@@ -40,10 +40,11 @@ declare module qtek {
 
             load(url: string): void;
 
-            parse(json: object): IGLTFLoaderResult;
+            parse(json: Object): IGLTFLoaderResult;
 
-            on(name: "success", (result: IGLTFLoaderResult)=> void, context?: any);
-            success((result: IGLTFLoaderResult)=> void, context?: any);
+            once(name: "success", handler: (result: IGLTFLoaderResult)=> void, context?: any): void;
+            once(name: string, handler: Function, context?: any): void;
+            success(handler: (result: IGLTFLoaderResult)=> void, context?: any);
         }
     }
 }

@@ -7,7 +7,7 @@ declare module qtek {
             output?: T;
         }
 
-        interface IClipInputEntry<T extends BlendClip> {
+        interface IBlend1DClipInputEntry<T extends BlendClip> {
             position: number;
             clip: T;
             offset: number;
@@ -15,9 +15,11 @@ declare module qtek {
 
         export class Blend1DClip<T extends BlendClip> extends Clip {
 
+            constructor(option?: IBlend1DClipOption<T>);
+
             output: T;
 
-            inputs: IClipInputEntry[];
+            inputs: IBlend1DClipInputEntry<T>[];
 
             position: number;
 

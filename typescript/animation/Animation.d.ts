@@ -12,7 +12,7 @@ declare module qtek {
             stage?: IStage;
         }
 
-        interface IAnimationOption {
+        interface IAnimationAnimateOption {
             loop?: boolean;
             getter?: (key: string) => any;
             setter?: (key: string, value: any) => any;
@@ -20,24 +20,24 @@ declare module qtek {
 
         interface IAnimationDeferred<T> {
 
-            when(time: number, props: Object) : IAnimationDeferred;
+            when(time: number, props: Object) : IAnimationDeferred<T>;
 
-            during(callback: (target: T, percent: number)=> any): IAnimationDeferred;
+            during(callback: (target: T, percent: number)=> any): IAnimationDeferred<T>;
 
-            start(): IAnimationDeferred;
-            start(easing: string): IAnimationDeferred;
-            start(easing: (percent: number) => number): IAnimationDeferred;
+            start(): IAnimationDeferred<T>;
+            start(easing: string): IAnimationDeferred<T>;
+            start(easing: (percent: number) => number): IAnimationDeferred<T>;
 
-            stop(): IAnimationDeferred;
+            stop(): IAnimationDeferred<T>;
 
-            delay(time: string): IAnimationDeferred;
+            delay(time: string): IAnimationDeferred<T>;
 
-            done(callback: Function): IAnimationDeferred;
+            done(callback: Function): IAnimationDeferred<T>;
         }
 
         export class Animation extends qtek.core.Base {
 
-            constructor(stage?: IStage);
+            constructor(option?: IAnimationOption);
 
             stage: IStage;
 
@@ -53,7 +53,7 @@ declare module qtek {
 
             stop(): void;
 
-            animate<T>(target: T, options: IAnimationOption): IAnimationDeferred<T>;
+            animate<T>(target: T, options: IAnimationAnimateOption): IAnimationDeferred<T>;
         }
     }
 }

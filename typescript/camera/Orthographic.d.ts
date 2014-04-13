@@ -12,7 +12,7 @@ declare module qtek {
             bottom?: number;
         }
 
-        export class Orthographic {
+        export class Orthographic extends Camera {
 
             constructor(option?: IOrthographicCameraOption);
 

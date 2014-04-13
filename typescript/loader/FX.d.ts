@@ -20,12 +20,13 @@ declare module qtek {
 
             bufferRootPath: string;
 
-            load(string: url): void;
+            load(url: string): void;
 
-            parse(json: object): compositor.Compositor;
+            parse(json: Object): compositor.Compositor;
 
-            on(name: "success", handler: (compositor: compositor.Compositor) => void, context?: any);
-            success(handler: (compositor: compositor.Compositor) => void, context?: any);
+            once(name: "success", handler: (compositor: compositor.Compositor) => void, context?: any): void;
+            once(name: string, handler: Function, context?: any): void;
+            success(handler: (compositor: compositor.Compositor) => void, context?: any): void;
         }
     }
 }

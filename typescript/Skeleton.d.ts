@@ -26,7 +26,7 @@ declare module qtek {
 
         getSubSkinMatrices(meshId: number, joints: number[]): Float32Array;
 
-        addClip(clip: animation.SkinningClip, mapRule?: object): number;
+        addClip(clip: animation.SkinningClip, mapRule?: Object): number;
 
         removeClip(clip: animation.SkinningClip): void;
 

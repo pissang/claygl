@@ -1,6 +1,5 @@
 ///<reference path="Geometry.d.ts" />
 ///<reference path="StaticGeometry.d.ts" />
-///<reference path="webgl.d.ts" />
 ///<reference path="math/Matrix4.d.ts" />
 declare module qtek {
 
