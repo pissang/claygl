@@ -63,16 +63,28 @@ define(function(require) {
             mat3.mul(this._array, this._array, b._array);
             return this;
         },
-        mulLeft : function(b) {
-            mat3.mul(this._array, b._array, this._array);
+        mulLeft : function(a) {
+            mat3.mul(this._array, a._array, this._array);
             return this;
         },
         multiply : function(b) {
             mat3.multiply(this._array, this._array, b._array);
             return this;
         },
-        multiplyLeft : function(b) {
-            mat3.multiply(this._array, b._array, this._array);
+        multiplyLeft : function(a) {
+            mat3.multiply(this._array, a._array, this._array);
+            return this;
+        },
+        rotate : function(rad) {
+            mat3.rotate(this._array, this._array, rad);
+            return this;
+        },
+        scale : function(v) {
+            mat3.scale(this._array, this._array, v._array);
+            return this;
+        },
+        translate : function(v) {
+            mat3.translate(this._array, this._array, v._array);
             return this;
         },
         /**

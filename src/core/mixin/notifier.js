@@ -63,7 +63,7 @@ define(function() {
             return handler;
         },
 
-        once : function(name, action, context) {
+        once : function(name, action, context/*optional*/) {
             if (!name || !action) {
                 return;
             }
@@ -99,11 +99,11 @@ define(function() {
         },
 
         // Alias of once('error')
-        error : function() {
+        error : function(action, context/*optional*/) {
             return this.once('error', action, context);
         },
 
-        off : function(name, action) {
+        off : function(name, action/*optional*/) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 

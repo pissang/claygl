@@ -51,14 +51,12 @@ define(function(require) {
         'COLOR' : 'color'
     }
 
-    var Loader = Base.derive(function() {
-        return {
-            rootPath : "",
-            textureRootPath : "",
-            bufferRootPath : "",
+    var Loader = Base.derive({
+        rootPath : "",
+        textureRootPath : "",
+        bufferRootPath : "",
 
-            shaderName : 'buildin.physical'
-        };
+        shaderName : 'buildin.physical'
     }, {
         
         load : function(url) {

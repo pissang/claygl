@@ -7,20 +7,17 @@ define(function(require) {
     var BoundingBox = require('../math/BoundingBox');
 
 	// From three.js SphereGeometry
-    var Sphere = DynamicGeometry.derive(function() {
+    var Sphere = DynamicGeometry.derive({
+        widthSegments : 20,
+        heightSegments : 20,
 
-        return {
-            widthSegments : 20,
-            heightSegments : 20,
+        phiStart : 0,
+        phiLength : Math.PI * 2,
 
-            phiStart : 0,
-            phiLength : Math.PI * 2,
+        thetaStart : 0,
+        thetaLength : Math.PI,
 
-            thetaStart : 0,
-            thetaLength : Math.PI,
-
-            radius : 1
-        }
+        radius : 1
     }, function() {
         
         var positions = this.attributes.position.value;

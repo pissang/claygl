@@ -7,7 +7,6 @@ define(function(require) {
     var util = require('../core/util');
     var Compositor = require('../compositor/Compositor');
     var CompoNode = require('../compositor/Node');
-    var CompoGroup = require('../compositor/Group');
     var CompoSceneNode = require('../compositor/SceneNode');
     var CompoTextureNode = require('../compositor/TextureNode');
     var Shader = require('../Shader');
@@ -18,12 +17,10 @@ define(function(require) {
     var shaderSourceReg = /#source\((.*?)\)/;
     var urlReg = /#url\((.*?)\)/;
 
-    var FXLoader = Base.derive(function() {
-        return {
-            rootPath : "",
-            textureRootPath : "",
-            shaderRootPath : ""
-        }
+    var FXLoader = Base.derive({
+        rootPath : "",
+        textureRootPath : "",
+        shaderRootPath : ""
     }, {
         load : function(url) {
             var self = this;
@@ -61,7 +58,7 @@ define(function(require) {
                     var nodeInfo = json.nodes[i];
                     var node = self._createNode(nodeInfo, lib);
                     if (node) {
-                        compositor.add(node);
+                        compositor.addNode(node);
                     }
                     if (nodeInfo.output) {
                         compositor.addOutput(node);

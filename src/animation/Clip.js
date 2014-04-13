@@ -50,9 +50,7 @@ define(function(require) {
         life : 0,
 
         delay : 0,
-
-        gap : 0,
-
+        
         setLoop : function(loop) {
             this._loop = loop;
             if (loop) {

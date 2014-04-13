@@ -52,6 +52,8 @@ GL_FLOAT = 0x1406
 GL_UNSIGNED_BYTE = 0x1401
 GL_UNSIGNED_SHORT = 0x1403
 GL_INT = 0x1404
+GL_UNSIGNED_INT = 0x1405
+
 GL_REPEAT = 0x2901
 GL_FLOAT_VEC2 = 0x8B50
 GL_FLOAT_VEC3 = 0x8B51
@@ -123,7 +125,11 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
             lGLTFAcessor['type'] = GL_FLOAT_VEC3
         elif pStride == 4:
             lGLTFAcessor['type'] = GL_FLOAT_VEC4
-    
+    # Unsigned Int
+    elif pType == 'I':
+        lByteStride = pStride * 4
+        lGLTFAcessor['type'] = GL_UNSIGNED_INT
+
     # Unsigned Short
     elif pType == 'H':
         lByteStride = pStride * 2

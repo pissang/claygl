@@ -1,21 +1,21 @@
-define( function( require ) {
+define(function(require) {
 
     var Base = require("../core/Base");
 
-    var Graph = Base.derive( function() {
+    var Graph = Base.derive(function() {
         return {
             nodes : []
         }
     }, {
         
-        add : function(node) {
+        addNode : function(node) {
 
             this.nodes.push(node);
 
             this._dirty = true;
         },
 
-        remove : function(node) {
+        removeNode : function(node) {
             this.nodes.splice(this.nodes.indexOf(node), 1);
 
             this._dirty = true;
@@ -53,29 +53,29 @@ define( function( require ) {
             }
         },
 
-        findPin : function(info) {
+        findPin : function(input) {
             var node;
-            if (typeof(info.node) === 'string') {
+            if (typeof(input.node) === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {
                     var tmp = this.nodes[i];
-                    if (tmp.name === info.node) {
+                    if (tmp.name === input.node) {
                         node = tmp;
                     }
                 }
-            }else{
-                node = info.node;
+            } else {
+                node = input.node;
             }
             if (node) {
-                if (node.outputs[info.pin]) {
+                if (node.outputs[input.pin]) {
                     return {
                         node : node,
-                        pin : info.pin
+                        pin : input.pin
                     }
                 }
             }
         },
 
-        fromJSON : function( json ) {
+        fromJSON : function(json) {
 
         }
     })

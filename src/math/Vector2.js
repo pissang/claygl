@@ -234,6 +234,7 @@ define(function(require) {
     Vector2.set = function(out, x, y) {
         vec2.set(out._array, x, y);
         out._dirty = true;
+        return out
     }
 
     Vector2.copy = function(out, b) {

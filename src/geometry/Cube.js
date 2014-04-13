@@ -9,15 +9,12 @@ define(function(require) {
 
     var planeMatrix = new Matrix4();
     
-    var Cube = DynamicGeometry.derive(function() {
-
-        return {
-            widthSegments : 1,
-            heightSegments : 1,
-            depthSegments : 1,
-            // TODO double side material
-            inside : false
-        }
+    var Cube = DynamicGeometry.derive({
+        widthSegments : 1,
+        heightSegments : 1,
+        depthSegments : 1,
+        // TODO double side material
+        inside : false
     }, function() {
         var planes = {
             "px" : createPlane("px", this.depthSegments, this.heightSegments),

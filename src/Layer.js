@@ -47,5 +47,6 @@ define(function(require) {
         }
     });
 
+
     return Layer;
 } )

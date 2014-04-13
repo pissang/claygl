@@ -5,7 +5,7 @@
  */
 define(function(require) {
 
-    'use strict'
+    'use strict';
 
     var Geometry = require("./Geometry");
     var util = require("./core/util");
@@ -98,6 +98,23 @@ define(function(require) {
             return false;
         },
 
+        createAttribute: function(name, type, size, semantic) {
+            var attrib = new AttributeBuffer(name, type, size, semantic, true);
+            this.attributes[name] = attrib;
+            this._attributeList.push(name);
+            return attrib;
+        },
+
+        removeAttribute: function(name) {
+            var idx = this._attributeList.indexOf(name);
+            if (idx >= 0) {
+                this._attributeList.splice(idx, 1);
+                delete this.attributes[name];
+                return true;
+            }
+            return false;
+        },
+
         getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {
@@ -107,7 +124,8 @@ define(function(require) {
             var result = {};
             var nVertex = this.getVertexNumber();
 
-            for (var name in this.attributes) {
+            for (var i = 0; i < this._attributeList.length; i++) {
+                var name = this._attributeList[i];
                 var attrib = this.attributes[name];
                 if (attrib.value.length) {
                     if (attrib.value.length === nVertex) {
@@ -362,8 +380,8 @@ define(function(require) {
         },
 
         _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
-
             var chunks = this.cache.get("chunks");
+            var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
                 // Intialize
@@ -374,6 +392,7 @@ define(function(require) {
                     }
                 }
                 this.cache.put("chunks", chunks);
+                firstUpdate = true;
             }
             for (var cc = 0; cc < this._arrayChunks.length; cc++) {
                 var chunk = chunks[cc];
@@ -399,18 +418,22 @@ define(function(require) {
                     var size = attribute.size;
 
                     var bufferInfo;
-                    for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
-                        if (attributeBuffers[i].name === name) {
-                            bufferInfo = attributeBuffers[i];
-                            prevSearchIdx = i + 1;
-                            break;
+                    if (!firstUpdate) {
+                        for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
+                            if (attributeBuffers[i].name === name) {
+                                bufferInfo = attributeBuffers[i];
+                                prevSearchIdx = i + 1;
+                                break;
+                            }
                         }
-                    }
-                    for (var i = prevSearchIdx - 1; i >= 0; i--) {
-                        if (attributeBuffers[i].name === name) {
-                            bufferInfo = attributeBuffers[i];
-                            prevSearchIdx = i;
-                            break;
+                        if (!bufferInfo) {
+                            for (var i = prevSearchIdx - 1; i >= 0; i--) {
+                                if (attributeBuffers[i].name === name) {
+                                    bufferInfo = attributeBuffers[i];
+                                    prevSearchIdx = i;
+                                    break;
+                                }
+                            }
                         }
                     }
 
@@ -749,9 +772,8 @@ define(function(require) {
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
-
-                    for (var name in chunk.attributeBuffers) {
-                        var attribs = chunk.attributeBuffers[name];
+                    for (var k = 0; k < chunk.attributeBuffers.length; k++) {
+                        var attribs = chunk.attributeBuffers[k];
                         _gl.deleteBuffer(attribs.buffer);
                     }
                 }

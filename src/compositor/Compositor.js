@@ -10,8 +10,8 @@ define(function(require){
             _outputs : []
         }
     }, {
-        add : function(node) {
-            Graph.prototype.add.call(this, node);
+        addNode : function(node) {
+            Graph.prototype.addNode.call(this, node);
             if (!node.outputs) {
                 this.addOutput(node);
             }

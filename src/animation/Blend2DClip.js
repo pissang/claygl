@@ -32,7 +32,7 @@ define(function(require) {
 
         this._triangles = [];
 
-        this.updateTriangles();
+        this._updateTriangles();
     }
 
     Blend2DClip.prototype = new Clip();
@@ -47,13 +47,13 @@ define(function(require) {
         this.inputs.push(obj);
         this.life = Math.max(inputClip.life, this.life);
         // TODO Change to incrementally adding
-        this.updateTriangles();
+        this._updateTriangles();
 
         return obj;
     }
 
     // Delaunay triangulate
-    Blend2DClip.prototype.updateTriangles = function() {
+    Blend2DClip.prototype._updateTriangles = function() {
         var inputs = this.inputs.map(function(a) {
             return a.position;
         });

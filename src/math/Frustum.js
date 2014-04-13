@@ -99,8 +99,6 @@ define(function(require) {
                     vec3.copy(this.vertices[i], this.boundingBox.vertices[i]);
                 }
             }
-
-            return this;
         },
 
         getTransformedBoundingBox : (function() {
@@ -133,6 +131,8 @@ define(function(require) {
 
                 bbox.min._dirty = true;
                 bbox.max._dirty = true;
+
+                return bbox;
             };
         }) ()
     }

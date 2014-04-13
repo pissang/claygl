@@ -65,8 +65,8 @@ define(function (require) {
                 this.frameBuffer.unbind(renderer);
             }
         },
-        dispose : function(renderer) {
-            this.frameBuffer.dispose(renderer._gl);
+        dispose : function(_gl) {
+            this.frameBuffer.dispose(_gl);
         }
     });
 

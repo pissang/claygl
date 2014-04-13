@@ -29,14 +29,13 @@ define(function(require) {
         this.enable();
     }, {
         enable : function() {
-            this.target.eulerOrder = ["Y", "X", "Z"];
             // Use pointer lock
             // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
             var el = this.domElement;
 
             //Must request pointer lock after click event, can't not do it directly
             //Why ? ?
-            el.addEventListener("click", this.requestPointerLock);
+            el.addEventListener("click", this._requestPointerLock);
 
             document.addEventListener("pointerlockchange", bindOnce(this._lockChange, this), false);
             document.addEventListener("mozpointerlockchange", bindOnce(this._lockChange, this), false);
@@ -65,7 +64,7 @@ define(function(require) {
         
         },
 
-        requestPointerLock : function() {
+        _requestPointerLock : function() {
             var el = this;
             el.requestPointerLock = el.requestPointerLock ||
                                     el.mozRequestPointerLock ||

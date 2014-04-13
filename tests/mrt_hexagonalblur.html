@@ -125,11 +125,11 @@
                 hexagonalBlur1.setParameter("blurSize", 1.0);
                 hexagonalBlur2.setParameter("blurSize", 1.0);
 
-                compositor.add(textureNode);
-                compositor.add(colorAdjustNode);
-                compositor.add(colorAdjustNode2);
-                compositor.add(hexagonalBlur1);
-                compositor.add(hexagonalBlur2);
+                compositor.addNode(textureNode);
+                compositor.addNode(colorAdjustNode);
+                compositor.addNode(colorAdjustNode2);
+                compositor.addNode(hexagonalBlur1);
+                compositor.addNode(hexagonalBlur2);
 
 
                 setInterval(function(){

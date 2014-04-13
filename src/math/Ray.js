@@ -40,7 +40,6 @@ define(function(require) {
             var d = vec3.dot(plane.normal._array, this.direction._array);
             vec3.scaleAndAdd(this.direction._array, this.direction._array, plane.normal._array, -d * 2);
             this.direction_dirty = true;
-            return this;
         },
 
         // http://www.graphics.cornell.edu/pubs/1997/MT97.html

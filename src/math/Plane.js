@@ -33,8 +33,6 @@ define(function(require) {
             var invLen = 1 / vec3.len(this.normal._array);
             vec3.scale(this.normal._array, invLen);
             this.distance *= invLen;
-
-            return this;
         },
 
         intersectFrustum : function(frustum) {
@@ -98,8 +96,6 @@ define(function(require) {
                 vec3.copy(normalv4, this.normal._array);
                 vec4.transformMat4(normalv4, normalv4, inverseTranspose);
                 vec3.copy(this.normal._array, normalv4);
-
-                return this;
             }
         })(),
 
@@ -107,7 +103,6 @@ define(function(require) {
             vec3.copy(this.normal._array, plane.normal._array);
             this.normal._dirty = true;
             this.distance = plane.distance;
-            return this;
         },
 
         clone : function() {

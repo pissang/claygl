@@ -37,8 +37,7 @@ define(function(require) {
 
             _normalType : 'vertex',
 
-            _enabledAttributes : null,
-
+            _enabledAttributes : null
         }
     }, {
         dirty : function() {
@@ -62,20 +61,38 @@ define(function(require) {
             return true;
         },
 
+        createAttribute: function(name, type, size, semantic) {
+            var attrib = new AttributeBuffer(name, type, size, semantic, false);
+            this.attributes[name] = attrib;
+            this._attributeList.push(name);
+            return attrib;
+        },
+
+        removeAttribute: function(name) {
+            var idx = this._attributeList.indexOf(name);
+            if (idx >= 0) {
+                this._attributeList.splice(idx, 1);
+                delete this.attributes[name];
+                return true;
+            }
+            return false;
+        },
+
         getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {
                 return this._enabledAttributes;
             }
 
-            var result = {};
+            var result = [];
             var nVertex = this.getVertexNumber();
 
-            for (var name in this.attributes) {
+            for (var i = 0; i < this._attributeList.length; i++) {
+                var name = this._attributeList[i];
                 var attrib = this.attributes[name];
                 if (attrib.value) {
                     if (attrib.value.length === nVertex * attrib.size) {
-                        result[name] = attrib;
+                        result.push(name);
                     }
                 }
             }
@@ -96,6 +113,7 @@ define(function(require) {
         
         _updateBuffer : function(_gl) {
             var chunks = this.cache.get("chunks");
+            var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
                 // Intialize
@@ -104,36 +122,40 @@ define(function(require) {
                     indicesBuffer : null
                 }
                 this.cache.put("chunks", chunks);
+                firstUpdate = true;
             }
             var chunk = chunks[0];
             var attributeBuffers = chunk.attributeBuffers;
             var indicesBuffer = chunk.indicesBuffer;
 
-            var attributes = this.getEnabledAttributes();
+            var attributeList = this.getEnabledAttributes();
             var prevSearchIdx = 0;
             var count = 0;
-            for (var name in attributes) {
-                var attribute = attributes[name];
-                if (!attribute.value) {
-                    continue;
-                }
+            for (var k = 0; k < attributeList.length; k++) {
+                var name = attributeList[k];
+                var attribute = this.attributes[name];
 
                 var bufferInfo;
-                for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
-                    if (attributeBuffers[i].name === name) {
-                        bufferInfo = attributeBuffers[i];
-                        prevSearchIdx = i + 1;
-                        break;
-                    }
-                }
-                for (var i = prevSearchIdx - 1; i >= 0; i--) {
-                    if (attributeBuffers[i].name === name) {
-                        bufferInfo = attributeBuffers[i];
-                        prevSearchIdx = i;
-                        break;
-                    }
-                }
 
+                if (!firstUpdate) {
+                    // Search for created buffer
+                    for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
+                        if (attributeBuffers[i].name === name) {
+                            bufferInfo = attributeBuffers[i];
+                            prevSearchIdx = i + 1;
+                            break;
+                        }
+                    }
+                    if (!bufferInfo) {
+                        for (var i = prevSearchIdx - 1; i >= 0; i--) {
+                            if (attributeBuffers[i].name === name) {
+                                bufferInfo = attributeBuffers[i];
+                                prevSearchIdx = i;
+                                break;
+                            }
+                        }
+                    }
+                }
                 var buffer;
                 if (bufferInfo) {
                     buffer = bufferInfo.buffer;
@@ -398,8 +420,8 @@ define(function(require) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
 
-                    for (var name in chunk.attributeBuffers) {
-                        var attribs = chunk.attributeBuffers[name];
+                    for (var k = 0; k < chunk.attributeBuffers.length; k++) {
+                        var attribs = chunk.attributeBuffers[k];
                         _gl.deleteBuffer(attribs.buffer);
                     }
                 }

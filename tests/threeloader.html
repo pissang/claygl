@@ -21,7 +21,7 @@
                     });
                 var data = JSON.parse(modelData);
 
-                var loader = new qtek.loader.three.Model();
+                var loader = new qtek.loader.ThreeModel();
                 console.profile("parse");
                 var meshList = loader.parse(data);
                 console.profileEnd("parse");
@@ -54,7 +54,6 @@
 
                 setInterval(function(){
                     renderer.render(scene, camera);
-                    
                     root.rotation.rotateY(Math.PI/500);
                 }, 20);
             })

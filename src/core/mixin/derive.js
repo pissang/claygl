@@ -21,7 +21,7 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
     var _super = this;
 
     var propList;
-    if (! (makeDefaultOpt instanceof Function)) {
+    if (!(makeDefaultOpt instanceof Function)) {
         // Optimize the property iterate if it have been fixed
         propList = [];
         for (var propName in makeDefaultOpt) {
@@ -34,40 +34,41 @@ function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
     var sub = function(options) {
 
         // call super constructor
-        _super.call(this);
+        _super.apply(this, arguments);
 
         if (makeDefaultOpt instanceof Function) {
             // call defaultOpt generate function each time
             // if it is a function, So we can make sure each 
-            // property in the object is fresh
+            // property in the object is not shared by mutiple instances
             extend(this, makeDefaultOpt.call(this));
         } else {
             extendWithPropList(this, makeDefaultOpt, propList);
         }
         
-        if (options) {
-            extend(this, options);
-        }
-
         if (this.constructor === sub) {
-            // initialize function will be called in the order of inherit
+            // PENDING
+            if (options) {
+                extend(this, options);
+            }
+
+            // Initialize function will be called in the order of inherit
             var base = sub;
-            var initializers = sub.__initializer__;
+            var initializers = sub.__initializers__;
             for (var i = 0; i < initializers.length; i++) {
-                initializers[i].call(this);
+                initializers[i].apply(this, arguments);
             }
         }
     };
     // save super constructor
     sub.__super__ = _super;
     // initialize function will be called after all the super constructor is called
-    if (!_super.__initializer__) {
-        sub.__initializer__ = [];
+    if (!_super.__initializers__) {
+        sub.__initializers__ = [];
     } else {
-        sub.__initializer__ = _super.__initializer__.slice();
+        sub.__initializers__ = _super.__initializers__.slice();
     }
     if (initialize) {
-        sub.__initializer__.push(initialize);
+        sub.__initializers__.push(initialize);
     }
 
     var Ctor = function() {};

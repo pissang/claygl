@@ -5,40 +5,36 @@
  */
 define(function(require) {
 
-    var Base = require('../../core/Base');
+    var Base = require('../core/Base');
 
-    var request = require("../../core/request");
-    var util = require('../../core/util');
-    var Shader = require("../../Shader");
-    var Material = require("../../Material");
-    var DynamicGeometry = require("../../DynamicGeometry");
-    var Mesh = require("../../Mesh");
-    var Node = require("../../Node");
-    var Texture2D = require("../../texture/Texture2D");
-    var TextureCube = require("../../texture/TextureCube");
-    var shaderLibrary = require("../../shader/library");
-    var Skeleton = require("../../Skeleton");
-    var Joint = require("../../Joint");
-    var Vector3 = require("../../math/Vector3");
-    var Quaternion = require("../../math/Quaternion");
-    var glenum = require('../../core/glenum');
-    var SkinningClip = require('../../animation/SkinningClip');
+    var request = require("../core/request");
+    var util = require('../core/util');
+    var Shader = require("../Shader");
+    var Material = require("../Material");
+    var DynamicGeometry = require("../DynamicGeometry");
+    var Mesh = require("../Mesh");
+    var Node = require("../Node");
+    var Texture2D = require("../texture/Texture2D");
+    var TextureCube = require("../texture/TextureCube");
+    var shaderLibrary = require("../shader/library");
+    var Skeleton = require("../Skeleton");
+    var Joint = require("../Joint");
+    var Vector3 = require("../math/Vector3");
+    var Quaternion = require("../math/Quaternion");
+    var glenum = require('../core/glenum');
+    var SkinningClip = require('../animation/SkinningClip');
 
     var glMatrix = require("glmatrix");
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
     var quat = glMatrix.quat;
 
-    var Loader = Base.derive(function() {
-        return {
-            rootPath : "",
-            textureRootPath : "",
-            textureNumber : 0
-        };
+    var Loader = Base.derive({
+        rootPath : "",
+        textureRootPath : ""
     }, {
         load : function(url) {
             var self = this;
-            this.textureNumber = 0;
 
             if (!this.rootPath) {
                 this.rootPath = url.slice(0, url.lastIndexOf("/"));
@@ -56,11 +52,11 @@ define(function(require) {
                 onload : function(data) {
                     self.parse(JSON.parse(data));
                 }
-            })
+            });
         },
         parse : function(data) {
             
-            var geometryList = this.parseGeometry(data);
+            var geometryList = this._parseGeometry(data);
 
             var dSkinIndices = data.skinIndices,
                 dSkinWeights = data.skinWeights;
@@ -68,14 +64,14 @@ define(function(require) {
                         && dSkinWeights && dSkinWeights.length;
 
             if (skinned) {
-                var skeleton = this.parseSkeleton(data);
+                var skeleton = this._parseSkeleton(data);
                 var jointNumber = skeleton.joints.length;
             }else{
                 var jointNumber = 0;
             }
 
             if (skinned) {
-                var skeleton = this.parseSkeleton(data);
+                var skeleton = this._parseSkeleton(data);
                 var jointNumber = skeleton.joints.length;
             }else{
                 var jointNumber = 0;
@@ -88,7 +84,7 @@ define(function(require) {
                     && geometry.faces.length 
                     && geometry.attributes.position.value.length) {
                     geometry.updateBoundingBox();
-                    var material = this.parseMaterial(data.materials[i], jointNumber);
+                    var material = this._parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
                         geometry : geometryList[i],
                         material : material
@@ -109,7 +105,7 @@ define(function(require) {
             return meshList;
         },
 
-        parseGeometry : function(data) {
+        _parseGeometry : function(data) {
 
             var geometryList = [];
             var cursorList = [];
@@ -391,7 +387,7 @@ define(function(require) {
             return geometryList;
         },
 
-        parseSkeleton : function(data) {
+        _parseSkeleton : function(data) {
             var joints = [];
             var dBones = data.bones;
             for ( var i = 0; i < dBones.length; i++) {
@@ -455,7 +451,7 @@ define(function(require) {
             return skeleton;
         },
 
-        parseMaterial : function(mConfig, jointNumber) {
+        _parseMaterial : function(mConfig, jointNumber) {
             var shaderName = "buildin.lambert";
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
             if (shading === "phong" || shading === "lambert") {
@@ -513,26 +509,24 @@ define(function(require) {
 
             // Textures
             if (mConfig.mapDiffuse) {
-                material.set("diffuseMap", this.loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
+                material.set("diffuseMap", this._loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
             }
             if (mConfig.mapBump) {
-                material.set("normalMap", this.loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
+                material.set("normalMap", this._loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
             }
             if (mConfig.mapNormal) {
-                material.set("normalMap", this.loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
+                material.set("normalMap", this._loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
             }
 
             return material;
         },
 
-        loadTexture : function(path, wrap) {
+        _loadTexture : function(path, wrap) {
             var self = this;
 
             var img = new Image();
             var texture = new Texture2D();
             texture.image = img;
-
-            this.textureNumber++;
 
             if (wrap && wrap.length) {
                 texture.wrapS = glenum[wrap[0].toUpperCase()];

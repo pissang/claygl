@@ -84,8 +84,8 @@ define(function(require) {
         clone : function() {
             return (new Matrix4()).copy(this);
         },
-        copy : function(b) {
-            mat4.copy(this._array, b._array);
+        copy : function(a) {
+            mat4.copy(this._array, a._array);
             return this;
         },
         determinant : function() {
@@ -119,8 +119,8 @@ define(function(require) {
             mat4.mul(this._array, this._array, b._array);
             return this;
         },
-        mulLeft : function(b) {
-            mat4.mul(this._array, b._array, this._array);
+        mulLeft : function(a) {
+            mat4.mul(this._array, a._array, this._array);
             return this;
         },
         multiply : function(b) {
@@ -128,8 +128,8 @@ define(function(require) {
             return this;
         },
         // Apply left multiply
-        multiplyLeft : function(b) {
-            mat4.multiply(this._array, b._array, this._array);
+        multiplyLeft : function(a) {
+            mat4.multiply(this._array, a._array, this._array);
             return this;
         },
         ortho : function(left, right, bottom, top, near, far) {
@@ -140,7 +140,7 @@ define(function(require) {
             mat4.perspective(this._array, fovy, aspect, near, far);
             return this;
         },
-        rotate : function(rad, axis /*Vector3*/) {
+        rotate : function(rad, axis) {
             mat4.rotate(this._array, this._array, rad, axis._array);
             return this;
         },
@@ -169,7 +169,6 @@ define(function(require) {
             return this;
         },
 
-        // Static method
         // Decompose a matrix to SRT
         // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
         decomposeMatrix : (function() {

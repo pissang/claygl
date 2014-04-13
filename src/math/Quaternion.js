@@ -164,7 +164,7 @@ define(function(require) {
             return this;
         },
 
-        mulLeft : function() {
+        mulLeft : function(a) {
             quat.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -295,8 +295,8 @@ define(function(require) {
         return quat.dot(a._array, b._array);
     }
 
-    Quaternion.len = function(b) {
-        return quat.length(b._array);
+    Quaternion.len = function(a) {
+        return quat.length(a._array);
     }
 
     // Quaternion.length = Quaternion.len;

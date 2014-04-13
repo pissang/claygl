@@ -99,6 +99,17 @@ define(function(require) {
             this._fields.splice(this._fields.indexOf(field), 1);
         },
 
+        reset: function() {
+            // Put all the particles back
+            for (var i = 0; i < this._particles.length; i++) {
+                var p = this._particles[i];
+                p.emitter.kill(p);
+            }
+            this._particles.length = 0;
+            this._elapsedTime = 0;
+            this._emitting = true;
+        },
+
         updateParticles : function(deltaTime) {
 
             // MS => Seconds

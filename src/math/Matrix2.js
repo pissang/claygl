@@ -53,24 +53,29 @@ define(function(require) {
             mat2.mul(this._array, this._array, b._array);
             return this;
         },
-        mulLeft : function(b) {
-            mat2.mul(this._array, b._array, this._array);
+        mulLeft : function(a) {
+            mat2.mul(this._array, a._array, this._array);
             return this;
         },
         multiply : function(b) {
             mat2.multiply(this._array, this._array, b._array);
             return this;
         },
-        multiplyLeft : function(b) {
-            mat2.multiply(this._array, b._array, this._array);
+        multiplyLeft : function(a) {
+            mat2.multiply(this._array, a._array, this._array);
             return this;
         },
         rotate : function(rad) {
             mat2.rotate(this._array, this._array, rad);
             return this;
         },
-        scale : function(s) {
-            mat2.scale(this._array, this._array, s);
+        scale : function(v) {
+            mat2.scale(this._array, this._array, v._array);
+            return this;
+        },
+        transpose: function() {
+            mat2.transpose(this._array, this._array);
+            return this;
         },
         toString : function() {
             return "[" + Array.prototype.join.call(this._array, ",") + "]";

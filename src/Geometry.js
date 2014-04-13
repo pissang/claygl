@@ -7,6 +7,7 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
 
+    // PENDING put the buffer data in attribute ? 
     function Attribute(name, type, size, semantic, isDynamic) {
         this.name = name;
         this.type = type;
@@ -21,7 +22,34 @@ define(function(require) {
             this._isDynamic = false;
             this.value = null
         }
+    }
 
+    Attribute.prototype.init = function(nVertex) {
+        if (!this._isDynamic) {
+            if (!this.value || this.value.length != nVertex * this.size) {
+                var ArrayConstructor;
+                switch(this.type) {
+                    case "byte":
+                        ArrayConstructor = Int8Array;
+                        break;
+                    case "ubyte":
+                        ArrayConstructor = Uint8Array;
+                        break;
+                    case "short":
+                        ArrayConstructor = Int16Array;
+                        break;
+                    case "ushort":
+                        ArrayConstructor = Uint16Array;
+                        break;
+                    default:
+                        ArrayConstructor = Float32Array;
+                        break;
+                }
+                this.value = new ArrayConstructor(nVertex * this.size);
+            }
+        } else {
+            console.warn('Dynamic geometry not support init method');
+        }
     }
 
     Attribute.prototype.clone = function(copyValue) {
@@ -55,7 +83,7 @@ define(function(require) {
     var Geometry = Base.derive({
         boundingBox : null,
         
-        attributes : null,
+        attributes : {},
 
         faces : null,
 
@@ -66,6 +94,8 @@ define(function(require) {
     }, function() {
         // Use cache
         this.cache = new Cache();
+
+        this._attributeList = Object.keys(this.attributes);
     }, {
         dirty : notImplementedWarn,
         getVertexNumber : notImplementedWarn,

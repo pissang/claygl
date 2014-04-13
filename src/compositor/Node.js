@@ -9,11 +9,6 @@
  *          pin : "diffuse"
         }
     },
-    // Optional, only use for the node in group
-    groupInputs : {
-        // Group input pin name : node input pin name
-        "texture" : "texture"
-    },
     outputs : {
             color : {
                 attachment : FrameBuffer.COLOR_ATTACHMENT0
@@ -28,11 +23,6 @@
                 outputLastFrame : true
             }
         }
-    },
-    // Optional, only use for the node in group
-    groupOutputs : {
-        // Node output pin name : group output pin name
-        "diffuse" : "diffuse"
     }
  * Multiple outputs is reserved for MRT support in WebGL2.0
  *
@@ -155,8 +145,9 @@ define(function(require) {
             this._rendered = true;
         },
 
-        updateParameter : function(name, renderer) {
-            var outputInfo = this.outputs[name];
+        // TODO Remove parameter function callback
+        updateParameter : function(outputName, renderer) {
+            var outputInfo = this.outputs[outputName];
             var parameters = outputInfo.parameters;
             var parametersCopy = outputInfo._parametersCopy;
             if (!parametersCopy) {
@@ -184,8 +175,8 @@ define(function(require) {
                 parametersCopy.width !== width
                 || parametersCopy.height !== height
             ) {
-                if (this._outputTextures[name]) {
-                    this._outputTextures[name].dispose(renderer.gl);
+                if (this._outputTextures[outputName]) {
+                    this._outputTextures[outputName].dispose(renderer.gl);
                 }
             }
             parametersCopy.width = width;
@@ -249,19 +240,19 @@ define(function(require) {
             return this._outputTextures[name];
         },
 
-        removeReference : function(name) {
-            this._outputReferences[name]--;
-            if (this._outputReferences[name] === 0) {
-                var outputInfo = this.outputs[name];
+        removeReference : function(outputName) {
+            this._outputReferences[outputName]--;
+            if (this._outputReferences[outputName] === 0) {
+                var outputInfo = this.outputs[outputName];
                 if (outputInfo.keepLastFrame) {
-                    if (this._prevOutputTextures[name]) {
-                        texturePool.put(this._prevOutputTextures[name]);
+                    if (this._prevOutputTextures[outputName]) {
+                        texturePool.put(this._prevOutputTextures[outputName]);
                     }
-                    this._prevOutputTextures[name] = this._outputTextures[name];
+                    this._prevOutputTextures[outputName] = this._outputTextures[outputName];
                 } else {
                     // Output of this node have alreay been used by all other nodes
                     // Put the texture back to the pool.
-                    texturePool.put(this._outputTextures[name]);
+                    texturePool.put(this._outputTextures[outputName]);
                 }
             }
         },
@@ -293,7 +284,7 @@ define(function(require) {
             shader.disableTexturesAll();   
         },
 
-        updateReference : function(name) {
+        updateReference : function(outputName) {
             if (!this._rendering) {
                 this._rendering = true;
                 for (var inputName in this.inputLinks) {
@@ -302,8 +293,8 @@ define(function(require) {
                 }
                 this._rendering = false;
             }
-            if (name) {
-                this._outputReferences[name] ++;
+            if (outputName) {
+                this._outputReferences[outputName] ++;
             }
         },
 

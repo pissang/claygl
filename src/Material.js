@@ -16,7 +16,6 @@ define(function(require) {
         //{
         // type
         // value
-        // semantic
         //}
         uniforms : null,
 

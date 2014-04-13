@@ -210,58 +210,58 @@ define(function(require) {
             this._addDefine();
         },
 
-        define : function(type, key, val) {
+        define : function(shaderType, symbol, val) {
             val = val !== undefined ? val : null;
-            if (type == 'vertex' || type == 'both') {
-                if (this.vertexDefines[key] !== val) {
-                    this.vertexDefines[key] = val;
+            if (shaderType == 'vertex' || shaderType == 'both') {
+                if (this.vertexDefines[symbol] !== val) {
+                    this.vertexDefines[symbol] = val;
                     // Mark as dirty
                     this.dirty();
                 }
             }
-            if (type == 'fragment' || type == 'both') {
-                if (this.fragmentDefines[key] !== val) {
-                    this.fragmentDefines[key] = val;
-                    if (type !== 'both') {
+            if (shaderType == 'fragment' || shaderType == 'both') {
+                if (this.fragmentDefines[symbol] !== val) {
+                    this.fragmentDefines[symbol] = val;
+                    if (shaderType !== 'both') {
                         this.dirty();
                     }
                 }
             }
         },
 
-        unDefine : function(type, key) {
-            if (type == 'vertex' || type == 'both') {
-                if (this.isDefined('vertex', key)) {
-                    delete this.vertexDefines[key];
+        unDefine : function(shaderType, symbol) {
+            if (shaderType == 'vertex' || shaderType == 'both') {
+                if (this.isDefined('vertex', symbol)) {
+                    delete this.vertexDefines[symbol];
                     // Mark as dirty
                     this.dirty();
                 }
             }
-            if (type == 'fragment' || type == 'both') {
-                if (this.isDefined('fragment', key)) {
-                    delete this.fragmentDefines[key];
-                    if (type !== 'both') {
+            if (shaderType == 'fragment' || shaderType == 'both') {
+                if (this.isDefined('fragment', symbol)) {
+                    delete this.fragmentDefines[symbol];
+                    if (shaderType !== 'both') {
                         this.dirty();
                     }
                 }
             }
         },
 
-        isDefined : function(type, key) {
-            switch(type) {
+        isDefined : function(shaderType, symbol) {
+            switch(shaderType) {
                 case "vertex":
-                    return this.vertexDefines[key] !== undefined;
+                    return this.vertexDefines[symbol] !== undefined;
                 case "fragment":
-                    return this.fragmentDefines[key] !== undefined;
+                    return this.fragmentDefines[symbol] !== undefined;
             }
         },
 
-        getDefine : function(type, key) {
-            switch(type) {
+        getDefine : function(shaderType, symbol) {
+            switch(shaderType) {
                 case "vertex":
-                    return this.vertexDefines[key];
+                    return this.vertexDefines[symbol];
                 case "fragment":
-                    return this.fragmentDefines[key];
+                    return this.fragmentDefines[symbol];
             }
         },
 
@@ -295,7 +295,7 @@ define(function(require) {
             }
         },
 
-        disableTexturesAll : function(symbol) {
+        disableTexturesAll : function() {
             for (var symbol in this._textureStatus) {
                 this._textureStatus[symbol].enabled = false;
             }
@@ -415,8 +415,6 @@ define(function(require) {
         /**
          * Enable the attributes passed in and disable the rest
          * Example Usage:
-         * enableAttributes(_gl, "position", "texcoords")
-         * OR
          * enableAttributes(_gl, ["position", "texcoords"])
          */
         enableAttributes : function(_gl, attribList) {
@@ -424,10 +422,6 @@ define(function(require) {
             var program = this.cache.get("program");
 
             var locationMap = this.cache.get("attriblocations");
-
-            if (typeof(attribList) === "string") {
-                attribList = Array.prototype.slice.call(arguments, 1);
-            }
 
             var enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
             if (! enabledAttributeListInContext) {
@@ -727,8 +721,13 @@ define(function(require) {
             function _defineParser(str, symbol, value) {
                 var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
                 if (!defines[symbol]) { // Haven't been defined by user
-                    defines[symbol] = value ? parseFloat(value) : null;
-
+                    if (value == 'false') {
+                        defines[symbol] = false
+                    } else if (value == 'true') {
+                        defines[symbol] = true;
+                    } else {
+                        defines[symbol] = value ? parseFloat(value) : null;
+                    }
                 }
                 return '';
             }

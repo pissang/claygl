@@ -110,11 +110,11 @@
                     radius : 2.0,
                     lumInfluence : 0.7
                 });
-                compositor.add(sceneNode);
-                compositor.add(SSAO);
-                compositor.add(FXAA);
+                compositor.addNode(sceneNode);
+                compositor.addNode(SSAO);
+                compositor.addNode(FXAA);
 
-                SSAO.pass.material.shader.define("fragment", "OUTPUT_AO");
+                // SSAO.pass.material.shader.define("fragment", "OUTPUT_AO");
 
                 setInterval(function() {
                     var a = SSAO;

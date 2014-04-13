@@ -3,12 +3,9 @@ define(function(require) {
     var DynamicGeometry = require('../DynamicGeometry');
     var BoundingBox = require('../math/BoundingBox');
 
-    var Plane = DynamicGeometry.derive(function() {
-
-        return {
-            widthSegments : 1,
-            heightSegments : 1
-        }
+    var Plane = DynamicGeometry.derive({
+        widthSegments : 1,
+        heightSegments : 1
     }, function() {
 
         var heightSegments = this.heightSegments;

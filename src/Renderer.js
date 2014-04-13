@@ -331,10 +331,7 @@ define(function(require) {
                     // Set lights uniforms
                     // TODO needs optimized
                     if (scene) {
-                        for (var symbol in scene.lightUniforms) {
-                            var lu = scene.lightUniforms[symbol];
-                            shader.setUniform(_gl, lu.type, symbol, lu.value);
-                        }
+                        scene.setLightUniforms(shader, _gl);
                     }
                     prevShaderID = shader.__GUID__;
                 }

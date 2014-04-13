@@ -204,7 +204,11 @@ define(function(require) {
                         _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
                     }
                     
-                    if (glDrawMode === glenum.LINES) {
+                    if (
+                        glDrawMode == glenum.LINES ||
+                        glDrawMode == glenum.LINE_STRIP ||
+                        glDrawMode == glenum.LINE_LOOP
+                    ) {
                         _gl.lineWidth(this.lineWidth);
                     }
                     

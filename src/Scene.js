@@ -1,5 +1,7 @@
 define(function(require){
 
+    'use strict';
+
     var Node = require('./Node');
     var Light = require('./Light');
     var glMatrix = require("glmatrix");
@@ -13,22 +15,23 @@ define(function(require){
             material : null,
             autoUpdate : true,
 
-            // Properties auto updated by self
             scene : null,
-            lights : {},
+
+            opaqueQueue : [],
+            transparentQueue : [],
+
             // Properties to save the light information in the scene
             // Will be set in the render function
-            lightNumber : {
+            lights : [],
+            
+            _lightUniforms : {},
+
+            _lightNumber : {
                 'POINT_LIGHT' : 0,
                 'DIRECTIONAL_LIGHT' : 0,
                 'SPOT_LIGHT' : 0,
                 'AMBIENT_LIGHT' : 0
             },
-            lightUniforms : {},
-
-            opaqueQueue : [],
-            transparentQueue : [],
-            lights : [],
 
             _opaqueObjectCount : 0,
             _transparentObjectCount : 0,
@@ -77,12 +80,12 @@ define(function(require){
             this.transparentQueue.length = this._transparentObjectCount;
 
             // reset
-            for (type in this.lightNumber) {
-                this.lightNumber[type] = 0;
+            for (var type in this._lightNumber) {
+                this._lightNumber[type] = 0;
             }
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
-                this.lightNumber[light.type]++;
+                this._lightNumber[light.type]++;
             }
             this._updateLightUniforms();
         },
@@ -114,7 +117,7 @@ define(function(require){
             // Put the light cast shadow before the light not cast shadow
             lights.sort(lightSortFunc);
 
-            var lightUniforms = this.lightUniforms;
+            var lightUniforms = this._lightUniforms;
             for (var symbol in lightUniforms) {
                 lightUniforms[symbol].value.length = 0;
             }
@@ -154,27 +157,36 @@ define(function(require){
         },
 
         isShaderLightNumberChanged : function(shader) {
-            return shader.lightNumber.POINT_LIGHT !== this.lightNumber.POINT_LIGHT
-                || shader.lightNumber.DIRECTIONAL_LIGHT !== this.lightNumber.DIRECTIONAL_LIGHT
-                || shader.lightNumber.SPOT_LIGHT !== this.lightNumber.SPOT_LIGHT
-                || shader.lightNumber.AMBIENT_LIGHT !== this.lightNumber.AMBIENT_LIGHT
+            return shader.lightNumber.POINT_LIGHT !== this._lightNumber.POINT_LIGHT
+                || shader.lightNumber.DIRECTIONAL_LIGHT !== this._lightNumber.DIRECTIONAL_LIGHT
+                || shader.lightNumber.SPOT_LIGHT !== this._lightNumber.SPOT_LIGHT
+                || shader.lightNumber.AMBIENT_LIGHT !== this._lightNumber.AMBIENT_LIGHT
         },
 
         setShaderLightNumber : function(shader) {
-            for (var type in this.lightNumber) {
-                shader.lightNumber[type] = this.lightNumber[type];
+            for (var type in this._lightNumber) {
+                shader.lightNumber[type] = this._lightNumber[type];
             }
             shader.dirty();
         },
 
+        setLightUniforms: function(shader, _gl) {
+            for (var symbol in this._lightUniforms) {
+                var lu = this._lightUniforms[symbol];
+                shader.setUniform(_gl, lu.type, symbol, lu.value);
+            }
+        },
+
         dispose : function() {
-            this.lights = [];
-            this.lightNumber = {};
-            this.lightUniforms = {};
-            this.material = {};
+            this.material = null;
             this.opaqueQueue = [];
             this.transparentQueue = [];
 
+            this.lights = [];
+            
+            this._lightUniforms = {};
+
+            this._lightNumber = {};
             this._nodeRepository = {};
         }
     });

@@ -44,14 +44,21 @@ define(function(require) {
     }, {
         attachScene : function(scene) {
             if (this.scene) {
-                this.scene.off('beforerender', this._beforeRenderScene);
+                this.detachScene();
             }
             this.scene = scene;
             scene.on("beforerender", this._beforeRenderScene, this);
         },
+        
+        detachScene : function() {
+            if (this.scene) {
+                this.scene.off("beforerender", this._beforeRenderScene, this);  
+            }
+            this.scene = null;
+        },
 
-        detachScene : function(scene) {
-            scene.off("beforerender", this._beforeRenderScene, this);  
+        dispose : function() {
+            this.detachScene();
         }
     });
 

@@ -39,7 +39,6 @@ define( function(require){
 	"compositor": {
 		"Compositor": require('qtek/compositor/Compositor'),
 		"Graph": require('qtek/compositor/Graph'),
-		"Group": require('qtek/compositor/Group'),
 		"Node": require('qtek/compositor/Node'),
 		"Pass": require('qtek/compositor/Pass'),
 		"SceneNode": require('qtek/compositor/SceneNode'),
@@ -76,9 +75,7 @@ define( function(require){
 	"loader": {
 		"FX": require('qtek/loader/FX'),
 		"GLTF": require('qtek/loader/GLTF'),
-		"three": {
-			"Model": require('qtek/loader/three/Model')
-		}
+		"ThreeModel": require('qtek/loader/ThreeModel')
 	},
 	"math": {
 		"BoundingBox": require('qtek/math/BoundingBox'),
@@ -98,7 +95,6 @@ define( function(require){
 	"particleSystem": {
 		"Emitter": require('qtek/particleSystem/Emitter'),
 		"ForceField": require('qtek/particleSystem/ForceField'),
-		"GravityField": require('qtek/particleSystem/GravityField'),
 		"Particle": require('qtek/particleSystem/Particle'),
 		"ParticleSystem": require('qtek/particleSystem/ParticleSystem')
 	},

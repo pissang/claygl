@@ -28,7 +28,7 @@ define(function(require) {
             setTimeout(function() {
                 self.resolve(data);
             });
-            return;
+            return this;
         }
         this._tasks = tasks;
         this._fulfilledNumber = 0;
@@ -72,7 +72,7 @@ define(function(require) {
             setTimeout(function() {
                 self.trigger('success', data);
             });
-            return;
+            return this;
         }
         this._tasks = tasks;
 

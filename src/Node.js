@@ -228,22 +228,22 @@ define(function(require) {
         },
 
         // Update the node status in each frame
-        update : function(force) {
+        update : function(forceUpdateWorld) {
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
             } else {
                 // Transform is manually setted
-                force = true;
+                forceUpdateWorld = true;
             }
 
-            if (force || this._needsUpdateWorldTransform) {
+            if (forceUpdateWorld || this._needsUpdateWorldTransform) {
                 this.updateWorldTransform();
-                force = true;
+                forceUpdateWorld = true;
                 this._needsUpdateWorldTransform = false;
             }
             
             for(var i = 0, len = this._children.length; i < len; i++) {
-                this._children[i].update(force);
+                this._children[i].update(forceUpdateWorld);
             }
         },
 

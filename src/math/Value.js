@@ -48,7 +48,8 @@ define(function(require) {
             if (!out) {
                 out = new Vector2();
             }
-            out.set(
+            Vector2.set(
+                out,
                 rangeX * Math.random() + min._array[0],
                 rangeY * Math.random() + min._array[1]
             );
@@ -68,7 +69,8 @@ define(function(require) {
             if (!out) {
                 out = new Vector3();
             }
-            out.set(
+            Vector3.set(
+                out,
                 rangeX * Math.random() + min._array[0],
                 rangeY * Math.random() + min._array[1],
                 rangeZ * Math.random() + min._array[2]

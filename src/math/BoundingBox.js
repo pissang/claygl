@@ -1,6 +1,5 @@
 define(function(require) {
 
-    var Base = require("../core/Base");
     var Vector3 = require("./Vector3");
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
@@ -97,8 +96,6 @@ define(function(require) {
 
             this.min._dirty = true;
             this.max._dirty = true;
-
-            return this;
         },
 
         applyProjection : function(matrix) {
@@ -142,8 +139,6 @@ define(function(require) {
             }
             this.min._dirty = true;
             this.max._dirty = true;
-
-            return this;
         },
 
         updateVertices : function() {
@@ -165,13 +160,11 @@ define(function(require) {
             vec3Set(vertices[7], max[0], max[1], max[2]);
         },
 
-        copy : function(boundingBox) {
-            vec3Copy(this.min._array, boundingBox.min._array);
-            vec3Copy(this.max._array, boundingBox.max._array);
+        copy : function(bbox) {
+            vec3Copy(this.min._array, bbox.min._array);
+            vec3Copy(this.max._array, bbox.max._array);
             this.min._dirty = true;
             this.max._dirty = true;
-
-            return this;
         },
 
         clone : function() {

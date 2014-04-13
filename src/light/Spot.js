@@ -4,17 +4,14 @@ define(function(require) {
     var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');
 
-    var SpotLight = Light.derive(function() {
-
-        return {
-            range : 20,
-            umbraAngle : 30,
-            penumbraAngle : 45,
-            falloffFactor : 2.0,
-            
-            shadowBias : 0.0002,
-            shadowSlopeScale : 2.0
-        }
+    var SpotLight = Light.derive({
+        range : 20,
+        umbraAngle : 30,
+        penumbraAngle : 45,
+        falloffFactor : 2.0,
+        
+        shadowBias : 0.0002,
+        shadowSlopeScale : 2.0
     },{
 
         type : 'SPOT_LIGHT',
