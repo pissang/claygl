@@ -42,7 +42,7 @@ declare module qtek {
 
             parse(json: Object): IGLTFLoaderResult;
 
-            once(name: "success", handler: (result: IGLTFLoaderResult)=> void, context?: any): void;
+            once(name: "success", handler: (result?: IGLTFLoaderResult) => void, context?: any): void;
             once(name: string, handler: Function, context?: any): void;
             success(handler: (result: IGLTFLoaderResult)=> void, context?: any);
         }

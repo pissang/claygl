@@ -52,7 +52,7 @@ define(function(require) {
                     texture.success(onsuccess);
                     texture.error(onerror);
                 }
-            } else if (path instanceof Array) {
+            } else if (typeof(path) == 'object' && typeof(path.px) !== 'undefined') {
                 var texture = new TextureCube();
                 texture.load(path);
                 texture.success(onsuccess);

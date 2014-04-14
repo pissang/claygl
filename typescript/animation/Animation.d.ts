@@ -54,6 +54,9 @@ declare module qtek {
             stop(): void;
 
             animate<T>(target: T, options: IAnimationAnimateOption): IAnimationDeferred<T>;
+
+            on(name: "frame", handler: (deltaTime?: number) => any, context?: any): void;
+            on(name: string, handler: Function, context?: any): void;
         }
     }
 }

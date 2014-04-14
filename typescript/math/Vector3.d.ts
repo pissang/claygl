@@ -6,7 +6,10 @@ declare module qtek {
     export module math {
 
         export class Vector3 {
-            
+
+            constructor(x: number, y: number, z: number);
+            constructor();
+
             x: number;
 
             y: number;

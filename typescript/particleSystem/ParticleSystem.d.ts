@@ -1,6 +1,7 @@
 ///<reference path="../Mesh.d.ts" />
 ///<reference path="../Material.d.ts" />
 ///<reference path="../Geometry.d.ts" />
+///<reference path="../Node.d.ts" />
 ///<reference path="../core/Base.d.ts" />
 ///<reference path="../math/Vector3.d.ts" />
 ///<reference path="../math/Vector3.d.ts" />
@@ -30,7 +31,7 @@ declare module qtek {
             applyTo(velocity: math.Vector3, position: math.Vector3, weight: number, deltaTime: number): void;
         }
 
-        export class ParticleSystem extends core.Base {
+        export class ParticleSystem extends Node {
 
             constructor(option?: IParticleSystemOption);
 

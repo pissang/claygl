@@ -8,19 +8,37 @@ declare module qtek {
     export module compositor {
         
         interface ICompositorNodeInput {
-            node: {
-                string;
-                Node;
-            }
+            // TODO
+            // string
+            // Node
+            node: any;
             pin: string;
         }
 
+        interface ICompositorNodeOutputParameter {
+            // TODO
+            // number;
+            // (renderer?: Renderer): number;
+            width?: any;
+            // number;
+            // (renderer?: Renderer): number;
+            height?: any;
+            type?: number;
+            format?: number;
+            wrapS?: number;
+            wrapT?: number;
+            minFilter?: number;
+            magFilter?: number;
+            useMipmap?: boolean;
+            anisotropic?: number;
+            flipY?: boolean;
+        }
+
         interface ICompositorNodeOutput {
-            attachment?: {
-                string;
-                number;
-            }
-            parameters?: ITextureOption;
+            // string
+            // number
+            attachment?: any;
+            parameters?: ICompositorNodeOutputParameter;
             keepLastFrame?: boolean;
             outputLastFrame?: boolean;
         }

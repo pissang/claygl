@@ -57,8 +57,8 @@ declare module qtek {
 
             load(imageList: ITextureCubeImageSrc): void;
 
-            once(name: "success", handler: Function, context?: any): void;
-            success(handler: Function, context?: any): void;
+            once(name: "success", handler: (texture?: TextureCube) => any, context?: any): void;
+            success(handler: (texture?: TextureCube) => any, context?: any): void;
 
             once(name: "error", handler: Function, context?: any): void;
             error(handler: Function, context?: any): void;

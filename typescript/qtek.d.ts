@@ -76,3 +76,5 @@
 ///<reference path="shader/library" />
 ///<reference path="texture/Texture2D" />
 ///<reference path="texture/TextureCube" />
+///<reference path="util/mesh" />
+///<reference path="util/texture" />

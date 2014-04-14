@@ -4,13 +4,15 @@ declare module qtek {
 
     export module compositor {
 
-        interface TextureNodeOption extends ICompositorNodeOption {
+        interface ICompositorTextureNodeOption {
+            name?: string;
+            outputs?: IDictionary<ICompositorNodeOutput>;
             texture: Texture;
         }
 
         export class TextureNode extends Node {
 
-            constructor(option?: TextureNodeOption);
+            constructor(option?: ICompositorTextureNodeOption);
 
             texture: Texture;
         }

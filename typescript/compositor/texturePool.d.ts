@@ -1,15 +1,9 @@
 ///<reference path="../Texture.d.ts" />
-declare module qtek {
+declare module qtek.compositor.texturePool {
 
-    export module compositor {
+    export function get(parameters: ITextureOption): Texture;
 
-        export module texturePool {
+    export function put(parameters: ITextureOption): void;
 
-            export function get(parameters: ITextureOption): Texture;
-
-            export function put(parameters: ITextureOption): void;
-
-            export function clear(gl: WebGLRenderingContext): void;
-        }
-    }
+    export function clear(gl: WebGLRenderingContext): void;
 }

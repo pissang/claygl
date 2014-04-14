@@ -83,9 +83,6 @@ define(function(require) {
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
         });
-        if (this.softShadow === ShadowMapPass.VSM) {
-            this._outputDepthPass.material.shader.define("fragment", "USE_VSM");
-        }
     }, {
 
         render : function(renderer, scene, sceneCamera) {
@@ -96,11 +93,16 @@ define(function(require) {
 
         renderDebug : function(renderer, size) {
             var prevClear = renderer.clear;
-            renderer.clear = glenum.DEPTH_BUFFER_BIT
+            renderer.clear = glenum.DEPTH_BUFFER_BIT;
             var viewport = renderer.viewport;
             var x = 0, y = 0;
             var width = size || viewport.width / 4;
             var height = width;
+            if (this.softShadow === ShadowMapPass.VSM) {
+                this._outputDepthPass.material.shader.define("fragment", "USE_VSM");
+            } else {
+                this._outputDepthPass.material.shader.unDefine("fragment", "USE_VSM");
+            }
             for (var name in this._textures) {
                 renderer.setViewport(x, y, width, height);
                 this._outputDepthPass.setUniform('depthMap', this._textures[name]);

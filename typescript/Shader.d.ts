@@ -39,7 +39,14 @@ declare module qtek {
         AREA_LIGHT: number;
     }
 
+    interface  IShaderOption {
+        vertex?: string;
+        fragment?: string;
+    }
+
     export class Shader extends core.Base {
+
+        constructor(option?: IShaderOption);
 
         vertex: string;
 
@@ -104,5 +111,9 @@ declare module qtek {
         clone(): Shader;
 
         dispose(gl: WebGLRenderingContext): void;
+
+        static import(shaderStr: string): void;
+
+        static source(name: string): string;
     }
 }

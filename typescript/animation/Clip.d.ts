@@ -7,14 +7,13 @@ declare module qtek {
             life?: number;
             delay?: number;
             gap?: number;
-            loop?: {
-                number;
-                boolean;
-            }
-            easing?: {
-                string;
-                (percent: number): number;
-            }
+            // boolean
+            // number
+            loop?: any;
+            // TODO
+            // string
+            // (percent: number): number;
+            easing?: any;
             onframe?: (target: any, schedule: number) => void;
             onrestart?: () => void;
             ondestroy?: () => void;

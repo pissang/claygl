@@ -149,7 +149,7 @@ define(function(require) {
 
         isRenderable : function() {},
         
-        isPowerOfTwo : function() {},
+        isPowerOfTwo : function() {}
     });
     
     /* DataType */

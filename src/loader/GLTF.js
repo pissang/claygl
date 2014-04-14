@@ -676,22 +676,31 @@ define(function(require) {
                         node = new OrthographicCamera();
                         console.warn("TODO:Orthographic camera")
                     }
+                    node.setName(nodeInfo.name);
                     lib.cameras[nodeInfo.name] = node;
-                } else {
-                    node = new Node({
-                        name : nodeInfo.name
-                    });
                 }
-                if (nodeInfo.lights) {
+                else if (nodeInfo.lights) {
+                    var lights = [];
                     for (var i = 0; i < nodeInfo.lights.length; i++) {
                         var lightInfo = json.lights[nodeInfo.lights[i]];
                         var light = this._parseLight(lightInfo);
                         if (light) {
+                            lights.push(light);
+                        }
+                    }
+                    if (lights.length == 1) {
+                        // Replace the node with light
+                        node = light;
+                        node.setName(nodeInfo.name);
+                    } else {
+                        node = new Node();
+                        node.setName(nodeInfo.name);
+                        for (var i = 0; i < lights.length; i++) {
                             node.add(light);
                         }
                     }
                 }
-                if (nodeInfo.meshes || nodeInfo.instanceSkin) {
+                else if (nodeInfo.meshes || nodeInfo.instanceSkin) {
                     // TODO one node have multiple meshes ?
                     if (nodeInfo.meshes) {
                         var meshKey = nodeInfo.meshes[0];
@@ -704,8 +713,10 @@ define(function(require) {
                             if (primitives.length === 1) {
                                 // Replace the node with mesh directly
                                 node = primitives[0];
-                                node.name = nodeInfo.name;
+                                node.setName(nodeInfo.name);
                             } else {
+                                node = new Node();
+                                node.setName(nodeInfo.name);
                                 for (var j = 0; j < primitives.length; j++) {                            
                                     if (nodeInfo.instanceSkin) {
                                         primitives[j].skeleton = nodeInfo.instanceSkin.skin;
@@ -715,6 +726,9 @@ define(function(require) {
                             }
                         }
                     }
+                } else {
+                    node = new Node();
+                    node.setName(nodeInfo.name);
                 }
                 if (nodeInfo.matrix) {
                     for (var i = 0; i < 16; i++) {

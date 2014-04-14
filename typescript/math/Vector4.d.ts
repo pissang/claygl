@@ -5,7 +5,10 @@ declare module qtek {
     export module math {
 
         export class Vector4 {
-            
+
+            constructor(x: number, y: number, z: number, w: number);
+            constructor();
+
             x: number;
 
             y: number;

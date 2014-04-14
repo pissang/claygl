@@ -22,11 +22,14 @@ declare module qtek {
 
             cascadeSplitLogFactor: number;
 
-            render(renderer: Renderer, scene: Scene, sceneCamera: Camera): void;
+            render(renderer: Renderer, scene: Scene, sceneCamera?: Camera): void;
 
             renderDebug(renderer: Renderer, size?: number): void;
 
             dispose(gl: WebGLRenderingContext): void;
+
+            static VSM: number;
+            static PCF: number;
         }
     }
 }

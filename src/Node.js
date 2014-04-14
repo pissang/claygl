@@ -56,10 +56,10 @@ define(function(require) {
 
         setName : function(name) {
             if (this.scene) {
-                this.scene._nodeRepository[name] = null;
-                this.scene._nodeRepository[newName] = this;
+                delete this.scene._nodeRepository[this.name];
+                this.scene._nodeRepository[name] = this;
             }
-            name = newName;
+            this.name = name;
         },
 
         add : function(node) {

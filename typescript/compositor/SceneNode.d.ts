@@ -5,16 +5,18 @@ declare module qtek {
 
     export module compositor {
 
-        interface SceneNodeOption extends ICompositorNodeOption {
+        interface ICompositorSceneNodeOption {
+            name?: string;
             scene?: Scene;
             camera?: Camera;
-            autoUpdateScene: boolean;
-            preZ: boolean;
+            autoUpdateScene?: boolean;
+            preZ?: boolean;
+            outputs?: IDictionary<ICompositorNodeOutput>;
         }
 
         export class SceneNode extends Node {
 
-            constructor(option?: SceneNodeOption);
+            constructor(option: ICompositorSceneNodeOption);
 
             scene: Scene;
 

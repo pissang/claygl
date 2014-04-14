@@ -62,5 +62,20 @@ declare module qtek {
         render(gl: WebGLRenderingContext, globalMaterial?: Material): IMeshRenderInfo;
 
         clone(): Mesh;
+
+        // Enums
+        static POINTS: number;
+        static LINES: number;
+        static LINE_LOOP: number;
+        static LINE_STRIP: number;
+        static TRIANGLES: number;
+        static TRIANGLE_STRIP: number;
+        static TRIANGLE_FAN: number;
+
+        static BACK: number;
+        static FRONT: number;
+        static FRONT_AND_BACK: number;
+        static CW: number;
+        static CCW: number;
     }
 }
