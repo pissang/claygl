@@ -27,6 +27,8 @@ define(function(require) {
         this._axisZ = new Vector3();
 
         this._array = mat4.create();
+
+        this._dirty = true;
     };
 
     Matrix4.prototype = {
@@ -47,6 +49,8 @@ define(function(require) {
             el[8] = v[0];
             el[9] = v[1];
             el[10] = v[2];
+
+            this._dirty = true;
         },
 
         get up() {
@@ -61,6 +65,8 @@ define(function(require) {
             el[4] = v[0];
             el[5] = v[1];
             el[6] = v[2];
+
+            this._dirty = true;
         },
 
         get right() {
@@ -75,10 +81,13 @@ define(function(require) {
             el[0] = v[0];
             el[1] = v[1];
             el[2] = v[2];
+
+            this._dirty = true;
         },
 
         adjoint : function() {
             mat4.adjoint(this._array, this._array);
+            this._dirty = true;
             return this;
         },
         clone : function() {
@@ -86,6 +95,7 @@ define(function(require) {
         },
         copy : function(a) {
             mat4.copy(this._array, a._array);
+            this._dirty = true;
             return this;
         },
         determinant : function() {
@@ -93,79 +103,98 @@ define(function(require) {
         },
         fromQuat : function(q) {
             mat4.fromQuat(this._array, q._array);
+            this._dirty = true;
             return this;
         },
         fromRotationTranslation : function(q, v) {
             mat4.fromRotationTranslation(this._array, q._array, v._array);
+            this._dirty = true;
             return this;
         },
         frustum : function(left, right, bottom, top, near, far) {
             mat4.frustum(this._array, left, right, bottom, top, near, far);
+            this._dirty = true;
             return this;
         },
         identity : function() {
             mat4.identity(this._array);
+            this._dirty = true;
             return this;
         },
         invert : function() {
             mat4.invert(this._array, this._array);
+            this._dirty = true;
             return this;
         },
         lookAt : function(eye, center, up) {
             mat4.lookAt(this._array, eye._array, center._array, up._array);
+            this._dirty = true;
             return this;
         },
         mul : function(b) {
             mat4.mul(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
         mulLeft : function(a) {
             mat4.mul(this._array, a._array, this._array);
+            this._dirty = true;
             return this;
         },
         multiply : function(b) {
             mat4.multiply(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
         // Apply left multiply
         multiplyLeft : function(a) {
             mat4.multiply(this._array, a._array, this._array);
+            this._dirty = true;
             return this;
         },
         ortho : function(left, right, bottom, top, near, far) {
             mat4.ortho(this._array, left, right, bottom, top, near, far);
+            this._dirty = true;
             return this;
         },
         perspective : function(fovy, aspect, near, far) {
             mat4.perspective(this._array, fovy, aspect, near, far);
+            this._dirty = true;
             return this;
         },
         rotate : function(rad, axis) {
             mat4.rotate(this._array, this._array, rad, axis._array);
+            this._dirty = true;
             return this;
         },
         rotateX : function(rad) {
             mat4.rotateX(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
         rotateY : function(rad) {
             mat4.rotateY(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
         rotateZ : function(rad) {
             mat4.rotateZ(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
         scale : function(v) {
             mat4.scale(this._array, this._array, v._array);
+            this._dirty = true;
             return this;
         },
         translate : function(v) {
             mat4.translate(this._array, this._array, v._array);
+            this._dirty = true;
             return this;
         },
         transpose : function() {
             mat4.transpose(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -241,11 +270,13 @@ define(function(require) {
 
     Matrix4.adjoint = function(out, a) {
         mat4.adjoint(out._array, a._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.copy = function(out, a) {
         mat4.copy(out._array, a._array);
+        out._dirty = true;
         return out;
     }
 
@@ -255,31 +286,37 @@ define(function(require) {
 
     Matrix4.identity = function(out) {
         mat4.identity(out._array);
+        out._dirty = true;
         return out;
     }
     
     Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
         mat4.ortho(out._array, left, right, bottom, top, near, far);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.perspective = function(out, fovy, aspect, near, far) {
         mat4.perspective(out._array, fovy, aspect, near, far);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.lookAt = function(out, eye, center, up) {
         mat4.lookAt(out._array, eye._array, center._array, up._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.invert = function(out, a) {
         mat4.invert(out._array, a._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.mul = function(out, a, b) {
         mat4.mul(out._array, a._array, b._array);
+        out._dirty = true;
         return out;
     }
 
@@ -287,46 +324,55 @@ define(function(require) {
 
     Matrix4.fromQuat = function(out, q) {
         mat4.fromQuat(out._array, q._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.fromRotationTranslation = function(out, q, v) {
         mat4.fromRotationTranslation(out._array, q._array, v._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.rotate = function(out, a, rad, axis) {
         mat4.rotate(out._array, a._array, rad, axis._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.rotateX = function(out, a, rad) {
         mat4.rotateX(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.rotateY = function(out, a, rad) {
         mat4.rotateY(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.rotateZ = function(out, a, rad) {
         mat4.rotateZ(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.scale = function(out, a, v) {
         mat4.scale(out._array, a._array, v._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.transpose = function(out, a) {
         mat4.transpose(out._array, a._array);
+        out._dirty = true;
         return out;
     }
 
     Matrix4.translate = function(out, a, v) {
         mat4.translate(out._array, a._array, v._array);
+        out._dirty = true;
         return out;
     }
 

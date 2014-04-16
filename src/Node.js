@@ -103,7 +103,7 @@ define(function(require) {
             descendant.scene = parent.scene;
         },
 
-        isAscendant : function(node) {
+        isAncestor : function(node) {
             var parent = node.parent;
             while(parent) {
                 if (parent === this) {

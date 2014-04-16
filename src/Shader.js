@@ -740,34 +740,33 @@ define(function(require) {
             }
             var program = _gl.createProgram();
 
-            try {
+            var vertexShader = this._compileShader(_gl, "vertex", vertexShaderString);
+            var fragmentShader = this._compileShader(_gl, "fragment", fragmentShaderString);
+            if (!vertexShader || !fragmentShader) {
+                return;
+            }
+            
+            _gl.attachShader(program, vertexShader);
+            _gl.attachShader(program, fragmentShader);
+            // Force the position bind to index 0;
+            if (this.attribSemantics['POSITION']) {
+                _gl.bindAttribLocation(program, 0, this.attribSemantics['POSITION'].symbol);
+            }
+            _gl.linkProgram(program);
 
-                var vertexShader = this._compileShader(_gl, "vertex", vertexShaderString);
-                var fragmentShader = this._compileShader(_gl, "fragment", fragmentShaderString);
-                _gl.attachShader(program, vertexShader);
-                _gl.attachShader(program, fragmentShader);
-                // Force the position bind to index 0;
-                if (this.attribSemantics['POSITION']) {
-                    _gl.bindAttribLocation(program, 0, this.attribSemantics['POSITION'].symbol);
-                }
-                _gl.linkProgram(program);
-
-                if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-                    throw new Error("Could not initialize shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]");
-                }
-                // Cache uniform locations
-                for (var i = 0; i < this._uniformList.length; i++) {
-                    var uniformSymbol = this._uniformList[i];
-                    var locationMap = this.cache.get("locations");
-                    locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
-                }
-
-            } catch(e) {
+            if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
                 if (errorShader[this.__GUID__]) {
                     return;
                 }
                 errorShader[this.__GUID__] = this;
-                throw e; 
+                throw new Error("Could not link program\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]");
+            }
+
+            // Cache uniform locations
+            for (var i = 0; i < this._uniformList.length; i++) {
+                var uniformSymbol = this._uniformList[i];
+                var locationMap = this.cache.get("locations");
+                locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
             }
 
             _gl.deleteShader(vertexShader);
@@ -782,6 +781,10 @@ define(function(require) {
             _gl.compileShader(shader);
 
             if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
+                if (errorShader[this.__GUID__]) {
+                    return;
+                }
+                errorShader[this.__GUID__] = this;
                 throw new Error([_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join("\n"));
             }
             return shader;

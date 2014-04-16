@@ -90,4 +90,4 @@ animation.start();
 animation.on('frame', function(deltaTime) {
     cubeMesh.rotation.rotateY(0.01);
     compositor.render(renderer);
-})
+});
