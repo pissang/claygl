@@ -28,24 +28,30 @@ define(function() {
             for (var i = 0; i < EXTENSION_LIST.length; i++) {
                 var extName = EXTENSION_LIST[i];
 
-                var ext = _gl.getExtension(extName);
-                // Try vendors
-                if (! ext) {
-                    ext = _gl.getExtension("MOZ_" + extName);
-                }
-                if (! ext) {
-                    ext = _gl.getExtension("WEBKIT_" + extName);
-                }
-
-                extensions[_gl.__GLID__][extName] = ext;
+                this._createExtension(_gl, extName);
             }
         },
 
         getExtension : function(_gl, name) {
             var guid = _gl.__GLID__;
             if (extensions[guid]) {
+                if (typeof(extensions[guid][name]) == 'undefined') {
+                    this._createExtension(_gl, name);
+                }
                 return extensions[guid][name];
             }
+        },
+
+        _createExtension : function(_gl, name) {
+            var ext = _gl.getExtension(name);
+            if (!ext) {
+                ext = _gl.getExtension('MOZ_' + name);
+            }
+            if (!ext) {
+                ext = _gl.getExtension('WEBKIT_' + name);
+            }
+
+            extensions[_gl.__GLID__][name] = ext;
         }
     }
 

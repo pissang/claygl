@@ -159,8 +159,11 @@ define(function(require) {
             this._sceneRendering = scene;
 
             var color = this.color;
-            _gl.clearColor(color[0], color[1], color[2], color[3]);
-            _gl.clear(this.clear);
+
+            if (this.clear) {
+                _gl.clearColor(color[0], color[1], color[2], color[3]);
+                _gl.clear(this.clear);
+            }
 
             // If the scene have been updated in the prepass like shadow map
             // There is no need to update it again

@@ -9,31 +9,35 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
 
-    var FrameBuffer = Base.derive(function() {
+    var FrameBuffer = Base.derive({
+        depthBuffer : true,
 
-        return {
-            depthBuffer : true,
+        //Save attached texture and target
+        _attachedTextures : null,
 
-            //Save attached texture and target
-            _attachedTextures : {},
+        _width : 0,
+        _height : 0,
+        _depthTextureAttached : false,
 
-            _width : 0,
-            _height : 0,
-            _depthTextureAttached : false,
+        _renderBufferWidth : 0,
+        _renderBufferHeight : 0,
 
-            _renderBufferWidth : 0,
-            _renderBufferHeight : 0
-        }
+        _binded : false,
     }, function() {
         // Use cache
         this.cache = new Cache();
+
+        this._attachedTextures = {};
     }, {
 
         bind : function(renderer) {
 
             var _gl = renderer.gl;
 
-            _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+            if (!this._binded) {
+                _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+                this._binded = true;
+            }
 
             this.cache.put("viewport", renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height);
@@ -56,19 +60,17 @@ define(function(require) {
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
                 }
                 if (! this.cache.get("renderbuffer_attached")) {
-                    
                     _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
                     this.cache.put("renderbuffer_attached", true);
-
                 }
             }
-            
         },
 
         unbind : function(renderer) {
             var _gl = renderer.gl;
             
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
+            this._binded = false;
 
             this.cache.use(_gl.__GLID__);
             var viewport = this.cache.get("viewport");
@@ -107,7 +109,10 @@ define(function(require) {
                 throw new Error("The texture attached to color buffer is not a valid.");
             }
 
-            _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+            if (!this._binded) {
+                _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+                this._binded = true;
+            }
 
             this._width = texture.width;
             this._height = texture.height;
@@ -138,8 +143,6 @@ define(function(require) {
             this._attachedTextures[attachment] = texture;
 
             _gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
-
-            _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
         },
 
         detach : function() {},

@@ -293,7 +293,10 @@ define(function(require) {
                     for (i = 0; i < rootNodes.length; i++) {
                         var rootNode = lib.nodes[rootNodes[i]];
                         var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1, rootNode);
-                        skeleton.roots.push(rootJoint);
+                        // Root joint may not in the skeleton
+                        if (rootJoint) {
+                            skeleton.roots.push(rootJoint);
+                        }
                     }
                 }
             }

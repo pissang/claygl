@@ -30,7 +30,6 @@ define(function(require) {
             outputs : null,
 
             material : null
-
         }
     }, function() {
 
@@ -80,17 +79,13 @@ define(function(require) {
         bind : function(renderer, frameBuffer) {
             
             if (this.outputs) {
-                var haveAttachment = false;
                 for (var attachment in this.outputs) {
                     var texture = this.outputs[attachment];
                     if (texture) {
-                        haveAttachment = true;
                         frameBuffer.attach(renderer.gl, texture, attachment);
                     }
                 }
-                if (haveAttachment) {
-                    frameBuffer.bind(renderer);
-                }
+                frameBuffer.bind(renderer);
             }
         },
 
@@ -106,20 +101,19 @@ define(function(require) {
 
             if (frameBuffer) {
                 this.bind(renderer, frameBuffer);
-            }
-
-            // MRT Support in chrome
-            // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-            var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
-            if (ext) {
-                var bufs = [];
-                for (var attachment in this.outputs) {
-                    attachment = parseInt(attachment);
-                    if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
-                        bufs.push(attachment);
+                // MRT Support in chrome
+                // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+                var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
+                if (ext) {
+                    var bufs = [];
+                    for (var attachment in this.outputs) {
+                        attachment = +attachment;
+                        if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
+                            bufs.push(attachment);
+                        }
                     }
+                    ext.drawBuffersEXT(bufs);
                 }
-                ext.drawBuffersEXT(bufs);
             }
 
             this.trigger("beforerender", this, renderer);

@@ -46,6 +46,9 @@ define(function(require) {
         },
         
         getVertexNumber : function() {
+            if (!this.attributes.position.value) {
+                return 0;
+            }
             return this.attributes.position.value.length / 3;
         },
 

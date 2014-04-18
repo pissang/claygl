@@ -38,7 +38,7 @@ define(function(require) {
             geometry.boundingBox = new BoundingBox();
             var faces = geometry.faces;
 
-            var attributeNames = Object.keys(templateGeo.getEnabledAttributes());
+            var attributeNames = templateGeo.getEnabledAttributes();
 
             for (var i = 0; i < attributeNames.length; i++) {
                 var name = attributeNames[i];
@@ -250,7 +250,7 @@ define(function(require) {
             var root = new Node({
                 name : mesh.name
             });
-            var attribNames = Object.keys(geometry.getEnabledAttributes());
+            var attribNames = geometry.getEnabledAttributes();
             attribNames.splice(attribNames.indexOf('joint'), 1);
             // Map from old vertex index to new vertex index
             var newIndices = [];

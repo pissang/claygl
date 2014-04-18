@@ -47,6 +47,8 @@ indicesBuffer = bytearray()
 invBindMatricesBuffer = bytearray()
 animationBuffer = bytearray()
 
+fbxNodes = {};
+
 GL_RGBA = 0x1908
 GL_FLOAT = 0x1406
 GL_UNSIGNED_BYTE = 0x1401
@@ -763,19 +765,35 @@ def ConvertSceneNode(pNode, fbxConverter):
                 'sources' : [lMeshKey]
             }
             # Find Root
-            # which do not have a parent or its parent is not in skin
-            # TODO IsSkeletonRoot not works well
             for lJointName in lGLTFSkin['joints']:
                 lCluster = lClusters[lJointName]
                 lLink = lCluster.GetLink()
-                lParent = lLink.GetParent()
-                if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
-                    if not lParent.GetName() in roots:
-                        roots.append(lLink.GetName())
+                lParent = lLink
+                lRootFound = False
+                # if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
+                #     if not lParent.GetName() in roots:
+                #         roots.append(lLink.GetName())
+                while not lParent == None:
+                    lSkeleton = lParent.GetSkeleton()
+                    if (lSkeleton == None):
+                        break;
+                    if lSkeleton.IsSkeletonRoot():
+                        lRootFound = True
+                        break;
+                    lParent = lParent.GetParent()
 
-            #Find root
-            lRootCluster = lClusters[roots[0]]
-            lRootNode = lRootCluster.GetLink().GetParent()
+                if lRootFound:
+                    if not lParent.GetName() in roots:
+                        roots.append(lParent.GetName())
+                else:
+                    # TODO IsSkeletonRoot not works well, try another way
+                    # which do not have a parent or its parent is not in skin
+                    lParent = lLink.GetParent()
+                    if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
+                        if not lLink.GetName() in roots:
+                            roots.append(lLink.GetName())
+
+            lRootNode = fbxNodes[roots[0]]
             lRootNodeTransform = lRootNode.EvaluateGlobalTransform()
 
             lClusterGlobalInitMatrix = FbxAMatrix()
@@ -1003,7 +1021,11 @@ def CreateBufferViews(pBufferName):
             lib_accessors[lKey] = lAccessor
 
         lByteOffset += lBufferView['byteLength']
-    
+
+def ListNodes(pNode):
+    fbxNodes[pNode.GetName()] = pNode
+    for k in range(pNode.GetChildCount()):
+        ListNodes(pNode.GetChild(k))
 
 def Convert(path, animFrameRate = 1 / 30):
     # Prepare the FBX SDK.
@@ -1018,6 +1040,7 @@ def Convert(path, animFrameRate = 1 / 30):
         lBaseName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
         lRoot, lExt = os.path.splitext(sys.argv[1])
 
+        ListNodes(lScene.GetRootNode())
         lSceneName = ConvertScene(lScene, fbxConverter)
         ConvertAnimation(lScene, animFrameRate)
 

@@ -124,9 +124,8 @@ define(function(require) {
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
                     // Joint space is relative to root joint's parent, if have
-                    if (joint.rootNode) {
-                        mat4.invert(m4, joint.rootNode.worldTransform._array);
-                        // TODO is the order right?
+                    if (joint.rootNode && joint.rootNode.parent) {
+                        mat4.invert(m4, joint.rootNode.parent.worldTransform._array);
                         mat4.multiply(
                             m4,
                             m4,
@@ -159,10 +158,7 @@ define(function(require) {
             var m4 = mat4.create();
             return function() {
                 for (var i = 0; i < this.roots.length; i++) {
-                    // Update the transform if joint node not attached to the scene
-                    if (!this.roots[i].node.scene) {
-                        this.roots[i].node.update(true);
-                    }
+                    this.roots[i].node.update(true);
                 }
 
                 for (var i = 0; i < this.joints.length; i++) {
@@ -207,6 +203,10 @@ define(function(require) {
         setPose : function(clipIndex) {
             var clip = this._clips[clipIndex].clip;
             var maps = this._clips[clipIndex].maps;
+
+            if (this.name == 'skin_6') {
+                console.log('okkk')
+            }
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
                 if (maps[i] === -1) {

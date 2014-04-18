@@ -91,7 +91,7 @@
                 });
                 var data = JSON.parse(modelData);
 
-                var loader = new qtek.loader.three.Model();
+                var loader = new qtek.loader.ThreeModel();
                 var meshList = loader.parse(data);
                 
                 var shader = qtek.shader.library.get("buildin.lambert");
