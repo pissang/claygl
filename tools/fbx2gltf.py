@@ -794,7 +794,7 @@ def ConvertSceneNode(pNode, fbxConverter):
                             roots.append(lLink.GetName())
 
             lRootNode = fbxNodes[roots[0]]
-            lRootNodeTransform = lRootNode.EvaluateGlobalTransform()
+            lRootNodeTransform = lRootNode.GetParent().EvaluateGlobalTransform()
 
             lClusterGlobalInitMatrix = FbxAMatrix()
             lReferenceGlobalInitMatrix = FbxAMatrix()
@@ -981,20 +981,6 @@ def CreateBufferViews(pBufferName):
 
     lByteOffset += lBufferView['byteLength']
 
-    #Indices buffer view
-    lBufferViewName = 'bufferView_' + str(GetId())
-    lBufferView = lib_buffer_views[lBufferViewName] = {}
-    lBufferView['buffer'] = pBufferName
-    lBufferView['byteLength'] = len(indicesBuffer)
-    lBufferView['byteOffset'] = lByteOffset
-    lBufferView['target'] = GL_ELEMENT_ARRAY_BUFFER
-
-    for lKey, lIndices in lib_indices.items():
-        lIndices['bufferView'] = lBufferViewName
-        lib_accessors[lKey] = lIndices
-
-    lByteOffset += lBufferView['byteLength']
-
     #Inverse Bind Pose Matrices
     if len(invBindMatricesBuffer) > 0:
         lBufferViewName = 'bufferView_' + str(GetId())
@@ -1022,6 +1008,22 @@ def CreateBufferViews(pBufferName):
 
         lByteOffset += lBufferView['byteLength']
 
+    #Indices buffer view
+    #Put the indices buffer at last or there may be a error
+    #When creating a Float32Array, which the offset must be multiple of 4
+    lBufferViewName = 'bufferView_' + str(GetId())
+    lBufferView = lib_buffer_views[lBufferViewName] = {}
+    lBufferView['buffer'] = pBufferName
+    lBufferView['byteLength'] = len(indicesBuffer)
+    lBufferView['byteOffset'] = lByteOffset
+    lBufferView['target'] = GL_ELEMENT_ARRAY_BUFFER
+
+    for lKey, lIndices in lib_indices.items():
+        lIndices['bufferView'] = lBufferViewName
+        lib_accessors[lKey] = lIndices
+
+    lByteOffset += lBufferView['byteLength']
+
 def ListNodes(pNode):
     fbxNodes[pNode.GetName()] = pNode
     for k in range(pNode.GetChildCount()):
@@ -1047,9 +1049,9 @@ def Convert(path, animFrameRate = 1 / 30):
         #Merge binary data and write to a binary file
         lBin = bytearray()
         lBin.extend(attributeBuffer)
-        lBin.extend(indicesBuffer)
         lBin.extend(invBindMatricesBuffer)
         lBin.extend(animationBuffer)
+        lBin.extend(indicesBuffer)
 
         out = open(lRoot + ".bin", 'wb')
         out.write(lBin)

@@ -124,6 +124,7 @@ define(function(require) {
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
                     // Joint space is relative to root joint's parent, if have
+                    // !!Parent node and joint node must all be updated
                     if (joint.rootNode && joint.rootNode.parent) {
                         mat4.invert(m4, joint.rootNode.parent.worldTransform._array);
                         mat4.multiply(
@@ -204,9 +205,6 @@ define(function(require) {
             var clip = this._clips[clipIndex].clip;
             var maps = this._clips[clipIndex].maps;
 
-            if (this.name == 'skin_6') {
-                console.log('okkk')
-            }
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
                 if (maps[i] === -1) {
