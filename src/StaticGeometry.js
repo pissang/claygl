@@ -296,12 +296,13 @@ define(function(require) {
             }
 
             var cursor = this.getVertexNumber();
-            var attributes = this.getEnabledAttributes();
+            var attributes = this.attributes;
             var faces = this.faces;
 
-            var attributeNameList = Object.keys(attributes);
+            var attributeNameList = this.getEnabledAttributes();
 
-            for (var name in attributes) {
+            for (var a = 0; a < attributeNameList.length; a++) {
+                var name = attributeNameList[a];
                 var expandedArray = new Float32Array(this.faces.length * attributes[name].size);
                 var len = attributes[name].value.length;
                 for (var i = 0; i < len; i++) {

@@ -39,6 +39,10 @@ define(function(require) {
             var faces = geometry.faces;
 
             var attributeNames = templateGeo.getEnabledAttributes();
+            // TODO
+            if (!isStatic) {
+                attributeNames = Object.keys(attributeNames);
+            }
 
             for (var i = 0; i < attributeNames.length; i++) {
                 var name = attributeNames[i];
@@ -250,7 +254,12 @@ define(function(require) {
             var root = new Node({
                 name : mesh.name
             });
-            var attribNames = geometry.getEnabledAttributes();
+            var attribNames = geometry.getEnabledAttributes();            
+            // TODO
+            if (!isStatic) {
+                attribNames = Object.keys(attribNames);
+            }
+
             attribNames.splice(attribNames.indexOf('joint'), 1);
             // Map from old vertex index to new vertex index
             var newIndices = [];

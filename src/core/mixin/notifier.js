@@ -60,7 +60,7 @@ define(function() {
             var handler = new Handler(action, context || this);
             handlers[name].push(handler);
 
-            return handler;
+            return this;
         },
 
         once : function(name, action, context/*optional*/) {
@@ -122,6 +122,8 @@ define(function() {
                 }
                 handlers[name] = retains;
             } 
+
+            return this;
         },
 
         has : function(name, action) {

@@ -111,6 +111,10 @@ define(function(require) {
             this._dirty = true;
             return this;
         },
+        fromMat2d : function(m2d) {
+            Matrix4.fromMat2d(this, m2d);
+            return this;
+        },
         frustum : function(left, right, bottom, top, near, far) {
             mat4.frustum(this._array, left, right, bottom, top, near, far);
             this._dirty = true;
@@ -332,6 +336,22 @@ define(function(require) {
         mat4.fromRotationTranslation(out._array, q._array, v._array);
         out._dirty = true;
         return out;
+    }
+
+    Matrix4.fromMat2d = function(m4, m2d) {
+        m4._dirty = true;
+        var m2d = m2d._array;
+        var m4 = m4._array;
+
+        m4[0] = m2d[0];
+        m4[4] = m2d[2];
+        m4[12] = m2d[4];
+
+        m4[1] = m2d[1];
+        m4[5] = m2d[3];
+        m4[13] = m2d[5];
+
+        return m4;
     }
 
     Matrix4.rotate = function(out, a, rad, axis) {
