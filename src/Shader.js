@@ -416,6 +416,8 @@ define(function(require) {
          * Enable the attributes passed in and disable the rest
          * Example Usage:
          * enableAttributes(_gl, ["position", "texcoords"])
+         *
+         * PENDING
          */
         enableAttributes : function(_gl, attribList) {
             

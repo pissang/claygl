@@ -4,6 +4,7 @@ define(function(require) {
 
     var Node = require("./Node");
     var glenum = require("./core/glenum");
+    var glinfo = require('./core/glinfo');
     var Vector3 = require("./math/Vector3");
     var StaticGeometry = require('./StaticGeometry');
 
@@ -21,7 +22,7 @@ define(function(require) {
         this.drawCallNumber = 0;
     }
 
-    function DrawDetail(
+    function VertexArrayObject(
         availableAttributes,
         availableAttributeSymbols,
         indicesBuffer
@@ -29,6 +30,8 @@ define(function(require) {
         this.availableAttributes = availableAttributes;
         this.availableAttributeSymbols = availableAttributeSymbols;
         this.indicesBuffer = indicesBuffer;
+
+        this.vao = null;
     }
 
     var Mesh = Node.derive(function() {
@@ -80,6 +83,13 @@ define(function(require) {
             var geometry = this.geometry;
 
             var glDrawMode = this.mode;
+
+            if (geometry.hint == glenum.STATIC_DRAW) {
+                var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            } else {
+                // create vertex object array cost a lot, so don't use it on the dynamic object
+                var vaoExt = null;
+            }
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
@@ -94,7 +104,7 @@ define(function(require) {
             renderInfo.drawCallNumber = 0;
             // Draw each chunk
             needsBindAttributes = false;
-            if (nVertex > geometry.chunkSize) {
+            if (nVertex > geometry.chunkSize || vaoExt) {
                 needsBindAttributes = true;
             } else {
                 // Hash with shader id in case previous material has less attributes than next material
@@ -119,13 +129,13 @@ define(function(require) {
                 // Use the cache of static geometry
                 // TODO : machanism to change to the DynamicGeometry automatically
                 // when the geometry is not static any more
-                var drawDetails = this._drawCache[currentDrawID];
-                if (!drawDetails) {
+                var vaoList = this._drawCache[currentDrawID];
+                if (!vaoList) {
                     var chunks = geometry.getBufferChunks(_gl);
                     if (!chunks) {  // Empty mesh
                         return;
                     }
-                    drawDetails = [];
+                    vaoList = [];
                     for (var c = 0; c < chunks.length; c++) {
                         var chunk = chunks[c];
                         var attributeBuffers = chunk.attributeBuffers;
@@ -149,61 +159,77 @@ define(function(require) {
                                 availableAttributeSymbols.push(symbol);
                             }
                         }
-                        var drawDetail = new DrawDetail(
+
+                        var vao = new VertexArrayObject(
                             availableAttributes,
                             availableAttributeSymbols,
                             indicesBuffer
                         );
-                        drawDetails.push(drawDetail);
+                        vaoList.push(vao);
                     }
                     if (geometry.hint == glenum.STATIC_DRAW) {
-                        this._drawCache[currentDrawID] = drawDetails;
+                        this._drawCache[currentDrawID] = vaoList;
                     }
                 }
 
-                for (var i = 0; i < drawDetails.length; i++) {
-                    var drawDetail = drawDetails[i];
-                    var availableAttributes = drawDetail.availableAttributes;
-                    var availableAttributeSymbols = drawDetail.availableAttributeSymbols;
-                    var indicesBuffer = drawDetail.indicesBuffer;
-
-                    var locationList = shader.enableAttributes(_gl, availableAttributeSymbols);
-                    // Setting attributes;
-                    for (var a = 0; a < availableAttributes.length; a++) {
-                        var location = locationList[a];
-                        if (location === -1) {
-                            continue;
+                for (var i = 0; i < vaoList.length; i++) {
+                    var vao = vaoList[i];
+                    var needsBinding = true;
+                    if (vaoExt) {
+                        // Use vertex array object
+                        // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
+                        if (vao.vao == null) {
+                            vao.vao = vaoExt.createVertexArrayOES();
+                        } else {
+                            needsBinding = false;
                         }
-                        var attributeBufferInfo = availableAttributes[a];
-                        var buffer = attributeBufferInfo.buffer;
-                        var symbol = availableAttributeSymbols[a];
-                        var size = attributeBufferInfo.size;
-                        var glType;
-                        switch (attributeBufferInfo.type) {
-                            case "float":
-                                glType = _gl.FLOAT;
-                                break;
-                            case "byte":
-                                glType = _gl.BYTE;
-                                break;
-                            case "ubyte":
-                                glType = _gl.UNSIGNED_BYTE;
-                                break;
-                            case "short":
-                                glType = _gl.SHORT;
-                                break;
-                            case "ushort":
-                                glType = _gl.UNSIGNED_SHORT;
-                                break;
-                            default:
-                                glType = _gl.FLOAT;
-                                break;
-                        }
-
-                        _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                        _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
+                        vaoExt.bindVertexArrayOES(vao.vao);   
                     }
+                    var availableAttributes = vao.availableAttributes;
+                    var availableAttributeSymbols = vao.availableAttributeSymbols;
+                    var indicesBuffer = vao.indicesBuffer;
                     
+                    if (needsBinding) {
+                        var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols);
+                        // Setting attributes;
+                        for (var a = 0; a < availableAttributes.length; a++) {
+                            var location = locationList[a];
+                            if (location === -1) {
+                                continue;
+                            }
+                            var attributeBufferInfo = availableAttributes[a];
+                            var buffer = attributeBufferInfo.buffer;
+                            var symbol = availableAttributeSymbols[a];
+                            var size = attributeBufferInfo.size;
+                            var glType;
+                            switch (attributeBufferInfo.type) {
+                                case "float":
+                                    glType = _gl.FLOAT;
+                                    break;
+                                case "byte":
+                                    glType = _gl.BYTE;
+                                    break;
+                                case "ubyte":
+                                    glType = _gl.UNSIGNED_BYTE;
+                                    break;
+                                case "short":
+                                    glType = _gl.SHORT;
+                                    break;
+                                case "ushort":
+                                    glType = _gl.UNSIGNED_SHORT;
+                                    break;
+                                default:
+                                    glType = _gl.FLOAT;
+                                    break;
+                            }
+
+                            _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                            _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
+                            if (vaoExt) {
+                                _gl.enableVertexAttribArray(location);
+                            }
+                        }
+                    }
                     if (
                         glDrawMode == glenum.LINES ||
                         glDrawMode == glenum.LINE_STRIP ||
@@ -216,13 +242,19 @@ define(function(require) {
                     prevDrawIndicesBuffer = indicesBuffer;
                     //Do drawing
                     if (prevDrawIsUseFace) {
-                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                        if (needsBinding) {
+                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+                        }
                         _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
                         renderInfo.faceNumber += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, nVertex);
                     }
                     renderInfo.drawCallNumber++;
+
+                    if (vaoExt) {
+                        vaoExt.bindVertexArrayOES(null);
+                    }
                 }
             }
 
