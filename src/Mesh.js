@@ -81,7 +81,6 @@ define(function(require) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
-            prevDrawIsUseFace = geometry.isUseFace();
 
             var glDrawMode = this.mode;
 
@@ -99,6 +98,7 @@ define(function(require) {
             }
 
             var nVertex = geometry.getVertexNumber();
+            var isUseFace = geometry.isUseFace();
             var renderInfo = this._renderInfo;
             renderInfo.vertexNumber = nVertex;
             renderInfo.faceNumber = 0;
@@ -107,7 +107,7 @@ define(function(require) {
             needsBindAttributes = false;
             // Hash with shader id in case previous material has less attributes than next material
             currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
-            if ((nVertex > geometry.chunkSize && prevDrawIsUseFace) || vaoExt) {
+            if ((nVertex > geometry.chunkSize && isUseFace) || vaoExt) {
                 needsBindAttributes = true;
                 prevDrawID = currentDrawID;
             } else {
@@ -119,7 +119,6 @@ define(function(require) {
             if (!needsBindAttributes) {
                 // Direct draw
                 if (prevDrawIsUseFace) {
-                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, prevDrawIndicesBuffer.buffer);
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
                     renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
@@ -241,6 +240,7 @@ define(function(require) {
                     }
                     
                     prevDrawIndicesBuffer = indicesBuffer;
+                    prevDrawIsUseFace = geometry.isUseFace();
                     //Do drawing
                     if (prevDrawIsUseFace) {
                         if (needsBinding) {
