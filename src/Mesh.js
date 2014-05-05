@@ -81,6 +81,7 @@ define(function(require) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
+            prevDrawIsUseFace = geometry.isUseFace();
 
             var glDrawMode = this.mode;
 
@@ -104,11 +105,12 @@ define(function(require) {
             renderInfo.drawCallNumber = 0;
             // Draw each chunk
             needsBindAttributes = false;
-            if (nVertex > geometry.chunkSize || vaoExt) {
+            // Hash with shader id in case previous material has less attributes than next material
+            currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
+            if ((nVertex > geometry.chunkSize && prevDrawIsUseFace) || vaoExt) {
                 needsBindAttributes = true;
+                prevDrawID = currentDrawID;
             } else {
-                // Hash with shader id in case previous material has less attributes than next material
-                currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                     prevDrawID = currentDrawID;
@@ -238,7 +240,6 @@ define(function(require) {
                         _gl.lineWidth(this.lineWidth);
                     }
                     
-                    prevDrawIsUseFace = geometry.isUseFace();
                     prevDrawIndicesBuffer = indicesBuffer;
                     //Do drawing
                     if (prevDrawIsUseFace) {
