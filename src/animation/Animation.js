@@ -144,12 +144,12 @@ define(function(require) {
     }
 
     function _isArrayLike(data) {
-        if (data === undefined) {
+        if (typeof(data) == 'undefined') {
             return false;
         } else if (typeof(data) == 'string') {
             return false;
         } else {
-            return data.length !== undefined;
+            return typeof(data.length) == 'number';
         }
     }
 
