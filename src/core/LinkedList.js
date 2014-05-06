@@ -14,14 +14,7 @@ define(function(require) {
 
     LinkedList.prototype.insert = function(val) {
         var entry = new LinkedList.Entry(val);
-        if (!this.head) {
-            this.head = this.tail = entry;
-        } else {
-            this.tail.next = entry;
-            entry.prev = this.tail;
-            this.tail = entry;
-        }
-        this._length++;
+        this.insertEntry(entry);
         return entry;
     }
 
@@ -45,6 +38,17 @@ define(function(require) {
         } else {
             this.insert(val);
         }
+    }
+
+    LinkedList.prototype.insertEntry = function(entry) {
+        if (!this.head) {
+            this.head = this.tail = entry;
+        } else {
+            this.tail.next = entry;
+            entry.prev = this.tail;
+            this.tail = entry;
+        }
+        this._length++;
     }
 
     LinkedList.prototype.remove = function(entry) {

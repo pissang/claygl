@@ -35,8 +35,10 @@ define(function(require) {
         var entry = this._map[key];
         if (typeof(entry) != 'undefined') {
             // Put the latest used entry in the tail
-            this._list.remove(entry);
-            this._list.insert(entry);
+            if (entry !== this._list.tail) {
+                this._list.remove(entry);
+                this._list.insertEntry(entry);
+            }
 
             return entry.value;
         }

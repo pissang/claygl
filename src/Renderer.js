@@ -94,17 +94,19 @@ define(function(require) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
-            // if (this.devicePixelRatio !== 1.0) {
+            if (typeof(width) !== 'undefined') {
                 canvas.style.width = width + "px";
                 canvas.style.height = height + "px";
-            // }
-             
-            // set the size of the drawingBuffer
-            canvas.width = width * this.devicePixelRatio;
-            canvas.height = height * this.devicePixelRatio;
+                // set the size of the drawingBuffer
+                canvas.width = width * this.devicePixelRatio;
+                canvas.height = height * this.devicePixelRatio;
 
-            this.width = width;
-            this.height = height;
+                this.width = width;
+                this.height = height;
+            } else {
+                this.width = canvas.width / this.devicePixelRatio;
+                this.height = canvas.height / this.devicePixelRatio;
+            }
 
             this.setViewport(0, 0, canvas.width, canvas.height);
         },
