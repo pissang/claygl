@@ -60,7 +60,7 @@ define(function(require) {
         },
         
         isUseFace : function() {
-            return this.useFace && this.faces;
+            return this.useFace && (this.faces != null);
         },
 
         isStatic : function() {

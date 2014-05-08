@@ -112,13 +112,14 @@ define(function(require) {
             }
             else if (geometry.isDirty()) {
                 needsBindAttributes = true;
-            } else {
+            }
+            else {
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
                 }
             }
             prevDrawID = currentDrawID;
-            
+
             if (!needsBindAttributes) {
                 // Direct draw
                 if (prevDrawIsUseFace) {

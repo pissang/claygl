@@ -30,6 +30,11 @@ define(function(require) {
         this._attachedTextures = {};
     }, {
 
+        resize : function(width, height) {
+            this._width = width;
+            this._height = height;
+        },
+
         bind : function(renderer) {
 
             var _gl = renderer.gl;
