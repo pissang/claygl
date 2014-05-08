@@ -51,6 +51,8 @@ define(function (require) {
             // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
             var n = this.texture.width;
             var fov = 2 * Math.atan(n / (n - 0.5)) / Math.PI * 180;
+            
+            this.frameBuffer.bind(renderer);
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._cameras[target];
@@ -60,10 +62,9 @@ define(function (require) {
                 camera.fov = fov;
 
                 this.frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
-                this.frameBuffer.bind(renderer);
                 renderer.render(scene, camera, true);
-                this.frameBuffer.unbind(renderer);
             }
+            this.frameBuffer.unbind(renderer);
         },
         dispose : function(_gl) {
             this.frameBuffer.dispose(_gl);

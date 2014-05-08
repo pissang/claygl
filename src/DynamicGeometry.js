@@ -46,6 +46,8 @@ define(function(require) {
             // is an array of the vertex indices of triangle
             faces : [],
             
+            _isDirty : true,
+
             _enabledAttributes : null,
 
             // Typed Array of each geometry chunk
@@ -75,6 +77,7 @@ define(function(require) {
             }
             this.cache.dirtyAll(field);
 
+            this._isDirty = true;
             this._enabledAttributes = null;
         },
 
@@ -96,6 +99,10 @@ define(function(require) {
         
         isStatic : function() {
             return false;
+        },
+
+        isDirty : function() {
+            return this._isDirty;
         },
 
         createAttribute: function(name, type, size, semantic) {
@@ -169,19 +176,22 @@ define(function(require) {
 
             this.cache.use(_gl.__GLID__);
 
-            var dirtyAttributes = this._getDirtyAttributes();
+            if (this._isDirty) {
+                var dirtyAttributes = this._getDirtyAttributes();
 
-            var isFacesDirty = this.cache.isDirty('indices');
-            isFacesDirty = isFacesDirty && this.isUseFace();
-            
-            if (dirtyAttributes) {
-                this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
-                this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
+                var isFacesDirty = this.cache.isDirty('indices');
+                isFacesDirty = isFacesDirty && this.isUseFace();
+                
+                if (dirtyAttributes) {
+                    this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
+                    this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
-                for (var name in dirtyAttributes) {
-                    this.cache.fresh(name);
+                    for (var name in dirtyAttributes) {
+                        this.cache.fresh(name);
+                    }
+                    this.cache.fresh('indices');
+                    this._isDirty = false;
                 }
-                this.cache.fresh('indices');
             }
             return this.cache.get("chunks");
         },

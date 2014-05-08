@@ -505,8 +505,6 @@ define(function(require) {
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
 
-            _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
-
             renderer.renderQueue(casters, camera);
 
             frameBuffer.unbind(renderer);

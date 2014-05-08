@@ -35,6 +35,8 @@ define(function(require) {
 
             hint : glenum.STATIC_DRAW,
 
+            _isDirty : true,
+
             _normalType : 'vertex',
 
             _enabledAttributes : null
@@ -42,6 +44,7 @@ define(function(require) {
     }, {
         dirty : function() {
             this.cache.dirtyAll("chunks");
+            this._isDirty = true;
             this._enabledAttributes = null;
         },
         
@@ -64,6 +67,10 @@ define(function(require) {
             return true;
         },
 
+        isDirty : function() {
+            return this._isDirty;
+        },
+        
         createAttribute: function(name, type, size, semantic) {
             var attrib = new AttributeBuffer(name, type, size, semantic, false);
             this.attributes[name] = attrib;
@@ -110,6 +117,7 @@ define(function(require) {
             if (this.cache.isDirty("chunks")) {
                 this._updateBuffer(_gl);
                 this.cache.fresh("chunks");
+                this._isDirty = false;
             }
             return this.cache.get("chunks");
         },

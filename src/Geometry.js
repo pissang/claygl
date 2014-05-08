@@ -98,6 +98,7 @@ define(function(require) {
         this._attributeList = Object.keys(this.attributes);
     }, {
         dirty : notImplementedWarn,
+        isDirty : notImplementedWarn,
         getVertexNumber : notImplementedWarn,
         getFaceNumber : notImplementedWarn,
         isUseFace : notImplementedWarn,

@@ -108,6 +108,10 @@ define(function(require) {
     // http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
     var enabledAttributeList = {};
 
+    var SHADER_STATE_TO_ENABLE = 1;
+    var SHADER_STATE_KEEP_ENABLE = 2;
+    var SHADER_STATE_PENDING = 3;
+
     var Shader = Base.derive(function() {
 
         return {
@@ -449,26 +453,25 @@ define(function(require) {
                     locationMap[symbol] = location;
                 }
                 locationList[i] = location;
-                // 2 is going to enable(not enabled yet), 
-                // 3 has beend enabled, and marked not to be disable
+
                 if (!enabledAttributeListInContext[location]) {
-                    enabledAttributeListInContext[location] = 2;
+                    enabledAttributeListInContext[location] = SHADER_STATE_TO_ENABLE;
                 } else {
-                    enabledAttributeListInContext[location] = 3;
+                    enabledAttributeListInContext[location] = SHADER_STATE_KEEP_ENABLE;
                 }
             }
 
             for (var i = 0; i < enabledAttributeListInContext.length; i++) {
                 switch(enabledAttributeListInContext[i]){
-                    case 2:
+                    case SHADER_STATE_TO_ENABLE:
                         _gl.enableVertexAttribArray(i);
-                        enabledAttributeListInContext[i] = 1;
+                        enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
                         break;
-                    case 3:
-                        enabledAttributeListInContext[i] = 1;
+                    case SHADER_STATE_KEEP_ENABLE:
+                        enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
                         break;
                     // Expired
-                    case 1:
+                    case SHADER_STATE_PENDING:
                         _gl.disableVertexAttribArray(i);
                         enabledAttributeListInContext[i] = 0;
                         break;

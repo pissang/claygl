@@ -109,13 +109,16 @@ define(function(require) {
             currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
             if ((nVertex > geometry.chunkSize && isUseFace) || vaoExt) {
                 needsBindAttributes = true;
-                prevDrawID = currentDrawID;
+            }
+            else if (geometry.isDirty()) {
+                needsBindAttributes = true;
             } else {
                 if (currentDrawID !== prevDrawID) {
                     needsBindAttributes = true;
-                    prevDrawID = currentDrawID;
                 }
             }
+            prevDrawID = currentDrawID;
+            
             if (!needsBindAttributes) {
                 // Direct draw
                 if (prevDrawIsUseFace) {
