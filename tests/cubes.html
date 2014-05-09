@@ -31,7 +31,6 @@
 
                 var cube = new Cube();
                 var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
-                shader.define('fragment', 'RENDER_NORMAL');
                 var material = new Material({
                     shader : shader
                 });
@@ -62,13 +61,6 @@
                 }
 
                 camera.position.set(0, 0, 10);
-
-                var light = new qtek.light.Point({
-                    color : [1.5, 1.5, 1.5]
-                })
-                light.position.set(0, 0, 0);
-                light.range = 30;
-                scene.add(light);
 
                 animation.on('frame', function(deltaTime) {
                     var start = new Date().getTime();

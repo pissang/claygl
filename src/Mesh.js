@@ -13,7 +13,6 @@ define(function(require) {
     var prevDrawIndicesBuffer = null;
     var prevDrawIsUseFace = true;
 
-    var needsBindAttributes;
     var currentDrawID;
 
     var RenderInfo = function() {
@@ -84,12 +83,8 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
-            if (geometry.hint == glenum.STATIC_DRAW) {
-                var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
-            } else {
-                // create vertex object array cost a lot, so don't use it on the dynamic object
-                var vaoExt = null;
-            }
+            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            var isStatic = geometry.hint == glenum.STATIC_DRAW;
             
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
@@ -104,23 +99,23 @@ define(function(require) {
             renderInfo.faceNumber = 0;
             renderInfo.drawCallNumber = 0;
             // Draw each chunk
-            needsBindAttributes = false;
+            var drawHashChanged = false;
             // Hash with shader id in case previous material has less attributes than next material
             currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
-            if ((nVertex > geometry.chunkSize && isUseFace) || vaoExt) {
-                needsBindAttributes = true;
+            if (nVertex > geometry.chunkSize && isUseFace) {
+                drawHashChanged = true;
             }
             else if (geometry.isDirty()) {
-                needsBindAttributes = true;
+                drawHashChanged = true;
             }
             else {
                 if (currentDrawID !== prevDrawID) {
-                    needsBindAttributes = true;
+                    drawHashChanged = true;
                 }
             }
             prevDrawID = currentDrawID;
 
-            if (!needsBindAttributes) {
+            if (!drawHashChanged) {
                 // Direct draw
                 if (prevDrawIsUseFace) {
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
@@ -172,29 +167,38 @@ define(function(require) {
                         );
                         vaoList.push(vao);
                     }
-                    if (geometry.hint == glenum.STATIC_DRAW) {
+                    if (isStatic) {
                         this._drawCache[currentDrawID] = vaoList;
                     }
                 }
 
                 for (var i = 0; i < vaoList.length; i++) {
                     var vao = vaoList[i];
-                    var needsBinding = true;
-                    if (vaoExt) {
+                    var needsBindAttributes = true;
+
+                    // Create vertex object array cost a lot
+                    // So we don't abaddoned it on the dynamic object
+                    if (vaoExt && isStatic) {
                         // Use vertex array object
                         // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
                         if (vao.vao == null) {
                             vao.vao = vaoExt.createVertexArrayOES();
                         } else {
-                            needsBinding = false;
+                            needsBindAttributes = false;
                         }
-                        vaoExt.bindVertexArrayOES(vao.vao);   
+                        vaoExt.bindVertexArrayOES(vao.vao);
+                    } else {
+                        // Unbind the vao 
+                        // It may be binded before when drawing static meshes
+                        // if (vaoExt) {
+                        //     vaoExt.bindVertexArrayOES(null);
+                        // }
                     }
                     var availableAttributes = vao.availableAttributes;
                     var availableAttributeSymbols = vao.availableAttributeSymbols;
                     var indicesBuffer = vao.indicesBuffer;
                     
-                    if (needsBinding) {
+                    if (needsBindAttributes) {
                         var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols);
                         // Setting attributes;
                         for (var a = 0; a < availableAttributes.length; a++) {
@@ -230,7 +234,7 @@ define(function(require) {
 
                             _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                             _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-                            if (vaoExt) {
+                            if (vaoExt && isStatic) {
                                 _gl.enableVertexAttribArray(location);
                             }
                         }
@@ -247,7 +251,7 @@ define(function(require) {
                     prevDrawIsUseFace = geometry.isUseFace();
                     //Do drawing
                     if (prevDrawIsUseFace) {
-                        if (needsBinding) {
+                        if (needsBindAttributes) {
                             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         }
                         _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
@@ -255,11 +259,12 @@ define(function(require) {
                     } else {
                         _gl.drawArrays(glDrawMode, 0, nVertex);
                     }
-                    renderInfo.drawCallNumber++;
 
-                    if (vaoExt) {
+                    if (vaoExt && isStatic) {
                         vaoExt.bindVertexArrayOES(null);
                     }
+
+                    renderInfo.drawCallNumber++;
                 }
             }
 
