@@ -82,7 +82,7 @@
                         var idx = i / 4;
                         var x = (idx % SIZE) / SIZE * 40 - 20;
                         var y = 20 - (idx / SIZE) / SIZE * 40;
-                        var z = 4 - Math.random() * 8;
+                        var z = 1 - Math.random() * 2;
 
                         position.push([x, y, z]);
                     }
@@ -100,7 +100,7 @@
                 for (var i = smaller.length; i < larger.length; i++) {
                     var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
                     random = random.slice();
-                    random[2] += Math.random() * 4;
+                    random[2] += Math.random() * 2;
                     smaller[i] = random;
                 }
 
@@ -130,9 +130,9 @@
                 camera.position.set(0, 0, 40);
 
                 var shader = qtek.shader.library.get('buildin.physical');
-                var cubeMat = new qtek.Material({
-                    shader : shader
-                });
+
+                var root = new qtek.Node();
+                scene.add(root);
 
                 var cubeList = [];
 
@@ -143,6 +143,9 @@
 
                     for (var i = 0; i < positionArr.length; i++) {
                         var position = positionArr[i];
+                        var cubeMat = new qtek.Material({
+                            shader : shader
+                        });
                         var mesh = new qtek.Mesh({
                             material: cubeMat,
                             geometry: cubeGeo
@@ -152,8 +155,8 @@
                         mesh.rotation.rotateX(Math.random() * Math.PI * 2);
                         mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
 
-                        mesh.scale.set(0.4, 0.4, 0.4);
-                        scene.add(mesh);
+                        mesh.scale.set(0.3, 0.3, 0.3);
+                        root.add(mesh);
 
                         cubeList.push(mesh);
                     }
@@ -162,7 +165,7 @@
                         shadowResolution : 1024,
                         shadowBias: 0.005
                     });
-                    light.position.set(0, 40, 40);
+                    light.position.set(0, 30, 30);
                     light.lookAt(scene.position);
                     scene.add(light);
 
@@ -181,15 +184,22 @@
                                 + renderTime + '<br />';
 
                         var color = document.getElementById('cubeColor').style.backgroundColor;
-                        cubeMat.set('color', color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
+                        color = color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
                             return parseInt(item) / 255;
-                        }));
+                        });
 
                         for (var i = 0; i < cubeList.length; i++) {
+                            cubeList[i].material.set('color', color);
                             var pos = positionArr[i];
                             qtek.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
                             qtek.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
                         }
+                    });
+
+                    document.body.addEventListener('mousemove', function(e) {
+                        var dx = e.pageX - window.innerWidth / 2;
+
+                        root.rotation.identity().rotateY(dx / 1000);
                     });
                     
                     var obj = {

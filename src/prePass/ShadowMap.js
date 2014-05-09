@@ -272,7 +272,6 @@ define(function(require) {
             _gl.disable(_gl.BLEND);
 
             _gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
             var cursor = 0;
 
@@ -504,6 +503,8 @@ define(function(require) {
 
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
+
+            _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
             renderer.renderQueue(casters, camera);
 

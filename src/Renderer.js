@@ -243,8 +243,8 @@ define(function(require) {
             var _gl = this.gl;
             var scene = this._sceneRendering;
             
-            var prevMaterialID;
-            var prevShaderID;
+            var prevMaterial;
+            var prevShader;
                 
             // Status 
             var depthTest, depthMask;
@@ -325,7 +325,7 @@ define(function(require) {
                     }
                 }
 
-                if (prevShaderID !== shader.__GUID__) {
+                if (prevShader !== shader) {
                     // Set lights number
                     if (scene && scene.isShaderLightNumberChanged(shader)) {
                         scene.setShaderLightNumber(shader);
@@ -338,9 +338,9 @@ define(function(require) {
                     if (scene) {
                         scene.setLightUniforms(shader, _gl);
                     }
-                    prevShaderID = shader.__GUID__;
+                    prevShader = shader;
                 }
-                if (prevMaterialID !== material.__GUID__) {
+                if (prevMaterial !== material) {
                     if (!preZ) {
                         if (material.depthTest !== depthTest) {
                             material.depthTest ? 
@@ -353,9 +353,10 @@ define(function(require) {
                             depthMask = material.depthMask;
                         }
                     }
-                    material.bind(_gl);
-                    prevMaterialID = material.__GUID__;
+                    material.bind(_gl, prevMaterial);
+                    prevMaterial = material;
 
+                    // TODO cache blending
                     if (material.transparent) {
                         if (material.blend) {
                             material.blend(_gl);

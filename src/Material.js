@@ -48,14 +48,26 @@ define(function(require) {
         }
     }, {
 
-        bind : function(_gl) {
+        bind : function(_gl, prevMaterial) {
 
             var slot = 0;
 
+            var sameShader = prevMaterial && prevMaterial.shader === this.shader;
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
+                // When binding two materials with the same shader
+                // Many uniforms will be be set twice even if they have the same value
+                // So add a evaluation to see if the uniform is really needed to be set
+                // 
+                // TODO Small possibility enabledUniforms are not the same
+                if (sameShader) {
+                    if (prevMaterial.uniforms[symbol].value === uniform.value) {
+                        continue;
+                    }
+                }
+
                 if (uniform.value === undefined) {
                     console.warn('Uniform value "' + symbol + '" is undefined');
                     continue;

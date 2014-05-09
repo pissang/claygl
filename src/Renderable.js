@@ -89,7 +89,12 @@ define(function(require) {
             var drawHashChanged = false;
             // Hash with shader id in case previous material has less attributes than next material
             currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
-            if (nVertex > geometry.chunkSize && isUseFace || vaoExt) {
+
+            // The cache will be invalid in the following cases
+            // 1. Geometry is splitted to multiple chunks
+            // 2. VAO is enabled and is binded to null after render
+            // 3. Geometry needs update
+            if (nVertex > geometry.chunkSize && isUseFace || (vaoExt && isStatic)) {
                 drawHashChanged = true;
             }
             else if (geometry.isDirty()) {
@@ -174,13 +179,8 @@ define(function(require) {
                             needsBindAttributes = false;
                         }
                         vaoExt.bindVertexArrayOES(vao.vao);
-                    } else {
-                        // Unbind the vao 
-                        // It may be binded before when drawing static meshes
-                        // if (vaoExt) {
-                        //     vaoExt.bindVertexArrayOES(null);
-                        // }
                     }
+
                     var availableAttributes = vao.availableAttributes;
                     var availableAttributeSymbols = vao.availableAttributeSymbols;
                     var indicesBuffer = vao.indicesBuffer;
