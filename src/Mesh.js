@@ -32,7 +32,7 @@ define(function(require) {
                 material.shader.setUniformBySemantic(_gl, "SKIN_MATRIX", skinMatricesArray);
             }
 
-            Renderable.prototype.render.call(this, _gl, globalMaterial);
+            return Renderable.prototype.render.call(this, _gl, globalMaterial);
         }
     });
 
