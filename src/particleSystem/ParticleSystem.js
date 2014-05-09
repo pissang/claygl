@@ -2,12 +2,11 @@ define(function(require) {
 
     'use strict';
 
-    var Node = require('../Node');
+    var Renderable = require('../Renderable');
     var Vector3 = require('../math/Vector3');
     var glenum = require("../core/glenum");
 
     var StaticGeometry = require('../StaticGeometry');
-    var Mesh = require('../Mesh');
     var Material = require('../Material');
     var Shader = require('../Shader');
 
@@ -23,7 +22,7 @@ define(function(require) {
     });
     particleShader.enableTexture('sprite');
 
-    var ParticleSystem = Node.derive({
+    var ParticleSystem = Renderable.derive({
         
         loop : true,
 
@@ -36,10 +35,7 @@ define(function(require) {
         spriteAnimationTileY : 1,
         spriteAnimationRepeat : 0,
 
-        geometry : null,
-        material : null,
-
-        mode : Mesh.POINTS,
+        mode : Renderable.POINTS,
 
         _elapsedTime : 0,
 
@@ -63,25 +59,14 @@ define(function(require) {
         this._particles = [];
         this._fields = [];
         this._emitters = [];
-
-        this._renderInfo = new Mesh.RenderInfo();
-
     }, {
 
-        visible : true,
-
         culling : false,
-        cullFace : glenum.BACK,
-        frontFace : glenum.CCW,
 
         frustumCulling : false,
 
         castShadow : false,
         receiveShadow : false,
-
-        isRenderable : function() {
-            return this.visible;
-        },
 
         addEmitter : function(emitter) {
             this._emitters.push(emitter);
@@ -209,7 +194,7 @@ define(function(require) {
 
         render : function(_gl) {
             this._updateVertices();
-            return Mesh.prototype.render.call(this, _gl);
+            return Renderable.prototype.render.call(this, _gl);
         },
 
         isFinished : function() {

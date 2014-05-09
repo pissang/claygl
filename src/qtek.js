@@ -11,6 +11,7 @@ define( function(require){
 	"Material": require('qtek/Material'),
 	"Mesh": require('qtek/Mesh'),
 	"Node": require('qtek/Node'),
+	"Renderable": require('qtek/Renderable'),
 	"Renderer": require('qtek/Renderer'),
 	"Scene": require('qtek/Scene'),
 	"Shader": require('qtek/Shader'),
