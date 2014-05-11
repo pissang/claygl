@@ -377,31 +377,26 @@ define(function(require) {
                     _gl.uniform4fv(location, value);
                     break;
                 case 'm2':
-                    // The matrix must be created by glmatrix and can pass it directly.
+                case "m2v":
                     _gl.uniformMatrix2fv(location, false, value);
                     break;
                 case 'm3':
-                    // The matrix must be created by glmatrix and can pass it directly.
+                case "m3v":
                     _gl.uniformMatrix3fv(location, false, value);
                     break;
-                case "m2v":
-                    var size = 4;
-                case "m3v":
-                    var size = 9;
                 case 'm4v':
-                    var size = 16;
                     if (value instanceof Array) {
-                        var array = new Float32Array(value.length * size);
+                        var array = new Float32Array(value.length * 16);
                         var cursor = 0;
                         for (var i = 0; i < value.length; i++) {
                             var item = value[i];
-                            for (var j = 0; j < item.length; j++) {
+                            for (var j = 0; j < 16; j++) {
                                 array[cursor++] = item[j];
                             }
                         }
                         _gl.uniformMatrix4fv(location, false, array);
                     // Raw value
-                    }else if (value instanceof Float32Array) {   // ArrayBufferView
+                    } else if (value instanceof Float32Array) {   // ArrayBufferView
                         _gl.uniformMatrix4fv(location, false, value);
                     }
                     break;
@@ -575,6 +570,7 @@ define(function(require) {
                         }
                         if (semantic) {
                             // This case is only for SKIN_MATRIX
+                            // TODO
                             if (attribSemantics.indexOf(semantic) >= 0) {
                                 self.attribSemantics[semantic] = {
                                     symbol : symbol,

@@ -57,6 +57,8 @@ define(function(require) {
         if (copyValue) {
             console.warn('todo');
         }
+
+        return ret;
     }
 
     function AttributeBuffer(name, type, buffer, size, semantic) {

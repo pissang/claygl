@@ -131,6 +131,10 @@
 
                 var shader = qtek.shader.library.get('buildin.physical');
 
+                var cubeMat = new qtek.Material({
+                    shader : shader
+                });
+
                 var root = new qtek.Node();
                 scene.add(root);
 
@@ -143,9 +147,6 @@
 
                     for (var i = 0; i < positionArr.length; i++) {
                         var position = positionArr[i];
-                        var cubeMat = new qtek.Material({
-                            shader : shader
-                        });
                         var mesh = new qtek.Mesh({
                             material: cubeMat,
                             geometry: cubeGeo
@@ -163,11 +164,16 @@
 
                     var light = new qtek.light.Directional({
                         shadowResolution : 1024,
-                        shadowBias: 0.005
+                        shadowBias: 0.005,
+                        intensity: 0.7
                     });
                     light.position.set(0, 30, 30);
                     light.lookAt(scene.position);
                     scene.add(light);
+
+                    scene.add(new qtek.light.Ambient({
+                        intensity: 0.3
+                    }));
 
                     var animation = new qtek.animation.Animation();
                     animation.start();

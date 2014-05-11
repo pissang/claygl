@@ -70,8 +70,7 @@ define(function(require) {
                 for (var n = 0; n < attributeNames.length; n++) {
                     var name = attributeNames[n];
                     var attrib = geometry.attributes[name];
-                    // TODO other type
-                    attrib.value = new Float32Array(nVertex * attrib.size);
+                    attrib.init(nVertex);
                 }
                 // TODO Uint32Array
                 geometry.faces = new Uint16Array(nFace * 3);
@@ -317,8 +316,7 @@ define(function(require) {
                     for (var a = 0; a < attribNames.length; a++) {
                         var attribName = attribNames[a];
                         var subAttrib = subGeo.attributes[attribName];
-                        // TODO other type
-                        subAttrib.value = new Float32Array(nVertex * subAttrib.size);
+                        subAttrib.init(nVertex);
                     }
                     subGeo.attributes.joint.value = new Float32Array(nVertex * 4);
                     subGeo.faces = new Uint16Array(bucket.faces.length * 3);

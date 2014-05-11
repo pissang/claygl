@@ -72,7 +72,7 @@ define(function(require) {
         },
         
         createAttribute: function(name, type, size, semantic) {
-            var attrib = new AttributeBuffer(name, type, size, semantic, false);
+            var attrib = new Geometry.Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
