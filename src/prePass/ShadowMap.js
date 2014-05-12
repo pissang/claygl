@@ -118,12 +118,13 @@ define(function(require) {
                 var mesh = casters[i];
                 var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
                 var transparentMap = mesh.material.shadowTransparentMap;
+                var nJoints = mesh.joints && mesh.joints.length;
                 if (isShadowTransparent) {
-                    var matHashKey = mesh.joints.length + '-' + transparentMap.__GUID__;
-                    var shaderHashKey = mesh.joints.length + 's';
+                    var matHashKey = nJoints + '-' + transparentMap.__GUID__;
+                    var shaderHashKey = nJoints + 's';
                 } else {
-                    var matHashKey = mesh.joints.length;
-                    var shaderHashKey = mesh.joints.length;
+                    var matHashKey = nJoints;
+                    var shaderHashKey = nJoints;
                 }
                 var depthMaterial = this._depthMaterials[matHashKey];
                 var depthShader = this._depthShaders[shaderHashKey];
@@ -134,9 +135,9 @@ define(function(require) {
                             vertex : Shader.source("buildin.sm.depth.vertex"),
                             fragment : Shader.source("buildin.sm.depth.fragment")
                         });
-                        if (mesh.joints.length > 0) {
+                        if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
-                            depthShader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
+                            depthShader.define('vertex', 'JOINT_NUMBER', nJoints);   
                         }
                         if (isShadowTransparent) {
                             depthShader.define('both', 'SHADOW_TRANSPARENT');
@@ -172,7 +173,8 @@ define(function(require) {
         _bindDistanceMaterial : function(casters, light) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
-                var distanceMaterial = this._distanceMaterials[mesh.joints.length];
+                var nJoints = mesh.joints && mesh.joints.length;
+                var distanceMaterial = this._distanceMaterials[nJoints];
                 if (mesh.material !== distanceMaterial) {
                     if (!distanceMaterial) {
                         // Skinned mesh
@@ -182,11 +184,11 @@ define(function(require) {
                                 fragment : Shader.source("buildin.sm.distance.fragment")
                             })
                         });
-                        if (mesh.joints.length > 0) {
+                        if (nJoints > 0) {
                             distanceMaterial.shader.define('vertex', 'SKINNING');
-                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);   
+                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', nJoints);   
                         }
-                        this._distanceMaterials[mesh.joints.length] = distanceMaterial;
+                        this._distanceMaterials[nJoints] = distanceMaterial;
                     }
 
                     this._meshMaterials[mesh.__GUID__] = mesh.material;
