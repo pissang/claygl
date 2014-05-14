@@ -76,7 +76,8 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
-            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            // var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            var vaoExt = null;
             var isStatic = geometry.hint == glenum.STATIC_DRAW;
             
             var nVertex = geometry.getVertexNumber();
@@ -105,6 +106,7 @@ define(function(require) {
                     drawHashChanged = true;
                 }
             }
+            drawHashChanged = true;
             prevDrawID = currentDrawID;
 
             if (!drawHashChanged) {

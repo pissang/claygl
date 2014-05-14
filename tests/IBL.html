@@ -170,16 +170,16 @@
                     debugPass.setUniform('texture', BRDFLookup);
                     debugPass.render(renderer);
 
-                    if (lumAdaptionNode) {
-                        x += width + 10;
-                        renderer.setViewport(x, y, width, height);
-                        debugPass.setUniform('texture', lumAdaptionNode._outputTextures['color']);
-                        debugPass.render(renderer);
-                        x += width + 10;
-                        renderer.setViewport(x, y, width, height);
-                        debugPass.setUniform('texture', currentLumNode._outputTextures['color']);
-                        debugPass.render(renderer);
-                    }
+                    // if (lumAdaptionNode) {
+                    //     x += width + 10;
+                    //     renderer.setViewport(x, y, width, height);
+                    //     debugPass.setUniform('texture', lumAdaptionNode._outputTextures['color']);
+                    //     debugPass.render(renderer);
+                    //     x += width + 10;
+                    //     renderer.setViewport(x, y, width, height);
+                    //     debugPass.setUniform('texture', currentLumNode._outputTextures['color']);
+                    //     debugPass.render(renderer);
+                    // }
                     renderer.setViewport(viewport);
                 });
 

@@ -14,7 +14,8 @@
                 var Plane = qtek.geometry.Plane;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio: 1.0
                 });
                 //Create scene
                 var scene = new qtek.Scene,
@@ -61,6 +62,7 @@
                 });
                 frameBuffer.attach( renderer.gl, rtt );
                 var rttShader = qtek.shader.library.get("buildin.basic", "diffuseMap");
+                rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
                 var rttMesh = new qtek.Mesh({
                     geometry : new Plane({
                         detailX : 100,
@@ -76,7 +78,9 @@
 
                 var orthCamera = new qtek.camera.Orthographic();
 
-                setInterval( function(){
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function() {
                     frameBuffer.bind( renderer );
                     renderer.render( scene, camera );
                     frameBuffer.unbind( renderer );
@@ -84,8 +88,7 @@
                     renderer.render( rttScene, orthCamera );
                     
                     mesh.rotation.rotateY(Math.PI/500);
-
-                }, 20)
+                });
             })
             
         </script>

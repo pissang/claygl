@@ -117,7 +117,9 @@ define(function(require) {
             }
 
             this.trigger("beforerender", this, renderer);
-            renderer.render(scene, camera);
+            // Don't clear in each pass, let the color overwrite the buffer
+            _gl.disable(_gl.BLEND);
+            renderer.renderQueue([mesh], camera);
             this.trigger("afterrender", this, renderer);
 
             if (frameBuffer) {

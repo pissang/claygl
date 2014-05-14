@@ -1,0 +1,54 @@
+// Shader X3 Improved Depth-of-Field Rendering
+@export dof.coc
+
+uniform sampler2D depth;
+
+uniform float zNear: 0.1;
+uniform float zFar: 2000;
+
+// 30mm
+uniform float focalLength: 30;
+uniform float focalPlane: 6;
+// f/2.8
+uniform float aperture: 0.36;
+
+varying vec2 v_Texcoord;
+
+void main()
+{
+   float z = texture2D(depth, v_Texcoord).r;
+
+   float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));
+
+   // GPU Gems Depth of Field: A Survey of Techniques
+   float coc = abs(aperture * (focalLength * (dist - focalPlane)) / (dist * (focalPlane - focalLength)));
+
+   // Clamp on the near focus plane and far focus plane
+   // PENDING
+   coc = clamp(coc, 0.0, 0.4) / 0.4;
+
+   gl_FragColor = vec4(vec3(coc), 1.0);
+}
+
+@end
+
+
+@export dof.composite
+
+uniform sampler2D original;
+uniform sampler2D blurred;
+uniform sampler2D coc;
+varying vec2 v_Texcoord;
+
+void main()
+{
+   vec4 blurredColor = texture2D(blurred, v_Texcoord);
+   vec4 originalColor = texture2D(original, v_Texcoord);
+   float coc = texture2D(coc, v_Texcoord).r;
+
+   gl_FragColor.rgb = blurredColor.rgb * coc + originalColor.rgb * (1.0 - coc);
+   // gl_FragColor.rgb = vec3(coc);
+   gl_FragColor.a = 1.0;
+}
+
+@end

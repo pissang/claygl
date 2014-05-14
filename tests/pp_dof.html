@@ -1,0 +1,281 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            require([
+                'qtek/qtek',
+                'text!../tests/shader/dof.essl'
+            ], function(qtek, dof){
+                qtek.Shader.import(dof);
+
+                var renderer = new qtek.Renderer({
+                    canvas : document.getElementById('Main')
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.width / renderer.height
+                });
+                camera.position.set(0, 0, 10);
+
+                var scene = new qtek.Scene();
+                scene.add(camera);
+
+                var cubeMap = new qtek.texture.TextureCube({
+                    width : 128,
+                    height : 128,
+                    type : qtek.Texture.FLOAT
+                });
+
+                qtek.util.texture.loadPanorama(
+                    'assets/textures/hdr/grace-new.hdr',
+                    cubeMap,
+                    renderer
+                );
+
+                var GLTFLoader = new qtek.loader.GLTF();
+                GLTFLoader.load("assets/models/suzanne.json");
+                var control = new qtek.plugin.OrbitControl({
+                    target : camera,
+                    domElement : renderer.canvas
+                });
+
+                var shader = new qtek.Shader({
+                    vertex: qtek.Shader.source('buildin.physical.vertex'),
+                    fragment: qtek.Shader.source('buildin.physical.fragment')
+                });
+                shader.enableTexture('environmentMap');
+                var material = new qtek.Material({
+                    shader : shader
+                });
+                material.set('specularColor', [0.1, 0.1, 0.1]);
+                material.set('glossiness', 0.7);
+                material.set('environmentMap', cubeMap);
+
+                GLTFLoader.on('success', function(res) {
+                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                    var size = 10;
+                    for (var i = 0; i < size; i++) {
+                        for (var j = 0; j < size; j++) {
+                            for (var k = 0; k < size; k++) {
+                                var mesh = new qtek.Mesh({
+                                    material : material,
+                                    geometry :suzanneGeometry
+                                });
+                                mesh.scale.set(1.5, 1.5, 1.5);
+                                mesh.position.set((i - size / 2) * size / 2, (k - size / 2) * size / 2, (j - size / 2) * size / 2);
+                                scene.add(mesh);
+                            }
+                        }
+                    }
+
+                    var light = new qtek.light.Directional();
+                    light.position.set(1, 4, 4);
+                    light.lookAt(qtek.math.Vector3.ZERO);
+                    scene.add(light);
+
+
+                    var compositor = new qtek.compositor.Compositor();
+                    var sceneNode = new qtek.compositor.SceneNode({
+                        name: "scene",
+                        scene: scene,
+                        camera: camera,
+                        outputs: {
+                            color: {
+                                parameters: {
+                                    // Half Float
+                                    type: 36193,
+                                    width: function(renderer) {return renderer.width},
+                                    height: function(renderer) {return renderer.height}
+                                }
+                            },
+                            depth: {
+                                attachment: 'DEPTH_ATTACHMENT',
+                                parameters: {
+                                    width: function(renderer) {return renderer.width},
+                                    height: function(renderer) {return renderer.height},
+                                    type: qtek.Texture.UNSIGNED_SHORT,
+                                    format: qtek.Texture.DEPTH_COMPONENT
+                                }
+                            }
+                        }
+                    });
+                    var cocNode = new qtek.compositor.Node({
+                        name: "coc",
+                        shader: qtek.Shader.source('dof.coc'),
+                        inputs: {
+                            depth: {
+                                node: "scene",
+                                pin: "depth"
+                            }
+                        },
+                        outputs: {
+                            color: {
+                                parameters: {
+                                    width: function(renderer) {return renderer.width},
+                                    height: function(renderer) {return renderer.height}
+                                }
+                            }
+                        }
+                    });
+                    var downSampleNode = new qtek.compositor.Node({
+                        name: "downSample",
+                        shader: qtek.Shader.source('buildin.compositor.output'),
+                        inputs: {
+                            texture: {
+                                node: "scene",
+                                pin: "color"
+                            }
+                        },
+                        outputs: {
+                            color: {
+                                parameters: {
+                                    // Half Float
+                                    type: 36193,
+                                    width: function(renderer) {return renderer.width / 4},
+                                    height: function(renderer) {return renderer.height / 4}
+                                }
+                            }
+                        }
+                    });
+                    var blurRepeat = 2;
+                    var blurNodes = [];
+                    for (var i = 0; i < blurRepeat; i++) {
+                        var blurNodeH = new qtek.compositor.Node({
+                            name: 'blur_h_' + i,
+                            shader: qtek.Shader.source('buildin.compositor.gaussian_blur_h'),
+                            inputs: {
+                                texture: {
+                                    node: i == 0 ? "downSample" : "blur_v_" + (i - 1),
+                                    pin: 'color'
+                                }
+                            },
+                            outputs: {
+                                color: {
+                                    parameters: {
+                                        // Half Float
+                                        type: 36193,
+                                        width: function(renderer) {return renderer.width / 4},
+                                        height: function(renderer) {return renderer.height / 4}
+                                    }
+                                }
+                            }
+                        });
+                        var blurNodeV = new qtek.compositor.Node({
+                            name: 'blur_v_' + i,
+                            shader: qtek.Shader.source('buildin.compositor.gaussian_blur_v'),
+                            inputs: {
+                                texture: {
+                                    node: "blur_h_" + i,
+                                    pin: 'color'
+                                }
+                            },
+                            outputs: {
+                                color: {
+                                    parameters: {
+                                        // Half Float
+                                        type: 36193,
+                                        width: function(renderer) {return renderer.width / 4},
+                                        height: function(renderer) {return renderer.height / 4}
+                                    }
+                                }
+                            }
+                        });
+                        blurNodeV.setParameter('blurSize', 0.4);
+                        blurNodeH.setParameter('blurSize', 0.4);
+                        blurNodeV.setParameter('textureHeight', renderer.height / 4);
+                        blurNodeH.setParameter('textureWidth', renderer.width / 4);
+                        compositor.addNode(blurNodeV);
+                        compositor.addNode(blurNodeH);
+
+                        blurNodes.push(blurNodeV);
+                        blurNodes.push(blurNodeH);
+                    }
+
+                    var compositeNode = new qtek.compositor.Node({
+                        name: 'composite',
+                        shader: qtek.Shader.source('dof.composite'),
+                        inputs: {
+                            original: {
+                                node: "scene",
+                                pin: 'color'
+                            },
+                            blurred: {
+                                node: "blur_v_" + (blurRepeat - 1),
+                                pin: 'color'
+                            },
+                            coc: {
+                                node: "coc",
+                                pin: "color"
+                            }
+                        },
+                        outputs: {
+                            color: {
+                                parameters: {
+                                    // Half Float
+                                    type: 36193,
+                                    width: function(renderer) {return renderer.width},
+                                    height: function(renderer) {return renderer.height}
+                                }
+                            }
+                        }
+                    });
+                    var toneMappingNode = new qtek.compositor.Node({
+                        name: "toneMapping",
+                        shader: qtek.Shader.source('buildin.compositor.hdr.tonemapping'),
+                        inputs: {
+                            "texture": {
+                                node: "composite",
+                                pin: "color"
+                            }
+                        }
+                    });
+                    toneMappingNode.setParameter('exposure', 2.0);
+                    cocNode.setParameter('zNear', camera.near);
+                    cocNode.setParameter('zFar', camera.far);
+
+                    compositor.addNode(sceneNode);
+                    compositor.addNode(downSampleNode);
+                    compositor.addNode(cocNode);
+                    compositor.addNode(compositeNode);
+                    compositor.addNode(toneMappingNode);
+
+                    var animation = new qtek.animation.Animation();
+                    animation.start();
+                    animation.on('frame', function() {
+                        control.update();
+
+                        compositor.render(renderer);
+                        // renderer.render(scene, camera);
+                        
+                        for (var i = 0; i < blurNodes.length; i++) {
+                            blurNodes[i].setParameter('blurSize', config.blurSize);
+                        }
+                        cocNode.setParameter('focalPlane', config.focalPlane);
+                        cocNode.setParameter('aperture', 1 / config.fstop);
+                    });
+
+                    //--------------------
+                    // Config GUI
+                    //--------------------
+                    var gui = new dat.GUI();
+                    var config = {
+                        blurSize: 0.4,
+                        focalPlane: 5,
+                        fstop: 2.8
+                    }
+
+                    gui.add(config, 'blurSize', 0, 1);
+                    gui.add(config, 'fstop', 1.4, 8);
+                    gui.add(config, 'focalPlane', 1, 100);
+                });
+            })
+            
+        </script>
+    </body>
+</html>
