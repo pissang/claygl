@@ -151,6 +151,8 @@ void main(void){
 
 @export buildin.compositor.hexagonal_blur_1
 
+#define KERNEL_SIZE 10
+
 uniform sampler2D texture;
 varying vec2 v_Texcoord;
 
@@ -162,9 +164,10 @@ void main(void){
    vec2 offset = blurSize / textureSize;
 
    vec4 color = vec4(0.0);
+   float fKernelSize = float(KERNEL_SIZE);
    // Top
-   for(int i = 0; i < 10; i++){
-      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
+   for(int i = 0; i < KERNEL_SIZE; i++){
+      color += 1.0 / fKernelSize * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
    }
    gl_FragColor = color;
 }
@@ -173,6 +176,8 @@ void main(void){
 
 @export buildin.compositor.hexagonal_blur_2
 
+#define KERNEL_SIZE 10
+
 uniform sampler2D texture;
 varying vec2 v_Texcoord;
 
@@ -182,17 +187,21 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
    vec2 offset = blurSize / textureSize;
+   offset.y /= 2.0;
 
    vec4 color = vec4(0.0);
+   float fKernelSize = float(KERNEL_SIZE);
    // Down left
-   for(int i = 0; i < 10; i++){
-      color += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+   for(int i = 0; i < KERNEL_SIZE; i++){
+      color += 1.0/fKernelSize * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
    }
    gl_FragColor = color;
 }
 @end
 
 @export buildin.compositor.hexagonal_blur_3
+
+#define KERNEL_SIZE 10
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
@@ -205,22 +214,24 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
    vec2 offset = blurSize / textureSize;
+   offset.y /= 2.0;
 
    vec4 color1 = vec4(0.0);
+   float fKernelSize = float(KERNEL_SIZE);
    // Down left
-   for(int i = 0; i < 10; i++){
-      color1 += 1.0/10.0 * texture2D(texture1, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+   for(int i = 0; i < KERNEL_SIZE; i++){
+      color1 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
    }
    vec4 color2 = vec4(0.0);
    // Down right
-   for(int i = 0; i < 10; i++){
-      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+   for(int i = 0; i < KERNEL_SIZE; i++){
+      color2 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
    }
 
    vec4 color3 = vec4(0.0);
    // Down right
-   for(int i = 0; i < 10; i++){
-      color3 += 1.0/10.0 * texture2D(texture2, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+   for(int i = 0; i < KERNEL_SIZE; i++){
+      color3 += 1.0/fKernelSize * texture2D(texture2, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
    }
 
    gl_FragColor = (color1 + color2 + color3) / 3.0;

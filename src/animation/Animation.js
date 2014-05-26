@@ -106,8 +106,9 @@ define(function(require) {
             var deferred = new Deferred(
                 target,
                 options.loop,
-                options.getter, 
-                options.setter
+                options.getter,
+                options.setter,
+                options.interpolater
             );
             deferred.animation = this;
             return deferred;
@@ -184,7 +185,7 @@ define(function(require) {
                 + v0 * t + p1;
     };
     
-    function Deferred(target, loop, getter, setter) {
+    function Deferred(target, loop, getter, setter, interpolater) {
         this._tracks = {};
         this._target = target;
 
@@ -192,6 +193,8 @@ define(function(require) {
 
         this._getter = getter || _defaultGetter;
         this._setter = setter || _defaultSetter;
+
+        this._interpolater = interpolater || null;
 
         this._clipCount = 0;
 
@@ -209,11 +212,16 @@ define(function(require) {
             for (var propName in props) {
                 if (! this._tracks[propName]) {
                     this._tracks[propName] = [];
-                    // Initialize value
-                    this._tracks[propName].push({
-                        time : 0,
-                        value : this._getter(this._target, propName)
-                    });
+                    // If time is 0 
+                    //  Then props is given initialize value
+                    // Else
+                    //  Initialize value from current prop value
+                    if (time !== 0) {
+                        this._tracks[propName].push({
+                            time : 0,
+                            value : this._getter(this._target, propName)
+                        });   
+                    }
                 }
                 this._tracks[propName].push({
                     time : parseInt(time),
@@ -231,6 +239,7 @@ define(function(require) {
             var self = this;
             var setter = this._setter;
             var getter = this._getter;
+            var interpolater = this._interpolater;
             var onFrameListLen = self._onframeList.length;
             var useSpline = easing === 'spline';
 
@@ -334,7 +343,16 @@ define(function(require) {
                         p0 = kfValues[i == 0 ? i : i - 1];
                         p2 = kfValues[i > trackLen - 2 ? trackLen - 1 : i + 1];
                         p3 = kfValues[i > trackLen - 3 ? trackLen - 1 : i + 2];
-                        if (isValueArray) {
+                        if (interpolater) {
+                            setter(
+                                target,
+                                propName, 
+                                interpolater(
+                                    getter(target, propName),
+                                    p0, p1, p2, p3, w
+                                )
+                            );
+                        } else if (isValueArray) {
                             _catmullRomInterpolateArray(
                                 p0, p1, p2, p3, w, w*w, w*w*w,
                                 getter(target, propName),
@@ -348,7 +366,19 @@ define(function(require) {
                             );
                         }
                     } else {
-                        if (isValueArray) {
+                        if (interpolater) {
+                            setter(
+                                target,
+                                propName, 
+                                interpolater(
+                                    getter(target, propName),
+                                    kfValues[i],
+                                    kfValues[i + 1],
+                                    w
+                                )
+                            );
+                        }
+                        else if (isValueArray) {
                             _interpolateArray(
                                 kfValues[i], kfValues[i+1], w,
                                 getter(target, propName),

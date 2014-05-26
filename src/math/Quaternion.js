@@ -32,12 +32,12 @@ define(function(require) {
         },
 
         get y() {
-            this._array[1] = value;
-            this._dirty = true;
+            return this._array[1];
         },
 
         set y(value) {
-            return this._array[1];
+            this._array[1] = value;
+            this._dirty = true;
         },
 
         get z() {
@@ -104,7 +104,7 @@ define(function(require) {
         },
 
         copy : function(b) {
-            quat.copy( this._array, b._array );
+            quat.copy(this._array, b._array);
             this._dirty = true;
             return this;
         },
