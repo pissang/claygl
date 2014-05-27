@@ -109,7 +109,9 @@ define(function(require) {
         setTime : function(time) {console.warn('set time is not implented in Clip')},
 
         restart : function() {
-            this._startTime = new Date().getTime() + this.gap;
+            var time = new Date().getTime();
+            var remainder = (time - this._startTime) % this._life;
+            this._startTime = time - remainder + this.gap;
         },
         
         fire : function(eventType, arg) {
