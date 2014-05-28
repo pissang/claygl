@@ -47,13 +47,14 @@
                     name : 'ROOT'
                 });
                 scene.add(root);
+                var cube = new Mesh({
+                    geometry: cube,
+                    material: material
+                });
                 for( var i = 0; i < 10; i++){
                     for(var j = 0; j < 20; j++){
                         for( var k = 0; k < 50; k++){
-                            var mesh = new Mesh({
-                                geometry : cube,
-                                material : material,
-                            });
+                            var mesh = cube.clone();
                             mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
                             root.add(mesh);
                         }

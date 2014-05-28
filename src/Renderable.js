@@ -260,14 +260,29 @@ define(function(require) {
             return renderInfo;
         },
 
-        clone : function() {
-            var renderable = Node.prototype.clone.call(this);
+        clone : (function() {
+            var properties = [
+                'castShadow', 'receiveShadow',
+                'mode', 'culling', 'cullFace', 'frontFace',
+                'frustumCulling'
+            ];
+            return function() {
+                var renderable = Node.prototype.clone.call(this);
 
-            renderable.geometry = this.geometry;
-            renderable.material = this.material;
+                renderable.geometry = this.geometry;
+                renderable.material = this.material;
+                
+                for (var i = 0; i < properties.length; i++) {
+                    var name = properties[i];
+                    // Try not to overwrite the prototype property
+                    if (renderable[name] !== this[name]) {
+                        renderable[name] = this[name];
+                    }
+                }
 
-            return renderable;
-        }
+                return renderable;
+            }
+        })()
     });
 
     Renderable.beforeFrame = function() {

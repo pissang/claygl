@@ -26,7 +26,9 @@ define(function(require) {
             _offsetRoll : 0
         }
     }, function() {
-        this.enable();
+        if (this.domElement) {
+            this.enable();
+        }
     }, {
         enable : function() {
             // Use pointer lock

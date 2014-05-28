@@ -65,8 +65,19 @@ define(function(require) {
                     return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];
                 }
             }
+        },
+
+        clone: function() {
+            var light = Light.prototype.clone.call(this);
+            light.range = this.range;
+            light.umbraAngle = this.umbraAngle;
+            light.penumbraAngle = this.penumbraAngle;
+            light.falloffFactor = this.falloffFactor;
+            light.shadowBias = this.shadowBias;
+            light.shadowSlopeScale = this.shadowSlopeScale;
+            return light
         }
-    })
+    });
 
     return SpotLight;
 } )

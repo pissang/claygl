@@ -4,13 +4,9 @@ define(function(require) {
     var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');
 
-    var DirectionalLight = Light.derive(function() {
-
-        return {
-
-            shadowBias : 0.0002,
-            shadowSlopeScale : 2.0
-        }
+    var DirectionalLight = Light.derive({
+        shadowBias : 0.0002,
+        shadowSlopeScale : 2.0
     }, {
 
         type : 'DIRECTIONAL_LIGHT',
@@ -33,6 +29,13 @@ define(function(require) {
                     return [color[0]*intensity, color[1]*intensity, color[1]*intensity];
                 }
             }
+        },
+
+        clone: function() {
+            var light = Light.prototype.clone.call(this);
+            light.shadowBias = this.shadowBias;
+            light.shadowSlopeScale = this.shadowSlopeScale;
+            return light;
         }
     })
 

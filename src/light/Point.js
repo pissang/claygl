@@ -3,13 +3,10 @@ define(function(require) {
     var Light = require('../Light');
     var Shader = require('../Shader');
 
-    var PointLight = Light.derive(function() {
+    var PointLight = Light.derive({
+        range : 100,
 
-        return {
-            range : 100,
-
-            castShadow : false,
-        }
+        castShadow : false
     }, {
 
         type : 'POINT_LIGHT',
@@ -35,6 +32,12 @@ define(function(require) {
                     return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];
                 }
             }
+        },
+
+        clone: function() {
+            var light = Light.prototype.clone.call(this);
+            light.range = this.range;
+            return light;
         }
     })
 

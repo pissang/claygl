@@ -12,6 +12,16 @@ define(function(require){
             castShadow : true,
             shadowResolution : 512
         }
+    }, {
+        clone: function() {
+            var light = Node.prototype.clone.call(this);
+            light.color = Array.prototype.slice.call(this.color);
+            light.intensity = this.intensity;
+            light.castShadow = this.castShadow;
+            light.shadowResolution = this.shadowResolution;
+
+            return light;
+        }
     });
 
     Shader.import(require('text!./light/light.essl'));

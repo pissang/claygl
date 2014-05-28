@@ -3,10 +3,8 @@ define(function(require) {
     var Light = require('../Light');
     var Shader = require('../Shader');
 
-    var AmbientLight = Light.derive(function() {
-        return {
-            castShadow : false
-        }
+    var AmbientLight = Light.derive({
+        castShadow : false
     }, {
 
         type : 'AMBIENT_LIGHT',
