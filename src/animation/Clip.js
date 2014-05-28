@@ -94,23 +94,25 @@ define(function(require) {
                     this.restart();
                     this._loopRemained--;
                     return 'restart';
-                }else{
+                } else {
                     // Mark this clip to be deleted
                     // In the animation.update
                     this._needsRemove = true;
 
                     return 'destroy';
                 }
-            }else{
+            } else {
                 return null;
             }
         },
 
-        setTime : function(time) {console.warn('set time is not implented in Clip')},
+        setTime : function(time) {
+            this.step(time + this._startTime);
+        },
 
         restart : function() {
             var time = new Date().getTime();
-            var remainder = (time - this._startTime) % this._life;
+            var remainder = (time - this._startTime) % this.life;
             this._startTime = time - remainder + this.gap;
         },
         

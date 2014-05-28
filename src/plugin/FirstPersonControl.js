@@ -60,10 +60,15 @@ define(function(require) {
             if (el.exitPointerLock) {
                 el.exitPointerLock();
             }
+
+            this.domElement.removeEventListener("click", this._requestPointerLock);
+
             document.removeEventListener("pointerlockchange", bindOnce(this._lockChange, this));
             document.removeEventListener("mozpointerlockchange", bindOnce(this._lockChange, this));
             document.removeEventListener("webkitpointerlockchange", bindOnce(this._lockChange, this));
-        
+            
+            document.removeEventListener("keydown", bindOnce(this._keyDown, this));
+            document.removeEventListener("keyup", bindOnce(this._keyUp, this));
         },
 
         _requestPointerLock : function() {

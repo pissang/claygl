@@ -415,7 +415,6 @@ define(function(require) {
                 self.animation.addClip(clip);
             }
 
-
             for (var propName in this._tracks) {
                 createTrackClip(this._tracks[propName], propName);
             }
@@ -435,6 +434,9 @@ define(function(require) {
         done : function(func) {
             this._doneList.push(func);
             return this;
+        },
+        getClips: function() {
+            return this._clipList;
         }
     };
 
