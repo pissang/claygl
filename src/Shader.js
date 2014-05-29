@@ -101,8 +101,6 @@ define(function(require) {
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
     ];
     
-    var errorShader = {};
-
     // Enable attribute operation is global to all programs
     // Here saved the list of all enabled attribute index 
     // http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
@@ -168,6 +166,8 @@ define(function(require) {
             this._updateShaderString();
             this.dirty();
         },
+
+        // Return true or error msg if error happened
         bind : function(_gl) {
             this.cache.use(_gl.__GLID__, getCacheSchema);
 
@@ -175,8 +175,12 @@ define(function(require) {
 
             if (this.cache.isDirty()) {
                 this._updateShaderString();
-                this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
+                var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
                 this.cache.fresh();
+                
+                if (errMsg) {
+                    return errMsg;
+                }
             }
 
             _gl.useProgram(this.cache.get("program"));
@@ -733,7 +737,7 @@ define(function(require) {
                 return '';
             }
         },
-
+        // Return true or error msg if error happened
         _buildProgram : function(_gl, vertexShaderString, fragmentShaderString) {
 
             if (this.cache.get("program")) {
@@ -741,12 +745,23 @@ define(function(require) {
             }
             var program = _gl.createProgram();
 
-            var vertexShader = this._compileShader(_gl, "vertex", vertexShaderString);
-            var fragmentShader = this._compileShader(_gl, "fragment", fragmentShaderString);
-            if (!vertexShader || !fragmentShader) {
-                return;
+            var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
+            _gl.shaderSource(vertexShader, vertexShaderString);
+            _gl.compileShader(vertexShader);
+
+            var fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
+            _gl.shaderSource(fragmentShader, fragmentShaderString);
+            _gl.compileShader(fragmentShader);
+
+            var msg = this._checkShaderErrorMsg(_gl, vertexShader, vertexShaderString);
+            if (msg) {
+                return msg;
             }
-            
+            msg = this._checkShaderErrorMsg(_gl, fragmentShader, fragmentShaderString);
+            if (msg) {
+                return msg;
+            }
+
             _gl.attachShader(program, vertexShader);
             _gl.attachShader(program, fragmentShader);
             // Force the position bind to index 0;
@@ -756,11 +771,7 @@ define(function(require) {
             _gl.linkProgram(program);
 
             if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-                if (errorShader[this.__GUID__]) {
-                    return;
-                }
-                errorShader[this.__GUID__] = this;
-                throw new Error("Could not link program\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]");
+                return "Could not link program\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ", gl error [" + _gl.getError() + "]";
             }
 
             // Cache uniform locations
@@ -776,19 +787,11 @@ define(function(require) {
             this.cache.put("program", program);
         },
 
-        _compileShader : function(_gl, type, shaderString) {
-            var shader = _gl.createShader(type === "fragment" ? _gl.FRAGMENT_SHADER : _gl.VERTEX_SHADER);
-            _gl.shaderSource(shader, shaderString);
-            _gl.compileShader(shader);
-
+        // Return true or error msg if error happened
+        _checkShaderErrorMsg : function(_gl, shader, shaderString) {
             if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
-                if (errorShader[this.__GUID__]) {
-                    return;
-                }
-                errorShader[this.__GUID__] = this;
-                throw new Error([_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join("\n"));
+                return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join("\n");
             }
-            return shader;
         },
 
         clone : function() {

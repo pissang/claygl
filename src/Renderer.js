@@ -27,6 +27,8 @@ define(function(require) {
         shader : preZPassShader
     });
 
+    var errorShader = {};
+
     var Renderer = Base.derive(function() {
         return {
 
@@ -51,6 +53,8 @@ define(function(require) {
             antialias : true,
             premultipliedAlpha : true,
             preserveDrawingBuffer : false,
+
+            throwShaderError: true,
 
             gl : null,
 
@@ -331,7 +335,15 @@ define(function(require) {
                         scene.setShaderLightNumber(shader);
                     }
 
-                    shader.bind(_gl);
+                    var errMsg = shader.bind(_gl);
+                    if (errMsg && this.throwShaderError) {
+                        if (errorShader[shader.__GUID__]) {
+                            continue;
+                        }
+                        errorShader[shader.__GUID__] = true;
+
+                        throw new Error(errMsg);
+                    }
 
                     // Set lights uniforms
                     // TODO needs optimized

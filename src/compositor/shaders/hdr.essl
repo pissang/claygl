@@ -119,8 +119,11 @@ float eyeAdaption(float fLum)
 void main()
 {
     vec3 tex = vec3(0.0);
+    float a = 1.0;
     #ifdef TEXTURE_ENABLED
-        tex = texture2D(texture, v_Texcoord).rgb;
+        vec4 res = texture2D(texture, v_Texcoord);
+        a = res.a;
+        tex = res.rgb;
     #endif
 
     #ifdef BLOOM_ENABLED
@@ -150,7 +153,7 @@ void main()
     #ifdef RGBM_ENCODE
         gl_FragColor.rgba = RGBMEncode(color);
     #else
-        gl_FragColor = vec4(color, 1.0);
+        gl_FragColor = vec4(color, a);
     #endif
 }
 

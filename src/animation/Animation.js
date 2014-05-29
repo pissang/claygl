@@ -29,8 +29,7 @@ define(function(require) {
         },
         removeClip : function(clip) {
             var idx = this._clips.indexOf(clip);
-            clip = this._clips.pop();
-            this._clips[idx] = clip;
+            this._clips.splice(idx, 1);
         },
         update : function() {
             
