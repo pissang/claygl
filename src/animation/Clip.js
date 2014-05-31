@@ -79,6 +79,7 @@ define(function(require) {
 
         step : function(time) {
             if (time < this._startTime) {
+                this._currentTime = time;
                 return;
             }
 
