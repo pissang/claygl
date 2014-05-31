@@ -8,36 +8,44 @@ define(function(require) {
 
         this.target = options.target;
 
-        if (options.life !== undefined) {
+        if( typeof(options.life) !== 'undefined') {
             this.life = options.life;
         }
-        if (options.delay !== undefined) {
+        if (typeof(options.delay) !== 'undefined') {
             this.delay = options.delay;
         }
-        if (options.gap !== undefined) {
+        if (typeof(options.gap) !== 'undefined') {
             this.gap = options.gap;
         }
-        
-        this._startTime = new Date().getTime() + this.delay;
 
-        this._endTime = this._startTime + this.life;
+        if (typeof(options.playbackRatio) !== 'undefined') {
+            this.playbackRatio = options.playbackRatio;
+        } else {
+            this.playbackRatio = 1;
+        }
+
+        this._currentTime = new Date().getTime();
+        
+        this._startTime = this._currentTime + this.delay;
+
+        this._elapsedTime = 0;
 
         this._loop = options.loop === undefined ? false : options.loop;
         this.setLoop(this._loop);
 
-        if (options.easing !== undefined) {
+        if (typeof(options.easing) !== 'undefined') {
             this.setEasing(options.easing);
         }
 
-        if (options.onframe !== undefined) {
+        if (typeof(options.onframe) !== 'undefined') {
             this.onframe = options.onframe;
         }
 
-        if (options.ondestroy !== undefined) {
+        if (typeof(options.ondestroy) !== 'undefined') {
             this.ondestroy = options.ondestroy;
         }
 
-        if (options.onrestart !== undefined) {
+        if (typeof(options.onrestart) !== 'undefined') {
             this.onrestart = options.onrestart;
         }
 
@@ -70,16 +78,17 @@ define(function(require) {
         },
 
         step : function(time) {
-            
-            this._elapsedTime = time - this._startTime;
-
-            var percent = this._elapsedTime / this.life;
-
-            if (percent < 0) {
+            if (time < this._startTime) {
                 return;
             }
 
-            percent = Math.min(percent, 1);
+            this._elapse(time);
+
+            var percent = this._elapsedTime / this.life;
+
+            if (percent > 1) {
+                percent = 1;
+            }
 
             var schedule;
             if (this.easing) {
@@ -107,13 +116,24 @@ define(function(require) {
         },
 
         setTime : function(time) {
-            this.step(time + this._startTime);
+            return this.step(time + this._startTime);
         },
 
         restart : function() {
+            // If user leave the page for a while, when he gets back
+            // All clips may be expired and all start from the beginning value(position)
+            // It is clearly wrong, so we use remainder to add a offset
             var time = new Date().getTime();
-            var remainder = (time - this._startTime) % this.life;
+            this._elapse(time);
+
+            var remainder = this._elapsedTime % this.life;
             this._startTime = time - remainder + this.gap;
+            this._elapsedTime = 0;
+        },
+
+        _elapse: function(time) {
+            this._elapsedTime += (time - this._currentTime) * this.playbackRatio;
+            this._currentTime = time;
         },
         
         fire : function(eventType, arg) {

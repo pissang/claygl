@@ -160,6 +160,7 @@ define(function(require) {
     Texture.INT = glenum.INT;
     Texture.UNSIGNED_INT = glenum.UNSIGNED_INT;
     Texture.FLOAT = glenum.FLOAT;
+    Texture.HALF_FLOAT = 36193;
     
     /* PixelFormat */
     Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;

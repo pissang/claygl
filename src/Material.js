@@ -73,6 +73,11 @@ define(function(require) {
                     continue;
                 }
                 else if (uniform.value === null) {
+                    // if (uniform.type == 't') {
+                    //     // PENDING
+                    //     _gl.bindTexture(_gl.TEXTURE_2D, null);
+                    //     _gl.bindTexture(_gl.TEXTURE_CUBE, null);
+                    // }
                     continue;
                 }
                 else if (uniform.value instanceof Array
