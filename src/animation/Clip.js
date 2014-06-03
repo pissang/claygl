@@ -87,6 +87,9 @@ define(function(require) {
 
             var percent = this._elapsedTime / this.life;
 
+            if (percent < 0) {
+                return;
+            }
             if (percent > 1) {
                 percent = 1;
             }

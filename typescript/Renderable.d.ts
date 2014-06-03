@@ -4,7 +4,7 @@
 ///<reference path="Skeleton.d.ts" />
 declare module qtek {
 
-    interface IMeshOption extends INodeOption {
+    interface IRenderableOption extends INodeOption {
         
         material?: Material;
         geometry?: Geometry;
@@ -25,15 +25,15 @@ declare module qtek {
         receiveShadow?: boolean;
     }
 
-    interface IMeshRenderInfo {
+    interface IRenderableRenderInfo {
         faceNumber: number;
         vertexNumber: number;
         drawCallNumber: number;
     }
 
-    export class Mesh extends Node {
+    export class Renderable extends Node {
 
-        constructor(option?: IMeshOption);
+        constructor(option?: IRenderableOption);
 
         material: Material;
         geometry: Geometry;
@@ -53,15 +53,11 @@ declare module qtek {
         castShadow: boolean;
         receiveShadow: boolean;
 
-        joints: number[];
-
-        skeleton: Skeleton;
-
         isRenderable(): boolean;
 
-        render(gl: WebGLRenderingContext, globalMaterial?: Material): IMeshRenderInfo;
+        render(gl: WebGLRenderingContext, globalMaterial?: Material): IRenderableRenderInfo;
 
-        clone(): Mesh;
+        clone(): Renderable;
 
         // Enums
         static POINTS: number;

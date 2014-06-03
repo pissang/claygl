@@ -1,4 +1,4 @@
-///<reference path="../Mesh.d.ts" />
+///<reference path="../Renderable.d.ts" />
 ///<reference path="../Material.d.ts" />
 ///<reference path="../Geometry.d.ts" />
 ///<reference path="../Node.d.ts" />
@@ -10,7 +10,7 @@ declare module qtek {
 
     export module particleSystem {
 
-        interface IParticleSystemOption {
+        interface IParticleSystemOption extends IRenderableOption {
             loop?: boolean;
             oneshot?: boolean;
             duration?: number;
@@ -18,20 +18,13 @@ declare module qtek {
             spriteAnimationTileX?: number;
             spriteAnimationTileY?: number;
             spriteAnimationRepeat?: number;
-
-            visible?: boolean;
-
-            culling?: boolean;
-            cullFace?: number;
-            frontFace?: number;
-
         }
 
         interface IParticleSystemField {
             applyTo(velocity: math.Vector3, position: math.Vector3, weight: number, deltaTime: number): void;
         }
 
-        export class ParticleSystem extends Node {
+        export class ParticleSystem extends Renderable {
 
             constructor(option?: IParticleSystemOption);
 
@@ -47,23 +40,6 @@ declare module qtek {
 
             spriteAnimationRepeat: number;
 
-            geometry: Geometry;
-
-            material: Material;
-
-            visible: boolean;
-
-            culling: boolean;
-
-            cullFace: number;
-
-            frontFace: number;
-
-            // frustumCulling: boolean;
-            // castShadow: boolean;
-            // receiveShadow: boolean;
-            isRenderable(): boolean;
-
             addEmitter(emitter: Emitter): void;
 
             removeEmitter(emitter: Emitter): void;
@@ -75,8 +51,6 @@ declare module qtek {
             reset(): void;
 
             updateParticles(deltaTime: number): void;
-
-            render(gl: WebGLRenderingContext): IMeshRenderInfo;
 
             isFinished(): boolean;
 

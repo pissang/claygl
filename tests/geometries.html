@@ -11,8 +11,7 @@
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main"),
-                    devicePixelRatio : 1.0
+                    canvas : document.getElementById( "Main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene;
@@ -92,14 +91,16 @@
                 scene.add( coneMesh );
                 scene.add( cylinderMesh );
 
-                setInterval(function(){
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function(dTime) {
                     renderer.render( scene, camera );
-                    cubeMesh.rotation.rotateY(Math.PI/500);
-                    planeMesh.rotation.rotateY(Math.PI/500);
-                    sphereMesh.rotation.rotateY(Math.PI/500);
-                    coneMesh.rotation.rotateY(Math.PI/500);
-                    cylinderMesh.rotation.rotateY(Math.PI/500);
-                }, 20);
+                    cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                });
             })
             
         </script>

@@ -42,16 +42,38 @@ declare module qtek {
 
         constructor(option?: IRendererOption);
 
+        /**
+         * @type {HTMLCanvasElement}
+         */
         canvas: HTMLCanvasElement;
         
+        /**
+         * Canvas width, read-only and set by resize method
+         * @type {number}
+         */
         width: number;
         
+        /**
+         * Canvas width, read-only and set by resize method
+         * @type {number}
+         */
         height: number;
         
+        /**
+         * Canvas width, read-only and set by setDevicePixelRatio method
+         * @type {number}
+         */
         devicePixelRatio: number;
 
-        color: number[];
+        /**
+         * Clear color
+         * @type {array}
+         */
+        color: any;
 
+        /**
+         * @type {number}
+         */
         clear: number;
 
         alhpa: boolean;
