@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
 
     'use strict';
 
@@ -9,15 +9,35 @@ define(function(require){
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
-    var Scene = Node.derive(function(){
+    /**
+     * @constructor qtek.Scene
+     */
+    var Scene = Node.derive(function() {
+        /** @lends qtek.Scene# */
         return {
-            // Global material of scene
+            /**
+             * Global material of scene
+             * @type {Material}
+             */
             material : null,
+
+            /**
+             * @type {boolean}
+             */
             autoUpdate : true,
 
-            scene : null,
-
+            /**
+             * Opaque renderable list, it will be updated automatically
+             * @type {Renderable[]}
+             * @readonly
+             */
             opaqueQueue : [],
+
+            /**
+             * Opaque renderable list, it will be updated automatically
+             * @type {Renderable[]}
+             * @readonly
+             */
             transparentQueue : [],
 
             // Properties to save the light information in the scene
@@ -40,20 +60,34 @@ define(function(require){
         }
     }, function() {
         this.scene = this;
-    }, {
-
+    }, 
+    /** @lends qtek.Scene.prototype. */
+    {
+        /**
+         * Add node to scene
+         * @param {Node} node
+         */
         addToScene : function(node) {
             if (node.name) {
                 this._nodeRepository[node.name] = node;
             }
         },
 
+        /**
+         * Remove node from scene
+         * @param {Node} node
+         */
         removeFromScene : function(node) {
             if (node.name) {
                 delete this._nodeRepository[node.name];
             }
         },
 
+        /**
+         * Get node by name
+         * @param  {string} name
+         * @return {Node}
+         */
         getNode : function(name) {
             return this._nodeRepository[name];
         },
@@ -177,6 +211,11 @@ define(function(require){
             }
         },
 
+        /**
+         * Dispose self, clear all the scene objects
+         * But resources of gl like texuture, shader will not be disposed.
+         * Mostly you should use disposeScene method in Renderer to do dispose.
+         */
         dispose : function() {
             this.material = null;
             this.opaqueQueue = [];

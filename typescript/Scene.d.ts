@@ -1,14 +1,8 @@
 ///<reference path="Material.d.ts" />
+///<reference path="Renderable.d.ts" />
 ///<reference path="Shader.d.ts" />
 ///<reference path="Node.d.ts" />
 declare module qtek {
-
-    interface IRenderable {
-        isRenderable(): boolean;
-        render(gl: WebGLRenderingContext):  IRenderInfo;
-        geometry: Geometry;
-        material: Material;
-    }
 
     interface ISceneOption extends INodeOption {
         material?: Material;
@@ -23,21 +17,21 @@ declare module qtek {
 
         autoUpdate: boolean;
 
-        opaqueQueue: IRenderable[];
+        opaqueQueue: Renderable[];
 
-        transparentQueue: IRenderable[];
+        transparentQueue: Renderable[];
 
         addToScene(node: Node): void;
-
+        
         removeFromScene(node: Node): void;
 
         getNode(name: string): Node;
 
-        isShaderLightNumberChanged(shader: Shader): boolean;
+        // isShaderLightNumberChanged(shader: Shader): boolean;
 
-        setShaderLightNumber(shader: Shader): void;
+        // setShaderLightNumber(shader: Shader): void;
 
-        setLightUniforms(shader: Shader, _gl, WebGLRenderingContext): void;
+        // setLightUniforms(shader: Shader, _gl, WebGLRenderingContext): void;
 
         dispose(): void;
     }

@@ -57,13 +57,6 @@ define(function(require) {
             this.trigger('frame', frameTime);
         }, this);
     }, {
-        /**
-         * Create a new 3d layer
-         * @param {qtek.3d.Renderer} [renderer]
-         * @param {qtek.3d.Scene} [scene]
-         * @param {qtek.3d.Camera} [camera]
-         * @return {qtek.Layer}
-         */
         createLayer3D : function(options) {
             options = options || {};
             options.renderer = options.renderer || new Renderer3D();

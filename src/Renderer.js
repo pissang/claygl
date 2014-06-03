@@ -29,35 +29,101 @@ define(function(require) {
 
     var errorShader = {};
 
+    /**
+     * @constructor qtek.Renderer
+     */
     var Renderer = Base.derive(function() {
+        /** @lends qtek.Renderer# */
         return {
 
+            /**
+             * @type {HTMLCanvasElement}
+             */
             canvas : null,
+
+            /**
+             * Canvas width, set by resize method
+             * @type {number}
+             * @readonly
+             */
             width : 100,
+
+            /**
+             * Canvas width, set by resize method
+             * @type {number}
+             * @readonly
+             */
             height : 100,
-            // Device Pixel Ratio is for high defination disply
-            // like retina display
-            // http://www.khronos.org/webgl/wiki/HandlingHighDPI
+
+            /**
+             * Device pixel ratio, set by setDevicePixelRatio method
+             * Specially for high defination display
+             * @see http://www.khronos.org/webgl/wiki/HandlingHighDPI
+             * @type {number}
+             * @readonly
+             */
             devicePixelRatio : window.devicePixelRatio || 1.0,
 
+            /**
+             * Clear color
+             * @type {array}
+             */
             color : [0.0, 0.0, 0.0, 0.0],
             
-            // _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
+            /**
+             * Default:
+             *     _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
+             * @type {number}
+             */
             clear : 17664,  
 
             // Settings when getting context
             // http://www.khronos.org/registry/webgl/specs/latest/#2.4
+
+            /**
+             * If enable alpha, default true
+             * @type {boolean}
+             */
             alhpa : true,
+            /**
+             * If enable depth buffer, default true
+             * @type {boolean}
+             */
             depth : true,
+            /**
+             * If enable stencil buffer, default false
+             * @type {boolean}
+             */
             stencil : false,
+            /**
+             * If enable antialias, default true
+             * @type {boolean}
+             */
             antialias : true,
+            /**
+             * If enable premultiplied alpha, default true
+             * @type {boolean}
+             */
             premultipliedAlpha : true,
+            /**
+             * If preserve drawing buffer, default false
+             * @type {boolean}
+             */
             preserveDrawingBuffer : false,
-
+            /**
+             * If throw shader error, usually turned on in debug mode
+             * @type {boolean}
+             */
             throwShaderError: true,
-
+            /**
+             * WebGL Context created from given canvas
+             * @type {WebGLRenderingContext}
+             */
             gl : null,
-
+            /**
+             * Renderer viewport, read-only, can be set by setViewport method
+             * @type {{x: number, y: number, width: number, height: number}}
+             */
             viewport : {},
 
             _viewportSettings : [],
@@ -92,8 +158,14 @@ define(function(require) {
         catch(e) {
             throw "Error creating WebGL Context";
         }
-    }, {
-
+    },
+    /** @lends qtek.Renderer.prototype. **/
+    {
+        /**
+         * Resize the canvas
+         * @param {number} width
+         * @param {number} height
+         */
         resize : function(width, height) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
@@ -115,11 +187,22 @@ define(function(require) {
             this.setViewport(0, 0, canvas.width, canvas.height);
         },
 
+        /**
+         * Set devicePixelRatio
+         * @param {number} devicePixelRatio
+         */
         setDevicePixelRatio : function(devicePixelRatio) {
             this.devicePixelRatio = devicePixelRatio;
             this.resize(this.width, this.height);
         },
 
+        /**
+         * Set rendering viewport
+         * @param {number|{x:number,y:number,width:number,height:number}} x
+         * @param {number} [y]
+         * @param {number} [width]
+         * @param {number} [height]
+         */
         setViewport : function(x, y, width, height) {
 
             if (typeof(x) === "object") {
@@ -139,26 +222,45 @@ define(function(require) {
             }
         },
 
+        /**
+         * Push current viewport into a stack
+         */
         saveViewport : function() {
             this._viewportSettings.push(this.viewport);
         },
 
+        /**
+         * Pop viewport from stack, restore in the renderer
+         */
         restoreViewport : function() {
             if (this._viewportSettings.length > 0) {
                 this.setViewport(this._viewportSettings.pop());
             }
         },
 
+        /**
+         * Push current clear into a stack
+         */
         saveClear : function() {
             this._clearSettings.push(this.clear);
         },
 
+        /**
+         * Pop clear from stack, restore in the renderer
+         */
         restoreClear : function() {
             if (this._clearSettings.length > 0) {
                 this.clear = this._clearSettings.pop();   
             }
         },
-
+        /**
+         * Render the scene in camera to the screen or binded offline framebuffer
+         * @param  {Scene}       scene
+         * @param  {Camera}      camera
+         * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
+         * @param  {boolean}     [preZ]           If use preZ optimization, default false
+         * @return {IRenderInfo}
+         */
         render : function(scene, camera, notUpdateScene, preZ) {
             var _gl = this.gl;
 
@@ -228,6 +330,15 @@ define(function(require) {
             return renderInfo;
         },
 
+        /**
+         * Render a single renderable list in camera in sequence
+         * @param  {Renderable[]} queue            List of all renderables.
+         *                                         Best to be sorted by Renderer.opaqueSortFunc or Renderer.transparentSortFunc
+         * @param  {Camera}       camera         
+         * @param  {Material}     [globalMaterial] globalMaterial will override the material of each renderable
+         * @param  {boolean}      [preZ]           If use preZ optimization, default false
+         * @return {IRenderInfo}
+         */
         renderQueue : function(queue, camera, globalMaterial, preZ) {
             var renderInfo = {
                 faceNumber : 0,
@@ -463,11 +574,19 @@ define(function(require) {
             }
         })(),
 
+        /**
+         * Dispose given scene, including all geometris, textures and shaders in the scene
+         * @param {Scene} scene
+         */
         disposeScene : function(scene) {
             this.disposeNode(scene);
             scene.dispose();
         },
 
+        /**
+         * Dispose given node, including all geometries, textures and shaders attached on it or its descendant
+         * @param {Node} node
+         */
         disposeNode : function(root) {
             var materials = {};
             var _gl = this.gl;
@@ -506,22 +625,48 @@ define(function(require) {
             root._children = [];
         },
 
+        /**
+         * Dispose given shader
+         * @param {Shader} shader
+         */
         disposeShader : function(shader) {
             shader.dispose(this.gl);
         },
 
+        /**
+         * Dispose given geometry
+         * @param {Geometry} geometry
+         */
         disposeGeometry : function(geometry) {
             geometry.dispose(this.gl);
         },
 
+        /**
+         * Dispose given texture
+         * @param {Texture} texture
+         */
         disposeTexture : function(texture) {
             texture.dispose(this.gl);
         },
 
+        /**
+         * Dispose given frame buffer
+         * @param {FrameBuffer} frameBuffer
+         */
         disposeFrameBuffer : function(frameBuffer) {
             frameBuffer.dispose(this.gl);
         },
 
+        /**
+         * Convert screen coords to normalized device coordinates(NDC)
+         * Screen coords can get from mouse event, it is positioned relative to canvas element
+         * NDC can be used in ray casting with Camera.castRay methods
+         * 
+         * @param  {number}       x
+         * @param  {number}       y
+         * @param  {math.Vector2} [out]
+         * @return {math.Vector2}
+         */
         screenToNdc : function(x, y, out) {
             if (!out) {
                 out = new Vector2();
@@ -538,6 +683,13 @@ define(function(require) {
         }
     })
 
+    /**
+     * Opaque renderables compare function
+     * @param  {Renderable} x
+     * @param  {Renderable} y
+     * @return {boolean}
+     * @static
+     */
     Renderer.opaqueSortFunc = function(x, y) {
         // Priority shader -> material -> geometry
         if (x.material.shader === y.material.shader) {
@@ -548,6 +700,14 @@ define(function(require) {
         }
         return x.material.shader.__GUID__ - y.material.shader.__GUID__;
     }
+
+    /**
+     * Transparent renderables compare function
+     * @param  {Renderable} a
+     * @param  {Renderable} b
+     * @return {boolean}
+     * @static
+     */
     Renderer.transparentSortFunc = function(x, y) {
         // Priority depth -> shader -> material -> geometry
         if (x.__depth === y.__depth) {

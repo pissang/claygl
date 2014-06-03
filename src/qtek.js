@@ -1,3 +1,6 @@
+/**
+ * @namespace qtek
+ */
 define( function(require){
 	
 	var exportsObject =  {
