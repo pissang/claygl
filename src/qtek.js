@@ -1,6 +1,21 @@
-/**
- * @namespace qtek
- */
+/** @namespace qtek */
+/** @namespace qtek.math */
+/** @namespace qtek.animation */
+/** @namespace qtek.async */
+/** @namespace qtek.camera */
+/** @namespace qtek.compositor */
+/** @namespace qtek.core */
+/** @namespace qtek.geometry */
+/** @namespace qtek.helper */
+/** @namespace qtek.light */
+/** @namespace qtek.loader */
+/** @namespace qtek.particleSystem */
+/** @namespace qtek.picking */
+/** @namespace qtek.plugin */
+/** @namespace qtek.prePass */
+/** @namespace qtek.shader */
+/** @namespace qtek.texture */
+/** @namespace qtek.util */
 define( function(require){
 	
 	var exportsObject =  {
@@ -63,6 +78,10 @@ define( function(require){
 		},
 		"request": require('qtek/core/request'),
 		"util": require('qtek/core/util')
+	},
+	"deferred": {
+		"Renderer": require('qtek/deferred/Renderer'),
+		"StandardMaterial": require('qtek/deferred/StandardMaterial')
 	},
 	"geometry": {
 		"Capsule": require('qtek/geometry/Capsule'),

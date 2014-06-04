@@ -18,6 +18,9 @@ define(function(require) {
         }
     }
 
+    /**
+     * @constructor qtek.math.Matrix2
+     */
     var Matrix2 = function() {
 
         this._array = mat2.create();

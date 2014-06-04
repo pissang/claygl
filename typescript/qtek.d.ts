@@ -7,6 +7,7 @@
 ///<reference path="Material" />
 ///<reference path="Mesh" />
 ///<reference path="Node" />
+///<reference path="Renderable" />
 ///<reference path="Renderer" />
 ///<reference path="Scene" />
 ///<reference path="Shader" />

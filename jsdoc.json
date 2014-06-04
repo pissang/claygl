@@ -1,0 +1,11 @@
+{
+    "source": {
+        "include": ["src"],
+        "includePattern": ".+\\.js(doc)?$"
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "./gh-pages/api/",
+        "recurse": true
+    }
+}

@@ -47,7 +47,7 @@ declare module qtek {
 
             length(): number;
 
-            lerp(a: Vector3, b: Vector3, t: number): number;
+            lerp(a: Vector3, b: Vector3, t: number): Vector3;
 
             min(b: Vector3): Vector3;
 
