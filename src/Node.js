@@ -13,6 +13,9 @@ define(function(require) {
 
     var nameId = 0;
 
+    /**
+     * @constructor qtek.Node
+     */
     var Node = Base.derive({
         
         parent : null,

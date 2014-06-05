@@ -11,8 +11,6 @@ declare module qtek {
 
             copy(b: Matrix2d): Matrix2d;
 
-            adjoint(): Matrix2d;
-
             determinant(): number;
 
             identity(): Matrix2d;
@@ -34,8 +32,6 @@ declare module qtek {
             translate(v: Vector2): Matrix2d;
 
             toString(): string;
-
-            static adjoint(out: Matrix2d, a: Matrix2d): Matrix2d;
 
             static copy(out: Matrix2d, a: Matrix2d): Matrix2d;
 

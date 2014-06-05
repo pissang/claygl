@@ -131,7 +131,7 @@ define(function(require) {
         },
 
         /**
-         * Copy x, y from b
+         * Copy from b
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */

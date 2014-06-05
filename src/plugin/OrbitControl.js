@@ -94,9 +94,13 @@ define(function(require) {
                 this._offsetRoll += dy * this.sensitivity / 100;
             } else if (this._op === 1) {
                 var len = this.origin.distance(this.target.position);
-                var tmp = Math.sin(this.target.fov/2) / 100;
-                this._panX -= dx * this.sensitivity * len * tmp;
-                this._panY -= dy * this.sensitivity * len * tmp;
+                if (this.target.fov) {
+                    var divider = Math.sin(this.target.fov * Math.PI / 360) / 200;
+                } else {
+                    var divider = 1 / 200;
+                }
+                this._panX += dx * this.sensitivity * len * divider;
+                this._panY += dy * this.sensitivity * len * divider;
             }
 
             this._offsetX = e.pageX;

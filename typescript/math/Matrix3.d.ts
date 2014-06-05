@@ -68,7 +68,7 @@ declare module qtek {
 
             static fromQuat(out: Matrix3, a: Quaternion): Matrix3;
 
-            static normalFromMat4(out: Matrix3, a: Matrix4, rad: number): Matrix3;
+            static normalFromMat4(out: Matrix3, a: Matrix4): Matrix3;
 
             static transpose(out: Matrix3, a: Matrix3): Matrix3;
 
