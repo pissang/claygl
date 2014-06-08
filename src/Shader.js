@@ -151,7 +151,7 @@ define(function(require) {
         }
     }, function() {
         
-        this.cache = new Cache();
+        this._cache = new Cache();
 
         this._updateShaderString();
     }, {
@@ -169,28 +169,28 @@ define(function(require) {
 
         // Return true or error msg if error happened
         bind : function(_gl) {
-            this.cache.use(_gl.__GLID__, getCacheSchema);
+            this._cache.use(_gl.__GLID__, getCacheSchema);
 
-            this._currentLocationsMap = this.cache.get('locations');
+            this._currentLocationsMap = this._cache.get('locations');
 
-            if (this.cache.isDirty()) {
+            if (this._cache.isDirty()) {
                 this._updateShaderString();
                 var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
-                this.cache.fresh();
+                this._cache.fresh();
                 
                 if (errMsg) {
                     return errMsg;
                 }
             }
 
-            _gl.useProgram(this.cache.get("program"));
+            _gl.useProgram(this._cache.get("program"));
         },
 
         dirty : function() {
-            this.cache.dirtyAll();
-            for (var i = 0; i < this.cache._caches.length; i++) {
-                if (this.cache._caches[i]) {
-                    var context = this.cache._caches[i];
+            this._cache.dirtyAll();
+            for (var i = 0; i < this._cache._caches.length; i++) {
+                if (this._cache._caches[i]) {
+                    var context = this._cache._caches[i];
                     context["locations"] = {};
                     context["attriblocations"] = {};
                 }
@@ -424,9 +424,9 @@ define(function(require) {
          */
         enableAttributes : function(_gl, attribList) {
             
-            var program = this.cache.get("program");
+            var program = this._cache.get("program");
 
-            var locationMap = this.cache.get("attriblocations");
+            var locationMap = this._cache.get("attriblocations");
 
             var enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
             if (! enabledAttributeListInContext) {
@@ -740,8 +740,8 @@ define(function(require) {
         // Return true or error msg if error happened
         _buildProgram : function(_gl, vertexShaderString, fragmentShaderString) {
 
-            if (this.cache.get("program")) {
-                _gl.deleteProgram(this.cache.get("program"));
+            if (this._cache.get("program")) {
+                _gl.deleteProgram(this._cache.get("program"));
             }
             var program = _gl.createProgram();
 
@@ -777,14 +777,14 @@ define(function(require) {
             // Cache uniform locations
             for (var i = 0; i < this._uniformList.length; i++) {
                 var uniformSymbol = this._uniformList[i];
-                var locationMap = this.cache.get("locations");
+                var locationMap = this._cache.get("locations");
                 locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
             }
 
             _gl.deleteShader(vertexShader);
             _gl.deleteShader(fragmentShader);
 
-            this.cache.put("program", program);
+            this._cache.put("program", program);
         },
 
         // Return true or error msg if error happened
@@ -808,12 +808,12 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GLID__);
+            this._cache.use(_gl.__GLID__);
             if (program) {
-                var program = this.cache.get('program');
+                var program = this._cache.get('program');
             }
             _gl.deleteProgram(program);
-            this.cache.deleteContext(_gl.__GLID__);
+            this._cache.deleteContext(_gl.__GLID__);
             this._locations = {};
         }
     });

@@ -43,7 +43,7 @@ define(function(require) {
         }
     }, {
         dirty : function() {
-            this.cache.dirtyAll("chunks");
+            this._cache.dirtyAll("chunks");
             this._isDirty = true;
             this._enabledAttributes = null;
         },
@@ -113,17 +113,17 @@ define(function(require) {
         },
 
         getBufferChunks : function(_gl) {
-            this.cache.use(_gl.__GLID__);
-            if (this.cache.isDirty("chunks")) {
+            this._cache.use(_gl.__GLID__);
+            if (this._cache.isDirty("chunks")) {
                 this._updateBuffer(_gl);
-                this.cache.fresh("chunks");
+                this._cache.fresh("chunks");
                 this._isDirty = false;
             }
-            return this.cache.get("chunks");
+            return this._cache.get("chunks");
         },
         
         _updateBuffer : function(_gl) {
-            var chunks = this.cache.get("chunks");
+            var chunks = this._cache.get("chunks");
             var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
@@ -132,7 +132,7 @@ define(function(require) {
                     attributeBuffers : [],
                     indicesBuffer : null
                 }
-                this.cache.put("chunks", chunks);
+                this._cache.put("chunks", chunks);
                 firstUpdate = true;
             }
             var chunk = chunks[0];
@@ -426,8 +426,8 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GLID__);
-            var chunks = this.cache.get('chunks');
+            this._cache.use(_gl.__GLID__);
+            var chunks = this._cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
@@ -438,7 +438,7 @@ define(function(require) {
                     }
                 }
             }
-            this.cache.deleteContext(_gl.__GLID__);
+            this._cache.deleteContext(_gl.__GLID__);
         }
     });
 

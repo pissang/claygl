@@ -66,7 +66,7 @@ define(function(require) {
 
             /**
              * Clear color
-             * @type {array}
+             * @type {number[]}
              */
             color : [0.0, 0.0, 0.0, 0.0],
             
@@ -255,8 +255,8 @@ define(function(require) {
         },
         /**
          * Render the scene in camera to the screen or binded offline framebuffer
-         * @param  {Scene}       scene
-         * @param  {Camera}      camera
+         * @param  {qtek.Scene}       scene
+         * @param  {qtek.Camera}      camera
          * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
          * @param  {boolean}     [preZ]           If use preZ optimization, default false
          * @return {IRenderInfo}
@@ -332,10 +332,10 @@ define(function(require) {
 
         /**
          * Render a single renderable list in camera in sequence
-         * @param  {Renderable[]} queue            List of all renderables.
+         * @param  {qtek.Renderable[]} queue            List of all renderables.
          *                                         Best to be sorted by Renderer.opaqueSortFunc or Renderer.transparentSortFunc
-         * @param  {Camera}       camera         
-         * @param  {Material}     [globalMaterial] globalMaterial will override the material of each renderable
+         * @param  {qtek.Camera}       camera         
+         * @param  {qtek.Material}     [globalMaterial] globalMaterial will override the material of each renderable
          * @param  {boolean}      [preZ]           If use preZ optimization, default false
          * @return {IRenderInfo}
          */
@@ -576,7 +576,7 @@ define(function(require) {
 
         /**
          * Dispose given scene, including all geometris, textures and shaders in the scene
-         * @param {Scene} scene
+         * @param {qtek.Scene} scene
          */
         disposeScene : function(scene) {
             this.disposeNode(scene);
@@ -585,7 +585,7 @@ define(function(require) {
 
         /**
          * Dispose given node, including all geometries, textures and shaders attached on it or its descendant
-         * @param {Node} node
+         * @param {qtek.Node} node
          */
         disposeNode : function(root) {
             var materials = {};
@@ -627,7 +627,7 @@ define(function(require) {
 
         /**
          * Dispose given shader
-         * @param {Shader} shader
+         * @param {qtek.Shader} shader
          */
         disposeShader : function(shader) {
             shader.dispose(this.gl);
@@ -635,7 +635,7 @@ define(function(require) {
 
         /**
          * Dispose given geometry
-         * @param {Geometry} geometry
+         * @param {qtek.Geometry} geometry
          */
         disposeGeometry : function(geometry) {
             geometry.dispose(this.gl);
@@ -643,7 +643,7 @@ define(function(require) {
 
         /**
          * Dispose given texture
-         * @param {Texture} texture
+         * @param {qtek.Texture} texture
          */
         disposeTexture : function(texture) {
             texture.dispose(this.gl);
@@ -651,7 +651,7 @@ define(function(require) {
 
         /**
          * Dispose given frame buffer
-         * @param {FrameBuffer} frameBuffer
+         * @param {qtek.FrameBuffer} frameBuffer
          */
         disposeFrameBuffer : function(frameBuffer) {
             frameBuffer.dispose(this.gl);
@@ -664,8 +664,8 @@ define(function(require) {
          * 
          * @param  {number}       x
          * @param  {number}       y
-         * @param  {math.Vector2} [out]
-         * @return {math.Vector2}
+         * @param  {qtek.math.Vector2} [out]
+         * @return {qtek.math.Vector2}
          */
         screenToNdc : function(x, y, out) {
             if (!out) {
@@ -685,8 +685,8 @@ define(function(require) {
 
     /**
      * Opaque renderables compare function
-     * @param  {Renderable} x
-     * @param  {Renderable} y
+     * @param  {qtek.Renderable} x
+     * @param  {qtek.Renderable} y
      * @return {boolean}
      * @static
      */
@@ -703,8 +703,8 @@ define(function(require) {
 
     /**
      * Transparent renderables compare function
-     * @param  {Renderable} a
-     * @param  {Renderable} b
+     * @param  {qtek.Renderable} a
+     * @param  {qtek.Renderable} b
      * @return {boolean}
      * @static
      */

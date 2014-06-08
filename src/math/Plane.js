@@ -6,8 +6,23 @@ define(function(require) {
     var mat4 = glmatrix.mat4;
     var vec4 = glmatrix.vec4;
 
+    /**
+     * @constructor
+     * @alias qtek.math.Plane
+     * @param {qtek.math.Vector3} [normal]
+     * @param {number} [distance]
+     */
     var Plane = function(normal, distance) {
+        /**
+         * Normal of the plane
+         * @type {qtek.math.Vector3}
+         */
         this.normal = normal || new Vector3(0, 1, 0);
+
+        /**
+         * Constant of the plane equation, used as distance to the origin
+         * @type {number}
+         */
         this.distance = distance || 0;
     }
 
@@ -15,10 +30,21 @@ define(function(require) {
 
         constructor : Plane,
 
+        /**
+         * Distance from given point to plane
+         * @param  {qtek.math.Vector3} point
+         * @return {number}
+         */
         distanceToPoint : function(point) {
             return vec3.dot(point._array, this.normal._array) - this.distance;
         },
 
+        /**
+         * Calculate the projection on the plane of point
+         * @param  {qtek.math.Vector3} point
+         * @param  {qtek.math.Vector3} out
+         * @return {qtek.math.Vector3}
+         */
         projectPoint : function(point, out) {
             if (!out) {
                 out = new Vector3();
@@ -29,12 +55,20 @@ define(function(require) {
             return out;
         },
 
+        /**
+         * Normalize the plane's normal and calculate distance
+         */
         normalize : function() {
             var invLen = 1 / vec3.len(this.normal._array);
             vec3.scale(this.normal._array, invLen);
             this.distance *= invLen;
         },
 
+        /**
+         * If the plane intersect a frustum
+         * @param  {qtek.math.Frustum} Frustum
+         * @return {boolean}
+         */
         intersectFrustum : function(frustum) {
             // Check if all coords of frustum is on plane all under plane
             var coords = frustum.vertices;
@@ -47,6 +81,14 @@ define(function(require) {
             }
         },
 
+        /**
+         * Calculate the intersection point between plane and a given line
+         * @method
+         * @param {qtek.math.Vector3} start start point of line
+         * @param {qtek.math.Vector3} end end point of line
+         * @param {qtek.math.Vector3} [out]
+         * @return {qtek.math.Vector3}
+         */
         intersectLine : (function() {
             var rd = vec3.create();
             return function(start, end, out) {
@@ -78,6 +120,11 @@ define(function(require) {
             };
         })(),
 
+        /**
+         * Apply an affine transform matrix to plane
+         * @method
+         * @return {qtek.math.Matrix4}
+         */
         applyTransform : (function() {
             var inverseTranspose = mat4.create();
             var normalv4 = vec4.create();
@@ -99,12 +146,20 @@ define(function(require) {
             }
         })(),
 
+        /**
+         * Copy from another plane
+         * @param  {qtek.math.Vector3} plane
+         */
         copy : function(plane) {
             vec3.copy(this.normal._array, plane.normal._array);
             this.normal._dirty = true;
             this.distance = plane.distance;
         },
 
+        /**
+         * Clone a new plane
+         * @return {qtek.math.Plane}
+         */
         clone : function() {
             var plane = new Plane();
             plane.copy(this);

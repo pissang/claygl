@@ -75,7 +75,7 @@ define(function(require) {
                 }
                 return;
             }
-            this.cache.dirtyAll(field);
+            this._cache.dirtyAll(field);
 
             this._isDirty = true;
             this._enabledAttributes = null;
@@ -150,14 +150,14 @@ define(function(require) {
 
             var attributes = this.getEnabledAttributes();
             
-            if (this.cache.miss('chunks')) {
+            if (this._cache.miss('chunks')) {
                 return attributes;
             } else {
                 var result = {};
                 var noDirtyAttributes = true;
                 for (var name in attributes) {
                     var attrib = attributes[name];
-                    if (this.cache.isDirty(name)) {
+                    if (this._cache.isDirty(name)) {
                         result[name] = attributes[name];
                         noDirtyAttributes = false;
                     }
@@ -174,12 +174,12 @@ define(function(require) {
 
         getBufferChunks : function(_gl) {
 
-            this.cache.use(_gl.__GLID__);
+            this._cache.use(_gl.__GLID__);
 
             if (this._isDirty) {
                 var dirtyAttributes = this._getDirtyAttributes();
 
-                var isFacesDirty = this.cache.isDirty('indices');
+                var isFacesDirty = this._cache.isDirty('indices');
                 isFacesDirty = isFacesDirty && this.isUseFace();
                 
                 if (dirtyAttributes) {
@@ -187,13 +187,13 @@ define(function(require) {
                     this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
                     for (var name in dirtyAttributes) {
-                        this.cache.fresh(name);
+                        this._cache.fresh(name);
                     }
-                    this.cache.fresh('indices');
+                    this._cache.fresh('indices');
                     this._isDirty = false;
                 }
             }
-            return this.cache.get("chunks");
+            return this._cache.get("chunks");
         },
 
         _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
@@ -390,7 +390,7 @@ define(function(require) {
         },
 
         _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
-            var chunks = this.cache.get("chunks");
+            var chunks = this._cache.get("chunks");
             var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
@@ -401,7 +401,7 @@ define(function(require) {
                         indicesBuffer : null
                     }
                 }
-                this.cache.put("chunks", chunks);
+                this._cache.put("chunks", chunks);
                 firstUpdate = true;
             }
             for (var cc = 0; cc < this._arrayChunks.length; cc++) {
@@ -777,8 +777,8 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GLID__);
-            var chunks = this.cache.get('chunks');
+            this._cache.use(_gl.__GLID__);
+            var chunks = this._cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
@@ -788,7 +788,7 @@ define(function(require) {
                     }
                 }
             }
-            this.cache.deleteContext(_gl.__GLID__);
+            this._cache.deleteContext(_gl.__GLID__);
         }
     });
     

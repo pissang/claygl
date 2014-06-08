@@ -9,7 +9,16 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
 
-    var FrameBuffer = Base.derive({
+    /**
+     * constructor qtek.FrameBuffer
+     */
+    var FrameBuffer = Base.derive(
+    /** @lends qtek.FrameBuffer# */
+    {
+        /**
+         * If use depth buffer
+         * @type {boolean}
+         */
         depthBuffer : true,
 
         //Save attached texture and target
@@ -25,16 +34,29 @@ define(function(require) {
         _binded : false,
     }, function() {
         // Use cache
-        this.cache = new Cache();
+        this._cache = new Cache();
 
         this._attachedTextures = {};
-    }, {
+    },
+    
+    /**@lends qtek.FrameBuffer.prototype. */
+    {
 
+        /**
+         * Resize framebuffer.
+         * It is not recommanded use this methods to change the framebuffer size because the size will still be changed when attaching a new texture
+         * @param  {number} width
+         * @param  {number} height
+         */
         resize : function(width, height) {
             this._width = width;
             this._height = height;
         },
 
+        /**
+         * Bind the framebuffer to given renderer before rendering
+         * @param  {qtek.Renderer} renderer
+         */
         bind : function(renderer) {
 
             var _gl = renderer.gl;
@@ -44,17 +66,17 @@ define(function(require) {
                 this._binded = true;
             }
 
-            this.cache.put("viewport", renderer.viewport);
+            this._cache.put("viewport", renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height);
             // Create a new render buffer
-            if (this.cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
-                this.cache.put("renderbuffer", _gl.createRenderbuffer());
+            if (this._cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
+                this._cache.put("renderbuffer", _gl.createRenderbuffer());
             }
             if (! this._depthTextureAttached && this.depthBuffer) {
 
                 var width = this._width;
                 var height = this._height;
-                var renderbuffer = this.cache.get('renderbuffer');
+                var renderbuffer = this._cache.get('renderbuffer');
 
                 if (width !== this._renderBufferWidth
                      || height !== this._renderBufferHeight) {
@@ -64,21 +86,24 @@ define(function(require) {
                     this._renderBufferHeight = height;
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
                 }
-                if (! this.cache.get("renderbuffer_attached")) {
+                if (! this._cache.get("renderbuffer_attached")) {
                     _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
-                    this.cache.put("renderbuffer_attached", true);
+                    this._cache.put("renderbuffer_attached", true);
                 }
             }
         },
-
+        /**
+         * Unbind the frame buffer after rendering
+         * @param  {qtek.Renderer} renderer
+         */
         unbind : function(renderer) {
             var _gl = renderer.gl;
             
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
             this._binded = false;
 
-            this.cache.use(_gl.__GLID__);
-            var viewport = this.cache.get("viewport");
+            this._cache.use(_gl.__GLID__);
+            var viewport = this._cache.get("viewport");
             // Reset viewport;
             if (viewport) {
                 renderer.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
@@ -99,15 +124,23 @@ define(function(require) {
 
         getFrameBuffer : function(_gl) {
 
-            this.cache.use(_gl.__GLID__);
+            this._cache.use(_gl.__GLID__);
 
-            if (this.cache.miss("framebuffer")) {
-                this.cache.put("framebuffer", _gl.createFramebuffer());
+            if (this._cache.miss("framebuffer")) {
+                this._cache.put("framebuffer", _gl.createFramebuffer());
             }
 
-            return this.cache.get("framebuffer");
+            return this._cache.get("framebuffer");
         },
 
+        /**
+         * Attach a texture(RTT) to the framebuffer
+         * @param  {WebGLRenderingContext} _gl
+         * @param  {qtek.Texture} texture
+         * @param  {number} [attachment]
+         * @param  {number} [target]
+         * @param  {number} [mipmapLevel]
+         */
         attach : function(_gl, texture, attachment, target, mipmapLevel) {
 
             if (! texture.width) {
@@ -141,7 +174,7 @@ define(function(require) {
                     console.error("The texture attached to depth buffer is not a valid.");
                     return;
                 }
-                this.cache.put("renderbuffer_attached", false);
+                this._cache.put("renderbuffer_attached", false);
                 this._depthTextureAttached = true;
             }
 
@@ -151,16 +184,19 @@ define(function(require) {
         },
 
         detach : function() {},
-
+        /**
+         * Dispose
+         * @param  {WebGLRenderingContext} _gl
+         */
         dispose : function(_gl) {
-            this.cache.use(_gl.__GLID__);
+            this._cache.use(_gl.__GLID__);
 
-            if (this.cache.get("renderbuffer"))
-                _gl.deleteRenderbuffer(this.cache.get("renderbuffer"));
-            if (this.cache.get("framebuffer"))
-                _gl.deleteFramebuffer(this.cache.get("framebuffer"));
+            if (this._cache.get("renderbuffer"))
+                _gl.deleteRenderbuffer(this._cache.get("renderbuffer"));
+            if (this._cache.get("framebuffer"))
+                _gl.deleteFramebuffer(this._cache.get("framebuffer"));
 
-            this.cache.deleteContext(_gl.__GLID__);
+            this._cache.deleteContext(_gl.__GLID__);
         }
     });
 

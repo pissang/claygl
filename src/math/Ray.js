@@ -5,8 +5,20 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
 
+    /**
+     * @constructor
+     * @alias qtek.math.Ray
+     * @param {qtek.math.Vector3} [origin]
+     * @param {qtek.math.Vector3} [direction]
+     */
     var Ray = function(origin, direction) {
+        /**
+         * @type {qtek.math.Vector3}
+         */
         this.origin = origin || new Vector3();
+        /**
+         * @type {qtek.math.Vector3}
+         */
         this.direction = direction || new Vector3();
     }
     Ray.prototype = {
@@ -14,6 +26,12 @@ define(function(require) {
         constructor : Ray,
 
         // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
+        /**
+         * Calculate intersection point between ray and a give plane
+         * @param  {qtek.math.Plane} plane
+         * @param  {qtek.math.Vector3} [out]
+         * @return {qtek.math.Vector3}
+         */
         intersectPlane : function(plane, out) {
             var pn = plane.normal._array;
             var d = plane.distance;
@@ -34,7 +52,10 @@ define(function(require) {
             return out;
         },
 
-        // Mirror the ray against plane
+        /**
+         * Mirror the ray against plane
+         * @param  {qtek.math.Plane} plane
+         */
         mirrorAgainstPlane : function(plane) {
             // Distance to plane
             var d = vec3.dot(plane.normal._array, this.direction._array);

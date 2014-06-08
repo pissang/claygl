@@ -82,20 +82,36 @@ define(function(require) {
         console.warn('Geometry doesn\'t implement this method, use DynamicGeometry or StaticGeometry instead');
     }
 
-    var Geometry = Base.derive({
+    /**
+     * @constructor qtek.Geometry
+     */
+    var Geometry = Base.derive(
+    /** @lends qtek.Geometry# */
+    {
+        /**
+         * @type {qtek.math.BoundingBox}
+         */
         boundingBox : null,
         
+        /**
+         * Vertex attributes
+         * @type {object}
+         */
         attributes : {},
 
         faces : null,
 
+        /**
+         * @type {boolean}
+         */
         useFace : true,
 
         //Max Value of Uint16, i.e. 0xffff
         chunkSize : 65535
+        
     }, function() {
         // Use cache
-        this.cache = new Cache();
+        this._cache = new Cache();
 
         this._attributeList = Object.keys(this.attributes);
     }, {

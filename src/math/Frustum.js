@@ -7,16 +7,32 @@ define(function(require) {
 
     var vec3 = glmatrix.vec3;
 
+    /**
+     * @constructor
+     * @alias qtek.math.Frustum
+     */
     var Frustum = function() {
 
+        /**
+         * Eight planes to enclose the frustum
+         * @type {qtek.math.Plane[]}
+         */
         this.planes = [];
 
         for (var i = 0; i < 6; i++) {
             this.planes.push(new Plane());
         }
 
+        /**
+         * Bounding box of frustum
+         * @type {qtek.math.BoundingBox}
+         */
         this.boundingBox = new BoundingBox();
 
+        /**
+         * Eight vertices of frustum
+         * @type {Float32Array[]}
+         */
         this.vertices = [];
         for (var i = 0; i < 8; i++) {
             this.vertices[i] = vec3.fromValues(0, 0, 0);
@@ -26,6 +42,10 @@ define(function(require) {
     Frustum.prototype = {
 
         // http://web.archive.org/web/20120531231005/http://crazyjoke.free.fr/doc/3D/plane%20extraction.pdf
+        /**
+         * Set frustum from a projection matrix
+         * @param {qtek.math.Matrix4} projectionMatrix
+         */
         setFromProjection : function(projectionMatrix) {
 
             var planes = this.planes;
@@ -101,6 +121,13 @@ define(function(require) {
             }
         },
 
+        /**
+         * Apply a affine transform matrix and set to the given bounding box
+         * @method
+         * @param {qtek.math.BoundingBox}
+         * @param {qtek.math.Matrix4}
+         * @return {qtek.math.BoundingBox}
+         */
         getTransformedBoundingBox : (function() {
             
             var tmpVec3 = vec3.create();

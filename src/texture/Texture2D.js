@@ -12,7 +12,7 @@ define(function(require) {
     }, {
         update : function(_gl) {
 
-            _gl.bindTexture(_gl.TEXTURE_2D, this.cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get("webgl_texture"));
             
             this.beforeUpdate( _gl);
 
@@ -87,7 +87,7 @@ define(function(require) {
 
         },
         generateMipmap : function(_gl) {
-            _gl.bindTexture(_gl.TEXTURE_2D, this.cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get("webgl_texture"));
             _gl.generateMipmap(_gl.TEXTURE_2D);    
         },
         isPowerOfTwo : function() {

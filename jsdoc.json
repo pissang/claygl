@@ -4,8 +4,12 @@
         "includePattern": ".+\\.js(doc)?$"
     },
     "opts": {
+        "template": "node_modules/ink-docstrap/template",
         "encoding": "utf8",
         "destination": "./gh-pages/api/",
         "recurse": true
+    },
+    "templates": {
+        "theme": "cerulean"
     }
 }

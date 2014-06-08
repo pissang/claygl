@@ -11,30 +11,54 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;
 
+    /**
+     * @constructor qtek.Camera
+     */
     var Camera = Node.derive(function() {
+        /** @lends qtek.Camera# */
         return {
-            
+            /**
+             * Camera projection matrix
+             * @type {qtek.math.Matrix4}
+             */
             projectionMatrix : new Matrix4(),
 
+            /**
+             * Inverse of camera projection matrix
+             * @type {qtek.math.Matrix4}
+             */
             invProjectionMatrix : new Matrix4(),
 
+            /**
+             * View matrix, equal to inverse of camera's world matrix
+             * @type {qtek.math.Matrix4}
+             */
             viewMatrix : new Matrix4(),
 
-            // Frustum bounding box in view space
+            /**
+             * Camera frustum in view space
+             * @type {qtek.math.Frustum}
+             */
             frustum : new Frustum(),
 
-            // Scene bounding box in view space
-            // mainly for the camera to adujst the near and far plane,
-            // so that the view frustum contains the visible objects as tightly as possible.
-            // Notice:
-            //  updated after rendering (in the step of frustum culling passingly)
-            //  So may be not so accurate, but saved a lot of calculation !!
-            //  TODO : In case of one camera to multiple scenes
+            /**
+             * Scene bounding box in view space
+             * Used when camera needs to adujst the near and far plane automatically
+             * so that the view frustum contains the visible objects as tightly as possible.
+             * Notice:
+             *  updated after rendering (in the step of frustum culling passingly)
+             *  So may be not so accurate, but saves a lot of calculation
+             *  
+             * @type {qtek.math.BoundingBox}
+             */
+            //TODO : In case of one camera to multiple scenes
             sceneBoundingBoxLastFrame : new BoundingBox()
         }
     }, function() {
         this.update(true);
-    }, {
+    },
+    /** @lends qtek.Camera.prototype */
+    {
         
         update : function(force) {
             Node.prototype.update.call(this, force);
@@ -45,8 +69,18 @@ define(function(require) {
 
             this.frustum.setFromProjection(this.projectionMatrix);
         },
+        /**
+         * Update projection matrix, called after update
+         */
         updateProjectionMatrix : function(){},
 
+        /**
+         * Cast a picking ray from camera near plane to far plane
+         * @method
+         * @param {qtek.math.Vector2} ndc
+         * @param {qtek.math.Ray} [out]
+         * @return {qtek.math.Ray}
+         */
         castRay : (function() {
             var v4 = vec4.create();
             return function(ndc, out) {

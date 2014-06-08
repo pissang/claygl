@@ -74,7 +74,7 @@ define(function(require) {
 
         /**
          * Y Axis of local transform
-         * @name forward
+         * @name up
          * @type {qtek.math.Vector3}
          * @memberOf qtek.math.Matrix4
          * @instance
@@ -97,7 +97,7 @@ define(function(require) {
 
         /**
          * X Axis of local transform
-         * @name forward
+         * @name right
          * @type {qtek.math.Vector3}
          * @memberOf qtek.math.Matrix4
          * @instance

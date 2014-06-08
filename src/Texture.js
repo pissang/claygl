@@ -41,26 +41,26 @@ define(function(require) {
 
         NPOT : false
     }, function() {
-        this.cache = new Cache();
+        this._cache = new Cache();
     }, {
 
         getWebGLTexture : function(_gl) {
 
-            this.cache.use(_gl.__GLID__);
+            this._cache.use(_gl.__GLID__);
 
-            if (this.cache.miss("webgl_texture")) {
+            if (this._cache.miss("webgl_texture")) {
                 // In a new gl context, create new texture and set dirty true
-                this.cache.put("webgl_texture", _gl.createTexture());
+                this._cache.put("webgl_texture", _gl.createTexture());
             }
             if (this.dynamic) {
                 this.update(_gl);
             }
-            else if (this.cache.isDirty()) {
+            else if (this._cache.isDirty()) {
                 this.update(_gl);
-                this.cache.fresh();
+                this._cache.fresh();
             }
 
-            return this.cache.get("webgl_texture");
+            return this._cache.get("webgl_texture");
         },
 
         bind : function() {},
@@ -68,7 +68,7 @@ define(function(require) {
         
         // Overwrite the dirty method
         dirty : function() {
-            this.cache.dirtyAll();
+            this._cache.dirtyAll();
         },
 
         update : function(_gl) {},
@@ -140,11 +140,11 @@ define(function(require) {
         },
 
         dispose : function(_gl) {
-            this.cache.use(_gl.__GLID__);
-            if (this.cache.get("webgl_texture")){
-                _gl.deleteTexture(this.cache.get("webgl_texture"));
+            this._cache.use(_gl.__GLID__);
+            if (this._cache.get("webgl_texture")){
+                _gl.deleteTexture(this._cache.get("webgl_texture"));
             }
-            this.cache.deleteContext(_gl.__GLID__);
+            this._cache.deleteContext(_gl.__GLID__);
         },
 
         isRenderable : function() {},
