@@ -8,7 +8,6 @@ define(function(require) {
     var Material = require('../Material');
     var Mesh = require('../Mesh');
     var Scene = require('../Scene');
-    var vertexShaderString = require("text!./shaders/vertex.essl");
     var Texture = require('../Texture');
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
@@ -34,7 +33,7 @@ define(function(require) {
     }, function() {
 
         var shader = new Shader({
-            vertex : vertexShaderString,
+            vertex : Shader.source('buildin.compositor.vertex'),
             fragment : this.fragment
         })
         var material = new Material({
@@ -127,17 +126,6 @@ define(function(require) {
             }
         }
     })
-
-    // Some build in shaders
-    Shader.import(require('text!./shaders/coloradjust.essl'));
-    Shader.import(require('text!./shaders/blur.essl'));
-    Shader.import(require('text!./shaders/lum.essl'));
-    Shader.import(require('text!./shaders/lut.essl'));
-    Shader.import(require('text!./shaders/output.essl'));
-    Shader.import(require('text!./shaders/hdr.essl'));
-    Shader.import(require('text!./shaders/lensflare.essl'));
-    Shader.import(require('text!./shaders/blend.essl'));
-    Shader.import(require('text!./shaders/fxaa.essl'));
 
     return Pass;
 })

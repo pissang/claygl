@@ -8,11 +8,8 @@ define(function(require) {
     var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
 
-    var nameId = 0;
-
     var Material = Base.derive({
-        name : 'MATERIAL_' + (nameId++),
-
+        name : '',
         //{
         // type
         // value
@@ -43,6 +40,9 @@ define(function(require) {
 
         _enabledUniforms : null,
     }, function() {
+        if (!this.name) {
+            this.name = 'MATERIAL_' + this.__GUID__;
+        }
         if (this.shader) {
             this.attachShader(this.shader);
         }

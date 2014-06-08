@@ -93,6 +93,8 @@ define(function(require) {
     Shader.import(require('text!./source/util.essl'));
     Shader.import(require('text!./source/prez.essl'));
 
+    Shader.import(require('text!./source/shadowmap.essl'));
+
     put("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
     put("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
     put("buildin.phong", Shader.source("buildin.phong.vertex"), Shader.source("buildin.phong.fragment"));
@@ -100,6 +102,18 @@ define(function(require) {
     put("buildin.skybox", Shader.source("buildin.skybox.vertex"), Shader.source("buildin.skybox.fragment"));
     put("buildin.prez", Shader.source("buildin.prez.vertex"), Shader.source("buildin.prez.fragment"));
     put("buildin.physical", Shader.source("buildin.physical.vertex"), Shader.source("buildin.physical.fragment"));
+
+    // Some build in shaders
+    Shader.import(require('text!./source/compositor/vertex.essl'));
+    Shader.import(require('text!./source/compositor/coloradjust.essl'));
+    Shader.import(require('text!./source/compositor/blur.essl'));
+    Shader.import(require('text!./source/compositor/lum.essl'));
+    Shader.import(require('text!./source/compositor/lut.essl'));
+    Shader.import(require('text!./source/compositor/output.essl'));
+    Shader.import(require('text!./source/compositor/hdr.essl'));
+    Shader.import(require('text!./source/compositor/lensflare.essl'));
+    Shader.import(require('text!./source/compositor/blend.essl'));
+    Shader.import(require('text!./source/compositor/fxaa.essl'));
 
     return {
         get : get,

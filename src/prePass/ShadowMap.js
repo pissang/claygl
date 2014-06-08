@@ -30,8 +30,6 @@ define(function(require) {
 
     var frameBuffer = new FrameBuffer();
 
-    Shader.import(require('text!./shadowmap.essl'));
-
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     var targetMap = {
         'px' : glenum.TEXTURE_CUBE_MAP_POSITIVE_X,

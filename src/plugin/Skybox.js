@@ -6,13 +6,16 @@ define(function(require) {
     var Material = require('../Material');
     var shaderLibrary = require('../shader/library');
 
-    var skyboxShader = new Shader({
-        vertex : Shader.source("buildin.skybox.vertex"), 
-        fragment : Shader.source("buildin.skybox.fragment")
-    });
+    var skyboxShader;
 
     var Skybox = Mesh.derive(function() {
 
+        if (!skyboxShader) {
+            skyboxShader = new Shader({
+                vertex : Shader.source("buildin.skybox.vertex"), 
+                fragment : Shader.source("buildin.skybox.fragment")
+            });
+        }
         var material = new Material({
             shader : skyboxShader,
             depthMask : false

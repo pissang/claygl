@@ -5,9 +5,11 @@ define(function(require) {
     var texturePool = require("./texturePool");
     var Shader = require("../Shader");
 
-    var TextureNode = Node.derive({
-        shader : Shader.source("buildin.compositor.output"),
-        texture : null
+    var TextureNode = Node.derive(function() {
+        return {
+            shader : Shader.source("buildin.compositor.output"),
+            texture : null
+        }
     }, {
         render : function(renderer) {
 

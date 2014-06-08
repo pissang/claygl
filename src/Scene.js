@@ -128,6 +128,10 @@ define(function(require) {
         // Traverse the scene and add the renderable
         // object to the render queue
         _updateRenderQueue : function(parent, sceneMaterialTransparent) {
+            if (!parent.visible) {
+                return;
+            }
+            
             for (var i = 0; i < parent._children.length; i++) {
                 var child = parent._children[i];
                 

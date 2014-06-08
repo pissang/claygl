@@ -16,12 +16,62 @@ define(function(require) {
     /**
      * @constructor qtek.Node
      */
-    var Node = Base.derive({
+    var Node = Base.derive(
+    /** @lends qtek.Node# */
+    {
+        /**
+         * Scene node name
+         * @type {string}
+         */
+        name: '',
+
+        /**
+         * Position relative to its parent node. aka translation.
+         * @type {qtek.math.Vector3}
+         */
+        position: null,
         
+        /**
+         * Rotation relative to its parent node. Represented with a quaternion
+         * @type {qtek.math.Quaternion}
+         */
+        rotation: null,
+        
+        /**
+         * Scale relative to its parent node
+         * @type {qtek.math.Vector3}
+         */
+        scale: null,
+
+        /**
+         * Affine transform matrix relative to its root scene.
+         * @type {qtek.math.Matrix4}
+         */
+        worldTransform: null,
+
+        /**
+         * Affine transform matrix relative to its parent node.
+         * Composite with position, rotation and scale.
+         * @type {qtek.math.Matrix4}
+         */
+        localTransform: null,
+        
+        /**
+         * Parent of current scene node
+         * @type {qtek.Node}
+         */
         parent : null,
         
+        /**
+         * The root scene attached to. Null if it is a isolated node
+         * @type {qtek.Scene}
+         */
         scene : null,
 
+        /**
+         * If the local transform is update from SRT(scale, rotation, translation, which is position here) each frame
+         * @type {boolean}
+         */
         autoUpdateLocalTransform : true,
 
         _needsUpdateWorldTransform : true,
@@ -52,11 +102,30 @@ define(function(require) {
 
         this._children = [];
 
-    }, {
+    },
+    /**@lends qtek.Node.prototype. */
+    {
+
+        /**
+         * If node and its chilren visible
+         * @type {Boolean}
+         * @memberOf qtek.Node
+         * @instance
+         */
+        visible : true,
+
+        /**
+         * Return true if it is a renderable scene node, like Mesh and ParticleSystem
+         * @return {boolean}
+         */
         isRenderable : function() {
             return false;
         },
 
+        /**
+         * Set the name of the scene node
+         * @param {string} name
+         */
         setName : function(name) {
             if (this.scene) {
                 delete this.scene._nodeRepository[this.name];
@@ -65,6 +134,10 @@ define(function(require) {
             this.name = name;
         },
 
+        /**
+         * Add a child node
+         * @param {qtek.Node} node
+         */
         add : function(node) {
             if (this._inIterating) {
                 console.warn('Add operation can cause unpredictable error when in iterating');
@@ -83,6 +156,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * Remove the specified child scene node
+         * @param {qtek.Node} node
+         */
         remove : function(node) {
             if (this._inIterating) {
                 console.warn('Remove operation can cause unpredictable error when in iterating');
@@ -106,6 +183,10 @@ define(function(require) {
             descendant.scene = parent.scene;
         },
 
+        /**
+         * Return true if it is ancestor of the given scene node
+         * @param {qtek.Node} node
+         */
         isAncestor : function(node) {
             var parent = node.parent;
             while(parent) {
@@ -117,6 +198,10 @@ define(function(require) {
             return false;
         },
 
+        /**
+         * Get a new created array of all its children nodes
+         * @return {qtek.Node[]}
+         */
         children : function() {
             return this._children.slice();
         },
@@ -125,6 +210,11 @@ define(function(require) {
             return this._children[idx];
         },
 
+        /**
+         * Get first child have the given name
+         * @param {string} name
+         * @return {qtek.Node}
+         */
         getChildByName : function(name) {
             for (var i = 0; i < this._children.length; i++) {
                 if (this._children[i].name === name) {
@@ -133,6 +223,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Get first descendant have the given name
+         * @param {string} name
+         * @return {qtek.Node}
+         */
         getDescendantByName : function(name) {
             for (var i = 0; i < this._children.length; i++) {
                 var child = this._children[i];
@@ -147,7 +242,12 @@ define(function(require) {
             }
         },
 
-        // pre-order traverse
+        /**
+         * Depth first traverse all its descendant scene nodes and
+         * @param {Function} callback
+         * @param {Node} [parent]
+         * @param {Function} [ctor]
+         */
         traverse : function(callback, parent, ctor) {
             
             this._inIterating = true;
@@ -163,20 +263,35 @@ define(function(require) {
             this._inIterating = false;
         },
 
+        /**
+         * Set the local transform and decompose to SRT
+         * @param {qtek.math.Matrix4} matrix
+         */
         setLocalTransform : function(matrix) {
             mat4.copy(this.localTransform._array, matrix._array);
             this.decomposeLocalTransform();
         },
 
+        /**
+         * Decompose the local transform to SRT
+         */
         decomposeLocalTransform : function() {
             this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
         },
 
+        /**
+         * Set the world transform and decompose to SRT
+         * @param {qtek.math.Matrix4} matrix
+         */
         setWorldTransform : function(matrix) {
             mat4.copy(this.worldTransform._array, matrix._array);
             this.decomposeWorldTransform();
         },
 
+        /**
+         * Decompose the world transform to SRT
+         * @method
+         */
         decomposeWorldTransform : (function() {
             
             var tmp = mat4.create();
@@ -193,6 +308,10 @@ define(function(require) {
             }
         })(),
 
+        /**
+         * Update local transform from SRT
+         * Notice that local transform will not be updated if _dirty mark of position, rotation, scale is all false
+         */
         updateLocalTransform : function() {
             var position = this.position;
             var rotation = this.rotation;
@@ -214,8 +333,9 @@ define(function(require) {
             }
         },
 
-        // Update world transform individually
-        // Assume its parent world transform have been updated
+        /**
+         * Update world transform, assume its parent world transform have been updated
+         */
         updateWorldTransform : function() {
             if (this.parent) {
                 mat4.multiply(
@@ -230,7 +350,10 @@ define(function(require) {
             }
         },
 
-        // Update the node status in each frame
+        /**
+         * Update local transform and world transform recursively
+         * @param {boolean} forceUpdateWorld 
+         */
         update : function(forceUpdateWorld) {
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
@@ -250,6 +373,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Get world position, extracted from world transform
+         * @param  {math.Vector3} [out]
+         * @return {math.Vector3}
+         */
         getWorldPosition : function(out) {
             var m = this.worldTransform._array;
             if (out) {
@@ -262,6 +390,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * Get cloned node
+         * @return {Node}
+         */
         clone : function() {
             // TODO Name
             var node = new this.constructor();
@@ -275,12 +407,19 @@ define(function(require) {
             return node;
         },
 
-        // http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
-        // TODO improve performance
+        /**
+         * Rotate the node around a axis by angle degrees, axis passes through point
+         * @param {math.Vector3} point Center point
+         * @param {math.Vector3} axis  Center axis
+         * @param {number}       angle Rotation angle
+         * @see http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
+         * @method
+         */
         rotateAround : (function() {
             var v = new Vector3();
             var RTMatrix = new Matrix4();
 
+            // TODO improve performance
             return function(point, axis, angle) {
 
                 v.copy(this.position).subtract(point);
@@ -299,6 +438,12 @@ define(function(require) {
             }
         })(),
 
+        /**
+         * @param {math.Vector3} target
+         * @param {math.Vector3} [up]
+         * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
+         * @method
+         */
         lookAt : (function() {
             var m = new Matrix4();
             var scaleVector = new Vector3();

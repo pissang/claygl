@@ -49,8 +49,6 @@ define(function(require) {
         this._renderInfo = new RenderInfo();
     }, {
 
-        visible : true,
-
         // Only if mode is LINES
         lineWidth : 1,
         

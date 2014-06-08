@@ -1,3 +1,6 @@
+
+@export buildin.compositor.vertex
+
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
@@ -10,3 +13,5 @@ void main()
     v_Texcoord = texcoord;
     gl_Position = worldViewProjection * vec4(position, 1.0);
 }
+
+@end
