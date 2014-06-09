@@ -111,10 +111,10 @@ define(function(require) {
              */
             preserveDrawingBuffer : false,
             /**
-             * If throw shader error, usually turned on in debug mode
+             * If throw context error, usually turned on in debug mode
              * @type {boolean}
              */
-            throwShaderError: true,
+            throwError: true,
             /**
              * WebGL Context created from given canvas
              * @type {WebGLRenderingContext}
@@ -133,7 +133,7 @@ define(function(require) {
         }
     }, function() {
 
-        if (! this.canvas) {
+        if (!this.canvas) {
             this.canvas = document.createElement("canvas");
             this.canvas.width = this.width;
             this.canvas.height = this.height;
@@ -156,7 +156,11 @@ define(function(require) {
             glinfo.initialize(this.gl);
         }
         catch(e) {
-            throw "Error creating WebGL Context";
+            if (this.throwError) {
+                throw "Error creating WebGL Context";
+            } else {
+                this.trigger('error', "Error creating WebGL Context");
+            }
         }
     },
     /** @lends qtek.Renderer.prototype. **/
@@ -447,13 +451,18 @@ define(function(require) {
                     }
 
                     var errMsg = shader.bind(_gl);
-                    if (errMsg && this.throwShaderError) {
+                    if (errMsg) {
+
                         if (errorShader[shader.__GUID__]) {
                             continue;
                         }
                         errorShader[shader.__GUID__] = true;
 
-                        throw new Error(errMsg);
+                        if (this.throwError) {
+                            throw new Error(errMsg);
+                        } else {
+                            this.trigger('error', errMsg);
+                        }
                     }
 
                     // Set lights uniforms
