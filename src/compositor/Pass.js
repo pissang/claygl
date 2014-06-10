@@ -16,10 +16,7 @@ define(function(require) {
     var mesh = new Mesh({
         geometry : planeGeo
     });
-    var scene = new Scene();
     var camera = new OrthoCamera();
-        
-    scene.add(mesh);
 
     var Pass = Base.derive(function() {
         return {
@@ -118,6 +115,7 @@ define(function(require) {
             this.trigger("beforerender", this, renderer);
             // Don't clear in each pass, let the color overwrite the buffer
             _gl.disable(_gl.BLEND);
+            _gl.clear(_gl.DEPTH_BUFFER_BIT);
             renderer.renderQueue([mesh], camera);
             this.trigger("afterrender", this, renderer);
 
