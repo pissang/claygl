@@ -13,7 +13,12 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
+    /**
+     * @constructor qtek.StaticGeometry
+     * @extends qtek.Geometry
+     */
     var StaticGeometry = Geometry.derive(function() {
+        /** @lends qtek.StaticGeometry# */
         return {
             attributes : {
                  position : new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
@@ -35,13 +40,21 @@ define(function(require) {
 
             hint : glenum.STATIC_DRAW,
 
+            /**
+             * @type {Uint16Array}
+             */
+            faces: null,
+
             _isDirty : true,
 
             _normalType : 'vertex',
 
             _enabledAttributes : null
         }
-    }, {
+    }, 
+
+    /** @lends qtek.StaticGeometry.prototype */
+    {
         dirty : function() {
             this._cache.dirtyAll("chunks");
             this._isDirty = true;
@@ -88,6 +101,11 @@ define(function(require) {
             return false;
         },
 
+        /**
+         * Get enabled attributes name list
+         * Attribute which has the same vertex number with position is treated as a enabled attribute
+         * @return {string[]}
+         */
         getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {

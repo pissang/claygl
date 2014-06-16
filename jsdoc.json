@@ -10,6 +10,7 @@
         "recurse": true
     },
     "templates": {
-        "theme": "cerulean"
+        "theme": "cerulean",
+        "inverseNav": true
     }
 }

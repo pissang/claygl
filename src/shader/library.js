@@ -84,16 +84,16 @@ define(function(require) {
     }
 
     // Some build in shaders
-    Shader.import(require('text!./source/basic.essl'));
-    Shader.import(require('text!./source/lambert.essl'));
-    Shader.import(require('text!./source/phong.essl'));
-    Shader.import(require('text!./source/physical.essl'));
-    Shader.import(require('text!./source/wireframe.essl'));
-    Shader.import(require('text!./source/skybox.essl'));
-    Shader.import(require('text!./source/util.essl'));
-    Shader.import(require('text!./source/prez.essl'));
+    Shader['import'](require('text!./source/basic.essl'));
+    Shader['import'](require('text!./source/lambert.essl'));
+    Shader['import'](require('text!./source/phong.essl'));
+    Shader['import'](require('text!./source/physical.essl'));
+    Shader['import'](require('text!./source/wireframe.essl'));
+    Shader['import'](require('text!./source/skybox.essl'));
+    Shader['import'](require('text!./source/util.essl'));
+    Shader['import'](require('text!./source/prez.essl'));
 
-    Shader.import(require('text!./source/shadowmap.essl'));
+    Shader['import'](require('text!./source/shadowmap.essl'));
 
     put("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
     put("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
@@ -104,16 +104,16 @@ define(function(require) {
     put("buildin.physical", Shader.source("buildin.physical.vertex"), Shader.source("buildin.physical.fragment"));
 
     // Some build in shaders
-    Shader.import(require('text!./source/compositor/vertex.essl'));
-    Shader.import(require('text!./source/compositor/coloradjust.essl'));
-    Shader.import(require('text!./source/compositor/blur.essl'));
-    Shader.import(require('text!./source/compositor/lum.essl'));
-    Shader.import(require('text!./source/compositor/lut.essl'));
-    Shader.import(require('text!./source/compositor/output.essl'));
-    Shader.import(require('text!./source/compositor/hdr.essl'));
-    Shader.import(require('text!./source/compositor/lensflare.essl'));
-    Shader.import(require('text!./source/compositor/blend.essl'));
-    Shader.import(require('text!./source/compositor/fxaa.essl'));
+    Shader['import'](require('text!./source/compositor/vertex.essl'));
+    Shader['import'](require('text!./source/compositor/coloradjust.essl'));
+    Shader['import'](require('text!./source/compositor/blur.essl'));
+    Shader['import'](require('text!./source/compositor/lum.essl'));
+    Shader['import'](require('text!./source/compositor/lut.essl'));
+    Shader['import'](require('text!./source/compositor/output.essl'));
+    Shader['import'](require('text!./source/compositor/hdr.essl'));
+    Shader['import'](require('text!./source/compositor/lensflare.essl'));
+    Shader['import'](require('text!./source/compositor/blend.essl'));
+    Shader['import'](require('text!./source/compositor/fxaa.essl'));
 
     return {
         get : get,

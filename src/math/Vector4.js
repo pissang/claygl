@@ -22,7 +22,7 @@ define( function(require) {
 
         /**
          * Storage of Vector4, read and write of x, y, z, w will change the values in _array
-         * All methods are also operate on the _array instead of x, y, z, w components
+         * All methods also operate on the _array instead of x, y, z, w components
          * @type {Float32Array}
          */
         this._array = vec4.fromValues(x, y, z, w);

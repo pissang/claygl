@@ -138,7 +138,7 @@ define(function(require) {
         },
 
         /**
-         * Apply an projection matrix to the bounding box
+         * Apply a projection matrix to the bounding box
          * @param  {qtek.math.Matrix4} matrix
          */
         applyProjection : function(matrix) {

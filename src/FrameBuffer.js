@@ -10,7 +10,7 @@ define(function(require) {
     var Cache = require("./core/Cache");
 
     /**
-     * constructor qtek.FrameBuffer
+     * @constructor qtek.FrameBuffer
      */
     var FrameBuffer = Base.derive(
     /** @lends qtek.FrameBuffer# */

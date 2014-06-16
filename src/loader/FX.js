@@ -232,7 +232,7 @@ define(function(require) {
                         url : path,
                         onload : function(shaderSource) {
                             shaders[name] = shaderSource;
-                            Shader.import(shaderSource);
+                            Shader['import'](shaderSource);
                             loading--;
                             if (loading === 0) {
                                 callback(shaders);
@@ -242,7 +242,7 @@ define(function(require) {
                     })
                 } else {
                     shaders[name] = shaderExp;
-                    Shader.import(shaderSource);
+                    Shader['import'](shaderSource);
                 }
             }, this);
             if (loading === 0 && !cbd) {

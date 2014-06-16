@@ -2,6 +2,7 @@ define(function(require) {
 
     var Texture = require('../Texture');
     var glinfo = require('../core/glinfo');
+    var glenum = require('../core/glenum');
 
     var Texture2D = Texture.derive(function() {
         return {
@@ -110,7 +111,6 @@ define(function(require) {
                 return this.width && this.height;
             }
         },
-
         bind : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this.getWebGLTexture(_gl));
         },

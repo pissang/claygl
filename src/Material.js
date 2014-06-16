@@ -8,32 +8,55 @@ define(function(require) {
     var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
 
-    var Material = Base.derive({
+    /**
+     * constructor qtek.Material
+     */
+    var Material = Base.derive(
+    /** @lends qtek.Material# */
+    {
+        /**
+         * @type {string}
+         */
         name : '',
-        //{
-        // type
-        // value
-        //}
+        
+        /**
+         * @type {object}
+         */
         uniforms : null,
 
+        /**
+         * @type {qtek.Shader}
+         */
         shader : null,
 
+        /**
+         * @type {boolean}
+         */
         depthTest : true,
+
+        /**
+         * @type {boolean}
+         */
         depthMask : true,
 
+        /**
+         * @type {boolean}
+         */
         transparent : false,
-        // Blend func is a callback function when the material 
-        // have custom blending
-        // The gl context will be the only argument passed in tho the
-        // blend function
-        // Detail of blend function in WebGL:
-        // http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
-        //
-        // Example :
-        // function(_gl) {
-        //  _gl.blendEquation(_gl.FUNC_ADD);
-        //  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-        // }
+        /**
+         * Blend func is a callback function when the material 
+         * have custom blending
+         * The gl context will be the only argument passed in tho the
+         * blend function
+         * Detail of blend function in WebGL:
+         * http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
+         *
+         * Example :
+         * function(_gl) {
+         *  _gl.blendEquation(_gl.FUNC_ADD);
+         *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+         * }
+         */
         blend : null,
 
         // shadowTransparentMap : null
@@ -46,7 +69,9 @@ define(function(require) {
         if (this.shader) {
             this.attachShader(this.shader);
         }
-    }, {
+    },
+    /** @lends qtek.Material.prototype */
+    {
 
         bind : function(_gl, prevMaterial) {
 
@@ -138,6 +163,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param {string} symbol
+         * @param {number|array|qtek.Texture|ArrayBufferView} value
+         */
         setUniform : function(symbol, value) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
@@ -145,19 +174,32 @@ define(function(require) {
             }
         },
 
-        setUniforms : function(object) {
-            for (var key in object) {
-                var val = object[key];
+        /**
+         * @param {object} obj
+         */
+        setUniforms : function(obj) {
+            for (var key in obj) {
+                var val = obj[key];
                 this.setUniform(key, val);
             }
         },
 
+        /**
+         * Enable a uniform
+         * It only have effect on the uniform exists in shader. 
+         * @param  {string} symbol
+         */
         enableUniform : function(symbol) {
             if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
                 this._enabledUniforms.push(symbol);
             }
         },
 
+        /**
+         * Disable a uniform
+         * It will not affect the uniform state in the shader. Because the shader uniforms is parsed from shader code with naive regex. When using micro to disable some uniforms in the shader. It will still try to set these uniforms in each rendering pass. We can disable these uniforms manually if we need this bit performance improvement. Mostly we can simply ignore it.
+         * @param  {string} symbol
+         */
         disableUniform : function(symbol) {
             var idx = this._enabledUniforms.indexOf(symbol);
             if (idx >= 0) {
@@ -165,11 +207,19 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param  {string}  symbol
+         * @return {boolean}
+         */
         isUniformEnabled : function(symbol) {
             return this._enabledUniforms.indexOf(symbol) >= 0;
         },
 
-        // Alias of setUniform and setUniforms
+        /**
+         * Alias of setUniform and setUniforms
+         * @param {object|string} symbol
+         * @param {number|array|qtek.Texture|ArrayBufferView} [value]
+         */
         set : function(symbol, value) {
             if (typeof(symbol) === 'object') {
                 for (var key in symbol) {
@@ -183,7 +233,11 @@ define(function(require) {
                 }
             }
         },
-
+        /**
+         * Get uniform value
+         * @param  {string} symbol
+         * @return {number|array|qtek.Texture|ArrayBufferView}
+         */
         get : function(symbol) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
@@ -192,7 +246,11 @@ define(function(require) {
                 // console.warn('Uniform '+symbol+' not exist');
             }
         },
-
+        /**
+         * Attach a shader instance
+         * @param  {qtek.Shader} shader
+         * @param  {boolean} keepUniform If try to keep uniform value
+         */
         attachShader : function(shader, keepUniform) {
             var originalUniforms = this.uniforms;
             this.uniforms = shader.createUniforms();
@@ -209,6 +267,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * Detach a shader instance
+         */
         detachShader : function() {
             this.shader = null;
             this.uniforms = {};

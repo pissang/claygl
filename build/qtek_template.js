@@ -10,7 +10,6 @@
 /** @namespace qtek.light */
 /** @namespace qtek.loader */
 /** @namespace qtek.particleSystem */
-/** @namespace qtek.picking */
 /** @namespace qtek.plugin */
 /** @namespace qtek.prePass */
 /** @namespace qtek.shader */

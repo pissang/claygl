@@ -9,13 +9,27 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
     var mat4 = glMatrix.mat4;
 
+    /**
+     * @constructor qtek.Skeleton
+     */
     var Skeleton = Base.derive(function() {
-
+        /** @lends qtek.Skeleton# */
         return {
+            /**
+             * @type {string}
+             */
             name : '',
 
-            // Root joints
+            /**
+             * Index of root joints
+             * @type {number[]}
+             */
             roots : [],
+
+            /**
+             * Index of joints
+             * @type {number[]}
+             */
             joints : [],
 
             _clips : [],
@@ -36,8 +50,12 @@ define(function(require) {
 
             _subSkinMatricesArray : {}
         }
-    }, {
-
+    },
+    /** @lends qtek.Skeleton.prototype */
+    {
+        /**
+         * Update joints hierarchy
+         */
         updateHierarchy : function() {
             this.roots = [];
             var joints = this.joints;
@@ -52,6 +70,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Add a skinning clip and create a map between clip and skeleton
+         * @param {qtek.animation.SkinningClip} clip
+         * @param {object} [mapRule] Map between joint name in skeleton and joint name in clip
+         */
         addClip : function(clip, mapRule) {
 
             // Map the joint index in skeleton to joint pose index in clip
@@ -83,6 +106,9 @@ define(function(require) {
             return this._clips.length - 1;
         },
 
+        /**
+         * @param {qtek.animation.SkinningClip} clip
+         */
         removeClip : function(clip) {
             var idx = -1;
             for (var i = 0; i < this._clips.length; i++) {
@@ -95,21 +121,34 @@ define(function(require) {
                 this._clips.splice(idx, 1);
             }
         },
-
+        /**
+         * Remove all clips
+         */
         removeClipsAll : function() {
             this._clips = [];
         },
 
+        /**
+         * Get clip by index
+         * @param  {number} index
+         */
         getClip : function(index) {
             if (this._clips[index]) {
                 return this._clips[index].clip;
             }
         },
 
+        /**
+         * @return {number}
+         */
         getClipNumber : function() {
             return this._clips.length;
         },
 
+        /**
+         * Calculate joint matrices from node transform
+         * @method
+         */
         updateJointMatrices : (function() {
 
             var m4 = mat4.create();
@@ -155,6 +194,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * Update skinning matrices
+         */
         update : (function() {
             var m4 = mat4.create();
             return function() {
@@ -201,6 +243,10 @@ define(function(require) {
             return subArray;
         },
 
+        /**
+         * Set pose and update skinning matrices
+         * @param {number} clipIndex
+         */
         setPose : function(clipIndex) {
             var clip = this._clips[clipIndex].clip;
             var maps = this._clips[clipIndex].maps;

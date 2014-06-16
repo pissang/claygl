@@ -127,7 +127,7 @@ define(function(require) {
             var e2 = this._assembleEvent(e);
             var el = this._findTrigger(e2);
             if (el) {
-                QEvent.throw(type, el, e2);
+                QEvent['throw'](type, el, e2);
             }
             this.trigger(type, e2);
         },
@@ -135,15 +135,15 @@ define(function(require) {
         _mouseMoveHandler : function(e) {
             var el = this._findTrigger(e);
             if (el) {
-                QEvent.throw('mousemove', el, this._assembleEvent(e));
+                QEvent['throw']('mousemove', el, this._assembleEvent(e));
             }
 
             if (this._mouseOverEl !== el) {
                 if (this._mouseOverEl) {
-                    QEvent.throw('mouseout', this._mouseOverEl, this._assembleEvent(e));
+                    QEvent['throw']('mouseout', this._mouseOverEl, this._assembleEvent(e));
                 }
                 if (el) {
-                    QEvent.throw('mouseover', el, this._assembleEvent(e));
+                    QEvent['throw']('mouseover', el, this._assembleEvent(e));
                 }
                 this._mouseOverEl = el;
             }
@@ -151,7 +151,7 @@ define(function(require) {
 
         _mouseOutHandler : function(e) {
             if (this._mouseOverEl) {
-                QEvent.throw('mouseout', this._mouseOverEl, this._assembleEvent(e));
+                QEvent['throw']('mouseout', this._mouseOverEl, this._assembleEvent(e));
             }
         },
 

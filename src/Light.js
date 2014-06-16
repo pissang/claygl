@@ -4,7 +4,8 @@ define(function(require){
     var Shader = require("./Shader");
 
     /**
-     * constructor qtek.Light
+     * @constructor qtek.Light
+     * @extends qtek.Node
      */
     var Light = Node.derive(function(){
         /** @lends qtek.Light# */
@@ -46,7 +47,7 @@ define(function(require){
         }
     });
 
-    Shader.import(require('text!./light/light.essl'));
+    Shader['import'](require('text!./light/light.essl'));
 
     return Light;
 })

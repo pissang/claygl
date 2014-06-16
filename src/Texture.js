@@ -9,40 +9,86 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var Cache = require("./core/Cache");
 
-    var Texture = Base.derive({
-        // Width and height is used when the image is null and want
-        // to use it as a texture attach to framebuffer(RTT)
+    /**
+     * @constructor qtek.Texture
+     */
+    var Texture = Base.derive(
+    /** @lends qtek.Texture# */
+    {
+        /**
+         * Texture width, only needed when the texture is used as a render target
+         * @type {number}
+         */
         width : 512,
+        /**
+         * Texture height, only needed when the texture is used as a render target
+         * @type {number}
+         */
         height : 512,
-
+        /**
+         * Texel data type
+         * @type {number}
+         */
         type : glenum.UNSIGNED_BYTE,
-
+        /**
+         * Format of texel data
+         * @type {number}
+         */
         format : glenum.RGBA,
-
+        /**
+         * @type {number}
+         */
         wrapS : glenum.CLAMP_TO_EDGE,
+        /**
+         * @type {number}
+         */
         wrapT : glenum.CLAMP_TO_EDGE,
-
+        /**
+         * @type {number}
+         */
         minFilter : glenum.LINEAR_MIPMAP_LINEAR,
-
+        /**
+         * @type {number}
+         */
         magFilter : glenum.LINEAR,
-
+        /**
+         * @type {boolean}
+         */
         useMipmap : true,
 
-        // http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
+        /**
+         * Anisotropic filtering, enabled if value is larger than 1
+         * @see http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
+         * @type {number}
+         */
         anisotropic : 1,
         // pixelStorei parameters
         // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
+        /**
+         * @type {boolean}
+         */
         flipY : true,
+        /**
+         * @type {number}
+         */
         unpackAlignment : 4,
+        /**
+         * @type {boolean}
+         */
         premultiplyAlpha : false,
 
-        // Dynamic option for texture like video
+        /**
+         * Dynamic option for texture like video
+         * @type {boolean}
+         */
         dynamic : false,
 
         NPOT : false
     }, function() {
         this._cache = new Cache();
-    }, {
+    },
+    /** @lends qtek.Texture.prototype */
+    {
 
         getWebGLTexture : function(_gl) {
 
@@ -67,6 +113,9 @@ define(function(require) {
         unbind : function() {},
         
         // Overwrite the dirty method
+        /**
+         * Mark texture is dirty and update in the next frame
+         */
         dirty : function() {
             this._cache.dirtyAll();
         },
@@ -138,7 +187,9 @@ define(function(require) {
             }
             return x + 1;
         },
-
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         */
         dispose : function(_gl) {
             this._cache.use(_gl.__GLID__);
             if (this._cache.get("webgl_texture")){
@@ -146,7 +197,10 @@ define(function(require) {
             }
             this._cache.deleteContext(_gl.__GLID__);
         },
-
+        /**
+         * Test if image of texture is valid and loaded.
+         * @return {boolean}
+         */
         isRenderable : function() {},
         
         isPowerOfTwo : function() {}

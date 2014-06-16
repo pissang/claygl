@@ -20,7 +20,7 @@ define(function(require) {
 
         /**
          * Storage of Vector3, read and write of x, y, z will change the values in _array
-         * All methods are also operate on the _array instead of x, y, z components
+         * All methods also operate on the _array instead of x, y, z components
          * @type {Float32Array}
          */
         this._array = vec3.fromValues(x, y, z);
@@ -667,7 +667,7 @@ define(function(require) {
      * @return {qtek.math.Vector3}
      */
     Vector3.scaleAndAdd = function(out, a, b, scale) {
-        vec3.scale(out._array, a._array, b._array, scale);
+        vec3.scaleAndAdd(out._array, a._array, b._array, scale);
         out._dirty = true;
         return out;
     }

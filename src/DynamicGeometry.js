@@ -20,7 +20,12 @@ define(function(require) {
 
     var arrSlice = Array.prototype.slice;
 
+    /**
+     * @constructor qtek.DynamicGeometry
+     * @extends qtek.Geometry
+     */
     var DynamicGeometry = Geometry.derive(function() {
+        /** @lends qtek.DynamicGeometry# */
         return {
             attributes : {
                  position : new Geometry.Attribute('position', 'float', 3, 'POSITION', true),
@@ -44,6 +49,10 @@ define(function(require) {
 
             // Face is list of triangles, each face
             // is an array of the vertex indices of triangle
+            
+            /**
+             * @type {array}
+             */
             faces : [],
             
             _isDirty : true,
@@ -59,7 +68,9 @@ define(function(require) {
             // }]
             _arrayChunks : []
         }
-    }, {
+    }, 
+    /** @lends qtek.DynamicGeometry.prototype */
+    {
         updateBoundingBox : function() {
             if (!this.boundingBox) {
                 this.boundingBox = new BoundingBox();
@@ -122,6 +133,11 @@ define(function(require) {
             return false;
         },
 
+        /**
+         * Get enabled attributes map.
+         * Attribute that has same vertex number with position is treated as an enabled attribute
+         * @return {object}
+         */
         getEnabledAttributes : function() {
             // Cache
             if (this._enabledAttributes) {

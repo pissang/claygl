@@ -6,16 +6,25 @@ define(function(require) {
     var glenum = require("./core/glenum");
     var glinfo = require('./core/glinfo');
 
-    var Mesh = Renderable.derive({
+    /**
+     * @constructor qtek.Mesh
+     * @extends qtek.Renderable
+     */
+    var Mesh = Renderable.derive(
+    /** @lends qtek.Mesh# */
+    {
 
         mode : glenum.TRIANGLES,
 
-        // Skinned Mesh
+        /**
+         * Used when it is a skinned mesh
+         * @type {qtek.Skeleton}
+         */
         skeleton : null,
-        // Joints indices
-        // Meshes can share the one skeleton instance
-        // and each mesh can use one part of joints
-        // Joints indeces indicate the index of joint in the skeleton instance
+        /**
+         * Joints indices Meshes can share the one skeleton instance and each mesh can use one part of joints. Joints indices indicate the index of joint in the skeleton instance
+         * @type {number[]}
+         */
         joints : null
 
     }, function() {

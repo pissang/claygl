@@ -114,22 +114,92 @@ define(function(require) {
         this._cache = new Cache();
 
         this._attributeList = Object.keys(this.attributes);
-    }, {
+    },
+    /** @lends qtek.Geometry.prototype */
+    {
+        /**
+         * Mark attributes in geometry is dirty
+         * @method
+         */
         dirty : notImplementedWarn,
+        /**
+         * @method
+         * @return {boolean}
+         */
         isDirty : notImplementedWarn,
+        /**
+         * Create a new attribute
+         * @method
+         * @param {string} name
+         * @param {string} type
+         * @param {number} size
+         * @param {string} [semantic]
+         */
+        createAttribute: notImplementedWarn,
+        /**
+         * Remove attribute
+         * @method
+         * @param {string} name
+         */
+        removeAttribute: notImplementedWarn,
+        /**
+         * @method
+         * @return {number}
+         */
         getVertexNumber : notImplementedWarn,
+        /**
+         * @method
+         * @return {number}
+         */
         getFaceNumber : notImplementedWarn,
+        /**
+         * @method
+         * @return {boolean}
+         */
         isUseFace : notImplementedWarn,
+        /**
+         * @method
+         * @return {boolean}
+         */
         isStatic : notImplementedWarn,
+
         getEnabledAttributes : notImplementedWarn,
         getBufferChunks : notImplementedWarn,
+
+        /**
+         * @method
+         */
         generateVertexNormals : notImplementedWarn,
+        /**
+         * @method
+         */
         generateFaceNormals : notImplementedWarn,
+        /**
+         * @method
+         * @return {boolean}
+         */
         isUniqueVertex : notImplementedWarn,
+        /**
+         * @method
+         */
         generateUniqueVertex : notImplementedWarn,
+        /**
+         * @method
+         */
         generateTangents : notImplementedWarn,
+        /**
+         * @method
+         */
         generateBarycentric : notImplementedWarn,
+        /**
+         * @method
+         * @param {qtek.math.Matrix4} matrix
+         */
         applyTransform : notImplementedWarn,
+        /**
+         * @method
+         * @param {WebGLRenderingContext} gl
+         */
         dispose : notImplementedWarn
     });
 

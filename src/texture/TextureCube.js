@@ -2,6 +2,7 @@ define(function(require) {
 
     var Texture = require('../Texture');
     var glinfo = require('../core/glinfo');
+    var glenum = require('../core/glenum');
     var util = require('../core/util');
 
     var targetMap = {
@@ -51,6 +52,14 @@ define(function(require) {
             var anisotropicExt = glinfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
+            }
+
+            // Fallback to float type if browser don't have half float extension
+            if (glType === 36193) {
+                var halfFloatExt = glinfo.getExtension(_gl, 'OES_texture_half_float');
+                if (!halfFloatExt) {
+                    glType = glenum.FLOAT;
+                }
             }
 
             for (var target in this.image) {

@@ -10,7 +10,7 @@ define( function(require) {
         }
     });
 
-    QEvent.throw = function(eventType, target, props) {
+    QEvent['throw'] = function(eventType, target, props) {
         
         var e = new QEvent(props);
 

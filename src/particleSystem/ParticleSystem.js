@@ -13,7 +13,7 @@ define(function(require) {
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
 
-    Shader.import(require('text!./particle.essl'));
+    Shader['import'](require('text!./particle.essl'));
 
     // TODO shader with uv animation
     var particleShader = new Shader({

@@ -13,8 +13,17 @@ define(function(require) {
 
     var arraySlice = Array.prototype.slice;
 
+    /** 
+     * Animation is global timeline that schedule all clipss. each frame animation will set the time of clips to current and update the states of clips
+     * @constructor qtek.animation.Animation
+     */
     var Animation = Base.derive(function() {
+        /** @lends qtek.animation.Animation# */
         return {
+            /**
+             * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
+             * @type {object}
+             */
             stage : null,
 
             _clips : [],
@@ -23,10 +32,18 @@ define(function(require) {
             
             _time : 0
         }
-    }, {
+    },
+    /** @lends qtek.animation.Animation.prototype */
+    {
+        /**
+         * @param {qtek.animation.Clip} clip
+         */
         addClip : function(clip) {
             this._clips.push(clip);
         },
+        /**
+         * @param  {qtek.animation.Clip} clip
+         */
         removeClip : function(clip) {
             var idx = this._clips.indexOf(clip);
             this._clips.splice(idx, 1);
@@ -77,6 +94,9 @@ define(function(require) {
 
             this.trigger('frame', delta);
         },
+        /**
+         * Start running animation
+         */
         start : function() {
             var self = this;
 
@@ -94,12 +114,28 @@ define(function(require) {
 
             requestAnimationFrame(step);
         },
+        /**
+         * Stop running animation
+         */
         stop : function() {
             this._running = false;
         },
+        /**
+         * Remove all clips
+         */
         removeClipsAll : function() {
             this._clips = [];
         },
+        /**
+         * Create a deferred animating object
+         * @param  {object} target
+         * @param  {object} [options]
+         * @param  {boolean} [options.loop]
+         * @param  {function} [options.getter]
+         * @param  {function} [options.setter]
+         * @param  {function} [options.interpolater]
+         * @return {qtek.animation.Animation._Deferred}
+         */
         animate : function(target, options) {
             options = options || {};
             var deferred = new Deferred(
@@ -184,7 +220,18 @@ define(function(require) {
                 + v0 * t + p1;
     };
     
-    function Deferred(target, loop, getter, setter, interpolater) {
+    /**
+     * @description Deferred object can only be created by Animation.prototype.animate method. After created, we can use when method to add all keyframes and start it. Clips will be automatically created and added to the animation instance which created this deferred object.
+     * 
+     * @constructor qtek.animation.Animation._Deferred
+     * 
+     * @param {object} target
+     * @param {boolean} loop
+     * @param {function} getter
+     * @param {function} setter
+     * @param {function} interpolater
+     */
+    function _Deferred(target, loop, getter, setter, interpolater) {
         this._tracks = {};
         this._target = target;
 
@@ -206,8 +253,17 @@ define(function(require) {
         this._clipList = [];
     }
 
-    Deferred.prototype = {
-        when : function(time /* ms */, props) {
+    _Deferred.prototype = {
+
+        constructor: _Deferred,
+
+        /**
+         * @param  {number} time Keyframe time using millisecond
+         * @param  {object} props A key-value object. Value can be number, 1d and 2d array
+         * @return {qtek.animation.Animation._Deferred}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
+        when : function(time, props) {
             for (var propName in props) {
                 if (! this._tracks[propName]) {
                     this._tracks[propName] = [];
@@ -229,10 +285,22 @@ define(function(require) {
             }
             return this;
         },
+        /**
+         * callback when running animation
+         * @param  {function} callback callback have two args, animating target and current percent
+         * @return {qtek.animation.Animation._Deferred}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         during : function(callback) {
             this._onframeList.push(callback);
             return this;
         },
+        /**
+         * Start the animation
+         * @param  {string|function} easing
+         * @return {qtek.animation.Animation._Deferred}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         start : function(easing) {
 
             var self = this;
@@ -419,6 +487,10 @@ define(function(require) {
             }
             return this;
         },
+        /**
+         * Stop the animation
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         stop : function() {
             for (var i = 0; i < this._clipList.length; i++) {
                 var clip = this._clipList[i];
@@ -426,18 +498,37 @@ define(function(require) {
             }
             this._clipList = [];
         },
+        /**
+         * Delay given milliseconds
+         * @param  {number} time
+         * @return {qtek.animation.Animation._Deferred}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         delay : function(time){
             this._delay = time;
             return this;
         },
+        /**
+         * Callback after animation finished
+         * @param {function} func
+         * @return {qtek.animation.Animation._Deferred}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         done : function(func) {
             this._doneList.push(func);
             return this;
         },
+        /**
+         * Get all clips created in start method.
+         * @return {qtek.animation.Clip[]}
+         * @memberOf qtek.animation.Animation._Deferred.prototype
+         */
         getClips: function() {
             return this._clipList;
         }
     };
+
+    Animation._Deferred = _Deferred;
 
     return Animation;
 });

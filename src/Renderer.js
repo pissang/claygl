@@ -139,14 +139,22 @@ define(function(require) {
             this.canvas.height = this.height;
         }
         try {
-            this.gl = this.canvas.getContext('experimental-webgl', {
+            var opts = {
                 alhpa : this.alhpa,
                 depth : this.depth,
                 stencil : this.stencil,
                 antialias : this.antialias,
                 premultipliedAlpha : this.premultipliedAlpha,
-                preserveDrawingBuffer : this.preserveDrawingBuffer,
-            });
+                preserveDrawingBuffer : this.preserveDrawingBuffer
+            }
+            
+            this.gl = this.canvas.getContext('webgl', opts)
+                || this.canvas.getContext('experimental-webgl', opts);
+
+            if (!this.gl) {
+                throw new Error();
+            }
+            
             this.gl.__GLID__ = glid++;
 
             this.width = this.canvas.width; 

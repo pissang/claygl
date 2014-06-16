@@ -32,13 +32,26 @@ define(function(require) {
 
         this.vao = null;
     }
-
-    var Renderable = Node.derive({
-            
+    /**
+     * @constructor qtek.Renderable
+     * @extends qtek.Node
+     */
+    var Renderable = Node.derive(
+    /** @lends qtek.Renderable# */
+    {
+        /**
+         * @type {qtek.Material}
+         */
         material : null,
 
+        /**
+         * @type {qtek.Geometry}
+         */
         geometry : null,
         
+        /**
+         * @type {number}
+         */
         mode : glenum.TRIANGLES,
 
         _drawCache : null,
@@ -47,26 +60,57 @@ define(function(require) {
     }, function() {
         this._drawCache = {};
         this._renderInfo = new RenderInfo();
-    }, {
+    },
+    /** @lends qtek.Renderable.prototype */
+    {
 
         // Only if mode is LINES
+        /**
+         * Used when mode is LINES, LINE_STRIP or LINE_LOOP
+         * @type {number}
+         */
         lineWidth : 1,
         
         // Culling
+        /**
+         * @type {boolean}
+         */
         culling : true,
+        /**
+         * @type {number}
+         */
         cullFace : glenum.BACK,
+        /**
+         * @type {number}
+         */
         frontFace : glenum.CCW,
 
-        // Software frustum culling
+        /**
+         * Software frustum culling
+         * @type {boolean}
+         */
         frustumCulling : true,
-
+        /**
+         * @type {boolean}
+         */
         receiveShadow : true,
+        /**
+         * @type {boolean}
+         */
         castShadow : true,
 
+        /**
+         * @return {boolean}
+         */
         isRenderable : function() {
             return this.geometry && this.material && this.material.shader && this.visible;
         },
 
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         * @param  {qtek.Material} [globalMaterial]
+         * @return {object}
+         */
         render : function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
@@ -74,6 +118,7 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
+            // TODO
             // var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
             var vaoExt = null;
             var isStatic = geometry.hint == glenum.STATIC_DRAW;

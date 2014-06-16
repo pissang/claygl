@@ -2,24 +2,54 @@ define(function(require) {
 
     var Easing = require('./easing');
 
-    var Clip = function(options) {
+    /**
+     * @constructor
+     * @alias qtek.animation.Clip
+     * @param {object} [opts]
+     * @param {object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     */
+    var Clip = function(opts) {
 
-        options = options || {};
+        opts = opts || {};
 
-        this.target = options.target;
+        /**
+         * @type {object}
+         */
+        this.target = opts.target;
 
-        if( typeof(options.life) !== 'undefined') {
-            this.life = options.life;
+        if (typeof(opts.life) !== 'undefined') {
+            /**
+             * @type {number}
+             */
+            this.life = opts.life;
         }
-        if (typeof(options.delay) !== 'undefined') {
-            this.delay = options.delay;
+        if (typeof(opts.delay) !== 'undefined') {
+            /**
+             * @type {number}
+             */
+            this.delay = opts.delay;
         }
-        if (typeof(options.gap) !== 'undefined') {
-            this.gap = options.gap;
+        if (typeof(opts.gap) !== 'undefined') {
+            /**
+             * @type {number}
+             */
+            this.gap = opts.gap;
         }
 
-        if (typeof(options.playbackRatio) !== 'undefined') {
-            this.playbackRatio = options.playbackRatio;
+        if (typeof(opts.playbackRatio) !== 'undefined') {
+            /**
+             * @type {number}
+             */
+            this.playbackRatio = opts.playbackRatio;
         } else {
             this.playbackRatio = 1;
         }
@@ -30,23 +60,32 @@ define(function(require) {
 
         this._elapsedTime = 0;
 
-        this._loop = options.loop === undefined ? false : options.loop;
+        this._loop = opts.loop === undefined ? false : opts.loop;
         this.setLoop(this._loop);
 
-        if (typeof(options.easing) !== 'undefined') {
-            this.setEasing(options.easing);
+        if (typeof(opts.easing) !== 'undefined') {
+            this.setEasing(opts.easing);
         }
 
-        if (typeof(options.onframe) !== 'undefined') {
-            this.onframe = options.onframe;
+        if (typeof(opts.onframe) !== 'undefined') {
+            /**
+             * @type {function}
+             */
+            this.onframe = opts.onframe;
         }
 
-        if (typeof(options.ondestroy) !== 'undefined') {
-            this.ondestroy = options.ondestroy;
+        if (typeof(opts.ondestroy) !== 'undefined') {
+            /**
+             * @type {function}
+             */
+            this.ondestroy = opts.ondestroy;
         }
 
-        if (typeof(options.onrestart) !== 'undefined') {
-            this.onrestart = options.onrestart;
+        if (typeof(opts.onrestart) !== 'undefined') {
+            /**
+             * @type {function}
+             */
+            this.onrestart = opts.onrestart;
         }
 
     };
@@ -59,6 +98,9 @@ define(function(require) {
 
         delay : 0,
         
+        /**
+         * @param {number|boolean} loop
+         */
         setLoop : function(loop) {
             this._loop = loop;
             if (loop) {
@@ -70,6 +112,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param {string|function} easing
+         */
         setEasing : function(easing) {
             if (typeof(easing) === 'string') {
                 easing = Easing[easing];
@@ -77,6 +122,10 @@ define(function(require) {
             this.easing = easing;
         },
 
+        /**
+         * @param  {number} time
+         * @return {string}
+         */
         step : function(time) {
             if (time < this._startTime) {
                 this._currentTime = time;
@@ -119,6 +168,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param  {number} time
+         * @return {string}
+         */
         setTime : function(time) {
             return this.step(time + this._startTime);
         },

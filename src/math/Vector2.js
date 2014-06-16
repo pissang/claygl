@@ -18,7 +18,7 @@ define(function(require) {
 
         /**
          * Storage of Vector2, read and write of x, y will change the values in _array
-         * All methods are also operate on the _array instead of x, y components
+         * All methods also operate on the _array instead of x, y components
          * @type {Float32Array}
          */
         this._array = vec2.fromValues(x, y);

@@ -3,13 +3,12 @@ define(function(require) {
 'use strict';
 
 /**
- * derive a sub class from base class
- * @makeDefaultOpt [Object|Function] default option of this sub class, 
-                        method of the sub can use this.xxx to access this option
- * @initialize [Function](optional) initialize after the sub class is instantiated
- * @proto [Object](optional) prototype methods/property of the sub class
+ * Extend a sub class from base class
+ * @param makeDefaultOpt [object|function] default option of this sub class, method of the sub can use this.xxx to access this option
+ * @param initialize [function](optional) Initialize after the sub class is instantiated
+ * @param proto [object](optional) Prototype methods/properties of the sub class
  *
- * @export{object}
+ * @return function
  */
 function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 
