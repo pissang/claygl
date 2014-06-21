@@ -1,6 +1,3 @@
-/**
- *  @export{object} request
- */
 define(function(require) {
 
     function get(options) {

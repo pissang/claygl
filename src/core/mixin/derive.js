@@ -1,107 +1,110 @@
 define(function(require) {
 
-'use strict';
+    'use strict';
 
-/**
- * Extend a sub class from base class
- * @param makeDefaultOpt [object|function] default option of this sub class, method of the sub can use this.xxx to access this option
- * @param initialize [function](optional) Initialize after the sub class is instantiated
- * @param proto [object](optional) Prototype methods/properties of the sub class
- *
- * @return function
- */
-function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
+    /**
+     * Extend a sub class from base class
+     * @param {object|function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
+     * @param {function} [initialize] Initialize after the sub class is instantiated
+     * @param {Object} [proto] Prototype methods/properties of the sub class
+     * @memberOf qtek.core.mixin.derive.
+     * @return {function}
+     */
+    function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 
-    if (typeof initialize == "object") {
-        proto = initialize;
-        initialize = null;
-    }
+        if (typeof initialize == "object") {
+            proto = initialize;
+            initialize = null;
+        }
 
-    var _super = this;
+        var _super = this;
 
-    var propList;
-    if (!(makeDefaultOpt instanceof Function)) {
-        // Optimize the property iterate if it have been fixed
-        propList = [];
-        for (var propName in makeDefaultOpt) {
-            if (makeDefaultOpt.hasOwnProperty(propName)) {
-                propList.push(propName);
+        var propList;
+        if (!(makeDefaultOpt instanceof Function)) {
+            // Optimize the property iterate if it have been fixed
+            propList = [];
+            for (var propName in makeDefaultOpt) {
+                if (makeDefaultOpt.hasOwnProperty(propName)) {
+                    propList.push(propName);
+                }
             }
         }
-    }
 
-    var sub = function(options) {
+        var sub = function(options) {
 
-        // call super constructor
-        _super.apply(this, arguments);
+            // call super constructor
+            _super.apply(this, arguments);
 
-        if (makeDefaultOpt instanceof Function) {
-            // call defaultOpt generate function each time
-            // if it is a function, So we can make sure each 
-            // property in the object is not shared by mutiple instances
-            extend(this, makeDefaultOpt.call(this));
+            if (makeDefaultOpt instanceof Function) {
+                // call defaultOpt generate function each time
+                // if it is a function, So we can make sure each 
+                // property in the object is not shared by mutiple instances
+                extend(this, makeDefaultOpt.call(this));
+            } else {
+                extendWithPropList(this, makeDefaultOpt, propList);
+            }
+            
+            if (this.constructor === sub) {
+                // PENDING
+                if (options) {
+                    extend(this, options);
+                }
+
+                // Initialize function will be called in the order of inherit
+                var base = sub;
+                var initializers = sub.__initializers__;
+                for (var i = 0; i < initializers.length; i++) {
+                    initializers[i].apply(this, arguments);
+                }
+            }
+        };
+        // save super constructor
+        sub.__super__ = _super;
+        // initialize function will be called after all the super constructor is called
+        if (!_super.__initializers__) {
+            sub.__initializers__ = [];
         } else {
-            extendWithPropList(this, makeDefaultOpt, propList);
+            sub.__initializers__ = _super.__initializers__.slice();
         }
+        if (initialize) {
+            sub.__initializers__.push(initialize);
+        }
+
+        var Ctor = function() {};
+        Ctor.prototype = _super.prototype;
+        sub.prototype = new Ctor();
+        sub.prototype.constructor = sub;
+        extend(sub.prototype, proto);
         
-        if (this.constructor === sub) {
-            // PENDING
-            if (options) {
-                extend(this, options);
-            }
+        // extend the derive method as a static method;
+        sub.derive = _super.derive;
 
-            // Initialize function will be called in the order of inherit
-            var base = sub;
-            var initializers = sub.__initializers__;
-            for (var i = 0; i < initializers.length; i++) {
-                initializers[i].apply(this, arguments);
+        return sub;
+    }
+
+    function extend(target, source) {
+        if (!source) {
+            return;
+        }
+        for (var name in source) {
+            if (source.hasOwnProperty(name)) {
+                target[name] = source[name];
             }
         }
-    };
-    // save super constructor
-    sub.__super__ = _super;
-    // initialize function will be called after all the super constructor is called
-    if (!_super.__initializers__) {
-        sub.__initializers__ = [];
-    } else {
-        sub.__initializers__ = _super.__initializers__.slice();
-    }
-    if (initialize) {
-        sub.__initializers__.push(initialize);
     }
 
-    var Ctor = function() {};
-    Ctor.prototype = _super.prototype;
-    sub.prototype = new Ctor();
-    sub.prototype.constructor = sub;
-    extend(sub.prototype, proto);
-    
-    // extend the derive method as a static method;
-    sub.derive = _super.derive;
-
-    return sub;
-}
-
-function extend(target, source) {
-    if (!source) {
-        return;
+    function extendWithPropList(target, source, propList) {
+        for (var i = 0; i < propList.length; i++) {
+            var propName = propList[i];
+            target[propName] = source[propName];
+        }   
     }
-    for (var name in source) {
-        if (source.hasOwnProperty(name)) {
-            target[name] = source[name];
-        }
+
+    /**
+     * @alias qtek.core.mixin.derive
+     * @mixin
+     */
+    return {
+        derive : derive
     }
-}
-
-function extendWithPropList(target, source, propList) {
-    for (var i = 0; i < propList.length; i++) {
-        var propName = propList[i];
-        target[propName] = source[propName];
-    }   
-}
-
-return {
-    derive : derive
-}
-
 });

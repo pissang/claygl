@@ -8,8 +8,7 @@ define(function(require){
      * @extends qtek.Node
      */
     var Light = Node.derive(function(){
-        /** @lends qtek.Light# */
-        return {
+        return /** @lends qtek.Light# */ {
             /**
              * Light RGB color
              * @type {number[]}
@@ -36,6 +35,13 @@ define(function(require){
             shadowResolution : 512
         }
     }, {
+        /**
+         * Light type
+         * @type {string}
+         * @memberOf qtek.Light#
+         */
+        type: '',
+
         clone: function() {
             var light = Node.prototype.clone.call(this);
             light.color = Array.prototype.slice.call(this.color);

@@ -33,8 +33,7 @@ define(function(require) {
      * @constructor qtek.Renderer
      */
     var Renderer = Base.derive(function() {
-        /** @lends qtek.Renderer# */
-        return {
+        return /** @lends qtek.Renderer# */ {
 
             /**
              * @type {HTMLCanvasElement}
@@ -672,6 +671,13 @@ define(function(require) {
          */
         disposeFrameBuffer : function(frameBuffer) {
             frameBuffer.dispose(this.gl);
+        },
+        
+        /**
+         * Dispose renderer
+         */
+        dispose: function() {
+            glinfo.dispose(this.gl);
         },
 
         /**

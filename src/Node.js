@@ -15,6 +15,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.Node
+     * @extends qtek.core.Base
      */
     var Node = Base.derive(
     /** @lends qtek.Node# */
@@ -32,7 +33,7 @@ define(function(require) {
         position: null,
         
         /**
-         * Rotation relative to its parent node. Represented with a quaternion
+         * Rotation relative to its parent node. Represented by a quaternion
          * @type {qtek.math.Quaternion}
          */
         rotation: null,
@@ -108,7 +109,7 @@ define(function(require) {
 
         /**
          * If node and its chilren visible
-         * @type {Boolean}
+         * @type {boolean}
          * @memberOf qtek.Node
          * @instance
          */
@@ -157,7 +158,7 @@ define(function(require) {
         },
 
         /**
-         * Remove the specified child scene node
+         * Remove the given child scene node
          * @param {qtek.Node} node
          */
         remove : function(node) {
@@ -391,7 +392,7 @@ define(function(require) {
         },
 
         /**
-         * Get cloned node
+         * Clone a new node
          * @return {Node}
          */
         clone : function() {

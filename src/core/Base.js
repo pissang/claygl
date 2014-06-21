@@ -4,8 +4,16 @@ define(function(require){
     var notifierMixin = require("./mixin/notifier");
     var util = require("./util");
 
-    var Base = function(options){
-        
+    /**
+     * Base class of all objects
+     * @constructor
+     * @alias qtek.core.Base
+     * @mixes qtek.core.mixin.notifier
+     */
+    var Base = function(){
+        /**
+         * @type {number}
+         */
         this.__GUID__ = util.genGUID();
     }
     util.extend(Base, deriveMixin);

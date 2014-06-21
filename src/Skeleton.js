@@ -13,8 +13,7 @@ define(function(require) {
      * @constructor qtek.Skeleton
      */
     var Skeleton = Base.derive(function() {
-        /** @lends qtek.Skeleton# */
-        return {
+        return /** @lends qtek.Skeleton# */{
             /**
              * @type {string}
              */
@@ -73,7 +72,7 @@ define(function(require) {
         /**
          * Add a skinning clip and create a map between clip and skeleton
          * @param {qtek.animation.SkinningClip} clip
-         * @param {object} [mapRule] Map between joint name in skeleton and joint name in clip
+         * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
          */
         addClip : function(clip, mapRule) {
 

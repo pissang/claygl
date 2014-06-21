@@ -9,7 +9,8 @@ define(function(require) {
     var TextureCube = require('./texture/TextureCube');
 
     /**
-     * constructor qtek.Material
+     * #constructor qtek.Material
+     * @extends qtek.core.Base
      */
     var Material = Base.derive(
     /** @lends qtek.Material# */
@@ -20,7 +21,7 @@ define(function(require) {
         name : '',
         
         /**
-         * @type {object}
+         * @type {Object}
          */
         uniforms : null,
 
@@ -175,7 +176,7 @@ define(function(require) {
         },
 
         /**
-         * @param {object} obj
+         * @param {Object} obj
          */
         setUniforms : function(obj) {
             for (var key in obj) {

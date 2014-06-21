@@ -6,18 +6,51 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
 
-    var Cone = DynamicGeometry.derive({
-
+    /**
+     * @constructor qtek.geometry.Cone
+     * @extends qtek.DynamicGeometry
+     * @param {Object} [opt]
+     * @param {number} [opt.topRadius]
+     * @param {number} [opt.bottomRadius]
+     * @param {number} [opt.height]
+     * @param {number} [opt.capSegments]
+     * @param {number} [opt.heightSegments]
+     */
+    var Cone = DynamicGeometry.derive(
+    /** @lends qtek.geometry.Cone# */
+    {
+        /**
+         * @type {number}
+         */
         topRadius : 0,
+        
+        /**
+         * @type {number}
+         */
         bottomRadius : 1,
 
+        /**
+         * @type {number}
+         */
         height : 2,
 
+        /**
+         * @type {number}
+         */
         capSegments : 50,
+
+        /**
+         * @type {number}
+         */
         heightSegments : 1
     }, function() {
         this.build();
-    }, {
+    },
+    /** @lends qtek.geometry.Cone.prototype */
+    {
+        /**
+         * Build cone geometry
+         */
         build : function() {
             var positions = this.attributes.position.value;
             var texcoords = this.attributes.texcoord0.value;
@@ -71,7 +104,7 @@ define(function(require) {
                 faces.push([offset, offset+((i+1) % n + 1), offset+i+1]);
             }
 
-            // // Build side
+            // Build side
             offset = positions.length;
             var n2 = this.heightSegments;
             for (var i =0; i < n; i++) {

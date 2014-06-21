@@ -25,8 +25,7 @@ define(function(require) {
      * @extends qtek.Geometry
      */
     var DynamicGeometry = Geometry.derive(function() {
-        /** @lends qtek.DynamicGeometry# */
-        return {
+        return /** @lends qtek.DynamicGeometry# */ {
             attributes : {
                  position : new Geometry.Attribute('position', 'float', 3, 'POSITION', true),
                  texcoord0 : new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
@@ -55,8 +54,6 @@ define(function(require) {
              */
             faces : [],
             
-            _isDirty : true,
-
             _enabledAttributes : null,
 
             // Typed Array of each geometry chunk
@@ -79,7 +76,7 @@ define(function(require) {
         },
         // Overwrite the dirty method
         dirty : function(field) {
-            if (! field) {
+            if (!field) {
                 this.dirty("indices");
                 for (var name in this.attributes) {
                     this.dirty(name);
@@ -88,7 +85,8 @@ define(function(require) {
             }
             this._cache.dirtyAll(field);
 
-            this._isDirty = true;
+            this._cache.dirtyAll();
+
             this._enabledAttributes = null;
         },
 
@@ -112,10 +110,6 @@ define(function(require) {
             return false;
         },
 
-        isDirty : function() {
-            return this._isDirty;
-        },
-
         createAttribute: function(name, type, size, semantic) {
             var attrib = new Geometry.Attribute(name, type, size, semantic, true);
             this.attributes[name] = attrib;
@@ -136,7 +130,7 @@ define(function(require) {
         /**
          * Get enabled attributes map.
          * Attribute that has same vertex number with position is treated as an enabled attribute
-         * @return {object}
+         * @return {Object}
          */
         getEnabledAttributes : function() {
             // Cache
@@ -192,7 +186,7 @@ define(function(require) {
 
             this._cache.use(_gl.__GLID__);
 
-            if (this._isDirty) {
+            if (this._cache.isDirty()) {
                 var dirtyAttributes = this._getDirtyAttributes();
 
                 var isFacesDirty = this._cache.isDirty('indices');
@@ -206,7 +200,7 @@ define(function(require) {
                         this._cache.fresh(name);
                     }
                     this._cache.fresh('indices');
-                    this._isDirty = false;
+                    this._cache.fresh();
                 }
             }
             return this._cache.get("chunks");

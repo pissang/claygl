@@ -18,13 +18,26 @@ define(function(require) {
     });
     var camera = new OrthoCamera();
 
+    /**
+     * @constructor qtek.compositor.Pass
+     * @extends qtek.core.Base
+     */
     var Pass = Base.derive(function() {
-        return {
-            // Fragment shader string
+        return /** @lends qtek.compositor.Pass# */ {
+            /**
+             * Fragment shader string
+             * @type {string}
+             */
             fragment : "",
 
+            /**
+             * @type {Object}
+             */
             outputs : null,
 
+            /**
+             * @type {qtek.Material}
+             */
             material : null
         }
     }, function() {
@@ -40,22 +53,33 @@ define(function(require) {
 
         this.material = material;
 
-    }, {
-
+    },
+    /** @lends qtek.compositor.Pass.prototype */
+    {
+        /**
+         * @param {string} name
+         * @param {} value
+         */
         setUniform : function(name, value) {
             var uniform = this.material.uniforms[name];
             if (uniform) {
                 uniform.value = value;
             }
         },
-
+        /**
+         * @param  {string} name
+         * @return {}
+         */
         getUniform : function(name) {
             var uniform = this.material.uniforms[name];
             if (uniform) {
                 return uniform.value;
             }
         },
-
+        /**
+         * @param  {qtek.Texture} texture
+         * @param  {number} attachment
+         */
         attachOutput : function(texture, attachment) {
             if (!this.outputs) {
                 this.outputs = {};
@@ -63,7 +87,9 @@ define(function(require) {
             attachment = attachment || glenum.COLOR_ATTACHMENT0;
             this.outputs[attachment] = texture;
         },
-
+        /**
+         * @param  {qtek.Texture} texture
+         */
         detachOutput : function(texture) {
             for (var attachment in this.outputs) {
                 if (this.outputs[attachment] === texture) {
@@ -88,7 +114,10 @@ define(function(require) {
         unbind : function(renderer, frameBuffer) {
             frameBuffer.unbind(renderer);
         },
-
+        /**
+         * @param  {qtek.Renderer} renderer
+         * @param  {qtek.FrameBuffer} [frameBuffer]
+         */
         render : function(renderer, frameBuffer) {
 
             var _gl = renderer.gl;

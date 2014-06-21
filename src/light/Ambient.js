@@ -3,6 +3,10 @@ define(function(require) {
     var Light = require('../Light');
     var Shader = require('../Shader');
 
+    /**
+     * @constructor qtek.light.Ambient
+     * @extends qtek.Light
+     */
     var AmbientLight = Light.derive({
         castShadow : false
     }, {

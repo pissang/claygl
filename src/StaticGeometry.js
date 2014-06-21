@@ -18,8 +18,7 @@ define(function(require) {
      * @extends qtek.Geometry
      */
     var StaticGeometry = Geometry.derive(function() {
-        /** @lends qtek.StaticGeometry# */
-        return {
+        return /** @lends qtek.StaticGeometry# */ {
             attributes : {
                  position : new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
                  texcoord0 : new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
@@ -45,8 +44,6 @@ define(function(require) {
              */
             faces: null,
 
-            _isDirty : true,
-
             _normalType : 'vertex',
 
             _enabledAttributes : null
@@ -56,8 +53,7 @@ define(function(require) {
     /** @lends qtek.StaticGeometry.prototype */
     {
         dirty : function() {
-            this._cache.dirtyAll("chunks");
-            this._isDirty = true;
+            this._cache.dirtyAll();
             this._enabledAttributes = null;
         },
         
@@ -80,10 +76,6 @@ define(function(require) {
             return true;
         },
 
-        isDirty : function() {
-            return this._isDirty;
-        },
-        
         createAttribute: function(name, type, size, semantic) {
             var attrib = new Geometry.Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;
@@ -132,10 +124,9 @@ define(function(require) {
 
         getBufferChunks : function(_gl) {
             this._cache.use(_gl.__GLID__);
-            if (this._cache.isDirty("chunks")) {
+            if (this._cache.isDirty()) {
                 this._updateBuffer(_gl);
-                this._cache.fresh("chunks");
-                this._isDirty = false;
+                this._cache.fresh();
             }
             return this._cache.get("chunks");
         },

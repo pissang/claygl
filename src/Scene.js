@@ -14,8 +14,7 @@ define(function(require) {
      * @extends qtek.Node
      */
     var Scene = Node.derive(function() {
-        /** @lends qtek.Scene# */
-        return {
+        return /** @lends qtek.Scene# */ {
             /**
              * Global material of scene
              * @type {Material}

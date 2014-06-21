@@ -83,7 +83,6 @@ define( function(require){
 		"StandardMaterial": require('qtek/deferred/StandardMaterial')
 	},
 	"geometry": {
-		"Capsule": require('qtek/geometry/Capsule'),
 		"Cone": require('qtek/geometry/Cone'),
 		"Cube": require('qtek/geometry/Cube'),
 		"Cylinder": require('qtek/geometry/Cylinder'),

@@ -3,9 +3,20 @@ define(function(require) {
     var Light = require('../Light');
     var Shader = require('../Shader');
 
-    var PointLight = Light.derive({
+    /**
+     * @constructor qtek.light.Point
+     */
+    var PointLight = Light.derive(
+    /** @lends qtek.light.Point# */
+    {
+        /**
+         * @type {number}
+         */
         range : 100,
 
+        /**
+         * @type {number}
+         */
         castShadow : false
     }, {
 
@@ -33,7 +44,10 @@ define(function(require) {
                 }
             }
         },
-
+        /**
+         * @return {qtek.light.Point}
+         * @memberOf qtek.light.Point.prototype
+         */
         clone: function() {
             var light = Light.prototype.clone.call(this);
             light.range = this.range;

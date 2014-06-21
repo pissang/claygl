@@ -11,21 +11,52 @@ define(function(require) {
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 
+    /**
+     * @typedef {Object} qtek.animation.IBlend2DInput
+     * @property {qtek.math.Vector2} position
+     * @property {qtek.animation.Clip} clip
+     * @property {number} offset
+     */
+    
+    /**
+     * 2d blending node in animation blend tree.
+     * output clip must have blend2D method
+     * @constructor
+     * @alias qtek.animation.Blend2DClip
+     * 
+     * @param {Object} [opts]
+     * @param {string} [opts.name]
+     * @param {Object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     * @param {object[]} [opts.inputs]
+     * @param {qtek.math.Vector2} [opts.position]
+     * @param {qtek.animation.Clip} [opts.output]
+     */
     var Blend2DClip = function(opts) {
 
         opts = opts || {};
         
         Clip.call(this, opts);
-
+        /**
+         * Output clip must have blend2D method
+         * @type {qtek.animation.Clip}
+         */
         this.output = opts.output || null;
-
-        // {
-        //  position : Vector2()
-        //  clip : Clip()
-        //  offset : 0
-        // }
+        /**
+         * @type {qtek.animation.IBlend2DInput[]}
+         */
         this.inputs = opts.inputs || [];
-
+        /**
+         * @type {qtek.math.Vector2}
+         */
         this.position = new Vector2();
 
         this._cacheTriangle = null;
@@ -37,7 +68,12 @@ define(function(require) {
 
     Blend2DClip.prototype = new Clip();
     Blend2DClip.prototype.constructor = Blend2DClip;
-
+    /**
+     * @param {qtek.math.Vector2} position
+     * @param {qtek.animation.Clip} inputClip
+     * @param {number} [offset]
+     * @return {qtek.animation.IBlend2DInput}
+     */
     Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {
             position : position,

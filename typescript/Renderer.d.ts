@@ -104,6 +104,8 @@ declare module qtek {
 
         disposeFrameBuffer(frameBuffer: FrameBuffer): void;
 
+        dispose(): void;
+
         screenToNdc(x: number, y: number, out?: math.Vector2): math.Vector2;
 
         // Events

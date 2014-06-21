@@ -1,33 +1,3 @@
-/**
- * Example
- * {
- *  name : "xxx",
- *  shader : shader,
- *  inputs :{ 
- *      "texture" : {
- *          node : "xxx",
- *          pin : "diffuse"
-        }
-    },
-    outputs : {
-            color : {
-                attachment : FrameBuffer.COLOR_ATTACHMENT0
-                parameters : {
-                    format : Texture.RGBA,
-                    width : 512,
-                    height : 512
-                },
-                // Node will keep the texture rendered in last frame
-                keepLastFrame : true,
-                // Force the node output the texture rendered in last frame
-                outputLastFrame : true
-            }
-        }
-    }
- * Multiple outputs is reserved for MRT support in WebGL2.0
- *
- * TODO blending 
- */
 define(function(require) {
 
     'use strict';
@@ -38,36 +8,84 @@ define(function(require) {
     var Shader = require("../Shader");
     var texturePool = require("./texturePool");
 
+    /**
+     * Node of graph based post processing.
+     * 
+     * @constructor qtek.compositor.Node
+     * @extends qtek.core.Base
+     * 
+     * @example
+        var node = new qtek.compositor.Node({
+            name: "fxaa",
+            shader: qtek.Shader.source('buildin.compositor.fxaa'),
+            inputs:{ 
+                texture : {
+                     node : "scene",
+                     pin : "color"
+                }
+            },
+            // Multiple outputs is preserved for MRT support in WebGL2.0
+            outputs: {
+                color: {
+                    attachment : qtek.FrameBuffer.COLOR_ATTACHMENT0
+                    parameters : {
+                        format : qtek.Texture.RGBA,
+                        width : 512,
+                        height : 512
+                    },
+                    // Node will keep the texture rendered in last frame
+                    keepLastFrame : true,
+                    // Force the node output the texture rendered in last frame
+                    outputLastFrame : true
+                }
+            }
+        });
+     *
+     */
     var Node = Base.derive(function() {
-        return {
-
+        return /** @lends qtek.compositor.Node# */ {
+            /**
+             * @type {string}
+             */
             name : "",
 
+            /**
+             * @type {Object}
+             */
             inputs : {},
             
-            outputs : null,
-
-            shader : '',
             /**
-             * Input links, will be auto updated by the graph
-             * Example:
-             * inputName : {
-             *     node : [Node],
-             *     pin : 'xxxx'    
-             * }
+             * @type {Object}
+             */
+            outputs : null,
+            
+            /**
+             * @type {string}
+             */
+            shader : '',
+            
+            /**
+             * Input links, will be updated by the graph
+             * @example:
+             *     inputName : {
+             *         node : someNode,
+             *         pin : 'xxxx'    
+             *     }
              * @type {Object}
              */
             inputLinks : {},
+            
             /**
-             * Output links, will be auto updated by the graph
-             * Example:
-             * outputName : {
-             *     node : [Node],
-             *     pin : 'xxxx'    
-             * }
+             * Output links, will be updated by the graph
+             * @example:
+             *     outputName : {
+             *         node : someNode,
+             *         pin : 'xxxx'    
+             *     }
              * @type {Object}
              */
             outputLinks : {},
+            
             /**
              * @type {qtek.compositor.Pass}
              */
@@ -77,9 +95,8 @@ define(function(require) {
             // Will be used when there exist a circular reference
             _prevOutputTextures : {},
             _outputTextures : {},
-            //{
-            //  name : 2
-            //}
+
+            // Example: { name : 2 }
             _outputReferences : {},
 
             _rendering : false,
@@ -98,9 +115,10 @@ define(function(require) {
                 depthBuffer : false
             })
         }
-    }, {
+    }, 
+    /** @lends qtek.compositor.Node.prototype */
+    {
         /**
-         * Do rendering
          * @param  {qtek.Renderer} renderer
          */
         render : function(renderer) {
@@ -185,20 +203,35 @@ define(function(require) {
             return parametersCopy;
         },
 
+        /**
+         * Set parameter
+         * @param {string} name
+         * @param {} value
+         */
         setParameter : function(name, value) {
             this.pass.setUniform(name, value);
         },
-
+        /**
+         * Get parameter value
+         * @param  {string} name
+         * @return {}
+         */
         getParameter : function(name) {
             return this.pass.getUniform(name);
         },
-
+        /**
+         * Set parameters
+         * @param {Object} obj
+         */
         setParameters : function(obj) {
             for (var name in obj) {
                 this.setParameter(name, obj[name]);
             }
         },
-
+        /**
+         * Set shader code
+         * @param {string} shaderStr
+         */
         setShader : function(shaderStr) {
             var material = this.pass.material;
             material.shader.setFragment(shaderStr);

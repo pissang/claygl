@@ -1,7 +1,3 @@
-/**
- *
- * @export{object} mesh
- */
 define(function(require) {
     
     var Geometry = require("../Geometry");

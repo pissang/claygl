@@ -109,7 +109,7 @@ define(function(require) {
         /**
          * @param  {WebGLRenderingContext} _gl
          * @param  {qtek.Material} [globalMaterial]
-         * @return {object}
+         * @return {Object}
          */
         render : function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;
@@ -141,7 +141,7 @@ define(function(require) {
             if (nVertex > geometry.chunkSize && isUseFace || (vaoExt && isStatic)) {
                 drawHashChanged = true;
             }
-            else if (geometry.isDirty()) {
+            else if (geometry._cache.isDirty()) {
                 drawHashChanged = true;
             }
             else {
@@ -303,6 +303,11 @@ define(function(require) {
             return renderInfo;
         },
 
+        /**
+         * Clone a new renderable
+         * @method
+         * @return {qtek.Renderable}
+         */
         clone : (function() {
             var properties = [
                 'castShadow', 'receiveShadow',

@@ -1,5 +1,5 @@
 /**
- * @export{object} library
+ * @export{Object} library
  */
 define(function(require) {
 

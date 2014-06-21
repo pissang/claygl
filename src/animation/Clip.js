@@ -5,8 +5,8 @@ define(function(require) {
     /**
      * @constructor
      * @alias qtek.animation.Clip
-     * @param {object} [opts]
-     * @param {object} [opts.target]
+     * @param {Object} [opts]
+     * @param {Object} [opts.target]
      * @param {number} [opts.life]
      * @param {number} [opts.delay]
      * @param {number} [opts.gap]
@@ -22,7 +22,7 @@ define(function(require) {
         opts = opts || {};
 
         /**
-         * @type {object}
+         * @type {Object}
          */
         this.target = opts.target;
 

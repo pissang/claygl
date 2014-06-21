@@ -4,15 +4,45 @@ define(function(require) {
     var BoundingBox = require('../math/BoundingBox');
     var ConeGeometry = require('./Cone');
 
-    var Cylinder = DynamicGeometry.derive({
+    /**
+     * @constructor qtek.geometry.Cylinder
+     * @extends qtek.DynamicGeometry
+     * @param {Object} [opt]
+     * @param {number} [opt.radius]
+     * @param {number} [opt.height]
+     * @param {number} [opt.capSegments]
+     * @param {number} [opt.heightSegments]
+     */
+    var Cylinder = DynamicGeometry.derive(
+    /** @lends qtek.geometry.Cylinder# */
+    {
+        /**
+         * @type {number}
+         */
         radius : 1,
+
+        /**
+         * @type {number}
+         */
         height : 2,
 
+        /**
+         * @type {number}
+         */
         capSegments : 50,
+
+        /**
+         * @type {number}
+         */
         heightSegments : 1
     }, function() {
         this.build();
-    }, {
+    },
+    /** @lends qtek.geometry.Cylinder.prototype */
+    {
+        /**
+         * Build cylinder geometry
+         */
         build : function() {
             var cone = new ConeGeometry({
                 topRadius : this.radius,

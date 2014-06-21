@@ -4,19 +4,30 @@ define(function(require){
 
     var Graph = require("./Graph");
 
+    /**
+     * Compositor provide graph based post processing
+     * 
+     * @constructor qtek.compositor.Compositor
+     * @extends qtek.compositor.Graph
+     * 
+     */
     var Compositor = Graph.derive(function() {
         return {
             // Output node
             _outputs : []
         }
-    }, {
+    },
+    /** @lends qtek.compositor.Compositor.prototype */
+    {
         addNode : function(node) {
             Graph.prototype.addNode.call(this, node);
             if (!node.outputs) {
                 this.addOutput(node);
             }
         },
-
+        /**
+         * @param  {qtek.Renderer} renderer
+         */
         render : function(renderer) {
             if (this._dirty) {
                 this.update();

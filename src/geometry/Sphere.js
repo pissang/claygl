@@ -6,77 +6,125 @@ define(function(require) {
     var vec2 = glMatrix.vec2;
     var BoundingBox = require('../math/BoundingBox');
 
-	// From three.js SphereGeometry
-    var Sphere = DynamicGeometry.derive({
+    /**
+     * @constructor qtek.geometry.Sphere
+     * @extends qtek.DynamicGeometry
+     * @param {Object} [opt]
+     * @param {number} [widthSegments]
+     * @param {number} [heightSegments]
+     * @param {number} [phiStart]
+     * @param {number} [phiLength]
+     * @param {number} [thetaStart]
+     * @param {number} [thetaLength]
+     * @param {number} [radius]
+     */
+    var Sphere = DynamicGeometry.derive(
+    /** @lends qtek.geometry.Sphere# */
+    {
+        /**
+         * @type {number}
+         */
         widthSegments : 20,
+        /**
+         * @type {number}
+         */
         heightSegments : 20,
 
+        /**
+         * @type {number}
+         */
         phiStart : 0,
+        /**
+         * @type {number}
+         */
         phiLength : Math.PI * 2,
 
+        /**
+         * @type {number}
+         */
         thetaStart : 0,
+        /**
+         * @type {number}
+         */
         thetaLength : Math.PI,
 
+        /**
+         * @type {number}
+         */
         radius : 1
+
     }, function() {
-        
-        var positions = this.attributes.position.value;
-        var texcoords = this.attributes.texcoord0.value;
-        var normals = this.attributes.normal.value;
+        this.build();
+    },
+    /** @lends qtek.geometry.Sphere.prototype */
+    {
+        /**
+         * Build sphere geometry
+         */
+        build: function() {
+            var positions = this.attributes.position.value;
+            var texcoords = this.attributes.texcoord0.value;
+            var normals = this.attributes.normal.value;
 
-        var x, y, z,
-            u, v,
-            i, j;
-        var normal;
+            positions.length = 0;
+            texcoords.length = 0;
+            normals.length = 0;
+            this.faces.length = 0;
 
-        var heightSegments = this.heightSegments;
-        var widthSegments = this.widthSegments;
-        var radius = this.radius;
-        var phiStart = this.phiStart;
-        var phiLength = this.phiLength;
-        var thetaStart = this.thetaStart;
-        var thetaLength = this.thetaLength;
-        var radius = this.radius;
+            var x, y, z,
+                u, v,
+                i, j;
+            var normal;
 
-        for (j = 0; j <= heightSegments; j ++) {
-            for (i = 0; i <= widthSegments; i ++) {
-                u = i / widthSegments;
-                v = j / heightSegments;
+            var heightSegments = this.heightSegments;
+            var widthSegments = this.widthSegments;
+            var radius = this.radius;
+            var phiStart = this.phiStart;
+            var phiLength = this.phiLength;
+            var thetaStart = this.thetaStart;
+            var thetaLength = this.thetaLength;
+            var radius = this.radius;
 
-                x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
-                y = radius * Math.cos(thetaStart + v * thetaLength);
-                z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
+            for (j = 0; j <= heightSegments; j ++) {
+                for (i = 0; i <= widthSegments; i ++) {
+                    u = i / widthSegments;
+                    v = j / heightSegments;
 
-                positions.push(vec3.fromValues(x, y, z));
-                texcoords.push(vec2.fromValues(u, v));
+                    x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
+                    y = radius * Math.cos(thetaStart + v * thetaLength);
+                    z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
 
-                normal = vec3.fromValues(x, y, z);
-                vec3.normalize(normal, normal)
-                normals.push(normal);
+                    positions.push(vec3.fromValues(x, y, z));
+                    texcoords.push(vec2.fromValues(u, v));
+
+                    normal = vec3.fromValues(x, y, z);
+                    vec3.normalize(normal, normal)
+                    normals.push(normal);
+                }
             }
-        }
 
-        var p1, p2, p3,
-            i1, i2, i3, i4;
-        var faces = this.faces;
+            var p1, p2, p3,
+                i1, i2, i3, i4;
+            var faces = this.faces;
 
-        var len = widthSegments + 1;
+            var len = widthSegments + 1;
 
-        for (j = 0; j < heightSegments; j ++) {
-            for (i = 0; i < widthSegments; i ++) {
-                i2 = j * len + i;
-                i1 = (j * len + i + 1);
-                i4 = (j + 1) * len + i + 1;
-                i3 = (j + 1) * len + i;
+            for (j = 0; j < heightSegments; j ++) {
+                for (i = 0; i < widthSegments; i ++) {
+                    i2 = j * len + i;
+                    i1 = (j * len + i + 1);
+                    i4 = (j + 1) * len + i + 1;
+                    i3 = (j + 1) * len + i;
 
-                faces.push(vec3.fromValues(i1, i2, i4));
-                faces.push(vec3.fromValues(i2, i3, i4));
+                    faces.push(vec3.fromValues(i1, i2, i4));
+                    faces.push(vec3.fromValues(i2, i3, i4));
+                }
             }
-        }
 
-        this.boundingBox = new BoundingBox();
-        this.boundingBox.max.set(radius, radius, radius);
-        this.boundingBox.min.set(-radius, -radius, -radius);
+            this.boundingBox = new BoundingBox();
+            this.boundingBox.max.set(radius, radius, radius);
+            this.boundingBox.min.set(-radius, -radius, -radius);
+        }
     })
 
     return Sphere;

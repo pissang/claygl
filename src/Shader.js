@@ -112,11 +112,10 @@ define(function(require) {
 
     /**
      * @constructor qtek.Shader
+     * @extends qtek.core.Base
      */
     var Shader = Base.derive(function() {
-        
-        /** @lends qtek.Shader# */
-        return {
+        return /** @lends qtek.Shader# */ {
             /**
              * Vertex shader code
              * @type {string}
@@ -141,12 +140,12 @@ define(function(require) {
 
             /**
              * Custom defined values in the vertex shader
-             * @type {object}
+             * @type {Object}
              */
             vertexDefines : {},
             /**
              * Custom defined values in the vertex shader
-             * @type {object}
+             * @type {Object}
              */
             fragmentDefines : {},
 

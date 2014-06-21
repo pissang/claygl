@@ -28,7 +28,7 @@
                 // Prepare animation shape data
                 //----------------------------------
                 var canvas = document.createElement('canvas');
-                var SIZE = 64;
+                var SIZE = 50;
                 canvas.width = SIZE;
                 canvas.height = SIZE;
                 var ctx = canvas.getContext('2d');
@@ -82,7 +82,7 @@
                         var idx = i / 4;
                         var x = (idx % SIZE) / SIZE * 40 - 20;
                         var y = 20 - (idx / SIZE) / SIZE * 40;
-                        var z = 1 - Math.random() * 2;
+                        var z = Math.random() * 5;
 
                         position.push([x, y, z]);
                     }
@@ -100,7 +100,7 @@
                 for (var i = smaller.length; i < larger.length; i++) {
                     var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
                     random = random.slice();
-                    random[2] += Math.random() * 2;
+                    random[2] += Math.random() * 5;
                     smaller[i] = random;
                 }
 
@@ -156,7 +156,7 @@
                         mesh.rotation.rotateX(Math.random() * Math.PI * 2);
                         mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
 
-                        mesh.scale.set(0.3, 0.3, 0.3);
+                        mesh.scale.set(0.5, 0.5, 0.5);
                         root.add(mesh);
 
                         cubeList.push(mesh);

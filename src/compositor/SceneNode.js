@@ -6,16 +6,29 @@ define(function(require) {
     var texturePool = require("./texturePool");
     var glinfo = require('../core/glinfo');
 
-    var SceneNode = Node.derive({
-            
+    /**
+     * @constructor qtek.compositor.SceneNode
+     * @extends qtek.compositor.Node
+     */
+    var SceneNode = Node.derive(
+    /** @lends qtek.compositor.SceneNode# */
+    {
         name : 'scene',
-        
+        /**
+         * @type {qtek.Scene}
+         */
         scene : null,
-        
+        /**
+         * @type {qtek.Camera}
+         */
         camera : null,
-        
+        /**
+         * @type {boolean}
+         */
         autoUpdateScene : true,
-
+        /**
+         * @type {boolean}
+         */
         preZ : false
         
     }, function() {

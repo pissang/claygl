@@ -12,13 +12,35 @@ define(function(require) {
         return a.time - b.time;
     }
 
-    var TransformClip = function(options) {
+    /**
+     * @constructor
+     * @alias qtek.animation.TransformClip
+     * @extends qtek.animation.Clip
+     * 
+     * @param {Object} [opts]
+     * @param {string} [opts.name]
+     * @param {Object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     * @param {object[]} [opts.keyFrames]
+     */
+    var TransformClip = function(opts) {
         
-        options = options || {};
+        opts = opts || {};
 
-        this.name = options.name || '';
+        /**
+         * @type {string}
+         */
+        this.name = opts.name || '';
 
-        Clip.call(this, options);
+        Clip.call(this, opts);
 
         //[{
         //  time : //ms
@@ -27,12 +49,22 @@ define(function(require) {
         //  scale :     // optional
         //}]
         this.keyFrames = []
-        if (options.keyFrames) {
-            this.addKeyFrames(options.keyFrames)
+        if (opts.keyFrames) {
+            this.addKeyFrames(opts.keyFrames)
         }
 
+        /**
+         * @type {Float32Array}
+         */
         this.position = vec3.create();
+        /**
+         * Rotation is represented by a quaternion
+         * @type {Float32Array}
+         */
         this.rotation = quat.create();
+        /**
+         * @type {Float32Array}
+         */
         this.scale = vec3.fromValues(1, 1, 1);
 
         this._cacheKey = 0;
@@ -59,7 +91,10 @@ define(function(require) {
         this._interpolateField(time, 'rotation');
         this._interpolateField(time, 'scale');   
     }
-
+    /**
+     * Add a key frame
+     * @param {Object} kf
+     */
     TransformClip.prototype.addKeyFrame = function(kf) {
         for (var i = 0; i < this.keyFrames.length - 1; i++) {
             var prevFrame = this.keyFrames[i];
@@ -74,6 +109,10 @@ define(function(require) {
         this.keyFrames.push(kf);
     }
 
+    /**
+     * Add keyframes
+     * @param {object[]} kfs
+     */
     TransformClip.prototype.addKeyFrames = function(kfs) {
         for (var i = 0; i < kfs.length; i++) {
             this.keyFrames.push(kfs[i]);
@@ -134,13 +173,27 @@ define(function(require) {
             this._cacheTime = 0;
         }
     }
-
+    /**
+     * 1D blending between two clips
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     * @param  {number} w
+     */
     TransformClip.prototype.blend1D = function(c1, c2, w) {
         vec3.lerp(this.position, c1.position, c2.position, w);
         vec3.lerp(this.scale, c1.scale, c2.scale, w);
         quat.slerp(this.rotation, c1.rotation, c2.rotation, w);
     }
 
+    /**
+     * 2D blending between three clips
+     * @method
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c3
+     * @param  {number} f
+     * @param  {number} g
+     */
     TransformClip.prototype.blend2D = (function() {
         var q1 = quat.create();
         var q2 = quat.create();
@@ -168,12 +221,22 @@ define(function(require) {
         }
     })(),
 
+    /**
+     * Additive blending between two clips
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     */
     TransformClip.prototype.additiveBlend = function(c1, c2) {
         vec3.add(this.position, c1.position, c2.position);
         vec3.add(this.scale, c1.scale, c2.scale);
         quat.multiply(this.rotation, c2.rotation, c1.rotation);
     }
 
+    /**
+     * Subtractive blending between two clips
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     */
     TransformClip.prototype.subtractiveBlend = function(c1, c2) {
         vec3.sub(this.position, c1.position, c2.position);
         vec3.sub(this.scale, c1.scale, c2.scale);
@@ -181,6 +244,12 @@ define(function(require) {
         quat.multiply(this.rotation, this.rotation, c1.rotation);
     }
 
+    /**
+     * @todo
+     * @param {number} startTime
+     * @param {number} endTime
+     * @param {boolean} isLoop
+     */
     TransformClip.prototype.getSubClip = function(startTime, endTime) {
         // TODO
         console.warn('TODO');

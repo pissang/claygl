@@ -343,6 +343,6 @@ define(function() {
         }
     };
 
-    return Easing;
+    return easing;
 });
 

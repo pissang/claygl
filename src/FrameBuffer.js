@@ -11,6 +11,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.FrameBuffer
+     * @extends qtek.core.Base
      */
     var FrameBuffer = Base.derive(
     /** @lends qtek.FrameBuffer# */

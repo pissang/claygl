@@ -16,8 +16,7 @@ define(function(require) {
      * @extends qtek.Node
      */
     var Camera = Node.derive(function() {
-        /** @lends qtek.Camera# */
-        return {
+        return /** @lends qtek.Camera# */ {
             /**
              * Camera projection matrix
              * @type {qtek.math.Matrix4}

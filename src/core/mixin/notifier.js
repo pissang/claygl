@@ -4,8 +4,15 @@ define(function() {
         this.action = action;
         this.context = context;
     }
-
-    return{
+    /**
+     * @mixin
+     * @alias qtek.core.mixin.notifier
+     */
+    var notifier = {
+        /**
+         * Trigger event
+         * @param  {string} name
+         */
         trigger : function(name) {
             if (! this.hasOwnProperty('__handlers__')) {
                 return;
@@ -44,8 +51,14 @@ define(function() {
                     return;
             }
         },
-        
-        on : function(name, action, context/*optional*/) {
+        /**
+         * Register event handler
+         * @param  {string} name
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        on : function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -63,7 +76,14 @@ define(function() {
             return this;
         },
 
-        once : function(name, action, context/*optional*/) {
+        /**
+         * Register event, event will only be triggered once and then removed
+         * @param  {string} name
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        once : function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -75,8 +95,14 @@ define(function() {
             return this.on(name, wrapper, context);
         },
 
-        // Alias of on('before')
-        before : function(name, action, context/*optional*/) {
+        /**
+         * Alias of on('before' + name)
+         * @param  {string} name
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        before : function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -84,8 +110,14 @@ define(function() {
             return this.on(name, action, context);
         },
 
-        // Alias of on('after')
-        after : function(name, action, context/*optional*/) {
+        /**
+         * Alias of on('after' + name)
+         * @param  {string} name
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        after : function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -93,17 +125,33 @@ define(function() {
             return this.on(name, action, context);
         },
 
-        // Alias of once('success')
-        success : function(action, context/*optional*/) {
+        /**
+         * Alias of on('success')
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        success : function(action, context) {
             return this.once('success', action, context);
         },
 
-        // Alias of once('error')
-        error : function(action, context/*optional*/) {
+        /**
+         * Alias of on('error')
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        error : function(action, context) {
             return this.once('error', action, context);
         },
 
-        off : function(name, action/*optional*/) {
+        /**
+         * Alias of on('success')
+         * @param  {function} action
+         * @param  {Object} [context]
+         * @chainable
+         */
+        off : function(name, action) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
@@ -113,7 +161,6 @@ define(function() {
             }
             if (handlers[name]) {
                 var hdls = handlers[name];
-                // Splice is evil!!
                 var retains = [];
                 for (var i = 0; i < hdls.length; i++) {
                     if (action && hdls[i].action !== action) {
@@ -126,6 +173,12 @@ define(function() {
             return this;
         },
 
+        /**
+         * If registered the event handler
+         * @param  {string}  name
+         * @param  {function}  action
+         * @return {boolean}
+         */
         has : function(name, action) {
             var handlers = this.__handlers__;
 
@@ -142,4 +195,5 @@ define(function() {
         }
     }
     
+    return notifier;
 });

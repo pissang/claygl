@@ -10,20 +10,40 @@ define(function(require) {
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 
-    var SkinningClip = function(options) {
+    /**
+     * @constructor
+     * @alias qtek.animation.SkinningClip
+     * 
+     * @extends qtek.animation.Clip
+     * @param {Object} [opts]
+     * @param {string} [opts.name]
+     * @param {Object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     */
+    var SkinningClip = function(opts) {
 
-        options = options || {};
+        opts = opts || {};
+        /**
+         * @type {string}
+         */
+        this.name = opts.name || '';
 
-        this.name = options.name || '';
-
-        Clip.call(this, options);
+        Clip.call(this, opts);
 
         this.jointClips = [];
 
         this.life = 0;
-        if (options.jointClips && options.jointClips.length > 0) {    
-            for (var j = 0; j < options.jointClips.length; j++) {
-                var jointPoseCfg = options.jointClips[j];
+        if (opts.jointClips && opts.jointClips.length > 0) {    
+            for (var j = 0; j < opts.jointClips.length; j++) {
+                var jointPoseCfg = opts.jointClips[j];
                 var jointClip = new TransformClip({
                     keyFrames : jointPoseCfg.keyFrames
                 });
@@ -56,15 +76,27 @@ define(function(require) {
         }
     }
 
+    /**
+     * @param {qtek.animation.TransformClip|qtek.animation.SamplerClip} jointClip
+     */
     SkinningClip.prototype.addJointClip = function(jointClip) {
         this.jointClips.push(jointClip);
         this.life = Math.max(jointClip.life, this.life);
     }
 
+    /**
+     * @param {qtek.animation.TransformClip|qtek.animation.SamplerClip} jointClip
+     */
     SkinningClip.prototype.removeJointClip = function(jointClip) {
         this.jointClips.splice(this.jointClips.indexOf(jointClip), 1);
     }
 
+    /**
+     * @param {number} startTime
+     * @param {number} endTime
+     * @param {boolean} isLoop
+     * @return {qtek.animation.SkinningClip}
+     */
     SkinningClip.prototype.getSubClip = function(startTime, endTime, isLoop) {
         var subClip = new SkinningClip({
             name : this.name
@@ -81,7 +113,12 @@ define(function(require) {
 
         return subClip; 
     }
-
+    /**
+     * 1d blending between two skinning clips
+     * @param  {qtek.animation.SkinningClip} clip1
+     * @param  {qtek.animation.SkinningClip} clip2
+     * @param  {number} w
+     */
     SkinningClip.prototype.blend1D = function(clip1, clip2, w) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var c1 = clip1.jointClips[i];
@@ -92,6 +129,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * Additive blending between two skinning clips
+     * @param  {qtek.animation.SkinningClip} clip1
+     * @param  {qtek.animation.SkinningClip} clip2
+     */
     SkinningClip.prototype.additiveBlend = function(clip1, clip2) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var c1 = clip1.jointClips[i];
@@ -102,6 +144,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * Subtractive blending between two skinning clips
+     * @param  {qtek.animation.SkinningClip} clip1
+     * @param  {qtek.animation.SkinningClip} clip2
+     */
     SkinningClip.prototype.subtractiveBlend = function(clip1, clip2) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var c1 = clip1.jointClips[i];
@@ -112,6 +159,14 @@ define(function(require) {
         }
     }
 
+    /**
+     * 2D blending between three skinning clips
+     * @param  {qtek.animation.SkinningClip} clip1
+     * @param  {qtek.animation.SkinningClip} clip2
+     * @param  {qtek.animation.SkinningClip} clip3
+     * @param  {number} f
+     * @param  {number} g
+     */
     SkinningClip.prototype.blend2D = function(clip1, clip2, clip3, f, g) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var c1 = clip1.jointClips[i];
@@ -123,6 +178,10 @@ define(function(require) {
         }
     }
 
+    /**
+     * Copy SRT of all joints clips from another SkinningClip
+     * @param  {qtek.animation.SkinningClip} clip
+     */
     SkinningClip.prototype.copy = function(clip) {
         for (var i = 0; i < this.jointClips.length; i++) {
             var sClip = clip.jointClips[i];

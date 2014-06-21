@@ -3,6 +3,11 @@ define(function(require) {
     var util  = require('../core/util');
     var Task = require('./Task');
 
+    /**
+     * @constructor
+     * @alias qtek.async.TaskGroup
+     * @extends qtek.async.Task
+     */
     var TaskGroup = function() {
 
         Task.apply(this, arguments);
@@ -20,6 +25,23 @@ define(function(require) {
 
     TaskGroup.prototype.constructor = TaskGroup;
 
+    /**
+     * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link qtek.texture.Texture2D}, {@link qtek.texture.TextureCube}, {@link qtek.loader.GLTF}.
+     * @param  {Array.<qtek.async.Task>} tasks
+     * @chainable
+     * @example
+     *     // Load texture list
+     *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
+     *     var textures = list.map(function(src) {
+     *         var texture = new qtek.texture.Texture2D();
+     *         texture.load(src);
+     *         return texture;
+     *     });
+     *     var taskGroup = new qtek.async.TaskGroup();
+     *     taskGroup.all(textures).success(function() {
+     *         // Do some thing after all textures loaded
+     *     });
+     */
     TaskGroup.prototype.all = function(tasks) {
         var count = tasks.length;
         var self = this;
@@ -62,7 +84,11 @@ define(function(require) {
         });
         return this;
     };
-
+    /**
+     * Wait for all given tasks finished, either successed or failed
+     * @param  {Array.<qtek.async.Task>} tasks
+     * @return {qtek.async.TaskGroup}
+     */
     TaskGroup.prototype.allSettled = function(tasks) {
         var count = tasks.length;
         var success = false;
@@ -112,7 +138,11 @@ define(function(require) {
         });
         return this;
     }
-
+    /**
+     * Get successed sub tasks number, recursive can be true if sub task is also a TaskGroup.
+     * @param  {boolean} [recursive]
+     * @return {number}
+     */
     TaskGroup.prototype.getFulfilledNumber = function(recursive) {
         if (recursive) {
             var nFulfilled = 0;
@@ -130,6 +160,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * Get failed sub tasks number, recursive can be true if sub task is also a TaskGroup.
+     * @param  {boolean} [recursive]
+     * @return {number}
+     */
     TaskGroup.prototype.getRejectedNumber = function(recursive) {
         if (recursive) {
             var nRejected = 0;
@@ -147,6 +182,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * Get finished sub tasks number, recursive can be true if sub task is also a TaskGroup.
+     * @param  {boolean} [recursive]
+     * @return {number}
+     */
     TaskGroup.prototype.getSettledNumber = function(recursive) {
 
         if (recursive) {
@@ -165,6 +205,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * Get all sub tasks number, recursive can be true if sub task is also a TaskGroup.
+     * @param  {boolean} [recursive]
+     * @return {number}
+     */
     TaskGroup.prototype.getTaskNumber = function(recursive) {
         if (recursive) {
             var nTask = 0;

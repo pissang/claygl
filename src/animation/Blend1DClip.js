@@ -8,21 +8,52 @@ define(function(require) {
         return a.position < b.position;
     }
 
+    /**
+     * @typedef {Object} qtek.animation.IBlend1DInput
+     * @property {number} position
+     * @property {qtek.animation.Clip} clip
+     * @property {number} offset
+     */
+    
+    /**
+     * 1d blending node in animation blend tree.
+     * output clip must have blend1D and copy method
+     * @constructor
+     * @alias qtek.animation.Blend1DClip
+     * 
+     * @param {Object} [opts]
+     * @param {string} [opts.name]
+     * @param {Object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     * @param {object[]} [opts.inputs]
+     * @param {number} [opts.position]
+     * @param {qtek.animation.Clip} [opts.output]
+     */
     var Blend1DClip = function(opts) {
 
         opts = opts || {};
 
         Clip.call(this, opts);
-
+        /**
+         * Output clip must have blend1D and copy method
+         * @type {qtek.animation.Clip}
+         */
         this.output = opts.output || null;
-        // 
-        // {
-        //  position : 
-        //  clip : 
-        //  offset : 0
-        // }
+        /**
+         * @type {qtek.animation.IBlend1DInput[]}
+         */
         this.inputs = opts.inputs || [];
-
+        /**
+         * @type {number}
+         */
         this.position = 0;
 
         this._cacheKey = 0;
@@ -34,6 +65,12 @@ define(function(require) {
     Blend1DClip.prototype = new Clip();
     Blend1DClip.prototype.constructor = Blend1DClip;
 
+    /**
+     * @param {number} position
+     * @param {qtek.animation.Clip} inputClip
+     * @param {number} [offset]
+     * @return {qtek.animation.IBlend1DInput}
+     */
     Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {
             position : position,

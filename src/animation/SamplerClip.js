@@ -64,16 +64,44 @@ define(function(require) {
         return out;
     };
 
-    var SamplerClip = function(options) {
+    /**
+     * @constructor
+     * @alias qtek.animation.SamplerClip
+     * @extends qtek.animation.Clip
+     * 
+     * @param {Object} [opts]
+     * @param {string} [opts.name]
+     * @param {Object} [opts.target]
+     * @param {number} [opts.life]
+     * @param {number} [opts.delay]
+     * @param {number} [opts.gap]
+     * @param {number} [opts.playbackRatio]
+     * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
+     * @param {string|function} [opts.easing]
+     * @param {function} [opts.onframe]
+     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onrestart]
+     */
+    var SamplerClip = function(opts) {
 
-        options = options || {};
+        opts = opts || {};
 
-        this.name = options.name || '';
+        this.name = opts.name || '';
 
-        Clip.call(this, options);
+        Clip.call(this, opts);
 
+        /**
+         * @type {Float32Array}
+         */
         this.position = vec3.create();
+        /**
+         * Rotation is represented by a quaternion
+         * @type {Float32Array}
+         */
         this.rotation = quat.create();
+        /**
+         * @type {Float32Array}
+         */
         this.scale = vec3.fromValues(1, 1, 1);
 
         this.channels = {
@@ -152,6 +180,11 @@ define(function(require) {
         }
     }
 
+    /**
+     * @param {number} startTime
+     * @param {number} endTime
+     * @return {qtek.animation.SamplerClip}
+     */
     SamplerClip.prototype.getSubClip = function(startTime, endTime) {
 
         var subClip = new SamplerClip({
@@ -234,9 +267,37 @@ define(function(require) {
         return [start, percent];
     }
 
+    /**
+     * 1D blending between two clips
+     * @method
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     * @param  {number} w
+     */
     SamplerClip.prototype.blend1D = TransformClip.prototype.blend1D;
+    /**
+     * 2D blending between three clips
+     * @method
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c3
+     * @param  {number} f
+     * @param  {number} g
+     */
     SamplerClip.prototype.blend2D = TransformClip.prototype.blend2D;
+    /**
+     * Additive blending between two clips
+     * @method
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     */
     SamplerClip.prototype.additiveBlend = TransformClip.prototype.additiveBlend;
+    /**
+     * Subtractive blending between two clips
+     * @method
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
+     * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+     */
     SamplerClip.prototype.subtractiveBlend = TransformClip.prototype.subtractiveBlend;
 
     return SamplerClip;

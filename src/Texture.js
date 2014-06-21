@@ -11,6 +11,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.Texture
+     * @extends qtek.core.Base
      */
     var Texture = Base.derive(
     /** @lends qtek.Texture# */

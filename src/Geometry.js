@@ -84,6 +84,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.Geometry
+     * @extends qtek.core.Base
      */
     var Geometry = Base.derive(
     /** @lends qtek.Geometry# */
@@ -95,7 +96,7 @@ define(function(require) {
         
         /**
          * Vertex attributes
-         * @type {object}
+         * @type {Object}
          */
         attributes : {},
 
@@ -122,11 +123,6 @@ define(function(require) {
          * @method
          */
         dirty : notImplementedWarn,
-        /**
-         * @method
-         * @return {boolean}
-         */
-        isDirty : notImplementedWarn,
         /**
          * Create a new attribute
          * @method

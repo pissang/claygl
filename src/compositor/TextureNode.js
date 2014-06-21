@@ -5,9 +5,16 @@ define(function(require) {
     var texturePool = require("./texturePool");
     var Shader = require("../Shader");
 
+    /**
+     * @constructor qtek.compositor.TextureNode
+     * @extends qtek.compositor.Node
+     */
     var TextureNode = Node.derive(function() {
-        return {
+        return /** @lends qtek.compositor.TextureNode# */ {
             shader : Shader.source("buildin.compositor.output"),
+            /**
+             * @type {qtek.texture.Texture2D}
+             */
             texture : null
         }
     }, {

@@ -5,6 +5,7 @@ define(function(require) {
     
     /**
      * @constructor qtek.Joint
+     * @extends qtek.core.Base
      */
     var Joint = Base.derive(
     /** @lends qtek.Joint# */

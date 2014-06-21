@@ -16,13 +16,13 @@ define(function(require) {
     /** 
      * Animation is global timeline that schedule all clipss. each frame animation will set the time of clips to current and update the states of clips
      * @constructor qtek.animation.Animation
+     * @extends qtek.core.Base
      */
     var Animation = Base.derive(function() {
-        /** @lends qtek.animation.Animation# */
-        return {
+        return /** @lends qtek.animation.Animation# */{
             /**
              * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
-             * @type {object}
+             * @type {Object}
              */
             stage : null,
 
@@ -128,8 +128,8 @@ define(function(require) {
         },
         /**
          * Create a deferred animating object
-         * @param  {object} target
-         * @param  {object} [options]
+         * @param  {Object} target
+         * @param  {Object} [options]
          * @param  {boolean} [options.loop]
          * @param  {function} [options.getter]
          * @param  {function} [options.setter]
@@ -138,7 +138,7 @@ define(function(require) {
          */
         animate : function(target, options) {
             options = options || {};
-            var deferred = new Deferred(
+            var deferred = new _Deferred(
                 target,
                 options.loop,
                 options.getter,
@@ -225,7 +225,7 @@ define(function(require) {
      * 
      * @constructor qtek.animation.Animation._Deferred
      * 
-     * @param {object} target
+     * @param {Object} target
      * @param {boolean} loop
      * @param {function} getter
      * @param {function} setter
@@ -259,7 +259,7 @@ define(function(require) {
 
         /**
          * @param  {number} time Keyframe time using millisecond
-         * @param  {object} props A key-value object. Value can be number, 1d and 2d array
+         * @param  {Object} props A key-value object. Value can be number, 1d and 2d array
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */

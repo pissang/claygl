@@ -33,13 +33,17 @@ define(function() {
         },
 
         getExtension : function(_gl, name) {
-            var guid = _gl.__GLID__;
-            if (extensions[guid]) {
-                if (typeof(extensions[guid][name]) == 'undefined') {
+            var glid = _gl.__GLID__;
+            if (extensions[glid]) {
+                if (typeof(extensions[glid][name]) == 'undefined') {
                     this._createExtension(_gl, name);
                 }
-                return extensions[guid][name];
+                return extensions[glid][name];
             }
+        },
+
+        dispose: function(_gl) {
+            delete extensions[_gl.__GLID__];
         },
 
         _createExtension : function(_gl, name) {
