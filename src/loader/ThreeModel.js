@@ -29,10 +29,25 @@ define(function(require) {
     var vec2 = glMatrix.vec2;
     var quat = glMatrix.quat;
 
-    var Loader = Base.derive({
+    /**
+     * @constructor qtek.loader.ThreeModel
+     * @extends qtek.core.Base
+     */
+    var Loader = Base.derive(
+    /** @lends qtek.loader.ThreeModel# */
+    {
+        /**
+         * @type {string}
+         */
         rootPath : "",
+        /**
+         * @type {string}
+         */
         textureRootPath : ""
     }, {
+        /**
+         * @param  {string} url
+         */
         load : function(url) {
             var self = this;
 
@@ -54,6 +69,11 @@ define(function(require) {
                 }
             });
         },
+
+        /**
+         * @param {Object} json
+         * @return {Array.<qtek.Mesh>}
+         */
         parse : function(data) {
             
             var geometryList = this._parseGeometry(data);

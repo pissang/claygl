@@ -12,7 +12,7 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
 
     /**
-     * @typedef {Object} qtek.animation.IBlend2DInput
+     * @typedef {Object} qtek.animation.Blend2DClip.IClipInput
      * @property {qtek.math.Vector2} position
      * @property {qtek.animation.Clip} clip
      * @property {number} offset
@@ -23,6 +23,7 @@ define(function(require) {
      * output clip must have blend2D method
      * @constructor
      * @alias qtek.animation.Blend2DClip
+     * @extends qtek.animation.Clip
      * 
      * @param {Object} [opts]
      * @param {string} [opts.name]
@@ -51,7 +52,7 @@ define(function(require) {
          */
         this.output = opts.output || null;
         /**
-         * @type {qtek.animation.IBlend2DInput[]}
+         * @type {qtek.animation.Blend2DClip.IClipInput[]}
          */
         this.inputs = opts.inputs || [];
         /**
@@ -72,7 +73,7 @@ define(function(require) {
      * @param {qtek.math.Vector2} position
      * @param {qtek.animation.Clip} inputClip
      * @param {number} [offset]
-     * @return {qtek.animation.IBlend2DInput}
+     * @return {qtek.animation.Blend2DClip.IClipInput}
      */
     Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {

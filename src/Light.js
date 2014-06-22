@@ -42,6 +42,10 @@ define(function(require){
          */
         type: '',
 
+        /**
+         * @return {qtek.Light}
+         * @memberOf qtek.Light.prototype
+         */
         clone: function() {
             var light = Node.prototype.clone.call(this);
             light.color = Array.prototype.slice.call(this.color);

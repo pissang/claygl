@@ -9,16 +9,34 @@ define(function(require) {
 
     _pool = {};
 
-    // Example
-    // ShaderLibrary.get("buildin.phong", "diffuseMap", "normalMap");
-    // Or
-    // ShaderLibrary.get("buildin.phong", ["diffuseMap", "normalMap"]);
-    // Or
-    // ShaderLibrary.get("buildin.phong", {
-    //      textures : ["diffuseMap"],
-    //      vertexDefines : {},
-    //      fragmentDefines : {}
-    // })
+    /** 
+     * ### Builin shaders
+     * + buildin.basic
+     * + buildin.lambert
+     * + buildin.phong
+     * + buildin.physical
+     * + buildin.wireframe
+     * 
+     * @namespace qtek.shader.library
+     */
+    /**
+     *
+     * Get shader from library. use shader name and option as hash key.
+     * 
+     * @param {string} name
+     * @param {Object|string|Array.<string>} [option]
+     * @return {qtek.Shader}
+     * 
+     * @memberOf qtek.shader.library
+     * @example
+     *     qtek.shader.library.get("buildin.phong", "diffuseMap", "normalMap");
+     *     qtek.shader.library.get("buildin.phong", ["diffuseMap", "normalMap"]);
+     *     qtek.shader.library.get("buildin.phong", {
+     *         textures : ["diffuseMap"],
+     *         vertexDefines : {},
+     *         fragmentDefines : {}
+     *     });
+     */
     function get(name, option) {
         var enabledTextures = [];
         var vertexDefines = {};
@@ -76,6 +94,12 @@ define(function(require) {
         }
     }
 
+    /**
+     * @memberOf qtek.shader.library
+     * @param  {string} name
+     * @param  {string} vertex - Vertex shader code
+     * @param  {string} fragment - Fragment shader code
+     */
     function put(name, vertex, fragment) {
         _library[name] = {
             vertex : vertex,

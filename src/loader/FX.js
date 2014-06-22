@@ -17,11 +17,31 @@ define(function(require) {
     var shaderSourceReg = /#source\((.*?)\)/;
     var urlReg = /#url\((.*?)\)/;
 
-    var FXLoader = Base.derive({
+    /**
+     * @constructor qtek.loader.FX
+     * @extends qtek.core.Base
+     */
+    var FXLoader = Base.derive(
+    /** @lends qtek.loader.FX# */
+    {
+        /**
+         * @type {string}
+         */
         rootPath : "",
+        /**
+         * @type {string}
+         */
         textureRootPath : "",
+        /**
+         * @type {string}
+         */
         shaderRootPath : ""
-    }, {
+    },
+    /** @lends qtek.loader.FX.prototype */
+    {
+        /**
+         * @param  {string} url
+         */
         load : function(url) {
             var self = this;
 
@@ -44,6 +64,10 @@ define(function(require) {
             });
         },
 
+        /**
+         * @param {Object} json
+         * @return {qtek.compositor.Compositor}
+         */
         parse : function(json) {
             var self = this;
             var compositor = new Compositor();
@@ -87,12 +111,12 @@ define(function(require) {
             if (!nodeInfo.shader) {
                 return;
             }
-            var type = nodeInfo.type || 'processor';
+            var type = nodeInfo.type || 'filter';
             var shaderSource;
             var inputs;
             var outputs;
 
-            if (type === 'processor') {
+            if (type === 'filter') {
                 var shaderExp = nodeInfo.shader.trim();
                 var res = shaderSourceReg.exec(shaderExp);
                 if (res) {
@@ -142,7 +166,7 @@ define(function(require) {
                 }   
             }
             var node;
-            if (type === 'processor') {
+            if (type === 'filter') {
                 node = new CompoNode({
                     name : nodeInfo.name,
                     shader : shaderSource,

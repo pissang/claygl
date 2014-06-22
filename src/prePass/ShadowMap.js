@@ -40,13 +40,47 @@ define(function(require) {
         'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
     }
 
+    /**
+     * Pass rendering shadow map.
+     * 
+     * @constructor qtek.prePass.ShadowMap
+     * @extends qtek.core.Base
+     * @example
+     *     var shadowMapPass = new qtek.prePass.ShadowMap({
+     *         softShadow: qtek.prePass.ShadowMap.VSM
+     *     });
+     *     ...
+     *     animation.on('frame', function(frameTime) {
+     *         shadowMapPass.render(renderer, scene, camera);
+     *         renderer.render(scene, camera);
+     *     });
+     */
     var ShadowMapPass = Base.derive(function() {
-        return {
-            
+        return /** @lends qtek.prePass.ShadowMap# */ {
+            /**
+             * Soft shadow technique.
+             * Can be {@link qtek.prePass.ShadowMap.PCF} or {@link qtek.prePass.ShadowMap.VSM}
+             * @type {number}
+             */
             softShadow : ShadowMapPass.PCF,
+            
+            /**
+             * Soft shadow blur size
+             * @type {number}
+             */
             shadowBlur : 1.0,
 
+            /**
+             * Shadow cascade.
+             * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
+             * @type {number}
+             */
             shadowCascade  : 1,
+
+            /**
+             * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
+             * @type {number}
+             */
             cascadeSplitLogFactor : 0.2,
 
             _textures : {},
@@ -82,13 +116,25 @@ define(function(require) {
             fragment : Shader.source('buildin.sm.debug_depth')
         });
     }, {
-
+        /**
+         * Render scene to shadow textures
+         * @param  {qtek.Renderer} renderer
+         * @param  {qtek.Scene} scene
+         * @param  {qtek.Camera} sceneCamera
+         * @memberOf qtek.prePass.ShadowMap.prototype
+         */
         render : function(renderer, scene, sceneCamera) {
             this.trigger('beforerender', this, renderer, scene, sceneCamera);
             this._renderShadowPass(renderer, scene, sceneCamera);
             this.trigger('afterrender', this, renderer, scene, sceneCamera);
         },
 
+        /**
+         * Debug rendering of shadow textures
+         * @param  {qtek.Renderer} renderer
+         * @param  {number} size
+         * @memberOf qtek.prePass.ShadowMap.prototype
+         */
         renderDebug : function(renderer, size) {
             var prevClear = renderer.clear;
             renderer.clear = glenum.DEPTH_BUFFER_BIT;
@@ -702,6 +748,10 @@ define(function(require) {
             return camera
         },
 
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         * @memberOf qtek.prePass.ShadowMap.prototype
+         */
         dispose : function(_gl) {
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
@@ -742,8 +792,17 @@ define(function(require) {
             this._lightsCastShadow = [];
         }
     });
-
+    
+    /**
+     * @name qtek.prePass.ShadowMap.VSM
+     * @type {number}
+     */
     ShadowMapPass.VSM = 1;
+    
+    /**
+     * @name qtek.prePass.ShadowMap.PCF
+     * @type {number}
+     */
     ShadowMapPass.PCF = 2;
     
     return ShadowMapPass;

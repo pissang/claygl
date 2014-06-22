@@ -59,13 +59,13 @@ define(function(require) {
         
         /**
          * Parent of current scene node
-         * @type {qtek.Node}
+         * @type {?qtek.Node}
          */
         parent : null,
         
         /**
          * The root scene attached to. Null if it is a isolated node
-         * @type {qtek.Scene}
+         * @type {?qtek.Scene}
          */
         scene : null,
 

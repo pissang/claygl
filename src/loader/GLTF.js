@@ -51,14 +51,49 @@ define(function(require) {
         'COLOR' : 'color'
     }
 
-    var Loader = Base.derive({
+    /**
+     * @typedef {Object} qtek.loader.IGLTFResult
+     * @property {qtek.Scene} scene
+     * @property {Object.<string, qtek.Camera>} cameras
+     * @property {Object.<string, qtek.Texture>} textures
+     * @property {Object.<string, qtek.Material>} materials
+     * @property {Object.<string, qtek.Skeleton>} skeletons
+     * @property {qtek.animation.SkinningClip} clip
+     */
+
+    /**
+     * @constructor qtek.loader.GLTF
+     * @extends qtek.core.Base
+     */
+    var GLTFLoader = Base.derive(
+    /** @lends qtek.loader.GLTF# */
+    {
+        /**
+         * @type {string}
+         */
         rootPath : "",
+
+        /**
+         * @type {string}
+         */
         textureRootPath : "",
+
+        /**
+         * @type {string}
+         */
         bufferRootPath : "",
 
+        /**
+         * @type {string}
+         */
         shaderName : 'buildin.physical'
-    }, {
-        
+    },
+
+    /** @lends qtek.loader.GLTF.prototype */
+    {
+        /**
+         * @param  {string} url
+         */
         load : function(url) {
             var self = this;
 
@@ -81,6 +116,10 @@ define(function(require) {
             });
         },
 
+        /**
+         * @param {Object} json
+         * @return {qtek.loader.IGLTFResult}
+         */
         parse : function(json) {
             var self = this;
             var loading = 0;
@@ -891,5 +930,5 @@ define(function(require) {
         }
     });
 
-    return Loader;
+    return GLTFLoader;
 });

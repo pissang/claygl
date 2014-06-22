@@ -14,10 +14,18 @@ define(function(require) {
 
     var arraySlice = Array.prototype.slice;
 
+    /**
+     * @namespace qtek.util.mesh
+     */
     var meshUtil = {
         /**
          * Merge multiple meshes to one.
          * Note that these meshes must have the same material
+         *
+         * @param {Array.<qtek.Mesh>} meshes
+         * @param {boolean} applyWorldTransform
+         * @return qtek.Mesh
+         * @memberOf qtek.util.mesh
          */
         merge : function(meshes, applyWorldTransform) {
 
@@ -156,6 +164,15 @@ define(function(require) {
             });
         },
 
+        /**
+         * Split mesh into sub meshes, each mesh will have maxJointNumber joints.
+         * @param  {qtek.Mesh} mesh
+         * @param  {number} maxJointNumber
+         * @param  {boolean} inPlace
+         * @return {qtek.Node}
+         *
+         * @memberOf qtek.util.mesh
+         */
         splitByJoints : function(mesh, maxJointNumber, inPlace) {
             var geometry = mesh.geometry;
             var skeleton = mesh.skeleton;

@@ -4,13 +4,27 @@
         "includePattern": ".+\\.js(doc)?$"
     },
     "opts": {
-        "template": "node_modules/ink-docstrap/template",
+        "template": "node_modules/jaguarjs-jsdoc",
         "encoding": "utf8",
         "destination": "./gh-pages/api/",
         "recurse": true
     },
+    "plugins": ["plugins/markdown"],
     "templates": {
-        "theme": "cerulean",
-        "inverseNav": true
+        "applicationName": "QTEK",
+        "disqus": "",
+        "googleAnalytics": "",
+        "openGraph": {
+            "title": "",
+            "type": "website",
+            "image": "",
+            "site_name": "",
+            "url": ""
+        },
+        "meta": {
+            "title": "",
+            "description": "",
+            "keyword": ""
+        }
     }
 }

@@ -113,6 +113,17 @@ define(function(require) {
     /**
      * @constructor qtek.Shader
      * @extends qtek.core.Base
+     *
+     * @example
+     *     // Create a phong shader
+     *     var shader = new qtek.Shader({
+     *         vertex: qtek.Shader.source('buildin.phong.vertex'),
+     *         fragment: qtek.Shader.source('buildin.phong.fragment')
+     *     });
+     *     // Enable diffuse texture
+     *     shader.enableTexture('diffuseMap');
+     *     // Use alpha channel in diffuse texture
+     *     shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
      */
     var Shader = Base.derive(function() {
         return /** @lends qtek.Shader# */ {

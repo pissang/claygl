@@ -7,6 +7,15 @@ define(function(require) {
     /**
      * @constructor qtek.light.Directional
      * @extends qtek.Light
+     *
+     * @example
+     *     var light = new qtek.light.Directional({
+     *         intensity: 0.5,
+     *         color: [1.0, 0.0, 0.0]
+     *     });
+     *     light.position.set(10, 10, 10);
+     *     light.lookAt(qtek.math.Vector3.ZERO);
+     *     scene.add(light);
      */
     var DirectionalLight = Light.derive(
     /** @lends qtek.light.Directional# */
@@ -44,7 +53,7 @@ define(function(require) {
         },
         /**
          * @return {qtek.light.Directional}
-         * @memberOf qtek.light.Point.prototype
+         * @memberOf qtek.light.Directional.prototype
          */
         clone: function() {
             var light = Light.prototype.clone.call(this);

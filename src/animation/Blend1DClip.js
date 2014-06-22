@@ -9,7 +9,7 @@ define(function(require) {
     }
 
     /**
-     * @typedef {Object} qtek.animation.IBlend1DInput
+     * @typedef {Object} qtek.animation.Blend1DClip.IClipInput
      * @property {number} position
      * @property {qtek.animation.Clip} clip
      * @property {number} offset
@@ -20,6 +20,7 @@ define(function(require) {
      * output clip must have blend1D and copy method
      * @constructor
      * @alias qtek.animation.Blend1DClip
+     * @extends qtek.animation.Clip
      * 
      * @param {Object} [opts]
      * @param {string} [opts.name]
@@ -48,7 +49,7 @@ define(function(require) {
          */
         this.output = opts.output || null;
         /**
-         * @type {qtek.animation.IBlend1DInput[]}
+         * @type {qtek.animation.Blend1DClip.IClipInput[]}
          */
         this.inputs = opts.inputs || [];
         /**
@@ -69,7 +70,7 @@ define(function(require) {
      * @param {number} position
      * @param {qtek.animation.Clip} inputClip
      * @param {number} [offset]
-     * @return {qtek.animation.IBlend1DInput}
+     * @return {qtek.animation.Blend1DClip.IClipInput}
      */
     Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {

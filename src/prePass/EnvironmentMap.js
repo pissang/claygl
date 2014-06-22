@@ -17,21 +17,66 @@ define(function (require) {
         'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
     }
 
+    /**
+     * Pass rendering scene to a environment cube map
+     * 
+     * @constructor qtek.prePass.EnvironmentMap
+     * @extends qtek.core.Base
+     * @example
+     *     // Example of car reflection
+     *     var envMap = new qtek.texture.TextureCube({
+     *         width: 256,
+     *         height: 256
+     *     });
+     *     var envPass = new qtek.prePass.EnvironmentMap({
+     *         position: car.position,
+     *         texture: envMap
+     *     });
+     *     var carBody = car.getChildByName('body');
+     *     carBody.material.shader.enableTexture('environmentMap');
+     *     carBody.material.set('environmentMap', envMap);
+     *     ...
+     *     animation.on('frame', function(frameTime) {
+     *         envPass.render(renderer, scene);
+     *         renderer.render(scene, camera);
+     *     });
+     */
     var EnvironmentMapPass = Base.derive(function() {
         var ret = {
+            /**
+             * Camera position
+             * @type {qtek.math.Vector3}
+             * @memberOf qtek.prePass.EnvironmentMap#
+             */
             position : new Vector3(),
+            /**
+             * Camera far plane
+             * @type {number}
+             * @memberOf qtek.prePass.EnvironmentMap#
+             */
             far : 1000,
+            /**
+             * Camera near plane
+             * @type {number}
+             * @memberOf qtek.prePass.EnvironmentMap#
+             */
             near : 0.1,
+            /**
+             * Environment cube map
+             * @type {qtek.texture.TextureCube}
+             * @memberOf qtek.prePass.EnvironmentMap#
+             */
             texture : null,
+
             frameBuffer : new FrameBuffer()
         }
         ret._cameras = {
-            'px' : new PerspectiveCamera({fov : 90}),
-            'nx' : new PerspectiveCamera({fov : 90}),
-            'py' : new PerspectiveCamera({fov : 90}),
-            'ny' : new PerspectiveCamera({fov : 90}),
-            'pz' : new PerspectiveCamera({fov : 90}),
-            'nz' : new PerspectiveCamera({fov : 90}),
+            px : new PerspectiveCamera({fov : 90}),
+            nx : new PerspectiveCamera({fov : 90}),
+            py : new PerspectiveCamera({fov : 90}),
+            ny : new PerspectiveCamera({fov : 90}),
+            pz : new PerspectiveCamera({fov : 90}),
+            nz : new PerspectiveCamera({fov : 90}),
         }
         ret._cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
         ret._cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
@@ -42,6 +87,11 @@ define(function (require) {
 
         return ret;
     }, {
+        /**
+         * @param  {qtek.Renderer} renderer
+         * @param  {qtek.Scene} scene
+         * @param  {boolean} notUpdateScene
+         */
         render : function(renderer, scene, notUpdateScene) {
             var _gl = renderer.gl;
             if (!notUpdateScene) {
@@ -65,6 +115,9 @@ define(function (require) {
                 this.frameBuffer.unbind(renderer);
             }
         },
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         */
         dispose : function(_gl) {
             this.frameBuffer.dispose(_gl);
         }

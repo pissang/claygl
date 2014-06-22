@@ -4,7 +4,7 @@ define(function(require) {
     var Vector4 = require("../math/Vector4");
 
     var ReflectionPass = Base.derive(function() {
-        // Vector4
+    
     }, {
         render : function(renderer, scene, camera) {
 

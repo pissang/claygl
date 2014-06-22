@@ -10,7 +10,7 @@ camera.position.z = 120;
 
 document.body.appendChild(renderer.canvas);
 
-var particleSystem = new qtek.particleSystem.ParticleSystem();
+var particleRenderable = new qtek.particleSystem.ParticleRenderable();
 var emitter = new qtek.particleSystem.Emitter({
     max: 5000,
     amount: 7,
@@ -19,14 +19,14 @@ var emitter = new qtek.particleSystem.Emitter({
     position: qtek.math.Value.random3D(new qtek.math.Vector3(-100, -30, 50), new qtek.math.Vector3(100, -40, 90)),
     velocity: qtek.math.Value.random3D(new qtek.math.Vector3(-20, 0, -10), new qtek.math.Vector3(20, 20, 10))
 });
-particleSystem.addEmitter(emitter);
-particleSystem.material.set('color', [1, 1, 1]);
-particleSystem.material.shader.enableTexture("sprite");
-particleSystem.material.set('sprite', new qtek.texture.Texture2D({
+particleRenderable.addEmitter(emitter);
+particleRenderable.material.set('color', [1, 1, 1]);
+particleRenderable.material.shader.enableTexture("sprite");
+particleRenderable.material.set('sprite', new qtek.texture.Texture2D({
     image: generateSprite(128)
 }));
 
-scene.add(particleSystem);
+scene.add(particleRenderable);
 
 var planeMesh: qtek.Mesh = new qtek.Mesh({
     geometry: new qtek.geometry.Plane(),
@@ -48,7 +48,7 @@ light.position.set(0, -40, 50);
 scene.add(light);
 
 animation.on('frame', function(deltaTime) {
-    particleSystem.updateParticles(deltaTime);
+    particleRenderable.updateParticles(deltaTime);
     renderer.render(scene, camera);
 });
 

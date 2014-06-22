@@ -10,7 +10,7 @@
         {
             "name" : "bright",
             "shader" : "#source(buildin.compositor.hdr.bright)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "scene",
@@ -32,7 +32,7 @@
         {
             "name" : "bright2",
             "shader" : "#source(buildin.compositor.hdr.bright)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "scene",
@@ -56,7 +56,7 @@
         {
             "name" : "blur_h_1",
             "shader" : "#source(buildin.compositor.gaussian_blur_h)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "bright",
@@ -79,7 +79,7 @@
         {
             "name" : "blur_v_1",
             "shader" : "#source(buildin.compositor.gaussian_blur_v)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "blur_h_1",
@@ -102,7 +102,7 @@
         {
             "name" : "blur_h_2",
             "shader" : "#source(buildin.compositor.gaussian_blur_h)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "bright",
@@ -125,7 +125,7 @@
         {
             "name" : "blur_v_2",
             "shader" : "#source(buildin.compositor.gaussian_blur_v)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "blur_h_2",
@@ -148,7 +148,7 @@
         {
             "name" : "blur_h_3",
             "shader" : "#source(buildin.compositor.gaussian_blur_h)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "bright",
@@ -171,7 +171,7 @@
         {
             "name" : "blur_v_3",
             "shader" : "#source(buildin.compositor.gaussian_blur_v)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "blur_h_3",
@@ -194,7 +194,7 @@
         {
             "name" : "bloom",
             "shader" : "#source(buildin.compositor.blend)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture1" : {
                     "node" : "blur_v_1",
@@ -227,7 +227,7 @@
         {
             "name" : "lensflare",
             "shader" : "#source(buildin.compositor.lensflare)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "bright2",
@@ -251,7 +251,7 @@
         {
             "name" : "lensflare_blur_h",
             "shader" : "#source(buildin.compositor.gaussian_blur_h)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "lensflare",
@@ -274,7 +274,7 @@
         {
             "name" : "lensflare_blur_v",
             "shader" : "#source(buildin.compositor.gaussian_blur_v)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "lensflare_blur_h",
@@ -297,7 +297,7 @@
         {
             "name" : "tonemapping",
             "shader" : "#source(buildin.compositor.hdr.tonemapping)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "scene",
@@ -329,7 +329,7 @@
         {
             "name" : "log_lum",
             "shader" : "#source(buildin.compositor.hdr.log_lum)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "scene",
@@ -349,7 +349,7 @@
         {
             "name" : "avg_log_lum",
             "shader" : "#source(buildin.compositor.output)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "log_lum",
@@ -369,7 +369,7 @@
         {
             "name" : "lum_adaption",
             "shader" : "#source(buildin.compositor.hdr.lum_adaption)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "adaptedLum" : {
                     "node" : "lum_adaption",
@@ -394,7 +394,7 @@
         {
             "name" : "FXAA",
             "shader" : "#source(buildin.compositor.fxaa)",
-            "type" : "processor",
+            "type" : "filter",
             "inputs" : {
                 "texture" : {
                     "node" : "tonemapping",

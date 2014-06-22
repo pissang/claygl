@@ -117,9 +117,10 @@ define( function(require){
 	},
 	"particleSystem": {
 		"Emitter": require('qtek/particleSystem/Emitter'),
+		"Field": require('qtek/particleSystem/Field'),
 		"ForceField": require('qtek/particleSystem/ForceField'),
 		"Particle": require('qtek/particleSystem/Particle'),
-		"ParticleSystem": require('qtek/particleSystem/ParticleSystem')
+		"ParticleRenderable": require('qtek/particleSystem/ParticleRenderable')
 	},
 	"picking": {
 		"Pixel": require('qtek/picking/Pixel')

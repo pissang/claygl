@@ -7,22 +7,76 @@ define(function(require) {
     
     var tmpMatrix = new Matrix4();
 
+    /**
+     * @constructor qtek.plugin.OrbitControl
+     *
+     * @example
+     * 
+     *     var control = new qtek.plugin.OrbitControl({
+     *         target: camera,
+     *         domElement: renderer.canvas
+     *     });
+     *     // Rotate around car
+     *     control.origin.copy(car.position);
+     *     ...
+     *     animation.on('frame', function(frameTime) {
+     *         control.update(frameTime);
+     *         renderer.render(scene, camera);
+     *     });
+     */
     var OrbitControl = Base.derive(function() {
-        return {
-            
+        return /** @lends qtek.plugin.OrbitControl# */ {
+            /**
+             * Scene node to control, mostly it is a camera
+             * @type {qtek.Node}
+             */
             target : null,
+
+            /**
+             * Target dom to bind with mouse events
+             * @type {HTMLElement}
+             */
             domElement : null,
 
+            /**
+             * Mouse move sensitivity
+             * @type {number}
+             */
             sensitivity : 1,
 
+            /**
+             * Origin to rotate around
+             * @type {qtek.math.Vector3}
+             */
             origin : new Vector3(),
 
+            /**
+             * Up axis
+             * @type {qtek.math.Vector3}
+             */
             up : new Vector3(0, 1, 0),
 
+            /**
+             * Minimum distance from origin to target when zooming in
+             * @type {number}
+             */
             minDistance : 0,
+            /**
+             * Maximum distance from origin to target when zooming out
+             * @type {number}
+             */
             maxDistance : Infinity,
 
+            /**
+             * Minimum polar angle when rotate up, it is 0 when the direction origin point to target is same with up axis
+             * @type {number}
+             */
             minPolarAngle : 0, // [0, Math.PI/2]
+
+            /**
+             * Maximum polar angle when rotate down. It is PI when the direction origin point to target is opposite to up axis
+             * @type {number}
+             */
             maxPolarAngle : Math.PI, // [Math.PI/2, Math.PI]
 
             // Rotate around origin
@@ -43,21 +97,34 @@ define(function(require) {
             _op : -1  //0 : ROTATE, 1 : PAN
         }
     }, function() {
+        this._mouseDown = this._mouseDown.bind(this);
+        this._mouseUp = this._mouseUp.bind(this);
+        this._mouseMove = this._mouseMove.bind(this);
+        this._mouseOut = this._mouseOut.bind(this);
+        this._mouseWheel = this._mouseWheel.bind(this);
+
         if (this.domElement) {
             this.enable();
         }
-    }, {
-
+    },
+    /** @lends qtek.plugin.OrbitControl.prototype */
+    {
+        /**
+         * Enable control
+         */
         enable : function() {
-            this.domElement.addEventListener("mousedown", bindOnce(this._mouseDown, this), false);
-            this.domElement.addEventListener("mousewheel", bindOnce(this._mouseWheel, this), false);
-            this.domElement.addEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this), false);
+            this.domElement.addEventListener("mousedown", this._mouseDown);
+            this.domElement.addEventListener("mousewheel", this._mouseWheel);
+            this.domElement.addEventListener("DOMMouseScroll", this._mouseWheel);
         },
 
+        /**
+         * Disable control
+         */
         disable : function() {
-            this.domElement.removeEventListener("mousedown", bindOnce(this._mouseDown, this));
-            this.domElement.removeEventListener("mousewheel", bindOnce(this._mouseWheel, this));
-            this.domElement.removeEventListener("DOMMouseScroll", bindOnce(this._mouseWheel, this));
+            this.domElement.removeEventListener("mousedown", this._mouseDown);
+            this.domElement.removeEventListener("mousewheel", this._mouseWheel);
+            this.domElement.removeEventListener("DOMMouseScroll", this._mouseWheel);
             this._mouseUp();
         },
 
@@ -70,9 +137,9 @@ define(function(require) {
         },
 
         _mouseDown : function(e) {
-            document.addEventListener("mousemove", bindOnce(this._mouseMove, this), false);
-            document.addEventListener("mouseup", bindOnce(this._mouseUp, this), false);
-            document.addEventListener("mouseout", bindOnce(this._mouseOut, this), false);
+            document.addEventListener("mousemove", this._mouseMove);
+            document.addEventListener("mouseup", this._mouseUp);
+            document.addEventListener("mouseout", this._mouseOut);
 
             this._offsetX = e.pageX;
             this._offsetY = e.pageY;
@@ -109,9 +176,9 @@ define(function(require) {
 
         _mouseUp : function() {
 
-            document.removeEventListener("mousemove", bindOnce(this._mouseMove, this));
-            document.removeEventListener("mouseup", bindOnce(this._mouseUp, this));
-            document.removeEventListener("mouseout", bindOnce(this._mouseOut, this));
+            document.removeEventListener("mousemove", this._mouseMove);
+            document.removeEventListener("mouseup", this._mouseUp);
+            document.removeEventListener("mouseout", this._mouseOut);
 
             this._op = -1;
         },
@@ -120,7 +187,11 @@ define(function(require) {
             this._mouseUp();
         },
 
-        update : function(delataTime) {
+        /**
+         * Control update. Should be invoked every frame
+         * @param {number} frameTime Frame time
+         */
+        update : function(frameTime) {
             var target = this.target;
             var zAxis = target.localTransform.forward.normalize();
             var yAxis = target.localTransform.up.normalize();
@@ -162,15 +233,6 @@ define(function(require) {
 
         }
     });
-
-    function bindOnce(func, context) {
-        if (!func.__bindfuc__) {
-            func.__bindfuc__ = function() {
-                return func.apply(context, arguments); 
-            }
-        }
-        return func.__bindfuc__;
-    }
 
     return OrbitControl;
 } )

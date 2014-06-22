@@ -113,7 +113,6 @@ define(function(require) {
         bind : function() {},
         unbind : function() {},
         
-        // Overwrite the dirty method
         /**
          * Mark texture is dirty and update in the next frame
          */

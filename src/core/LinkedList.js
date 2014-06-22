@@ -1,23 +1,42 @@
-/**
- * Simple double linked list
- */
 define(function(require) {
     
+    /**
+     * Simple double linked list. Compared with array, it has O(1) remove operation.
+     * @constructor
+     * @alias qtek.core.LinkedList
+     */
     var LinkedList = function() {
 
+        /**
+         * @type {qtek.core.LinkedList.Entry}
+         */
         this.head = null;
 
+        /**
+         * @type {qtek.core.LinkedList.Entry}
+         */
         this.tail = null;
 
         this._length = 0;
     }
 
+    /**
+     * Insert a new value at the tail
+     * @param  {} val
+     * @return {qtek.core.LinkedList.Entry}
+     */
     LinkedList.prototype.insert = function(val) {
         var entry = new LinkedList.Entry(val);
         this.insertEntry(entry);
         return entry;
     }
 
+    /**
+     * Insert a new value at idx
+     * @param {number} idx
+     * @param  {} val
+     * @return {qtek.core.LinkedList.Entry}
+     */
     LinkedList.prototype.insertAt = function(idx, val) {
         if (idx < 0) {
             return;
@@ -40,6 +59,10 @@ define(function(require) {
         }
     }
 
+    /**
+     * Insert an entry at the tail
+     * @param  {qtek.core.LinkedList.Entry} entry
+     */
     LinkedList.prototype.insertEntry = function(entry) {
         if (!this.head) {
             this.head = this.tail = entry;
@@ -51,6 +74,10 @@ define(function(require) {
         this._length++;
     }
 
+    /**
+     * Remove entry.
+     * @param  {qtek.core.LinkedList.Entry} entry
+     */
     LinkedList.prototype.remove = function(entry) {
         var prev = entry.prev;
         var next = entry.next;
@@ -70,6 +97,11 @@ define(function(require) {
         this._length--;
     }
 
+    /**
+     * Remove entry at index.
+     * @param  {number} idx
+     * @return {}
+     */
     LinkedList.prototype.removeAt = function(idx) {
         if (idx < 0) {
             return;
@@ -85,19 +117,29 @@ define(function(require) {
             return curr.value;
         }
     }
-
+    /**
+     * Get head value
+     * @return {}
+     */
     LinkedList.prototype.getHead = function() {
         if (this.head) {
             return this.head.value;
         }
     }
-
+    /**
+     * Get tail value
+     * @return {}
+     */
     LinkedList.prototype.getTail = function() {
         if (this.tail) {
             return this.tail.value;
         }
     }
-
+    /**
+     * Get value at idx 
+     * @param {number} idx
+     * @return {}
+     */
     LinkedList.prototype.getAt = function(idx) {
         if (idx < 0) {
             return;
@@ -111,6 +153,10 @@ define(function(require) {
         return curr.value;
     }
 
+    /**
+     * @param  {} value
+     * @return {number}
+     */
     LinkedList.prototype.indexOf = function(value) {
         var curr = this.head;
         var cursor = 0;
@@ -123,40 +169,65 @@ define(function(require) {
         }
     }
 
+    /**
+     * @return {number}
+     */
     LinkedList.prototype.length = function() {
         return this._length;
     }
 
+    /**
+     * If list is empty
+     */
     LinkedList.prototype.isEmpty = function() {
         return this._length == 0;
     }
 
-    LinkedList.prototype.forEach = function(f, context) {
+    /**
+     * @param  {function} cb
+     * @param  {} context
+     */
+    LinkedList.prototype.forEach = function(cb, context) {
         var curr = this.head;
         var idx = 0;
         var haveContext = typeof(context) != 'undefined';
         while (curr) {
             if (haveContext) {
-                f.call(context, curr.value, idx);
+                cb.call(context, curr.value, idx);
             } else {
-                f(curr.value, idx);
+                cb(curr.value, idx);
             }
             curr = curr.next;
             idx++;
         }
     }
 
+    /**
+     * Clear the list
+     */
     LinkedList.prototype.clear = function() {
         this.tail = this.head = null;
         this._length = 0;
     }
 
+    /**
+     * @constructor
+     * @param {} val
+     */
     LinkedList.Entry = function(val) {
-
+        /**
+         * @type {}
+         */
         this.value = val;
-
+        
+        /**
+         * @type {qtek.core.LinkedList.Entry}
+         */
         this.next = null;
 
+        /**
+         * @type {qtek.core.LinkedList.Entry}
+         */
         this.prev = null;
     }
 

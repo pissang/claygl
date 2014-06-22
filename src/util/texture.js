@@ -13,7 +13,18 @@ define(function(require) {
 
     var environmentMapPass = new EnvironmentMapPass();
 
+    /**
+     * @namespace qtek.util.texture
+     */
     var textureUtil = {
+        /**
+         * @param  {string|object} path
+         * @param  {function} [onsuccess]
+         * @param  {function} [onerror]
+         * @return {qtek.Texture}
+         *
+         * @memberOf qtek.util.texture
+         */
         loadTexture : function(path, onsuccess, onerror) {
             var texture;
             if (typeof(path) === 'string') {
@@ -61,6 +72,16 @@ define(function(require) {
             return texture;
         },
 
+        /**
+         * Load a panorama texture and render it to a cube map
+         * @param  {string} path
+         * @param  {qtek.texture.TextureCube} cubeMap
+         * @param  {qtek.Renderer} renderer
+         * @param  {function} [onsuccess]
+         * @param  {function} [onerror]
+         * 
+         * @memberOf qtek.util.texture
+         */
         loadPanorama : function(path, cubeMap, renderer, onsuccess, onerror) {
             var self = this;
             textureUtil.loadTexture(path, function(texture) {
@@ -72,6 +93,14 @@ define(function(require) {
             }, onerror);
         },
 
+        /**
+         * Render a panorama texture to a cube map
+         * @param  {qtek.texture.Texture2D} panoramaMap
+         * @param  {qtek.texture.TextureCube} cubeMap
+         * @param  {qtek.Renderer} renderer
+         * 
+         * @memberOf qtek.util.texture
+         */
         panoramaToCubeMap : function(panoramaMap, cubeMap, renderer) {
             var skydome = new Skydome({
                 scene : new Scene
@@ -92,6 +121,16 @@ define(function(require) {
             });
         },
 
+        /**
+         * Create a chessboard texture
+         * @param  {number} [size]
+         * @param  {number} [unitSize]
+         * @param  {string} [color1]
+         * @param  {string} [color2]
+         * @return {qtek.texture.Texture2D}
+         * 
+         * @memberOf qtek.util.texture
+         */
         createChessboard : function(size, unitSize, color1, color2) {
             size = size || 512;
             unitSize = unitSize || 64;
@@ -125,6 +164,13 @@ define(function(require) {
             return texture;
         },
 
+        /**
+         * Create a blank pure color 1x1 texture
+         * @param  {string} color
+         * @return {qtek.texture.Texture2D}
+         * 
+         * @memberOf qtek.util.texture
+         */
         createBlank : function(color) {
             var canvas = document.createElement('canvas');
             canvas.width = 1;

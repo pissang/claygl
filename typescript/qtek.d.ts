@@ -67,7 +67,7 @@
 ///<reference path="particleSystem/Emitter" />
 ///<reference path="particleSystem/ForceField" />
 ///<reference path="particleSystem/Particle" />
-///<reference path="particleSystem/ParticleSystem" />
+///<reference path="particleSystem/ParticleRenderable" />
 ///<reference path="plugin/FirstPersonControl" />
 ///<reference path="plugin/OrbitControl" />
 ///<reference path="plugin/Skybox" />

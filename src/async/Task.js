@@ -3,6 +3,7 @@ define(function(require) {
     var notifier = require('../core/mixin/notifier');
     var request = require('../core/request');
     var util  = require('../core/util');
+
     /**
      * @constructor
      * @alias qtek.async.Task

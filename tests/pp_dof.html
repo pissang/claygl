@@ -258,6 +258,8 @@
                         }
                         cocNode.setParameter('focalPlane', config.focalPlane);
                         cocNode.setParameter('aperture', 1 / config.fstop);
+                        compositeNode.setParameter('textureSize', [renderer.width, renderer.height]);
+                        compositeNode.setParameter('blurredSize', [renderer.width / 4, renderer.height / 4]);
                     });
 
                     //--------------------

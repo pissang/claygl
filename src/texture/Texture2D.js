@@ -4,10 +4,39 @@ define(function(require) {
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
 
+    /**
+     * @constructor qtek.texture.Texture2D
+     * @extends qtek.Texture
+     *
+     * @example
+     *     ...
+     *     var mat = new qtek.Material({
+     *         shader: qtek.shader.library.get('buildin.phong', 'diffuseMap')
+     *     });
+     *     var diffuseMap = new qtek.texture.Texture2D();
+     *     diffuseMap.load('assets/textures/diffuse.jpg');
+     *     mat.set('diffuseMap', diffuseMap);
+     *     ...
+     *     diffuseMap.success(function() {
+     *         // Wait for the diffuse texture loaded
+     *         animation.on('frame', function(frameTime) {
+     *             renderer.render(scene, camera);
+     *         });
+     *     });
+     */
     var Texture2D = Texture.derive(function() {
-        return {
+        return /** @lends qtek.texture.Texture2D# */ {
+            /**
+             * @type {HTMLImageElement|HTMLCanvasElemnet}
+             */
             image : null,
+            /**
+             * @type {Uint8Array}
+             */
             pixels : null,
+            /**
+             * @type {Array.<Uint8Array>}
+             */
             mipmaps : []
         }
     }, {
@@ -87,6 +116,10 @@ define(function(require) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
 
         },
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         * @memberOf qtek.texture.Texture2D.prototype
+         */
         generateMipmap : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get("webgl_texture"));
             _gl.generateMipmap(_gl.TEXTURE_2D);    
@@ -132,6 +165,8 @@ define(function(require) {
 
             image.src = src;
             this.image = image;
+
+            return this;
         }
     });
 

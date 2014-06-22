@@ -24,7 +24,7 @@ declare module qtek {
             applyTo(velocity: math.Vector3, position: math.Vector3, weight: number, deltaTime: number): void;
         }
 
-        export class ParticleSystem extends Renderable {
+        export class ParticleRenderable extends Renderable {
 
             constructor(option?: IParticleSystemOption);
 
@@ -56,7 +56,7 @@ declare module qtek {
 
             dispose(gl: WebGLRenderingContext): void;
 
-            clone(): ParticleSystem;
+            clone(): ParticleRenderable;
         }
     }
 }

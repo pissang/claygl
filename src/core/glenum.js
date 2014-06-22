@@ -1,5 +1,6 @@
 /**
- * http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
+ * @namespace qtek.core.glenum
+ * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
  */
 define(function() {
 

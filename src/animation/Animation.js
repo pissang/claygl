@@ -14,9 +14,26 @@ define(function(require) {
     var arraySlice = Array.prototype.slice;
 
     /** 
-     * Animation is global timeline that schedule all clipss. each frame animation will set the time of clips to current and update the states of clips
+     * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
      * @constructor qtek.animation.Animation
      * @extends qtek.core.Base
+     *
+     * @example
+     *     var animation = new qtek.animation.Animation();
+     *     var node = new qtek.Node();
+     *     animation.animate(node.position)
+     *         .when(1000, {
+     *             x: 500,
+     *             y: 500
+     *         })
+     *         .when(2000, {
+     *             x: 100,
+     *             y: 100
+     *         })
+     *         .when(3000, {
+     *             z: 10
+     *         })
+     *         .start('spline');
      */
     var Animation = Base.derive(function() {
         return /** @lends qtek.animation.Animation# */{
@@ -221,7 +238,9 @@ define(function(require) {
     };
     
     /**
-     * @description Deferred object can only be created by Animation.prototype.animate method. After created, we can use when method to add all keyframes and start it. Clips will be automatically created and added to the animation instance which created this deferred object.
+     * @description Deferred object can only be created by Animation.prototype.animate method.
+     * After created, we can use {@link qtek.animation.Animation._Deferred#when} to add all keyframes and {@link qtek.animation.Animation._Deferred#start} it.
+     * Clips will be automatically created and added to the animation instance which created this deferred object.
      * 
      * @constructor qtek.animation.Animation._Deferred
      * 

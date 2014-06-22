@@ -128,7 +128,8 @@ define(function (require) {
         },
 
         dispose : function(_gl) {
-
+            this._frameBuffer.dispose(_gl);
+            this._shader.dispose(_gl);
         }
     });
 

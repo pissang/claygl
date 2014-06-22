@@ -5,16 +5,55 @@ define(function(require) {
     var Matrix4 = require("../math/Matrix4");
     var Quaternion = require("../math/Quaternion");
 
+    /**
+     * @constructor qtek.plugin.FirstPersonControl
+     * @example
+     *     var control = new qtek.plugin.FirstPersonControl({
+     *         target: camera,
+     *         domElement: renderer.canvas
+     *     });
+     *     ...
+     *     animation.on('frame', function(frameTime) {
+     *         control.update(frameTime);
+     *         renderer.render(scene, camera);
+     *     });
+     */
     var FirstPersonControl = Base.derive(function() {
-        return {
+        return /** @lends qtek.plugin.FirstPersonControl# */ {
+            /**
+             * Scene node to control, mostly it is a camera
+             * @type {qtek.Node}
+             */
             target : null,
+            
+            /**
+             * Target dom to bind with mouse events
+             * @type {HTMLElement}
+             */
             domElement : null,
-
+            
+            /**
+             * Mouse move sensitivity
+             * @type {number}
+             */
             sensitivity : 1,
+            
+            /**
+             * Target move speed
+             * @type {number}
+             */
             speed : 0.4,
 
+            /**
+             * Up axis
+             * @type {qtek.math.Vector3}
+             */
             up : new Vector3(0, 1, 0),
 
+            /**
+             * If lock vertical movement
+             * @type {boolean}
+             */
             verticalMoveLock : false,
 
             _moveForward : false,
@@ -26,10 +65,20 @@ define(function(require) {
             _offsetRoll : 0
         }
     }, function() {
+        this._lockChange = this._lockChange.bind(this);
+        this._keyDown = this._keyDown.bind(this);
+        this._keyUp = this._keyUp.bind(this);
+        this._mouseMove = this._mouseMove.bind(this);
+
         if (this.domElement) {
             this.enable();
         }
-    }, {
+    },
+    /** @lends qtek.plugin.FirstPersonControl.prototype */
+    {
+        /**
+         * Enable control
+         */
         enable : function() {
             // Use pointer lock
             // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
@@ -39,14 +88,17 @@ define(function(require) {
             //Why ? ?
             el.addEventListener("click", this._requestPointerLock);
 
-            document.addEventListener("pointerlockchange", bindOnce(this._lockChange, this), false);
-            document.addEventListener("mozpointerlockchange", bindOnce(this._lockChange, this), false);
-            document.addEventListener("webkitpointerlockchange", bindOnce(this._lockChange, this), false);
+            document.addEventListener("pointerlockchange", this._lockChange);
+            document.addEventListener("mozpointerlockchange", this._lockChange);
+            document.addEventListener("webkitpointerlockchange", this._lockChange);
 
-            document.addEventListener("keydown", bindOnce(this._keyDown, this), false);
-            document.addEventListener("keyup", bindOnce(this._keyUp, this), false);
+            document.addEventListener("keydown", this._keyDown);
+            document.addEventListener("keyup", this._keyUp);
         },
 
+        /**
+         * Disable control
+         */
         disable : function() {
 
             this.target.off('beforeupdate', this._beforeUpdateCamera);
@@ -63,12 +115,12 @@ define(function(require) {
 
             this.domElement.removeEventListener("click", this._requestPointerLock);
 
-            document.removeEventListener("pointerlockchange", bindOnce(this._lockChange, this));
-            document.removeEventListener("mozpointerlockchange", bindOnce(this._lockChange, this));
-            document.removeEventListener("webkitpointerlockchange", bindOnce(this._lockChange, this));
+            document.removeEventListener("pointerlockchange", this._lockChange);
+            document.removeEventListener("mozpointerlockchange", this._lockChange);
+            document.removeEventListener("webkitpointerlockchange", this._lockChange);
             
-            document.removeEventListener("keydown", bindOnce(this._keyDown, this));
-            document.removeEventListener("keyup", bindOnce(this._keyUp, this));
+            document.removeEventListener("keydown", this._keyDown);
+            document.removeEventListener("keyup", this._keyUp);
         },
 
         _requestPointerLock : function() {
@@ -80,11 +132,15 @@ define(function(require) {
             el.requestPointerLock();
         },
 
+        /**
+         * Control update. Should be invoked every frame
+         * @param {number} frameTime Frame time
+         */
         update : (function() {
 
             var rotateQuat = new Quaternion();
             
-            return function(deltaTime) {
+            return function(frameTime) {
                 
                 var target = this.target;
 
@@ -94,26 +150,29 @@ define(function(require) {
 
                 if (this.verticalMoveLock) {
                     zAxis.y = 0;
+                    zAxis.normalize();
                 }
+
+                var speed = this.speed * frameTime / 20;
 
                 if (this._moveForward) {
                     // Opposite direction of z
-                    position.scaleAndAdd(zAxis, -this.speed);
+                    position.scaleAndAdd(zAxis, -speed);
                 }
                 if (this._moveBackward) {
-                    position.scaleAndAdd(zAxis, this.speed);
+                    position.scaleAndAdd(zAxis, speed);
                 }
                 if (this._moveLeft) {
-                    position.scaleAndAdd(xAxis, -this.speed/2);
+                    position.scaleAndAdd(xAxis, -speed / 2);
                 }
                 if (this._moveRight) {
-                    position.scaleAndAdd(xAxis, this.speed/2);
+                    position.scaleAndAdd(xAxis, speed / 2);
                 }
 
 
-                target.rotateAround(target.position, this.up, -this._offsetPitch * Math.PI / 180);
+                target.rotateAround(target.position, this.up, -this._offsetPitch * frameTime * Math.PI / 360);
                 var xAxis = target.localTransform.right;
-                target.rotateAround(target.position, xAxis, -this._offsetRoll * Math.PI / 180);
+                target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
 
                 this._offsetRoll = this._offsetPitch = 0;
             }
@@ -125,9 +184,9 @@ define(function(require) {
                 document.mozPointerlockElement === this.domElement ||
                 document.webkitPointerLockElement === this.domElement) {
 
-                document.addEventListener('mousemove', bindOnce(this._mouseMove, this), false);
+                document.addEventListener('mousemove', this._mouseMove, false);
             }else{
-                document.removeEventListener('mousemove', bindOnce(this._mouseMove, this));
+                document.removeEventListener('mousemove', this._mouseMove);
             }
         },
 
@@ -139,8 +198,8 @@ define(function(require) {
                     e.mozMovementY ||
                     e.webkitMovementY || 0;
 
-            this._offsetPitch += dx * this.sensitivity / 10;
-            this._offsetRoll += dy * this.sensitivity / 10;
+            this._offsetPitch += dx * this.sensitivity / 200;
+            this._offsetRoll += dy * this.sensitivity / 200;
             
         },
 
@@ -172,15 +231,6 @@ define(function(require) {
             this._moveRight = false;
         }
     })
-
-    function bindOnce(func, context) {
-        if (!func.__bindfuc__) {
-            func.__bindfuc__ = function() {
-                return func.apply(context, arguments); 
-            }
-        }
-        return func.__bindfuc__;
-    }
 
     return FirstPersonControl;
 })

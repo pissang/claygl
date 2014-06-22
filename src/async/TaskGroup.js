@@ -63,7 +63,7 @@ define(function(require) {
                 self._fulfilledNumber++;
                 // TODO
                 // Some tasks like texture, loader are not inherited from task
-                // We need to set the deferred status here
+                // We need to set the states here
                 task._fulfilled = true;
                 task._rejected = false;
 

@@ -104,6 +104,13 @@ define(function(require) {
                 return ray;
             }
         })()
+
+        /**
+         * @method
+         * @name clone
+         * @return {qtek.Camera}
+         * @memberOf qtek.Camera.prototype
+         */
     });
 
     return Camera;

@@ -4,13 +4,35 @@ define(function(require) {
     var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');
 
-    var SpotLight = Light.derive({
+    /**
+     * @constructor qtek.light.Spot
+     */
+    var SpotLight = Light.derive(
+    /**@lends qtek.light.Spot */
+    {
+        /**
+         * @type {number}
+         */
         range : 20,
+        /**
+         * @type {number}
+         */
         umbraAngle : 30,
+        /**
+         * @type {number}
+         */
         penumbraAngle : 45,
+        /**
+         * @type {number}
+         */
         falloffFactor : 2.0,
-        
+        /**
+         * @type {number}
+         */
         shadowBias : 0.0002,
+        /**
+         * @type {number}
+         */
         shadowSlopeScale : 2.0
     },{
 
@@ -66,7 +88,10 @@ define(function(require) {
                 }
             }
         },
-
+        /**
+         * @return {qtek.light.Spot}
+         * @memberOf qtek.light.Spot.prototype
+         */
         clone: function() {
             var light = Light.prototype.clone.call(this);
             light.range = this.range;

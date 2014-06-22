@@ -2,12 +2,27 @@ define(function(require){
     
     var guid = 0;
 
+    /**
+     * Util functions
+     * @namespace qtek.core.util
+     */
 	var util = {
 
+        /**
+         * Generate GUID
+         * @return {number}
+         * @memberOf qtek.core.util
+         */
 		genGUID : function() {
 			return ++guid;
 		},
-
+        /**
+         * Relative path to absolute path
+         * @param  {string} path
+         * @param  {string} basePath
+         * @return {string}
+         * @memberOf qtek.core.util
+         */
         relative2absolute : function(path, basePath) {
             if (!basePath || path.match(/^\//)) {
                 return path;
@@ -26,6 +41,13 @@ define(function(require){
             return basePathParts.join('/') + '/' + pathParts.join('/');
         },
 
+        /**
+         * Extend target with source
+         * @param  {Object} target
+         * @param  {Object} source
+         * @return {Object}
+         * @memberOf qtek.core.util
+         */
         extend : function(target, source) {
             if (source) {
                 for (var name in source) {
@@ -37,6 +59,13 @@ define(function(require){
             return target;
         },
 
+        /**
+         * Extend properties to target if not exist.
+         * @param  {Object} target
+         * @param  {Object} source
+         * @return {Object}
+         * @memberOf qtek.core.util
+         */
         defaults : function(target, source) {
             if (source) {
                 for (var propName in source) {
@@ -45,8 +74,16 @@ define(function(require){
                     }
                 }
             }
+            return target;
         },
-
+        /**
+         * Extend properties with a given property list to avoid for..in.. iteration.
+         * @param  {Object} target
+         * @param  {Object} source
+         * @param  {Array.<string>} propList
+         * @return {Object}
+         * @memberOf qtek.core.util
+         */
         extendWithPropList : function(target, source, propList) {
             if (source) {
                 for (var i = 0; i < propList.length; i++) {
@@ -56,7 +93,14 @@ define(function(require){
             }
             return target;
         },
-
+        /**
+         * Extend properties to target if not exist. With a given property list avoid for..in.. iteration.
+         * @param  {Object} target
+         * @param  {Object} source
+         * @param  {Array.<string>} propList
+         * @return {Object}
+         * @memberOf qtek.core.util
+         */
         defaultsWithPropList : function(target, source, propList) {
             if (source) {
                 for (var i = 0; i < propList.length; i++) {
@@ -68,7 +112,12 @@ define(function(require){
             }
             return target;
         },
-
+        /**
+         * @param  {Object|Array} obj
+         * @param  {function} iterator
+         * @param  {Object} [context]
+         * @memberOf qtek.core.util
+         */
         each : function(obj, iterator, context) {
             if (!(obj && iterator)) {
                 return;
@@ -88,15 +137,32 @@ define(function(require){
             }
         },
 
+        /**
+         * Is object ?
+         * @param  {}  obj
+         * @return {boolean}
+         * @memberOf qtek.core.util
+         */
         isObject : function(obj) {
             return obj === Object(obj);
         },
 
+        /**
+         * Is array ?
+         * @param  {}  obj
+         * @return {boolean}
+         * @memberOf qtek.core.util
+         */
         isArray : function(obj) {
             return obj instanceof Array;
         },
 
-        // Can be TypedArray
+        /**
+         * Is array like, which have a length property
+         * @param  {}  obj
+         * @return {boolean}
+         * @memberOf qtek.core.util
+         */
         isArrayLike : function(obj) {
             if (!obj) {
                 return false;
@@ -105,6 +171,11 @@ define(function(require){
             }
         },
 
+        /**
+         * @param  {} obj
+         * @return {}
+         * @memberOf qtek.core.util
+         */
         clone : function(obj) {
             if (!util.isObject(obj)) {
                 return obj;

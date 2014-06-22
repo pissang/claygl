@@ -23,6 +23,12 @@ define(function(require) {
                 }
             }
         }
+        /**
+         * @method
+         * @name clone
+         * @return {qtek.light.Ambient}
+         * @memberOf qtek.light.Ambient.prototype
+         */
     })
 
     return AmbientLight;

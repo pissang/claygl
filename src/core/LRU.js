@@ -2,6 +2,11 @@ define(function(require) {
 
     var LinkedList = require('./LinkedList');
 
+    /**
+     * LRU Cache
+     * @constructor
+     * @alias qtek.core.LRU
+     */
     var LRU = function(maxSize) {
 
         this._list = new LinkedList();
@@ -11,10 +16,18 @@ define(function(require) {
         this._maxSize = maxSize || 10;
     }
 
+    /**
+     * Set cache max size
+     * @param {number} size
+     */
     LRU.prototype.setMaxSize = function(size) {
         this._maxSize = size;
     }
 
+    /**
+     * @param  {string} key
+     * @param  {} value
+     */
     LRU.prototype.put = function(key, value) {
         if (typeof(this._map[key]) == 'undefined') {
             var len = this._list.length();
@@ -31,6 +44,10 @@ define(function(require) {
         }
     }
 
+    /**
+     * @param  {string} key
+     * @return {}
+     */
     LRU.prototype.get = function(key) {
         var entry = this._map[key];
         if (typeof(entry) != 'undefined') {
@@ -44,6 +61,9 @@ define(function(require) {
         }
     }
 
+    /**
+     * @param {string} key
+     */
     LRU.prototype.remove = function(key) {
         var entry = this._map[key];
         if (typeof(entry) != 'undefined') {
@@ -52,6 +72,9 @@ define(function(require) {
         }
     }
 
+    /**
+     * Clear the cache
+     */
     LRU.prototype.clear = function() {
         this._list.clear();
         this._map = {};

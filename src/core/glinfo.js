@@ -1,5 +1,8 @@
+/**
+ * @namespace qtek.core.glinfo
+ * @see http://www.khronos.org/registry/webgl/extensions/
+ */
 define(function() {
-    // http://www.khronos.org/registry/webgl/extensions/
     var EXTENSION_LIST = [
         "OES_texture_float",
         "OES_texture_half_float",
@@ -17,7 +20,11 @@ define(function() {
     var extensions = {};
 
     var glinfo = {
-
+        /**
+         * Initialize all extensions in context
+         * @param  {WebGLRenderingContext} _gl
+         * @memberOf qtek.core.glinfo
+         */
         initialize : function(_gl) {
 
             if (extensions[_gl.__GLID__]) {
@@ -32,6 +39,13 @@ define(function() {
             }
         },
 
+        /**
+         * Get extension
+         * @param  {WebGLRenderingContext} _gl
+         * @param {string} name - Extension name, vendorless
+         * @return {WebGLExtension}
+         * @memberOf qtek.core.glinfo
+         */
         getExtension : function(_gl, name) {
             var glid = _gl.__GLID__;
             if (extensions[glid]) {
@@ -41,7 +55,11 @@ define(function() {
                 return extensions[glid][name];
             }
         },
-
+        /**
+         * Dispose context
+         * @param  {WebGLRenderingContext} _gl
+         * @memberOf qtek.core.glinfo
+         */
         dispose: function(_gl) {
             delete extensions[_gl.__GLID__];
         },

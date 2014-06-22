@@ -33,9 +33,9 @@ define(function(require) {
                         width : 512,
                         height : 512
                     },
-                    // Node will keep the texture rendered in last frame
+                    // Node will keep the RTT rendered in last frame
                     keepLastFrame : true,
-                    // Force the node output the texture rendered in last frame
+                    // Force the node output the RTT rendered in last frame
                     outputLastFrame : true
                 }
             }

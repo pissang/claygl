@@ -14,8 +14,44 @@ define(function(require) {
         'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
     }
 
+    /**
+     * @constructor qtek.texture.TextureCube
+     * @extends qtek.Texture
+     *
+     * @example
+     *     ...
+     *     var mat = new qtek.Material({
+     *         shader: qtek.shader.library.get('buildin.phong', 'environmentMap')
+     *     });
+     *     var envMap = new qtek.texture.TextureCube();
+     *     envMap.load({
+     *         'px': 'assets/textures/sky/px.jpg',
+     *         'nx': 'assets/textures/sky/nx.jpg'
+     *         'py': 'assets/textures/sky/py.jpg'
+     *         'ny': 'assets/textures/sky/ny.jpg'
+     *         'pz': 'assets/textures/sky/pz.jpg'
+     *         'nz': 'assets/textures/sky/nz.jpg'
+     *     });
+     *     mat.set('environmentMap', envMap);
+     *     ...
+     *     envMap.success(function() {
+     *         // Wait for the sky texture loaded
+     *         animation.on('frame', function(frameTime) {
+     *             renderer.render(scene, camera);
+     *         });
+     *     });
+     */
     var TextureCube = Texture.derive(function() {
-        return {
+        return /** @lends qtek.texture.TextureCube# */{
+            /**
+             * @type {Object}
+             * @property {HTMLImageElement|HTMLCanvasElemnet} px
+             * @property {HTMLImageElement|HTMLCanvasElemnet} nx
+             * @property {HTMLImageElement|HTMLCanvasElemnet} py
+             * @property {HTMLImageElement|HTMLCanvasElemnet} ny
+             * @property {HTMLImageElement|HTMLCanvasElemnet} pz
+             * @property {HTMLImageElement|HTMLCanvasElemnet} nz
+             */
             image : {
                 px : null,
                 nx : null,
@@ -24,6 +60,15 @@ define(function(require) {
                 pz : null,
                 nz : null
             },
+            /**
+             * @type {Object}
+             * @property {Uint8Array} px
+             * @property {Uint8Array} nx
+             * @property {Uint8Array} py
+             * @property {Uint8Array} ny
+             * @property {Uint8Array} pz
+             * @property {Uint8Array} nz
+             */
             pixels : {
                 px : null,
                 nx : null,
@@ -78,6 +123,10 @@ define(function(require) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         * @memberOf qtek.texture.TextureCube.prototype
+         */
         generateMipmap : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get("webgl_texture"));
             _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);    
@@ -137,6 +186,8 @@ define(function(require) {
                 image.src = src;
                 self.image[target] = image;
             });
+
+            return this;
         }
     });
 

@@ -8,6 +8,24 @@ define(function(require) {
 
     var skyboxShader;
 
+    /**
+     * @constructor qtek.plugin.Skybox
+     *
+     * @example
+     *     var skyTex = new qtek.texture.TextureCube();
+     *     skyTex.load({
+     *         'px': 'assets/textures/sky/px.jpg',
+     *         'nx': 'assets/textures/sky/nx.jpg'
+     *         'py': 'assets/textures/sky/py.jpg'
+     *         'ny': 'assets/textures/sky/ny.jpg'
+     *         'pz': 'assets/textures/sky/pz.jpg'
+     *         'nz': 'assets/textures/sky/nz.jpg'
+     *     });
+     *     var skybox = new qtek.plugin.Skybox({
+     *         scene: scene
+     *     });
+     *     skybox.material.set('environmentMap', skyTex);
+     */
     var Skybox = Mesh.derive(function() {
 
         if (!skyboxShader) {
@@ -22,17 +40,15 @@ define(function(require) {
         });
         
         return {
+            /**
+             * @type {qtek.Scene}
+             * @memberOf qtek.plugin.Skybox.prototype
+             */
             scene : null,
 
             geometry : new CubeGeometry(),
             material : material,
-            culling : false,
-
-            _beforeRenderScene : function(renderer, scene, camera) {
-                this.position.copy(camera.getWorldPosition());
-                this.update();
-                renderer.renderQueue([this], camera);
-            }
+            culling : false
         }
     }, function() {
         var scene = this.scene;
@@ -40,6 +56,11 @@ define(function(require) {
             this.attachScene(scene);
         }
     }, {
+        /**
+         * Attach the skybox to the scene
+         * @param  {qtek.Scene} scene
+         * @memberOf qtek.plugin.Skybox.prototype
+         */
         attachScene : function(scene) {
             if (this.scene) {
                 this.detachScene();
@@ -47,7 +68,10 @@ define(function(require) {
             this.scene = scene;
             scene.on("beforerender", this._beforeRenderScene, this);
         },
-        
+        /**
+         * Detach from scene
+         * @memberOf qtek.plugin.Skybox.prototype
+         */
         detachScene : function() {
             if (this.scene) {
                 this.scene.off("beforerender", this._beforeRenderScene, this);  
@@ -57,6 +81,12 @@ define(function(require) {
 
         dispose : function() {
             this.detachScene();
+        },
+
+        _beforeRenderScene : function(renderer, scene, camera) {
+            this.position.copy(camera.getWorldPosition());
+            this.update();
+            renderer.renderQueue([this], camera);
         }
     });
 

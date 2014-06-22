@@ -1,11 +1,15 @@
 define(function(require) {
 
-    var Base = require('../core/Base');
+    var Field = require('./Field');
     var Vector3 = require('../math/Vector3');
     var glMatrix = require('glmatrix');
     var vec3 =  glMatrix.vec3;
 
-    var ForceField = Base.derive(function() {
+    /**
+     * @constructor qtek.particleSystem.ForceField
+     * @extends qtek.particleSystem.Field
+     */
+    var ForceField = Field.derive(function() {
         return {
             force : new Vector3()
         }
