@@ -21,7 +21,7 @@
         {
             "name" : "spawn",
             "shader" : "#source(curlnoise.spawn)",
-            "type" : "processor",
+            "type" : "filter",
             "outputs" : {
                 "position" : {
                     "parameters" : "#common"
@@ -31,7 +31,7 @@
         {
             "name" : "noise",
             "shader" : "#source(curlnoise.noise)",
-            "type" : "processor",
+            "type" : "filter",
             "outputs" : {
                 "noise" : {
                     "parameters" : "#common"
@@ -41,7 +41,7 @@
         {
             "name" : "particle",
             "shader" : "#source(curlnoise.particle)",
-            "type" : "processor",
+            "type" : "filter",
             "output" : true,
             "parameters" : {
                 "noiseTextureSize" : 256

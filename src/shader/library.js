@@ -4,6 +4,7 @@
 define(function(require) {
 
     var Shader = require("../Shader");
+    var util = require('../core/util');
 
     _library = {};
 
@@ -44,7 +45,7 @@ define(function(require) {
         if (typeof(option) === "string") {
             enabledTextures = Array.prototype.slice.call(arguments, 1);
         }
-        else if (toString.call(option) == '[object Object]') {
+        else if (Object.prototype.toString.call(option) == '[object Object]') {
             enabledTextures = option.textures || [];
             vertexDefines = option.vertexDefines || {};
             fragmentDefines = option.fragmentDefines || {};
