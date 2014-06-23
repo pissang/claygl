@@ -33,7 +33,7 @@ define(function(require) {
          */
         bottom : -1
     },
-    /** @lends qtek.camera.Perspective.prototype */
+    /** @lends qtek.camera.Orthographic.prototype */
     {
         
         updateProjectionMatrix : function() {

@@ -54,7 +54,7 @@ define(function(require) {
      *     });
      */
     var ParticleRenderable = Renderable.derive(
-    /** @lends qtek.particleSystem.Renderable# */
+    /** @lends qtek.particleSystem.ParticleRenderable# */
     {
         /**
          * @type {boolean}

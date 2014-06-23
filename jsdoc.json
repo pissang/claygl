@@ -4,7 +4,7 @@
         "includePattern": ".+\\.js(doc)?$"
     },
     "opts": {
-        "template": "node_modules/jaguarjs-jsdoc",
+        "template": "jsdoc-tmpl",
         "encoding": "utf8",
         "destination": "./gh-pages/api/",
         "recurse": true
