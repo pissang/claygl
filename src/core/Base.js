@@ -16,6 +16,13 @@ define(function(require){
          */
         this.__GUID__ = util.genGUID();
     }
+
+    Base.__initializers__ = [
+        function(opts) {
+            util.extend(this, opts)
+        }
+    ];
+    
     util.extend(Base, deriveMixin);
     util.extend(Base.prototype, notifierMixin);
 

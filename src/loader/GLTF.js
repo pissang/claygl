@@ -52,7 +52,7 @@ define(function(require) {
     }
 
     /**
-     * @typedef {Object} qtek.loader.IGLTFResult
+     * @typedef {Object} qtek.loader.GLTF.IResult
      * @property {qtek.Scene} scene
      * @property {Object.<string, qtek.Camera>} cameras
      * @property {Object.<string, qtek.Texture>} textures
@@ -118,7 +118,7 @@ define(function(require) {
 
         /**
          * @param {Object} json
-         * @return {qtek.loader.IGLTFResult}
+         * @return {qtek.loader.GLTF.IResult}
          */
         parse : function(json) {
             var self = this;

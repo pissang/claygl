@@ -36,20 +36,14 @@ define(function(require) {
             _super.apply(this, arguments);
 
             if (makeDefaultOpt instanceof Function) {
-                // call defaultOpt generate function each time
-                // if it is a function, So we can make sure each 
-                // property in the object is not shared by mutiple instances
+                // Invoke makeDefaultOpt each time if it is a function, So we can make sure each 
+                // property in the object will not be shared by mutiple instances
                 extend(this, makeDefaultOpt.call(this));
             } else {
                 extendWithPropList(this, makeDefaultOpt, propList);
             }
             
             if (this.constructor === sub) {
-                // PENDING
-                if (options) {
-                    extend(this, options);
-                }
-
                 // Initialize function will be called in the order of inherit
                 var base = sub;
                 var initializers = sub.__initializers__;
@@ -60,7 +54,7 @@ define(function(require) {
         };
         // save super constructor
         sub.__super__ = _super;
-        // initialize function will be called after all the super constructor is called
+        // Initialize function will be called after all the super constructor is called
         if (!_super.__initializers__) {
             sub.__initializers__ = [];
         } else {
