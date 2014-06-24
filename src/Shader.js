@@ -921,9 +921,10 @@ define(function(require) {
     var importRegex = /(@import)\s*([0-9a-zA-Z_\-\.]*)/g;
     Shader.parseImport = function(shaderStr) {
         shaderStr = shaderStr.replace(importRegex, function(str, importSymbol, importName) {
-            if (_source[importName]) {
+            var str = Shader.source(importName);
+            if (str) {
                 // Recursively parse
-                return Shader.parseImport(_source[importName]);
+                return Shader.parseImport(str);
             } else {
                 console.warn('Shader chunk "' + importName + '" not existed in library');
                 return '';
@@ -941,13 +942,32 @@ define(function(require) {
      */
     Shader['import'] = function(shaderStr) {
         shaderStr.replace(exportRegex, function(str, exportSymbol, exportName, code) {
-            _source[exportName] = code;
+            var code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
+            if (code) {
+                var parts = exportName.split('.');
+                var obj = Shader.codes;
+                var i = 0;
+                while(i < parts.length - 1) {
+                    var key = parts[i++];
+                    if (!obj[key]) {
+                        obj[key] = {};
+                    }
+                    obj = obj[key];
+                }
+                key = parts[i];
+                obj[key] = code;
+            }
             return code;
         })
     }
 
-    // Library to store all the loaded shader strings
-    var _source = {};
+    /**
+     * Library to store all the loaded shader codes
+     * @type {Object}
+     * @readOnly
+     * @memberOf qtek.Shader
+     */
+    Shader.codes = {};
 
     /**
      * Get shader source
@@ -956,12 +976,18 @@ define(function(require) {
      * @memberOf qtek.Shader
      */
     Shader.source = function(name) {
-        var shaderStr = _source[name];
-        if (! shaderStr) {
+        var parts = name.split('.');
+        var obj = Shader.codes;
+        var i = 0;
+        while(obj && i < parts.length) {
+            var key = parts[i++];
+            obj = obj[key];
+        }
+        if (! obj) {
             console.warn('Shader "' + name + '" not existed in library');
             return;
         }
-        return shaderStr;
+        return obj;
     }
 
     return Shader;
