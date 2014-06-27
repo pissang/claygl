@@ -184,7 +184,7 @@ define(function(require) {
     }
 
     /**
-     * @param  {function} cb
+     * @param  {Function} cb
      * @param  {} context
      */
     LinkedList.prototype.forEach = function(cb, context) {

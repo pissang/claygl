@@ -114,7 +114,7 @@ define(function(require){
         },
         /**
          * @param  {Object|Array} obj
-         * @param  {function} iterator
+         * @param  {Function} iterator
          * @param  {Object} [context]
          * @memberOf qtek.core.util
          */

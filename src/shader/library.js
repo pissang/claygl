@@ -101,11 +101,18 @@ define(function(require) {
      * @param  {string} vertex - Vertex shader code
      * @param  {string} fragment - Fragment shader code
      */
-    function put(name, vertex, fragment) {
+    function template(name, vertex, fragment) {
         _library[name] = {
             vertex : vertex,
             fragment : fragment
         }
+    }
+
+    /**
+     * @memberOf qtek.shader.library
+     */
+    function clear() {
+        _pool = {};
     }
 
     // Some build in shaders
@@ -120,13 +127,13 @@ define(function(require) {
 
     Shader['import'](require('text!./source/shadowmap.essl'));
 
-    put("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
-    put("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
-    put("buildin.phong", Shader.source("buildin.phong.vertex"), Shader.source("buildin.phong.fragment"));
-    put("buildin.wireframe", Shader.source("buildin.wireframe.vertex"), Shader.source("buildin.wireframe.fragment"));
-    put("buildin.skybox", Shader.source("buildin.skybox.vertex"), Shader.source("buildin.skybox.fragment"));
-    put("buildin.prez", Shader.source("buildin.prez.vertex"), Shader.source("buildin.prez.fragment"));
-    put("buildin.physical", Shader.source("buildin.physical.vertex"), Shader.source("buildin.physical.fragment"));
+    template("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
+    template("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
+    template("buildin.phong", Shader.source("buildin.phong.vertex"), Shader.source("buildin.phong.fragment"));
+    template("buildin.wireframe", Shader.source("buildin.wireframe.vertex"), Shader.source("buildin.wireframe.fragment"));
+    template("buildin.skybox", Shader.source("buildin.skybox.vertex"), Shader.source("buildin.skybox.fragment"));
+    template("buildin.prez", Shader.source("buildin.prez.vertex"), Shader.source("buildin.prez.fragment"));
+    template("buildin.physical", Shader.source("buildin.physical.vertex"), Shader.source("buildin.physical.fragment"));
 
     // Some build in shaders
     Shader['import'](require('text!./source/compositor/vertex.essl'));
@@ -142,6 +149,7 @@ define(function(require) {
 
     return {
         get : get,
-        put : put
+        template : template,
+        clear: clear
     }
 })

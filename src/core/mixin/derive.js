@@ -4,11 +4,11 @@ define(function(require) {
 
     /**
      * Extend a sub class from base class
-     * @param {object|function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
-     * @param {function} [initialize] Initialize after the sub class is instantiated
+     * @param {object|Function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
+     * @param {Function} [initialize] Initialize after the sub class is instantiated
      * @param {Object} [proto] Prototype methods/properties of the sub class
      * @memberOf qtek.core.mixin.derive.
-     * @return {function}
+     * @return {Function}
      */
     function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 

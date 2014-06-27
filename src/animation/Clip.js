@@ -12,10 +12,10 @@ define(function(require) {
      * @param {number} [opts.gap]
      * @param {number} [opts.playbackRatio]
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
-     * @param {string|function} [opts.easing]
-     * @param {function} [opts.onframe]
-     * @param {function} [opts.ondestroy]
-     * @param {function} [opts.onrestart]
+     * @param {string|Function} [opts.easing]
+     * @param {Function} [opts.onframe]
+     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onrestart]
      */
     var Clip = function(opts) {
 
@@ -69,21 +69,21 @@ define(function(require) {
 
         if (typeof(opts.onframe) !== 'undefined') {
             /**
-             * @type {function}
+             * @type {Function}
              */
             this.onframe = opts.onframe;
         }
 
         if (typeof(opts.ondestroy) !== 'undefined') {
             /**
-             * @type {function}
+             * @type {Function}
              */
             this.ondestroy = opts.ondestroy;
         }
 
         if (typeof(opts.onrestart) !== 'undefined') {
             /**
-             * @type {function}
+             * @type {Function}
              */
             this.onrestart = opts.onrestart;
         }

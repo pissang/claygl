@@ -19,8 +19,8 @@ define(function(require) {
     var textureUtil = {
         /**
          * @param  {string|object} path
-         * @param  {function} [onsuccess]
-         * @param  {function} [onerror]
+         * @param  {Function} [onsuccess]
+         * @param  {Function} [onerror]
          * @return {qtek.Texture}
          *
          * @memberOf qtek.util.texture
@@ -77,8 +77,8 @@ define(function(require) {
          * @param  {string} path
          * @param  {qtek.texture.TextureCube} cubeMap
          * @param  {qtek.Renderer} renderer
-         * @param  {function} [onsuccess]
-         * @param  {function} [onerror]
+         * @param  {Function} [onsuccess]
+         * @param  {Function} [onerror]
          * 
          * @memberOf qtek.util.texture
          */

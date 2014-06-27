@@ -148,9 +148,9 @@ define(function(require) {
          * @param  {Object} target
          * @param  {Object} [options]
          * @param  {boolean} [options.loop]
-         * @param  {function} [options.getter]
-         * @param  {function} [options.setter]
-         * @param  {function} [options.interpolater]
+         * @param  {Function} [options.getter]
+         * @param  {Function} [options.setter]
+         * @param  {Function} [options.interpolater]
          * @return {qtek.animation.Animation._Deferred}
          */
         animate : function(target, options) {
@@ -206,6 +206,23 @@ define(function(require) {
         }
     }
 
+    function _cloneValue(value) {
+        if (_isArrayLike(value)) {
+            var len = value.length;
+            if (_isArrayLike(value[0])) {
+                var ret = [];
+                for (var i = 0; i < len; i++) {
+                    ret.push(arraySlice.call(value[i]));
+                }
+                return ret;
+            } else {
+                return arraySlice.call(value)
+            }
+        } else {
+            return value;
+        }
+    }
+
     function _catmullRomInterpolateArray(
         p0, p1, p2, p3, t, t2, t3, out, arrDim
     ) {
@@ -246,9 +263,9 @@ define(function(require) {
      * 
      * @param {Object} target
      * @param {boolean} loop
-     * @param {function} getter
-     * @param {function} setter
-     * @param {function} interpolater
+     * @param {Function} getter
+     * @param {Function} setter
+     * @param {Function} interpolater
      */
     function _Deferred(target, loop, getter, setter, interpolater) {
         this._tracks = {};
@@ -293,7 +310,9 @@ define(function(require) {
                     if (time !== 0) {
                         this._tracks[propName].push({
                             time : 0,
-                            value : this._getter(this._target, propName)
+                            value : _cloneValue(
+                                this._getter(this._target, propName)
+                            )
                         });   
                     }
                 }
@@ -306,7 +325,7 @@ define(function(require) {
         },
         /**
          * callback when running animation
-         * @param  {function} callback callback have two args, animating target and current percent
+         * @param  {Function} callback callback have two args, animating target and current percent
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
@@ -372,18 +391,7 @@ define(function(require) {
                 var kfValues = [];
                 for (var i = 0; i < trackLen; i++) {
                     kfPercents.push(keyframes[i].time / trackMaxTime);
-                    if (isValueArray) {
-                        if (arrDim == 2) {
-                            kfValues[i] = [];
-                            for (var j = 0; j < firstVal.length; j++) {
-                                kfValues[i].push(arraySlice.call(keyframes[i].value[j]));
-                            }
-                        } else {
-                            kfValues.push(arraySlice.call(keyframes[i].value));
-                        }
-                    } else {
-                        kfValues.push(keyframes[i].value);
-                    }
+                    kfValues.push(keyframes[i].value);
                 }
 
                 // Cache the key of last frame to speed up when 
@@ -529,7 +537,7 @@ define(function(require) {
         },
         /**
          * Callback after animation finished
-         * @param {function} func
+         * @param {Function} func
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */

@@ -86,7 +86,17 @@ define(function(require) {
         /**
          * @type {string}
          */
-        shaderName : 'buildin.physical'
+        shaderName : 'buildin.physical',
+
+        /**
+         * @type {boolean}
+         */
+        includeCamera: true,
+
+        /**
+         * @type {boolean}
+         */
+        includeLight: true,
     },
 
     /** @lends qtek.loader.GLTF.prototype */
@@ -702,7 +712,7 @@ define(function(require) {
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
                 var node;
-                if (nodeInfo.camera) {
+                if (nodeInfo.camera && this.includeCamera) {
                     var cameraInfo = json.cameras[nodeInfo.camera];
 
                     if (cameraInfo.projection === "perspective") {
@@ -721,7 +731,7 @@ define(function(require) {
                     node.setName(nodeInfo.name);
                     lib.cameras[nodeInfo.name] = node;
                 }
-                else if (nodeInfo.lights) {
+                else if (nodeInfo.lights && this.includeLight) {
                     var lights = [];
                     for (var i = 0; i < nodeInfo.lights.length; i++) {
                         var lightInfo = json.lights[nodeInfo.lights[i]];

@@ -54,7 +54,7 @@ define(function() {
         /**
          * Register event handler
          * @param  {string} name
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -79,7 +79,7 @@ define(function() {
         /**
          * Register event, event will only be triggered once and then removed
          * @param  {string} name
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -98,7 +98,7 @@ define(function() {
         /**
          * Alias of on('before' + name)
          * @param  {string} name
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -113,7 +113,7 @@ define(function() {
         /**
          * Alias of on('after' + name)
          * @param  {string} name
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -127,7 +127,7 @@ define(function() {
 
         /**
          * Alias of on('success')
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -137,7 +137,7 @@ define(function() {
 
         /**
          * Alias of on('error')
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -147,7 +147,7 @@ define(function() {
 
         /**
          * Alias of on('success')
-         * @param  {function} action
+         * @param  {Function} action
          * @param  {Object} [context]
          * @chainable
          */
@@ -176,7 +176,7 @@ define(function() {
         /**
          * If registered the event handler
          * @param  {string}  name
-         * @param  {function}  action
+         * @param  {Function}  action
          * @return {boolean}
          */
         has : function(name, action) {

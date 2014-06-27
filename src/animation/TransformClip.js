@@ -25,10 +25,10 @@ define(function(require) {
      * @param {number} [opts.gap]
      * @param {number} [opts.playbackRatio]
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
-     * @param {string|function} [opts.easing]
-     * @param {function} [opts.onframe]
-     * @param {function} [opts.ondestroy]
-     * @param {function} [opts.onrestart]
+     * @param {string|Function} [opts.easing]
+     * @param {Function} [opts.onframe]
+     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onrestart]
      * @param {object[]} [opts.keyFrames]
      */
     var TransformClip = function(opts) {
