@@ -483,15 +483,14 @@ define(function(require) {
         },
 
         generateVertexNormals : function() {
-            var faces = this.faces
-            var len = faces.length
-            var positions = this.attributes.position.value
-            var normals = this.attributes.normal.value
+            var faces = this.faces;
+            var len = faces.length;
+            var positions = this.attributes.position.value;
+            var normals = this.attributes.normal.value;
             var normal = vec3.create();
 
             var v12 = vec3.create(), v23 = vec3.create();
 
-            var difference = positions.length - normals.length;
             for (var i = 0; i < normals.length; i++) {
                 vec3.set(normals[i], 0.0, 0.0, 0.0);
             }

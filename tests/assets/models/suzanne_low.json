@@ -1,0 +1,172 @@
+{
+    "accessors": {
+        "attrbute_1": {
+            "bufferView": "bufferView_4",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "count": 507,
+            "max": [
+                1.3671870000000002,
+                0.984375,
+                0.8515625,
+                1.0
+            ],
+            "min": [
+                -1.3671870000000002,
+                -0.984375,
+                -0.8515625,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_2": {
+            "bufferView": "bufferView_4",
+            "byteOffset": 6084,
+            "byteStride": 12,
+            "count": 507,
+            "max": [
+                0.9989318000000001,
+                0.9997254000000001,
+                0.9999695,
+                1.0
+            ],
+            "min": [
+                -0.9989318000000001,
+                -0.9862666999999999,
+                -0.9753105,
+                1.0
+            ],
+            "type": 35665
+        },
+        "indices_3": {
+            "bufferView": "bufferView_5",
+            "byteOffset": 0,
+            "count": 2904,
+            "type": 5123
+        }
+    },
+    "animations": {},
+    "asset": {},
+    "bufferViews": {
+        "bufferView_4": {
+            "buffer": "suzanne_low.bin",
+            "byteLength": 12168,
+            "byteOffset": 0,
+            "target": 34962
+        },
+        "bufferView_5": {
+            "buffer": "suzanne_low.bin",
+            "byteLength": 5808,
+            "byteOffset": 12168,
+            "target": 34963
+        }
+    },
+    "buffers": {
+        "suzanne_low.bin": {
+            "byteLength": 17976,
+            "path": "suzanne_low.bin"
+        }
+    },
+    "images": {},
+    "materials": {
+        "Material_001": {
+            "instanceTechnique": {
+                "technique": "technique_0",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": [
+                        0.64,
+                        0.64,
+                        0.64
+                    ],
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "transparency": 1
+                }
+            },
+            "name": "Material_001"
+        }
+    },
+    "meshes": {
+        "Suzanne-mesh": {
+            "name": "Suzanne",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": "attrbute_2",
+                        "POSITION": "attrbute_1"
+                    },
+                    "indices": "indices_3",
+                    "material": "Material_001"
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "Suzanne": {
+            "children": [],
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -4.371139999386969e-08,
+                1.0,
+                0.0,
+                0.0,
+                -1.0,
+                -4.371139999386969e-08,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "meshes": [
+                "Suzanne-mesh"
+            ],
+            "name": "Suzanne"
+        }
+    },
+    "samplers": {},
+    "scene": "Scene",
+    "scenes": {
+        "Scene": {
+            "nodes": [
+                "Suzanne"
+            ]
+        }
+    },
+    "shaders": {},
+    "skins": {},
+    "techniques": {
+        "technique_0": {
+            "parameters": {},
+            "pass": "defaultPass",
+            "passes": {
+                "defaultPass": {
+                    "instanceProgram": {
+                        "attributes": {},
+                        "program": "",
+                        "uniforms": {}
+                    },
+                    "states": {
+                        "blendEnable": false,
+                        "cullFaceEnable": false,
+                        "depthMask": true,
+                        "depthTestEnable": true
+                    }
+                }
+            }
+        }
+    },
+    "textures": {}
+}

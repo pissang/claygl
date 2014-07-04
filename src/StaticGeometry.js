@@ -199,11 +199,98 @@ define(function(require) {
         },
 
         generateVertexNormals : function() {
-            console.warn('Static Geometry doesn\'t support normal generate');
+            var faces = this.faces;
+            var positions = this.attributes.position.value;
+            var normals = this.attributes.normal.value;
+
+            if (!normals || normals.length !== positions.length) {
+                normals = this.attributes.normal.value = new Float32Array(positions.length);
+            } else {
+                // Reset
+                for (var i = 0; i < normals.length; i++) {
+                    normals[i] = 0;
+                }
+            }
+
+            var p1 = vec3.create();
+            var p2 = vec3.create();
+            var p3 = vec3.create();
+
+            var v12 = vec3.create();
+            var v23 = vec3.create();
+
+            var n = vec3.create();
+
+            for (var f = 0; f < faces.length;) {
+                var i1 = faces[f++];
+                var i2 = faces[f++];
+                var i3 = faces[f++];
+
+                vec3.set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
+                vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
+                vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
+
+                vec3.sub(v12, p1, p2);
+                vec3.sub(v23, p2, p3);
+                vec3.cross(n, v12, v23);
+                // Weighted by the triangle area
+                for (var i = 0; i < 3; i++) {
+                    normals[i1*3+i] = normals[i1*3+i] + n[i];
+                    normals[i2*3+i] = normals[i2*3+i] + n[i];
+                    normals[i3*3+i] = normals[i3*3+i] + n[i];
+                }
+            }
+
+            for (var i = 0; i < normals.length;) {
+                vec3.set(n, normals[i], normals[i+1], normals[i+2]);
+                vec3.normalize(n, n);
+                normals[i++] = n[0];
+                normals[i++] = n[1];
+                normals[i++] = n[2];
+            }
         },
 
         generateFaceNormals : function() {
-            console.warn('Static Geometry doesn\'t support normal generate');
+            if (!this.isUniqueVertex()) {
+                this.generateUniqueVertex();
+            }
+
+            var faces = this.faces;
+            var positions = this.attributes.position.value;
+            var normals = this.attributes.normal.value;
+
+            var p1 = vec3.create();
+            var p2 = vec3.create();
+            var p3 = vec3.create();
+
+            var v12 = vec3.create();
+            var v23 = vec3.create();
+            var n = vec3.create();
+
+            if (!normals) {
+                normals = this.attributes.position.value = new Float32Array(positions.length);
+            }
+            for (var f = 0; f < faces.length;) {
+                var i1 = faces[f++];
+                var i2 = faces[f++];
+                var i3 = faces[f++];
+
+                vec3.set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
+                vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
+                vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
+
+                vec3.sub(v12, p1, p2);
+                vec3.sub(v23, p2, p3);
+                vec3.cross(n, v12, v23);
+
+                vec3.normalize(n, n);
+
+                for (var i = 0; i < 3; i++) {
+                    normals[i1*3+i] = n[i];
+                    normals[i2*3+i] = n[i];
+                    normals[i3*3+i] = n[i];
+                }
+            }
         },
 
         generateTangents : function() {
