@@ -62,12 +62,6 @@
                     culling : false,
                     scale : new qtek.math.Vector3(10, 10, 10)
                 });
-                for (var i = 0; i < bigCube.geometry.attributes.normal.value.length; i++){
-                    var normal = bigCube.geometry.attributes.normal.value[i];
-                    normal[0] = -normal[0];
-                    normal[1] = -normal[1];
-                    normal[2] = -normal[2];
-                }
                 root.add(bigCube);
 
                 camera.position.set(0, 2, 10);

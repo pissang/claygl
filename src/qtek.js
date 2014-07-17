@@ -23,7 +23,6 @@ define( function(require){
 	"FrameBuffer": require('qtek/FrameBuffer'),
 	"Geometry": require('qtek/Geometry'),
 	"Joint": require('qtek/Joint'),
-	"Layer": require('qtek/Layer'),
 	"Light": require('qtek/Light'),
 	"Material": require('qtek/Material'),
 	"Mesh": require('qtek/Mesh'),
@@ -33,7 +32,6 @@ define( function(require){
 	"Scene": require('qtek/Scene'),
 	"Shader": require('qtek/Shader'),
 	"Skeleton": require('qtek/Skeleton'),
-	"Stage": require('qtek/Stage'),
 	"StaticGeometry": require('qtek/StaticGeometry'),
 	"Texture": require('qtek/Texture'),
 	"animation": {

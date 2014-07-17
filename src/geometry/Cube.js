@@ -67,7 +67,7 @@ define(function(require) {
                     var attrArray = planes[pos].attributes[attrName].value;
                     for (var i = 0; i < attrArray.length; i++) {
                         var value = attrArray[i];
-                        if (this.inside && attrName === "normal") {
+                        if (self.inside && attrName === "normal") {
                             value[0] = -value[0];
                             value[1] = -value[1];
                             value[2] = -value[2];

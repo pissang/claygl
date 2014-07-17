@@ -166,7 +166,12 @@ define(function(require) {
                 console.warn('Remove operation can cause unpredictable error when in iterating');
             }
 
-            this._children.splice(this._children.indexOf(node), 1);
+            var idx = this._children.indexOf(node);
+            if (idx < 0) {
+                return;
+            }
+
+            this._children.splice(idx, 1);
             node.parent = null;
 
             if (this.scene) {

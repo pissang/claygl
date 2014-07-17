@@ -5,18 +5,20 @@
         <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body style="margin:0px;">
-        <div id="Main"></div>
+        <canvas id="main"></canvas>
         <script>
             require(['qtek/qtek'], function(qtek) {
-                var stage = new qtek.Stage({
-                    container : document.getElementById('Main')
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0
                 });
-                stage.resize(window.innerWidth, window.innerHeight);
-                var layer = stage.createLayer3D();
-                var camera = layer.camera;
-                var renderer = layer.renderer;
-                var scene = layer.scene;
-                renderer.setDevicePixelRatio(1.0);
+                renderer.resize(window.innerWidth, window.innerHeight);
+
+                var camera = new qtek.camera.Perspective();
+                camera.aspect = renderer.width / renderer.height;
+                camera.position.z = 10;
+
+                var scene = new qtek.Scene();
 
                 var cubeGeo = new qtek.geometry.Cube();
                 for (var i = 0; i < 5; i++) {
@@ -33,7 +35,6 @@
                         scene.add(mesh);
                     }
                 }
-                camera.position.z = 10;
                 var light = new qtek.light.Directional();
                 light.position.set(4, 4, 0);
                 light.lookAt(qtek.math.Vector3.ZERO);
@@ -45,18 +46,31 @@
                 var picking = new qtek.picking.Pixel({
                     renderer : renderer
                 });
-                layer.setPicking(picking);
-                // picking.setPrecision(0.2);
 
-                scene.on('mousedown', function(e) {
-                    stage.on('mousemove', dragging, e.target);
-                });
-                scene.on('mouseup', function(e) {
-                    stage.off('mousemove', dragging);
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function() {
+                    picking.update(scene, camera);
+                    renderer.render(scene, camera);
                 });
 
-                stage.on('frame', function() {
-                    stage.render();
+                var currentCube;
+                var plane = new qtek.math.Plane();
+                renderer.canvas.addEventListener('mousedown', function(e) {
+                    currentCube = picking.pick(e.offsetX, e.offsetY);
+                });
+                renderer.canvas.addEventListener('mousemove', function(e) {
+                    if (currentCube) {
+                        plane.normal.copy(camera.localTransform.forward).negate();
+                        plane.distance = -currentCube.position.len();
+                        plane.distance = Math.abs(plane.distanceToPoint(camera.position));
+                        var ndc = renderer.screenToNdc(e.offsetX, e.offsetY);
+                        var ray = camera.castRay(ndc);
+                        ray.intersectPlane(plane, currentCube.position);
+                    }
+                });
+                renderer.canvas.addEventListener('mouseup', function(e) {
+                    currentCube = null;
                 });
             });
         </script>

@@ -23,7 +23,7 @@ define(function() {
 
             var hdls = this.__handlers__[name];
             var l = hdls.length, i = -1, args = arguments;
-            // Optimize from backbone
+            // Optimize advise from backbone
             switch (args.length) {
                 case 1: 
                     while (++i < l)
@@ -96,7 +96,7 @@ define(function() {
         },
 
         /**
-         * Alias of on('before' + name)
+         * Alias of once('before' + name)
          * @param  {string} name
          * @param  {Function} action
          * @param  {Object} [context]
@@ -111,7 +111,7 @@ define(function() {
         },
 
         /**
-         * Alias of on('after' + name)
+         * Alias of once('after' + name)
          * @param  {string} name
          * @param  {Function} action
          * @param  {Object} [context]

@@ -1,9 +1,12 @@
 #QTEK
 
-Qtek is a graphic library for both canvas2d and webgl drawing. It is still an experiment version.
+Qtek is a graphic library for webgl 3d and 2d drawing. It is still an experiment version.
 
 
 ### [API](http://pissang.github.io/qtek/api)
+
+### [Playground](https://github.com/pissang/qtek-playground)
+
 
 #####Features 
 

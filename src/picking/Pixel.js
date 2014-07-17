@@ -30,6 +30,10 @@ define(function (require) {
             _idOffset : 0
         }
     }, function() {
+        if (this.renderer) {
+            this.width = this.renderer.width;
+            this.height = this.renderer.height;
+        }
         this.init();
     }, {
         init : function() {

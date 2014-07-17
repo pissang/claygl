@@ -683,7 +683,7 @@ define(function(require) {
         /**
          * Convert screen coords to normalized device coordinates(NDC)
          * Screen coords can get from mouse event, it is positioned relative to canvas element
-         * NDC can be used in ray casting with Camera.castRay methods
+         * NDC can be used in ray casting with Camera.prototype.castRay methods
          * 
          * @param  {number}       x
          * @param  {number}       y
