@@ -103,7 +103,7 @@ define(function(require) {
                             var pointW = new Vector3();
                             Vector3.transformMat4(pointW, point, renderable.worldTransform);
                             out.push(new RayPicking.Intersection(
-                                pointW, renderable, [v1.clone(), v2.clone(), v3.clone()], Vector3.dist(pointW, this._ray.origin)
+                                pointW, renderable, [[i1, i2, i3]], Vector3.dist(pointW, this._ray.origin)
                             ));
                         }
                     }
@@ -130,7 +130,7 @@ define(function(require) {
                             var pointW = new Vector3();
                             Vector3.transformMat4(pointW, point, renderable.worldTransform);
                             out.push(new RayPicking.Intersection(
-                                pointW, renderable, [v1.clone(), v2.clone(), v3.clone()], Vector3.dist(pointW, this._ray.origin)
+                                pointW, renderable, [i1, i2, i3], Vector3.dist(pointW, this._ray.origin)
                             ));
                         }
                     }
