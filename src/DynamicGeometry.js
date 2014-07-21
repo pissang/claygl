@@ -489,7 +489,7 @@ define(function(require) {
             var normals = this.attributes.normal.value;
             var normal = vec3.create();
 
-            var v12 = vec3.create(), v23 = vec3.create();
+            var v21 = vec3.create(), v32 = vec3.create();
 
             for (var i = 0; i < normals.length; i++) {
                 vec3.set(normals[i], 0.0, 0.0, 0.0);
@@ -509,9 +509,9 @@ define(function(require) {
                 var p2 = positions[i2];
                 var p3 = positions[i3];
 
-                vec3.sub(v12, p1, p2);
-                vec3.sub(v23, p2, p3);
-                vec3.cross(normal, v12, v23);
+                vec3.sub(v21, p1, p2);
+                vec3.sub(v32, p2, p3);
+                vec3.cross(normal, v21, v32);
                 // Weighted by the triangle area
                 vec3.add(normals[i1], normals[i1], normal);
                 vec3.add(normals[i2], normals[i2], normal);
@@ -533,12 +533,10 @@ define(function(require) {
             var normals = this.attributes.normal.value;
             var normal = vec3.create();
 
-            var v12 = vec3.create(), v23 = vec3.create();
+            var v21 = vec3.create(), v32 = vec3.create();
 
             var isCopy = normals.length === positions.length;
-            //   p1
-            //  /  \
-            // p3---p2
+            
             for (var i = 0; i < len; i++) {
                 var face = faces[i];
                 var i1 = face[0];
@@ -548,9 +546,9 @@ define(function(require) {
                 var p2 = positions[i2];
                 var p3 = positions[i3];
 
-                vec3.sub(v12, p1, p2);
-                vec3.sub(v23, p2, p3);
-                vec3.cross(normal, v12, v23);
+                vec3.sub(v21, p1, p2);
+                vec3.sub(v32, p2, p3);
+                vec3.cross(normal, v21, v32);
 
                 if (isCopy) {
                     vec3.copy(normals[i1], normal);

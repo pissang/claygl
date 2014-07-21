@@ -3,4 +3,5 @@ qtek.todo
 gh-pages
 .DS_Store
 .idea
-doc
+cloc_definitions.txt
+tests/unit

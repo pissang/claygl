@@ -216,8 +216,8 @@ define(function(require) {
             var p2 = vec3.create();
             var p3 = vec3.create();
 
-            var v12 = vec3.create();
-            var v23 = vec3.create();
+            var v21 = vec3.create();
+            var v32 = vec3.create();
 
             var n = vec3.create();
 
@@ -230,9 +230,9 @@ define(function(require) {
                 vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
                 vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
 
-                vec3.sub(v12, p1, p2);
-                vec3.sub(v23, p2, p3);
-                vec3.cross(n, v12, v23);
+                vec3.sub(v21, p1, p2);
+                vec3.sub(v32, p2, p3);
+                vec3.cross(n, v21, v32);
                 // Weighted by the triangle area
                 for (var i = 0; i < 3; i++) {
                     normals[i1*3+i] = normals[i1*3+i] + n[i];
@@ -263,8 +263,8 @@ define(function(require) {
             var p2 = vec3.create();
             var p3 = vec3.create();
 
-            var v12 = vec3.create();
-            var v23 = vec3.create();
+            var v21 = vec3.create();
+            var v32 = vec3.create();
             var n = vec3.create();
 
             if (!normals) {
@@ -279,9 +279,9 @@ define(function(require) {
                 vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
                 vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
 
-                vec3.sub(v12, p1, p2);
-                vec3.sub(v23, p2, p3);
-                vec3.cross(n, v12, v23);
+                vec3.sub(v21, p1, p2);
+                vec3.sub(v32, p2, p3);
+                vec3.cross(n, v21, v32);
 
                 vec3.normalize(n, n);
 

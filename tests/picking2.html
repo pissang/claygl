@@ -43,43 +43,21 @@
                     intensity : 0.5
                 }));
 
-                var picking = new qtek.picking.RayPicking({
-                    renderer : renderer,
-                    scene: scene,
-                    camera: camera
+                var picking = new qtek.picking.PixelPicking({
+                    renderer : renderer
                 });
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 animation.on('frame', function() {
+                    picking.update(scene, camera);
                     renderer.render(scene, camera);
                 });
 
                 var currentCube;
-                var point;
-                var offset = new qtek.math.Vector3();
                 var plane = new qtek.math.Plane();
-                renderer.canvas.addEventListener('mousedown', function(e) {
-                    var res = picking.pick(e.offsetX, e.offsetY);
-                    if (res) {
-                        currentCube = res.target;
-                        point = res.point;
-                        offset.copy(currentCube.position).sub(point);
-                    }
-                });
-                renderer.canvas.addEventListener('mousemove', function(e) {
-                    if (currentCube) {
-                        plane.normal.copy(camera.worldTransform.forward);
-                        plane.distance = point.dot(plane.normal);
-
-                        var ndc = renderer.screenToNdc(e.offsetX, e.offsetY);
-                        var ray = camera.castRay(ndc);
-                        ray.intersectPlane(plane, currentCube.position);
-                        currentCube.position.add(offset);
-                    }
-                });
-                renderer.canvas.addEventListener('mouseup', function(e) {
-                    currentCube = null;
+                renderer.canvas.addEventListener('click', function(e) {
+                    console.log(picking.pick(e.offsetX, e.offsetY));
                 });
             });
         </script>

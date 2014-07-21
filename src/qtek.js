@@ -117,7 +117,8 @@ define( function(require){
 		"ParticleRenderable": require('qtek/particleSystem/ParticleRenderable')
 	},
 	"picking": {
-		"Pixel": require('qtek/picking/Pixel')
+		"PixelPicking": require('qtek/picking/PixelPicking'),
+		"RayPicking": require('qtek/picking/RayPicking')
 	},
 	"plugin": {
 		"FirstPersonControl": require('qtek/plugin/FirstPersonControl'),
