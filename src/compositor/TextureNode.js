@@ -18,7 +18,7 @@ define(function(require) {
             texture : null
         }
     }, {
-        render : function(renderer) {
+        render : function(renderer, frameBuffer) {
 
             this._rendering = true;
 
@@ -27,7 +27,7 @@ define(function(require) {
             
             if (! this.outputs) {
                 this.pass.outputs = null;
-                this.pass.render(renderer);
+                this.pass.render(renderer, frameBuffer);
             } else {
                 
                 this.pass.outputs = {};

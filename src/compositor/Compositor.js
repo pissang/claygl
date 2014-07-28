@@ -28,7 +28,7 @@ define(function(require){
         /**
          * @param  {qtek.Renderer} renderer
          */
-        render : function(renderer) {
+        render : function(renderer, frameBuffer) {
             if (this._dirty) {
                 this.update();
                 this._dirty = false;
@@ -42,7 +42,7 @@ define(function(require){
                 this._outputs[i].updateReference();
             }
             for (var i = 0; i < this._outputs.length; i++) {
-                this._outputs[i].render(renderer);
+                this._outputs[i].render(renderer, frameBuffer);
             }
 
             for (var i = 0; i < this.nodes.length; i++) {

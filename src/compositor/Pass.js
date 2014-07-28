@@ -107,6 +107,9 @@ define(function(require) {
                         frameBuffer.attach(renderer.gl, texture, attachment);
                     }
                 }
+            }
+
+            if (frameBuffer) {
                 frameBuffer.bind(renderer);
             }
         },
@@ -129,7 +132,7 @@ define(function(require) {
                 // MRT Support in chrome
                 // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
                 var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
-                if (ext) {
+                if (ext && this.outputs) {
                     var bufs = [];
                     for (var attachment in this.outputs) {
                         attachment = +attachment;

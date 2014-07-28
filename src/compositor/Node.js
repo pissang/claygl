@@ -121,7 +121,7 @@ define(function(require) {
         /**
          * @param  {qtek.Renderer} renderer
          */
-        render : function(renderer) {
+        render : function(renderer, frameBuffer) {
                         
             this._rendering = true;
 
@@ -135,7 +135,7 @@ define(function(require) {
             // Output
             if (! this.outputs) {
                 this.pass.outputs = null;
-                this.pass.render(renderer);
+                this.pass.render(renderer, frameBuffer);
             } else {
                 this.pass.outputs = {};
 
