@@ -1,5 +1,6 @@
-
 define(function(require) {
+
+    'use strict';
 
     var DynamicGeometry = require('../DynamicGeometry');
     var Plane = require('./Plane');

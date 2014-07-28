@@ -1,5 +1,7 @@
 define( function(require) {
 
+    'use strict';
+
     var Base = require('./Base');
 
     var QEvent = Base.derive({

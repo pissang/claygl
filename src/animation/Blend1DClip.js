@@ -2,6 +2,8 @@
 // http://docs.unity3d.com/Documentation/Manual/1DBlending.html
 define(function(require) {
 
+    'use strict';
+
     var Clip = require('./Clip');
 
     var clipSortFunc = function(a, b) {

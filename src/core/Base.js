@@ -1,8 +1,10 @@
 define(function(require){
 
-    var deriveMixin = require("./mixin/derive");
-    var notifierMixin = require("./mixin/notifier");
-    var util = require("./util");
+    'use strict';
+
+    var deriveMixin = require('./mixin/derive');
+    var notifierMixin = require('./mixin/notifier');
+    var util = require('./util');
 
     /**
      * Base class of all objects

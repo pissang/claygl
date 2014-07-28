@@ -60,7 +60,6 @@ void main() {
     #ifdef GRADIENT_ENABLED
         color *= texture2D(gradient, vec2(v_Age, 0.5));
     #endif
-
     gl_FragColor = color;
 }
 

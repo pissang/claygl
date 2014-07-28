@@ -1,9 +1,11 @@
 define(function(require) {
 
-    var Node = require("./Node");
-    var Pass = require("./Pass");
-    var FrameBuffer = require("../FrameBuffer");
-    var texturePool = require("./texturePool");
+    'use strict';
+
+    var Node = require('./Node');
+    var Pass = require('./Pass');
+    var FrameBuffer = require('../FrameBuffer');
+    var texturePool = require('./texturePool');
     var glinfo = require('../core/glinfo');
 
     /**
@@ -57,7 +59,7 @@ define(function(require) {
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                    if (typeof(attachment) == "string") {
+                    if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
                     frameBuffer.attach(renderer.gl, texture, attachment);
@@ -66,7 +68,7 @@ define(function(require) {
 
                 // MRT Support in chrome
                 // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-                var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
+                var ext = glinfo.getExtension(_gl, 'EXT_draw_buffers');
                 if (ext) {
                     var bufs = [];
                     for (var attachment in this.outputs) {

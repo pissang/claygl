@@ -81,7 +81,7 @@ define(function(require) {
     }, {
         update : function(_gl) {
 
-            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
             this.beforeUpdate(_gl);
 
@@ -94,7 +94,7 @@ define(function(require) {
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.magFilter);
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.minFilter);
             
-            var anisotropicExt = glinfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
+            var anisotropicExt = glinfo.getExtension(_gl, 'EXT_texture_filter_anisotropic');
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
@@ -123,21 +123,25 @@ define(function(require) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
+        
         /**
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.texture.TextureCube.prototype
          */
         generateMipmap : function(_gl) {
-            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
             _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);    
         },
+
         bind : function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
         },
+
         unbind : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
+
         // Overwrite the isPowerOfTwo method
         isPowerOfTwo : function() {
             if (this.image.px) {
@@ -152,6 +156,7 @@ define(function(require) {
                 return value & (value-1) === 0
             }
         },
+
         isRenderable : function() {
             if (this.image.px) {
                 return isImageRenderable(this.image.px) &&
@@ -164,6 +169,7 @@ define(function(require) {
                 return this.width && this.height;
             }
         },
+
         load : function(imageList) {
             var loading = 0;
             var self = this;
@@ -173,7 +179,7 @@ define(function(require) {
                     loading --;
                     if (loading === 0){
                         self.dirty();
-                        self.trigger("success", self);
+                        self.trigger('success', self);
                     }
                     image.onload = null;
                 }
@@ -192,7 +198,7 @@ define(function(require) {
     });
 
     function isImageRenderable(image) {
-        return image.nodeName === "CANVAS" ||
+        return image.nodeName === 'CANVAS' ||
                 image.complete;
     }
 

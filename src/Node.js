@@ -2,12 +2,12 @@ define(function(require) {
     
     'use strict';
 
-    var Base = require("./core/Base");
-    var util = require("./core/util");
-    var Vector3 = require("./math/Vector3");
-    var Quaternion = require("./math/Quaternion");
-    var Matrix4 = require("./math/Matrix4");
-    var Matrix3 = require("./math/Matrix3");
+    var Base = require('./core/Base');
+    var util = require('./core/util');
+    var Vector3 = require('./math/Vector3');
+    var Quaternion = require('./math/Quaternion');
+    var Matrix4 = require('./math/Matrix4');
+    var Matrix3 = require('./math/Matrix3');
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
 

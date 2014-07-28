@@ -1,10 +1,12 @@
 define(function(require) {
 
-    var Node = require("./Node");
-    var Matrix4 = require("./math/Matrix4");
-    var Frustum = require("./math/Frustum");
-    var BoundingBox = require("./math/BoundingBox");
-    var Ray = require("./math/Ray");
+    'use strict';
+
+    var Node = require('./Node');
+    var Matrix4 = require('./math/Matrix4');
+    var Frustum = require('./math/Frustum');
+    var BoundingBox = require('./math/BoundingBox');
+    var Ray = require('./math/Ray');
 
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;

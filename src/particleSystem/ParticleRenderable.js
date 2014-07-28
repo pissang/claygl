@@ -4,7 +4,7 @@ define(function(require) {
 
     var Renderable = require('../Renderable');
     var Vector3 = require('../math/Vector3');
-    var glenum = require("../core/glenum");
+    var glenum = require('../core/glenum');
 
     var StaticGeometry = require('../StaticGeometry');
     var Material = require('../Material');

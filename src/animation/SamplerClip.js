@@ -7,7 +7,7 @@ define(function(require) {
     var Clip = require('./Clip');
     var TransformClip = require('./TransformClip');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 
@@ -50,7 +50,7 @@ define(function(require) {
             scale0 = Math.sin((1.0 - t) * omega) / sinom;
             scale1 = Math.sin(t * omega) / sinom;
         } else {        
-            // "from" and "to" quaternions are very close 
+            // 'from' and 'to' quaternions are very close 
             //  ... so we can do a linear interpolation
             scale0 = 1.0 - t;
             scale1 = t;

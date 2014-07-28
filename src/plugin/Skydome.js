@@ -23,10 +23,10 @@ define(function(require) {
 
         if (!skydomeShader) {
             skydomeShader = new Shader({
-                vertex : Shader.source("buildin.basic.vertex"),
-                fragment : Shader.source("buildin.basic.fragment")
+                vertex : Shader.source('buildin.basic.vertex'),
+                fragment : Shader.source('buildin.basic.fragment')
             })
-            skydomeShader.enableTexture("diffuseMap");
+            skydomeShader.enableTexture('diffuseMap');
         }
 
         var material = new Material({
@@ -65,7 +65,7 @@ define(function(require) {
                 this.detachScene();
             }
             this.scene = scene;
-            scene.on("beforerender", this._beforeRenderScene, this);
+            scene.on('beforerender', this._beforeRenderScene, this);
         },
         /**
          * Detach from scene
@@ -73,7 +73,7 @@ define(function(require) {
          */
         detachScene : function() {
             if (this.scene) {
-                this.scene.off("beforerender", this._beforeRenderScene, this);  
+                this.scene.off('beforerender', this._beforeRenderScene, this);  
             }
             this.scene = null;
         },

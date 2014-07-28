@@ -5,11 +5,11 @@ define(function(require) {
 
     'use strict';
 
-    var Geometry = require("./Geometry");
-    var util = require("./core/util");
-    var BoundingBox = require("./math/BoundingBox");
-    var glMatrix = require("glmatrix");
-    var glenum = require("./core/glenum");
+    var Geometry = require('./Geometry');
+    var util = require('./core/util');
+    var BoundingBox = require('./math/BoundingBox');
+    var glMatrix = require('glmatrix');
+    var glenum = require('./core/glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
@@ -128,11 +128,11 @@ define(function(require) {
                 this._updateBuffer(_gl);
                 this._cache.fresh();
             }
-            return this._cache.get("chunks");
+            return this._cache.get('chunks');
         },
         
         _updateBuffer : function(_gl) {
-            var chunks = this._cache.get("chunks");
+            var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
@@ -141,7 +141,7 @@ define(function(require) {
                     attributeBuffers : [],
                     indicesBuffer : null
                 }
-                this._cache.put("chunks", chunks);
+                this._cache.put('chunks', chunks);
                 firstUpdate = true;
             }
             var chunk = chunks[0];

@@ -2,7 +2,8 @@
 // Modified from https://github.com/ironwallaby/delaunay
 
 define(function(require) {
-    "use strict";
+
+    'use strict';
 
     function appendSupertriangleVertices(vertices) {
         var xmin = Number.POSITIVE_INFINITY,

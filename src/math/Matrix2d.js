@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var mat2d = glMatrix.mat2d;
 
     function makeProperty(n) {
@@ -163,7 +163,7 @@ define(function(require) {
             return this;
         },
         toString : function() {
-            return "[" + Array.prototype.join.call(this._array, ",") + "]";
+            return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     }
 

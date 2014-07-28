@@ -1,13 +1,15 @@
 define(function(require) {
     
-    var Geometry = require("../Geometry");
-    var DynamicGeometry = require("../DynamicGeometry");
-    var StaticGeometry = require("../StaticGeometry");
-    var Mesh = require("../Mesh");
-    var Node = require("../Node");
-    var Material = require("../Material");
-    var Shader = require("../Shader");
-    var glMatrix = require("glmatrix");
+    'use strict';
+
+    var Geometry = require('../Geometry');
+    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
+    var Mesh = require('../Mesh');
+    var Node = require('../Node');
+    var Material = require('../Material');
+    var Shader = require('../Shader');
+    var glMatrix = require('glmatrix');
     var BoundingBox = require('../math/BoundingBox');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
@@ -119,12 +121,12 @@ define(function(require) {
                     } else {
                         for (var i = 0; i < nVertex; i++) {
                             // Transform position, normal and tangent
-                            if (name === "position") {
+                            if (name === 'position') {
                                 var newValue = vec3.create();
                                 vec3.transformMat4(newValue, currentAttr.value[i], matrix);
                                 targetAttr.value.push(newValue);
                             }
-                            else if (name === "normal" || name === 'tangent') {
+                            else if (name === 'normal' || name === 'tangent') {
                                 var newValue = vec3.create();
                                 vec3.transformMat4(newValue, currentAttr.value[i], inverseTransposeMatrix);
                                 targetAttr.value.push(newValue);

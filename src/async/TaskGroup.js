@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var util  = require('../core/util');
     var Task = require('./Task');
 

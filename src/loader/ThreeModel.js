@@ -7,24 +7,24 @@ define(function(require) {
 
     var Base = require('../core/Base');
 
-    var request = require("../core/request");
+    var request = require('../core/request');
     var util = require('../core/util');
-    var Shader = require("../Shader");
-    var Material = require("../Material");
-    var DynamicGeometry = require("../DynamicGeometry");
-    var Mesh = require("../Mesh");
-    var Node = require("../Node");
-    var Texture2D = require("../texture/Texture2D");
-    var TextureCube = require("../texture/TextureCube");
-    var shaderLibrary = require("../shader/library");
-    var Skeleton = require("../Skeleton");
-    var Joint = require("../Joint");
-    var Vector3 = require("../math/Vector3");
-    var Quaternion = require("../math/Quaternion");
+    var Shader = require('../Shader');
+    var Material = require('../Material');
+    var DynamicGeometry = require('../DynamicGeometry');
+    var Mesh = require('../Mesh');
+    var Node = require('../Node');
+    var Texture2D = require('../texture/Texture2D');
+    var TextureCube = require('../texture/TextureCube');
+    var shaderLibrary = require('../shader/library');
+    var Skeleton = require('../Skeleton');
+    var Joint = require('../Joint');
+    var Vector3 = require('../math/Vector3');
+    var Quaternion = require('../math/Quaternion');
     var glenum = require('../core/glenum');
     var SkinningClip = require('../animation/SkinningClip');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
     var quat = glMatrix.quat;
@@ -39,11 +39,11 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : "",
+        rootPath : '',
         /**
          * @type {string}
          */
-        textureRootPath : ""
+        textureRootPath : ''
     }, {
         /**
          * @param  {string} url
@@ -52,7 +52,7 @@ define(function(require) {
             var self = this;
 
             if (!this.rootPath) {
-                this.rootPath = url.slice(0, url.lastIndexOf("/"));
+                this.rootPath = url.slice(0, url.lastIndexOf('/'));
             }
 
             request.get({

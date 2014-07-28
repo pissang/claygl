@@ -1,30 +1,30 @@
 define(function(require) {
 
-    var Base = require("../core/Base");
-    var glenum = require("../core/glenum");
-    var Vector3 = require("../math/Vector3");
-    var BoundingBox = require("../math/BoundingBox");
-    var Frustum = require("../math/Frustum");
-    var Matrix4 = require("../math/Matrix4");
+    var Base = require('../core/Base');
+    var glenum = require('../core/glenum');
+    var Vector3 = require('../math/Vector3');
+    var BoundingBox = require('../math/BoundingBox');
+    var Frustum = require('../math/Frustum');
+    var Matrix4 = require('../math/Matrix4');
     var Renderer = require('../Renderer');
-    var Shader = require("../Shader");
-    var Light = require("../Light");
-    var Mesh = require("../Mesh");
-    var SpotLight = require("../light/Spot");
-    var DirectionalLight = require("../light/Directional");
-    var PointLight = require("../light/Point");
-    var shaderLibrary = require("../shader/library");
-    var Material = require("../Material");
-    var FrameBuffer = require("../FrameBuffer");
-    var Texture2D = require("../texture/Texture2D");
-    var TextureCube = require("../texture/TextureCube");
-    var PerspectiveCamera = require("../camera/Perspective");
-    var OrthoCamera = require("../camera/Orthographic");
+    var Shader = require('../Shader');
+    var Light = require('../Light');
+    var Mesh = require('../Mesh');
+    var SpotLight = require('../light/Spot');
+    var DirectionalLight = require('../light/Directional');
+    var PointLight = require('../light/Point');
+    var shaderLibrary = require('../shader/library');
+    var Material = require('../Material');
+    var FrameBuffer = require('../FrameBuffer');
+    var Texture2D = require('../texture/Texture2D');
+    var TextureCube = require('../texture/TextureCube');
+    var PerspectiveCamera = require('../camera/Perspective');
+    var OrthoCamera = require('../camera/Orthographic');
 
-    var Pass = require("../compositor/Pass");
-    var texturePool = require("../compositor/texturePool");
+    var Pass = require('../compositor/Pass');
+    var texturePool = require('../compositor/texturePool');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
@@ -109,8 +109,8 @@ define(function(require) {
         this._gaussianPassV = new Pass({
             fragment : Shader.source('buildin.compositor.gaussian_blur_v')
         });
-        this._gaussianPassH.setUniform("blurSize", this.shadowBlur);
-        this._gaussianPassV.setUniform("blurSize", this.shadowBlur);
+        this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
+        this._gaussianPassV.setUniform('blurSize', this.shadowBlur);
 
         this._outputDepthPass = new Pass({
             fragment : Shader.source('buildin.sm.debug_depth')
@@ -143,9 +143,9 @@ define(function(require) {
             var width = size || viewport.width / 4;
             var height = width;
             if (this.softShadow === ShadowMapPass.VSM) {
-                this._outputDepthPass.material.shader.define("fragment", "USE_VSM");
+                this._outputDepthPass.material.shader.define('fragment', 'USE_VSM');
             } else {
-                this._outputDepthPass.material.shader.unDefine("fragment", "USE_VSM");
+                this._outputDepthPass.material.shader.unDefine('fragment', 'USE_VSM');
             }
             for (var name in this._textures) {
                 renderer.setViewport(x, y, width, height);
@@ -176,8 +176,8 @@ define(function(require) {
                 if (mesh.material !== depthMaterial) {  // Not binded yet
                     if (!depthShader) {
                         depthShader = new Shader({
-                            vertex : Shader.source("buildin.sm.depth.vertex"),
-                            fragment : Shader.source("buildin.sm.depth.fragment")
+                            vertex : Shader.source('buildin.sm.depth.vertex'),
+                            fragment : Shader.source('buildin.sm.depth.fragment')
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
@@ -200,9 +200,9 @@ define(function(require) {
                     mesh.material = depthMaterial;
 
                     if (this.softShadow === ShadowMapPass.VSM) {
-                        depthShader.define("fragment", "USE_VSM");
+                        depthShader.define('fragment', 'USE_VSM');
                     } else {
-                        depthShader.unDefine("fragment", "USE_VSM");
+                        depthShader.unDefine('fragment', 'USE_VSM');
                     }
 
                     depthMaterial.setUniform('bias', bias);
@@ -224,8 +224,8 @@ define(function(require) {
                         // Skinned mesh
                         distanceMaterial = new Material({
                             shader : new Shader({
-                                vertex : Shader.source("buildin.sm.distance.vertex"),
-                                fragment : Shader.source("buildin.sm.distance.fragment")
+                                vertex : Shader.source('buildin.sm.distance.vertex'),
+                                fragment : Shader.source('buildin.sm.distance.fragment')
                             })
                         });
                         if (nJoints > 0) {
@@ -239,12 +239,12 @@ define(function(require) {
                     mesh.material = distanceMaterial;
 
                     if (this.softShadow === ShadowMapPass.VSM) {
-                        distanceMaterial.shader.define("fragment", "USE_VSM");
+                        distanceMaterial.shader.define('fragment', 'USE_VSM');
                     } else {
-                        distanceMaterial.shader.unDefine("fragment", "USE_VSM");
+                        distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
                     }
-                    distanceMaterial.set("lightPosition", light.position._array);
-                    distanceMaterial.set("range", light.range * 5);
+                    distanceMaterial.set('lightPosition', light.position._array);
+                    distanceMaterial.set('range', light.range * 5);
                 }
             }
         },
@@ -390,7 +390,7 @@ define(function(require) {
                     var shaderNeedsUpdate = false;
                     for (var lightType in this._shadowMapNumber) {
                         var number = this._shadowMapNumber[lightType];
-                        var key = lightType + "_SHADOWMAP_NUMBER";
+                        var key = lightType + '_SHADOWMAP_NUMBER';
 
                         if (shader.fragmentDefines[key] !== number && number > 0) {
                             shader.fragmentDefines[key] = number;
@@ -409,20 +409,20 @@ define(function(require) {
                 }
 
                 if (spotLightShadowMaps.length > 0) {
-                    material.setUniform("spotLightShadowMaps", spotLightShadowMaps);
-                    material.setUniform("spotLightMatrices", spotLightMatrices);   
+                    material.setUniform('spotLightShadowMaps', spotLightShadowMaps);
+                    material.setUniform('spotLightMatrices', spotLightMatrices);   
                 }
                 if (directionalLightShadowMaps.length > 0) {
-                    material.setUniform("directionalLightShadowMaps", directionalLightShadowMaps);
+                    material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
                     if (this.shadowCascade > 1) {
                         material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
                         material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
                     }
-                    material.setUniform("directionalLightMatrices", directionalLightMatrices);   
+                    material.setUniform('directionalLightMatrices', directionalLightMatrices);   
                 }
                 if (pointLightShadowMaps.length > 0) {
-                    material.setUniform("pointLightShadowMaps", pointLightShadowMaps);
-                    material.setUniform("pointLightRanges", pointLightRanges);   
+                    material.setUniform('pointLightShadowMaps', pointLightShadowMaps);
+                    material.setUniform('pointLightRanges', pointLightRanges);   
                 }
                 material.__shadowUniformUpdated = true;
             }
@@ -603,15 +603,15 @@ define(function(require) {
             
             frameBuffer.attach(_gl, tmpTexture);
             frameBuffer.bind(renderer);
-            this._gaussianPassH.setUniform("texture", texture);
-            this._gaussianPassH.setUniform("textureWidth", size);
+            this._gaussianPassH.setUniform('texture', texture);
+            this._gaussianPassH.setUniform('textureWidth', size);
             this._gaussianPassH.render(renderer);
             frameBuffer.unbind(renderer);
 
             frameBuffer.attach(_gl, texture);
             frameBuffer.bind(renderer);
-            this._gaussianPassV.setUniform("texture", tmpTexture);
-            this._gaussianPassV.setUniform("textureHeight", size);
+            this._gaussianPassV.setUniform('texture', tmpTexture);
+            this._gaussianPassV.setUniform('textureHeight', size);
             this._gaussianPassV.render(renderer);
             frameBuffer.unbind(renderer);
 

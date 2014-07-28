@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var LinkedList = require('./LinkedList');
 
     /**

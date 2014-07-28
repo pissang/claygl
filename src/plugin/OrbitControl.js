@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Base = require("../core/Base");
-    var Vector3 = require("../math/Vector3");
-    var Matrix4 = require("../math/Matrix4");
-    var Quaternion = require("../math/Quaternion");
+    var Base = require('../core/Base');
+    var Vector3 = require('../math/Vector3');
+    var Matrix4 = require('../math/Matrix4');
+    var Quaternion = require('../math/Quaternion');
     
     var tmpMatrix = new Matrix4();
 
@@ -113,18 +113,18 @@ define(function(require) {
          * Enable control
          */
         enable : function() {
-            this.domElement.addEventListener("mousedown", this._mouseDown);
-            this.domElement.addEventListener("mousewheel", this._mouseWheel);
-            this.domElement.addEventListener("DOMMouseScroll", this._mouseWheel);
+            this.domElement.addEventListener('mousedown', this._mouseDown);
+            this.domElement.addEventListener('mousewheel', this._mouseWheel);
+            this.domElement.addEventListener('DOMMouseScroll', this._mouseWheel);
         },
 
         /**
          * Disable control
          */
         disable : function() {
-            this.domElement.removeEventListener("mousedown", this._mouseDown);
-            this.domElement.removeEventListener("mousewheel", this._mouseWheel);
-            this.domElement.removeEventListener("DOMMouseScroll", this._mouseWheel);
+            this.domElement.removeEventListener('mousedown', this._mouseDown);
+            this.domElement.removeEventListener('mousewheel', this._mouseWheel);
+            this.domElement.removeEventListener('DOMMouseScroll', this._mouseWheel);
             this._mouseUp();
         },
 
@@ -137,9 +137,9 @@ define(function(require) {
         },
 
         _mouseDown : function(e) {
-            document.addEventListener("mousemove", this._mouseMove);
-            document.addEventListener("mouseup", this._mouseUp);
-            document.addEventListener("mouseout", this._mouseOut);
+            document.addEventListener('mousemove', this._mouseMove);
+            document.addEventListener('mouseup', this._mouseUp);
+            document.addEventListener('mouseout', this._mouseOut);
 
             this._offsetX = e.pageX;
             this._offsetY = e.pageY;
@@ -176,9 +176,9 @@ define(function(require) {
 
         _mouseUp : function() {
 
-            document.removeEventListener("mousemove", this._mouseMove);
-            document.removeEventListener("mouseup", this._mouseUp);
-            document.removeEventListener("mouseout", this._mouseOut);
+            document.removeEventListener('mousemove', this._mouseMove);
+            document.removeEventListener('mouseup', this._mouseUp);
+            document.removeEventListener('mouseout', this._mouseOut);
 
             this._op = -1;
         },

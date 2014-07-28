@@ -1,5 +1,7 @@
 define(function() {
 
+    'use strict';
+
     var Cache = function() {
 
         this._contextId = 0;
@@ -34,14 +36,14 @@ define(function() {
         },
 
         dirty : function(field) {
-            field = field || "";
-            var key = "__dirty__" + field;
+            field = field || '';
+            var key = '__dirty__' + field;
             this.put(key, true)
         },
         
         dirtyAll : function(field) {
-            field = field || "";
-            var key = "__dirty__" + field;
+            field = field || '';
+            var key = '__dirty__' + field;
             for (var i = 0; i < this._caches.length; i++) {
                 if (this._caches[i]) {
                     this._caches[i][key] = true;
@@ -50,14 +52,14 @@ define(function() {
         },
 
         fresh : function(field) {
-            field = field || "";
-            var key = "__dirty__" + field;
+            field = field || '';
+            var key = '__dirty__' + field;
             this.put(key, false);
         },
 
         freshAll : function(field) {
-            field = field || "";
-            var key = "__dirty__" + field;
+            field = field || '';
+            var key = '__dirty__' + field;
             for (var i = 0; i < this._caches.length; i++) {
                 if (this._caches[i]) {
                     this._caches[i][key] = false;
@@ -66,8 +68,8 @@ define(function() {
         },
 
         isDirty : function(field) {
-            field = field || "";
-            var key = "__dirty__" + field;
+            field = field || '';
+            var key = '__dirty__' + field;
             return  !this._context.hasOwnProperty(key)
                     || this._context[key] === true
         },

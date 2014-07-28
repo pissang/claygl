@@ -1,5 +1,7 @@
 define(function(require) {
     
+    'use strict';
+
     /**
      * Simple double linked list. Compared with array, it has O(1) remove operation.
      * @constructor

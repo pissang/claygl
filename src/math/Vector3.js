@@ -2,7 +2,7 @@ define(function(require) {
     
     'use strict';
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
 
     /**
@@ -454,7 +454,7 @@ define(function(require) {
         },
 
         toString : function() {
-            return "[" + Array.prototype.join.call(this._array, ",") + "]";
+            return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
     }
 

@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var Camera = require('../Camera');
     /**
      * @constructor qtek.camera.Orthographic

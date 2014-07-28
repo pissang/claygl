@@ -4,7 +4,7 @@ define(function(require) {
 
     var Node = require('./Node');
     var Light = require('./Light');
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var BoundingBox = require('./math/BoundingBox');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
@@ -168,27 +168,27 @@ define(function(require) {
                     var uniformTpl = light.uniformTemplates[symbol];
                     if (! lightUniforms[symbol]) {
                         lightUniforms[symbol] = {
-                            type : "",
+                            type : '',
                             value : []
                         }
                     }
                     var value = uniformTpl.value(light);
                     var lu = lightUniforms[symbol];
-                    lu.type = uniformTpl.type + "v";
+                    lu.type = uniformTpl.type + 'v';
                     switch (uniformTpl.type) {
-                        case "1i":
-                        case "1f":
+                        case '1i':
+                        case '1f':
                             lu.value.push(value);
                             break;
-                        case "2f":
-                        case "3f":
-                        case "4f":
+                        case '2f':
+                        case '3f':
+                        case '4f':
                             for (var j =0; j < value.length; j++) {
                                 lu.value.push(value[j]);
                             }
                             break;
                         default:
-                            console.error("Unkown light uniform type "+uniformTpl.type);
+                            console.error('Unkown light uniform type '+uniformTpl.type);
                     }
                 }
             }

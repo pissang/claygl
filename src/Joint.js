@@ -1,7 +1,9 @@
 define(function(require) {
 
-    var Node = require("./Node");
-    var Base = require("./core/Base");
+    'use strict';
+
+    var Node = require('./Node');
+    var Base = require('./core/Base');
     
     /**
      * @constructor qtek.Joint

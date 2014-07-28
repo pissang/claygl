@@ -2,11 +2,11 @@ define(function(require) {
 
     'use strict';
 
-    var Base = require("../core/Base");
-    var Pass = require("./Pass");
-    var FrameBuffer = require("../FrameBuffer");
-    var Shader = require("../Shader");
-    var texturePool = require("./texturePool");
+    var Base = require('../core/Base');
+    var Pass = require('./Pass');
+    var FrameBuffer = require('../FrameBuffer');
+    var Shader = require('../Shader');
+    var texturePool = require('./texturePool');
 
     /**
      * Node of graph based post processing.
@@ -16,12 +16,12 @@ define(function(require) {
      * 
      * @example
         var node = new qtek.compositor.Node({
-            name: "fxaa",
+            name: 'fxaa',
             shader: qtek.Shader.source('buildin.compositor.fxaa'),
             inputs:{ 
                 texture : {
-                     node : "scene",
-                     pin : "color"
+                     node : 'scene',
+                     pin : 'color'
                 }
             },
             // Multiple outputs is preserved for MRT support in WebGL2.0
@@ -47,7 +47,7 @@ define(function(require) {
             /**
              * @type {string}
              */
-            name : "",
+            name : '',
 
             /**
              * @type {Object}
@@ -145,7 +145,7 @@ define(function(require) {
                     var texture = texturePool.get(parameters);
                     this._outputTextures[name] = texture;
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                    if (typeof(attachment) == "string") {
+                    if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
                     this.pass.outputs[attachment] = texture;

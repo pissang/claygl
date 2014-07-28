@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var Light = require('../Light');
     var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');

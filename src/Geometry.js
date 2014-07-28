@@ -1,11 +1,11 @@
 define(function(require) {
     
-    'use strict'
+    'use strict';
 
-    var Base = require("./core/Base");
-    var util = require("./core/util");
-    var glenum = require("./core/glenum");
-    var Cache = require("./core/Cache");
+    var Base = require('./core/Base');
+    var util = require('./core/util');
+    var glenum = require('./core/glenum');
+    var Cache = require('./core/Cache');
 
     // PENDING put the buffer data in attribute ? 
     function Attribute(name, type, size, semantic, isDynamic) {
@@ -29,16 +29,16 @@ define(function(require) {
             if (!this.value || this.value.length != nVertex * this.size) {
                 var ArrayConstructor;
                 switch(this.type) {
-                    case "byte":
+                    case 'byte':
                         ArrayConstructor = Int8Array;
                         break;
-                    case "ubyte":
+                    case 'ubyte':
                         ArrayConstructor = Uint8Array;
                         break;
-                    case "short":
+                    case 'short':
                         ArrayConstructor = Int16Array;
                         break;
-                    case "ushort":
+                    case 'ushort':
                         ArrayConstructor = Uint16Array;
                         break;
                     default:

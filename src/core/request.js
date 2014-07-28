@@ -1,15 +1,17 @@
 define(function(require) {
 
+    'use strict';
+
     function get(options) {
 
         var xhr = new XMLHttpRequest();
 
-        xhr.open("get", options.url);
+        xhr.open('get', options.url);
         // With response type set browser can get and put binary data
         // https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Sending_and_Receiving_Binary_Data
         // Default is text, and it can be set
         // arraybuffer, blob, document, json, text
-        xhr.responseType = options.responseType || "text";
+        xhr.responseType = options.responseType || 'text';
 
         if (options.onprogress) {
             //https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest

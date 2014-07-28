@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var Vector3 = require('./Vector3');
     var BoundingBox = require('./BoundingBox');
     var Plane = require('./Plane');

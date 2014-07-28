@@ -2,12 +2,12 @@ define(function(require) {
     
     'use strict';
     
-    var Base = require("./core/Base");
-    var Texture2D = require("./texture/Texture2D");
-    var TextureCube = require("./texture/TextureCube");
+    var Base = require('./core/Base');
+    var Texture2D = require('./texture/Texture2D');
+    var TextureCube = require('./texture/TextureCube');
     var glinfo = require('./core/glinfo');
-    var glenum = require("./core/glenum");
-    var Cache = require("./core/Cache");
+    var glenum = require('./core/glenum');
+    var Cache = require('./core/Cache');
 
     /**
      * @constructor qtek.FrameBuffer
@@ -67,11 +67,11 @@ define(function(require) {
                 this._binded = true;
             }
 
-            this._cache.put("viewport", renderer.viewport);
+            this._cache.put('viewport', renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height);
             // Create a new render buffer
-            if (this._cache.miss("renderbuffer") && this.depthBuffer && ! this._depthTextureAttached) {
-                this._cache.put("renderbuffer", _gl.createRenderbuffer());
+            if (this._cache.miss('renderbuffer') && this.depthBuffer && ! this._depthTextureAttached) {
+                this._cache.put('renderbuffer', _gl.createRenderbuffer());
             }
             if (! this._depthTextureAttached && this.depthBuffer) {
 
@@ -87,9 +87,9 @@ define(function(require) {
                     this._renderBufferHeight = height;
                     _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
                 }
-                if (! this._cache.get("renderbuffer_attached")) {
+                if (! this._cache.get('renderbuffer_attached')) {
                     _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
-                    this._cache.put("renderbuffer_attached", true);
+                    this._cache.put('renderbuffer_attached', true);
                 }
             }
         },
@@ -104,7 +104,7 @@ define(function(require) {
             this._binded = false;
 
             this._cache.use(_gl.__GLID__);
-            var viewport = this._cache.get("viewport");
+            var viewport = this._cache.get('viewport');
             // Reset viewport;
             if (viewport) {
                 renderer.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
@@ -127,11 +127,11 @@ define(function(require) {
 
             this._cache.use(_gl.__GLID__);
 
-            if (this._cache.miss("framebuffer")) {
-                this._cache.put("framebuffer", _gl.createFramebuffer());
+            if (this._cache.miss('framebuffer')) {
+                this._cache.put('framebuffer', _gl.createFramebuffer());
             }
 
-            return this._cache.get("framebuffer");
+            return this._cache.get('framebuffer');
         },
 
         /**
@@ -145,7 +145,7 @@ define(function(require) {
         attach : function(_gl, texture, attachment, target, mipmapLevel) {
 
             if (! texture.width) {
-                throw new Error("The texture attached to color buffer is not a valid.");
+                throw new Error('The texture attached to color buffer is not a valid.');
             }
 
             if (!this._binded) {
@@ -165,17 +165,17 @@ define(function(require) {
             
             if (attachment === _gl.DEPTH_ATTACHMENT) {
 
-                var extension = glinfo.getExtension(_gl, "WEBGL_depth_texture");
+                var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
 
                 if (!extension) {
-                    console.error(" Depth texture is not supported by the browser ");
+                    console.error(' Depth texture is not supported by the browser ');
                     return;
                 }
                 if (texture.format !== glenum.DEPTH_COMPONENT) {
-                    console.error("The texture attached to depth buffer is not a valid.");
+                    console.error('The texture attached to depth buffer is not a valid.');
                     return;
                 }
-                this._cache.put("renderbuffer_attached", false);
+                this._cache.put('renderbuffer_attached', false);
                 this._depthTextureAttached = true;
             }
 
@@ -192,10 +192,10 @@ define(function(require) {
         dispose : function(_gl) {
             this._cache.use(_gl.__GLID__);
 
-            if (this._cache.get("renderbuffer"))
-                _gl.deleteRenderbuffer(this._cache.get("renderbuffer"));
-            if (this._cache.get("framebuffer"))
-                _gl.deleteFramebuffer(this._cache.get("framebuffer"));
+            if (this._cache.get('renderbuffer'))
+                _gl.deleteRenderbuffer(this._cache.get('renderbuffer'));
+            if (this._cache.get('framebuffer'))
+                _gl.deleteFramebuffer(this._cache.get('framebuffer'));
 
             this._cache.deleteContext(_gl.__GLID__);
         }

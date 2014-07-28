@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var DynamicGeometry = require('../DynamicGeometry');
     var BoundingBox = require('../math/BoundingBox');
     var ConeGeometry = require('./Cone');

@@ -1,6 +1,8 @@
 define(function(require) {
 
-    var Base = require("../core/Base");
+    'use strict';
+
+    var Base = require('../core/Base');
 
     /**
      * @constructor qtek.compositor.Graph
@@ -65,7 +67,7 @@ define(function(require) {
                     if (fromPin) {
                         node.link(inputName, fromPin.node, fromPin.pin);
                     }else{
-                        console.warn("Pin of "+fromPinInfo.node+"."+fromPinInfo.pin+" not exist");
+                        console.warn('Pin of ' + fromPinInfo.node + '.' + fromPinInfo.pin + ' not exist');
                     }
                 }
             }

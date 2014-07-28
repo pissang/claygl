@@ -2,10 +2,10 @@ define(function(require) {
 
     'use strict';
 
-    var Node = require("./Node");
-    var glenum = require("./core/glenum");
+    var Node = require('./Node');
+    var glenum = require('./core/glenum');
     var glinfo = require('./core/glinfo');
-    var Vector3 = require("./math/Vector3");
+    var Vector3 = require('./math/Vector3');
     var StaticGeometry = require('./StaticGeometry');
 
     // Cache
@@ -244,19 +244,19 @@ define(function(require) {
                             var size = attributeBufferInfo.size;
                             var glType;
                             switch (attributeBufferInfo.type) {
-                                case "float":
+                                case 'float':
                                     glType = _gl.FLOAT;
                                     break;
-                                case "byte":
+                                case 'byte':
                                     glType = _gl.BYTE;
                                     break;
-                                case "ubyte":
+                                case 'ubyte':
                                     glType = _gl.UNSIGNED_BYTE;
                                     break;
-                                case "short":
+                                case 'short':
                                     glType = _gl.SHORT;
                                     break;
-                                case "ushort":
+                                case 'ushort':
                                     glType = _gl.UNSIGNED_SHORT;
                                     break;
                                 default:

@@ -4,10 +4,12 @@
  */
 define(function(require) {
 
-    var Base = require("./core/Base");
-    var util = require("./core/util");
-    var glenum = require("./core/glenum");
-    var Cache = require("./core/Cache");
+    'use strict';
+
+    var Base = require('./core/Base');
+    var util = require('./core/util');
+    var glenum = require('./core/glenum');
+    var Cache = require('./core/Cache');
 
     /**
      * @constructor qtek.Texture
@@ -95,9 +97,9 @@ define(function(require) {
 
             this._cache.use(_gl.__GLID__);
 
-            if (this._cache.miss("webgl_texture")) {
+            if (this._cache.miss('webgl_texture')) {
                 // In a new gl context, create new texture and set dirty true
-                this._cache.put("webgl_texture", _gl.createTexture());
+                this._cache.put('webgl_texture', _gl.createTexture());
             }
             if (this.dynamic) {
                 this.update(_gl);
@@ -107,7 +109,7 @@ define(function(require) {
                 this._cache.fresh();
             }
 
-            return this._cache.get("webgl_texture");
+            return this._cache.get('webgl_texture');
         },
 
         bind : function() {},
@@ -192,8 +194,8 @@ define(function(require) {
          */
         dispose : function(_gl) {
             this._cache.use(_gl.__GLID__);
-            if (this._cache.get("webgl_texture")){
-                _gl.deleteTexture(this._cache.get("webgl_texture"));
+            if (this._cache.get('webgl_texture')){
+                _gl.deleteTexture(this._cache.get('webgl_texture'));
             }
             this._cache.deleteContext(_gl.__GLID__);
         },

@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Base = require("../core/Base");
-    var Vector3 = require("../math/Vector3");
-    var Matrix4 = require("../math/Matrix4");
-    var Quaternion = require("../math/Quaternion");
+    var Base = require('../core/Base');
+    var Vector3 = require('../math/Vector3');
+    var Matrix4 = require('../math/Matrix4');
+    var Quaternion = require('../math/Quaternion');
 
     /**
      * @constructor qtek.plugin.FirstPersonControl
@@ -86,14 +86,14 @@ define(function(require) {
 
             //Must request pointer lock after click event, can't not do it directly
             //Why ? ?
-            el.addEventListener("click", this._requestPointerLock);
+            el.addEventListener('click', this._requestPointerLock);
 
-            document.addEventListener("pointerlockchange", this._lockChange);
-            document.addEventListener("mozpointerlockchange", this._lockChange);
-            document.addEventListener("webkitpointerlockchange", this._lockChange);
+            document.addEventListener('pointerlockchange', this._lockChange);
+            document.addEventListener('mozpointerlockchange', this._lockChange);
+            document.addEventListener('webkitpointerlockchange', this._lockChange);
 
-            document.addEventListener("keydown", this._keyDown);
-            document.addEventListener("keyup", this._keyUp);
+            document.addEventListener('keydown', this._keyDown);
+            document.addEventListener('keyup', this._keyUp);
         },
 
         /**
@@ -113,14 +113,14 @@ define(function(require) {
                 el.exitPointerLock();
             }
 
-            this.domElement.removeEventListener("click", this._requestPointerLock);
+            this.domElement.removeEventListener('click', this._requestPointerLock);
 
-            document.removeEventListener("pointerlockchange", this._lockChange);
-            document.removeEventListener("mozpointerlockchange", this._lockChange);
-            document.removeEventListener("webkitpointerlockchange", this._lockChange);
+            document.removeEventListener('pointerlockchange', this._lockChange);
+            document.removeEventListener('mozpointerlockchange', this._lockChange);
+            document.removeEventListener('webkitpointerlockchange', this._lockChange);
             
-            document.removeEventListener("keydown", this._keyDown);
-            document.removeEventListener("keyup", this._keyUp);
+            document.removeEventListener('keydown', this._keyDown);
+            document.removeEventListener('keyup', this._keyUp);
         },
 
         _requestPointerLock : function() {

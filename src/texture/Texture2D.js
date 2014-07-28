@@ -42,7 +42,7 @@ define(function(require) {
     }, {
         update : function(_gl) {
 
-            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
             
             this.beforeUpdate( _gl);
 
@@ -55,7 +55,7 @@ define(function(require) {
             _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.magFilter);
             _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.minFilter);
             
-            var anisotropicExt = glinfo.getExtension(_gl, "EXT_texture_filter_anisotropic");
+            var anisotropicExt = glinfo.getExtension(_gl, 'EXT_texture_filter_anisotropic');
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
             }
@@ -121,7 +121,7 @@ define(function(require) {
          * @memberOf qtek.texture.Texture2D.prototype
          */
         generateMipmap : function(_gl) {
-            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get("webgl_texture"));
+            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
             _gl.generateMipmap(_gl.TEXTURE_2D);    
         },
         isPowerOfTwo : function() {
@@ -138,24 +138,27 @@ define(function(require) {
 
         isRenderable : function() {
             if (this.image) {
-                return this.image.nodeName === "CANVAS" ||
+                return this.image.nodeName === 'CANVAS' ||
                         this.image.complete;
             } else {
                 return this.width && this.height;
             }
         },
+
         bind : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this.getWebGLTexture(_gl));
         },
+        
         unbind : function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
+        
         load : function(src) {
             var image = new Image();
             var self = this;
             image.onload = function() {
                 self.dirty();
-                self.trigger("success", self);
+                self.trigger('success', self);
                 image.onload = null;
             }
             image.onerror = function() {

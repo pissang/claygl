@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var Texture = require('../Texture');
     var Texture2D = require('../texture/Texture2D');
     var TextureCube = require('../texture/TextureCube');

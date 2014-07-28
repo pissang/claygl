@@ -1,10 +1,12 @@
 define(function(require) {
 
-    var Base = require("./core/Base");
-    var util = require("./core/util");
-    var Light = require("./Light");
-    var Mesh = require("./Mesh");
-    var Texture = require("./Texture");
+    'use strict';
+
+    var Base = require('./core/Base');
+    var util = require('./core/util');
+    var Light = require('./Light');
+    var Mesh = require('./Mesh');
+    var Texture = require('./Texture');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
     var BoundingBox = require('./math/BoundingBox');
@@ -15,7 +17,7 @@ define(function(require) {
     var Vector3 = require('./math/Vector3');
     var Vector2 = require('./math/Vector2');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;
@@ -133,7 +135,7 @@ define(function(require) {
     }, function() {
 
         if (!this.canvas) {
-            this.canvas = document.createElement("canvas");
+            this.canvas = document.createElement('canvas');
             this.canvas.width = this.width;
             this.canvas.height = this.height;
         }
@@ -164,9 +166,9 @@ define(function(require) {
         }
         catch(e) {
             if (this.throwError) {
-                throw "Error creating WebGL Context";
+                throw 'Error creating WebGL Context';
             } else {
-                this.trigger('error', "Error creating WebGL Context");
+                this.trigger('error', 'Error creating WebGL Context');
             }
         }
     },
@@ -182,8 +184,8 @@ define(function(require) {
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
             if (typeof(width) !== 'undefined') {
-                canvas.style.width = width + "px";
-                canvas.style.height = height + "px";
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
                 // set the size of the drawingBuffer
                 canvas.width = width * this.devicePixelRatio;
                 canvas.height = height * this.devicePixelRatio;
@@ -216,7 +218,7 @@ define(function(require) {
          */
         setViewport : function(x, y, width, height) {
 
-            if (typeof(x) === "object") {
+            if (typeof(x) === 'object') {
                 var obj = x;
                 x = obj.x;
                 y = obj.y;
@@ -314,7 +316,7 @@ define(function(require) {
             transparentQueue.sort(Renderer.transparentSortFunc);
 
             // Render Opaque queue
-            scene.trigger("beforerender:opaque", this, opaqueQueue);
+            scene.trigger('beforerender:opaque', this, opaqueQueue);
 
             // Reset the scene bounding box;
             camera.sceneBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
@@ -324,14 +326,14 @@ define(function(require) {
             _gl.enable(_gl.DEPTH_TEST);
             var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, preZ);
 
-            scene.trigger("afterrender:opaque", this, opaqueQueue, opaqueRenderInfo);
-            scene.trigger("beforerender:transparent", this, transparentQueue);
+            scene.trigger('afterrender:opaque', this, opaqueQueue, opaqueRenderInfo);
+            scene.trigger('beforerender:transparent', this, transparentQueue);
 
             // Render Transparent Queue
             _gl.enable(_gl.BLEND);
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial);
 
-            scene.trigger("afterrender:transparent", this, transparentQueue, transparentRenderInfo);
+            scene.trigger('afterrender:transparent', this, transparentQueue, transparentRenderInfo);
             var renderInfo = {}
             for (name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];

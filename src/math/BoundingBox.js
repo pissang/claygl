@@ -1,6 +1,8 @@
 define(function(require) {
 
-    var Vector3 = require("./Vector3");
+    'use strict';
+
+    var Vector3 = require('./Vector3');
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;

@@ -3,7 +3,7 @@
  */
 define(function(require) {
 
-    var Shader = require("../Shader");
+    var Shader = require('../Shader');
     var util = require('../core/util');
 
     _library = {};
@@ -30,10 +30,10 @@ define(function(require) {
      * 
      * @memberOf qtek.shader.library
      * @example
-     *     qtek.shader.library.get("buildin.phong", "diffuseMap", "normalMap");
-     *     qtek.shader.library.get("buildin.phong", ["diffuseMap", "normalMap"]);
-     *     qtek.shader.library.get("buildin.phong", {
-     *         textures : ["diffuseMap"],
+     *     qtek.shader.library.get('buildin.phong', 'diffuseMap', 'normalMap');
+     *     qtek.shader.library.get('buildin.phong', ['diffuseMap', 'normalMap']);
+     *     qtek.shader.library.get('buildin.phong', {
+     *         textures : ['diffuseMap'],
      *         vertexDefines : {},
      *         fragmentDefines : {}
      *     });
@@ -42,7 +42,7 @@ define(function(require) {
         var enabledTextures = [];
         var vertexDefines = {};
         var fragmentDefines = {};
-        if (typeof(option) === "string") {
+        if (typeof(option) === 'string') {
             enabledTextures = Array.prototype.slice.call(arguments, 1);
         }
         else if (Object.prototype.toString.call(option) == '[object Object]') {
@@ -78,8 +78,8 @@ define(function(require) {
                 return;
             }
             var shader = new Shader({
-                "vertex" : source.vertex,
-                "fragment" : source.fragment
+                'vertex' : source.vertex,
+                'fragment' : source.fragment
             });
             for (var i = 0; i < enabledTextures.length; i++) {
                 shader.enableTexture(enabledTextures[i]);
@@ -127,13 +127,13 @@ define(function(require) {
 
     Shader['import'](require('text!./source/shadowmap.essl'));
 
-    template("buildin.basic", Shader.source("buildin.basic.vertex"), Shader.source("buildin.basic.fragment"));
-    template("buildin.lambert", Shader.source("buildin.lambert.vertex"), Shader.source("buildin.lambert.fragment"));
-    template("buildin.phong", Shader.source("buildin.phong.vertex"), Shader.source("buildin.phong.fragment"));
-    template("buildin.wireframe", Shader.source("buildin.wireframe.vertex"), Shader.source("buildin.wireframe.fragment"));
-    template("buildin.skybox", Shader.source("buildin.skybox.vertex"), Shader.source("buildin.skybox.fragment"));
-    template("buildin.prez", Shader.source("buildin.prez.vertex"), Shader.source("buildin.prez.fragment"));
-    template("buildin.physical", Shader.source("buildin.physical.vertex"), Shader.source("buildin.physical.fragment"));
+    template('buildin.basic', Shader.source('buildin.basic.vertex'), Shader.source('buildin.basic.fragment'));
+    template('buildin.lambert', Shader.source('buildin.lambert.vertex'), Shader.source('buildin.lambert.fragment'));
+    template('buildin.phong', Shader.source('buildin.phong.vertex'), Shader.source('buildin.phong.fragment'));
+    template('buildin.wireframe', Shader.source('buildin.wireframe.vertex'), Shader.source('buildin.wireframe.fragment'));
+    template('buildin.skybox', Shader.source('buildin.skybox.vertex'), Shader.source('buildin.skybox.fragment'));
+    template('buildin.prez', Shader.source('buildin.prez.vertex'), Shader.source('buildin.prez.fragment'));
+    template('buildin.physical', Shader.source('buildin.physical.vertex'), Shader.source('buildin.physical.fragment'));
 
     // Some build in shaders
     Shader['import'](require('text!./source/compositor/vertex.essl'));

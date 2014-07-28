@@ -1,9 +1,11 @@
 define(function(require) {
 
-    var Node = require("./Node");
-    var FrameBuffer = require("../FrameBuffer");
-    var texturePool = require("./texturePool");
-    var Shader = require("../Shader");
+    'use strict';
+
+    var Node = require('./Node');
+    var FrameBuffer = require('../FrameBuffer');
+    var texturePool = require('./texturePool');
+    var Shader = require('../Shader');
 
     /**
      * @constructor qtek.compositor.TextureNode
@@ -11,7 +13,7 @@ define(function(require) {
      */
     var TextureNode = Node.derive(function() {
         return /** @lends qtek.compositor.TextureNode# */ {
-            shader : Shader.source("buildin.compositor.output"),
+            shader : Shader.source('buildin.compositor.output'),
             /**
              * @type {qtek.texture.Texture2D}
              */
@@ -23,7 +25,7 @@ define(function(require) {
             this._rendering = true;
 
             var _gl = renderer.gl;
-            this.pass.setUniform("texture", this.texture);
+            this.pass.setUniform('texture', this.texture);
             
             if (! this.outputs) {
                 this.pass.outputs = null;
@@ -39,7 +41,7 @@ define(function(require) {
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                    if (typeof(attachment) == "string") {
+                    if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
                     this.pass.outputs[ attachment ] = texture;

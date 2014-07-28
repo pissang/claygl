@@ -2,12 +2,14 @@
 // http://docs.unity3d.com/Documentation/Manual/2DBlending.html
 define(function(require) {
 
+    'use strict';
+
     var Clip = require('./Clip');
 
     var delaunay = require('../util/delaunay');
     var Vector2 = require('../math/Vector2');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 

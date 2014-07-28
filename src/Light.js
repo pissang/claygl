@@ -1,7 +1,9 @@
 define(function(require){
 
-    var Node = require("./Node");
-    var Shader = require("./Shader");
+    'use strict';
+
+    var Node = require('./Node');
+    var Shader = require('./Shader');
 
     /**
      * @constructor qtek.Light

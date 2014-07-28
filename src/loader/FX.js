@@ -27,15 +27,15 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : "",
+        rootPath : '',
         /**
          * @type {string}
          */
-        textureRootPath : "",
+        textureRootPath : '',
         /**
          * @type {string}
          */
-        shaderRootPath : ""
+        shaderRootPath : ''
     },
     /** @lends qtek.loader.FX.prototype */
     {
@@ -46,18 +46,18 @@ define(function(require) {
             var self = this;
 
             if (!this.rootPath) {
-                this.rootPath = url.slice(0, url.lastIndexOf("/"));
+                this.rootPath = url.slice(0, url.lastIndexOf('/'));
             }
 
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", percent, loaded, total);
+                    self.trigger('progress', percent, loaded, total);
                 },
                 onerror : function(e) {
-                    self.trigger("error", e);
+                    self.trigger('error', e);
                 },
-                responseType : "text",
+                responseType : 'text',
                 onload : function(data) {
                     self.parse(JSON.parse(data));
                 }

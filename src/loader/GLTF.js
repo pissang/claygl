@@ -7,37 +7,37 @@ define(function(require) {
     'use strict';
 
     var Base = require('../core/Base');
-    var request = require("../core/request");
+    var request = require('../core/request');
     var util = require('../core/util');
 
     var Scene = require('../Scene');
-    var Shader = require("../Shader");
-    var Material = require("../Material");
-    var Mesh = require("../Mesh");
-    var Node = require("../Node");
+    var Shader = require('../Shader');
+    var Material = require('../Material');
+    var Mesh = require('../Mesh');
+    var Node = require('../Node');
     var Texture = require('../Texture');
-    var Texture2D = require("../texture/Texture2D");
-    var TextureCube = require("../texture/TextureCube");
-    var shaderLibrary = require("../shader/library");
-    var Skeleton = require("../Skeleton");
-    var Joint = require("../Joint");
-    var PerspectiveCamera = require("../camera/Perspective");
-    var OrthographicCamera = require("../camera/Orthographic");
-    var PointLight = require("../light/Point");
-    var SpotLight = require("../light/Spot");
-    var DirectionalLight = require("../light/Directional");
-    var glenum = require("../core/glenum");
+    var Texture2D = require('../texture/Texture2D');
+    var TextureCube = require('../texture/TextureCube');
+    var shaderLibrary = require('../shader/library');
+    var Skeleton = require('../Skeleton');
+    var Joint = require('../Joint');
+    var PerspectiveCamera = require('../camera/Perspective');
+    var OrthographicCamera = require('../camera/Orthographic');
+    var PointLight = require('../light/Point');
+    var SpotLight = require('../light/Spot');
+    var DirectionalLight = require('../light/Directional');
+    var glenum = require('../core/glenum');
 
-    var Vector3 = require("../math/Vector3");
-    var Quaternion = require("../math/Quaternion");
+    var Vector3 = require('../math/Vector3');
+    var Quaternion = require('../math/Quaternion');
     var BoundingBox = require('../math/BoundingBox');
 
-    var SamplerClip = require("../animation/SamplerClip");
-    var SkinningClip = require("../animation/SkinningClip");
+    var SamplerClip = require('../animation/SamplerClip');
+    var SkinningClip = require('../animation/SkinningClip');
 
-    var StaticGeometry = require("../StaticGeometry");
+    var StaticGeometry = require('../StaticGeometry');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var vec4 = glMatrix.vec4;
     var vec3 = glMatrix.vec3;
     var quat = glMatrix.quat;
@@ -71,17 +71,17 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : "",
+        rootPath : '',
 
         /**
          * @type {string}
          */
-        textureRootPath : "",
+        textureRootPath : '',
 
         /**
          * @type {string}
          */
-        bufferRootPath : "",
+        bufferRootPath : '',
 
         /**
          * @type {string}
@@ -108,18 +108,18 @@ define(function(require) {
             var self = this;
 
             if (!this.rootPath) {
-                this.rootPath = url.slice(0, url.lastIndexOf("/"));
+                this.rootPath = url.slice(0, url.lastIndexOf('/'));
             }
 
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", percent, loaded, total);
+                    self.trigger('progress', percent, loaded, total);
                 },
                 onerror : function(e) {
-                    self.trigger("error", e);
+                    self.trigger('error', e);
                 },
-                responseType : "text",
+                responseType : 'text',
                 onload : function(data) {
                     self.parse(JSON.parse(data));
                 }
@@ -196,7 +196,7 @@ define(function(require) {
                     }
                 }
 
-                self.trigger("success", {
+                self.trigger('success', {
                     scene : scene,
                     cameras : lib.cameras,
                     textures : lib.textures,
@@ -219,11 +219,11 @@ define(function(require) {
         _loadBuffer : function(path, onsuccess, onerror) {
             var root = this.bufferRootPath || this.rootPath;
             if (root) {
-                path = root + "/" + path;
+                path = root + '/' + path;
             }
             request.get({
                 url : path,
-                responseType : "arraybuffer",
+                responseType : 'arraybuffer',
                 onload : function(buffer) {
                     onsuccess && onsuccess(buffer);
                 },
@@ -473,8 +473,8 @@ define(function(require) {
                 var techniqueInfo = json.techniques[name];
                 // Default phong shader
                 // var shader = new Shader({
-                //     vertex : Shader.source("buildin.phong.vertex"),
-                //     fragment : Shader.source("buildin.phong.fragment")
+                //     vertex : Shader.source('buildin.phong.vertex'),
+                //     fragment : Shader.source('buildin.phong.fragment')
                 // });
                 techniques[name] = {
                     // shader : shader,
@@ -531,29 +531,29 @@ define(function(require) {
                 if (uniforms['diffuse']) {
                     // Color
                     if (uniforms['diffuse'] instanceof Array) {
-                        material.set("color", uniforms['diffuse'].slice(0, 3));
+                        material.set('color', uniforms['diffuse'].slice(0, 3));
                     } else { // Texture
-                        material.set("diffuseMap", uniforms["diffuse"]);
+                        material.set('diffuseMap', uniforms['diffuse']);
                     }
                 }
                 if (uniforms['normalMap'] !== undefined) {
-                    material.set("normalMap", uniforms["normalMap"]);
+                    material.set('normalMap', uniforms['normalMap']);
                 }
                 if (uniforms['emission'] !== undefined) {
                     material.set('emission', uniforms['emission'].slice(0, 3));
                 }
                 if (uniforms['shininess'] !== undefined) {
-                    material.set("glossiness", Math.log(uniforms["shininess"]) / Math.log(8192));
-                    material.set("shininess", uniforms["shininess"]);
+                    material.set('glossiness', Math.log(uniforms['shininess']) / Math.log(8192));
+                    material.set('shininess', uniforms['shininess']);
                 } else {
-                    material.set("glossiness", 0.5);
-                    material.set("shininess", 0.5);
+                    material.set('glossiness', 0.5);
+                    material.set('shininess', 0.5);
                 }
-                if (uniforms["specular"] !== undefined) {
-                    material.set("specularColor", uniforms["specular"].slice(0, 3));
+                if (uniforms['specular'] !== undefined) {
+                    material.set('specularColor', uniforms['specular'].slice(0, 3));
                 }
-                if (uniforms["transparency"] !== undefined) {
-                    material.set("alpha", uniforms["transparency"]);
+                if (uniforms['transparency'] !== undefined) {
+                    material.set('alpha', uniforms['transparency']);
                 }
 
                 lib.materials[name] = material;
@@ -641,7 +641,7 @@ define(function(require) {
                                 var arrayConstructor = Float32Array;
                                 break;
                             default:
-                                console.warn("Attribute type "+attributeInfo.type+" not support yet");
+                                console.warn('Attribute type '+attributeInfo.type+' not support yet');
                                 break;
                         }
                         var attributeArray = new arrayConstructor(buffer, byteOffset, attributeInfo.count * size);
@@ -715,7 +715,7 @@ define(function(require) {
                 if (nodeInfo.camera && this.includeCamera) {
                     var cameraInfo = json.cameras[nodeInfo.camera];
 
-                    if (cameraInfo.projection === "perspective") {
+                    if (cameraInfo.projection === 'perspective') {
                         node = new PerspectiveCamera({
                             name : nodeInfo.name,
                             aspect : cameraInfo.aspect_ratio,
@@ -726,7 +726,7 @@ define(function(require) {
                     } else {
                         // TODO
                         node = new OrthographicCamera();
-                        console.warn("TODO:Orthographic camera")
+                        console.warn('TODO:Orthographic camera')
                     }
                     node.setName(nodeInfo.name);
                     lib.cameras[nodeInfo.name] = node;
@@ -822,26 +822,26 @@ define(function(require) {
         _parseLight : function(lightInfo) {
             // TODO : Light parameters
             switch(lightInfo.type) {
-                case "point":
+                case 'point':
                     var light = new PointLight({
                         name : lightInfo.id,
                         color : lightInfo.point.color,
                     });
                     break;
-                case "spot":
+                case 'spot':
                     var light = new SpotLight({
                         name : lightInfo.id,
                         color : lightInfo.spot.color
                     });
                     break;
-                case "directional":
+                case 'directional':
                     var light = new DirectionalLight({
                         name : lightInfo.id,
                         color : lightInfo.directional.color
                     });
                     break;
                 default:
-                    console.warn("Light " + lightInfo.type + " not support yet");
+                    console.warn('Light ' + lightInfo.type + ' not support yet');
             }
 
             return light;

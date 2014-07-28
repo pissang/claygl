@@ -4,7 +4,7 @@ define(function(require) {
     
     var Clip = require('./Clip');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 
@@ -163,7 +163,7 @@ define(function(require) {
         if (start && end) {
             var percent = (time-start.time) / (end.time-start.time);
             percent = Math.max(Math.min(percent, 1), 0);
-            if (fieldName === "rotation") {
+            if (fieldName === 'rotation') {
                 quat.slerp(this[fieldName], start[fieldName], end[fieldName], percent);
             } else {
                 vec3.lerp(this[fieldName], start[fieldName], end[fieldName], percent);

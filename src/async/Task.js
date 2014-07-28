@@ -1,5 +1,7 @@
 define(function(require) {
 
+    'use strict';
+
     var notifier = require('../core/mixin/notifier');
     var request = require('../core/request');
     var util  = require('../core/util');

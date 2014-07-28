@@ -7,12 +7,12 @@ define(function(require) {
 
     'use strict';
 
-    var Geometry = require("./Geometry");
-    var util = require("./core/util");
-    var Vector3 = require("./math/Vector3");
-    var BoundingBox = require("./math/BoundingBox");
-    var glenum = require("./core/glenum");
-    var glMatrix = require("glmatrix");
+    var Geometry = require('./Geometry');
+    var util = require('./core/util');
+    var Vector3 = require('./math/Vector3');
+    var BoundingBox = require('./math/BoundingBox');
+    var glenum = require('./core/glenum');
+    var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
     var mat2 = glMatrix.mat2;
@@ -77,7 +77,7 @@ define(function(require) {
         // Overwrite the dirty method
         dirty : function(field) {
             if (!field) {
-                this.dirty("indices");
+                this.dirty('indices');
                 for (var name in this.attributes) {
                     this.dirty(name);
                 }
@@ -203,7 +203,7 @@ define(function(require) {
                     this._cache.fresh();
                 }
             }
-            return this._cache.get("chunks");
+            return this._cache.get('chunks');
         },
 
         _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
@@ -218,16 +218,16 @@ define(function(require) {
             for (var name in attributes) {
                 // Type can be byte, ubyte, short, ushort, float
                 switch(type) {
-                    case "byte":
+                    case 'byte':
                         ArrayConstructors[name] = Int8Array;
                         break;
-                    case "ubyte":
+                    case 'ubyte':
                         ArrayConstructors[name] = Uint8Array;
                         break;
-                    case "short":
+                    case 'short':
                         ArrayConstructors[name] = Int16Array;
                         break;
-                    case "ushort":
+                    case 'ushort':
                         ArrayConstructors[name] = Uint16Array;
                         break;
                     default:
@@ -400,7 +400,7 @@ define(function(require) {
         },
 
         _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
-            var chunks = this._cache.get("chunks");
+            var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
                 chunks = [];
@@ -411,7 +411,7 @@ define(function(require) {
                         indicesBuffer : null
                     }
                 }
-                this._cache.put("chunks", chunks);
+                this._cache.put('chunks', chunks);
                 firstUpdate = true;
             }
             for (var cc = 0; cc < this._arrayChunks.length; cc++) {
@@ -559,7 +559,7 @@ define(function(require) {
                 }
             }
         },
-        // "Mathmatics for 3D programming and computer graphics, third edition"
+        // 'Mathmatics for 3D programming and computer graphics, third edition'
         // section 7.8.2
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
         generateTangents : function() {

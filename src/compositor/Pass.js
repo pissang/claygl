@@ -1,7 +1,9 @@
 define(function(require) {
+    
+    'use strict';
 
-    var Base = require("../core/Base");
-    var Scene = require("../Scene");
+    var Base = require('../core/Base');
+    var Scene = require('../Scene');
     var OrthoCamera = require('../camera/Orthographic');
     var Plane = require('../geometry/Plane');
     var Shader = require('../Shader');
@@ -28,7 +30,7 @@ define(function(require) {
              * Fragment shader string
              * @type {string}
              */
-            fragment : "",
+            fragment : '',
 
             /**
              * @type {Object}
@@ -131,7 +133,7 @@ define(function(require) {
                 this.bind(renderer, frameBuffer);
                 // MRT Support in chrome
                 // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-                var ext = glinfo.getExtension(_gl, "EXT_draw_buffers");
+                var ext = glinfo.getExtension(_gl, 'EXT_draw_buffers');
                 if (ext && this.outputs) {
                     var bufs = [];
                     for (var attachment in this.outputs) {
@@ -144,12 +146,12 @@ define(function(require) {
                 }
             }
 
-            this.trigger("beforerender", this, renderer);
+            this.trigger('beforerender', this, renderer);
             // Don't clear in each pass, let the color overwrite the buffer
             _gl.disable(_gl.BLEND);
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
             renderer.renderQueue([mesh], camera);
-            this.trigger("afterrender", this, renderer);
+            this.trigger('afterrender', this, renderer);
 
             if (frameBuffer) {
                 this.unbind(renderer, frameBuffer);
