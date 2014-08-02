@@ -25,7 +25,7 @@ define(function(require) {
             skydomeShader = new Shader({
                 vertex : Shader.source('buildin.basic.vertex'),
                 fragment : Shader.source('buildin.basic.fragment')
-            })
+            });
             skydomeShader.enableTexture('diffuseMap');
         }
 
@@ -48,7 +48,7 @@ define(function(require) {
             }),
             material : material,
             culling : false
-        }
+        };
     }, function() {
         var scene = this.scene;
         if (scene) {

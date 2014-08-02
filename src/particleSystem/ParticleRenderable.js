@@ -212,7 +212,6 @@ define(function(require) {
         },
 
         _updateVertices : function() {
-            var particles = this._particles;
             var geometry = this.geometry;
             // If has uv animation
             var animTileX = this.spriteAnimationTileX;
@@ -244,7 +243,8 @@ define(function(require) {
                 for (var j = 0; j < 3; j++) {
                     positions[offset + j] = particle.position._array[j];
                     normals[offset] = particle.age / particle.life;
-                    normals[offset + 1] = particle.rotation;
+                    // normals[offset + 1] = particle.rotation;
+                    normals[offset + 1] = 0;
                     normals[offset + 2] = particle.spriteSize;
                 }
                 var offset2 = i * 2;

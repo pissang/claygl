@@ -8,7 +8,7 @@ define(function(require) {
 
     var clipSortFunc = function(a, b) {
         return a.position < b.position;
-    }
+    };
 
     /**
      * @typedef {Object} qtek.animation.Blend1DClip.IClipInput
@@ -63,7 +63,7 @@ define(function(require) {
         this._cachePosition = -Infinity;
 
         this.inputs.sort(clipSortFunc);
-    }
+    };
 
     Blend1DClip.prototype = new Clip();
     Blend1DClip.prototype.constructor = Blend1DClip;
@@ -79,7 +79,7 @@ define(function(require) {
             position : position,
             clip : inputClip,
             offset : offset || 0
-        }
+        };
         this.life = Math.max(inputClip.life, this.life);
 
         if (!this.inputs.length) {
@@ -97,7 +97,7 @@ define(function(require) {
         }
 
         return obj;
-    }
+    };
 
     Blend1DClip.prototype.step = function(time) {
 
@@ -108,7 +108,7 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     Blend1DClip.prototype.setTime = function(time) {
         var position = this.position;
@@ -144,7 +144,7 @@ define(function(require) {
             var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
             this.output.blend1D(c1, c2, w);
         }
-    }
+    };
     
     // Find the key where position in range [inputs[key].position, inputs[key+1].position)
     Blend1DClip.prototype._findKey = function(position) {
@@ -171,7 +171,7 @@ define(function(require) {
         }
 
         return key;
-    }
+    };
 
     return Blend1DClip;
 });

@@ -63,7 +63,7 @@ define(function(require) {
 
             _offsetPitch : 0,
             _offsetRoll : 0
-        }
+        };
     }, function() {
         this._lockChange = this._lockChange.bind(this);
         this._keyDown = this._keyDown.bind(this);
@@ -105,9 +105,9 @@ define(function(require) {
 
             var el = this.domElement;
 
-            el.exitPointerLock = el.exitPointerLock ||
-                                    el.mozExitPointerLock ||
-                                    el.webkitExitPointerLock
+            el.exitPointerLock = el.exitPointerLock
+                || el.mozExitPointerLock
+                || el.webkitExitPointerLock;
 
             if (el.exitPointerLock) {
                 el.exitPointerLock();
@@ -125,9 +125,9 @@ define(function(require) {
 
         _requestPointerLock : function() {
             var el = this;
-            el.requestPointerLock = el.requestPointerLock ||
-                                    el.mozRequestPointerLock ||
-                                    el.webkitRequestPointerLock;
+            el.requestPointerLock = el.requestPointerLock
+                || el.mozRequestPointerLock
+                || el.webkitRequestPointerLock;
 
             el.requestPointerLock();
         },
@@ -136,71 +136,59 @@ define(function(require) {
          * Control update. Should be invoked every frame
          * @param {number} frameTime Frame time
          */
-        update : (function() {
+        update : function(frameTime) {
+            var target = this.target;
 
-            var rotateQuat = new Quaternion();
-            
-            return function(frameTime) {
-                
-                var target = this.target;
+            var position = this.target.position;
+            var xAxis = target.localTransform.right.normalize();
+            var zAxis = target.localTransform.forward.normalize();
 
-                var position = this.target.position;
-                var xAxis = target.localTransform.right.normalize();
-                var zAxis = target.localTransform.forward.normalize();
-
-                if (this.verticalMoveLock) {
-                    zAxis.y = 0;
-                    zAxis.normalize();
-                }
-
-                var speed = this.speed * frameTime / 20;
-
-                if (this._moveForward) {
-                    // Opposite direction of z
-                    position.scaleAndAdd(zAxis, -speed);
-                }
-                if (this._moveBackward) {
-                    position.scaleAndAdd(zAxis, speed);
-                }
-                if (this._moveLeft) {
-                    position.scaleAndAdd(xAxis, -speed / 2);
-                }
-                if (this._moveRight) {
-                    position.scaleAndAdd(xAxis, speed / 2);
-                }
-
-
-                target.rotateAround(target.position, this.up, -this._offsetPitch * frameTime * Math.PI / 360);
-                var xAxis = target.localTransform.right;
-                target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
-
-                this._offsetRoll = this._offsetPitch = 0;
+            if (this.verticalMoveLock) {
+                zAxis.y = 0;
+                zAxis.normalize();
             }
 
-        })(),
+            var speed = this.speed * frameTime / 20;
+
+            if (this._moveForward) {
+                // Opposite direction of z
+                position.scaleAndAdd(zAxis, -speed);
+            }
+            if (this._moveBackward) {
+                position.scaleAndAdd(zAxis, speed);
+            }
+            if (this._moveLeft) {
+                position.scaleAndAdd(xAxis, -speed / 2);
+            }
+            if (this._moveRight) {
+                position.scaleAndAdd(xAxis, speed / 2);
+            }
+
+            target.rotateAround(target.position, this.up, -this._offsetPitch * frameTime * Math.PI / 360);
+            var xAxis = target.localTransform.right;
+            target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
+
+            this._offsetRoll = this._offsetPitch = 0;
+        },
 
         _lockChange : function() {
-            if (document.pointerlockElement === this.domElement ||
-                document.mozPointerlockElement === this.domElement ||
-                document.webkitPointerLockElement === this.domElement) {
-
+            if (
+                document.pointerlockElement === this.domElement
+                || document.mozPointerlockElement === this.domElement
+                || document.webkitPointerLockElement === this.domElement
+            ) {
                 document.addEventListener('mousemove', this._mouseMove, false);
-            }else{
+            } else {
                 document.removeEventListener('mousemove', this._mouseMove);
             }
         },
 
         _mouseMove : function(e) {
-            var dx = e.movementX || 
-                    e.mozMovementX ||
-                    e.webkitMovementX || 0;
-            var dy = e.movementY ||
-                    e.mozMovementY ||
-                    e.webkitMovementY || 0;
+            var dx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+            var dy = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
             this._offsetPitch += dx * this.sensitivity / 200;
             this._offsetRoll += dy * this.sensitivity / 200;
-            
         },
 
         _keyDown : function(e) {
@@ -230,7 +218,7 @@ define(function(require) {
             this._moveLeft = false;
             this._moveRight = false;
         }
-    })
+    });
 
     return FirstPersonControl;
-})
+});

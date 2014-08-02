@@ -148,7 +148,7 @@ define(function(require) {
         this.target = target;
         this.triangle = tri;
         this.distance = distance;
-    }
+    };
 
     return RayPicking;
 });

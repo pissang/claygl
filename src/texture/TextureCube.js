@@ -12,7 +12,7 @@ define(function(require) {
         'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
         'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
         'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
-    }
+    };
 
     /**
      * @constructor qtek.texture.TextureCube
@@ -77,7 +77,7 @@ define(function(require) {
                 pz : null,
                 nz : null
             }
-       }
+       };
     }, {
         update : function(_gl) {
 
@@ -146,25 +146,25 @@ define(function(require) {
         isPowerOfTwo : function() {
             if (this.image.px) {
                 return isPowerOfTwo(this.image.px.width)
-                        && isPowerOfTwo(this.image.px.height);
+                    && isPowerOfTwo(this.image.px.height);
             } else {
                 return isPowerOfTwo(this.width)
-                        && isPowerOfTwo(this.height);
+                    && isPowerOfTwo(this.height);
             }
 
             function isPowerOfTwo(value) {
-                return value & (value-1) === 0
+                return value & (value-1) === 0;
             }
         },
 
         isRenderable : function() {
             if (this.image.px) {
-                return isImageRenderable(this.image.px) &&
-                       isImageRenderable(this.image.nx) &&
-                       isImageRenderable(this.image.py) &&
-                       isImageRenderable(this.image.ny) &&
-                       isImageRenderable(this.image.pz) &&
-                       isImageRenderable(this.image.nz);
+                return isImageRenderable(this.image.px)
+                    && isImageRenderable(this.image.nx)
+                    && isImageRenderable(this.image.py)
+                    && isImageRenderable(this.image.ny)
+                    && isImageRenderable(this.image.pz)
+                    && isImageRenderable(this.image.nz);
             } else {
                 return this.width && this.height;
             }
@@ -182,11 +182,11 @@ define(function(require) {
                         self.trigger('success', self);
                     }
                     image.onload = null;
-                }
+                };
                 image.onerror = function() {
                     loading --;
                     image.onerror = null;
-                }
+                };
                 
                 loading++;
                 image.src = src;
@@ -203,4 +203,4 @@ define(function(require) {
     }
 
     return TextureCube;
-})
+});

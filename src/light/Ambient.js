@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Light = require('../Light');
-    var Shader = require('../Shader');
 
     /**
      * @constructor qtek.light.Ambient
@@ -31,7 +30,7 @@ define(function(require) {
          * @return {qtek.light.Ambient}
          * @memberOf qtek.light.Ambient.prototype
          */
-    })
+    });
 
     return AmbientLight;
-})
+});

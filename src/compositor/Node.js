@@ -5,7 +5,6 @@ define(function(require) {
     var Base = require('../core/Base');
     var Pass = require('./Pass');
     var FrameBuffer = require('../FrameBuffer');
-    var Shader = require('../Shader');
     var texturePool = require('./texturePool');
 
     /**
@@ -102,7 +101,7 @@ define(function(require) {
             _rendering : false,
             // If rendered in this frame
             _rendered : false
-        }
+        };
     }, function() {
         
         var pass = new Pass({
@@ -113,7 +112,7 @@ define(function(require) {
         if (this.outputs) {
             this.frameBuffer = new FrameBuffer({
                 depthBuffer : false
-            })
+            });
         }
     }, 
     /** @lends qtek.compositor.Node.prototype */
@@ -235,7 +234,7 @@ define(function(require) {
         setShader : function(shaderStr) {
             var material = this.pass.material;
             material.shader.setFragment(shaderStr);
-            material.attachShader(shader, true);
+            material.attachShader(material.shader, true);
         },
 
         getOutput : function(renderer /*optional*/, name) {
@@ -296,7 +295,7 @@ define(function(require) {
             this.inputLinks[inputPinName] = {
                 node : fromNode,
                 pin : fromPinName
-            }
+            };
             if (! fromNode.outputLinks[fromPinName]) {
                 fromNode.outputLinks[fromPinName] = [];
             }
@@ -355,7 +354,7 @@ define(function(require) {
                 }
             }
         }
-    })
+    });
 
     return Node;
-})
+});

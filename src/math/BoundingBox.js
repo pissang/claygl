@@ -4,7 +4,6 @@ define(function(require) {
 
     var Vector3 = require('./Vector3');
     var glMatrix = require('glmatrix');
-    var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
     var vec3TransformMat4 = vec3.transformMat4;
@@ -43,7 +42,7 @@ define(function(require) {
          * @type {Float32Array[]}
          */
         this.vertices = vertices;
-    }
+    };
 
     BoundingBox.prototype = {
         

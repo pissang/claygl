@@ -78,7 +78,7 @@ define(function() {
 
             extensions[_gl.__GLID__][name] = ext;
         }
-    }
+    };
 
     return glinfo;
-})
+});

@@ -4,7 +4,6 @@ define(function(require) {
 
     var Renderable = require('./Renderable');
     var glenum = require('./core/glenum');
-    var glinfo = require('./core/glinfo');
 
     /**
      * @constructor qtek.Mesh
@@ -32,7 +31,6 @@ define(function(require) {
             this.joints = [];
         }
     }, {
-
         render : function(_gl, globalMaterial) {       
             var material = globalMaterial || this.material;
             // Set pose matrices of skinned mesh
@@ -61,4 +59,4 @@ define(function(require) {
     Mesh.CCW = glenum.CCW;
 
     return Mesh;
-})
+});

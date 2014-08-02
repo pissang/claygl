@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Light = require('../Light');
-    var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');
 
     /**
@@ -69,7 +68,7 @@ define(function(require) {
             'spotLightFalloffFactor' : {
                 type : '1f',
                 value : function(instance) {
-                    return instance.falloffFactor
+                    return instance.falloffFactor;
                 }
             },
             'spotLightDirection' : {
@@ -79,15 +78,15 @@ define(function(require) {
                     return function(instance) {
                         // Direction is target to eye
                         return z.copy(instance.worldTransform.forward).negate()._array;
-                    }
+                    };
                 })()
             },
             'spotLightColor' : {
                 type : '3f',
                 value : function(instance) {
-                    var color = instance.color,
-                        intensity = instance.intensity;
-                    return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];
+                    var color = instance.color;
+                    var intensity = instance.intensity;
+                    return [color[0]*intensity, color[1]*intensity, color[1]*intensity];
                 }
             }
         },
@@ -103,9 +102,9 @@ define(function(require) {
             light.falloffFactor = this.falloffFactor;
             light.shadowBias = this.shadowBias;
             light.shadowSlopeScale = this.shadowSlopeScale;
-            return light
+            return light;
         }
     });
 
     return SpotLight;
-} )
+});

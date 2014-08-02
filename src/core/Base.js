@@ -12,16 +12,16 @@ define(function(require){
      * @alias qtek.core.Base
      * @mixes qtek.core.mixin.notifier
      */
-    var Base = function(){
+    var Base = function() {
         /**
          * @type {number}
          */
         this.__GUID__ = util.genGUID();
-    }
+    };
 
     Base.__initializers__ = [
         function(opts) {
-            util.extend(this, opts)
+            util.extend(this, opts);
         }
     ];
     
@@ -29,4 +29,4 @@ define(function(require){
     util.extend(Base.prototype, notifierMixin);
 
     return Base;
-})
+});

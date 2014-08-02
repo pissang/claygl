@@ -3,11 +3,9 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var util = require('./core/util');
     var Vector3 = require('./math/Vector3');
     var Quaternion = require('./math/Quaternion');
     var Matrix4 = require('./math/Matrix4');
-    var Matrix3 = require('./math/Matrix3');
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
 
@@ -311,7 +309,7 @@ define(function(require) {
                     mat4.copy(this.localTransform._array, matrix._array);
                 }
                 this.localTransform.decomposeMatrix(this.scale, this.rotation, this.position);
-            }
+            };
         })(),
 
         /**
@@ -348,11 +346,11 @@ define(function(require) {
                     this.worldTransform._array,
                     this.parent.worldTransform._array,
                     this.localTransform._array
-                )
+                );
             } else {
                 mat4.copy(
                     this.worldTransform._array, this.localTransform._array 
-                )
+                );
             }
         },
 
@@ -441,7 +439,7 @@ define(function(require) {
 
                 this.decomposeLocalTransform();
                 this._needsUpdateWorldTransform = true;
-            }
+            };
         })(),
 
         /**
@@ -456,9 +454,9 @@ define(function(require) {
             return function(target, up) {
                 m.lookAt(this.position, target, up || this.localTransform.up).invert();
                 m.decomposeMatrix(scaleVector, this.rotation, this.position);
-            }
+            };
         })()
     });
 
     return Node;
-})
+});

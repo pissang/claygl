@@ -16,7 +16,7 @@ define(function(require) {
         this._map = {};
 
         this._maxSize = maxSize || 10;
-    }
+    };
 
     /**
      * Set cache max size
@@ -24,7 +24,7 @@ define(function(require) {
      */
     LRU.prototype.setMaxSize = function(size) {
         this._maxSize = size;
-    }
+    };
 
     /**
      * @param  {string} key
@@ -44,7 +44,7 @@ define(function(require) {
             entry.key = key;
             this._map[key] = entry;
         }
-    }
+    };
 
     /**
      * @param  {string} key
@@ -61,7 +61,7 @@ define(function(require) {
 
             return entry.value;
         }
-    }
+    };
 
     /**
      * @param {string} key
@@ -72,7 +72,7 @@ define(function(require) {
             delete this._map[key];
             this._list.remove(entry);
         }
-    }
+    };
 
     /**
      * Clear the cache
@@ -80,7 +80,7 @@ define(function(require) {
     LRU.prototype.clear = function() {
         this._list.clear();
         this._map = {};
-    }
+    };
 
     return LRU;
 });

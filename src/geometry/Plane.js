@@ -68,7 +68,7 @@ define(function(require) {
             this.boundingBox.min.set(-1, -1, 0);
             this.boundingBox.max.set(1, 1, 0);
         }
-    })
+    });
 
     return Plane;
-})
+});

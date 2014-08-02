@@ -2,7 +2,6 @@ define(function(require) {
 
     'use strict';
 
-    var Node = require('./Node');
     var Base = require('./core/Base');
     
     /**
@@ -40,8 +39,7 @@ define(function(require) {
          * @type {qtek.Node}
          */
         rootNode : null
-    }, {
     });
 
     return Joint;
-})
+});

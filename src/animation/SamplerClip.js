@@ -62,7 +62,7 @@ define(function(require) {
         out[3] = scale0 * aw + scale1 * bw;
         
         return out;
-    };
+    }
 
     /**
      * @constructor
@@ -109,11 +109,11 @@ define(function(require) {
             position : null,
             rotation : null,
             scale : null
-        }
+        };
 
         this._cacheKey = 0;
         this._cacheTime = 0;
-    }
+    };
 
     SamplerClip.prototype = Object.create(Clip.prototype);
 
@@ -128,7 +128,7 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     SamplerClip.prototype.setTime = function(time) {
         if (!this.channels.time) {
@@ -138,16 +138,16 @@ define(function(require) {
         var len = channels.time.length;
         var key = -1;
         if (time < this._cacheTime) {
-            var s = Math.min(len-2, this._cacheKey);
+            var s = Math.min(len - 2, this._cacheKey);
             for (var i = s; i >= 0; i--) {
-                if (channels.time[i-1] <= time && channels.time[i] > time) {
+                if (channels.time[i - 1] <= time && channels.time[i] > time) {
                     key = i - 1;
                     break;
                 }
             }
         } else {
             for (var i = this._cacheKey; i < len-1; i++) {
-                if (channels.time[i] <= time && channels.time[i+1] > time) {
+                if (channels.time[i] <= time && channels.time[i + 1] > time) {
                     key = i;
                     break;
                 }
@@ -155,13 +155,13 @@ define(function(require) {
         }
 
         if (key > -1) {
-            this._cacheKey = i;
+            this._cacheKey = key;
             this._cacheTime = time;
             var start = key;
-            var end = key+1;
+            var end = key + 1;
             var startTime = channels.time[start];
             var endTime = channels.time[end];
-            var percent = (time-startTime) / (endTime-startTime);
+            var percent = (time - startTime) / (endTime - startTime);
 
             if (channels.rotation) {
                 quatSlerp(this.rotation, channels.rotation, channels.rotation, percent, start * 4, end * 4);
@@ -178,7 +178,7 @@ define(function(require) {
             this._cacheKey = 0;
             this._cacheTime = 0;
         }
-    }
+    };
 
     /**
      * @param {number} startTime
@@ -224,8 +224,9 @@ define(function(require) {
         subClip.channels.rotation[3] = this.rotation[3];
 
         for (var i = 1; i < count-1; i++) {
+            var i2;
             for (var j = 0; j < 3; j++) {
-                var i2 = rangeStart[0] + i;
+                i2 = rangeStart[0] + i;
                 subClip.channels.rotation[i * 4 + j] = this.channels.rotation[i2 * 4 + j];
                 subClip.channels.position[i * 3 + j] = this.channels.position[i2 * 3 + j];
                 subClip.channels.scale[i * 3 + j] = this.channels.scale[i2 * 3 + j];
@@ -246,7 +247,7 @@ define(function(require) {
         // TODO set back ?
         subClip.life = endTime - startTime;
         return subClip;
-    },
+    };
 
     SamplerClip.prototype._findRange = function(time) {
         var channels = this.channels;
@@ -265,7 +266,7 @@ define(function(require) {
         }
         // Percent [0, 1)
         return [start, percent];
-    }
+    };
 
     /**
      * 1D blending between two clips

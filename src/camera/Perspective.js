@@ -50,4 +50,4 @@ define(function(require) {
     });
 
     return Perspective;
-} )
+});

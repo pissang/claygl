@@ -6,7 +6,7 @@ define(function(require) {
 
     var TransformClip = require('./TransformClip');
 
-    var glMatrix = require("glmatrix");
+    var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 
@@ -53,7 +53,7 @@ define(function(require) {
                 this.life = Math.max(jointClip.life, this.life);
             }
         }
-    }
+    };
 
     SkinningClip.prototype = Object.create(Clip.prototype);
 
@@ -68,13 +68,13 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     SkinningClip.prototype.setTime = function(time) {
         for (var i = 0; i < this.jointClips.length; i++) {
             this.jointClips[i].setTime(time);
         }
-    }
+    };
 
     /**
      * @param {qtek.animation.TransformClip|qtek.animation.SamplerClip} jointClip
@@ -82,14 +82,14 @@ define(function(require) {
     SkinningClip.prototype.addJointClip = function(jointClip) {
         this.jointClips.push(jointClip);
         this.life = Math.max(jointClip.life, this.life);
-    }
+    };
 
     /**
      * @param {qtek.animation.TransformClip|qtek.animation.SamplerClip} jointClip
      */
     SkinningClip.prototype.removeJointClip = function(jointClip) {
         this.jointClips.splice(this.jointClips.indexOf(jointClip), 1);
-    }
+    };
 
     /**
      * @param {number} startTime
@@ -112,7 +112,8 @@ define(function(require) {
         }
 
         return subClip; 
-    }
+    };
+
     /**
      * 1d blending between two skinning clips
      * @param  {qtek.animation.SkinningClip} clip1
@@ -127,7 +128,7 @@ define(function(require) {
 
             tClip.blend1D(c1, c2, w);
         }
-    }
+    };
 
     /**
      * Additive blending between two skinning clips
@@ -142,7 +143,7 @@ define(function(require) {
 
             tClip.additiveBlend(c1, c2);
         }
-    }
+    };
 
     /**
      * Subtractive blending between two skinning clips
@@ -157,7 +158,7 @@ define(function(require) {
 
             tClip.subtractiveBlend(c1, c2);
         }
-    }
+    };
 
     /**
      * 2D blending between three skinning clips
@@ -176,7 +177,7 @@ define(function(require) {
 
             tClip.blend2D(c1, c2, c3, f, g);
         }
-    }
+    };
 
     /**
      * Copy SRT of all joints clips from another SkinningClip
@@ -191,7 +192,7 @@ define(function(require) {
             vec3.copy(tClip.scale, sClip.scale);
             quat.copy(tClip.rotation, sClip.rotation);
         }
-    }
+    };
 
     return SkinningClip;
 });

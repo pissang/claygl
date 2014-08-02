@@ -14,7 +14,7 @@ define(function(require) {
              * @type {Array.<qtek.compositor.Node>}
              */
             nodes : []
-        }
+        };
     },
     /** @lends qtek.compositor.Graph.prototype */
     {
@@ -90,11 +90,11 @@ define(function(require) {
                     return {
                         node : node,
                         pin : input.pin
-                    }
+                    };
                 }
             }
         }
-    })
+    });
     
     return Graph;
-})
+});

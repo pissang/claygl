@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var DynamicGeometry = require('../DynamicGeometry');
-    var BoundingBox = require('../math/BoundingBox');
     var ConeGeometry = require('./Cone');
 
     /**
@@ -61,7 +60,7 @@ define(function(require) {
 
             this.boundingBox = cone.boundingBox;
         }
-    })
+    });
 
     return Cylinder;
-})
+});

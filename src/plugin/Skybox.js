@@ -30,8 +30,8 @@ define(function(require) {
 
         if (!skyboxShader) {
             skyboxShader = new Shader({
-                vertex : Shader.source("buildin.skybox.vertex"), 
-                fragment : Shader.source("buildin.skybox.fragment")
+                vertex : Shader.source('buildin.skybox.vertex'), 
+                fragment : Shader.source('buildin.skybox.fragment')
             });
         }
         var material = new Material({
@@ -49,7 +49,7 @@ define(function(require) {
             geometry : new CubeGeometry(),
             material : material,
             culling : false
-        }
+        };
     }, function() {
         var scene = this.scene;
         if (scene) {
@@ -66,7 +66,7 @@ define(function(require) {
                 this.detachScene();
             }
             this.scene = scene;
-            scene.on("beforerender", this._beforeRenderScene, this);
+            scene.on('beforerender', this._beforeRenderScene, this);
         },
         /**
          * Detach from scene
@@ -74,7 +74,7 @@ define(function(require) {
          */
         detachScene : function() {
             if (this.scene) {
-                this.scene.off("beforerender", this._beforeRenderScene, this);  
+                this.scene.off('beforerender', this._beforeRenderScene, this);  
             }
             this.scene = null;
         },

@@ -7,7 +7,6 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var util = require('./core/util');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
 
@@ -160,7 +159,7 @@ define(function(require) {
                     this.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
                     this.minFilter == glenum.LINEAR_MIPMAP_NEAREST
                 ) {
-                    this.minFilter = glenum.LINEAR
+                    this.minFilter = glenum.LINEAR;
                 }
 
                 this.wrapS = glenum.CLAMP_TO_EDGE;
@@ -255,4 +254,4 @@ define(function(require) {
 
 
     return Texture;
-})
+});

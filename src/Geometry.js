@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var util = require('./core/util');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
 
@@ -20,7 +19,7 @@ define(function(require) {
             this.value = [];
         } else {
             this._isDynamic = false;
-            this.value = null
+            this.value = null;
         }
     }
 
@@ -50,7 +49,7 @@ define(function(require) {
         } else {
             console.warn('Dynamic geometry not support init method');
         }
-    }
+    };
 
     Attribute.prototype.clone = function(copyValue) {
         var ret = new Attribute(this.name, this.type, this.size, this.semantic, this._isDynamic);
@@ -59,7 +58,7 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
@@ -207,5 +206,5 @@ define(function(require) {
     Geometry.IndicesBuffer = IndicesBuffer;
     Geometry.Attribute = Attribute;
 
-    return Geometry
+    return Geometry;
 });

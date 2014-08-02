@@ -164,6 +164,6 @@ define(function(require) {
                 return bbox;
             };
         }) ()
-    }
+    };
     return Frustum;
 });

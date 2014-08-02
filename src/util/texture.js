@@ -105,7 +105,7 @@ define(function(require) {
          */
         panoramaToCubeMap : function(panoramaMap, cubeMap, renderer) {
             var skydome = new Skydome({
-                scene : new Scene
+                scene : new Scene()
             });
             skydome.material.set('diffuseMap', panoramaMap);
             environmentMapPass.texture = cubeMap;
@@ -187,7 +187,7 @@ define(function(require) {
 
             return texture;
         }
-    }
+    };
 
     return textureUtil;
 });

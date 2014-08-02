@@ -3,8 +3,6 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var util = require('./core/util');
-    var Matrix4 = require('./math/Matrix4');
 
     var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
@@ -50,7 +48,7 @@ define(function(require) {
             _skinMatricesSubArrays : [],
 
             _subSkinMatricesArray : {}
-        }
+        };
     },
     /** @lends qtek.Skeleton.prototype */
     {
@@ -185,7 +183,7 @@ define(function(require) {
                 }
 
                 this.updateMatricesSubArrays();
-            }
+            };
         })(),
 
         updateMatricesSubArrays : function() {
@@ -224,11 +222,11 @@ define(function(require) {
                         );
                     }
                 }
-            }
+            };
         })(),
 
         getSubSkinMatrices : function(meshId, joints) {
-            var subArray = this._subSkinMatricesArray[meshId]
+            var subArray = this._subSkinMatricesArray[meshId];
             if (!subArray) {
                 subArray 
                     = this._subSkinMatricesArray[meshId]
@@ -272,4 +270,4 @@ define(function(require) {
     });
 
     return Skeleton;
-})
+});

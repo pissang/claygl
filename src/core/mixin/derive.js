@@ -12,7 +12,7 @@ define(function(require) {
      */
     function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
 
-        if (typeof initialize == "object") {
+        if (typeof initialize == 'object') {
             proto = initialize;
             initialize = null;
         }
@@ -45,7 +45,6 @@ define(function(require) {
             
             if (this.constructor === sub) {
                 // Initialize function will be called in the order of inherit
-                var base = sub;
                 var initializers = sub.__initializers__;
                 for (var i = 0; i < initializers.length; i++) {
                     initializers[i].apply(this, arguments);
@@ -100,5 +99,5 @@ define(function(require) {
      */
     return {
         derive : derive
-    }
+    };
 });

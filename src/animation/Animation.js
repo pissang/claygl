@@ -9,7 +9,7 @@ define(function(require) {
                                 || window.msRequestAnimationFrame
                                 || window.mozRequestAnimationFrame
                                 || window.webkitRequestAnimationFrame
-                                || function(func){setTimeout(func, 16)};
+                                || function(func){setTimeout(func, 16);};
 
     var arraySlice = Array.prototype.slice;
 
@@ -48,7 +48,7 @@ define(function(require) {
             _running : false,
             
             _time : 0
-        }
+        };
     },
     /** @lends qtek.animation.Animation.prototype */
     {
@@ -155,7 +155,7 @@ define(function(require) {
          */
         animate : function(target, options) {
             options = options || {};
-            var deferred = new _Deferred(
+            var deferred = new Deferred(
                 target,
                 options.loop,
                 options.getter,
@@ -216,7 +216,7 @@ define(function(require) {
                 }
                 return ret;
             } else {
-                return arraySlice.call(value)
+                return arraySlice.call(value);
             }
         } else {
             return value;
@@ -252,7 +252,7 @@ define(function(require) {
         return (2 * (p1 - p2) + v0 + v1) * t3 
                 + (- 3 * (p1 - p2) - 2 * v0 - v1) * t2
                 + v0 * t + p1;
-    };
+    }
     
     /**
      * @description Deferred object can only be created by Animation.prototype.animate method.
@@ -267,7 +267,7 @@ define(function(require) {
      * @param {Function} setter
      * @param {Function} interpolater
      */
-    function _Deferred(target, loop, getter, setter, interpolater) {
+    function Deferred(target, loop, getter, setter, interpolater) {
         this._tracks = {};
         this._target = target;
 
@@ -289,9 +289,9 @@ define(function(require) {
         this._clipList = [];
     }
 
-    _Deferred.prototype = {
+    Deferred.prototype = {
 
-        constructor: _Deferred,
+        constructor: Deferred,
 
         /**
          * @param  {number} time Keyframe time using millisecond
@@ -359,7 +359,7 @@ define(function(require) {
                         self._doneList[i].call(self);
                     }
                 }
-            }
+            };
 
             var createTrackClip = function(keyframes, propName) {
                 var trackLen = keyframes.length;
@@ -380,11 +380,8 @@ define(function(require) {
                 keyframes.sort(function(a, b) {
                     return a.time - b.time;
                 });
-                if (trackLen) {
-                    var trackMaxTime = keyframes[trackLen-1].time;
-                }else{
-                    return;
-                }
+
+                var trackMaxTime = keyframes[trackLen - 1].time;
                 // Percents of each keyframe
                 var kfPercents = [];
                 // Value of each keyframe
@@ -427,14 +424,14 @@ define(function(require) {
                     cachePercent = percent;
 
                     var range = (kfPercents[i+1] - kfPercents[i]);
-                    if (range == 0) {
+                    if (range === 0) {
                         return;
                     } else {
                         w = (percent - kfPercents[i]) / range;
                     }
                     if (useSpline) {
                         p1 = kfValues[i];
-                        p0 = kfValues[i == 0 ? i : i - 1];
+                        p0 = kfValues[i === 0 ? i : i - 1];
                         p2 = kfValues[i > trackLen - 2 ? trackLen - 1 : i + 1];
                         p3 = kfValues[i > trackLen - 3 ? trackLen - 1 : i + 2];
                         if (interpolater) {
@@ -507,7 +504,7 @@ define(function(require) {
                 self._clipList.push(clip);
                 self._clipCount++;
                 self.animation.addClip(clip);
-            }
+            };
 
             for (var propName in this._tracks) {
                 createTrackClip(this._tracks[propName], propName);
@@ -555,7 +552,7 @@ define(function(require) {
         }
     };
 
-    Animation._Deferred = _Deferred;
+    Animation._Deferred = Deferred;
 
     return Animation;
 });

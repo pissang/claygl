@@ -48,9 +48,9 @@ define(function(require) {
         //  rotation :  // optional
         //  scale :     // optional
         //}]
-        this.keyFrames = []
+        this.keyFrames = [];
         if (opts.keyFrames) {
-            this.addKeyFrames(opts.keyFrames)
+            this.addKeyFrames(opts.keyFrames);
         }
 
         /**
@@ -69,7 +69,7 @@ define(function(require) {
 
         this._cacheKey = 0;
         this._cacheTime = 0;
-    }
+    };
 
     TransformClip.prototype = Object.create(Clip.prototype);
 
@@ -84,13 +84,13 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     TransformClip.prototype.setTime = function(time) {
         this._interpolateField(time, 'position');
         this._interpolateField(time, 'rotation');
         this._interpolateField(time, 'scale');   
-    }
+    };
     /**
      * Add a key frame
      * @param {Object} kf
@@ -107,7 +107,7 @@ define(function(require) {
 
         this.life = kf.time;
         this.keyFrames.push(kf);
-    }
+    };
 
     /**
      * Add keyframes
@@ -121,7 +121,7 @@ define(function(require) {
         this.keyFrames.sort(keyframeSort);
 
         this.life = this.keyFrames[this.keyFrames.length - 1].time;
-    }
+    };
 
     TransformClip.prototype._interpolateField = function(time, fieldName) {
         var kfs = this.keyFrames;
@@ -172,7 +172,7 @@ define(function(require) {
             this._cacheKey = 0;
             this._cacheTime = 0;
         }
-    }
+    };
     /**
      * 1D blending between two clips
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
@@ -183,7 +183,7 @@ define(function(require) {
         vec3.lerp(this.position, c1.position, c2.position, w);
         vec3.lerp(this.scale, c1.scale, c2.scale, w);
         quat.slerp(this.rotation, c1.rotation, c2.rotation, w);
-    }
+    };
 
     /**
      * 2D blending between three clips
@@ -218,8 +218,8 @@ define(function(require) {
                 quat.slerp(q2, c1.rotation, c3.rotation, s);
                 quat.slerp(this.rotation, q1, q2, g / s);
             }
-        }
-    })(),
+        };
+    })();
 
     /**
      * Additive blending between two clips
@@ -230,7 +230,7 @@ define(function(require) {
         vec3.add(this.position, c1.position, c2.position);
         vec3.add(this.scale, c1.scale, c2.scale);
         quat.multiply(this.rotation, c2.rotation, c1.rotation);
-    }
+    };
 
     /**
      * Subtractive blending between two clips
@@ -242,7 +242,7 @@ define(function(require) {
         vec3.sub(this.scale, c1.scale, c2.scale);
         quat.invert(this.rotation, c2.rotation);
         quat.multiply(this.rotation, this.rotation, c1.rotation);
-    }
+    };
 
     /**
      * @todo
@@ -253,7 +253,7 @@ define(function(require) {
     TransformClip.prototype.getSubClip = function(startTime, endTime) {
         // TODO
         console.warn('TODO');
-    }
+    };
 
     return TransformClip;
 });

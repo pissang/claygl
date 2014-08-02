@@ -18,7 +18,7 @@ define(function(require) {
             get : function() {
                 return this._array[n];
             }
-        }
+        };
     }
 
     /**
@@ -472,7 +472,7 @@ define(function(require) {
         mat4.adjoint(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -483,7 +483,7 @@ define(function(require) {
         mat4.copy(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} a
@@ -491,7 +491,7 @@ define(function(require) {
      */
     Matrix4.determinant = function(a) {
         return mat4.determinant(a._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -501,7 +501,7 @@ define(function(require) {
         mat4.identity(out._array);
         out._dirty = true;
         return out;
-    }
+    };
     
     /**
      * @param  {qtek.math.Matrix4} out
@@ -517,7 +517,7 @@ define(function(require) {
         mat4.ortho(out._array, left, right, bottom, top, near, far);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -531,7 +531,7 @@ define(function(require) {
         mat4.perspective(out._array, fovy, aspect, near, far);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -544,7 +544,7 @@ define(function(require) {
         mat4.lookAt(out._array, eye._array, center._array, up._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -555,7 +555,7 @@ define(function(require) {
         mat4.invert(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -567,7 +567,7 @@ define(function(require) {
         mat4.mul(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -587,7 +587,7 @@ define(function(require) {
         mat4.fromQuat(out._array, q._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4}    out
@@ -599,7 +599,7 @@ define(function(require) {
         mat4.fromRotationTranslation(out._array, q._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} m4
@@ -620,7 +620,7 @@ define(function(require) {
         m4[13] = m2d[5];
 
         return m4;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -633,7 +633,7 @@ define(function(require) {
         mat4.rotate(out._array, a._array, rad, axis._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -645,7 +645,7 @@ define(function(require) {
         mat4.rotateX(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -657,7 +657,7 @@ define(function(require) {
         mat4.rotateY(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -669,7 +669,7 @@ define(function(require) {
         mat4.rotateZ(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -681,7 +681,7 @@ define(function(require) {
         mat4.scale(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -692,7 +692,7 @@ define(function(require) {
         mat4.transpose(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix4} out
@@ -704,7 +704,7 @@ define(function(require) {
         mat4.translate(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Matrix4;
 })

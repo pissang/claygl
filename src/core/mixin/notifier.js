@@ -26,28 +26,34 @@ define(function() {
             // Optimize advise from backbone
             switch (args.length) {
                 case 1: 
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.call(hdls[i].context);
+                    }
                     return;
                 case 2:
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.call(hdls[i].context, args[1]);
+                    }
                     return;
                 case 3:
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.call(hdls[i].context, args[1], args[2]);
+                    }
                     return;
                 case 4:
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.call(hdls[i].context, args[1], args[2], args[3]);
+                    }
                     return;
                 case 5:
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.call(hdls[i].context, args[1], args[2], args[3], args[4]);
+                    }
                     return;
                 default:
-                    while (++i < l)
+                    while (++i < l) {
                         hdls[i].action.apply(hdls[i].context, Array.prototype.slice.call(args, 1));
+                    }
                     return;
             }
         },
@@ -193,7 +199,7 @@ define(function() {
                 }
             }
         }
-    }
+    };
     
     return notifier;
 });

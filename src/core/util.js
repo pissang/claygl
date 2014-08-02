@@ -193,7 +193,7 @@ define(function(require){
                 return util.extend({}, obj);
             }
         }
-	}
+	};
 
     return util;
-})
+});

@@ -19,8 +19,6 @@
     "strict": false,
     "trailing": false,
     "maxparams": 20,
-    "maxdepth": 6,
-    "maxlen": 120,
 
     "asi": false,
     "boss": false,

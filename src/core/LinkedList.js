@@ -20,7 +20,7 @@ define(function(require) {
         this.tail = null;
 
         this._length = 0;
-    }
+    };
 
     /**
      * Insert a new value at the tail
@@ -31,7 +31,7 @@ define(function(require) {
         var entry = new LinkedList.Entry(val);
         this.insertEntry(entry);
         return entry;
-    }
+    };
 
     /**
      * Insert a new value at idx
@@ -59,7 +59,7 @@ define(function(require) {
         } else {
             this.insert(val);
         }
-    }
+    };
 
     /**
      * Insert an entry at the tail
@@ -74,7 +74,7 @@ define(function(require) {
             this.tail = entry;
         }
         this._length++;
-    }
+    };
 
     /**
      * Remove entry.
@@ -97,7 +97,7 @@ define(function(require) {
         }
         entry.next = entry.prev = null;
         this._length--;
-    }
+    };
 
     /**
      * Remove entry at index.
@@ -118,7 +118,7 @@ define(function(require) {
             this.remove(curr);
             return curr.value;
         }
-    }
+    };
     /**
      * Get head value
      * @return {}
@@ -127,7 +127,7 @@ define(function(require) {
         if (this.head) {
             return this.head.value;
         }
-    }
+    };
     /**
      * Get tail value
      * @return {}
@@ -136,7 +136,7 @@ define(function(require) {
         if (this.tail) {
             return this.tail.value;
         }
-    }
+    };
     /**
      * Get value at idx 
      * @param {number} idx
@@ -153,7 +153,7 @@ define(function(require) {
             cursor++;
         }
         return curr.value;
-    }
+    };
 
     /**
      * @param  {} value
@@ -169,21 +169,21 @@ define(function(require) {
             curr = curr.next;
             cursor++;
         }
-    }
+    };
 
     /**
      * @return {number}
      */
     LinkedList.prototype.length = function() {
         return this._length;
-    }
+    };
 
     /**
      * If list is empty
      */
     LinkedList.prototype.isEmpty = function() {
-        return this._length == 0;
-    }
+        return this._length === 0;
+    };
 
     /**
      * @param  {Function} cb
@@ -202,7 +202,7 @@ define(function(require) {
             curr = curr.next;
             idx++;
         }
-    }
+    };
 
     /**
      * Clear the list
@@ -210,7 +210,7 @@ define(function(require) {
     LinkedList.prototype.clear = function() {
         this.tail = this.head = null;
         this._length = 0;
-    }
+    };
 
     /**
      * @constructor
@@ -231,7 +231,7 @@ define(function(require) {
          * @type {qtek.core.LinkedList.Entry}
          */
         this.prev = null;
-    }
+    };
 
     return LinkedList;
-})
+});

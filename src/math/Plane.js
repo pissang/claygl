@@ -26,7 +26,7 @@ define(function(require) {
          * @type {number}
          */
         this.distance = distance || 0;
-    }
+    };
 
     Plane.prototype = {
 
@@ -109,7 +109,7 @@ define(function(require) {
 
                 var divider = vec3.dot(pn, rd);
                 // ray is parallel to the plane
-                if (divider == 0) {
+                if (divider === 0) {
                     return null;
                 }
                 if (!out) {
@@ -145,7 +145,7 @@ define(function(require) {
                 vec3.copy(normalv4, this.normal._array);
                 vec4.transformMat4(normalv4, normalv4, inverseTranspose);
                 vec3.copy(this.normal._array, normalv4);
-            }
+            };
         })(),
 
         /**
@@ -167,7 +167,7 @@ define(function(require) {
             plane.copy(this);
             return plane;
         }
-    }
+    };
 
     return Plane;
 });

@@ -22,11 +22,11 @@ define(function(require) {
                 } else {
                     options.onprogress(null);
                 }
-            }
+            };
         }
         xhr.onload = function(e) {
             options.onload && options.onload(xhr.response);
-        }
+        };
         if (options.onerror) {
             xhr.onerror = options.onerror;
         }
@@ -35,5 +35,5 @@ define(function(require) {
 
     return {
         get : get
-    }
-})
+    };
+});

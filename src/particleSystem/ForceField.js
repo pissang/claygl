@@ -12,7 +12,7 @@ define(function(require) {
     var ForceField = Field.derive(function() {
         return {
             force : new Vector3()
-        }
+        };
     }, {
         applyTo : function(velocity, position, weight, deltaTime) {
             if (weight > 0) {
@@ -22,4 +22,4 @@ define(function(require) {
     });
 
     return ForceField;
-})
+});

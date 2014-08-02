@@ -4,10 +4,6 @@ define(function(require) {
 
     var Node = require('./Node');
     var Light = require('./Light');
-    var glMatrix = require('glmatrix');
-    var BoundingBox = require('./math/BoundingBox');
-    var mat4 = glMatrix.mat4;
-    var vec3 = glMatrix.vec3;
 
     /**
      * @constructor qtek.Scene
@@ -57,7 +53,7 @@ define(function(require) {
             _transparentObjectCount : 0,
 
             _nodeRepository : {}
-        }
+        };
     }, function() {
         this.scene = this;
     }, 
@@ -99,8 +95,6 @@ define(function(require) {
             Node.prototype.update.call(this, force);
 
             var lights = this.lights;
-            var opaqueQueue = this.opaqueQueue;
-            var transparentQueue = this.transparentQueue;
             var sceneMaterialTransparent = this.material && this.material.transparent;
 
             this._opaqueObjectCount = 0;
@@ -170,7 +164,7 @@ define(function(require) {
                         lightUniforms[symbol] = {
                             type : '',
                             value : []
-                        }
+                        };
                     }
                     var value = uniformTpl.value(light);
                     var lu = lightUniforms[symbol];
@@ -198,7 +192,7 @@ define(function(require) {
             return shader.lightNumber.POINT_LIGHT !== this._lightNumber.POINT_LIGHT
                 || shader.lightNumber.DIRECTIONAL_LIGHT !== this._lightNumber.DIRECTIONAL_LIGHT
                 || shader.lightNumber.SPOT_LIGHT !== this._lightNumber.SPOT_LIGHT
-                || shader.lightNumber.AMBIENT_LIGHT !== this._lightNumber.AMBIENT_LIGHT
+                || shader.lightNumber.AMBIENT_LIGHT !== this._lightNumber.AMBIENT_LIGHT;
         },
 
         setShaderLightNumber : function(shader) {
@@ -241,4 +235,4 @@ define(function(require) {
     }
 
     return Scene;
-})
+});

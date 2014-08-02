@@ -38,7 +38,7 @@ define(function(require) {
         'nx' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
         'ny' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
         'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-    }
+    };
 
     /**
      * Pass rendering shadow map.
@@ -100,7 +100,7 @@ define(function(require) {
             _lightsCastShadow : [],
 
             _lightCameras : {}
-        }
+        };
     }, function() {
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
@@ -163,12 +163,14 @@ define(function(require) {
                 var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
                 var transparentMap = mesh.material.shadowTransparentMap;
                 var nJoints = mesh.joints && mesh.joints.length;
+                var matHashKey;
+                var shaderHashKey;
                 if (isShadowTransparent) {
-                    var matHashKey = nJoints + '-' + transparentMap.__GUID__;
-                    var shaderHashKey = nJoints + 's';
+                    matHashKey = nJoints + '-' + transparentMap.__GUID__;
+                    shaderHashKey = nJoints + 's';
                 } else {
-                    var matHashKey = nJoints;
-                    var shaderHashKey = nJoints;
+                    matHashKey = nJoints;
+                    shaderHashKey = nJoints;
                 }
                 var depthMaterial = this._depthMaterials[matHashKey];
                 var depthShader = this._depthShaders[shaderHashKey];
@@ -287,14 +289,12 @@ define(function(require) {
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 if (light.castShadow) {
-                    this._lightsCastShadow.push(light)
+                    this._lightsCastShadow.push(light);
                 }
             }
         },
 
         _renderShadowPass : function(renderer, scene, sceneCamera) {
-            var self = this;
-
             // reset
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
@@ -319,8 +319,6 @@ define(function(require) {
 
             _gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
-            var cursor = 0;
-
             // Shadow uniforms
             var spotLightShadowMaps = [];
             var spotLightMatrices = [];
@@ -334,8 +332,7 @@ define(function(require) {
             for (var i = 0; i < this._lightsCastShadow.length; i++) {
                 var light = this._lightsCastShadow[i];
                 if (light instanceof DirectionalLight) {
-                    this._renderDirectionalLightShadow
-                    (
+                    this._renderDirectionalLightShadow(
                         renderer,
                         light,
                         scene,
@@ -346,8 +343,7 @@ define(function(require) {
                         directionalLightShadowMaps
                     );
                 } else if (light instanceof SpotLight) {
-                    this._renderSpotLightShadow
-                    (
+                    this._renderSpotLightShadow(
                         renderer,
                         light,
                         this._opaqueCasters, 
@@ -355,18 +351,17 @@ define(function(require) {
                         spotLightShadowMaps
                     );
                 } else if (light instanceof PointLight) {
-                    this._renderPointLightShadow
-                    (
+                    this._renderPointLightShadow(
                         renderer,
                         light,
                         this._opaqueCasters,
                         pointLightRanges,
                         pointLightShadowMaps
-                    )
+                    );
                 }
 
                 this._shadowMapNumber[light.type]++;
-            };
+            }
             this._restoreMaterial(this._opaqueCasters);
 
             if (this.shadowCascade > 1 && this._shadowMapNumber.DIRECTIONAL_LIGHT > 1) {
@@ -535,7 +530,7 @@ define(function(require) {
 
                 // set back
                 sceneCamera.far = originalFar;
-            }
+            };
         })(),
 
         _renderSpotLightShadow : function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
@@ -730,7 +725,7 @@ define(function(require) {
                 camera.update(true);
 
                 return camera;
-            }
+            };
         })(),
 
         _getSpotLightCamera : function(light) {
@@ -745,7 +740,7 @@ define(function(require) {
             camera.updateProjectionMatrix();
             mat4.invert(camera.viewMatrix._array, camera.worldTransform._array);
 
-            return camera
+            return camera;
         },
 
         /**
@@ -806,4 +801,4 @@ define(function(require) {
     ShadowMapPass.PCF = 2;
     
     return ShadowMapPass;
-})
+});

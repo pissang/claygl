@@ -100,13 +100,12 @@ define(function(require) {
                     texcoords.push(vec2.fromValues(u, v));
 
                     normal = vec3.fromValues(x, y, z);
-                    vec3.normalize(normal, normal)
+                    vec3.normalize(normal, normal);
                     normals.push(normal);
                 }
             }
 
-            var p1, p2, p3,
-                i1, i2, i3, i4;
+            var i1, i2, i3, i4;
             var faces = this.faces;
 
             var len = widthSegments + 1;
@@ -127,7 +126,7 @@ define(function(require) {
             this.boundingBox.max.set(radius, radius, radius);
             this.boundingBox.min.set(-radius, -radius, -radius);
         }
-    })
+    });
 
     return Sphere;
-})
+});

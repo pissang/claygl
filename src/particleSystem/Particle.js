@@ -54,7 +54,7 @@ define(function(require) {
          * @type {qtek.particleSystem.Emitter}
          */
         this.emitter = null;
-    }
+    };
 
     /**
      * Update particle position
@@ -67,7 +67,7 @@ define(function(require) {
         if (this.angularVelocity) {
             vec3.scaleAndAdd(this.rotation._array, this.rotation._array, this.angularVelocity._array, deltaTime);
         }
-    }
+    };
 
     return Particle;
 });

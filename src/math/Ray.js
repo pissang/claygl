@@ -2,7 +2,6 @@ define(function(require) {
 
     'use strict';
 
-    var Base = require('../core/Base');
     var Vector3 = require('./Vector3');
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
@@ -24,7 +23,8 @@ define(function(require) {
          * @type {qtek.math.Vector3}
          */
         this.direction = direction || new Vector3();
-    }
+    };
+
     Ray.prototype = {
         
         constructor : Ray,
@@ -44,7 +44,7 @@ define(function(require) {
 
             var divider = vec3.dot(pn, rd);
             // ray is parallel to the plane
-            if (divider == 0) {
+            if (divider === 0) {
                 return null;
             }
             if (!out) {
@@ -64,7 +64,7 @@ define(function(require) {
             // Distance to plane
             var d = vec3.dot(plane.normal._array, this.direction._array);
             vec3.scaleAndAdd(this.direction._array, this.direction._array, plane.normal._array, -d * 2);
-            this.direction_dirty = true;
+            this.direction._dirty = true;
         },
 
         // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
@@ -142,7 +142,7 @@ define(function(require) {
             return out;
         },
 
-        // http://en.wikipedia.org/wiki/Möller–Trumbore_intersection_algorithm
+        // http://en.wikipedia.org/wiki/M枚ller鈥揟rumbore_intersection_algorithm
         /**
          * Calculate intersection point between ray and three triangle vertices
          * @param {qtek.math.Vector3} a
@@ -210,7 +210,7 @@ define(function(require) {
                 vec3.scaleAndAdd(out._array, origin, dir, t);
 
                 return out;
-            }
+            };
         })(),
 
         /**

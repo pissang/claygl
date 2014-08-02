@@ -54,7 +54,7 @@ define(function(require) {
              */
             //TODO : In case of one camera to multiple scenes
             sceneBoundingBoxLastFrame : new BoundingBox()
-        }
+        };
     }, function() {
         this.update(true);
     },
@@ -104,7 +104,7 @@ define(function(require) {
                 ray.origin._dirty = true;
                 
                 return ray;
-            }
+            };
         })()
 
         /**
@@ -116,4 +116,4 @@ define(function(require) {
     });
 
     return Camera;
-})
+});

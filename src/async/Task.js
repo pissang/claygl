@@ -14,7 +14,7 @@ define(function(require) {
     var Task = function() {
         this._fullfilled = false;
         this._rejected = false;
-    }
+    };
     /**
      * Task successed
      * @param {} data
@@ -23,7 +23,7 @@ define(function(require) {
         this._fullfilled = true;
         this._rejected = false;
         this.trigger('success', data);
-    }
+    };
     /**
      * Task failed
      * @param {} err
@@ -32,28 +32,28 @@ define(function(require) {
         this._rejected = true;
         this._fullfilled = false;
         this.trigger('error', err);
-    }
+    };
     /**
      * If task successed
      * @return {boolean}
      */
     Task.prototype.isFullfilled = function() {
         return this._fullfilled;
-    }
+    };
     /**
      * If task failed
      * @return {boolean}
      */
     Task.prototype.isRejected = function() {
         return this._rejected;
-    }
+    };
     /**
      * If task finished, either successed or failed
      * @return {boolean}
      */
     Task.prototype.isSettled = function() {
         return this._fullfilled || this._rejected;
-    }
+    };
     
     util.extend(Task.prototype, notifier);
 
@@ -65,12 +65,12 @@ define(function(require) {
             onload : function(res) {
                 task.resolve(res);
             },
-            onerror : function() {
-                self.reject(error);
+            onerror : function(error) {
+                task.reject(error);
             }
         });
         return task;
-    };
+    }
     /**
      * Make a request task
      * @param  {string|object|object[]|string[]} url
@@ -89,14 +89,12 @@ define(function(require) {
      * @return {qtek.async.Task|qtek.async.Task[]}
      */
     Task.makeRequestTask = function(url, responseType) {
-        var self = this;
         if (typeof url === 'string') {
             return makeRequestTask(url, responseType);
         } else if (url.url) {   //  Configure object
             var obj = url;
             return makeRequestTask(obj.url, obj.responseType);
         } else if (url instanceof Array) {  // Url list
-            var count = 0;
             var urlList = url;
             var tasks = [];
             urlList.forEach(function(obj) {
@@ -111,13 +109,13 @@ define(function(require) {
             });
             return tasks;
         }
-    }
+    };
     /**
      * @return {qtek.async.Task}
      */
     Task.makeTask = function() {
         return new Task();
-    }
+    };
 
     util.extend(Task.prototype, notifier);
 

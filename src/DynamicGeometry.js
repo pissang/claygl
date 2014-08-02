@@ -8,14 +8,10 @@ define(function(require) {
     'use strict';
 
     var Geometry = require('./Geometry');
-    var util = require('./core/util');
-    var Vector3 = require('./math/Vector3');
     var BoundingBox = require('./math/BoundingBox');
     var glenum = require('./core/glenum');
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
-    var vec2 = glMatrix.vec2;
-    var mat2 = glMatrix.mat2;
     var mat4 = glMatrix.mat4;
 
     var arrSlice = Array.prototype.slice;
@@ -64,7 +60,7 @@ define(function(require) {
             //     indicesArray : null
             // }]
             _arrayChunks : []
-        }
+        };
     }, 
     /** @lends qtek.DynamicGeometry.prototype */
     {
@@ -166,7 +162,6 @@ define(function(require) {
                 var result = {};
                 var noDirtyAttributes = true;
                 for (var name in attributes) {
-                    var attrib = attributes[name];
                     if (this._cache.isDirty(name)) {
                         result[name] = attributes[name];
                         noDirtyAttributes = false;
@@ -208,7 +203,7 @@ define(function(require) {
 
         _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
 
-            var self = this
+            var self = this;
             var nVertex = this.getVertexNumber();
             
             var verticesReorganizedMap = [];
@@ -255,14 +250,13 @@ define(function(require) {
                 
                 self._arrayChunks.push(chunk);
                 return chunk;
-            }
+            };
 
             var attribNameList = Object.keys(attributes);
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
             if (nVertex > this.chunkSize && this.isUseFace()) {
-                var vertexCursor = 0;
                 var chunkIdx = 0;
                 var currentChunk;
 
@@ -409,7 +403,7 @@ define(function(require) {
                     chunks[i] = {
                         attributeBuffers : [],
                         indicesBuffer : null
-                    }
+                    };
                 }
                 this._cache.put('chunks', chunks);
                 firstUpdate = true;
@@ -420,7 +414,7 @@ define(function(require) {
                     chunk = chunks[cc] = {
                         attributeBuffers : [],
                         indicesBuffer : null
-                    }
+                    };
                 }
                 var attributeBuffers = chunk.attributeBuffers;
                 var indicesBuffer = chunk.indicesBuffer;
@@ -459,7 +453,7 @@ define(function(require) {
 
                     var buffer;
                     if (bufferInfo) {
-                        buffer = bufferInfo.buffer
+                        buffer = bufferInfo.buffer;
                     } else {
                         buffer = _gl.createBuffer();
                     }
@@ -690,9 +684,9 @@ define(function(require) {
         // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
         // http://en.wikipedia.org/wiki/Barycentric_coordinate_system_(mathematics)
         generateBarycentric : (function() {
-            var a = [1, 0, 0],
-                b = [0, 0, 1],
-                c = [0, 1, 0];
+            var a = [1, 0, 0];
+            var b = [0, 0, 1];
+            var c = [0, 1, 0];
             return function() {
 
                 if (! this.isUniqueVertex()) {
@@ -714,7 +708,7 @@ define(function(require) {
                     array[i2] = b;
                     array[i3] = c;
                 }
-            }
+            };
         })(),
 
         convertToStatic : function(geometry) {
@@ -737,7 +731,7 @@ define(function(require) {
                         type : attrib.type,
                         size : attrib.size,
                         value : null
-                    }
+                    };
                     if (attrib.semantic) {
                         geoAttrib.semantic = attrib.semantic;
                     }
@@ -752,7 +746,7 @@ define(function(require) {
                 geometry.boundingBox.max.copy(this.boundingBox.max);
             }
             // PENDING : copy buffer ?
-            return geometry
+            return geometry;
         },
 
         applyTransform : function(matrix) {
@@ -800,4 +794,4 @@ define(function(require) {
     });
     
     return DynamicGeometry;
-})
+});

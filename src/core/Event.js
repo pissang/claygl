@@ -20,13 +20,13 @@ define( function(require) {
         e.target = target;
 
         // enable bubbling
-        while (target && !e.cancelBubble ) {
+        while (target && !e.cancelBubble) {
             e.currentTarget = target;
             target.trigger(eventType, e);
 
             target = target.parent;
         }
-    }
+    };
 
     return QEvent;
-} )
+});

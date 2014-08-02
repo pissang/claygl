@@ -55,7 +55,7 @@ define(function(require) {
                 var attr = templateGeo.attributes[name];
                 // Extend custom attributes
                 if (! geometry.attributes[name]) {
-                    geometry.attributes[name] = attr.clone(false)
+                    geometry.attributes[name] = attr.clone(false);
                 }
             }
 
@@ -204,6 +204,10 @@ define(function(require) {
             var addedJointIdxPerFace = [];
 
             var buckets = [];
+
+            var getJointByIndex = function(idx) {
+                return joints[idx];
+            };
             while(rest > 0) {
                 var bucketFaces = [];
                 var bucketJointReverseMap = [];
@@ -223,10 +227,11 @@ define(function(require) {
                         var idx = isStatic ? faces[f * 3 + i] : faces[f][i];
                         
                         for (var j = 0; j < 4; j++) {
+                            var jointIdx;
                             if (isStatic) {
-                                var jointIdx = jointValues[idx * 4 + j];
+                                jointIdx = jointValues[idx * 4 + j];
                             } else {
-                                var jointIdx = jointValues[idx][j];
+                                jointIdx = jointValues[idx][j];
                             }
                             if (jointIdx >= 0) {
                                 if (bucketJointReverseMap[jointIdx] === -1) {
@@ -260,7 +265,7 @@ define(function(require) {
                 }
                 buckets.push({
                     faces : bucketFaces,
-                    joints : bucketJoints.map(function(idx){return joints[idx];}),
+                    joints : bucketJoints.map(getJointByIndex),
                     jointReverseMap : bucketJointReverseMap
                 });
             }
@@ -299,11 +304,8 @@ define(function(require) {
                     var uniform = material.uniforms[name];
                     subMat.set(name, uniform.value);
                 }
-                if (isStatic) {
-                    var subGeo = new StaticGeometry();
-                } else {
-                    var subGeo = new DynamicGeometry();
-                }
+                var subGeo = isStatic ? new StaticGeometry() : new DynamicGeometry();
+                
                 var subMesh = new Mesh({
                     name : [mesh.name, i].join('-'),
                     material : subMat,
@@ -344,8 +346,9 @@ define(function(require) {
                 }
 
                 for (var f = 0; f < bucket.faces.length; f++) {
+                    var newFace;
                     if (!isStatic) {
-                        var newFace = [];
+                        newFace = [];
                     }
                     var face = bucket.faces[f];
                     for (var i = 0; i < 3; i++) {
@@ -375,7 +378,7 @@ define(function(require) {
                             if (isStatic) {
                                 for (var j = 0; j < 4; j++) {
                                     var jointIdx = geometry.attributes.joint.value[idx * 4 + j];
-                                    var offset = nVertex * 4 + j
+                                    var offset = nVertex * 4 + j;
                                     if (jointIdx >= 0) {
                                         subGeo.attributes.joint.value[offset] = jointReverseMap[jointIdx];
                                     } else {
@@ -415,7 +418,6 @@ define(function(require) {
             root.rotation.copy(mesh.rotation);
             root.scale.copy(mesh.scale);
 
-            material.dispose();
             if (inPlace) {
                 if (mesh.parent) {
                     var parent = mesh.parent;
@@ -428,4 +430,4 @@ define(function(require) {
     }
 
     return meshUtil;
-})
+});

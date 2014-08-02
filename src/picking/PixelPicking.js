@@ -28,7 +28,7 @@ define(function (require) {
             _meshMaterials : [],
 
             _idOffset : 0
-        }
+        };
     }, function() {
         if (this.renderer) {
             this.width = this.renderer.width;
@@ -103,8 +103,6 @@ define(function (require) {
             var renderer = this.renderer;
 
             var ratio = this.downSampleRatio;
-            var width = this._texture.width;
-            var height = this._texture.height;
             x = Math.ceil(ratio * x);
             y = Math.ceil(ratio * (this.height - y));
 

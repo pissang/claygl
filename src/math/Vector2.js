@@ -29,7 +29,7 @@ define(function(require) {
          * @type {boolean}
          */
         this._dirty = true;
-    }
+    };
 
     Vector2.prototype = {
 
@@ -425,7 +425,7 @@ define(function(require) {
         vec2.add(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector2} out
@@ -437,7 +437,7 @@ define(function(require) {
         vec2.set(out._array, x, y);
         out._dirty = true;
         return out
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector2} out
@@ -448,7 +448,7 @@ define(function(require) {
         vec2.copy(out._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector3} out
@@ -460,7 +460,7 @@ define(function(require) {
         vec2.cross(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} a
      * @param  {qtek.math.Vector2} b
@@ -468,7 +468,7 @@ define(function(require) {
      */
     Vector2.dist = function(a, b) {
         return vec2.distance(a._array, b._array);
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} a
@@ -486,7 +486,7 @@ define(function(require) {
         vec2.divide(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} out
@@ -502,7 +502,7 @@ define(function(require) {
      */
     Vector2.dot = function(a, b) {
         return vec2.dot(a._array, b._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector2} a
@@ -510,7 +510,7 @@ define(function(require) {
      */
     Vector2.len = function(b) {
         return vec2.length(b._array);
-    }
+    };
 
     // Vector2.length = Vector2.len;
     
@@ -525,7 +525,7 @@ define(function(require) {
         vec2.lerp(out._array, a._array, b._array, t);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -536,7 +536,7 @@ define(function(require) {
         vec2.min(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector2} out
@@ -548,7 +548,7 @@ define(function(require) {
         vec2.max(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -559,7 +559,7 @@ define(function(require) {
         vec2.multiply(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} out
@@ -577,7 +577,7 @@ define(function(require) {
         vec2.negate(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -587,7 +587,7 @@ define(function(require) {
         vec2.normalize(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {number}  scale
@@ -597,7 +597,7 @@ define(function(require) {
         vec2.random(out._array, scale);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -608,7 +608,7 @@ define(function(require) {
         vec2.scale(out._array, a._array, scale);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -620,7 +620,7 @@ define(function(require) {
         vec2.scale(out._array, a._array, b._array, scale);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} a
      * @param  {qtek.math.Vector2} b
@@ -628,7 +628,7 @@ define(function(require) {
      */
     Vector2.sqrDist = function(a, b) {
         return vec2.sqrDist(a._array, b._array);
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} a
@@ -643,7 +643,7 @@ define(function(require) {
      */
     Vector2.sqrLen = function(a) {
         return vec2.sqrLen(a._array);
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} a
@@ -661,7 +661,7 @@ define(function(require) {
         vec2.subtract(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @method
      * @param  {qtek.math.Vector2} out
@@ -680,7 +680,7 @@ define(function(require) {
         vec2.transformMat2(out._array, a._array, m._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2}  out
      * @param  {qtek.math.Vector2}  a
@@ -691,7 +691,7 @@ define(function(require) {
         vec2.transformMat2d(out._array, a._array, m._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -702,7 +702,7 @@ define(function(require) {
         vec2.transformMat3(out._array, a._array, m._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -713,7 +713,7 @@ define(function(require) {
         vec2.transformMat4(out._array, a._array, m._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Vector2;
 

@@ -55,6 +55,8 @@
                 light.penumbraAngle = 25;
                 light.shadowResolution = 1024;
 
+                light.lookAt(scene.position);
+
                 scene.add(new qtek.light.Ambient({
                     intensity: 0.1
                 }));

@@ -137,4 +137,4 @@ define(function(require) {
     });
 
     return Cone;
-})
+});

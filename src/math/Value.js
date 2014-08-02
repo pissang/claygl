@@ -24,7 +24,7 @@ define(function(require) {
         this.get = function() {
             return val;
         }
-    }
+    };
     ConstantValue.prototype = new Value();
     ConstantValue.prototype.constructor = ConstantValue;
 
@@ -38,7 +38,7 @@ define(function(require) {
             out.copy(val);
             return out;
         }
-    }
+    };
     VectorValue.prototype = new Value();
     VectorValue.prototype.constructor = VectorValue;
     //Random 1D
@@ -47,7 +47,7 @@ define(function(require) {
         this.get = function() {
             return Math.random() * range + min;
         }
-    }
+    };
     Random1D.prototype = new Value();
     Random1D.prototype.constructor = Random1D;
 
@@ -68,7 +68,7 @@ define(function(require) {
 
             return out;
         }
-    }
+    };
     Random2D.prototype = new Value();
     Random2D.prototype.constructor = Random2D;
 
@@ -90,7 +90,7 @@ define(function(require) {
 
             return out;
         }
-    }
+    };
     Random3D.prototype = new Value()
     Random3D.prototype.constructor = Random3D;
 
@@ -103,7 +103,7 @@ define(function(require) {
      */
     Value.constant = function(constant) {
         return new ConstantValue(constant);
-    }
+    };
 
     /**
      * Create a constant vector value(2d or 3d) generator
@@ -112,7 +112,7 @@ define(function(require) {
      */
     Value.vector = function(vector) {
         return new VectorValue(vector);
-    }
+    };
 
     /**
      * Create a random 1d value generator
@@ -122,7 +122,7 @@ define(function(require) {
      */
     Value.random1D = function(min, max) {
         return new Random1D(min, max);
-    }
+    };
 
     /**
      * Create a random 2d value generator
@@ -132,7 +132,7 @@ define(function(require) {
      */
     Value.random2D = function(min, max) {
         return new Random2D(min, max);
-    }
+    };
 
     /**
      * Create a random 3d value generator
@@ -142,7 +142,7 @@ define(function(require) {
      */
     Value.random3D = function(min, max) {
         return new Random3D(min, max);
-    }
+    };
 
     return Value;
 });

@@ -38,7 +38,7 @@ define(function(require) {
              * @type {Array.<Uint8Array>}
              */
             mipmaps : []
-        }
+        };
     }, {
         update : function(_gl) {
 
@@ -125,21 +125,23 @@ define(function(require) {
             _gl.generateMipmap(_gl.TEXTURE_2D);    
         },
         isPowerOfTwo : function() {
+            var width;
+            var height;
             if (this.image) {
-                var width = this.image.width;
-                var height = this.image.height;   
+                width = this.image.width;
+                height = this.image.height;   
             } else {
-                var width = this.width;
-                var height = this.height;
+                width = this.width;
+                height = this.height;
             }
             return (width & (width-1)) === 0
-                    && (height & (height-1)) === 0;
+                && (height & (height-1)) === 0;
         },
 
         isRenderable : function() {
             if (this.image) {
-                return this.image.nodeName === 'CANVAS' ||
-                        this.image.complete;
+                return this.image.nodeName === 'CANVAS'
+                    || this.image.complete;
             } else {
                 return this.width && this.height;
             }
@@ -160,11 +162,11 @@ define(function(require) {
                 self.dirty();
                 self.trigger('success', self);
                 image.onload = null;
-            }
+            };
             image.onerror = function() {
                 self.trigger('error', self);
                 image.onerror = null;
-            }
+            };
 
             image.src = src;
             this.image = image;
@@ -174,4 +176,4 @@ define(function(require) {
     });
 
     return Texture2D;
-})
+});

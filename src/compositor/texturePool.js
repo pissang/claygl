@@ -36,13 +36,13 @@ define(function(require) {
         },
 
         clear : function(gl) {
-            for (i = 0; i < allocatedTextures.length; i++) {
+            for (var i = 0; i < allocatedTextures.length; i++) {
                 allocatedTextures[i].dispose(gl);
             }
             pool = {};
             allocatedTextures = [];
         }
-    }
+    };
 
     var defaultParams = {
         width : 512,
@@ -58,7 +58,7 @@ define(function(require) {
         flipY : true,
         unpackAlignment : 4,
         premultiplyAlpha : false
-    }
+    };
 
     var defaultParamPropList = Object.keys(defaultParams);
 
@@ -91,7 +91,7 @@ define(function(require) {
                 target.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
                 target.minFilter == glenum.LINEAR_MIPMAP_NEAREST
             ) {
-                target.minFilter = glenum.LINEAR
+                target.minFilter = glenum.LINEAR;
             }
 
             target.wrapS = glenum.CLAMP_TO_EDGE;
@@ -105,4 +105,4 @@ define(function(require) {
     }
 
     return texturePool;
-})
+});

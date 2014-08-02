@@ -6,9 +6,9 @@ define(function(require) {
     var Shader = require('../Shader');
     var util = require('../core/util');
 
-    _library = {};
+    var _library = {};
 
-    _pool = {};
+    var _pool = {};
 
     /** 
      * ### Builin shaders
@@ -105,7 +105,7 @@ define(function(require) {
         _library[name] = {
             vertex : vertex,
             fragment : fragment
-        }
+        };
     }
 
     /**

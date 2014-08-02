@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
     
     var Base = require('./core/Base');
-    var Texture2D = require('./texture/Texture2D');
     var TextureCube = require('./texture/TextureCube');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
@@ -192,10 +191,14 @@ define(function(require) {
         dispose : function(_gl) {
             this._cache.use(_gl.__GLID__);
 
-            if (this._cache.get('renderbuffer'))
-                _gl.deleteRenderbuffer(this._cache.get('renderbuffer'));
-            if (this._cache.get('framebuffer'))
-                _gl.deleteFramebuffer(this._cache.get('framebuffer'));
+            var renderBuffer = this._cache.get('renderbuffer');
+            if (renderBuffer) {
+                _gl.deleteRenderbuffer(renderBuffer);
+            }
+            var frameBuffer = this._cache.get('framebuffer');
+            if (frameBuffer) {
+                _gl.deleteFramebuffer(frameBuffer);
+            }
 
             this._cache.deleteContext(_gl.__GLID__);
         }

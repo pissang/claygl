@@ -33,7 +33,7 @@ define(function(require) {
          * @type {boolean}
          */
         this._dirty = true;
-    }
+    };
 
     Quaternion.prototype = {
 
@@ -444,7 +444,7 @@ define(function(require) {
         quat.add(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -457,7 +457,7 @@ define(function(require) {
     Quaternion.set = function(out, x, y, z, w) {
         quat.set(out._array, x, y, z, w);
         out._dirty = true;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -468,7 +468,7 @@ define(function(require) {
         quat.copy(out._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -479,7 +479,7 @@ define(function(require) {
         quat.calculateW(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -490,7 +490,7 @@ define(function(require) {
         quat.conjugate(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -500,7 +500,7 @@ define(function(require) {
         quat.identity(out._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -511,7 +511,7 @@ define(function(require) {
         quat.invert(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} a
@@ -520,7 +520,7 @@ define(function(require) {
      */
     Quaternion.dot = function(a, b) {
         return quat.dot(a._array, b._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} a
@@ -528,7 +528,7 @@ define(function(require) {
      */
     Quaternion.len = function(a) {
         return quat.length(a._array);
-    }
+    };
 
     // Quaternion.length = Quaternion.len;
 
@@ -543,7 +543,7 @@ define(function(require) {
         quat.lerp(out._array, a._array, b._array, t);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -556,7 +556,7 @@ define(function(require) {
         quat.slerp(out._array, a._array, b._array, t);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -568,7 +568,7 @@ define(function(require) {
         quat.multiply(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -589,7 +589,7 @@ define(function(require) {
         quat.rotateX(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -601,7 +601,7 @@ define(function(require) {
         quat.rotateY(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -613,7 +613,7 @@ define(function(require) {
         quat.rotateZ(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -625,7 +625,7 @@ define(function(require) {
         quat.setAxisAngle(out._array, axis._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -636,7 +636,7 @@ define(function(require) {
         quat.normalize(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} a
@@ -644,7 +644,7 @@ define(function(require) {
      */
     Quaternion.sqrLen = function(a) {
         return quat.sqrLen(a._array);
-    }
+    };
 
     /**
      * @method
@@ -662,7 +662,7 @@ define(function(require) {
         quat.fromMat3(out._array, m._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -675,7 +675,7 @@ define(function(require) {
         quat.setAxes(out._array, view._array, right._array, up._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Quaternion} out
@@ -687,7 +687,7 @@ define(function(require) {
         quat.rotationTo(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Quaternion;
 })

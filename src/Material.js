@@ -3,12 +3,7 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var Shader = require('./Shader');
-    var util = require('./core/util');
-    var glenum = require('./core/glenum');
     var Texture = require('./Texture');
-    var Texture2D = require('./texture/Texture2D');
-    var TextureCube = require('./texture/TextureCube');
 
     /**
      * #constructor qtek.Material
@@ -245,8 +240,6 @@ define(function(require) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
                 return uniform.value;
-            } else {
-                // console.warn('Uniform '+symbol+' not exist');
             }
         },
         /**
@@ -276,12 +269,12 @@ define(function(require) {
         detachShader : function() {
             this.shader = null;
             this.uniforms = {};
-        },
-
-        dispose : function() {
-            //TODO
         }
+
+        // PENDING
+        // dispose : function() {
+        // }
     });
 
     return Material;
-})
+});

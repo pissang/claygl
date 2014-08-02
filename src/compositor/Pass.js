@@ -3,14 +3,11 @@ define(function(require) {
     'use strict';
 
     var Base = require('../core/Base');
-    var Scene = require('../Scene');
     var OrthoCamera = require('../camera/Orthographic');
     var Plane = require('../geometry/Plane');
     var Shader = require('../Shader');
     var Material = require('../Material');
     var Mesh = require('../Mesh');
-    var Scene = require('../Scene');
-    var Texture = require('../Texture');
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
 
@@ -41,13 +38,13 @@ define(function(require) {
              * @type {qtek.Material}
              */
             material : null
-        }
+        };
     }, function() {
 
         var shader = new Shader({
             vertex : Shader.source('buildin.compositor.vertex'),
             fragment : this.fragment
-        })
+        });
         var material = new Material({
             shader : shader
         });
@@ -148,6 +145,7 @@ define(function(require) {
 
             this.trigger('beforerender', this, renderer);
             // Don't clear in each pass, let the color overwrite the buffer
+            // PENDING Transparent ?
             _gl.disable(_gl.BLEND);
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
             renderer.renderQueue([mesh], camera);
@@ -157,7 +155,7 @@ define(function(require) {
                 this.unbind(renderer, frameBuffer);
             }
         }
-    })
+    });
 
     return Pass;
-})
+});

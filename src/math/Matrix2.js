@@ -15,7 +15,7 @@ define(function(require) {
             get : function() {
                 return this._array[n];
             }
-        }
+        };
     }
 
     /**
@@ -174,7 +174,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
-    }
+    };
 
     /**
      * @param  {Matrix2} out
@@ -185,7 +185,7 @@ define(function(require) {
         mat2.adjoint(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} out
@@ -196,7 +196,7 @@ define(function(require) {
         mat2.copy(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} a
@@ -204,7 +204,7 @@ define(function(require) {
      */
     Matrix2.determinant = function(a) {
         return mat2.determinant(a._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} out
@@ -214,7 +214,7 @@ define(function(require) {
         mat2.identity(out._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} out
@@ -225,7 +225,7 @@ define(function(require) {
         mat2.invert(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} out
@@ -237,7 +237,7 @@ define(function(require) {
         mat2.mul(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -258,7 +258,7 @@ define(function(require) {
         mat2.rotate(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2} out
@@ -270,7 +270,7 @@ define(function(require) {
         mat2.scale(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
     /**
      * @param  {Matrix2} out
      * @param  {Matrix2} a
@@ -280,7 +280,7 @@ define(function(require) {
         mat2.transpose(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Matrix2;
-})
+});

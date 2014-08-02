@@ -6,7 +6,6 @@ define(function(require) {
     'use strict';
 
     var Geometry = require('./Geometry');
-    var util = require('./core/util');
     var BoundingBox = require('./math/BoundingBox');
     var glMatrix = require('glmatrix');
     var glenum = require('./core/glenum');
@@ -47,7 +46,7 @@ define(function(require) {
             _normalType : 'vertex',
 
             _enabledAttributes : null
-        }
+        };
     }, 
 
     /** @lends qtek.StaticGeometry.prototype */
@@ -140,7 +139,7 @@ define(function(require) {
                 chunks[0] = {
                     attributeBuffers : [],
                     indicesBuffer : null
-                }
+                };
                 this._cache.put('chunks', chunks);
                 firstUpdate = true;
             }
@@ -380,7 +379,7 @@ define(function(require) {
                 tangents[i * 4] = tmp[0];
                 tangents[i * 4 + 1] = tmp[1];
                 tangents[i * 4 + 2] = tmp[2];
-                tangents[i * 4 + 3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? -1.0 : 1.0;;
+                tangents[i * 4 + 3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? -1.0 : 1.0;
             }
         },
 
@@ -446,7 +445,6 @@ define(function(require) {
                 return;
             }
             array = this.attributes.barycentric.value = new Float32Array(this.faces.length * 3);
-            var i1, i2, i3, face;
             for (var i = 0; i < this.faces.length;) {
                 for (var j = 0; j < 3; j++) {
                     var ii = this.faces[i++];
@@ -456,9 +454,6 @@ define(function(require) {
         },
 
         convertToDynamic : function(geometry) {
-            var offset = 0;
-            var chunk = this._arrayChunks[c];
-
             for (var i = 0; i < this.faces.length; i+=3) {
                 geometry.faces.push(this.face.subarray(i, i + 3));
             }
@@ -472,7 +467,7 @@ define(function(require) {
                         type : attrib.type,
                         size : attrib.size,
                         value : []
-                    }
+                    };
                     if (attrib.semantic) {
                         geoAttrib.semantic = attrib.semantic;
                     }
@@ -539,4 +534,4 @@ define(function(require) {
     });
 
     return StaticGeometry;
-})
+});

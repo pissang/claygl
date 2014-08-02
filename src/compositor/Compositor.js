@@ -2,7 +2,7 @@ define(function(require){
 
     'use strict';
 
-    var Graph = require("./Graph");
+    var Graph = require('./Graph');
 
     /**
      * Compositor provide graph based post processing
@@ -15,7 +15,7 @@ define(function(require){
         return {
             // Output node
             _outputs : []
-        }
+        };
     },
     /** @lends qtek.compositor.Compositor.prototype */
     {
@@ -60,7 +60,7 @@ define(function(require){
         removeOutput : function(node) {
             this._outputs.splice(this._outputs.indexOf(node), 1);
         }
-    })
+    });
 
     return Compositor;
-})
+});

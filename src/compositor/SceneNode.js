@@ -3,8 +3,6 @@ define(function(require) {
     'use strict';
 
     var Node = require('./Node');
-    var Pass = require('./Pass');
-    var FrameBuffer = require('../FrameBuffer');
     var texturePool = require('./texturePool');
     var glinfo = require('../core/glinfo');
 
@@ -45,9 +43,11 @@ define(function(require) {
 
             this.trigger('beforerender');
 
-            if (! this.outputs) {
-                
-                var renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+            var renderInfo;
+
+            if (!this.outputs) {
+
+                renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
 
             } else {
 
@@ -80,7 +80,7 @@ define(function(require) {
                     ext.drawBuffersEXT(bufs);
                 }
 
-                var renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+                renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
 
                 frameBuffer.unbind(renderer);
             }
@@ -90,7 +90,7 @@ define(function(require) {
             this._rendering = false;
             this._rendered = true;
         }
-    })
+    });
 
     return SceneNode;
-})
+});

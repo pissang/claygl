@@ -48,7 +48,7 @@ define(function(require) {
         var count = tasks.length;
         var self = this;
         var data = [];
-        if (tasks.length == 0) {
+        if (tasks.length === 0) {
             setTimeout(function() {
                 self.resolve(data);
             });
@@ -96,7 +96,7 @@ define(function(require) {
         var success = false;
         var self = this;
         var data = [];
-        if (tasks.length == 0) {
+        if (tasks.length === 0) {
             setTimeout(function() {
                 self.trigger('success', data);
             });
@@ -139,7 +139,7 @@ define(function(require) {
             });
         });
         return this;
-    }
+    };
     /**
      * Get successed sub tasks number, recursive can be true if sub task is also a TaskGroup.
      * @param  {boolean} [recursive]
@@ -160,7 +160,7 @@ define(function(require) {
         } else {
             return this._fulfilledNumber;
         }
-    }
+    };
 
     /**
      * Get failed sub tasks number, recursive can be true if sub task is also a TaskGroup.
@@ -182,7 +182,7 @@ define(function(require) {
         } else {
             return this._rejectedNumber;
         }
-    }
+    };
 
     /**
      * Get finished sub tasks number, recursive can be true if sub task is also a TaskGroup.
@@ -205,7 +205,7 @@ define(function(require) {
         } else {
             return this._fulfilledNumber + this._rejectedNumber;
         }
-    }
+    };
 
     /**
      * Get all sub tasks number, recursive can be true if sub task is also a TaskGroup.
@@ -227,7 +227,7 @@ define(function(require) {
         } else {
             return this._tasks.length;
         }
-    }
+    };
 
     return TaskGroup;
 });

@@ -15,7 +15,7 @@ define(function(require) {
             get : function() {
                 return this._array[n];
             }
-        }
+        };
     }
 
     /**
@@ -176,7 +176,7 @@ define(function(require) {
         mat2d.copy(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} a
@@ -184,7 +184,7 @@ define(function(require) {
      */
     Matrix2d.determinant = function(a) {
         return mat2d.determinant(a._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -194,7 +194,7 @@ define(function(require) {
         mat2d.identity(out._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -205,7 +205,7 @@ define(function(require) {
         mat2d.invert(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -217,7 +217,7 @@ define(function(require) {
         mat2d.mul(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -238,7 +238,7 @@ define(function(require) {
         mat2d.rotate(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -250,7 +250,7 @@ define(function(require) {
         mat2d.scale(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -262,7 +262,7 @@ define(function(require) {
         mat2d.translate(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Matrix2d;
 })

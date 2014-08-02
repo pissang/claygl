@@ -49,7 +49,7 @@ define(function(require) {
             if (scan[x][0] === 1 && scan[x][1] === 1 && scan[x][2] === 1) {
                 // exp is count of repeated pixels
                 for (var i = (scan[x][3] << rshift) >>> 0; i > 0; i--) {
-                    copy(scan[x-1], scan[x]);
+                    copyrgbe(scan[x-1], scan[x]);
                     x++;
                     len--;
                 }
@@ -122,7 +122,7 @@ define(function(require) {
             }
             // find resolution info line
             i += 2;
-            var str = ''
+            var str = '';
             for (; i < size; i++) {
                 var _char = toChar(data[i]);
                 if (_char === '\n') {
@@ -174,6 +174,7 @@ define(function(require) {
         parseRGBEFromPNG : function(png) {
 
         }
-    }
+    };
+
     return ret;
 });

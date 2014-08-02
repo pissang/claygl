@@ -3,24 +3,18 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    var util = require('./core/util');
-    var Light = require('./Light');
-    var Mesh = require('./Mesh');
     var Texture = require('./Texture');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
     var BoundingBox = require('./math/BoundingBox');
     var Matrix4 = require('./math/Matrix4');
-    var Shader = require('./Shader');
     var shaderLibrary = require('./shader/library');
     var Material = require('./Material');
-    var Vector3 = require('./math/Vector3');
     var Vector2 = require('./math/Vector2');
 
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
-    var vec4 = glMatrix.vec4;
 
     var glid = 0;
 
@@ -131,7 +125,7 @@ define(function(require) {
             _clearSettings : [],
 
             _sceneRendering : null
-        }
+        };
     }, function() {
 
         if (!this.canvas) {
@@ -147,7 +141,7 @@ define(function(require) {
                 antialias : this.antialias,
                 premultipliedAlpha : this.premultipliedAlpha,
                 preserveDrawingBuffer : this.preserveDrawingBuffer
-            }
+            };
             
             this.gl = this.canvas.getContext('webgl', opts)
                 || this.canvas.getContext('experimental-webgl', opts);
@@ -163,8 +157,7 @@ define(function(require) {
             this.resize(this.width, this.height);
 
             glinfo.initialize(this.gl);
-        }
-        catch(e) {
+        } catch(e) {
             if (this.throwError) {
                 throw 'Error creating WebGL Context';
             } else {
@@ -232,7 +225,7 @@ define(function(require) {
                 y : y,
                 width : width,
                 height : height
-            }
+            };
         },
 
         /**
@@ -334,8 +327,8 @@ define(function(require) {
             var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial);
 
             scene.trigger('afterrender:transparent', this, transparentQueue, transparentRenderInfo);
-            var renderInfo = {}
-            for (name in opaqueRenderInfo) {
+            var renderInfo = {};
+            for (var name in opaqueRenderInfo) {
                 renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
             }
 
@@ -409,7 +402,7 @@ define(function(require) {
                     }
                     if (renderable.culling !== culling) {
                         culling = renderable.culling;
-                        culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
+                        culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
                     }
 
                     var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
@@ -530,7 +523,7 @@ define(function(require) {
                 }
                 if (renderable.culling !== culling) {
                     culling = renderable.culling;
-                    culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE)
+                    culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
                 }
 
                 var objectRenderInfo = renderable.render(_gl, globalMaterial);
@@ -589,7 +582,7 @@ define(function(require) {
                     }   
                 }
                 return true;
-            }
+            };
         })(),
 
         /**
@@ -706,7 +699,7 @@ define(function(require) {
 
             return out;
         }
-    })
+    });
 
     /**
      * Opaque renderables compare function
@@ -724,7 +717,7 @@ define(function(require) {
             return x.material.__GUID__ - y.material.__GUID__;
         }
         return x.material.shader.__GUID__ - y.material.shader.__GUID__;
-    }
+    };
 
     /**
      * Transparent renderables compare function
@@ -746,8 +739,8 @@ define(function(require) {
         }
         // Depth is negative
         // So farther object has smaller depth value
-        return x.__depth - y.__depth
-    }
+        return x.__depth - y.__depth;
+    };
 
     // Temporary variables
     var matrices = {
@@ -779,9 +772,9 @@ define(function(require) {
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
     };
 
-    Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT
-    Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT
-    Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT
+    Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
+    Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
+    Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;
 
     return Renderer;
-})
+});

@@ -4,9 +4,6 @@ define(function(require) {
 
     var Node = require('./Node');
     var glenum = require('./core/glenum');
-    var glinfo = require('./core/glinfo');
-    var Vector3 = require('./math/Vector3');
-    var StaticGeometry = require('./StaticGeometry');
 
     // Cache
     var prevDrawID = 0;
@@ -19,7 +16,7 @@ define(function(require) {
         this.faceNumber = 0;
         this.vertexNumber = 0;
         this.drawCallNumber = 0;
-    }
+    };
 
     function VertexArrayObject(
         availableAttributes,
@@ -184,12 +181,12 @@ define(function(require) {
                             var attributeBufferInfo = attributeBuffers[a];
                             var name = attributeBufferInfo.name;
                             var semantic = attributeBufferInfo.semantic;
-
+                            var symbol;
                             if (semantic) {
                                 var semanticInfo = shader.attribSemantics[semantic];
-                                var symbol = semanticInfo && semanticInfo.symbol;
+                                symbol = semanticInfo && semanticInfo.symbol;
                             } else {
-                                var symbol = name;
+                                symbol = name;
                             }
                             if (symbol && shader.attributeTemplates[symbol]) {
                                 availableAttributes.push(attributeBufferInfo);
@@ -227,7 +224,6 @@ define(function(require) {
                     }
 
                     var availableAttributes = vao.availableAttributes;
-                    var availableAttributeSymbols = vao.availableAttributeSymbols;
                     var indicesBuffer = vao.indicesBuffer;
                     
                     if (needsBindAttributes) {
@@ -240,7 +236,6 @@ define(function(require) {
                             }
                             var attributeBufferInfo = availableAttributes[a];
                             var buffer = attributeBufferInfo.buffer;
-                            var symbol = availableAttributeSymbols[a];
                             var size = attributeBufferInfo.size;
                             var glType;
                             switch (attributeBufferInfo.type) {
@@ -329,13 +324,13 @@ define(function(require) {
                 }
 
                 return renderable;
-            }
+            };
         })()
     });
 
     Renderable.beforeFrame = function() {
         prevDrawID = 0;
-    }
+    };
 
     // Enums
     Renderable.POINTS = glenum.POINTS;
@@ -355,4 +350,4 @@ define(function(require) {
     Renderable.RenderInfo = RenderInfo;
 
     return Renderable;
-})
+});

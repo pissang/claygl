@@ -9,7 +9,7 @@ define(function() {
         this._caches = [];
 
         this._context = {};
-    }
+    };
 
     Cache.prototype = {
 
@@ -38,7 +38,7 @@ define(function() {
         dirty : function(field) {
             field = field || '';
             var key = '__dirty__' + field;
-            this.put(key, true)
+            this.put(key, true);
         },
         
         dirtyAll : function(field) {
@@ -71,7 +71,7 @@ define(function() {
             field = field || '';
             var key = '__dirty__' + field;
             return  !this._context.hasOwnProperty(key)
-                    || this._context[key] === true
+                || this._context[key] === true;
         },
 
         deleteContext : function(contextId) {
@@ -94,10 +94,10 @@ define(function() {
         miss : function(key) {
             return ! this._context.hasOwnProperty(key);
         }
-    }
+    };
 
     Cache.prototype.constructor = Cache;
 
     return Cache;
 
-})
+});

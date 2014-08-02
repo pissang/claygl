@@ -26,7 +26,6 @@ define(function(require) {
 
     var glMatrix = require('glmatrix');
     var vec3 = glMatrix.vec3;
-    var vec2 = glMatrix.vec2;
     var quat = glMatrix.quat;
 
     /**
@@ -58,12 +57,12 @@ define(function(require) {
             request.get({
                 url : url,
                 onprogress : function(percent, loaded, total) {
-                    self.trigger("progress", percent, loaded, total);
+                    self.trigger('progress', percent, loaded, total);
                 },
                 onerror : function(e) {
-                    self.trigger("error", e);
+                    self.trigger('error', e);
                 },
-                responseType : "text",
+                responseType : 'text',
                 onload : function(data) {
                     self.parse(JSON.parse(data));
                 }
@@ -78,31 +77,26 @@ define(function(require) {
             
             var geometryList = this._parseGeometry(data);
 
-            var dSkinIndices = data.skinIndices,
-                dSkinWeights = data.skinWeights;
+            var dSkinIndices = data.skinIndices;
+            var dSkinWeights = data.skinWeights;
             var skinned = dSkinIndices && dSkinIndices.length
-                        && dSkinWeights && dSkinWeights.length;
+                && dSkinWeights && dSkinWeights.length;
 
+            var jointNumber;
+            var skeleton;
             if (skinned) {
-                var skeleton = this._parseSkeleton(data);
-                var jointNumber = skeleton.joints.length;
-            }else{
-                var jointNumber = 0;
-            }
-
-            if (skinned) {
-                var skeleton = this._parseSkeleton(data);
-                var jointNumber = skeleton.joints.length;
-            }else{
-                var jointNumber = 0;
+                skeleton = this._parseSkeleton(data);
+                jointNumber = skeleton.joints.length;
+            } else {
+                jointNumber = 0;
             }
 
             var meshList = [];
             for (var i = 0; i < data.materials.length; i++) {
                 var geometry = geometryList[i];
-                if (geometry 
-                    && geometry.faces.length 
-                    && geometry.attributes.position.value.length) {
+                if (
+                    geometry && geometry.faces.length && geometry.attributes.position.value.length
+                ) {
                     geometry.updateBoundingBox();
                     var material = this._parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
@@ -136,8 +130,6 @@ define(function(require) {
             }
             geometryList[0] = new DynamicGeometry();
 
-            var faceMaterial = data.materials && data.materials.length > 1;
-
             var dFaces = data.faces;
             var dVertices = data.vertices;
             var dNormals = data.normals;
@@ -147,14 +139,16 @@ define(function(require) {
             var dUvs = data.uvs;
 
             var skinned = dSkinIndices && dSkinIndices.length
-                        && dSkinWeights && dSkinWeights.length;
+                && dSkinWeights && dSkinWeights.length;
 
             var geometry = geometryList[0];
             var attributes = geometry.attributes;
             var positions = attributes.position.value;
             var normals = attributes.normal.value;
-            var texcoords = [attributes.texcoord0.value,
-                            attributes.texcoord1.value];
+            var texcoords = [
+                attributes.texcoord0.value,
+                attributes.texcoord1.value
+            ];
             var colors = attributes.color.value;
             var jointIndices = attributes.joint.value;
             var jointWeights = attributes.weight.value;
@@ -199,11 +193,11 @@ define(function(require) {
                     return newIndexMap[oi];
                 }else{
 
-                    positions.push([dVertices[oi*3], dVertices[oi*3+1], dVertices[oi*3+2]]);
+                    positions.push([dVertices[oi * 3], dVertices[oi * 3 + 1], dVertices[oi * 3 + 2]]);
                     //Skin data
                     if (skinned) {
-                        jointWeights.push([dSkinWeights[oi*2], dSkinWeights[oi*2+1], 0]);
-                        jointIndices.push([dSkinIndices[oi*2], dSkinIndices[oi*2+1], -1, -1]);
+                        jointWeights.push([dSkinWeights[oi * 2], dSkinWeights[oi * 2 + 1], 0]);
+                        jointIndices.push([dSkinIndices[oi * 2], dSkinIndices[oi * 2 + 1], -1, -1]);
                     }
 
                     newIndexMap[oi] = cursorList[materialIndex];
@@ -228,52 +222,56 @@ define(function(require) {
 
             while (offset < len) {
                 var type = dFaces[offset++];
-                var isQuad = isBitSet(type, 0),
-                    hasMaterial = isBitSet(type, 1),
-                    hasFaceUv = isBitSet(type, 2),
-                    hasFaceVertexUv = isBitSet(type, 3),
-                    hasFaceNormal = isBitSet(type, 4),
-                    hasFaceVertexNormal = isBitSet(type, 5),
-                    hasFaceColor = isBitSet(type, 6),
-                    hasFaceVertexColor = isBitSet(type, 7);
+                var isQuad = isBitSet(type, 0);
+                var hasMaterial = isBitSet(type, 1);
+                var hasFaceUv = isBitSet(type, 2);
+                var hasFaceVertexUv = isBitSet(type, 3);
+                var hasFaceNormal = isBitSet(type, 4);
+                var hasFaceVertexNormal = isBitSet(type, 5);
+                var hasFaceColor = isBitSet(type, 6);
+                var hasFaceVertexColor = isBitSet(type, 7);
 
                 var nVertices = isQuad ? 4 : 3;
 
                 if (hasMaterial) {
-                    materialIndex = dFaces[ offset+ (isQuad ? 4 : 3) ];
-                    if ( ! geometryList[materialIndex] ) {
+                    materialIndex = dFaces[offset+ (isQuad ? 4 : 3)];
+                    if (!geometryList[materialIndex]) {
                         geometryList[materialIndex] = new DynamicGeometry();
                     }
                     geometry = geometryList[materialIndex];
                     attributes = geometry.attributes;
                     positions = attributes.position.value;
                     normals = attributes.normal.value;
-                    texcoords = [attributes.texcoord0.value,
-                                attributes.texcoord1.value];
+                    texcoords = [
+                        attributes.texcoord0.value,
+                        attributes.texcoord1.value
+                    ];
                     colors = attributes.color.value;
                     jointWeights = attributes.weight.value;
                     jointIndices = attributes.joint.value;
                     faces = geometry.faces;
                 }
+                var i1o, i2o, i3o, i4o;
+                var i1, i2, i3, i4, i5, i6;
                 if (isQuad) {
                     // Split into two triangle faces, 1-2-4 and 2-3-4
-                    var i1o = dFaces[offset++],
-                        i2o = dFaces[offset++],
-                        i3o = dFaces[offset++],
-                        i4o = dFaces[offset++];
+                    i1o = dFaces[offset++];
+                    i2o = dFaces[offset++];
+                    i3o = dFaces[offset++];
+                    i4o = dFaces[offset++];
                     // Face1
-                    var i1 = getNewIndex(i1o, 0),
-                        i2 = getNewIndex(i2o, 1),
-                        i3 = getNewIndex(i4o, 2),
+                    i1 = getNewIndex(i1o, 0);
+                    i2 = getNewIndex(i2o, 1);
+                    i3 = getNewIndex(i4o, 2);
                     // Face2
-                        i4 = getNewIndex(i2o, 3),
-                        i5 = getNewIndex(i3o, 4),
-                        i6 = getNewIndex(i4o, 5);
+                    i4 = getNewIndex(i2o, 3);
+                    i5 = getNewIndex(i3o, 4);
+                    i6 = getNewIndex(i4o, 5);
                     faces.push([i1, i2, i3], [i4, i5, i6]);
                 } else {
-                    var i1 = dFaces[offset++],
-                        i2 = dFaces[offset++],
-                        i3 = dFaces[offset++];
+                    i1 = dFaces[offset++];
+                    i2 = dFaces[offset++];
+                    i3 = dFaces[offset++];
                     i1 = getNewIndex(i1, 0);
                     i2 = getNewIndex(i2, 1);
                     i3 = getNewIndex(i3, 2);
@@ -422,7 +420,7 @@ define(function(require) {
                     position : new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
                     rotation : new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
                     scale : new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
-                })
+                });
                 joints.push(joint);
             }
 
@@ -472,43 +470,44 @@ define(function(require) {
         },
 
         _parseMaterial : function(mConfig, jointNumber) {
-            var shaderName = "buildin.lambert";
+            var shaderName = 'buildin.lambert';
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
-            if (shading === "phong" || shading === "lambert") {
-                shaderName = "buildin." + shading;
+            if (shading === 'phong' || shading === 'lambert') {
+                shaderName = 'buildin.' + shading;
             }
             var enabledTextures = [];
             if (mConfig.mapDiffuse) {
-                enabledTextures.push("diffuseMap");
+                enabledTextures.push('diffuseMap');
             }
             if (mConfig.mapNormal || mConfig.mapBump) {
                 enabledTextures.push('normalMap');
             }
-            if (jointNumber == 0) {
-                var shader = shaderLibrary.get(shaderName, enabledTextures);
+            var shader;
+            if (jointNumber === 0) {
+                shader = shaderLibrary.get(shaderName, enabledTextures);
             } else {
                 // Shader for skinned mesh
-                var shader = new Shader({
-                    vertex : Shader.source(shaderName+".vertex"),
-                    fragment : Shader.source(shaderName+".fragment")
-                })
+                shader = new Shader({
+                    vertex : Shader.source(shaderName+'.vertex'),
+                    fragment : Shader.source(shaderName+'.fragment')
+                });
                 for (var i = 0; i < enabledTextures; i++) {
                     shader.enableTexture(enabledTextures[i]);
                 }
-                shader.define('vertex', "SKINNING");
-                shader.define('vertex', "JOINT_NUMBER", jointNumber);
+                shader.define('vertex', 'SKINNING');
+                shader.define('vertex', 'JOINT_NUMBER', jointNumber);
             }
 
             var material = new Material({
                 shader : shader
             });
             if (mConfig.colorDiffuse) {
-                material.set("color", mConfig.colorDiffuse );
+                material.set('color', mConfig.colorDiffuse );
             } else if (mConfig.DbgColor) {
-                material.set("color", hex2rgb(mConfig.DbgColor));
+                material.set('color', hex2rgb(mConfig.DbgColor));
             }
             if (mConfig.colorSpecular) {
-                material.set("specular", mConfig.colorSpecular );
+                material.set('specular', mConfig.colorSpecular );
             }
             if (mConfig.transparent !== undefined && mConfig.transparent) {
                 material.transparent = true;
@@ -521,29 +520,27 @@ define(function(require) {
             }
             
             if (mConfig.transparency && mConfig.transparency < 1) {
-                material.set("opacity", mConfig.transparency);
+                material.set('opacity', mConfig.transparency);
             }
             if (mConfig.specularCoef) {
-                material.set("shininess", mConfig.specularCoef);
+                material.set('shininess', mConfig.specularCoef);
             }
 
             // Textures
             if (mConfig.mapDiffuse) {
-                material.set("diffuseMap", this._loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
+                material.set('diffuseMap', this._loadTexture(mConfig.mapDiffuse, mConfig.mapDiffuseWrap) );
             }
             if (mConfig.mapBump) {
-                material.set("normalMap", this._loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
+                material.set('normalMap', this._loadTexture(mConfig.mapBump, mConfig.mapBumpWrap) );
             }
             if (mConfig.mapNormal) {
-                material.set("normalMap", this._loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
+                material.set('normalMap', this._loadTexture(mConfig.mapNormal, mConfig.mapBumpWrap) );
             }
 
             return material;
         },
 
         _loadTexture : function(path, wrap) {
-            var self = this;
-
             var img = new Image();
             var texture = new Texture2D();
             texture.image = img;
@@ -554,13 +551,13 @@ define(function(require) {
             }
             img.onload = function() {
                 texture.dirty();
-            }
+            };
             var root = this.textureRootPath || this.rootPath;
             img.src = util.relative2absolute(path, root);
 
             return texture;
         }
-    })
+    });
 
 
     function isBitSet(value, position) {
@@ -569,15 +566,11 @@ define(function(require) {
 
 
     function hex2rgb(hex) {
-        var r = (hex >> 16) & 0xff,
-            g = (hex >> 8) & 0xff,
-            b = hex & 0xff;
-        return [r/255, g/255, b/255];
+        var r = (hex >> 16) & 0xff;
+        var g = (hex >> 8) & 0xff;
+        var b = hex & 0xff;
+        return [r / 255, g / 255, b / 255];
     }
 
-    function translateColor(color) {
-        return [color[0]/255, color[1]/255, color[2]/255];
-    }
-
-    return Loader
-} )
+    return Loader;
+});

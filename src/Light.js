@@ -35,8 +35,10 @@ define(function(require){
              * @type {number}
              */
             shadowResolution : 512
-        }
-    }, {
+        };
+    },
+    /** @lends qtek.Light.prototype. */
+    {
         /**
          * Light type
          * @type {string}
@@ -62,4 +64,4 @@ define(function(require){
     Shader['import'](require('text!./light/light.essl'));
 
     return Light;
-})
+});

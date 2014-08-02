@@ -311,7 +311,7 @@ define(function() {
          * @return {number}
          */
         BounceIn: function(k) {
-            return 1 - Easing.BounceOut(1 - k);
+            return 1 - easing.BounceOut(1 - k);
         },
         /**
          * @alias qtek.animation.easing.BounceOut
@@ -337,9 +337,9 @@ define(function() {
          */
         BounceInOut: function(k) {
             if (k < 0.5) {
-                return Easing.BounceIn(k * 2) * 0.5;
+                return easing.BounceIn(k * 2) * 0.5;
             }
-            return Easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
+            return easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
         }
     };
 

@@ -37,7 +37,8 @@ define(function(require) {
         'mat2' : 'm2',
         'mat3' : 'm3',
         'mat4' : 'm4'
-    }
+    };
+
     var uniformValueConstructor = {
         'bool' : function() {return true;},
         'int' : function() {return 0;},
@@ -58,7 +59,8 @@ define(function(require) {
         'mat4' : function() {return mat4.create();},
 
         'array' : function() {return [];}
-    }
+    };
+
     var attribSemantics = [
         'POSITION', 
         'NORMAL',
@@ -179,7 +181,7 @@ define(function(require) {
             _fragmentProcessed : '',
 
             _currentLocationsMap : {}
-        }
+        };
     }, function() {
         
         this._cache = new Cache();
@@ -484,7 +486,7 @@ define(function(require) {
                     }
                     break;
             }
-            return true
+            return true;
         },
 
         setUniformBySemantic : function(_gl, semantic, val) {
@@ -602,7 +604,7 @@ define(function(require) {
             for (var symbol in this._textureStatus) {
                 var status = this._textureStatus[symbol];
                 if (status.enabled) {
-                    defineStr.push("#define " + symbol.toUpperCase() + "_ENABLED");
+                    defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
                 }
             }
             // Custom Defines
@@ -636,6 +638,7 @@ define(function(require) {
                 if (type && symbol) {
                     var uniformType = uniformTypeMap[type];
                     var isConfigurable = true;
+                    var defaultValueFunc;
                     if (uniformType) {
                         self._uniformList.push(symbol);
                         if (type === 'sampler2D' || type === 'samplerCube') {
@@ -655,32 +658,32 @@ define(function(require) {
                                 self.attribSemantics[semantic] = {
                                     symbol : symbol,
                                     type : uniformType
-                                }
+                                };
                                 isConfigurable = false;
-                            }
-                            else if (matrixSemantics.indexOf(semantic) >= 0) {
+                            } else if (matrixSemantics.indexOf(semantic) >= 0) {
                                 var isTranspose = false;
                                 var semanticNoTranspose = semantic;
                                 if (semantic.match(/TRANSPOSE$/)) {
                                     isTranspose = true;
-                                    semanticNoTranspose = semantic.slice(0, -9)
+                                    semanticNoTranspose = semantic.slice(0, -9);
                                 }
                                 self.matrixSemantics[semantic] = {
                                     symbol : symbol,
                                     type : uniformType,
                                     isTranspose : isTranspose,
                                     semanticNoTranspose : semanticNoTranspose
-                                }
+                                };
                                 isConfigurable = false;
-                            }
-                            else {
+                            } else {
                                 // The uniform is not configurable, which means it will not appear
                                 // in the material uniform properties
                                 if (semantic === 'unconfigurable') {
                                     isConfigurable = false;
-                                }else{
-                                    var defaultValueFunc = self._parseDefaultValue(type, semantic);
-                                    if (! defaultValueFunc) {
+                                } else {
+                                    // Uniform have a defalut value, like
+                                    // uniform vec3 color: [1, 1, 1];
+                                    defaultValueFunc = self._parseDefaultValue(type, semantic);
+                                    if (!defaultValueFunc) {
                                         throw new Error('Unkown semantic "' + semantic + '"');
                                     }
                                     else {
@@ -694,7 +697,7 @@ define(function(require) {
                                 type : uniformType,
                                 value : isArray ? uniformValueConstructor['array'] : (defaultValueFunc || uniformValueConstructor[type]),
                                 semantic : semantic || null
-                            }
+                            };
                         }
                     }
                     return ['uniform', type, symbol, isArray].join(' ') + ';\n';
@@ -705,32 +708,26 @@ define(function(require) {
         },
 
         _parseDefaultValue : function(type, str) {
-            var arrayRegex = /\[\s*(.*)\s*\]/
-            if (
-                type === 'vec2'
-                || type === 'vec3'
-                || type === 'vec4'
-            ) {
+            var arrayRegex = /\[\s*(.*)\s*\]/;
+            if (type === 'vec2' || type === 'vec3' || type === 'vec4') {
                 var arrayStr = arrayRegex.exec(str)[1];
                 if (arrayStr) {
                     var arr = arrayStr.split(/\s*,\s*/);
                     return function() {
                         return new Float32Array(arr);
-                    }
-                }else{
+                    };
+                } else {
                     // Invalid value
                     return;
                 }
-            }
-            else if (type === 'bool') {
+            } else if (type === 'bool') {
                 return function() {
                     return str.toLowerCase() === 'true' ? true : false;
-                }
-            }
-            else if (type === 'float') {
+                };
+            } else if (type === 'float') {
                 return function() {
                     return parseFloat(str);
-                }
+                };
             }
         },
 
@@ -743,8 +740,9 @@ define(function(require) {
                 uniforms[symbol] = {
                     type : uniformTpl.type,
                     value : uniformTpl.value()
-                }
+                };
             }
+
             return uniforms;
         },
 
@@ -772,11 +770,11 @@ define(function(require) {
                     }
 
                     attributes[symbol] = {
-                        // Force float
-                        type : "float",
+                        // Can only be float
+                        type : 'float',
                         size : size,
                         semantic : semantic || null
-                    }
+                    };
 
                     if (semantic) {
                         if (attribSemantics.indexOf(semantic) < 0) {
@@ -785,7 +783,7 @@ define(function(require) {
                             self.attribSemantics[semantic] = {
                                 symbol : symbol,
                                 type : type
-                            }
+                            };
                         }
                     }
                 }
@@ -807,7 +805,7 @@ define(function(require) {
                 var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
                 if (!defines[symbol]) { // Haven't been defined by user
                     if (value == 'false') {
-                        defines[symbol] = false
+                        defines[symbol] = false;
                     } else if (value == 'true') {
                         defines[symbol] = true;
                     } else {
@@ -817,6 +815,7 @@ define(function(require) {
                 return '';
             }
         },
+
         // Return true or error msg if error happened
         _buildProgram : function(_gl, vertexShaderString, fragmentShaderString) {
 
@@ -895,10 +894,10 @@ define(function(require) {
          */
         dispose : function(_gl) {
             this._cache.use(_gl.__GLID__);
+            var program = this._cache.get('program');
             if (program) {
-                var program = this._cache.get('program');
+                _gl.deleteProgram(program);
             }
-            _gl.deleteProgram(program);
             this._cache.deleteContext(_gl.__GLID__);
             this._locations = {};
         }
@@ -908,7 +907,7 @@ define(function(require) {
         return {
             'locations' : {},
             'attriblocations' : {}
-        }
+        };
     }
 
     // some util functions
@@ -933,9 +932,9 @@ define(function(require) {
                 console.warn('Shader chunk "' + importName + '" not existed in library');
                 return '';
             }
-        })
+        });
         return shaderStr;
-    }
+    };
 
     var exportRegex = /(@export)\s*([0-9a-zA-Z_\-\.]*)\s*\n([\s\S]*?)@end/g;
 
@@ -951,8 +950,9 @@ define(function(require) {
                 var parts = exportName.split('.');
                 var obj = Shader.codes;
                 var i = 0;
-                while(i < parts.length - 1) {
-                    var key = parts[i++];
+                var key;
+                while (i < parts.length - 1) {
+                    key = parts[i++];
                     if (!obj[key]) {
                         obj[key] = {};
                     }
@@ -962,8 +962,8 @@ define(function(require) {
                 obj[key] = code;
             }
             return code;
-        })
-    }
+        });
+    };
 
     /**
      * Library to store all the loaded shader codes
@@ -987,12 +987,12 @@ define(function(require) {
             var key = parts[i++];
             obj = obj[key];
         }
-        if (! obj) {
+        if (!obj) {
             console.warn('Shader "' + name + '" not existed in library');
             return;
         }
         return obj;
-    }
+    };
 
     return Shader;
-})
+});

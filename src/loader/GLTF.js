@@ -38,8 +38,6 @@ define(function(require) {
     var StaticGeometry = require('../StaticGeometry');
 
     var glMatrix = require('glmatrix');
-    var vec4 = glMatrix.vec4;
-    var vec3 = glMatrix.vec3;
     var quat = glMatrix.quat;
 
     var semanticAttributeMap = {
@@ -49,7 +47,7 @@ define(function(require) {
         'WEIGHT' : 'weight',
         'JOINT' : 'joint',
         'COLOR' : 'color'
-    }
+    };
 
     /**
      * @typedef {Object} qtek.loader.GLTF.IResult
@@ -176,18 +174,7 @@ define(function(require) {
                     scene.add(node);
                 }
 
-                var isOldVersion = false;
-                for (var name in json.skins) {
-                    if (json.skins[name].roots) {
-                        isOldVersion = true;
-                        break;
-                    }
-                }
-                if (isOldVersion) {
-                    self._parseSkins(json, lib);
-                } else {
-                    self._parseSkins2(json, lib);
-                }
+                self._parseSkins(json, lib);
 
                 var clip = self._parseAnimations(json, lib);
                 if (clip) {
@@ -213,7 +200,7 @@ define(function(require) {
                 materials : lib.materials,
                 skeletons : lib.skeletons,
                 clip : null
-            }
+            };
         },
 
         _loadBuffer : function(path, onsuccess, onerror) {
@@ -235,8 +222,7 @@ define(function(require) {
 
         // https://github.com/KhronosGroup/glTF/issues/100
         // https://github.com/KhronosGroup/glTF/issues/193
-        _parseSkins2 : function(json, lib) {
-            var self = this;
+        _parseSkins : function(json, lib) {
 
             // Create skeletons and joints
             var haveInvBindMatrices = false;
@@ -293,7 +279,11 @@ define(function(require) {
                 }
 
                 return joint;
-            }
+            };
+
+            var getJointIndex = function(joint) {
+                return joint.index;
+            };
 
             var instanceSkins = {};
 
@@ -307,9 +297,7 @@ define(function(require) {
                     instanceSkins[skinName] = skeleton;
 
                     var node = lib.nodes[name];
-                    var jointIndices = skeleton.joints.map(function(joint) {
-                        return joint.index;
-                    });
+                    var jointIndices = skeleton.joints.map(getJointIndex);
                     if (node instanceof Mesh) {
                         node.skeleton = skeleton;
                         node.joints = jointIndices;
@@ -361,71 +349,6 @@ define(function(require) {
             }
         },     
 
-        // DEPRECATED
-        _parseSkins : function(json, lib) {
-            var self = this;
-
-            var createJoint = function(nodeName, parentIndex, skeleton) {
-                var nodeInfo = json.nodes[nodeName];
-                nodeInfo._isJoint = true;
-                // Cast node to joint
-                var joint = new Joint();
-                joint.name = nodeName;
-                var node = lib.nodes[nodeName];
-                joint.node = node;
-                joint.index = skeleton.joints.length;
-                if (parentIndex !== undefined) {
-                    joint.parentIndex = parentIndex;
-                }
-                
-                skeleton.joints.push(joint);
-                lib.joints[nodeName] = joint;
-                
-                for (var i = 0; i < nodeInfo.children.length; i++) {
-                    var child = createJoint(nodeInfo.children[i], joint.index, skeleton);
-                }
-                return joint;
-            }
-
-            for (var name in json.skins) {
-                var skinInfo = json.skins[name];
-                var skeleton = new Skeleton({
-                    name : name
-                });
-                for (var i = 0; i < skinInfo.roots.length; i++) {
-                    var rootJointName = skinInfo.roots[i];
-                    var rootJoint = createJoint(rootJointName, undefined, skeleton);
-                    if (rootJoint) {
-                        skeleton.roots.push(rootJoint);
-                    }
-                }
-                if (skeleton.joints.length) {
-                    lib.skeletons[name] = skeleton;
-                    skeleton.updateJointMatrices();
-                    skeleton.update();
-                }
-            }
-
-            for (var name in lib.meshes) {
-                var meshList = lib.meshes[name];
-                for (var i = 0; i < meshList.length; i++) {
-                    var mesh = meshList[i];
-                    if (mesh.skeleton) {
-                        var material = mesh.material;
-                        mesh.skeleton = lib.skeletons[mesh.skeleton];
-                        if (mesh.skeleton) {
-                            for (var j = 0; j < mesh.skeleton.joints.length; j++) {
-                                mesh.joints.push(j);
-                            }
-                            material.shader = material.shader.clone();
-                            material.shader.define('vertex', 'SKINNING');
-                            material.shader.define('vertex', 'JOINT_NUMBER', mesh.joints.length);
-                        } 
-                    }
-                }
-            }
-        },
-
         _parseTextures : function(json, lib) {
             var root = this.textureRootPath || this.rootPath;
             util.each(json.textures, function(textureInfo, name){
@@ -466,7 +389,6 @@ define(function(require) {
         // Only phong material is support yet
         // TODO : support custom material
         _parseMaterials : function(json, lib) {
-            var self = this;
             var techniques = {};
             // Parse techniques
             for (var name in json.techniques) {
@@ -479,7 +401,7 @@ define(function(require) {
                 techniques[name] = {
                     // shader : shader,
                     pass : techniqueInfo.passes[techniqueInfo.pass]
-                }
+                };
             }
             for (var name in json.materials) {
                 var materialInfo = json.materials[name];
@@ -488,16 +410,8 @@ define(function(require) {
                 var technique = techniques[instanceTechniqueInfo.technique];
                 var pass = technique.pass;
                 var uniforms = {};
-                // DEPRECATED
-                // https://github.com/KhronosGroup/glTF/issues/108
-                // https://github.com/KhronosGroup/glTF/issues/110
-                if (instanceTechniqueInfo.values instanceof Array) {
-                    instanceTechniqueInfo.values.forEach(function(item){
-                        uniforms[item.parameter] = item.value;
-                    });
-                } else {
-                    uniforms = instanceTechniqueInfo.values;
-                }
+
+                uniforms = instanceTechniqueInfo.values;
                 for (var symbol in uniforms) {
                     var value = uniforms[symbol];
                     // TODO: texture judgement should be more robust
@@ -576,36 +490,20 @@ define(function(require) {
                         boundingBox : new BoundingBox()
                     });
                     // Parse indices
-                    if (json.indices) {
-                        // DEPRECATED
-                        // https://github.com/KhronosGroup/glTF/issues/161
-                        var indicesInfo = json.indices[primitiveInfo.indices];
-                    } else {
-                        var indicesInfo = json.accessors[primitiveInfo.indices];
-                    }
+                    var indicesInfo = json.accessors[primitiveInfo.indices];
+
                     var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
                     var buffer = lib.buffers[bufferViewInfo.buffer];
                     var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
 
                     geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);
 
-                    // DEPRECATED
-                    // https://github.com/KhronosGroup/glTF/issues/162
-                    if (primitiveInfo.semantics) {
-                        primitiveInfo.attributes = primitiveInfo.semantics
-                    }
                     // Parse attributes
                     var semantics = Object.keys(primitiveInfo.attributes);
                     for (var ss = 0; ss < semantics.length; ss++) {
                         var semantic = semantics[ss];
                         var accessorName = primitiveInfo.attributes[semantic];
-                        if (json.attributes) {
-                            // DEPRECATED
-                            // https://github.com/KhronosGroup/glTF/issues/161
-                            var attributeInfo = json.attributes[accessorName];
-                        } else {
-                            var attributeInfo = json.accessors[accessorName];
-                        }
+                        var attributeInfo = json.accessors[accessorName];
                         var attributeName = semanticAttributeMap[semantic];
                         if (!attributeName) {
                             continue;
@@ -615,39 +513,38 @@ define(function(require) {
                         var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
 
-                        if (typeof(attributeType) === 'string') {
-                            // DEPRECATED
-                            attributeType = glenum[attributeType];
-                        }
+                        var size;
+                        var ArrayCtor;
+                        var type;
                         switch(attributeType) {
                             case 0x8B50:     // FLOAT_VEC2
-                                var size = 2;
-                                var type = 'float';
-                                var arrayConstructor = Float32Array;
+                                size = 2;
+                                type = 'float';
+                                ArrayCtor = Float32Array;
                                 break;
                             case 0x8B51:     // FLOAT_VEC3
-                                var size = 3;
-                                var type = 'float';
-                                var arrayConstructor = Float32Array;
+                                size = 3;
+                                type = 'float';
+                                ArrayCtor = Float32Array;
                                 break;
                             case 0x8B52:     // FLOAT_VEC4
-                                var size = 4;
-                                var type = 'float';
-                                var arrayConstructor = Float32Array;
+                                size = 4;
+                                type = 'float';
+                                ArrayCtor = Float32Array;
                                 break;
                             case 0x1406:     // FLOAT
-                                var size = 1;
-                                var type = 'float';
-                                var arrayConstructor = Float32Array;
+                                size = 1;
+                                type = 'float';
+                                ArrayCtor = Float32Array;
                                 break;
                             default:
                                 console.warn('Attribute type '+attributeInfo.type+' not support yet');
                                 break;
                         }
-                        var attributeArray = new arrayConstructor(buffer, byteOffset, attributeInfo.count * size);
+                        var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
                         if (semantic === 'WEIGHT' && size === 4) {
                             // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
-                            var weightArray = new arrayConstructor(attributeInfo.count * 3);
+                            var weightArray = new ArrayCtor(attributeInfo.count * 3);
                             for (var i = 0; i < attributeInfo.count; i++) {
                                 weightArray[i * 3] = attributeArray[i * 4];
                                 weightArray[i * 3 + 1] = attributeArray[i * 4 + 1];
@@ -675,7 +572,7 @@ define(function(require) {
                     if (!material) {
                         material = new Material({
                             shader : shaderLibrary.get(self.shaderName)
-                        })
+                        });
                     }
                     var mesh = new Mesh({
                         geometry : geometry,
@@ -687,11 +584,6 @@ define(function(require) {
                         }
                     }
 
-                    // DEPRECATED
-                    var skinName = primitiveInfo.skin;
-                    if (skinName) {
-                        mesh.skeleton = skinName;
-                    }
                     if (meshInfo.name) {
                         if (meshInfo.primitives.length > 1) {
                             mesh.name = [meshInfo.name, pp].join('-');
@@ -726,7 +618,7 @@ define(function(require) {
                     } else {
                         // TODO
                         node = new OrthographicCamera();
-                        console.warn('TODO:Orthographic camera')
+                        console.warn('TODO:Orthographic camera');
                     }
                     node.setName(nodeInfo.name);
                     lib.cameras[nodeInfo.name] = node;
@@ -742,22 +634,23 @@ define(function(require) {
                     }
                     if (lights.length == 1) {
                         // Replace the node with light
-                        node = light;
+                        node = lights[0];
                         node.setName(nodeInfo.name);
                     } else {
                         node = new Node();
                         node.setName(nodeInfo.name);
                         for (var i = 0; i < lights.length; i++) {
-                            node.add(light);
+                            node.add(lights[i]);
                         }
                     }
                 }
                 else if (nodeInfo.meshes || nodeInfo.instanceSkin) {
                     // TODO one node have multiple meshes ?
+                    var meshKey;
                     if (nodeInfo.meshes) {
-                        var meshKey = nodeInfo.meshes[0];
+                        meshKey = nodeInfo.meshes[0];
                     } else {
-                        var meshKey = nodeInfo.instanceSkin.sources[0];
+                        meshKey = nodeInfo.instanceSkin.sources[0];
                     }
                     if (meshKey) {
                         var primitives = lib.meshes[meshKey];
@@ -897,7 +790,7 @@ define(function(require) {
                 // https://github.com/KhronosGroup/glTF/issues/144
                 var rotationArr = parameters.rotation;
                 if (rotationArr) {
-                    for (i = 0; i < parameters.TIME.length; i++) {
+                    for (var i = 0; i < parameters.TIME.length; i++) {
                         parameters.TIME[i] *= 1000;
                         var offset = i * 4;
                         if (rotationArr) {

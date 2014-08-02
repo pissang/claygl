@@ -15,7 +15,7 @@ define(function(require) {
             get : function() {
                 return this._array[n];
             }
-        }
+        };
     }
 
     /**
@@ -238,7 +238,7 @@ define(function(require) {
         mat3.adjoint(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -249,7 +249,7 @@ define(function(require) {
         mat3.copy(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} a
@@ -257,7 +257,7 @@ define(function(require) {
      */
     Matrix3.determinant = function(a) {
         return mat3.determinant(a._array);
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -267,7 +267,7 @@ define(function(require) {
         mat3.identity(out._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -277,7 +277,7 @@ define(function(require) {
     Matrix3.invert = function(out, a) {
         mat3.invert(out._array, a._array);
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -289,7 +289,7 @@ define(function(require) {
         mat3.mul(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -309,7 +309,7 @@ define(function(require) {
         mat3.fromMat2d(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -320,7 +320,7 @@ define(function(require) {
         mat3.fromMat4(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3}    out
@@ -331,7 +331,7 @@ define(function(require) {
         mat3.fromQuat(out._array, q._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -342,7 +342,7 @@ define(function(require) {
         mat3.normalFromMat4(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -354,7 +354,7 @@ define(function(require) {
         mat3.rotate(out._array, a._array, rad);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -366,7 +366,7 @@ define(function(require) {
         mat3.scale(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -377,7 +377,7 @@ define(function(require) {
         mat3.transpose(out._array, a._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix3} out
@@ -389,7 +389,7 @@ define(function(require) {
         mat3.translate(out._array, a._array, v._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     return Matrix3;
 })

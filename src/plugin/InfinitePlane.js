@@ -114,7 +114,7 @@ define(function(require) {
                         nPoints++;
                     }
                 }
-                if (nPoints == 0) {
+                if (nPoints === 0) {
                     return;
                 }
                 for (var i = 0; i < nPoints; i++) {
@@ -144,7 +144,7 @@ define(function(require) {
 
                 for (var i = 0; i < 4; i++) {
                     this.camera.castRay(coords[i], ray);
-                    ray.intersectPlane(this.plane, coords[i])
+                    ray.intersectPlane(this.plane, coords[i]);
                 }
 
                 return coords;
@@ -153,4 +153,4 @@ define(function(require) {
     });
 
     return InfinitePlane;
-})
+});

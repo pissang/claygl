@@ -7,8 +7,6 @@ define(function(require) {
     var util = require('../core/util');
     var Compositor = require('../compositor/Compositor');
     var CompoNode = require('../compositor/Node');
-    var CompoSceneNode = require('../compositor/SceneNode');
-    var CompoTextureNode = require('../compositor/TextureNode');
     var Shader = require('../Shader');
     var Texture = require('../Texture');
     var Texture2D = require('../texture/Texture2D');
@@ -76,7 +74,7 @@ define(function(require) {
                 textures : {},
                 shaders : {},
                 parameters : {}
-            }
+            };
             var afterLoad = function(shaderLib, textureLib) {
                 for (var i = 0; i < json.nodes.length; i++) {
                     var nodeInfo = json.nodes[i];
@@ -90,7 +88,7 @@ define(function(require) {
                 }
 
                 self.trigger('success', compositor);
-            }
+            };
 
             for (var name in json.parameters) {
                 var paramInfo = json.parameters[name];
@@ -138,7 +136,7 @@ define(function(require) {
                     inputs[name] = {
                         node : nodeInfo.inputs[name].node,
                         pin : nodeInfo.inputs[name].pin
-                    }
+                    };
                 }
             }
             if (nodeInfo.outputs) {
@@ -263,10 +261,11 @@ define(function(require) {
                                 cbd = true;
                             }
                         }
-                    })
+                    });
                 } else {
                     shaders[name] = shaderExp;
-                    Shader['import'](shaderSource);
+                    // Try import shader
+                    Shader['import'](shaderExp);
                 }
             }, this);
             if (loading === 0 && !cbd) {
@@ -288,14 +287,14 @@ define(function(require) {
                 var texture;
                 var path = textureInfo.path;
                 var parameters = this._convertParameter(textureInfo.parameters);
-                if (typeof(path) === 'array' && path.length === 6) {
+                if (path instanceof Array && path.length === 6) {
                     path = path.map(function(item) {
                         return util.relative2absolute(item, textureRootPath);
-                    })
-                    texture = new TextureCube();
+                    });
+                    texture = new TextureCube(parameters);
                 } else if(typeof(path) === 'string') {
                     path = util.relative2absolute(path, textureRootPath);
-                    texture = new Texture2D();
+                    texture = new Texture2D(parameters);
                 } else {
                     return;
                 }

@@ -9,10 +9,6 @@ define(function(require) {
     var delaunay = require('../util/delaunay');
     var Vector2 = require('../math/Vector2');
 
-    var glMatrix = require('glmatrix');
-    var quat = glMatrix.quat;
-    var vec3 = glMatrix.vec3;
-
     /**
      * @typedef {Object} qtek.animation.Blend2DClip.IClipInput
      * @property {qtek.math.Vector2} position
@@ -67,7 +63,7 @@ define(function(require) {
         this._triangles = [];
 
         this._updateTriangles();
-    }
+    };
 
     Blend2DClip.prototype = new Clip();
     Blend2DClip.prototype.constructor = Blend2DClip;
@@ -82,14 +78,14 @@ define(function(require) {
             position : position,
             clip : inputClip,
             offset : offset || 0
-        }
+        };
         this.inputs.push(obj);
         this.life = Math.max(inputClip.life, this.life);
         // TODO Change to incrementally adding
         this._updateTriangles();
 
         return obj;
-    }
+    };
 
     // Delaunay triangulate
     Blend2DClip.prototype._updateTriangles = function() {
@@ -97,7 +93,7 @@ define(function(require) {
             return a.position;
         });
         this._triangles = delaunay.triangulate(inputs, '_array');
-    }
+    };
 
     Blend2DClip.prototype.step = function(time) {
 
@@ -108,7 +104,7 @@ define(function(require) {
         }
 
         return ret;
-    }
+    };
 
     Blend2DClip.prototype.setTime = function(time) {
         var res = this._findTriangle(this.position);
@@ -137,7 +133,7 @@ define(function(require) {
         var c3 = clip3.output instanceof Clip ? clip3.output : clip3;
 
         this.output.blend2D(c1, c2, c3, a, b);
-    }
+    };
 
     Blend2DClip.prototype._findTriangle = function(position) {
         if (this._cacheTriangle) {
@@ -154,7 +150,7 @@ define(function(require) {
                 return [tri, res[0], res[1]];
             }
         }
-    }
+    };
 
     return Blend2DClip;
 });

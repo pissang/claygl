@@ -15,7 +15,7 @@ define(function (require) {
         'nx' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
         'ny' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
         'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-    }
+    };
 
     /**
      * Pass rendering scene to a environment cube map
@@ -69,7 +69,7 @@ define(function (require) {
             texture : null,
 
             frameBuffer : new FrameBuffer()
-        }
+        };
         ret._cameras = {
             px : new PerspectiveCamera({fov : 90}),
             nx : new PerspectiveCamera({fov : 90}),
@@ -77,7 +77,7 @@ define(function (require) {
             ny : new PerspectiveCamera({fov : 90}),
             pz : new PerspectiveCamera({fov : 90}),
             nz : new PerspectiveCamera({fov : 90}),
-        }
+        };
         ret._cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
         ret._cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
         ret._cameras.py.lookAt(Vector3.POSITIVE_Y, Vector3.POSITIVE_Z);
@@ -124,4 +124,4 @@ define(function (require) {
     });
 
     return EnvironmentMapPass;
-})
+});

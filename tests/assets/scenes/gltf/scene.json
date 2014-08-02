@@ -1,382 +1,406 @@
 {
-    "animations": {},
-    "asset": {
-        "generator": "collada2gltf@fee09e531a1a294c3ff31316bb89998afa1aeb75"
-    },
-    "attributes": {
-        "attribute_100": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 185520,
-            "byteStride": 12,
-            "count": 324,
-            "max": [
-                0.999115,
-                0.999115,
-                0.998169
-            ],
-            "min": [
-                -0.998169,
-                -0.998169,
-                -0.999115
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_123": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 189408,
-            "byteStride": 12,
-            "count": 6,
-            "max": [
-                1,
-                1,
-                0
-            ],
-            "min": [
-                -1,
-                -1,
-                0
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_125": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 189480,
-            "byteStride": 12,
-            "count": 6,
-            "max": [
-                0,
-                0,
-                1
-            ],
-            "min": [
-                0,
-                0,
-                1
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_127": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 189552,
-            "byteStride": 8,
-            "count": 6,
-            "max": [
-                1,
-                1
-            ],
-            "min": [
-                0,
-                0
-            ],
-            "type": "FLOAT_VEC2"
-        },
-        "attribute_145": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 189600,
-            "byteStride": 12,
-            "count": 7958,
-            "max": [
-                1.33068,
-                0.941956,
-                0.822896
-            ],
-            "min": [
-                -1.33068,
-                -0.973083,
-                -0.78389
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_147": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 285096,
-            "byteStride": 12,
-            "count": 7958,
-            "max": [
-                0.999939,
-                0.999939,
-                0.999969
-            ],
-            "min": [
-                -0.999939,
-                -0.999481,
-                -0.999969
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_165": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 380592,
-            "byteStride": 12,
-            "count": 6914,
-            "max": [
-                0.994205,
-                0.994205,
-                1
-            ],
-            "min": [
-                -0.994205,
-                -0.994205,
-                -1
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_167": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 463560,
-            "byteStride": 12,
-            "count": 6914,
-            "max": [
-                1,
-                1,
-                1
-            ],
-            "min": [
-                -1,
-                -1,
-                -1
-            ],
-            "type": "FLOAT_VEC3"
-        },
-        "attribute_18": {
-            "bufferView": "bufferView_176",
+    "accessors": {
+        "attrbute_1": {
+            "bufferView": "bufferView_26",
             "byteOffset": 0,
             "byteStride": 12,
             "count": 6914,
             "max": [
-                0.994205,
-                0.994205,
-                1
+                0.9942048000000001,
+                0.9942049000000001,
+                1.0,
+                1.0
             ],
             "min": [
-                -0.994205,
-                -0.994205,
-                -1
+                -0.9942049000000001,
+                -0.9942049000000001,
+                -1.0,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_20": {
-            "bufferView": "bufferView_176",
+        "attrbute_10": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 181488,
+            "byteStride": 12,
+            "count": 4,
+            "max": [
+                1.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                0.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_11": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 181536,
+            "byteStride": 12,
+            "count": 4,
+            "max": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_13": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 181584,
+            "byteStride": 12,
+            "count": 324,
+            "max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_14": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 185472,
+            "byteStride": 12,
+            "count": 324,
+            "max": [
+                0.999115,
+                0.999115,
+                0.9981689,
+                1.0
+            ],
+            "min": [
+                -0.9981689,
+                -0.9981689,
+                -0.999115,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_16": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 189360,
+            "byteStride": 12,
+            "count": 4,
+            "max": [
+                1.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                0.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_17": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 189408,
+            "byteStride": 12,
+            "count": 4,
+            "max": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_18": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 189456,
+            "byteStride": 8,
+            "count": 4,
+            "max": [
+                1.0,
+                1.0
+            ],
+            "min": [
+                0.0,
+                0.0
+            ],
+            "type": 35664
+        },
+        "attrbute_2": {
+            "bufferView": "bufferView_26",
             "byteOffset": 82968,
             "byteStride": 12,
             "count": 6914,
             "max": [
-                1,
-                1,
-                1
+                1.0,
+                1.0,
+                1.0,
+                1.0
             ],
             "min": [
-                -1,
-                -1,
-                -1
+                -1.0,
+                -1.0,
+                -1.0,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_38": {
-            "bufferView": "bufferView_176",
+        "attrbute_20": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 189488,
+            "byteStride": 12,
+            "count": 7958,
+            "max": [
+                1.330684,
+                0.9419556,
+                0.8228964,
+                1.0
+            ],
+            "min": [
+                -1.330684,
+                -0.9730834999999999,
+                -0.7838898,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_21": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 284984,
+            "byteStride": 12,
+            "count": 7958,
+            "max": [
+                0.9999389999999999,
+                0.9999389999999999,
+                0.9999695,
+                1.0
+            ],
+            "min": [
+                -0.9999389999999999,
+                -0.9994812,
+                -0.9999695,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_23": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 380480,
+            "byteStride": 12,
+            "count": 6914,
+            "max": [
+                0.9942048000000001,
+                0.9942049000000001,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -0.9942049000000001,
+                -0.9942049000000001,
+                -1.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_24": {
+            "bufferView": "bufferView_26",
+            "byteOffset": 463448,
+            "byteStride": 12,
+            "count": 6914,
+            "max": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0,
+                1.0
+            ],
+            "type": 35665
+        },
+        "attrbute_4": {
+            "bufferView": "bufferView_26",
             "byteOffset": 165936,
             "byteStride": 12,
             "count": 324,
             "max": [
-                1,
-                1,
-                1
+                1.0,
+                1.0,
+                1.0,
+                1.0
             ],
             "min": [
-                -1,
-                -1,
-                -1
+                -1.0,
+                -1.0,
+                -1.0,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_40": {
-            "bufferView": "bufferView_176",
+        "attrbute_5": {
+            "bufferView": "bufferView_26",
             "byteOffset": 169824,
             "byteStride": 12,
             "count": 324,
             "max": [
                 0.999115,
                 0.999115,
-                0.998169
+                0.9981689,
+                1.0
             ],
             "min": [
-                -0.998169,
-                -0.998169,
-                -0.999115
+                -0.9981689,
+                -0.9981689,
+                -0.999115,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_58": {
-            "bufferView": "bufferView_176",
+        "attrbute_7": {
+            "bufferView": "bufferView_26",
             "byteOffset": 173712,
             "byteStride": 12,
             "count": 324,
             "max": [
-                1,
-                1,
-                1
+                1.0,
+                1.0,
+                1.0,
+                1.0
             ],
             "min": [
-                -1,
-                -1,
-                -1
+                -1.0,
+                -1.0,
+                -1.0,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_60": {
-            "bufferView": "bufferView_176",
+        "attrbute_8": {
+            "bufferView": "bufferView_26",
             "byteOffset": 177600,
             "byteStride": 12,
             "count": 324,
             "max": [
                 0.999115,
                 0.999115,
-                0.998169
+                0.9981689,
+                1.0
             ],
             "min": [
-                -0.998169,
-                -0.998169,
-                -0.999115
+                -0.9981689,
+                -0.9981689,
+                -0.999115,
+                1.0
             ],
-            "type": "FLOAT_VEC3"
+            "type": 35665
         },
-        "attribute_78": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 181488,
-            "byteStride": 12,
+        "indices_12": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 90672,
             "count": 6,
-            "max": [
-                1,
-                1,
-                0
-            ],
-            "min": [
-                -1,
-                -1,
-                0
-            ],
-            "type": "FLOAT_VEC3"
+            "type": 5123
         },
-        "attribute_80": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 181560,
-            "byteStride": 12,
+        "indices_15": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 90684,
+            "count": 1932,
+            "type": 5123
+        },
+        "indices_19": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 94548,
             "count": 6,
-            "max": [
-                0,
-                0,
-                1
-            ],
-            "min": [
-                0,
-                0,
-                1
-            ],
-            "type": "FLOAT_VEC3"
+            "type": 5123
         },
-        "attribute_98": {
-            "bufferView": "bufferView_176",
-            "byteOffset": 181632,
-            "byteStride": 12,
-            "count": 324,
-            "max": [
-                1,
-                1,
-                1
-            ],
-            "min": [
-                -1,
-                -1,
-                -1
-            ],
-            "type": "FLOAT_VEC3"
+        "indices_22": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 94560,
+            "count": 47232,
+            "type": 5123
+        },
+        "indices_25": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 189024,
+            "count": 41472,
+            "type": 5123
+        },
+        "indices_3": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 0,
+            "count": 41472,
+            "type": 5123
+        },
+        "indices_6": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 82944,
+            "count": 1932,
+            "type": 5123
+        },
+        "indices_9": {
+            "bufferView": "bufferView_27",
+            "byteOffset": 86808,
+            "count": 1932,
+            "type": 5123
         }
     },
+    "animations": {},
+    "asset": {},
     "bufferViews": {
-        "bufferView_176": {
+        "bufferView_26": {
             "buffer": "scene.bin",
-            "byteLength": 546528,
+            "byteLength": 546416,
             "byteOffset": 0,
-            "target": "ARRAY_BUFFER"
+            "target": 34962
         },
-        "bufferView_177": {
+        "bufferView_27": {
             "buffer": "scene.bin",
             "byteLength": 271968,
-            "byteOffset": 546528,
-            "target": "ELEMENT_ARRAY_BUFFER"
+            "byteOffset": 546416,
+            "target": 34963
         }
     },
     "buffers": {
         "scene.bin": {
-            "byteLength": 818496,
+            "byteLength": 818384,
             "path": "scene.bin"
         }
     },
     "cameras": {
-        "camera_0": {
-            "aspect_ratio": 1.77778,
+        "Camera.001-camera": {
             "projection": "perspective",
-            "xfov": 49.1343,
-            "zfar": 100,
+            "xfov": 49.13434,
+            "zfar": 100.0,
             "znear": 0.1
         }
     },
     "images": {
         "image_0": {
             "path": "photo.jpg"
-        },
-        "image_1": {
-            "path": "photo.hdr"
-        }
-    },
-    "indices": {
-        "indices_121": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 94548,
-            "count": 6,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_143": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 94560,
-            "count": 47232,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_16": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 0,
-            "count": 41472,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_163": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 189024,
-            "count": 41472,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_36": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 82944,
-            "count": 1932,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_56": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 86808,
-            "count": 1932,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_76": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 90672,
-            "count": 6,
-            "type": "UNSIGNED_SHORT"
-        },
-        "indices_96": {
-            "bufferView": "bufferView_177",
-            "byteOffset": 90684,
-            "count": 1932,
-            "type": "UNSIGNED_SHORT"
         }
     },
     "lights": {
@@ -384,328 +408,199 @@
             "id": "Spot-light",
             "spot": {
                 "color": [
-                    2,
-                    2,
-                    2
+                    2.0,
+                    2.0,
+                    2.0
                 ],
                 "constantAttenuation": 1,
-                "fallOffAngle": 45,
+                "fallOffAngle": 45.0,
                 "fallOffExponent": 0.15,
                 "linearAttenuation": 0,
-                "quadraticAttenuation": 0.0025
+                "quadraticAttenuation": 0.00159997
             },
             "type": "spot"
         }
     },
     "materials": {
-        "Material-effect": {
+        "Material": {
             "instanceTechnique": {
-                "technique": "technique2",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": [
-                            0.64,
-                            0.64,
-                            0.64,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 50
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            0.5,
-                            0.5,
-                            0.5,
-                            1
-                        ]
-                    }
-                ]
+                "technique": "technique_1",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": [
+                        0.64,
+                        0.64,
+                        0.64
+                    ],
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "transparency": 1
+                }
             },
             "name": "Material"
         },
-        "Material_002-effect": {
+        "Material_002": {
             "instanceTechnique": {
-                "technique": "technique1",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": [
-                            0.00244961,
-                            0.106293,
-                            0.00817745,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 50
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            0.5,
-                            0.5,
-                            0.5,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "transparency",
-                        "value": 0.5
-                    }
-                ]
+                "technique": "technique_0",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": [
+                        0.0024496089999999997,
+                        0.1062932,
+                        0.00817745
+                    ],
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
             },
             "name": "Material_002"
         },
-        "Material_003-effect": {
+        "Material_003": {
             "instanceTechnique": {
-                "technique": "technique3",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": "texture_image_0"
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 50
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            0.25,
-                            0.25,
-                            0.25,
-                            1
-                        ]
-                    }
-                ]
+                "technique": "technique_2",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": "photo_jpg",
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "transparency": 1
+                }
             },
             "name": "Material_003"
         },
-        "Material_004-effect": {
+        "Material_004": {
             "instanceTechnique": {
-                "technique": "technique2",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": [
-                            0.512,
-                            0,
-                            0.0361504,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 50
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            0.588235,
-                            0.588235,
-                            0.588235,
-                            1
-                        ]
-                    }
-                ]
+                "technique": "technique_1",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": [
+                        0.512,
+                        0.0,
+                        0.03615039
+                    ],
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "transparency": 1
+                }
             },
             "name": "Material_004"
         },
-        "Mirror-effect": {
+        "Mirror": {
             "instanceTechnique": {
-                "technique": "technique2",
-                "values": [
-                    {
-                        "parameter": "ambient",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "diffuse",
-                        "value": [
-                            0.177327,
-                            0.177327,
-                            0.177327,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "emission",
-                        "value": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ]
-                    },
-                    {
-                        "parameter": "shininess",
-                        "value": 49
-                    },
-                    {
-                        "parameter": "specular",
-                        "value": [
-                            1,
-                            1,
-                            1,
-                            1
-                        ]
-                    }
-                ]
+                "technique": "technique_1",
+                "values": {
+                    "ambient": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "diffuse": [
+                        0.17732720000000002,
+                        0.17732720000000002,
+                        0.17732720000000002
+                    ],
+                    "emission": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "transparency": 1
+                }
             },
             "name": "Mirror"
         }
     },
     "meshes": {
-        "Cube_001-mesh": {
+        "Cube-mesh": {
             "name": "Cube.001",
             "primitives": [
                 {
-                    "indices": "indices_96",
-                    "material": "Material_004-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_100",
-                        "POSITION": "attribute_98"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_14",
+                        "POSITION": "attrbute_13"
+                    },
+                    "indices": "indices_15",
+                    "material": "Material_004"
+                }
+            ]
+        },
+        "Cube_001-mesh": {
+            "name": "Cube.002",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": "attrbute_8",
+                        "POSITION": "attrbute_7"
+                    },
+                    "indices": "indices_9",
+                    "material": "Material_004"
                 }
             ]
         },
         "Cube_002-mesh": {
-            "name": "Cube.002",
-            "primitives": [
-                {
-                    "indices": "indices_56",
-                    "material": "Material_004-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_60",
-                        "POSITION": "attribute_58"
-                    }
-                }
-            ]
-        },
-        "Cube_003-mesh": {
             "name": "Cube.003",
             "primitives": [
                 {
-                    "indices": "indices_36",
-                    "material": "Material_004-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_40",
-                        "POSITION": "attribute_38"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_5",
+                        "POSITION": "attrbute_4"
+                    },
+                    "indices": "indices_6",
+                    "material": "Material_004"
                 }
             ]
         },
-        "Cylinder_002-mesh": {
+        "Cylinder-mesh": {
             "name": "Cylinder.002",
             "primitives": [
                 {
-                    "indices": "indices_163",
-                    "material": "Material_002-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_167",
-                        "POSITION": "attribute_165"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_24",
+                        "POSITION": "attrbute_23"
+                    },
+                    "indices": "indices_25",
+                    "material": "Material_002"
                 }
             ]
         },
-        "Cylinder_003-mesh": {
+        "Cylinder_001-mesh": {
             "name": "Cylinder.003",
             "primitives": [
                 {
-                    "indices": "indices_16",
-                    "material": "Material_002-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_20",
-                        "POSITION": "attribute_18"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_2",
+                        "POSITION": "attrbute_1"
+                    },
+                    "indices": "indices_3",
+                    "material": "Material_002"
                 }
             ]
         },
@@ -713,214 +608,211 @@
             "name": "Plane",
             "primitives": [
                 {
-                    "indices": "indices_76",
-                    "material": "Material-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_80",
-                        "POSITION": "attribute_78"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_11",
+                        "POSITION": "attrbute_10"
+                    },
+                    "indices": "indices_12",
+                    "material": "Material"
                 }
             ]
         },
-        "Plane_002-mesh": {
+        "Plane_001-mesh": {
             "name": "Plane.002",
             "primitives": [
                 {
-                    "indices": "indices_121",
-                    "material": "Material_003-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_125",
-                        "POSITION": "attribute_123",
-                        "TEXCOORD_0": "attribute_127"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_17",
+                        "POSITION": "attrbute_16",
+                        "TEXCOORD_0": "attrbute_18"
+                    },
+                    "indices": "indices_19",
+                    "material": "Material_003"
                 }
             ]
         },
-        "Suzanne_001-mesh": {
+        "Suzanne-mesh": {
             "name": "Suzanne.001",
             "primitives": [
                 {
-                    "indices": "indices_143",
-                    "material": "Mirror-effect",
-                    "primitive": "TRIANGLES",
-                    "semantics": {
-                        "NORMAL": "attribute_147",
-                        "POSITION": "attribute_145"
-                    }
+                    "attributes": {
+                        "NORMAL": "attrbute_21",
+                        "POSITION": "attrbute_20"
+                    },
+                    "indices": "indices_22",
+                    "material": "Mirror"
                 }
             ]
         }
     },
     "nodes": {
         "Camera": {
-            "camera": "camera_0",
+            "camera": "Camera.001-camera",
             "children": [],
             "matrix": [
-                0.194697,
-                0.206555,
-                -0.00306957,
-                0,
-                -0.0900896,
-                0.0886947,
-                0.254162,
-                0,
-                0.185899,
-                -0.173349,
-                0.126387,
-                0,
-                7.61403,
-                -7.56541,
-                5.19021,
-                1
+                -0.18589881550398177,
+                0.17334820547889168,
+                -0.12638617832817112,
+                0.0,
+                -0.09008966333547126,
+                0.08869468116387712,
+                0.25416248788762613,
+                0.0,
+                0.19469764030390835,
+                0.20655597930253614,
+                -0.0030695790949528015,
+                0.0,
+                7.614025999999999,
+                -7.565408000000001,
+                5.190208999999999,
+                1.0
             ],
             "name": "Camera"
         },
         "Cube": {
             "children": [],
             "matrix": [
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                -0.0414299,
-                -0.523132,
-                0.281124,
-                1
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                -0.04142994,
+                -0.5231316,
+                0.2811239,
+                1.0
             ],
             "meshes": [
-                "Cube_001-mesh"
+                "Cube-mesh"
             ],
             "name": "Cube"
         },
         "Cube_001": {
             "children": [],
             "matrix": [
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                -1.41011,
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                -1.410107,
                 -0.499562,
-                0.281124,
-                1
+                0.2811239,
+                1.0
             ],
             "meshes": [
-                "Cube_002-mesh"
+                "Cube_001-mesh"
             ],
             "name": "Cube_001"
         },
         "Cube_002": {
             "children": [],
             "matrix": [
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                0.283868,
-                0,
-                1.31018,
-                -0.523132,
-                0.281124,
-                1
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2838683,
+                0.0,
+                1.310181,
+                -0.5231316,
+                0.2811239,
+                1.0
             ],
             "meshes": [
-                "Cube_003-mesh"
+                "Cube_002-mesh"
             ],
             "name": "Cube_002"
         },
         "Cylinder": {
             "children": [],
             "matrix": [
-                0.262991,
-                0,
-                0,
-                0,
-                0,
-                0.262991,
-                0,
-                0,
-                0,
-                0,
-                0.262991,
-                0,
-                -1.29153,
-                -1.64759,
-                0.259889,
-                1
+                0.2629915,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2629915,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2629915,
+                0.0,
+                -1.291526,
+                -1.647593,
+                0.2598891,
+                1.0
             ],
             "meshes": [
-                "Cylinder_002-mesh"
+                "Cylinder-mesh"
             ],
             "name": "Cylinder"
         },
         "Cylinder_001": {
             "children": [],
             "matrix": [
-                0.262991,
-                0,
-                0,
-                0,
-                0,
-                0.262991,
-                0,
-                0,
-                0,
-                0,
-                0.262991,
-                0,
-                1.23716,
-                -1.64759,
-                0.259889,
-                1
+                0.2629915,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2629915,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.2629915,
+                0.0,
+                1.237164,
+                -1.647593,
+                0.2598891,
+                1.0
             ],
             "meshes": [
-                "Cylinder_003-mesh"
+                "Cylinder_001-mesh"
             ],
             "name": "Cylinder_001"
         },
         "Plane": {
             "children": [],
             "matrix": [
-                2.52352,
-                0,
-                0,
-                0,
-                0,
-                2.52352,
-                0,
-                0,
-                0,
-                0,
-                2.52352,
-                0,
-                -0.0414299,
-                -0.523132,
-                -0.0194833,
-                1
+                2.523521,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                2.523521,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                2.523521,
+                0.0,
+                -0.04142994,
+                -0.5231316,
+                -0.01948333,
+                1.0
             ],
             "meshes": [
                 "Plane-mesh"
@@ -930,25 +822,25 @@
         "Plane_001": {
             "children": [],
             "matrix": [
-                -9.20198e-07,
-                1.92327e-12,
-                -1.43835,
-                0,
-                1.43835,
-                -1.01153e-06,
-                -9.20198e-07,
-                0,
-                -1.01153e-06,
-                -1.43835,
-                -1.27613e-12,
-                0,
-                -0.125903,
-                -0.0890651,
-                1.37005,
-                1
+                9.201979998607573e-07,
+                1.797182238937505e-28,
+                -1.4383540000000001,
+                0.0,
+                1.4383540000000001,
+                -1.0115299999036017e-06,
+                9.201979998607574e-07,
+                0.0,
+                -1.0115299999031875e-06,
+                -1.438354,
+                -6.471340731906508e-13,
+                0.0,
+                -0.1259032,
+                -0.08906507,
+                1.370054,
+                1.0
             ],
             "meshes": [
-                "Plane_002-mesh"
+                "Plane_001-mesh"
             ],
             "name": "Plane_001"
         },
@@ -958,77 +850,62 @@
                 "Spot-light"
             ],
             "matrix": [
-                0.231714,
-                -0.109253,
-                0.122286,
-                0,
-                0.00509024,
-                0.216378,
-                0.183673,
-                0,
-                -0.163903,
-                -0.147734,
-                0.178583,
-                0,
-                -3.88718,
-                -3.69707,
-                3.91161,
-                1
+                0.2317136,
+                -0.10925309999999998,
+                0.12228559999999998,
+                0.0,
+                -0.16390272752937315,
+                -0.14773410179814014,
+                0.17858261682886445,
+                0.0,
+                -0.005090216763543465,
+                -0.2163783799317136,
+                -0.18367278182759456,
+                0.0,
+                -3.8871839999999995,
+                -3.6970690000000004,
+                3.9116120000000003,
+                1.0
             ],
             "name": "Spot"
         },
         "Suzanne": {
             "children": [],
             "matrix": [
-                0.283868,
-                0,
-                0,
-                0,
-                0,
-                -1.24083e-08,
-                0.283868,
-                0,
-                0,
-                -0.283868,
-                -1.24083e-08,
-                0,
-                -0.0488677,
-                -1.51352,
-                0.24198,
-                1
+                0.2838683,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.240830003146428e-08,
+                0.2838683000000001,
+                0.0,
+                0.0,
+                -0.2838683000000001,
+                -1.240830003146428e-08,
+                0.0,
+                -0.04886769999999999,
+                -1.513519,
+                0.24197960000000002,
+                1.0
             ],
             "meshes": [
-                "Suzanne_001-mesh"
+                "Suzanne-mesh"
             ],
             "name": "Suzanne"
         }
     },
-    "profile": "WebGL 1.0",
-    "programs": {
-        "program_0": {
-            "fragmentShader": "scene0FS",
-            "vertexShader": "scene0VS"
-        },
-        "program_1": {
-            "fragmentShader": "scene2FS",
-            "vertexShader": "scene2VS"
-        },
-        "program_2": {
-            "fragmentShader": "scene4FS",
-            "vertexShader": "scene4VS"
-        }
-    },
     "samplers": {
         "sampler_0": {
-            "magFilter": "LINEAR",
-            "minFilter": "LINEAR",
-            "wrapS": "REPEAT",
-            "wrapT": "REPEAT"
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
         }
     },
-    "scene": "defaultScene",
+    "scene": "Scene",
     "scenes": {
-        "defaultScene": {
+        "Scene": {
             "nodes": [
                 "Cylinder_001",
                 "Cube_002",
@@ -1043,189 +920,18 @@
             ]
         }
     },
-    "shaders": {
-        "scene0FS": {
-            "path": "scene0FS.glsl"
-        },
-        "scene0VS": {
-            "path": "scene0VS.glsl"
-        },
-        "scene2FS": {
-            "path": "scene2FS.glsl"
-        },
-        "scene2VS": {
-            "path": "scene2VS.glsl"
-        },
-        "scene4FS": {
-            "path": "scene4FS.glsl"
-        },
-        "scene4VS": {
-            "path": "scene4VS.glsl"
-        }
-    },
+    "shaders": {},
     "skins": {},
     "techniques": {
-        "technique1": {
-            "parameters": {
-                "ambient": {
-                    "type": "FLOAT_VEC4"
-                },
-                "diffuse": {
-                    "type": "FLOAT_VEC4"
-                },
-                "emission": {
-                    "type": "FLOAT_VEC4"
-                },
-                "light0Color": {
-                    "type": "FLOAT_VEC3",
-                    "value": [
-                        2,
-                        2,
-                        2
-                    ]
-                },
-                "light0Transform": {
-                    "source": "Spot",
-                    "type": "FLOAT_MAT4"
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": "FLOAT_VEC3"
-                },
-                "normalMatrix": {
-                    "semantic": "WORLDVIEWINVERSETRANSPOSE",
-                    "type": "FLOAT_MAT3"
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": "FLOAT_VEC3"
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": "FLOAT_MAT4"
-                },
-                "shininess": {
-                    "type": "FLOAT"
-                },
-                "specular": {
-                    "type": "FLOAT_VEC4"
-                },
-                "transparency": {
-                    "type": "FLOAT"
-                },
-                "worldViewMatrix": {
-                    "semantic": "WORLDVIEW",
-                    "type": "FLOAT_MAT4"
-                }
-            },
+        "technique_0": {
+            "parameters": {},
             "pass": "defaultPass",
             "passes": {
                 "defaultPass": {
                     "instanceProgram": {
-                        "attributes": {
-                            "a_normal": "normal",
-                            "a_position": "position"
-                        },
-                        "program": "program_0",
-                        "uniforms": {
-                            "u_ambient": "ambient",
-                            "u_diffuse": "diffuse",
-                            "u_emission": "emission",
-                            "u_light0Color": "light0Color",
-                            "u_light0Transform": "light0Transform",
-                            "u_normalMatrix": "normalMatrix",
-                            "u_projectionMatrix": "projectionMatrix",
-                            "u_shininess": "shininess",
-                            "u_specular": "specular",
-                            "u_transparency": "transparency",
-                            "u_worldViewMatrix": "worldViewMatrix"
-                        }
-                    },
-                    "states": {
-                        "blendEnable": true,
-                        "blendEquation": "FUNC_ADD",
-                        "blendFunc": {
-                            "dfactor": "ONE_MINUS_SRC_ALPHA",
-                            "sfactor": "SRC_ALPHA"
-                        },
-                        "cullFaceEnable": false,
-                        "depthMask": false,
-                        "depthTestEnable": true
-                    }
-                }
-            }
-        },
-        "technique2": {
-            "parameters": {
-                "ambient": {
-                    "type": "FLOAT_VEC4"
-                },
-                "diffuse": {
-                    "type": "FLOAT_VEC4"
-                },
-                "emission": {
-                    "type": "FLOAT_VEC4"
-                },
-                "light0Color": {
-                    "type": "FLOAT_VEC3",
-                    "value": [
-                        2,
-                        2,
-                        2
-                    ]
-                },
-                "light0Transform": {
-                    "source": "Spot",
-                    "type": "FLOAT_MAT4"
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": "FLOAT_VEC3"
-                },
-                "normalMatrix": {
-                    "semantic": "WORLDVIEWINVERSETRANSPOSE",
-                    "type": "FLOAT_MAT3"
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": "FLOAT_VEC3"
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": "FLOAT_MAT4"
-                },
-                "shininess": {
-                    "type": "FLOAT"
-                },
-                "specular": {
-                    "type": "FLOAT_VEC4"
-                },
-                "worldViewMatrix": {
-                    "semantic": "WORLDVIEW",
-                    "type": "FLOAT_MAT4"
-                }
-            },
-            "pass": "defaultPass",
-            "passes": {
-                "defaultPass": {
-                    "instanceProgram": {
-                        "attributes": {
-                            "a_normal": "normal",
-                            "a_position": "position"
-                        },
-                        "program": "program_1",
-                        "uniforms": {
-                            "u_ambient": "ambient",
-                            "u_diffuse": "diffuse",
-                            "u_emission": "emission",
-                            "u_light0Color": "light0Color",
-                            "u_light0Transform": "light0Transform",
-                            "u_normalMatrix": "normalMatrix",
-                            "u_projectionMatrix": "projectionMatrix",
-                            "u_shininess": "shininess",
-                            "u_specular": "specular",
-                            "u_worldViewMatrix": "worldViewMatrix"
-                        }
+                        "attributes": {},
+                        "program": "",
+                        "uniforms": {}
                     },
                     "states": {
                         "blendEnable": false,
@@ -1236,82 +942,34 @@
                 }
             }
         },
-        "technique3": {
-            "parameters": {
-                "ambient": {
-                    "type": "FLOAT_VEC4"
-                },
-                "diffuse": {
-                    "type": "SAMPLER_2D"
-                },
-                "emission": {
-                    "type": "FLOAT_VEC4"
-                },
-                "light0Color": {
-                    "type": "FLOAT_VEC3",
-                    "value": [
-                        2,
-                        2,
-                        2
-                    ]
-                },
-                "light0Transform": {
-                    "source": "Spot",
-                    "type": "FLOAT_MAT4"
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": "FLOAT_VEC3"
-                },
-                "normalMatrix": {
-                    "semantic": "WORLDVIEWINVERSETRANSPOSE",
-                    "type": "FLOAT_MAT3"
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": "FLOAT_VEC3"
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": "FLOAT_MAT4"
-                },
-                "shininess": {
-                    "type": "FLOAT"
-                },
-                "specular": {
-                    "type": "FLOAT_VEC4"
-                },
-                "texcoord0": {
-                    "semantic": "TEXCOORD_0",
-                    "type": "FLOAT_VEC2"
-                },
-                "worldViewMatrix": {
-                    "semantic": "WORLDVIEW",
-                    "type": "FLOAT_MAT4"
-                }
-            },
+        "technique_1": {
+            "parameters": {},
             "pass": "defaultPass",
             "passes": {
                 "defaultPass": {
                     "instanceProgram": {
-                        "attributes": {
-                            "a_normal": "normal",
-                            "a_position": "position",
-                            "a_texcoord0": "texcoord0"
-                        },
-                        "program": "program_2",
-                        "uniforms": {
-                            "u_ambient": "ambient",
-                            "u_diffuse": "diffuse",
-                            "u_emission": "emission",
-                            "u_light0Color": "light0Color",
-                            "u_light0Transform": "light0Transform",
-                            "u_normalMatrix": "normalMatrix",
-                            "u_projectionMatrix": "projectionMatrix",
-                            "u_shininess": "shininess",
-                            "u_specular": "specular",
-                            "u_worldViewMatrix": "worldViewMatrix"
-                        }
+                        "attributes": {},
+                        "program": "",
+                        "uniforms": {}
+                    },
+                    "states": {
+                        "blendEnable": false,
+                        "cullFaceEnable": false,
+                        "depthMask": true,
+                        "depthTestEnable": true
+                    }
+                }
+            }
+        },
+        "technique_2": {
+            "parameters": {},
+            "pass": "defaultPass",
+            "passes": {
+                "defaultPass": {
+                    "instanceProgram": {
+                        "attributes": {},
+                        "program": "",
+                        "uniforms": {}
                     },
                     "states": {
                         "blendEnable": false,
@@ -1324,12 +982,12 @@
         }
     },
     "textures": {
-        "texture_image_0": {
-            "format": "RGBA",
-            "internalFormat": "RGBA",
+        "photo_jpg": {
+            "format": 6408,
+            "internalFormat": 6408,
             "sampler": "sampler_0",
             "source": "image_0",
-            "target": "TEXTURE_2D"
+            "target": 3553
         }
     }
 }

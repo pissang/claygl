@@ -95,7 +95,7 @@ define(function(require) {
             _forward : 0,
 
             _op : -1  //0 : ROTATE, 1 : PAN
-        }
+        };
     }, function() {
         this._mouseDown = this._mouseDown.bind(this);
         this._mouseUp = this._mouseUp.bind(this);
@@ -161,10 +161,11 @@ define(function(require) {
                 this._offsetRoll += dy * this.sensitivity / 100;
             } else if (this._op === 1) {
                 var len = this.origin.distance(this.target.position);
+                var divider;
                 if (this.target.fov) {
-                    var divider = Math.sin(this.target.fov * Math.PI / 360) / 200;
+                    divider = Math.sin(this.target.fov * Math.PI / 360) / 200;
                 } else {
-                    var divider = 1 / 200;
+                    divider = 1 / 200;
                 }
                 this._panX += dx * this.sensitivity * len * divider;
                 this._panY += dy * this.sensitivity * len * divider;
@@ -235,4 +236,4 @@ define(function(require) {
     });
 
     return OrbitControl;
-} )
+});

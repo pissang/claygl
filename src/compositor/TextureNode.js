@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Node = require('./Node');
-    var FrameBuffer = require('../FrameBuffer');
     var texturePool = require('./texturePool');
     var Shader = require('../Shader');
 
@@ -18,7 +17,7 @@ define(function(require) {
              * @type {qtek.texture.Texture2D}
              */
             texture : null
-        }
+        };
     }, {
         render : function(renderer, frameBuffer) {
 
@@ -54,7 +53,7 @@ define(function(require) {
             this._rendering = false;
             this._rendered = true;
         }
-    })
+    });
 
     return TextureNode;
-})
+});

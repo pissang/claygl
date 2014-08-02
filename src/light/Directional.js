@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Light = require('../Light');
-    var Shader = require('../Shader');
     var Vector3 = require('../math/Vector3');
 
     /**
@@ -41,7 +40,7 @@ define(function(require) {
                     var z = new Vector3();
                     return function(instance) {
                         return z.copy(instance.worldTransform.forward).negate()._array;
-                    }
+                    };
                 })()
             },
             'directionalLightColor' : {
@@ -63,7 +62,7 @@ define(function(require) {
             light.shadowSlopeScale = this.shadowSlopeScale;
             return light;
         }
-    })
+    });
 
     return DirectionalLight;
-} )
+});

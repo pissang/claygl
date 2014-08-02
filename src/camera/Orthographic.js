@@ -58,4 +58,4 @@ define(function(require) {
     });
 
     return Orthographic;
-} )
+});
