@@ -33,7 +33,7 @@ define( function(require) {
          * @type {boolean}
          */
         this._dirty = true;
-    }
+    };
 
     Vector4.prototype = {
 
@@ -704,4 +704,4 @@ define( function(require) {
     };
 
     return Vector4;
-} )
+});

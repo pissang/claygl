@@ -165,7 +165,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
-    }
+    };
 
     /**
      * @param  {qtek.math.Matrix2d} out
@@ -265,4 +265,4 @@ define(function(require) {
     };
 
     return Matrix2d;
-})
+});

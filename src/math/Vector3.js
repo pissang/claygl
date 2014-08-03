@@ -456,7 +456,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
-    }
+    };
 
     // Supply methods that are not in place
     
@@ -470,7 +470,7 @@ define(function(require) {
         vec3.add(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector3} out
@@ -482,7 +482,7 @@ define(function(require) {
     Vector3.set = function(out, x, y, z) {
         vec3.set(out._array, x, y, z);
         out._dirty = true;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector3} out
@@ -493,7 +493,7 @@ define(function(require) {
         vec3.copy(out._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector3} out
@@ -505,7 +505,7 @@ define(function(require) {
         vec3.cross(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @param  {qtek.math.Vector3} a
@@ -514,7 +514,7 @@ define(function(require) {
      */
     Vector3.dist = function(a, b) {
         return vec3.distance(a._array, b._array);
-    }
+    };
 
     /**
      * @method
@@ -534,7 +534,7 @@ define(function(require) {
         vec3.divide(out._array, a._array, b._array);
         out._dirty = true;
         return out;
-    }
+    };
 
     /**
      * @method
@@ -788,4 +788,4 @@ define(function(require) {
     Vector3.ZERO = new Vector3(0, 0, 0);
 
     return Vector3;
-} )
+});

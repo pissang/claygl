@@ -151,5 +151,5 @@ define(function(require) {
         get : get,
         template : template,
         clear: clear
-    }
-})
+    };
+});

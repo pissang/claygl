@@ -444,7 +444,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
-    }
+    };
 
     // Object.defineProperty(Matrix4.prototype, 'm00', makeProperty(0));
     // Object.defineProperty(Matrix4.prototype, 'm01', makeProperty(1));
@@ -707,4 +707,4 @@ define(function(require) {
     };
 
     return Matrix4;
-})
+});

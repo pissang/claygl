@@ -23,7 +23,7 @@ define(function(require) {
     var ConstantValue = function(val) {
         this.get = function() {
             return val;
-        }
+        };
     };
     ConstantValue.prototype = new Value();
     ConstantValue.prototype.constructor = ConstantValue;
@@ -37,7 +37,7 @@ define(function(require) {
             }
             out.copy(val);
             return out;
-        }
+        };
     };
     VectorValue.prototype = new Value();
     VectorValue.prototype.constructor = VectorValue;
@@ -46,7 +46,7 @@ define(function(require) {
         var range = max - min;
         this.get = function() {
             return Math.random() * range + min;
-        }
+        };
     };
     Random1D.prototype = new Value();
     Random1D.prototype.constructor = Random1D;
@@ -67,7 +67,7 @@ define(function(require) {
             );
 
             return out;
-        }
+        };
     };
     Random2D.prototype = new Value();
     Random2D.prototype.constructor = Random2D;
@@ -89,9 +89,9 @@ define(function(require) {
             );
 
             return out;
-        }
+        };
     };
-    Random3D.prototype = new Value()
+    Random3D.prototype = new Value();
     Random3D.prototype.constructor = Random3D;
 
     // Factory methods

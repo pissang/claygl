@@ -219,7 +219,7 @@ define(function(require) {
                 quat.fromMat3(this._array, m3);
                 this._dirty = true;
                 return this;
-            }
+            };
         })(),
 
         /**
@@ -430,7 +430,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
-    }
+    };
 
     // Supply methods that are not in place
     
@@ -690,4 +690,4 @@ define(function(require) {
     };
 
     return Quaternion;
-})
+});

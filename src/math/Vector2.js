@@ -411,7 +411,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
-    }
+    };
 
     // Supply methods that are not in place
     
@@ -436,7 +436,7 @@ define(function(require) {
     Vector2.set = function(out, x, y) {
         vec2.set(out._array, x, y);
         out._dirty = true;
-        return out
+        return out;
     };
 
     /**
@@ -717,4 +717,4 @@ define(function(require) {
 
     return Vector2;
 
-})
+});

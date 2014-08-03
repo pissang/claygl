@@ -193,7 +193,6 @@ define(function(require) {
 
             var faces = geometry.faces;
             
-            var meshNumber = Math.ceil(joints.length / maxJointNumber);
             var faceLen = geometry.getFaceNumber();
             var rest = faceLen;
             var isFaceAdded = [];
@@ -427,7 +426,7 @@ define(function(require) {
             }
             return root;
         }
-    }
+    };
 
     return meshUtil;
 });

@@ -228,7 +228,7 @@ define(function(require) {
         toString : function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
-    }
+    };
     /**
      * @param  {qtek.math.Matrix3} out
      * @param  {qtek.math.Matrix3} a
@@ -392,4 +392,4 @@ define(function(require) {
     };
 
     return Matrix3;
-})
+});
