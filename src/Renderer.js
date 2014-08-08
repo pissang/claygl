@@ -158,11 +158,7 @@ define(function(require) {
 
             glinfo.initialize(this.gl);
         } catch(e) {
-            if (this.throwError) {
-                throw 'Error creating WebGL Context';
-            } else {
-                this.trigger('error', 'Error creating WebGL Context');
-            }
+            throw 'Error creating WebGL Context';
         }
     },
     /** @lends qtek.Renderer.prototype. **/

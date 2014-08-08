@@ -146,7 +146,6 @@ define(function(require) {
                     drawHashChanged = true;
                 }
             }
-            drawHashChanged = true;
             prevDrawID = currentDrawID;
 
             if (!drawHashChanged) {
