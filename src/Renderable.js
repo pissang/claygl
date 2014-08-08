@@ -4,6 +4,7 @@ define(function(require) {
 
     var Node = require('./Node');
     var glenum = require('./core/glenum');
+    var glinfo = require('./core/glinfo');
 
     // Cache
     var prevDrawID = 0;
@@ -116,8 +117,8 @@ define(function(require) {
             var glDrawMode = this.mode;
 
             // TODO
-            // var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
-            var vaoExt = null;
+            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            // var vaoExt = null;
             var isStatic = geometry.hint == glenum.STATIC_DRAW;
             
             var nVertex = geometry.getVertexNumber();
@@ -131,18 +132,18 @@ define(function(require) {
             // Hash with shader id in case previous material has less attributes than next material
             currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
 
-            // The cache will be invalid in the following cases
-            // 1. Geometry is splitted to multiple chunks
-            // 2. VAO is enabled and is binded to null after render
-            // 3. Geometry needs update
-            if (nVertex > geometry.chunkSize && isUseFace || (vaoExt && isStatic)) {
+            if (currentDrawID !== prevDrawID) {
                 drawHashChanged = true;
-            }
-            else if (geometry._cache.isDirty()) {
-                drawHashChanged = true;
-            }
-            else {
-                if (currentDrawID !== prevDrawID) {
+            } else {
+                // The cache will be invalid in the following cases
+                // 1. Geometry is splitted to multiple chunks
+                // 2. VAO is enabled and is binded to null after render
+                // 3. Geometry needs update
+                if (
+                    (nVertex > geometry.chunkSize && isUseFace)
+                 || (vaoExt && isStatic)
+                 || geometry._cache.isDirty()
+                ) {
                     drawHashChanged = true;
                 }
             }
@@ -210,7 +211,7 @@ define(function(require) {
                     var needsBindAttributes = true;
 
                     // Create vertex object array cost a lot
-                    // So we don't abaddoned it on the dynamic object
+                    // So we don't use it on the dynamic object
                     if (vaoExt && isStatic) {
                         // Use vertex array object
                         // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -226,7 +227,7 @@ define(function(require) {
                     var indicesBuffer = vao.indicesBuffer;
                     
                     if (needsBindAttributes) {
-                        var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols);
+                        var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
                         // Setting attributes;
                         for (var a = 0; a < availableAttributes.length; a++) {
                             var location = locationList[a];
@@ -260,9 +261,6 @@ define(function(require) {
 
                             _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                             _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-                            if (vaoExt && isStatic) {
-                                _gl.enableVertexAttribArray(location);
-                            }
                         }
                     }
                     if (

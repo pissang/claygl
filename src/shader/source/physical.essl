@@ -25,6 +25,7 @@ varying vec3 v_Bitangent;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
+uniform sampler2D specularMap;
 uniform samplerCube environmentMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -72,9 +73,9 @@ float G_Smith(float glossiness, float ndv, float ndl)
     float G1L = ndl / (ndl * (1.0 - k) + k);
     return G1L * G1V;
 }
-
-vec3 F_Schlick(float ldn) {
-    return specularColor + (1.0 - specularColor) * pow(1.0 - ldn, 5.0);
+// Fresnel
+vec3 F_Schlick(float ldn, vec3 spec) {
+    return spec + (1.0 - spec) * pow(1.0 - ldn, 5.0);
 }
 
 float D_Phong(float g, float ndh) {
@@ -115,6 +116,11 @@ void main()
         #ifdef DIFFUSEMAP_ALPHA_GLOSS
             g *= tex.a;
         #endif
+    #endif
+
+    vec3 spec = specularColor;
+    #ifdef SPECULARMAP_ENABLED
+        spec *= texture2D(specularMap, v_Texcoord).rgb;
     #endif
 
     vec3 N = v_Normal;
@@ -185,7 +191,7 @@ void main()
 
             vec3 li = lc * ndl * attenuation * shadowContrib;
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
         }
     #endif
 
@@ -219,7 +225,7 @@ void main()
             vec3 li = lc * ndl * shadowContrib;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
         }
     #endif
 
@@ -272,7 +278,7 @@ void main()
             vec3 li = lc * attenuation * (1.0-falloff) * shadowContrib * ndl;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
         }
     #endif
 

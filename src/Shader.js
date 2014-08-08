@@ -500,17 +500,30 @@ define(function(require) {
         // Enable the attributes passed in and disable the rest
         // Example Usage:
         // enableAttributes(_gl, ["position", "texcoords"])
-        enableAttributes : function(_gl, attribList) {
+        enableAttributes : function(_gl, attribList, vao) {
             
             var program = this._cache.get('program');
 
             var locationMap = this._cache.get('attriblocations');
 
-            var enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
+            var enabledAttributeListInContext;
+            if (vao) {
+                enabledAttributeListInContext = vao.__enabledAttributeList;
+            } else {
+                enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
+            }
             if (! enabledAttributeListInContext) {
-                enabledAttributeListInContext
-                    = enabledAttributeList[_gl.__GLID__] 
-                    = [];
+                // In vertex array object context
+                // PENDING Each vao object needs to enable attributes again?
+                if (vao) {
+                    enabledAttributeListInContext
+                        = vao.__enabledAttributeList
+                        = [];
+                } else {
+                    enabledAttributeListInContext
+                        = enabledAttributeList[_gl.__GLID__] 
+                        = [];   
+                }
             }
             var locationList = [];
             for (var i = 0; i < attribList.length; i++) {

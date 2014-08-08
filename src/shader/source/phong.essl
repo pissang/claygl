@@ -93,6 +93,7 @@ varying vec3 v_Bitangent;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
+uniform sampler2D specularMap;
 uniform samplerCube environmentMap;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -152,6 +153,11 @@ void main()
         #ifdef DIFFUSEMAP_ALPHA_ALPHA
             finalColor.a *= tex.a;
         #endif
+    #endif
+
+    vec3 spec = specularColor;
+    #ifdef SPECULARMAP_ENABLED
+        spec *= texture2D(specularMap, v_Texcoord).rgb;
     #endif
 
     vec3 normal = v_Normal;
@@ -326,7 +332,7 @@ void main()
     #endif
 
     finalColor.rgb *= diffuseTerm;
-    finalColor.rgb += specularTerm * specularColor;
+    finalColor.rgb += specularTerm * spec;
     finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED

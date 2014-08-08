@@ -60,13 +60,13 @@ define(function(require) {
                 for (var i = 1; i < vertices.length; i++) {
                     var vertex = vertices[i];
 
-                    _min[0] = Math.min(vertex[0], _min[0]);
-                    _min[1] = Math.min(vertex[1], _min[1]);
-                    _min[2] = Math.min(vertex[2], _min[2]);
+                    if (vertex[0] < _min[0]) { _min[0] = vertex[0]; }
+                    if (vertex[1] < _min[1]) { _min[1] = vertex[1]; }
+                    if (vertex[2] < _min[2]) { _min[2] = vertex[2]; }
 
-                    _max[0] = Math.max(vertex[0], _max[0]);
-                    _max[1] = Math.max(vertex[1], _max[1]);
-                    _max[2] = Math.max(vertex[2], _max[2]);
+                    if (vertex[0] > _max[0]) { _max[0] = vertex[0]; }
+                    if (vertex[1] > _max[1]) { _max[1] = vertex[1]; }
+                    if (vertex[2] > _max[2]) { _max[2] = vertex[2]; }
                 }
                 this.min._dirty = true;
                 this.max._dirty = true;
@@ -125,13 +125,13 @@ define(function(require) {
                 v = vertices[i];
                 vec3TransformMat4(v, v, m4);
 
-                _min[0] = Math.min(v[0], _min[0]);
-                _min[1] = Math.min(v[1], _min[1]);
-                _min[2] = Math.min(v[2], _min[2]);
+                if (v[0] < _min[0]) { _min[0] = v[0]; }
+                if (v[1] < _min[1]) { _min[1] = v[1]; }
+                if (v[2] < _min[2]) { _min[2] = v[2]; }
 
-                _max[0] = Math.max(v[0], _max[0]);
-                _max[1] = Math.max(v[1], _max[1]);
-                _max[2] = Math.max(v[2], _max[2]);
+                if (v[0] > _max[0]) { _max[0] = v[0]; }
+                if (v[1] > _max[1]) { _max[1] = v[1]; }
+                if (v[2] > _max[2]) { _max[2] = v[2]; }
             }
 
             this.min._dirty = true;
