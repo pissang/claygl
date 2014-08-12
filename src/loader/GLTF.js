@@ -1,6 +1,8 @@
 /**
  * glTF Loader
  * Specification : https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
+ *
+ * TODO https://github.com/KhronosGroup/glTF/issues/298
  */
 define(function(require) {
 
@@ -778,7 +780,7 @@ define(function(require) {
                     parameters[paramName] = new Float32Array(buffer, byteOffset, size * accessorInfo.count);
                 }
 
-                if (!parameters.TIME) {
+                if (!parameters.TIME || !animationInfo.channels.length) {
                     continue;
                 }
 

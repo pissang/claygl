@@ -334,11 +334,11 @@ define(function(require) {
 
         /**
          * Render a single renderable list in camera in sequence
-         * @param  {qtek.Renderable[]} queue            List of all renderables.
+         * @param  {qtek.Renderable[]} queue       List of all renderables.
          *                                         Best to be sorted by Renderer.opaqueSortFunc or Renderer.transparentSortFunc
-         * @param  {qtek.Camera}       camera         
+         * @param  {qtek.Camera}       camera
          * @param  {qtek.Material}     [globalMaterial] globalMaterial will override the material of each renderable
-         * @param  {boolean}      [preZ]           If use preZ optimization, default false
+         * @param  {boolean}           [preZ]           If use preZ optimization, default false
          * @return {IRenderInfo}
          */
         renderQueue : function(queue, camera, globalMaterial, preZ) {

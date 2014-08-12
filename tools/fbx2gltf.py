@@ -1,7 +1,7 @@
 # ############################################
 # fbx to glTF converter
 # glTF spec : https://github.com/KhronosGroup/glTF
-# fbx version 2014.2
+# fbx version 2014.2/2015.1
 # TODO: support python2.7
 # TODO: 2014.2 python3.3 LoadScene is too slow
 # http://github.com/pissang/
@@ -718,6 +718,7 @@ def ConvertSceneNode(pNode, fbxConverter):
         m[2][0], m[2][1], m[2][2], m[2][3],
         m[3][0], m[3][1], m[3][2], m[3][3],
     ]
+    
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
     lGeometry = pNode.GetGeometry()
@@ -731,8 +732,9 @@ def ConvertSceneNode(pNode, fbxConverter):
 
         fbxConverter.Triangulate(lGeometry, True)
         # TODO SplitMeshPerMaterial may loss deformer in mesh
+        # TODO It will be crashed in some fbx files
         # FBX version 2014.2 seems have fixed it
-        fbxConverter.SplitMeshPerMaterial(lGeometry, True)
+        # fbxConverter.SplitMeshPerMaterial(lGeometry, True)
 
         lHasSkin = False
         lGLTFSkin = None
@@ -741,6 +743,7 @@ def ConvertSceneNode(pNode, fbxConverter):
 
         # If any attribute of this node have skinning data
         # (Mesh splitted by material may have multiple MeshAttribute in one node)
+        pNode
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
             if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
@@ -793,6 +796,7 @@ def ConvertSceneNode(pNode, fbxConverter):
                         if not lLink.GetName() in roots:
                             roots.append(lLink.GetName())
 
+            # TODO
             lRootNode = fbxNodes[roots[0]]
             lRootNodeTransform = lRootNode.GetParent().EvaluateGlobalTransform()
 
@@ -809,6 +813,7 @@ def ConvertSceneNode(pNode, fbxConverter):
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
                 # Matrix in fbx is column major
                 # (root-1 * reference-1 * cluster)-1 = cluster-1 * reference * root
+                # http://blog.csdn.net/bugrunner/article/details/7232291
                 m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * lRootNodeTransform
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
@@ -869,55 +874,47 @@ def CreateAnimation():
         'parameters' : {},
         'samplers' : {} 
     }
-    lib_animations[lAnimName] = lGLTFAnimation
 
     return lAnimName, lGLTFAnimation
 
 _samplerChannels = ['rotation', 'scale', 'translation']
-def CreateTransformAnimation(nodeName):
-    lAnimName, lGLTFAnimation = CreateAnimation()
 
-    lGLTFAnimation['parameters'] = {
-        "TIME" : None,
-        "rotation" : None,
-        "scale" : None,
-        "translation" : None
-    }
-    #TODO Other interpolation methods
-    for path in _samplerChannels:
-        lSamplerName = lAnimName + '_' + path + '_sampler'
-        lGLTFAnimation['samplers'][lSamplerName] = {
-            "input": "TIME",
-            "interpolation": "LINEAR",
-            "output": path
-        }
-        lGLTFAnimation['channels'].append({
-            "sampler" : lSamplerName,
-            "target" : {
-                "id" : nodeName,
-                "path" : path
-            }
-        })
-
-    return lAnimName, lGLTFAnimation
-
-def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
-    lNodeName = pNode.GetName()
-
-    # Find start and end time of animation layer
-    # Use the time of X channel of translation curve
-    lAnimCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
-    if lAnimCurve == None:
-        return;
-
+def GetPropertyAnimationCurveTime(pAnimCurve):
     lTimeSpan = FbxTimeSpan()
-    lAnimCurve.GetTimeInterval(lTimeSpan)
+    pAnimCurve.GetTimeInterval(lTimeSpan)
     lStartTimeDouble = lTimeSpan.GetStart().GetSecondDouble()
     lEndTimeDouble = lTimeSpan.GetStop().GetSecondDouble()
     lDuration = lEndTimeDouble - lStartTimeDouble
 
+    return lStartTimeDouble, lEndTimeDouble, lDuration
+
+def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
+    lNodeName = pNode.GetName()
+
+    # PENDING
+    lTranslationCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
+    lRotationCurve = pNode.LclRotation.GetCurve(pAnimLayer, 'X')
+    lScalingCurve = pNode.LclScaling.GetCurve(pAnimLayer, 'X')
+    
+    lHaveTranslation = not lTranslationCurve == None
+    lHaveRotation = not lRotationCurve == None
+    lHaveScaling = not lScalingCurve == None
+
+    # Curve time span may much smaller than stack local time span
+    # It can reduce a lot of space
+    # PENDING
+    lStartTimeDouble = lEndTimeDouble = lDuration = 0
+    if lTranslationCurve:
+        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lTranslationCurve)
+        
+    if lDuration < 1e-5 and lHaveRotation:
+        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lRotationCurve)
+
+    if lDuration < 1e-5 and lHaveScaling:
+        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lScalingCurve)
+
     if lDuration > 1e-5:
-        lAnimName, lGLTFAnimation = CreateTransformAnimation(lNodeName)
+        lAnimName, lGLTFAnimation = CreateAnimation()
 
         lNumFrames = math.ceil(lDuration / pSampleRate)
 
@@ -939,17 +936,43 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
             lScale = lTransform.GetS()
 
             #Convert quaternion to axis angle
-            lRotationChannel.append(QuaternionToAxisAngle(lQuaternion))
-
             lTimeChannel.append(lSecondDouble)
-            lTranslationChannel.append(list(lTranslation))
-            lScaleChannel.append(list(lScale))
+
+            if lHaveRotation:
+                lRotationChannel.append(QuaternionToAxisAngle(lQuaternion))
+            if lHaveTranslation:
+                lTranslationChannel.append(list(lTranslation))
+            if lHaveScaling:
+                lScaleChannel.append(list(lScale))
 
         lGLTFAnimation['count'] = lNumFrames
         lGLTFAnimation['parameters']['TIME'] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
-        lGLTFAnimation['parameters']['rotation'] = CreateAnimationBuffer(lRotationChannel, 'f', 4)
-        lGLTFAnimation['parameters']['translation'] = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
-        lGLTFAnimation['parameters']['scale'] = CreateAnimationBuffer(lScaleChannel, 'f', 3)
+        if lHaveTranslation:
+            lGLTFAnimation['parameters']['translation'] = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
+        if lHaveRotation:
+            lGLTFAnimation['parameters']['rotation'] = CreateAnimationBuffer(lRotationChannel, 'f', 4)
+        if lHaveScaling:
+            lGLTFAnimation['parameters']['scale'] = CreateAnimationBuffer(lScaleChannel, 'f', 3)
+
+        #TODO Other interpolation methods
+        for path in _samplerChannels:
+            if path in lGLTFAnimation['parameters']:
+                lSamplerName = lAnimName + '_' + path + '_sampler'
+                lGLTFAnimation['samplers'][lSamplerName] = {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": path
+                }
+                lGLTFAnimation['channels'].append({
+                    "sampler" : lSamplerName,
+                    "target" : {
+                        "id" : lNodeName,
+                        "path" : path
+                    }
+                })
+
+        if len(lGLTFAnimation['channels']) > 0:
+            lib_animations[lAnimName] = lGLTFAnimation
 
     for i in range(pNode.GetChildCount()):
         ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate)
