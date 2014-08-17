@@ -4,7 +4,7 @@
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
     </head>
-    <body style="margin:0px;">
+    <body style="margin:0px;background-color:#20242B;">
         <canvas width="1200" height="640" id="Main"></canvas>
         <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
@@ -30,18 +30,18 @@
                 });
 
                 var cube = new Cube();
-                var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
+                cube.generateTangents();
+                var shader = shaderLibrary.get('buildin.physical', 'diffuseMap', 'normalMap');
                 var material = new Material({
                     shader : shader
                 });
-                var texture = new qtek.texture.Texture2D;
-                texture.image = new Image;
-                texture.image.onload = function(){
-                    texture.dirty();
-                }
-                texture.image.src = "assets/textures/crate.gif";
-                var uniforms = material.uniforms;
-                uniforms.diffuseMap.value = texture;
+                material.set('glossiness', 0.4);
+                var diffuse = new qtek.texture.Texture2D;
+                diffuse.load("assets/textures/crate.gif");
+                var normal = new qtek.texture.Texture2D;
+                normal.load("assets/textures/normal_map.jpg");
+                material.set('diffuseMap', diffuse);
+                material.set('normalMap', normal);
 
                 var root = new qtek.Node({
                     name : 'ROOT'
@@ -51,8 +51,8 @@
                     geometry: cube,
                     material: material
                 });
-                for( var i = 0; i < 10; i++){
-                    for(var j = 0; j < 20; j++){
+                for( var i = 0; i < 20; i++){
+                    for(var j = 0; j < 10; j++){
                         for( var k = 0; k < 50; k++){
                             var mesh = cube.clone();
                             mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
@@ -60,6 +60,13 @@
                         }
                     }
                 }
+                var light = new qtek.light.Point({
+                    range: 200
+                });
+                scene.add(light);
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.4
+                }))
 
                 camera.position.set(0, 0, 10);
 
@@ -70,7 +77,7 @@
                     document.getElementById('time').innerHTML = 
                             Math.round(1000 / deltaTime) + '<br />' 
                             + renderTime + '<br />'
-                            + drawInfo.drawCallNumber + '(' + 10000 + ')';
+                            + drawInfo.renderedMeshNumber + '(' + drawInfo.meshNumber + ')';
                     // near z is larger than far z in view space !!
                     camera.far = Math.max(camera.near, -camera.sceneBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);

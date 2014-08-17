@@ -28,8 +28,6 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
-    var frameBuffer = new FrameBuffer();
-
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     var targetMap = {
         'px' : glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -82,6 +80,8 @@ define(function(require) {
              * @type {number}
              */
             cascadeSplitLogFactor : 0.2,
+
+            _frameBuffer: new FrameBuffer(),
 
             _textures : {},
             _shadowMapNumber : {
@@ -497,8 +497,8 @@ define(function(require) {
 
                     var _gl = renderer.gl;
 
-                    frameBuffer.attach(_gl, texture);
-                    frameBuffer.bind(renderer);
+                    this._frameBuffer.attach(_gl, texture);
+                    this._frameBuffer.bind(renderer);
 
                     _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
@@ -510,7 +510,7 @@ define(function(require) {
 
                     renderer.renderQueue(casters, lightCamera);
 
-                    frameBuffer.unbind(renderer);
+                    this._frameBuffer.unbind(renderer);
 
                     // Filter for VSM
                     if (this.softShadow === ShadowMapPass.VSM) {
@@ -542,14 +542,14 @@ define(function(require) {
             var camera = this._getSpotLightCamera(light);
             var _gl = renderer.gl;
 
-            frameBuffer.attach(_gl, texture);
-            frameBuffer.bind(renderer);
+            this._frameBuffer.attach(_gl, texture);
+            this._frameBuffer.bind(renderer);
 
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
             renderer.renderQueue(casters, camera);
 
-            frameBuffer.unbind(renderer);
+            this._frameBuffer.unbind(renderer);
 
             // Filter for VSM
             if (this.softShadow === ShadowMapPass.VSM) {
@@ -576,14 +576,14 @@ define(function(require) {
                 var target = targets[i];
                 var camera = this._getPointLightCamera(light, target);
 
-                frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
-                frameBuffer.bind(renderer);
+                this._frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
+                this._frameBuffer.bind(renderer);
 
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                 renderer.renderQueue(casters, camera);
 
-                frameBuffer.unbind(renderer);
+                this._frameBuffer.unbind(renderer);
             }
         },
 
@@ -596,19 +596,19 @@ define(function(require) {
             var _gl = renderer.gl;
             var tmpTexture = texturePool.get(parameter);
             
-            frameBuffer.attach(_gl, tmpTexture);
-            frameBuffer.bind(renderer);
+            this._frameBuffer.attach(_gl, tmpTexture);
+            this._frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform('texture', texture);
             this._gaussianPassH.setUniform('textureWidth', size);
             this._gaussianPassH.render(renderer);
-            frameBuffer.unbind(renderer);
+            this._frameBuffer.unbind(renderer);
 
-            frameBuffer.attach(_gl, texture);
-            frameBuffer.bind(renderer);
+            this._frameBuffer.attach(_gl, texture);
+            this._frameBuffer.bind(renderer);
             this._gaussianPassV.setUniform('texture', tmpTexture);
             this._gaussianPassV.setUniform('textureHeight', size);
             this._gaussianPassV.render(renderer);
-            frameBuffer.unbind(renderer);
+            this._frameBuffer.unbind(renderer);
 
             texturePool.put(tmpTexture);
         },
@@ -755,6 +755,10 @@ define(function(require) {
             for (var guid in this._distanceMaterials) {
                 var mat = this._distanceMaterials[guid];
                 mat.dispose();
+            }
+
+            if (this._frameBuffer) {
+                this._frameBuffer.dispose(_gl);
             }
 
             for (var name in this._textures) {

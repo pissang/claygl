@@ -45,10 +45,10 @@
                     geometry : sphere,
                     material : material
                 });
-                scene.add( sphereMesh );
+                scene.add(sphereMesh);
 
-                setInterval( function(){
-                    renderer.render( scene, camera );
+                setInterval(function() {
+                    var renderInfo = renderer.render(scene, camera);
                     sphereMesh.rotation.rotateY(Math.PI/500);
                 }, 20);
             })

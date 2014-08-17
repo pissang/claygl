@@ -346,7 +346,8 @@ define(function(require) {
                 faceNumber : 0,
                 vertexNumber : 0,
                 drawCallNumber : 0,
-                meshNumber : 0
+                meshNumber: queue.length,
+                renderedMeshNumber : 0
             };
 
             // Calculate view and projection matrix
@@ -528,7 +529,7 @@ define(function(require) {
                     renderInfo.faceNumber += objectRenderInfo.faceNumber;
                     renderInfo.vertexNumber += objectRenderInfo.vertexNumber;
                     renderInfo.drawCallNumber += objectRenderInfo.drawCallNumber;
-                    renderInfo.meshNumber ++;
+                    renderInfo.renderedMeshNumber ++;
                 }
             }
 

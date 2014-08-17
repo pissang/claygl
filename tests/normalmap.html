@@ -40,7 +40,7 @@
                     geometry : cube,
                     material : material
                 });
-                scene.add( mesh );
+                scene.add(mesh);
                 var light = new qtek.light.Directional({
                     position : new qtek.math.Vector3(10, 10, 10)
                 })
@@ -54,13 +54,8 @@
 
 
                 function loadTexture(src){
-                    var texture = new qtek.texture.Texture2D({
-                        image : new Image()
-                    })
-                    texture.image.onload = function(){
-                        texture.dirty();
-                    }
-                    texture.image.src = src;
+                    var texture = new qtek.texture.Texture2D();
+                    texture.load(src);
                     return texture;
                 }
             })
