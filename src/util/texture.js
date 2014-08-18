@@ -13,8 +13,6 @@ define(function(require) {
     var dds = require('./dds');
     var hdr = require('./hdr');
 
-    var environmentMapPass = new EnvironmentMapPass();
-
     /**
      * @namespace qtek.util.texture
      */
@@ -104,6 +102,7 @@ define(function(require) {
          * @memberOf qtek.util.texture
          */
         panoramaToCubeMap : function(panoramaMap, cubeMap, renderer) {
+            var environmentMapPass = new EnvironmentMapPass();
             var skydome = new Skydome({
                 scene : new Scene()
             });
@@ -111,6 +110,7 @@ define(function(require) {
             environmentMapPass.texture = cubeMap;
             environmentMapPass.render(renderer, skydome.scene);
             environmentMapPass.texture = null;
+            environmentMapPass.dispose(renderer.gl);
             return cubeMap;
         },
 
