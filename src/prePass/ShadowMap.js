@@ -750,11 +750,11 @@ define(function(require) {
         dispose : function(_gl) {
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
-                mat.dispose();
+                mat.shader.dispose(_gl);
             }
             for (var guid in this._distanceMaterials) {
                 var mat = this._distanceMaterials[guid];
-                mat.dispose();
+                mat.shader.dispose(_gl);
             }
 
             if (this._frameBuffer) {

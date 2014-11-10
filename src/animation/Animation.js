@@ -539,7 +539,9 @@ define(function(require) {
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
         done : function(func) {
-            this._doneList.push(func);
+            if (cb) {
+                this._doneList.push(cb);
+            }
             return this;
         },
         /**

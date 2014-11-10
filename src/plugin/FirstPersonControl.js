@@ -173,8 +173,8 @@ define(function(require) {
 
         _lockChange : function() {
             if (
-                document.pointerlockElement === this.domElement
-                || document.mozPointerlockElement === this.domElement
+                document.pointerLockElement === this.domElement
+                || document.mozPointerLockElement === this.domElement
                 || document.webkitPointerLockElement === this.domElement
             ) {
                 document.addEventListener('mousemove', this._mouseMove, false);
