@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;background-color:#20242B;">
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script type="text/javascript">
+            require(['qtek/qtek'], function(qtek){
+                var Shader = qtek.Shader;
+                var Material = qtek.Material;
+                var Mesh = qtek.Mesh;
+                var SphereGeo = qtek.geometry.Sphere;
+                var PlaneGeo = qtek.geometry.Plane;
+                var shaderLibrary = qtek.shader.library;
+                var Texture2D = qtek.texture.Texture2D;
+                var Texture = qtek.Texture;
+                var Vector3 = qtek.math.Vector3;
+                var animation = new qtek.animation.Animation;
+                var shadowMapPass = new qtek.prePass.ShadowMap();
+                animation.start();
+
+                ///////////// Prepare scene
+                var renderer = new qtek.Renderer({
+                    canvas : document.getElementById("Main")
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var scene = new qtek.Scene();
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
+
+                var control = new qtek.plugin.OrbitControl({
+                    target : camera,
+                    domElement : renderer.canvas,
+                    sensitivity : 0.4
+                });
+
+                var light = new qtek.light.Directional({
+                    shadowResolution: 1024,
+                    shadowBias: 0.004
+                });
+                light.position.set(10, 10, 10);
+                light.lookAt(Vector3.ZERO);
+                scene.add(light);
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.1
+                }));
+
+                //////////// Create sphere
+                var sphere = new Mesh();
+                sphere.geometry = new SphereGeo();
+                sphere.material = new Material({
+                    shader: shaderLibrary.get('buildin.physical')
+                });
+                scene.add(sphere);
+                scene.add(camera);
+                sphere.position.y = 1;
+
+                camera.position.z = 10;
+                camera.position.y = 2;
+                camera.lookAt(Vector3.ZERO);
+
+                ////////////// Create plane
+                var plane = new Mesh();
+                plane.scale.set(100, 100, 1);
+                plane.geometry = new PlaneGeo();
+                plane.geometry.boundingBox = null;
+                plane.geometry.generateTangents();
+                plane.material = new Material({
+                    shader: shaderLibrary.get('buildin.physical', 'normalMap', 'diffuseMap')
+                });
+                plane.material.set('uvRepeat', [100, 100]);
+                var diffuseTexture = new Texture2D({
+                    wrapS: Texture.REPEAT,
+                    wrapT: Texture.REPEAT,
+                    anisotropic: 32
+                });
+                diffuseTexture.load('assets/textures/chessboard.png');
+                var normalTexture = new Texture2D({
+                    wrapS: Texture.REPEAT,
+                    wrapT: Texture.REPEAT,
+                    anisotropic: 32
+                });
+                normalTexture.load('assets/textures/chessboard_NRM.png');
+                plane.material.set('diffuseMap', diffuseTexture);
+                plane.material.set('normalMap', normalTexture);
+
+                plane.rotation.rotateX(-Math.PI / 2);
+                scene.add(plane);
+
+                animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
+                    shadowMapPass.render(renderer, scene, camera);
+                    var drawInfo = renderer.render(scene, camera);
+                });
+            })
+            
+        </script>
+    </body>
+</html>
