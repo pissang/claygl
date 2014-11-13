@@ -595,7 +595,10 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
                     lTexcoord = lTexcoords[lCount]
                 lCount += 1
                 #Compress vertex, hashed with position and normal
-                lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
+                if not lLayerUV == None:
+                    lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1])
+                else:
+                    lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
                 if lKey in lVertexMap:
                     lIndices.append(lVertexMap[lKey])
                 else:
