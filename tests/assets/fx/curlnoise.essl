@@ -197,7 +197,7 @@ void main(){
     }
 
     life = 1.0 - p.w / 6.0; 
-    gl_PointSize = 20.0;
+    gl_PointSize = 4.0;
 
 }
 

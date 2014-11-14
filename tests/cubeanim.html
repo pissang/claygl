@@ -82,7 +82,7 @@
                         var idx = i / 4;
                         var x = (idx % SIZE) / SIZE * 40 - 20;
                         var y = 20 - (idx / SIZE) / SIZE * 40;
-                        var z = Math.random() * 5;
+                        var z = Math.random() * 6;
 
                         position.push([x, y, z]);
                     }
@@ -100,7 +100,7 @@
                 for (var i = smaller.length; i < larger.length; i++) {
                     var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
                     random = random.slice();
-                    random[2] += Math.random() * 5;
+                    random[2] += Math.random() * 3;
                     smaller[i] = random;
                 }
 
@@ -216,7 +216,7 @@
                     setInterval(function() {
                         var another = current == crossPosArr ? checkPosArr : crossPosArr;
                         animation.animate(obj)
-                        .when(2000, {
+                        .when(1000, {
                             position : another
                         }).start("CubicInOut");
                         current = another;

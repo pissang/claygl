@@ -6,18 +6,20 @@
     <script type="text/javascript" src="js/config.js"></script>
 </head>
 <body style="margin:0px;">
-    <canvas id="Main" style="background-color:#06b3db;"></canvas>
+    <canvas id="main"></canvas>
     <script type="text/javascript">
         require(['qtek/qtek'], function(qtek){
             
             var Shader = qtek.Shader;
 
-            var SIZE = 256;
+            var SIZE = 512;
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById("Main")
+                canvas : document.getElementById("main")
             });
             renderer.resize(window.innerWidth, window.innerHeight);
+            var animation = new qtek.animation.Animation();
+            animation.start();
 
             var fxLoader = new qtek.loader.FX();
             fxLoader.load('assets/fx/curlnoise.json');
@@ -64,7 +66,7 @@
                 var spiritTexture = new qtek.texture.Texture2D();
                 spiritTexture.image = generateSprite();
                 mat.set("spiritTexture", spiritTexture);
-                mat.set("color", [0.5, 0.3, 0.1]);
+                mat.set("color", [0.0, 0.0, 0.0]);
 
                 var control = new qtek.plugin.OrbitControl({
                     target : camera,
@@ -72,7 +74,7 @@
                     sensitivity : 0.4
                 });
 
-                function update(){
+                animation.on('frame', function () {
                     control.update();
                     var currentTime = new Date().getTime();
                     var deltaTime = (currentTime - time) / 1000;
@@ -86,10 +88,7 @@
 
                     mat.set("particleTexture", particleNode._outputTextures['position']);
                     renderer.render(scene, camera);
-
-                    setTimeout(update, 100);
-                }
-                setTimeout(update, 500);
+                });
             });
 
             function generateSprite(){

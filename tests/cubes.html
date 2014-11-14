@@ -78,7 +78,7 @@
                             Math.round(1000 / deltaTime) + '<br />' 
                             + renderTime + '<br />'
                             + drawInfo.renderedMeshNumber + '(' + drawInfo.meshNumber + ')';
-                    // near z is larger than far z in view space !!
+                    // near z is larger than far z in view space
                     camera.far = Math.max(camera.near, -camera.sceneBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);
                 });
