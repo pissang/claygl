@@ -4,7 +4,6 @@ define(function(require) {
     var CubeGeometry = require('../geometry/Cube');
     var Shader = require('../Shader');
     var Material = require('../Material');
-    var shaderLibrary = require('../shader/library');
 
     var skyboxShader;
 

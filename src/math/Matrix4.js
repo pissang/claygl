@@ -390,7 +390,7 @@ define(function(require) {
 
         /**
          * Decompose a matrix to SRT
-         * @param {qtek.math.Vector3} scale
+         * @param {qtek.math.Vector3} [scale]
          * @param {qtek.math.Quaternion} rotation
          * @param {qtek.math.Vector} position
          * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
@@ -410,9 +410,15 @@ define(function(require) {
                 vec3.set(y, el[4], el[5], el[6]);
                 vec3.set(z, el[8], el[9], el[10]);
 
-                scale.x = vec3.length(x);
-                scale.y = vec3.length(y);
-                scale.z = vec3.length(z);
+                var sx = vec3.length(x);
+                var sy = vec3.length(y);
+                var sz = vec3.length(z);
+                if (scale) {
+                    scale.x = sx;
+                    scale.y = sy;
+                    scale.z = sz;
+                    scale._dirty = true;
+                }
 
                 position.set(el[12], el[13], el[14]);
 
@@ -420,22 +426,21 @@ define(function(require) {
                 // Not like mat4, mat3 in glmatrix seems to be row-based
                 mat3.transpose(m3, m3);
 
-                m3[0] /= scale.x;
-                m3[1] /= scale.x;
-                m3[2] /= scale.x;
+                m3[0] /= sx;
+                m3[1] /= sx;
+                m3[2] /= sx;
 
-                m3[3] /= scale.y;
-                m3[4] /= scale.y;
-                m3[5] /= scale.y;
+                m3[3] /= sy;
+                m3[4] /= sy;
+                m3[5] /= sy;
 
-                m3[6] /= scale.z;
-                m3[7] /= scale.z;
-                m3[8] /= scale.z;
+                m3[6] /= sz;
+                m3[7] /= sz;
+                m3[8] /= sz;
 
                 quat.fromMat3(rotation._array, m3);
                 quat.normalize(rotation._array, rotation._array);
 
-                scale._dirty = true;
                 rotation._dirty = true;
                 position._dirty = true;
             }

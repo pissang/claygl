@@ -280,7 +280,8 @@ define(function(require) {
             if (!notUpdateScene) {
                 scene.update(false);
             }
-            if (!camera.scene) {
+            // Update if camera not mounted on the scene
+            if (!camera.getScene()) {
                 camera.update(true);
             }
 

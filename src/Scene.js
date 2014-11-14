@@ -55,7 +55,7 @@ define(function(require) {
             _nodeRepository : {}
         };
     }, function() {
-        this.scene = this;
+        this._scene = this;
     }, 
     /** @lends qtek.Scene.prototype. */
     {

@@ -418,8 +418,8 @@ define(function(require) {
             root.scale.copy(mesh.scale);
 
             if (inPlace) {
-                if (mesh.parent) {
-                    var parent = mesh.parent;
+                if (mesh.getParent()) {
+                    var parent = mesh.getParent();
                     parent.remove(mesh);
                     parent.add(root);
                 }

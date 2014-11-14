@@ -163,8 +163,8 @@ define(function(require) {
                     var joint = this.joints[i];
                     // Joint space is relative to root joint's parent, if have
                     // !!Parent node and joint node must all be updated
-                    if (joint.rootNode && joint.rootNode.parent) {
-                        mat4.invert(m4, joint.rootNode.parent.worldTransform._array);
+                    if (joint.rootNode && joint.rootNode.getParent()) {
+                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
                         mat4.multiply(
                             m4,
                             m4,
@@ -213,8 +213,8 @@ define(function(require) {
 
                     // Joint space is relative to root joint's parent, if have
                     // PENDING
-                    if (joint.rootNode && joint.rootNode.parent) {
-                        mat4.invert(m4, joint.rootNode.parent.worldTransform._array);
+                    if (joint.rootNode && joint.rootNode.getParent()) {
+                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
                         mat4.multiply(
                             this._skinMatricesSubArrays[i],
                             m4,

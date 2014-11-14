@@ -116,9 +116,7 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
-            // TODO
             var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
-            // var vaoExt = null;
             var isStatic = geometry.hint == glenum.STATIC_DRAW;
             
             var nVertex = geometry.getVertexNumber();

@@ -24,7 +24,7 @@ define( function(require) {
             e.currentTarget = target;
             target.trigger(eventType, e);
 
-            target = target.parent;
+            target = target.getParent();
         }
     };
 

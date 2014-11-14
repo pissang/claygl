@@ -191,6 +191,7 @@ define(function(require) {
                     textures : lib.textures,
                     materials : lib.materials,
                     skeletons : lib.skeletons,
+                    meshes: lib.meshes,
                     clip : clip
                 });
             }
@@ -201,6 +202,7 @@ define(function(require) {
                 textures : lib.textures,
                 materials : lib.materials,
                 skeletons : lib.skeletons,
+                meshes: lib.meshes,
                 clip : null
             };
         },
@@ -745,6 +747,8 @@ define(function(require) {
         _parseAnimations : function(json, lib) {
             // TODO Only support nodes animation now
             var clip = new SkinningClip();
+            // Default loop the skinning animation
+            clip.setLoop(true);
             var haveAnimation = false;
 
             var jointClips = {};
