@@ -75,7 +75,12 @@ define(function(require) {
          * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
          */
         addClip : function(clip, mapRule) {
-
+            // Clip have been exists in 
+            for (var i = 0; i < this._clips.length; i++) {
+                if (this._clips[i].clip === clip) {
+                    return;
+                }
+            }
             // Map the joint index in skeleton to joint pose index in clip
             var maps = [];
             for (var i = 0; i < this.joints.length; i++) {
@@ -247,6 +252,10 @@ define(function(require) {
          * @param {number} clipIndex
          */
         setPose : function(clipIndex) {
+            if (!this._clips[clipIndex]) {
+                return;
+            }
+            
             var clip = this._clips[clipIndex].clip;
             var maps = this._clips[clipIndex].maps;
 

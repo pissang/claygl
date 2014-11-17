@@ -45,7 +45,7 @@ define(function(require) {
      *     });
      */
     TaskGroup.prototype.all = function(tasks) {
-        var count = tasks.length;
+        var count = 0;
         var self = this;
         var data = [];
         if (tasks.length === 0) {
@@ -59,6 +59,10 @@ define(function(require) {
         this._rejectedNumber = 0;
 
         util.each(tasks, function(task, idx) {
+            if (!task || !task.once) {
+                return;
+            }
+            count++;
             task.once('success', function(res) {
                 count--;
 
@@ -92,7 +96,7 @@ define(function(require) {
      * @return {qtek.async.TaskGroup}
      */
     TaskGroup.prototype.allSettled = function(tasks) {
-        var count = tasks.length;
+        var count = 0;
         var success = false;
         var self = this;
         var data = [];
@@ -105,6 +109,10 @@ define(function(require) {
         this._tasks = tasks;
 
         util.each(tasks, function(task, idx) {
+            if (!task || !task.once) {
+                return;
+            }
+            count++;
             task.once('success', function(res) {
                 count--;
                 

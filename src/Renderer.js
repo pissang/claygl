@@ -33,6 +33,7 @@ define(function(require) {
 
             /**
              * @type {HTMLCanvasElement}
+             * @readonly
              */
             canvas : null,
 
