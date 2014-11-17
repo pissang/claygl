@@ -54,10 +54,12 @@ define(function(require) {
     /**
      * @typedef {Object} qtek.loader.GLTF.IResult
      * @property {qtek.Scene} scene
+     * @property {qtek.Node} rootNode
      * @property {Object.<string, qtek.Camera>} cameras
      * @property {Object.<string, qtek.Texture>} textures
      * @property {Object.<string, qtek.Material>} materials
      * @property {Object.<string, qtek.Skeleton>} skeletons
+     * @property {Object.<string, qtek.Mesh>} meshes
      * @property {qtek.animation.SkinningClip} clip
      */
 
@@ -68,6 +70,10 @@ define(function(require) {
     var GLTFLoader = Base.derive(
     /** @lends qtek.loader.GLTF# */
     {
+        /**
+         * @type {qtek.Node}
+         */
+        rootNode: null,
         /**
          * @type {string}
          */
@@ -97,6 +103,15 @@ define(function(require) {
          * @type {boolean}
          */
         includeLight: true,
+
+        /**
+         * @type {boolean}
+         */
+        includeAnimation: true,
+        /**
+         * @type {boolean}
+         */
+        includeMesh: true
     },
 
     /** @lends qtek.loader.GLTF.prototype */
@@ -144,8 +159,8 @@ define(function(require) {
                 cameras : {},
                 nodes : {}
             };
-            // Build scene
-            var scene = new Scene();
+            // Mount on the root node if given
+            var rootNode = this.rootNode || new Scene();
             // Load buffers
             util.each(json.buffers, function(bufferInfo, name) {
                 loading++;
@@ -164,50 +179,58 @@ define(function(require) {
             });
 
             function afterLoadBuffer() {
-                self._parseTextures(json, lib);
-                self._parseMaterials(json, lib);
-                self._parseMeshes(json, lib);
+                if (self.includeMesh) {
+                    self._parseTextures(json, lib);
+                    self._parseMaterials(json, lib);
+                    self._parseMeshes(json, lib);
+                }
                 self._parseNodes(json, lib);
 
                 var sceneInfo = json.scenes[json.scene];
                 for (var i = 0; i < sceneInfo.nodes.length; i++) {
                     var node = lib.nodes[sceneInfo.nodes[i]];
                     node.update();
-                    scene.add(node);
+                    rootNode.add(node);
                 }
 
-                self._parseSkins(json, lib);
+                if (self.includeMesh) {
+                    self._parseSkins(json, lib);
+                }
 
-                var clip = self._parseAnimations(json, lib);
-                if (clip) {
-                    for (var name in lib.skeletons) {
-                        lib.skeletons[name].addClip(clip);
-                    }
+                if (self.includeAnimation) {
+                    var clip = self._parseAnimations(json, lib);
+                    if (clip) {
+                        for (var name in lib.skeletons) {
+                            lib.skeletons[name].addClip(clip);
+                        }
+                    }   
                 }
 
                 self.trigger('success', {
-                    scene : scene,
-                    cameras : lib.cameras,
-                    textures : lib.textures,
-                    materials : lib.materials,
-                    skeletons : lib.skeletons,
+                    scene: this.rootNode ? null : rootNode,
+                    rootNode: this.rootNode ? rootNode : null,
+                    cameras: lib.cameras,
+                    textures: lib.textures,
+                    materials: lib.materials,
+                    skeletons: lib.skeletons,
                     meshes: lib.meshes,
-                    clip : clip
+                    clip: clip
                 });
             }
 
             return {
-                scene : scene,
-                cameras : lib.cameras,
-                textures : lib.textures,
-                materials : lib.materials,
-                skeletons : lib.skeletons,
+                scene: this.rootNode ? null : rootNode,
+                rootNode: this.rootNode ? rootNode : null,
+                cameras: lib.cameras,
+                textures: lib.textures,
+                materials: lib.materials,
+                skeletons: lib.skeletons,
                 meshes: lib.meshes,
-                clip : null
+                clip: null
             };
         },
 
-        _loadBuffer : function(path, onsuccess, onerror) {
+        _loadBuffer: function(path, onsuccess, onerror) {
             var root = this.bufferRootPath || this.rootPath;
             if (root) {
                 path = root + '/' + path;
@@ -648,7 +671,7 @@ define(function(require) {
                         }
                     }
                 }
-                else if (nodeInfo.meshes || nodeInfo.instanceSkin) {
+                else if ((nodeInfo.meshes || nodeInfo.instanceSkin) && this.includeMesh) {
                     // TODO one node have multiple meshes ?
                     var meshKey;
                     if (nodeInfo.meshes) {

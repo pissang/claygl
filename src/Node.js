@@ -264,6 +264,34 @@ define(function(require) {
         },
 
         /**
+         * Query descendant node by path
+         * @param {string} path
+         * @return {qtek.Node}
+         */
+        queryNode: function (path) {
+            pathArr = path.split('/');
+            var current = this;
+            for (var i = 0; i < pathArr.length; i++) {
+                var name = pathArr[i];
+                for (var j = 0; j < current._children.length; j++) {
+                    var child = current._children[j];
+                    if (child.name === name) {
+                        current = child;
+                        break;
+                    }
+                }
+                // Early return if not found
+                if (j === current._children.length) {
+                    return;
+                }
+            }
+
+            if (current !== this) {
+                return current;
+            }
+        },
+
+        /**
          * Depth first traverse all its descendant scene nodes and
          * @param {Function} callback
          * @param {Node} [parent]
