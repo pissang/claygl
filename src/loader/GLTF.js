@@ -207,8 +207,8 @@ define(function(require) {
                 }
 
                 self.trigger('success', {
-                    scene: this.rootNode ? null : rootNode,
-                    rootNode: this.rootNode ? rootNode : null,
+                    scene: self.rootNode ? null : rootNode,
+                    rootNode: self.rootNode ? rootNode : null,
                     cameras: lib.cameras,
                     textures: lib.textures,
                     materials: lib.materials,
@@ -219,8 +219,8 @@ define(function(require) {
             }
 
             return {
-                scene: this.rootNode ? null : rootNode,
-                rootNode: this.rootNode ? rootNode : null,
+                scene: self.rootNode ? null : rootNode,
+                rootNode: self.rootNode ? rootNode : null,
                 cameras: lib.cameras,
                 textures: lib.textures,
                 materials: lib.materials,
@@ -288,17 +288,22 @@ define(function(require) {
                 var node = lib.nodes[nodeName];
                 var nodeInfo = json.nodes[nodeName];
                 var joint = jointsMap[nodeInfo.jointId];
-                // TODO 
-                // collada2gltf may have jointId in node but corresponding skin doesn't have this jointId
-                // maybe because the joint has no weight on the skinned mesh, so converter removed it for optimization
-                // Skip it ??
-                // wired
                 if (joint) {
                     // throw new Error('Joint bind to ' + nodeInfo.name + ' doesn\'t exist in skin');
                     joint.node = node;
                     joint.parentIndex = parentIndex;
                     joint.rootNode = rootNode;
                     parentIndex = joint.index;
+                }
+                else {
+                    // Some root node may be a simple transform joint, without deformation data.
+                    // Which is, no vertex is attached to the joint
+                    // PENDING
+                    joint = new Joint({
+                        node: node,
+                        rootNode: rootNode,
+                        parentIndex: parentIndex
+                    });
                 }
 
                 for (var i = 0; i < nodeInfo.children.length; i++) {

@@ -770,6 +770,7 @@ def ConvertSceneNode(pNode, fbxConverter):
                 'skin' : lSkinName,
                 'sources' : [lMeshKey]
             }
+            lExtraJoints = []
             # Find Root
             for lJointName in lGLTFSkin['joints']:
                 lCluster = lClusters[lJointName]
@@ -781,8 +782,13 @@ def ConvertSceneNode(pNode, fbxConverter):
                 #         roots.append(lLink.GetName())
                 while not lParent == None:
                     lSkeleton = lParent.GetSkeleton()
-                    if (lSkeleton == None):
+                    if lSkeleton == None:
                         break;
+                    # In case some skeleton is not a attached to any vertices(not a cluster)
+                    # PENDING
+                    if not lParent.GetName() in lGLTFSkin['joints'] and not lParent.GetName() in lExtraJoints:
+                        lExtraJoints.append(lParent.GetName())
+
                     if lSkeleton.IsSkeletonRoot():
                         lRootFound = True
                         break;
@@ -810,7 +816,6 @@ def ConvertSceneNode(pNode, fbxConverter):
                 lJointName = lGLTFSkin['joints'][i]
                 lCluster = lClusters[lJointName]
 
-                lLink = lCluster.GetLink()
                 # Inverse Bind Pose Matrix
                 lCluster.GetTransformMatrix(lReferenceGlobalInitMatrix)
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
@@ -821,12 +826,17 @@ def ConvertSceneNode(pNode, fbxConverter):
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
 
+            for i in range(len(lExtraJoints)):
+                invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1))
+
+            lGLTFSkin['joints'] += lExtraJoints
+
             # PENDING
             lGLTFNode['matrix'] = [
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                0, 0, 0, 1,
+                0, 0, 0, 1
             ]
         else:
             lGLTFNode['meshes'] = [lMeshKey]

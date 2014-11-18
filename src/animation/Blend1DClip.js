@@ -135,6 +135,7 @@ define(function(require) {
             var in2 = inputs[key + 1];
             var clip1 = in1.clip;
             var clip2 = in2.clip;
+            // Set time on input clips
             clip1.setTime((time + in1.offset) % clip1.life);
             clip2.setTime((time + in2.offset) % clip2.life);
 

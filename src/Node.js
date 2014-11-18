@@ -199,9 +199,9 @@ define(function(require) {
             descendant._scene = null;
         },
 
-        _addSelfToScene: function(descendant, parent) {
-            parent._scene.addToScene(descendant);
-            descendant._scene = parent._scene;
+        _addSelfToScene: function(descendant) {
+            this._scene.addToScene(descendant);
+            descendant._scene = this._scene;
         },
 
         /**
@@ -298,19 +298,19 @@ define(function(require) {
         /**
          * Depth first traverse all its descendant scene nodes and
          * @param {Function} callback
-         * @param {Node} [parent]
+         * @param {Node} [context]
          * @param {Function} [ctor]
          */
-        traverse: function(callback, parent, ctor) {
+        traverse: function(callback, context, ctor) {
             
             this._inIterating = true;
 
             if (ctor === undefined || this.constructor === ctor) {
-                callback(this, parent);
+                callback.call(context, this);
             }
             var _children = this._children;
             for(var i = 0, len = _children.length; i < len; i++) {
-                _children[i].traverse(callback, this, ctor);
+                _children[i].traverse(callback, context, ctor);
             }
 
             this._inIterating = false;
