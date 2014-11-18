@@ -273,7 +273,7 @@ define(function(require) {
                 return;
             }
             
-            pathArr = path.split('/');
+            var pathArr = path.split('/');
             var current = this;
             for (var i = 0; i < pathArr.length; i++) {
                 var name = pathArr[i];

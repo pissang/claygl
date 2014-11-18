@@ -97,7 +97,6 @@ define(function(require) {
      */
     TaskGroup.prototype.allSettled = function(tasks) {
         var count = 0;
-        var success = false;
         var self = this;
         var data = [];
         if (tasks.length === 0) {
@@ -122,7 +121,6 @@ define(function(require) {
                 task._rejected = false;
 
                 data[idx] = res;
-                success = true;
                 if (count === 0) {
                     self.resolve(data);
                 }
@@ -138,11 +136,7 @@ define(function(require) {
                 // TODO 
                 data[idx] = null;
                 if (count === 0) {
-                    if (success) {
-                        self.resolve(data);
-                    } else {
-                        self.reject(data);
-                    }
+                    self.resolve(data);
                 }
             });
         });
