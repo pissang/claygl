@@ -8,7 +8,12 @@ define(function(require) {
 
     var _library = {};
 
-    var _pool = {};
+    /**
+     * @export qtek.shader.library~Libaray
+     */
+    function ShaderLibrary () {
+        this._pool = {};
+    }
 
     /** 
      * ### Builin shaders
@@ -28,17 +33,15 @@ define(function(require) {
      * @param {Object|string|Array.<string>} [option]
      * @return {qtek.Shader}
      * 
-     * @memberOf qtek.shader.library
      * @example
      *     qtek.shader.library.get('buildin.phong', 'diffuseMap', 'normalMap');
      *     qtek.shader.library.get('buildin.phong', ['diffuseMap', 'normalMap']);
      *     qtek.shader.library.get('buildin.phong', {
-     *         textures : ['diffuseMap'],
-     *         vertexDefines : {},
-     *         fragmentDefines : {}
-     *     });
+     *         textures: ['diffuseMap'],
+     *         vertexDefines: {},
+     *         fragmentDefines: {}
      */
-    function get(name, option) {
+    ShaderLibrary.prototype.get = function(name, option) {
         var enabledTextures = [];
         var vertexDefines = {};
         var fragmentDefines = {};
@@ -69,8 +72,8 @@ define(function(require) {
         }
         var key = keyArr.join('_');
 
-        if (_pool[key]) {
-            return _pool[key];
+        if (this._pool[key]) {
+            return this._pool[key];
         } else {
             var source = _library[name];
             if (!source) {
@@ -78,8 +81,8 @@ define(function(require) {
                 return;
             }
             var shader = new Shader({
-                'vertex' : source.vertex,
-                'fragment' : source.fragment
+                'vertex': source.vertex,
+                'fragment': source.fragment
             });
             for (var i = 0; i < enabledTextures.length; i++) {
                 shader.enableTexture(enabledTextures[i]);
@@ -90,9 +93,16 @@ define(function(require) {
             for (var name in fragmentDefines) {
                 shader.define('fragment', name, fragmentDefines[name]);
             }
-            _pool[key] = shader;
+            this._pool[key] = shader;
             return shader;
         }
+    }
+
+    /**
+     * Clear shaders
+     */
+    ShaderLibrary.prototype.clear = function() {
+        _pool = {};
     }
 
     /**
@@ -103,16 +113,9 @@ define(function(require) {
      */
     function template(name, vertex, fragment) {
         _library[name] = {
-            vertex : vertex,
-            fragment : fragment
+            vertex: vertex,
+            fragment: fragment
         };
-    }
-
-    /**
-     * @memberOf qtek.shader.library
-     */
-    function clear() {
-        _pool = {};
     }
 
     // Some build in shaders
@@ -147,9 +150,18 @@ define(function(require) {
     Shader['import'](require('text!./source/compositor/blend.essl'));
     Shader['import'](require('text!./source/compositor/fxaa.essl'));
 
+    var defaultLibrary = new ShaderLibrary();
+
     return {
-        get : get,
-        template : template,
-        clear: clear
+        createLibrary: function () {
+            return new ShaderLibrary();
+        },
+        get: function () {
+            return defaultLibrary.get.apply(defaultLibrary, arguments)
+        },
+        template: template,
+        clear: function () {
+            return defaultLibrary.clear();
+        }
     };
 });

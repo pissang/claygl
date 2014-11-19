@@ -19,14 +19,22 @@ define(function(require) {
     var textureUtil = {
         /**
          * @param  {string|object} path
+         * @param  {object} [option]
          * @param  {Function} [onsuccess]
          * @param  {Function} [onerror]
          * @return {qtek.Texture}
          *
          * @memberOf qtek.util.texture
          */
-        loadTexture : function(path, onsuccess, onerror) {
+        loadTexture : function(path, option, onsuccess, onerror) {
             var texture;
+            if (typeof(option) === 'function') {
+                onsuccess = option;
+                onerror = onsuccess;
+                option = {};
+            } else {
+                option = option || {};
+            }
             if (typeof(path) === 'string') {
                 if (path.match(/.hdr$/)) {
                     texture = new Texture2D({
@@ -36,7 +44,7 @@ define(function(require) {
                     textureUtil._fetchTexture(
                         path,
                         function (data) {
-                            hdr.parseRGBE(data, texture);
+                            hdr.parseRGBE(data, texture, option.exposure);
                             texture.dirty();
                             onsuccess && onsuccess(texture);
                         },
@@ -77,14 +85,24 @@ define(function(require) {
          * @param  {string} path
          * @param  {qtek.texture.TextureCube} cubeMap
          * @param  {qtek.Renderer} renderer
+         * @param  {object} [option]
          * @param  {Function} [onsuccess]
          * @param  {Function} [onerror]
          * 
          * @memberOf qtek.util.texture
          */
-        loadPanorama : function(path, cubeMap, renderer, onsuccess, onerror) {
+        loadPanorama : function(path, cubeMap, renderer, option, onsuccess, onerror) {
             var self = this;
-            textureUtil.loadTexture(path, function(texture) {
+
+            if (typeof(option) === 'function') {
+                onsuccess = option;
+                onerror = onsuccess;
+                option = {};
+            } else {
+                option = option || {};
+            }
+
+            textureUtil.loadTexture(path, option, function(texture) {
                 // PENDING 
                 texture.flipY = false;
                 self.panoramaToCubeMap(texture, cubeMap, renderer);
