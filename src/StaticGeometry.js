@@ -48,7 +48,6 @@ define(function(require) {
             _enabledAttributes : null
         };
     }, 
-
     /** @lends qtek.StaticGeometry.prototype */
     {
         dirty : function() {

@@ -5,6 +5,7 @@ define(function(require) {
     var Node = require('./Node');
     var glenum = require('./core/glenum');
     var glinfo = require('./core/glinfo');
+    var DynamicGeometry = require('./DynamicGeometry');
 
     // Cache
     var prevDrawID = 0;
@@ -138,7 +139,7 @@ define(function(require) {
                 // 2. VAO is enabled and is binded to null after render
                 // 3. Geometry needs update
                 if (
-                    (nVertex > geometry.chunkSize && isUseFace)
+                    ((geometry instanceof DynamicGeometry) && nVertex > 0xffff && isUseFace)
                  || (vaoExt && isStatic)
                  || geometry._cache.isDirty()
                 ) {

@@ -4,6 +4,7 @@
 # fbx version 2014.2/2015.1
 # TODO: support python2.7
 # TODO: 2014.2 python3.3 LoadScene is too slow
+# TODO: exportAnimation, exportMesh, exportCamera, exportLight configuration
 # http://github.com/pissang/
 # ############################################
 import sys
@@ -157,8 +158,8 @@ def CreateAttributeBuffer(pList, pType, pStride):
     return lKey
 
 
-def CreateIndicesBuffer(pList):
-    lData, lGLTFIndices = CreateAccessorBuffer(pList, 'H', 1, False)
+def CreateIndicesBuffer(pList, pType):
+    lData, lGLTFIndices = CreateAccessorBuffer(pList, pType, 1, False)
     lGLTFIndices['byteOffset'] = len(indicesBuffer)
     indicesBuffer.extend(lData)
     lKey = 'indices_' + str(GetId())
@@ -632,7 +633,12 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
             lGLTFPrimitive['attributes']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)
             lGLTFPrimitive['attributes']['WEIGHT'] = CreateAttributeBuffer(lWeights, 'f', 3)
 
-        lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices)
+        if len(lPositions) >= 0xffff:
+            #Use unsigned int in element indices
+            lIndicesType = 'I'
+        else:
+            lIndicesType = 'H'
+        lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices, lIndicesType)
 
         return lGLTFPrimitive
     else:

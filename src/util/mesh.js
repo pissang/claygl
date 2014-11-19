@@ -78,8 +78,11 @@ define(function(require) {
                     var attrib = geometry.attributes[name];
                     attrib.init(nVertex);
                 }
-                // TODO Uint32Array
-                geometry.faces = new Uint16Array(nFace * 3);
+                if (nVertex >= 0xffff) {
+                    geometry.faces = new Uint32Array(nFace * 3);
+                } else {
+                    geometry.faces = new Uint16Array(nFace * 3);
+                }
             }
 
             var vertexOffset = 0;
@@ -335,7 +338,12 @@ define(function(require) {
                         subAttrib.init(nVertex);
                     }
                     subGeo.attributes.joint.value = new Float32Array(nVertex * 4);
-                    subGeo.faces = new Uint16Array(bucket.faces.length * 3);
+
+                    if (nVertex > 0xffff) {
+                        subGeo.faces = new Uint32Array(bucket.faces.length * 3);
+                    } else {
+                        subGeo.faces = new Uint16Array(bucket.faces.length * 3);
+                    }
                 }
 
                 var faceOffset = 0;

@@ -521,15 +521,6 @@ define(function(require) {
                     var geometry = new StaticGeometry({
                         boundingBox : new BoundingBox()
                     });
-                    // Parse indices
-                    var indicesInfo = json.accessors[primitiveInfo.indices];
-
-                    var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
-                    var buffer = lib.buffers[bufferViewInfo.buffer];
-                    var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
-
-                    geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);
-
                     // Parse attributes
                     var semantics = Object.keys(primitiveInfo.attributes);
                     for (var ss = 0; ss < semantics.length; ss++) {
@@ -597,6 +588,21 @@ define(function(require) {
                                 geometry.boundingBox.max.set(max[0], max[1], max[2]);
                             }
                         }
+                    }
+                    
+                    // Parse indices
+                    var indicesInfo = json.accessors[primitiveInfo.indices];
+
+                    var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
+                    var buffer = lib.buffers[bufferViewInfo.buffer];
+                    var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
+
+                    // index uint
+                    if (indicesInfo.type === 0x1405) { // UNSIGNED_INT
+                        geometry.faces  = new Uint32Array(buffer, byteOffset, indicesInfo.count);
+                    }
+                    else { // UNSIGNED_SHORT, 0x1403
+                        geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);
                     }
 
                     var material = lib.materials[primitiveInfo.material];

@@ -104,10 +104,7 @@ define(function(require) {
         /**
          * @type {boolean}
          */
-        useFace : true,
-
-        //Max Value of Uint16, i.e. 0xffff
-        chunkSize : 65535
+        useFace : true
         
     }, function() {
         // Use cache

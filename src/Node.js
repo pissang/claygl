@@ -277,6 +277,11 @@ define(function(require) {
             var current = this;
             for (var i = 0; i < pathArr.length; i++) {
                 var name = pathArr[i];
+                // Skip empty
+                if (!name) {
+                    continue;
+                }
+
                 for (var j = 0; j < current._children.length; j++) {
                     var child = current._children[j];
                     if (child.name === name) {
@@ -290,9 +295,7 @@ define(function(require) {
                 }
             }
 
-            if (current !== this) {
-                return current;
-            }
+            return current;
         },
 
         /**

@@ -99,7 +99,7 @@ define(function(require) {
         },
 
         isSplitted : function() {
-            return this.getVertexNumber() > this.chunkSize;
+            return this.getVertexNumber() > 0xffff;
         },
         
         isStatic : function() {
@@ -256,7 +256,7 @@ define(function(require) {
             // Split large geometry into chunks because index buffer
             // only support uint16 which means each draw call can only
              // have at most 65535 vertex data
-            if (nVertex > this.chunkSize && this.isUseFace()) {
+            if (nVertex > 0xffff && this.isUseFace()) {
                 var chunkIdx = 0;
                 var currentChunk;
 
@@ -281,7 +281,7 @@ define(function(require) {
                     var reorganizedFace = reorganizedFaces[i];
 
                     // newChunk
-                    if (vertexCount+3 > this.chunkSize) {
+                    if (vertexCount+3 > 0xffff) {
                         chunkIdx++;
                         chunkFaceStart[chunkIdx] = i;
                         vertexCount = 0;
