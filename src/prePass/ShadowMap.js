@@ -22,7 +22,7 @@ define(function(require) {
     var OrthoCamera = require('../camera/Orthographic');
 
     var Pass = require('../compositor/Pass');
-    var texturePool = require('../compositor/texturePool');
+    var TexturePool = require('../compositor/TexturePool');
 
     var glMatrix = require('glmatrix');
     var mat4 = glMatrix.mat4;
@@ -99,7 +99,9 @@ define(function(require) {
             _receivers : [],
             _lightsCastShadow : [],
 
-            _lightCameras : {}
+            _lightCameras : {},
+
+            _texturePool: new TexturePool()
         };
     }, function() {
         // Gaussian filter pass for VSM
@@ -594,7 +596,7 @@ define(function(require) {
                 type : glenum.FLOAT
             };
             var _gl = renderer.gl;
-            var tmpTexture = texturePool.get(parameter);
+            var tmpTexture = this._texturePool.get(parameter);
             
             this._frameBuffer.attach(_gl, tmpTexture);
             this._frameBuffer.bind(renderer);
@@ -610,7 +612,7 @@ define(function(require) {
             this._gaussianPassV.render(renderer);
             this._frameBuffer.unbind(renderer);
 
-            texturePool.put(tmpTexture);
+            this._texturePool.put(tmpTexture);
         },
 
         _getTexture : function(key, light) {
@@ -765,6 +767,8 @@ define(function(require) {
             for (var name in this._textures) {
                 this._textures[name].dispose(_gl);
             }
+
+            this._texturePool.clear(renderer.gl);
 
             this._depthMaterials = {};
             this._distanceMaterials = {};

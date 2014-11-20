@@ -59,7 +59,7 @@ define( function(require){
 		"Pass": require('qtek/compositor/Pass'),
 		"SceneNode": require('qtek/compositor/SceneNode'),
 		"TextureNode": require('qtek/compositor/TextureNode'),
-		"texturePool": require('qtek/compositor/texturePool')
+		"TexturePool": require('qtek/compositor/TexturePool')
 	},
 	"core": {
 		"Base": require('qtek/core/Base'),

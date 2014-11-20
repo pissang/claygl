@@ -128,7 +128,7 @@ define(function(require) {
             environmentMapPass.texture = cubeMap;
             environmentMapPass.render(renderer, skydome.scene);
             environmentMapPass.texture = null;
-            environmentMapPass.dispose(renderer.gl);
+            environmentMapPass.dispose(renderer);
             return cubeMap;
         },
 

@@ -5,7 +5,6 @@ define(function(require) {
     var Base = require('../core/Base');
     var Pass = require('./Pass');
     var FrameBuffer = require('../FrameBuffer');
-    var texturePool = require('./texturePool');
 
     /**
      * Node of graph based post processing.
@@ -100,7 +99,9 @@ define(function(require) {
 
             _rendering : false,
             // If rendered in this frame
-            _rendered : false
+            _rendered : false,
+
+            _compositor: null
         };
     }, function() {
         
@@ -141,7 +142,7 @@ define(function(require) {
                 for (var name in this.outputs) {
                     var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-                    var texture = texturePool.get(parameters);
+                    var texture = this._compositor.allocateTexture(parameters);
                     this._outputTextures[name] = texture;
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == 'string') {
@@ -262,7 +263,7 @@ define(function(require) {
             ) {
                 if (!this._prevOutputTextures[name]) {
                     // Create a blank texture at first pass
-                    this._prevOutputTextures[name] = texturePool.get(outputInfo.parameters || {});
+                    this._prevOutputTextures[name] = this._compositor.allocateTexture(outputInfo.parameters || {});
                 }
                 return this._prevOutputTextures[name];
             }
@@ -278,13 +279,13 @@ define(function(require) {
                 var outputInfo = this.outputs[outputName];
                 if (outputInfo.keepLastFrame) {
                     if (this._prevOutputTextures[outputName]) {
-                        texturePool.put(this._prevOutputTextures[outputName]);
+                        this._compositor.releaseTexture(this._prevOutputTextures[outputName]);
                     }
                     this._prevOutputTextures[outputName] = this._outputTextures[outputName];
                 } else {
                     // Output of this node have alreay been used by all other nodes
                     // Put the texture back to the pool.
-                    texturePool.put(this._outputTextures[outputName]);
+                    this._compositor.releaseTexture(this._outputTextures[outputName]);
                 }
             }
         },
@@ -345,11 +346,11 @@ define(function(require) {
                     var outputInfo = this.outputs[name];
                     if (outputInfo.keepLastFrame) {
                         if (this._prevOutputTextures[name]) {
-                            texturePool.put(this._prevOutputTextures[name]);
+                            this._compositor.releaseTexture(this._prevOutputTextures[name]);
                         }
                         this._prevOutputTextures[name] = this._outputTextures[name];
                     } else {
-                        texturePool.put(this._outputTextures[name]);
+                        this._compositor.releaseTexture(this._outputTextures[name]);
                     }
                 }
             }

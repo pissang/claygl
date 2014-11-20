@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Node = require('./Node');
-    var texturePool = require('./texturePool');
     var Shader = require('../Shader');
 
     /**
@@ -36,14 +35,14 @@ define(function(require) {
                 for (var name in this.outputs) {
                     var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-                    var texture = texturePool.get(parameters);
+                    var texture = this._compositor.allocateTexture(parameters);
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
                     if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
-                    this.pass.outputs[ attachment ] = texture;
+                    this.pass.outputs[attachment] = texture;
 
                 }
 

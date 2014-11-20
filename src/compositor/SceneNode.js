@@ -3,7 +3,6 @@ define(function(require) {
     'use strict';
 
     var Node = require('./Node');
-    var texturePool = require('./texturePool');
     var glinfo = require('../core/glinfo');
 
     /**
@@ -55,7 +54,7 @@ define(function(require) {
                 for (var name in this.outputs) {
                     var parameters = this.updateParameter(name, renderer);
                     var outputInfo = this.outputs[name];
-                    var texture = texturePool.get(parameters);
+                    var texture = this._compositor.allocateTexture(parameters);
                     this._outputTextures[name] = texture;
 
                     var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;

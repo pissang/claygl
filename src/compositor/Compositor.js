@@ -3,6 +3,7 @@ define(function(require){
     'use strict';
 
     var Graph = require('./Graph');
+    var TexturePool = require('./TexturePool');
 
     /**
      * Compositor provide graph based post processing
@@ -14,7 +15,9 @@ define(function(require){
     var Compositor = Graph.derive(function() {
         return {
             // Output node
-            _outputs : []
+            _outputs : [],
+
+            _texturePool: new TexturePool()
         };
     },
     /** @lends qtek.compositor.Compositor.prototype */
@@ -24,6 +27,7 @@ define(function(require){
             if (!node.outputs) {
                 this.addOutput(node);
             }
+            node._compositor = this;
         },
         /**
          * @param  {qtek.Renderer} renderer
@@ -59,6 +63,18 @@ define(function(require){
 
         removeOutput : function(node) {
             this._outputs.splice(this._outputs.indexOf(node), 1);
+        },
+
+        allocateTexture: function (parameters) {
+            return this._texturePool.get(parameters);
+        },
+
+        releaseTexture: function (parameters) {
+            this._texturePool.put(parameters);
+        },
+
+        dispose: function (renderer) {
+            this._texturePool.clear(renderer.gl);
         }
     });
 

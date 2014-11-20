@@ -6,21 +6,26 @@ define(function(require) {
     var glenum = require('../core/glenum');
     var util = require('../core/util');
 
-    var pool = {};
+    var TexturePool = function () {
+        
+        this._pool = {};
 
-    var allocatedTextures = [];
+        this._allocatedTextures = [];
+    };
 
-    var texturePool = {
+    TexturePool.prototype = {
+
+        constructor: TexturePool,
 
         get : function(parameters) {
             var key = generateKey(parameters);
-            if (!pool.hasOwnProperty(key)) {
-                pool[key] = [];
+            if (!this._pool.hasOwnProperty(key)) {
+                this._pool[key] = [];
             }
-            var list = pool[key];
+            var list = this._pool[key];
             if (!list.length) {
                 var texture = new Texture2D(parameters);
-                allocatedTextures.push(texture);
+                this._allocatedTextures.push(texture);
                 return texture;
             }
             return list.pop();
@@ -28,19 +33,19 @@ define(function(require) {
 
         put : function(texture) {
             var key = generateKey(texture);
-            if (!pool.hasOwnProperty(key)) {
-                pool[key] = [];
+            if (!this._pool.hasOwnProperty(key)) {
+                this._pool[key] = [];
             }
-            var list = pool[key];
+            var list = this._pool[key];
             list.push(texture);
         },
 
         clear : function(gl) {
-            for (var i = 0; i < allocatedTextures.length; i++) {
-                allocatedTextures[i].dispose(gl);
+            for (var i = 0; i < this._allocatedTextures.length; i++) {
+                this._allocatedTextures[i].dispose(gl);
             }
-            pool = {};
-            allocatedTextures = [];
+            this._pool = {};
+            this._allocatedTextures = [];
         }
     };
 
@@ -104,5 +109,5 @@ define(function(require) {
                 (height & (height-1)) === 0;
     }
 
-    return texturePool;
+    return TexturePool;
 });
