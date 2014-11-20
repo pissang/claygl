@@ -77,7 +77,7 @@ define(function(require) {
         } else {
             var source = _library[name];
             if (!source) {
-                console.error('Shader "'+name+'"'+' is not in the library');
+                console.error('Shader "' + name + '"' + ' is not in the library');
                 return;
             }
             var shader = new Shader({

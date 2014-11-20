@@ -116,10 +116,10 @@ define(function (require) {
             }
         },
         /**
-         * @param  {WebGLRenderingContext} _gl
+         * @param  {qtek.Renderer} renderer
          */
-        dispose : function(_gl) {
-            this.frameBuffer.dispose(_gl);
+        dispose : function(renderer) {
+            this.frameBuffer.dispose(renderer.gl);
         }
     });
 

@@ -79,7 +79,7 @@ define(function(require) {
     var off_caps4 = 30;
 
     var ret = {
-        parse : function(arrayBuffer, out) {
+        parse: function(arrayBuffer, out) {
             var header = new Int32Array(arrayBuffer, 0, headerLengthInt);
             if (header[off_magic] !== DDS_MAGIC) {
                 return null;
@@ -154,5 +154,7 @@ define(function(require) {
                 return textures[0];
             }
         }
-    }
+    };
+
+    return ret;
 });

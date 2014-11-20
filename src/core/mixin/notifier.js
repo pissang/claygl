@@ -14,7 +14,7 @@ define(function() {
          * @param  {string} name
          */
         trigger : function(name) {
-            if (! this.hasOwnProperty('__handlers__')) {
+            if (!this.hasOwnProperty('__handlers__')) {
                 return;
             }
             if (!this.__handlers__.hasOwnProperty(name)) {
