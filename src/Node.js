@@ -332,7 +332,7 @@ define(function(require) {
          * Decompose the local transform to SRT
          */
         decomposeLocalTransform: function(keepScale) {
-            var scale = keepScale ? this.scale: null;
+            var scale = !keepScale ? this.scale: null;
             this.localTransform.decomposeMatrix(scale, this.rotation, this.position);
         },
 
@@ -361,7 +361,7 @@ define(function(require) {
                 } else {
                     mat4.copy(this.localTransform._array, this.worldTransform._array);
                 }
-                var scale = keepScale ? this.scale: null;
+                var scale = !keepScale ? this.scale: null;
                 this.localTransform.decomposeMatrix(scale, this.rotation, this.position);
             };
         })(),

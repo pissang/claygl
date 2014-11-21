@@ -196,22 +196,20 @@ define(function(require) {
             var target = this.target;
             var zAxis = target.localTransform.forward.normalize();
             var yAxis = target.localTransform.up.normalize();
-            if (this._op === 0) {
+            if (this._op === 0 && this._offsetPitch !== 0 && this._offsetRoll !== 0) {
                 // Rotate
                 target.rotateAround(this.origin, this.up, -this._offsetPitch);
-                tmpMatrix.copy(target.localTransform);
                 var xAxis = target.localTransform.right;
                 target.rotateAround(this.origin, xAxis, -this._offsetRoll);
-                var zAxis = target.localTransform.forward.normalize();
-                var yAxis = target.localTransform.up.normalize();
+
+                var zAxis = target.worldTransform.forward.normalize();
                 var phi = Math.acos(this.up.dot(zAxis));
-                var isUp = this.up.dot(yAxis) >= 0;
-                if (
-                    !(isUp && phi >= this.minPolarAngle && phi <= this.maxPolarAngle)
-                ) {
-                    // Rool back
-                    target.localTransform.copy(tmpMatrix);
-                    target.decomposeLocalTransform();
+                // Rotate back a bit
+                if (this._offsetRoll > 0 && phi <= this.minPolarAngle) {
+                    target.rotateAround(this.origin, xAxis, -phi + this.minPolarAngle);
+                }
+                else if (this._offsetRoll < 0 && phi >= this.maxPolarAngle) {
+                    target.rotateAround(this.origin, xAxis, -phi + this.maxPolarAngle);
                 }
                 this._offsetRoll = this._offsetPitch = 0;
             } else if (this._op === 1) {
