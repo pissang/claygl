@@ -319,7 +319,9 @@ define(function(require) {
             _gl.depthMask(true);
             _gl.disable(_gl.BLEND);
 
-            _gl.clearColor(0.0, 0.0, 0.0, 0.0);
+            // Clear with high-z, so the part not rendered will not been shadowed
+            // TODO
+            _gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
             // Shadow uniforms
             var spotLightShadowMaps = [];

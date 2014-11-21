@@ -550,8 +550,11 @@ define(function(require) {
                 cullingBoundingBox.applyTransform(cullingMatrix);
 
                 // Passingly update the scene bounding box
-                // TODO : exclude very large mesh like ground plane or terrain ?
-                camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
+                // TODO: exclude very large mesh like ground plane or terrain ?
+                // TODO: Only rendererable which cast shadow ?
+                if (renderable.castShadow) {
+                    camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
+                }
 
                 if (renderable.frustumCulling)  {
                     if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {

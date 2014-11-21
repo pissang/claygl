@@ -133,7 +133,7 @@ uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 
 varying vec3 v_WorldPosition;
 
-void main(){
+void main (){
 
     vec3 skinnedPosition = position;
     #ifdef SKINNING
@@ -202,13 +202,13 @@ uniform bool shadowEnabled : true;
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
-    return decodeFloat(tex) * 2.0 - 1.0< z ? 0.0 : 1.0;
+    return decodeFloat(tex) * 2.0 - 1.0 < z ? 0.0 : 1.0;
 }
 
 float pcf(sampler2D map, vec2 uv, float z){
 
     float shadowContrib = tapShadowMap(map, uv, z);
-    float offset = 1.0 / 2048.0;
+    float offset = 1.0 / 1024.0;
     shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z);
     shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z);
     shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z);
@@ -310,6 +310,10 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
     // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
     float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
                     / (gl_DepthRange.far - gl_DepthRange.near);
+
+    // Pixels not in light box are lighted
+    // TODO
+    shadowContribs[0] = 1.0;
 
     for (int i = 0; i < SHADOW_CASCADE; i++) {
         if (
