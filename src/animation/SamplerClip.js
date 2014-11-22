@@ -301,5 +301,25 @@ define(function(require) {
      */
     SamplerClip.prototype.subtractiveBlend = TransformClip.prototype.subtractiveBlend;
 
+    /**
+     * Clone a new SamplerClip
+     * @return {qtek.animation.SamplerClip}
+     */
+    SamplerClip.prototype.clone = function () {
+        var clip = Clip.prototype.clone.call(this);
+        clip.channels = {
+            time: this.channels.time || null,
+            position: this.channels.position || null,
+            rotation: this.channels.rotation || null,
+            scale: this.channels.scale || null
+        };
+        vec3.copy(clip.position, this.position);
+        quat.copy(clip.rotation, this.rotation);
+        vec3.copy(clip.scale, this.scale);
+
+        return clip;
+
+    }
+
     return SamplerClip;
 });

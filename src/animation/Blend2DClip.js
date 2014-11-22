@@ -135,6 +135,23 @@ define(function(require) {
         this.output.blend2D(c1, c2, c3, a, b);
     };
 
+    /**
+     * Clone a new Blend2D clip
+     * @param {boolean} cloneInputs True if clone the input clips
+     * @return {qtek.animation.Blend2DClip}
+     */
+    Blend2DClip.prototype.clone = function (cloneInputs) {
+        var clip = Clip.prototype.clone.call(this);
+        clip.output = this.output.clone();
+        if (cloneInputs) {
+            for (var i = 0; i < this.inputs.length; i++) {
+                var position = this.inputs[i].position.clone();
+                clip.addInput(position, this.inputs[i].clip.clone(cloneInputs), this.inputs[i].offset);
+            }
+        }
+        return clip;
+    };
+
     Blend2DClip.prototype._findTriangle = function(position) {
         if (this._cacheTriangle) {
             var res = delaunay.contains(this._cacheTriangle.vertices, position._array);

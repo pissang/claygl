@@ -194,5 +194,9 @@ define(function(require) {
         }
     };
 
+    SkinningClip.prototype.clone = function (clip) {
+        var clip = Clip.prototype.clone.call(this);
+    }
+
     return SkinningClip;
 });

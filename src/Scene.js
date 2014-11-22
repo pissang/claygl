@@ -83,6 +83,7 @@ define(function(require) {
          * Get node by name
          * @param  {string} name
          * @return {Node}
+         * @DEPRECATED
          */
         getNode : function(name) {
             return this._nodeRepository[name];

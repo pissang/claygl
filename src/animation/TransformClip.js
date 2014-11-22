@@ -255,5 +255,22 @@ define(function(require) {
         console.warn('TODO');
     };
 
+    /**
+     * Clone a new TransformClip
+     * @return {qtek.animation.TransformClip}
+     */
+    TransformClip.prototype.clone = function () {
+        var clip = Clip.prototype.clone.call(this);
+        clip.keyFrames = this.keyFrames;
+
+        vec3.copy(clip.position, this.position);
+        quat.copy(clip.rotation, this.rotation);
+        vec3.copy(clip.scale, this.scale);
+
+        return clip;
+    }
+
+    TransformClip
+
     return TransformClip;
 });

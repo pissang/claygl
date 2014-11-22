@@ -94,16 +94,16 @@ define(function(require) {
 
     Clip.prototype = {
 
-        gap : 0,
+        gap: 0,
 
-        life : 0,
+        life: 0,
 
-        delay : 0,
+        delay: 0,
         
         /**
          * @param {number|boolean} loop
          */
-        setLoop : function(loop) {
+        setLoop: function(loop) {
             this._loop = loop;
             if (loop) {
                 if (typeof(loop) == 'number') {
@@ -117,7 +117,7 @@ define(function(require) {
         /**
          * @param {string|function} easing
          */
-        setEasing : function(easing) {
+        setEasing: function(easing) {
             if (typeof(easing) === 'string') {
                 easing = Easing[easing];
             }
@@ -128,7 +128,7 @@ define(function(require) {
          * @param  {number} time
          * @return {string}
          */
-        step : function(time) {
+        step: function(time) {
             if (time < this._startTime) {
                 this._currentTime = time;
                 return;
@@ -174,11 +174,11 @@ define(function(require) {
          * @param  {number} time
          * @return {string}
          */
-        setTime : function(time) {
+        setTime: function(time) {
             return this.step(time + this._startTime);
         },
 
-        restart : function() {
+        restart: function() {
             // If user leave the page for a while, when he gets back
             // All clips may be expired and all start from the beginning value(position)
             // It is clearly wrong, so we use remainder to add a offset
@@ -197,11 +197,23 @@ define(function(require) {
             this._currentTime = time;
         },
         
-        fire : function(eventType, arg) {
+        fire: function(eventType, arg) {
             var eventName = 'on' + eventType;
             if (this[eventName]) {
                 this[eventName](this.target, arg);
             }
+        },
+
+        clone: function () {
+            var clip = new this.constructor();
+            clip._loop = this._loop;
+            clip._loopRemained = this._loopRemained;
+
+            clip.life = this.life;
+            clip.gap = this.gap;
+            clip.delay = this.delay;
+
+            return clip;
         }
     };
     Clip.prototype.constructor = Clip;

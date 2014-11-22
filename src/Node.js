@@ -299,6 +299,23 @@ define(function(require) {
         },
 
         /**
+         * Get query path, relative to rootNode(default is scene)
+         * @return {string}
+         */
+        getPath: function (rootNode) {
+            if (!this.parent) {
+                return '/';
+            }
+
+            var current = this._parent;
+            var path = this.name;
+            while (current._parent && current._parent !== rootNode) {
+                path = current.name + '/' + path;
+                parent = current._parent;
+            }
+        },
+
+        /**
          * Depth first traverse all its descendant scene nodes and
          * @param {Function} callback
          * @param {Node} [context]
@@ -453,8 +470,8 @@ define(function(require) {
          * @return {Node}
          */
         clone: function() {
-            // TODO Name
             var node = new this.constructor();
+            node.setName(this.name);
             node.position.copy(this.position);
             node.rotation.copy(this.rotation);
             node.scale.copy(this.scale);

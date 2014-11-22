@@ -76,9 +76,9 @@ define(function(require) {
      */
     Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
         var obj = {
-            position : position,
-            clip : inputClip,
-            offset : offset || 0
+            position: position,
+            clip: inputClip,
+            offset: offset || 0
         };
         this.life = Math.max(inputClip.life, this.life);
 
@@ -145,6 +145,22 @@ define(function(require) {
             var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
             this.output.blend1D(c1, c2, w);
         }
+    };
+
+    /**
+     * Clone a new Blend1D clip
+     * @param {boolean} cloneInputs True if clone the input clips
+     * @return {qtek.animation.Blend1DClip}
+     */
+    Blend1DClip.prototype.clone = function (cloneInputs) {
+        var clip = Clip.prototype.clone.call(this);
+        clip.output = this.output.clone();
+        if (cloneInputs) {
+            for (var i = 0; i < this.inputs.length; i++) {
+                clip.addInput(this.inputs[i].position, this.inputs[i].clip.clone(cloneInputs), this.inputs[i].offset);
+            }
+        }
+        return clip;
     };
     
     // Find the key where position in range [inputs[key].position, inputs[key+1].position)
