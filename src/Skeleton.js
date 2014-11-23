@@ -3,6 +3,7 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
+    var Joint = require('./Joint');
 
     var glMatrix = require('glmatrix');
     var quat = glMatrix.quat;
@@ -20,14 +21,14 @@ define(function(require) {
             name: '',
 
             /**
-             * Index of root joints
-             * @type {number[]}
+             * root joints
+             * @type {Array.<qtek.Joint>}
              */
             roots: [],
 
             /**
-             * Index of joints
-             * @type {number[]}
+             * joints
+             * @type {Array.<qtek.Joint>}
              */
             joints: [],
 
@@ -277,8 +278,47 @@ define(function(require) {
             this.update();
         },
 
-        clone: function () {
-            
+        clone: function (rootNode, newRootNode) {
+            var skeleton = new Skeleton();
+            skeleton.name = this.name;
+
+            for (var i = 0; i < this.joints.length; i++) {
+                var newJoint = new Joint();
+                newJoint.name = this.joints[i].name;
+                newJoint.index = this.joints[i].index;
+                newJoint.parentIndex = this.joints[i].parentIndex;
+
+                var path = this.joints[i].node.getPath(rootNode);
+                var rootNodePath = this.joints[i].rootNode.getPath(rootNode);
+
+                if (path != null && rootNodePath != null) {
+                    newJoint.node = newRootNode.queryNode(path);
+                    newJoint.rootNode = newRootNode.queryNode(rootNodePath);
+                } else {
+                    // PENDING
+                    console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.')
+                }
+                skeleton.joints.push(newJoint);
+            }
+            for (var i = 0; i < this.roots.length; i++) {
+                skeleton.roots.push(skeleton.joints[this.roots[i].index]);
+            }
+
+            if (this._invBindPoseMatricesArray) {
+                var len = this._invBindPoseMatricesArray.length;
+                skeleton._invBindPoseMatricesArray = new Float32Array(len);
+                for (var i = 0; i < len; i++) {
+                    skeleton._invBindPoseMatricesArray[i] = this._invBindPoseMatricesArray[i];
+                }
+
+                skeleton._skinMatricesArray = new Float32Array(len);
+
+                skeleton.updateMatricesSubArrays();
+            }
+
+            skeleton.update();
+
+            return skeleton;
         }
     });
 

@@ -194,8 +194,12 @@ define(function(require) {
         }
     };
 
-    SkinningClip.prototype.clone = function (clip) {
+    SkinningClip.prototype.clone = function () {
         var clip = Clip.prototype.clone.call(this);
+        for (var i = 0; i < this.jointClips.length; i++) {
+            clip.addJointClip(this.jointClips[i].clone());
+        }
+        return clip;
     }
 
     return SkinningClip;

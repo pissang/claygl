@@ -89,6 +89,47 @@ define(function(require) {
             return this._nodeRepository[name];
         },
 
+        /**
+         * Clone a new scene node recursively, including material, skeleton.
+         * Shader and geometry instances will not been cloned
+         * @param  {qtek.Node} node
+         * @return {qtek.Node}
+         */
+        cloneNode: function (node) {
+            var newNode = node.clone();
+            var materialsMap = {};
+
+            var cloneSkeleton = function (current, currentNew) {
+                if (current.skeleton) {
+                    currentNew.skeleton = current.skeleton.clone(node, newNode);
+                    currentNew.joints = current.joints.slice();
+                }
+                for (var i = 0; i < current._children.length; i++) {
+                    cloneSkeleton(current._children[i], currentNew._children[i]);
+                }
+                if (current.material) {
+                    materialsMap[current.material.__GUID__] = {
+                        oldMat: current.material
+                    };
+                }
+            }
+            cloneSkeleton(node, newNode);
+
+            for (var guid in materialsMap) {
+                materialsMap[guid].newMat = materialsMap[guid].oldMat.clone();
+            }
+
+            // Replace material
+            newNode.traverse(function (current) {
+                if (current.material) {
+                    current.material = materialsMap[current.material.__GUID__].newMat;
+                }
+            });
+
+            return newNode;
+        },
+
+
         update : function(force) {
             if (!(this.autoUpdate || force)) {
                 return;

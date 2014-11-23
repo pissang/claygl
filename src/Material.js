@@ -15,32 +15,32 @@ define(function(require) {
         /**
          * @type {string}
          */
-        name : '',
+        name: '',
         
         /**
          * @type {Object}
          */
-        uniforms : null,
+        uniforms: null,
 
         /**
          * @type {qtek.Shader}
          */
-        shader : null,
+        shader: null,
 
         /**
          * @type {boolean}
          */
-        depthTest : true,
+        depthTest: true,
 
         /**
          * @type {boolean}
          */
-        depthMask : true,
+        depthMask: true,
 
         /**
          * @type {boolean}
          */
-        transparent : false,
+        transparent: false,
         /**
          * Blend func is a callback function when the material 
          * have custom blending
@@ -55,11 +55,11 @@ define(function(require) {
          *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
          * }
          */
-        blend : null,
+        blend: null,
 
         // shadowTransparentMap : null
 
-        _enabledUniforms : null,
+        _enabledUniforms: null,
     }, function() {
         if (!this.name) {
             this.name = 'MATERIAL_' + this.__GUID__;
@@ -71,7 +71,7 @@ define(function(require) {
     /** @lends qtek.Material.prototype */
     {
 
-        bind : function(_gl, prevMaterial) {
+        bind: function(_gl, prevMaterial) {
 
             var slot = 0;
 
@@ -165,7 +165,7 @@ define(function(require) {
          * @param {string} symbol
          * @param {number|array|qtek.Texture|ArrayBufferView} value
          */
-        setUniform : function(symbol, value) {
+        setUniform: function(symbol, value) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
                 uniform.value = value;
@@ -175,7 +175,7 @@ define(function(require) {
         /**
          * @param {Object} obj
          */
-        setUniforms : function(obj) {
+        setUniforms: function(obj) {
             for (var key in obj) {
                 var val = obj[key];
                 this.setUniform(key, val);
@@ -187,7 +187,7 @@ define(function(require) {
          * It only have effect on the uniform exists in shader. 
          * @param  {string} symbol
          */
-        enableUniform : function(symbol) {
+        enableUniform: function(symbol) {
             if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
                 this._enabledUniforms.push(symbol);
             }
@@ -198,7 +198,7 @@ define(function(require) {
          * It will not affect the uniform state in the shader. Because the shader uniforms is parsed from shader code with naive regex. When using micro to disable some uniforms in the shader. It will still try to set these uniforms in each rendering pass. We can disable these uniforms manually if we need this bit performance improvement. Mostly we can simply ignore it.
          * @param  {string} symbol
          */
-        disableUniform : function(symbol) {
+        disableUniform: function(symbol) {
             var idx = this._enabledUniforms.indexOf(symbol);
             if (idx >= 0) {
                 this._enabledUniforms.splice(idx, 1);
@@ -209,7 +209,7 @@ define(function(require) {
          * @param  {string}  symbol
          * @return {boolean}
          */
-        isUniformEnabled : function(symbol) {
+        isUniformEnabled: function(symbol) {
             return this._enabledUniforms.indexOf(symbol) >= 0;
         },
 
@@ -218,7 +218,7 @@ define(function(require) {
          * @param {object|string} symbol
          * @param {number|array|qtek.Texture|ArrayBufferView} [value]
          */
-        set : function(symbol, value) {
+        set: function(symbol, value) {
             if (typeof(symbol) === 'object') {
                 for (var key in symbol) {
                     var val = symbol[key];
@@ -236,7 +236,7 @@ define(function(require) {
          * @param  {string} symbol
          * @return {number|array|qtek.Texture|ArrayBufferView}
          */
-        get : function(symbol) {
+        get: function(symbol) {
             var uniform = this.uniforms[symbol];
             if (uniform) {
                 return uniform.value;
@@ -247,7 +247,7 @@ define(function(require) {
          * @param  {qtek.Shader} shader
          * @param  {boolean} keepUniform If try to keep uniform value
          */
-        attachShader : function(shader, keepUniform) {
+        attachShader: function(shader, keepUniform) {
             var originalUniforms = this.uniforms;
             this.uniforms = shader.createUniforms();
             this.shader = shader;
@@ -266,13 +266,29 @@ define(function(require) {
         /**
          * Detach a shader instance
          */
-        detachShader : function() {
+        detachShader: function() {
             this.shader = null;
             this.uniforms = {};
+        },
+
+        clone: function () {
+            var material = new Material({
+                name: this.name,
+                shader: this.shader
+            });
+            for (var symbol in this.uniforms) {
+                material.uniforms[symbol].value = this.uniforms[symbol].value;
+            }
+            material.depthTest = this.depthTest;
+            material.depthMask = this.depthMask;
+            material.transparent = this.transparent;
+            material.blend = this.blend;
+
+            return material;
         }
 
         // PENDING
-        // dispose : function() {
+        // dispose: function() {
         // }
     });
 

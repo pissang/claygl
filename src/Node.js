@@ -272,7 +272,7 @@ define(function(require) {
             if (!path) {
                 return;
             }
-            
+            // TODO Name have slash ?
             var pathArr = path.split('/');
             var current = this;
             for (var i = 0; i < pathArr.length; i++) {
@@ -281,16 +281,17 @@ define(function(require) {
                 if (!name) {
                     continue;
                 }
-
+                var found = false;
                 for (var j = 0; j < current._children.length; j++) {
                     var child = current._children[j];
                     if (child.name === name) {
                         current = child;
+                        found = true;
                         break;
                     }
                 }
                 // Early return if not found
-                if (j === current._children.length) {
+                if (!found) {
                     return;
                 }
             }
@@ -303,16 +304,23 @@ define(function(require) {
          * @return {string}
          */
         getPath: function (rootNode) {
-            if (!this.parent) {
+            if (!this._parent) {
                 return '/';
             }
 
             var current = this._parent;
             var path = this.name;
-            while (current._parent && current._parent !== rootNode) {
+            while (current._parent) {
                 path = current.name + '/' + path;
-                parent = current._parent;
+                if (current._parent == rootNode) {
+                    break;
+                }
+                current = current._parent;
             }
+            if (!current._parent && rootNode) {
+                return null;
+            }
+            return path;
         },
 
         /**

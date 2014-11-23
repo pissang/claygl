@@ -13,25 +13,25 @@ define(function(require) {
     /** @lends qtek.Mesh# */
     {
 
-        mode : glenum.TRIANGLES,
+        mode: glenum.TRIANGLES,
 
         /**
          * Used when it is a skinned mesh
          * @type {qtek.Skeleton}
          */
-        skeleton : null,
+        skeleton: null,
         /**
          * Joints indices Meshes can share the one skeleton instance and each mesh can use one part of joints. Joints indices indicate the index of joint in the skeleton instance
          * @type {number[]}
          */
-        joints : null
+        joints: null
 
     }, function() {
         if (!this.joints) {
             this.joints = [];
         }
     }, {
-        render : function(_gl, globalMaterial) {       
+        render: function(_gl, globalMaterial) {       
             var material = globalMaterial || this.material;
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
