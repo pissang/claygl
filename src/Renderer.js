@@ -1,3 +1,5 @@
+// TODO Resources like shader, texture, geometry reference management
+// Trace and find out which shader, texture, geometry can be destroyed
 define(function(require) {
 
     'use strict';
@@ -592,22 +594,24 @@ define(function(require) {
          * @param {qtek.Scene} scene
          */
         disposeScene : function(scene) {
-            this.disposeNode(scene);
+            this.disposeNode(scene, true, true);
             scene.dispose();
         },
 
         /**
          * Dispose given node, including all geometries, textures and shaders attached on it or its descendant
          * @param {qtek.Node} node
+         * @param {boolean} [disposeGeometry=false] If dispose the geometries used in the descendant mesh
+         * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
          */
-        disposeNode : function(root) {
+        disposeNode : function(root, disposeGeometry, disposeTexture) {
             var materials = {};
             var _gl = this.gl;
             if (root.getParent()) {
                 root.getParent().remove(root);
             }
             root.traverse(function(node) {
-                if (node.geometry) {
+                if (node.geometry && disposeGeometry) {
                     node.geometry.dispose(_gl);
                 }
                 if (node.material) {
@@ -620,7 +624,7 @@ define(function(require) {
             });
             for (var guid in materials) {
                 var mat = materials[guid];
-                mat.dispose(_gl);
+                mat.dispose(_gl, disposeTexture);
             }
             root._children = [];
         },

@@ -301,21 +301,24 @@ define(function(require) {
         /**
          * Dispose material, if material shader is not attached to any other materials
          * Shader will also be disposed
-         * @param  {WebGLRenderingContext} gl
+         * @param {WebGLRenderingContext} gl
+         * @param {boolean} [disposeTexture=false] If dispose the textures used in the material
          */
-        dispose: function(_gl) {
-            for (var name in this.uniforms) {
-                var val = this.uniforms[name].value;
-                if (!val ) {
-                    continue;
-                }
-                if (val instanceof Texture) {
-                    val.dispose(_gl);
-                }
-                else if (val instanceof Array) {
-                    for (var i = 0; i < val.length; i++) {
-                        if (val[i] instanceof Texture) {
-                            val[i].dispose(_gl);
+        dispose: function(_gl, disposeTexture) {
+            if (disposeTexture) {
+                for (var name in this.uniforms) {
+                    var val = this.uniforms[name].value;
+                    if (!val ) {
+                        continue;
+                    }
+                    if (val instanceof Texture) {
+                        val.dispose(_gl);
+                    }
+                    else if (val instanceof Array) {
+                        for (var i = 0; i < val.length; i++) {
+                            if (val[i] instanceof Texture) {
+                                val[i].dispose(_gl);
+                            }
                         }
                     }
                 }
