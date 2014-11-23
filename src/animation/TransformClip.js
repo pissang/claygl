@@ -35,11 +35,6 @@ define(function(require) {
         
         opts = opts || {};
 
-        /**
-         * @type {string}
-         */
-        this.name = opts.name || '';
-
         Clip.call(this, opts);
 
         //[{

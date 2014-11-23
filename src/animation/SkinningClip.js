@@ -31,11 +31,7 @@ define(function(require) {
     var SkinningClip = function(opts) {
 
         opts = opts || {};
-        /**
-         * @type {string}
-         */
-        this.name = opts.name || '';
-
+        
         Clip.call(this, opts);
 
         this.jointClips = [];

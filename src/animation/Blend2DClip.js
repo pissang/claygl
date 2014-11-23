@@ -143,11 +143,9 @@ define(function(require) {
     Blend2DClip.prototype.clone = function (cloneInputs) {
         var clip = Clip.prototype.clone.call(this);
         clip.output = this.output.clone();
-        if (cloneInputs) {
-            for (var i = 0; i < this.inputs.length; i++) {
-                var position = this.inputs[i].position.clone();
-                clip.addInput(position, this.inputs[i].clip.clone(cloneInputs), this.inputs[i].offset);
-            }
+        for (var i = 0; i < this.inputs.length; i++) {
+            var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip; 
+            clip.addInput(this.inputs[i].position, inputClip, this.inputs[i].offset);
         }
         return clip;
     };

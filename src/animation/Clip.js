@@ -24,6 +24,11 @@ define(function(require) {
         opts = opts || {};
 
         /**
+         * @type {string}
+         */
+        this.name = opts.name || '';
+
+        /**
          * @type {Object}
          */
         this.target = opts.target;
@@ -206,6 +211,7 @@ define(function(require) {
 
         clone: function () {
             var clip = new this.constructor();
+            clip.name = this.name;
             clip._loop = this._loop;
             clip._loopRemained = this._loopRemained;
 

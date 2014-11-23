@@ -86,8 +86,6 @@ define(function(require) {
 
         opts = opts || {};
 
-        this.name = opts.name || '';
-
         Clip.call(this, opts);
 
         /**
