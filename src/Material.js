@@ -248,6 +248,10 @@ define(function(require) {
          * @param  {boolean} keepUniform If try to keep uniform value
          */
         attachShader: function(shader, keepUniform) {
+            if (this.shader) {
+                this.shader.detached();
+            }
+
             var originalUniforms = this.uniforms;
             this.uniforms = shader.createUniforms();
             this.shader = shader;
@@ -261,16 +265,23 @@ define(function(require) {
                     }
                 }
             }
+
+            shader.attached();
         },
 
         /**
          * Detach a shader instance
          */
         detachShader: function() {
+            this.shader.detached();
             this.shader = null;
             this.uniforms = {};
         },
 
+        /**
+         * Clone a new material and keep uniforms, shader will not be cloned
+         * @return {qtek.Material}
+         */
         clone: function () {
             var material = new Material({
                 name: this.name,
@@ -285,11 +296,38 @@ define(function(require) {
             material.blend = this.blend;
 
             return material;
-        }
+        },
 
-        // PENDING
-        // dispose: function() {
-        // }
+        /**
+         * Dispose material, if material shader is not attached to any other materials
+         * Shader will also be disposed
+         * @param  {WebGLRenderingContext} gl
+         */
+        dispose: function(_gl) {
+            for (var name in this.uniforms) {
+                var val = this.uniforms[name].value;
+                if (!val ) {
+                    continue;
+                }
+                if (val instanceof Texture) {
+                    val.dispose(_gl);
+                }
+                else if (val instanceof Array) {
+                    for (var i = 0; i < val.length; i++) {
+                        if (val[i] instanceof Texture) {
+                            val[i].dispose(_gl);
+                        }
+                    }
+                }
+            }
+            var shader = this.shader;
+            if (shader) {
+                this.detachShader();
+                if (!shader.isAttachedToAny()) {
+                    shader.dispose(gl);
+                }
+            }
+        }
     });
 
     return Material;

@@ -170,6 +170,8 @@ define(function(require) {
             // AREA_LIGHT
             lightNumber : {},
 
+            _attacheMaterialNumber: 0,
+
             _uniformList : [],
             // {
             //  enabled : true
@@ -757,6 +759,20 @@ define(function(require) {
             }
 
             return uniforms;
+        },
+
+        // Attached to material
+        attached: function () {
+            this._attacheMaterialNumber++;
+        },
+
+        // Detached to material
+        detached: function () {
+            this._attacheMaterialNumber--;
+        },
+
+        isAttachedToAny: function () {
+            return this._attacheMaterialNumber !== 0;
         },
 
         _parseAttributes : function() {

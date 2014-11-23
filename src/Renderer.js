@@ -603,7 +603,9 @@ define(function(require) {
         disposeNode : function(root) {
             var materials = {};
             var _gl = this.gl;
-
+            if (root.getParent()) {
+                root.getParent().remove(root);
+            }
             root.traverse(function(node) {
                 if (node.geometry) {
                     node.geometry.dispose(_gl);
@@ -611,29 +613,14 @@ define(function(require) {
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
                 }
+                // Particle system need to dispose
                 if (node.dispose) {
                     node.dispose(_gl);
                 }
             });
             for (var guid in materials) {
                 var mat = materials[guid];
-                mat.shader.dispose(_gl);
-                for (var name in mat.uniforms) {
-                    var val = mat.uniforms[name].value;
-                    if (!val ) {
-                        continue;
-                    }
-                    if (val instanceof Texture) {
-                        val.dispose(_gl);
-                    }
-                    else if (val instanceof Array) {
-                        for (var i = 0; i < val.length; i++) {
-                            if (val[i] instanceof Texture) {
-                                val[i].dispose(_gl);
-                            }
-                        }
-                    }
-                }
+                mat.dispose(_gl);
             }
             root._children = [];
         },

@@ -755,11 +755,11 @@ define(function(require) {
             var _gl = renderer.gl;
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
-                mat.shader.dispose(_gl);
+                mat.dispose(_gl);
             }
             for (var guid in this._distanceMaterials) {
                 var mat = this._distanceMaterials[guid];
-                mat.shader.dispose(_gl);
+                mat.dispose(_gl);
             }
 
             if (this._frameBuffer) {
