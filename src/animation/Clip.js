@@ -193,6 +193,7 @@ define(function(require) {
             var remainder = this._elapsedTime % this.life;
             this._startTime = time - remainder + this.gap;
             this._elapsedTime = 0;
+            this._currentTime = time - remainder;
 
             this._needsRemove = false;
         },
