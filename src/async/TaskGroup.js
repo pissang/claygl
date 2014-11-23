@@ -48,12 +48,6 @@ define(function(require) {
         var count = 0;
         var self = this;
         var data = [];
-        if (tasks.length === 0) {
-            setTimeout(function() {
-                self.resolve(data);
-            });
-            return this;
-        }
         this._tasks = tasks;
         this._fulfilledNumber = 0;
         this._rejectedNumber = 0;
@@ -88,6 +82,12 @@ define(function(require) {
                 self.reject(task);
             });
         });
+        if (count === 0) {
+            setTimeout(function() {
+                self.resolve(data);
+            });
+            return this;
+        }
         return this;
     };
     /**

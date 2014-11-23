@@ -277,7 +277,9 @@ define(function(require) {
             this.update();
         },
 
-        clone: function 
+        clone: function () {
+            
+        }
     });
 
     return Skeleton;
