@@ -180,6 +180,21 @@ define(function(require) {
                             val = val.trim();
                             if (val.charAt(0) === '#'){
                                 val = lib.textures[val.substr(1)];
+                            } else if (val.match(/%width$/)) {
+                                node.on('beforerender', createWidthSetHandler(name, val));
+                                continue;
+                            } else if (val.match(/%height$/)) {
+                                node.on('beforerender', createHeightSetHandler(name, val));
+                                continue;
+                            }
+                        } else if (val instanceof Array) {
+                            if (
+                                typeof(val[0]) === 'string' && typeof(val[1]) === 'string'
+                                && (val[0].match(/%width$/))
+                                && (val[1].match(/%height$/))
+                            ) {
+                                node.on('beforerender', createSizeSetHandler(name, val));
+                                continue;
                             }
                         }
                         node.setParameter(name, val);
@@ -217,12 +232,11 @@ define(function(require) {
                         var val = paramInfo[name];
                         if (typeof val === 'string') {
                             val = val.trim();
-                            if (val.match(/%$/)) {
-                                if (name === 'width') {
-                                    param[name] = percentToWidth.bind(null, val);
-                                } else {
-                                    param[name] = percentToHeight.bind(null, val);
-                                }
+                            if (val.match(/%width$/)) {
+                                param[name] = percentToWidth.bind(null, parseFloat(val));
+                            }
+                            else if (val.match(/%height$/)) {
+                                param[name] = percentToHeight.bind(null, parseFloat(val));
                             }
                         } else {
                             param[name] = val;
@@ -317,20 +331,33 @@ define(function(require) {
         }
     });
 
-    function percentToWidth(percentStr, renderer) {
-        var percent = parseFloat(percentStr.substr(0, percentStr.length-1));
-        return Math.max(
-            percent / 100 * renderer.width,
-            1
-        );
+    function createWidthSetHandler(name, val) {
+        val = parseFloat(val);
+        return function (renderer) {
+            this.setParameter(name, percentToWidth(val, renderer))
+        }
+    }
+    function createHeightSetHandler(name, val) {
+        val = parseFloat(val);
+        return function (renderer) {
+            this.setParameter(name, percentToWidth(val, renderer))
+        }
     }
 
-    function percentToHeight(percentStr, renderer) {
-        var percent = parseFloat(percentStr.substr(0, percentStr.length-1));
-        return Math.max(
-            percent / 100 * renderer.height,
-            1
-        );
+    function createSizeSetHandler(name, val) {
+        val[0] = parseFloat(val[0]);
+        val[1] = parseFloat(val[1]);
+        return function (renderer) {
+            this.setParameter(name, [percentToWidth(val[0], renderer), percentToHeight(val[0], renderer)]);
+        }
+    }
+
+    function percentToWidth(percent, renderer) {
+        return percent / 100 * renderer.width;
+    }
+
+    function percentToHeight(percent, renderer) {
+        return percent / 100 * renderer.height;
     }
 
     return FXLoader;

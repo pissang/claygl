@@ -77,12 +77,6 @@
                 animation.on('frame', function() {
                     compositor.render(renderer);
                     control.update();
-
-                    var FXAANode = compositor.findNode('FXAA');
-                    if (FXAANode) {
-                        FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
-                    }
-
                 });
             });
         });

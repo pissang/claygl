@@ -319,8 +319,8 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : "100%",
-                        "height" : "100%"
+                        "width" : "100%width",
+                        "height" : "100%height"
                     }
                 }
             }
@@ -400,6 +400,9 @@
                     "node" : "tonemapping",
                     "pin" : "color"
                 }
+            },
+            "parameters": {
+                "viewportSize": ["100%width", "100%height"]
             }
         }
     ]

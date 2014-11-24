@@ -122,7 +122,8 @@ define(function(require) {
          * @param  {qtek.Renderer} renderer
          */
         render : function(renderer, frameBuffer) {
-                        
+            this.trigger('beforerender', renderer);
+
             this._rendering = true;
 
             var _gl = renderer.gl;
@@ -161,6 +162,8 @@ define(function(require) {
 
             this._rendering = false;
             this._rendered = true;
+
+            this.trigger('afterrender', renderer);
         },
 
         // TODO Remove parameter function callback

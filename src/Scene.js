@@ -104,13 +104,13 @@ define(function(require) {
                     currentNew.skeleton = current.skeleton.clone(node, newNode);
                     currentNew.joints = current.joints.slice();
                 }
-                for (var i = 0; i < current._children.length; i++) {
-                    cloneSkeleton(current._children[i], currentNew._children[i]);
-                }
                 if (current.material) {
                     materialsMap[current.material.__GUID__] = {
                         oldMat: current.material
                     };
+                }
+                for (var i = 0; i < current._children.length; i++) {
+                    cloneSkeleton(current._children[i], currentNew._children[i]);
                 }
             }
             cloneSkeleton(node, newNode);

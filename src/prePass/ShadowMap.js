@@ -81,6 +81,8 @@ define(function(require) {
              */
             cascadeSplitLogFactor : 0.2,
 
+            lightFrustumBias: 10,
+
             _frameBuffer: new FrameBuffer(),
 
             _textures : {},
@@ -376,6 +378,12 @@ define(function(require) {
             var shadowCascadeClipsFar = shadowCascadeClips.slice();
             shadowCascadeClipsNear.pop();
             shadowCascadeClipsFar.shift();
+
+            // Iterate from far to near
+            shadowCascadeClipsNear.reverse();
+            shadowCascadeClipsFar.reverse();
+            directionalLightShadowMaps.reverse();
+            directionalLightMatrices.reverse();
 
             for (var i = 0; i < this._receivers.length; i++) {
                 var mesh = this._receivers[i];
@@ -719,13 +727,13 @@ define(function(require) {
                 // Move camera to adjust the near to 0
                 // TODO : some scene object cast shadow in view will also be culled
                 // add a bias?
-                camera.position.scaleAndAdd(camera.worldTransform.forward, max[2] + 10);
+                camera.position.scaleAndAdd(camera.worldTransform.forward, max[2] + this.lightFrustumBias);
                 camera.near = 0;
-                camera.far = -min[2] + max[2] + 10;
-                camera.left = min[0];
-                camera.right = max[0];
-                camera.top = max[1];
-                camera.bottom = min[1];
+                camera.far = -min[2] + max[2] + this.lightFrustumBias;
+                camera.left = min[0] - this.lightFrustumBias;
+                camera.right = max[0] + this.lightFrustumBias;
+                camera.top = max[1] + this.lightFrustumBias;
+                camera.bottom = min[1] - this.lightFrustumBias;
                 camera.update(true);
 
                 return camera;
