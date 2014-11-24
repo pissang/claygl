@@ -160,7 +160,7 @@ define(function(require) {
 
             if (percent == 1) {
                 if (this._loop && this._loopRemained > 0) {
-                    this.restart();
+                    this._restartInLoop();
                     this._loopRemained--;
                     return 'restart';
                 } else {
@@ -191,11 +191,18 @@ define(function(require) {
             this._elapse(time);
 
             var remainder = this._elapsedTime % this.life;
-            this._startTime = time - remainder + this.gap;
+            this._startTime = time - remainder + this.delay;
             this._elapsedTime = 0;
             this._currentTime = time - remainder;
 
             this._needsRemove = false;
+        },
+
+        _restartInLoop: function () {
+            var time = new Date().getTime();
+            this._startTime = time + this.gap;
+            this._currentTime = time;
+            this._elapsedTime = 0;
         },
 
         _elapse: function(time) {
