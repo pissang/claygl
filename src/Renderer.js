@@ -685,9 +685,9 @@ define(function(require) {
             // Invert y;
             y = this.height - y;
 
-            out._array[0] = (x - this.viewport.x) / this.viewport.width;
+            out._array[0] = (x - this.viewport.x) / (this.viewport.width / this.devicePixelRatio);
             out._array[0] = out._array[0] * 2 - 1;
-            out._array[1] = (y - this.viewport.y) / this.viewport.height;
+            out._array[1] = (y - this.viewport.y) / (this.viewport.height / this.devicePixelRatio);
             out._array[1] = out._array[1] * 2 - 1;
 
             return out;
