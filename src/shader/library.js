@@ -118,37 +118,6 @@ define(function(require) {
         };
     }
 
-    // Some build in shaders
-    Shader['import'](require('text!./source/basic.essl'));
-    Shader['import'](require('text!./source/lambert.essl'));
-    Shader['import'](require('text!./source/phong.essl'));
-    Shader['import'](require('text!./source/physical.essl'));
-    Shader['import'](require('text!./source/wireframe.essl'));
-    Shader['import'](require('text!./source/skybox.essl'));
-    Shader['import'](require('text!./source/util.essl'));
-    Shader['import'](require('text!./source/prez.essl'));
-
-    Shader['import'](require('text!./source/shadowmap.essl'));
-
-    template('buildin.basic', Shader.source('buildin.basic.vertex'), Shader.source('buildin.basic.fragment'));
-    template('buildin.lambert', Shader.source('buildin.lambert.vertex'), Shader.source('buildin.lambert.fragment'));
-    template('buildin.phong', Shader.source('buildin.phong.vertex'), Shader.source('buildin.phong.fragment'));
-    template('buildin.wireframe', Shader.source('buildin.wireframe.vertex'), Shader.source('buildin.wireframe.fragment'));
-    template('buildin.skybox', Shader.source('buildin.skybox.vertex'), Shader.source('buildin.skybox.fragment'));
-    template('buildin.prez', Shader.source('buildin.prez.vertex'), Shader.source('buildin.prez.fragment'));
-    template('buildin.physical', Shader.source('buildin.physical.vertex'), Shader.source('buildin.physical.fragment'));
-
-    // Some build in shaders
-    Shader['import'](require('text!./source/compositor/coloradjust.essl'));
-    Shader['import'](require('text!./source/compositor/blur.essl'));
-    Shader['import'](require('text!./source/compositor/lum.essl'));
-    Shader['import'](require('text!./source/compositor/lut.essl'));
-    Shader['import'](require('text!./source/compositor/output.essl'));
-    Shader['import'](require('text!./source/compositor/hdr.essl'));
-    Shader['import'](require('text!./source/compositor/lensflare.essl'));
-    Shader['import'](require('text!./source/compositor/blend.essl'));
-    Shader['import'](require('text!./source/compositor/fxaa.essl'));
-
     var defaultLibrary = new ShaderLibrary();
 
     return {

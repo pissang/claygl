@@ -31,7 +31,7 @@
 ///<reference path="compositor/Pass" />
 ///<reference path="compositor/SceneNode" />
 ///<reference path="compositor/TextureNode" />
-///<reference path="compositor/texturePool" />
+///<reference path="compositor/TexturePool" />
 ///<reference path="core/Base" />
 ///<reference path="core/Cache" />
 ///<reference path="core/glinfo" />

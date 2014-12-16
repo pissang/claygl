@@ -18,7 +18,7 @@ glob("**/*.js", {
     var namespace = {};
 
     files.forEach(function(file){
-        if( file.match(/qtek.*?\.js/) || file === "text.js"){
+        if (file.match(/qtek.*?\.js/) || file === "text.js" || file.indexOf('_') >= 0) {
             return;
         }
         var filePathWithOutExt = file.slice(0, -3);

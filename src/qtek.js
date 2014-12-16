@@ -133,6 +133,7 @@ define( function(require){
 		"ShadowMap": require('qtek/prePass/ShadowMap')
 	},
 	"shader": {
+		"buildin": require('qtek/shader/buildin'),
 		"library": require('qtek/shader/library')
 	},
 	"texture": {

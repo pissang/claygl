@@ -20,11 +20,6 @@ define(function(require) {
 
     var glid = 0;
 
-    var preZPassShader = shaderLibrary.get('buildin.prez');
-    var preZPassMaterial = new Material({
-        shader : preZPassShader
-    });
-
     var errorShader = {};
 
     /**
@@ -374,6 +369,10 @@ define(function(require) {
 
             var culledRenderQueue;
             if (preZ) {
+                var preZPassMaterial = new Material({
+                    shader : shaderLibrary.get('buildin.prez')
+                });
+
                 culledRenderQueue = [];
                 preZPassShader.bind(_gl);
                 _gl.colorMask(false, false, false, false);
