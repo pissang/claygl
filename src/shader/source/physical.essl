@@ -140,8 +140,6 @@ void main()
         return;
     #endif
 
-    float ndv = dot(N, V);
-
     // Diffuse part of all lights
     vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
@@ -179,7 +177,6 @@ void main()
             vec3 H = normalize(L + V);
             float ndl = clamp(dot(N, L), 0.0, 1.0);
             float ndh = clamp(dot(N, H), 0.0, 1.0);
-            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
@@ -191,7 +188,7 @@ void main()
 
             vec3 li = lc * ndl * attenuation * shadowContrib;
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
         }
     #endif
 
@@ -212,7 +209,6 @@ void main()
             vec3 H = normalize(L + V);
             float ndl = clamp(dot(N, L), 0.0, 1.0);
             float ndh = clamp(dot(N, H), 0.0, 1.0);
-            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
@@ -225,7 +221,7 @@ void main()
             vec3 li = lc * ndl * shadowContrib;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
         }
     #endif
 
@@ -265,7 +261,6 @@ void main()
             vec3 H = normalize(L + V);
             float ndl = clamp(dot(N, L), 0.0, 1.0);
             float ndh = clamp(dot(N, H), 0.0, 1.0);
-            float ldn = clamp(dot(L, N), 0.0, 1.0);
 
             float shadowContrib = 1.0;
             #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
@@ -278,7 +273,7 @@ void main()
             vec3 li = lc * attenuation * (1.0-falloff) * shadowContrib * ndl;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ldn, spec) * D_Phong(g, ndh);
+            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
         }
     #endif
 

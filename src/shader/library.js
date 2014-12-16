@@ -139,7 +139,6 @@ define(function(require) {
     template('buildin.physical', Shader.source('buildin.physical.vertex'), Shader.source('buildin.physical.fragment'));
 
     // Some build in shaders
-    Shader['import'](require('text!./source/compositor/vertex.essl'));
     Shader['import'](require('text!./source/compositor/coloradjust.essl'));
     Shader['import'](require('text!./source/compositor/blur.essl'));
     Shader['import'](require('text!./source/compositor/lum.essl'));

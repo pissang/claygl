@@ -640,8 +640,8 @@ define(function(require) {
                     texture.type = glenum.FLOAT;
                     texture.anisotropic = 4;
                 } else {
-                    texture.minFilter = glenum.NEAREST;
-                    texture.magFilter = glenum.NEAREST;
+                    texture.minFilter = glenum.LINEAR;
+                    texture.magFilter = glenum.LINEAR;
                     texture.useMipmap = false;
                 }
                 this._textures[key] = texture;

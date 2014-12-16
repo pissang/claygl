@@ -11,6 +11,8 @@ define(function(require) {
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
 
+    Shader['import'](require('text!../shader/source/compositor/vertex.essl'));
+
     var planeGeo = new Plane();
     var mesh = new Mesh({
         geometry : planeGeo
