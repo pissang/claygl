@@ -67,23 +67,3 @@ Have been updated to the latest glTF specification
 <a href="http://efe.baidu.com/webgl/bootcamp/" target="_blank">
 <img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
 </a>
-
-####Other Examples
-
-[Sponza](http://pissang.github.io/qtek/sponza/)
-
-+ Normal Mapping
-+ Omnilight Shadow 
-
-[Murcielago](http://pissang.github.io/qtek/murcielago)
-
-+ [Simple material editor](http://pissang.github.io/qtek/murcielago/editor.html)
-+ Image based lighting
-+ Physically based shading
-+ Realtime atmosphere scattering
-+ Variance shadow map
-+ HDR pipeline
-    + Bloom
-    + Eye adaption tone mapping
-    + Linear space
-+ FXAA
