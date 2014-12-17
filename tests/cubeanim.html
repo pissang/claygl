@@ -15,6 +15,11 @@
                 bottom: 10px;
                 right: 10px;
             }
+            #shape {
+                position: absolute;
+                left:0px;
+                bottom: 0px;
+            }
         </style>
     </head>
     <body style="margin:0px;">
@@ -28,6 +33,7 @@
                 // Prepare animation shape data
                 //----------------------------------
                 var canvas = document.createElement('canvas');
+                canvas.id = 'shape';
                 var SIZE = 50;
                 canvas.width = SIZE;
                 canvas.height = SIZE;

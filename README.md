@@ -1,14 +1,43 @@
 #QTEK
 
-Qtek is a graphic library for webgl 3d and 2d drawing. It is still an experiment version.
-
+QTEK is a webgl graphic library.
 
 ### [API](http://pissang.github.io/qtek/doc/api)
 
 ### [Playground](https://github.com/pissang/qtek-playground)
 
+### Feature Projects
 
-#####Features 
+[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
+
+<a href="https://github.com/pissang/qtek-bootcamp" target="_blank">
+<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500px"></img>
+</a>
+
+[Bootcamp](https://github.com/pissang/qtek-bootcamp/)
+
+<a href="https://github.com/pissang/qtek-bootcamp/" target="_blank">
+<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
+</a>
+
+### Quick examples
++ [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/tests/cubes.html)
++ [Cube animation](http://pissang.github.io/qtek/tests/cubeanim.html)
++ [Physically based rendering with HDR IBL](http://pissang.github.io/qtek/tests/IBL.html)
++ [A simple glTF scene](http://pissang.github.io/qtek/tests/gltf.html)
++ [3d model loader of THREE.js format](http://pissang.github.io/qtek/tests/threeloader.html)
++ [Skinning](http://pissang.github.io/qtek/tests/skinning.html)
++ [Particle effects](http://pissang.github.io/qtek/tests/particle.html)
++ [Curl noise particle effects](http://pissang.github.io/qtek/tests/curlnoise.html)
++ [Cascade shadow mapping](http://pissang.github.io/qtek/tests/nanosuit.html)
++ [Omni light shadow mapping](http://pissang.github.io/qtek/tests/cubeshadowmap.html)
++ [Post processing - Depth of field](http://pissang.github.io/qtek/tests/pp_dof.html)
++ [Post processing - Lensflare](http://pissang.github.io/qtek/tests/pp_lensflare.html)
++ [RGBE Decoder](http://pissang.github.io/qtek/tests/rgbedecoder.html)
++ [Skybox](http://pissang.github.io/qtek/tests/skybox.html)
++ [Draggable cubes](http://pissang.github.io/qtek/tests/picking.html)
+
+### Features 
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
 + Basic primitive geometry procedural generate
@@ -28,15 +57,13 @@ Qtek is a graphic library for webgl 3d and 2d drawing. It is still an experiment
 + First person camera control, orbit camera control
 + Skybox, skydom
 + Particle System
-+ GPU Picking
++ Support both ray picking and GPU Picking
 + Loader
-	+ three.js model loader
-	+ glTF loader
-
-#####Animation
+    + three.js model loader
+    + glTF loader
 + Timeline based animation, support spline interpolation between keyframes.
 
-#####FBX2GLTF Converter
+### FBX2GLTF Converter
 
 Have been updated to the latest glTF specification
 
@@ -46,24 +73,15 @@ Have been updated to the latest glTF specification
 + Skinning
 + Animation
 
-#####Physics Component
+### Physics Component
 
 [https://github.com/pissang/qtek-physics](https://github.com/pissang/qtek-physics)
 
-#####2D Component
+### 3D Application framework
+
+[https://github.com/pissang/qtek-app](https://github.com/pissang/qtek-app)
+
+### 2D Component
 
 [https://github.com/pissang/qtek-2d](https://github.com/pissang/qtek-2d)
 
-#####Feature Projects
-
-[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
-
-<a href="http://efe.baidu.com/webgl/dota2hero/#/heroes" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500px"></img>
-</a>
-
-[Bootcamp](https://github.com/pissang/qtek-bootcamp/)
-
-<a href="http://efe.baidu.com/webgl/bootcamp/" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
-</a>

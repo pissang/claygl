@@ -12,10 +12,11 @@
             
             var Shader = qtek.Shader;
 
-            var SIZE = 512;
+            var SIZE = 1024;
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById("main")
+                canvas : document.getElementById("main"),
+                devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
             var animation = new qtek.animation.Animation();
