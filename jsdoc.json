@@ -6,7 +6,7 @@
     "opts": {
         "template": "jsdoc-tmpl",
         "encoding": "utf8",
-        "destination": "./gh-pages/api/",
+        "destination": "./doc/api/",
         "recurse": true
     },
     "plugins": ["plugins/markdown"],

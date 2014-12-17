@@ -3,7 +3,7 @@
 Qtek is a graphic library for webgl 3d and 2d drawing. It is still an experiment version.
 
 
-### [API](http://pissang.github.io/qtek/api)
+### [API](http://pissang.github.io/qtek/doc/api)
 
 ### [Playground](https://github.com/pissang/qtek-playground)
 

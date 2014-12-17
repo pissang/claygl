@@ -9,20 +9,52 @@ define(function(require) {
     var StaticGeometry = require('../StaticGeometry');
     var glenum = require('../core/glenum');
 
-    var RayPicking = Base.derive({
+    /**
+     * @constructor qtek.picking.RayPicking
+     * @extends qtek.core.Base
+     */
+    var RayPicking = Base.derive(
+    /** @lends qtek.picking.RayPicking# */
+    {
+        /**
+         * Target scene
+         * @type {qtek.Scene}
+         */
         scene: null,
+        /**
+         * Target camera
+         * @type {qtek.Camera}
+         */
         camera: null,
+        /**
+         * Target renderer
+         * @type {qtek.Renderer}
+         */
         renderer: null
     }, function() {
         this._ray = new Ray();
         this._ndc = new Vector2();
-    }, {
+    },
+    /** @lends qtek.picking.RayPicking.prototype */
+    {
 
+        /**
+         * Pick the nearest intersection object in the scene
+         * @param  {number} x Mouse position x
+         * @param  {number} y Mouse position y
+         * @return {qtek.picking.RayPicking~Intersection}
+         */
         pick: function(x, y) {
             var out = this.pickAll(x, y);
             return out[0] || null;
         },
 
+        /**
+         * Pick all intersection objects, wich will be sorted from near to far
+         * @param  {number} x Mouse position x
+         * @param  {number} y Mouse position y
+         * @return {Array.<qtek.picking.RayPicking~Intersection>}
+         */
         pickAll: function(x, y) {
             this.renderer.screenToNdc(x, y, this._ndc);
             this.camera.castRay(this._ndc, this._ray);
@@ -143,10 +175,33 @@ define(function(require) {
         }
     });
 
+    /**
+     * @constructor qtek.picking.RayPicking~Intersection
+     * @param {qtek.math.Vector3} point
+     * @param {qtek.Node} target
+     * @param {Array.<number>} tri
+     * @param {number} distance
+     */
     RayPicking.Intersection = function(point, target, tri, distance) {
+        /**
+         * Intersection point
+         * @type {qtek.math.Vector3}
+         */
         this.point = point;
+        /**
+         * Intersection scene node
+         * @type {qtek.Node}
+         */
         this.target = target;
+        /**
+         * Intersection triangle, which is an array of vertex index
+         * @type {Array.<number>}
+         */
         this.triangle = tri;
+        /**
+         * Distance from intersection point to ray origin
+         * @type {number}
+         */
         this.distance = distance;
     };
 

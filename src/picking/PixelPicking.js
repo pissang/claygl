@@ -8,11 +8,25 @@ define(function (require) {
 
     Shader.import(require('text!./color.essl'));    
 
+    /**
+     * Pixel picking is gpu based picking, which is fast and accurate.
+     * But not like ray picking, it can't get the intersection point and triangle.
+     * @constructor qtek.picking.PixelPicking
+     * @extends qtek.core.Base
+     */
     var PixelPicking = Base.derive(function() {
-        return {
+        return /** @lends qtek.picking.PixelPicking# */ {
+            /**
+             * Target renderer
+             * @type {qtek.Renderer}
+             */
             renderer : null,
-
+            /**
+             * Downsample ratio of hidden frame buffer
+             * @type {number}
+             */
             downSampleRatio : 1,
+
             width : 100,
             height : 100,
 
@@ -34,9 +48,9 @@ define(function (require) {
             this.width = this.renderer.width;
             this.height = this.renderer.height;
         }
-        this.init();
-    }, {
-        init : function() {
+        this._init();
+    }, /** @lends qtek.picking.PixelPicking.prototype */ {
+        _init : function() {
             this._texture = new Texture2D({
                 width : this.width * this.downSampleRatio,
                 height : this.height * this.downSampleRatio
@@ -48,6 +62,10 @@ define(function (require) {
                 fragment : Shader.source('buildin.picking.color.fragment')
             });
         },
+        /**
+         * Set picking presision
+         * @param {number} ratio
+         */
         setPrecision : function(ratio) {
             this._texture.width = this.width * ratio;
             this._texture.height = this.height * ratio;
@@ -58,9 +76,18 @@ define(function (require) {
             this._texture.height = height * this.downSampleRatio;
             this.width = width;
             this.height = height;
+            this._texture.dirty();
         },
+        /**
+         * Update the picking framebuffer
+         * @param {number} ratio
+         */
         update : function(scene, camera) {
             var renderer = this.renderer;
+            if (renderer.width !== this.width || renderer.height !== this.height) {
+                this.resize(renderer.width, renderer.height);
+            }
+
             this._frameBuffer.attach(renderer.gl, this._texture);
             this._frameBuffer.bind(renderer);
             this._idOffset = this.lookupOffset;
@@ -99,6 +126,12 @@ define(function (require) {
             }
         },
 
+        /**
+         * Pick the object
+         * @param  {number} x Mouse position x
+         * @param  {number} y Mouse position y
+         * @return {qtek.Node}
+         */
         pick : function(x, y) {
             var renderer = this.renderer;
 

@@ -240,7 +240,6 @@ define(function(require) {
     };
 
     /**
-     * @todo
      * @param {number} startTime
      * @param {number} endTime
      * @param {boolean} isLoop
