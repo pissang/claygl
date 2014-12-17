@@ -20,7 +20,7 @@ QTEK is a webgl graphic library.
 <img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
 </a>
 
-### Quick examples
+### Quick Examples
 + [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/tests/cubes.html)
 + [Cube animation](http://pissang.github.io/qtek/tests/cubeanim.html)
 + [Physically based rendering with HDR IBL](http://pissang.github.io/qtek/tests/IBL.html)
