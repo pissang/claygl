@@ -1,8 +1,12 @@
 requirejs.config({
-    'baseUrl' : '../src',
-    'paths' : {
-        'glmatrix' : '../thirdparty/gl-matrix',
-        'qtek' : './',
-        'tests': '../tests'
-    }
+    paths: {
+        glmatrix: '../thirdparty/gl-matrix',
+        qtek: '../dist/qtek.min'
+    },
+    // Debug
+    // packages: [{
+    //     name: 'qtek',
+    //     location: '../src',
+    //     main: 'qtek'
+    // }]
 });

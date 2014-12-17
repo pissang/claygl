@@ -63,8 +63,8 @@
                 return scene;
             }
 
-            require(['qtek/qtek',
-                    'text!../tests/assets/models/knight.js'], function(qtek, modelData){
+            require(['qtek',
+                    'text!assets/models/knight.js'], function(qtek, modelData){
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
