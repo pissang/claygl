@@ -39,7 +39,7 @@ define(function(require) {
 
     var StaticGeometry = require('../StaticGeometry');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var quat = glMatrix.quat;
 
     var semanticAttributeMap = {

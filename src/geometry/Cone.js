@@ -4,7 +4,7 @@ define(function(require) {
 
     var DynamicGeometry = require('../DynamicGeometry');
     var BoundingBox = require('../math/BoundingBox');
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
 

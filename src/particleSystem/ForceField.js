@@ -2,7 +2,7 @@ define(function(require) {
 
     var Field = require('./Field');
     var Vector3 = require('../math/Vector3');
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var vec3 =  glMatrix.vec3;
 
     /**

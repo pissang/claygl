@@ -24,7 +24,7 @@ define(function(require) {
     var glenum = require('../core/glenum');
     var SkinningClip = require('../animation/SkinningClip');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
     var quat = glMatrix.quat;
 

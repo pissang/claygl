@@ -13,7 +13,7 @@ define(function(require) {
     var Base = require('./core/Base');
     var util = require('./core/util');
     var Cache = require('./core/Cache');
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;
     var mat4 = glMatrix.mat4;

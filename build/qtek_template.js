@@ -15,12 +15,9 @@
 /** @namespace qtek.shader */
 /** @namespace qtek.texture */
 /** @namespace qtek.util */
-define( function(require){
+define(function(require) {
 	
-	var exportsObject =  {{$exportsObject}};
+	var exportsObject = {{$exportsObject}};
 
-    var glMatrix = require('glmatrix');
-    exportsObject.glMatrix = glMatrix;
-    
     return exportsObject;
-})
+});

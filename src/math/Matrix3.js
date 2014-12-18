@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var mat3 = glMatrix.mat3;
 
     function makeProperty(n) {

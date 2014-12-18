@@ -15,9 +15,9 @@
 /** @namespace qtek.shader */
 /** @namespace qtek.texture */
 /** @namespace qtek.util */
-define( function(require){
+define(function(require) {
 	
-	var exportsObject =  {
+	var exportsObject = {
 	"Camera": require('qtek/Camera'),
 	"DynamicGeometry": require('qtek/DynamicGeometry'),
 	"FrameBuffer": require('qtek/FrameBuffer'),
@@ -75,6 +75,9 @@ define( function(require){
 		},
 		"request": require('qtek/core/request'),
 		"util": require('qtek/core/util')
+	},
+	"dep": {
+		"glmatrix": require('qtek/dep/glmatrix')
 	},
 	"geometry": {
 		"Cone": require('qtek/geometry/Cone'),
@@ -149,8 +152,5 @@ define( function(require){
 	}
 };
 
-    var glMatrix = require('glmatrix');
-    exportsObject.glMatrix = glMatrix;
-    
     return exportsObject;
-})
+});

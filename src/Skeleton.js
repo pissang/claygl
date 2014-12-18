@@ -5,7 +5,7 @@ define(function(require) {
     var Base = require('./core/Base');
     var Joint = require('./Joint');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
     var mat4 = glMatrix.mat4;

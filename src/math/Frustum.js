@@ -5,9 +5,9 @@ define(function(require) {
     var Vector3 = require('./Vector3');
     var BoundingBox = require('./BoundingBox');
     var Plane = require('./Plane');
-    var glmatrix = require('glmatrix');
 
-    var vec3 = glmatrix.vec3;
+    var glMatrix = require('../dep/glmatrix');
+    var vec3 = glMatrix.vec3;
 
     /**
      * @constructor

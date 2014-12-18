@@ -7,7 +7,7 @@ define(function(require) {
 
     var Geometry = require('./Geometry');
     var BoundingBox = require('./math/BoundingBox');
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var glenum = require('./core/glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;

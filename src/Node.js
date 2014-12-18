@@ -6,7 +6,7 @@ define(function(require) {
     var Vector3 = require('./math/Vector3');
     var Quaternion = require('./math/Quaternion');
     var Matrix4 = require('./math/Matrix4');
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var mat4 = glMatrix.mat4;
 
     var nameId = 0;

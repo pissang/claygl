@@ -8,7 +8,7 @@ define(function(require) {
     var BoundingBox = require('./math/BoundingBox');
     var Ray = require('./math/Ray');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;

@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var quat = glMatrix.quat;
 
     /**

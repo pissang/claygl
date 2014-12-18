@@ -9,7 +9,7 @@ define(function(require) {
 
     var PerspectiveCamera = require('../camera/Perspective');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;

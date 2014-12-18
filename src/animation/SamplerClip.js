@@ -7,7 +7,7 @@ define(function(require) {
     var Clip = require('./Clip');
     var TransformClip = require('./TransformClip');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var quat = glMatrix.quat;
     var vec3 = glMatrix.vec3;
 

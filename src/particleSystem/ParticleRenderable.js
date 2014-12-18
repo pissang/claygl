@@ -10,7 +10,7 @@ define(function(require) {
     var Material = require('../Material');
     var Shader = require('../Shader');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
 
     Shader['import'](require('text!./particle.essl'));

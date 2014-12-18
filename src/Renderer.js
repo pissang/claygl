@@ -14,7 +14,7 @@ define(function(require) {
     var Material = require('./Material');
     var Vector2 = require('./math/Vector2');
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('./dep/glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 

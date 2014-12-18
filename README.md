@@ -77,7 +77,7 @@ Have been updated to the latest glTF specification
 
 [https://github.com/pissang/qtek-physics](https://github.com/pissang/qtek-physics)
 
-### 3D Application framework
+### 3D Application Framework
 
 [https://github.com/pissang/qtek-app](https://github.com/pissang/qtek-app)
 

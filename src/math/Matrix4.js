@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var glMatrix = require('glmatrix');
+    var glMatrix = require('../dep/glmatrix');
     var Vector3 = require('./Vector3');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
