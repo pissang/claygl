@@ -102,6 +102,12 @@ define(function(require) {
         faces : null,
 
         /**
+         * Is vertices data dynamically updated
+         * @type {boolean}
+         */
+        dynamic: false,
+
+        /**
          * @type {boolean}
          */
         useFace : true
@@ -149,11 +155,6 @@ define(function(require) {
          * @return {boolean}
          */
         isUseFace : notImplementedWarn,
-        /**
-         * @method
-         * @return {boolean}
-         */
-        isStatic : notImplementedWarn,
 
         getEnabledAttributes : notImplementedWarn,
         getBufferChunks : notImplementedWarn,

@@ -93,7 +93,7 @@ define(function(require) {
     }, function(){
 
         this.geometry = new StaticGeometry({
-            hint : glenum.DYNAMIC_DRAW
+            dynamic: true
         });
         
         if (!this.material) {

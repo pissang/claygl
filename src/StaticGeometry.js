@@ -69,11 +69,7 @@ define(function(require) {
         isUseFace : function() {
             return this.useFace && (this.faces != null);
         },
-
-        isStatic : function() {
-            return true;
-        },
-
+        
         createAttribute: function(name, type, size, semantic) {
             var attrib = new Geometry.Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;

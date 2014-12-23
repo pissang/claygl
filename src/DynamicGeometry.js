@@ -40,7 +40,9 @@ define(function(require) {
                  barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, true)
             },
 
-            hint : glenum.DYNAMIC_DRAW,
+            dynamic: true,
+
+            hint: glenum.DYNAMIC_DRAW,
 
             // Face is list of triangles, each face
             // is an array of the vertex indices of triangle
@@ -100,10 +102,6 @@ define(function(require) {
 
         isSplitted : function() {
             return this.getVertexNumber() > 0xffff;
-        },
-        
-        isStatic : function() {
-            return false;
         },
 
         createAttribute: function(name, type, size, semantic) {

@@ -118,7 +118,7 @@ define(function(require) {
             var glDrawMode = this.mode;
 
             var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
-            var isStatic = geometry.hint == glenum.STATIC_DRAW;
+            var isStatic = !geometry.dynamic;
             
             var nVertex = geometry.getVertexNumber();
             var isUseFace = geometry.isUseFace();
