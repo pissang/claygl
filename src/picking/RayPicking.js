@@ -69,8 +69,8 @@ define(function(require) {
         },
 
         _intersectNode: function(node, out) {
-            if ((node instanceof Renderable) && node.geometry) {
-                if (node.geometry.isUseFace()) {
+            if ((node instanceof Renderable) && node.isRenderable()) {
+                if (!node.ignorePicking && node.geometry.isUseFace()) {
                     this._intersectRenderable(node, out);
                 }
             }

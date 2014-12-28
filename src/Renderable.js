@@ -63,14 +63,12 @@ define(function(require) {
     /** @lends qtek.Renderable.prototype */
     {
 
-        // Only if mode is LINES
         /**
          * Used when mode is LINES, LINE_STRIP or LINE_LOOP
          * @type {number}
          */
         lineWidth : 1,
-        
-        // Culling
+
         /**
          * @type {boolean}
          */
@@ -97,6 +95,10 @@ define(function(require) {
          * @type {boolean}
          */
         castShadow : true,
+        /**
+         * @type {boolean}
+         */
+        ignorePicking : false,
 
         /**
          * @return {boolean}
