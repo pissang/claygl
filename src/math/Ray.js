@@ -67,6 +67,71 @@ define(function(require) {
             this.direction._dirty = true;
         },
 
+        distanceToPoint: (function () {
+            var v = vec3.create();
+            return function (point) {
+                vec3.sub(v, point, this.origin._array);
+                // Distance from projection point to origin
+                var b = vec3.dot(v, this.direction._array);
+                if (b < 0) {
+                    return vec3.distance(this.origin._array, point);
+                }
+                // Squared distance from center to origin
+                var c2 = vec3.lenSquared(v);
+                // Squared distance from center to projection point
+                return Math.sqrt(c2 - b * b);
+            }
+        })(),
+
+        /**
+         * Calculate intersection point between ray and sphere
+         * @param  {qtek.math.Vector3} center
+         * @param  {number} radius
+         * @param  {qtek.math.Vector3} out
+         * @return {qtek.math.Vector3}
+         */
+        intersectSphere: (function () {
+            var v = vec3.create();
+            return function (center, radius, out) {
+                var origin = this.origin._array;
+                var direction = this.direction._array;
+                vec3.sub(v, center, origin);
+                // Distance from projection point to origin
+                var b = vec3.dot(v, direction);
+                // Squared distance from center to origin
+                var c2 = vec3.lenSquared(v);
+                // Squared distance from center to projection point
+                var d2 = c2 - b * b;
+
+                var r2 = radius * radius;
+                // No intersection
+                if (d2 > r2) {
+                    return;
+                }
+
+                var a = Math.sqrt(r2 - d2);
+                // First intersect point
+                var t0 = b - a;
+                // Second intersect point
+                var t1 = b + a;
+
+                if (!out) {
+                    out = new Vector3();
+                }
+                if (t0 < 0) {
+                    if (t1 < 0) {
+                        return null;
+                    } else {
+                        vec3.scaleAndAdd(out._array, origin, direction, t1);
+                        return out;
+                    }
+                } else {
+                    vec3.scaleAndAdd(out._array, origin, direction, t0);
+                    return out;
+                }
+            }
+        })(),
+
         // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
         /**
          * Calculate intersection point between ray and bounding box
