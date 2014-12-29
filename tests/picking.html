@@ -63,8 +63,8 @@
                     var res = picking.pick(e.offsetX, e.offsetY);
                     if (res) {
                         currentCube = res.target;
-                        point = res.point;
-                        offset.copy(currentCube.position).sub(point);
+                        point = res.pointWorld;
+                        offset.copy(res.point);
                     }
                 });
                 renderer.canvas.addEventListener('mousemove', function(e) {
@@ -75,7 +75,7 @@
                         var ndc = renderer.screenToNdc(e.offsetX, e.offsetY);
                         var ray = camera.castRay(ndc);
                         ray.intersectPlane(plane, currentCube.position);
-                        currentCube.position.add(offset);
+                        currentCube.position.sub(offset);
                     }
                 });
                 renderer.canvas.addEventListener('mouseup', function(e) {

@@ -12,9 +12,6 @@ define(function(require) {
     var Mesh = Renderable.derive(
     /** @lends qtek.Mesh# */
     {
-
-        mode: glenum.TRIANGLES,
-
         /**
          * Used when it is a skinned mesh
          * @type {qtek.Skeleton}

@@ -92,6 +92,7 @@ define(function(require) {
                     u = i / widthSegments;
                     v = j / heightSegments;
 
+                    // X axis is inverted so texture can be mapped from left to right
                     x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
                     y = radius * Math.cos(thetaStart + v * thetaLength);
                     z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
