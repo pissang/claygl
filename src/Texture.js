@@ -21,78 +21,78 @@ define(function(require) {
          * Texture width, only needed when the texture is used as a render target
          * @type {number}
          */
-        width : 512,
+        width: 512,
         /**
          * Texture height, only needed when the texture is used as a render target
          * @type {number}
          */
-        height : 512,
+        height: 512,
         /**
          * Texel data type
          * @type {number}
          */
-        type : glenum.UNSIGNED_BYTE,
+        type: glenum.UNSIGNED_BYTE,
         /**
          * Format of texel data
          * @type {number}
          */
-        format : glenum.RGBA,
+        format: glenum.RGBA,
         /**
          * @type {number}
          */
-        wrapS : glenum.CLAMP_TO_EDGE,
+        wrapS: glenum.CLAMP_TO_EDGE,
         /**
          * @type {number}
          */
-        wrapT : glenum.CLAMP_TO_EDGE,
+        wrapT: glenum.CLAMP_TO_EDGE,
         /**
          * @type {number}
          */
-        minFilter : glenum.LINEAR_MIPMAP_LINEAR,
+        minFilter: glenum.LINEAR_MIPMAP_LINEAR,
         /**
          * @type {number}
          */
-        magFilter : glenum.LINEAR,
+        magFilter: glenum.LINEAR,
         /**
          * @type {boolean}
          */
-        useMipmap : true,
+        useMipmap: true,
 
         /**
          * Anisotropic filtering, enabled if value is larger than 1
          * @see http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
          * @type {number}
          */
-        anisotropic : 1,
+        anisotropic: 1,
         // pixelStorei parameters
         // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
         /**
          * @type {boolean}
          */
-        flipY : true,
+        flipY: true,
         /**
          * @type {number}
          */
-        unpackAlignment : 4,
+        unpackAlignment: 4,
         /**
          * @type {boolean}
          */
-        premultiplyAlpha : false,
+        premultiplyAlpha: false,
 
         /**
          * Dynamic option for texture like video
          * @type {boolean}
          */
-        dynamic : false,
+        dynamic: false,
 
-        NPOT : false
+        NPOT: false
     }, function() {
         this._cache = new Cache();
     },
     /** @lends qtek.Texture.prototype */
     {
 
-        getWebGLTexture : function(_gl) {
+        getWebGLTexture: function(_gl) {
 
             this._cache.use(_gl.__GLID__);
 
@@ -111,20 +111,20 @@ define(function(require) {
             return this._cache.get('webgl_texture');
         },
 
-        bind : function() {},
-        unbind : function() {},
+        bind: function() {},
+        unbind: function() {},
         
         /**
          * Mark texture is dirty and update in the next frame
          */
-        dirty : function() {
+        dirty: function() {
             this._cache.dirtyAll();
         },
 
-        update : function(_gl) {},
+        update: function(_gl) {},
 
         // Update the common parameters of texture
-        beforeUpdate : function(_gl) {
+        beforeUpdate: function(_gl) {
             _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
             _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
             _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
@@ -132,7 +132,7 @@ define(function(require) {
             this.fallBack();
         },
 
-        fallBack : function() {
+        fallBack: function() {
 
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
@@ -181,7 +181,7 @@ define(function(require) {
 
         },
 
-        nextHighestPowerOfTwo : function(x) {
+        nextHighestPowerOfTwo: function(x) {
             --x;
             for (var i = 1; i < 32; i <<= 1) {
                 x = x | x >> i;
@@ -191,7 +191,7 @@ define(function(require) {
         /**
          * @param  {WebGLRenderingContext} _gl
          */
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             this._cache.use(_gl.__GLID__);
             if (this._cache.get('webgl_texture')){
                 _gl.deleteTexture(this._cache.get('webgl_texture'));
@@ -202,9 +202,9 @@ define(function(require) {
          * Test if image of texture is valid and loaded.
          * @return {boolean}
          */
-        isRenderable : function() {},
+        isRenderable: function() {},
         
-        isPowerOfTwo : function() {}
+        isPowerOfTwo: function() {}
     });
     
     /* DataType */

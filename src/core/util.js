@@ -15,7 +15,7 @@ define(function(require){
          * @return {number}
          * @memberOf qtek.core.util
          */
-		genGUID : function() {
+		genGUID: function() {
 			return ++guid;
 		},
         /**
@@ -25,7 +25,7 @@ define(function(require){
          * @return {string}
          * @memberOf qtek.core.util
          */
-        relative2absolute : function(path, basePath) {
+        relative2absolute: function(path, basePath) {
             if (!basePath || path.match(/^\//)) {
                 return path;
             }
@@ -50,7 +50,7 @@ define(function(require){
          * @return {Object}
          * @memberOf qtek.core.util
          */
-        extend : function(target, source) {
+        extend: function(target, source) {
             if (source) {
                 for (var name in source) {
                     if (source.hasOwnProperty(name)) {
@@ -68,7 +68,7 @@ define(function(require){
          * @return {Object}
          * @memberOf qtek.core.util
          */
-        defaults : function(target, source) {
+        defaults: function(target, source) {
             if (source) {
                 for (var propName in source) {
                     if (target[propName] === undefined) {
@@ -86,7 +86,7 @@ define(function(require){
          * @return {Object}
          * @memberOf qtek.core.util
          */
-        extendWithPropList : function(target, source, propList) {
+        extendWithPropList: function(target, source, propList) {
             if (source) {
                 for (var i = 0; i < propList.length; i++) {
                     var propName = propList[i];
@@ -103,7 +103,7 @@ define(function(require){
          * @return {Object}
          * @memberOf qtek.core.util
          */
-        defaultsWithPropList : function(target, source, propList) {
+        defaultsWithPropList: function(target, source, propList) {
             if (source) {
                 for (var i = 0; i < propList.length; i++) {
                     var propName = propList[i];
@@ -120,7 +120,7 @@ define(function(require){
          * @param  {Object} [context]
          * @memberOf qtek.core.util
          */
-        each : function(obj, iterator, context) {
+        each: function(obj, iterator, context) {
             if (!(obj && iterator)) {
                 return;
             }
@@ -145,7 +145,7 @@ define(function(require){
          * @return {boolean}
          * @memberOf qtek.core.util
          */
-        isObject : function(obj) {
+        isObject: function(obj) {
             return obj === Object(obj);
         },
 
@@ -155,7 +155,7 @@ define(function(require){
          * @return {boolean}
          * @memberOf qtek.core.util
          */
-        isArray : function(obj) {
+        isArray: function(obj) {
             return obj instanceof Array;
         },
 
@@ -165,7 +165,7 @@ define(function(require){
          * @return {boolean}
          * @memberOf qtek.core.util
          */
-        isArrayLike : function(obj) {
+        isArrayLike: function(obj) {
             if (!obj) {
                 return false;
             } else {
@@ -178,7 +178,7 @@ define(function(require){
          * @return {}
          * @memberOf qtek.core.util
          */
-        clone : function(obj) {
+        clone: function(obj) {
             if (!util.isObject(obj)) {
                 return obj;
             } else if (util.isArray(obj)) {

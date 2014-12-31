@@ -13,7 +13,7 @@ define(function() {
 
     Cache.prototype = {
 
-        use : function(contextId, documentSchema) {
+        use: function(contextId, documentSchema) {
 
             if (! this._caches[contextId]) {
                 this._caches[contextId] = {};
@@ -27,21 +27,21 @@ define(function() {
             this._context = this._caches[contextId];
         },
 
-        put : function(key, value) {
+        put: function(key, value) {
             this._context[key] = value;
         },
 
-        get : function(key) {
+        get: function(key) {
             return this._context[key];
         },
 
-        dirty : function(field) {
+        dirty: function(field) {
             field = field || '';
             var key = '__dirty__' + field;
             this.put(key, true);
         },
         
-        dirtyAll : function(field) {
+        dirtyAll: function(field) {
             field = field || '';
             var key = '__dirty__' + field;
             for (var i = 0; i < this._caches.length; i++) {
@@ -51,13 +51,13 @@ define(function() {
             }
         },
 
-        fresh : function(field) {
+        fresh: function(field) {
             field = field || '';
             var key = '__dirty__' + field;
             this.put(key, false);
         },
 
-        freshAll : function(field) {
+        freshAll: function(field) {
             field = field || '';
             var key = '__dirty__' + field;
             for (var i = 0; i < this._caches.length; i++) {
@@ -67,31 +67,31 @@ define(function() {
             }
         },
 
-        isDirty : function(field) {
+        isDirty: function(field) {
             field = field || '';
             var key = '__dirty__' + field;
             return  !this._context.hasOwnProperty(key)
                 || this._context[key] === true;
         },
 
-        deleteContext : function(contextId) {
+        deleteContext: function(contextId) {
             delete this._caches[contextId];
             this._context = {};
         },
 
-        'delete' : function(key) {
+        'delete': function(key) {
             delete this._context[key];
         },
 
-        clearAll : function() {
+        clearAll: function() {
             this._caches = {};
         },
 
-        getContext : function() {
+        getContext: function() {
             return this._context;
         },
 
-        miss : function(key) {
+        miss: function(key) {
             return ! this._context.hasOwnProperty(key);
         }
     };

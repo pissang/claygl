@@ -15,14 +15,14 @@ define(function(require){
     var Compositor = Graph.derive(function() {
         return {
             // Output node
-            _outputs : [],
+            _outputs: [],
 
             _texturePool: new TexturePool()
         };
     },
     /** @lends qtek.compositor.Compositor.prototype */
     {
-        addNode : function(node) {
+        addNode: function(node) {
             Graph.prototype.addNode.call(this, node);
             if (!node.outputs) {
                 this.addOutput(node);
@@ -32,7 +32,7 @@ define(function(require){
         /**
          * @param  {qtek.Renderer} renderer
          */
-        render : function(renderer, frameBuffer) {
+        render: function(renderer, frameBuffer) {
             if (this._dirty) {
                 this.update();
                 this._dirty = false;
@@ -55,13 +55,13 @@ define(function(require){
             }
         },
 
-        addOutput : function(node) {
+        addOutput: function(node) {
             if (this._outputs.indexOf(node) < 0) {
                 this._outputs.push(node);
             }
         },
 
-        removeOutput : function(node) {
+        removeOutput: function(node) {
             this._outputs.splice(this._outputs.indexOf(node), 1);
         },
 

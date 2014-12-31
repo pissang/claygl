@@ -3,9 +3,6 @@ define(function(require) {
     var Base = require('../core/Base');
     var Vector3 = require('../math/Vector3');
     var Matrix4 = require('../math/Matrix4');
-    var Quaternion = require('../math/Quaternion');
-    
-    var tmpMatrix = new Matrix4();
 
     /**
      * @constructor qtek.plugin.OrbitControl
@@ -30,71 +27,71 @@ define(function(require) {
              * Scene node to control, mostly it is a camera
              * @type {qtek.Node}
              */
-            target : null,
+            target: null,
 
             /**
              * Target dom to bind with mouse events
              * @type {HTMLElement}
              */
-            domElement : null,
+            domElement: null,
 
             /**
              * Mouse move sensitivity
              * @type {number}
              */
-            sensitivity : 1,
+            sensitivity: 1,
 
             /**
              * Origin to rotate around
              * @type {qtek.math.Vector3}
              */
-            origin : new Vector3(),
+            origin: new Vector3(),
 
             /**
              * Up axis
              * @type {qtek.math.Vector3}
              */
-            up : new Vector3(0, 1, 0),
+            up: new Vector3(0, 1, 0),
 
             /**
              * Minimum distance from origin to target when zooming in
              * @type {number}
              */
-            minDistance : 0,
+            minDistance: 0,
             /**
              * Maximum distance from origin to target when zooming out
              * @type {number}
              */
-            maxDistance : Infinity,
+            maxDistance: Infinity,
 
             /**
              * Minimum polar angle when rotate up, it is 0 when the direction origin point to target is same with up axis
              * @type {number}
              */
-            minPolarAngle : 0, // [0, Math.PI/2]
+            minPolarAngle: 0, // [0, Math.PI/2]
 
             /**
              * Maximum polar angle when rotate down. It is PI when the direction origin point to target is opposite to up axis
              * @type {number}
              */
-            maxPolarAngle : Math.PI, // [Math.PI/2, Math.PI]
+            maxPolarAngle: Math.PI, // [Math.PI/2, Math.PI]
 
             // Rotate around origin
-            _offsetPitch : 0,
-            _offsetRoll : 0,
+            _offsetPitch: 0,
+            _offsetRoll: 0,
 
             // Pan the origin
-            _panX : 0,
-            _panY : 0,
+            _panX: 0,
+            _panY: 0,
 
             // Offset of mouse move
-            _offsetX : 0,
-            _offsetY : 0,
+            _offsetX: 0,
+            _offsetY: 0,
 
             // Zoom with mouse wheel
-            _forward : 0,
+            _forward: 0,
 
-            _op : -1  //0 : ROTATE, 1 : PAN
+            _op: -1  //0: ROTATE, 1: PAN
         };
     }, function() {
         this._mouseDown = this._mouseDown.bind(this);
@@ -112,7 +109,7 @@ define(function(require) {
         /**
          * Enable control
          */
-        enable : function() {
+        enable: function() {
             this.domElement.addEventListener('mousedown', this._mouseDown);
             this.domElement.addEventListener('mousewheel', this._mouseWheel);
             this.domElement.addEventListener('DOMMouseScroll', this._mouseWheel);
@@ -121,14 +118,14 @@ define(function(require) {
         /**
          * Disable control
          */
-        disable : function() {
+        disable: function() {
             this.domElement.removeEventListener('mousedown', this._mouseDown);
             this.domElement.removeEventListener('mousewheel', this._mouseWheel);
             this.domElement.removeEventListener('DOMMouseScroll', this._mouseWheel);
             this._mouseUp();
         },
 
-        _mouseWheel : function(e) {
+        _mouseWheel: function(e) {
             e.preventDefault();
             var delta = e.wheelDelta // Webkit 
                         || -e.detail; // Firefox
@@ -136,7 +133,7 @@ define(function(require) {
             this._forward += delta * this.sensitivity;
         },
 
-        _mouseDown : function(e) {
+        _mouseDown: function(e) {
             document.addEventListener('mousemove', this._mouseMove);
             document.addEventListener('mouseup', this._mouseUp);
             document.addEventListener('mouseout', this._mouseOut);
@@ -152,7 +149,7 @@ define(function(require) {
             }
         },
 
-        _mouseMove : function(e) {
+        _mouseMove: function(e) {
             var dx = e.pageX - this._offsetX;
             var dy = e.pageY - this._offsetY;
 
@@ -175,7 +172,7 @@ define(function(require) {
             this._offsetY = e.pageY;
         },
 
-        _mouseUp : function() {
+        _mouseUp: function() {
 
             document.removeEventListener('mousemove', this._mouseMove);
             document.removeEventListener('mouseup', this._mouseUp);
@@ -184,7 +181,7 @@ define(function(require) {
             this._op = -1;
         },
 
-        _mouseOut : function() {
+        _mouseOut: function() {
             this._mouseUp();
         },
 
@@ -192,7 +189,7 @@ define(function(require) {
          * Control update. Should be invoked every frame
          * @param {number} frameTime Frame time
          */
-        update : function(frameTime) {
+        update: function(frameTime) {
             var target = this.target;
             var zAxis = target.localTransform.forward.normalize();
             var yAxis = target.localTransform.up.normalize();

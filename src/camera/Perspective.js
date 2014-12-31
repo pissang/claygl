@@ -14,24 +14,24 @@ define(function(require) {
         /**
          * @type {number}
          */
-        fov : 50,
+        fov: 50,
         /**
          * @type {number}
          */
-        aspect : 1,
+        aspect: 1,
         /**
          * @type {number}
          */
-        near : 0.1,
+        near: 0.1,
         /**
          * @type {number}
          */
-        far : 2000
+        far: 2000
     },
     /** @lends qtek.camera.Perspective.prototype */
     {
         
-        updateProjectionMatrix : function() {
+        updateProjectionMatrix: function() {
             var rad = this.fov / 180 * Math.PI;
             this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
         },

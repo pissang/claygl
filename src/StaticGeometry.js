@@ -148,8 +148,8 @@ define(function(require) {
                 chunks = [];
                 // Intialize
                 chunks[0] = {
-                    attributeBuffers : [],
-                    indicesBuffer : null
+                    attributeBuffers: [],
+                    indicesBuffer: null
                 };
                 this._cache.put('chunks', chunks);
                 firstUpdate = true;
@@ -475,9 +475,9 @@ define(function(require) {
                 var geoAttrib = geometry.attributes[name];
                 if (!geoAttrib) {
                     geoAttrib = geometry.attributes[name] = {
-                        type : attrib.type,
-                        size : attrib.size,
-                        value : []
+                        type: attrib.type,
+                        size: attrib.size,
+                        value: []
                     };
                     if (attrib.semantic) {
                         geoAttrib.semantic = attrib.semantic;
@@ -497,7 +497,7 @@ define(function(require) {
                 geometry.boundingBox.min.copy(this.boundingBox.min);
                 geometry.boundingBox.max.copy(this.boundingBox.max);
             }
-            // PENDING : copy buffer ?
+            // PENDING copy buffer ?
             
             return geometry;
         },

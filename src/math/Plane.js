@@ -30,14 +30,14 @@ define(function(require) {
 
     Plane.prototype = {
 
-        constructor : Plane,
+        constructor: Plane,
 
         /**
          * Distance from given point to plane
          * @param  {qtek.math.Vector3} point
          * @return {number}
          */
-        distanceToPoint : function(point) {
+        distanceToPoint: function(point) {
             return vec3.dot(point._array, this.normal._array) - this.distance;
         },
 
@@ -47,7 +47,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} out
          * @return {qtek.math.Vector3}
          */
-        projectPoint : function(point, out) {
+        projectPoint: function(point, out) {
             if (!out) {
                 out = new Vector3();
             }
@@ -60,7 +60,7 @@ define(function(require) {
         /**
          * Normalize the plane's normal and calculate distance
          */
-        normalize : function() {
+        normalize: function() {
             var invLen = 1 / vec3.len(this.normal._array);
             vec3.scale(this.normal._array, invLen);
             this.distance *= invLen;
@@ -71,7 +71,7 @@ define(function(require) {
          * @param  {qtek.math.Frustum} Frustum
          * @return {boolean}
          */
-        intersectFrustum : function(frustum) {
+        intersectFrustum: function(frustum) {
             // Check if all coords of frustum is on plane all under plane
             var coords = frustum.vertices;
             var normal = this.normal._array;
@@ -91,7 +91,7 @@ define(function(require) {
          * @param {qtek.math.Vector3} [out]
          * @return {qtek.math.Vector3}
          */
-        intersectLine : (function() {
+        intersectLine: (function() {
             var rd = vec3.create();
             return function(start, end, out) {
                 var d0 = this.distanceToPoint(start);
@@ -127,7 +127,7 @@ define(function(require) {
          * @method
          * @return {qtek.math.Matrix4}
          */
-        applyTransform : (function() {
+        applyTransform: (function() {
             var inverseTranspose = mat4.create();
             var normalv4 = vec4.create();
             var pointv4 = vec4.create();
@@ -152,7 +152,7 @@ define(function(require) {
          * Copy from another plane
          * @param  {qtek.math.Vector3} plane
          */
-        copy : function(plane) {
+        copy: function(plane) {
             vec3.copy(this.normal._array, plane.normal._array);
             this.normal._dirty = true;
             this.distance = plane.distance;
@@ -162,7 +162,7 @@ define(function(require) {
          * Clone a new plane
          * @return {qtek.math.Plane}
          */
-        clone : function() {
+        clone: function() {
             var plane = new Plane();
             plane.copy(this);
             return plane;

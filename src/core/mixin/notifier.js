@@ -13,7 +13,7 @@ define(function() {
          * Trigger event
          * @param  {string} name
          */
-        trigger : function(name) {
+        trigger: function(name) {
             if (!this.hasOwnProperty('__handlers__')) {
                 return;
             }
@@ -64,7 +64,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        on : function(name, action, context) {
+        on: function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -89,7 +89,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        once : function(name, action, context) {
+        once: function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -108,7 +108,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        before : function(name, action, context) {
+        before: function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -123,7 +123,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        after : function(name, action, context) {
+        after: function(name, action, context) {
             if (!name || !action) {
                 return;
             }
@@ -137,7 +137,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        success : function(action, context) {
+        success: function(action, context) {
             return this.once('success', action, context);
         },
 
@@ -147,7 +147,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        error : function(action, context) {
+        error: function(action, context) {
             return this.once('error', action, context);
         },
 
@@ -157,7 +157,7 @@ define(function() {
          * @param  {Object} [context]
          * @chainable
          */
-        off : function(name, action) {
+        off: function(name, action) {
             
             var handlers = this.__handlers__ || (this.__handlers__={});
 
@@ -185,7 +185,7 @@ define(function() {
          * @param  {Function}  action
          * @return {boolean}
          */
-        has : function(name, action) {
+        has: function(name, action) {
             var handlers = this.__handlers__;
 
             if (! handlers ||

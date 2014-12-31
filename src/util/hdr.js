@@ -102,7 +102,7 @@ define(function(require) {
         // http://www.graphics.cornell.edu/~bjw/rgbe.html
         // Blender source
         // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
-        parseRGBE : function(arrayBuffer, texture, exposure) {
+        parseRGBE: function(arrayBuffer, texture, exposure) {
             if (exposure === undefined) {
                 exposure = 0;
             }
@@ -171,7 +171,7 @@ define(function(require) {
             return texture;
         },
 
-        parseRGBEFromPNG : function(png) {
+        parseRGBEFromPNG: function(png) {
 
         }
     };

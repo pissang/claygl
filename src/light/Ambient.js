@@ -9,15 +9,15 @@ define(function(require) {
      * @extends qtek.Light
      */
     var AmbientLight = Light.derive({
-        castShadow : false
+        castShadow: false
     }, {
 
-        type : 'AMBIENT_LIGHT',
+        type: 'AMBIENT_LIGHT',
 
-        uniformTemplates : {
-            'ambientLightColor' : {
-                type : '3f',
-                value : function(instance) {
+        uniformTemplates: {
+            'ambientLightColor': {
+                type: '3f',
+                value: function(instance) {
                     var color = instance.color,
                         intensity = instance.intensity;
                     return [color[0]*intensity, color[1]*intensity, color[1]*intensity];

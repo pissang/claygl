@@ -245,8 +245,8 @@ define(function(require) {
                     return self._arrayChunks[chunkIdx];
                 }
                 var chunk = {
-                    attributeArrays : {},
-                    indicesArray : null
+                    attributeArrays: {},
+                    indicesArray: null
                 };
 
                 for (var name in attributes) {
@@ -410,8 +410,8 @@ define(function(require) {
                 // Intialize
                 for (var i = 0; i < this._arrayChunks.length; i++) {
                     chunks[i] = {
-                        attributeBuffers : [],
-                        indicesBuffer : null
+                        attributeBuffers: [],
+                        indicesBuffer: null
                     };
                 }
                 this._cache.put('chunks', chunks);
@@ -421,8 +421,8 @@ define(function(require) {
                 var chunk = chunks[cc];
                 if (! chunk) {
                     chunk = chunks[cc] = {
-                        attributeBuffers : [],
-                        indicesBuffer : null
+                        attributeBuffers: [],
+                        indicesBuffer: null
                     };
                 }
                 var attributeBuffers = chunk.attributeBuffers;
@@ -692,7 +692,7 @@ define(function(require) {
 
         // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
         // http://en.wikipedia.org/wiki/Barycentric_coordinate_system_(mathematics)
-        generateBarycentric : (function() {
+        generateBarycentric: (function() {
             var a = [1, 0, 0];
             var b = [0, 0, 1];
             var c = [0, 1, 0];
@@ -737,9 +737,9 @@ define(function(require) {
                 var geoAttrib = geometry.attributes[name];
                 if (!geoAttrib) {
                     geoAttrib = geometry.attributes[name] = {
-                        type : attrib.type,
-                        size : attrib.size,
-                        value : null
+                        type: attrib.type,
+                        size: attrib.size,
+                        value: null
                     };
                     if (attrib.semantic) {
                         geoAttrib.semantic = attrib.semantic;
@@ -754,7 +754,7 @@ define(function(require) {
                 geometry.boundingBox.min.copy(this.boundingBox.min);
                 geometry.boundingBox.max.copy(this.boundingBox.max);
             }
-            // PENDING : copy buffer ?
+            // PENDING copy buffer ?
             return geometry;
         },
 

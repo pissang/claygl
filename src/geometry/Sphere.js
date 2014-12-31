@@ -26,34 +26,34 @@ define(function(require) {
         /**
          * @type {number}
          */
-        widthSegments : 20,
+        widthSegments: 20,
         /**
          * @type {number}
          */
-        heightSegments : 20,
+        heightSegments: 20,
 
         /**
          * @type {number}
          */
-        phiStart : 0,
+        phiStart: 0,
         /**
          * @type {number}
          */
-        phiLength : Math.PI * 2,
+        phiLength: Math.PI * 2,
 
         /**
          * @type {number}
          */
-        thetaStart : 0,
+        thetaStart: 0,
         /**
          * @type {number}
          */
-        thetaLength : Math.PI,
+        thetaLength: Math.PI,
 
         /**
          * @type {number}
          */
-        radius : 1
+        radius: 1
 
     }, function() {
         this.build();

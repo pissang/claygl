@@ -15,26 +15,26 @@ define(function(require){
              * Light RGB color
              * @type {number[]}
              */
-            color : [1, 1, 1],
+            color: [1, 1, 1],
 
             /**
              * Light intensity
              * @type {number}
              */
-            intensity : 1.0,
+            intensity: 1.0,
             
             // Config for shadow map
             /**
              * If light cast shadow
              * @type {boolean}
              */
-            castShadow : true,
+            castShadow: true,
 
             /**
              * Shadow map size
              * @type {number}
              */
-            shadowResolution : 512
+            shadowResolution: 512
         };
     },
     /** @lends qtek.Light.prototype. */

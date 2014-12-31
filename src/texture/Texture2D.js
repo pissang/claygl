@@ -29,18 +29,18 @@ define(function(require) {
             /**
              * @type {HTMLImageElement|HTMLCanvasElemnet}
              */
-            image : null,
+            image: null,
             /**
              * @type {Uint8Array}
              */
-            pixels : null,
+            pixels: null,
             /**
              * @type {Array.<Uint8Array>}
              */
-            mipmaps : []
+            mipmaps: []
         };
     }, {
-        update : function(_gl) {
+        update: function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
             
@@ -120,11 +120,11 @@ define(function(require) {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.texture.Texture2D.prototype
          */
-        generateMipmap : function(_gl) {
+        generateMipmap: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
             _gl.generateMipmap(_gl.TEXTURE_2D);    
         },
-        isPowerOfTwo : function() {
+        isPowerOfTwo: function() {
             var width;
             var height;
             if (this.image) {
@@ -138,7 +138,7 @@ define(function(require) {
                 && (height & (height-1)) === 0;
         },
 
-        isRenderable : function() {
+        isRenderable: function() {
             if (this.image) {
                 return this.image.nodeName === 'CANVAS'
                     || this.image.complete;
@@ -147,15 +147,15 @@ define(function(require) {
             }
         },
 
-        bind : function(_gl) {
+        bind: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this.getWebGLTexture(_gl));
         },
         
-        unbind : function(_gl) {
+        unbind: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
         
-        load : function(src) {
+        load: function(src) {
             var image = new Image();
             var self = this;
             image.onload = function() {

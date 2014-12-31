@@ -103,10 +103,10 @@ define(function(require) {
         this.scale = vec3.fromValues(1, 1, 1);
 
         this.channels = {
-            time : null,
-            position : null,
-            rotation : null,
-            scale : null
+            time: null,
+            position: null,
+            rotation: null,
+            scale: null
         };
 
         this._cacheKey = 0;
@@ -186,7 +186,7 @@ define(function(require) {
     SamplerClip.prototype.getSubClip = function(startTime, endTime) {
 
         var subClip = new SamplerClip({
-            name : this.name
+            name: this.name
         });
         var minTime = this.channels.time[0];
         startTime = Math.min(Math.max(startTime, minTime), this.life);
@@ -317,7 +317,7 @@ define(function(require) {
 
         return clip;
 
-    }
+    };
 
     return SamplerClip;
 });

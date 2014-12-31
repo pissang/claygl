@@ -19,19 +19,19 @@ define(function(require) {
          * If use depth buffer
          * @type {boolean}
          */
-        depthBuffer : true,
+        depthBuffer: true,
 
         //Save attached texture and target
-        _attachedTextures : null,
+        _attachedTextures: null,
 
-        _width : 0,
-        _height : 0,
-        _depthTextureAttached : false,
+        _width: 0,
+        _height: 0,
+        _depthTextureAttached: false,
 
-        _renderBufferWidth : 0,
-        _renderBufferHeight : 0,
+        _renderBufferWidth: 0,
+        _renderBufferHeight: 0,
 
-        _binded : false,
+        _binded: false,
     }, function() {
         // Use cache
         this._cache = new Cache();
@@ -48,7 +48,7 @@ define(function(require) {
          * @param  {number} width
          * @param  {number} height
          */
-        resize : function(width, height) {
+        resize: function(width, height) {
             this._width = width;
             this._height = height;
         },
@@ -57,7 +57,7 @@ define(function(require) {
          * Bind the framebuffer to given renderer before rendering
          * @param  {qtek.Renderer} renderer
          */
-        bind : function(renderer) {
+        bind: function(renderer) {
 
             var _gl = renderer.gl;
 
@@ -96,7 +96,7 @@ define(function(require) {
          * Unbind the frame buffer after rendering
          * @param  {qtek.Renderer} renderer
          */
-        unbind : function(renderer) {
+        unbind: function(renderer) {
             var _gl = renderer.gl;
             
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
@@ -122,7 +122,7 @@ define(function(require) {
             }
         },
 
-        getFrameBuffer : function(_gl) {
+        getFrameBuffer: function(_gl) {
 
             this._cache.use(_gl.__GLID__);
 
@@ -141,7 +141,7 @@ define(function(require) {
          * @param  {number} [target]
          * @param  {number} [mipmapLevel]
          */
-        attach : function(_gl, texture, attachment, target, mipmapLevel) {
+        attach: function(_gl, texture, attachment, target, mipmapLevel) {
 
             if (! texture.width) {
                 throw new Error('The texture attached to color buffer is not a valid.');
@@ -183,12 +183,12 @@ define(function(require) {
             _gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
         },
 
-        detach : function() {},
+        detach: function() {},
         /**
          * Dispose
          * @param  {WebGLRenderingContext} _gl
          */
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             this._cache.use(_gl.__GLID__);
 
             var renderBuffer = this._cache.get('renderbuffer');

@@ -41,21 +41,21 @@ define(function(require) {
         /**
          * @type {qtek.Material}
          */
-        material : null,
+        material: null,
 
         /**
          * @type {qtek.Geometry}
          */
-        geometry : null,
+        geometry: null,
         
         /**
          * @type {number}
          */
-        mode : glenum.TRIANGLES,
+        mode: glenum.TRIANGLES,
 
-        _drawCache : null,
+        _drawCache: null,
 
-        _renderInfo : null
+        _renderInfo: null
     }, function() {
         this._drawCache = {};
         this._renderInfo = new RenderInfo();
@@ -67,43 +67,43 @@ define(function(require) {
          * Used when mode is LINES, LINE_STRIP or LINE_LOOP
          * @type {number}
          */
-        lineWidth : 1,
+        lineWidth: 1,
 
         /**
          * @type {boolean}
          */
-        culling : true,
+        culling: true,
         /**
          * @type {number}
          */
-        cullFace : glenum.BACK,
+        cullFace: glenum.BACK,
         /**
          * @type {number}
          */
-        frontFace : glenum.CCW,
+        frontFace: glenum.CCW,
 
         /**
          * Software frustum culling
          * @type {boolean}
          */
-        frustumCulling : true,
+        frustumCulling: true,
         /**
          * @type {boolean}
          */
-        receiveShadow : true,
+        receiveShadow: true,
         /**
          * @type {boolean}
          */
-        castShadow : true,
+        castShadow: true,
         /**
          * @type {boolean}
          */
-        ignorePicking : false,
+        ignorePicking: false,
 
         /**
          * @return {boolean}
          */
-        isRenderable : function() {
+        isRenderable: function() {
             return this.geometry && this.material && this.material.shader && this.visible;
         },
 
@@ -112,7 +112,7 @@ define(function(require) {
          * @param  {qtek.Material} [globalMaterial]
          * @return {Object}
          */
-        render : function(_gl, globalMaterial) {
+        render: function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
@@ -162,7 +162,7 @@ define(function(require) {
                 renderInfo.drawCallNumber = 1;
             } else {
                 // Use the cache of static geometry
-                // TODO : machanism to change to the DynamicGeometry automatically
+                // TODO machanism to change to the DynamicGeometry automatically
                 // when the geometry is not static any more
                 var vaoList = this._drawCache[currentDrawID];
                 if (!vaoList) {
@@ -301,7 +301,7 @@ define(function(require) {
          * @method
          * @return {qtek.Renderable}
          */
-        clone : (function() {
+        clone: (function() {
             var properties = [
                 'castShadow', 'receiveShadow',
                 'mode', 'culling', 'cullFace', 'frontFace',

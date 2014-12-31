@@ -48,7 +48,7 @@ define(function(require) {
          * Set frustum from a projection matrix
          * @param {qtek.math.Matrix4} projectionMatrix
          */
-        setFromProjection : function(projectionMatrix) {
+        setFromProjection: function(projectionMatrix) {
 
             var planes = this.planes;
             var m = projectionMatrix._array;
@@ -130,7 +130,7 @@ define(function(require) {
          * @param {qtek.math.Matrix4}
          * @return {qtek.math.BoundingBox}
          */
-        getTransformedBoundingBox : (function() {
+        getTransformedBoundingBox: (function() {
             
             var tmpVec3 = vec3.create();
 

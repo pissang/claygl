@@ -24,28 +24,28 @@ define(function(require) {
         /**
          * @type {number}
          */
-        shadowBias : 0.0002,
+        shadowBias: 0.0002,
         /**
          * @type {number}
          */
-        shadowSlopeScale : 2.0
+        shadowSlopeScale: 2.0
     }, {
 
-        type : 'DIRECTIONAL_LIGHT',
+        type: 'DIRECTIONAL_LIGHT',
 
-        uniformTemplates : {
-            'directionalLightDirection' : {
-                type : '3f',
-                value : (function() {
+        uniformTemplates: {
+            'directionalLightDirection': {
+                type: '3f',
+                value: (function() {
                     var z = new Vector3();
                     return function(instance) {
                         return z.copy(instance.worldTransform.forward).negate()._array;
                     };
                 })()
             },
-            'directionalLightColor' : {
-                type : '3f',
-                value : function(instance) {
+            'directionalLightColor': {
+                type: '3f',
+                value: function(instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
                     return [color[0]*intensity, color[1]*intensity, color[1]*intensity];

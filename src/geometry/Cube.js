@@ -25,19 +25,19 @@ define(function(require) {
         /**
          * @type {number}
          */
-        widthSegments : 1,
+        widthSegments: 1,
         /**
          * @type {number}
          */
-        heightSegments : 1,
+        heightSegments: 1,
         /**
          * @type {number}
          */
-        depthSegments : 1,
+        depthSegments: 1,
         /**
          * @type {boolean}
          */
-        inside : false
+        inside: false
     }, function() {
         this.build();
     },
@@ -54,12 +54,12 @@ define(function(require) {
             this.attributes.normal.value.length = 0;
 
             var planes = {
-                'px' : createPlane('px', this.depthSegments, this.heightSegments),
-                'nx' : createPlane('nx', this.depthSegments, this.heightSegments),
-                'py' : createPlane('py', this.widthSegments, this.depthSegments),
-                'ny' : createPlane('ny', this.widthSegments, this.depthSegments),
-                'pz' : createPlane('pz', this.widthSegments, this.heightSegments),
-                'nz' : createPlane('nz', this.widthSegments, this.heightSegments),
+                'px': createPlane('px', this.depthSegments, this.heightSegments),
+                'nx': createPlane('nx', this.depthSegments, this.heightSegments),
+                'py': createPlane('py', this.widthSegments, this.depthSegments),
+                'ny': createPlane('ny', this.widthSegments, this.depthSegments),
+                'pz': createPlane('pz', this.widthSegments, this.heightSegments),
+                'nz': createPlane('nz', this.widthSegments, this.heightSegments),
             };
             var cursor = 0;
             var attrList = ['position', 'texcoord0', 'normal'];
@@ -97,8 +97,8 @@ define(function(require) {
         planeMatrix.identity();
 
         var plane = new Plane({
-            widthSegments : widthSegments,
-            heightSegments : heightSegments
+            widthSegments: widthSegments,
+            heightSegments: heightSegments
         });
 
         switch(pos) {

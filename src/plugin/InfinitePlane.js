@@ -19,16 +19,16 @@ define(function(require) {
 
     var InfinitePlane = Mesh.derive({
         
-        camera : null,
+        camera: null,
 
-        plane : null,
+        plane: null,
 
-        gridSize : 1,
+        gridSize: 1,
 
-        maxGrid : 0,
+        maxGrid: 0,
 
         // TODO
-        frustumCulling : false
+        frustumCulling: false
 
     }, function() {
         if (!this.geometry) {
@@ -39,7 +39,7 @@ define(function(require) {
         }
     }, {
 
-        updateGeometry : function() {
+        updateGeometry: function() {
 
             var coords = this._unProjectGrid();
             if (!coords) {
@@ -70,7 +70,7 @@ define(function(require) {
         },
 
         // http://fileadmin.cs.lth.se/graphics/theses/projects/projgrid/
-        _unProjectGrid : (function() {
+        _unProjectGrid: (function() {
             
             var planeViewSpace = new Plane();
             var lines = [

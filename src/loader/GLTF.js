@@ -1,6 +1,6 @@
 /**
  * glTF Loader
- * Specification : https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
+ * Specification https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
  *
  * TODO https://github.com/KhronosGroup/glTF/issues/298
  */
@@ -43,12 +43,12 @@ define(function(require) {
     var quat = glMatrix.quat;
 
     var semanticAttributeMap = {
-        'NORMAL' : 'normal',
-        'POSITION' : 'position',
-        'TEXCOORD_0' : 'texcoord0',
-        'WEIGHT' : 'weight',
-        'JOINT' : 'joint',
-        'COLOR' : 'color'
+        'NORMAL': 'normal',
+        'POSITION': 'position',
+        'TEXCOORD_0': 'texcoord0',
+        'WEIGHT': 'weight',
+        'JOINT': 'joint',
+        'COLOR': 'color'
     };
 
     /**
@@ -77,22 +77,22 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : '',
+        rootPath: '',
 
         /**
          * @type {string}
          */
-        textureRootPath : '',
+        textureRootPath: '',
 
         /**
          * @type {string}
          */
-        bufferRootPath : '',
+        bufferRootPath: '',
 
         /**
          * @type {string}
          */
-        shaderName : 'buildin.physical',
+        shaderName: 'buildin.physical',
 
         /**
          * @type {boolean}
@@ -119,7 +119,7 @@ define(function(require) {
         /**
          * @param  {string} url
          */
-        load : function(url) {
+        load: function(url) {
             var self = this;
 
             if (!this.rootPath) {
@@ -127,15 +127,15 @@ define(function(require) {
             }
 
             request.get({
-                url : url,
-                onprogress : function(percent, loaded, total) {
+                url: url,
+                onprogress: function(percent, loaded, total) {
                     self.trigger('progress', percent, loaded, total);
                 },
-                onerror : function(e) {
+                onerror: function(e) {
                     self.trigger('error', e);
                 },
-                responseType : 'text',
-                onload : function(data) {
+                responseType: 'text',
+                onload: function(data) {
                     self.parse(JSON.parse(data));
                 }
             });
@@ -145,19 +145,19 @@ define(function(require) {
          * @param {Object} json
          * @return {qtek.loader.GLTF.IResult}
          */
-        parse : function(json) {
+        parse: function(json) {
             var self = this;
             var loading = 0;
 
             var lib = {
-                buffers : {},
-                materials : {},
-                textures : {},
-                meshes : {},
-                joints : {},
-                skeletons : {},
-                cameras : {},
-                nodes : {}
+                buffers: {},
+                materials: {},
+                textures: {},
+                meshes: {},
+                joints: {},
+                skeletons: {},
+                cameras: {},
+                nodes: {}
             };
             // Mount on the root node if given
             var rootNode = this.rootNode || new Scene();
@@ -236,12 +236,12 @@ define(function(require) {
                 path = root + '/' + path;
             }
             request.get({
-                url : path,
-                responseType : 'arraybuffer',
-                onload : function(buffer) {
+                url: path,
+                responseType: 'arraybuffer',
+                onload: function(buffer) {
                     onsuccess && onsuccess(buffer);
                 },
-                onerror : function(buffer) {
+                onerror: function(buffer) {
                     onerror && onerror(buffer);
                 }
             });
@@ -249,20 +249,20 @@ define(function(require) {
 
         // https://github.com/KhronosGroup/glTF/issues/100
         // https://github.com/KhronosGroup/glTF/issues/193
-        _parseSkins : function(json, lib) {
+        _parseSkins: function(json, lib) {
 
             // Create skeletons and joints
             var haveInvBindMatrices = false;
             for (var name in json.skins) {
                 var skinInfo = json.skins[name];
                 var skeleton = new Skeleton({
-                    name : name
+                    name: name
                 });
                 for (var i = 0; i < skinInfo.joints.length; i++) {
                     var jointId = skinInfo.joints[i];
                     var joint = new Joint({
-                        name : jointId,
-                        index : skeleton.joints.length
+                        name: jointId,
+                        index: skeleton.joints.length
                     });
                     skeleton.joints.push(joint);
                 }
@@ -381,7 +381,7 @@ define(function(require) {
             }
         },     
 
-        _parseTextures : function(json, lib) {
+        _parseTextures: function(json, lib) {
             var root = this.textureRootPath || this.rootPath;
             util.each(json.textures, function(textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
@@ -419,20 +419,20 @@ define(function(require) {
         },
 
         // Only phong material is support yet
-        // TODO : support custom material
-        _parseMaterials : function(json, lib) {
+        // TODO support custom material
+        _parseMaterials: function(json, lib) {
             var techniques = {};
             // Parse techniques
             for (var name in json.techniques) {
                 var techniqueInfo = json.techniques[name];
                 // Default phong shader
                 // var shader = new Shader({
-                //     vertex : Shader.source('buildin.phong.vertex'),
-                //     fragment : Shader.source('buildin.phong.fragment')
+                //     vertex: Shader.source('buildin.phong.vertex'),
+                //     fragment: Shader.source('buildin.phong.fragment')
                 // });
                 techniques[name] = {
-                    // shader : shader,
-                    pass : techniqueInfo.passes[techniqueInfo.pass]
+                    // shader: shader,
+                    pass: techniqueInfo.passes[techniqueInfo.pass]
                 };
             }
             for (var name in json.materials) {
@@ -459,8 +459,8 @@ define(function(require) {
                     enabledTextures.push('normalMap');
                 }
                 var material = new Material({
-                    name : materialInfo.name,
-                    shader : shaderLibrary.get(this.shaderName, enabledTextures)
+                    name: materialInfo.name,
+                    shader: shaderLibrary.get(this.shaderName, enabledTextures)
                 });
                 if (pass.states.depthMask !== undefined) {
                     material.depthMask = pass.states.depthMask;
@@ -506,7 +506,7 @@ define(function(require) {
             }
         },
 
-        _parseMeshes : function(json, lib) {
+        _parseMeshes: function(json, lib) {
             var self = this;
 
             var meshKeys = Object.keys(json.meshes);
@@ -519,7 +519,7 @@ define(function(require) {
                 for (var pp = 0; pp < meshInfo.primitives.length; pp++) {
                     var primitiveInfo = meshInfo.primitives[pp];
                     var geometry = new StaticGeometry({
-                        boundingBox : new BoundingBox()
+                        boundingBox: new BoundingBox()
                     });
                     // Parse attributes
                     var semantics = Object.keys(primitiveInfo.attributes);
@@ -609,12 +609,12 @@ define(function(require) {
                     //Collada export from blender may not have default material
                     if (!material) {
                         material = new Material({
-                            shader : shaderLibrary.get(self.shaderName)
+                            shader: shaderLibrary.get(self.shaderName)
                         });
                     }
                     var mesh = new Mesh({
-                        geometry : geometry,
-                        material : material
+                        geometry: geometry,
+                        material: material
                     });
                     if (material.shader.isTextureEnabled('normalMap')) {
                         if (!mesh.geometry.attributes.tangent.value) {
@@ -637,7 +637,7 @@ define(function(require) {
             }
         },
 
-        _parseNodes : function(json, lib) {
+        _parseNodes: function(json, lib) {
 
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
@@ -647,11 +647,11 @@ define(function(require) {
 
                     if (cameraInfo.projection === 'perspective') {
                         node = new PerspectiveCamera({
-                            name : nodeInfo.name,
-                            aspect : cameraInfo.aspect_ratio,
-                            fov : cameraInfo.xfov,
-                            far : cameraInfo.zfar,
-                            near : cameraInfo.znear
+                            name: nodeInfo.name,
+                            aspect: cameraInfo.aspect_ratio,
+                            fov: cameraInfo.xfov,
+                            far: cameraInfo.zfar,
+                            near: cameraInfo.znear
                         });
                     } else {
                         // TODO
@@ -750,25 +750,25 @@ define(function(require) {
             }
          },
 
-        _parseLight : function(lightInfo) {
-            // TODO : Light parameters
+        _parseLight: function(lightInfo) {
+            // TODO Light parameters
             switch(lightInfo.type) {
                 case 'point':
                     var light = new PointLight({
-                        name : lightInfo.id,
-                        color : lightInfo.point.color,
+                        name: lightInfo.id,
+                        color: lightInfo.point.color,
                     });
                     break;
                 case 'spot':
                     var light = new SpotLight({
-                        name : lightInfo.id,
-                        color : lightInfo.spot.color
+                        name: lightInfo.id,
+                        color: lightInfo.spot.color
                     });
                     break;
                 case 'directional':
                     var light = new DirectionalLight({
-                        name : lightInfo.id,
-                        color : lightInfo.directional.color
+                        name: lightInfo.id,
+                        color: lightInfo.directional.color
                     });
                     break;
                 default:
@@ -778,7 +778,7 @@ define(function(require) {
             return light;
         },
 
-        _parseAnimations : function(json, lib) {
+        _parseAnimations: function(json, lib) {
             // TODO Only support nodes animation now
             var clip = new SkinningClip();
             // Default loop the skinning animation
@@ -851,7 +851,7 @@ define(function(require) {
                 //     continue;
                 // }
                 jointClips[targetId] = new SamplerClip({
-                    name : targetNode.name
+                    name: targetNode.name
                 });
                 var jointClip = jointClips[targetId];
                 jointClip.channels.time = parameters.TIME;

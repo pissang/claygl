@@ -14,7 +14,7 @@ define(function(require) {
          * @param  {number} deltaTime
          * @memberOf qtek.particleSystem.Field.prototype
          */
-        applyTo : function(velocity, position, weight, deltaTime) {}
+        applyTo: function(velocity, position, weight, deltaTime) {}
     });
 
     return Field;

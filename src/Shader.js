@@ -23,20 +23,20 @@ define(function(require) {
     var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*\n/g;
 
     var uniformTypeMap = {
-        'bool' : '1i',
-        'int' : '1i',
-        'sampler2D' : 't',
-        'samplerCube' : 't',
-        'float' : '1f',
-        'vec2' : '2f',
-        'vec3' : '3f',
-        'vec4' : '4f',
-        'ivec2' : '2i',
-        'ivec3' : '3i',
-        'ivec4' : '4i',
-        'mat2' : 'm2',
-        'mat3' : 'm3',
-        'mat4' : 'm4'
+        'bool': '1i',
+        'int': '1i',
+        'sampler2D': 't',
+        'samplerCube': 't',
+        'float': '1f',
+        'vec2': '2f',
+        'vec3': '3f',
+        'vec4': '4f',
+        'ivec2': '2i',
+        'ivec3': '3i',
+        'ivec4': '4i',
+        'mat2': 'm2',
+        'mat3': 'm3',
+        'mat4': 'm4'
     };
 
     var uniformValueConstructor = {
@@ -669,8 +669,8 @@ define(function(require) {
                         if (type === 'sampler2D' || type === 'samplerCube') {
                             // Texture is default disabled
                             self._textureStatus[symbol] = {
-                                enabled : false,
-                                shaderType : shaderType
+                                enabled: false,
+                                shaderType: shaderType
                             };
                         }
                         if (isArray) {
@@ -681,8 +681,8 @@ define(function(require) {
                             // TODO
                             if (attribSemantics.indexOf(semantic) >= 0) {
                                 self.attribSemantics[semantic] = {
-                                    symbol : symbol,
-                                    type : uniformType
+                                    symbol: symbol,
+                                    type: uniformType
                                 };
                                 isConfigurable = false;
                             } else if (matrixSemantics.indexOf(semantic) >= 0) {
@@ -693,10 +693,10 @@ define(function(require) {
                                     semanticNoTranspose = semantic.slice(0, -9);
                                 }
                                 self.matrixSemantics[semantic] = {
-                                    symbol : symbol,
-                                    type : uniformType,
-                                    isTranspose : isTranspose,
-                                    semanticNoTranspose : semanticNoTranspose
+                                    symbol: symbol,
+                                    type: uniformType,
+                                    isTranspose: isTranspose,
+                                    semanticNoTranspose: semanticNoTranspose
                                 };
                                 isConfigurable = false;
                             } else {
@@ -719,9 +719,9 @@ define(function(require) {
                         }
                         if (isConfigurable) {
                             uniforms[symbol] = {
-                                type : uniformType,
-                                value : isArray ? uniformValueConstructor['array'] : (defaultValueFunc || uniformValueConstructor[type]),
-                                semantic : semantic || null
+                                type: uniformType,
+                                value: isArray ? uniformValueConstructor['array'] : (defaultValueFunc || uniformValueConstructor[type]),
+                                semantic: semantic || null
                             };
                         }
                     }
@@ -763,8 +763,8 @@ define(function(require) {
             for (var symbol in this.uniformTemplates){
                 var uniformTpl = this.uniformTemplates[symbol];
                 uniforms[symbol] = {
-                    type : uniformTpl.type,
-                    value : uniformTpl.value()
+                    type: uniformTpl.type,
+                    value: uniformTpl.value()
                 };
             }
 
@@ -810,9 +810,9 @@ define(function(require) {
 
                     attributes[symbol] = {
                         // Can only be float
-                        type : 'float',
-                        size : size,
-                        semantic : semantic || null
+                        type: 'float',
+                        size: size,
+                        semantic: semantic || null
                     };
 
                     if (semantic) {
@@ -820,8 +820,8 @@ define(function(require) {
                             throw new Error('Unkown semantic "' + semantic + '"');
                         }else{
                             self.attribSemantics[semantic] = {
-                                symbol : symbol,
-                                type : type
+                                symbol: symbol,
+                                type: type
                             };
                         }
                     }
@@ -918,10 +918,10 @@ define(function(require) {
          */
         clone: function() {
             var shader = new Shader({
-                vertex : this.vertex,
-                fragment : this.fragment,
-                vertexDefines : util.clone(this.vertexDefines),
-                fragmentDefines : util.clone(this.fragmentDefines)
+                vertex: this.vertex,
+                fragment: this.fragment,
+                vertexDefines: util.clone(this.vertexDefines),
+                fragmentDefines: util.clone(this.fragmentDefines)
             });
             for (var name in this._textureStatus) {
                 shader._textureStatus[name] = util.clone(this._textureStatus[name]);
@@ -944,8 +944,8 @@ define(function(require) {
     
     function getCacheSchema() {
         return {
-            'locations' : {},
-            'attriblocations' : {}
+            locations: {},
+            attriblocations: {}
         };
     }
 

@@ -20,28 +20,28 @@ define(function (require) {
              * Target renderer
              * @type {qtek.Renderer}
              */
-            renderer : null,
+            renderer: null,
             /**
              * Downsample ratio of hidden frame buffer
              * @type {number}
              */
-            downSampleRatio : 1,
+            downSampleRatio: 1,
 
-            width : 100,
-            height : 100,
+            width: 100,
+            height: 100,
 
-            lookupOffset : 1,
+            lookupOffset: 1,
 
-            _frameBuffer : null,
-            _texture : null,
-            _shader : null,
+            _frameBuffer: null,
+            _texture: null,
+            _shader: null,
 
-            _idMaterials : [],
-            _lookupTable : [],
+            _idMaterials: [],
+            _lookupTable: [],
 
-            _meshMaterials : [],
+            _meshMaterials: [],
 
-            _idOffset : 0
+            _idOffset: 0
         };
     }, function() {
         if (this.renderer) {
@@ -50,28 +50,28 @@ define(function (require) {
         }
         this._init();
     }, /** @lends qtek.picking.PixelPicking.prototype */ {
-        _init : function() {
+        _init: function() {
             this._texture = new Texture2D({
-                width : this.width * this.downSampleRatio,
-                height : this.height * this.downSampleRatio
+                width: this.width * this.downSampleRatio,
+                height: this.height * this.downSampleRatio
             });
             this._frameBuffer = new FrameBuffer();
 
             this._shader = new Shader({
-                vertex : Shader.source('buildin.picking.color.vertex'),
-                fragment : Shader.source('buildin.picking.color.fragment')
+                vertex: Shader.source('buildin.picking.color.vertex'),
+                fragment: Shader.source('buildin.picking.color.fragment')
             });
         },
         /**
          * Set picking presision
          * @param {number} ratio
          */
-        setPrecision : function(ratio) {
+        setPrecision: function(ratio) {
             this._texture.width = this.width * ratio;
             this._texture.height = this.height * ratio;
             this.downSampleRatio = ratio;
         },
-        resize : function(width, height) {
+        resize: function(width, height) {
             this._texture.width = width * this.downSampleRatio;
             this._texture.height = height * this.downSampleRatio;
             this.width = width;
@@ -82,7 +82,7 @@ define(function (require) {
          * Update the picking framebuffer
          * @param {number} ratio
          */
-        update : function(scene, camera) {
+        update: function(scene, camera) {
             var renderer = this.renderer;
             if (renderer.width !== this.width || renderer.height !== this.height) {
                 this.resize(renderer.width, renderer.height);
@@ -97,7 +97,7 @@ define(function (require) {
             this._frameBuffer.unbind(renderer);
         },
 
-        _setMaterial : function(root) {
+        _setMaterial: function(root) {
             for (var i =0; i < root._children.length; i++) {
                 var child = root._children[i];
                 if (child.geometry && child.material && child.material.shader) {
@@ -106,7 +106,7 @@ define(function (require) {
                     var material = this._idMaterials[idx];
                     if (!material) {
                         material = new Material({
-                            shader : this._shader
+                            shader: this._shader
                         });
                         var color = packID(id);
                         color[0] /= 255;
@@ -132,7 +132,7 @@ define(function (require) {
          * @param  {number} y Mouse position y
          * @return {qtek.Node}
          */
-        pick : function(x, y) {
+        pick: function(x, y) {
             var renderer = this.renderer;
 
             var ratio = this.downSampleRatio;
@@ -156,13 +156,13 @@ define(function (require) {
             }
         },
 
-        _restoreMaterial : function() {
+        _restoreMaterial: function() {
             for (var i = 0; i < this._lookupTable.length; i++) {
                 this._lookupTable[i].material = this._meshMaterials[i];
             }
         },
 
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             this._frameBuffer.dispose(_gl);
             this._shader.dispose(_gl);
         }

@@ -15,65 +15,65 @@ define(function(require) {
         /**
          * @type {number}
          */
-        range : 20,
+        range: 20,
         /**
          * @type {number}
          */
-        umbraAngle : 30,
+        umbraAngle: 30,
         /**
          * @type {number}
          */
-        penumbraAngle : 45,
+        penumbraAngle: 45,
         /**
          * @type {number}
          */
-        falloffFactor : 2.0,
+        falloffFactor: 2.0,
         /**
          * @type {number}
          */
-        shadowBias : 0.0002,
+        shadowBias: 0.0002,
         /**
          * @type {number}
          */
-        shadowSlopeScale : 2.0
+        shadowSlopeScale: 2.0
     },{
 
-        type : 'SPOT_LIGHT',
+        type: 'SPOT_LIGHT',
 
-        uniformTemplates : {
-            'spotLightPosition' : {
-                type : '3f',
-                value : function(instance) {
+        uniformTemplates: {
+            'spotLightPosition': {
+                type: '3f',
+                value: function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
-            'spotLightRange' : {
-                type : '1f',
-                value : function(instance) {
+            'spotLightRange': {
+                type: '1f',
+                value: function(instance) {
                     return instance.range;
                 }
             },
-            'spotLightUmbraAngleCosine' : {
-                type : '1f',
-                value : function(instance) {
+            'spotLightUmbraAngleCosine': {
+                type: '1f',
+                value: function(instance) {
                     return Math.cos(instance.umbraAngle * Math.PI / 180);
                 }
             },
-            'spotLightPenumbraAngleCosine' : {
-                type : '1f',
-                value : function(instance) {
+            'spotLightPenumbraAngleCosine': {
+                type: '1f',
+                value: function(instance) {
                     return Math.cos(instance.penumbraAngle * Math.PI / 180);
                 }
             },
-            'spotLightFalloffFactor' : {
-                type : '1f',
-                value : function(instance) {
+            'spotLightFalloffFactor': {
+                type: '1f',
+                value: function(instance) {
                     return instance.falloffFactor;
                 }
             },
-            'spotLightDirection' : {
-                type : '3f',
-                value : (function() {
+            'spotLightDirection': {
+                type: '3f',
+                value: (function() {
                     var z = new Vector3();
                     return function(instance) {
                         // Direction is target to eye
@@ -81,9 +81,9 @@ define(function(require) {
                     };
                 })()
             },
-            'spotLightColor' : {
-                type : '3f',
-                value : function(instance) {
+            'spotLightColor': {
+                type: '3f',
+                value: function(instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
                     return [color[0]*intensity, color[1]*intensity, color[1]*intensity];

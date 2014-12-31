@@ -7,12 +7,12 @@ define(function(require) {
 
     function makeProperty(n) {
         return {
-            configurable : false,
-            set : function(value) {
+            configurable: false,
+            set: function(value) {
                 this._array[n] = value;
                 this._dirty = true;
             },
-            get : function() {
+            get: function() {
                 return this._array[n];
             }
         };
@@ -38,13 +38,13 @@ define(function(require) {
 
     Matrix3.prototype = {
 
-        constructor : Matrix3,
+        constructor: Matrix3,
 
         /**
          * Calculate the adjugate of self, in-place
          * @return {qtek.math.Matrix3}
          */
-        adjoint : function() {
+        adjoint: function() {
             mat3.adjoint(this._array, this._array);
             this._dirty = true;
             return this;
@@ -54,7 +54,7 @@ define(function(require) {
          * Clone a new Matrix3
          * @return {qtek.math.Matrix3}
          */
-        clone : function() {
+        clone: function() {
             return (new Matrix3()).copy(this);
         },
 
@@ -63,7 +63,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} b
          * @return {qtek.math.Matrix3}
          */
-        copy : function(b) {
+        copy: function(b) {
             mat3.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -73,7 +73,7 @@ define(function(require) {
          * Calculate matrix determinant
          * @return {number}
          */
-        determinant : function() {
+        determinant: function() {
             return mat3.determinant(this._array);
         },
 
@@ -82,7 +82,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} a
          * @return {qtek.math.Matrix3}
          */
-        fromMat2d : function(a) {
+        fromMat2d: function(a) {
             mat3.fromMat2d(this._array, a._array);
             this._dirty = true;
             return this;
@@ -93,7 +93,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} a
          * @return {qtek.math.Matrix3}
          */
-        fromMat4 : function(a) {
+        fromMat4: function(a) {
             mat3.fromMat4(this._array, a._array);
             this._dirty = true;
             return this;
@@ -104,7 +104,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} q
          * @return {qtek.math.Matrix3}
          */
-        fromQuat : function(q) {
+        fromQuat: function(q) {
             mat3.fromQuat(this._array, q._array);
             this._dirty = true;
             return this;
@@ -114,7 +114,7 @@ define(function(require) {
          * Set to a identity matrix
          * @return {qtek.math.Matrix3}
          */
-        identity : function() {
+        identity: function() {
             mat3.identity(this._array);
             this._dirty = true;
             return this;
@@ -124,7 +124,7 @@ define(function(require) {
          * Invert self
          * @return {qtek.math.Matrix3}
          */
-        invert : function() {
+        invert: function() {
             mat3.invert(this._array, this._array);
             this._dirty = true;
             return this;
@@ -135,7 +135,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} b
          * @return {qtek.math.Matrix3}
          */
-        mul : function(b) {
+        mul: function(b) {
             mat3.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -146,7 +146,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} a
          * @return {qtek.math.Matrix3}
          */
-        mulLeft : function(a) {
+        mulLeft: function(a) {
             mat3.mul(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -157,7 +157,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} b
          * @return {qtek.math.Matrix3}
          */
-        multiply : function(b) {
+        multiply: function(b) {
             mat3.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -168,7 +168,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} a
          * @return {qtek.math.Matrix3}
          */
-        multiplyLeft : function(a) {
+        multiplyLeft: function(a) {
             mat3.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -179,7 +179,7 @@ define(function(require) {
          * @param  {number}   rad
          * @return {qtek.math.Matrix3}
          */
-        rotate : function(rad) {
+        rotate: function(rad) {
             mat3.rotate(this._array, this._array, rad);
             this._dirty = true;
             return this;
@@ -190,7 +190,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2}  s
          * @return {qtek.math.Matrix3}
          */
-        scale : function(v) {
+        scale: function(v) {
             mat3.scale(this._array, this._array, v._array);
             this._dirty = true;
             return this;
@@ -201,7 +201,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2}  v
          * @return {qtek.math.Matrix3}
          */
-        translate : function(v) {
+        translate: function(v) {
             mat3.translate(this._array, this._array, v._array);
             this._dirty = true;
             return this;
@@ -210,7 +210,7 @@ define(function(require) {
          * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
          * @param {qtek.math.Matrix4} a
          */
-        normalFromMat4 : function(a) {
+        normalFromMat4: function(a) {
             mat3.normalFromMat4(this._array, a._array);
             this._dirty = true;
             return this;
@@ -220,12 +220,12 @@ define(function(require) {
          * Transpose self, in-place.
          * @return {qtek.math.Matrix2}
          */
-        transpose : function() {
+        transpose: function() {
             mat3.transpose(this._array, this._array);
             this._dirty = true;
             return this;
         },
-        toString : function() {
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };

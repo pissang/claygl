@@ -225,7 +225,7 @@ define(function(require) {
          * Mark attributes in geometry is dirty
          * @method
          */
-        dirty : notImplementedWarn,
+        dirty: notImplementedWarn,
         /**
          * Create a new attribute
          * @method
@@ -245,56 +245,56 @@ define(function(require) {
          * @method
          * @return {number}
          */
-        getVertexNumber : notImplementedWarn,
+        getVertexNumber: notImplementedWarn,
         /**
          * @method
          * @return {number}
          */
-        getFaceNumber : notImplementedWarn,
+        getFaceNumber: notImplementedWarn,
         /**
          * @method
          * @return {boolean}
          */
-        isUseFace : notImplementedWarn,
+        isUseFace: notImplementedWarn,
 
-        getEnabledAttributes : notImplementedWarn,
-        getBufferChunks : notImplementedWarn,
+        getEnabledAttributes: notImplementedWarn,
+        getBufferChunks: notImplementedWarn,
 
         /**
          * @method
          */
-        generateVertexNormals : notImplementedWarn,
+        generateVertexNormals: notImplementedWarn,
         /**
          * @method
          */
-        generateFaceNormals : notImplementedWarn,
+        generateFaceNormals: notImplementedWarn,
         /**
          * @method
          * @return {boolean}
          */
-        isUniqueVertex : notImplementedWarn,
+        isUniqueVertex: notImplementedWarn,
         /**
          * @method
          */
-        generateUniqueVertex : notImplementedWarn,
+        generateUniqueVertex: notImplementedWarn,
         /**
          * @method
          */
-        generateTangents : notImplementedWarn,
+        generateTangents: notImplementedWarn,
         /**
          * @method
          */
-        generateBarycentric : notImplementedWarn,
+        generateBarycentric: notImplementedWarn,
         /**
          * @method
          * @param {qtek.math.Matrix4} matrix
          */
-        applyTransform : notImplementedWarn,
+        applyTransform: notImplementedWarn,
         /**
          * @method
          * @param {WebGLRenderingContext} gl
          */
-        dispose : notImplementedWarn
+        dispose: notImplementedWarn
     });
 
     Geometry.STATIC_DRAW = glenum.STATIC_DRAW;

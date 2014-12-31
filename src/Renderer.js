@@ -32,21 +32,21 @@ define(function(require) {
              * @type {HTMLCanvasElement}
              * @readonly
              */
-            canvas : null,
+            canvas: null,
 
             /**
              * Canvas width, set by resize method
              * @type {number}
              * @readonly
              */
-            width : 100,
+            width: 100,
 
             /**
              * Canvas width, set by resize method
              * @type {number}
              * @readonly
              */
-            height : 100,
+            height: 100,
 
             /**
              * Device pixel ratio, set by setDevicePixelRatio method
@@ -55,20 +55,20 @@ define(function(require) {
              * @type {number}
              * @readonly
              */
-            devicePixelRatio : window.devicePixelRatio || 1.0,
+            devicePixelRatio: window.devicePixelRatio || 1.0,
 
             /**
              * Clear color
              * @type {number[]}
              */
-            color : [0.0, 0.0, 0.0, 0.0],
+            color: [0.0, 0.0, 0.0, 0.0],
             
             /**
              * Default:
              *     _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
              * @type {number}
              */
-            clear : 17664,  
+            clear: 17664,  
 
             // Settings when getting context
             // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -77,32 +77,32 @@ define(function(require) {
              * If enable alpha, default true
              * @type {boolean}
              */
-            alhpa : true,
+            alhpa: true,
             /**
              * If enable depth buffer, default true
              * @type {boolean}
              */
-            depth : true,
+            depth: true,
             /**
              * If enable stencil buffer, default false
              * @type {boolean}
              */
-            stencil : false,
+            stencil: false,
             /**
              * If enable antialias, default true
              * @type {boolean}
              */
-            antialias : true,
+            antialias: true,
             /**
              * If enable premultiplied alpha, default true
              * @type {boolean}
              */
-            premultipliedAlpha : true,
+            premultipliedAlpha: true,
             /**
              * If preserve drawing buffer, default false
              * @type {boolean}
              */
-            preserveDrawingBuffer : false,
+            preserveDrawingBuffer: false,
             /**
              * If throw context error, usually turned on in debug mode
              * @type {boolean}
@@ -112,17 +112,17 @@ define(function(require) {
              * WebGL Context created from given canvas
              * @type {WebGLRenderingContext}
              */
-            gl : null,
+            gl: null,
             /**
              * Renderer viewport, read-only, can be set by setViewport method
              * @type {{x: number, y: number, width: number, height: number}}
              */
-            viewport : {},
+            viewport: {},
 
-            _viewportSettings : [],
-            _clearSettings : [],
+            _viewportSettings: [],
+            _clearSettings: [],
 
-            _sceneRendering : null
+            _sceneRendering: null
         };
     }, function() {
 
@@ -133,12 +133,12 @@ define(function(require) {
         }
         try {
             var opts = {
-                alhpa : this.alhpa,
-                depth : this.depth,
-                stencil : this.stencil,
-                antialias : this.antialias,
-                premultipliedAlpha : this.premultipliedAlpha,
-                preserveDrawingBuffer : this.preserveDrawingBuffer
+                alhpa: this.alhpa,
+                depth: this.depth,
+                stencil: this.stencil,
+                antialias: this.antialias,
+                premultipliedAlpha: this.premultipliedAlpha,
+                preserveDrawingBuffer: this.preserveDrawingBuffer
             };
             
             this.gl = this.canvas.getContext('webgl', opts)
@@ -166,7 +166,7 @@ define(function(require) {
          * @param {number} width
          * @param {number} height
          */
-        resize : function(width, height) {
+        resize: function(width, height) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
@@ -191,7 +191,7 @@ define(function(require) {
          * Set devicePixelRatio
          * @param {number} devicePixelRatio
          */
-        setDevicePixelRatio : function(devicePixelRatio) {
+        setDevicePixelRatio: function(devicePixelRatio) {
             this.devicePixelRatio = devicePixelRatio;
             this.resize(this.width, this.height);
         },
@@ -203,7 +203,7 @@ define(function(require) {
          * @param {number} [width]
          * @param {number} [height]
          */
-        setViewport : function(x, y, width, height) {
+        setViewport: function(x, y, width, height) {
 
             if (typeof(x) === 'object') {
                 var obj = x;
@@ -215,24 +215,24 @@ define(function(require) {
             this.gl.viewport(x, y, width, height);
 
             this.viewport = {
-                x : x,
-                y : y,
-                width : width,
-                height : height
+                x: x,
+                y: y,
+                width: width,
+                height: height
             };
         },
 
         /**
          * Push current viewport into a stack
          */
-        saveViewport : function() {
+        saveViewport: function() {
             this._viewportSettings.push(this.viewport);
         },
 
         /**
          * Pop viewport from stack, restore in the renderer
          */
-        restoreViewport : function() {
+        restoreViewport: function() {
             if (this._viewportSettings.length > 0) {
                 this.setViewport(this._viewportSettings.pop());
             }
@@ -241,14 +241,14 @@ define(function(require) {
         /**
          * Push current clear into a stack
          */
-        saveClear : function() {
+        saveClear: function() {
             this._clearSettings.push(this.clear);
         },
 
         /**
          * Pop clear from stack, restore in the renderer
          */
-        restoreClear : function() {
+        restoreClear: function() {
             if (this._clearSettings.length > 0) {
                 this.clear = this._clearSettings.pop();   
             }
@@ -261,7 +261,7 @@ define(function(require) {
          * @param  {boolean}     [preZ]           If use preZ optimization, default false
          * @return {IRenderInfo}
          */
-        render : function(scene, camera, notUpdateScene, preZ) {
+        render: function(scene, camera, notUpdateScene, preZ) {
             var _gl = this.gl;
 
             this._sceneRendering = scene;
@@ -340,13 +340,13 @@ define(function(require) {
          * @param  {boolean}           [preZ]           If use preZ optimization, default false
          * @return {IRenderInfo}
          */
-        renderQueue : function(queue, camera, globalMaterial, preZ) {
+        renderQueue: function(queue, camera, globalMaterial, preZ) {
             var renderInfo = {
-                faceNumber : 0,
-                vertexNumber : 0,
-                drawCallNumber : 0,
+                faceNumber: 0,
+                vertexNumber: 0,
+                drawCallNumber: 0,
                 meshNumber: queue.length,
-                renderedMeshNumber : 0
+                renderedMeshNumber: 0
             };
 
             // Calculate view and projection matrix
@@ -370,8 +370,9 @@ define(function(require) {
             var culledRenderQueue;
             if (preZ) {
                 var preZPassMaterial = new Material({
-                    shader : shaderLibrary.get('buildin.prez')
+                    shader: shaderLibrary.get('buildin.prez')
                 });
+                var preZPassShader = preZPassMaterial.shader;
 
                 culledRenderQueue = [];
                 preZPassShader.bind(_gl);
@@ -539,7 +540,7 @@ define(function(require) {
             return renderInfo;
         },
 
-        _frustumCulling : (function() {
+        _frustumCulling: (function() {
             // Frustum culling
             // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
             var cullingBoundingBox = new BoundingBox();
@@ -592,7 +593,7 @@ define(function(require) {
          * Dispose given scene, including all geometris, textures and shaders in the scene
          * @param {qtek.Scene} scene
          */
-        disposeScene : function(scene) {
+        disposeScene: function(scene) {
             this.disposeNode(scene, true, true);
             scene.dispose();
         },
@@ -603,7 +604,7 @@ define(function(require) {
          * @param {boolean} [disposeGeometry=false] If dispose the geometries used in the descendant mesh
          * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
          */
-        disposeNode : function(root, disposeGeometry, disposeTexture) {
+        disposeNode: function(root, disposeGeometry, disposeTexture) {
             var materials = {};
             var _gl = this.gl;
             if (root.getParent()) {
@@ -632,7 +633,7 @@ define(function(require) {
          * Dispose given shader
          * @param {qtek.Shader} shader
          */
-        disposeShader : function(shader) {
+        disposeShader: function(shader) {
             shader.dispose(this.gl);
         },
 
@@ -640,7 +641,7 @@ define(function(require) {
          * Dispose given geometry
          * @param {qtek.Geometry} geometry
          */
-        disposeGeometry : function(geometry) {
+        disposeGeometry: function(geometry) {
             geometry.dispose(this.gl);
         },
 
@@ -648,7 +649,7 @@ define(function(require) {
          * Dispose given texture
          * @param {qtek.Texture} texture
          */
-        disposeTexture : function(texture) {
+        disposeTexture: function(texture) {
             texture.dispose(this.gl);
         },
 
@@ -656,7 +657,7 @@ define(function(require) {
          * Dispose given frame buffer
          * @param {qtek.FrameBuffer} frameBuffer
          */
-        disposeFrameBuffer : function(frameBuffer) {
+        disposeFrameBuffer: function(frameBuffer) {
             frameBuffer.dispose(this.gl);
         },
         
@@ -677,7 +678,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} [out]
          * @return {qtek.math.Vector2}
          */
-        screenToNdc : function(x, y, out) {
+        screenToNdc: function(x, y, out) {
             if (!out) {
                 out = new Vector2();
             }
@@ -736,32 +737,32 @@ define(function(require) {
 
     // Temporary variables
     var matrices = {
-        'WORLD' : mat4.create(),
-        'VIEW' : mat4.create(),
-        'PROJECTION' : mat4.create(),
-        'WORLDVIEW' : mat4.create(),
-        'VIEWPROJECTION' : mat4.create(),
-        'WORLDVIEWPROJECTION' : mat4.create(),
+        WORLD: mat4.create(),
+        VIEW: mat4.create(),
+        PROJECTION: mat4.create(),
+        WORLDVIEW: mat4.create(),
+        VIEWPROJECTION: mat4.create(),
+        WORLDVIEWPROJECTION: mat4.create(),
 
-        'WORLDINVERSE' : mat4.create(),
-        'VIEWINVERSE' : mat4.create(),
-        'PROJECTIONINVERSE' : mat4.create(),
-        'WORLDVIEWINVERSE' : mat4.create(),
-        'VIEWPROJECTIONINVERSE' : mat4.create(),
-        'WORLDVIEWPROJECTIONINVERSE' : mat4.create(),
+        WORLDINVERSE: mat4.create(),
+        VIEWINVERSE: mat4.create(),
+        PROJECTIONINVERSE: mat4.create(),
+        WORLDVIEWINVERSE: mat4.create(),
+        VIEWPROJECTIONINVERSE: mat4.create(),
+        WORLDVIEWPROJECTIONINVERSE: mat4.create(),
 
-        'WORLDTRANSPOSE' : mat4.create(),
-        'VIEWTRANSPOSE' : mat4.create(),
-        'PROJECTIONTRANSPOSE' : mat4.create(),
-        'WORLDVIEWTRANSPOSE' : mat4.create(),
-        'VIEWPROJECTIONTRANSPOSE' : mat4.create(),
-        'WORLDVIEWPROJECTIONTRANSPOSE' : mat4.create(),
-        'WORLDINVERSETRANSPOSE' : mat4.create(),
-        'VIEWINVERSETRANSPOSE' : mat4.create(),
-        'PROJECTIONINVERSETRANSPOSE' : mat4.create(),
-        'WORLDVIEWINVERSETRANSPOSE' : mat4.create(),
-        'VIEWPROJECTIONINVERSETRANSPOSE' : mat4.create(),
-        'WORLDVIEWPROJECTIONINVERSETRANSPOSE' : mat4.create()
+        WORLDTRANSPOSE: mat4.create(),
+        VIEWTRANSPOSE: mat4.create(),
+        PROJECTIONTRANSPOSE: mat4.create(),
+        WORLDVIEWTRANSPOSE: mat4.create(),
+        VIEWPROJECTIONTRANSPOSE: mat4.create(),
+        WORLDVIEWPROJECTIONTRANSPOSE: mat4.create(),
+        WORLDINVERSETRANSPOSE: mat4.create(),
+        VIEWINVERSETRANSPOSE: mat4.create(),
+        PROJECTIONINVERSETRANSPOSE: mat4.create(),
+        WORLDVIEWINVERSETRANSPOSE: mat4.create(),
+        VIEWPROJECTIONINVERSETRANSPOSE: mat4.create(),
+        WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4.create()
     };
 
     Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;

@@ -41,7 +41,7 @@ define(function(require) {
             for (var j = 0; j < opts.jointClips.length; j++) {
                 var jointPoseCfg = opts.jointClips[j];
                 var jointClip = new TransformClip({
-                    keyFrames : jointPoseCfg.keyFrames
+                    keyFrames: jointPoseCfg.keyFrames
                 });
                 jointClip.name = jointPoseCfg.name || '';
                 this.jointClips[j] = jointClip;
@@ -95,7 +95,7 @@ define(function(require) {
      */
     SkinningClip.prototype.getSubClip = function(startTime, endTime, isLoop) {
         var subClip = new SkinningClip({
-            name : this.name
+            name: this.name
         });
 
         for (var i = 0; i < this.jointClips.length; i++) {
@@ -196,7 +196,7 @@ define(function(require) {
             clip.addJointClip(this.jointClips[i].clone());
         }
         return clip;
-    }
+    };
 
     return SkinningClip;
 });

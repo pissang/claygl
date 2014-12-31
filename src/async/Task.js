@@ -60,12 +60,12 @@ define(function(require) {
     function makeRequestTask(url, responseType) {
         var task = new Task();
         request.get({
-            url : url,
-            responseType : responseType,
-            onload : function(res) {
+            url: url,
+            responseType: responseType,
+            onload: function(res) {
                 task.resolve(res);
             },
-            onerror : function(error) {
+            onerror: function(error) {
                 task.reject(error);
             }
         });

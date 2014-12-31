@@ -14,32 +14,32 @@ define(function(require) {
         /**
          * @type {number}
          */
-        range : 100,
+        range: 100,
 
         /**
          * @type {number}
          */
-        castShadow : false
+        castShadow: false
     }, {
 
-        type : 'POINT_LIGHT',
+        type: 'POINT_LIGHT',
 
-        uniformTemplates : {
-            'pointLightPosition' : {
-                type : '3f',
-                value : function(instance) {
+        uniformTemplates: {
+            'pointLightPosition': {
+                type: '3f',
+                value: function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
-            'pointLightRange' : {
-                type : '1f',
-                value : function(instance) {
+            'pointLightRange': {
+                type: '1f',
+                value: function(instance) {
                     return instance.range;
                 }
             },
-            'pointLightColor' : {
-                type : '3f',
-                value : function(instance) {
+            'pointLightColor': {
+                type: '3f',
+                value: function(instance) {
                     var color = instance.color,
                         intensity = instance.intensity;
                     return [ color[0]*intensity, color[1]*intensity, color[1]*intensity ];

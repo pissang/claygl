@@ -7,12 +7,12 @@ define(function(require) {
 
     function makeProperty(n) {
         return {
-            configurable : false,
-            set : function(value) {
+            configurable: false,
+            set: function(value) {
                 this._array[n] = value;
                 this._dirty = true;
             },
-            get : function() {
+            get: function() {
                 return this._array[n];
             }
         };
@@ -37,13 +37,13 @@ define(function(require) {
 
     Matrix2d.prototype = {
 
-        constructor : Matrix2d,
+        constructor: Matrix2d,
 
         /**
          * Clone a new Matrix2d
          * @return {qtek.math.Matrix2d}
          */
-        clone : function() {
+        clone: function() {
             return (new Matrix2d()).copy(this);
         },
 
@@ -52,7 +52,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} b
          * @return {qtek.math.Matrix2d}
          */
-        copy : function(b) {
+        copy: function(b) {
             mat2d.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -62,7 +62,7 @@ define(function(require) {
          * Calculate matrix determinant
          * @return {number}
          */
-        determinant : function() {
+        determinant: function() {
             return mat2d.determinant(this._array);
         },
 
@@ -70,7 +70,7 @@ define(function(require) {
          * Set to a identity matrix
          * @return {qtek.math.Matrix2d}
          */
-        identity : function() {
+        identity: function() {
             mat2d.identity(this._array);
             this._dirty = true;
             return this;
@@ -80,7 +80,7 @@ define(function(require) {
          * Invert self
          * @return {qtek.math.Matrix2d}
          */
-        invert : function() {
+        invert: function() {
             mat2d.invert(this._array, this._array);
             this._dirty = true;
             return this;
@@ -91,7 +91,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} b
          * @return {qtek.math.Matrix2d}
          */
-        mul : function(b) {
+        mul: function(b) {
             mat2d.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -102,7 +102,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} a
          * @return {qtek.math.Matrix2d}
          */
-        mulLeft : function(b) {
+        mulLeft: function(b) {
             mat2d.mul(this._array, b._array, this._array);
             this._dirty = true;
             return this;
@@ -113,7 +113,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} b
          * @return {qtek.math.Matrix2d}
          */
-        multiply : function(b) {
+        multiply: function(b) {
             mat2d.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -124,7 +124,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} a
          * @return {qtek.math.Matrix2d}
          */
-        multiplyLeft : function(b) {
+        multiplyLeft: function(b) {
             mat2d.multiply(this._array, b._array, this._array);
             this._dirty = true;
             return this;
@@ -135,7 +135,7 @@ define(function(require) {
          * @param  {number}   rad
          * @return {qtek.math.Matrix2d}
          */
-        rotate : function(rad) {
+        rotate: function(rad) {
             mat2d.rotate(this._array, this._array, rad);
             this._dirty = true;
             return this;
@@ -146,7 +146,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2}  s
          * @return {qtek.math.Matrix2d}
          */
-        scale : function(s) {
+        scale: function(s) {
             mat2d.scale(this._array, this._array, s._array);
             this._dirty = true;
             return this;
@@ -157,12 +157,12 @@ define(function(require) {
          * @param  {qtek.math.Vector2}  v
          * @return {qtek.math.Matrix2d}
          */
-        translate : function(v) {
+        translate: function(v) {
             mat2d.translate(this._array, this._array, v._array);
             this._dirty = true;
             return this;
         },
-        toString : function() {
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };

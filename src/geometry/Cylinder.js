@@ -20,22 +20,22 @@ define(function(require) {
         /**
          * @type {number}
          */
-        radius : 1,
+        radius: 1,
 
         /**
          * @type {number}
          */
-        height : 2,
+        height: 2,
 
         /**
          * @type {number}
          */
-        capSegments : 50,
+        capSegments: 50,
 
         /**
          * @type {number}
          */
-        heightSegments : 1
+        heightSegments: 1
     }, function() {
         this.build();
     },
@@ -44,13 +44,13 @@ define(function(require) {
         /**
          * Build cylinder geometry
          */
-        build : function() {
+        build: function() {
             var cone = new ConeGeometry({
-                topRadius : this.radius,
-                bottomRadius : this.radius,
-                capSegments : this.capSegments,
-                heightSegments : this.heightSegments,
-                height : this.height
+                topRadius: this.radius,
+                bottomRadius: this.radius,
+                capSegments: this.capSegments,
+                heightSegments: this.heightSegments,
+                height: this.height
             });
 
             this.attributes.position.value = cone.attributes.position.value;

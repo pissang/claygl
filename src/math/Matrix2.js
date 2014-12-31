@@ -7,12 +7,12 @@ define(function(require) {
 
     function makeProperty(n) {
         return {
-            configurable : false,
-            set : function(value) {
+            configurable: false,
+            set: function(value) {
                 this._array[n] = value;
                 this._dirty = true;
             },
-            get : function() {
+            get: function() {
                 return this._array[n];
             }
         };
@@ -38,13 +38,13 @@ define(function(require) {
 
     Matrix2.prototype = {
 
-        constructor : Matrix2,
+        constructor: Matrix2,
 
         /**
          * Clone a new Matrix2
          * @return {qtek.math.Matrix2}
          */
-        clone : function() {
+        clone: function() {
             return (new Matrix2()).copy(this);
         },
 
@@ -53,7 +53,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} b
          * @return {qtek.math.Matrix2}
          */
-        copy : function(b) {
+        copy: function(b) {
             mat2.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -63,7 +63,7 @@ define(function(require) {
          * Calculate the adjugate of self, in-place
          * @return {qtek.math.Matrix2}
          */
-        adjoint : function() {
+        adjoint: function() {
             mat2.adjoint(this._array, this._array);
             this._dirty = true;
             return this;
@@ -73,7 +73,7 @@ define(function(require) {
          * Calculate matrix determinant
          * @return {number}
          */
-        determinant : function() {
+        determinant: function() {
             return mat2.determinant(this._array);
         },
 
@@ -81,7 +81,7 @@ define(function(require) {
          * Set to a identity matrix
          * @return {qtek.math.Matrix2}
          */
-        identity : function() {
+        identity: function() {
             mat2.identity(this._array);
             this._dirty = true;
             return this;
@@ -91,7 +91,7 @@ define(function(require) {
          * Invert self
          * @return {qtek.math.Matrix2}
          */
-        invert : function() {
+        invert: function() {
             mat2.invert(this._array, this._array);
             this._dirty = true;
             return this;
@@ -102,7 +102,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} b
          * @return {qtek.math.Matrix2}
          */
-        mul : function(b) {
+        mul: function(b) {
             mat2.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -113,7 +113,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} a
          * @return {qtek.math.Matrix2}
          */
-        mulLeft : function(a) {
+        mulLeft: function(a) {
             mat2.mul(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -124,7 +124,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} b
          * @return {qtek.math.Matrix2}
          */
-        multiply : function(b) {
+        multiply: function(b) {
             mat2.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -135,7 +135,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} a
          * @return {qtek.math.Matrix2}
          */
-        multiplyLeft : function(a) {
+        multiplyLeft: function(a) {
             mat2.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -146,7 +146,7 @@ define(function(require) {
          * @param  {number}   rad
          * @return {qtek.math.Matrix2}
          */
-        rotate : function(rad) {
+        rotate: function(rad) {
             mat2.rotate(this._array, this._array, rad);
             this._dirty = true;
             return this;
@@ -157,7 +157,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2}  s
          * @return {qtek.math.Matrix2}
          */
-        scale : function(v) {
+        scale: function(v) {
             mat2.scale(this._array, this._array, v._array);
             this._dirty = true;
             return this;
@@ -171,7 +171,7 @@ define(function(require) {
             this._dirty = true;
             return this;
         },
-        toString : function() {
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };

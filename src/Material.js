@@ -327,7 +327,7 @@ define(function(require) {
             if (shader) {
                 this.detachShader();
                 if (!shader.isAttachedToAny()) {
-                    shader.dispose(gl);
+                    shader.dispose(_gl);
                 }
             }
         }

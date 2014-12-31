@@ -46,12 +46,12 @@ define(function(require) {
 
     BoundingBox.prototype = {
         
-        constructor : BoundingBox,
+        constructor: BoundingBox,
         /**
          * Update min and max coords from a vertices array
          * @param  {array} vertices
          */
-        updateFromVertices : function(vertices) {
+        updateFromVertices: function(vertices) {
             if (vertices.length > 0) {
                 var _min = this.min._array;
                 var _max = this.max._array;
@@ -77,7 +77,7 @@ define(function(require) {
          * Union operation with another bounding box
          * @param  {qtek.math.BoundingBox} bbox
          */
-        union : function(bbox) {
+        union: function(bbox) {
             vec3.min(this.min._array, this.min._array, bbox.min._array);
             vec3.max(this.max._array, this.max._array, bbox.max._array);
             this.min._dirty = true;
@@ -89,7 +89,7 @@ define(function(require) {
          * @param  {qtek.math.BoundingBox} bbox
          * @return {boolean}
          */
-        intersectBoundingBox : function(bbox) {
+        intersectBoundingBox: function(bbox) {
             var _min = this.min._array;
             var _max = this.max._array;
 
@@ -104,7 +104,7 @@ define(function(require) {
          * Apply an affine transform matrix to the bounding box 
          * @param  {qtek.math.Matrix4} matrix
          */
-        applyTransform : function(matrix) {
+        applyTransform: function(matrix) {
             if (this.min._dirty || this.max._dirty) {
                 this.updateVertices();
                 this.min._dirty = false;
@@ -142,7 +142,7 @@ define(function(require) {
          * Apply a projection matrix to the bounding box
          * @param  {qtek.math.Matrix4} matrix
          */
-        applyProjection : function(matrix) {
+        applyProjection: function(matrix) {
             if (this.min._dirty || this.max._dirty) {
                 this.updateVertices();
                 this.min._dirty = false;
@@ -185,7 +185,7 @@ define(function(require) {
             this.max._dirty = true;
         },
 
-        updateVertices : function() {
+        updateVertices: function() {
             var min = this.min._array;
             var max = this.max._array;
             var vertices = this.vertices;
@@ -207,7 +207,7 @@ define(function(require) {
          * Copy values from another bounding box
          * @param  {qtek.math.BoundingBox} bbox
          */
-        copy : function(bbox) {
+        copy: function(bbox) {
             vec3Copy(this.min._array, bbox.min._array);
             vec3Copy(this.max._array, bbox.max._array);
             this.min._dirty = true;
@@ -218,7 +218,7 @@ define(function(require) {
          * Clone a new bounding box
          * @return {qtek.math.BoundingBox}
          */
-        clone : function() {
+        clone: function() {
             var boundingBox = new BoundingBox();
             boundingBox.copy(this);
             return boundingBox;

@@ -23,25 +23,25 @@ define(function(require) {
              * Camera projection matrix
              * @type {qtek.math.Matrix4}
              */
-            projectionMatrix : new Matrix4(),
+            projectionMatrix: new Matrix4(),
 
             /**
              * Inverse of camera projection matrix
              * @type {qtek.math.Matrix4}
              */
-            invProjectionMatrix : new Matrix4(),
+            invProjectionMatrix: new Matrix4(),
 
             /**
              * View matrix, equal to inverse of camera's world matrix
              * @type {qtek.math.Matrix4}
              */
-            viewMatrix : new Matrix4(),
+            viewMatrix: new Matrix4(),
 
             /**
              * Camera frustum in view space
              * @type {qtek.math.Frustum}
              */
-            frustum : new Frustum(),
+            frustum: new Frustum(),
 
             /**
              * Scene bounding box in view space.
@@ -52,8 +52,8 @@ define(function(require) {
              *  
              * @type {qtek.math.BoundingBox}
              */
-            //TODO : In case of one camera to multiple scenes
-            sceneBoundingBoxLastFrame : new BoundingBox()
+            //TODO In case of one camera to multiple scenes
+            sceneBoundingBoxLastFrame: new BoundingBox()
         };
     }, function() {
         this.update(true);
@@ -61,7 +61,7 @@ define(function(require) {
     /** @lends qtek.Camera.prototype */
     {
         
-        update : function(force) {
+        update: function(force) {
             Node.prototype.update.call(this, force);
             mat4.invert(this.viewMatrix._array, this.worldTransform._array);
             
@@ -73,7 +73,7 @@ define(function(require) {
         /**
          * Update projection matrix, called after update
          */
-        updateProjectionMatrix : function(){},
+        updateProjectionMatrix: function(){},
 
         /**
          * Cast a picking ray from camera near plane to far plane
@@ -82,7 +82,7 @@ define(function(require) {
          * @param {qtek.math.Ray} [out]
          * @return {qtek.math.Ray}
          */
-        castRay : (function() {
+        castRay: (function() {
             var v4 = vec4.create();
             return function(ndc, out) {
                 var ray = out !== undefined ? out : new Ray();

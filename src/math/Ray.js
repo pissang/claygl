@@ -27,7 +27,7 @@ define(function(require) {
 
     Ray.prototype = {
         
-        constructor : Ray,
+        constructor: Ray,
 
         // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
         /**
@@ -36,7 +36,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} [out]
          * @return {qtek.math.Vector3}
          */
-        intersectPlane : function(plane, out) {
+        intersectPlane: function(plane, out) {
             var pn = plane.normal._array;
             var d = plane.distance;
             var ro = this.origin._array;
@@ -60,7 +60,7 @@ define(function(require) {
          * Mirror the ray against plane
          * @param  {qtek.math.Plane} plane
          */
-        mirrorAgainstPlane : function(plane) {
+        mirrorAgainstPlane: function(plane) {
             // Distance to plane
             var d = vec3.dot(plane.normal._array, this.direction._array);
             vec3.scaleAndAdd(this.direction._array, this.direction._array, plane.normal._array, -d * 2);
@@ -80,7 +80,7 @@ define(function(require) {
                 var c2 = vec3.lenSquared(v);
                 // Squared distance from center to projection point
                 return Math.sqrt(c2 - b * b);
-            }
+            };
         })(),
 
         /**
@@ -129,7 +129,7 @@ define(function(require) {
                     vec3.scaleAndAdd(out._array, origin, direction, t0);
                     return out;
                 }
-            }
+            };
         })(),
 
         // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
@@ -218,7 +218,7 @@ define(function(require) {
          * @param {qtek.math.Vector3} [barycenteric] barycentric coords
          * @return {qtek.math.Vector3}
          */
-        intersectTriangle : (function() {
+        intersectTriangle: (function() {
             
             var eBA = vec3.create();
             var eCA = vec3.create();

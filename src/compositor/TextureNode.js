@@ -11,14 +11,14 @@ define(function(require) {
      */
     var TextureNode = Node.derive(function() {
         return /** @lends qtek.compositor.TextureNode# */ {
-            shader : Shader.source('buildin.compositor.output'),
+            shader: Shader.source('buildin.compositor.output'),
             /**
              * @type {qtek.texture.Texture2D}
              */
-            texture : null
+            texture: null
         };
     }, {
-        render : function(renderer, frameBuffer) {
+        render: function(renderer, frameBuffer) {
 
             this._rendering = true;
 

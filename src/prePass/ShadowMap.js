@@ -30,12 +30,12 @@ define(function(require) {
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     var targetMap = {
-        'px' : glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
-        'py' : glenum.TEXTURE_CUBE_MAP_POSITIVE_Y,
-        'pz' : glenum.TEXTURE_CUBE_MAP_POSITIVE_Z,
-        'nx' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
-        'ny' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-        'nz' : glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+        'px': glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
+        'py': glenum.TEXTURE_CUBE_MAP_POSITIVE_Y,
+        'pz': glenum.TEXTURE_CUBE_MAP_POSITIVE_Z,
+        'nx': glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
+        'ny': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        'nz': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
     };
 
     /**
@@ -60,64 +60,64 @@ define(function(require) {
              * Can be {@link qtek.prePass.ShadowMap.PCF} or {@link qtek.prePass.ShadowMap.VSM}
              * @type {number}
              */
-            softShadow : ShadowMapPass.PCF,
+            softShadow: ShadowMapPass.PCF,
             
             /**
              * Soft shadow blur size
              * @type {number}
              */
-            shadowBlur : 1.0,
+            shadowBlur: 1.0,
 
             /**
              * Shadow cascade.
              * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
              * @type {number}
              */
-            shadowCascade  : 1,
+            shadowCascade: 1,
 
             /**
              * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
              * @type {number}
              */
-            cascadeSplitLogFactor : 0.2,
+            cascadeSplitLogFactor: 0.2,
 
             lightFrustumBias: 10,
 
             _frameBuffer: new FrameBuffer(),
 
-            _textures : {},
-            _shadowMapNumber : {
-                'POINT_LIGHT' : 0,
-                'DIRECTIONAL_LIGHT' : 0,
-                'SPOT_LIGHT' : 0
+            _textures: {},
+            _shadowMapNumber: {
+                'POINT_LIGHT': 0,
+                'DIRECTIONAL_LIGHT': 0,
+                'SPOT_LIGHT': 0
             },
 
-            _meshMaterials : {},
-            _depthMaterials : {},
-            _depthShaders : {},
-            _distanceMaterials : {},
+            _meshMaterials: {},
+            _depthMaterials: {},
+            _depthShaders: {},
+            _distanceMaterials: {},
 
-            _opaqueCasters : [],
-            _receivers : [],
-            _lightsCastShadow : [],
+            _opaqueCasters: [],
+            _receivers: [],
+            _lightsCastShadow: [],
 
-            _lightCameras : {},
+            _lightCameras: {},
 
             _texturePool: new TexturePool()
         };
     }, function() {
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
-            fragment : Shader.source('buildin.compositor.gaussian_blur_h')
+            fragment: Shader.source('buildin.compositor.gaussian_blur_h')
         });
         this._gaussianPassV = new Pass({
-            fragment : Shader.source('buildin.compositor.gaussian_blur_v')
+            fragment: Shader.source('buildin.compositor.gaussian_blur_v')
         });
         this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
         this._gaussianPassV.setUniform('blurSize', this.shadowBlur);
 
         this._outputDepthPass = new Pass({
-            fragment : Shader.source('buildin.sm.debug_depth')
+            fragment: Shader.source('buildin.sm.debug_depth')
         });
     }, {
         /**
@@ -127,7 +127,7 @@ define(function(require) {
          * @param  {qtek.Camera} sceneCamera
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        render : function(renderer, scene, sceneCamera) {
+        render: function(renderer, scene, sceneCamera) {
             this.trigger('beforerender', this, renderer, scene, sceneCamera);
             this._renderShadowPass(renderer, scene, sceneCamera);
             this.trigger('afterrender', this, renderer, scene, sceneCamera);
@@ -139,7 +139,7 @@ define(function(require) {
          * @param  {number} size
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        renderDebug : function(renderer, size) {
+        renderDebug: function(renderer, size) {
             var prevClear = renderer.clear;
             renderer.clear = glenum.DEPTH_BUFFER_BIT;
             var viewport = renderer.viewport;
@@ -161,7 +161,7 @@ define(function(require) {
             renderer.clear = prevClear;
         },
 
-        _bindDepthMaterial : function(casters, bias, slopeScale) {
+        _bindDepthMaterial: function(casters, bias, slopeScale) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
@@ -182,8 +182,8 @@ define(function(require) {
                 if (mesh.material !== depthMaterial) {  // Not binded yet
                     if (!depthShader) {
                         depthShader = new Shader({
-                            vertex : Shader.source('buildin.sm.depth.vertex'),
-                            fragment : Shader.source('buildin.sm.depth.fragment')
+                            vertex: Shader.source('buildin.sm.depth.vertex'),
+                            fragment: Shader.source('buildin.sm.depth.fragment')
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
@@ -197,7 +197,7 @@ define(function(require) {
                     if (!depthMaterial) {
                         // Skinned mesh
                         depthMaterial = new Material({
-                            shader : depthShader
+                            shader: depthShader
                         });
                         this._depthMaterials[matHashKey] = depthMaterial;
                     }
@@ -220,7 +220,7 @@ define(function(require) {
             }
         },
 
-        _bindDistanceMaterial : function(casters, light) {
+        _bindDistanceMaterial: function(casters, light) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var nJoints = mesh.joints && mesh.joints.length;
@@ -229,9 +229,9 @@ define(function(require) {
                     if (!distanceMaterial) {
                         // Skinned mesh
                         distanceMaterial = new Material({
-                            shader : new Shader({
-                                vertex : Shader.source('buildin.sm.distance.vertex'),
-                                fragment : Shader.source('buildin.sm.distance.fragment')
+                            shader: new Shader({
+                                vertex: Shader.source('buildin.sm.distance.vertex'),
+                                fragment: Shader.source('buildin.sm.distance.fragment')
                             })
                         });
                         if (nJoints > 0) {
@@ -255,14 +255,14 @@ define(function(require) {
             }
         },
 
-        _restoreMaterial : function(casters) {
+        _restoreMaterial: function(casters) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 mesh.material = this._meshMaterials[mesh.__GUID__];
             }
         },
 
-        _updateCaster : function(mesh) {
+        _updateCaster: function(mesh) {
             if (mesh.castShadow) {
                 this._opaqueCasters.push(mesh);
             }
@@ -281,7 +281,7 @@ define(function(require) {
             }
         },
 
-        _update : function(scene) {
+        _update: function(scene) {
             for (var i = 0; i < scene.opaqueQueue.length; i++) {
                 this._updateCaster(scene.opaqueQueue[i]);
             }
@@ -298,7 +298,7 @@ define(function(require) {
             }
         },
 
-        _renderShadowPass : function(renderer, scene, sceneCamera) {
+        _renderShadowPass: function(renderer, scene, sceneCamera) {
             // reset
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
@@ -435,7 +435,7 @@ define(function(require) {
             }
         },
 
-        _renderDirectionalLightShadow : (function() {
+        _renderDirectionalLightShadow: (function() {
 
             var splitFrustum = new Frustum();
             var splitProjMatrix = new Matrix4();
@@ -545,7 +545,7 @@ define(function(require) {
             };
         })(),
 
-        _renderSpotLightShadow : function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
+        _renderSpotLightShadow: function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
             this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
             casters.sort(Renderer.opaqueSortFunc);
@@ -577,7 +577,7 @@ define(function(require) {
             spotLightMatrices.push(matrix._array);
         },
 
-        _renderPointLightShadow : function(renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
+        _renderPointLightShadow: function(renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
             var texture = this._getTexture(light.__GUID__, light);
             var _gl = renderer.gl;
             pointLightShadowMaps.push(texture);
@@ -599,11 +599,11 @@ define(function(require) {
             }
         },
 
-        _gaussianFilter : function(renderer, texture, size) {
+        _gaussianFilter: function(renderer, texture, size) {
             var parameter = {
-                width : size,
-                height : size,
-                type : glenum.FLOAT
+                width: size,
+                height: size,
+                type: glenum.FLOAT
             };
             var _gl = renderer.gl;
             var tmpTexture = this._texturePool.get(parameter);
@@ -625,7 +625,7 @@ define(function(require) {
             this._texturePool.put(tmpTexture);
         },
 
-        _getTexture : function(key, light) {
+        _getTexture: function(key, light) {
             var texture = this._textures[key];
             var resolution = light.shadowResolution || 512;
             if (!texture) {
@@ -650,15 +650,15 @@ define(function(require) {
             return texture;
         },
 
-        _getPointLightCamera : function(light, target) {
+        _getPointLightCamera: function(light, target) {
             if (!this._lightCameras.point) {
                 this._lightCameras.point = {
-                    px : new PerspectiveCamera(),
-                    nx : new PerspectiveCamera(),
-                    py : new PerspectiveCamera(),
-                    ny : new PerspectiveCamera(),
-                    pz : new PerspectiveCamera(),
-                    nz : new PerspectiveCamera()
+                    px: new PerspectiveCamera(),
+                    nx: new PerspectiveCamera(),
+                    py: new PerspectiveCamera(),
+                    ny: new PerspectiveCamera(),
+                    pz: new PerspectiveCamera(),
+                    nz: new PerspectiveCamera()
                 };
             }
             var camera = this._lightCameras.point[target];
@@ -692,7 +692,7 @@ define(function(require) {
             return camera;
         },
 
-        _getDirectionalLightCamera : (function() {
+        _getDirectionalLightCamera: (function() {
             var lightViewMatrix = new Matrix4();
             var lightViewBBox = new BoundingBox();
             // Camera of directional light will be adjusted
@@ -725,7 +725,7 @@ define(function(require) {
                 var max = lightViewBBox.max._array;
 
                 // Move camera to adjust the near to 0
-                // TODO : some scene object cast shadow in view will also be culled
+                // TODO: some scene object cast shadow in view will also be culled
                 // add a bias?
                 camera.position.scaleAndAdd(camera.worldTransform.forward, max[2] + this.lightFrustumBias);
                 camera.near = 0;
@@ -740,7 +740,7 @@ define(function(require) {
             };
         })(),
 
-        _getSpotLightCamera : function(light) {
+        _getSpotLightCamera: function(light) {
             if (!this._lightCameras.spot) {
                 this._lightCameras.spot = new PerspectiveCamera();
             }
@@ -759,7 +759,7 @@ define(function(require) {
          * @param  {qtek.Renderer} renderer
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        dispose : function(renderer) {
+        dispose: function(renderer) {
             var _gl = renderer.gl;
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
@@ -785,9 +785,9 @@ define(function(require) {
             this._textures = {};
             this._lightCameras = {};
             this._shadowMapNumber = {
-                'POINT_LIGHT' : 0,
-                'DIRECTIONAL_LIGHT' : 0,
-                'SPOT_LIGHT' : 0
+                'POINT_LIGHT': 0,
+                'DIRECTIONAL_LIGHT': 0,
+                'SPOT_LIGHT': 0
             };
             this._meshMaterials = {};
 

@@ -38,10 +38,10 @@ define(function(require) {
         Clip.call(this, opts);
 
         //[{
-        //  time : //ms
-        //  position :  // optional
-        //  rotation :  // optional
-        //  scale :     // optional
+        //  time: //ms
+        //  position:  // optional
+        //  rotation:  // optional
+        //  scale:     // optional
         //}]
         this.keyFrames = [];
         if (opts.keyFrames) {
@@ -262,9 +262,8 @@ define(function(require) {
         vec3.copy(clip.scale, this.scale);
 
         return clip;
-    }
+    };
 
-    TransformClip
 
     return TransformClip;
 });

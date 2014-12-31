@@ -25,22 +25,22 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : '',
+        rootPath: '',
         /**
          * @type {string}
          */
-        textureRootPath : '',
+        textureRootPath: '',
         /**
          * @type {string}
          */
-        shaderRootPath : ''
+        shaderRootPath: ''
     },
     /** @lends qtek.loader.FX.prototype */
     {
         /**
          * @param  {string} url
          */
-        load : function(url) {
+        load: function(url) {
             var self = this;
 
             if (!this.rootPath) {
@@ -48,15 +48,15 @@ define(function(require) {
             }
 
             request.get({
-                url : url,
-                onprogress : function(percent, loaded, total) {
+                url: url,
+                onprogress: function(percent, loaded, total) {
                     self.trigger('progress', percent, loaded, total);
                 },
-                onerror : function(e) {
+                onerror: function(e) {
                     self.trigger('error', e);
                 },
-                responseType : 'text',
-                onload : function(data) {
+                responseType: 'text',
+                onload: function(data) {
                     self.parse(JSON.parse(data));
                 }
             });
@@ -66,14 +66,14 @@ define(function(require) {
          * @param {Object} json
          * @return {qtek.compositor.Compositor}
          */
-        parse : function(json) {
+        parse: function(json) {
             var self = this;
             var compositor = new Compositor();
 
             var lib = {
-                textures : {},
-                shaders : {},
-                parameters : {}
+                textures: {},
+                shaders: {},
+                parameters: {}
             };
             var afterLoad = function(shaderLib, textureLib) {
                 for (var i = 0; i < json.nodes.length; i++) {
@@ -105,7 +105,7 @@ define(function(require) {
             return compositor;
         },
 
-        _createNode : function(nodeInfo, lib) {
+        _createNode: function(nodeInfo, lib) {
             if (!nodeInfo.shader) {
                 return;
             }
@@ -134,8 +134,8 @@ define(function(require) {
                 inputs = {};      
                 for (var name in nodeInfo.inputs) {
                     inputs[name] = {
-                        node : nodeInfo.inputs[name].node,
-                        pin : nodeInfo.inputs[name].pin
+                        node: nodeInfo.inputs[name].node,
+                        pin: nodeInfo.inputs[name].pin
                     };
                 }
             }
@@ -166,10 +166,10 @@ define(function(require) {
             var node;
             if (type === 'filter') {
                 node = new CompoNode({
-                    name : nodeInfo.name,
-                    shader : shaderSource,
-                    inputs : inputs,
-                    outputs : outputs
+                    name: nodeInfo.name,
+                    shader: shaderSource,
+                    inputs: inputs,
+                    outputs: outputs
                 });
             }
             if (node) {
@@ -210,7 +210,7 @@ define(function(require) {
             return node;
         },
 
-        _convertParameter : function(paramInfo) {
+        _convertParameter: function(paramInfo) {
             var param = {};
             if (!paramInfo) {
                 return param;
@@ -249,7 +249,7 @@ define(function(require) {
             return param;
         },
         
-        _loadShaders : function(json, callback) {
+        _loadShaders: function(json, callback) {
             if (!json.shaders) {
                 callback({});
                 return;
@@ -265,8 +265,8 @@ define(function(require) {
                     path = util.relative2absolute(path, shaderRootPath);
                     loading++;
                     request.get({
-                        url : path,
-                        onload : function(shaderSource) {
+                        url: path,
+                        onload: function(shaderSource) {
                             shaders[name] = shaderSource;
                             Shader['import'](shaderSource);
                             loading--;
@@ -287,7 +287,7 @@ define(function(require) {
             }
         },
 
-        _loadTextures : function(json, lib, callback) {
+        _loadTextures: function(json, lib, callback) {
             if (!json.textures) {
                 callback({});
                 return;
@@ -334,14 +334,14 @@ define(function(require) {
     function createWidthSetHandler(name, val) {
         val = parseFloat(val);
         return function (renderer) {
-            this.setParameter(name, percentToWidth(val, renderer))
-        }
+            this.setParameter(name, percentToWidth(val, renderer));
+        };
     }
     function createHeightSetHandler(name, val) {
         val = parseFloat(val);
         return function (renderer) {
-            this.setParameter(name, percentToWidth(val, renderer))
-        }
+            this.setParameter(name, percentToWidth(val, renderer));
+        };
     }
 
     function createSizeSetHandler(name, val) {
@@ -349,7 +349,7 @@ define(function(require) {
         val[1] = parseFloat(val[1]);
         return function (renderer) {
             this.setParameter(name, [percentToWidth(val[0], renderer), percentToHeight(val[0], renderer)]);
-        }
+        };
     }
 
     function percentToWidth(percent, renderer) {

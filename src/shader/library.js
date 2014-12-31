@@ -96,14 +96,14 @@ define(function(require) {
             this._pool[key] = shader;
             return shader;
         }
-    }
+    };
 
     /**
      * Clear shaders
      */
     ShaderLibrary.prototype.clear = function() {
-        _pool = {};
-    }
+        this._pool = {};
+    };
 
     /**
      * @memberOf qtek.shader.library
@@ -125,7 +125,7 @@ define(function(require) {
             return new ShaderLibrary();
         },
         get: function () {
-            return defaultLibrary.get.apply(defaultLibrary, arguments)
+            return defaultLibrary.get.apply(defaultLibrary, arguments);
         },
         template: template,
         clear: function () {

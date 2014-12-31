@@ -13,7 +13,7 @@ define(function(require) {
             /**
              * @type {Array.<qtek.compositor.Node>}
              */
-            nodes : []
+            nodes: []
         };
     },
     /** @lends qtek.compositor.Graph.prototype */
@@ -21,7 +21,7 @@ define(function(require) {
         /**
          * @param {qtek.compositor.Node} node
          */
-        addNode : function(node) {
+        addNode: function(node) {
 
             this.nodes.push(node);
 
@@ -30,7 +30,7 @@ define(function(require) {
         /**
          * @param  {qtek.compositor.Node} node
          */
-        removeNode : function(node) {
+        removeNode: function(node) {
             this.nodes.splice(this.nodes.indexOf(node), 1);
 
             this._dirty = true;
@@ -39,7 +39,7 @@ define(function(require) {
          * @param {string} name
          * @return {qtek.compositor.Node}
          */
-        findNode : function(name) {
+        findNode: function(name) {
             for (var i = 0; i < this.nodes.length; i++) {
                 if (this.nodes[i].name === name) {
                     return this.nodes[i];
@@ -49,7 +49,7 @@ define(function(require) {
         /**
          * Update links of graph
          */
-        update : function() {
+        update: function() {
             for (var i = 0; i < this.nodes.length; i++) {
                 this.nodes[i].clear();
             }
@@ -73,7 +73,7 @@ define(function(require) {
             }
         },
 
-        findPin : function(input) {
+        findPin: function(input) {
             var node;
             if (typeof(input.node) === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {
@@ -88,8 +88,8 @@ define(function(require) {
             if (node) {
                 if (node.outputs[input.pin]) {
                     return {
-                        node : node,
-                        pin : input.pin
+                        node: node,
+                        pin: input.pin
                     };
                 }
             }

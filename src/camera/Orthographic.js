@@ -13,32 +13,32 @@ define(function(require) {
         /**
          * @type {number}
          */
-        left : -1,
+        left: -1,
         /**
          * @type {number}
          */
-        right : 1,
+        right: 1,
         /**
          * @type {number}
          */
-        near : -1,
+        near: -1,
         /**
          * @type {number}
          */
-        far : 1,
+        far: 1,
         /**
          * @type {number}
          */
-        top : 1,
+        top: 1,
         /**
          * @type {number}
          */
-        bottom : -1
+        bottom: -1
     },
     /** @lends qtek.camera.Orthographic.prototype */
     {
         
-        updateProjectionMatrix : function() {
+        updateProjectionMatrix: function() {
             this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
         },
         /**

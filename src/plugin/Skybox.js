@@ -29,13 +29,13 @@ define(function(require) {
 
         if (!skyboxShader) {
             skyboxShader = new Shader({
-                vertex : Shader.source('buildin.skybox.vertex'), 
-                fragment : Shader.source('buildin.skybox.fragment')
+                vertex: Shader.source('buildin.skybox.vertex'), 
+                fragment: Shader.source('buildin.skybox.fragment')
             });
         }
         var material = new Material({
-            shader : skyboxShader,
-            depthMask : false
+            shader: skyboxShader,
+            depthMask: false
         });
         
         return {
@@ -43,11 +43,11 @@ define(function(require) {
              * @type {qtek.Scene}
              * @memberOf qtek.plugin.Skybox.prototype
              */
-            scene : null,
+            scene: null,
 
-            geometry : new CubeGeometry(),
-            material : material,
-            culling : false
+            geometry: new CubeGeometry(),
+            material: material,
+            culling: false
         };
     }, function() {
         var scene = this.scene;
@@ -60,7 +60,7 @@ define(function(require) {
          * @param  {qtek.Scene} scene
          * @memberOf qtek.plugin.Skybox.prototype
          */
-        attachScene : function(scene) {
+        attachScene: function(scene) {
             if (this.scene) {
                 this.detachScene();
             }
@@ -71,18 +71,18 @@ define(function(require) {
          * Detach from scene
          * @memberOf qtek.plugin.Skybox.prototype
          */
-        detachScene : function() {
+        detachScene: function() {
             if (this.scene) {
                 this.scene.off('beforerender', this._beforeRenderScene, this);  
             }
             this.scene = null;
         },
 
-        dispose : function() {
+        dispose: function() {
             this.detachScene();
         },
 
-        _beforeRenderScene : function(renderer, scene, camera) {
+        _beforeRenderScene: function(renderer, scene, camera) {
             this.position.copy(camera.getWorldPosition());
             this.update();
             renderer.renderQueue([this], camera);

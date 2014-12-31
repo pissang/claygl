@@ -24,45 +24,45 @@ define(function(require) {
              * Scene node to control, mostly it is a camera
              * @type {qtek.Node}
              */
-            target : null,
+            target: null,
             
             /**
              * Target dom to bind with mouse events
              * @type {HTMLElement}
              */
-            domElement : null,
+            domElement: null,
             
             /**
              * Mouse move sensitivity
              * @type {number}
              */
-            sensitivity : 1,
+            sensitivity: 1,
             
             /**
              * Target move speed
              * @type {number}
              */
-            speed : 0.4,
+            speed: 0.4,
 
             /**
              * Up axis
              * @type {qtek.math.Vector3}
              */
-            up : new Vector3(0, 1, 0),
+            up: new Vector3(0, 1, 0),
 
             /**
              * If lock vertical movement
              * @type {boolean}
              */
-            verticalMoveLock : false,
+            verticalMoveLock: false,
 
-            _moveForward : false,
-            _moveBackward : false,
-            _moveLeft : false,
-            _moveRight : false,
+            _moveForward: false,
+            _moveBackward: false,
+            _moveLeft: false,
+            _moveRight: false,
 
-            _offsetPitch : 0,
-            _offsetRoll : 0
+            _offsetPitch: 0,
+            _offsetRoll: 0
         };
     }, function() {
         this._lockChange = this._lockChange.bind(this);
@@ -79,7 +79,7 @@ define(function(require) {
         /**
          * Enable control
          */
-        enable : function() {
+        enable: function() {
             // Use pointer lock
             // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
             var el = this.domElement;
@@ -99,7 +99,7 @@ define(function(require) {
         /**
          * Disable control
          */
-        disable : function() {
+        disable: function() {
 
             this.target.off('beforeupdate', this._beforeUpdateCamera);
 
@@ -123,7 +123,7 @@ define(function(require) {
             document.removeEventListener('keyup', this._keyUp);
         },
 
-        _requestPointerLock : function() {
+        _requestPointerLock: function() {
             var el = this;
             el.requestPointerLock = el.requestPointerLock
                 || el.mozRequestPointerLock
@@ -136,7 +136,7 @@ define(function(require) {
          * Control update. Should be invoked every frame
          * @param {number} frameTime Frame time
          */
-        update : function(frameTime) {
+        update: function(frameTime) {
             var target = this.target;
 
             var position = this.target.position;
@@ -171,7 +171,7 @@ define(function(require) {
             this._offsetRoll = this._offsetPitch = 0;
         },
 
-        _lockChange : function() {
+        _lockChange: function() {
             if (
                 document.pointerLockElement === this.domElement
                 || document.mozPointerLockElement === this.domElement
@@ -183,7 +183,7 @@ define(function(require) {
             }
         },
 
-        _mouseMove : function(e) {
+        _mouseMove: function(e) {
             var dx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
             var dy = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
@@ -191,7 +191,7 @@ define(function(require) {
             this._offsetRoll += dy * this.sensitivity / 200;
         },
 
-        _keyDown : function(e) {
+        _keyDown: function(e) {
             switch(e.keyCode) {
                 case 87: //w
                 case 37: //up arrow
@@ -212,7 +212,7 @@ define(function(require) {
             }
         },
 
-        _keyUp : function(e) {
+        _keyUp: function(e) {
             this._moveForward = false;
             this._moveBackward = false;
             this._moveLeft = false;

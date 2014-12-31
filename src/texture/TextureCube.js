@@ -6,12 +6,12 @@ define(function(require) {
     var util = require('../core/util');
 
     var targetMap = {
-        'px' : 'TEXTURE_CUBE_MAP_POSITIVE_X',
-        'py' : 'TEXTURE_CUBE_MAP_POSITIVE_Y',
-        'pz' : 'TEXTURE_CUBE_MAP_POSITIVE_Z',
-        'nx' : 'TEXTURE_CUBE_MAP_NEGATIVE_X',
-        'ny' : 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
-        'nz' : 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
+        'px': 'TEXTURE_CUBE_MAP_POSITIVE_X',
+        'py': 'TEXTURE_CUBE_MAP_POSITIVE_Y',
+        'pz': 'TEXTURE_CUBE_MAP_POSITIVE_Z',
+        'nx': 'TEXTURE_CUBE_MAP_NEGATIVE_X',
+        'ny': 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
+        'nz': 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
     };
 
     /**
@@ -52,13 +52,13 @@ define(function(require) {
              * @property {HTMLImageElement|HTMLCanvasElemnet} pz
              * @property {HTMLImageElement|HTMLCanvasElemnet} nz
              */
-            image : {
-                px : null,
-                nx : null,
-                py : null,
-                ny : null,
-                pz : null,
-                nz : null
+            image: {
+                px: null,
+                nx: null,
+                py: null,
+                ny: null,
+                pz: null,
+                nz: null
             },
             /**
              * @type {Object}
@@ -69,17 +69,17 @@ define(function(require) {
              * @property {Uint8Array} pz
              * @property {Uint8Array} nz
              */
-            pixels : {
-                px : null,
-                nx : null,
-                py : null,
-                ny : null,
-                pz : null,
-                nz : null
+            pixels: {
+                px: null,
+                nx: null,
+                py: null,
+                ny: null,
+                pz: null,
+                nz: null
             }
        };
     }, {
-        update : function(_gl) {
+        update: function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
@@ -128,22 +128,22 @@ define(function(require) {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.texture.TextureCube.prototype
          */
-        generateMipmap : function(_gl) {
+        generateMipmap: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
             _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);    
         },
 
-        bind : function(_gl) {
+        bind: function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
         },
 
-        unbind : function(_gl) {
+        unbind: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
 
         // Overwrite the isPowerOfTwo method
-        isPowerOfTwo : function() {
+        isPowerOfTwo: function() {
             if (this.image.px) {
                 return isPowerOfTwo(this.image.px.width)
                     && isPowerOfTwo(this.image.px.height);
@@ -157,7 +157,7 @@ define(function(require) {
             }
         },
 
-        isRenderable : function() {
+        isRenderable: function() {
             if (this.image.px) {
                 return isImageRenderable(this.image.px)
                     && isImageRenderable(this.image.nx)
@@ -170,7 +170,7 @@ define(function(require) {
             }
         },
 
-        load : function(imageList) {
+        load: function(imageList) {
             var loading = 0;
             var self = this;
             util.each(imageList, function(src, target){

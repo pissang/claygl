@@ -16,8 +16,8 @@ define(function(require) {
     Shader['import'](require('text!./particle.essl'));
 
     var particleShader = new Shader({
-        vertex : Shader.source('buildin.particle.vertex'),
-        fragment : Shader.source('buildin.particle.fragment')
+        vertex: Shader.source('buildin.particle.vertex'),
+        fragment: Shader.source('buildin.particle.fragment')
     });
     particleShader.enableTexture('sprite');
 
@@ -59,36 +59,36 @@ define(function(require) {
         /**
          * @type {boolean}
          */
-        loop : true,
+        loop: true,
         /**
          * @type {boolean}
          */
-        oneshot : false,
+        oneshot: false,
         /**
          * Duration of particle system in milliseconds
          * @type {number}
          */
-        duration : 1,
+        duration: 1,
 
         // UV Animation
         /**
          * @type {number}
          */
-        spriteAnimationTileX : 1,
+        spriteAnimationTileX: 1,
         /**
          * @type {number}
          */
-        spriteAnimationTileY : 1,
+        spriteAnimationTileY: 1,
         /**
          * @type {number}
          */
-        spriteAnimationRepeat : 0,
+        spriteAnimationRepeat: 0,
 
-        mode : Renderable.POINTS,
+        mode: Renderable.POINTS,
 
-        _elapsedTime : 0,
+        _elapsedTime: 0,
 
-        _emitting : true
+        _emitting: true
 
     }, function(){
 
@@ -98,9 +98,9 @@ define(function(require) {
         
         if (!this.material) {
             this.material = new Material({
-                shader : particleShader,
-                transparent : true,
-                depthMask : false
+                shader: particleShader,
+                transparent: true,
+                depthMask: false
             });
         }
 
@@ -111,18 +111,18 @@ define(function(require) {
     /** @lends qtek.particleSystem.ParticleRenderable.prototype */
     {
 
-        culling : false,
+        culling: false,
 
-        frustumCulling : false,
+        frustumCulling: false,
 
-        castShadow : false,
-        receiveShadow : false,
+        castShadow: false,
+        receiveShadow: false,
 
         /**
          * Add emitter
          * @param {qtek.particleSystem.Emitter} emitter
          */
-        addEmitter : function(emitter) {
+        addEmitter: function(emitter) {
             this._emitters.push(emitter);
         },
 
@@ -130,7 +130,7 @@ define(function(require) {
          * Remove emitter
          * @param {qtek.particleSystem.Emitter} emitter
          */
-        removeEmitter : function(emitter) {
+        removeEmitter: function(emitter) {
             this._emitters.splice(this._emitters.indexOf(emitter), 1);
         },
 
@@ -138,7 +138,7 @@ define(function(require) {
          * Add field
          * @param {qtek.particleSystem.Field} field
          */
-        addField : function(field) {
+        addField: function(field) {
             this._fields.push(field);
         },
 
@@ -146,7 +146,7 @@ define(function(require) {
          * Remove field
          * @param {qtek.particleSystem.Field} field
          */
-        removeField : function(field) {
+        removeField: function(field) {
             this._fields.splice(this._fields.indexOf(field), 1);
         },
 
@@ -167,7 +167,7 @@ define(function(require) {
         /**
          * @param  {number} deltaTime
          */
-        updateParticles : function(deltaTime) {
+        updateParticles: function(deltaTime) {
 
             // MS => Seconds
             deltaTime /= 1000;
@@ -211,7 +211,7 @@ define(function(require) {
             }
         },
 
-        _updateVertices : function() {
+        _updateVertices: function() {
             var geometry = this.geometry;
             // If has uv animation
             var animTileX = this.spriteAnimationTileX;
@@ -264,7 +264,7 @@ define(function(require) {
             geometry.dirty();
         },
 
-        render : function(_gl) {
+        render: function(_gl) {
             this._updateVertices();
             return Renderable.prototype.render.call(this, _gl);
         },
@@ -272,14 +272,14 @@ define(function(require) {
         /**
          * @return {boolean}
          */
-        isFinished : function() {
+        isFinished: function() {
             return this._elapsedTime > this.duration && !this.loop;
         },
 
         /**
          * @param  {WebGLRenderingContext} _gl
          */
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             // Put all the particles back
             for (var i = 0; i < this._particles.length; i++) {
                 var p = this._particles[i];
@@ -292,9 +292,9 @@ define(function(require) {
         /**
          * @return {qtek.particleSystem.ParticleRenderable}
          */
-        clone : function() {
+        clone: function() {
             var particleSystem = new ParticleRenderable({
-                material : this.material
+                material: this.material
             });
             particleSystem.loop = this.loop;
             particleSystem.duration = this.duration;

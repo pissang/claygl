@@ -37,7 +37,7 @@ define(function(require) {
 
     Quaternion.prototype = {
 
-        constructor : Quaternion,
+        constructor: Quaternion,
 
         /**
          * @name x
@@ -104,7 +104,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} b
          * @return {qtek.math.Quaternion}
          */
-        add : function(b) {
+        add: function(b) {
             quat.add( this._array, this._array, b._array );
             this._dirty = true;
             return this;
@@ -114,7 +114,7 @@ define(function(require) {
          * Calculate the w component from x, y, z component
          * @return {qtek.math.Quaternion}
          */
-        calculateW : function() {
+        calculateW: function() {
             quat.calculateW(this._array, this._array);
             this._dirty = true;
             return this;
@@ -128,7 +128,7 @@ define(function(require) {
          * @param  {number}  w
          * @return {qtek.math.Quaternion}
          */
-        set : function(x, y, z, w) {
+        set: function(x, y, z, w) {
             this._array[0] = x;
             this._array[1] = y;
             this._array[2] = z;
@@ -142,7 +142,7 @@ define(function(require) {
          * @param  {Float32Array|number[]} arr
          * @return {qtek.math.Quaternion}
          */
-        setArray : function(arr) {
+        setArray: function(arr) {
             this._array[0] = arr[0];
             this._array[1] = arr[1];
             this._array[2] = arr[2];
@@ -156,7 +156,7 @@ define(function(require) {
          * Clone a new Quaternion
          * @return {qtek.math.Quaternion}
          */
-        clone : function() {
+        clone: function() {
             return new Quaternion( this.x, this.y, this.z, this.w );
         },
 
@@ -166,7 +166,7 @@ define(function(require) {
          * 
          * @return {qtek.math.Quaternion}
          */
-        conjugate : function() {
+        conjugate: function() {
             quat.conjugate(this._array, this._array);
             this._dirty = true;
             return this;
@@ -177,7 +177,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} b
          * @return {qtek.math.Quaternion}
          */
-        copy : function(b) {
+        copy: function(b) {
             quat.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -188,7 +188,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} b
          * @return {number}
          */
-        dot : function(b) {
+        dot: function(b) {
             return quat.dot(this._array, b._array);
         },
 
@@ -197,7 +197,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} m
          * @return {qtek.math.Quaternion}
          */
-        fromMat3 : function(m) {
+        fromMat3: function(m) {
             quat.fromMat3(this._array, m._array);
             this._dirty = true;
             return this;
@@ -209,7 +209,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} m
          * @return {qtek.math.Quaternion}
          */
-        fromMat4 : (function() {
+        fromMat4: (function() {
             var mat3 = glMatrix.mat3;
             var m3 = mat3.create();
             return function(m) {
@@ -226,7 +226,7 @@ define(function(require) {
          * Set to identity quaternion
          * @return {qtek.math.Quaternion}
          */
-        identity : function() {
+        identity: function() {
             quat.identity(this._array);
             this._dirty = true;
             return this;
@@ -235,7 +235,7 @@ define(function(require) {
          * Invert self
          * @return {qtek.math.Quaternion}
          */
-        invert : function() {
+        invert: function() {
             quat.invert(this._array, this._array);
             this._dirty = true;
             return this;
@@ -244,7 +244,7 @@ define(function(require) {
          * Alias of length
          * @return {number}
          */
-        len : function() {
+        len: function() {
             return quat.len(this._array);
         },
 
@@ -252,7 +252,7 @@ define(function(require) {
          * Calculate the length
          * @return {number}
          */
-        length : function() {
+        length: function() {
             return quat.length(this._array);
         },
 
@@ -263,7 +263,7 @@ define(function(require) {
          * @param  {number}  t
          * @return {qtek.math.Quaternion}
          */
-        lerp : function(a, b, t) {
+        lerp: function(a, b, t) {
             quat.lerp(this._array, a._array, b._array, t);
             this._dirty = true;
             return this;
@@ -274,7 +274,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} b
          * @return {qtek.math.Quaternion}
          */
-        mul : function(b) {
+        mul: function(b) {
             quat.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -285,7 +285,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} a
          * @return {qtek.math.Quaternion}
          */
-        mulLeft : function(a) {
+        mulLeft: function(a) {
             quat.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -296,7 +296,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} b
          * @return {qtek.math.Quaternion}
          */
-        multiply : function(b) {
+        multiply: function(b) {
             quat.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -308,7 +308,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} a
          * @return {qtek.math.Quaternion}
          */
-        multiplyLeft : function(a) {
+        multiplyLeft: function(a) {
             quat.multiply(this._array, a._array, this._array);
             this._dirty = true;
             return this;
@@ -318,7 +318,7 @@ define(function(require) {
          * Normalize self
          * @return {qtek.math.Quaternion}
          */
-        normalize : function() {
+        normalize: function() {
             quat.normalize(this._array, this._array);
             this._dirty = true;
             return this;
@@ -329,7 +329,7 @@ define(function(require) {
          * @param {number} rad
          * @return {qtek.math.Quaternion}
          */
-        rotateX : function(rad) {
+        rotateX: function(rad) {
             quat.rotateX(this._array, this._array, rad); 
             this._dirty = true;
             return this;
@@ -340,7 +340,7 @@ define(function(require) {
          * @param {number} rad
          * @return {qtek.math.Quaternion}
          */
-        rotateY : function(rad) {
+        rotateY: function(rad) {
             quat.rotateY(this._array, this._array, rad);
             this._dirty = true;
             return this;
@@ -351,7 +351,7 @@ define(function(require) {
          * @param {number} rad
          * @return {qtek.math.Quaternion}
          */
-        rotateZ : function(rad) {
+        rotateZ: function(rad) {
             quat.rotateZ(this._array, this._array, rad);
             this._dirty = true;
             return this;
@@ -364,7 +364,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Quaternion}
          */
-        rotationTo : function(a, b) {
+        rotationTo: function(a, b) {
             quat.rotationTo(this._array, a._array, b._array);
             this._dirty = true;
             return this;
@@ -376,7 +376,7 @@ define(function(require) {
          * @param {qtek.math.Vector3} up
          * @return {qtek.math.Quaternion}
          */
-        setAxes : function(view, right, up) {
+        setAxes: function(view, right, up) {
             quat.setAxes(this._array, view._array, right._array, up._array);
             this._dirty = true;
             return this;
@@ -388,7 +388,7 @@ define(function(require) {
          * @param {number} rad
          * @return {qtek.math.Quaternion}
          */
-        setAxisAngle : function(axis, rad) {
+        setAxisAngle: function(axis, rad) {
             quat.setAxisAngle(this._array, axis._array, rad);
             this._dirty = true;
             return this;
@@ -400,7 +400,7 @@ define(function(require) {
          * @param  {number} t
          * @return {qtek.math.Quaternion}
          */
-        slerp : function(a, b, t) {
+        slerp: function(a, b, t) {
             quat.slerp(this._array, a._array, b._array, t);
             this._dirty = true;
             return this;
@@ -410,7 +410,7 @@ define(function(require) {
          * Alias for squaredLength
          * @return {number}
          */
-        sqrLen : function() {
+        sqrLen: function() {
             return quat.sqrLen(this._array);
         },
 
@@ -418,16 +418,16 @@ define(function(require) {
          * Squared length of self
          * @return {number}
          */
-        squaredLength : function() {
+        squaredLength: function() {
             return quat.squaredLength(this._array);
         },
 
         // Set quaternion from euler angle
-        setFromEuler : function(v) {
+        setFromEuler: function(v) {
             
         },
 
-        toString : function() {
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };

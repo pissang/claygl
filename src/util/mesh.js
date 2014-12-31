@@ -29,7 +29,7 @@ define(function(require) {
          * @return qtek.Mesh
          * @memberOf qtek.util.mesh
          */
-        merge : function(meshes, applyWorldTransform) {
+        merge: function(meshes, applyWorldTransform) {
 
             if (! meshes.length) {
                 return;
@@ -164,8 +164,8 @@ define(function(require) {
             }
 
             return new Mesh({
-                material : material,
-                geometry : geometry
+                material: material,
+                geometry: geometry
             });
         },
 
@@ -178,7 +178,7 @@ define(function(require) {
          *
          * @memberOf qtek.util.mesh
          */
-        splitByJoints : function(mesh, maxJointNumber, inPlace) {
+        splitByJoints: function(mesh, maxJointNumber, inPlace) {
             var geometry = mesh.geometry;
             var skeleton = mesh.skeleton;
             var material = mesh.material;

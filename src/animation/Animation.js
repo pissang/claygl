@@ -41,13 +41,13 @@ define(function(require) {
              * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
              * @type {Object}
              */
-            stage : null,
+            stage: null,
 
-            _clips : [],
+            _clips: [],
 
-            _running : false,
+            _running: false,
             
-            _time : 0
+            _time: 0
         };
     },
     /** @lends qtek.animation.Animation.prototype */
@@ -55,17 +55,17 @@ define(function(require) {
         /**
          * @param {qtek.animation.Clip} clip
          */
-        addClip : function(clip) {
+        addClip: function(clip) {
             this._clips.push(clip);
         },
         /**
          * @param  {qtek.animation.Clip} clip
          */
-        removeClip : function(clip) {
+        removeClip: function(clip) {
             var idx = this._clips.indexOf(clip);
             this._clips.splice(idx, 1);
         },
-        update : function() {
+        update: function() {
             
             var time = new Date().getTime();
             var delta = time - this._time;
@@ -114,7 +114,7 @@ define(function(require) {
         /**
          * Start running animation
          */
-        start : function() {
+        start: function() {
             var self = this;
 
             this._running = true;
@@ -134,13 +134,13 @@ define(function(require) {
         /**
          * Stop running animation
          */
-        stop : function() {
+        stop: function() {
             this._running = false;
         },
         /**
          * Remove all clips
          */
-        removeClipsAll : function() {
+        removeClipsAll: function() {
             this._clips = [];
         },
         /**
@@ -153,7 +153,7 @@ define(function(require) {
          * @param  {Function} [options.interpolater]
          * @return {qtek.animation.Animation._Deferred}
          */
-        animate : function(target, options) {
+        animate: function(target, options) {
             options = options || {};
             var deferred = new Deferred(
                 target,
@@ -299,7 +299,7 @@ define(function(require) {
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        when : function(time, props) {
+        when: function(time, props) {
             for (var propName in props) {
                 if (! this._tracks[propName]) {
                     this._tracks[propName] = [];
@@ -309,16 +309,16 @@ define(function(require) {
                     //  Initialize value from current prop value
                     if (time !== 0) {
                         this._tracks[propName].push({
-                            time : 0,
-                            value : _cloneValue(
+                            time: 0,
+                            value: _cloneValue(
                                 this._getter(this._target, propName)
                             )
                         });   
                     }
                 }
                 this._tracks[propName].push({
-                    time : parseInt(time),
-                    value : props[propName]
+                    time: parseInt(time),
+                    value: props[propName]
                 });
             }
             return this;
@@ -329,7 +329,7 @@ define(function(require) {
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        during : function(callback) {
+        during: function(callback) {
             this._onframeList.push(callback);
             return this;
         },
@@ -339,7 +339,7 @@ define(function(require) {
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        start : function(easing) {
+        start: function(easing) {
 
             var self = this;
             var setter = this._setter;
@@ -490,12 +490,12 @@ define(function(require) {
                 };
 
                 var clip = new Clip({
-                    target : self._target,
-                    life : trackMaxTime,
-                    loop : self._loop,
-                    delay : self._delay,
-                    onframe : onframe,
-                    ondestroy : ondestroy
+                    target: self._target,
+                    life: trackMaxTime,
+                    loop: self._loop,
+                    delay: self._delay,
+                    onframe: onframe,
+                    ondestroy: ondestroy
                 });
 
                 if (easing && easing !== 'spline') {
@@ -515,7 +515,7 @@ define(function(require) {
          * Stop the animation
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        stop : function() {
+        stop: function() {
             for (var i = 0; i < this._clipList.length; i++) {
                 var clip = this._clipList[i];
                 this.animation.removeClip(clip);
@@ -528,7 +528,7 @@ define(function(require) {
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        delay : function(time){
+        delay: function(time){
             this._delay = time;
             return this;
         },
@@ -538,9 +538,9 @@ define(function(require) {
          * @return {qtek.animation.Animation._Deferred}
          * @memberOf qtek.animation.Animation._Deferred.prototype
          */
-        done : function(func) {
-            if (cb) {
-                this._doneList.push(cb);
+        done: function(func) {
+            if (func) {
+                this._doneList.push(func);
             }
             return this;
         },

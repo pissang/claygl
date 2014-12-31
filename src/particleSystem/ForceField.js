@@ -11,10 +11,10 @@ define(function(require) {
      */
     var ForceField = Field.derive(function() {
         return {
-            force : new Vector3()
+            force: new Vector3()
         };
     }, {
-        applyTo : function(velocity, position, weight, deltaTime) {
+        applyTo: function(velocity, position, weight, deltaTime) {
             if (weight > 0) {
                 vec3.scaleAndAdd(velocity._array, velocity._array, this.force._array, deltaTime / weight);
             }

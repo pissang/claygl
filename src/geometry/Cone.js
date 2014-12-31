@@ -24,27 +24,27 @@ define(function(require) {
         /**
          * @type {number}
          */
-        topRadius : 0,
+        topRadius: 0,
         
         /**
          * @type {number}
          */
-        bottomRadius : 1,
+        bottomRadius: 1,
 
         /**
          * @type {number}
          */
-        height : 2,
+        height: 2,
 
         /**
          * @type {number}
          */
-        capSegments : 50,
+        capSegments: 50,
 
         /**
          * @type {number}
          */
-        heightSegments : 1
+        heightSegments: 1
     }, function() {
         this.build();
     },
@@ -53,7 +53,7 @@ define(function(require) {
         /**
          * Build cone geometry
          */
-        build : function() {
+        build: function() {
             var positions = this.attributes.position.value;
             var texcoords = this.attributes.texcoord0.value;
             var faces = this.faces;

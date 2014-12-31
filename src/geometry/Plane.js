@@ -18,11 +18,11 @@ define(function(require) {
         /**
          * @type {number}
          */
-        widthSegments : 1,
+        widthSegments: 1,
         /**
          * @type {number}
          */
-        heightSegments : 1
+        heightSegments: 1
     }, function() {
         this.build();
     },

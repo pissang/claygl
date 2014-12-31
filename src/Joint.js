@@ -16,29 +16,29 @@ define(function(require) {
          * Joint name
          * @type {string}
          */
-        name : '',
+        name: '',
         /**
          * Index of joint in the skeleton
          * @type {number}
          */
-        index : -1,
+        index: -1,
         /**
          * Index of parent joint index, -1 if it is a root joint
          * @type {number}
          */
-        parentIndex : -1,
+        parentIndex: -1,
 
         /**
          * Scene node attached to
          * @type {qtek.Node}
          */
-        node : null,
+        node: null,
 
         /**
          * Root scene node of the skeleton, which parent node is null or don't have a joint
          * @type {qtek.Node}
          */
-        rootNode : null
+        rootNode: null
     });
 
     return Joint;

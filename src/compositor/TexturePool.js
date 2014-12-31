@@ -17,7 +17,7 @@ define(function(require) {
 
         constructor: TexturePool,
 
-        get : function(parameters) {
+        get: function(parameters) {
             var key = generateKey(parameters);
             if (!this._pool.hasOwnProperty(key)) {
                 this._pool[key] = [];
@@ -31,7 +31,7 @@ define(function(require) {
             return list.pop();
         },
 
-        put : function(texture) {
+        put: function(texture) {
             var key = generateKey(texture);
             if (!this._pool.hasOwnProperty(key)) {
                 this._pool[key] = [];
@@ -40,7 +40,7 @@ define(function(require) {
             list.push(texture);
         },
 
-        clear : function(gl) {
+        clear: function(gl) {
             for (var i = 0; i < this._allocatedTextures.length; i++) {
                 this._allocatedTextures[i].dispose(gl);
             }
@@ -50,19 +50,19 @@ define(function(require) {
     };
 
     var defaultParams = {
-        width : 512,
-        height : 512,
-        type : glenum.UNSIGNED_BYTE,
-        format : glenum.RGBA,
-        wrapS : glenum.CLAMP_TO_EDGE,
-        wrapT : glenum.CLAMP_TO_EDGE,
-        minFilter : glenum.LINEAR_MIPMAP_LINEAR,
-        magFilter : glenum.LINEAR,
-        useMipmap : true,
-        anisotropic : 1,
-        flipY : true,
-        unpackAlignment : 4,
-        premultiplyAlpha : false
+        width: 512,
+        height: 512,
+        type: glenum.UNSIGNED_BYTE,
+        format: glenum.RGBA,
+        wrapS: glenum.CLAMP_TO_EDGE,
+        wrapT: glenum.CLAMP_TO_EDGE,
+        minFilter: glenum.LINEAR_MIPMAP_LINEAR,
+        magFilter: glenum.LINEAR,
+        useMipmap: true,
+        anisotropic: 1,
+        flipY: true,
+        unpackAlignment: 4,
+        premultiplyAlpha: false
     };
 
     var defaultParamPropList = Object.keys(defaultParams);

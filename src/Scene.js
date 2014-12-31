@@ -15,44 +15,44 @@ define(function(require) {
              * Global material of scene
              * @type {Material}
              */
-            material : null,
+            material: null,
 
             /**
              * @type {boolean}
              */
-            autoUpdate : true,
+            autoUpdate: true,
 
             /**
              * Opaque renderable list, it will be updated automatically
              * @type {Renderable[]}
              * @readonly
              */
-            opaqueQueue : [],
+            opaqueQueue: [],
 
             /**
              * Opaque renderable list, it will be updated automatically
              * @type {Renderable[]}
              * @readonly
              */
-            transparentQueue : [],
+            transparentQueue: [],
 
             // Properties to save the light information in the scene
             // Will be set in the render function
-            lights : [],
+            lights: [],
             
-            _lightUniforms : {},
+            _lightUniforms: {},
 
-            _lightNumber : {
-                'POINT_LIGHT' : 0,
-                'DIRECTIONAL_LIGHT' : 0,
-                'SPOT_LIGHT' : 0,
-                'AMBIENT_LIGHT' : 0
+            _lightNumber: {
+                'POINT_LIGHT': 0,
+                'DIRECTIONAL_LIGHT': 0,
+                'SPOT_LIGHT': 0,
+                'AMBIENT_LIGHT': 0
             },
 
-            _opaqueObjectCount : 0,
-            _transparentObjectCount : 0,
+            _opaqueObjectCount: 0,
+            _transparentObjectCount: 0,
 
-            _nodeRepository : {}
+            _nodeRepository: {}
         };
     }, function() {
         this._scene = this;
@@ -63,7 +63,7 @@ define(function(require) {
          * Add node to scene
          * @param {Node} node
          */
-        addToScene : function(node) {
+        addToScene: function(node) {
             if (node.name) {
                 this._nodeRepository[node.name] = node;
             }
@@ -73,7 +73,7 @@ define(function(require) {
          * Remove node from scene
          * @param {Node} node
          */
-        removeFromScene : function(node) {
+        removeFromScene: function(node) {
             if (node.name) {
                 delete this._nodeRepository[node.name];
             }
@@ -85,7 +85,7 @@ define(function(require) {
          * @return {Node}
          * @DEPRECATED
          */
-        getNode : function(name) {
+        getNode: function(name) {
             return this._nodeRepository[name];
         },
 
@@ -112,7 +112,8 @@ define(function(require) {
                 for (var i = 0; i < current._children.length; i++) {
                     cloneSkeleton(current._children[i], currentNew._children[i]);
                 }
-            }
+            };
+
             cloneSkeleton(node, newNode);
 
             for (var guid in materialsMap) {
@@ -130,7 +131,7 @@ define(function(require) {
         },
 
 
-        update : function(force) {
+        update: function(force) {
             if (!(this.autoUpdate || force)) {
                 return;
             }
@@ -162,7 +163,7 @@ define(function(require) {
 
         // Traverse the scene and add the renderable
         // object to the render queue
-        _updateRenderQueue : function(parent, sceneMaterialTransparent) {
+        _updateRenderQueue: function(parent, sceneMaterialTransparent) {
             if (!parent.visible) {
                 return;
             }
@@ -186,7 +187,7 @@ define(function(require) {
             }
         },
 
-        _updateLightUniforms : function() {
+        _updateLightUniforms: function() {
             var lights = this.lights;
             // Put the light cast shadow before the light not cast shadow
             lights.sort(lightSortFunc);
@@ -204,8 +205,8 @@ define(function(require) {
                     var uniformTpl = light.uniformTemplates[symbol];
                     if (! lightUniforms[symbol]) {
                         lightUniforms[symbol] = {
-                            type : '',
-                            value : []
+                            type: '',
+                            value: []
                         };
                     }
                     var value = uniformTpl.value(light);
@@ -230,14 +231,14 @@ define(function(require) {
             }
         },
 
-        isShaderLightNumberChanged : function(shader) {
+        isShaderLightNumberChanged: function(shader) {
             return shader.lightNumber.POINT_LIGHT !== this._lightNumber.POINT_LIGHT
                 || shader.lightNumber.DIRECTIONAL_LIGHT !== this._lightNumber.DIRECTIONAL_LIGHT
                 || shader.lightNumber.SPOT_LIGHT !== this._lightNumber.SPOT_LIGHT
                 || shader.lightNumber.AMBIENT_LIGHT !== this._lightNumber.AMBIENT_LIGHT;
         },
 
-        setShaderLightNumber : function(shader) {
+        setShaderLightNumber: function(shader) {
             for (var type in this._lightNumber) {
                 shader.lightNumber[type] = this._lightNumber[type];
             }
@@ -256,7 +257,7 @@ define(function(require) {
          * But resources of gl like texuture, shader will not be disposed.
          * Mostly you should use disposeScene method in Renderer to do dispose.
          */
-        dispose : function() {
+        dispose: function() {
             this.material = null;
             this.opaqueQueue = [];
             this.transparentQueue = [];

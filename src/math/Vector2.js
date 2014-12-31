@@ -33,7 +33,7 @@ define(function(require) {
 
     Vector2.prototype = {
 
-        constructor : Vector2,
+        constructor: Vector2,
 
         /**
          * @name x
@@ -69,7 +69,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        add : function(b) {
+        add: function(b) {
             vec2.add(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -81,7 +81,7 @@ define(function(require) {
          * @param  {number}  y
          * @return {qtek.math.Vector2}
          */
-        set : function(x, y) {
+        set: function(x, y) {
             this._array[0] = x;
             this._array[1] = y;
             this._dirty = true;
@@ -93,7 +93,7 @@ define(function(require) {
          * @param  {Float32Array|number[]} arr
          * @return {qtek.math.Vector2}
          */
-        setArray : function(arr) {
+        setArray: function(arr) {
             this._array[0] = arr[0];
             this._array[1] = arr[1];
 
@@ -105,7 +105,7 @@ define(function(require) {
          * Clone a new Vector2
          * @return {qtek.math.Vector2}
          */
-        clone : function() {
+        clone: function() {
             return new Vector2(this.x, this.y);
         },
 
@@ -114,7 +114,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        copy : function(b) {
+        copy: function(b) {
             vec2.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -126,7 +126,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        cross : function(out, b) {
+        cross: function(out, b) {
             vec2.cross(out._array, this._array, b._array);
             out._dirty = true;
             return this;
@@ -137,7 +137,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {number}
          */
-        dist : function(b) {
+        dist: function(b) {
             return vec2.dist(this._array, b._array);
         },
 
@@ -146,7 +146,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {number}
          */
-        distance : function(b) {
+        distance: function(b) {
             return vec2.distance(this._array, b._array);
         },
 
@@ -155,7 +155,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        div : function(b) {
+        div: function(b) {
             vec2.div(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -166,7 +166,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        divide : function(b) {
+        divide: function(b) {
             vec2.divide(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -177,7 +177,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {number}
          */
-        dot : function(b) {
+        dot: function(b) {
             return vec2.dot(this._array, b._array);
         },
 
@@ -185,7 +185,7 @@ define(function(require) {
          * Alias of length
          * @return {number}
          */
-        len : function() {
+        len: function() {
             return vec2.len(this._array);
         },
 
@@ -193,7 +193,7 @@ define(function(require) {
          * Calculate the length
          * @return {number}
          */
-        length : function() {
+        length: function() {
             return vec2.length(this._array);
         },
         
@@ -204,7 +204,7 @@ define(function(require) {
          * @param  {number}  t
          * @return {qtek.math.Vector2}
          */
-        lerp : function(a, b, t) {
+        lerp: function(a, b, t) {
             vec2.lerp(this._array, a._array, b._array, t);
             this._dirty = true;
             return this;
@@ -215,7 +215,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        min : function(b) {
+        min: function(b) {
             vec2.min(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -226,7 +226,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        max : function(b) {
+        max: function(b) {
             vec2.max(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -237,7 +237,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        mul : function(b) {
+        mul: function(b) {
             vec2.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -248,7 +248,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        multiply : function(b) {
+        multiply: function(b) {
             vec2.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -258,7 +258,7 @@ define(function(require) {
          * Negate self
          * @return {qtek.math.Vector2}
          */
-        negate : function() {
+        negate: function() {
             vec2.negate(this._array, this._array);
             this._dirty = true;
             return this;
@@ -268,7 +268,7 @@ define(function(require) {
          * Normalize self
          * @return {qtek.math.Vector2}
          */
-        normalize : function() {
+        normalize: function() {
             vec2.normalize(this._array, this._array);
             this._dirty = true;
             return this;
@@ -279,7 +279,7 @@ define(function(require) {
          * @param  {number} scale
          * @return {qtek.math.Vector2}
          */
-        random : function(scale) {
+        random: function(scale) {
             vec2.random(this._array, scale);
             this._dirty = true;
             return this;
@@ -290,7 +290,7 @@ define(function(require) {
          * @param  {number}  scale
          * @return {qtek.math.Vector2}
          */
-        scale : function(s) {
+        scale: function(s) {
             vec2.scale(this._array, this._array, s);
             this._dirty = true;
             return this;
@@ -302,7 +302,7 @@ define(function(require) {
          * @param  {number}  scale
          * @return {qtek.math.Vector2}
          */
-        scaleAndAdd : function(b, s) {
+        scaleAndAdd: function(b, s) {
             vec2.scaleAndAdd(this._array, this._array, b._array, s);
             this._dirty = true;
             return this;
@@ -313,7 +313,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {number}
          */
-        sqrDist : function(b) {
+        sqrDist: function(b) {
             return vec2.sqrDist(this._array, b._array);
         },
 
@@ -322,7 +322,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {number}
          */
-        squaredDistance : function(b) {
+        squaredDistance: function(b) {
             return vec2.squaredDistance(this._array, b._array);
         },
 
@@ -330,7 +330,7 @@ define(function(require) {
          * Alias for squaredLength
          * @return {number}
          */
-        sqrLen : function() {
+        sqrLen: function() {
             return vec2.sqrLen(this._array);
         },
 
@@ -338,7 +338,7 @@ define(function(require) {
          * Squared length of self
          * @return {number}
          */
-        squaredLength : function() {
+        squaredLength: function() {
             return vec2.squaredLength(this._array);
         },
 
@@ -347,7 +347,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        sub : function(b) {
+        sub: function(b) {
             vec2.sub(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -358,7 +358,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
          */
-        subtract : function(b) {
+        subtract: function(b) {
             vec2.subtract(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -369,7 +369,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2} m
          * @return {qtek.math.Vector2}
          */
-        transformMat2 : function(m) {
+        transformMat2: function(m) {
             vec2.transformMat2(this._array, this._array, m._array);
             this._dirty = true;
             return this;
@@ -380,7 +380,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix2d} m
          * @return {qtek.math.Vector2}
          */
-        transformMat2d : function(m) {
+        transformMat2d: function(m) {
             vec2.transformMat2d(this._array, this._array, m._array);
             this._dirty = true;
             return this;
@@ -391,7 +391,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} m
          * @return {qtek.math.Vector2}
          */
-        transformMat3 : function(m) {
+        transformMat3: function(m) {
             vec2.transformMat3(this._array, this._array, m._array);
             this._dirty = true;
             return this;
@@ -402,13 +402,13 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} m
          * @return {qtek.math.Vector2}
          */
-        transformMat4 : function(m) {
+        transformMat4: function(m) {
             vec2.transformMat4(this._array, this._array, m._array);
             this._dirty = true;
             return this;
         },
 
-        toString : function() {
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
     };

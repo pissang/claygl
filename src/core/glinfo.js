@@ -28,7 +28,7 @@ define(function() {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.core.glinfo
          */
-        initialize : function(_gl) {
+        initialize: function(_gl) {
 
             if (extensions[_gl.__GLID__]) {
                 return;
@@ -49,7 +49,7 @@ define(function() {
          * @return {WebGLExtension}
          * @memberOf qtek.core.glinfo
          */
-        getExtension : function(_gl, name) {
+        getExtension: function(_gl, name) {
             var glid = _gl.__GLID__;
             if (extensions[glid]) {
                 if (typeof(extensions[glid][name]) == 'undefined') {
@@ -67,7 +67,7 @@ define(function() {
             delete extensions[_gl.__GLID__];
         },
 
-        _createExtension : function(_gl, name) {
+        _createExtension: function(_gl, name) {
             var ext = _gl.getExtension(name);
             if (!ext) {
                 ext = _gl.getExtension('MOZ_' + name);

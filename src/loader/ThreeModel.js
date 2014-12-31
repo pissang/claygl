@@ -1,7 +1,7 @@
 /**
  * Load three.js JSON Format model
  *
- * Format specification : https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
+ * Format specification https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3.1
  */
 define(function(require) {
 
@@ -38,16 +38,16 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath : '',
+        rootPath: '',
         /**
          * @type {string}
          */
-        textureRootPath : ''
+        textureRootPath: ''
     }, {
         /**
          * @param  {string} url
          */
-        load : function(url) {
+        load: function(url) {
             var self = this;
 
             if (!this.rootPath) {
@@ -55,15 +55,15 @@ define(function(require) {
             }
 
             request.get({
-                url : url,
-                onprogress : function(percent, loaded, total) {
+                url: url,
+                onprogress: function(percent, loaded, total) {
                     self.trigger('progress', percent, loaded, total);
                 },
-                onerror : function(e) {
+                onerror: function(e) {
                     self.trigger('error', e);
                 },
-                responseType : 'text',
-                onload : function(data) {
+                responseType: 'text',
+                onload: function(data) {
                     self.parse(JSON.parse(data));
                 }
             });
@@ -73,7 +73,7 @@ define(function(require) {
          * @param {Object} json
          * @return {Array.<qtek.Mesh>}
          */
-        parse : function(data) {
+        parse: function(data) {
             
             var geometryList = this._parseGeometry(data);
 
@@ -100,8 +100,8 @@ define(function(require) {
                     geometry.updateBoundingBox();
                     var material = this._parseMaterial(data.materials[i], jointNumber);
                     var mesh = new Mesh({
-                        geometry : geometryList[i],
-                        material : material
+                        geometry: geometryList[i],
+                        material: material
                     }) ;
                     if (skinned) {
                         mesh.skeleton = skeleton;
@@ -119,7 +119,7 @@ define(function(require) {
             return meshList;
         },
 
-        _parseGeometry : function(data) {
+        _parseGeometry: function(data) {
 
             var geometryList = [];
             var cursorList = [];
@@ -405,27 +405,27 @@ define(function(require) {
             return geometryList;
         },
 
-        _parseSkeleton : function(data) {
+        _parseSkeleton: function(data) {
             var joints = [];
             var dBones = data.bones;
             for ( var i = 0; i < dBones.length; i++) {
                 var dBone = dBones[i];
                 var joint = new Joint({
-                    index : i,
-                    parentIndex : dBone.parent,
-                    name : dBone.name
+                    index: i,
+                    parentIndex: dBone.parent,
+                    name: dBone.name
                 });
                 joint.node = new Node({
-                    name : dBone.name,
-                    position : new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
-                    rotation : new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
-                    scale : new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
+                    name: dBone.name,
+                    position: new Vector3(dBone.pos[0], dBone.pos[1], dBone.pos[2]),
+                    rotation: new Quaternion(dBone.rotq[0], dBone.rotq[1], dBone.rotq[2], dBone.rotq[3]),
+                    scale: new Vector3(dBone.scl[0], dBone.scl[1], dBone.scl[2])
                 });
                 joints.push(joint);
             }
 
             var skeleton = new Skeleton({
-                joints : joints
+                joints: joints
             });
             skeleton.updateHierarchy();
             skeleton.updateJointMatrices();
@@ -439,7 +439,7 @@ define(function(require) {
                 for (var i = 0; i < dFrames.length; i++) {
                     var channel = dFrames[i];
                     var jointPose = jointClips[i] = {
-                        keyFrames : []
+                        keyFrames: []
                     };
                     jointPose.name = joints[i].name;
                     for (var j = 0; j < channel.keys.length; j++) {
@@ -460,7 +460,7 @@ define(function(require) {
                 }
 
                 var skinningClip = new SkinningClip({
-                    jointClips : jointClips
+                    jointClips: jointClips
                 });
 
                 skeleton.addClip(skinningClip);
@@ -469,7 +469,7 @@ define(function(require) {
             return skeleton;
         },
 
-        _parseMaterial : function(mConfig, jointNumber) {
+        _parseMaterial: function(mConfig, jointNumber) {
             var shaderName = 'buildin.lambert';
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
             if (shading === 'phong' || shading === 'lambert') {
@@ -488,8 +488,8 @@ define(function(require) {
             } else {
                 // Shader for skinned mesh
                 shader = new Shader({
-                    vertex : Shader.source(shaderName+'.vertex'),
-                    fragment : Shader.source(shaderName+'.fragment')
+                    vertex: Shader.source(shaderName+'.vertex'),
+                    fragment: Shader.source(shaderName+'.fragment')
                 });
                 for (var i = 0; i < enabledTextures; i++) {
                     shader.enableTexture(enabledTextures[i]);
@@ -499,7 +499,7 @@ define(function(require) {
             }
 
             var material = new Material({
-                shader : shader
+                shader: shader
             });
             if (mConfig.colorDiffuse) {
                 material.set('color', mConfig.colorDiffuse );
@@ -540,7 +540,7 @@ define(function(require) {
             return material;
         },
 
-        _loadTexture : function(path, wrap) {
+        _loadTexture: function(path, wrap) {
             var img = new Image();
             var texture = new Texture2D();
             texture.image = img;

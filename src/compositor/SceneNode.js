@@ -12,30 +12,30 @@ define(function(require) {
     var SceneNode = Node.derive(
     /** @lends qtek.compositor.SceneNode# */
     {
-        name : 'scene',
+        name: 'scene',
         /**
          * @type {qtek.Scene}
          */
-        scene : null,
+        scene: null,
         /**
          * @type {qtek.Camera}
          */
-        camera : null,
+        camera: null,
         /**
          * @type {boolean}
          */
-        autoUpdateScene : true,
+        autoUpdateScene: true,
         /**
          * @type {boolean}
          */
-        preZ : false
+        preZ: false
         
     }, function() {
         if (this.frameBuffer) {
             this.frameBuffer.depthBuffer = true;
         }
     }, {
-        render : function(renderer) {
+        render: function(renderer) {
             
             this._rendering = true;
             var _gl = renderer.gl;
