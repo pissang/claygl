@@ -84,7 +84,6 @@ define(function(require) {
             var v1 = new Vector3();
             var v2 = new Vector3();
             var v3 = new Vector3();
-            var intersectionPoint = new Vector3();
             var ray = new Ray();
             var worldInverse = new Matrix4();
 
@@ -105,6 +104,7 @@ define(function(require) {
                 var cullBack = (renderable.cullFace === glenum.BACK && renderable.frontFace === glenum.CCW)
                             || (renderable.cullFace === glenum.FRONT && renderable.frontFace === glenum.CW);
 
+                var point;
                 if (isStatic) {
                     var faces = geometry.faces;
                     var positions = geometry.attributes.position.value;
@@ -125,17 +125,17 @@ define(function(require) {
                         v3._array[1] = positions[i3 + 1];
                         v3._array[2] = positions[i3 + 2];
 
-                        var point;
                         if (cullBack) {
-                            point = ray.intersectTriangle(v1, v2, v3, renderable.culling, intersectionPoint);
+                            point = ray.intersectTriangle(v1, v2, v3, renderable.culling);
                         } else {
-                            point = ray.intersectTriangle(v1, v3, v2, renderable.culling, intersectionPoint);
+                            point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
                         }
                         if (point) {
                             var pointW = new Vector3();
-                            // Vector3.transformMat4(pointW, point, renderable.worldTransform);
+                            Vector3.transformMat4(pointW, point, renderable.worldTransform);
                             out.push(new RayPicking.Intersection(
-                                pointW, renderable, [[i1, i2, i3]], Vector3.dist(pointW, this._ray.origin)
+                                point, pointW, renderable, [i1, i2, i3],
+                                Vector3.dist(pointW, this._ray.origin)
                             ));
                         }
                     }
@@ -152,17 +152,17 @@ define(function(require) {
                         v2.setArray(positions[i2]);
                         v3.setArray(positions[i3]);
 
-                        var point;
                         if (cullBack) {
-                            point = ray.intersectTriangle(v1, v2, v3, renderable.culling, intersectionPoint);
+                            point = ray.intersectTriangle(v1, v2, v3, renderable.culling);
                         } else {
-                            point = ray.intersectTriangle(v1, v3, v2, renderable.culling, intersectionPoint);
+                            point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
                         }
                         if (point) {
                             var pointW = new Vector3();
                             Vector3.transformMat4(pointW, point, renderable.worldTransform);
                             out.push(new RayPicking.Intersection(
-                                point, pointW, renderable, [i1, i2, i3], Vector3.dist(pointW, this._ray.origin)
+                                point, pointW, renderable, [i1, i2, i3],
+                                Vector3.dist(pointW, this._ray.origin)
                             ));
                         }
                     }
@@ -180,16 +180,15 @@ define(function(require) {
      * @param {qtek.math.Vector3} point
      * @param {qtek.math.Vector3} pointWorld
      * @param {qtek.Node} target
-     * @param {Array.<number>} tri
+     * @param {Array.<number>} face
      * @param {number} distance
      */
-    RayPicking.Intersection = function(point, pointWorld, target, tri, distance) {
+    RayPicking.Intersection = function(point, pointWorld, target, face, distance) {
         /**
          * Intersection point in local transform coordinates
          * @type {qtek.math.Vector3}
          */
         this.point = point;
-
         /**
          * Intersection point in world transform coordinates
          * @type {qtek.math.Vector3}
@@ -204,7 +203,7 @@ define(function(require) {
          * Intersection triangle, which is an array of vertex index
          * @type {Array.<number>}
          */
-        this.triangle = tri;
+        this.face = face;
         /**
          * Distance from intersection point to ray origin
          * @type {number}
