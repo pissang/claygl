@@ -72,7 +72,7 @@
                 renderer.canvas.addEventListener('mousemove', function(e) {
                     var res = picking.pick(e.offsetX, e.offsetY);
                     if (res) {
-                        sphere.position.copy(res.point);
+                        sphere.position.copy(res.pointWorld);
                     } else {
                         sphere.position.set(1000, 1000, 1000);
                     }

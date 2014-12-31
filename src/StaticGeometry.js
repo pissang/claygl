@@ -18,55 +18,71 @@ define(function(require) {
      */
     var StaticGeometry = Geometry.derive(function() {
         return /** @lends qtek.StaticGeometry# */ {
-            attributes : {
-                 position : new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
-                 texcoord0 : new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
-                 texcoord1 : new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
-                 normal : new Geometry.Attribute('normal', 'float', 3, 'NORMAL', false),
-                 tangent : new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', false),
-                 color : new Geometry.Attribute('color', 'float', 4, 'COLOR', false),
+            attributes: {
+                 position: new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
+                 texcoord0: new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
+                 texcoord1: new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
+                 normal: new Geometry.Attribute('normal', 'float', 3, 'NORMAL', false),
+                 tangent: new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', false),
+                 color: new Geometry.Attribute('color', 'float', 4, 'COLOR', false),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the 
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight : new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', false),
-                 joint : new Geometry.Attribute('joint', 'float', 4, 'JOINT', false),
+                 weight: new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', false),
+                 joint: new Geometry.Attribute('joint', 'float', 4, 'JOINT', false),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, false),
+                 barycentric: new Geometry.Attribute('barycentric', 'float', 3, null, false),
             },
 
-            hint : glenum.STATIC_DRAW,
+            hint: glenum.STATIC_DRAW,
 
             /**
              * @type {Uint16Array}
              */
             faces: null,
 
-            _normalType : 'vertex',
+            _normalType: 'vertex',
 
-            _enabledAttributes : null
+            _enabledAttributes: null
         };
     }, 
     /** @lends qtek.StaticGeometry.prototype */
     {
-        dirty : function() {
+        dirty: function() {
             this._cache.dirtyAll();
             this._enabledAttributes = null;
         },
         
-        getVertexNumber : function() {
+        getVertexNumber: function() {
             if (!this.attributes.position.value) {
                 return 0;
             }
             return this.attributes.position.value.length / 3;
         },
 
-        getFaceNumber : function() {
-            return this.faces.length / 3;
+        getFaceNumber: function() {
+            if (!this.faces) {
+                return 0;
+            } else {
+                return this.faces.length / 3;
+            }
+        },
+
+        getFace: function (idx, out) {
+            if (idx < this.getFaceNumber() && idx >= 0) {
+                if (!out) {
+                    out = vec3.create();
+                }
+                out[0] = this.faces[idx * 3];
+                out[1] = this.faces[idx * 3 + 1];
+                out[2] = this.faces[idx * 3 + 2];
+                return out;
+            }
         },
         
-        isUseFace : function() {
+        isUseFace: function() {
             return this.useFace && (this.faces != null);
         },
         
@@ -92,7 +108,7 @@ define(function(require) {
          * Attribute which has the same vertex number with position is treated as a enabled attribute
          * @return {string[]}
          */
-        getEnabledAttributes : function() {
+        getEnabledAttributes: function() {
             // Cache
             if (this._enabledAttributes) {
                 return this._enabledAttributes;
@@ -116,7 +132,7 @@ define(function(require) {
             return result;
         },
 
-        getBufferChunks : function(_gl) {
+        getBufferChunks: function(_gl) {
             this._cache.use(_gl.__GLID__);
             if (this._cache.isDirty()) {
                 this._updateBuffer(_gl);
@@ -125,7 +141,7 @@ define(function(require) {
             return this._cache.get('chunks');
         },
         
-        _updateBuffer : function(_gl) {
+        _updateBuffer: function(_gl) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
@@ -192,7 +208,7 @@ define(function(require) {
             }
         },
 
-        generateVertexNormals : function() {
+        generateVertexNormals: function() {
             var faces = this.faces;
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
@@ -244,7 +260,7 @@ define(function(require) {
             }
         },
 
-        generateFaceNormals : function() {
+        generateFaceNormals: function() {
             if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
@@ -287,7 +303,7 @@ define(function(require) {
             }
         },
 
-        generateTangents : function() {
+        generateTangents: function() {
             var nVertex = this.getVertexNumber();
             if (!this.attributes.tangent.value) {
                 this.attributes.tangent.value = new Float32Array(nVertex * 4);
@@ -378,7 +394,7 @@ define(function(require) {
             }
         },
 
-        isUniqueVertex : function() {
+        isUniqueVertex: function() {
             if (this.isUseFace()) {
                 return this.getVertexNumber() === this.faces.length;
             } else {
@@ -386,7 +402,7 @@ define(function(require) {
             }
         },
 
-        generateUniqueVertex : function() {
+        generateUniqueVertex: function() {
             var vertexUseCount = [];
 
             for (var i = 0, len = this.getVertexNumber(); i < len; i++) {
@@ -428,7 +444,7 @@ define(function(require) {
             }
         },
 
-        generateBarycentric : function() {
+        generateBarycentric: function() {
 
             if (! this.isUniqueVertex()) {
                 this.generateUniqueVertex();
@@ -448,7 +464,7 @@ define(function(require) {
             }
         },
 
-        convertToDynamic : function(geometry) {
+        convertToDynamic: function(geometry) {
             for (var i = 0; i < this.faces.length; i+=3) {
                 geometry.faces.push(this.face.subarray(i, i + 3));
             }
@@ -486,7 +502,7 @@ define(function(require) {
             return geometry;
         },
 
-        applyTransform : function(matrix) {
+        applyTransform: function(matrix) {
 
             if (this.boundingBox) {
                 this.boundingBox.applyTransform(matrix);
@@ -511,7 +527,7 @@ define(function(require) {
             }
         },
 
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             this._cache.use(_gl.__GLID__);
             var chunks = this._cache.get('chunks');
             if (chunks) {

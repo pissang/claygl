@@ -207,14 +207,15 @@ define(function(require) {
             return out;
         },
 
-        // http://en.wikipedia.org/wiki/M枚ller鈥揟rumbore_intersection_algorithm
+        // http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
         /**
          * Calculate intersection point between ray and three triangle vertices
          * @param {qtek.math.Vector3} a
          * @param {qtek.math.Vector3} b
          * @param {qtek.math.Vector3} c
          * @param {boolean}           singleSided, CW triangle will be ignored
-         * @param {qtek.math.Vector3} out
+         * @param {qtek.math.Vector3} [out]
+         * @param {qtek.math.Vector3} [barycenteric] barycentric coords
          * @return {qtek.math.Vector3}
          */
         intersectTriangle : (function() {
@@ -224,7 +225,7 @@ define(function(require) {
             var AO = vec3.create();
             var vCross = vec3.create();
 
-            return function(a, b, c, singleSided, out) {
+            return function(a, b, c, singleSided, out, barycenteric) {
                 var dir = this.direction._array;
                 var origin = this.origin._array;
                 a = a._array;
@@ -271,6 +272,9 @@ define(function(require) {
 
                 if (!out) {
                     out = new Vector3();
+                }
+                if (barycenteric) {
+                    Vector3.set(barycenteric, (1 - u - v), u, v);
                 }
                 vec3.scaleAndAdd(out._array, origin, dir, t);
 

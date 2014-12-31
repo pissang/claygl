@@ -22,22 +22,22 @@ define(function(require) {
      */
     var DynamicGeometry = Geometry.derive(function() {
         return /** @lends qtek.DynamicGeometry# */ {
-            attributes : {
-                 position : new Geometry.Attribute('position', 'float', 3, 'POSITION', true),
-                 texcoord0 : new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
-                 texcoord1 : new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', true),
-                 normal : new Geometry.Attribute('normal', 'float', 3, 'NORMAL', true),
-                 tangent : new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', true),
-                 color : new Geometry.Attribute('color', 'float', 4, 'COLOR', true),
+            attributes: {
+                 position: new Geometry.Attribute('position', 'float', 3, 'POSITION', true),
+                 texcoord0: new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
+                 texcoord1: new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', true),
+                 normal: new Geometry.Attribute('normal', 'float', 3, 'NORMAL', true),
+                 tangent: new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', true),
+                 color: new Geometry.Attribute('color', 'float', 4, 'COLOR', true),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the 
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight : new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', true),
-                 joint : new Geometry.Attribute('joint', 'float', 4, 'JOINT', true),
+                 weight: new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', true),
+                 joint: new Geometry.Attribute('joint', 'float', 4, 'JOINT', true),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric : new Geometry.Attribute('barycentric', 'float', 3, null, true)
+                 barycentric: new Geometry.Attribute('barycentric', 'float', 3, null, true)
             },
 
             dynamic: true,
@@ -50,30 +50,30 @@ define(function(require) {
             /**
              * @type {array}
              */
-            faces : [],
+            faces: [],
             
-            _enabledAttributes : null,
+            _enabledAttributes: null,
 
             // Typed Array of each geometry chunk
             // [{
             //     attributeArrays:{
-            //         position : TypedArray
+            //         position: TypedArray
             //     },
-            //     indicesArray : null
+            //     indicesArray: null
             // }]
-            _arrayChunks : []
+            _arrayChunks: []
         };
     }, 
     /** @lends qtek.DynamicGeometry.prototype */
     {
-        updateBoundingBox : function() {
+        updateBoundingBox: function() {
             if (!this.boundingBox) {
                 this.boundingBox = new BoundingBox();
             }
             this.boundingBox.updateFromVertices(this.attributes.position.value);
         },
         // Overwrite the dirty method
-        dirty : function(field) {
+        dirty: function(field) {
             if (!field) {
                 this.dirty('indices');
                 for (var name in this.attributes) {
@@ -88,19 +88,30 @@ define(function(require) {
             this._enabledAttributes = null;
         },
 
-        getVertexNumber : function() {
+        getVertexNumber: function() {
             return this.attributes.position.value.length;
         },
 
-        getFaceNumber : function() {
+        getFaceNumber: function() {
             return this.faces.length;
         },
 
-        isUseFace : function() {
+        getFace: function (idx, out) {
+            if (idx < this.getFaceNumber() && idx >= 0) {
+                if (!out) {
+                    out = vec3.create();
+                }
+                vec3.copy(out, this.faces[idx]);
+
+                return out;
+            }
+        },
+
+        isUseFace: function() {
             return this.useFace && (this.faces.length > 0);
         },
 
-        isSplitted : function() {
+        isSplitted: function() {
             return this.getVertexNumber() > 0xffff;
         },
 
@@ -126,7 +137,7 @@ define(function(require) {
          * Attribute that has same vertex number with position is treated as an enabled attribute
          * @return {Object}
          */
-        getEnabledAttributes : function() {
+        getEnabledAttributes: function() {
             // Cache
             if (this._enabledAttributes) {
                 return this._enabledAttributes;
@@ -150,7 +161,7 @@ define(function(require) {
             return result;
         },
 
-        _getDirtyAttributes : function() {
+        _getDirtyAttributes: function() {
 
             var attributes = this.getEnabledAttributes();
             
@@ -171,11 +182,11 @@ define(function(require) {
             }
         },
 
-        getChunkNumber : function() {
+        getChunkNumber: function() {
             return this._arrayChunks.length;
         },
 
-        getBufferChunks : function(_gl) {
+        getBufferChunks: function(_gl) {
 
             this._cache.use(_gl.__GLID__);
 
@@ -199,7 +210,7 @@ define(function(require) {
             return this._cache.get('chunks');
         },
 
-        _updateAttributesAndIndicesArrays : function(attributes, isFacesDirty) {
+        _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty) {
 
             var self = this;
             var nVertex = this.getVertexNumber();
@@ -391,7 +402,7 @@ define(function(require) {
             }
         },
 
-        _updateBuffer : function(_gl, dirtyAttributes, isFacesDirty) {
+        _updateBuffer: function(_gl, dirtyAttributes, isFacesDirty) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
@@ -474,7 +485,7 @@ define(function(require) {
             }
         },
 
-        generateVertexNormals : function() {
+        generateVertexNormals: function() {
             var faces = this.faces;
             var len = faces.length;
             var positions = this.attributes.position.value;
@@ -514,7 +525,7 @@ define(function(require) {
             }
         },
 
-        generateFaceNormals : function() {
+        generateFaceNormals: function() {
             if (! this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
@@ -554,7 +565,7 @@ define(function(require) {
         // 'Mathmatics for 3D programming and computer graphics, third edition'
         // section 7.8.2
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
-        generateTangents : function() {
+        generateTangents: function() {
             
             var texcoords = this.attributes.texcoord0.value;
             var positions = this.attributes.position.value;
@@ -630,7 +641,7 @@ define(function(require) {
             }
         },
 
-        isUniqueVertex : function() {
+        isUniqueVertex: function() {
             if (this.isUseFace()) {
                 return this.getVertexNumber() === this.faces.length * 3;
             } else {
@@ -638,7 +649,7 @@ define(function(require) {
             }
         },
 
-        generateUniqueVertex : function() {
+        generateUniqueVertex: function() {
 
             var vertexUseCount = [];
             // Intialize with empty value, read undefined value from array
@@ -709,7 +720,7 @@ define(function(require) {
             };
         })(),
 
-        convertToStatic : function(geometry) {
+        convertToStatic: function(geometry) {
             this._updateAttributesAndIndicesArrays(this.getEnabledAttributes(), true);
 
             if (this._arrayChunks.length > 1) {
@@ -747,7 +758,7 @@ define(function(require) {
             return geometry;
         },
 
-        applyTransform : function(matrix) {
+        applyTransform: function(matrix) {
             
             if (this.boundingBox) {
                 this.boundingBox.applyTransform(matrix);
@@ -775,7 +786,7 @@ define(function(require) {
             }
         },
 
-        dispose : function(_gl) {
+        dispose: function(_gl) {
             this._cache.use(_gl.__GLID__);
             var chunks = this._cache.get('chunks');
             if (chunks) {

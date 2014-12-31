@@ -5,6 +5,10 @@ define(function(require) {
     var Base = require('./core/Base');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
+    var glmatrix = require('./dep/glmatrix');
+    var vec2 = glmatrix.vec2;
+    var vec3 = glmatrix.vec3;
+    var vec4 = glmatrix.vec4;
 
     // PENDING put the buffer data in attribute ? 
     function Attribute(name, type, size, semantic, isDynamic) {
@@ -20,6 +24,102 @@ define(function(require) {
         } else {
             this._isDynamic = false;
             this.value = null;
+        }
+
+        // Init getter setter
+        switch (size) {
+            case 1:
+                this.get = function (idx) {
+                    return this.value[idx];
+                };
+                this.set = function (idx, value) {
+                    this.value[idx] = value;
+                };
+                break;
+            case 2:
+                if (isDynamic) {
+                    this.get = function (idx, out) {
+                        var item = this.value[idx];
+                        if (item) {
+                            vec2.copy(out, item);
+                        }
+                    };
+                    this.set = function (idx, val) {
+                        var item = this.value[idx];
+                        if (!item) {
+                            item = this.value[idx] = vec2.create();
+                        }
+                        vec2.copy(item, val);
+                    };
+                } else {
+                    this.get = function (idx, out) {
+                        out[0] = this.value[idx * 2];
+                        out[1] = this.value[idx * 2 + 1];
+                    };
+                    this.set = function (idx, val) {
+                        this.value[idx * 2] = val[0];
+                        this.value[idx * 2 + 1] = val[1];
+                    };
+                }
+                break;
+            case 3:
+                if (isDynamic) {
+                    this.get = function (idx, out) {
+                        var item = this.value[idx];
+                        if (item) {
+                            vec3.copy(out, item);
+                        }
+                    };
+                    this.set = function (idx, val) {
+                        var item = this.value[idx];
+                        if (!item) {
+                            item = this.value[idx] = vec3.create();
+                        }
+                        vec3.copy(item, val);
+                    };
+                } else {
+                    this.get = function (idx, out) {
+                        out[0] = this.value[idx * 3];
+                        out[1] = this.value[idx * 3 + 1];
+                        out[2] = this.value[idx * 3 + 2];
+                    };
+                    this.set = function (idx, val) {
+                        this.value[idx * 3] = val[0];
+                        this.value[idx * 3 + 1] = val[1];
+                        this.value[idx * 3 + 2] = val[2];
+                    };
+                }
+                break;
+            case 4:
+                if (isDynamic) {
+                    this.get = function (idx, out) {
+                        var item = this.value[idx];
+                        if (item) {
+                            vec4.copy(out, item);
+                        }
+                    };
+                    this.set = function (idx, val) {
+                        var item = this.value[idx];
+                        if (!item) {
+                            item = this.value[idx] = vec4.create();
+                        }
+                        vec4.copy(item, val);
+                    };
+                } else {
+                    this.get = function (idx, out) {
+                        out[0] = this.value[idx * 4];
+                        out[1] = this.value[idx * 4 + 1];
+                        out[2] = this.value[idx * 4 + 2];
+                        out[3] = this.value[idx * 4 + 3];
+                    };
+                    this.set = function (idx, val) {
+                        this.value[idx * 4] = val[0];
+                        this.value[idx * 4 + 1] = val[1];
+                        this.value[idx * 4 + 2] = val[2];
+                        this.value[idx * 4 + 3] = val[3];
+                    };
+                }
+                break;
         }
     }
 
@@ -59,6 +159,7 @@ define(function(require) {
 
         return ret;
     };
+
 
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
