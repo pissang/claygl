@@ -623,7 +623,7 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.scaleAndAdd = function(out, a, b, scale) {
-        vec4.scale(out._array, a._array, b._array, scale);
+        vec4.scaleAndAdd(out._array, a._array, b._array, scale);
         out._dirty = true;
         return out;
     };

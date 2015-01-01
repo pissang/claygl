@@ -617,7 +617,7 @@ define(function(require) {
      * @return {qtek.math.Vector2}
      */
     Vector2.scaleAndAdd = function(out, a, b, scale) {
-        vec2.scale(out._array, a._array, b._array, scale);
+        vec2.scaleAndAdd(out._array, a._array, b._array, scale);
         out._dirty = true;
         return out;
     };

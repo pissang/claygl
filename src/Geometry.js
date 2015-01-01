@@ -39,12 +39,14 @@ define(function(require) {
             case 2:
                 if (isDynamic) {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         var item = this.value[idx];
                         if (item) {
                             vec2.copy(out, item);
                         }
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         var item = this.value[idx];
                         if (!item) {
                             item = this.value[idx] = vec2.create();
@@ -53,10 +55,12 @@ define(function(require) {
                     };
                 } else {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         out[0] = this.value[idx * 2];
                         out[1] = this.value[idx * 2 + 1];
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         this.value[idx * 2] = val[0];
                         this.value[idx * 2 + 1] = val[1];
                     };
@@ -65,12 +69,14 @@ define(function(require) {
             case 3:
                 if (isDynamic) {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         var item = this.value[idx];
                         if (item) {
                             vec3.copy(out, item);
                         }
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         var item = this.value[idx];
                         if (!item) {
                             item = this.value[idx] = vec3.create();
@@ -79,11 +85,13 @@ define(function(require) {
                     };
                 } else {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         out[0] = this.value[idx * 3];
                         out[1] = this.value[idx * 3 + 1];
                         out[2] = this.value[idx * 3 + 2];
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         this.value[idx * 3] = val[0];
                         this.value[idx * 3 + 1] = val[1];
                         this.value[idx * 3 + 2] = val[2];
@@ -93,12 +101,14 @@ define(function(require) {
             case 4:
                 if (isDynamic) {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         var item = this.value[idx];
                         if (item) {
                             vec4.copy(out, item);
                         }
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         var item = this.value[idx];
                         if (!item) {
                             item = this.value[idx] = vec4.create();
@@ -107,12 +117,14 @@ define(function(require) {
                     };
                 } else {
                     this.get = function (idx, out) {
+                        out = out._array || out;
                         out[0] = this.value[idx * 4];
                         out[1] = this.value[idx * 4 + 1];
                         out[2] = this.value[idx * 4 + 2];
                         out[3] = this.value[idx * 4 + 3];
                     };
                     this.set = function (idx, val) {
+                        val = val._array || val;
                         this.value[idx * 4] = val[0];
                         this.value[idx * 4 + 1] = val[1];
                         this.value[idx * 4 + 2] = val[2];
@@ -251,6 +263,13 @@ define(function(require) {
          * @return {number}
          */
         getFaceNumber: notImplementedWarn,
+        /**
+         * @method
+         * @param {number} idx
+         * @param {qtek.math.Vector3} out
+         * @return {qtek.math.Vector3}
+         */
+        getFace: notImplementedWarn,
         /**
          * @method
          * @return {boolean}
