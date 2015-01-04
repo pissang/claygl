@@ -11,14 +11,20 @@ QTEK is a webgl graphic library.
 [DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 <a href="https://github.com/pissang/qtek-bootcamp" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500px"></img>
+<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500"></img>
 </a>
 
 [Bootcamp](https://github.com/pissang/qtek-bootcamp/)
 
 <a href="https://github.com/pissang/qtek-bootcamp/" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500px"></img>
+<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500"></img>
 </a>
+
+[Worldcup 2014 Intro Movie](https://github.com/pissang/worldcup-intro)
+<a href="https://github.com/pissang/worldcup-intro" target="_blank">
+<img src="https://github.com/pissang/worldcup-intro/raw/master/screenshots/2.png" width="500" alt="">
+</a>
+
 
 ### Quick Examples
 + [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/tests/cubes.html)
