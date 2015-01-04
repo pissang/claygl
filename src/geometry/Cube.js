@@ -103,27 +103,27 @@ define(function(require) {
 
         switch(pos) {
             case 'px':
-                planeMatrix.translate(new Vector3(1, 0, 0));
-                planeMatrix.rotateY(Math.PI/2);
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.POSITIVE_X);
+                Matrix4.rotateY(planeMatrix, planeMatrix, Math.PI / 2);
                 break;
             case 'nx':
-                planeMatrix.translate(new Vector3(-1, 0, 0));
-                planeMatrix.rotateY(-Math.PI/2);
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.NEGATIVE_X);
+                Matrix4.rotateY(planeMatrix, planeMatrix, -Math.PI / 2);
                 break;
             case 'py':
-                planeMatrix.translate(new Vector3(0, 1, 0));
-                planeMatrix.rotateX(-Math.PI/2);
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.POSITIVE_Y);
+                Matrix4.rotateX(planeMatrix, planeMatrix, -Math.PI / 2);
                 break;
             case 'ny':
-                planeMatrix.translate(new Vector3(0, -1, 0));
-                planeMatrix.rotateX(Math.PI/2);
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.NEGATIVE_Y);
+                Matrix4.rotateX(planeMatrix, planeMatrix, Math.PI / 2);
                 break;
             case 'pz':
-                planeMatrix.translate(new Vector3(0, 0, 1));
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.POSITIVE_Z);
                 break;
             case 'nz':
-                planeMatrix.translate(new Vector3(0, 0, -1));
-                planeMatrix.rotateY(Math.PI);
+                Matrix4.translate(planeMatrix, planeMatrix, Vector3.NEGATIVE_Z);
+                Matrix4.rotateY(planeMatrix, planeMatrix, Math.PI);
                 break;
         }
         plane.applyTransform(planeMatrix);

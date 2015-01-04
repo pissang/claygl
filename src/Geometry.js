@@ -44,6 +44,7 @@ define(function(require) {
                         if (item) {
                             vec2.copy(out, item);
                         }
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
@@ -58,6 +59,7 @@ define(function(require) {
                         out = out._array || out;
                         out[0] = this.value[idx * 2];
                         out[1] = this.value[idx * 2 + 1];
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
@@ -74,6 +76,7 @@ define(function(require) {
                         if (item) {
                             vec3.copy(out, item);
                         }
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
@@ -89,6 +92,7 @@ define(function(require) {
                         out[0] = this.value[idx * 3];
                         out[1] = this.value[idx * 3 + 1];
                         out[2] = this.value[idx * 3 + 2];
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
@@ -106,6 +110,7 @@ define(function(require) {
                         if (item) {
                             vec4.copy(out, item);
                         }
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
@@ -122,6 +127,7 @@ define(function(require) {
                         out[1] = this.value[idx * 4 + 1];
                         out[2] = this.value[idx * 4 + 2];
                         out[3] = this.value[idx * 4 + 3];
+                        return out;
                     };
                     this.set = function (idx, val) {
                         val = val._array || val;
