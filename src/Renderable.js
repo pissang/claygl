@@ -119,11 +119,17 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
-            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
-            var isStatic = !geometry.dynamic;
-            
             var nVertex = geometry.getVertexNumber();
             var isUseFace = geometry.isUseFace();
+
+            var uintExt = glinfo.getExtension(_gl, 'OES_element_index_uint');
+            var useUintExt = uintExt && nVertex > 0xffff;
+            var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+
+            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+
+            var isStatic = !geometry.dynamic;
+
             var renderInfo = this._renderInfo;
             renderInfo.vertexNumber = nVertex;
             renderInfo.faceNumber = 0;
@@ -141,7 +147,7 @@ define(function(require) {
                 // 2. VAO is enabled and is binded to null after render
                 // 3. Geometry needs update
                 if (
-                    ((geometry instanceof DynamicGeometry) && nVertex > 0xffff && isUseFace)
+                    ((geometry instanceof DynamicGeometry) && (nVertex > 0xffff && !uintExt) && isUseFace)
                  || (vaoExt && isStatic)
                  || geometry._cache.isDirty()
                 ) {
@@ -153,7 +159,7 @@ define(function(require) {
             if (!drawHashChanged) {
                 // Direct draw
                 if (prevDrawIsUseFace) {
-                    _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
+                    _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, indicesType, 0);
                     renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
@@ -279,7 +285,7 @@ define(function(require) {
                         if (needsBindAttributes) {
                             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         }
-                        _gl.drawElements(glDrawMode, indicesBuffer.count, _gl.UNSIGNED_SHORT, 0);
+                        _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
                         renderInfo.faceNumber += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, nVertex);

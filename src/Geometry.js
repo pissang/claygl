@@ -191,9 +191,9 @@ define(function(require) {
         this.symbol = '';
     }
 
-    function IndicesBuffer(buffer, count) {
+    function IndicesBuffer(buffer) {
         this.buffer = buffer;
-        this.count = count;
+        this.count = 0;
     }
 
     function notImplementedWarn() {

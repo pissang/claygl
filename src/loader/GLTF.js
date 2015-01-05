@@ -599,7 +599,7 @@ define(function(require) {
 
                     // index uint
                     if (indicesInfo.type === 0x1405) { // UNSIGNED_INT
-                        geometry.faces  = new Uint32Array(buffer, byteOffset, indicesInfo.count);
+                        geometry.faces = new Uint32Array(buffer, byteOffset, indicesInfo.count);
                     }
                     else { // UNSIGNED_SHORT, 0x1403
                         geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);

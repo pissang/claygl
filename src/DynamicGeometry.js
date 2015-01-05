@@ -10,12 +10,13 @@ define(function(require) {
     var Geometry = require('./Geometry');
     var BoundingBox = require('./math/BoundingBox');
     var glenum = require('./core/glenum');
+    var glinfo = require('./core/glinfo');
+
     var glMatrix = require('./dep/glmatrix');
     var vec3 = glMatrix.vec3;
     var mat4 = glMatrix.mat4;
 
     var arrSlice = Array.prototype.slice;
-
     /**
      * @constructor qtek.DynamicGeometry
      * @extends qtek.Geometry
@@ -197,7 +198,10 @@ define(function(require) {
                 isFacesDirty = isFacesDirty && this.isUseFace();
                 
                 if (dirtyAttributes) {
-                    this._updateAttributesAndIndicesArrays(dirtyAttributes, isFacesDirty);
+                    this._updateAttributesAndIndicesArrays(
+                        dirtyAttributes, isFacesDirty,
+                        glinfo.getExtension(_gl, 'OES_element_index_uint') != null
+                    );
                     this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
                     for (var name in dirtyAttributes) {
@@ -210,7 +214,7 @@ define(function(require) {
             return this._cache.get('chunks');
         },
 
-        _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty) {
+        _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty, useUintExtension) {
 
             var self = this;
             var nVertex = this.getVertexNumber();
@@ -263,9 +267,12 @@ define(function(require) {
 
             var attribNameList = Object.keys(attributes);
             // Split large geometry into chunks because index buffer
-            // only support uint16 which means each draw call can only
-             // have at most 65535 vertex data
-            if (nVertex > 0xffff && this.isUseFace()) {
+            // only can use uint16 which means each draw call can only
+            // have at most 65535 vertex data
+            // But now most browsers support OES_element_index_uint extension
+            if (
+                nVertex > 0xffff && this.isUseFace() && !useUintExtension
+            ) {
                 var chunkIdx = 0;
                 var currentChunk;
 
@@ -364,11 +371,13 @@ define(function(require) {
                 // Use faces
                 if (isFacesDirty) {
                     var indicesArray = chunk.indicesArray;
-                    if (! indicesArray) {
-                        indicesArray = chunk.indicesArray = new Uint16Array(this.faces.length*3);
+                    var nFace = this.faces.length;
+                    if (!indicesArray || (nFace * 3 !== indicesArray.length)) {
+                        var ArrayCtor = nVertex > 0xffff ? Uint32Array : Uint16Array;
+                        indicesArray = chunk.indicesArray = new ArrayCtor(this.faces.length * 3);
                     }
                     var cursor = 0;
-                    for (var i = 0; i < this.faces.length; i++) {
+                    for (var i = 0; i < nFace; i++) {
                         indicesArray[cursor++] = this.faces[i][0];
                         indicesArray[cursor++] = this.faces[i][1];
                         indicesArray[cursor++] = this.faces[i][2];
@@ -476,9 +485,10 @@ define(function(require) {
 
                 if (isFacesDirty) {
                     if (! indicesBuffer) {
-                        indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer(), indicesArray.length);
+                        indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer());
                         chunk.indicesBuffer = indicesBuffer;
                     }
+                    indicesBuffer.count = indicesArray.length;
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                     _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, this.hint);   
                 }
@@ -720,8 +730,8 @@ define(function(require) {
             };
         })(),
 
-        convertToStatic: function(geometry) {
-            this._updateAttributesAndIndicesArrays(this.getEnabledAttributes(), true);
+        convertToStatic: function(geometry, useUintExtension) {
+            this._updateAttributesAndIndicesArrays(this.getEnabledAttributes(), true, useUintExtension);
 
             if (this._arrayChunks.length > 1) {
                 console.warn('Large geometry will discard chunks when convert to StaticGeometry');
