@@ -90,7 +90,11 @@ define(function(require) {
         },
 
         getVertexNumber: function() {
-            return this.attributes.position.value.length;
+            var mainAttribute = this.attributes[this.mainAttribute];
+            if (!mainAttribute || !mainAttribute.value) {
+                return 0;
+            }
+            return mainAttribute.value.length;
         },
 
         getFaceNumber: function() {

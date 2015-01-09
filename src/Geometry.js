@@ -240,6 +240,11 @@ define(function(require) {
     /** @lends qtek.Geometry.prototype */
     {
         /**
+         * Main attribute will be used to count vertex number
+         * @type {string}
+         */
+        mainAttribute: 'position',
+        /**
          * Mark attributes in geometry is dirty
          * @method
          */

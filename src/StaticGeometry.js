@@ -56,10 +56,11 @@ define(function(require) {
         },
         
         getVertexNumber: function() {
-            if (!this.attributes.position.value) {
+            var mainAttribute = this.attributes[this.mainAttribute];
+            if (!mainAttribute || !mainAttribute.value) {
                 return 0;
             }
-            return this.attributes.position.value.length / 3;
+            return mainAttribute.value.length / 3;
         },
 
         getFaceNumber: function() {
