@@ -49,12 +49,12 @@ define(function(require) {
 
         /**
          * Z Axis of local transform
-         * @name forward
+         * @name z
          * @type {qtek.math.Vector3}
          * @memberOf qtek.math.Matrix4
          * @instance
          */
-        get forward() {
+        get z() {
             var el = this._array;
             this._axisZ.set(el[8], el[9], el[10]);
             return this._axisZ;
@@ -62,7 +62,7 @@ define(function(require) {
 
         // TODO Here has a problem
         // If only set an item of vector will not work
-        set forward(v) {
+        set z(v) {
             var el = this._array;
             v = v._array;
             el[8] = v[0];
@@ -74,18 +74,18 @@ define(function(require) {
 
         /**
          * Y Axis of local transform
-         * @name up
+         * @name y
          * @type {qtek.math.Vector3}
          * @memberOf qtek.math.Matrix4
          * @instance
          */
-        get up() {
+        get y() {
             var el = this._array;
             this._axisY.set(el[4], el[5], el[6]);
             return this._axisY;
         },
 
-        set up(v) {
+        set y(v) {
             var el = this._array;
             v = v._array;
             el[4] = v[0];
@@ -97,18 +97,18 @@ define(function(require) {
 
         /**
          * X Axis of local transform
-         * @name right
+         * @name x
          * @type {qtek.math.Vector3}
          * @memberOf qtek.math.Matrix4
          * @instance
          */
-        get right() {
+        get x() {
             var el = this._array;
             this._axisX.set(el[0], el[1], el[2]);
             return this._axisX;
         },
 
-        set right(v) {
+        set x(v) {
             var el = this._array;
             v = v._array;
             el[0] = v[0];

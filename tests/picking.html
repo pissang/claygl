@@ -69,7 +69,7 @@
                 });
                 renderer.canvas.addEventListener('mousemove', function(e) {
                     if (currentCube) {
-                        plane.normal.copy(camera.worldTransform.forward);
+                        plane.normal.copy(camera.worldTransform.z);
                         plane.distance = point.dot(plane.normal);
 
                         var ndc = renderer.screenToNdc(e.offsetX, e.offsetY);

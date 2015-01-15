@@ -191,15 +191,15 @@ define(function(require) {
          */
         update: function(frameTime) {
             var target = this.target;
-            var zAxis = target.localTransform.forward.normalize();
-            var yAxis = target.localTransform.up.normalize();
+            var zAxis = target.localTransform.z.normalize();
+            var yAxis = target.localTransform.y.normalize();
             if (this._op === 0 && this._offsetPitch !== 0 && this._offsetRoll !== 0) {
                 // Rotate
                 target.rotateAround(this.origin, this.up, -this._offsetPitch);
-                var xAxis = target.localTransform.right;
+                var xAxis = target.localTransform.x;
                 target.rotateAround(this.origin, xAxis, -this._offsetRoll);
 
-                var zAxis = target.worldTransform.forward.normalize();
+                var zAxis = target.worldTransform.z.normalize();
                 var phi = Math.acos(this.up.dot(zAxis));
                 // Rotate back a bit
                 if (this._offsetRoll > 0 && phi <= this.minPolarAngle) {
@@ -211,8 +211,8 @@ define(function(require) {
                 this._offsetRoll = this._offsetPitch = 0;
             } else if (this._op === 1) {
                 // Pan
-                var xAxis = target.localTransform.right.normalize().scale(-this._panX);
-                var yAxis = target.localTransform.up.normalize().scale(this._panY);
+                var xAxis = target.localTransform.x.normalize().scale(-this._panX);
+                var yAxis = target.localTransform.y.normalize().scale(this._panY);
                 target.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;

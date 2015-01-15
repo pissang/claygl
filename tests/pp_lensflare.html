@@ -35,7 +35,10 @@
             qtek.util.texture.loadPanorama(
                 'assets/textures/hdr/pisa.hdr',
                 cubeMap,
-                renderer
+                renderer,
+                {
+                    exposure: 10
+                }
             );
 
             var skybox = new qtek.plugin.Skybox({

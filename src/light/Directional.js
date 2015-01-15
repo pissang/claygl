@@ -39,7 +39,7 @@ define(function(require) {
                 value: (function() {
                     var z = new Vector3();
                     return function(instance) {
-                        return z.copy(instance.worldTransform.forward).negate()._array;
+                        return z.copy(instance.worldTransform.z).negate()._array;
                     };
                 })()
             },
@@ -48,7 +48,7 @@ define(function(require) {
                 value: function(instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
-                    return [color[0]*intensity, color[1]*intensity, color[1]*intensity];
+                    return [color[0] * intensity, color[1] * intensity, color[1] * intensity];
                 }
             }
         },

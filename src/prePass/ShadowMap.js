@@ -727,7 +727,7 @@ define(function(require) {
                 // Move camera to adjust the near to 0
                 // TODO: some scene object cast shadow in view will also be culled
                 // add a bias?
-                camera.position.scaleAndAdd(camera.worldTransform.forward, max[2] + this.lightFrustumBias);
+                camera.position.scaleAndAdd(camera.worldTransform.z, max[2] + this.lightFrustumBias);
                 camera.near = 0;
                 camera.far = -min[2] + max[2] + this.lightFrustumBias;
                 camera.left = min[0] - this.lightFrustumBias;

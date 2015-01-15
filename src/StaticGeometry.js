@@ -206,7 +206,7 @@ define(function(require) {
                     indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer());
                     chunk.indicesBuffer = indicesBuffer;
                 }
-                indicesBuffer.count = indicesArray.length;
+                indicesBuffer.count = this.faces.length;
                 _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                 _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.faces, this.hint);
             }

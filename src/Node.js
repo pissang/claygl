@@ -530,7 +530,7 @@ define(function(require) {
         lookAt: (function() {
             var m = new Matrix4();
             return function(target, up) {
-                m.lookAt(this.position, target, up || this.localTransform.up).invert();
+                m.lookAt(this.position, target, up || this.localTransform.y).invert();
                 m.decomposeMatrix(null, this.rotation, this.position);
             };
         })()

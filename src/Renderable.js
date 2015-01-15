@@ -163,13 +163,13 @@ define(function(require) {
                     renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
+                    // FIXME Use vertex number in buffer
+                    // getVertexNumber may get the wrong value when geometry forget to mark dirty after update
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
                 renderInfo.drawCallNumber = 1;
             } else {
                 // Use the cache of static geometry
-                // TODO machanism to change to the DynamicGeometry automatically
-                // when the geometry is not static any more
                 var vaoList = this._drawCache[currentDrawID];
                 if (!vaoList) {
                     var chunks = geometry.getBufferChunks(_gl);

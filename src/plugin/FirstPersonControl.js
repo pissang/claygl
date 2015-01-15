@@ -140,8 +140,8 @@ define(function(require) {
             var target = this.target;
 
             var position = this.target.position;
-            var xAxis = target.localTransform.right.normalize();
-            var zAxis = target.localTransform.forward.normalize();
+            var xAxis = target.localTransform.x.normalize();
+            var zAxis = target.localTransform.z.normalize();
 
             if (this.verticalMoveLock) {
                 zAxis.y = 0;
