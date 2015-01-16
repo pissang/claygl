@@ -28,14 +28,14 @@ define(function(require) {
     TaskGroup.prototype.constructor = TaskGroup;
 
     /**
-     * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link qtek.texture.Texture2D}, {@link qtek.texture.TextureCube}, {@link qtek.loader.GLTF}.
+     * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link qtek.Texture2D}, {@link qtek.TextureCube}, {@link qtek.loader.GLTF}.
      * @param  {Array.<qtek.async.Task>} tasks
      * @chainable
      * @example
      *     // Load texture list
      *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
      *     var textures = list.map(function(src) {
-     *         var texture = new qtek.texture.Texture2D();
+     *         var texture = new qtek.Texture2D();
      *         texture.load(src);
      *         return texture;
      *     });

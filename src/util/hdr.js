@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     var Texture = require('../Texture');
-    var Texture2D = require('../texture/Texture2D');
+    var Texture2D = require('../Texture2D');
     var toChar = String.fromCharCode;
 
     var MINELEN = 8;

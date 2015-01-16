@@ -11,7 +11,7 @@ define(function(require) {
      * @constructor qtek.plugin.Skybox
      *
      * @example
-     *     var skyTex = new qtek.texture.TextureCube();
+     *     var skyTex = new qtek.TextureCube();
      *     skyTex.load({
      *         'px': 'assets/textures/sky/px.jpg',
      *         'nx': 'assets/textures/sky/nx.jpg'

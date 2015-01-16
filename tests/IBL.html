@@ -190,7 +190,7 @@
                     var ROUGHNESS_LEVELS = 256;
                     var SAMPLE_SIZE = 1024;
 
-                    var normalDistribution = new qtek.texture.Texture2D({
+                    var normalDistribution = new qtek.Texture2D({
                         width : ROUGHNESS_LEVELS,
                         height : SAMPLE_SIZE,
                         type : qtek.Texture.FLOAT,
@@ -240,7 +240,7 @@
                         scene : emptyScene
                     });
                     skydome.material.set('diffuseMap', envMap);
-                    mipmaps[0] = new qtek.texture.TextureCube({
+                    mipmaps[0] = new qtek.TextureCube({
                         width : size,
                         height : size,
                         type : qtek.Texture.FLOAT
@@ -267,7 +267,7 @@
 
                     // Down sample
                     skybox.material = downsampleMaterial;
-                    downsampleTexture = new qtek.texture.TextureCube({
+                    downsampleTexture = new qtek.TextureCube({
                         width : 16,
                         height : 16,
                         type : qtek.Texture.FLOAT
@@ -285,7 +285,7 @@
                             roughness = mipmapLevel / mipmapNum;
                             prefilterMaterial.set('roughness', roughness);
                             prefilterMaterial.set('environmentMap', downsampleTexture);
-                            var mipmap = new qtek.texture.TextureCube({
+                            var mipmap = new qtek.TextureCube({
                                 useMipmap : false,
                                 width : Math.max(size, 8),
                                 height : Math.max(size, 8),
@@ -310,7 +310,7 @@
                         fragment : qtek.Shader.source('split_sum.integrate_BRDF')
                     });
 
-                    var texture = new qtek.texture.Texture2D({
+                    var texture = new qtek.Texture2D({
                         width : 512,
                         height : 256,
                         type : qtek.Texture.FLOAT,

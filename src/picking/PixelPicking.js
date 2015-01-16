@@ -2,7 +2,7 @@ define(function (require) {
 
     var Base = require('../core/Base');
     var FrameBuffer = require('../FrameBuffer');
-    var Texture2D = require('../texture/Texture2D');
+    var Texture2D = require('../Texture2D');
     var Shader = require('../Shader');
     var Material = require('../Material');
 

@@ -9,8 +9,8 @@ define(function(require) {
     var CompoNode = require('../compositor/Node');
     var Shader = require('../Shader');
     var Texture = require('../Texture');
-    var Texture2D = require('../texture/Texture2D');
-    var TextureCube = require('../texture/TextureCube');
+    var Texture2D = require('../Texture2D');
+    var TextureCube = require('../TextureCube');
 
     var shaderSourceReg = /#source\((.*?)\)/;
     var urlReg = /#url\((.*?)\)/;

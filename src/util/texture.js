@@ -3,8 +3,8 @@ define(function(require) {
     'use strict';
 
     var Texture = require('../Texture');
-    var Texture2D = require('../texture/Texture2D');
-    var TextureCube = require('../texture/TextureCube');
+    var Texture2D = require('../Texture2D');
+    var TextureCube = require('../TextureCube');
     var request = require('../core/request');
     var EnvironmentMapPass = require('../prePass/EnvironmentMap');
     var Skydome = require('../plugin/Skydome');
@@ -83,7 +83,7 @@ define(function(require) {
         /**
          * Load a panorama texture and render it to a cube map
          * @param  {string} path
-         * @param  {qtek.texture.TextureCube} cubeMap
+         * @param  {qtek.TextureCube} cubeMap
          * @param  {qtek.Renderer} renderer
          * @param  {object} [option]
          * @param  {Function} [onsuccess]
@@ -113,8 +113,8 @@ define(function(require) {
 
         /**
          * Render a panorama texture to a cube map
-         * @param  {qtek.texture.Texture2D} panoramaMap
-         * @param  {qtek.texture.TextureCube} cubeMap
+         * @param  {qtek.Texture2D} panoramaMap
+         * @param  {qtek.TextureCube} cubeMap
          * @param  {qtek.Renderer} renderer
          * 
          * @memberOf qtek.util.texture
@@ -147,7 +147,7 @@ define(function(require) {
          * @param  {number} [unitSize]
          * @param  {string} [color1]
          * @param  {string} [color2]
-         * @return {qtek.texture.Texture2D}
+         * @return {qtek.Texture2D}
          * 
          * @memberOf qtek.util.texture
          */
@@ -187,7 +187,7 @@ define(function(require) {
         /**
          * Create a blank pure color 1x1 texture
          * @param  {string} color
-         * @return {qtek.texture.Texture2D}
+         * @return {qtek.Texture2D}
          * 
          * @memberOf qtek.util.texture
          */

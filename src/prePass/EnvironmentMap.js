@@ -5,7 +5,7 @@ define(function (require) {
     var PerspectiveCamera = require('../camera/Perspective');
     var glenum = require('../core/glenum');
     var FrameBuffer = require('../FrameBuffer');
-    var TextureCube = require('../texture/TextureCube');
+    var TextureCube = require('../TextureCube');
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     var targetMap = {
@@ -24,7 +24,7 @@ define(function (require) {
      * @extends qtek.core.Base
      * @example
      *     // Example of car reflection
-     *     var envMap = new qtek.texture.TextureCube({
+     *     var envMap = new qtek.TextureCube({
      *         width: 256,
      *         height: 256
      *     });
@@ -63,7 +63,7 @@ define(function (require) {
             near: 0.1,
             /**
              * Environment cube map
-             * @type {qtek.texture.TextureCube}
+             * @type {qtek.TextureCube}
              * @memberOf qtek.prePass.EnvironmentMap#
              */
             texture: null,

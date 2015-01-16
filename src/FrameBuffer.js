@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
     
     var Base = require('./core/Base');
-    var TextureCube = require('./texture/TextureCube');
+    var TextureCube = require('./TextureCube');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');

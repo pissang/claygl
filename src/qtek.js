@@ -34,6 +34,8 @@ define(function(require) {
 	"Skeleton": require('qtek/Skeleton'),
 	"StaticGeometry": require('qtek/StaticGeometry'),
 	"Texture": require('qtek/Texture'),
+	"Texture2D": require('qtek/Texture2D'),
+	"TextureCube": require('qtek/TextureCube'),
 	"animation": {
 		"Animation": require('qtek/animation/Animation'),
 		"Blend1DClip": require('qtek/animation/Blend1DClip'),
@@ -138,10 +140,6 @@ define(function(require) {
 	"shader": {
 		"buildin": require('qtek/shader/buildin'),
 		"library": require('qtek/shader/library')
-	},
-	"texture": {
-		"Texture2D": require('qtek/texture/Texture2D'),
-		"TextureCube": require('qtek/texture/TextureCube')
 	},
 	"util": {
 		"dds": require('qtek/util/dds'),

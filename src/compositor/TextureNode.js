@@ -13,7 +13,7 @@ define(function(require) {
         return /** @lends qtek.compositor.TextureNode# */ {
             shader: Shader.source('buildin.compositor.output'),
             /**
-             * @type {qtek.texture.Texture2D}
+             * @type {qtek.Texture2D}
              */
             texture: null
         };

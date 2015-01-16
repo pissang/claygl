@@ -12,7 +12,7 @@ define(function(require) {
      * @constructor qtek.plugin.Skydome
      *
      * @example
-     *     var skyTex = new qtek.texture.Texture2D();
+     *     var skyTex = new qtek.Texture2D();
      *     skyTex.load('assets/textures/sky.jpg');
      *     var skydome = new qtek.plugin.Skydome({
      *         scene: scene

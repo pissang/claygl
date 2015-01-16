@@ -1,9 +1,9 @@
 define(function(require) {
 
-    var Texture = require('../Texture');
-    var glinfo = require('../core/glinfo');
-    var glenum = require('../core/glenum');
-    var util = require('../core/util');
+    var Texture = require('./Texture');
+    var glinfo = require('./core/glinfo');
+    var glenum = require('./core/glenum');
+    var util = require('./core/util');
 
     var targetMap = {
         'px': 'TEXTURE_CUBE_MAP_POSITIVE_X',
@@ -15,7 +15,7 @@ define(function(require) {
     };
 
     /**
-     * @constructor qtek.texture.TextureCube
+     * @constructor qtek.TextureCube
      * @extends qtek.Texture
      *
      * @example
@@ -23,7 +23,7 @@ define(function(require) {
      *     var mat = new qtek.Material({
      *         shader: qtek.shader.library.get('buildin.phong', 'environmentMap')
      *     });
-     *     var envMap = new qtek.texture.TextureCube();
+     *     var envMap = new qtek.TextureCube();
      *     envMap.load({
      *         'px': 'assets/textures/sky/px.jpg',
      *         'nx': 'assets/textures/sky/nx.jpg'
@@ -42,7 +42,7 @@ define(function(require) {
      *     });
      */
     var TextureCube = Texture.derive(function() {
-        return /** @lends qtek.texture.TextureCube# */{
+        return /** @lends qtek.TextureCube# */{
             /**
              * @type {Object}
              * @property {HTMLImageElement|HTMLCanvasElemnet} px
@@ -126,7 +126,7 @@ define(function(require) {
         
         /**
          * @param  {WebGLRenderingContext} _gl
-         * @memberOf qtek.texture.TextureCube.prototype
+         * @memberOf qtek.TextureCube.prototype
          */
         generateMipmap: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));

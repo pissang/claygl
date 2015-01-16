@@ -36,9 +36,9 @@
                     shader : shader
                 });
                 material.set('glossiness', 0.4);
-                var diffuse = new qtek.texture.Texture2D;
+                var diffuse = new qtek.Texture2D;
                 diffuse.load("assets/textures/crate.gif");
-                var normal = new qtek.texture.Texture2D;
+                var normal = new qtek.Texture2D;
                 normal.load("assets/textures/normal_map.jpg");
                 material.set('diffuseMap', diffuse);
                 material.set('normalMap', normal);

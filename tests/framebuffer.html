@@ -32,7 +32,7 @@
                 var material = new qtek.Material({
                     shader : shader
                 });
-                var texture = new qtek.texture.Texture2D;
+                var texture = new qtek.Texture2D;
                 texture.image = new Image;
                 texture.image.onload = function(){
                     texture.dirty();
@@ -56,7 +56,7 @@
                 scene.add( light );
 
                 var frameBuffer = new FrameBuffer();
-                var rtt = new qtek.texture.Texture2D({
+                var rtt = new qtek.Texture2D({
                     width : 1024,
                     height : 1024,
                 });

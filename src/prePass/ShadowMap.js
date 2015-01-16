@@ -16,8 +16,8 @@ define(function(require) {
     var shaderLibrary = require('../shader/library');
     var Material = require('../Material');
     var FrameBuffer = require('../FrameBuffer');
-    var Texture2D = require('../texture/Texture2D');
-    var TextureCube = require('../texture/TextureCube');
+    var Texture2D = require('../Texture2D');
+    var TextureCube = require('../TextureCube');
     var PerspectiveCamera = require('../camera/Perspective');
     var OrthoCamera = require('../camera/Orthographic');
 

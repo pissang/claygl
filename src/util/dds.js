@@ -3,8 +3,8 @@ define(function(require) {
     'use strict';
 
     var Texture = require('../Texture');
-    var Texture2D = require('../texture/Texture2D');
-    var TextureCube = require('../texture/TextureCube');
+    var Texture2D = require('../Texture2D');
+    var TextureCube = require('../TextureCube');
 
     // http://msdn.microsoft.com/en-us/library/windows/desktop/bb943991(v=vs.85).aspx
     // https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js

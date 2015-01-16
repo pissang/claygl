@@ -15,7 +15,7 @@ var cubeGeo = new qtek.geometry.Cube();
 var cubeMat = new qtek.Material({
     shader: qtek.shader.library.get('buildin.basic', "diffuseMap")
 });
-var diffuseTexture = new qtek.texture.Texture2D();
+var diffuseTexture = new qtek.Texture2D();
 diffuseTexture.load('../assets/textures/crate.gif');
 cubeMat.setUniform("diffuseMap", diffuseTexture);
 

@@ -14,8 +14,8 @@ define(function(require) {
     var DynamicGeometry = require('../DynamicGeometry');
     var Mesh = require('../Mesh');
     var Node = require('../Node');
-    var Texture2D = require('../texture/Texture2D');
-    var TextureCube = require('../texture/TextureCube');
+    var Texture2D = require('../Texture2D');
+    var TextureCube = require('../TextureCube');
     var shaderLibrary = require('../shader/library');
     var Skeleton = require('../Skeleton');
     var Joint = require('../Joint');

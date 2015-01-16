@@ -1,11 +1,11 @@
 define(function(require) {
 
-    var Texture = require('../Texture');
-    var glinfo = require('../core/glinfo');
-    var glenum = require('../core/glenum');
+    var Texture = require('./Texture');
+    var glinfo = require('./core/glinfo');
+    var glenum = require('./core/glenum');
 
     /**
-     * @constructor qtek.texture.Texture2D
+     * @constructor qtek.Texture2D
      * @extends qtek.Texture
      *
      * @example
@@ -13,7 +13,7 @@ define(function(require) {
      *     var mat = new qtek.Material({
      *         shader: qtek.shader.library.get('buildin.phong', 'diffuseMap')
      *     });
-     *     var diffuseMap = new qtek.texture.Texture2D();
+     *     var diffuseMap = new qtek.Texture2D();
      *     diffuseMap.load('assets/textures/diffuse.jpg');
      *     mat.set('diffuseMap', diffuseMap);
      *     ...
@@ -25,7 +25,7 @@ define(function(require) {
      *     });
      */
     var Texture2D = Texture.derive(function() {
-        return /** @lends qtek.texture.Texture2D# */ {
+        return /** @lends qtek.Texture2D# */ {
             /**
              * @type {HTMLImageElement|HTMLCanvasElemnet}
              */
@@ -118,7 +118,7 @@ define(function(require) {
         },
         /**
          * @param  {WebGLRenderingContext} _gl
-         * @memberOf qtek.texture.Texture2D.prototype
+         * @memberOf qtek.Texture2D.prototype
          */
         generateMipmap: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
