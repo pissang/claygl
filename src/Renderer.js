@@ -607,6 +607,7 @@ define(function(require) {
         disposeNode: function(root, disposeGeometry, disposeTexture) {
             var materials = {};
             var _gl = this.gl;
+            // Dettached from parent
             if (root.getParent()) {
                 root.getParent().remove(root);
             }
@@ -626,7 +627,6 @@ define(function(require) {
                 var mat = materials[guid];
                 mat.dispose(_gl, disposeTexture);
             }
-            root._children = [];
         },
 
         /**
