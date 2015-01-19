@@ -165,6 +165,7 @@ define(function(require) {
                 this.wrapS = glenum.CLAMP_TO_EDGE;
                 this.wrapT = glenum.CLAMP_TO_EDGE;
             } else {
+                this.NPOT = false;
                 if (this._minFilterOriginal) {
                     this.minFilter = this._minFilterOriginal;
                 }
