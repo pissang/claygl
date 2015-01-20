@@ -60,7 +60,7 @@ define(function(require) {
             if (!mainAttribute || !mainAttribute.value) {
                 return 0;
             }
-            return mainAttribute.value.length / 3;
+            return mainAttribute.value.length / mainAttribute.size;
         },
 
         getFaceNumber: function() {

@@ -882,10 +882,15 @@ define(function(require) {
 
             _gl.attachShader(program, vertexShader);
             _gl.attachShader(program, fragmentShader);
-            // Force the position bind to index 0;
+            // Force the position bind to location 0;
             if (this.attribSemantics['POSITION']) {
                 _gl.bindAttribLocation(program, 0, this.attribSemantics['POSITION'].symbol);
+            } else {
+                // Else choose an attribute and bind to location 0;
+                var keys = Object.keys(this.attributeTemplates);
+                _gl.bindAttribLocation(program, 0, keys[0]);
             }
+            
             _gl.linkProgram(program);
 
             if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
