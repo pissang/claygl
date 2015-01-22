@@ -182,7 +182,7 @@ define(function(require) {
 
             _gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
         },
-
+        // TODO
         detach: function() {},
         /**
          * Dispose

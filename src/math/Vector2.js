@@ -36,35 +36,6 @@ define(function(require) {
         constructor: Vector2,
 
         /**
-         * @name x
-         * @type {number}
-         * @memberOf qtek.math.Vector2
-         * @instance
-         */
-        get x() {
-            return this._array[0];
-        },
-        set x(value) {
-            this._array[0] = value;
-            this._dirty = true;
-        },
-
-        /**
-         * @name y
-         * @type {number}
-         * @memberOf qtek.math.Vector2
-         * @instance
-         */
-        get y() {
-            return this._array[1];
-        },
-
-        set y(value) {
-            this._array[1] = value;
-            this._dirty = true;
-        },
-
-        /**
          * Add b to self
          * @param  {qtek.math.Vector2} b
          * @return {qtek.math.Vector2}
@@ -412,6 +383,43 @@ define(function(require) {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
     };
+
+    // Getter and Setter
+    if (Object.defineProperty) {
+
+        var proto = Vector2.prototype;
+        /**
+         * @name x
+         * @type {number}
+         * @memberOf qtek.math.Vector2
+         * @instance
+         */
+        Object.defineProperty(proto, 'x', {
+            get: function () {
+                return this._array[0];
+            },
+            set: function (value) {
+                this._array[0] = value;
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * @name y
+         * @type {number}
+         * @memberOf qtek.math.Vector2
+         * @instance
+         */
+        Object.defineProperty(proto, 'y', {
+            get: function () {
+                return this._array[1];
+            },
+            set: function (value) {
+                this._array[1] = value;
+                this._dirty = true;
+            }
+        });
+    }
 
     // Supply methods that are not in place
     

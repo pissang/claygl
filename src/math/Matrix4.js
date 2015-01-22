@@ -48,77 +48,6 @@ define(function(require) {
         constructor: Matrix4,
 
         /**
-         * Z Axis of local transform
-         * @name z
-         * @type {qtek.math.Vector3}
-         * @memberOf qtek.math.Matrix4
-         * @instance
-         */
-        get z() {
-            var el = this._array;
-            this._axisZ.set(el[8], el[9], el[10]);
-            return this._axisZ;
-        },
-
-        // TODO Here has a problem
-        // If only set an item of vector will not work
-        set z(v) {
-            var el = this._array;
-            v = v._array;
-            el[8] = v[0];
-            el[9] = v[1];
-            el[10] = v[2];
-
-            this._dirty = true;
-        },
-
-        /**
-         * Y Axis of local transform
-         * @name y
-         * @type {qtek.math.Vector3}
-         * @memberOf qtek.math.Matrix4
-         * @instance
-         */
-        get y() {
-            var el = this._array;
-            this._axisY.set(el[4], el[5], el[6]);
-            return this._axisY;
-        },
-
-        set y(v) {
-            var el = this._array;
-            v = v._array;
-            el[4] = v[0];
-            el[5] = v[1];
-            el[6] = v[2];
-
-            this._dirty = true;
-        },
-
-        /**
-         * X Axis of local transform
-         * @name x
-         * @type {qtek.math.Vector3}
-         * @memberOf qtek.math.Matrix4
-         * @instance
-         */
-        get x() {
-            var el = this._array;
-            this._axisX.set(el[0], el[1], el[2]);
-            return this._axisX;
-        },
-
-        set x(v) {
-            var el = this._array;
-            v = v._array;
-            el[0] = v[0];
-            el[1] = v[1];
-            el[2] = v[2];
-
-            this._dirty = true;
-        },
-
-        /**
          * Calculate the adjugate of self, in-place
          * @return {qtek.math.Matrix4}
          */
@@ -450,6 +379,83 @@ define(function(require) {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };
+
+    if (Object.defineProperty) {
+        var proto = Matrix4.prototype;
+        /**
+         * Z Axis of local transform
+         * @name z
+         * @type {qtek.math.Vector3}
+         * @memberOf qtek.math.Matrix4
+         * @instance
+         */
+        Object.defineProperty(proto, 'z', {
+            get: function () {
+                var el = this._array;
+                this._axisZ.set(el[8], el[9], el[10]);
+                return this._axisZ;
+            },
+            set: function () {
+                // TODO Here has a problem
+                // If only set an item of vector will not work
+                var el = this._array;
+                v = v._array;
+                el[8] = v[0];
+                el[9] = v[1];
+                el[10] = v[2];
+
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * Y Axis of local transform
+         * @name y
+         * @type {qtek.math.Vector3}
+         * @memberOf qtek.math.Matrix4
+         * @instance
+         */
+        Object.defineProperty(proto, 'y', {
+            get: function () {
+                var el = this._array;
+                this._axisY.set(el[4], el[5], el[6]);
+                return this._axisY;
+            },
+            set: function (v) {
+                var el = this._array;
+                v = v._array;
+                el[4] = v[0];
+                el[5] = v[1];
+                el[6] = v[2];
+
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * X Axis of local transform
+         * @name x
+         * @type {qtek.math.Vector3}
+         * @memberOf qtek.math.Matrix4
+         * @instance
+         */
+        Object.defineProperty(proto, 'x', {
+            get: function () {
+                var el = this._array;
+                this._axisX.set(el[0], el[1], el[2]);
+                return this._axisX;
+            },
+            set: function () {
+                var el = this._array;
+                v = v._array;
+                el[0] = v[0];
+                el[1] = v[1];
+                el[2] = v[2];
+
+                this._dirty = true;
+            }
+        })
+    }
 
     // Object.defineProperty(Matrix4.prototype, 'm00', makeProperty(0));
     // Object.defineProperty(Matrix4.prototype, 'm01', makeProperty(1));

@@ -40,66 +40,6 @@ define( function(require) {
         constructor: Vector4,
 
         /**
-         * @name x
-         * @type {number}
-         * @memberOf qtek.math.Vector4
-         * @instance
-         */
-        get x() {
-            return this._array[0];
-        },
-
-        set x(value) {
-            this._array[0] = value;
-            this._dirty = true;
-        },
-
-        /**
-         * @name y
-         * @type {number}
-         * @memberOf qtek.math.Vector4
-         * @instance
-         */
-        get y() {
-            return this._array[1];
-        },
-
-        set y(value) {
-            this._array[1] = value;
-            this._dirty = true;
-        },
-
-        /**
-         * @name z
-         * @type {number}
-         * @memberOf qtek.math.Vector4
-         * @instance
-         */
-        get z() {
-            return this._array[2];
-        },
-
-        set z(value) {
-            this._array[2] = value;
-            this._dirty = true;
-        },
-
-        /**
-         * @name w
-         * @type {number}
-         * @memberOf qtek.math.Vector4
-         * @instance
-         */
-        get w() {
-            return this._array[3];
-        },
-
-        set w(value) {
-            this._array[3] = value;
-            this._dirty = true;
-        },
-
-        /**
          * Add b to self
          * @param  {qtek.math.Vector4} b
          * @return {qtek.math.Vector4}
@@ -417,6 +357,75 @@ define( function(require) {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };
+
+    // Getter and Setter
+    if (Object.defineProperty) {
+
+        var proto = Vector4.prototype;
+        /**
+         * @name x
+         * @type {number}
+         * @memberOf qtek.math.Vector4
+         * @instance
+         */
+        Object.defineProperty(proto, 'x', {
+            get: function () {
+                return this._array[0];
+            },
+            set: function (value) {
+                this._array[0] = value;
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * @name y
+         * @type {number}
+         * @memberOf qtek.math.Vector4
+         * @instance
+         */
+        Object.defineProperty(proto, 'y', {
+            get: function () {
+                return this._array[1];
+            },
+            set: function (value) {
+                this._array[1] = value;
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * @name z
+         * @type {number}
+         * @memberOf qtek.math.Vector4
+         * @instance
+         */
+        Object.defineProperty(proto, 'z', {
+            get: function () {
+                return this._array[2];
+            },
+            set: function (value) {
+                this._array[2] = value;
+                this._dirty = true;
+            }
+        });
+
+        /**
+         * @name w
+         * @type {number}
+         * @memberOf qtek.math.Vector4
+         * @instance
+         */
+        Object.defineProperty(proto, 'w', {
+            get: function () {
+                return this._array[3];
+            },
+            set: function (value) {
+                this._array[3] = value;
+                this._dirty = true;
+            }
+        });
+    }
 
     // Supply methods that are not in place
     
