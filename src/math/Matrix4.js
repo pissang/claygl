@@ -395,7 +395,7 @@ define(function(require) {
                 this._axisZ.set(el[8], el[9], el[10]);
                 return this._axisZ;
             },
-            set: function () {
+            set: function (v) {
                 // TODO Here has a problem
                 // If only set an item of vector will not work
                 var el = this._array;
@@ -445,7 +445,7 @@ define(function(require) {
                 this._axisX.set(el[0], el[1], el[2]);
                 return this._axisX;
             },
-            set: function () {
+            set: function (v) {
                 var el = this._array;
                 v = v._array;
                 el[0] = v[0];
