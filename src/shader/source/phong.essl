@@ -8,6 +8,7 @@ uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
 uniform mat4 world : WORLD;
 
 uniform vec2 uvRepeat : [1.0, 1.0];
+uniform vec2 uvOffset : [0.0, 0.0];
 
 attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
@@ -59,7 +60,7 @@ void main()
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 
-    v_Texcoord = texcoord * uvRepeat;
+    v_Texcoord = texcoord * uvRepeat + uvOffset;
     v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
     v_Barycentric = barycentric;
 

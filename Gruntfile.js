@@ -9,7 +9,7 @@ module.exports = function(grunt){
         var common = {
             'baseUrl' : './src',
             'paths' : {
-                'glmatrix' : '../thirdparty/gl-matrix'
+                'text': '../build/text'
             },
             'exclude' : ['text'],
             'name' : 'qtek',

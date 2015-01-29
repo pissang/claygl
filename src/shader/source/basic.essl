@@ -3,6 +3,7 @@
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 uniform vec2 uvRepeat : [1.0, 1.0];
+uniform vec2 uvOffset : [0.0, 0.0];
 
 attribute vec2 texcoord : TEXCOORD_0;
 attribute vec3 position : POSITION;
@@ -30,7 +31,7 @@ void main()
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
 
-    v_Texcoord = texcoord * uvRepeat;
+    v_Texcoord = texcoord * uvRepeat + uvOffset;
     v_Barycentric = barycentric;
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
