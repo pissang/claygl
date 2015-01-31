@@ -184,7 +184,7 @@ define(function(require) {
                 this.height = canvas.height / this.devicePixelRatio;
             }
 
-            this.setViewport(0, 0, canvas.width, canvas.height);
+            this.setViewport(0, 0, width, height);
         },
 
         /**
@@ -236,7 +236,11 @@ define(function(require) {
                 width = obj.width;
                 height = obj.height;
             }
-            this.gl.viewport(x, y, width, height);
+            var dpr = this.devicePixelRatio;
+
+            this.gl.viewport(
+                x * dpr, y * dpr, width * dpr, height * dpr
+            );
 
             this.viewport = {
                 x: x,
@@ -709,10 +713,13 @@ define(function(require) {
             // Invert y;
             y = this.height - y;
 
-            out._array[0] = (x - this.viewport.x) / (this.viewport.width / this.devicePixelRatio);
-            out._array[0] = out._array[0] * 2 - 1;
-            out._array[1] = (y - this.viewport.y) / (this.viewport.height / this.devicePixelRatio);
-            out._array[1] = out._array[1] * 2 - 1;
+            var viewport = this.viewport;
+            var dpr = this.devicePixelRatio;
+            var arr = out._array;
+            arr[0] = (x - viewport.x) / (viewport.width / dpr);
+            arr[0] = arr[0] * 2 - 1;
+            arr[1] = (y - viewport.y) / (viewport.height / dpr);
+            arr[1] = arr[1] * 2 - 1;
 
             return out;
         }
