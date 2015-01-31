@@ -226,8 +226,11 @@ define(function(require) {
          * @param {number} [y]
          * @param {number} [width]
          * @param {number} [height]
+         * @param {number} [devicePixelRatio]
+         *        Defaultly use the renderere devicePixelRatio
+         *        It needs to be 1 when setViewport is called by frameBuffer
          */
-        setViewport: function(x, y, width, height) {
+        setViewport: function(x, y, width, height, dpr) {
 
             if (typeof(x) === 'object') {
                 var obj = x;
@@ -236,7 +239,7 @@ define(function(require) {
                 width = obj.width;
                 height = obj.height;
             }
-            var dpr = this.devicePixelRatio;
+            dpr = dpr || this.devicePixelRatio;
 
             this.gl.viewport(
                 x * dpr, y * dpr, width * dpr, height * dpr

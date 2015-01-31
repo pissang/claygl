@@ -67,7 +67,7 @@ define(function(require) {
             }
 
             this._cache.put('viewport', renderer.viewport);
-            renderer.setViewport(0, 0, this._width, this._height);
+            renderer.setViewport(0, 0, this._width, this._height, 1);
             // Create a new render buffer
             if (this._cache.miss('renderbuffer') && this.depthBuffer && ! this._depthTextureAttached) {
                 this._cache.put('renderbuffer', _gl.createRenderbuffer());
@@ -106,7 +106,9 @@ define(function(require) {
             var viewport = this._cache.get('viewport');
             // Reset viewport;
             if (viewport) {
-                renderer.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+                renderer.setViewport(
+                    viewport.x, viewport.y, viewport.width, viewport.height
+                );
             }
 
             // Because the data of texture is changed over time,
