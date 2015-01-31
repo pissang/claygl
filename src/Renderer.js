@@ -37,14 +37,14 @@ define(function(require) {
             /**
              * Canvas width, set by resize method
              * @type {number}
-             * @readonly
+             * @private
              */
             width: 100,
 
             /**
              * Canvas width, set by resize method
              * @type {number}
-             * @readonly
+             * @private
              */
             height: 100,
 
@@ -53,7 +53,7 @@ define(function(require) {
              * Specially for high defination display
              * @see http://www.khronos.org/webgl/wiki/HandlingHighDPI
              * @type {number}
-             * @readonly
+             * @private
              */
             devicePixelRatio: window.devicePixelRatio || 1.0,
 
@@ -115,7 +115,7 @@ define(function(require) {
             gl: null,
             /**
              * Renderer viewport, read-only, can be set by setViewport method
-             * @type {{x: number, y: number, width: number, height: number}}
+             * @type {Object}
              */
             viewport: {},
 
@@ -166,7 +166,7 @@ define(function(require) {
          * @param {number} width
          * @param {number} height
          */
-        resize: function(width, height) {
+        resize: function(width, height, keepViewportRatio) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
@@ -188,6 +188,22 @@ define(function(require) {
         },
 
         /**
+         * Get renderer width
+         * @return {number}
+         */
+        getWidth: function () {
+            return this.width;
+        },
+
+        /**
+         * Get renderer height
+         * @return {number}
+         */
+        getHeight: function () {
+            return this.height;
+        },
+
+        /**
          * Set devicePixelRatio
          * @param {number} devicePixelRatio
          */
@@ -197,8 +213,16 @@ define(function(require) {
         },
 
         /**
+         * Get devicePixelRatio
+         * @param {number} devicePixelRatio
+         */
+        getDevicePixelRatio: function () {
+            return this.devicePixelRatio;
+        },
+
+        /**
          * Set rendering viewport
-         * @param {number|{x:number,y:number,width:number,height:number}} x
+         * @param {number|Object} x
          * @param {number} [y]
          * @param {number} [width]
          * @param {number} [height]
