@@ -93,22 +93,22 @@ define(function(require) {
     {
 
         getWebGLTexture: function(_gl) {
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
 
-            this._cache.use(_gl.__GLID__);
-
-            if (this._cache.miss('webgl_texture')) {
+            if (cache.miss('webgl_texture')) {
                 // In a new gl context, create new texture and set dirty true
-                this._cache.put('webgl_texture', _gl.createTexture());
+                cache.put('webgl_texture', _gl.createTexture());
             }
             if (this.dynamic) {
                 this.update(_gl);
             }
-            else if (this._cache.isDirty()) {
+            else if (cache.isDirty()) {
                 this.update(_gl);
-                this._cache.fresh();
+                cache.fresh();
             }
 
-            return this._cache.get('webgl_texture');
+            return cache.get('webgl_texture');
         },
 
         bind: function() {},
@@ -193,11 +193,14 @@ define(function(require) {
          * @param  {WebGLRenderingContext} _gl
          */
         dispose: function(_gl) {
-            this._cache.use(_gl.__GLID__);
-            if (this._cache.get('webgl_texture')){
-                _gl.deleteTexture(this._cache.get('webgl_texture'));
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
+
+            var webglTexture = cache.get('webgl_texture');
+            if (webglTexture){
+                _gl.deleteTexture(webglTexture);
             }
-            this._cache.deleteContext(_gl.__GLID__);
+            cache.deleteContext(_gl.__GLID__);
         },
         /**
          * Test if image of texture is valid and loaded.

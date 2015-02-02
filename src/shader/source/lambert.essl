@@ -56,8 +56,6 @@ void main()
 @end
 
 
-
-
 @export buildin.lambert.fragment
 
 varying vec2 v_Texcoord;

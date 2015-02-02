@@ -585,8 +585,8 @@ define(function(require) {
 
         _parseImport: function() {
 
-            this._vertexProcessedWithoutDefine = Shader.parseImport(this.vertex);
-            this._fragmentProcessedWithoutDefine = Shader.parseImport(this.fragment);
+            this._vertexProcessedNoDefine = Shader.parseImport(this.vertex);
+            this._fragmentProcessedNoDefine = Shader.parseImport(this.fragment);
 
         },
 
@@ -616,7 +616,7 @@ define(function(require) {
                     defineStr.push('#define ' + symbol + ' ' + value.toString());
                 }
             }
-            this._vertexProcessed = defineStr.join('\n') + '\n' + this._vertexProcessedWithoutDefine;
+            this._vertexProcessed = defineStr.join('\n') + '\n' + this._vertexProcessedNoDefine;
 
             // FRAGMENT
             defineStr = [];
@@ -641,7 +641,7 @@ define(function(require) {
                     defineStr.push('#define ' + symbol + ' ' + value.toString());
                 }
             }
-            var code = defineStr.join('\n') + '\n' + this._fragmentProcessedWithoutDefine;
+            var code = defineStr.join('\n') + '\n' + this._fragmentProcessedNoDefine;
             
             // Add precision
             this._fragmentProcessed = ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
@@ -653,9 +653,9 @@ define(function(require) {
             var shaderType = 'vertex';
             this._uniformList = [];
 
-            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
+            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(uniformRegex, _uniformParser);
             shaderType = 'fragment';
-            this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
+            this._fragmentProcessedNoDefine = this._fragmentProcessedNoDefine.replace(uniformRegex, _uniformParser);
 
             self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
@@ -788,7 +788,9 @@ define(function(require) {
         _parseAttributes: function() {
             var attributes = {};
             var self = this;
-            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(attributeRegex, _attributeParser);
+            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(
+                attributeRegex, _attributeParser
+            );
 
             function _attributeParser(str, type, symbol, semanticWrapper, semantic) {
                 if (type && symbol) {
@@ -836,9 +838,9 @@ define(function(require) {
         _parseDefines: function() {
             var self = this;
             var shaderType = 'vertex';
-            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(defineRegex, _defineParser);
+            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(defineRegex, _defineParser);
             shaderType = 'fragment';
-            this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(defineRegex, _defineParser);
+            this._fragmentProcessedNoDefine = this._fragmentProcessedNoDefine.replace(defineRegex, _defineParser);
 
             function _defineParser(str, symbol, value) {
                 var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
