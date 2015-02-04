@@ -156,7 +156,7 @@ define(function(require) {
 
             glinfo.initialize(this.gl);
         } catch(e) {
-            throw 'Error creating WebGL Context';
+            throw 'Error creating WebGL Context ' + e;
         }
     },
     /** @lends qtek.Renderer.prototype. **/
@@ -166,7 +166,7 @@ define(function(require) {
          * @param {number} width
          * @param {number} height
          */
-        resize: function(width, height, keepViewportRatio) {
+        resize: function(width, height) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.

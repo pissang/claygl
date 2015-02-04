@@ -133,7 +133,6 @@ define(function(require) {
         },
 
         fallBack: function() {
-
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
             

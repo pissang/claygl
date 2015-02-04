@@ -20,25 +20,37 @@ define(function() {
         'WEBGL_draw_buffers'
     ];
 
+    var PARAMETER_NAMES = [
+        'MAX_TEXTURE_SIZE',
+        'MAX_CUBE_MAP_TEXTURE_SIZE'
+    ]
+
     var extensions = {};
+    var parameters = {};
 
     var glinfo = {
         /**
-         * Initialize all extensions in context
+         * Initialize all extensions and parameters in context
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.core.glinfo
          */
         initialize: function(_gl) {
-
-            if (extensions[_gl.__GLID__]) {
+            var glid = _gl.__GLID__;
+            if (extensions[glid]) {
                 return;
             }
-            extensions[_gl.__GLID__] = {};
+            extensions[glid] = {};
+            parameters[glid] = {};
             // Get webgl extension
             for (var i = 0; i < EXTENSION_LIST.length; i++) {
                 var extName = EXTENSION_LIST[i];
 
                 this._createExtension(_gl, extName);
+            }
+            // Get parameters
+            for (var i = 0; i < PARAMETER_NAMES.length; i++) {
+                var name = PARAMETER_NAMES[i];
+                parameters[glid][name] = _gl.getParameter(_gl[name]);
             }
         },
 
@@ -58,6 +70,20 @@ define(function() {
                 return extensions[glid][name];
             }
         },
+
+        /**
+         * Get parameter
+         * @param {WebGLRenderingContext} _gl
+         * @param {string} name Parameter name
+         * @return {*}
+         */
+        getParameter: function(_gl, name) {
+            var glid = _gl.__GLID__;
+            if (parameters[glid]) {
+                return parameters[glid][name];
+            }
+        },
+
         /**
          * Dispose context
          * @param  {WebGLRenderingContext} _gl
@@ -65,6 +91,7 @@ define(function() {
          */
         dispose: function(_gl) {
             delete extensions[_gl.__GLID__];
+            delete parameters[_gl.__GLID__];
         },
 
         _createExtension: function(_gl, name) {
