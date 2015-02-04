@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Class: Skybox</title>
+    <title>Class: Texture2D</title>
     
     
     
@@ -5791,7 +5791,7 @@
     </ul>
 </div>
     <div class="main">
-        <h1 class="page-title" data-filename="qtek.plugin.Skybox.html">Class: Skybox</h1>
+        <h1 class="page-title" data-filename="qtek.Texture2D.html">Class: Texture2D</h1>
         
 
 
@@ -5800,9 +5800,9 @@
     
 <header>
     <h2>
-        <span class="ancestors"><a href="qtek.html">qtek</a><a href="qtek.plugin.html">.plugin</a>.</span>
+        <span class="ancestors"><a href="qtek.html">qtek</a>.</span>
     
-    Skybox
+    Texture2D
     </h2>
     
 </header>  
@@ -5815,14 +5815,14 @@
         
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="Skybox">
+        <h4 class="name" id="Texture2D">
             
-            new qtek.plugin.Skybox<span class="signature">()</span>
+            new qtek.Texture2D<span class="signature">()</span>
         </h4>
     
         
         <div class="tag-source">
-            plugin/Skybox.js, line 10
+            Texture2D.js, line 7
         </div>
         
     </div>
@@ -5880,19 +5880,20 @@
         
 
     
-    <pre class="prettyprint"><code>var skyTex = new qtek.TextureCube();
-    skyTex.load({
-        'px': 'assets/textures/sky/px.jpg',
-        'nx': 'assets/textures/sky/nx.jpg'
-        'py': 'assets/textures/sky/py.jpg'
-        'ny': 'assets/textures/sky/ny.jpg'
-        'pz': 'assets/textures/sky/pz.jpg'
-        'nz': 'assets/textures/sky/nz.jpg'
+    <pre class="prettyprint"><code>...
+    var mat = new qtek.Material({
+        shader: qtek.shader.library.get('buildin.phong', 'diffuseMap')
     });
-    var skybox = new qtek.plugin.Skybox({
-        scene: scene
-    });
-    skybox.material.set('environmentMap', skyTex);</code></pre>
+    var diffuseMap = new qtek.Texture2D();
+    diffuseMap.load('assets/textures/diffuse.jpg');
+    mat.set('diffuseMap', diffuseMap);
+    ...
+    diffuseMap.success(function() {
+        // Wait for the diffuse texture loaded
+        animation.on('frame', function(frameTime) {
+            renderer.render(scene, camera);
+        });
+    });</code></pre>
     
 
     
@@ -5901,6 +5902,12 @@
     
     </div>
     
+    
+        <h3 class="subsection-title">Extends</h3>
+        
+        <ul>
+            <li><a href="qtek.Texture.html">qtek.Texture</a></li>
+        </ul>
     
     
     
@@ -5918,9 +5925,9 @@
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="camera">
+        <h4 class="name" id="image">
             
-            camera<span class="type-signature type qtek.camera"><a href="qtek.Camera_.html">qtek.Camera</a></span> 
+            image<span class="type-signature type htmlimageelement">HTMLImageElement</span> <span class="type-signature type htmlcanvaselemnet">HTMLCanvasElemnet</span> 
         </h4>
     </div>
     
@@ -5962,15 +5969,550 @@
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="scene">
+        <h4 class="name" id="mipmaps">
             
-            scene<span class="type-signature type qtek.scene"><a href="qtek.Scene.html">qtek.Scene</a></span> 
+            mipmaps<span class="type-signature type array.<uint8array>">Array.&lt;Uint8Array></span> 
         </h4>
     </div>
     
     
 </dt>
 <dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="pixels">
+            
+            pixels<span class="type-signature type uint8array">Uint8Array</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="__GUID__">
+            
+                <span class="inherited"><a href="qtek.core.Base.html#__GUID__">inherited</a></span>
+            
+            __GUID__<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="anisotropic">
+            
+                <span class="inherited"><a href="qtek.Texture.html#anisotropic">inherited</a></span>
+            
+            anisotropic<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Anisotropic filtering, enabled if value is larger than 1</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html">http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="dynamic">
+            
+                <span class="inherited"><a href="qtek.Texture.html#dynamic">inherited</a></span>
+            
+            dynamic<span class="type-signature type boolean">boolean</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Dynamic option for texture like video</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="flipY">
+            
+                <span class="inherited"><a href="qtek.Texture.html#flipY">inherited</a></span>
+            
+            flipY<span class="type-signature type boolean">boolean</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="format">
+            
+                <span class="inherited"><a href="qtek.Texture.html#format">inherited</a></span>
+            
+            format<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Format of texel data</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="height">
+            
+                <span class="inherited"><a href="qtek.Texture.html#height">inherited</a></span>
+            
+            height<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Texture height, only needed when the texture is used as a render target</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="premultiplyAlpha">
+            
+                <span class="inherited"><a href="qtek.Texture.html#premultiplyAlpha">inherited</a></span>
+            
+            premultiplyAlpha<span class="type-signature type boolean">boolean</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="type">
+            
+                <span class="inherited"><a href="qtek.Texture.html#type">inherited</a></span>
+            
+            type<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Texel data type</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="unpackAlignment">
+            
+                <span class="inherited"><a href="qtek.Texture.html#unpackAlignment">inherited</a></span>
+            
+            unpackAlignment<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="width">
+            
+                <span class="inherited"><a href="qtek.Texture.html#width">inherited</a></span>
+            
+            width<span class="type-signature type number">number</span> 
+        </h4>
+    </div>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Texture width, only needed when the texture is used as a render target</p>
+    </div>
     
     
     
@@ -6012,14 +6554,14 @@
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="attachScene">
+        <h4 class="name" id="generateMipmap">
             
-            attachScene<span class="signature">(scene)</span>
+            generateMipmap<span class="signature">(_gl)</span>
         </h4>
     
         
         <div class="tag-source">
-            plugin/Skybox.js, line 63
+            Texture2D.js, line 123
         </div>
         
     </div>
@@ -6028,10 +6570,6 @@
 </dt>
 <dd>
     
-    
-    <div class="description">
-        <p>Attach the skybox to the scene</p>
-    </div>
     
 
     
@@ -6061,13 +6599,13 @@
 	
         <tr>
             
-                <td class="name"><code>scene</code></td>
+                <td class="name"><code>_gl</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type"><a href="qtek.Scene.html">qtek.Scene</a></span>
+<span class="param-type">WebGLRenderingContext</span>
 
 
             
@@ -6127,15 +6665,17 @@
         
             
 <dt>
-    <div class="nameContainer">
-        <h4 class="name" id="detachScene">
+    <div class="nameContainer inherited">
+        <h4 class="name" id="dirty">
             
-            detachScene<span class="signature">()</span>
+                <span class="inherited"><a href="qtek.Texture.html#dirty">inherited</a></span>
+            
+            dirty<span class="signature">()</span>
         </h4>
     
         
         <div class="tag-source">
-            plugin/Skybox.js, line 74
+            Texture.js, line 120
         </div>
         
     </div>
@@ -6146,7 +6686,7 @@
     
     
     <div class="description">
-        <p>Detach from scene</p>
+        <p>Mark texture is dirty and update in the next frame</p>
     </div>
     
 
@@ -6195,6 +6735,198 @@
     
 </dd>
 
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="dispose">
+            
+                <span class="inherited"><a href="qtek.Texture.html#dispose">inherited</a></span>
+            
+            dispose<span class="signature">(_gl)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            Texture.js, line 194
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>_gl</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">WebGLRenderingContext</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer inherited">
+        <h4 class="name" id="isRenderable">
+            
+                <span class="inherited"><a href="qtek.Texture.html#isRenderable">inherited</a></span>
+            
+            isRenderable<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            Texture.js, line 208
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Test if image of texture is valid and loaded.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
         </dl>
     
     
@@ -6212,7 +6944,7 @@
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Wed Feb 04 2015 23:23:45 GMT+0800 (CST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Wed Feb 04 2015 23:23:46 GMT+0800 (CST)
         </footer>
     </div>
 </div>

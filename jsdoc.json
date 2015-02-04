@@ -1,7 +1,8 @@
 {
     "source": {
         "include": ["src"],
-        "includePattern": ".+\\.js(doc)?$"
+        "includePattern": ".+\\.js(doc)?$",
+        "exclude": ["src/dep/glmatrix.js"]
     },
     "opts": {
         "template": "jsdoc-tmpl",
