@@ -82,7 +82,7 @@ define(function(require) {
          * @return {qtek.math.Vector3}
          */
         clone : function() {
-            return new Vector3( this.x, this.y, this.z );
+            return new Vector3(this.x, this.y, this.z);
         },
 
         /**
@@ -396,16 +396,8 @@ define(function(require) {
             return this;
         },
         
-        setEulerFromQuaternion : function(q) {
-            // var sqx = q.x * q.x;
-            // var sqy = q.y * q.y;
-            // var sqz = q.z * q.z;
-            // var sqw = q.w * q.w;
-            // this.x = Math.atan2( 2 * ( q.y * q.z + q.x * q.w ), ( -sqx - sqy + sqz + sqw ) );
-            // this.y = Math.asin( -2 * ( q.x * q.z - q.y * q.w ) );
-            // this.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqx - sqy - sqz + sqw ) );
-
-            // return this;
+        eulerFromQuaternion : function(q, order) {
+            Vector3.eulerFromQuaternion(this, q, order);
         },
 
         toString : function() {
@@ -763,6 +755,61 @@ define(function(require) {
         out._dirty = true;
         return out;
     };
+
+    function clamp(val, min, max) {
+        return val < min ? min : (val > max ? max : val);
+    };
+    /**
+     * Convert quaternion to euler angle
+     * From three.js
+     */
+    Vector3.eulerFromQuaternion = function (v, q, order) {
+        v = v._array;
+        q = q._array;
+        var x = q[0], y = q[1], z = q[2], w = q[3];
+        var x2 = x * x;
+        var y2 = y * y;
+        var z2 = z * z;
+        var w2 = w * w;
+        var atan2 = Math.atan2;
+        var asin = Math.asin;
+        switch (order.toUpperCase()) {
+            case 'YXZ':
+                v[0] = asin(clamp(2 * (x * w - y * z), - 1, 1));
+                v[1] = atan2(2 * (x * z + y * w), (w2 - x2 - y2 + z2));
+                v[2] = atan2(2 * (x * y + z * w), (w2 - x2 + y2 - z2));
+                break;
+            case 'ZXY':
+                v[0] = asin(clamp(2 * (x * w + y * z), - 1, 1));
+                v[1] = atan2(2 * (y * w - z * x), (w2 - x2 - y2 + z2));
+                v[2] = atan2(2 * (z * w - x * y), (w2 - x2 + y2 - z2));
+                break;
+            case 'ZYX':
+                v[0] = atan2(2 * (x * w + z * y), (w2 - x2 - y2 + z2));
+                v[1] = asin(clamp(2 * (y * w - x * z), - 1, 1));
+                v[2] = atan2(2 * (x * y + z * w), (w2 + x2 - y2 - z2));
+                break;
+            case 'YZX':
+                v[0] = atan2(2 * (x * w - z * y), (w2 - x2 + y2 - z2));
+                v[1] = atan2(2 * (y * w - x * z), (w2 + x2 - y2 - z2));
+                v[2] = asin(clamp(2 * (x * y + z * w), - 1, 1));
+                break;
+            case 'XZY':
+                v[0] = atan2(2 * (x * w + y * z), (w2 - x2 + y2 - z2));
+                v[1] = atan2(2 * (x * z + y * w), (w2 + x2 - y2 - z2));
+                v[2] = asin(clamp(2 * (z * w - x * y), - 1, 1));
+                break;
+            case 'XYZ':
+            default:
+                v[0] = atan2(2 * (x * w - y * z), (w2 - x2 - y2 + z2));
+                v[1] = asin(clamp(2 * (x * z + y * w), - 1, 1));
+                v[2] = atan2(2 * (z * w - x * y), (w2 + x2 - y2 - z2));
+                break;
+        }
+        v._dirty = true;
+        return v;
+    };
+
     /**
      * @type {qtek.math.Vector3}
      */
