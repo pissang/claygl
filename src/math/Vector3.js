@@ -98,14 +98,13 @@ define(function(require) {
 
         /**
          * Cross product of self and b, written to a Vector3 out
-         * @param  {qtek.math.Vector3} out
          * @param  {qtek.math.Vector3} a
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        cross : function(out, a, b) {
-            vec3.cross(out._array, this._array, a._array, b._array);
-            out._dirty = true;
+        cross : function(a, b) {
+            vec3.cross(this._array, a._array, b._array);
+            this._dirty = true;
             return this;
         },
 
