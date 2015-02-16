@@ -202,6 +202,13 @@ define(function(require) {
                 _gl.deleteFramebuffer(frameBuffer);
             }
 
+            // Clear cache for reusing
+            this._renderBufferWidth = 0;
+            this._renderBufferHeight = 0;
+            this._depthTextureAttached = false;
+            this._attachedTextures = {};
+            this._width = this._height = 0;
+
             this._cache.deleteContext(_gl.__GLID__);
         }
     });

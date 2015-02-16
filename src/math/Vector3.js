@@ -761,6 +761,7 @@ define(function(require) {
     };
     /**
      * Convert quaternion to euler angle
+     * Quaternion must be normalized
      * From three.js
      */
     Vector3.eulerFromQuaternion = function (v, q, order) {
@@ -773,7 +774,7 @@ define(function(require) {
         var w2 = w * w;
         var atan2 = Math.atan2;
         var asin = Math.asin;
-        switch (order.toUpperCase()) {
+        switch (order && order.toUpperCase()) {
             case 'YXZ':
                 v[0] = asin(clamp(2 * (x * w - y * z), - 1, 1));
                 v[1] = atan2(2 * (x * z + y * w), (w2 - x2 - y2 + z2));

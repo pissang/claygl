@@ -793,12 +793,15 @@ define(function(require) {
 
             for (var i = 0; i < this._receivers.length; i++) {
                 var mesh = this._receivers[i];
-                var material = mesh.material;
-                var shader = material.shader;
-                shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
-                shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_NUMBER');
-                shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_NUMBER');
-                material.set('shadowEnabled', 0);
+                // Mesh may be disposed
+                if (mesh.material && mesh.material.shader) {
+                    var material = mesh.material;
+                    var shader = material.shader;
+                    shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
+                    shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_NUMBER');
+                    shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_NUMBER');
+                    material.set('shadowEnabled', 0);   
+                }
             }
 
             this._opaqueCasters = [];

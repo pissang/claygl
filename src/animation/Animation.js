@@ -65,7 +65,8 @@ define(function(require) {
             var idx = this._clips.indexOf(clip);
             this._clips.splice(idx, 1);
         },
-        update: function() {
+
+        _update: function() {
             
             var time = new Date().getTime();
             var delta = time - this._time;
@@ -83,12 +84,6 @@ define(function(require) {
                     deferredEvents.push(e);
                     deferredClips.push(clip);
                 }
-            }
-            if (this.stage
-                && this.stage.render
-                && this._clips.length
-            ) {
-                this.stage.render();
             }
 
             // Remove the finished clip
@@ -110,6 +105,10 @@ define(function(require) {
             this._time = time;
 
             this.trigger('frame', delta);
+
+            if (this.stage && this.stage.render) {
+                this.stage.render();
+            }
         },
         /**
          * Start running animation
@@ -125,7 +124,7 @@ define(function(require) {
                     
                     requestAnimationFrame(step);
 
-                    self.update();
+                    self._update();
                 }
             }
 
