@@ -95,11 +95,12 @@ define(function(require) {
             return function (center, radius, out) {
                 var origin = this.origin._array;
                 var direction = this.direction._array;
+                center = center._array;
                 vec3.sub(v, center, origin);
                 // Distance from projection point to origin
                 var b = vec3.dot(v, direction);
                 // Squared distance from center to origin
-                var c2 = vec3.lenSquared(v);
+                var c2 = vec3.squaredLength(v);
                 // Squared distance from center to projection point
                 var d2 = c2 - b * b;
 
