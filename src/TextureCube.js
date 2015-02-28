@@ -170,7 +170,7 @@ define(function(require) {
             }
 
             function isPowerOfTwo(value) {
-                return value & (value-1) === 0;
+                return (value & (value-1)) === 0;
             }
         },
 
