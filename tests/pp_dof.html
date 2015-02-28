@@ -46,8 +46,8 @@
                 });
 
                 var shader = new qtek.Shader({
-                    vertex: qtek.Shader.source('buildin.physical.vertex'),
-                    fragment: qtek.Shader.source('buildin.physical.fragment')
+                    vertex: qtek.Shader.source('buildin.standard.vertex'),
+                    fragment: qtek.Shader.source('buildin.standard.fragment')
                 });
                 shader.enableTexture('environmentMap');
                 var material = new qtek.Material({

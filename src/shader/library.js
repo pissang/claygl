@@ -17,10 +17,10 @@ define(function(require) {
 
     /** 
      * ### Builin shaders
+     * + buildin.standard
      * + buildin.basic
      * + buildin.lambert
      * + buildin.phong
-     * + buildin.physical
      * + buildin.wireframe
      * 
      * @namespace qtek.shader.library

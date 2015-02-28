@@ -84,7 +84,7 @@ define(function(require) {
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
                 // 
-                // TODO Small possibility enabledUniforms are not the same
+                // FIXME Small possibility enabledUniforms are not the same
                 if (sameShader) {
                     if (prevMaterial.uniforms[symbol].value === uniform.value) {
                         continue;

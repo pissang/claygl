@@ -1,14 +1,14 @@
 
 // http://blog.selfshadow.com/publications/s2013-shading-course/
 
-@export buildin.physical.vertex
+@export buildin.standard.vertex
 
 @import buildin.phong.vertex
 
 @end
 
 
-@export buildin.physical.fragment
+@export buildin.standard.fragment
 
 #define PI 3.14159265358979
 
@@ -296,5 +296,18 @@ void main()
     #endif
     gl_FragColor = finalColor;
 }
+
+@end
+
+
+@export buildin.physical.fragment
+
+@import buildin.standard.vertex
+
+@end
+
+@export buildin.physical.fragment
+
+@import buildin.standard.fragment
 
 @end

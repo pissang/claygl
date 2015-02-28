@@ -92,7 +92,7 @@ define(function(require) {
         /**
          * @type {string}
          */
-        shaderName: 'buildin.physical',
+        shaderName: 'buildin.standard',
 
         /**
          * @type {boolean}
