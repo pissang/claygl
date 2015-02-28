@@ -29,14 +29,6 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
-    var targetMap = {
-        'px': glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
-        'py': glenum.TEXTURE_CUBE_MAP_POSITIVE_Y,
-        'pz': glenum.TEXTURE_CUBE_MAP_POSITIVE_Z,
-        'nx': glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
-        'ny': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-        'nz': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-    };
 
     /**
      * Pass rendering shadow map.
@@ -588,7 +580,7 @@ define(function(require) {
                 var target = targets[i];
                 var camera = this._getPointLightCamera(light, target);
 
-                this._frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
+                this._frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
                 this._frameBuffer.bind(renderer);
 
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);

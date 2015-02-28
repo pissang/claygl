@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <script>
+            require(['qtek'], function(qtek){
+                var Shader = qtek.Shader
+
+                var renderer = new qtek.Renderer({
+                    canvas : document.getElementById( "Main"),
+                    devicePixelRatio : 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                });
+
+                var shader = qtek.shader.library.get("buildin.basic", "diffuseMap");
+
+                var material = new qtek.Material({
+                    shader : shader
+                });
+                var texture = new qtek.Texture2D({
+                    wrapS : qtek.Texture.REPEAT,
+                    wrapT : qtek.Texture.REPEAT,
+                    mipmaps: [
+                        createMipMap(32, '#000'),
+                        createMipMap(16, '#333'),
+                        createMipMap(8, '#666'),
+                        createMipMap(4, '#999'),
+                        createMipMap(2, '#ccc'),
+                        createMipMap(1, '#fff')
+                    ]
+                });
+                material.set("diffuseMap", texture);
+                material.set("uvRepeat", [100, 100])
+
+                function createMipMap(size, color) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = canvas.height = size;
+                    var ctx = canvas.getContext('2d');
+                    ctx.fillStyle = color;
+                    ctx.fillRect(0, 0, size, size);
+
+                    return {
+                        image: canvas
+                    };
+                }
+
+                var root = new qtek.Node();
+
+                camera.position.set(0, 4, 14);
+                camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
+
+                scene.add( root );
+                // Add Plane
+                var plane = new qtek.geometry.Plane({
+                    widthSegments : 1,
+                    heightSegments : 1
+                });
+                var planeMesh = new qtek.Mesh({
+                    geometry : plane,
+                    material : material,
+                    scale : new qtek.math.Vector3(60, 60, 60)
+                });
+                planeMesh.position.y = -0.8;
+                planeMesh.rotation.rotateX(-Math.PI/2);
+                root.add(planeMesh);
+
+                setInterval(function(){
+                    renderer.render( scene, camera );
+                }, 20);
+            })
+            
+        </script>
+    </body>
+</html>

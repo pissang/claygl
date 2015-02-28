@@ -66,12 +66,11 @@ define(function(require) {
 
             cache.put('viewport', renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height, 1);
-            // Create a new render buffer
-            if (cache.miss('renderbuffer') && this.depthBuffer && ! this._depthTextureAttached) {
-                cache.put('renderbuffer', _gl.createRenderbuffer());
-            }
             if (! this._depthTextureAttached && this.depthBuffer) {
-
+                // Create a new render buffer
+                if (cache.miss('renderbuffer')) {
+                    cache.put('renderbuffer', _gl.createRenderbuffer());
+                }
                 var width = this._width;
                 var height = this._height;
                 var renderbuffer = cache.get('renderbuffer');

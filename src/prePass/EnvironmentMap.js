@@ -8,14 +8,6 @@ define(function (require) {
     var TextureCube = require('../TextureCube');
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
-    var targetMap = {
-        'px': glenum.TEXTURE_CUBE_MAP_POSITIVE_X,
-        'py': glenum.TEXTURE_CUBE_MAP_POSITIVE_Y,
-        'pz': glenum.TEXTURE_CUBE_MAP_POSITIVE_Z,
-        'nx': glenum.TEXTURE_CUBE_MAP_NEGATIVE_X,
-        'ny': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-        'nz': glenum.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-    };
 
     /**
      * Pass rendering scene to a environment cube map
@@ -66,9 +58,9 @@ define(function (require) {
              * @type {qtek.TextureCube}
              * @memberOf qtek.prePass.EnvironmentMap#
              */
-            texture: null,
+            texture: null
 
-            frameBuffer: new FrameBuffer()
+            // frameBuffer: new FrameBuffer()
         };
         ret._cameras = {
             px: new PerspectiveCamera({fov: 90}),
@@ -76,7 +68,7 @@ define(function (require) {
             py: new PerspectiveCamera({fov: 90}),
             ny: new PerspectiveCamera({fov: 90}),
             pz: new PerspectiveCamera({fov: 90}),
-            nz: new PerspectiveCamera({fov: 90}),
+            nz: new PerspectiveCamera({fov: 90})
         };
         ret._cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
         ret._cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
@@ -84,6 +76,16 @@ define(function (require) {
         ret._cameras.ny.lookAt(Vector3.NEGATIVE_Y, Vector3.NEGATIVE_Z);
         ret._cameras.pz.lookAt(Vector3.POSITIVE_Z, Vector3.NEGATIVE_Y);
         ret._cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
+
+        // FIXME In windows, use one framebuffer only renders one side of cubemap
+        ret._frameBuffers = {
+            px: new FrameBuffer(),
+            nx: new FrameBuffer(),
+            py: new FrameBuffer(),
+            ny: new FrameBuffer(),
+            pz: new FrameBuffer(),
+            nz: new FrameBuffer()
+        };
 
         return ret;
     }, {
@@ -109,19 +111,23 @@ define(function (require) {
                 camera.near = this.near;
                 camera.fov = fov;
 
-                this.frameBuffer.attach(
-                    _gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target], 0
+                this._frameBuffers[target].attach(
+                    _gl, this.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
                 );
-                this.frameBuffer.bind(renderer);
+                this._frameBuffers[target].bind(renderer);
                 renderer.render(scene, camera, true);
-                this.frameBuffer.unbind(renderer);
+                this._frameBuffers[target].unbind(renderer);
             }
         },
         /**
          * @param  {qtek.Renderer} renderer
          */
         dispose: function(renderer) {
-            this.frameBuffer.dispose(renderer.gl);
+            // this.frameBuffer.dispose(renderer.gl);
+            for (var i = 0; i < 6; i++) {
+                var target = targets[i];
+                this._frameBuffers[target].dispose(renderer.gl);
+            }
         }
     });
 
