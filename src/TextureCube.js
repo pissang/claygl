@@ -5,14 +5,7 @@ define(function(require) {
     var glenum = require('./core/glenum');
     var util = require('./core/util');
 
-    var targetMap = {
-        'px': 'TEXTURE_CUBE_MAP_POSITIVE_X',
-        'py': 'TEXTURE_CUBE_MAP_POSITIVE_Y',
-        'pz': 'TEXTURE_CUBE_MAP_POSITIVE_Z',
-        'nx': 'TEXTURE_CUBE_MAP_NEGATIVE_X',
-        'ny': 'TEXTURE_CUBE_MAP_NEGATIVE_Y',
-        'nz': 'TEXTURE_CUBE_MAP_NEGATIVE_Z',
-    };
+    var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
     /**
      * @constructor qtek.TextureCube
@@ -76,7 +69,12 @@ define(function(require) {
                 ny: null,
                 pz: null,
                 nz: null
-            }
+            },
+
+            /**
+             * @type {Array.<Object>}
+             */
+            mipmaps: []
        };
     }, {
         update: function(_gl) {
@@ -107,30 +105,49 @@ define(function(require) {
                 }
             }
 
-            for (var target in this.image) {
-                var img = this.image[target];
-                if (img) {
-                    _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, glFormat, glType, img);
-                }
-                else {
-                    _gl.texImage2D(_gl[targetMap[target]], 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels[target]);
+            if (this.mipmaps.length) {
+                var width = this.width;
+                var height = this.height;
+                for (var i = 0; i < this.mipmaps.length; i++) {
+                    var mipmap = this.mipmaps[i];
+                    this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
+                    width /= 2;
+                    height /= 2;
                 }
             }
+            else {
+                this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
 
-            if (!this.NPOT && this.useMipmap) {
-                _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+                if (!this.NPOT && this.useMipmap) {
+                    _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+                }
             }
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
         
+        _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
+            for (var i = 0; i < 6; i++) {
+                var target = targetList[i];
+                var img = data.image && data.image[target];
+                if (img) {
+                    _gl.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, glFormat, glFormat, glType, img);
+                }
+                else {
+                    _gl.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, glFormat, width, height, 0, glFormat, glType, data.pixels && data.pixels[target]);
+                }
+            }
+        },
+
         /**
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.TextureCube.prototype
          */
         generateMipmap: function(_gl) {
-            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-            _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);    
+            if (this.useMipmap && !this.NPOT) {
+                _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+                _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+            }
         },
 
         bind: function(_gl) {

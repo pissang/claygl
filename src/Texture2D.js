@@ -31,11 +31,19 @@ define(function(require) {
              */
             image: null,
             /**
-             * @type {Uint8Array}
+             * @type {Uint8Array|Float32Array}
              */
             pixels: null,
             /**
-             * @type {Array.<Uint8Array>}
+             * @type {Array.<Object>}
+             * @example
+             *     [{
+             *         image: mipmap0,
+             *         pixels: null
+             *     }, {
+             *         image: mipmap1,
+             *         pixels: null
+             *     }, ....]
              */
             mipmaps: []
         };
@@ -68,62 +76,55 @@ define(function(require) {
                 }
             }
 
-            if (this.image) {
-                _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, glFormat, glType, this.image);
+            if (this.mipmaps.length) {
+                var width = this.width;
+                var height = this.height;
+                for (var i = 0; i < this.mipmaps.length; i++) {
+                    var mipmap = this.mipmaps[i];
+                    this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
+                    width /= 2;
+                    height /= 2;
+                }
             }
-            // Can be used as a blank texture when writing render to texture(RTT)
             else {
+                this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
+
+                if (this.useMipmap && !this.NPOT) {
+                    _gl.generateMipmap(_gl.TEXTURE_2D);
+                }
+            }
+
+            _gl.bindTexture(_gl.TEXTURE_2D, null);
+        },
+
+        _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
+            if (data.image) {
+                _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, data.image);
+            }
+            else {
+                // Can be used as a blank texture when writing render to texture(RTT)
                 if (
                     glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT 
                     && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
                 ) {
-                    _gl.compressedTexImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, this.pixels);
+                    _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
                 } else {
-                    _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, this.width, this.height, 0, glFormat, glType, this.pixels);
+                    _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, glFormat, glType, data.pixels);
                 }
             }
-            if (this.useMipmap) {
-                if (this.mipmaps.length) {
-                    if (this.image) {
-                        for (var i = 0; i < this.mipmaps.length; i++) {
-                            if (this.mipmaps[i]) {
-                                _gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, this.mipmaps[i]);
-                            }
-                        }
-                    } else if (this.pixels) {
-                        var width = this.width;
-                        var height = this.height;
-                        for (var i = 0; i < this.mipmaps.length; i++) {
-                            if (this.mipmaps[i]) {
-                                if (
-                                    glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
-                                    && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
-                                ) {
-                                    _gl.compressedTexImage2D(_gl.TEXTURE_2D, 0, glFormat, width, height, 0, this.mipmaps[i]);
-                                } else {
-                                    _gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, width, height, 0, glFormat, glType, this.mipmaps[i]);
-                                }
-                            }
-                            width /= 2;
-                            height /= 2;
-                        }
-                    }
-                } else if (!this.NPOT && !this.mipmaps.length) {
-                    _gl.generateMipmap(_gl.TEXTURE_2D);
-                }
-            }
-            
-            _gl.bindTexture(_gl.TEXTURE_2D, null);
-
         },
+
         /**
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.Texture2D.prototype
          */
         generateMipmap: function(_gl) {
-            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
-            _gl.generateMipmap(_gl.TEXTURE_2D);    
+            if (this.useMipmap && !this.NPOT) {
+                _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
+                _gl.generateMipmap(_gl.TEXTURE_2D);
+            }
         },
+
         isPowerOfTwo: function() {
             var width;
             var height;

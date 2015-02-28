@@ -90,7 +90,7 @@ define(function (require) {
         /**
          * @param  {qtek.Renderer} renderer
          * @param  {qtek.Scene} scene
-         * @param  {boolean} notUpdateScene
+         * @param  {boolean} [notUpdateScene=false]
          */
         render: function(renderer, scene, notUpdateScene) {
             var _gl = renderer.gl;
@@ -109,7 +109,9 @@ define(function (require) {
                 camera.near = this.near;
                 camera.fov = fov;
 
-                this.frameBuffer.attach(_gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target]);
+                this.frameBuffer.attach(
+                    _gl, this.texture, _gl.COLOR_ATTACHMENT0, targetMap[target], 0
+                );
                 this.frameBuffer.bind(renderer);
                 renderer.render(scene, camera, true);
                 this.frameBuffer.unbind(renderer);

@@ -17,6 +17,7 @@ define(function() {
         'WEBGL_compressed_texture_s3tc',
         'WEBGL_depth_texture',
         'EXT_texture_filter_anisotropic',
+        'EXT_shader_texture_lod',
         'WEBGL_draw_buffers'
     ];
 
