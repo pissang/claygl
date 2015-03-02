@@ -53,7 +53,7 @@ void main()
         @import buildin.chunk.skin_matrix
 
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-        // Normal matrix ???
+        // Upper 3x3 of skinMatrix is orthogonal
         skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
         skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
     #endif

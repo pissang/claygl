@@ -74,8 +74,8 @@ float G_Smith(float glossiness, float ndv, float ndl)
     return G1L * G1V;
 }
 // Fresnel
-vec3 F_Schlick(float ldn, vec3 spec) {
-    return spec + (1.0 - spec) * pow(1.0 - ldn, 5.0);
+vec3 F_Schlick(float ndv, vec3 spec) {
+    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);
 }
 
 float D_Phong(float g, float ndh) {
@@ -145,6 +145,8 @@ void main()
     // Specular part of all lights
     vec3 specularTerm = vec3(0.0, 0.0, 0.0);
     
+    vec3 fresnelTerm = F_Schlick(clamp(dot(N, V), 0.0, 1.0), spec);
+    
     #ifdef AMBIENT_LIGHT_NUMBER
         for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
         {
@@ -172,7 +174,7 @@ void main()
 
             // Calculate point light attenuation
             float dist = length(L);
-            float attenuation = lightAttenuation(dist, range); 
+            float attenuation = lightAttenuation(dist, range);
             L /= dist;
             vec3 H = normalize(L + V);
             float ndl = clamp(dot(N, L), 0.0, 1.0);
@@ -188,7 +190,7 @@ void main()
 
             vec3 li = lc * ndl * attenuation * shadowContrib;
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
+            specularTerm += li *  * D_Phong(g, ndh);
         }
     #endif
 
@@ -221,7 +223,7 @@ void main()
             vec3 li = lc * ndl * shadowContrib;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
+            specularTerm += li * fresnelTerm * D_Phong(g, ndh);
         }
     #endif
 
@@ -273,7 +275,7 @@ void main()
             vec3 li = lc * attenuation * (1.0-falloff) * shadowContrib * ndl;
 
             diffuseTerm += li;
-            specularTerm += li * F_Schlick(ndl, spec) * D_Phong(g, ndh);
+            specularTerm += li * fresnelTerm * D_Phong(g, ndh);
         }
     #endif
 
@@ -283,7 +285,7 @@ void main()
 
     #ifdef ENVIRONMENTMAP_ENABLED
         vec3 envTex = textureCube(environmentMap, reflect(-V, N)).xyz;;
-        finalColor.rgb = finalColor.rgb + envTex * g * F_Schlick(clamp(dot(N, V), 0.0, 1.0), spec);
+        finalColor.rgb = finalColor.rgb + envTex * g * fresnelTerm;
     #endif
 
     if(lineWidth > 0.)
