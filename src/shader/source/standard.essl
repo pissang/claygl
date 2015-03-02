@@ -282,8 +282,8 @@ void main()
     finalColor.rgb += emission;
 
     #ifdef ENVIRONMENTMAP_ENABLED
-        vec3 envTex = textureCube(environmentMap, reflect(-V, N)).xyz;
-        finalColor.rgb = finalColor.rgb + envTex * g;
+        vec3 envTex = textureCube(environmentMap, reflect(-V, N)).xyz;;
+        finalColor.rgb = finalColor.rgb + envTex * g * F_Schlick(clamp(dot(N, V), 0.0, 1.0), spec);
     #endif
 
     if(lineWidth > 0.)
