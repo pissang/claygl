@@ -96,7 +96,7 @@ define(function(require) {
             var _min2 = bbox.min._array;
             var _max2 = bbox.max._array;
 
-            return ! (_min[0] > _max2[0] || _min[1] > _max2[1] || _min[2] > _max2[1]
+            return ! (_min[0] > _max2[0] || _min[1] > _max2[1] || _min[2] > _max2[2]
                 || _max[0] < _min2[0] || _max[1] < _min2[1] || _max[2] < _min2[2]);
         },
 
