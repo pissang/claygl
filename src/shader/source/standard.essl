@@ -190,7 +190,7 @@ void main()
 
             vec3 li = lc * ndl * attenuation * shadowContrib;
             diffuseTerm += li;
-            specularTerm += li *  * D_Phong(g, ndh);
+            specularTerm += li * fresnelTerm * D_Phong(g, ndh);
         }
     #endif
 
