@@ -221,6 +221,14 @@ define(function(require) {
         },
 
         /**
+         * Get WebGL extionsion
+         * @return {[type]} [description]
+         */
+        getExtension: function (name) {
+            return glinfo.getExtension(this.gl, name);
+        },
+
+        /**
          * Set rendering viewport
          * @param {number|Object} x
          * @param {number} [y]
@@ -300,6 +308,10 @@ define(function(require) {
             var color = this.color;
 
             if (this.clear) {
+                // Must set depth and color mask true before clear
+                _gl.colorMask(true, true, true, true);
+                _gl.depthMask(true);
+
                 _gl.clearColor(color[0], color[1], color[2], color[3]);
                 _gl.clear(this.clear);
             }
@@ -359,6 +371,9 @@ define(function(require) {
             }
 
             scene.trigger('afterrender', this, scene, camera, renderInfo);
+
+            // Cleanup
+            this._sceneRendering = null;
             return renderInfo;
         },
 
@@ -409,6 +424,7 @@ define(function(require) {
                 preZPassShader.bind(_gl);
                 _gl.colorMask(false, false, false, false);
                 _gl.depthMask(true);
+                _gl.enable(_gl.DEPTH_TEST);
                 for (var i = 0; i < queue.length; i++) {
                     var renderable = queue[i];
                     var worldM = renderable.worldTransform._array;
@@ -417,7 +433,9 @@ define(function(require) {
                     mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
 
                     if (geometry.boundingBox) {
-                        if (!this._frustumCulling(renderable, camera)) {
+                        if (this.isFrustumCulled(
+                            renderable, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                        )) {
                             continue;
                         }
                     }
@@ -449,6 +467,10 @@ define(function(require) {
                 culledRenderQueue = queue;
             }
 
+            culling = null;
+            cullFace = null;
+            frontFace = null;
+
             for (var i =0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
                 var material = globalMaterial || renderable.material;
@@ -473,7 +495,9 @@ define(function(require) {
                     mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
                 }
                 if (geometry.boundingBox && ! preZ) {
-                    if (!this._frustumCulling(renderable, camera)) {
+                    if (this.isFrustumCulled(
+                        renderable, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                    )) {
                         continue;
                     }
                 }
@@ -568,33 +592,49 @@ define(function(require) {
                 }
             }
 
+            if (preZ) {
+                // default depth func
+                _gl.depthFunc(_gl.LESS);
+            }
+
             return renderInfo;
         },
 
-        _frustumCulling: (function() {
+        /**
+         * Evaluate if an scene object is culled by camera frustum
+         *
+         * Object can be a renderable or a light
+         *
+         * @param {qtek.Node} Scene object
+         * @param {qtek.Camera} camera
+         * @param {Array.<number>} worldViewMat represented with array
+         * @param {Array.<number>} projectionMat represented with array
+         */
+        isFrustumCulled: (function() {
             // Frustum culling
             // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
             var cullingBoundingBox = new BoundingBox();
             var cullingMatrix = new Matrix4();
-            return function(renderable, camera) {
-                var geoBBox = renderable.geometry.boundingBox;
-                cullingMatrix._array = matrices.WORLDVIEW;
+            return function(object, camera, worldViewMat, projectionMat) {
+                // Bounding box can be a property of object(like light) or renderable.geometry
+                var geoBBox = object.boundingBox || object.geometry.boundingBox;
+                cullingMatrix._array = worldViewMat;
                 cullingBoundingBox.copy(geoBBox);
                 cullingBoundingBox.applyTransform(cullingMatrix);
 
                 // Passingly update the scene bounding box
-                // TODO: exclude very large mesh like ground plane or terrain ?
-                // TODO: Only rendererable which cast shadow ?
-                if (renderable.castShadow) {
+                // FIXME exclude very large mesh like ground plane or terrain ?
+                // FIXME Only rendererable which cast shadow ?
+                if (object.isRenderable() && object.castShadow) {
                     camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
                 }
 
-                if (renderable.frustumCulling)  {
+                if (object.frustumCulling)  {
                     if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
-                        return false;
+                        return true;
                     }
 
-                    cullingMatrix._array = matrices.PROJECTION;
+                    cullingMatrix._array = projectionMat;
                     if (
                         cullingBoundingBox.max._array[2] > 0 &&
                         cullingBoundingBox.min._array[2] < 0
@@ -613,10 +653,10 @@ define(function(require) {
                         || max[1] < -1 || min[1] > 1
                         || max[2] < -1 || min[2] > 1
                     ) {
-                        return false;
+                        return true;
                     }   
                 }
-                return true;
+                return false;
             };
         })(),
 

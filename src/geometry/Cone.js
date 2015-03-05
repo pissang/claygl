@@ -39,7 +39,7 @@ define(function(require) {
         /**
          * @type {number}
          */
-        capSegments: 50,
+        capSegments: 20,
 
         /**
          * @type {number}
@@ -85,12 +85,12 @@ define(function(require) {
 
             // Build top cap
             positions.push(c1);
-            // TODO
+            // FIXME
             texcoords.push(vec2.fromValues(0, 1));
             var n = this.capSegments;
             for (var i = 0; i < n; i++) {
                 positions.push(topCap[i]);
-                // TODO
+                // FIXME
                 texcoords.push(vec2.fromValues(i / n, 0));
                 faces.push([0, i+1, (i+1) % n + 1]);
             }
@@ -101,7 +101,7 @@ define(function(require) {
             texcoords.push(vec2.fromValues(0, 1));
             for (var i = 0; i < n; i++) {
                 positions.push(bottomCap[i]);
-                // TODO
+                // FIXME
                 texcoords.push(vec2.fromValues(i / n, 0));
                 faces.push([offset, offset+((i+1) % n + 1), offset+i+1]);
             }
@@ -109,7 +109,7 @@ define(function(require) {
             // Build side
             offset = positions.length;
             var n2 = this.heightSegments;
-            for (var i =0; i < n; i++) {
+            for (var i = 0; i < n; i++) {
                 for (var j = 0; j < n2+1; j++) {
                     var v = j / n2;
                     positions.push(vec3.lerp(vec3.create(), topCap[i], bottomCap[i], v));

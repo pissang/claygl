@@ -126,8 +126,6 @@ define(function(require) {
 
             var _gl = renderer.gl;
 
-            mesh.material = this.material;
-
             if (frameBuffer) {
                 this.bind(renderer, frameBuffer);
                 // MRT Support in chrome
@@ -150,12 +148,20 @@ define(function(require) {
             // PENDING Transparent ?
             _gl.disable(_gl.BLEND);
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
-            renderer.renderQueue([mesh], camera);
+            this.renderQuad(renderer);
             this.trigger('afterrender', this, renderer);
 
             if (frameBuffer) {
                 this.unbind(renderer, frameBuffer);
             }
+        },
+
+        /**
+         * Simply do quad rendering
+         */
+        renderQuad: function (renderer) {
+            mesh.material = this.material;
+            renderer.renderQueue([mesh], camera);
         }
     });
 

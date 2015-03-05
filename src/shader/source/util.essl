@@ -16,7 +16,7 @@ float lightAttenuation(float dist, float range)
         attenuation = attenuation - att_s;
         attenuation /= 1.0 - att_s;
     }
-    return attenuation;
+    return clamp(attenuation, 0.0, 1.0);
 }
 
 @end

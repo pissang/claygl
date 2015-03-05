@@ -1,0 +1,104 @@
+@export buildin.deferred.gbuffer.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
+uniform mat4 world : WORLD;
+
+uniform vec2 uvRepeat;
+uniform vec2 uvOffset;
+
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 normal : NORMAL;
+attribute vec4 tangent : TANGENT;
+
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+#endif
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+
+#ifdef NORMALMAP_ENABLED
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+varying vec4 v_ProjPos;
+
+void main()
+{
+    
+    vec3 skinnedPosition = position;
+    vec3 skinnedNormal = normal;
+    vec3 skinnedTangent = tangent.xyz;
+    #ifdef SKINNING
+        
+        @import buildin.chunk.skin_matrix
+
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+        // Upper skinMatrix 
+        skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
+        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+    #endif
+
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
+    v_Texcoord = texcoord * uvRepeat + uvOffset;
+
+    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
+    
+    #ifdef NORMALMAP_ENABLED
+        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
+        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+    #endif
+
+    v_ProjPos = gl_Position;
+}
+
+
+@end
+
+
+@export buildin.deferred.gbuffer.fragment
+
+uniform sampler2D diffuseMap;
+uniform float glossiness;
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+
+#ifdef NORMALMAP_ENABLED
+uniform sampler2D normalMap;
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+varying vec4 v_ProjPos;
+
+void main()
+{
+    vec3 N = v_Normal;
+    #ifdef NORMALMAP_ENABLED
+        N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+        N = tbn * N;
+    #endif
+
+    // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
+    gl_FragColor.rg = (N.xy + 1.0) * 0.5;
+
+    // Depth
+    gl_FragColor.b = v_ProjPos.z / v_ProjPos.w;
+
+    gl_FragColor.a = glossiness;
+    #ifdef DIFFUSEMAP_ENABLED
+        // Ouptut glossiness to alpha channel
+        gl_FragColor.a *= texture2D(diffuseMap, v_Texcoord).a;
+    #endif
+
+}
+@end

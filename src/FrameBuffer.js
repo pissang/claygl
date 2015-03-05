@@ -26,7 +26,6 @@ define(function(require) {
 
         _width: 0,
         _height: 0,
-        _depthTextureAttached: false,
 
         _binded: false,
     }, function() {
@@ -66,7 +65,7 @@ define(function(require) {
 
             cache.put('viewport', renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height, 1);
-            if (! this._depthTextureAttached && this.depthBuffer) {
+            if (! cache.get('depthtexture_attached') && this.depthBuffer) {
                 // Create a new render buffer
                 if (cache.miss('renderbuffer')) {
                     cache.put('renderbuffer', _gl.createRenderbuffer());
@@ -174,7 +173,7 @@ define(function(require) {
                     return;
                 }
                 this._cache.put('renderbuffer_attached', false);
-                this._depthTextureAttached = true;
+                this._cache.put('depthtexture_attached', true);
             }
 
             this._attachedTextures[attachment] = texture;
@@ -200,7 +199,6 @@ define(function(require) {
             }
 
             // Clear cache for reusing
-            this._depthTextureAttached = false;
             this._attachedTextures = {};
             this._width = this._height = 0;
 

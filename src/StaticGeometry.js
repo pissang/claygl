@@ -508,10 +508,6 @@ define(function(require) {
 
         applyTransform: function(matrix) {
 
-            if (this.boundingBox) {
-                this.boundingBox.applyTransform(matrix);
-            }
-
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
             var tangents = this.attributes.tangent.value;
@@ -528,6 +524,10 @@ define(function(require) {
             }
             if (tangents) {
                 vec3.forEach(tangents, 4, 0, null, vec3.transformMat4, inverseTransposeMatrix);   
+            }
+
+            if (this.boundingBox) {
+                this.updateBoundingBox();
             }
         },
 

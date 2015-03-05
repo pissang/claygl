@@ -78,6 +78,10 @@ define(function(require) {
 		"request": require('qtek/core/request'),
 		"util": require('qtek/core/util')
 	},
+	"deferred": {
+		"Renderer": require('qtek/deferred/Renderer'),
+		"StandardMaterial": require('qtek/deferred/StandardMaterial')
+	},
 	"dep": {
 		"glmatrix": require('qtek/dep/glmatrix')
 	},

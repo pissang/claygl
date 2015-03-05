@@ -67,6 +67,9 @@ define(function(require) {
         if (this.shader) {
             this.attachShader(this.shader);
         }
+        if (! this.uniforms) {
+            this.uniforms = {};
+        }
     },
     /** @lends qtek.Material.prototype */
     {

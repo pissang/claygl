@@ -36,10 +36,10 @@ define(function(require) {
              */
             transparentQueue: [],
 
-            // Properties to save the light information in the scene
-            // Will be set in the render function
             lights: [],
             
+            // Properties to save the light information in the scene
+            // Will be set in the render function
             _lightUniforms: {},
 
             _lightNumber: {
@@ -131,7 +131,13 @@ define(function(require) {
         },
 
 
-        update: function(force) {
+        /**
+         * Scene update
+         * @param  {boolean} force
+         * @param  {boolean} notUpdateLights
+         *         Useful in deferred pipeline 
+         */
+        update: function(force, notUpdateLights) {
             if (!(this.autoUpdate || force)) {
                 return;
             }
@@ -151,14 +157,16 @@ define(function(require) {
             this.transparentQueue.length = this._transparentObjectCount;
 
             // reset
-            for (var type in this._lightNumber) {
-                this._lightNumber[type] = 0;
+            if (!notUpdateLights) {
+                for (var type in this._lightNumber) {
+                    this._lightNumber[type] = 0;
+                }
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    this._lightNumber[light.type]++;
+                }
+                this._updateLightUniforms();
             }
-            for (var i = 0; i < lights.length; i++) {
-                var light = lights[i];
-                this._lightNumber[light.type]++;
-            }
-            this._updateLightUniforms();
         },
 
         // Traverse the scene and add the renderable

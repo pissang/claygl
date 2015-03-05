@@ -773,10 +773,6 @@ define(function(require) {
         },
 
         applyTransform: function(matrix) {
-            
-            if (this.boundingBox) {
-                this.boundingBox.applyTransform(matrix);
-            }
 
             var positions = this.attributes.position.value;
             var normals = this.attributes.normal.value;
@@ -797,6 +793,10 @@ define(function(require) {
 
             for (var i = 0; i < tangents.length; i++) {
                 vec3.transformMat4(tangents[i], tangents[i], inverseTransposeMatrix);
+            }
+            
+            if (this.boundingBox) {
+                this.updateBoundingBox();
             }
         },
 

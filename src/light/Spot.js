@@ -86,7 +86,7 @@ define(function(require) {
                 value: function(instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
-                    return [color[0] * intensity, color[1] * intensity, color[1] * intensity];
+                    return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
                 }
             }
         },

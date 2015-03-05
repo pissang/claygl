@@ -1,0 +1,96 @@
+@export buildin.deferred.output.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 world: WORLD;
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+
+uniform vec2 uvRepeat;
+uniform vec2 uvOffset;
+
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+#endif
+
+varying vec2 v_Texcoord;
+
+varying vec4 v_ProjPos;
+
+varying vec3 v_WorldPos;
+
+void main()
+{
+
+    vec3 skinnedPosition = position;
+
+    #ifdef SKINNING
+        
+        @import buildin.chunk.skin_matrix
+
+        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    #endif
+
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
+    v_WorldPos = (world * vec4(skinnedPosition, 1.0)).xyz;
+
+    v_ProjPos = gl_Position;
+
+    v_Texcoord = texcoord * uvRepeat + uvOffset;
+}
+@end
+
+@export buildin.deferred.output.fragment
+
+uniform sampler2D diffuseMap;
+
+uniform sampler2D lightAccumTex;
+uniform sampler2D normalTex;
+
+uniform vec3 color;
+uniform vec3 specularColor;
+uniform vec3 emission;
+
+uniform vec3 eyePosition;
+
+varying vec2 v_Texcoord;
+varying vec3 v_WorldPos;
+varying vec4 v_ProjPos;
+
+const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
+
+// Fresnel
+vec3 F_Schlick(float ndv, vec3 spec) {
+    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);
+}
+
+void main()
+{
+    vec2 uv = (v_ProjPos.xy / v_ProjPos.w + 1.0) * 0.5;
+
+    vec3 V = normalize(eyePosition - v_WorldPos);
+
+    vec3 albedo = color;
+    #ifdef diffuseMap
+        albedo *= texture2D(diffuseMap, v_Texcoord);
+    #endif
+
+    vec4 diffSpec = texture2D(lightAccumTex, uv);
+    vec3 N;
+    vec2 tex = texture2D(normalTex, uv).rg;
+    N.xy = tex * 2.0 - 1.0;
+    N.z = sqrt(1.0 - dot(N.xy, N.xy));
+
+    vec3 diffTerm = diffSpec.rgb;
+    // PENDING
+    vec3 specTerm = diffTerm * diffSpec.a / (dot(LUM, diffTerm) + 0.1);
+    vec3 fresnelTerm = F_Schlick(clamp(dot(N, V), 0.0, 1.0), specularColor);
+
+    gl_FragColor.rgb = albedo * diffTerm + fresnelTerm * specTerm + emission;
+    gl_FragColor.a = 1.0;
+}
+@end
+
