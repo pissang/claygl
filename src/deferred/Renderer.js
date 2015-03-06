@@ -35,6 +35,8 @@ define(function (require) {
 
     Shader.import(require('text!../shader/source/prez.essl'));
 
+    var errorShader = {};
+
     var DeferredRenderer = Base.derive(function () {
 
         var gBufferShader = new Shader({
@@ -108,7 +110,9 @@ define(function (require) {
                 height: 0,
                 // FIXME Device not support float texture
                 // FIXME Half float seems has problem
-                type: Texture.FLOAT
+                type: Texture.FLOAT,
+                minFilter: Texture.NEAREST,
+                magFilter: Texture.NEAREST
             }),
 
             // _depthTex: new Texture2D({
@@ -120,7 +124,9 @@ define(function (require) {
 
             _lightAccumTex: new Texture2D({
                 // FIXME Device not support float texture
-                type: Texture.FLOAT
+                type: Texture.FLOAT,
+                minFilter: Texture.NEAREST,
+                magFilter: Texture.NEAREST
             }),
 
             _fullQuadPass: new FullQuadPass(),
@@ -398,7 +404,8 @@ define(function (require) {
                     Matrix4.multiply(worldViewProjection, camera.projectionMatrix, worldView);
 
                     var prezShader = preZMaterial.shader;
-                    prezShader.bind(gl);
+                    this._bindShader(renderer, prezShader);
+
                     var semanticInfo = prezShader.matrixSemantics.WORLDVIEWPROJECTION;
                     prezShader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
                     volumeMesh.render(gl, preZMaterial);
@@ -407,7 +414,8 @@ define(function (require) {
                     gl.colorMask(true, true, true, true);
                     gl.depthMask(false);
                     var shader = volumeMesh.material.shader;
-                    shader.bind(gl);
+                    this._bindShader(renderer, shader);
+
                     var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
                     shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
                     volumeMesh.material.bind(gl);
@@ -417,6 +425,23 @@ define(function (require) {
                 gl.depthFunc(gl.LESS);
             }
         })(),
+
+        _bindShader: function (renderer, shader) {
+            var errMsg = shader.bind(renderer.gl);
+            if (errMsg) {
+
+                if (errorShader[shader.__GUID__]) {
+                    return;
+                }
+                errorShader[shader.__GUID__] = true;
+
+                if (renderer.throwError) {
+                    throw new Error(errMsg);
+                } else {
+                    renderer.trigger('error', errMsg);
+                }
+            }
+        },
 
         _replaceGBufferMaterial: function (renderable) {
             if (renderable.material instanceof StandardMaterial) {
