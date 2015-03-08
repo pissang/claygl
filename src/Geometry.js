@@ -240,6 +240,13 @@ define(function(require) {
     /** @lends qtek.Geometry.prototype */
     {
         /**
+         * User defined ray picking algorithm instead of default 
+         * triangle ray intersection
+         * @type {Function}
+         */
+        pickByRay: null,
+
+        /**
          * Main attribute will be used to count vertex number
          * @type {string}
          */

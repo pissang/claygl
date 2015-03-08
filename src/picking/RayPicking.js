@@ -97,9 +97,18 @@ define(function(require) {
                 var geometry = renderable.geometry;
                 if (geometry.boundingBox) {
                     if (!ray.intersectBoundingBox(geometry.boundingBox)) {
-                        return false;
+                        return;
                     }
                 }
+                // Use user defined ray picking algorithm
+                if (geometry.pickByRay) {
+                    var intersection = geometry.pickByRay(ray);
+                    if (intersection) {
+                        out.push(intersection);
+                    }
+                    return;
+                }
+
                 var isStatic = geometry instanceof StaticGeometry;
                 var cullBack = (renderable.cullFace === glenum.BACK && renderable.frontFace === glenum.CCW)
                             || (renderable.cullFace === glenum.FRONT && renderable.frontFace === glenum.CW);
