@@ -222,7 +222,7 @@ define(function(require) {
 
         /**
          * Get WebGL extionsion
-         * @return {[type]} [description]
+         * @return {object}
          */
         getExtension: function (name) {
             return glinfo.getExtension(this.gl, name);
