@@ -2,6 +2,8 @@
 
 QTEK is a webgl graphic library.
 
+### [Download v0.2.1](https://github.com/pissang/qtek/archive/0.2.1.zip)
+
 ### [API](http://pissang.github.io/qtek/doc/api)
 
 ### [Playground](https://github.com/pissang/qtek-playground)
@@ -43,6 +45,7 @@ QTEK is a webgl graphic library.
 + [RGBE Decoder](http://pissang.github.io/qtek/tests/rgbedecoder.html)
 + [Skybox](http://pissang.github.io/qtek/tests/skybox.html)
 + [Draggable cubes](http://pissang.github.io/qtek/tests/picking.html)
++ [Deferred rendering](http://pissang.github.io/qtek/tests/deferred.html)
 
 ### Features 
 
@@ -69,6 +72,7 @@ QTEK is a webgl graphic library.
     + three.js model loader
     + glTF loader
 + Timeline based animation, support spline interpolation between keyframes.
++ Light-pre-pass deferred pipeline.
 
 ### FBX2GLTF Converter
 
