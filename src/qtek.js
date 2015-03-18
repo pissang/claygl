@@ -154,5 +154,7 @@ define(function(require) {
 	}
 };
 
+    exportsObject.version = '0.2.1';
+
     return exportsObject;
 });

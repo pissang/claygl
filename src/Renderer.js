@@ -757,11 +757,10 @@ define(function(require) {
             y = this.height - y;
 
             var viewport = this.viewport;
-            var dpr = this.devicePixelRatio;
             var arr = out._array;
-            arr[0] = (x - viewport.x) / (viewport.width);
+            arr[0] = (x - viewport.x) / viewport.width;
             arr[0] = arr[0] * 2 - 1;
-            arr[1] = (y - viewport.y) / (viewport.height);
+            arr[1] = (y - viewport.y) / viewport.height;
             arr[1] = arr[1] * 2 - 1;
 
             return out;

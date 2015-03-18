@@ -110,9 +110,13 @@ define(function(require) {
          * Enable control
          */
         enable: function() {
-            this.domElement.addEventListener('mousedown', this._mouseDown);
-            this.domElement.addEventListener('mousewheel', this._mouseWheel);
-            this.domElement.addEventListener('DOMMouseScroll', this._mouseWheel);
+            var domElement = this.domElement;
+            domElement.addEventListener('mousedown', this._mouseDown);
+            domElement.addEventListener('mousewheel', this._mouseWheel);
+            domElement.addEventListener('DOMMouseScroll', this._mouseWheel);
+
+            domElement.addEventListener('touchstart', this._mouseDown);
+
         },
 
         /**
@@ -122,6 +126,9 @@ define(function(require) {
             this.domElement.removeEventListener('mousedown', this._mouseDown);
             this.domElement.removeEventListener('mousewheel', this._mouseWheel);
             this.domElement.removeEventListener('DOMMouseScroll', this._mouseWheel);
+
+            this.domElement.removeEventListener('touchstart', this._mouseDown);
+
             this._mouseUp();
         },
 
@@ -137,6 +144,9 @@ define(function(require) {
             document.addEventListener('mousemove', this._mouseMove);
             document.addEventListener('mouseup', this._mouseUp);
             document.addEventListener('mouseout', this._mouseOut);
+
+            document.addEventListener('touchend', this._mouseUp);
+            document.addEventListener('touchmove', this._mouseMove);
 
             this._offsetX = e.pageX;
             this._offsetY = e.pageY;
@@ -177,6 +187,9 @@ define(function(require) {
             document.removeEventListener('mousemove', this._mouseMove);
             document.removeEventListener('mouseup', this._mouseUp);
             document.removeEventListener('mouseout', this._mouseOut);
+
+            document.removeEventListener('touchend', this._mouseUp);
+            document.removeEventListener('touchmove', this._mouseMove);
 
             this._op = -1;
         },
