@@ -12,7 +12,7 @@ define(function(require) {
      * @param {number} [opts.life]
      * @param {number} [opts.delay]
      * @param {number} [opts.gap]
-     * @param {number} [opts.playbackRatio]
+     * @param {number} [opts.playbackRate]
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
@@ -52,13 +52,13 @@ define(function(require) {
             this.gap = opts.gap;
         }
 
-        if (typeof(opts.playbackRatio) !== 'undefined') {
+        if (typeof(opts.playbackRate) !== 'undefined') {
             /**
              * @type {number}
              */
-            this.playbackRatio = opts.playbackRatio;
+            this.playbackRate = opts.playbackRate;
         } else {
-            this.playbackRatio = 1;
+            this.playbackRate = 1;
         }
 
         this._currentTime = new Date().getTime();
@@ -206,7 +206,7 @@ define(function(require) {
         },
 
         _elapse: function(time) {
-            this._elapsedTime += (time - this._currentTime) * this.playbackRatio;
+            this._elapsedTime += (time - this._currentTime) * this.playbackRate;
             this._currentTime = time;
         },
         
