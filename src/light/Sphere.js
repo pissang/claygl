@@ -1,15 +1,15 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
     var Light = require('../Light');
 
     /**
-     * @constructor qtek.light.Point
-     * @extends qtek.Light
+     * @constructor qtek.light.Sphere
+     * @extends {qtek.Light}
      */
-    var PointLight = Light.derive(
-    /** @lends qtek.light.Point# */
+    var SphereLight = Light.derive(
+    /** @lends qtek.light.Sphere# */
     {
         /**
          * @type {number}
@@ -19,25 +19,31 @@ define(function(require) {
         /**
          * @type {number}
          */
-        castShadow: false
+        radius: 5
     }, {
-
-        type: 'POINT_LIGHT',
+        
+        type: 'SPHERE_LIGHT',
 
         uniformTemplates: {
-            pointLightPosition: {
+            sphereLightPosition: {
                 type: '3f',
                 value: function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
-            pointLightRange: {
+            sphereLightRange: {
                 type: '1f',
                 value: function(instance) {
                     return instance.range;
                 }
             },
-            pointLightColor: {
+            sphereLightRadius: {
+                type: '1f',
+                value: function(instance) {
+                    return instance.radius;
+                }
+            },
+            sphereLightColor: {
                 type: '3f',
                 value: function(instance) {
                     var color = instance.color,
@@ -45,17 +51,8 @@ define(function(require) {
                     return [ color[0]*intensity, color[1]*intensity, color[2]*intensity ];
                 }
             }
-        },
-        /**
-         * @return {qtek.light.Point}
-         * @memberOf qtek.light.Point.prototype
-         */
-        clone: function() {
-            var light = Light.prototype.clone.call(this);
-            light.range = this.range;
-            return light;
         }
     });
 
-    return PointLight;
+    return SphereLight;
 });

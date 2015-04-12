@@ -15,7 +15,7 @@ define(function(require) {
         type: 'AMBIENT_LIGHT',
 
         uniformTemplates: {
-            'ambientLightColor': {
+            ambientLightColor: {
                 type: '3f',
                 value: function(instance) {
                     var color = instance.color,

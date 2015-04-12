@@ -25,11 +25,13 @@ define(function (require) {
     Shader.import(require('text!../shader/source/deferred/chunk.essl'));
 
     Shader.import(require('text!../shader/source/deferred/lightvolume.essl'));
+
     // Light shaders
     Shader.import(require('text!../shader/source/deferred/spot.essl'));
     Shader.import(require('text!../shader/source/deferred/directional.essl'));
     Shader.import(require('text!../shader/source/deferred/ambient.essl'));
     Shader.import(require('text!../shader/source/deferred/point.essl'));
+    Shader.import(require('text!../shader/source/deferred/sphere.essl'));
 
     Shader.import(require('text!../shader/source/deferred/output.essl'));
 
@@ -147,6 +149,10 @@ define(function (require) {
             _pointLightShader: new Shader({
                 vertex: lightVolumeVertex,
                 fragment: Shader.source('buildin.deferred.point_light')
+            }),
+            _sphereLightShader: new Shader({
+                vertex: lightVolumeVertex,
+                fragment: Shader.source('buildin.deferred.sphere_light')
             }),
 
             _createLightPassMat: createLightPassMat,
@@ -283,6 +289,12 @@ define(function (require) {
                             material.setUniform('penumbraAngleCosine', uTpl.spotLightPenumbraAngleCosine.value(light));
                             material.setUniform('falloffFactor', uTpl.spotLightFalloffFactor.value(light));
                             break;
+                        case 'SPHERE_LIGHT':
+                            material.setUniform('lightColor', uTpl.sphereLightColor.value(light));
+                            material.setUniform('lightRange', uTpl.sphereLightRange.value(light));
+                            material.setUniform('lightRadius', uTpl.sphereLightRadius.value(light));
+                            material.setUniform('lightPosition', uTpl.sphereLightPosition.value(light));
+                            break;
                     }
 
                     volumeMeshList.push(volumeMesh);
@@ -331,9 +343,11 @@ define(function (require) {
                     // Only local light (point and spot) needs volume mesh.
                     // Directional and ambient light renders in full quad
                     case 'POINT_LIGHT':
+                    case 'SPHERE_LIGHT':
                         // Volume mesh created automatically
+                        var shader = light.type === 'SPHERE_LIGHT' ? this._sphereLightShader : this._pointLightShader;
                         light.__volumeMesh = light.__volumeMesh || new Mesh({
-                            material: this._createLightPassMat(this._pointLightShader),
+                            material: this._createLightPassMat(shader),
                             geometry: this._lightSphereGeo,
                             // Disable culling
                             // if light volume mesh intersect camera near plane
@@ -341,7 +355,7 @@ define(function (require) {
                             culling: false
                         });
                         volumeMesh = light.__volumeMesh;
-                        var r = light.range;
+                        var r = light.range + (light.radius || 0);
                         volumeMesh.scale.set(r, r, r);
                         break;
                     case 'SPOT_LIGHT':
@@ -398,7 +412,7 @@ define(function (require) {
                     // Use prez to avoid one pixel rendered twice
                     gl.colorMask(false, false, false, false);
                     gl.depthMask(true);
-
+                    // depthMask must be enabled before clear DEPTH_BUFFER
                     gl.clear(gl.DEPTH_BUFFER_BIT);
 
                     Matrix4.multiply(worldViewProjection, camera.projectionMatrix, worldView);

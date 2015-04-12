@@ -96,6 +96,7 @@ define(function(require) {
 		"Ambient": require('qtek/light/Ambient'),
 		"Directional": require('qtek/light/Directional'),
 		"Point": require('qtek/light/Point'),
+		"Sphere": require('qtek/light/Sphere'),
 		"Spot": require('qtek/light/Spot')
 	},
 	"loader": {

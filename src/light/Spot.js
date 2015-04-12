@@ -41,37 +41,37 @@ define(function(require) {
         type: 'SPOT_LIGHT',
 
         uniformTemplates: {
-            'spotLightPosition': {
+            spotLightPosition: {
                 type: '3f',
                 value: function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
-            'spotLightRange': {
+            spotLightRange: {
                 type: '1f',
                 value: function(instance) {
                     return instance.range;
                 }
             },
-            'spotLightUmbraAngleCosine': {
+            spotLightUmbraAngleCosine: {
                 type: '1f',
                 value: function(instance) {
                     return Math.cos(instance.umbraAngle * Math.PI / 180);
                 }
             },
-            'spotLightPenumbraAngleCosine': {
+            spotLightPenumbraAngleCosine: {
                 type: '1f',
                 value: function(instance) {
                     return Math.cos(instance.penumbraAngle * Math.PI / 180);
                 }
             },
-            'spotLightFalloffFactor': {
+            spotLightFalloffFactor: {
                 type: '1f',
                 value: function(instance) {
                     return instance.falloffFactor;
                 }
             },
-            'spotLightDirection': {
+            spotLightDirection: {
                 type: '3f',
                 value: (function() {
                     var z = new Vector3();
@@ -81,7 +81,7 @@ define(function(require) {
                     };
                 })()
             },
-            'spotLightColor': {
+            spotLightColor: {
                 type: '3f',
                 value: function(instance) {
                     var color = instance.color;

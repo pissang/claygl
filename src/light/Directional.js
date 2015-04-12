@@ -34,7 +34,7 @@ define(function(require) {
         type: 'DIRECTIONAL_LIGHT',
 
         uniformTemplates: {
-            'directionalLightDirection': {
+            directionalLightDirection: {
                 type: '3f',
                 value: (function() {
                     var z = new Vector3();
@@ -43,7 +43,7 @@ define(function(require) {
                     };
                 })()
             },
-            'directionalLightColor': {
+            directionalLightColor: {
                 type: '3f',
                 value: function(instance) {
                     var color = instance.color;
