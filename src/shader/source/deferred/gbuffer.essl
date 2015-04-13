@@ -103,6 +103,5 @@ void main()
     // Ouptut glossiness to alpha channel
     gl_FragColor.a *= texture2D(diffuseMap, v_Texcoord).a;
 #endif
-
 }
 @end

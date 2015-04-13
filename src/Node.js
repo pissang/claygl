@@ -50,7 +50,7 @@ define(function(require) {
 
         /**
          * Affine transform matrix relative to its parent node.
-         * Composite with position, rotation and scale.
+         * Composited with position, rotation and scale.
          * @type {qtek.math.Matrix4}
          */
         localTransform: null,
@@ -232,7 +232,7 @@ define(function(require) {
         },
 
         /**
-         * Get first child have the given name
+         * Get first child with the given name
          * @param {string} name
          * @return {qtek.Node}
          */

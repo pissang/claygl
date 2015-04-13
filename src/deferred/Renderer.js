@@ -497,6 +497,7 @@ define(function (require) {
                 }
 
                 gBufferMat.set('uvOffset', standardMat.uvOffset);
+                gBufferMat.set('uvRepeat', standardMat.uvRepeat);
                 gBufferMat.setUniform('glossiness', standardMat.glossiness);
 
                 renderable.material = gBufferMat;
