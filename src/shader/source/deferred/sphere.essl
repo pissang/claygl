@@ -24,19 +24,14 @@ void main()
     vec3 V = normalize(eyePosition - position);
 
     float dist = length(L);
-
+    // Light pos fix
     vec3 R = reflect(V, N);
     float tmp = dot(L, R);
     vec3 cToR = tmp * R - L;
     float d = length(cToR);
     L = L + cToR * clamp(lightRadius / d, 0.0, 1.0);
 
-    // float dist = length(L);
     L = normalize(L);
-
-    // d = clamp(d, 0.0, lightRadius);
-    // dist -= sqrt(lightRadius * lightRadius - d * d);
-    // dist = clamp(dist, 0.0, lightRange);
 
     vec3 H = normalize(L + V);
 
@@ -49,9 +44,11 @@ void main()
     {
         discard;
     }
-    // // Specular luminance
+
+    // Specular fix
+    glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);
+
+    // Specular luminance
     gl_FragColor.a = dot(LUM, gl_FragColor.rgb * D_Phong(glossiness, ndh));
-    // gl_FragColor.rgb = vec3(attenuation);
-    // gl_FragColor.a = 1.0;
 }
 @end
