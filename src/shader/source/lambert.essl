@@ -35,14 +35,14 @@ void main()
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
 
-    #ifdef SKINNING
-        
-        @import buildin.chunk.skin_matrix
+#ifdef SKINNING
+    
+    @import buildin.chunk.skin_matrix
 
-        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-        // Upper 3x3 of skinMatrix is orthogonal
-        skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
-    #endif
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    // Upper 3x3 of skinMatrix is orthogonal
+    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
+#endif
 
     gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );
 
@@ -97,148 +97,146 @@ varying vec3 v_Barycentric;
 
 void main()
 {
-    #ifdef RENDER_NORMAL
-        gl_FragColor = vec4(v_Normal, 1.0);
-        return;
-    #endif
-    #ifdef RENDER_TEXCOORD
-        gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
-        return;
-    #endif
+#ifdef RENDER_NORMAL
+    gl_FragColor = vec4(v_Normal, 1.0);
+    return;
+#endif
+#ifdef RENDER_TEXCOORD
+    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
+    return;
+#endif
 
     gl_FragColor = vec4(color, alpha);
 
-    #ifdef DIFFUSEMAP_ENABLED
-        vec4 tex = texture2D( diffuseMap, v_Texcoord );
-        #ifdef SRGB_DECODE
-            tex.rgb = pow(tex.rgb, vec3(2.2));
-        #endif
-        gl_FragColor.rgb *= tex.rgb;
-        #ifdef DIFFUSEMAP_ALPHA_ALPHA
-            gl_FragColor.a *= tex.a;
-        #endif
-    #endif
+#ifdef DIFFUSEMAP_ENABLED
+    vec4 tex = texture2D( diffuseMap, v_Texcoord );
+#ifdef SRGB_DECODE
+    tex.rgb = pow(tex.rgb, vec3(2.2));
+#endif
+    gl_FragColor.rgb *= tex.rgb;
+#ifdef DIFFUSEMAP_ALPHA_ALPHA
+    gl_FragColor.a *= tex.a;
+#endif
+#endif
 
     vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
     
-    #ifdef AMBIENT_LIGHT_NUMBER
-        for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+#ifdef AMBIENT_LIGHT_NUMBER
+    for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+    {
+        diffuseColor += ambientLightColor[i];
+    }
+#endif
+// Compute point light color
+#ifdef POINT_LIGHT_NUMBER
+#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+    float shadowContribsPoint[POINT_LIGHT_NUMBER];
+    if( shadowEnabled )
+    {
+        computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);
+    }
+#endif
+    for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+    {
+
+        vec3 lightPosition = pointLightPosition[i];
+        vec3 lightColor = pointLightColor[i];
+        float range = pointLightRange[i];
+
+        vec3 lightDirection = lightPosition - v_WorldPosition;
+
+        // Calculate point light attenuation
+        float dist = length(lightDirection);
+        float attenuation = lightAttenuation(dist, range);
+
+        // Normalize vectors
+        lightDirection /= dist;
+
+        float ndl = dot( v_Normal, lightDirection );
+
+        float shadowContrib = 1.0;
+#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+        if( shadowEnabled )
         {
-            diffuseColor += ambientLightColor[i];
+            shadowContrib = shadowContribsPoint[i];
         }
-    #endif
-    // Compute point light color
-    #ifdef POINT_LIGHT_NUMBER
-        #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-            float shadowContribs[POINT_LIGHT_NUMBER];
-            if( shadowEnabled )
-            {
-                computeShadowOfPointLights( v_WorldPosition, shadowContribs );
-            }
-        #endif
-        for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+#endif
+
+        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;
+    }
+#endif
+#ifdef DIRECTIONAL_LIGHT_NUMBER
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+    float shadowContribsDir[DIRECTIONAL_LIGHT_NUMBER];
+    if(shadowEnabled)
+    {
+        computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);
+    }
+#endif
+    for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
+    {
+        vec3 lightDirection = -directionalLightDirection[i];
+        vec3 lightColor = directionalLightColor[i];
+        
+        float ndl = dot(v_Normal, normalize(lightDirection));
+
+        float shadowContrib = 1.0;
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+        if( shadowEnabled )
         {
-
-            vec3 lightPosition = pointLightPosition[i];
-            vec3 lightColor = pointLightColor[i];
-            float range = pointLightRange[i];
-
-            vec3 lightDirection = lightPosition - v_WorldPosition;
-
-            // Calculate point light attenuation
-            float dist = length(lightDirection);
-            float attenuation = lightAttenuation(dist, range);
-
-            // Normalize vectors
-            lightDirection /= dist;
-
-            float ndl = dot( v_Normal, lightDirection );
-
-            float shadowContrib = 1.0;
-            #if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled )
-                {
-                    shadowContrib = shadowContribs[i];
-                }
-            #endif
-
-            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;
+            shadowContrib = shadowContribsDir[i];
         }
-    #endif
-    #ifdef DIRECTIONAL_LIGHT_NUMBER
-        #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-            float shadowContribs[DIRECTIONAL_LIGHT_NUMBER];
-            if(shadowEnabled)
-            {
-                computeShadowOfDirectionalLights( v_WorldPosition, shadowContribs );
-            }
-        #endif
-        for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
-        {
-            vec3 lightDirection = -directionalLightDirection[i];
-            vec3 lightColor = directionalLightColor[i];
-            
-            float ndl = dot( v_Normal, normalize( lightDirection ) );
+#endif
 
-            float shadowContrib = 1.0;
-            #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled )
-                {
-                    shadowContrib = shadowContribs[i];
-                }
-            #endif
-
-            diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;
-        }
-    #endif
+        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;
+    }
+#endif
     
-    #ifdef SPOT_LIGHT_NUMBER
-        #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-            float shadowContribs[SPOT_LIGHT_NUMBER];
-            if( shadowEnabled )
-            {
-                computeShadowOfSpotLights( v_WorldPosition, shadowContribs );
-            }
-        #endif
-        for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+#ifdef SPOT_LIGHT_NUMBER
+#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+    float shadowContribsSpot[SPOT_LIGHT_NUMBER];
+    if(shadowEnabled)
+    {
+        computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);
+    }
+#endif
+    for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+    {
+        vec3 lightPosition = -spotLightPosition[i];
+        vec3 spotLightDirection = -normalize( spotLightDirection[i] );
+        vec3 lightColor = spotLightColor[i];
+        float range = spotLightRange[i];
+        float a = spotLightUmbraAngleCosine[i];
+        float b = spotLightPenumbraAngleCosine[i];
+        float falloffFactor = spotLightFalloffFactor[i];
+
+        vec3 lightDirection = lightPosition - v_WorldPosition;
+        // Calculate attenuation
+        float dist = length(lightDirection);
+        float attenuation = lightAttenuation(dist, range); 
+
+        // Normalize light direction
+        lightDirection /= dist;
+        // Calculate spot light fall off
+        float c = dot(spotLightDirection, lightDirection);
+
+        float falloff;
+        falloff = clamp((c - a) /( b - a), 0.0, 1.0);
+        falloff = pow(falloff, falloffFactor);
+
+        float ndl = dot(v_Normal, lightDirection);
+        ndl = clamp(ndl, 0.0, 1.0);
+
+        float shadowContrib = 1.0;
+#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+        if( shadowEnabled )
         {
-            vec3 lightPosition = -spotLightPosition[i];
-            vec3 spotLightDirection = -normalize( spotLightDirection[i] );
-            vec3 lightColor = spotLightColor[i];
-            float range = spotLightRange[i];
-            float a = spotLightUmbraAngleCosine[i];
-            float b = spotLightPenumbraAngleCosine[i];
-            float falloffFactor = spotLightFalloffFactor[i];
-
-            vec3 lightDirection = lightPosition - v_WorldPosition;
-            // Calculate attenuation
-            float dist = length(lightDirection);
-            float attenuation = lightAttenuation(dist, range); 
-
-            // Normalize light direction
-            lightDirection /= dist;
-            // Calculate spot light fall off
-            float c = dot(spotLightDirection, lightDirection);
-
-            float falloff;
-            falloff = clamp((c - a) /( b - a), 0.0, 1.0);
-            falloff = pow(falloff, falloffFactor);
-
-            float ndl = dot(v_Normal, lightDirection);
-            ndl = clamp(ndl, 0.0, 1.0);
-
-            float shadowContrib = 1.0;
-            #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-                if( shadowEnabled )
-                {
-                    shadowContrib = shadowContribs[i];
-                }
-            #endif
-
-            diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
-
+            shadowContrib = shadowContribsSpot[i];
         }
-    #endif
+#endif
+        diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;
+    }
+#endif
 
     gl_FragColor.rgb *= diffuseColor;
     gl_FragColor.rgb += emission;

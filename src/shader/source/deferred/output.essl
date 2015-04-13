@@ -26,12 +26,12 @@ void main()
 
     vec3 skinnedPosition = position;
 
-    #ifdef SKINNING
-        
-        @import buildin.chunk.skin_matrix
+#ifdef SKINNING
+    
+    @import buildin.chunk.skin_matrix
 
-        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-    #endif
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 
@@ -74,9 +74,9 @@ void main()
     vec3 V = normalize(eyePosition - v_WorldPos);
 
     vec3 albedo = color;
-    #ifdef diffuseMap
-        albedo *= texture2D(diffuseMap, v_Texcoord);
-    #endif
+#ifdef diffuseMap
+    albedo *= texture2D(diffuseMap, v_Texcoord);
+#endif
 
     vec4 diffSpec = texture2D(lightAccumTex, uv);
     vec3 N;
@@ -86,7 +86,7 @@ void main()
 
     vec3 diffTerm = diffSpec.rgb;
     // PENDING
-    vec3 specTerm = diffTerm * diffSpec.a / (dot(LUM, diffTerm) + 0.1);
+    vec3 specTerm = diffTerm * diffSpec.a / (dot(LUM, diffTerm) + 0.001);
     vec3 fresnelTerm = F_Schlick(clamp(dot(N, V), 0.0, 1.0), specularColor);
 
     gl_FragColor.rgb = albedo * diffTerm + fresnelTerm * specTerm + emission;

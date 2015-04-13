@@ -70,7 +70,7 @@ define(function (require) {
 
         this.emission = this.emission || [0, 0, 0];
             
-        this.specularColor = this.specularColor || [0.5, 0.5, 0.5];
+        this.specularColor = this.specularColor || [0.1, 0.1, 0.1];
 
         this.uvRepeat = this.uvRepeat || [1, 1];
         this.uvOffset = this.uvOffset || [0, 0];

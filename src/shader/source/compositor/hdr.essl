@@ -14,15 +14,15 @@ const vec3 lumWeight = vec3(0.2125, 0.7154, 0.0721);
 
 void main()
 {
-    #ifdef TEXTURE_ENABLED
-        #ifdef RGBM_DECODE
-            vec3 tex = RGBMDecode(texture2D(texture, v_Texcoord));
-        #else
-            vec3 tex = texture2D(texture, v_Texcoord).rgb;
-        #endif
-    #else
-        vec3 tex = vec3(0.0);
-    #endif
+#ifdef TEXTURE_ENABLED
+#ifdef RGBM_DECODE
+    vec3 tex = RGBMDecode(texture2D(texture, v_Texcoord));
+#else
+    vec3 tex = texture2D(texture, v_Texcoord).rgb;
+#endif
+#else
+    vec3 tex = vec3(0.0);
+#endif
 
     float lum = dot(tex, lumWeight);
     if (lum > threshold)
@@ -35,9 +35,9 @@ void main()
     }
     gl_FragColor.a = 1.0;
 
-    #ifdef RGBM_ENCODE
-        gl_FragColor.rgba = RGBMEncode(gl_FragColor.rgb);
-    #endif
+#ifdef RGBM_ENCODE
+    gl_FragColor.rgba = RGBMEncode(gl_FragColor.rgb);
+#endif
 }
 @end
 
@@ -120,29 +120,29 @@ void main()
 {
     vec3 tex = vec3(0.0);
     float a = 1.0;
-    #ifdef TEXTURE_ENABLED
-        vec4 res = texture2D(texture, v_Texcoord);
-        a = res.a;
-        tex = res.rgb;
-    #endif
+#ifdef TEXTURE_ENABLED
+    vec4 res = texture2D(texture, v_Texcoord);
+    a = res.a;
+    tex = res.rgb;
+#endif
 
-    #ifdef BLOOM_ENABLED
-        tex += texture2D(bloom, v_Texcoord).rgb * 0.25;
-    #endif
+#ifdef BLOOM_ENABLED
+    tex += texture2D(bloom, v_Texcoord).rgb * 0.25;
+#endif
 
-    #ifdef LENSFLARE_ENABLED
-        tex += texture2D(lensflare, v_Texcoord).rgb;
-    #endif
+#ifdef LENSFLARE_ENABLED
+    tex += texture2D(lensflare, v_Texcoord).rgb;
+#endif
 
-    // Adjust exposure
-    // From KlayGE
-    #ifdef LUM_ENABLED
-        float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
-        float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
-        float exposureBias = adaptedLumDest * exposure;
-    #else
-        float exposureBias = exposure;
-    #endif
+// Adjust exposure
+// From KlayGE
+#ifdef LUM_ENABLED
+    float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
+    float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
+    float exposureBias = adaptedLumDest * exposure;
+#else
+    float exposureBias = exposure;
+#endif
     tex *= exposureBias;
 
     // Do tone mapping
@@ -150,11 +150,11 @@ void main()
     color = pow(color, vec3(1.0/2.2));
     // vec3 color = filmicToneMap(tex);
 
-    #ifdef RGBM_ENCODE
-        gl_FragColor.rgba = RGBMEncode(color);
-    #else
-        gl_FragColor = vec4(color, a);
-    #endif
+#ifdef RGBM_ENCODE
+    gl_FragColor.rgba = RGBMEncode(color);
+#else
+    gl_FragColor = vec4(color, a);
+#endif
 }
 
 @end

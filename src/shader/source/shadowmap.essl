@@ -1,4 +1,3 @@
-
 @export buildin.sm.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
@@ -26,19 +25,19 @@ void main(){
     
     vec3 skinnedPosition = position;
     
-    #ifdef SKINNING
+#ifdef SKINNING
 
-        @import buildin.chunk.skin_matrix
+    @import buildin.chunk.skin_matrix
 
-        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-    #endif
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
 
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
     gl_Position = v_ViewPosition;
 
-    #ifdef SHADOW_TRANSPARENT
-        v_Texcoord = texcoord;
-    #endif
+#ifdef SHADOW_TRANSPARENT
+    v_Texcoord = texcoord;
+#endif
 }
 @end
 
@@ -67,33 +66,33 @@ void main(){
     float depth = v_ViewPosition.z / v_ViewPosition.w;
     // float depth = gl_FragCoord.z / gl_FragCoord.w;
 
-    #ifdef USE_VSM
-        depth = depth * 0.5 + 0.5;
-        float moment1 = depth;
-        float moment2 = depth * depth;
+#ifdef USE_VSM
+    depth = depth * 0.5 + 0.5;
+    float moment1 = depth;
+    float moment2 = depth * depth;
 
-        // Adjusting moments using partial derivative
-        float dx = dFdx(depth);
-        float dy = dFdy(depth);
-        moment2 += 0.25*(dx*dx+dy*dy);
+    // Adjusting moments using partial derivative
+    float dx = dFdx(depth);
+    float dy = dFdy(depth);
+    moment2 += 0.25*(dx*dx+dy*dy);
 
-        gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
-    #else
-        // Add slope scaled bias using partial derivative
-        float dx = dFdx(depth);
-        float dy = dFdy(depth);
-        depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
+    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
+#else
+    // Add slope scaled bias using partial derivative
+    float dx = dFdx(depth);
+    float dy = dFdy(depth);
+    depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
 
-        #ifdef SHADOW_TRANSPARENT
-            if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {
-                // Hi-Z
-                gl_FragColor = encodeFloat(0.9999);
-                return;
-            }
-        #endif
+#ifdef SHADOW_TRANSPARENT
+    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {
+        // Hi-Z
+        gl_FragColor = encodeFloat(0.9999);
+        return;
+    }
+#endif
 
-        gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
-    #endif
+    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
+#endif
 }
 @end
 
@@ -106,12 +105,12 @@ varying vec2 v_Texcoord;
 
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
-    #ifdef USE_VSM
-        gl_FragColor = vec4(tex.rgb, 1.0);
-    #else
-        float depth = decodeFloat(tex);
-        gl_FragColor = vec4(depth, depth, depth, 1.0);
-    #endif
+#ifdef USE_VSM
+    gl_FragColor = vec4(tex.rgb, 1.0);
+#else
+    float depth = decodeFloat(tex);
+    gl_FragColor = vec4(depth, depth, depth, 1.0);
+#endif
 }
 
 @end
@@ -136,11 +135,11 @@ varying vec3 v_WorldPosition;
 void main (){
 
     vec3 skinnedPosition = position;
-    #ifdef SKINNING
-        @import buildin.chunk.skin_matrix
+#ifdef SKINNING
+    @import buildin.chunk.skin_matrix
 
-        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-    #endif
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);
     v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
@@ -159,12 +158,12 @@ varying vec3 v_WorldPosition;
 
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
-    #ifdef USE_VSM
-        gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
-    #else
-        dist = dist / range;
-        gl_FragColor = encodeFloat(dist);
-    #endif
+#ifdef USE_VSM
+    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
+#else
+    dist = dist / range;
+    gl_FragColor = encodeFloat(dist);
+#endif
 }
 @end
 
@@ -266,23 +265,23 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
     vec4 shadowTex = textureCube(map, direction);
     float dist = length(direction);
 
-    #ifdef USE_VSM
-        vec2 moments = shadowTex.xy;
-        float variance = moments.y - moments.x * moments.x;
-        float mD = moments.x - dist;
-        float p = variance / (variance + mD * mD);
-        if(moments.x + 0.001 < dist){
-            return clamp(p, 0.0, 1.0);
-        }else{
-            return 1.0;
-        }
-    #else
-        if((decodeFloat(shadowTex) + 0.0002) * range < dist){
-            return 0.0;
-        }else{
-            return 1.0;
-        }
-    #endif
+#ifdef USE_VSM
+    vec2 moments = shadowTex.xy;
+    float variance = moments.y - moments.x * moments.x;
+    float mD = moments.x - dist;
+    float p = variance / (variance + mD * mD);
+    if(moments.x + 0.001 < dist){
+        return clamp(p, 0.0, 1.0);
+    }else{
+        return 1.0;
+    }
+#else
+    if((decodeFloat(shadowTex) + 0.0002) * range < dist){
+        return 0.0;
+    }else{
+        return 1.0;
+    }
+#endif
 }
 #endif
 

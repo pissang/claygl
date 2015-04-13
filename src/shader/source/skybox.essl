@@ -29,9 +29,9 @@ void main()
 
     vec3 tex = textureCube(environmentMap, viewDirection).xyz;
 
-    #ifdef SRGB_DECODE
-        tex.rgb = pow(tex.rgb, vec3(2.2));
-    #endif
+#ifdef SRGB_DECODE
+    tex.rgb = pow(tex.rgb, vec3(2.2));
+#endif
     
     gl_FragColor = vec4(tex, 1.0);
 }

@@ -7,15 +7,12 @@ uniform float attenuationFactor : 5.0;
 float lightAttenuation(float dist, float range)
 {
     float attenuation = 1.0;
-    if( range > 0.0)
-    {
-        attenuation = dist*dist/(range*range);
-        float att_s = attenuationFactor;
-        attenuation = 1.0/(attenuation*att_s+1.0);
-        att_s = 1.0/(att_s+1.0);
-        attenuation = attenuation - att_s;
-        attenuation /= 1.0 - att_s;
-    }
+    attenuation = dist*dist/(range*range+1.0);
+    float att_s = attenuationFactor;
+    attenuation = 1.0/(attenuation*att_s+1.0);
+    att_s = 1.0/(att_s+1.0);
+    attenuation = attenuation - att_s;
+    attenuation /= 1.0 - att_s;
     return clamp(attenuation, 0.0, 1.0);
 }
 
@@ -56,25 +53,6 @@ float decodeFloat(const in vec4 colour)
     return dot(colour, bitShifts);
 }
 @end
-
-// http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
-@export buildin.util.rgbm_decode
-vec3 RGBMDecode(vec4 rgbm, float range) {
-  return range * rgbm.rgb * rgbm.a;
-}
-@end
-
-@export buildin.util.rgbm_encode
-vec4 RGBMEncode(vec3 color, float range) {
-    vec4 rgbm;
-    color *= 1.0 / range;
-    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);
-    rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
-    rgbm.rgb = color / rgbm.a;
-    return rgbm;
-}
-@end
-
 
 @export buildin.chunk.skin_matrix
 

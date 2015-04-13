@@ -17,12 +17,12 @@ void main()
 
     vec3 skinnedPosition = position;
 
-    #ifdef SKINNING
-        
-        @import buildin.chunk.skin_matrix
-        
-        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-    #endif
+#ifdef SKINNING
+    
+    @import buildin.chunk.skin_matrix
+    
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
     
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 }

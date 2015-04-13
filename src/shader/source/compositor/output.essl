@@ -12,11 +12,11 @@ void main()
 
     gl_FragColor.rgb = tex.rgb;
 
-    #ifdef OUTPUT_ALPHA
-        gl_FragColor.a = tex.a;
-    #else
-        gl_FragColor.a = 1.0;
-    #endif
+#ifdef OUTPUT_ALPHA
+    gl_FragColor.a = tex.a;
+#else
+    gl_FragColor.a = 1.0;
+#endif
 
 }
 
