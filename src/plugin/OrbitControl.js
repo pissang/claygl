@@ -206,7 +206,8 @@ define(function(require) {
             var target = this.target;
             var zAxis = target.localTransform.z.normalize();
             var yAxis = target.localTransform.y.normalize();
-            if (this._op === 0 && this._offsetPitch !== 0 && this._offsetRoll !== 0) {
+
+            if (this._op === 0 && (this._offsetPitch !== 0 || this._offsetRoll !== 0)) {
                 // Rotate
                 target.rotateAround(this.origin, this.up, -this._offsetPitch);
                 var xAxis = target.localTransform.x;
