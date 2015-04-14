@@ -1,0 +1,63 @@
+@export buildin.deferred.tube_light
+
+@import buildin.deferred.chunk.light_head
+
+@import buildin.util.calculate_attenuation
+
+@import buildin.deferred.chunk.light_equation
+
+uniform vec3 lightPosition;
+uniform vec3 lightColor;
+uniform float lightRange;
+uniform vec3 lightExtend;
+
+uniform vec3 eyePosition;
+
+varying vec3 v_Position;
+
+void main()
+{
+    @import buildin.deferred.chunk.gbuffer_read
+
+    vec3 L = lightPosition - position;
+
+    vec3 V = normalize(eyePosition - position);
+
+    // Light pos and irradiance fix
+    vec3 R = reflect(V, N);
+
+    vec3 L0 = lightPosition - lightExtend - position;
+    vec3 L1 = lightPosition + lightExtend - position;
+    vec3 LD = L1 - L0;
+
+    float len0 = length(L0);
+    float len1 = length(L1);
+    float irra = 2.0 * clamp(dot(N, L0) / (2.0 * len0) + dot(N, L1) / (2.0 * len1), 0.0, 1.0);
+
+    float LDDotR = dot(R, LD);
+    float t = (LDDotR * dot(R, L0) - dot(L0, LD)) / (dot(LD, LD) - LDDotR * LDDotR);
+    t = clamp(t, 0.0, 1.0);
+    L = L0 + t * LD;
+    // FIXME attenuation integration
+    float dist = length(L);
+    L /= dist;
+
+    vec3 H = normalize(L + V);
+
+    float ndh = clamp(dot(N, H), 0.0, 1.0);
+
+    // Diffuse term
+
+    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange);
+    if (dot(gl_FragColor.rgb, vec3(1.0)) == 0.0) // Reduce blending
+    {
+        discard;
+    }
+
+    // Specular fix
+    // glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);
+
+    // Specular luminance
+    gl_FragColor.a = dot(LUM, gl_FragColor.rgb * D_Phong(glossiness, ndh));
+}
+@end

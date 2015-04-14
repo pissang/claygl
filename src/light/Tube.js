@@ -1,16 +1,17 @@
 define(function (require) {
-
+    
     'use strict';
 
     var Light = require('../Light');
+    var Vector3 = require('../math/Vector3');
 
     /**
-     * @constructor qtek.light.Sphere
+     * @constructor qtek.light.Tube
      * @extends {qtek.Light}
      */
-    var SphereLight = Light.derive(
-    /** @lends qtek.light.Sphere# */
-    {
+    var TubeLight = Light.derive(
+    /** @lends qtek.light.Tube# */
+    {   
         /**
          * @type {number}
          */
@@ -19,31 +20,39 @@ define(function (require) {
         /**
          * @type {number}
          */
-        radius: 5
+        length: 10
     }, {
-        
-        type: 'SPHERE_LIGHT',
+
+        type: 'TUBE_LIGHT',
 
         uniformTemplates: {
-            sphereLightPosition: {
+            tubeLightPosition: {
                 type: '3f',
                 value: function(instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
-            sphereLightRange: {
+
+            tubeLightExtend: {
+                type: '3f',
+                value: (function() {
+                    var x = new Vector3();
+                    return function(instance) {
+                        // Extend in x axis
+                        return x.copy(instance.worldTransform.x)
+                            .normalize().scale(instance.length / 2)._array;
+                    };
+                })()
+            },
+
+            tubeLightRange: {
                 type: '1f',
                 value: function(instance) {
                     return instance.range;
                 }
             },
-            sphereLightRadius: {
-                type: '1f',
-                value: function(instance) {
-                    return instance.radius;
-                }
-            },
-            sphereLightColor: {
+
+            tubeLightColor: {
                 type: '3f',
                 value: function(instance) {
                     var color = instance.color;
@@ -54,5 +63,5 @@ define(function (require) {
         }
     });
 
-    return SphereLight;
+    return TubeLight;
 });

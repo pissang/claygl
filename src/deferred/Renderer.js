@@ -16,6 +16,7 @@ define(function (require) {
     var Mesh = require('../Mesh');
     var SphereGeo = require('../geometry/Sphere');
     var ConeGeo = require('../geometry/Cone');
+    var CylinderGeo = require('../geometry/Cylinder');
     var Matrix4 = require('../math/Matrix4');
     var Vector3 = require('../math/Vector3');
     var ForwardRenderer = require('../Renderer');
@@ -32,6 +33,7 @@ define(function (require) {
     Shader.import(require('text!../shader/source/deferred/ambient.essl'));
     Shader.import(require('text!../shader/source/deferred/point.essl'));
     Shader.import(require('text!../shader/source/deferred/sphere.essl'));
+    Shader.import(require('text!../shader/source/deferred/tube.essl'));
 
     Shader.import(require('text!../shader/source/deferred/output.essl'));
 
@@ -66,7 +68,7 @@ define(function (require) {
         var lightAccumulateBlendFunc = function (gl) {
             gl.blendEquation(gl.FUNC_ADD);
             gl.blendFunc(gl.ONE, gl.ONE);
-        }
+        };
 
         var createLightPassMat = function (shader) {
             return new Material({
@@ -75,21 +77,34 @@ define(function (require) {
                 transparent: true,
                 depthMask: false
             })
+        };
+
+        var createVolumeShader = function (name) {
+            return new Shader({
+                vertex: lightVolumeVertex,
+                fragment: Shader.source('buildin.deferred.' + name)
+            })
         }
 
         // Rotate and positioning to fit the spot light
-        // Which the cusp of cone pointing to the negative z
+        // Which the cusp of cone pointing to the positive z
         // and positioned on the origin
         var coneGeo = new ConeGeo({
-            bottomRadius: 1,
-            height: 2,
             capSegments: 10
         });
         var mat = new Matrix4();
-        mat.rotateX(Math.PI / 2);
-        mat.translate(new Vector3(0, 0, -1));
+        mat.rotateX(Math.PI / 2)
+            .translate(new Vector3(0, -1, 0));
 
         coneGeo.applyTransform(mat);
+
+        var cylinderGeo = new CylinderGeo({
+            capSegments: 10
+        });
+        // Align with x axis
+        mat.identity().rotateZ(Math.PI / 2);
+
+        cylinderGeo.applyTransform(mat);
 
         return {
             // GBuffer shaders
@@ -142,18 +157,13 @@ define(function (require) {
                 fragment: Shader.source('buildin.deferred.ambient_light')
             })),
 
-            _spotLightShader: new Shader({
-                vertex: lightVolumeVertex,
-                fragment: Shader.source('buildin.deferred.spot_light')
-            }),
-            _pointLightShader: new Shader({
-                vertex: lightVolumeVertex,
-                fragment: Shader.source('buildin.deferred.point_light')
-            }),
-            _sphereLightShader: new Shader({
-                vertex: lightVolumeVertex,
-                fragment: Shader.source('buildin.deferred.sphere_light')
-            }),
+            _spotLightShader: createVolumeShader('spot_light'),
+
+            _pointLightShader: createVolumeShader('point_light'),
+
+            _sphereLightShader: createVolumeShader('sphere_light'),
+
+            _tubeLightShader: createVolumeShader('tube_light'),
 
             _createLightPassMat: createLightPassMat,
 
@@ -162,7 +172,9 @@ define(function (require) {
                 heightSegements: 10
             }),
 
-            _lightConeGeo: coneGeo
+            _lightConeGeo: coneGeo,
+
+            _lightCylinderGeo: cylinderGeo
         }
     }, {
         render: function (renderer, scene, camera) {
@@ -295,6 +307,12 @@ define(function (require) {
                             material.setUniform('lightRadius', uTpl.sphereLightRadius.value(light));
                             material.setUniform('lightPosition', uTpl.sphereLightPosition.value(light));
                             break;
+                        case 'TUBE_LIGHT':
+                            material.setUniform('lightColor', uTpl.tubeLightColor.value(light));
+                            material.setUniform('lightRange', uTpl.tubeLightRange.value(light));
+                            material.setUniform('lightExtend', uTpl.tubeLightExtend.value(light));
+                            material.setUniform('lightPosition', uTpl.tubeLightPosition.value(light));
+                            break;
                     }
 
                     volumeMeshList.push(volumeMesh);
@@ -366,9 +384,18 @@ define(function (require) {
                         });
                         volumeMesh = light.__volumeMesh;
                         var aspect = Math.tan(light.penumbraAngle * Math.PI / 180);
-                        volumeMesh.scale.set(
-                            aspect * light.range, aspect * light.range, light.range / 2
-                        );
+                        var range = light.range;
+                        volumeMesh.scale.set(aspect * range, aspect * range, range / 2);
+                        break;
+                    case 'TUBE_LIGHT':
+                        light.__volumeMesh = light.__volumeMesh || new Mesh({
+                            material: this._createLightPassMat(this._tubeLightShader),
+                            geometry: this._lightCylinderGeo,
+                            culling: false
+                        });
+                        volumeMesh = light.__volumeMesh;
+                        var range = light.range;
+                        volumeMesh.scale.set(light.length / 2 + range, range, range);
                         break;
                 }
             }
