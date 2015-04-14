@@ -241,7 +241,8 @@ define(function(require) {
         },
 
         /**
-         * Rotate self by rad about axis
+         * Rotate self by rad about axis.
+         * Equal to right-multiply a rotaion matrix
          * @param  {number}   rad
          * @param  {qtek.math.Vector3} axis
          * @return {qtek.math.Matrix4}
@@ -253,7 +254,8 @@ define(function(require) {
         },
 
         /**
-         * Rotate self by a given radian about X axis
+         * Rotate self by a given radian about X axis.
+         * Equal to right-multiply a rotaion matrix
          * @param {number} rad
          * @return {qtek.math.Matrix4}
          */
@@ -264,7 +266,8 @@ define(function(require) {
         },
 
         /**
-         * Rotate self by a given radian about Y axis
+         * Rotate self by a given radian about Y axis.
+         * Equal to right-multiply a rotaion matrix
          * @param {number} rad
          * @return {qtek.math.Matrix4}
          */
@@ -275,7 +278,8 @@ define(function(require) {
         },
 
         /**
-         * Rotate self by a given radian about Z axis
+         * Rotate self by a given radian about Z axis.
+         * Equal to right-multiply a rotaion matrix
          * @param {number} rad
          * @return {qtek.math.Matrix4}
          */
@@ -287,6 +291,7 @@ define(function(require) {
 
         /**
          * Scale self by s
+         * Equal to right-multiply a scale matrix
          * @param  {qtek.math.Vector3}  s
          * @return {qtek.math.Matrix4}
          */
@@ -297,7 +302,8 @@ define(function(require) {
         },
 
         /**
-         * Translate self by v
+         * Translate self by v.
+         * Equal to right-multiply a translate matrix
          * @param  {qtek.math.Vector3}  v
          * @return {qtek.math.Matrix4}
          */
@@ -353,7 +359,9 @@ define(function(require) {
 
                 mat3.fromMat4(m3, el);
                 // Not like mat4, mat3 in glmatrix seems to be row-based
-                mat3.transpose(m3, m3);
+                // Seems fixed in gl-matrix 2.2.2
+                // https://github.com/toji/gl-matrix/issues/114
+                // mat3.transpose(m3, m3);
 
                 m3[0] /= sx;
                 m3[1] /= sx;
