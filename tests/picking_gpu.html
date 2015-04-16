@@ -15,7 +15,7 @@
                 renderer.resize(window.innerWidth, window.innerHeight);
 
                 var camera = new qtek.camera.Perspective();
-                camera.aspect = renderer.width / renderer.height;
+                camera.aspect = renderer.getViewportAspect();
                 camera.position.z = 10;
 
                 var scene = new qtek.Scene();

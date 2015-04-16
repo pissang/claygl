@@ -14,7 +14,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek.camera.Perspective();
-                camera.aspect = renderer.width / renderer.height;
+                camera.aspect = renderer.getViewportAspect();
                 camera.position.z = 3;
 
                 var control = new qtek.plugin.OrbitControl({

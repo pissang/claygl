@@ -39,7 +39,7 @@
 
             var scene = new qtek.Scene();
             var camera = new qtek.camera.Perspective({
-                aspect : window.innerWidth / window.innerHeight,
+                aspect : renderer.getViewportAspect(),
                 far : 1000,
                 near : 1
             });

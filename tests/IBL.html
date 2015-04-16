@@ -15,7 +15,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.width / renderer.height
+                    aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0, 20);
 
@@ -44,12 +44,12 @@
                     'assets/textures/hdr/pisa.hdr',
                     function () {
                         envMap.flipY = false;
-                        prefilterEnvMap(envMap, normalDistribution, function(mipmaps) {
-                            var skybox = new qtek.plugin.Skybox({
+                        prefilterEnvMap(envMap, normalDistribution, function(prefilteredEnvMap, mipmapNum) {
+                            var skydome = new qtek.plugin.Skydome({
                                 scene : scene
                             });
 
-                            skybox.material.set('environmentMap', mipmaps[0]);
+                            skydome.material.set('diffuseMap', envMap);
                             for (var i = 0; i < 10; i++) {
                                 var material = new qtek.Material({
                                     shader : shader
@@ -59,7 +59,7 @@
                                     geometry : sphereGeo,
                                     material : material
                                 });
-                                applyMaterial(material, mipmaps, roughness);
+                                applyMaterial(material, prefilteredEnvMap, mipmapNum, roughness);
                                 material.set('specularColor', [0.05, 0.05, 0.05]);
                                 mesh.position.x = i * 3 - 15;
                                 mesh.position.y = 3;
@@ -76,7 +76,7 @@
                                     geometry : sphereGeo,
                                     material : material
                                 });
-                                applyMaterial(material, mipmaps, roughness);
+                                applyMaterial(material, prefilteredEnvMap, mipmapNum, roughness);
                                 // material.set('specularColor', [0.6, 0.6, 0.6]);
                                 mesh.position.x = i * 3 - 15;
                                 mesh.position.y = 6;
@@ -95,7 +95,7 @@
                                     material : material
                                 });
                                 monkeys.push(mesh);
-                                applyMaterial(material, mipmaps, roughness);
+                                applyMaterial(material, prefilteredEnvMap, mipmapNum, roughness);
                                 mesh.position.x = i * 8 - 15;
                                 mesh.position.y = -2;
                                 mesh.scale.set(3, 3, 3);
@@ -105,7 +105,7 @@
                             monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
                             monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
                             monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05])
-                            applyMaterial(monkeys[3].material, mipmaps, 0.2);
+                            applyMaterial(monkeys[3].material, prefilteredEnvMap, mipmapNum, 0.2);
                         });
                     }
                 );
@@ -130,8 +130,8 @@
                         outputs : {
                             "color" : {
                                 parameters : {
-                                    width : function(renderer) {return renderer.width}, 
-                                    height : function(renderer) {return renderer.height},
+                                    width : function(renderer) {return renderer.getWidth()}, 
+                                    height : function(renderer) {return renderer.getHeight()},
                                     type : qtek.Texture.FLOAT   
                                 }
                             }
@@ -154,7 +154,7 @@
 
                         var FXAANode = compositor.findNode('FXAA');
                         if (FXAANode) {
-                            FXAANode.setParameter('viewportSize', [renderer.width, renderer.height]);
+                            FXAANode.setParameter('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
                         }
                     }
 
@@ -231,23 +231,33 @@
                 }
 
                 function prefilterEnvMap(envMap, normalDistribution, callback) {
-                    var mipmaps = [];
-                    var size = 1024;
+                    var size = 128;
                     var mipmapNum = Math.log(size) / Math.log(2);
                     var emptyScene = new qtek.Scene();
+                    var prefilterRenderer = new qtek.Renderer({
+                        preserveDrawingBuffer: true
+                    });
                     var environmentMapPass = new qtek.prePass.EnvironmentMap();
                     var skydome = new qtek.plugin.Skydome({
                         scene : emptyScene
                     });
                     skydome.material.set('diffuseMap', envMap);
-                    mipmaps[0] = new qtek.TextureCube({
-                        width : size,
-                        height : size,
-                        type : qtek.Texture.FLOAT
+
+                    envMap = new qtek.TextureCube({
+                        width: size,
+                        height: size
                     });
-                    environmentMapPass.texture = mipmaps[0];
+                    environmentMapPass.texture = envMap;
                     environmentMapPass.render(renderer, emptyScene);
                     skydome.detachScene(emptyScene);
+
+                    prefilteredEnvMap = new qtek.TextureCube({
+                        width: size,
+                        height: size,
+                        minFilter: qtek.Texture.LINEAR,
+                        magFilter: qtek.Texture.LINEAR,
+                        flipY: false
+                    });
 
                     var skybox = new qtek.plugin.Skybox({
                         scene : emptyScene
@@ -258,46 +268,60 @@
                             fragment : qtek.Shader.source('split_sum.prefilter_envmap')
                         })
                     })
-                    var downsampleMaterial = skybox.material;
-                    downsampleMaterial.set('environmentMap', mipmaps[0]);
                     prefilterMaterial.set('normalDistribution', normalDistribution);
+                    prefilterMaterial.set('environmentMap', envMap);
+                    skybox.material = prefilterMaterial;
 
-                    var mipmapLevel = 1;
-                    var downsampleTexture = null;
+                    var mipmapLevel = 0;
 
-                    // Down sample
-                    skybox.material = downsampleMaterial;
-                    downsampleTexture = new qtek.TextureCube({
-                        width : 16,
-                        height : 16,
-                        type : qtek.Texture.FLOAT
-                    });
-                    environmentMapPass.texture = downsampleTexture;
-                    environmentMapPass.render(renderer, emptyScene);
-
+                    var frameBuffer = new qtek.FrameBuffer();
                     function onFrame() {
-
-                        if (size > 1) {
-                            size /= 2;
+                        if (size >= 1) {
                             environmentMapPass.position.copy(camera.position);
-                            // Prefilter
-                            skybox.material = prefilterMaterial;
+                            var sideTexture = new qtek.Texture2D({
+                                width: size,
+                                height: size
+                            });
+                            var mipmap = {
+                                pixels: {}
+                            };
+                            prefilteredEnvMap.mipmaps.push(mipmap);
+                            var gl = renderer.gl;
                             roughness = mipmapLevel / mipmapNum;
                             prefilterMaterial.set('roughness', roughness);
-                            prefilterMaterial.set('environmentMap', downsampleTexture);
-                            var mipmap = new qtek.TextureCube({
-                                useMipmap : false,
-                                width : Math.max(size, 8),
-                                height : Math.max(size, 8),
-                                type : qtek.Texture.FLOAT
+                            ['px', 'nx', 'py', 'ny', 'pz', 'nz'].forEach(function (target) {
+                                var fb = frameBuffer;
+                                var camera = environmentMapPass._cameras[target];
+
+                                fb.attach(gl, sideTexture);
+                                fb.bind(renderer);
+                                renderer.render(emptyScene, camera);
+
+                                var canvas = document.createElement('canvas');
+                                var ctx = canvas.getContext('2d');
+                                canvas.width = canvas.height = size;
+                                var imageData = ctx.createImageData(size, size);
+
+                                var pixels = new Uint8Array(4 * size * size);
+                                gl.readPixels(0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+                                fb.unbind(renderer);
+
+                                for (var i = 0; i < pixels.length; i++) {
+                                    imageData.data[i] = pixels[i];
+                                }
+                                ctx.putImageData(imageData, 0, 0);
+                                mipmap.pixels[target] = pixels;
+
+                                document.body.appendChild(canvas);
                             });
-                            mipmaps[mipmapLevel++] = mipmap;
-                            environmentMapPass.texture = mipmap;
-                            environmentMapPass.render(renderer, emptyScene);
+
+                            renderer.disposeTexture(sideTexture);
+
+                            size /= 2;
+                            mipmapLevel++;
                         } else {
-                            callback && callback(mipmaps);
+                            callback && callback(prefilteredEnvMap, mipmapNum);
                             animation.off('frame', onFrame);
-                            renderer.disposeTexture(downsampleTexture);
                         }
                     }
 
@@ -326,19 +350,17 @@
                     return texture;
                 }
 
-                function applyMaterial(material, mipmaps, roughness) {
-                    var lodLevel = Math.floor(roughness * (mipmaps.length-1));
+                function applyMaterial(material, prefilteredEnvMap, mipmapNum, roughness) {
+                    material.set('mipmapLevels', mipmapNum);
                     material.set('BRDFLookup', BRDFLookup);
-                    material.set('envMap1', mipmaps[lodLevel]);
-                    material.set('envMap2', mipmaps[lodLevel+1] || mipmaps[mipmaps.length - 1]);
-                    material.set('lodMix', roughness * (mipmaps.length-1) - lodLevel);
+                    material.set('envMap', prefilteredEnvMap);
                     material.set('roughness', roughness);
-                    material.set('envMapSize', material.get('envMap2').width);
+                    material.set('envMapSize', prefilteredEnvMap.width);
                 }
 
                 window.onresize = function() {
                     renderer.resize(window.innerWidth, window.innerHeight);
-                    camera.aspect = renderer.width / renderer.height;
+                    camera.aspect = renderer.getViewportAspect();
                 }
             });
         </script>

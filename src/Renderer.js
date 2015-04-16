@@ -39,14 +39,14 @@ define(function(require) {
              * @type {number}
              * @private
              */
-            width: 100,
+            _width: 100,
 
             /**
              * Canvas width, set by resize method
              * @type {number}
              * @private
              */
-            height: 100,
+            _height: 100,
 
             /**
              * Device pixel ratio, set by setDevicePixelRatio method
@@ -124,13 +124,12 @@ define(function(require) {
 
             _sceneRendering: null
         };
-    }, function() {
+    }, function () {
 
         if (!this.canvas) {
             this.canvas = document.createElement('canvas');
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
         }
+        var canvas = this.canvas;
         try {
             var opts = {
                 alhpa: this.alhpa,
@@ -141,20 +140,22 @@ define(function(require) {
                 preserveDrawingBuffer: this.preserveDrawingBuffer
             };
             
-            this.gl = this.canvas.getContext('webgl', opts)
-                || this.canvas.getContext('experimental-webgl', opts);
+            this.gl = canvas.getContext('webgl', opts)
+                || canvas.getContext('experimental-webgl', opts);
 
             if (!this.gl) {
                 throw new Error();
             }
             
-            this.gl.__GLID__ = glid++;
+            if (this.gl.__GLID__ == null) {
+                // gl context is not created
+                // Otherwise is the case mutiple renderer share the same gl context
+                this.gl.__GLID__ = glid++;
 
-            this.width = this.canvas.width; 
-            this.height = this.canvas.height;
-            this.resize(this.width, this.height);
+                glinfo.initialize(this.gl);
+            } 
 
-            glinfo.initialize(this.gl);
+            this.resize();
         } catch(e) {
             throw 'Error creating WebGL Context ' + e;
         }
@@ -170,21 +171,22 @@ define(function(require) {
             var canvas = this.canvas;
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
+            var dpr = this.devicePixelRatio;
             if (typeof(width) !== 'undefined') {
                 canvas.style.width = width + 'px';
                 canvas.style.height = height + 'px';
                 // set the size of the drawingBuffer
-                canvas.width = width * this.devicePixelRatio;
-                canvas.height = height * this.devicePixelRatio;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
 
-                this.width = width;
-                this.height = height;
+                this._width = width;
+                this._height = height;
             } else {
-                this.width = canvas.width / this.devicePixelRatio;
-                this.height = canvas.height / this.devicePixelRatio;
+                this._width = canvas.width / dpr;
+                this._height = canvas.height / dpr;
             }
 
-            this.setViewport(0, 0, width, height);
+            this.setViewport(0, 0, this._width, this._height);
         },
 
         /**
@@ -192,7 +194,7 @@ define(function(require) {
          * @return {number}
          */
         getWidth: function () {
-            return this.width;
+            return this._width;
         },
 
         /**
@@ -200,7 +202,15 @@ define(function(require) {
          * @return {number}
          */
         getHeight: function () {
-            return this.height;
+            return this._height;
+        },
+
+        /**
+         * Get viewport aspect, 
+         */ 
+        getViewportAspect: function () {
+            var viewport = this.viewport;
+            return viewport.width / viewport.height;
         },
 
         /**
@@ -209,7 +219,7 @@ define(function(require) {
          */
         setDevicePixelRatio: function(devicePixelRatio) {
             this.devicePixelRatio = devicePixelRatio;
-            this.resize(this.width, this.height);
+            this.resize(this._width, this._height);
         },
 
         /**
@@ -754,7 +764,7 @@ define(function(require) {
                 out = new Vector2();
             }
             // Invert y;
-            y = this.height - y;
+            y = this._height - y;
 
             var viewport = this.viewport;
             var arr = out._array;

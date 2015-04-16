@@ -19,7 +19,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.width / renderer.height
+                    aspect : renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0, 10);
 
@@ -90,15 +90,15 @@
                                 parameters: {
                                     // Half Float
                                     type: 36193,
-                                    width: function(renderer) {return renderer.width},
-                                    height: function(renderer) {return renderer.height}
+                                    width: function(renderer) {return renderer.getWidth()},
+                                    height: function(renderer) {return renderer.getHeight()}
                                 }
                             },
                             depth: {
                                 attachment: 'DEPTH_ATTACHMENT',
                                 parameters: {
-                                    width: function(renderer) {return renderer.width},
-                                    height: function(renderer) {return renderer.height},
+                                    width: function(renderer) {return renderer.getWidth()},
+                                    height: function(renderer) {return renderer.getHeight()},
                                     type: qtek.Texture.UNSIGNED_SHORT,
                                     format: qtek.Texture.DEPTH_COMPONENT
                                 }
@@ -117,8 +117,8 @@
                         outputs: {
                             color: {
                                 parameters: {
-                                    width: function(renderer) {return renderer.width},
-                                    height: function(renderer) {return renderer.height}
+                                    width: function(renderer) {return renderer.getWidth()},
+                                    height: function(renderer) {return renderer.getHeight()}
                                 }
                             }
                         }
@@ -137,8 +137,8 @@
                                 parameters: {
                                     // Half Float
                                     type: 36193,
-                                    width: function(renderer) {return renderer.width / 4},
-                                    height: function(renderer) {return renderer.height / 4}
+                                    width: function(renderer) {return renderer.getWidth() / 4},
+                                    height: function(renderer) {return renderer.getHeight() / 4}
                                 }
                             }
                         }
@@ -160,8 +160,8 @@
                                     parameters: {
                                         // Half Float
                                         type: 36193,
-                                        width: function(renderer) {return renderer.width / 4},
-                                        height: function(renderer) {return renderer.height / 4}
+                                        width: function(renderer) {return renderer.getWidth() / 4},
+                                        height: function(renderer) {return renderer.getHeight() / 4}
                                     }
                                 }
                             }
@@ -180,16 +180,16 @@
                                     parameters: {
                                         // Half Float
                                         type: 36193,
-                                        width: function(renderer) {return renderer.width / 4},
-                                        height: function(renderer) {return renderer.height / 4}
+                                        width: function(renderer) {return renderer.getWidth() / 4},
+                                        height: function(renderer) {return renderer.getHeight() / 4}
                                     }
                                 }
                             }
                         });
                         blurNodeV.setParameter('blurSize', 0.4);
                         blurNodeH.setParameter('blurSize', 0.4);
-                        blurNodeV.setParameter('textureHeight', renderer.height / 4);
-                        blurNodeH.setParameter('textureWidth', renderer.width / 4);
+                        blurNodeV.setParameter('textureHeight', renderer.getHeight() / 4);
+                        blurNodeH.setParameter('textureWidth', renderer.getWidth() / 4);
                         compositor.addNode(blurNodeV);
                         compositor.addNode(blurNodeH);
 
@@ -219,8 +219,8 @@
                                 parameters: {
                                     // Half Float
                                     type: 36193,
-                                    width: function(renderer) {return renderer.width},
-                                    height: function(renderer) {return renderer.height}
+                                    width: function(renderer) {return renderer.getWidth()},
+                                    height: function(renderer) {return renderer.getHeight()}
                                 }
                             }
                         }
@@ -258,8 +258,8 @@
                         }
                         cocNode.setParameter('focalPlane', config.focalPlane);
                         cocNode.setParameter('aperture', 1 / config.fstop);
-                        compositeNode.setParameter('textureSize', [renderer.width, renderer.height]);
-                        compositeNode.setParameter('blurredSize', [renderer.width / 4, renderer.height / 4]);
+                        compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
+                        compositeNode.setParameter('blurredSize', [renderer.getWidth() / 4, renderer.getHeight() / 4]);
                     });
 
                     //--------------------

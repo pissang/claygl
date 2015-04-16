@@ -3,6 +3,7 @@
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;background-color:#20242B;">
         <canvas width="1200" height="640" id="Main"></canvas>
@@ -25,7 +26,7 @@
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    aspect : renderer.getViewportAspect(),
                     far : 500
                 });
 
@@ -47,14 +48,17 @@
                     name : 'ROOT'
                 });
                 scene.add(root);
-                var cube = new Mesh({
+                var cubeMesh = new Mesh({
                     geometry: cube,
                     material: material
                 });
                 for( var i = 0; i < 20; i++){
                     for(var j = 0; j < 10; j++){
                         for( var k = 0; k < 50; k++){
-                            var mesh = cube.clone();
+                            var mesh = new qtek.Mesh({
+                                geometry: cube,
+                                material: material
+                            });
                             mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
                             root.add(mesh);
                         }
@@ -78,10 +82,17 @@
                             Math.round(1000 / deltaTime) + '<br />' 
                             + renderTime + '<br />'
                             + drawInfo.renderedMeshNumber + '(' + drawInfo.meshNumber + ')';
-                    // near z is larger than far z in view space
-                    camera.far = Math.max(camera.near, -camera.sceneBoundingBoxLastFrame.min.z);
                     root.rotation.rotateY(Math.PI/500);
+
+                    stats.update();
                 });
+
+                var stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                stats.domElement.style.right = '0px';
+                document.body.appendChild( stats.domElement );
+
             })
             
         </script>

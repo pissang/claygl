@@ -13,7 +13,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.width / renderer.height
+                    aspect : renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0, 10);
 

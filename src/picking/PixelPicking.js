@@ -45,8 +45,8 @@ define(function (require) {
         };
     }, function() {
         if (this.renderer) {
-            this.width = this.renderer.width;
-            this.height = this.renderer.height;
+            this.width = this.renderer.getWidth();
+            this.height = this.renderer.getHeight();
         }
         this._init();
     }, /** @lends qtek.picking.PixelPicking.prototype */ {
@@ -84,7 +84,7 @@ define(function (require) {
          */
         update: function(scene, camera) {
             var renderer = this.renderer;
-            if (renderer.width !== this.width || renderer.height !== this.height) {
+            if (renderer.getWidth() !== this.width || renderer.getHeight() !== this.height) {
                 this.resize(renderer.width, renderer.height);
             }
 

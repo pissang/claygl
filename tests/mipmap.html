@@ -11,25 +11,25 @@
                 var Shader = qtek.Shader
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main"),
-                    devicePixelRatio : 1.0
+                    canvas: document.getElementById( "Main"),
+                    devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.canvas.width/renderer.canvas.height,
-                    far : 500
+                    aspect: renderer.getViewportAspect(),
+                    far: 500
                 });
 
                 var shader = qtek.shader.library.get("buildin.basic", "diffuseMap");
 
                 var material = new qtek.Material({
-                    shader : shader
+                    shader: shader
                 });
                 var texture = new qtek.Texture2D({
-                    wrapS : qtek.Texture.REPEAT,
-                    wrapT : qtek.Texture.REPEAT,
+                    wrapS: qtek.Texture.REPEAT,
+                    wrapT: qtek.Texture.REPEAT,
                     mipmaps: [
                         createMipMap(32, '#000'),
                         createMipMap(16, '#333'),
@@ -59,16 +59,16 @@
                 camera.position.set(0, 4, 14);
                 camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
 
-                scene.add( root );
+                scene.add(root);
                 // Add Plane
                 var plane = new qtek.geometry.Plane({
-                    widthSegments : 1,
-                    heightSegments : 1
+                    widthSegments: 1,
+                    heightSegments: 1
                 });
                 var planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material,
-                    scale : new qtek.math.Vector3(60, 60, 60)
+                    geometry: plane,
+                    material: material,
+                    scale: new qtek.math.Vector3(60, 60, 60)
                 });
                 planeMesh.position.y = -0.8;
                 planeMesh.rotation.rotateX(-Math.PI/2);

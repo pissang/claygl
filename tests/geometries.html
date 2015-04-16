@@ -16,7 +16,7 @@
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    aspect : renderer.getViewportAspect(),
                     far : 500
                 });
 
@@ -93,8 +93,14 @@
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
+
+                var control = new qtek.plugin.OrbitControl({
+                    domElement: renderer.canvas,
+                    target: camera
+                });
                 animation.on('frame', function(dTime) {
                     renderer.render( scene, camera );
+                    control.update(dTime);
                     cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
                     planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
                     sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);

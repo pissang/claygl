@@ -353,11 +353,11 @@ define(function(require) {
     }
 
     function percentToWidth(percent, renderer) {
-        return percent / 100 * renderer.width;
+        return percent / 100 * renderer.getWidth();
     }
 
     function percentToHeight(percent, renderer) {
-        return percent / 100 * renderer.height;
+        return percent / 100 * renderer.getHeight();
     }
 
     return FXLoader;

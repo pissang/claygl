@@ -24,7 +24,7 @@
                 var scene = res.scene;
                 var skeleton = res.skeletons['skin_0'];
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.canvas.width/renderer.canvas.height
+                    aspect : renderer.getViewportAspect()
                 });
 
                 camera.position.set(0, 100, 300);

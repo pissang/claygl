@@ -139,8 +139,7 @@ varying vec3 v_Weight;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
-uniform samplerCube envMap1;
-uniform samplerCube envMap2;
+uniform samplerCube envMap;
 uniform sampler2D BRDFLookup;
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -148,21 +147,10 @@ uniform float alpha : 1.0;
 
 uniform vec3 specularColor : [0.56, 0.57, 0.58];
 uniform float roughness : 0;
-uniform float lodMix : 0;
 uniform float envMapSize : 128;
+uniform float mipmapLevels: 8;
 
-@import buildin.plugin.compute_shadow_map
-
-vec3 edgeFixup(vec3 v)
-{
-    float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
-    float scale = (envMapSize - 1.0) / envMapSize;
-    if (abs(v.x) != M) v.x *= scale;
-    if (abs(v.y) != M) v.y *= scale;
-    if (abs(v.z) != M) v.z *= scale;
-
-    return v;
-}
+#extension GL_EXT_shader_texture_lod : enable
 
 void main(){
 
@@ -191,11 +179,9 @@ void main(){
 
     vec2 envBRDF = texture2D(BRDFLookup, vec2(roughness, NoV)).rg;
     vec3 L = reflect(-V, N);
-    L = edgeFixup(L);
-    vec3 color1 = textureCube(envMap1, L).rgb;
-    vec3 color2 = textureCube(envMap2, L).rgb;
 
-    vec3 prefilteredColor = mix(color1, color2, lodMix);
+    float bias = roughness * mipmapLevels;
+    vec3 prefilteredColor = textureCubeLodEXT(envMap, L, bias).rgb;
 
     gl_FragColor.rgb = prefilteredColor * (specularColor * envBRDF.x + envBRDF.y);
     gl_FragColor.a = 1.0;

@@ -18,9 +18,9 @@
                 var deferredRenderer = new qtek.deferred.Renderer();
 
                 var camera = new qtek.camera.Perspective({
-                    far: 10000
+                    far: 10000,
+                    aspect: renderer.getViewportAspect()
                 });
-                camera.aspect = renderer.getWidth() / renderer.getHeight();
 
                 var scene = new qtek.Scene();
 
@@ -60,7 +60,7 @@
                 spotLight.rotation.rotateX(-Math.PI / 2);
                 scene.add(spotLight);
 
-                for (var i = 0; i < 200; i ++) {
+                for (var i = 0; i < 100; i ++) {
                     var pointLight = new qtek.light.Point({
                         color: [Math.random(), Math.random(), Math.random()],
                         range: 100 + Math.random() * 100
@@ -91,14 +91,14 @@
                 });
 
                 var animation = new qtek.animation.Animation();
-                var debugPass = new qtek.compositor.Pass({
-                    fragment: qtek.Shader.source('buildin.compositor.output')
-                });
-                debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
+                // var debugPass = new qtek.compositor.Pass({
+                //     fragment: qtek.Shader.source('buildin.compositor.output')
+                // });
+                // debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
                 animation.on('frame', function (deltaTime) {
                     control.update(deltaTime);
                     deferredRenderer.render(renderer, scene, camera);
-                    debugPass.setUniform('texture', deferredRenderer._lightAccumTex);
+                    // debugPass.setUniform('texture', deferredRenderer._lightAccumTex);
                     // debugPass.render(renderer);
                     
                     stats.update();

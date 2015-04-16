@@ -54,6 +54,24 @@ float decodeFloat(const in vec4 colour)
 }
 @end
 
+// http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
+@export buildin.util.rgbm_decode
+vec3 RGBMDecode(vec4 rgbm, float range) {
+  return range * rgbm.rgb * rgbm.a;
+}
+@end
+
+@export buildin.util.rgbm_encode
+vec4 RGBMEncode(vec3 color, float range) {
+    vec4 rgbm;
+    color *= 1.0 / range;
+    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);
+    rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
+    rgbm.rgb = color / rgbm.a;
+    return rgbm;
+}
+@end
+
 @export buildin.chunk.skin_matrix
 
 // Weighted Sum Skinning Matrix

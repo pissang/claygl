@@ -58,7 +58,7 @@
                 var scene = new qtek.Scene();
                 scene.add(particleSystem);
                 var camera = new qtek.camera.Perspective({
-                    aspect : window.innerWidth / window.innerHeight
+                    aspect : renderer.getViewportAspect()
                 });
                 camera.position.z = 0.3;
                 camera.position.y = 0.3;

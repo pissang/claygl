@@ -15,9 +15,9 @@
                 });
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    });
+                    aspect : renderer.getViewportAspect(),
+                    far : 500
+                });
                 var cube = new qtek.geometry.Cube({
                     widthSegments : 10,
                     heightSegments : 10

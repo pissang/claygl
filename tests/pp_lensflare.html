@@ -16,7 +16,7 @@
             renderer.resize(window.innerWidth, window.innerHeight);
 
             var camera = new qtek.camera.Perspective({
-                aspect : renderer.width / renderer.height
+                aspect : renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 20);
 
@@ -65,10 +65,10 @@
                         color : {
                             parameters : {
                                 width : function(renderer) {
-                                    return renderer.width;
+                                    return renderer.getWidth();
                                 },
                                 height : function(renderer) {
-                                    return renderer.height;
+                                    return renderer.getHeight();
                                 },
                                 type : qtek.Texture.FLOAT
                             }

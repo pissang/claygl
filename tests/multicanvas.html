@@ -22,11 +22,11 @@
                 var renderer2 = new qtek.Renderer({
                     canvas : document.getElementById( "Renderer2")
                 });
-                var scene = new qtek.Scene,
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer1.canvas.width/renderer1.canvas.height,
-                        far : 500
-                    });
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer1.getViewportAspect(),
+                    far : 500
+                });
 
                 var cube = new Cube();
                 var shader = shaderLibrary.get("buildin.lambert", "diffuseMap");

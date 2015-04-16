@@ -11,13 +11,13 @@
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas: document.getElementById('Main')
                 });
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 30
-                    });
+                    aspect: renderer.getViewportAspect(),
+                    far: 30
+                });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
                 camera.position.set(0, 1, 2);
