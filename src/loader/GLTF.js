@@ -42,6 +42,9 @@ define(function(require) {
     var glMatrix = require('../dep/glmatrix');
     var quat = glMatrix.quat;
 
+    // Import buildin shader
+    require('../shader/buildin');
+
     var semanticAttributeMap = {
         'NORMAL': 'normal',
         'POSITION': 'position',
@@ -50,6 +53,7 @@ define(function(require) {
         'JOINT': 'joint',
         'COLOR': 'color'
     };
+
 
     /**
      * @typedef {Object} qtek.loader.GLTF.IResult
