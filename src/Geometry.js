@@ -10,6 +10,10 @@ define(function(require) {
     var vec3 = glmatrix.vec3;
     var vec4 = glmatrix.vec4;
 
+    var vec4Copy = vec4.copy;
+    var vec3Copy = vec3.copy;
+    var vec2Copy = vec2.copy;
+
     // PENDING put the buffer data in attribute ? 
     function Attribute(name, type, size, semantic, isDynamic) {
         this.name = name;
@@ -41,7 +45,7 @@ define(function(require) {
                     this.get = function (idx, out) {
                         var item = this.value[idx];
                         if (item) {
-                            vec2.copy(out, item);
+                            vec2Copy(out, item);
                         }
                         return out;
                     };
@@ -50,17 +54,19 @@ define(function(require) {
                         if (!item) {
                             item = this.value[idx] = vec2.create();
                         }
-                        vec2.copy(item, val);
+                        vec2Copy(item, val);
                     };
                 } else {
                     this.get = function (idx, out) {
-                        out[0] = this.value[idx * 2];
-                        out[1] = this.value[idx * 2 + 1];
+                        var arr = this.value;
+                        out[0] = arr[idx * 2];
+                        out[1] = arr[idx * 2 + 1];
                         return out;
                     };
                     this.set = function (idx, val) {
-                        this.value[idx * 2] = val[0];
-                        this.value[idx * 2 + 1] = val[1];
+                        var arr = this.value;
+                        arr[idx * 2] = val[0];
+                        arr[idx * 2 + 1] = val[1];
                     };
                 }
                 break;
@@ -69,7 +75,7 @@ define(function(require) {
                     this.get = function (idx, out) {
                         var item = this.value[idx];
                         if (item) {
-                            vec3.copy(out, item);
+                            vec3Copy(out, item);
                         }
                         return out;
                     };
@@ -78,19 +84,23 @@ define(function(require) {
                         if (!item) {
                             item = this.value[idx] = vec3.create();
                         }
-                        vec3.copy(item, val);
+                        vec3Copy(item, val);
                     };
                 } else {
                     this.get = function (idx, out) {
-                        out[0] = this.value[idx * 3];
-                        out[1] = this.value[idx * 3 + 1];
-                        out[2] = this.value[idx * 3 + 2];
+                        var idx3 = idx * 3;
+                        var arr = this.value;
+                        out[0] = arr[idx3++];
+                        out[1] = arr[idx3++];
+                        out[2] = arr[idx3++];
                         return out;
                     };
                     this.set = function (idx, val) {
-                        this.value[idx * 3] = val[0];
-                        this.value[idx * 3 + 1] = val[1];
-                        this.value[idx * 3 + 2] = val[2];
+                        var idx3 = idx * 3;
+                        var arr = this.value;
+                        arr[idx3++] = val[0];
+                        arr[idx3++] = val[1];
+                        arr[idx3++] = val[2];
                     };
                 }
                 break;
@@ -99,7 +109,7 @@ define(function(require) {
                     this.get = function (idx, out) {
                         var item = this.value[idx];
                         if (item) {
-                            vec4.copy(out, item);
+                            vec4Copy(out, item);
                         }
                         return out;
                     };
@@ -108,21 +118,25 @@ define(function(require) {
                         if (!item) {
                             item = this.value[idx] = vec4.create();
                         }
-                        vec4.copy(item, val);
+                        vec4Copy(item, val);
                     };
                 } else {
                     this.get = function (idx, out) {
-                        out[0] = this.value[idx * 4];
-                        out[1] = this.value[idx * 4 + 1];
-                        out[2] = this.value[idx * 4 + 2];
-                        out[3] = this.value[idx * 4 + 3];
+                        var arr = this.value;
+                        var idx4 = idx * 4;
+                        out[0] = arr[idx4++];
+                        out[1] = arr[idx4++];
+                        out[2] = arr[idx4++];
+                        out[3] = arr[idx4++];
                         return out;
                     };
                     this.set = function (idx, val) {
-                        this.value[idx * 4] = val[0];
-                        this.value[idx * 4 + 1] = val[1];
-                        this.value[idx * 4 + 2] = val[2];
-                        this.value[idx * 4 + 3] = val[3];
+                        var arr = this.value;
+                        var idx4 = idx * 4;
+                        arr[idx4++] = val[0];
+                        arr[idx4++] = val[1];
+                        arr[idx4++] = val[2];
+                        arr[idx4++] = val[3];
                     };
                 }
                 break;
