@@ -61,7 +61,5 @@ define(function(require){
         }
     });
 
-    Shader['import'](require('text!./light/light.essl'));
-
     return Light;
 });

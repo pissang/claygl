@@ -3,6 +3,10 @@ define(function (require) {
     var library = require('./library');
     var Shader = require('../Shader');
 
+
+    Shader['import'](require('text!./source/light.essl'));
+    Shader['import'](require('text!./source/util.essl'));
+
     // Some build in shaders
     Shader['import'](require('text!./source/basic.essl'));
     Shader['import'](require('text!./source/lambert.essl'));
@@ -10,7 +14,6 @@ define(function (require) {
     Shader['import'](require('text!./source/standard.essl'));
     Shader['import'](require('text!./source/wireframe.essl'));
     Shader['import'](require('text!./source/skybox.essl'));
-    Shader['import'](require('text!./source/util.essl'));
     Shader['import'](require('text!./source/prez.essl'));
 
     Shader['import'](require('text!./source/shadowmap.essl'));
