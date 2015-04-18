@@ -8,8 +8,6 @@ define(function (require) {
 
         opacity: 1,
 
-        lineWidth: 0,
-
         pointSize: 0,
 
         /**

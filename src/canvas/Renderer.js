@@ -79,6 +79,8 @@ define(function (require) {
         this.color = vec4Create();
 
         this.depth = 0;
+
+        this.lineWidth = 1;
     }
 
     Line.prototype.type = PRIMITIVE_LINE;
@@ -284,6 +286,7 @@ define(function (require) {
                             indices[1] = j++;
                             var line = linesPool.pick();
                             line.material = material;
+                            line.lineWidth = renderable.lineWidth;
 
                             var clipped = this._setPrimitive(line, indices, 2, attributes, worldViewProjMat, matColor);
 
@@ -392,6 +395,9 @@ define(function (require) {
             var height = this._height * dpr;
             var halfWidth = width / 2;
             var halfHeight = height / 2;
+
+            var prevLineWidth;
+
             for (var i = 0; i < primitives.length; i++) {
                 var primitive = primitives[i];
                 var vertices = primitive.vertices;
@@ -401,9 +407,6 @@ define(function (require) {
                 if (material !== prevMaterial) {
                     // Set material
                     ctx.globalAlpha = material.opacity;
-                    if (primitiveType === PRIMITIVE_LINE) {
-                        ctx.lineWidth = material.lineWidth;
-                    }
                     prevMaterial = material;
                 }
 
@@ -424,7 +427,11 @@ define(function (require) {
                     case PRIMITIVE_LINE:
                         var v0 = vertices[0];
                         var v1 = vertices[1];
+                        var lineWidth = primitive.lineWidth;
                         ctx.strokeStyle = colorStr;
+                        if (lineWidth !== prevLineWidth) {
+                            ctx.lineWidth = prevLineWidth = lineWidth;
+                        }
                         ctx.beginPath();
                         ctx.moveTo((v0[0] + 1) * halfWidth, (-v0[1] + 1) * halfHeight);
                         ctx.lineTo((v1[0] + 1) * halfWidth, (-v1[1] + 1) * halfHeight);
