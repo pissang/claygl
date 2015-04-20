@@ -180,8 +180,9 @@ define(function (require) {
             if (this.clear) {
                 var color = this.color;
                 var ctx = this.ctx;
-                var w = this._width;
-                var h = this._height;
+                var dpr = this.devicePixelRatio;
+                var w = this._width * dpr;
+                var h = this._height * dpr;
                 if (color && color[3] === 0) {
                     ctx.clearRect(0, 0, w, h);
                 }
@@ -238,6 +239,7 @@ define(function (require) {
                 // alpha is default 1
                 if (material.color.length == 3) {
                     vec3.copy(matColor, material.color);
+                    matColor[3] = 1;
                 }
                 else {
                     vec4.copy(matColor, material.color);
@@ -370,7 +372,7 @@ define(function (require) {
                 }
 
                 if (! clipped) {
-                    primitive.depth /= 3;
+                    primitive.depth /= size;
 
                     if (useVertexColor) {
                         vec4.mul(priColor, priColor, matColor);
