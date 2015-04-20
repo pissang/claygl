@@ -218,31 +218,33 @@ define(function(require) {
          * @param {WebGLRenderingContext} _gl
          */
         bind: function(_gl) {
-            this._cache.use(_gl.__GLID__, getCacheSchema);
+            var cache = this._cache;
+            cache.use(_gl.__GLID__, getCacheSchema);
 
-            this._currentLocationsMap = this._cache.get('locations');
+            this._currentLocationsMap = cache.get('locations');
 
-            if (this._cache.isDirty()) {
+            if (cache.isDirty()) {
                 this._updateShaderString();
                 var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
-                this._cache.fresh();
-                
+                cache.fresh();
+
                 if (errMsg) {
                     return errMsg;
                 }
             }
 
-            _gl.useProgram(this._cache.get('program'));
+            _gl.useProgram(cache.get('program'));
         },
 
         /**
          * Mark dirty and update program in next frame
          */
         dirty: function() {
-            this._cache.dirtyAll();
-            for (var i = 0; i < this._cache._caches.length; i++) {
-                if (this._cache._caches[i]) {
-                    var context = this._cache._caches[i];
+            var cache = this._cache;
+            cache.dirtyAll();
+            for (var i = 0; i < cache._caches.length; i++) {
+                if (cache._caches[i]) {
+                    var context = cache._caches[i];
                     context['locations'] = {};
                     context['attriblocations'] = {};
                 }
@@ -277,17 +279,19 @@ define(function(require) {
          * @param  {number} [val]
          */
         define: function(shaderType, symbol, val) {
+            var vertexDefines = this.vertexDefines;
+            var fragmentDefines = this.fragmentDefines;
             val = val !== undefined ? val : null;
             if (shaderType == 'vertex' || shaderType == 'both') {
-                if (this.vertexDefines[symbol] !== val) {
-                    this.vertexDefines[symbol] = val;
+                if (vertexDefines[symbol] !== val) {
+                    vertexDefines[symbol] = val;
                     // Mark as dirty
                     this.dirty();
                 }
             }
             if (shaderType == 'fragment' || shaderType == 'both') {
-                if (this.fragmentDefines[symbol] !== val) {
-                    this.fragmentDefines[symbol] = val;
+                if (fragmentDefines[symbol] !== val) {
+                    fragmentDefines[symbol] = val;
                     if (shaderType !== 'both') {
                         this.dirty();
                     }
@@ -360,8 +364,9 @@ define(function(require) {
          * Enable all textures used in the shader
          */
         enableTexturesAll: function() {
-            for (var symbol in this._textureStatus) {
-                this._textureStatus[symbol].enabled = true;
+            var textureStatus = this._textureStatus;
+            for (var symbol in textureStatus) {
+                textureStatus[symbol].enabled = true;
             }
 
             this.dirty();
@@ -384,8 +389,9 @@ define(function(require) {
          * Disable all textures used in the shader
          */
         disableTexturesAll: function() {
-            for (var symbol in this._textureStatus) {
-                this._textureStatus[symbol].enabled = false;
+            var textureStatus = this._textureStatus;
+            for (var symbol in textureStatus) {
+                textureStatus[symbol].enabled = false;
             }
 
             this.dirty();
@@ -400,8 +406,9 @@ define(function(require) {
 
         getEnabledTextures: function () {
             var enabledTextures = [];
-            for (var symbol in this._textureStatus) {
-                if (this._textureStatus[symbol].enabled) {
+            var textureStatus = this._textureStatus;
+            for (var symbol in textureStatus) {
+                if (textureStatus[symbol].enabled) {
                     enabledTextures.push(symbol);
                 }
             }
@@ -594,15 +601,17 @@ define(function(require) {
 
             // Add defines
             // VERTEX
+            var lightNumber = this.lightNumber;
+            var textureStatus = this._textureStatus;
             var defineStr = [];
-            for (var lightType in this.lightNumber) {
-                var count = this.lightNumber[lightType];
+            for (var lightType in lightNumber) {
+                var count = lightNumber[lightType];
                 if (count > 0) {
                     defineStr.push('#define ' + lightType.toUpperCase() + '_NUMBER ' + count);
                 }
             }
-            for (var symbol in this._textureStatus) {
-                var status = this._textureStatus[symbol];
+            for (var symbol in textureStatus) {
+                var status = textureStatus[symbol];
                 if (status.enabled) {
                     defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
                 }
@@ -620,14 +629,14 @@ define(function(require) {
 
             // FRAGMENT
             defineStr = [];
-            for (var lightType in this.lightNumber) {
-                var count = this.lightNumber[lightType];
+            for (var lightType in lightNumber) {
+                var count = lightNumber[lightType];
                 if (count > 0) {
                     defineStr.push('#define ' + lightType.toUpperCase() + '_NUMBER ' + count);
                 }
             }
-            for (var symbol in this._textureStatus) {
-                var status = this._textureStatus[symbol];
+            for (var symbol in textureStatus) {
+                var status = textureStatus[symbol];
                 if (status.enabled) {
                     defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
                 }
@@ -859,9 +868,9 @@ define(function(require) {
 
         // Return true or error msg if error happened
         _buildProgram: function(_gl, vertexShaderString, fragmentShaderString) {
-
-            if (this._cache.get('program')) {
-                _gl.deleteProgram(this._cache.get('program'));
+            var cache = this._cache;
+            if (cache.get('program')) {
+                _gl.deleteProgram(cache.get('program'));
             }
             var program = _gl.createProgram();
 
@@ -873,11 +882,11 @@ define(function(require) {
             _gl.shaderSource(fragmentShader, fragmentShaderString);
             _gl.compileShader(fragmentShader);
 
-            var msg = this._checkShaderErrorMsg(_gl, vertexShader, vertexShaderString);
+            var msg = checkShaderErrorMsg(_gl, vertexShader, vertexShaderString);
             if (msg) {
                 return msg;
             }
-            msg = this._checkShaderErrorMsg(_gl, fragmentShader, fragmentShaderString);
+            msg = checkShaderErrorMsg(_gl, fragmentShader, fragmentShaderString);
             if (msg) {
                 return msg;
             }
@@ -902,21 +911,14 @@ define(function(require) {
             // Cache uniform locations
             for (var i = 0; i < this._uniformList.length; i++) {
                 var uniformSymbol = this._uniformList[i];
-                var locationMap = this._cache.get('locations');
+                var locationMap = cache.get('locations');
                 locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
             }
 
             _gl.deleteShader(vertexShader);
             _gl.deleteShader(fragmentShader);
 
-            this._cache.put('program', program);
-        },
-
-        // Return true or error msg if error happened
-        _checkShaderErrorMsg: function(_gl, shader, shaderString) {
-            if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
-                return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
-            }
+            cache.put('program', program);
         },
 
         /**
@@ -954,6 +956,13 @@ define(function(require) {
             locations: {},
             attriblocations: {}
         };
+    }
+
+    // Return true or error msg if error happened
+    function checkShaderErrorMsg(_gl, shader, shaderString) {
+        if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
+            return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
+        }
     }
 
     // some util functions

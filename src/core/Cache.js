@@ -2,6 +2,8 @@ define(function() {
 
     'use strict';
 
+    var DIRTY_PREFIX = '__dirty__';
+
     var Cache = function() {
 
         this._contextId = 0;
@@ -14,17 +16,17 @@ define(function() {
     Cache.prototype = {
 
         use: function(contextId, documentSchema) {
-
-            if (! this._caches[contextId]) {
-                this._caches[contextId] = {};
+            var caches = this._caches;
+            if (! caches[contextId]) {
+                caches[contextId] = {};
 
                 if (documentSchema) {
-                    this._caches[contextId] = documentSchema();
+                    caches[contextId] = documentSchema();
                 }
             }
             this._contextId = contextId;
 
-            this._context = this._caches[contextId];
+            this._context = caches[contextId];
         },
 
         put: function(key, value) {
@@ -37,41 +39,44 @@ define(function() {
 
         dirty: function(field) {
             field = field || '';
-            var key = '__dirty__' + field;
+            var key = DIRTY_PREFIX + field;
             this.put(key, true);
         },
         
         dirtyAll: function(field) {
             field = field || '';
-            var key = '__dirty__' + field;
-            for (var i = 0; i < this._caches.length; i++) {
-                if (this._caches[i]) {
-                    this._caches[i][key] = true;
+            var key = DIRTY_PREFIX + field;
+            var caches = this._caches;
+            for (var i = 0; i < caches.length; i++) {
+                if (caches[i]) {
+                    caches[i][key] = true;
                 }
             }
         },
 
         fresh: function(field) {
             field = field || '';
-            var key = '__dirty__' + field;
+            var key = DIRTY_PREFIX + field;
             this.put(key, false);
         },
 
         freshAll: function(field) {
             field = field || '';
-            var key = '__dirty__' + field;
-            for (var i = 0; i < this._caches.length; i++) {
-                if (this._caches[i]) {
-                    this._caches[i][key] = false;
+            var key = DIRTY_PREFIX + field;
+            var caches = this._caches;
+            for (var i = 0; i < caches.length; i++) {
+                if (caches[i]) {
+                    caches[i][key] = false;
                 }
             }
         },
 
         isDirty: function(field) {
             field = field || '';
-            var key = '__dirty__' + field;
-            return  !this._context.hasOwnProperty(key)
-                || this._context[key] === true;
+            var key = DIRTY_PREFIX + field;
+            var context = this._context;
+            return  !context.hasOwnProperty(key)
+                || context[key] === true;
         },
 
         deleteContext: function(contextId) {

@@ -83,22 +83,23 @@ define(function(require) {
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
+                var uniformValue = uniform.value;
                 // When binding two materials with the same shader
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
                 // 
                 // FIXME Small possibility enabledUniforms are not the same
                 if (sameShader) {
-                    if (prevMaterial.uniforms[symbol].value === uniform.value) {
+                    if (prevMaterial.uniforms[symbol].value === uniformValue) {
                         continue;
                     }
                 }
 
-                if (uniform.value === undefined) {
+                if (uniformValue === undefined) {
                     console.warn('Uniform value "' + symbol + '" is undefined');
                     continue;
                 }
-                else if (uniform.value === null) {
+                else if (uniformValue === null) {
                     // if (uniform.type == 't') {
                     //     // PENDING
                     //     _gl.bindTexture(_gl.TEXTURE_2D, null);
@@ -106,16 +107,16 @@ define(function(require) {
                     // }
                     continue;
                 }
-                else if (uniform.value instanceof Array
-                    && ! uniform.value.length) {
+                else if (uniformValue instanceof Array
+                    && ! uniformValue.length) {
                     continue;
                 }
-                else if (uniform.value instanceof Texture) {
+                else if (uniformValue instanceof Texture) {
                     var res = this.shader.setUniform(_gl, '1i', symbol, slot);
                     if (!res) { // Texture is not enabled
                         continue;
                     }
-                    var texture = uniform.value;
+                    var texture = uniformValue;
                     _gl.activeTexture(_gl.TEXTURE0 + slot);
                     // Maybe texture is not loaded yet;
                     if (texture.isRenderable()) {
@@ -127,12 +128,12 @@ define(function(require) {
 
                     slot++;
                 }
-                else if (uniform.value instanceof Array) {
-                    if (uniform.value.length === 0) {
+                else if (uniformValue instanceof Array) {
+                    if (uniformValue.length === 0) {
                         continue;
                     }
                     // Texture Array
-                    var exampleValue = uniform.value[0];
+                    var exampleValue = uniformValue[0];
 
                     if (exampleValue instanceof Texture) {
                         if (!this.shader.hasUniform(symbol)) {
@@ -140,8 +141,8 @@ define(function(require) {
                         }
 
                         var arr = [];
-                        for (var i = 0; i < uniform.value.length; i++) {
-                            var texture = uniform.value[i];
+                        for (var i = 0; i < uniformValue.length; i++) {
+                            var texture = uniformValue[i];
                             _gl.activeTexture(_gl.TEXTURE0 + slot);
                             // Maybe texture is not loaded yet;
                             if (texture.isRenderable()) {
@@ -155,11 +156,11 @@ define(function(require) {
 
                         this.shader.setUniform(_gl, '1iv', symbol, arr);
                     } else {
-                        this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
+                        this.shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                     }
                 }
                 else{
-                    this.shader.setUniform(_gl, uniform.type, symbol, uniform.value);
+                    this.shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                 }
             }
         },
@@ -258,13 +259,14 @@ define(function(require) {
             var originalUniforms = this.uniforms;
             this.uniforms = shader.createUniforms();
             this.shader = shader;
-            
-            this._enabledUniforms = Object.keys(this.uniforms);
+
+            var uniforms = this.uniforms;
+            this._enabledUniforms = Object.keys(uniforms);
 
             if (keepUniform) {
                 for (var symbol in originalUniforms) {
-                    if (this.uniforms[symbol]) {
-                        this.uniforms[symbol].value = originalUniforms[symbol].value;
+                    if (uniforms[symbol]) {
+                        uniforms[symbol].value = originalUniforms[symbol].value;
                     }
                 }
             }

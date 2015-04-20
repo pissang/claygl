@@ -5,18 +5,8 @@ define(function(require) {
     var glMatrix = require('../dep/glmatrix');
     var mat2 = glMatrix.mat2;
 
-    function makeProperty(n) {
-        return {
-            configurable: false,
-            set: function(value) {
-                this._array[n] = value;
-                this._dirty = true;
-            },
-            get: function() {
-                return this._array[n];
-            }
-        };
-    }
+    var KEY_ARRAY = '_array';
+    var KEY_DIRTY = '_dirty';
 
     /**
      * @constructor
@@ -26,14 +16,16 @@ define(function(require) {
 
         /**
          * Storage of Matrix2
+         * @name _array
          * @type {Float32Array}
          */
-        this._array = mat2.create();
+        this[KEY_ARRAY] = mat2.create();
 
         /**
+         * @name _dirty
          * @type {boolean}
          */
-        this._dirty = true;
+        this[KEY_DIRTY] = true;
     };
 
     Matrix2.prototype = {
@@ -54,8 +46,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         copy: function(b) {
-            mat2.copy(this._array, b._array);
-            this._dirty = true;
+            mat2.copy(this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -64,8 +56,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         adjoint: function() {
-            mat2.adjoint(this._array, this._array);
-            this._dirty = true;
+            mat2.adjoint(this[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -74,7 +66,7 @@ define(function(require) {
          * @return {number}
          */
         determinant: function() {
-            return mat2.determinant(this._array);
+            return mat2.determinant(this[KEY_ARRAY]);
         },
 
         /**
@@ -82,8 +74,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         identity: function() {
-            mat2.identity(this._array);
-            this._dirty = true;
+            mat2.identity(this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -92,8 +84,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         invert: function() {
-            mat2.invert(this._array, this._array);
-            this._dirty = true;
+            mat2.invert(this[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -103,8 +95,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         mul: function(b) {
-            mat2.mul(this._array, this._array, b._array);
-            this._dirty = true;
+            mat2.mul(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -114,8 +106,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         mulLeft: function(a) {
-            mat2.mul(this._array, a._array, this._array);
-            this._dirty = true;
+            mat2.mul(this[KEY_ARRAY], a[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -125,8 +117,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         multiply: function(b) {
-            mat2.multiply(this._array, this._array, b._array);
-            this._dirty = true;
+            mat2.multiply(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -136,8 +128,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         multiplyLeft: function(a) {
-            mat2.multiply(this._array, a._array, this._array);
-            this._dirty = true;
+            mat2.multiply(this[KEY_ARRAY], a[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -147,8 +139,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         rotate: function(rad) {
-            mat2.rotate(this._array, this._array, rad);
-            this._dirty = true;
+            mat2.rotate(this[KEY_ARRAY], this[KEY_ARRAY], rad);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -158,8 +150,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         scale: function(v) {
-            mat2.scale(this._array, this._array, v._array);
-            this._dirty = true;
+            mat2.scale(this[KEY_ARRAY], this[KEY_ARRAY], v[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
         /**
@@ -167,12 +159,12 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         transpose: function() {
-            mat2.transpose(this._array, this._array);
-            this._dirty = true;
+            mat2.transpose(this[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
         toString: function() {
-            return '[' + Array.prototype.join.call(this._array, ',') + ']';
+            return '[' + Array.prototype.join.call(this[KEY_ARRAY], ',') + ']';
         }
     };
 
@@ -182,8 +174,8 @@ define(function(require) {
      * @return {Matrix2}
      */
     Matrix2.adjoint = function(out, a) {
-        mat2.adjoint(out._array, a._array);
-        out._dirty = true;
+        mat2.adjoint(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -193,8 +185,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.copy = function(out, a) {
-        mat2.copy(out._array, a._array);
-        out._dirty = true;
+        mat2.copy(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -203,7 +195,7 @@ define(function(require) {
      * @return {number}
      */
     Matrix2.determinant = function(a) {
-        return mat2.determinant(a._array);
+        return mat2.determinant(a[KEY_ARRAY]);
     };
 
     /**
@@ -211,8 +203,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.identity = function(out) {
-        mat2.identity(out._array);
-        out._dirty = true;
+        mat2.identity(out[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -222,8 +214,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.invert = function(out, a) {
-        mat2.invert(out._array, a._array);
-        out._dirty = true;
+        mat2.invert(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -234,8 +226,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.mul = function(out, a, b) {
-        mat2.mul(out._array, a._array, b._array);
-        out._dirty = true;
+        mat2.mul(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -255,8 +247,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.rotate = function(out, a, rad) {
-        mat2.rotate(out._array, a._array, rad);
-        out._dirty = true;
+        mat2.rotate(out[KEY_ARRAY], a[KEY_ARRAY], rad);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -267,8 +259,8 @@ define(function(require) {
      * @return {qtek.math.Matrix2}
      */
     Matrix2.scale = function(out, a, v) {
-        mat2.scale(out._array, a._array, v._array);
-        out._dirty = true;
+        mat2.scale(out[KEY_ARRAY], a[KEY_ARRAY], v[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
     /**
@@ -277,8 +269,8 @@ define(function(require) {
      * @return {Matrix2}
      */
     Matrix2.transpose = function(out, a) {
-        mat2.transpose(out._array, a._array);
-        out._dirty = true;
+        mat2.transpose(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 

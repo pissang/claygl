@@ -3,7 +3,6 @@ define(function(require){
     'use strict';
 
     var Node = require('./Node');
-    var Shader = require('./Shader');
 
     /**
      * @constructor qtek.Light

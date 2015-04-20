@@ -18,6 +18,8 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
+    var mat4Create = mat4.create;
+
     var glid = 0;
 
     var errorShader = {};
@@ -344,7 +346,7 @@ define(function(require) {
             // Sort render queue
             // Calculate the object depth
             if (transparentQueue.length > 0) {
-                var worldViewMat = mat4.create();
+                var worldViewMat = mat4Create();
                 var posViewSpace = vec3.create();
                 for (var i = 0; i < transparentQueue.length; i++) {
                     var node = transparentQueue[i];
@@ -820,32 +822,32 @@ define(function(require) {
 
     // Temporary variables
     var matrices = {
-        WORLD: mat4.create(),
-        VIEW: mat4.create(),
-        PROJECTION: mat4.create(),
-        WORLDVIEW: mat4.create(),
-        VIEWPROJECTION: mat4.create(),
-        WORLDVIEWPROJECTION: mat4.create(),
+        WORLD: mat4Create(),
+        VIEW: mat4Create(),
+        PROJECTION: mat4Create(),
+        WORLDVIEW: mat4Create(),
+        VIEWPROJECTION: mat4Create(),
+        WORLDVIEWPROJECTION: mat4Create(),
 
-        WORLDINVERSE: mat4.create(),
-        VIEWINVERSE: mat4.create(),
-        PROJECTIONINVERSE: mat4.create(),
-        WORLDVIEWINVERSE: mat4.create(),
-        VIEWPROJECTIONINVERSE: mat4.create(),
-        WORLDVIEWPROJECTIONINVERSE: mat4.create(),
+        WORLDINVERSE: mat4Create(),
+        VIEWINVERSE: mat4Create(),
+        PROJECTIONINVERSE: mat4Create(),
+        WORLDVIEWINVERSE: mat4Create(),
+        VIEWPROJECTIONINVERSE: mat4Create(),
+        WORLDVIEWPROJECTIONINVERSE: mat4Create(),
 
-        WORLDTRANSPOSE: mat4.create(),
-        VIEWTRANSPOSE: mat4.create(),
-        PROJECTIONTRANSPOSE: mat4.create(),
-        WORLDVIEWTRANSPOSE: mat4.create(),
-        VIEWPROJECTIONTRANSPOSE: mat4.create(),
-        WORLDVIEWPROJECTIONTRANSPOSE: mat4.create(),
-        WORLDINVERSETRANSPOSE: mat4.create(),
-        VIEWINVERSETRANSPOSE: mat4.create(),
-        PROJECTIONINVERSETRANSPOSE: mat4.create(),
-        WORLDVIEWINVERSETRANSPOSE: mat4.create(),
-        VIEWPROJECTIONINVERSETRANSPOSE: mat4.create(),
-        WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4.create()
+        WORLDTRANSPOSE: mat4Create(),
+        VIEWTRANSPOSE: mat4Create(),
+        PROJECTIONTRANSPOSE: mat4Create(),
+        WORLDVIEWTRANSPOSE: mat4Create(),
+        VIEWPROJECTIONTRANSPOSE: mat4Create(),
+        WORLDVIEWPROJECTIONTRANSPOSE: mat4Create(),
+        WORLDINVERSETRANSPOSE: mat4Create(),
+        VIEWINVERSETRANSPOSE: mat4Create(),
+        PROJECTIONINVERSETRANSPOSE: mat4Create(),
+        WORLDVIEWINVERSETRANSPOSE: mat4Create(),
+        VIEWPROJECTIONINVERSETRANSPOSE: mat4Create(),
+        WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4Create()
     };
 
     Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;

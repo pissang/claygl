@@ -8,6 +8,17 @@ define(function(require) {
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
 
+    var KEY_FRAMEBUFFER = 'framebuffer';
+    var KEY_RENDERBUFFER = 'renderbuffer';
+    var KEY_RENDERBUFFER_WIDTH = KEY_RENDERBUFFER + '_width';
+    var KEY_RENDERBUFFER_HEIGHT = KEY_RENDERBUFFER + '_height';
+    var KEY_RENDERBUFFER_ATTACHED = KEY_RENDERBUFFER + '_attached';
+    var KEY_DEPTHTEXTURE_ATTACHED = 'depthtexture_attached';
+
+    var GL_FRAMEBUFFER = glenum.FRAMEBUFFER;
+    var GL_RENDERBUFFER = glenum.RENDERBUFFER;
+    var GL_DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
+    var GL_COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
     /**
      * @constructor qtek.FrameBuffer
      * @extends qtek.core.Base
@@ -58,33 +69,33 @@ define(function(require) {
             var _gl = renderer.gl;
 
             if (!this._binded) {
-                _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+                _gl.bindFramebuffer(GL_FRAMEBUFFER, this.getFrameBuffer(_gl));
                 this._binded = true;
             }
             var cache = this._cache;
 
             cache.put('viewport', renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height, 1);
-            if (! cache.get('depthtexture_attached') && this.depthBuffer) {
+            if (! cache.get(KEY_DEPTHTEXTURE_ATTACHED) && this.depthBuffer) {
                 // Create a new render buffer
-                if (cache.miss('renderbuffer')) {
-                    cache.put('renderbuffer', _gl.createRenderbuffer());
+                if (cache.miss(KEY_RENDERBUFFER)) {
+                    cache.put(KEY_RENDERBUFFER, _gl.createRenderbuffer());
                 }
                 var width = this._width;
                 var height = this._height;
-                var renderbuffer = cache.get('renderbuffer');
+                var renderbuffer = cache.get(KEY_RENDERBUFFER);
 
-                if (width !== cache.get('renderbuffer_width')
-                     || height !== cache.get('renderbuffer_height')) {
-                    _gl.bindRenderbuffer(_gl.RENDERBUFFER, renderbuffer);
-                    _gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, width, height);
-                    cache.put('renderbuffer_width', width);
-                    cache.put('renderbuffer_height', height);
-                    _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);                 
+                if (width !== cache.get(KEY_RENDERBUFFER_WIDTH)
+                     || height !== cache.get(KEY_RENDERBUFFER_HEIGHT)) {
+                    _gl.bindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+                    _gl.renderbufferStorage(GL_RENDERBUFFER, _gl.DEPTH_COMPONENT16, width, height);
+                    cache.put(KEY_RENDERBUFFER_WIDTH, width);
+                    cache.put(KEY_RENDERBUFFER_HEIGHT, height);
+                    _gl.bindRenderbuffer(GL_RENDERBUFFER, null);                 
                 }
-                if (! cache.get('renderbuffer_attached')) {
-                    _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
-                    cache.put('renderbuffer_attached', true);
+                if (! cache.get(KEY_RENDERBUFFER_ATTACHED)) {
+                    _gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
+                    cache.put(KEY_RENDERBUFFER_ATTACHED, true);
                 }
             }
         },
@@ -95,7 +106,7 @@ define(function(require) {
         unbind: function(renderer) {
             var _gl = renderer.gl;
             
-            _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
+            _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
             this._binded = false;
 
             this._cache.use(_gl.__GLID__);
@@ -121,14 +132,14 @@ define(function(require) {
         },
 
         getFrameBuffer: function(_gl) {
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
 
-            this._cache.use(_gl.__GLID__);
-
-            if (this._cache.miss('framebuffer')) {
-                this._cache.put('framebuffer', _gl.createFramebuffer());
+            if (cache.miss(KEY_FRAMEBUFFER)) {
+                cache.put(KEY_FRAMEBUFFER, _gl.createFramebuffer());
             }
 
-            return this._cache.get('framebuffer');
+            return cache.get(KEY_FRAMEBUFFER);
         },
 
         /**
@@ -146,7 +157,7 @@ define(function(require) {
             }
 
             if (!this._binded) {
-                _gl.bindFramebuffer(_gl.FRAMEBUFFER, this.getFrameBuffer(_gl));
+                _gl.bindFramebuffer(GL_FRAMEBUFFER, this.getFrameBuffer(_gl));
                 this._binded = true;
             }
 
@@ -156,29 +167,29 @@ define(function(require) {
             // If the depth_texture extension is enabled, developers
             // Can attach a depth texture to the depth buffer
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
-            attachment = attachment || _gl.COLOR_ATTACHMENT0;
+            attachment = attachment || GL_COLOR_ATTACHMENT0;
             target = target || _gl.TEXTURE_2D;
             mipmapLevel = mipmapLevel || 0;
             
-            if (attachment === _gl.DEPTH_ATTACHMENT) {
+            if (attachment === GL_DEPTH_ATTACHMENT) {
 
                 var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
 
                 if (!extension) {
-                    console.error(' Depth texture is not supported by the browser');
+                    console.error('Depth texture is not supported by the browser');
                     return;
                 }
                 if (texture.format !== glenum.DEPTH_COMPONENT) {
                     console.error('The texture attached to depth buffer is not a valid.');
                     return;
                 }
-                this._cache.put('renderbuffer_attached', false);
-                this._cache.put('depthtexture_attached', true);
+                this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
+                this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
             }
 
             this._attachedTextures[attachment] = texture;
 
-            _gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
+            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
         },
         // TODO
         detach: function() {},
@@ -187,13 +198,14 @@ define(function(require) {
          * @param  {WebGLRenderingContext} _gl
          */
         dispose: function(_gl) {
-            this._cache.use(_gl.__GLID__);
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
 
-            var renderBuffer = this._cache.get('renderbuffer');
+            var renderBuffer = cache.get(KEY_RENDERBUFFER);
             if (renderBuffer) {
                 _gl.deleteRenderbuffer(renderBuffer);
             }
-            var frameBuffer = this._cache.get('framebuffer');
+            var frameBuffer = cache.get(KEY_FRAMEBUFFER);
             if (frameBuffer) {
                 _gl.deleteFramebuffer(frameBuffer);
             }
@@ -202,12 +214,12 @@ define(function(require) {
             this._attachedTextures = {};
             this._width = this._height = 0;
 
-            this._cache.deleteContext(_gl.__GLID__);
+            cache.deleteContext(_gl.__GLID__);
         }
     });
 
-    FrameBuffer.COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
-    FrameBuffer.DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
+    FrameBuffer.DEPTH_ATTACHMENT = GL_DEPTH_ATTACHMENT;
+    FrameBuffer.COLOR_ATTACHMENT0 = GL_COLOR_ATTACHMENT0;
     FrameBuffer.STENCIL_ATTACHMENT = glenum.STENCIL_ATTACHMENT;
     FrameBuffer.DEPTH_STENCIL_ATTACHMENT = glenum.DEPTH_STENCIL_ATTACHMENT;
 

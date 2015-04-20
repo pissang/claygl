@@ -16,7 +16,11 @@ define(function(require) {
     var vec3 = glMatrix.vec3;
     var mat4 = glMatrix.mat4;
 
+    var vec3Add = vec3.add;
+    var vec3Create = vec3.create;
+
     var arrSlice = Array.prototype.slice;
+    var Attribute = Geometry.Attribute;
     /**
      * @constructor qtek.DynamicGeometry
      * @extends qtek.Geometry
@@ -24,21 +28,21 @@ define(function(require) {
     var DynamicGeometry = Geometry.derive(function() {
         return /** @lends qtek.DynamicGeometry# */ {
             attributes: {
-                 position: new Geometry.Attribute('position', 'float', 3, 'POSITION', true),
-                 texcoord0: new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
-                 texcoord1: new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', true),
-                 normal: new Geometry.Attribute('normal', 'float', 3, 'NORMAL', true),
-                 tangent: new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', true),
-                 color: new Geometry.Attribute('color', 'float', 4, 'COLOR', true),
+                 position: new Attribute('position', 'float', 3, 'POSITION', true),
+                 texcoord0: new Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
+                 texcoord1: new Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', true),
+                 normal: new Attribute('normal', 'float', 3, 'NORMAL', true),
+                 tangent: new Attribute('tangent', 'float', 4, 'TANGENT', true),
+                 color: new Attribute('color', 'float', 4, 'COLOR', true),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the 
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight: new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', true),
-                 joint: new Geometry.Attribute('joint', 'float', 4, 'JOINT', true),
+                 weight: new Attribute('weight', 'float', 3, 'WEIGHT', true),
+                 joint: new Attribute('joint', 'float', 4, 'JOINT', true),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric: new Geometry.Attribute('barycentric', 'float', 3, null, true)
+                 barycentric: new Attribute('barycentric', 'float', 3, null, true)
             },
 
             dynamic: true,
@@ -68,10 +72,11 @@ define(function(require) {
     /** @lends qtek.DynamicGeometry.prototype */
     {
         updateBoundingBox: function() {
-            if (!this.boundingBox) {
-                this.boundingBox = new BoundingBox();
+            var bbox = this.boundingBox;
+            if (! bbox) {
+                bbox = this.boundingBox = new BoundingBox();
             }
-            this.boundingBox.updateFromVertices(this.attributes.position.value);
+            bbox.updateFromVertices(this.attributes.position.value);
         },
         // Overwrite the dirty method
         dirty: function(field) {
@@ -121,16 +126,17 @@ define(function(require) {
         },
 
         createAttribute: function(name, type, size, semantic) {
-            var attrib = new Geometry.Attribute(name, type, size, semantic, true);
+            var attrib = new Attribute(name, type, size, semantic, true);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
         },
 
         removeAttribute: function(name) {
-            var idx = this._attributeList.indexOf(name);
+            var attributeList = this._attributeList;
+            var idx = attributeList.indexOf(name);
             if (idx >= 0) {
-                this._attributeList.splice(idx, 1);
+                attributeList.splice(idx, 1);
                 delete this.attributes[name];
                 return true;
             }
@@ -143,16 +149,18 @@ define(function(require) {
          * @return {Object}
          */
         getEnabledAttributes: function() {
+            var enabledAttributes = this._enabledAttributes;
+            var attributeList = this._attributeList;
             // Cache
-            if (this._enabledAttributes) {
-                return this._enabledAttributes;
+            if (enabledAttributes) {
+                return enabledAttributes;
             }
 
             var result = {};
             var nVertex = this.getVertexNumber();
 
-            for (var i = 0; i < this._attributeList.length; i++) {
-                var name = this._attributeList[i];
+            for (var i = 0; i < attributeList.length; i++) {
+                var name = attributeList[i];
                 var attrib = this.attributes[name];
                 if (attrib.value.length) {
                     if (attrib.value.length === nVertex) {
@@ -169,14 +177,15 @@ define(function(require) {
         _getDirtyAttributes: function() {
 
             var attributes = this.getEnabledAttributes();
+            var cache = this._cache;
             
-            if (this._cache.miss('chunks')) {
+            if (cache.miss('chunks')) {
                 return attributes;
             } else {
                 var result = {};
                 var noDirtyAttributes = true;
                 for (var name in attributes) {
-                    if (this._cache.isDirty(name)) {
+                    if (cache.isDirty(name)) {
                         result[name] = attributes[name];
                         noDirtyAttributes = false;
                     }
@@ -192,13 +201,13 @@ define(function(require) {
         },
 
         getBufferChunks: function(_gl) {
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
 
-            this._cache.use(_gl.__GLID__);
-
-            if (this._cache.isDirty()) {
+            if (cache.isDirty()) {
                 var dirtyAttributes = this._getDirtyAttributes();
 
-                var isFacesDirty = this._cache.isDirty('indices');
+                var isFacesDirty = cache.isDirty('indices');
                 isFacesDirty = isFacesDirty && this.isUseFace();
                 
                 if (dirtyAttributes) {
@@ -209,13 +218,13 @@ define(function(require) {
                     this._updateBuffer(_gl, dirtyAttributes, isFacesDirty);
 
                     for (var name in dirtyAttributes) {
-                        this._cache.fresh(name);
+                        cache.fresh(name);
                     }
-                    this._cache.fresh('indices');
-                    this._cache.fresh();
+                    cache.fresh('indices');
+                    cache.fresh();
                 }
             }
-            return this._cache.get('chunks');
+            return cache.get('chunks');
         },
 
         _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty, useUintExtension) {
@@ -502,11 +511,12 @@ define(function(require) {
         generateVertexNormals: function() {
             var faces = this.faces;
             var len = faces.length;
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
-            var normal = vec3.create();
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
+            var normal = vec3Create();
 
-            var v21 = vec3.create(), v32 = vec3.create();
+            var v21 = vec3Create(), v32 = vec3Create();
 
             for (var i = 0; i < normals.length; i++) {
                 vec3.set(normals[i], 0.0, 0.0, 0.0);
@@ -530,9 +540,9 @@ define(function(require) {
                 vec3.sub(v32, p2, p3);
                 vec3.cross(normal, v21, v32);
                 // Weighted by the triangle area
-                vec3.add(normals[i1], normals[i1], normal);
-                vec3.add(normals[i2], normals[i2], normal);
-                vec3.add(normals[i3], normals[i3], normal);
+                vec3Add(normals[i1], normals[i1], normal);
+                vec3Add(normals[i2], normals[i2], normal);
+                vec3Add(normals[i3], normals[i3], normal);
             }
             for (var i = 0; i < normals.length; i++) {
                 vec3.normalize(normals[i], normals[i]);
@@ -546,11 +556,12 @@ define(function(require) {
 
             var faces = this.faces;
             var len = faces.length;
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
-            var normal = vec3.create();
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
+            var normal = vec3Create();
 
-            var v21 = vec3.create(), v32 = vec3.create();
+            var v21 = vec3Create(), v32 = vec3Create();
 
             var isCopy = normals.length === positions.length;
             
@@ -581,10 +592,11 @@ define(function(require) {
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
         generateTangents: function() {
             
-            var texcoords = this.attributes.texcoord0.value;
-            var positions = this.attributes.position.value;
-            var tangents = this.attributes.tangent.value;
-            var normals = this.attributes.normal.value;
+            var attributes = this.attributes;
+            var texcoords = attributes.texcoord0.value;
+            var positions = attributes.position.value;
+            var tangents = attributes.tangent.value;
+            var normals = attributes.normal.value;
 
             var tan1 = [];
             var tan2 = [];
@@ -631,12 +643,12 @@ define(function(require) {
                 tdir[1] = (s1 * y2 - s2 * y1) * r;
                 tdir[2] = (s1 * z2 - s2 * z1) * r;
 
-                vec3.add(tan1[i1], tan1[i1], sdir);
-                vec3.add(tan1[i2], tan1[i2], sdir);
-                vec3.add(tan1[i3], tan1[i3], sdir);
-                vec3.add(tan2[i1], tan2[i1], tdir);
-                vec3.add(tan2[i2], tan2[i2], tdir);
-                vec3.add(tan2[i3], tan2[i3], tdir);
+                vec3Add(tan1[i1], tan1[i1], sdir);
+                vec3Add(tan1[i2], tan1[i2], sdir);
+                vec3Add(tan1[i3], tan1[i3], sdir);
+                vec3Add(tan2[i1], tan2[i1], tdir);
+                vec3Add(tan2[i2], tan2[i2], tdir);
+                vec3Add(tan2[i3], tan2[i3], tdir);
             }
             var tmp = [0, 0, 0, 0];
             var nCrossT = [0, 0, 0];
@@ -773,14 +785,16 @@ define(function(require) {
         },
 
         applyTransform: function(matrix) {
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
+            var tangents = attributes.tangent.value;
 
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
-            var tangents = this.attributes.tangent.value;
+            var vec3TransformMat4 = vec3.transformMat4;
 
             matrix = matrix._array;
             for (var i = 0; i < positions.length; i++) {
-                vec3.transformMat4(positions[i], positions[i], matrix);
+                vec3TransformMat4(positions[i], positions[i], matrix);
             }
             // Normal Matrix
             var inverseTransposeMatrix = mat4.create();
@@ -788,11 +802,11 @@ define(function(require) {
             mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
             for (var i = 0; i < normals.length; i++) {
-                vec3.transformMat4(normals[i], normals[i], inverseTransposeMatrix);
+                vec3TransformMat4(normals[i], normals[i], inverseTransposeMatrix);
             }
 
             for (var i = 0; i < tangents.length; i++) {
-                vec3.transformMat4(tangents[i], tangents[i], inverseTransposeMatrix);
+                vec3TransformMat4(tangents[i], tangents[i], inverseTransposeMatrix);
             }
             
             if (this.boundingBox) {
@@ -801,8 +815,9 @@ define(function(require) {
         },
 
         dispose: function(_gl) {
-            this._cache.use(_gl.__GLID__);
-            var chunks = this._cache.get('chunks');
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
+            var chunks = cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
@@ -812,7 +827,7 @@ define(function(require) {
                     }
                 }
             }
-            this._cache.deleteContext(_gl.__GLID__);
+            cache.deleteContext(_gl.__GLID__);
         }
     });
     

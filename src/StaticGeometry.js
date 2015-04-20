@@ -12,6 +12,12 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
+    var Attribute = Geometry.Attribute;
+    var vec3Create = vec3.create;
+    var vec3Add = vec3.add;
+    var vec3Set = vec3.set;
+
+    var Float32Array = typeof window.Float32Array === 'undefined' ? Array : window.Float32Array;
     /**
      * @constructor qtek.StaticGeometry
      * @extends qtek.Geometry
@@ -19,21 +25,21 @@ define(function(require) {
     var StaticGeometry = Geometry.derive(function() {
         return /** @lends qtek.StaticGeometry# */ {
             attributes: {
-                 position: new Geometry.Attribute('position', 'float', 3, 'POSITION', false),
-                 texcoord0: new Geometry.Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
-                 texcoord1: new Geometry.Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
-                 normal: new Geometry.Attribute('normal', 'float', 3, 'NORMAL', false),
-                 tangent: new Geometry.Attribute('tangent', 'float', 4, 'TANGENT', false),
-                 color: new Geometry.Attribute('color', 'float', 4, 'COLOR', false),
+                 position: new Attribute('position', 'float', 3, 'POSITION', false),
+                 texcoord0: new Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
+                 texcoord1: new Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
+                 normal: new Attribute('normal', 'float', 3, 'NORMAL', false),
+                 tangent: new Attribute('tangent', 'float', 4, 'TANGENT', false),
+                 color: new Attribute('color', 'float', 4, 'COLOR', false),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the 
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight: new Geometry.Attribute('weight', 'float', 3, 'WEIGHT', false),
-                 joint: new Geometry.Attribute('joint', 'float', 4, 'JOINT', false),
+                 weight: new Attribute('weight', 'float', 3, 'WEIGHT', false),
+                 joint: new Attribute('joint', 'float', 4, 'JOINT', false),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric: new Geometry.Attribute('barycentric', 'float', 3, null, false),
+                 barycentric: new Attribute('barycentric', 'float', 3, null, false),
             },
 
             hint: glenum.STATIC_DRAW,
@@ -64,21 +70,23 @@ define(function(require) {
         },
 
         getFaceNumber: function() {
-            if (!this.faces) {
+            var faces = this.faces;
+            if (!faces) {
                 return 0;
             } else {
-                return this.faces.length / 3;
+                return faces.length / 3;
             }
         },
 
         getFace: function (idx, out) {
             if (idx < this.getFaceNumber() && idx >= 0) {
                 if (!out) {
-                    out = vec3.create();
+                    out = vec3Create();
                 }
-                out[0] = this.faces[idx * 3];
-                out[1] = this.faces[idx * 3 + 1];
-                out[2] = this.faces[idx * 3 + 2];
+                var faces = this.faces;
+                out[0] = faces[idx * 3];
+                out[1] = faces[idx * 3 + 1];
+                out[2] = faces[idx * 3 + 2];
                 return out;
             }
         },
@@ -88,16 +96,16 @@ define(function(require) {
         },
         
         createAttribute: function(name, type, size, semantic) {
-            var attrib = new Geometry.Attribute(name, type, size, semantic, false);
+            var attrib = new Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
         },
 
         removeAttribute: function(name) {
-            var idx = this._attributeList.indexOf(name);
+            var idx = attributeList.indexOf(name);
             if (idx >= 0) {
-                this._attributeList.splice(idx, 1);
+                attributeList.splice(idx, 1);
                 delete this.attributes[name];
                 return true;
             }
@@ -110,16 +118,18 @@ define(function(require) {
          * @return {string[]}
          */
         getEnabledAttributes: function() {
+            var enabledAttributes = this._enabledAttributes;
+            var attributeList = this._attributeList;
             // Cache
-            if (this._enabledAttributes) {
-                return this._enabledAttributes;
+            if (enabledAttributes) {
+                return enabledAttributes;
             }
 
             var result = [];
             var nVertex = this.getVertexNumber();
 
-            for (var i = 0; i < this._attributeList.length; i++) {
-                var name = this._attributeList[i];
+            for (var i = 0; i < attributeList.length; i++) {
+                var name = attributeList[i];
                 var attrib = this.attributes[name];
                 if (attrib.value) {
                     if (attrib.value.length === nVertex * attrib.size) {
@@ -134,12 +144,13 @@ define(function(require) {
         },
 
         getBufferChunks: function(_gl) {
-            this._cache.use(_gl.__GLID__);
-            if (this._cache.isDirty()) {
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
+            if (cache.isDirty()) {
                 this._updateBuffer(_gl);
-                this._cache.fresh();
+                cache.fresh();
             }
-            return this._cache.get('chunks');
+            return cache.get('chunks');
         },
         
         _updateBuffer: function(_gl) {
@@ -214,11 +225,12 @@ define(function(require) {
 
         generateVertexNormals: function() {
             var faces = this.faces;
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
 
             if (!normals || normals.length !== positions.length) {
-                normals = this.attributes.normal.value = new Float32Array(positions.length);
+                normals = attributes.normal.value = new Float32Array(positions.length);
             } else {
                 // Reset
                 for (var i = 0; i < normals.length; i++) {
@@ -226,23 +238,23 @@ define(function(require) {
                 }
             }
 
-            var p1 = vec3.create();
-            var p2 = vec3.create();
-            var p3 = vec3.create();
+            var p1 = vec3Create();
+            var p2 = vec3Create();
+            var p3 = vec3Create();
 
-            var v21 = vec3.create();
-            var v32 = vec3.create();
+            var v21 = vec3Create();
+            var v32 = vec3Create();
 
-            var n = vec3.create();
+            var n = vec3Create();
 
             for (var f = 0; f < faces.length;) {
                 var i1 = faces[f++];
                 var i2 = faces[f++];
                 var i3 = faces[f++];
 
-                vec3.set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
-                vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
-                vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
+                vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
+                vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
+                vec3Set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
 
                 vec3.sub(v21, p1, p2);
                 vec3.sub(v32, p2, p3);
@@ -256,7 +268,7 @@ define(function(require) {
             }
 
             for (var i = 0; i < normals.length;) {
-                vec3.set(n, normals[i], normals[i+1], normals[i+2]);
+                vec3Set(n, normals[i], normals[i+1], normals[i+2]);
                 vec3.normalize(n, n);
                 normals[i++] = n[0];
                 normals[i++] = n[1];
@@ -270,28 +282,29 @@ define(function(require) {
             }
 
             var faces = this.faces;
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
 
-            var p1 = vec3.create();
-            var p2 = vec3.create();
-            var p3 = vec3.create();
+            var p1 = vec3Create();
+            var p2 = vec3Create();
+            var p3 = vec3Create();
 
-            var v21 = vec3.create();
-            var v32 = vec3.create();
-            var n = vec3.create();
+            var v21 = vec3Create();
+            var v32 = vec3Create();
+            var n = vec3Create();
 
             if (!normals) {
-                normals = this.attributes.position.value = new Float32Array(positions.length);
+                normals = attributes.position.value = new Float32Array(positions.length);
             }
             for (var f = 0; f < faces.length;) {
                 var i1 = faces[f++];
                 var i2 = faces[f++];
                 var i3 = faces[f++];
 
-                vec3.set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
-                vec3.set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
-                vec3.set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
+                vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
+                vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
+                vec3Set(p3, positions[i3*3], positions[i3*3+1], positions[i3*3+2]);
 
                 vec3.sub(v21, p1, p2);
                 vec3.sub(v32, p2, p3);
@@ -309,13 +322,14 @@ define(function(require) {
 
         generateTangents: function() {
             var nVertex = this.getVertexNumber();
-            if (!this.attributes.tangent.value) {
-                this.attributes.tangent.value = new Float32Array(nVertex * 4);
+            var attributes = this.attributes;
+            if (!attributes.tangent.value) {
+                attributes.tangent.value = new Float32Array(nVertex * 4);
             }
-            var texcoords = this.attributes.texcoord0.value;
-            var positions = this.attributes.position.value;
-            var tangents = this.attributes.tangent.value;
-            var normals = this.attributes.normal.value;
+            var texcoords = attributes.texcoord0.value;
+            var positions = attributes.position.value;
+            var tangents = attributes.tangent.value;
+            var normals = attributes.normal.value;
 
             var tan1 = [];
             var tan2 = [];
@@ -326,10 +340,11 @@ define(function(require) {
 
             var sdir = [0.0, 0.0, 0.0];
             var tdir = [0.0, 0.0, 0.0];
-            for (var i = 0; i < this.faces.length;) {
-                var i1 = this.faces[i++],
-                    i2 = this.faces[i++],
-                    i3 = this.faces[i++],
+            var faces = this.faces;
+            for (var i = 0; i < faces.length;) {
+                var i1 = faces[i++],
+                    i2 = faces[i++],
+                    i3 = faces[i++],
 
                     st1s = texcoords[i1 * 2],
                     st2s = texcoords[i2 * 2],
@@ -369,16 +384,16 @@ define(function(require) {
                 tdir[1] = (s1 * y2 - s2 * y1) * r;
                 tdir[2] = (s1 * z2 - s2 * z1) * r;
 
-                vec3.add(tan1[i1], tan1[i1], sdir);
-                vec3.add(tan1[i2], tan1[i2], sdir);
-                vec3.add(tan1[i3], tan1[i3], sdir);
-                vec3.add(tan2[i1], tan2[i1], tdir);
-                vec3.add(tan2[i2], tan2[i2], tdir);
-                vec3.add(tan2[i3], tan2[i3], tdir);
+                vec3Add(tan1[i1], tan1[i1], sdir);
+                vec3Add(tan1[i2], tan1[i2], sdir);
+                vec3Add(tan1[i3], tan1[i3], sdir);
+                vec3Add(tan2[i1], tan2[i1], tdir);
+                vec3Add(tan2[i2], tan2[i2], tdir);
+                vec3Add(tan2[i3], tan2[i3], tdir);
             }
-            var tmp = vec3.create();
-            var nCrossT = vec3.create();
-            var n = vec3.create();
+            var tmp = vec3Create();
+            var nCrossT = vec3Create();
+            var n = vec3Create();
             for (var i = 0; i < nVertex; i++) {
                 n[0] = normals[i * 3];
                 n[1] = normals[i * 3 + 1];
@@ -422,9 +437,10 @@ define(function(require) {
             for (var a = 0; a < attributeNameList.length; a++) {
                 var name = attributeNameList[a];
                 var expandedArray = new Float32Array(this.faces.length * attributes[name].size);
-                var len = attributes[name].value.length;
+                var valueArr = attributes[name].value;
+                var len = valueArr.length;
                 for (var i = 0; i < len; i++) {
-                    expandedArray[i] = attributes[name].value[i];
+                    expandedArray[i] = valueArr[i];
                 }
                 attributes[name].value = expandedArray;
             }
@@ -454,15 +470,17 @@ define(function(require) {
                 this.generateUniqueVertex();
             }
 
-            var array = this.attributes.barycentric.value;
+            var attributes = this.attributes;
+            var array = attributes.barycentric.value;
+            var faces = this.faces;
             // Already existed;
-            if (array && array.length === this.faces.length * 3) {
+            if (array && array.length === faces.length * 3) {
                 return;
             }
-            array = this.attributes.barycentric.value = new Float32Array(this.faces.length * 3);
-            for (var i = 0; i < this.faces.length;) {
+            array = attributes.barycentric.value = new Float32Array(faces.length * 3);
+            for (var i = 0; i < faces.length;) {
                 for (var j = 0; j < 3; j++) {
-                    var ii = this.faces[i++];
+                    var ii = faces[i++];
                     array[ii + j] = 1;
                 }
             }
@@ -508,9 +526,10 @@ define(function(require) {
 
         applyTransform: function(matrix) {
 
-            var positions = this.attributes.position.value;
-            var normals = this.attributes.normal.value;
-            var tangents = this.attributes.tangent.value;
+            var attributes = this.attributes;
+            var positions = attributes.position.value;
+            var normals = attributes.normal.value;
+            var tangents = attributes.tangent.value;
 
             matrix = matrix._array;
             // Normal Matrix
@@ -518,12 +537,14 @@ define(function(require) {
             mat4.invert(inverseTransposeMatrix, matrix);
             mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
-            vec3.forEach(positions, 3, 0, null, vec3.transformMat4, matrix);
+            var vec3TransformMat4 = vec3.transformMat4;
+            var vec3ForEach = vec3.forEach;
+            vec3ForEach(positions, 3, 0, null, vec3TransformMat4, matrix);
             if (normals) {
-                vec3.forEach(normals, 3, 0, null, vec3.transformMat4, inverseTransposeMatrix);
+                vec3ForEach(normals, 3, 0, null, vec3TransformMat4, inverseTransposeMatrix);
             }
             if (tangents) {
-                vec3.forEach(tangents, 4, 0, null, vec3.transformMat4, inverseTransposeMatrix);   
+                vec3ForEach(tangents, 4, 0, null, vec3TransformMat4, inverseTransposeMatrix);   
             }
 
             if (this.boundingBox) {
@@ -532,8 +553,9 @@ define(function(require) {
         },
 
         dispose: function(_gl) {
-            this._cache.use(_gl.__GLID__);
-            var chunks = this._cache.get('chunks');
+            var cache = this._cache;
+            cache.use(_gl.__GLID__);
+            var chunks = cache.get('chunks');
             if (chunks) {
                 for (var c = 0; c < chunks.length; c++) {
                     var chunk = chunks[c];
@@ -544,7 +566,7 @@ define(function(require) {
                     }
                 }
             }
-            this._cache.deleteContext(_gl.__GLID__);
+            cache.deleteContext(_gl.__GLID__);
         }
     });
 

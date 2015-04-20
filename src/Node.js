@@ -127,9 +127,11 @@ define(function(require) {
          * @param {string} name
          */
         setName: function(name) {
-            if (this._scene) {
-                delete this._scene._nodeRepository[this.name];
-                this._scene._nodeRepository[name] = this;
+            var scene = this._scene;
+            if (scene) {
+                var nodeRepository = scene._nodeRepository;
+                delete nodeRepository[this.name];
+                nodeRepository[name] = this;
             }
             this.name = name;
         },
@@ -142,16 +144,18 @@ define(function(require) {
             if (this._inIterating) {
                 console.warn('Add operation can cause unpredictable error when in iterating');
             }
-            if (node._parent === this) {
+            var originalParent = node._parent;
+            if (originalParent === this) {
                 return;
             }
-            if (node._parent) {
-                node._parent.remove(node);
+            if (originalParent) {
+                originalParent.remove(node);
             }
             node._parent = this;
             this._children.push(node);
 
-            if (this._scene && this._scene !== node.scene) {
+            var scene = this._scene;
+            if (scene && scene !== node.scene) {
                 node.traverse(this._addSelfToScene, this);
             }
         },
@@ -164,13 +168,13 @@ define(function(require) {
             if (this._inIterating) {
                 console.warn('Remove operation can cause unpredictable error when in iterating');
             }
-
-            var idx = this._children.indexOf(node);
+            var children = this._children;
+            var idx = children.indexOf(node);
             if (idx < 0) {
                 return;
             }
 
-            this._children.splice(idx, 1);
+            children.splice(idx, 1);
             node._parent = null;
 
             if (this._scene) {
@@ -237,9 +241,10 @@ define(function(require) {
          * @return {qtek.Node}
          */
         getChildByName: function(name) {
-            for (var i = 0; i < this._children.length; i++) {
-                if (this._children[i].name === name) {
-                    return this._children[i];
+            var children = this._children;
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].name === name) {
+                    return children[i];
                 }
             }
         },
@@ -250,8 +255,9 @@ define(function(require) {
          * @return {qtek.Node}
          */
         getDescendantByName: function(name) {
-            for (var i = 0; i < this._children.length; i++) {
-                var child = this._children[i];
+            var children = this._children;
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
                 if (child.name === name) {
                     return child;
                 } else {
@@ -282,8 +288,9 @@ define(function(require) {
                     continue;
                 }
                 var found = false;
-                for (var j = 0; j < current._children.length; j++) {
-                    var child = current._children[j];
+                var children = current._children;
+                for (var j = 0; j < children.length; j++) {
+                    var child = children[j];
                     if (child.name === name) {
                         current = child;
                         found = true;
@@ -379,15 +386,17 @@ define(function(require) {
             var tmp = mat4.create();
 
             return function(keepScale) {
+                var localTransform = this.localTransform;
+                var worldTransform = this.worldTransform;
                 // Assume world transform is updated
                 if (this._parent) {
                     mat4.invert(tmp, this._parent.worldTransform._array);
-                    mat4.multiply(this.localTransform._array, tmp, this.worldTransform._array);
+                    mat4.multiply(localTransform._array, tmp, worldTransform._array);
                 } else {
-                    mat4.copy(this.localTransform._array, this.worldTransform._array);
+                    mat4.copy(localTransform._array, worldTransform._array);
                 }
                 var scale = !keepScale ? this.scale: null;
-                this.localTransform.decomposeMatrix(scale, this.rotation, this.position);
+                localTransform.decomposeMatrix(scale, this.rotation, this.position);
             };
         })(),
 
@@ -420,16 +429,16 @@ define(function(require) {
          * Update world transform, assume its parent world transform have been updated
          */
         updateWorldTransform: function() {
+            var localTransform = this.localTransform._array;
+            var worldTransform = this.worldTransform._array;
             if (this._parent) {
                 mat4.multiply(
-                    this.worldTransform._array,
+                    worldTransform,
                     this._parent.worldTransform._array,
-                    this.localTransform._array
+                    localTransform
                 );
             } else {
-                mat4.copy(
-                    this.worldTransform._array, this.localTransform._array 
-                );
+                mat4.copy(worldTransform, localTransform );
             }
         },
 
@@ -451,8 +460,9 @@ define(function(require) {
                 this._needsUpdateWorldTransform = false;
             }
             
-            for(var i = 0, len = this._children.length; i < len; i++) {
-                this._children[i].update(forceUpdateWorld);
+            var children = this._children;
+            for(var i = 0, len = children.length; i < len; i++) {
+                children[i].update(forceUpdateWorld);
             }
         },
 
@@ -464,9 +474,10 @@ define(function(require) {
         getWorldPosition: function(out) {
             var m = this.worldTransform._array;
             if (out) {
-                out._array[0] = m[12];
-                out._array[1] = m[13];
-                out._array[2] = m[14];
+                var arr = out._array;
+                arr[0] = m[12];
+                arr[1] = m[13];
+                arr[2] = m[14];
                 return out;
             } else {
                 return new Vector3(m[12], m[13], m[14]);
@@ -479,13 +490,15 @@ define(function(require) {
          */
         clone: function() {
             var node = new this.constructor();
+            var children = this._children;
+
             node.setName(this.name);
             node.position.copy(this.position);
             node.rotation.copy(this.rotation);
             node.scale.copy(this.scale);
 
-            for (var i = 0; i < this._children.length; i++) {
-                node.add(this._children[i].clone());
+            for (var i = 0; i < children.length; i++) {
+                node.add(children[i].clone());
             }
             return node;
         },
@@ -507,14 +520,15 @@ define(function(require) {
 
                 v.copy(this.position).subtract(point);
 
-                this.localTransform.identity();
+                var localTransform = this.localTransform;
+                localTransform.identity();
                 // parent node
-                this.localTransform.translate(point);
-                this.localTransform.rotate(angle, axis);
+                localTransform.translate(point);
+                localTransform.rotate(angle, axis);
 
                 RTMatrix.fromRotationTranslation(this.rotation, v);
-                this.localTransform.multiply(RTMatrix);
-                this.localTransform.scale(this.scale);
+                localTransform.multiply(RTMatrix);
+                localTransform.scale(this.scale);
 
                 this.decomposeLocalTransform();
                 this._needsUpdateWorldTransform = true;

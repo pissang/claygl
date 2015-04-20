@@ -53,23 +53,25 @@ define(function(require) {
          */
         updateFromVertices: function(vertices) {
             if (vertices.length > 0) {
-                var _min = this.min._array;
-                var _max = this.max._array;
-                vec3Copy(_min, vertices[0]);
-                vec3Copy(_max, vertices[0]);
+                var min = this.min;
+                var max = this.max;
+                var minArr = min._array;
+                var maxArr = max._array;
+                vec3Copy(minArr, vertices[0]);
+                vec3Copy(maxArr, vertices[0]);
                 for (var i = 1; i < vertices.length; i++) {
                     var vertex = vertices[i];
 
-                    if (vertex[0] < _min[0]) { _min[0] = vertex[0]; }
-                    if (vertex[1] < _min[1]) { _min[1] = vertex[1]; }
-                    if (vertex[2] < _min[2]) { _min[2] = vertex[2]; }
+                    if (vertex[0] < minArr[0]) { minArr[0] = vertex[0]; }
+                    if (vertex[1] < minArr[1]) { minArr[1] = vertex[1]; }
+                    if (vertex[2] < minArr[2]) { minArr[2] = vertex[2]; }
 
-                    if (vertex[0] > _max[0]) { _max[0] = vertex[0]; }
-                    if (vertex[1] > _max[1]) { _max[1] = vertex[1]; }
-                    if (vertex[2] > _max[2]) { _max[2] = vertex[2]; }
+                    if (vertex[0] > maxArr[0]) { maxArr[0] = vertex[0]; }
+                    if (vertex[1] > maxArr[1]) { maxArr[1] = vertex[1]; }
+                    if (vertex[2] > maxArr[2]) { maxArr[2] = vertex[2]; }
                 }
-                this.min._dirty = true;
-                this.max._dirty = true;
+                min._dirty = true;
+                max._dirty = true;
             }
         },
 
@@ -78,10 +80,12 @@ define(function(require) {
          * @param  {qtek.math.BoundingBox} bbox
          */
         union: function(bbox) {
-            vec3.min(this.min._array, this.min._array, bbox.min._array);
-            vec3.max(this.max._array, this.max._array, bbox.max._array);
-            this.min._dirty = true;
-            this.max._dirty = true;
+            var min = this.min;
+            var max = this.max;
+            vec3.min(min._array, min._array, bbox.min._array);
+            vec3.max(max._array, max._array, bbox.max._array);
+            min._dirty = true;
+            max._dirty = true;
         },
 
         /**
@@ -105,37 +109,37 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} matrix
          */
         applyTransform: function(matrix) {
-            if (this.min._dirty || this.max._dirty) {
+            var min = this.min;
+            var max = this.max;
+            if (min._dirty || max._dirty) {
                 this.updateVertices();
-                this.min._dirty = false;
-                this.max._dirty = false;
             }
 
             var m4 = matrix._array;
-            var _min = this.min._array;
-            var _max = this.max._array;
+            var minArr = min._array;
+            var maxArr = max._array;
             var vertices = this.vertices;
 
             var v = vertices[0];
             vec3TransformMat4(v, v, m4);
-            vec3Copy(_min, v);
-            vec3Copy(_max, v);
+            vec3Copy(minArr, v);
+            vec3Copy(maxArr, v);
 
             for (var i = 1; i < 8; i++) {
                 v = vertices[i];
                 vec3TransformMat4(v, v, m4);
 
-                if (v[0] < _min[0]) { _min[0] = v[0]; }
-                if (v[1] < _min[1]) { _min[1] = v[1]; }
-                if (v[2] < _min[2]) { _min[2] = v[2]; }
+                if (v[0] < minArr[0]) { minArr[0] = v[0]; }
+                if (v[1] < minArr[1]) { minArr[1] = v[1]; }
+                if (v[2] < minArr[2]) { minArr[2] = v[2]; }
 
-                if (v[0] > _max[0]) { _max[0] = v[0]; }
-                if (v[1] > _max[1]) { _max[1] = v[1]; }
-                if (v[2] > _max[2]) { _max[2] = v[2]; }
+                if (v[0] > maxArr[0]) { maxArr[0] = v[0]; }
+                if (v[1] > maxArr[1]) { maxArr[1] = v[1]; }
+                if (v[2] > maxArr[2]) { maxArr[2] = v[2]; }
             }
 
-            this.min._dirty = true;
-            this.max._dirty = true;
+            min._dirty = true;
+            max._dirty = true;
         },
 
         /**
@@ -143,46 +147,47 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} matrix
          */
         applyProjection: function(matrix) {
-            if (this.min._dirty || this.max._dirty) {
+            var min = this.min;
+            var max = this.max;
+            if (min._dirty || max._dirty) {
                 this.updateVertices();
-                this.min._dirty = false;
-                this.max._dirty = false;
             }
 
             var m = matrix._array;
+            var vertices = this.vertices;
             // min in min z
-            var v1 = this.vertices[0];
+            var v1 = vertices[0];
             // max in min z
-            var v2 = this.vertices[3];
+            var v2 = vertices[3];
             // max in max z
-            var v3 = this.vertices[7];
+            var v3 = vertices[7];
 
-            var _min = this.min._array;
-            var _max = this.max._array;
+            var minArr = min._array;
+            var maxArr = max._array;
 
             if (m[15] === 1) {  // Orthographic projection
-                _min[0] = m[0] * v1[0] + m[12];
-                _min[1] = m[5] * v1[1] + m[13];
-                _max[2] = m[10] * v1[2] + m[14];
+                minArr[0] = m[0] * v1[0] + m[12];
+                minArr[1] = m[5] * v1[1] + m[13];
+                maxArr[2] = m[10] * v1[2] + m[14];
 
-                _max[0] = m[0] * v3[0] + m[12];
-                _max[1] = m[5] * v3[1] + m[13];
-                _min[2] = m[10] * v3[2] + m[14];
+                maxArr[0] = m[0] * v3[0] + m[12];
+                maxArr[1] = m[5] * v3[1] + m[13];
+                minArr[2] = m[10] * v3[2] + m[14];
             } else {
                 var w = -1 / v1[2];
-                _min[0] = m[0] * v1[0] * w;
-                _min[1] = m[5] * v1[1] * w;
-                _max[2] = (m[10] * v1[2] + m[14]) * w;
+                minArr[0] = m[0] * v1[0] * w;
+                minArr[1] = m[5] * v1[1] * w;
+                maxArr[2] = (m[10] * v1[2] + m[14]) * w;
 
                 w = -1 / v2[2];
-                _max[0] = m[0] * v2[0] * w;
-                _max[1] = m[5] * v2[1] * w;
+                maxArr[0] = m[0] * v2[0] * w;
+                maxArr[1] = m[5] * v2[1] * w;
 
                 w = -1 / v3[2];
-                _min[2] = (m[10] * v3[2] + m[14]) * w;
+                minArr[2] = (m[10] * v3[2] + m[14]) * w;
             }
-            this.min._dirty = true;
-            this.max._dirty = true;
+            min._dirty = true;
+            max._dirty = true;
         },
 
         updateVertices: function() {
@@ -208,10 +213,12 @@ define(function(require) {
          * @param  {qtek.math.BoundingBox} bbox
          */
         copy: function(bbox) {
-            vec3Copy(this.min._array, bbox.min._array);
-            vec3Copy(this.max._array, bbox.max._array);
-            this.min._dirty = true;
-            this.max._dirty = true;
+            var min = this.min;
+            var max = this.max;
+            vec3Copy(min._array, bbox.min._array);
+            vec3Copy(max._array, bbox.max._array);
+            min._dirty = true;
+            max._dirty = true;
         },
 
         /**

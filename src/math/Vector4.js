@@ -1,9 +1,12 @@
-define( function(require) {
+define(function(require) {
 
     'use strict';
 
     var glMatrix = require('../dep/glmatrix');
     var vec4 = glMatrix.vec4;
+
+    var KEY_ARRAY = '_array';
+    var KEY_DIRTY = '_dirty';
 
     /**
      * @constructor
@@ -23,16 +26,18 @@ define( function(require) {
         /**
          * Storage of Vector4, read and write of x, y, z, w will change the values in _array
          * All methods also operate on the _array instead of x, y, z, w components
+         * @name _array
          * @type {Float32Array}
          */
-        this._array = vec4.fromValues(x, y, z, w);
+        this[KEY_ARRAY] = vec4.fromValues(x, y, z, w);
 
         /**
          * Dirty flag is used by the Node to determine
          * if the matrix is updated to latest
+         * @name _dirty
          * @type {boolean}
          */
-        this._dirty = true;
+        this[KEY_DIRTY] = true;
     };
 
     Vector4.prototype = {
@@ -45,8 +50,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         add: function(b) {
-            vec4.add( this._array, this._array, b._array );
-            this._dirty = true;
+            vec4.add(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -59,11 +64,11 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         set: function(x, y, z, w) {
-            this._array[0] = x;
-            this._array[1] = y;
-            this._array[2] = z;
-            this._array[3] = w;
-            this._dirty = true;
+            this[KEY_ARRAY][0] = x;
+            this[KEY_ARRAY][1] = y;
+            this[KEY_ARRAY][2] = z;
+            this[KEY_ARRAY][3] = w;
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -73,12 +78,12 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         setArray: function(arr) {
-            this._array[0] = arr[0];
-            this._array[1] = arr[1];
-            this._array[2] = arr[2];
-            this._array[3] = arr[3];
+            this[KEY_ARRAY][0] = arr[0];
+            this[KEY_ARRAY][1] = arr[1];
+            this[KEY_ARRAY][2] = arr[2];
+            this[KEY_ARRAY][3] = arr[3];
 
-            this._dirty = true;
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -87,7 +92,7 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         clone: function() {
-            return new Vector4( this.x, this.y, this.z, this.w);
+            return new Vector4(this.x, this.y, this.z, this.w);
         },
 
         /**
@@ -96,8 +101,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         copy: function(b) {
-            vec4.copy( this._array, b._array );
-            this._dirty = true;
+            vec4.copy(this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -107,7 +112,7 @@ define( function(require) {
          * @return {number}
          */
         dist: function(b) {
-            return vec4.dist(this._array, b._array);
+            return vec4.dist(this[KEY_ARRAY], b[KEY_ARRAY]);
         },
 
         /**
@@ -116,7 +121,7 @@ define( function(require) {
          * @return {number}
          */
         distance: function(b) {
-            return vec4.distance(this._array, b._array);
+            return vec4.distance(this[KEY_ARRAY], b[KEY_ARRAY]);
         },
 
         /**
@@ -125,8 +130,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         div: function(b) {
-            vec4.div(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.div(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -136,8 +141,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         divide: function(b) {
-            vec4.divide(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.divide(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -147,7 +152,7 @@ define( function(require) {
          * @return {number}
          */
         dot: function(b) {
-            return vec4.dot(this._array, b._array);
+            return vec4.dot(this[KEY_ARRAY], b[KEY_ARRAY]);
         },
 
         /**
@@ -155,7 +160,7 @@ define( function(require) {
          * @return {number}
          */
         len: function() {
-            return vec4.len(this._array);
+            return vec4.len(this[KEY_ARRAY]);
         },
 
         /**
@@ -163,7 +168,7 @@ define( function(require) {
          * @return {number}
          */
         length: function() {
-            return vec4.length(this._array);
+            return vec4.length(this[KEY_ARRAY]);
         },
         /**
          * Linear interpolation between a and b
@@ -173,8 +178,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         lerp: function(a, b, t) {
-            vec4.lerp(this._array, a._array, b._array, t);
-            this._dirty = true;
+            vec4.lerp(this[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY], t);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -184,8 +189,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         min: function(b) {
-            vec4.min(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.min(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -195,8 +200,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         max: function(b) {
-            vec4.max(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.max(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -206,8 +211,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         mul: function(b) {
-            vec4.mul(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.mul(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -217,8 +222,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         multiply: function(b) {
-            vec4.multiply(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.multiply(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -227,8 +232,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         negate: function() {
-            vec4.negate(this._array, this._array);
-            this._dirty = true;
+            vec4.negate(this[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -237,8 +242,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         normalize: function() {
-            vec4.normalize(this._array, this._array);
-            this._dirty = true;
+            vec4.normalize(this[KEY_ARRAY], this[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -248,8 +253,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         random: function(scale) {
-            vec4.random(this._array, scale);
-            this._dirty = true;
+            vec4.random(this[KEY_ARRAY], scale);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -259,8 +264,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         scale: function(s) {
-            vec4.scale(this._array, this._array, s);
-            this._dirty = true;
+            vec4.scale(this[KEY_ARRAY], this[KEY_ARRAY], s);
+            this[KEY_DIRTY] = true;
             return this;
         },
         /**
@@ -270,8 +275,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         scaleAndAdd: function(b, s) {
-            vec4.scaleAndAdd(this._array, this._array, b._array, s);
-            this._dirty = true;
+            vec4.scaleAndAdd(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY], s);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -281,7 +286,7 @@ define( function(require) {
          * @return {number}
          */
         sqrDist: function(b) {
-            return vec4.sqrDist(this._array, b._array);
+            return vec4.sqrDist(this[KEY_ARRAY], b[KEY_ARRAY]);
         },
 
         /**
@@ -290,7 +295,7 @@ define( function(require) {
          * @return {number}
          */
         squaredDistance: function(b) {
-            return vec4.squaredDistance(this._array, b._array);
+            return vec4.squaredDistance(this[KEY_ARRAY], b[KEY_ARRAY]);
         },
 
         /**
@@ -298,7 +303,7 @@ define( function(require) {
          * @return {number}
          */
         sqrLen: function() {
-            return vec4.sqrLen(this._array);
+            return vec4.sqrLen(this[KEY_ARRAY]);
         },
 
         /**
@@ -306,7 +311,7 @@ define( function(require) {
          * @return {number}
          */
         squaredLength: function() {
-            return vec4.squaredLength(this._array);
+            return vec4.squaredLength(this[KEY_ARRAY]);
         },
 
         /**
@@ -315,8 +320,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         sub: function(b) {
-            vec4.sub(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.sub(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -326,8 +331,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         subtract: function(b) {
-            vec4.subtract(this._array, this._array, b._array);
-            this._dirty = true;
+            vec4.subtract(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -337,8 +342,8 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         transformMat4: function(m) {
-            vec4.transformMat4(this._array, this._array, m._array);
-            this._dirty = true;
+            vec4.transformMat4(this[KEY_ARRAY], this[KEY_ARRAY], m[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },
 
@@ -348,18 +353,19 @@ define( function(require) {
          * @return {qtek.math.Vector4}
          */
         transformQuat: function(q) {
-            vec4.transformQuat(this._array, this._array, q._array);
-            this._dirty = true;
+            vec4.transformQuat(this[KEY_ARRAY], this[KEY_ARRAY], q[KEY_ARRAY]);
+            this[KEY_DIRTY] = true;
             return this;
         },     
 
         toString: function() {
-            return '[' + Array.prototype.join.call(this._array, ',') + ']';
+            return '[' + Array.prototype.join.call(this[KEY_ARRAY], ',') + ']';
         }
     };
 
+    var defineProperty = Object.defineProperty;
     // Getter and Setter
-    if (Object.defineProperty) {
+    if (defineProperty) {
 
         var proto = Vector4.prototype;
         /**
@@ -368,13 +374,13 @@ define( function(require) {
          * @memberOf qtek.math.Vector4
          * @instance
          */
-        Object.defineProperty(proto, 'x', {
+        defineProperty(proto, 'x', {
             get: function () {
-                return this._array[0];
+                return this[KEY_ARRAY][0];
             },
             set: function (value) {
-                this._array[0] = value;
-                this._dirty = true;
+                this[KEY_ARRAY][0] = value;
+                this[KEY_DIRTY] = true;
             }
         });
 
@@ -384,13 +390,13 @@ define( function(require) {
          * @memberOf qtek.math.Vector4
          * @instance
          */
-        Object.defineProperty(proto, 'y', {
+        defineProperty(proto, 'y', {
             get: function () {
-                return this._array[1];
+                return this[KEY_ARRAY][1];
             },
             set: function (value) {
-                this._array[1] = value;
-                this._dirty = true;
+                this[KEY_ARRAY][1] = value;
+                this[KEY_DIRTY] = true;
             }
         });
 
@@ -400,13 +406,13 @@ define( function(require) {
          * @memberOf qtek.math.Vector4
          * @instance
          */
-        Object.defineProperty(proto, 'z', {
+        defineProperty(proto, 'z', {
             get: function () {
-                return this._array[2];
+                return this[KEY_ARRAY][2];
             },
             set: function (value) {
-                this._array[2] = value;
-                this._dirty = true;
+                this[KEY_ARRAY][2] = value;
+                this[KEY_DIRTY] = true;
             }
         });
 
@@ -416,13 +422,13 @@ define( function(require) {
          * @memberOf qtek.math.Vector4
          * @instance
          */
-        Object.defineProperty(proto, 'w', {
+        defineProperty(proto, 'w', {
             get: function () {
-                return this._array[3];
+                return this[KEY_ARRAY][3];
             },
             set: function (value) {
-                this._array[3] = value;
-                this._dirty = true;
+                this[KEY_ARRAY][3] = value;
+                this[KEY_DIRTY] = true;
             }
         });
     }
@@ -436,8 +442,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.add = function(out, a, b) {
-        vec4.add(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.add(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -449,8 +455,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}  
      */
     Vector4.set = function(out, x, y, z, w) {
-        vec4.set(out._array, x, y, z, w);
-        out._dirty = true;
+        vec4.set(out[KEY_ARRAY], x, y, z, w);
+        out[KEY_DIRTY] = true;
     };
 
     /**
@@ -459,8 +465,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.copy = function(out, b) {
-        vec4.copy(out._array, b._array);
-        out._dirty = true;
+        vec4.copy(out[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -470,7 +476,7 @@ define( function(require) {
      * @return {number}
      */
     Vector4.dist = function(a, b) {
-        return vec4.distance(a._array, b._array);
+        return vec4.distance(a[KEY_ARRAY], b[KEY_ARRAY]);
     };
 
     /**
@@ -488,8 +494,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.div = function(out, a, b) {
-        vec4.divide(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.divide(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -508,7 +514,7 @@ define( function(require) {
      * @return {number}
      */
     Vector4.dot = function(a, b) {
-        return vec4.dot(a._array, b._array);
+        return vec4.dot(a[KEY_ARRAY], b[KEY_ARRAY]);
     };
 
     /**
@@ -516,7 +522,7 @@ define( function(require) {
      * @return {number}
      */
     Vector4.len = function(b) {
-        return vec4.length(b._array);
+        return vec4.length(b[KEY_ARRAY]);
     };
 
     // Vector4.length = Vector4.len;
@@ -529,8 +535,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.lerp = function(out, a, b, t) {
-        vec4.lerp(out._array, a._array, b._array, t);
-        out._dirty = true;
+        vec4.lerp(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY], t);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -541,8 +547,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.min = function(out, a, b) {
-        vec4.min(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.min(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -553,8 +559,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.max = function(out, a, b) {
-        vec4.max(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.max(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -565,8 +571,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.mul = function(out, a, b) {
-        vec4.multiply(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.multiply(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -585,8 +591,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.negate = function(out, a) {
-        vec4.negate(out._array, a._array);
-        out._dirty = true;
+        vec4.negate(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -596,8 +602,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.normalize = function(out, a) {
-        vec4.normalize(out._array, a._array);
-        out._dirty = true;
+        vec4.normalize(out[KEY_ARRAY], a[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -607,8 +613,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.random = function(out, scale) {
-        vec4.random(out._array, scale);
-        out._dirty = true;
+        vec4.random(out[KEY_ARRAY], scale);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -619,8 +625,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.scale = function(out, a, scale) {
-        vec4.scale(out._array, a._array, scale);
-        out._dirty = true;
+        vec4.scale(out[KEY_ARRAY], a[KEY_ARRAY], scale);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -632,8 +638,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.scaleAndAdd = function(out, a, b, scale) {
-        vec4.scaleAndAdd(out._array, a._array, b._array, scale);
-        out._dirty = true;
+        vec4.scaleAndAdd(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY], scale);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -643,7 +649,7 @@ define( function(require) {
      * @return {number}
      */
     Vector4.sqrDist = function(a, b) {
-        return vec4.sqrDist(a._array, b._array);
+        return vec4.sqrDist(a[KEY_ARRAY], b[KEY_ARRAY]);
     };
 
     /**
@@ -659,7 +665,7 @@ define( function(require) {
      * @return {number}
      */
     Vector4.sqrLen = function(a) {
-        return vec4.sqrLen(a._array);
+        return vec4.sqrLen(a[KEY_ARRAY]);
     };
     /**
      * @method
@@ -675,8 +681,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.sub = function(out, a, b) {
-        vec4.subtract(out._array, a._array, b._array);
-        out._dirty = true;
+        vec4.subtract(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
     /**
@@ -695,8 +701,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.transformMat4 = function(out, a, m) {
-        vec4.transformMat4(out._array, a._array, m._array);
-        out._dirty = true;
+        vec4.transformMat4(out[KEY_ARRAY], a[KEY_ARRAY], m[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
@@ -707,8 +713,8 @@ define( function(require) {
      * @return {qtek.math.Vector4}
      */
     Vector4.transformQuat = function(out, a, q) {
-        vec4.transformQuat(out._array, a._array, q._array);
-        out._dirty = true;
+        vec4.transformQuat(out[KEY_ARRAY], a[KEY_ARRAY], q[KEY_ARRAY]);
+        out[KEY_DIRTY] = true;
         return out;
     };
 
