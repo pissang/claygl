@@ -11,6 +11,7 @@ define(function(require) {
     var BoundingBox = require('./math/BoundingBox');
     var glenum = require('./core/glenum');
     var glinfo = require('./core/glinfo');
+    var vendor = require('./core/vendor');
 
     var glMatrix = require('./dep/glmatrix');
     var vec3 = glMatrix.vec3;
@@ -21,6 +22,7 @@ define(function(require) {
 
     var arrSlice = Array.prototype.slice;
     var Attribute = Geometry.Attribute;
+
     /**
      * @constructor qtek.DynamicGeometry
      * @extends qtek.Geometry
@@ -240,19 +242,19 @@ define(function(require) {
                 // Type can be byte, ubyte, short, ushort, float
                 switch(type) {
                     case 'byte':
-                        ArrayConstructors[name] = Int8Array;
+                        ArrayConstructors[name] = vendor.Int8Array;
                         break;
                     case 'ubyte':
-                        ArrayConstructors[name] = Uint8Array;
+                        ArrayConstructors[name] = vendor.Uint8Array;
                         break;
                     case 'short':
-                        ArrayConstructors[name] = Int16Array;
+                        ArrayConstructors[name] = vendor.Int16Array;
                         break;
                     case 'ushort':
-                        ArrayConstructors[name] = Uint16Array;
+                        ArrayConstructors[name] = vendor.Uint16Array;
                         break;
                     default:
-                        ArrayConstructors[name] = Float32Array;
+                        ArrayConstructors[name] = vendor.Float32Array;
                         break;
                 }
             }

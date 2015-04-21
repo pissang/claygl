@@ -11,6 +11,7 @@ define(function(require) {
     var Base = require('../core/Base');
     var request = require('../core/request');
     var util = require('../core/util');
+    var vendor = require('../core/vendor');
 
     var Scene = require('../Scene');
     var Shader = require('../Shader');
@@ -280,10 +281,10 @@ define(function(require) {
                     var offset = IBMInfo.byteOffset + bufferViewInfo.byteOffset;
                     var size = IBMInfo.count * 16;
 
-                    var array = new Float32Array(buffer, offset, size);
+                    var array = new vendor.Float32Array(buffer, offset, size);
 
                     skeleton._invBindPoseMatricesArray = array;
-                    skeleton._skinMatricesArray = new Float32Array(array.length);
+                    skeleton._skinMatricesArray = new vendor.Float32Array(array.length);
                 }
                 lib.skeletons[name] = skeleton;
             }
@@ -547,22 +548,22 @@ define(function(require) {
                             case 0x8B50:     // FLOAT_VEC2
                                 size = 2;
                                 type = 'float';
-                                ArrayCtor = Float32Array;
+                                ArrayCtor = vendor.Float32Array;
                                 break;
                             case 0x8B51:     // FLOAT_VEC3
                                 size = 3;
                                 type = 'float';
-                                ArrayCtor = Float32Array;
+                                ArrayCtor = vendor.Float32Array;
                                 break;
                             case 0x8B52:     // FLOAT_VEC4
                                 size = 4;
                                 type = 'float';
-                                ArrayCtor = Float32Array;
+                                ArrayCtor = vendor.Float32Array;
                                 break;
                             case 0x1406:     // FLOAT
                                 size = 1;
                                 type = 'float';
-                                ArrayCtor = Float32Array;
+                                ArrayCtor = vendor.Float32Array;
                                 break;
                             default:
                                 console.warn('Attribute type '+attributeInfo.type+' not support yet');
@@ -603,10 +604,10 @@ define(function(require) {
 
                     // index uint
                     if (indicesInfo.type === 0x1405) { // UNSIGNED_INT
-                        geometry.faces = new Uint32Array(buffer, byteOffset, indicesInfo.count);
+                        geometry.faces = new vendor.Uint32Array(buffer, byteOffset, indicesInfo.count);
                     }
                     else { // UNSIGNED_SHORT, 0x1403
-                        geometry.faces = new Uint16Array(buffer, byteOffset, indicesInfo.count);
+                        geometry.faces = new vendor.Uint16Array(buffer, byteOffset, indicesInfo.count);
                     }
 
                     var material = lib.materials[primitiveInfo.material];
@@ -819,7 +820,7 @@ define(function(require) {
                             var size = 1;
                             break;
                     }
-                    parameters[paramName] = new Float32Array(buffer, byteOffset, size * accessorInfo.count);
+                    parameters[paramName] = new vendor.Float32Array(buffer, byteOffset, size * accessorInfo.count);
                 }
 
                 if (!parameters.TIME || !animationInfo.channels.length) {

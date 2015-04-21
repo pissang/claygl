@@ -8,6 +8,7 @@ define(function(require) {
     var Geometry = require('./Geometry');
     var BoundingBox = require('./math/BoundingBox');
     var glMatrix = require('./dep/glmatrix');
+    var vendor = require('./core/vendor');
     var glenum = require('./core/glenum');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
@@ -17,7 +18,6 @@ define(function(require) {
     var vec3Add = vec3.add;
     var vec3Set = vec3.set;
 
-    var Float32Array = typeof window.Float32Array === 'undefined' ? Array : window.Float32Array;
     /**
      * @constructor qtek.StaticGeometry
      * @extends qtek.Geometry
@@ -230,7 +230,7 @@ define(function(require) {
             var normals = attributes.normal.value;
 
             if (!normals || normals.length !== positions.length) {
-                normals = attributes.normal.value = new Float32Array(positions.length);
+                normals = attributes.normal.value = new vendor.Float32Array(positions.length);
             } else {
                 // Reset
                 for (var i = 0; i < normals.length; i++) {

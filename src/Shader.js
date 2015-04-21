@@ -13,6 +13,7 @@ define(function(require) {
     var Base = require('./core/Base');
     var util = require('./core/util');
     var Cache = require('./core/Cache');
+    var vendor = require('./core/vendor');
     var glMatrix = require('./dep/glmatrix');
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;
@@ -490,7 +491,7 @@ define(function(require) {
                     break;
                 case 'm4v':
                     if (value instanceof Array) {
-                        var array = new Float32Array(value.length * 16);
+                        var array = new vendor.Float32Array(value.length * 16);
                         var cursor = 0;
                         for (var i = 0; i < value.length; i++) {
                             var item = value[i];
@@ -500,7 +501,7 @@ define(function(require) {
                         }
                         _gl.uniformMatrix4fv(location, false, array);
                     // Raw value
-                    } else if (value instanceof Float32Array) {   // ArrayBufferView
+                    } else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
                         _gl.uniformMatrix4fv(location, false, value);
                     }
                     break;
@@ -748,7 +749,7 @@ define(function(require) {
                 if (arrayStr) {
                     var arr = arrayStr.split(/\s*,\s*/);
                     return function() {
-                        return new Float32Array(arr);
+                        return new vendor.Float32Array(arr);
                     };
                 } else {
                     // Invalid value

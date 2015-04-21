@@ -5,6 +5,7 @@ define(function(require) {
     var Base = require('./core/Base');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
+    var vendor = require('./core/vendor');
     var glmatrix = require('./dep/glmatrix');
     var vec2 = glmatrix.vec2;
     var vec3 = glmatrix.vec3;
@@ -149,19 +150,19 @@ define(function(require) {
                 var ArrayConstructor;
                 switch(this.type) {
                     case 'byte':
-                        ArrayConstructor = Int8Array;
+                        ArrayConstructor = vendor.Int8Array;
                         break;
                     case 'ubyte':
-                        ArrayConstructor = Uint8Array;
+                        ArrayConstructor = vendor.Uint8Array;
                         break;
                     case 'short':
-                        ArrayConstructor = Int16Array;
+                        ArrayConstructor = vendor.Int16Array;
                         break;
                     case 'ushort':
-                        ArrayConstructor = Uint16Array;
+                        ArrayConstructor = vendor.Uint16Array;
                         break;
                     default:
-                        ArrayConstructor = Float32Array;
+                        ArrayConstructor = vendor.Float32Array;
                         break;
                 }
                 this.value = new ArrayConstructor(nVertex * this.size);
