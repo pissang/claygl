@@ -399,6 +399,7 @@ define(function (require) {
             var halfHeight = height / 2;
 
             var prevLineWidth;
+            var prevStrokeColor;
 
             for (var i = 0; i < primitives.length; i++) {
                 var primitive = primitives[i];
@@ -430,7 +431,9 @@ define(function (require) {
                         var v0 = vertices[0];
                         var v1 = vertices[1];
                         var lineWidth = primitive.lineWidth;
-                        ctx.strokeStyle = colorStr;
+                        if (prevStrokeColor !== colorStr) {
+                            prevStrokeColor = ctx.strokeStyle = colorStr;
+                        }
                         if (lineWidth !== prevLineWidth) {
                             ctx.lineWidth = prevLineWidth = lineWidth;
                         }
