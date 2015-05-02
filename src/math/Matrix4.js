@@ -9,9 +9,6 @@ define(function(require) {
     var mat3 = glMatrix.mat3;
     var quat = glMatrix.quat;
 
-    var KEY_ARRAY = '_array';
-    var KEY_DIRTY = '_dirty';
-
     /**
      * @constructor
      * @alias qtek.math.Matrix4
@@ -27,13 +24,13 @@ define(function(require) {
          * @name _array
          * @type {Float32Array}
          */
-        this[KEY_ARRAY] = mat4.create();
+        this._array = mat4.create();
 
         /**
          * @name _dirty
          * @type {boolean}
          */
-        this[KEY_DIRTY] = true;
+        this._dirty = true;
     };
 
     Matrix4.prototype = {
@@ -45,8 +42,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         adjoint: function() {
-            mat4.adjoint(this[KEY_ARRAY], this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.adjoint(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -64,8 +61,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         copy: function(a) {
-            mat4.copy(this[KEY_ARRAY], a[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.copy(this._array, a._array);
+            this._dirty = true;
             return this;
         },
 
@@ -74,7 +71,7 @@ define(function(require) {
          * @return {number}
          */
         determinant: function() {
-            return mat4.determinant(this[KEY_ARRAY]);
+            return mat4.determinant(this._array);
         },
 
         /**
@@ -83,8 +80,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         fromQuat: function(q) {
-            mat4.fromQuat(this[KEY_ARRAY], q[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.fromQuat(this._array, q._array);
+            this._dirty = true;
             return this;
         },
 
@@ -95,8 +92,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         fromRotationTranslation: function(q, v) {
-            mat4.fromRotationTranslation(this[KEY_ARRAY], q[KEY_ARRAY], v[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.fromRotationTranslation(this._array, q._array, v._array);
+            this._dirty = true;
             return this;
         },
 
@@ -122,8 +119,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         frustum: function(left, right, bottom, top, near, far) {
-            mat4.frustum(this[KEY_ARRAY], left, right, bottom, top, near, far);
-            this[KEY_DIRTY] = true;
+            mat4.frustum(this._array, left, right, bottom, top, near, far);
+            this._dirty = true;
             return this;
         },
 
@@ -132,8 +129,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         identity: function() {
-            mat4.identity(this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.identity(this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -142,8 +139,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         invert: function() {
-            mat4.invert(this[KEY_ARRAY], this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.invert(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -155,8 +152,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         lookAt: function(eye, center, up) {
-            mat4.lookAt(this[KEY_ARRAY], eye[KEY_ARRAY], center[KEY_ARRAY], up[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.lookAt(this._array, eye._array, center._array, up._array);
+            this._dirty = true;
             return this;
         },
 
@@ -166,8 +163,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         mul: function(b) {
-            mat4.mul(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.mul(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
@@ -177,8 +174,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         mulLeft: function(a) {
-            mat4.mul(this[KEY_ARRAY], a[KEY_ARRAY], this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.mul(this._array, a._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -188,8 +185,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         multiply: function(b) {
-            mat4.multiply(this[KEY_ARRAY], this[KEY_ARRAY], b[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.multiply(this._array, this._array, b._array);
+            this._dirty = true;
             return this;
         },
 
@@ -199,8 +196,8 @@ define(function(require) {
          * @return {qtek.math.Matrix3}
          */
         multiplyLeft: function(a) {
-            mat4.multiply(this[KEY_ARRAY], a[KEY_ARRAY], this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.multiply(this._array, a._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -215,8 +212,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         ortho: function(left, right, bottom, top, near, far) {
-            mat4.ortho(this[KEY_ARRAY], left, right, bottom, top, near, far);
-            this[KEY_DIRTY] = true;
+            mat4.ortho(this._array, left, right, bottom, top, near, far);
+            this._dirty = true;
             return this;
         },
         /**
@@ -228,8 +225,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         perspective: function(fovy, aspect, near, far) {
-            mat4.perspective(this[KEY_ARRAY], fovy, aspect, near, far);
-            this[KEY_DIRTY] = true;
+            mat4.perspective(this._array, fovy, aspect, near, far);
+            this._dirty = true;
             return this;
         },
 
@@ -241,8 +238,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         rotate: function(rad, axis) {
-            mat4.rotate(this[KEY_ARRAY], this[KEY_ARRAY], rad, axis[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.rotate(this._array, this._array, rad, axis._array);
+            this._dirty = true;
             return this;
         },
 
@@ -253,8 +250,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         rotateX: function(rad) {
-            mat4.rotateX(this[KEY_ARRAY], this[KEY_ARRAY], rad);
-            this[KEY_DIRTY] = true;
+            mat4.rotateX(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
 
@@ -265,8 +262,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         rotateY: function(rad) {
-            mat4.rotateY(this[KEY_ARRAY], this[KEY_ARRAY], rad);
-            this[KEY_DIRTY] = true;
+            mat4.rotateY(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
 
@@ -277,8 +274,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         rotateZ: function(rad) {
-            mat4.rotateZ(this[KEY_ARRAY], this[KEY_ARRAY], rad);
-            this[KEY_DIRTY] = true;
+            mat4.rotateZ(this._array, this._array, rad);
+            this._dirty = true;
             return this;
         },
 
@@ -289,8 +286,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         scale: function(v) {
-            mat4.scale(this[KEY_ARRAY], this[KEY_ARRAY], v[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.scale(this._array, this._array, v._array);
+            this._dirty = true;
             return this;
         },
 
@@ -301,8 +298,8 @@ define(function(require) {
          * @return {qtek.math.Matrix4}
          */
         translate: function(v) {
-            mat4.translate(this[KEY_ARRAY], this[KEY_ARRAY], v[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.translate(this._array, this._array, v._array);
+            this._dirty = true;
             return this;
         },
 
@@ -311,8 +308,8 @@ define(function(require) {
          * @return {qtek.math.Matrix2}
          */
         transpose: function() {
-            mat4.transpose(this[KEY_ARRAY], this[KEY_ARRAY]);
-            this[KEY_DIRTY] = true;
+            mat4.transpose(this._array, this._array);
+            this._dirty = true;
             return this;
         },
 
@@ -333,7 +330,7 @@ define(function(require) {
 
             return function(scale, rotation, position) {
 
-                var el = this[KEY_ARRAY];
+                var el = this._array;
                 vec3.set(x, el[0], el[1], el[2]);
                 vec3.set(y, el[4], el[5], el[6]);
                 vec3.set(z, el[8], el[9], el[10]);
@@ -345,7 +342,7 @@ define(function(require) {
                     scale.x = sx;
                     scale.y = sy;
                     scale.z = sz;
-                    scale[KEY_DIRTY] = true;
+                    scale._dirty = true;
                 }
 
                 position.set(el[12], el[13], el[14]);
@@ -368,16 +365,16 @@ define(function(require) {
                 m3[7] /= sz;
                 m3[8] /= sz;
 
-                quat.fromMat3(rotation[KEY_ARRAY], m3);
-                quat.normalize(rotation[KEY_ARRAY], rotation[KEY_ARRAY]);
+                quat.fromMat3(rotation._array, m3);
+                quat.normalize(rotation._array, rotation._array);
 
-                rotation[KEY_DIRTY] = true;
-                position[KEY_DIRTY] = true;
+                rotation._dirty = true;
+                position._dirty = true;
             };
         })(),
 
         toString: function() {
-            return '[' + Array.prototype.join.call(this[KEY_ARRAY], ',') + ']';
+            return '[' + Array.prototype.join.call(this._array, ',') + ']';
         }
     };
 
@@ -394,20 +391,20 @@ define(function(require) {
          */
         defineProperty(proto, 'z', {
             get: function () {
-                var el = this[KEY_ARRAY];
+                var el = this._array;
                 this._axisZ.set(el[8], el[9], el[10]);
                 return this._axisZ;
             },
             set: function (v) {
                 // TODO Here has a problem
                 // If only set an item of vector will not work
-                var el = this[KEY_ARRAY];
-                v = v[KEY_ARRAY];
+                var el = this._array;
+                v = v._array;
                 el[8] = v[0];
                 el[9] = v[1];
                 el[10] = v[2];
 
-                this[KEY_DIRTY] = true;
+                this._dirty = true;
             }
         });
 
@@ -420,18 +417,18 @@ define(function(require) {
          */
         defineProperty(proto, 'y', {
             get: function () {
-                var el = this[KEY_ARRAY];
+                var el = this._array;
                 this._axisY.set(el[4], el[5], el[6]);
                 return this._axisY;
             },
             set: function (v) {
-                var el = this[KEY_ARRAY];
-                v = v[KEY_ARRAY];
+                var el = this._array;
+                v = v._array;
                 el[4] = v[0];
                 el[5] = v[1];
                 el[6] = v[2];
 
-                this[KEY_DIRTY] = true;
+                this._dirty = true;
             }
         });
 
@@ -444,18 +441,18 @@ define(function(require) {
          */
         defineProperty(proto, 'x', {
             get: function () {
-                var el = this[KEY_ARRAY];
+                var el = this._array;
                 this._axisX.set(el[0], el[1], el[2]);
                 return this._axisX;
             },
             set: function (v) {
-                var el = this[KEY_ARRAY];
-                v = v[KEY_ARRAY];
+                var el = this._array;
+                v = v._array;
                 el[0] = v[0];
                 el[1] = v[1];
                 el[2] = v[2];
 
-                this[KEY_DIRTY] = true;
+                this._dirty = true;
             }
         })
     }
@@ -466,8 +463,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.adjoint = function(out, a) {
-        mat4.adjoint(out[KEY_ARRAY], a[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.adjoint(out._array, a._array);
+        out._dirty = true;
         return out;
     };
 
@@ -477,8 +474,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.copy = function(out, a) {
-        mat4.copy(out[KEY_ARRAY], a[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.copy(out._array, a._array);
+        out._dirty = true;
         return out;
     };
 
@@ -487,7 +484,7 @@ define(function(require) {
      * @return {number}
      */
     Matrix4.determinant = function(a) {
-        return mat4.determinant(a[KEY_ARRAY]);
+        return mat4.determinant(a._array);
     };
 
     /**
@@ -495,8 +492,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.identity = function(out) {
-        mat4.identity(out[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.identity(out._array);
+        out._dirty = true;
         return out;
     };
     
@@ -511,8 +508,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
-        mat4.ortho(out[KEY_ARRAY], left, right, bottom, top, near, far);
-        out[KEY_DIRTY] = true;
+        mat4.ortho(out._array, left, right, bottom, top, near, far);
+        out._dirty = true;
         return out;
     };
 
@@ -525,8 +522,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.perspective = function(out, fovy, aspect, near, far) {
-        mat4.perspective(out[KEY_ARRAY], fovy, aspect, near, far);
-        out[KEY_DIRTY] = true;
+        mat4.perspective(out._array, fovy, aspect, near, far);
+        out._dirty = true;
         return out;
     };
 
@@ -538,8 +535,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.lookAt = function(out, eye, center, up) {
-        mat4.lookAt(out[KEY_ARRAY], eye[KEY_ARRAY], center[KEY_ARRAY], up[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.lookAt(out._array, eye._array, center._array, up._array);
+        out._dirty = true;
         return out;
     };
 
@@ -549,8 +546,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.invert = function(out, a) {
-        mat4.invert(out[KEY_ARRAY], a[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.invert(out._array, a._array);
+        out._dirty = true;
         return out;
     };
 
@@ -561,8 +558,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.mul = function(out, a, b) {
-        mat4.mul(out[KEY_ARRAY], a[KEY_ARRAY], b[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.mul(out._array, a._array, b._array);
+        out._dirty = true;
         return out;
     };
 
@@ -581,8 +578,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.fromQuat = function(out, q) {
-        mat4.fromQuat(out[KEY_ARRAY], q[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.fromQuat(out._array, q._array);
+        out._dirty = true;
         return out;
     };
 
@@ -593,8 +590,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.fromRotationTranslation = function(out, q, v) {
-        mat4.fromRotationTranslation(out[KEY_ARRAY], q[KEY_ARRAY], v[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.fromRotationTranslation(out._array, q._array, v._array);
+        out._dirty = true;
         return out;
     };
 
@@ -604,9 +601,9 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.fromMat2d = function(m4, m2d) {
-        m4[KEY_DIRTY] = true;
-        var m2d = m2d[KEY_ARRAY];
-        var m4 = m4[KEY_ARRAY];
+        m4._dirty = true;
+        var m2d = m2d._array;
+        var m4 = m4._array;
 
         m4[0] = m2d[0];
         m4[4] = m2d[2];
@@ -627,8 +624,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.rotate = function(out, a, rad, axis) {
-        mat4.rotate(out[KEY_ARRAY], a[KEY_ARRAY], rad, axis[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.rotate(out._array, a._array, rad, axis._array);
+        out._dirty = true;
         return out;
     };
 
@@ -639,8 +636,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.rotateX = function(out, a, rad) {
-        mat4.rotateX(out[KEY_ARRAY], a[KEY_ARRAY], rad);
-        out[KEY_DIRTY] = true;
+        mat4.rotateX(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     };
 
@@ -651,8 +648,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.rotateY = function(out, a, rad) {
-        mat4.rotateY(out[KEY_ARRAY], a[KEY_ARRAY], rad);
-        out[KEY_DIRTY] = true;
+        mat4.rotateY(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     };
 
@@ -663,8 +660,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.rotateZ = function(out, a, rad) {
-        mat4.rotateZ(out[KEY_ARRAY], a[KEY_ARRAY], rad);
-        out[KEY_DIRTY] = true;
+        mat4.rotateZ(out._array, a._array, rad);
+        out._dirty = true;
         return out;
     };
 
@@ -675,8 +672,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.scale = function(out, a, v) {
-        mat4.scale(out[KEY_ARRAY], a[KEY_ARRAY], v[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.scale(out._array, a._array, v._array);
+        out._dirty = true;
         return out;
     };
 
@@ -686,8 +683,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.transpose = function(out, a) {
-        mat4.transpose(out[KEY_ARRAY], a[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.transpose(out._array, a._array);
+        out._dirty = true;
         return out;
     };
 
@@ -698,8 +695,8 @@ define(function(require) {
      * @return {qtek.math.Matrix4}
      */
     Matrix4.translate = function(out, a, v) {
-        mat4.translate(out[KEY_ARRAY], a[KEY_ARRAY], v[KEY_ARRAY]);
-        out[KEY_DIRTY] = true;
+        mat4.translate(out._array, a._array, v._array);
+        out._dirty = true;
         return out;
     };
 

@@ -613,7 +613,7 @@ define(function(require) {
         },
 
         /**
-         * Evaluate if an scene object is culled by camera frustum
+         * If an scene object is culled by camera frustum
          *
          * Object can be a renderable or a light
          *
