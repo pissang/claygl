@@ -4,6 +4,9 @@ define(function(require){
 
     var guid = 0;
 
+    var ArrayProto = Array.prototype;
+    var nativeForEach = ArrayProto.forEach;
+
     /**
      * Util functions
      * @namespace qtek.core.util
@@ -124,7 +127,7 @@ define(function(require){
             if (!(obj && iterator)) {
                 return;
             }
-            if (obj.forEach) {
+            if (obj.forEach && obj.forEach === nativeForEach) {
                 obj.forEach(iterator, context);
             } else if (obj.length === + obj.length) {
                 for (var i = 0, len = obj.length; i < len; i++) {
