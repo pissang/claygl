@@ -150,11 +150,11 @@ define(function(require) {
          * @param  {Function} [options.getter]
          * @param  {Function} [options.setter]
          * @param  {Function} [options.interpolater]
-         * @return {qtek.animation.Animation._Deferred}
+         * @return {qtek.animation.Animation._Animator}
          */
         animate: function(target, options) {
             options = options || {};
-            var deferred = new Deferred(
+            var deferred = new Animator(
                 target,
                 options.loop,
                 options.getter,
@@ -254,11 +254,11 @@ define(function(require) {
     }
     
     /**
-     * @description Deferred object can only be created by Animation.prototype.animate method.
-     * After created, we can use {@link qtek.animation.Animation._Deferred#when} to add all keyframes and {@link qtek.animation.Animation._Deferred#start} it.
+     * @description Animator object can only be created by Animation.prototype.animate method.
+     * After created, we can use {@link qtek.animation.Animation._Animator#when} to add all keyframes and {@link qtek.animation.Animation._Animator#start} it.
      * Clips will be automatically created and added to the animation instance which created this deferred object.
      * 
-     * @constructor qtek.animation.Animation._Deferred
+     * @constructor qtek.animation.Animation._Animator
      * 
      * @param {Object} target
      * @param {boolean} loop
@@ -266,7 +266,7 @@ define(function(require) {
      * @param {Function} setter
      * @param {Function} interpolater
      */
-    function Deferred(target, loop, getter, setter, interpolater) {
+    function Animator(target, loop, getter, setter, interpolater) {
         this._tracks = {};
         this._target = target;
 
@@ -288,15 +288,15 @@ define(function(require) {
         this._clipList = [];
     }
 
-    Deferred.prototype = {
+    Animator.prototype = {
 
-        constructor: Deferred,
+        constructor: Animator,
 
         /**
          * @param  {number} time Keyframe time using millisecond
          * @param  {Object} props A key-value object. Value can be number, 1d and 2d array
-         * @return {qtek.animation.Animation._Deferred}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @return {qtek.animation.Animation._Animator}
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         when: function(time, props) {
             for (var propName in props) {
@@ -325,8 +325,8 @@ define(function(require) {
         /**
          * callback when running animation
          * @param  {Function} callback callback have two args, animating target and current percent
-         * @return {qtek.animation.Animation._Deferred}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @return {qtek.animation.Animation._Animator}
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         during: function(callback) {
             this._onframeList.push(callback);
@@ -335,8 +335,8 @@ define(function(require) {
         /**
          * Start the animation
          * @param  {string|function} easing
-         * @return {qtek.animation.Animation._Deferred}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @return {qtek.animation.Animation._Animator}
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         start: function(easing) {
 
@@ -512,7 +512,7 @@ define(function(require) {
         },
         /**
          * Stop the animation
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         stop: function() {
             for (var i = 0; i < this._clipList.length; i++) {
@@ -524,8 +524,8 @@ define(function(require) {
         /**
          * Delay given milliseconds
          * @param  {number} time
-         * @return {qtek.animation.Animation._Deferred}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @return {qtek.animation.Animation._Animator}
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         delay: function(time){
             this._delay = time;
@@ -534,8 +534,8 @@ define(function(require) {
         /**
          * Callback after animation finished
          * @param {Function} func
-         * @return {qtek.animation.Animation._Deferred}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @return {qtek.animation.Animation._Animator}
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         done: function(func) {
             if (func) {
@@ -546,14 +546,14 @@ define(function(require) {
         /**
          * Get all clips created in start method.
          * @return {qtek.animation.Clip[]}
-         * @memberOf qtek.animation.Animation._Deferred.prototype
+         * @memberOf qtek.animation.Animation._Animator.prototype
          */
         getClips: function() {
             return this._clipList;
         }
     };
 
-    Animation._Deferred = Deferred;
+    Animation._Animator = Animator;
 
     return Animation;
 });

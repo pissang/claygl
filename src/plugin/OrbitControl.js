@@ -4,6 +4,13 @@ define(function(require) {
     var Vector3 = require('../math/Vector3');
     var Matrix4 = require('../math/Matrix4');
 
+    function addEvent(dom, eveType, handler) {
+        dom.addEventListener(eveType, handler);
+    }
+    function removeEvent(dom, eveType, handler) {
+        dom.removeEventListener(eveType, handler);
+    }
+
     /**
      * @constructor qtek.plugin.OrbitControl
      *
@@ -111,23 +118,28 @@ define(function(require) {
          */
         enable: function() {
             var domElement = this.domElement;
-            domElement.addEventListener('mousedown', this._mouseDown);
-            domElement.addEventListener('mousewheel', this._mouseWheel);
-            domElement.addEventListener('DOMMouseScroll', this._mouseWheel);
+            addEvent(domElement, 'mousedown', this._mouseDown);
+            addEvent(domElement, 'touchstart', this._mouseDown);
 
-            domElement.addEventListener('touchstart', this._mouseDown);
-
+            addEvent(domElement, 'mousewheel', this._mouseWheel);
+            addEvent(domElement, 'DOMMouseScroll', this._mouseWheel);
         },
 
         /**
          * Disable control
          */
         disable: function() {
-            this.domElement.removeEventListener('mousedown', this._mouseDown);
-            this.domElement.removeEventListener('mousewheel', this._mouseWheel);
-            this.domElement.removeEventListener('DOMMouseScroll', this._mouseWheel);
+            var domElement = this.domElement;
+            removeEvent(domElement, 'mousedown', this._mouseDown);
+            removeEvent(domElement, 'mousemove', this._mouseMove);
+            removeEvent(domElement, 'mouseup', this._mouseUp);
 
-            this.domElement.removeEventListener('touchstart', this._mouseDown);
+            removeEvent(domElement, 'touchstart', this._mouseDown);
+            removeEvent(domElement, 'touchmove', this._mouseMove);
+            removeEvent(domElement, 'touchend', this._mouseUp);
+
+            removeEvent(domElement, 'mousewheel', this._mouseWheel);
+            removeEvent(domElement, 'DOMMouseScroll', this._mouseWheel);
 
             this._mouseUp();
         },
@@ -141,15 +153,27 @@ define(function(require) {
         },
 
         _mouseDown: function(e) {
-            document.addEventListener('mousemove', this._mouseMove);
-            document.addEventListener('mouseup', this._mouseUp);
-            document.addEventListener('mouseout', this._mouseOut);
+            var domElement = this.domElement;
+            addEvent(domElement, 'mousemove', this._mouseMove);
+            addEvent(domElement, 'mouseup', this._mouseUp);
+            addEvent(domElement, 'mouseout', this._mouseOut);
 
-            document.addEventListener('touchend', this._mouseUp);
-            document.addEventListener('touchmove', this._mouseMove);
+            addEvent(domElement, 'touchend', this._mouseUp);
+            addEvent(domElement, 'touchmove', this._mouseMove);
 
-            this._offsetX = e.pageX;
-            this._offsetY = e.pageY;
+            var x = e.pageX;
+            var y = e.pageY;
+            // Touch
+            if (e.targetTouches) {
+                var touch = e.targetTouches[0];
+                x = touch.clientX;
+                y = touch.clientY;
+
+                this._op = 0;
+            }
+
+            this._offsetX = x;
+            this._offsetY = y;
 
             // Rotate
             if (e.button === 0) {
@@ -160,8 +184,19 @@ define(function(require) {
         },
 
         _mouseMove: function(e) {
-            var dx = e.pageX - this._offsetX;
-            var dy = e.pageY - this._offsetY;
+            var x = e.pageX;
+            var y = e.pageY;
+            // Touch
+            if (e.targetTouches) {
+                var touch = e.targetTouches[0];
+                x = touch.clientX;
+                y = touch.clientY;
+                // PENDING
+                e.preventDefault();
+            }
+
+            var dx = x - this._offsetX;
+            var dy = y - this._offsetY;
 
             if (this._op === 0) {
                 this._offsetPitch += dx * this.sensitivity / 100;
@@ -178,18 +213,18 @@ define(function(require) {
                 this._panY += dy * this.sensitivity * len * divider;
             }
 
-            this._offsetX = e.pageX;
-            this._offsetY = e.pageY;
+            this._offsetX = x;
+            this._offsetY = y;
         },
 
         _mouseUp: function() {
+            var domElement = this.domElement;
+            removeEvent(domElement, 'mousemove', this._mouseMove);
+            removeEvent(domElement, 'mouseup', this._mouseUp);
+            removeEvent(domElement, 'mouseout', this._mouseOut);
 
-            document.removeEventListener('mousemove', this._mouseMove);
-            document.removeEventListener('mouseup', this._mouseUp);
-            document.removeEventListener('mouseout', this._mouseOut);
-
-            document.removeEventListener('touchend', this._mouseUp);
-            document.removeEventListener('touchmove', this._mouseMove);
+            removeEvent(domElement, 'touchend', this._mouseUp);
+            removeEvent(domElement, 'touchmove', this._mouseMove);
 
             this._op = -1;
         },
