@@ -216,6 +216,7 @@ define(function(require) {
 
     function isImageRenderable(image) {
         return image.nodeName === 'CANVAS' ||
+                image.nodeName === 'VIDEO' ||
                 image.complete;
     }
 

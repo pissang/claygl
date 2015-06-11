@@ -142,6 +142,7 @@ define(function(require) {
         isRenderable: function() {
             if (this.image) {
                 return this.image.nodeName === 'CANVAS'
+                    || this.image.nodeName === 'VIDEO'
                     || this.image.complete;
             } else {
                 return this.width && this.height;
