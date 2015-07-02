@@ -1,5 +1,7 @@
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
+// 
+// TODO prez shader dependency
 define(function(require) {
 
     'use strict';
