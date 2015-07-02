@@ -5,7 +5,7 @@ var scene: qtek.Scene = new qtek.Scene();
 var animation: qtek.animation.Animation = new qtek.animation.Animation();
 animation.start();
 renderer.resize(window.innerWidth, window.innerHeight);
-camera.aspect = renderer.width / renderer.height;
+camera.aspect = renderer.getViewportAspect();
 camera.position.z = 120;
 
 document.body.appendChild(renderer.canvas);

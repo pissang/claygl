@@ -6,7 +6,7 @@ var compositor: qtek.compositor.Compositor = new qtek.compositor.Compositor();
 
 renderer.resize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.canvas);
-camera.aspect = renderer.width / renderer.height;
+camera.aspect = renderer.getViewportAspect();
 camera.position.z = 5;
 
 var cubeMat: qtek.Material = new qtek.Material({
@@ -78,8 +78,8 @@ var gaussianNodeV = new qtek.compositor.Node({
     }
 });
 
-gaussianNodeH.setParameter("textureWidth", renderer.width);
-gaussianNodeV.setParameter("textureHeight", renderer.height);
+gaussianNodeH.setParameter("textureWidth", renderer.getWidth());
+gaussianNodeV.setParameter("textureHeight", renderer.getHeight());
 compositor.addNode(gaussianNodeH);
 compositor.addNode(gaussianNodeV);
 compositor.addNode(sceneNode);

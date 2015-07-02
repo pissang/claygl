@@ -1,5 +1,5 @@
-///<reference path="../texture/Texture2D.d.ts" />
-///<reference path="../texture/TextureCube.d.ts" />
+///<reference path="../Texture2D.d.ts" />
+///<reference path="../TextureCube.d.ts" />
 ///<reference path="../Renderer.d.ts" />
 declare module qtek.util.texture {
 

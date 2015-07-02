@@ -14,6 +14,8 @@
 ///<reference path="Skeleton" />
 ///<reference path="StaticGeometry" />
 ///<reference path="Texture" />
+///<reference path="Texture2D" />
+///<reference path="TextureCube" />
 ///<reference path="animation/Animation" />
 ///<reference path="animation/Blend1DClip" />
 ///<reference path="animation/Blend2DClip" />

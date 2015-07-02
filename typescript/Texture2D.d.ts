@@ -1,4 +1,4 @@
-///<reference path="../Texture.d.ts" />
+///<reference path="./Texture.d.ts" />
 declare module qtek {
 
     export module texture {

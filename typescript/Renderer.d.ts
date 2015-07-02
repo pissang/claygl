@@ -43,11 +43,7 @@ declare module qtek {
         constructor(option?: IRendererOption);
 
         canvas: HTMLCanvasElement;
-        
-        width: number;
-        
-        height: number;
-        
+
         devicePixelRatio: number;
 
         color: any;
@@ -75,6 +71,14 @@ declare module qtek {
         render(scene: Scene, camera: Camera, notUpdateScene?: boolean, preZ?: boolean) : IRenderInfo;
         
         renderQueue(queue: Renderable[], camera: Camera, globalMaterial?: Material, preZ?: boolean): IRenderInfo;
+        
+        getWidth(): number;
+        
+        getHeight(): number;
+        
+        getDevicePixelRatio(): number;
+        
+        getViewportAspect(): number;
 
         resize(width: number, height: number): void;
 

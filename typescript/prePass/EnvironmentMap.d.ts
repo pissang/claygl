@@ -1,7 +1,7 @@
 ///<reference path="../core/Base.d.ts" />
 ///<reference path="../math/Vector3.d.ts" />
 ///<reference path="../math/Vector3.d.ts" />
-///<reference path="../texture/TextureCube.d.ts" />
+///<reference path="../TextureCube.d.ts" />
 ///<reference path="../Renderer.d.ts" />
 ///<reference path="../Scene.d.ts" />
 declare module qtek {

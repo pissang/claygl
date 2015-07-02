@@ -8,7 +8,7 @@ animation.start();
 renderer.resize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.canvas);
 
-camera.aspect = renderer.width / renderer.height;
+camera.aspect = renderer.getViewportAspect();
 
 var rootNode: qtek.Node = new qtek.Node();
 var cubeGeo: qtek.geometry.Cube = new qtek.geometry.Cube();
