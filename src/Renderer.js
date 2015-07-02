@@ -16,6 +16,9 @@ define(function(require) {
     var Material = require('./Material');
     var Vector2 = require('./math/Vector2');
 
+    var Shader = require('./Shader');
+    Shader['import'](require('./shader/source/header/light'));
+
     var glMatrix = require('./dep/glmatrix');
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;

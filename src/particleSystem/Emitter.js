@@ -81,7 +81,6 @@ define(function(require) {
                 particle.angularVelocity = new Vector3();
             }
         }
-
     },
     /** @lends qtek.particleSystem.Emitter.prototype */
     {
