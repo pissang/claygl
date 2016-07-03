@@ -15,24 +15,24 @@ define(function(require) {
         this._pool = {};
     }
 
-    /** 
+    /**
      * ### Builin shaders
      * + buildin.standard
      * + buildin.basic
      * + buildin.lambert
      * + buildin.phong
      * + buildin.wireframe
-     * 
+     *
      * @namespace qtek.shader.library
      */
     /**
      *
      * Get shader from library. use shader name and option as hash key.
-     * 
+     *
      * @param {string} name
      * @param {Object|string|Array.<string>} [option]
      * @return {qtek.Shader}
-     * 
+     *
      * @example
      *     qtek.shader.library.get('buildin.phong', 'diffuseMap', 'normalMap');
      *     qtek.shader.library.get('buildin.phong', ['diffuseMap', 'normalMap']);
@@ -40,6 +40,7 @@ define(function(require) {
      *         textures: ['diffuseMap'],
      *         vertexDefines: {},
      *         fragmentDefines: {}
+     *     })
      */
     ShaderLibrary.prototype.get = function(name, option) {
         var enabledTextures = [];
@@ -52,13 +53,13 @@ define(function(require) {
             enabledTextures = option.textures || [];
             vertexDefines = option.vertexDefines || {};
             fragmentDefines = option.fragmentDefines || {};
-        } 
+        }
         else if(option instanceof Array) {
             enabledTextures = option;
         }
         var vertexDefineKeys = Object.keys(vertexDefines);
         var fragmentDefineKeys = Object.keys(fragmentDefines);
-        enabledTextures.sort(); 
+        enabledTextures.sort();
         vertexDefineKeys.sort();
         fragmentDefineKeys.sort();
 

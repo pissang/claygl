@@ -752,7 +752,6 @@ def ConvertSceneNode(pNode, fbxConverter):
 
         # If any attribute of this node have skinning data
         # (Mesh splitted by material may have multiple MeshAttribute in one node)
-        pNode
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
             if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:

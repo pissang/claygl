@@ -5,3 +5,4 @@ gh-pages
 .idea
 cloc_definitions.txt
 tests/unit
+lib

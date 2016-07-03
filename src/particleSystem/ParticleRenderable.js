@@ -13,7 +13,7 @@ define(function(require) {
     var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
 
-    Shader['import'](require('text!./particle.essl'));
+    Shader['import'](require('./particle.essl'));
 
     var particleShader = new Shader({
         vertex: Shader.source('buildin.particle.vertex'),
@@ -95,7 +95,7 @@ define(function(require) {
         this.geometry = new StaticGeometry({
             dynamic: true
         });
-        
+
         if (!this.material) {
             this.material = new Material({
                 shader: particleShader,
@@ -249,7 +249,7 @@ define(function(require) {
                 }
                 var offset2 = i * 2;
                 if (hasUvAnimation) {
-                    // TODO 
+                    // TODO
                     var p = particle.age / particle.life;
                     var stage = Math.round(p * (nUvAnimFrame - 1)) * animRepeat;
                     var v = Math.floor(stage * invAnimTileX);

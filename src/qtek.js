@@ -18,141 +18,151 @@
 define(function(require) {
 	
 	var exportsObject = {
-	"Camera": require('qtek/Camera'),
-	"DynamicGeometry": require('qtek/DynamicGeometry'),
-	"FrameBuffer": require('qtek/FrameBuffer'),
-	"Geometry": require('qtek/Geometry'),
-	"Joint": require('qtek/Joint'),
-	"Light": require('qtek/Light'),
-	"Material": require('qtek/Material'),
-	"Mesh": require('qtek/Mesh'),
-	"Node": require('qtek/Node'),
-	"Renderable": require('qtek/Renderable'),
-	"Renderer": require('qtek/Renderer'),
-	"Scene": require('qtek/Scene'),
-	"Shader": require('qtek/Shader'),
-	"Skeleton": require('qtek/Skeleton'),
-	"StaticGeometry": require('qtek/StaticGeometry'),
-	"Texture": require('qtek/Texture'),
-	"Texture2D": require('qtek/Texture2D'),
-	"TextureCube": require('qtek/TextureCube'),
 	"animation": {
-		"Animation": require('qtek/animation/Animation'),
-		"Blend1DClip": require('qtek/animation/Blend1DClip'),
-		"Blend2DClip": require('qtek/animation/Blend2DClip'),
-		"Clip": require('qtek/animation/Clip'),
-		"SamplerClip": require('qtek/animation/SamplerClip'),
-		"SkinningClip": require('qtek/animation/SkinningClip'),
-		"TransformClip": require('qtek/animation/TransformClip'),
-		"easing": require('qtek/animation/easing')
+		"Animation": require('./animation/Animation'),
+		"Blend1DClip": require('./animation/Blend1DClip'),
+		"Blend2DClip": require('./animation/Blend2DClip'),
+		"Clip": require('./animation/Clip'),
+		"easing": require('./animation/easing'),
+		"SamplerClip": require('./animation/SamplerClip'),
+		"SkinningClip": require('./animation/SkinningClip'),
+		"TransformClip": require('./animation/TransformClip')
 	},
 	"async": {
-		"Task": require('qtek/async/Task'),
-		"TaskGroup": require('qtek/async/TaskGroup')
+		"Task": require('./async/Task'),
+		"TaskGroup": require('./async/TaskGroup')
 	},
+	"Camera": require('./Camera'),
 	"camera": {
-		"Orthographic": require('qtek/camera/Orthographic'),
-		"Perspective": require('qtek/camera/Perspective')
+		"Orthographic": require('./camera/Orthographic'),
+		"Perspective": require('./camera/Perspective')
+	},
+	"canvas": {
+		"Material": require('./canvas/Material'),
+		"Renderer": require('./canvas/Renderer')
 	},
 	"compositor": {
-		"Compositor": require('qtek/compositor/Compositor'),
-		"Graph": require('qtek/compositor/Graph'),
-		"Node": require('qtek/compositor/Node'),
-		"Pass": require('qtek/compositor/Pass'),
-		"SceneNode": require('qtek/compositor/SceneNode'),
-		"TextureNode": require('qtek/compositor/TextureNode'),
-		"TexturePool": require('qtek/compositor/TexturePool')
+		"Compositor": require('./compositor/Compositor'),
+		"Graph": require('./compositor/Graph'),
+		"Node": require('./compositor/Node'),
+		"Pass": require('./compositor/Pass'),
+		"SceneNode": require('./compositor/SceneNode'),
+		"TextureNode": require('./compositor/TextureNode'),
+		"TexturePool": require('./compositor/TexturePool')
 	},
 	"core": {
-		"Base": require('qtek/core/Base'),
-		"Cache": require('qtek/core/Cache'),
-		"Event": require('qtek/core/Event'),
-		"LRU": require('qtek/core/LRU'),
-		"LinkedList": require('qtek/core/LinkedList'),
-		"glenum": require('qtek/core/glenum'),
-		"glinfo": require('qtek/core/glinfo'),
+		"Base": require('./core/Base'),
+		"Cache": require('./core/Cache'),
+		"Event": require('./core/Event'),
+		"glenum": require('./core/glenum'),
+		"glinfo": require('./core/glinfo'),
+		"LinkedList": require('./core/LinkedList'),
+		"LRU": require('./core/LRU'),
 		"mixin": {
-			"derive": require('qtek/core/mixin/derive'),
-			"notifier": require('qtek/core/mixin/notifier')
+			"derive": require('./core/mixin/derive'),
+			"notifier": require('./core/mixin/notifier')
 		},
-		"request": require('qtek/core/request'),
-		"util": require('qtek/core/util')
+		"request": require('./core/request'),
+		"util": require('./core/util'),
+		"vendor": require('./core/vendor')
 	},
 	"deferred": {
-		"Renderer": require('qtek/deferred/Renderer'),
-		"StandardMaterial": require('qtek/deferred/StandardMaterial')
+		"Renderer": require('./deferred/Renderer'),
+		"StandardMaterial": require('./deferred/StandardMaterial')
 	},
 	"dep": {
-		"glmatrix": require('qtek/dep/glmatrix')
+		"glmatrix": require('./dep/glmatrix')
 	},
+	"DynamicGeometry": require('./DynamicGeometry'),
+	"FrameBuffer": require('./FrameBuffer'),
+	"Geometry": require('./Geometry'),
 	"geometry": {
-		"Cone": require('qtek/geometry/Cone'),
-		"Cube": require('qtek/geometry/Cube'),
-		"Cylinder": require('qtek/geometry/Cylinder'),
-		"Plane": require('qtek/geometry/Plane'),
-		"Sphere": require('qtek/geometry/Sphere')
+		"Cone": require('./geometry/Cone'),
+		"Cube": require('./geometry/Cube'),
+		"Cylinder": require('./geometry/Cylinder'),
+		"Plane": require('./geometry/Plane'),
+		"Sphere": require('./geometry/Sphere')
 	},
+	"Joint": require('./Joint'),
+	"Light": require('./Light'),
 	"light": {
-		"Ambient": require('qtek/light/Ambient'),
-		"Directional": require('qtek/light/Directional'),
-		"Point": require('qtek/light/Point'),
-		"Sphere": require('qtek/light/Sphere'),
-		"Spot": require('qtek/light/Spot'),
-		"Tube": require('qtek/light/Tube')
+		"Ambient": require('./light/Ambient'),
+		"Directional": require('./light/Directional'),
+		"Point": require('./light/Point'),
+		"Sphere": require('./light/Sphere'),
+		"Spot": require('./light/Spot'),
+		"Tube": require('./light/Tube')
 	},
 	"loader": {
-		"FX": require('qtek/loader/FX'),
-		"GLTF": require('qtek/loader/GLTF'),
-		"ThreeModel": require('qtek/loader/ThreeModel')
+		"FX": require('./loader/FX'),
+		"GLTF": require('./loader/GLTF'),
+		"ThreeModel": require('./loader/ThreeModel')
 	},
+	"Material": require('./Material'),
 	"math": {
-		"BoundingBox": require('qtek/math/BoundingBox'),
-		"Frustum": require('qtek/math/Frustum'),
-		"Matrix2": require('qtek/math/Matrix2'),
-		"Matrix2d": require('qtek/math/Matrix2d'),
-		"Matrix3": require('qtek/math/Matrix3'),
-		"Matrix4": require('qtek/math/Matrix4'),
-		"Plane": require('qtek/math/Plane'),
-		"Quaternion": require('qtek/math/Quaternion'),
-		"Ray": require('qtek/math/Ray'),
-		"Value": require('qtek/math/Value'),
-		"Vector2": require('qtek/math/Vector2'),
-		"Vector3": require('qtek/math/Vector3'),
-		"Vector4": require('qtek/math/Vector4')
+		"BoundingBox": require('./math/BoundingBox'),
+		"Frustum": require('./math/Frustum'),
+		"Matrix2": require('./math/Matrix2'),
+		"Matrix2d": require('./math/Matrix2d'),
+		"Matrix3": require('./math/Matrix3'),
+		"Matrix4": require('./math/Matrix4'),
+		"Plane": require('./math/Plane'),
+		"Quaternion": require('./math/Quaternion'),
+		"Ray": require('./math/Ray'),
+		"Value": require('./math/Value'),
+		"Vector2": require('./math/Vector2'),
+		"Vector3": require('./math/Vector3'),
+		"Vector4": require('./math/Vector4')
 	},
+	"Mesh": require('./Mesh'),
+	"Node": require('./Node'),
 	"particleSystem": {
-		"Emitter": require('qtek/particleSystem/Emitter'),
-		"Field": require('qtek/particleSystem/Field'),
-		"ForceField": require('qtek/particleSystem/ForceField'),
-		"Particle": require('qtek/particleSystem/Particle'),
-		"ParticleRenderable": require('qtek/particleSystem/ParticleRenderable')
+		"Emitter": require('./particleSystem/Emitter'),
+		"Field": require('./particleSystem/Field'),
+		"ForceField": require('./particleSystem/ForceField'),
+		"Particle": require('./particleSystem/Particle'),
+		"ParticleRenderable": require('./particleSystem/ParticleRenderable')
 	},
 	"picking": {
-		"PixelPicking": require('qtek/picking/PixelPicking'),
-		"RayPicking": require('qtek/picking/RayPicking')
+		"PixelPicking": require('./picking/PixelPicking'),
+		"RayPicking": require('./picking/RayPicking')
 	},
 	"plugin": {
-		"FirstPersonControl": require('qtek/plugin/FirstPersonControl'),
-		"InfinitePlane": require('qtek/plugin/InfinitePlane'),
-		"OrbitControl": require('qtek/plugin/OrbitControl'),
-		"Skybox": require('qtek/plugin/Skybox'),
-		"Skydome": require('qtek/plugin/Skydome')
+		"FirstPersonControl": require('./plugin/FirstPersonControl'),
+		"InfinitePlane": require('./plugin/InfinitePlane'),
+		"OrbitControl": require('./plugin/OrbitControl'),
+		"Skybox": require('./plugin/Skybox'),
+		"Skydome": require('./plugin/Skydome')
 	},
 	"prePass": {
-		"EnvironmentMap": require('qtek/prePass/EnvironmentMap'),
-		"Reflection": require('qtek/prePass/Reflection'),
-		"ShadowMap": require('qtek/prePass/ShadowMap')
+		"EnvironmentMap": require('./prePass/EnvironmentMap'),
+		"Reflection": require('./prePass/Reflection'),
+		"ShadowMap": require('./prePass/ShadowMap')
 	},
+	"Renderable": require('./Renderable'),
+	"Renderer": require('./Renderer'),
+	"Scene": require('./Scene'),
+	"Shader": require('./Shader'),
 	"shader": {
-		"buildin": require('qtek/shader/buildin'),
-		"library": require('qtek/shader/library')
+		"buildin": require('./shader/buildin'),
+		"library": require('./shader/library'),
+		"source": {
+			"header": {
+				"light": require('./shader/source/header/light')
+			}
+		}
 	},
+	"Skeleton": require('./Skeleton'),
+	"StaticGeometry": require('./StaticGeometry'),
+	"Texture": require('./Texture'),
+	"Texture2D": require('./Texture2D'),
+	"TextureCube": require('./TextureCube'),
 	"util": {
-		"dds": require('qtek/util/dds'),
-		"delaunay": require('qtek/util/delaunay'),
-		"hdr": require('qtek/util/hdr'),
-		"mesh": require('qtek/util/mesh'),
-		"texture": require('qtek/util/texture')
+		"dds": require('./util/dds'),
+		"delaunay": require('./util/delaunay'),
+		"hdr": require('./util/hdr'),
+		"mesh": require('./util/mesh'),
+		"texture": require('./util/texture')
 	}
 };
 

@@ -6,7 +6,7 @@ define(function (require) {
     var Shader = require('../Shader');
     var Material = require('../Material');
 
-    Shader.import(require('text!./color.essl'));    
+    Shader.import(require('./color.essl'));
 
     /**
      * Pixel picking is gpu based picking, which is fast and accurate.

@@ -1,7 +1,7 @@
 // Light-pre pass deferred rendering
 // http://www.realtimerendering.com/blog/deferred-lighting-approaches/
 define(function (require) {
-    
+
     'use strict';
 
     var Base = require('../core/Base');
@@ -21,23 +21,23 @@ define(function (require) {
     var Vector3 = require('../math/Vector3');
     var ForwardRenderer = require('../Renderer');
 
-    Shader.import(require('text!../shader/source/util.essl'));
-    Shader.import(require('text!../shader/source/deferred/gbuffer.essl'));
-    Shader.import(require('text!../shader/source/deferred/chunk.essl'));
+    Shader.import(require('../shader/source/util.essl'));
+    Shader.import(require('../shader/source/deferred/gbuffer.essl'));
+    Shader.import(require('../shader/source/deferred/chunk.essl'));
 
-    Shader.import(require('text!../shader/source/deferred/lightvolume.essl'));
+    Shader.import(require('../shader/source/deferred/lightvolume.essl'));
 
     // Light shaders
-    Shader.import(require('text!../shader/source/deferred/spot.essl'));
-    Shader.import(require('text!../shader/source/deferred/directional.essl'));
-    Shader.import(require('text!../shader/source/deferred/ambient.essl'));
-    Shader.import(require('text!../shader/source/deferred/point.essl'));
-    Shader.import(require('text!../shader/source/deferred/sphere.essl'));
-    Shader.import(require('text!../shader/source/deferred/tube.essl'));
+    Shader.import(require('../shader/source/deferred/spot.essl'));
+    Shader.import(require('../shader/source/deferred/directional.essl'));
+    Shader.import(require('../shader/source/deferred/ambient.essl'));
+    Shader.import(require('../shader/source/deferred/point.essl'));
+    Shader.import(require('../shader/source/deferred/sphere.essl'));
+    Shader.import(require('../shader/source/deferred/tube.essl'));
 
-    Shader.import(require('text!../shader/source/deferred/output.essl'));
+    Shader.import(require('../shader/source/deferred/output.essl'));
 
-    Shader.import(require('text!../shader/source/prez.essl'));
+    Shader.import(require('../shader/source/prez.essl'));
 
     var errorShader = {};
 
@@ -277,7 +277,7 @@ define(function (require) {
 
                 if (volumeMesh) {
                     var material = volumeMesh.material;
-                    // Volume mesh will affect the scene bounding box when rendering 
+                    // Volume mesh will affect the scene bounding box when rendering
                     // if castShadow is true
                     volumeMesh.castShadow = false;
 
@@ -349,7 +349,7 @@ define(function (require) {
         // Light volume mesh is rendered in light accumulate pass instead of full quad.
         // It will reduce pixels significantly when local light is relatively small.
         // And we can use custom volume mesh to shape the light.
-        // 
+        //
         // See "Deferred Shading Optimizations" in GDC2011
         _updateLightProxy: function (light) {
             var volumeMesh;
@@ -555,7 +555,7 @@ define(function (require) {
                 }
 
                 outputMat.set('eyePosition', eyePosition);
-                
+
                 outputMat.set('color', standardMat.color);
                 outputMat.set('emission', standardMat.emission);
                 outputMat.set('specularColor', standardMat.specularColor);

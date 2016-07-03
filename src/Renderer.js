@@ -1,13 +1,12 @@
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
-// 
+//
 // TODO prez shader dependency
 define(function(require) {
 
     'use strict';
 
     var Base = require('./core/Base');
-    var Texture = require('./Texture');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
     var BoundingBox = require('./math/BoundingBox');
@@ -69,13 +68,13 @@ define(function(require) {
              * @type {number[]}
              */
             color: [0.0, 0.0, 0.0, 0.0],
-            
+
             /**
              * Default:
              *     _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
              * @type {number}
              */
-            clear: 17664,  
+            clear: 17664,
 
             // Settings when getting context
             // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -146,21 +145,21 @@ define(function(require) {
                 premultipliedAlpha: this.premultipliedAlpha,
                 preserveDrawingBuffer: this.preserveDrawingBuffer
             };
-            
+
             this.gl = canvas.getContext('webgl', opts)
                 || canvas.getContext('experimental-webgl', opts);
 
             if (!this.gl) {
                 throw new Error();
             }
-            
+
             if (this.gl.__GLID__ == null) {
                 // gl context is not created
                 // Otherwise is the case mutiple renderer share the same gl context
                 this.gl.__GLID__ = glid++;
 
                 glinfo.initialize(this.gl);
-            } 
+            }
 
             this.resize();
         } catch(e) {
@@ -213,8 +212,8 @@ define(function(require) {
         },
 
         /**
-         * Get viewport aspect, 
-         */ 
+         * Get viewport aspect,
+         */
         getViewportAspect: function () {
             var viewport = this.viewport;
             return viewport.width / viewport.height;
@@ -306,7 +305,7 @@ define(function(require) {
          */
         restoreClear: function() {
             if (this._clearSettings.length > 0) {
-                this.clear = this._clearSettings.pop();   
+                this.clear = this._clearSettings.pop();
             }
         },
         /**
@@ -422,11 +421,11 @@ define(function(require) {
 
             var _gl = this.gl;
             var scene = this._sceneRendering;
-            
+
             var prevMaterial;
             var prevShader;
-                
-            // Status 
+
+            // Status
             var depthTest, depthMask;
             var culling, cullFace, frontFace;
 
@@ -550,8 +549,8 @@ define(function(require) {
                 if (prevMaterial !== material) {
                     if (!preZ) {
                         if (material.depthTest !== depthTest) {
-                            material.depthTest ? 
-                                _gl.enable(_gl.DEPTH_TEST) : 
+                            material.depthTest ?
+                                _gl.enable(_gl.DEPTH_TEST) :
                                 _gl.disable(_gl.DEPTH_TEST);
                             depthTest = material.depthTest;
                         }
@@ -570,7 +569,7 @@ define(function(require) {
                         } else {    // Default blend function
                             _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
                             _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
-                        } 
+                        }
                     }
                 }
 
@@ -659,19 +658,19 @@ define(function(require) {
                         // Clip in the near plane
                         cullingBoundingBox.max._array[2] = -1e-20;
                     }
-                    
+
                     cullingBoundingBox.applyProjection(cullingMatrix);
 
                     var min = cullingBoundingBox.min._array;
                     var max = cullingBoundingBox.max._array;
-                    
+
                     if (
                         max[0] < -1 || min[0] > 1
                         || max[1] < -1 || min[1] > 1
                         || max[2] < -1 || min[2] > 1
                     ) {
                         return true;
-                    }   
+                    }
                 }
                 return false;
             };
@@ -748,7 +747,7 @@ define(function(require) {
         disposeFrameBuffer: function(frameBuffer) {
             frameBuffer.dispose(this.gl);
         },
-        
+
         /**
          * Dispose renderer
          */
@@ -760,7 +759,7 @@ define(function(require) {
          * Convert screen coords to normalized device coordinates(NDC)
          * Screen coords can get from mouse event, it is positioned relative to canvas element
          * NDC can be used in ray casting with Camera.prototype.castRay methods
-         * 
+         *
          * @param  {number}       x
          * @param  {number}       y
          * @param  {qtek.math.Vector2} [out]

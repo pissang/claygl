@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var Base = require('../core/Base');
@@ -11,7 +11,7 @@ define(function(require) {
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
 
-    Shader['import'](require('text!../shader/source/compositor/vertex.essl'));
+    Shader['import'](require('../shader/source/compositor/vertex.essl'));
 
     var planeGeo = new Plane();
     var mesh = new Mesh({
@@ -100,7 +100,7 @@ define(function(require) {
         },
 
         bind : function(renderer, frameBuffer) {
-            
+
             if (this.outputs) {
                 for (var attachment in this.outputs) {
                     var texture = this.outputs[attachment];
