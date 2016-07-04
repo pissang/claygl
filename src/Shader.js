@@ -7,7 +7,7 @@
  *
  */
 define(function(require) {
-    
+
     'use strict';
 
     var Base = require('./core/Base');
@@ -63,7 +63,7 @@ define(function(require) {
     };
 
     var attribSemantics = [
-        'POSITION', 
+        'POSITION',
         'NORMAL',
         'BINORMAL',
         'TANGENT',
@@ -103,9 +103,9 @@ define(function(require) {
         'VIEWPROJECTIONINVERSETRANSPOSE',
         'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
     ];
-    
+
     // Enable attribute operation is global to all programs
-    // Here saved the list of all enabled attribute index 
+    // Here saved the list of all enabled attribute index
     // http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
     var enabledAttributeList = {};
 
@@ -135,7 +135,7 @@ define(function(require) {
              * @type {string}
              */
             vertex: '',
-            
+
             /**
              * Fragment shader code
              * @type {string}
@@ -186,7 +186,7 @@ define(function(require) {
             _currentLocationsMap: {}
         };
     }, function() {
-        
+
         this._cache = new Cache();
 
         this._updateShaderString();
@@ -258,7 +258,7 @@ define(function(require) {
                 this.fragment !== this._fragmentPrev) {
 
                 this._parseImport();
-                
+
                 this.attribSemantics = {};
                 this.matrixSemantics = {};
                 this._textureStatus = {};
@@ -521,7 +521,7 @@ define(function(require) {
         // Example Usage:
         // enableAttributes(_gl, ["position", "texcoords"])
         enableAttributes: function(_gl, attribList, vao) {
-            
+
             var program = this._cache.get('program');
 
             var locationMap = this._cache.get('attriblocations');
@@ -541,8 +541,8 @@ define(function(require) {
                         = [];
                 } else {
                     enabledAttributeListInContext
-                        = enabledAttributeList[_gl.__GLID__] 
-                        = [];   
+                        = enabledAttributeList[_gl.__GLID__]
+                        = [];
                 }
             }
             var locationList = [];
@@ -652,7 +652,7 @@ define(function(require) {
                 }
             }
             var code = defineStr.join('\n') + '\n' + this._fragmentProcessedNoDefine;
-            
+
             // Add precision
             this._fragmentProcessed = ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
         },
@@ -769,7 +769,7 @@ define(function(require) {
         // Create a new uniform instance for material
         createUniforms: function() {
             var uniforms = {};
-            
+
             for (var symbol in this.uniformTemplates){
                 var uniformTpl = this.uniformTemplates[symbol];
                 uniforms[symbol] = {
@@ -902,7 +902,7 @@ define(function(require) {
                 var keys = Object.keys(this.attributeTemplates);
                 _gl.bindAttribLocation(program, 0, keys[0]);
             }
-            
+
             _gl.linkProgram(program);
 
             if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
@@ -951,7 +951,7 @@ define(function(require) {
             this._locations = {};
         }
     });
-    
+
     function getCacheSchema() {
         return {
             locations: {},
@@ -1039,13 +1039,14 @@ define(function(require) {
         var parts = name.split('.');
         var obj = Shader.codes;
         var i = 0;
-        while(obj && i < parts.length) {
+        while (obj && i < parts.length) {
             var key = parts[i++];
             obj = obj[key];
         }
-        if (!obj) {
+        if (typeof obj !== 'string') {
+            // FIXME Use default instead
             console.warn('Shader "' + name + '" not existed in library');
-            return;
+            return '';
         }
         return obj;
     };

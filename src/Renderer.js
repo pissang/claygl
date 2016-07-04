@@ -359,8 +359,8 @@ define(function(require) {
                     node.__depth = posViewSpace[2];
                 }
             }
-            opaqueQueue.sort(Renderer.opaqueSortFunc);
-            transparentQueue.sort(Renderer.transparentSortFunc);
+            opaqueQueue.sort(this.opaqueSortFunc);
+            transparentQueue.sort(this.transparentSortFunc);
 
             // Render Opaque queue
             scene.trigger('beforerender:opaque', this, opaqueQueue);
@@ -781,7 +781,7 @@ define(function(require) {
             arr[1] = arr[1] * 2 - 1;
 
             return out;
-        }
+        },
     });
 
     /**
@@ -791,15 +791,18 @@ define(function(require) {
      * @return {boolean}
      * @static
      */
-    Renderer.opaqueSortFunc = function(x, y) {
-        // Priority shader -> material -> geometry
-        if (x.material.shader === y.material.shader) {
-            if (x.material === y.material) {
-                return x.geometry.__GUID__ - y.geometry.__GUID__;
+    Renderer.opaqueSortFunc = Renderer.prototype.opaqueSortFunc = function(x, y) {
+        // Priority renderOrder -> shader -> material -> geometry
+        if (x.renderOrder === y.renderOrder) {
+            if (x.material.shader === y.material.shader) {
+                if (x.material === y.material) {
+                    return x.geometry.__GUID__ - y.geometry.__GUID__;
+                }
+                return x.material.__GUID__ - y.material.__GUID__;
             }
-            return x.material.__GUID__ - y.material.__GUID__;
+            return x.material.shader.__GUID__ - y.material.shader.__GUID__;
         }
-        return x.material.shader.__GUID__ - y.material.shader.__GUID__;
+        return x.renderOrder - y.renderOrder;
     };
 
     /**
@@ -809,20 +812,24 @@ define(function(require) {
      * @return {boolean}
      * @static
      */
-    Renderer.transparentSortFunc = function(x, y) {
-        // Priority depth -> shader -> material -> geometry
-        if (x.__depth === y.__depth) {
-            if (x.material.shader === y.material.shader) {
-                if (x.material === y.material) {
-                    return x.geometry.__GUID__ - y.geometry.__GUID__;
+    Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function(x, y) {
+        // Priority renderOrder -> depth -> shader -> material -> geometry
+
+        if (x.renderOrder === y.renderOrder) {
+            if (x.__depth === y.__depth) {
+                if (x.material.shader === y.material.shader) {
+                    if (x.material === y.material) {
+                        return x.geometry.__GUID__ - y.geometry.__GUID__;
+                    }
+                    return x.material.__GUID__ - y.material.__GUID__;
                 }
-                return x.material.__GUID__ - y.material.__GUID__;
+                return x.material.shader.__GUID__ - y.material.shader.__GUID__;
             }
-            return x.material.shader.__GUID__ - y.material.shader.__GUID__;
+            // Depth is negative
+            // So farther object has smaller depth value
+            return x.__depth - y.__depth;
         }
-        // Depth is negative
-        // So farther object has smaller depth value
-        return x.__depth - y.__depth;
+        return x.renderOrder - y.renderOrder;
     };
 
     // Temporary variables

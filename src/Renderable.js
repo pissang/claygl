@@ -64,6 +64,11 @@ define(function(require) {
     {
 
         /**
+         * Render order
+         * @type {Number}
+         */
+        renderOrder: 0,
+        /**
          * Used when mode is LINES, LINE_STRIP or LINE_LOOP
          * @type {number}
          */
