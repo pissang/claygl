@@ -83,7 +83,7 @@ define(function(require) {
              * If enable alpha, default true
              * @type {boolean}
              */
-            alhpa: true,
+            alpha: true,
             /**
              * If enable depth buffer, default true
              * @type {boolean}
@@ -138,7 +138,7 @@ define(function(require) {
         var canvas = this.canvas;
         try {
             var opts = {
-                alhpa: this.alhpa,
+                alpha: this.alpha,
                 depth: this.depth,
                 stencil: this.stencil,
                 antialias: this.antialias,
@@ -566,7 +566,8 @@ define(function(require) {
                     if (material.transparent) {
                         if (material.blend) {
                             material.blend(_gl);
-                        } else {    // Default blend function
+                        }
+                        else {    // Default blend function
                             _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
                             _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
                         }

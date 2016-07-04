@@ -47,7 +47,7 @@ define(function(require) {
          * @type {qtek.Geometry}
          */
         geometry: null,
-        
+
         /**
          * @type {number}
          */
@@ -232,7 +232,7 @@ define(function(require) {
 
                     var availableAttributes = vao.availableAttributes;
                     var indicesBuffer = vao.indicesBuffer;
-                    
+
                     if (needsBindAttributes) {
                         var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
                         // Setting attributes;
@@ -277,10 +277,10 @@ define(function(require) {
                     ) {
                         _gl.lineWidth(this.lineWidth);
                     }
-                    
+
                     prevDrawIndicesBuffer = indicesBuffer;
                     prevDrawIsUseFace = geometry.isUseFace();
-                    //Do drawing
+                    // Do drawing
                     if (prevDrawIsUseFace) {
                         if (needsBindAttributes) {
                             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
@@ -318,7 +318,7 @@ define(function(require) {
 
                 renderable.geometry = this.geometry;
                 renderable.material = this.material;
-                
+
                 for (var i = 0; i < properties.length; i++) {
                     var name = properties[i];
                     // Try not to overwrite the prototype property
