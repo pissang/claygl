@@ -338,6 +338,8 @@ define(function (require) {
         if (easing && easing !== 'spline') {
             clip.setEasing(easing);
         }
+
+        return clip;
     }
 
     /**
