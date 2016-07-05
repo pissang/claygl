@@ -125,8 +125,8 @@ define(function(require) {
              */
             viewport: {},
 
-            _viewportSettings: [],
-            _clearSettings: [],
+            _viewportStack: [],
+            _clearStack: [],
 
             _sceneRendering: null
         };
@@ -281,15 +281,15 @@ define(function(require) {
          * Push current viewport into a stack
          */
         saveViewport: function() {
-            this._viewportSettings.push(this.viewport);
+            this._viewportStack.push(this.viewport);
         },
 
         /**
          * Pop viewport from stack, restore in the renderer
          */
         restoreViewport: function() {
-            if (this._viewportSettings.length > 0) {
-                this.setViewport(this._viewportSettings.pop());
+            if (this._viewportStack.length > 0) {
+                this.setViewport(this._viewportStack.pop());
             }
         },
 
@@ -297,15 +297,15 @@ define(function(require) {
          * Push current clear into a stack
          */
         saveClear: function() {
-            this._clearSettings.push(this.clear);
+            this._clearStack.push(this.clear);
         },
 
         /**
          * Pop clear from stack, restore in the renderer
          */
         restoreClear: function() {
-            if (this._clearSettings.length > 0) {
-                this.clear = this._clearSettings.pop();
+            if (this._clearStack.length > 0) {
+                this.clear = this._clearStack.pop();
             }
         },
         /**

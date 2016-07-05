@@ -4,6 +4,7 @@ define(function(require) {
 
     var Node = require('./Node');
     var glinfo = require('../core/glinfo');
+    var glenum = require('../core/glenum');
 
     /**
      * @constructor qtek.compositor.SceneNode
@@ -29,14 +30,14 @@ define(function(require) {
          * @type {boolean}
          */
         preZ: false
-        
+
     }, function() {
         if (this.frameBuffer) {
             this.frameBuffer.depthBuffer = true;
         }
     }, {
         render: function(renderer) {
-            
+
             this._rendering = true;
             var _gl = renderer.gl;
 
@@ -79,7 +80,12 @@ define(function(require) {
                     ext.drawBuffersEXT(bufs);
                 }
 
+                // Always clear
+                // PENDING
+                renderer.saveClear();
+                renderer.clear = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
                 renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+                renderer.restoreClear();
 
                 frameBuffer.unbind(renderer);
             }

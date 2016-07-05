@@ -20,6 +20,7 @@ define(function(require) {
 	var exportsObject = {
 	"animation": {
 		"Animation": require('./animation/Animation'),
+		"Animator": require('./animation/Animator'),
 		"Blend1DClip": require('./animation/Blend1DClip'),
 		"Blend2DClip": require('./animation/Blend2DClip'),
 		"Clip": require('./animation/Clip'),

@@ -144,11 +144,22 @@ define(function(require) {
             }
 
             this.trigger('beforerender', this, renderer);
+
             // Don't clear in each pass, let the color overwrite the buffer
-            // PENDING Transparent ?
-            _gl.disable(_gl.BLEND);
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
+
+            if (!frameBuffer) {
+                // Blend with previous rendered scene in the final output
+                _gl.enable(_gl.BLEND);
+                this.material.transparent = true;
+            }
+            else {
+                _gl.disable(_gl.BLEND);
+                this.material.transparent = false;
+            }
+
             this.renderQuad(renderer);
+
             this.trigger('afterrender', this, renderer);
 
             if (frameBuffer) {
