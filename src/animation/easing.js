@@ -1,172 +1,172 @@
 // 缓动函数来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
 define(function() {
 
-    /** 
+    /**
      * @namespace qtek.animation.easing
      */
     var easing = {
         /**
-         * @alias qtek.animation.easing.Linear
+         * @alias qtek.animation.easing.linear
          * @param {number} k
          * @return {number}
          */
-        Linear: function(k) {
+        linear: function(k) {
             return k;
         },
         /**
-         * @alias qtek.animation.easing.QuadraticIn
+         * @alias qtek.animation.easing.quadraticIn
          * @param {number} k
          * @return {number}
          */
-        QuadraticIn: function(k) {
+        quadraticIn: function(k) {
             return k * k;
         },
         /**
-         * @alias qtek.animation.easing.QuadraticOut
+         * @alias qtek.animation.easing.quadraticOut
          * @param {number} k
          * @return {number}
          */
-        QuadraticOut: function(k) {
+        quadraticOut: function(k) {
             return k * (2 - k);
         },
         /**
-         * @alias qtek.animation.easing.QuadraticInOut
+         * @alias qtek.animation.easing.quadraticInOut
          * @param {number} k
          * @return {number}
          */
-        QuadraticInOut: function(k) {
+        quadraticInOut: function(k) {
             if ((k *= 2) < 1) {
                 return 0.5 * k * k;
             }
             return - 0.5 * (--k * (k - 2) - 1);
         },
         /**
-         * @alias qtek.animation.easing.CubicIn
+         * @alias qtek.animation.easing.cubicIn
          * @param {number} k
          * @return {number}
          */
-        CubicIn: function(k) {
+        cubicIn: function(k) {
             return k * k * k;
         },
         /**
-         * @alias qtek.animation.easing.CubicOut
+         * @alias qtek.animation.easing.cubicOut
          * @param {number} k
          * @return {number}
          */
-        CubicOut: function(k) {
+        cubicOut: function(k) {
             return --k * k * k + 1;
         },
         /**
-         * @alias qtek.animation.easing.CubicInOut
+         * @alias qtek.animation.easing.cubicInOut
          * @param {number} k
          * @return {number}
          */
-        CubicInOut: function(k) {
+        cubicInOut: function(k) {
             if ((k *= 2) < 1) {
                 return 0.5 * k * k * k;
             }
             return 0.5 * ((k -= 2) * k * k + 2);
         },
         /**
-         * @alias qtek.animation.easing.QuarticIn
+         * @alias qtek.animation.easing.quarticIn
          * @param {number} k
          * @return {number}
          */
-        QuarticIn: function(k) {
+        quarticIn: function(k) {
             return k * k * k * k;
         },
         /**
-         * @alias qtek.animation.easing.QuarticOut
+         * @alias qtek.animation.easing.quarticOut
          * @param {number} k
          * @return {number}
          */
-        QuarticOut: function(k) {
+        quarticOut: function(k) {
             return 1 - (--k * k * k * k);
         },
         /**
-         * @alias qtek.animation.easing.QuarticInOut
+         * @alias qtek.animation.easing.quarticInOut
          * @param {number} k
          * @return {number}
          */
-        QuarticInOut: function(k) {
+        quarticInOut: function(k) {
             if ((k *= 2) < 1) {
                 return 0.5 * k * k * k * k;
             }
             return - 0.5 * ((k -= 2) * k * k * k - 2);
         },
         /**
-         * @alias qtek.animation.easing.QuinticIn
+         * @alias qtek.animation.easing.quinticIn
          * @param {number} k
          * @return {number}
          */
-        QuinticIn: function(k) {
+        quinticIn: function(k) {
             return k * k * k * k * k;
         },
         /**
-         * @alias qtek.animation.easing.QuinticOut
+         * @alias qtek.animation.easing.quinticOut
          * @param {number} k
          * @return {number}
          */
-        QuinticOut: function(k) {
+        quinticOut: function(k) {
             return --k * k * k * k * k + 1;
         },
         /**
-         * @alias qtek.animation.easing.QuinticInOut
+         * @alias qtek.animation.easing.quinticInOut
          * @param {number} k
          * @return {number}
          */
-        QuinticInOut: function(k) {
+        quinticInOut: function(k) {
             if ((k *= 2) < 1) {
                 return 0.5 * k * k * k * k * k;
             }
             return 0.5 * ((k -= 2) * k * k * k * k + 2);
         },
         /**
-         * @alias qtek.animation.easing.SinusoidalIn
+         * @alias qtek.animation.easing.sinusoidalIn
          * @param {number} k
          * @return {number}
          */
-        SinusoidalIn: function(k) {
+        sinusoidalIn: function(k) {
             return 1 - Math.cos(k * Math.PI / 2);
         },
         /**
-         * @alias qtek.animation.easing.SinusoidalOut
+         * @alias qtek.animation.easing.sinusoidalOut
          * @param {number} k
          * @return {number}
          */
-        SinusoidalOut: function(k) {
+        sinusoidalOut: function(k) {
             return Math.sin(k * Math.PI / 2);
         },
         /**
-         * @alias qtek.animation.easing.SinusoidalInOut
+         * @alias qtek.animation.easing.sinusoidalInOut
          * @param {number} k
          * @return {number}
          */
-        SinusoidalInOut: function(k) {
+        sinusoidalInOut: function(k) {
             return 0.5 * (1 - Math.cos(Math.PI * k));
         },
         /**
-         * @alias qtek.animation.easing.ExponentialIn
+         * @alias qtek.animation.easing.exponentialIn
          * @param {number} k
          * @return {number}
          */
-        ExponentialIn: function(k) {
+        exponentialIn: function(k) {
             return k === 0 ? 0 : Math.pow(1024, k - 1);
         },
         /**
-         * @alias qtek.animation.easing.ExponentialOut
+         * @alias qtek.animation.easing.exponentialOut
          * @param {number} k
          * @return {number}
          */
-        ExponentialOut: function(k) {
+        exponentialOut: function(k) {
             return k === 1 ? 1 : 1 - Math.pow(2, - 10 * k);
         },
         /**
-         * @alias qtek.animation.easing.ExponentialInOut
+         * @alias qtek.animation.easing.exponentialInOut
          * @param {number} k
          * @return {number}
          */
-        ExponentialInOut: function(k) {
+        exponentialInOut: function(k) {
             if (k === 0) {
                 return 0;
             }
@@ -179,38 +179,38 @@ define(function() {
             return 0.5 * (- Math.pow(2, - 10 * (k - 1)) + 2);
         },
         /**
-         * @alias qtek.animation.easing.CircularIn
+         * @alias qtek.animation.easing.circularIn
          * @param {number} k
          * @return {number}
          */
-        CircularIn: function(k) {
+        circularIn: function(k) {
             return 1 - Math.sqrt(1 - k * k);
         },
         /**
-         * @alias qtek.animation.easing.CircularOut
+         * @alias qtek.animation.easing.circularOut
          * @param {number} k
          * @return {number}
          */
-        CircularOut: function(k) {
+        circularOut: function(k) {
             return Math.sqrt(1 - (--k * k));
         },
         /**
-         * @alias qtek.animation.easing.CircularInOut
+         * @alias qtek.animation.easing.circularInOut
          * @param {number} k
          * @return {number}
          */
-        CircularInOut: function(k) {
+        circularInOut: function(k) {
             if ((k *= 2) < 1) {
                 return - 0.5 * (Math.sqrt(1 - k * k) - 1);
             }
             return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
         },
         /**
-         * @alias qtek.animation.easing.ElasticIn
+         * @alias qtek.animation.easing.elasticIn
          * @param {number} k
          * @return {number}
          */
-        ElasticIn: function(k) {
+        elasticIn: function(k) {
             var s, a = 0.1, p = 0.4;
             if (k === 0) {
                 return 0;
@@ -227,11 +227,11 @@ define(function() {
                         Math.sin((k - s) * (2 * Math.PI) / p));
         },
         /**
-         * @alias qtek.animation.easing.ElasticOut
+         * @alias qtek.animation.easing.elasticOut
          * @param {number} k
          * @return {number}
          */
-        ElasticOut: function(k) {
+        elasticOut: function(k) {
             var s, a = 0.1, p = 0.4;
             if (k === 0) {
                 return 0;
@@ -249,11 +249,11 @@ define(function() {
                     Math.sin((k - s) * (2 * Math.PI) / p) + 1);
         },
         /**
-         * @alias qtek.animation.easing.ElasticInOut
+         * @alias qtek.animation.easing.elasticInOut
          * @param {number} k
          * @return {number}
          */
-        ElasticInOut: function(k) {
+        elasticInOut: function(k) {
             var s, a = 0.1, p = 0.4;
             if (k === 0) {
                 return 0;
@@ -276,29 +276,29 @@ define(function() {
 
         },
         /**
-         * @alias qtek.animation.easing.BackIn
+         * @alias qtek.animation.easing.backIn
          * @param {number} k
          * @return {number}
          */
-        BackIn: function(k) {
+        backIn: function(k) {
             var s = 1.70158;
             return k * k * ((s + 1) * k - s);
         },
         /**
-         * @alias qtek.animation.easing.BackOut
+         * @alias qtek.animation.easing.backOut
          * @param {number} k
          * @return {number}
          */
-        BackOut: function(k) {
+        backOut: function(k) {
             var s = 1.70158;
             return --k * k * ((s + 1) * k + s) + 1;
         },
         /**
-         * @alias qtek.animation.easing.BackInOut
+         * @alias qtek.animation.easing.backInOut
          * @param {number} k
          * @return {number}
          */
-        BackInOut: function(k) {
+        backInOut: function(k) {
             var s = 1.70158 * 1.525;
             if ((k *= 2) < 1) {
                 return 0.5 * (k * k * ((s + 1) * k - s));
@@ -306,19 +306,19 @@ define(function() {
             return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
         },
         /**
-         * @alias qtek.animation.easing.BounceIn
+         * @alias qtek.animation.easing.bounceIn
          * @param {number} k
          * @return {number}
          */
-        BounceIn: function(k) {
-            return 1 - easing.BounceOut(1 - k);
+        bounceIn: function(k) {
+            return 1 - easing.bounceOut(1 - k);
         },
         /**
-         * @alias qtek.animation.easing.BounceOut
+         * @alias qtek.animation.easing.bounceOut
          * @param {number} k
          * @return {number}
          */
-        BounceOut: function(k) {
+        bounceOut: function(k) {
             if (k < (1 / 2.75)) {
                 return 7.5625 * k * k;
             }
@@ -331,15 +331,15 @@ define(function() {
             }
         },
         /**
-         * @alias qtek.animation.easing.BounceInOut
+         * @alias qtek.animation.easing.bounceInOut
          * @param {number} k
          * @return {number}
          */
-        BounceInOut: function(k) {
+        bounceInOut: function(k) {
             if (k < 0.5) {
-                return easing.BounceIn(k * 2) * 0.5;
+                return easing.bounceIn(k * 2) * 0.5;
             }
-            return easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
+            return easing.bounceOut(k * 2 - 1) * 0.5 + 0.5;
         }
     };
 
