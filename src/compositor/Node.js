@@ -8,15 +8,15 @@ define(function(require) {
 
     /**
      * Node of graph based post processing.
-     * 
+     *
      * @constructor qtek.compositor.Node
      * @extends qtek.core.Base
-     * 
+     *
      * @example
         var node = new qtek.compositor.Node({
             name: 'fxaa',
             shader: qtek.Shader.source('buildin.compositor.fxaa'),
-            inputs: { 
+            inputs: {
                 texture: {
                      node: 'scene',
                      pin: 'color'
@@ -51,39 +51,39 @@ define(function(require) {
              * @type {Object}
              */
             inputs: {},
-            
+
             /**
              * @type {Object}
              */
             outputs: null,
-            
+
             /**
              * @type {string}
              */
             shader: '',
-            
+
             /**
              * Input links, will be updated by the graph
              * @example:
              *     inputName: {
              *         node: someNode,
-             *         pin: 'xxxx'    
+             *         pin: 'xxxx'
              *     }
              * @type {Object}
              */
             inputLinks: {},
-            
+
             /**
              * Output links, will be updated by the graph
              * @example:
              *     outputName: {
              *         node: someNode,
-             *         pin: 'xxxx'    
+             *         pin: 'xxxx'
              *     }
              * @type {Object}
              */
             outputLinks: {},
-            
+
             /**
              * @type {qtek.compositor.Pass}
              */
@@ -104,7 +104,7 @@ define(function(require) {
             _compositor: null
         };
     }, function() {
-        
+
         var pass = new Pass({
             fragment: this.shader
         });
@@ -115,7 +115,7 @@ define(function(require) {
                 depthBuffer: false
             });
         }
-    }, 
+    },
     /** @lends qtek.compositor.Node.prototype */
     {
         /**
@@ -134,7 +134,7 @@ define(function(require) {
                 this.pass.setUniform(inputName, inputTexture);
             }
             // Output
-            if (! this.outputs) {
+            if (!this.outputs) {
                 this.pass.outputs = null;
                 this.pass.render(renderer, frameBuffer);
             } else {
@@ -154,7 +154,7 @@ define(function(require) {
 
                 this.pass.render(renderer, this.frameBuffer);
             }
-            
+
             for (var inputName in this.inputLinks) {
                 var link = this.inputLinks[inputName];
                 link.node.removeReference(link.pin);
@@ -272,7 +272,7 @@ define(function(require) {
             }
 
             this.render(renderer);
-            
+
             return this._outputTextures[name];
         },
 
@@ -317,7 +317,7 @@ define(function(require) {
             this.outputLinks = {};
 
             var shader = this.pass.material.shader;
-            shader.disableTexturesAll();   
+            shader.disableTexturesAll();
         },
 
         updateReference: function(outputName) {
