@@ -1,27 +1,40 @@
+@export buildin.compositor.util.sample
+/* switch to pre-multiplied alpha to correctly blur transparent images */
+vec4 sample(const in sampler2D texture, const in vec2 coord) {
+   vec4 tex = texture2D(texture, coord);
+   tex.rgb *= tex.a;
+   return tex;
+}
+@end
+
 @export buildin.compositor.gaussian_blur_h
 
 uniform sampler2D texture; // the texture with the scene you want to blur
 varying vec2 v_Texcoord;
- 
-uniform float blurSize : 2.0; 
+
+uniform float blurSize : 2.0;
 uniform float textureWidth : 512.0;
 
-void main(void)
+@import buildin.compositor.util.sample
+
+void main (void)
 {
    vec4 sum = vec4(0.0);
    float blurOffset = blurSize / textureWidth;
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
-   sum += texture2D(texture, vec2(max(v_Texcoord.x - 4.0*blurOffset, 0.0), v_Texcoord.y)) * 0.05;
-   sum += texture2D(texture, vec2(max(v_Texcoord.x - 3.0*blurOffset, 0.0), v_Texcoord.y)) * 0.09;
-   sum += texture2D(texture, vec2(max(v_Texcoord.x - 2.0*blurOffset, 0.0), v_Texcoord.y)) * 0.12;
-   sum += texture2D(texture, vec2(max(v_Texcoord.x - blurOffset, 0.0), v_Texcoord.y)) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += texture2D(texture, vec2(min(v_Texcoord.x + blurOffset, 1.0), v_Texcoord.y)) * 0.15;
-   sum += texture2D(texture, vec2(min(v_Texcoord.x + 2.0*blurOffset, 1.0), v_Texcoord.y)) * 0.12;
-   sum += texture2D(texture, vec2(min(v_Texcoord.x + 3.0*blurOffset, 1.0), v_Texcoord.y)) * 0.09;
-   sum += texture2D(texture, vec2(min(v_Texcoord.x + 4.0*blurOffset, 1.0), v_Texcoord.y)) * 0.05;
- 
+   sum += sample(texture, vec2(max(v_Texcoord.x - 4.0*blurOffset, 0.0), v_Texcoord.y)) * 0.05;
+   sum += sample(texture, vec2(max(v_Texcoord.x - 3.0*blurOffset, 0.0), v_Texcoord.y)) * 0.09;
+   sum += sample(texture, vec2(max(v_Texcoord.x - 2.0*blurOffset, 0.0), v_Texcoord.y)) * 0.12;
+   sum += sample(texture, vec2(max(v_Texcoord.x - blurOffset, 0.0), v_Texcoord.y)) * 0.15;
+   sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
+   sum += sample(texture, vec2(min(v_Texcoord.x + blurOffset, 1.0), v_Texcoord.y)) * 0.15;
+   sum += sample(texture, vec2(min(v_Texcoord.x + 2.0*blurOffset, 1.0), v_Texcoord.y)) * 0.12;
+   sum += sample(texture, vec2(min(v_Texcoord.x + 3.0*blurOffset, 1.0), v_Texcoord.y)) * 0.09;
+   sum += sample(texture, vec2(min(v_Texcoord.x + 4.0*blurOffset, 1.0), v_Texcoord.y)) * 0.05;
+
+   sum.rgb /= sum.a + 0.0000001;
+
    gl_FragColor = sum;
 }
 
@@ -31,26 +44,30 @@ void main(void)
 
 uniform sampler2D texture;
 varying vec2 v_Texcoord;
- 
+
 uniform float blurSize : 2.0;
 uniform float textureHeight : 512.0;
- 
+
+@import buildin.compositor.util.sample
+
 void main(void)
 {
    vec4 sum = vec4(0.0);
    float blurOffset = blurSize / textureHeight;
    // blur in y (vertical)
    // take nine samples, with the distance blurSize between them
-   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurOffset, 0.0))) * 0.05;
-   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 3.0*blurOffset, 0.0))) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 2.0*blurOffset, 0.0))) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - blurOffset, 0.0))) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + blurOffset, 1.0))) * 0.15;
-   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 2.0*blurOffset, 1.0))) * 0.12;
-   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 3.0*blurOffset, 1.0))) * 0.09;
-   sum += texture2D(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 4.0*blurOffset, 1.0))) * 0.05;
- 
+   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurOffset, 0.0))) * 0.05;
+   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 3.0*blurOffset, 0.0))) * 0.09;
+   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 2.0*blurOffset, 0.0))) * 0.12;
+   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - blurOffset, 0.0))) * 0.15;
+   sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
+   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + blurOffset, 1.0))) * 0.15;
+   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 2.0*blurOffset, 1.0))) * 0.12;
+   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 3.0*blurOffset, 1.0))) * 0.09;
+   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 4.0*blurOffset, 1.0))) * 0.05;
+
+   sum.rgb /= sum.a + 0.0000001;
+
    gl_FragColor = sum;
 }
 
@@ -64,26 +81,34 @@ varying vec2 v_Texcoord;
 uniform float blurSize : 3.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
+@import buildin.compositor.util.sample
+
 void main(void){
 
    vec4 tex = texture2D(texture, v_Texcoord);
    vec2 offset = blurSize / textureSize;
 
-   tex += texture2D(texture, v_Texcoord + vec2(offset.x, 0.0) );
-   tex += texture2D(texture, v_Texcoord + vec2(offset.x, offset.y) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, offset.y) );
-   tex += texture2D(texture, v_Texcoord + vec2(0.0, offset.y) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, 0.0) );
-   tex += texture2D(texture, v_Texcoord + vec2(-offset.x, -offset.y) );
-   tex += texture2D(texture, v_Texcoord + vec2(offset.x, -offset.y) );
-   tex += texture2D(texture, v_Texcoord + vec2(0.0, -offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(offset.x, 0.0) );
+   tex += sample(texture, v_Texcoord + vec2(offset.x, offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(-offset.x, offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(0.0, offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(-offset.x, 0.0) );
+   tex += sample(texture, v_Texcoord + vec2(-offset.x, -offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(offset.x, -offset.y) );
+   tex += sample(texture, v_Texcoord + vec2(0.0, -offset.y) );
 
    tex /= 9.0;
+
+   tex.rgb /= tex.a + 0.0000001;
 
    gl_FragColor = tex;
 }
 
 @end
+
+
+
+
 
 // http://www.slideshare.net/DICEStudio/five-rendering-ideas-from-battlefield-3-need-for-speed-the-run
 @export buildin.compositor.hexagonal_blur_mrt_1
