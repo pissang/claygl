@@ -32,7 +32,7 @@ define(function(require) {
                  tangent: new Attribute('tangent', 'float', 4, 'TANGENT', false),
                  color: new Attribute('color', 'float', 4, 'COLOR', false),
                  // Skinning attributes
-                 // Each vertex can be bind to 4 bones, because the 
+                 // Each vertex can be bind to 4 bones, because the
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
                  weight: new Attribute('weight', 'float', 3, 'WEIGHT', false),
@@ -53,14 +53,14 @@ define(function(require) {
 
             _enabledAttributes: null
         };
-    }, 
+    },
     /** @lends qtek.StaticGeometry.prototype */
     {
         dirty: function() {
             this._cache.dirtyAll();
             this._enabledAttributes = null;
         },
-        
+
         getVertexNumber: function() {
             var mainAttribute = this.attributes[this.mainAttribute];
             if (!mainAttribute || !mainAttribute.value) {
@@ -90,11 +90,11 @@ define(function(require) {
                 return out;
             }
         },
-        
+
         isUseFace: function() {
             return this.useFace && (this.faces != null);
         },
-        
+
         createAttribute: function(name, type, size, semantic) {
             var attrib = new Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;
@@ -152,7 +152,7 @@ define(function(require) {
             }
             return cache.get('chunks');
         },
-        
+
         _updateBuffer: function(_gl) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
@@ -295,7 +295,7 @@ define(function(require) {
             var n = vec3Create();
 
             if (!normals) {
-                normals = attributes.position.value = new Float32Array(positions.length);
+                normals = attributes.normals.value = new Float32Array(positions.length);
             }
             for (var f = 0; f < faces.length;) {
                 var i1 = faces[f++];
@@ -377,7 +377,7 @@ define(function(require) {
 
                 var r = 1.0 / (s1 * t2 - t1 * s2);
                 sdir[0] = (t2 * x1 - t1 * x2) * r;
-                sdir[1] = (t2 * y1 - t1 * y2) * r; 
+                sdir[1] = (t2 * y1 - t1 * y2) * r;
                 sdir[2] = (t2 * z1 - t1 * z2) * r;
 
                 tdir[0] = (s1 * x2 - s2 * x1) * r;
@@ -520,7 +520,7 @@ define(function(require) {
                 geometry.boundingBox.max.copy(this.boundingBox.max);
             }
             // PENDING copy buffer ?
-            
+
             return geometry;
         },
 
@@ -544,7 +544,7 @@ define(function(require) {
                 vec3ForEach(normals, 3, 0, null, vec3TransformMat4, inverseTransposeMatrix);
             }
             if (tangents) {
-                vec3ForEach(tangents, 4, 0, null, vec3TransformMat4, inverseTransposeMatrix);   
+                vec3ForEach(tangents, 4, 0, null, vec3TransformMat4, inverseTransposeMatrix);
             }
 
             if (this.boundingBox) {

@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var Base = require('./core/Base');
@@ -15,7 +15,7 @@ define(function(require) {
     var vec3Copy = vec3.copy;
     var vec2Copy = vec2.copy;
 
-    // PENDING put the buffer data in attribute ? 
+    // PENDING put the buffer data in attribute ?
     function Attribute(name, type, size, semantic, isDynamic) {
         this.name = name;
         this.type = type;
@@ -144,40 +144,56 @@ define(function(require) {
         }
     }
 
-    Attribute.prototype.init = function(nVertex) {
+    function getArrayCtorByType (type) {
+        var ArrayConstructor;
+        switch(type) {
+            case 'byte':
+                ArrayConstructor = vendor.Int8Array;
+                break;
+            case 'ubyte':
+                ArrayConstructor = vendor.Uint8Array;
+                break;
+            case 'short':
+                ArrayConstructor = vendor.Int16Array;
+                break;
+            case 'ushort':
+                ArrayConstructor = vendor.Uint16Array;
+                break;
+            default:
+                ArrayConstructor = vendor.Float32Array;
+                break;
+        }
+        return ArrayConstructor;
+    }
+
+    Attribute.prototype.init = function (nVertex) {
         if (!this._isDynamic) {
             if (!this.value || this.value.length != nVertex * this.size) {
-                var ArrayConstructor;
-                switch(this.type) {
-                    case 'byte':
-                        ArrayConstructor = vendor.Int8Array;
-                        break;
-                    case 'ubyte':
-                        ArrayConstructor = vendor.Uint8Array;
-                        break;
-                    case 'short':
-                        ArrayConstructor = vendor.Int16Array;
-                        break;
-                    case 'ushort':
-                        ArrayConstructor = vendor.Uint16Array;
-                        break;
-                    default:
-                        ArrayConstructor = vendor.Float32Array;
-                        break;
-                }
+                var ArrayConstructor = getArrayCtorByType(this.type);
                 this.value = new ArrayConstructor(nVertex * this.size);
             }
-        } else {
+        }
+        else {
             console.warn('Dynamic geometry not support init method');
+        }
+    };
+
+    Attribute.prototype.fromArray = function (array) {
+        if (!this._isDynamic) {
+            var ArrayConstructor = getArrayCtorByType(this.type);
+            this.value = new ArrayConstructor(array);
+        }
+        else {
+            console.warn('Dynamic geometry not support fromArray method');
         }
     };
 
     Attribute.prototype.clone = function(copyValue) {
         var ret = new Attribute(this.name, this.type, this.size, this.semantic, this._isDynamic);
+        // FIXME
         if (copyValue) {
             console.warn('todo');
         }
-
         return ret;
     };
 
@@ -214,7 +230,7 @@ define(function(require) {
          * @type {qtek.math.BoundingBox}
          */
         boundingBox : null,
-        
+
         /**
          * Vertex attributes
          * @type {Object}
@@ -233,7 +249,7 @@ define(function(require) {
          * @type {boolean}
          */
         useFace : true
-        
+
     }, function() {
         // Use cache
         this._cache = new Cache();
@@ -243,7 +259,7 @@ define(function(require) {
     /** @lends qtek.Geometry.prototype */
     {
         /**
-         * User defined ray picking algorithm instead of default 
+         * User defined ray picking algorithm instead of default
          * triangle ray intersection
          * @type {Function}
          */

@@ -1,5 +1,6 @@
 @export buildin.compositor.util.sample
 /* switch to pre-multiplied alpha to correctly blur transparent images */
+// PENDING
 vec4 sample(const in sampler2D texture, const in vec2 coord) {
    vec4 tex = texture2D(texture, coord);
    tex.rgb *= tex.a;

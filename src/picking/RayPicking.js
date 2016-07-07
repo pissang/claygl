@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     var Base = require('../core/Base');
     var Ray = require('../math/Ray');
     var Vector2 = require('../math/Vector2');
@@ -44,7 +44,7 @@ define(function(require) {
          * @param  {number} y Mouse position y
          * @return {qtek.picking.RayPicking~Intersection}
          */
-        pick: function(x, y) {
+        pick: function (x, y) {
             var out = this.pickAll(x, y);
             return out[0] || null;
         },
@@ -55,7 +55,7 @@ define(function(require) {
          * @param  {number} y Mouse position y
          * @return {Array.<qtek.picking.RayPicking~Intersection>}
          */
-        pickAll: function(x, y) {
+        pickAll: function (x, y) {
             this.renderer.screenToNdc(x, y, this._ndc);
             this.camera.castRay(this._ndc, this._ray);
 
@@ -68,7 +68,7 @@ define(function(require) {
             return output;
         },
 
-        _intersectNode: function(node, out) {
+        _intersectNode: function (node, out) {
             if ((node instanceof Renderable) && node.isRenderable()) {
                 if (!node.ignorePicking && node.geometry.isUseFace()) {
                     this._intersectRenderable(node, out);
@@ -79,16 +79,16 @@ define(function(require) {
             }
         },
 
-        _intersectRenderable: (function() {
-            
+        _intersectRenderable: (function () {
+
             var v1 = new Vector3();
             var v2 = new Vector3();
             var v3 = new Vector3();
             var ray = new Ray();
             var worldInverse = new Matrix4();
 
-            return function(renderable, out) {
-                
+            return function (renderable, out) {
+
                 ray.copy(this._ray);
                 Matrix4.invert(worldInverse, renderable.worldTransform);
 
@@ -129,7 +129,7 @@ define(function(require) {
                         v2._array[0] = positions[i2];
                         v2._array[1] = positions[i2 + 1];
                         v2._array[2] = positions[i2 + 2];
-                        
+
                         v3._array[0] = positions[i3];
                         v3._array[1] = positions[i3 + 1];
                         v3._array[2] = positions[i3 + 2];
@@ -179,7 +179,7 @@ define(function(require) {
             };
         })(),
 
-        _intersectionCompareFunc: function(a, b) {
+        _intersectionCompareFunc: function (a, b) {
             return a.distance - b.distance;
         }
     });
@@ -192,7 +192,7 @@ define(function(require) {
      * @param {Array.<number>} face
      * @param {number} distance
      */
-    RayPicking.Intersection = function(point, pointWorld, target, face, distance) {
+    RayPicking.Intersection = function (point, pointWorld, target, face, distance) {
         /**
          * Intersection point in local transform coordinates
          * @type {qtek.math.Vector3}

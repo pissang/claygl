@@ -86,6 +86,8 @@ define(function(require) {
 
         mode: Renderable.POINTS,
 
+        ignorePicking: true,
+
         _elapsedTime: 0,
 
         _emitting: true
