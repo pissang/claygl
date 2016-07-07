@@ -295,7 +295,7 @@ define(function(require) {
             var n = vec3Create();
 
             if (!normals) {
-                normals = attributes.normals.value = new Float32Array(positions.length);
+                normals = attributes.normal.value = new Float32Array(positions.length);
             }
             for (var f = 0; f < faces.length;) {
                 var i1 = faces[f++];
