@@ -36,7 +36,7 @@ void main()
     vec3 skinnedNormal = normal;
 
 #ifdef SKINNING
-    
+
     @import buildin.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
@@ -98,7 +98,7 @@ varying vec3 v_Barycentric;
 void main()
 {
 #ifdef RENDER_NORMAL
-    gl_FragColor = vec4(v_Normal, 1.0);
+    gl_FragColor = vec4(v_Normal * 0.5 + 0.5, 1.0);
     return;
 #endif
 #ifdef RENDER_TEXCOORD
@@ -120,7 +120,7 @@ void main()
 #endif
 
     vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
-    
+
 #ifdef AMBIENT_LIGHT_NUMBER
     for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
     {
@@ -177,7 +177,7 @@ void main()
     {
         vec3 lightDirection = -directionalLightDirection[i];
         vec3 lightColor = directionalLightColor[i];
-        
+
         float ndl = dot(v_Normal, normalize(lightDirection));
 
         float shadowContrib = 1.0;
@@ -191,7 +191,7 @@ void main()
         diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;
     }
 #endif
-    
+
 #ifdef SPOT_LIGHT_NUMBER
 #if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
     float shadowContribsSpot[SPOT_LIGHT_NUMBER];
@@ -213,7 +213,7 @@ void main()
         vec3 lightDirection = lightPosition - v_WorldPosition;
         // Calculate attenuation
         float dist = length(lightDirection);
-        float attenuation = lightAttenuation(dist, range); 
+        float attenuation = lightAttenuation(dist, range);
 
         // Normalize light direction
         lightDirection /= dist;

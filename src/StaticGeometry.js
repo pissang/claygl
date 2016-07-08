@@ -274,6 +274,7 @@ define(function(require) {
                 normals[i++] = n[1];
                 normals[i++] = n[2];
             }
+            this.dirty();
         },
 
         generateFaceNormals: function() {
@@ -313,11 +314,12 @@ define(function(require) {
                 vec3.normalize(n, n);
 
                 for (var i = 0; i < 3; i++) {
-                    normals[i1*3+i] = n[i];
-                    normals[i2*3+i] = n[i];
-                    normals[i3*3+i] = n[i];
+                    normals[i1*3 + i] = n[i];
+                    normals[i2*3 + i] = n[i];
+                    normals[i3*3 + i] = n[i];
                 }
             }
+            this.dirty();
         },
 
         generateTangents: function() {
@@ -411,6 +413,7 @@ define(function(require) {
                 tangents[i * 4 + 2] = tmp[2];
                 tangents[i * 4 + 3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? -1.0 : 1.0;
             }
+            this.dirty();
         },
 
         isUniqueVertex: function() {
@@ -436,13 +439,12 @@ define(function(require) {
 
             for (var a = 0; a < attributeNameList.length; a++) {
                 var name = attributeNameList[a];
-                var expandedArray = new Float32Array(this.faces.length * attributes[name].size);
                 var valueArr = attributes[name].value;
-                var len = valueArr.length;
-                for (var i = 0; i < len; i++) {
+                attributes[name].init(this.faces.length);
+                var expandedArray = attributes[name].value;
+                for (var i = 0; i < valueArr.length; i++) {
                     expandedArray[i] = valueArr[i];
                 }
-                attributes[name].value = expandedArray;
             }
 
             for (var i = 0; i < faces.length; i++) {
@@ -462,6 +464,7 @@ define(function(require) {
                 }
                 vertexUseCount[ii]++;
             }
+            this.dirty();
         },
 
         generateBarycentric: function() {
@@ -484,6 +487,7 @@ define(function(require) {
                     array[ii + j] = 1;
                 }
             }
+            this.dirty();
         },
 
         convertToDynamic: function(geometry) {

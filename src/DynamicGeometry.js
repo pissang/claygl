@@ -37,7 +37,7 @@ define(function(require) {
                  tangent: new Attribute('tangent', 'float', 4, 'TANGENT', true),
                  color: new Attribute('color', 'float', 4, 'COLOR', true),
                  // Skinning attributes
-                 // Each vertex can be bind to 4 bones, because the 
+                 // Each vertex can be bind to 4 bones, because the
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
                  weight: new Attribute('weight', 'float', 3, 'WEIGHT', true),
@@ -53,12 +53,12 @@ define(function(require) {
 
             // Face is list of triangles, each face
             // is an array of the vertex indices of triangle
-            
+
             /**
              * @type {array}
              */
             faces: [],
-            
+
             _enabledAttributes: null,
 
             // Typed Array of each geometry chunk
@@ -70,7 +70,7 @@ define(function(require) {
             // }]
             _arrayChunks: []
         };
-    }, 
+    },
     /** @lends qtek.DynamicGeometry.prototype */
     {
         updateBoundingBox: function() {
@@ -180,7 +180,7 @@ define(function(require) {
 
             var attributes = this.getEnabledAttributes();
             var cache = this._cache;
-            
+
             if (cache.miss('chunks')) {
                 return attributes;
             } else {
@@ -211,7 +211,7 @@ define(function(require) {
 
                 var isFacesDirty = cache.isDirty('indices');
                 isFacesDirty = isFacesDirty && this.isUseFace();
-                
+
                 if (dirtyAttributes) {
                     this._updateAttributesAndIndicesArrays(
                         dirtyAttributes, isFacesDirty,
@@ -233,7 +233,7 @@ define(function(require) {
 
             var self = this;
             var nVertex = this.getVertexNumber();
-            
+
             var verticesReorganizedMap = [];
             var reorganizedFaces = [];
 
@@ -275,7 +275,7 @@ define(function(require) {
                 for (var i = 0; i < nVertex; i++) {
                     verticesReorganizedMap[i] = -1;
                 }
-                
+
                 self._arrayChunks.push(chunk);
                 return chunk;
             };
@@ -321,7 +321,7 @@ define(function(require) {
 
                     for (var f = 0; f < 3; f++) {
                         var ii = face[f];
-                        var isNew = verticesReorganizedMap[ii] === -1; 
+                        var isNew = verticesReorganizedMap[ii] === -1;
 
                         for (var k = 0; k < attribNameList.length; k++) {
                             var name = attribNameList[k];
@@ -403,7 +403,7 @@ define(function(require) {
                     var type = attributes[name].type;
                     var size = attributes[name].size;
                     var attribArray = chunk.attributeArrays[name];
-                    
+
                     var arrSize = nVertex * size;
                     if (! attribArray || attribArray.length !== arrSize) {
                         attribArray = new ArrayConstructors[name](arrSize);
@@ -451,7 +451,7 @@ define(function(require) {
                 }
                 var attributeBuffers = chunk.attributeBuffers;
                 var indicesBuffer = chunk.indicesBuffer;
-                
+
                 var arrayChunk = this._arrayChunks[cc];
                 var attributeArrays = arrayChunk.attributeArrays;
                 var indicesArray = arrayChunk.indicesArray;
@@ -505,7 +505,7 @@ define(function(require) {
                     }
                     indicesBuffer.count = indicesArray.length;
                     _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                    _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, this.hint);   
+                    _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, indicesArray, this.hint);
                 }
             }
         },
@@ -566,7 +566,7 @@ define(function(require) {
             var v21 = vec3Create(), v32 = vec3Create();
 
             var isCopy = normals.length === positions.length;
-            
+
             for (var i = 0; i < len; i++) {
                 var face = faces[i];
                 var i1 = face[0];
@@ -579,6 +579,8 @@ define(function(require) {
                 vec3.sub(v21, p1, p2);
                 vec3.sub(v32, p2, p3);
                 vec3.cross(normal, v21, v32);
+
+                vec3.normalize(normal, normal);
 
                 if (isCopy) {
                     vec3.copy(normals[i1], normal);
@@ -593,7 +595,7 @@ define(function(require) {
         // section 7.8.2
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
         generateTangents: function() {
-            
+
             var attributes = this.attributes;
             var texcoords = attributes.texcoord0.value;
             var positions = attributes.position.value;
@@ -638,7 +640,7 @@ define(function(require) {
 
                 var r = 1.0 / (s1 * t2 - t1 * s2);
                 sdir[0] = (t2 * x1 - t1 * x2) * r;
-                sdir[1] = (t2 * y1 - t1 * y2) * r; 
+                sdir[1] = (t2 * y1 - t1 * y2) * r;
                 sdir[2] = (t2 * z1 - t1 * z2) * r;
 
                 tdir[0] = (s1 * x2 - s2 * x1) * r;
@@ -810,7 +812,7 @@ define(function(require) {
             for (var i = 0; i < tangents.length; i++) {
                 vec3TransformMat4(tangents[i], tangents[i], inverseTransposeMatrix);
             }
-            
+
             if (this.boundingBox) {
                 this.updateBoundingBox();
             }
@@ -832,6 +834,6 @@ define(function(require) {
             cache.deleteContext(_gl.__GLID__);
         }
     });
-    
+
     return DynamicGeometry;
 });
