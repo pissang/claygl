@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var Base = require('./core/Base');
@@ -29,13 +29,13 @@ define(function(require) {
          * @type {qtek.math.Vector3}
          */
         position: null,
-        
+
         /**
          * Rotation relative to its parent node. Represented by a quaternion
          * @type {qtek.math.Quaternion}
          */
         rotation: null,
-        
+
         /**
          * Scale relative to its parent node
          * @type {qtek.math.Vector3}
@@ -54,7 +54,7 @@ define(function(require) {
          * @type {qtek.math.Matrix4}
          */
         localTransform: null,
-        
+
         /**
          * If the local transform is update from SRT(scale, rotation, translation, which is position here) each frame
          * @type {boolean}
@@ -107,12 +107,12 @@ define(function(require) {
     {
 
         /**
-         * If node and its chilren visible
+         * If node and its chilren invisible
          * @type {boolean}
          * @memberOf qtek.Node
          * @instance
          */
-        visible: true,
+        invisible: false,
 
         /**
          * Return true if it is a renderable scene node, like Mesh and ParticleSystem
@@ -337,7 +337,7 @@ define(function(require) {
          * @param {Function} [ctor]
          */
         traverse: function(callback, context, ctor) {
-            
+
             this._inIterating = true;
 
             if (ctor === undefined || this.constructor === ctor) {
@@ -381,8 +381,8 @@ define(function(require) {
          * Decompose the world transform to SRT
          * @method
          */
-        decomposeWorldTransform: (function() { 
-            
+        decomposeWorldTransform: (function() {
+
             var tmp = mat4.create();
 
             return function(keepScale) {
@@ -444,7 +444,7 @@ define(function(require) {
 
         /**
          * Update local transform and world transform recursively
-         * @param {boolean} forceUpdateWorld 
+         * @param {boolean} forceUpdateWorld
          */
         update: function(forceUpdateWorld) {
             if (this.autoUpdateLocalTransform) {
@@ -459,7 +459,7 @@ define(function(require) {
                 forceUpdateWorld = true;
                 this._needsUpdateWorldTransform = false;
             }
-            
+
             var children = this._children;
             for(var i = 0, len = children.length; i < len; i++) {
                 children[i].update(forceUpdateWorld);

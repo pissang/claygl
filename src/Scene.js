@@ -37,7 +37,7 @@ define(function(require) {
             transparentQueue: [],
 
             lights: [],
-            
+
             // Properties to save the light information in the scene
             // Will be set in the render function
             _lightUniforms: {},
@@ -56,7 +56,7 @@ define(function(require) {
         };
     }, function() {
         this._scene = this;
-    }, 
+    },
     /** @lends qtek.Scene.prototype. */
     {
         /**
@@ -135,7 +135,7 @@ define(function(require) {
          * Scene update
          * @param  {boolean} force
          * @param  {boolean} notUpdateLights
-         *         Useful in deferred pipeline 
+         *         Useful in deferred pipeline
          */
         update: function(force, notUpdateLights) {
             if (!(this.autoUpdate || force)) {
@@ -172,13 +172,13 @@ define(function(require) {
         // Traverse the scene and add the renderable
         // object to the render queue
         _updateRenderQueue: function(parent, sceneMaterialTransparent) {
-            if (!parent.visible) {
+            if (parent.invisible) {
                 return;
             }
-            
+
             for (var i = 0; i < parent._children.length; i++) {
                 var child = parent._children[i];
-                
+
                 if (child instanceof Light) {
                     this.lights.push(child);
                 }
@@ -205,9 +205,9 @@ define(function(require) {
                 lightUniforms[symbol].value.length = 0;
             }
             for (var i = 0; i < lights.length; i++) {
-                
+
                 var light = lights[i];
-                
+
                 for (symbol in light.uniformTemplates) {
 
                     var uniformTpl = light.uniformTemplates[symbol];
@@ -271,7 +271,7 @@ define(function(require) {
             this.transparentQueue = [];
 
             this.lights = [];
-            
+
             this._lightUniforms = {};
 
             this._lightNumber = {};
