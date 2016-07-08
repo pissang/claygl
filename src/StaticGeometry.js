@@ -469,7 +469,7 @@ define(function(require) {
 
         generateBarycentric: function() {
 
-            if (! this.isUniqueVertex()) {
+            if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
 
@@ -484,7 +484,7 @@ define(function(require) {
             for (var i = 0; i < faces.length;) {
                 for (var j = 0; j < 3; j++) {
                     var ii = faces[i++];
-                    array[ii + j] = 1;
+                    array[ii * 3 + j] = 1;
                 }
             }
             this.dirty();
