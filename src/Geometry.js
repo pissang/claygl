@@ -181,7 +181,22 @@ define(function(require) {
     Attribute.prototype.fromArray = function (array) {
         if (!this._isDynamic) {
             var ArrayConstructor = getArrayCtorByType(this.type);
-            this.value = new ArrayConstructor(array);
+            var value;
+            // Convert 2d array to flat
+            if (array[0] && (array[0].length)) {
+                var n = 0;
+                var size = this.size;
+                value = new ArrayConstructor(array.length * size);
+                for (var i = 0; i < array.length; i++) {
+                    for (var j = 0; j < size; j++) {
+                        value[n++] = array[i][j];
+                    }
+                }
+            }
+            else {
+                value = new ArrayConstructor(array);
+            }
+            this.value = value;
         }
         else {
             console.warn('Dynamic geometry not support fromArray method');

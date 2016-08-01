@@ -23,12 +23,12 @@ define(function(require) {
          */
         joints: null
 
-    }, function() {
+    }, function () {
         if (!this.joints) {
             this.joints = [];
         }
     }, {
-        render: function(_gl, globalMaterial) {       
+        render: function(_gl, globalMaterial) {
             var material = globalMaterial || this.material;
             // Set pose matrices of skinned mesh
             if (this.skeleton) {

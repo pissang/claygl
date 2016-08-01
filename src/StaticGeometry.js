@@ -56,6 +56,36 @@ define(function(require) {
     },
     /** @lends qtek.StaticGeometry.prototype */
     {
+        updateBoundingBox: function() {
+            var bbox = this.boundingBox;
+            if (!bbox) {
+                bbox = this.boundingBox = new BoundingBox();
+            }
+            var posArr = this.attributes.position.value;
+            if (posArr && posArr.length) {
+                var min = bbox.min;
+                var max = bbox.max;
+                var minArr = min._array;
+                var maxArr = max._array;
+                vec3.set(minArr, posArr[0], posArr[1], posArr[2]);
+                vec3.set(maxArr, posArr[0], posArr[1], posArr[2]);
+                for (var i = 3; i < posArr.length;) {
+                    var x = posArr[i++];
+                    var y = posArr[i++];
+                    var z = posArr[i++];
+                    if (x < minArr[0]) { minArr[0] = x; }
+                    if (y < minArr[1]) { minArr[1] = y; }
+                    if (z < minArr[2]) { minArr[2] = z; }
+
+                    if (x > maxArr[0]) { maxArr[0] = x; }
+                    if (y > maxArr[1]) { maxArr[1] = y; }
+                    if (z > maxArr[2]) { maxArr[2] = z; }
+                }
+                min._dirty = true;
+                max._dirty = true;
+            }
+        },
+
         dirty: function() {
             this._cache.dirtyAll();
             this._enabledAttributes = null;
@@ -95,6 +125,29 @@ define(function(require) {
             return this.useFace && (this.faces != null);
         },
 
+        initFaceFromArray: function (array) {
+            var value;
+            var ArrayConstructor = this.getVertexNumber() > 0xffff
+                ? vendor.Uint32Array : vendor.Uint16Array;
+            // Convert 2d array to flat
+            if (array[0] && (array[0].length)) {
+                var n = 0;
+                var size = 3;
+
+                value = new ArrayConstructor(array.length * size);
+                for (var i = 0; i < array.length; i++) {
+                    for (var j = 0; j < size; j++) {
+                        value[n++] = array[i][j];
+                    }
+                }
+            }
+            else {
+                value = new ArrayConstructor(array);
+            }
+
+            this.faces = value;
+        },
+
         createAttribute: function(name, type, size, semantic) {
             var attrib = new Attribute(name, type, size, semantic, false);
             this.attributes[name] = attrib;
@@ -103,6 +156,7 @@ define(function(require) {
         },
 
         removeAttribute: function(name) {
+            var attributeList = this._attributeList;
             var idx = attributeList.indexOf(name);
             if (idx >= 0) {
                 attributeList.splice(idx, 1);

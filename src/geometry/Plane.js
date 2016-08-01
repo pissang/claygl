@@ -2,17 +2,17 @@ define(function(require) {
 
     'use strict';
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var BoundingBox = require('../math/BoundingBox');
 
     /**
      * @constructor qtek.geometry.Plane
-     * @extends qtek.DynamicGeometry
+     * @extends qtek.StaticGeometry
      * @param {Object} [opt]
      * @param {number} [opt.widthSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Plane = DynamicGeometry.derive(
+    var Plane = StaticGeometry.derive(
     /** @lends qtek.geometry.Plane# */
     {
         /**
@@ -34,15 +34,11 @@ define(function(require) {
         build: function() {
             var heightSegments = this.heightSegments;
             var widthSegments = this.widthSegments;
-            var positions = this.attributes.position.value;
-            var texcoords = this.attributes.texcoord0.value;
-            var normals = this.attributes.normal.value;
-            var faces = this.faces;
-
-            positions.length = 0;
-            texcoords.length = 0;
-            normals.length = 0;
-            faces.length = 0;
+            var attributes = this.attributes;
+            var positions = [];
+            var texcoords = [];
+            var normals = [];
+            var faces = [];
 
             for (var y = 0; y <= heightSegments; y++) {
                 var t = y / heightSegments;
@@ -63,6 +59,12 @@ define(function(require) {
                     }
                 }
             }
+
+            attributes.position.fromArray(positions);
+            attributes.texcoord0.fromArray(texcoords);
+            attributes.normal.fromArray(normals);
+
+            this.initFaceFromArray(faces);
 
             this.boundingBox = new BoundingBox();
             this.boundingBox.min.set(-1, -1, 0);

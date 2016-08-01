@@ -2,24 +2,25 @@ define(function(require) {
 
     'use strict';
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var Plane = require('./Plane');
     var Matrix4 = require('../math/Matrix4');
     var Vector3 = require('../math/Vector3');
     var BoundingBox = require('../math/BoundingBox');
+    var vendor = require('../core/vendor');
 
     var planeMatrix = new Matrix4();
-    
+
     /**
      * @constructor qtek.geometry.Cube
-     * @extends qtek.DynamicGeometry
+     * @extends qtek.StaticGeometry
      * @param {Object} [opt]
      * @param {number} [opt.widthSegments]
      * @param {number} [opt.heightSegments]
      * @param {number} [opt.depthSegments]
      * @param {boolean} [opt.inside]
      */
-    var Cube = DynamicGeometry.derive(
+    var Cube = StaticGeometry.derive(
     /**@lends qtek.geometry.Cube# */
     {
         /**
@@ -47,11 +48,6 @@ define(function(require) {
          * Build cube geometry
          */
         build: function() {
-            
-            this.faces.length = 0;
-            this.attributes.position.value.length = 0;
-            this.attributes.texcoord0.value.length = 0;
-            this.attributes.normal.value.length = 0;
 
             var planes = {
                 'px': createPlane('px', this.depthSegments, this.heightSegments),
@@ -61,29 +57,34 @@ define(function(require) {
                 'pz': createPlane('pz', this.widthSegments, this.heightSegments),
                 'nz': createPlane('nz', this.widthSegments, this.heightSegments),
             };
-            var cursor = 0;
+
             var attrList = ['position', 'texcoord0', 'normal'];
+            for (var k = 0; k < attrList.length; k++) {
+                this.attributes[attrList[k]].init(6 * planes.px.getVertexNumber());
+            }
+            this.faces = new vendor.Uint16Array(6 * planes.px.faces.length);
+            var planeCount = 0;
             for (var pos in planes) {
+                var plane = planes[pos];
                 for (var k = 0; k < attrList.length; k++) {
                     var attrName = attrList[k];
-                    var attrArray = planes[pos].attributes[attrName].value;
+                    var attrArray = plane.attributes[attrName].value;
+                    var isNormal = attrName === 'normal';
                     for (var i = 0; i < attrArray.length; i++) {
                         var value = attrArray[i];
-                        if (this.inside && attrName === 'normal') {
-                            value[0] = -value[0];
-                            value[1] = -value[1];
-                            value[2] = -value[2];
+                        if (this.inside && isNormal) {
+                            value = -value;
                         }
-                        this.attributes[attrName].value.push(value);
+                        this.attributes[attrName].value[i + attrArray.length * planeCount] = value;
                     }
                 }
-                var plane = planes[pos];
+                var faceOffset = plane.faces.length * planeCount;
+                var vertexOffset = plane.getVertexNumber() * planeCount;
                 for (var i = 0; i < plane.faces.length; i++) {
-                    var face = plane.faces[i];
-                    this.faces.push([face[0]+cursor, face[1]+cursor, face[2]+cursor]);
+                    this.faces[i + faceOffset] = vertexOffset + plane.faces[i];
                 }
 
-                cursor += planes[pos].getVertexNumber();
+                planeCount++;
             }
 
             this.boundingBox = new BoundingBox();

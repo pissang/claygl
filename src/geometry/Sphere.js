@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
     var vec2 = glMatrix.vec2;
@@ -10,7 +10,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.geometry.Sphere
-     * @extends qtek.DynamicGeometry
+     * @extends qtek.StaticGeometry
      * @param {Object} [opt]
      * @param {number} [widthSegments]
      * @param {number} [heightSegments]
@@ -20,7 +20,7 @@ define(function(require) {
      * @param {number} [thetaLength]
      * @param {number} [radius]
      */
-    var Sphere = DynamicGeometry.derive(
+    var Sphere = StaticGeometry.derive(
     /** @lends qtek.geometry.Sphere# */
     {
         /**
@@ -64,14 +64,10 @@ define(function(require) {
          * Build sphere geometry
          */
         build: function() {
-            var positions = this.attributes.position.value;
-            var texcoords = this.attributes.texcoord0.value;
-            var normals = this.attributes.normal.value;
-
-            positions.length = 0;
-            texcoords.length = 0;
-            normals.length = 0;
-            this.faces.length = 0;
+            var positions = [];
+            var texcoords = [];
+            var normals = [];
+            var faces = [];
 
             var x, y, z,
                 u, v,
@@ -107,7 +103,6 @@ define(function(require) {
             }
 
             var i1, i2, i3, i4;
-            var faces = this.faces;
 
             var len = widthSegments + 1;
 
@@ -122,6 +117,15 @@ define(function(require) {
                     faces.push(vec3.fromValues(i2, i3, i4));
                 }
             }
+
+            var attributes = this.attributes;
+
+            attributes.position.fromArray(positions);
+            attributes.texcoord0.fromArray(texcoords);
+            attributes.normal.fromArray(normals);
+
+            this.initFaceFromArray(faces);
+
 
             this.boundingBox = new BoundingBox();
             this.boundingBox.max.set(radius, radius, radius);

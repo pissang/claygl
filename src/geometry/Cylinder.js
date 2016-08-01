@@ -2,19 +2,19 @@ define(function(require) {
 
     'use strict';
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var ConeGeometry = require('./Cone');
 
     /**
      * @constructor qtek.geometry.Cylinder
-     * @extends qtek.DynamicGeometry
+     * @extends qtek.StaticGeometry
      * @param {Object} [opt]
      * @param {number} [opt.radius]
      * @param {number} [opt.height]
      * @param {number} [opt.capSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Cylinder = DynamicGeometry.derive(
+    var Cylinder = StaticGeometry.derive(
     /** @lends qtek.geometry.Cylinder# */
     {
         /**

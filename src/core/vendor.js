@@ -23,17 +23,18 @@ define(function (require) {
         return supportWebGL;
     };
 
-    var strUndefined = 'undefined';
 
-    vendor.Int8Array = typeof Int8Array == strUndefined ? Array : Int8Array;
+    vendor.Int8Array = typeof Int8Array == 'undefined' ? Array : Int8Array;
 
-    vendor.Uint8Array = typeof Uint8Array == strUndefined ? Array : Uint8Array;
+    vendor.Uint8Array = typeof Uint8Array == 'undefined' ? Array : Uint8Array;
 
-    vendor.Uint16Array = typeof Uint16Array == strUndefined ? Array : Uint16Array;
+    vendor.Uint16Array = typeof Uint16Array == 'undefined' ? Array : Uint16Array;
 
-    vendor.Int16Array = typeof Int16Array == strUndefined ? Array : Int16Array;
+    vendor.Int16Array = typeof Int16Array == 'undefined' ? Array : Int16Array;
 
-    vendor.Float32Array = typeof Float32Array == strUndefined ? Array : Float32Array;
+    vendor.Float32Array = typeof Float32Array == 'undefined' ? Array : Float32Array;
+
+    vendor.Float64Array = typeof Float64Array == 'undefined' ? Array : Float64Array;
 
     return vendor;
 });

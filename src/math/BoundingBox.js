@@ -45,7 +45,7 @@ define(function(require) {
     };
 
     BoundingBox.prototype = {
-        
+
         constructor: BoundingBox,
         /**
          * Update min and max coords from a vertices array
@@ -105,7 +105,7 @@ define(function(require) {
         },
 
         /**
-         * Apply an affine transform matrix to the bounding box 
+         * Apply an affine transform matrix to the bounding box
          * @param  {qtek.math.Matrix4} matrix
          */
         applyTransform: function(matrix) {

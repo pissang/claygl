@@ -2,7 +2,7 @@ define(function(require) {
 
     'use strict';
 
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var BoundingBox = require('../math/BoundingBox');
     var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
@@ -10,7 +10,7 @@ define(function(require) {
 
     /**
      * @constructor qtek.geometry.Cone
-     * @extends qtek.DynamicGeometry
+     * @extends qtek.StaticGeometry
      * @param {Object} [opt]
      * @param {number} [opt.topRadius]
      * @param {number} [opt.bottomRadius]
@@ -18,14 +18,14 @@ define(function(require) {
      * @param {number} [opt.capSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Cone = DynamicGeometry.derive(
+    var Cone = StaticGeometry.derive(
     /** @lends qtek.geometry.Cone# */
     {
         /**
          * @type {number}
          */
         topRadius: 0,
-        
+
         /**
          * @type {number}
          */
@@ -54,9 +54,9 @@ define(function(require) {
          * Build cone geometry
          */
         build: function() {
-            var positions = this.attributes.position.value;
-            var texcoords = this.attributes.texcoord0.value;
-            var faces = this.faces;
+            var positions = [];
+            var texcoords = [];
+            var faces = [];
             positions.length = 0;
             texcoords.length = 0;
             faces.length = 0;
@@ -126,6 +126,11 @@ define(function(require) {
                     faces.push([offset+i4, offset+i3, offset+i2]);
                 }
             }
+
+            this.attributes.position.fromArray(positions);
+            this.attributes.texcoord0.fromArray(texcoords);
+
+            this.initFaceFromArray(faces);
 
             this.generateVertexNormals();
 
