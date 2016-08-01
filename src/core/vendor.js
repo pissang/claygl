@@ -30,6 +30,8 @@ define(function (require) {
 
     vendor.Uint16Array = typeof Uint16Array == 'undefined' ? Array : Uint16Array;
 
+    vendor.Uint32Array = typeof Uint32Array == 'undefined' ? Array : Uint32Array;
+
     vendor.Int16Array = typeof Int16Array == 'undefined' ? Array : Int16Array;
 
     vendor.Float32Array = typeof Float32Array == 'undefined' ? Array : Float32Array;

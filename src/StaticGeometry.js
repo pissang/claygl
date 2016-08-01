@@ -484,6 +484,9 @@ define(function(require) {
             for (var i = 0, len = this.getVertexNumber(); i < len; i++) {
                 vertexUseCount[i] = 0;
             }
+            if (this.faces.length > 0xffff) {
+                this.faces = new vendor.Uint32Array(this.faces);
+            }
 
             var cursor = this.getVertexNumber();
             var attributes = this.attributes;
@@ -518,6 +521,7 @@ define(function(require) {
                 }
                 vertexUseCount[ii]++;
             }
+
             this.dirty();
         },
 
