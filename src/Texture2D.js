@@ -51,7 +51,7 @@ define(function(require) {
         update: function(_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
-            
+
             this.beforeUpdate( _gl);
 
             var glFormat = this.format;
@@ -62,7 +62,7 @@ define(function(require) {
 
             _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.magFilter);
             _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.minFilter);
-            
+
             var anisotropicExt = glinfo.getExtension(_gl, 'EXT_texture_filter_anisotropic');
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
@@ -104,11 +104,12 @@ define(function(require) {
             else {
                 // Can be used as a blank texture when writing render to texture(RTT)
                 if (
-                    glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT 
+                    glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
                     && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
                 ) {
                     _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
                 } else {
+                    // Is a render target if pixels is null
                     _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, glFormat, glType, data.pixels);
                 }
             }
@@ -130,7 +131,7 @@ define(function(require) {
             var height;
             if (this.image) {
                 width = this.image.width;
-                height = this.image.height;   
+                height = this.image.height;
             } else {
                 width = this.width;
                 height = this.height;
@@ -152,11 +153,11 @@ define(function(require) {
         bind: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, this.getWebGLTexture(_gl));
         },
-        
+
         unbind: function(_gl) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
-        
+
         load: function(src) {
             var image = new Image();
             var self = this;

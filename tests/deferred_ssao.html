@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+
+        <script type="text/javascript" src="lib/stats.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="main"></canvas>
+        <script>
+            require(['qtek', 'js/SSAOPass'], function(qtek, SSAOPass) {
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0,
+                    antialias: false
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var deferredRenderer = new qtek.deferred.Renderer();
+                var ssaoPass = new SSAOPass();
+
+                var camera = new qtek.camera.Perspective({
+                    far: 10000,
+                    aspect: renderer.getViewportAspect()
+                });
+
+                var scene = new qtek.Scene();
+
+                function randomInSquare(size) {
+                    return (Math.random() - 0.5) * size * 2;
+                }
+
+                var cubeGeo = new qtek.geometry.Sphere();
+                for (var i = 0; i < 20; i ++) {
+                    for (var j = 0; j < 20; j ++) {
+                        var mesh = new qtek.Mesh({
+                            material: new qtek.deferred.StandardMaterial({
+                            }),
+                            geometry: cubeGeo
+                        });
+                        mesh.position.set(
+                            randomInSquare(50), randomInSquare(50), randomInSquare(50)
+                        );
+                        var scale = Math.random() * 5 + 5;
+                        mesh.scale.set(scale, scale, scale);
+                        scene.add(mesh);
+                    }
+                }
+
+                camera.position.set(0, 50, 100);
+                camera.lookAt(scene.position);
+
+                var control = new qtek.plugin.OrbitControl({
+                    domElement: renderer.canvas,
+                    target: camera
+                });
+
+                var animation = new qtek.animation.Animation();
+
+                animation.on('frame', function (deltaTime) {
+                    control.update(deltaTime);
+                    deferredRenderer.render(renderer, scene, camera);
+                    ssaoPass.render(deferredRenderer, renderer, camera);
+                    stats.update();
+                });
+                animation.start();
+
+                var stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                stats.domElement.style.left = '0px';
+                document.body.appendChild(stats.domElement);
+
+                var gui = new dat.GUI();
+                var config = {
+                    kernelSize: 64,
+                    blurSize: 4,
+                    noiseSize: 4,
+                    radius: 1.5,
+                    power: 2
+                };
+
+                gui.add(config, 'kernelSize', 12, 256).step(1).onChange(function () {
+                    ssaoPass.setParameter('kernelSize', config.kernelSize);
+                });
+                gui.add(config, 'blurSize', 1, 10).step(1).onChange(function () {
+                    ssaoPass.setParameter('blurSize', config.blurSize);
+                });
+                // gui.add(config, 'noiseSize', 1, 16).step(1).onChange(function () {
+                //     ssaoPass.setParameter('noiseSize', config.noiseSize);
+                // });
+                gui.add(config, 'radius', 0.1, 10).onChange(function () {
+                    ssaoPass.setParameter('radius', config.radius);
+                });
+                gui.add(config, 'power', 0.1, 6).onChange(function () {
+                    ssaoPass.setParameter('power', config.power);
+                });
+            });
+        </script>
+    </body>
+</html>

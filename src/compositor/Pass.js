@@ -146,10 +146,12 @@ define(function(require) {
             this.trigger('beforerender', this, renderer);
 
             // Don't clear in each pass, let the color overwrite the buffer
+            // FIXME pixels may be discard
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
 
             if (!frameBuffer) {
                 // Blend with previous rendered scene in the final output
+                // FIXME Configure blend.
                 _gl.enable(_gl.BLEND);
                 this.material.transparent = true;
             }

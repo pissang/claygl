@@ -1,6 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
 
@@ -46,7 +47,7 @@
                 scene.add(plane);
 
                 function randomInSquare(size) {
-                    return (Math.random() - 0.5) * size * 2
+                    return (Math.random() - 0.5) * size * 2;
                 }
 
                 var sphereGeo = new qtek.geometry.Sphere();
@@ -99,7 +100,7 @@
                     control.update(deltaTime);
                     deferredRenderer.render(renderer, scene, camera);
 
-                    debugPass.setUniform('texture', deferredRenderer._gBufferTex);
+                    debugPass.setUniform('texture', deferredRenderer.getGBuffer());
                     // debugPass.render(renderer);
 
                     stats.update();
@@ -110,7 +111,7 @@
                 stats.domElement.style.position = 'absolute';
                 stats.domElement.style.top = '0px';
                 stats.domElement.style.right = '0px';
-                document.body.appendChild( stats.domElement )
+                document.body.appendChild(stats.domElement);
             });
         </script>
     </body>
