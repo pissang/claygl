@@ -501,7 +501,8 @@ define(function(require) {
                         }
                         _gl.uniformMatrix4fv(location, false, array);
                     // Raw value
-                    } else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
+                    }
+                    else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
                         _gl.uniformMatrix4fv(location, false, value);
                     }
                     break;

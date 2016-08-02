@@ -31,7 +31,7 @@ varying vec4 v_ProjPos;
 
 void main()
 {
-    
+
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
 #ifdef NORMALMAP_ENABLED
@@ -42,7 +42,7 @@ void main()
     @import buildin.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
-    // Upper skinMatrix 
+    // Upper skinMatrix
     skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
 #ifdef NORMALMAP_ENABLED
     skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
@@ -54,7 +54,7 @@ void main()
     v_Texcoord = texcoord * uvRepeat + uvOffset;
 
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
-    
+
 #ifdef NORMALMAP_ENABLED
     v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
@@ -103,5 +103,10 @@ void main()
     // Ouptut glossiness to alpha channel
     gl_FragColor.a *= texture2D(diffuseMap, v_Texcoord).a;
 #endif
+
+    // Sign of normal z
+    if (N.z < 0.0) {
+        gl_FragColor.a = -gl_FragColor.a;
+    }
 }
 @end

@@ -1,5 +1,5 @@
 @export buildin.deferred.chunk.light_head
-uniform sampler2D normalTex;
+uniform sampler2D gBufferTex;
 uniform vec2 viewportSize;
 
 uniform mat4 viewProjectionInv;
@@ -10,7 +10,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
 @export buildin.deferred.chunk.gbuffer_read
     vec2 uv = gl_FragCoord.xy / viewportSize;
 
-    vec4 tex = texture2D(normalTex, uv);
+    vec4 tex = texture2D(gBufferTex, uv);
     // Is empty
     if (dot(tex.rgb, vec3(1.0)) == 0.0) {
         discard;
@@ -25,6 +25,10 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     float z = tex.b;
 
     float glossiness = tex.a;
+    if (glossiness < 0.0) {
+        N.z = -N.z;
+        glossiness = - glossiness;
+    }
 
     vec2 xy = uv * 2.0 - 1.0;
 
