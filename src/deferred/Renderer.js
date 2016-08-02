@@ -12,7 +12,7 @@ define(function (require) {
     var FullQuadPass = require('../compositor/Pass');
     var Texture2D = require('../Texture2D');
     var Texture = require('../Texture');
-    var boundingBox = require('../math/BoundingBox');
+    var BoundingBox = require('../math/BoundingBox');
     var Mesh = require('../Mesh');
     var SphereGeo = require('../geometry/Sphere');
     var ConeGeo = require('../geometry/Cone');
@@ -76,15 +76,15 @@ define(function (require) {
                 blend: lightAccumulateBlendFunc,
                 transparent: true,
                 depthMask: false
-            })
+            });
         };
 
         var createVolumeShader = function (name) {
             return new Shader({
                 vertex: lightVolumeVertex,
                 fragment: Shader.source('buildin.deferred.' + name)
-            })
-        }
+            });
+        };
 
         // Rotate and positioning to fit the spot light
         // Which the cusp of cone pointing to the positive z
@@ -107,6 +107,8 @@ define(function (require) {
         cylinderGeo.applyTransform(mat);
 
         return {
+            _outputFrameBuffer: new FrameBuffer(),
+
             // GBuffer shaders
             _gBufferShader: gBufferShader,
 
@@ -141,7 +143,7 @@ define(function (require) {
 
             _lightAccumTex: new Texture2D({
                 // FIXME Device not support float texture
-                type: Texture.FLOAT,
+                type: Texture.HALF_FLOAT,
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST
             }),
@@ -175,9 +177,9 @@ define(function (require) {
             _lightConeGeo: coneGeo,
 
             _lightCylinderGeo: cylinderGeo
-        }
+        };
     }, {
-        render: function (renderer, scene, camera) {
+        render: function (renderer, scene, camera, outputTexture) {
 
             var gl = renderer.gl;
 
@@ -239,7 +241,16 @@ define(function (require) {
             }
 
             gl.disable(gl.BLEND);
+
+            var outputFrameBuffer = this._outputFrameBuffer;
+            if (outputTexture) {
+                outputFrameBuffer.attach(gl, outputTexture);
+                outputFrameBuffer.bind(renderer);
+            }
             renderer.renderQueue(opaqueQueue, camera);
+            if (outputTexture) {
+                outputFrameBuffer.unbind(renderer);
+            }
 
             for (var i = 0; i < opaqueQueue.length; i++) {
                 // Swap material back
@@ -247,12 +258,16 @@ define(function (require) {
             }
         },
 
+        getGBuffer: function () {
+            return this._gBufferTex;
+        },
+
         _accumulateLightBuffer: function (renderer, scene, camera) {
             var gl = renderer.gl;
             var lightAccumTex = this._lightAccumTex;
             var lightAccumFrameBuffer = this._lightAccumFrameBuffer;
-            var lightVolumeMeshList = this._lightVolumeMeshList;
-            var listLen = 0;
+            // var lightVolumeMeshList = this._lightVolumeMeshList;
+            // var listLen = 0;
             var eyePosition = camera.getWorldPosition()._array;
 
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
@@ -284,7 +299,7 @@ define(function (require) {
                     material.setUniform('eyePosition', eyePosition);
                     material.setUniform('viewportSize', viewportSize);
                     material.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    material.setUniform('normalTex', this._gBufferTex);
+                    material.setUniform('gBufferTex', this._gBufferTex);
 
                     switch (light.type) {
                         case 'POINT_LIGHT':
@@ -334,7 +349,7 @@ define(function (require) {
                     pass.material.set('eyePosition', eyePosition);
                     pass.material.set('viewportSize', viewportSize);
                     pass.material.set('viewProjectionInv', viewProjectionInv._array);
-                    pass.material.set('normalTex', this._gBufferTex);
+                    pass.material.set('gBufferTex', this._gBufferTex);
 
                     pass.renderQuad(renderer);
                 }
@@ -464,7 +479,7 @@ define(function (require) {
                 }
 
                 gl.depthFunc(gl.LESS);
-            }
+            };
         })(),
 
         _bindShader: function (renderer, shader) {
@@ -565,7 +580,7 @@ define(function (require) {
                 outputMat.set('specularColor', standardMat.specularColor);
 
                 outputMat.set('lightAccumTex', this._lightAccumTex);
-                outputMat.set('normalTex', this._gBufferTex);
+                outputMat.set('gBufferTex', this._gBufferTex);
 
                 renderable.material = outputMat;
             }
