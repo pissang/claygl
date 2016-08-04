@@ -143,7 +143,7 @@ define(function(require) {
                             var pointW = new Vector3();
                             Vector3.transformMat4(pointW, point, renderable.worldTransform);
                             out.push(new RayPicking.Intersection(
-                                point, pointW, renderable, [i1, i2, i3],
+                                point, pointW, renderable, [i1 / 3, i2 / 3, i3 / 3],
                                 Vector3.dist(pointW, this._ray.origin)
                             ));
                         }
