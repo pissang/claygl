@@ -488,9 +488,14 @@ define(function(require) {
                 this.faces = new vendor.Uint32Array(this.faces);
             }
 
-            var cursor = this.getVertexNumber();
+            var cursor = 0;
             var attributes = this.attributes;
             var faces = this.faces;
+
+            // Cursor not use vertexNumber in case vertex array length is larger than face used.
+            for (var i = 0; i < faces.length; i++) {
+                cursor = Math.max(cursor, faces[i] + 1);
+            }
 
             var attributeNameList = this.getEnabledAttributes();
 

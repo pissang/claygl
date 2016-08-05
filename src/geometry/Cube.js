@@ -59,32 +59,38 @@ define(function(require) {
             };
 
             var attrList = ['position', 'texcoord0', 'normal'];
-            for (var k = 0; k < attrList.length; k++) {
-                this.attributes[attrList[k]].init(6 * planes.px.getVertexNumber());
+            var vertexNumber = 0;
+            var faceNumber = 0;
+            for (var pos in planes) {
+                vertexNumber += planes[pos].getVertexNumber();
+                faceNumber += planes[pos].faces.length;
             }
-            this.faces = new vendor.Uint16Array(6 * planes.px.faces.length);
-            var planeCount = 0;
+            for (var k = 0; k < attrList.length; k++) {
+                this.attributes[attrList[k]].init(vertexNumber);
+            }
+            this.faces = new vendor.Uint16Array(faceNumber);
+            var faceOffset = 0;
+            var vertexOffset = 0;
             for (var pos in planes) {
                 var plane = planes[pos];
                 for (var k = 0; k < attrList.length; k++) {
                     var attrName = attrList[k];
                     var attrArray = plane.attributes[attrName].value;
+                    var attrSize = plane.attributes[attrName].size;
                     var isNormal = attrName === 'normal';
                     for (var i = 0; i < attrArray.length; i++) {
                         var value = attrArray[i];
                         if (this.inside && isNormal) {
                             value = -value;
                         }
-                        this.attributes[attrName].value[i + attrArray.length * planeCount] = value;
+                        this.attributes[attrName].value[i + attrSize * vertexOffset] = value;
                     }
                 }
-                var faceOffset = plane.faces.length * planeCount;
-                var vertexOffset = plane.getVertexNumber() * planeCount;
                 for (var i = 0; i < plane.faces.length; i++) {
                     this.faces[i + faceOffset] = vertexOffset + plane.faces[i];
                 }
-
-                planeCount++;
+                faceOffset += plane.faces.length;
+                vertexOffset += plane.getVertexNumber();
             }
 
             this.boundingBox = new BoundingBox();

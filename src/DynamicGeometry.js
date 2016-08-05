@@ -706,7 +706,8 @@ define(function(require) {
                             var size = attributes[name].size;
                             if (size === 1) {
                                 array.push(array[ii]);
-                            } else {
+                            }
+                            else {
                                 array.push(arrSlice.call(array[ii]));
                             }
                         }
