@@ -152,6 +152,7 @@ define(function(require) {
             if (!frameBuffer) {
                 // Blend with previous rendered scene in the final output
                 // FIXME Configure blend.
+                // FIXME It will cause screen blink？
                 _gl.enable(_gl.BLEND);
                 this.material.transparent = true;
             }

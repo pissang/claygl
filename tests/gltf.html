@@ -28,7 +28,7 @@
             var GLTFLoader = new qtek.loader.GLTF();
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
-            
+
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
                 scene.rotation.rotateX(-Math.PI / 2);

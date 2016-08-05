@@ -23,6 +23,7 @@ define(function (require) {
 
     Shader.import(require('../shader/source/util.essl'));
     Shader.import(require('../shader/source/deferred/gbuffer.essl'));
+    Shader.import(require('../shader/source/deferred/depth.essl'));
     Shader.import(require('../shader/source/deferred/chunk.essl'));
 
     Shader.import(require('../shader/source/deferred/lightvolume.essl'));
@@ -129,15 +130,18 @@ define(function (require) {
                 height: 0,
                 // FIXME Device not support float texture
                 // FIXME Half float seems has problem
-                type: Texture.FLOAT,
+                // type: Texture.FLOAT,
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST
             }),
 
-            // _depthTex: new Texture2D({
-            //     type: Texture.UNSIGNED_SHORT,
-            //     format: Texture.DEPTH_COMPONENT
-            // }),
+            _depthTex: new Texture2D({
+                // FIXME UNSINGED_SHORT may have precision issue
+                type: Texture.UNSIGNED_INT,
+                format: Texture.DEPTH_COMPONENT,
+                minFilter: Texture.NEAREST,
+                magFilter: Texture.NEAREST
+            }),
 
             _lightAccumFrameBuffer: new FrameBuffer(),
 
@@ -200,23 +204,24 @@ define(function (require) {
             var height = renderer.getHeight();
             var gBufferFrameBuffer = this._gBufferFrameBuffer;
             var gBufferTex = this._gBufferTex;
-            // var depthTex = this._depthTex;
+            var depthTex = this._depthTex;
             var lightAccumTex = this._lightAccumTex;
             if (width !== gBufferTex.width || height !== gBufferTex.height) {
                 gBufferTex.width = width;
                 gBufferTex.height = height;
-                // depthTex.width = width;
-                // depthTex.height = height;
+                depthTex.width = width;
+                depthTex.height = height;
+
                 lightAccumTex.width = width;
                 lightAccumTex.height = height;
                 gBufferTex.dirty();
-                // depthTex.dirty();
+                depthTex.dirty();
                 lightAccumTex.dirty();
             }
             // Render normal and glossiness to GBuffer
             gBufferFrameBuffer.attach(gl, gBufferTex);
             // FIXME Device that not support depth texture
-            // gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
+            gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
             gBufferFrameBuffer.bind(renderer);
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -247,6 +252,8 @@ define(function (require) {
                 outputFrameBuffer.attach(gl, outputTexture);
                 outputFrameBuffer.bind(renderer);
             }
+            gl.clearColor(renderer.color[0], renderer.color[1], renderer.color[2], renderer.color[3]);
+            gl.clear(renderer.clear);
             renderer.renderQueue(opaqueQueue, camera);
             if (outputTexture) {
                 outputFrameBuffer.unbind(renderer);
@@ -260,6 +267,10 @@ define(function (require) {
 
         getGBuffer: function () {
             return this._gBufferTex;
+        },
+
+        getDepthBuffer: function () {
+            return this._depthTex;
         },
 
         _accumulateLightBuffer: function (renderer, scene, camera) {
@@ -299,6 +310,7 @@ define(function (require) {
                     material.setUniform('eyePosition', eyePosition);
                     material.setUniform('viewportSize', viewportSize);
                     material.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    material.setUniform('depthTex', this._depthTex);
                     material.setUniform('gBufferTex', this._gBufferTex);
 
                     switch (light.type) {
@@ -350,6 +362,7 @@ define(function (require) {
                     pass.material.set('viewportSize', viewportSize);
                     pass.material.set('viewProjectionInv', viewProjectionInv._array);
                     pass.material.set('gBufferTex', this._gBufferTex);
+                    pass.material.set('depthTex', this._depthTex);
 
                     pass.renderQuad(renderer);
                 }
@@ -508,7 +521,6 @@ define(function (require) {
                 renderable.__gBufferMat = renderable.__gBufferMat || new Material();
                 var gBufferMat = renderable.__gBufferMat;
 
-                var shader;
                 if (standardMat.normalMap) {
                     if (isDiffuseAlphaGlossiness) {
                         // FIXME Toggle shader may be too frequently

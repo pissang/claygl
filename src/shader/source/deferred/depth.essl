@@ -1,0 +1,52 @@
+@export buildin.deferred.depth.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+#endif
+
+varying vec4 v_ViewPosition;
+
+#ifdef SHADOW_TRANSPARENT
+varying vec2 v_Texcoord;
+#endif
+
+void main(){
+
+    vec3 skinnedPosition = position;
+
+#ifdef SKINNING
+
+    @import buildin.chunk.skin_matrix
+
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
+
+    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
+    gl_Position = v_ViewPosition;
+
+#ifdef SHADOW_TRANSPARENT
+    v_Texcoord = texcoord;
+#endif
+}
+@end
+
+
+@export buildin.deferred.depth.fragment
+
+varying vec4 v_ViewPosition;
+@import buildin.util.encode_float
+
+void main() {
+    float depth = v_ViewPosition.z / v_ViewPosition.w;
+
+    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
+}
+
+@end

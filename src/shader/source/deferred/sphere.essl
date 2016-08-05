@@ -19,6 +19,7 @@ void main()
 {
     @import buildin.deferred.chunk.gbuffer_read
 
+
     vec3 L = lightPosition - position;
 
     vec3 V = normalize(eyePosition - position);

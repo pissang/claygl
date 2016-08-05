@@ -1,10 +1,12 @@
 @export ssao.fragment
 
 uniform sampler2D gBufferTex;
+uniform sampler2D depthTex;
 
 uniform sampler2D noiseTex;
 
 uniform vec2 gBufferTexSize;
+
 uniform vec2 noiseTexSize;
 
 uniform vec2 viewportSize;
@@ -30,10 +32,6 @@ vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
     vec4 texCoord = projection * vec4(tmp, 1.0);
     texCoord.xy /= texCoord.w;
 
-    // float sampleDepth = texture2D(gBufferTex, texCoord.xy * 0.5 + 0.5).b;
-
-    // sampleDepth = projection[3][2] / (sampleDepth * projection[2][3] - projection[2][2]);
-    // return vec3(-sampleDepth);
     for (int i = 0; i < KERNEL_SIZE; i++) {
         vec3 samplePos = kernelBasis * kernel[i];
         samplePos = samplePos * radius + originPos;
@@ -41,13 +39,9 @@ vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
         vec4 texCoord = projection * vec4(samplePos, 1.0);
         texCoord.xy /= texCoord.w;
 
-        float sampleDepth = texture2D(gBufferTex, texCoord.xy * 0.5 + 0.5).b;
+        float sampleDepth = texture2D(depthTex, texCoord.xy * 0.5 + 0.5).r * 2.0 - 1.0;
 
         sampleDepth = projection[3][2] / (sampleDepth * projection[2][3] - projection[2][2]);
-        // TODO linear depth is enough
-        // vec4 hitPos = vec4(texCoord.xy * texCoord.w, sampleDepth * texCoord.w, texCoord.w);
-        // hitPos = projectionInv * hitPos;
-        // hitPos.z /= hitPos.w;
 
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(originPos.z - sampleDepth));
         occlusion += rangeCheck * step(samplePos.z, sampleDepth);
@@ -66,18 +60,13 @@ void main() {
         discard;
     }
 
-    vec3 N;
-    N.xy = tex.rg * 2.0 - 1.0;
-    N.z = sqrt(1.0 - dot(N.xy, N.xy));
-
-    if (tex.a < 0.0) {
-        N.z = -N.z;
-    }
+    vec3 N = tex.rgb * 2.0 - 1.0;
 
     // Convert to view space
     N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
 
-    float z = tex.b;
+    // float z = tex.b;
+    float z = texture2D(depthTex, uv).r * 2.0 - 1.0;
 
     vec4 projectedPos = vec4(uv * 2.0 - 1.0, z, 1.0);
     vec4 p4 = projectionInv * projectedPos;
@@ -93,7 +82,6 @@ void main() {
     vec3 BT = normalize(cross(N, T));
     mat3 kernelBasis = mat3(T, BT, N);
 
-    // gl_FragColor = vec4(N, 1.0);
     gl_FragColor = vec4(vec3(ssaoEstimator(kernelBasis, position)), 1.0);
 }
 

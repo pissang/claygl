@@ -92,11 +92,12 @@ void main()
     N = tbn * N;
 #endif
 
+    gl_FragColor.rgb = (N.xyz + 1.0) * 0.5;
+
     // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
-    gl_FragColor.rg = (N.xy + 1.0) * 0.5;
 
     // Depth
-    gl_FragColor.b = v_ProjPos.z / v_ProjPos.w;
+    // gl_FragColor.b = v_ProjPos.z / v_ProjPos.w;
 
     gl_FragColor.a = glossiness;
 #ifdef DIFFUSEMAP_ENABLED
@@ -105,8 +106,8 @@ void main()
 #endif
 
     // Sign of normal z
-    if (N.z < 0.0) {
-        gl_FragColor.a = -gl_FragColor.a;
-    }
+    // if (N.z < 0.0) {
+    //     gl_FragColor.a = -gl_FragColor.a;
+    // }
 }
 @end

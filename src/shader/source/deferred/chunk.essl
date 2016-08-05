@@ -1,5 +1,9 @@
 @export buildin.deferred.chunk.light_head
+
 uniform sampler2D gBufferTex;
+
+uniform sampler2D depthTex;
+
 uniform vec2 viewportSize;
 
 uniform mat4 viewProjectionInv;
@@ -16,19 +20,12 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
         discard;
     }
 
-    vec3 N;
-    N.xy = tex.rg * 2.0 - 1.0;
-    N.z = sqrt(1.0 - dot(N.xy, N.xy));
+    vec3 N = tex.rgb * 2.0 - 1.0;
 
-    // Depth value in depth texture is 0 - 1
-    // float z = texture2D(depthTex, uv).r * 2.0 - 1.0;
-    float z = tex.b;
+    // Depth buffer range is 0.0 - 1.0
+    float z = texture2D(depthTex, uv).r * 2.0 - 1.0;
 
     float glossiness = tex.a;
-    if (glossiness < 0.0) {
-        N.z = -N.z;
-        glossiness = - glossiness;
-    }
 
     vec2 xy = uv * 2.0 - 1.0;
 

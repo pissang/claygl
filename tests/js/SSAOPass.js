@@ -67,6 +67,7 @@ define(function (require) {
         var blurPass = this._blurPass;
 
         ssaoPass.setUniform('gBufferTex', gBufferTex);
+        ssaoPass.setUniform('depthTex', deferredRenderer.getDepthBuffer());
         ssaoPass.setUniform('gBufferTexSize', [gBufferTex.width, gBufferTex.height]);
         ssaoPass.setUniform('viewportSize', [width, height]);
 
@@ -90,6 +91,10 @@ define(function (require) {
         ssaoPass.render(forwardRenderer);
         this._framebuffer.unbind(forwardRenderer);
 
+        blurPass.material.blend = function (gl) {
+            gl.blendEquation(gl.FUNC_ADD);
+            gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+        };
         blurPass.setUniform('textureSize', [width, height]);
         blurPass.setUniform('texture', ssaoTexture);
         blurPass.render(forwardRenderer);

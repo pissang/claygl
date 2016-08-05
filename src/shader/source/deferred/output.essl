@@ -27,7 +27,7 @@ void main()
     vec3 skinnedPosition = position;
 
 #ifdef SKINNING
-    
+
     @import buildin.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
@@ -48,7 +48,7 @@ void main()
 uniform sampler2D diffuseMap;
 
 uniform sampler2D lightAccumTex;
-uniform sampler2D normalTex;
+uniform sampler2D gBufferTex;
 
 uniform vec3 color;
 uniform vec3 specularColor;
@@ -79,10 +79,8 @@ void main()
 #endif
 
     vec4 diffSpec = texture2D(lightAccumTex, uv);
-    vec3 N;
-    vec2 tex = texture2D(normalTex, uv).rg;
-    N.xy = tex * 2.0 - 1.0;
-    N.z = sqrt(1.0 - dot(N.xy, N.xy));
+
+    vec3 N = texture2D(gBufferTex, uv).xyz * 2.0 - 1.0;
 
     vec3 diffTerm = diffSpec.rgb;
     // PENDING

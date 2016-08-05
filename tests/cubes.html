@@ -78,8 +78,8 @@
                     var start = new Date().getTime();
                     var drawInfo = renderer.render(scene, camera);
                     var renderTime = new Date().getTime() - start;
-                    document.getElementById('time').innerHTML = 
-                            Math.round(1000 / deltaTime) + '<br />' 
+                    document.getElementById('time').innerHTML =
+                            Math.round(1000 / deltaTime) + '<br />'
                             + renderTime + '<br />'
                             + drawInfo.renderedMeshNumber + '(' + drawInfo.meshNumber + ')';
                     root.rotation.rotateY(Math.PI/500);
@@ -94,7 +94,7 @@
                 document.body.appendChild( stats.domElement );
 
             })
-            
+
         </script>
     </body>
 </html>

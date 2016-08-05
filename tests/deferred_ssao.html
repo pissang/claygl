@@ -37,6 +37,7 @@
                     for (var j = 0; j < 20; j ++) {
                         var mesh = new qtek.Mesh({
                             material: new qtek.deferred.StandardMaterial({
+                                color: [Math.random(), Math.random(), Math.random()]
                             }),
                             geometry: cubeGeo
                         });
@@ -48,8 +49,15 @@
                         scene.add(mesh);
                     }
                 }
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.8
+                }));
+                var directionalLight = new qtek.light.Directional();
+                directionalLight.position.set(1, 1, 1);
+                directionalLight.lookAt(scene.position);
+                scene.add(directionalLight);
 
-                camera.position.set(0, 50, 100);
+                camera.position.set(0, 80, 150);
                 camera.lookAt(scene.position);
 
                 var control = new qtek.plugin.OrbitControl({

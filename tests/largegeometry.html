@@ -11,32 +11,32 @@
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas : document.getElementById('Main')
                 });
                 var scene = new qtek.Scene();
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
-                console.profile("generate");
+                console.profile('generate');
                 var sphere = new qtek.geometry.Sphere({
                     widthSegments: 200,
                     heightSegments: 200
                 });
-                console.profileEnd("generate");
+                console.profileEnd('generate');
                 sphere.generateUniqueVertex();
                 sphere.generateBarycentric();
 
                 var shader = new Shader({
-                    vertex: Shader.source("buildin.wireframe.vertex"),
-                    fragment: Shader.source("buildin.wireframe.fragment")
-                })
+                    vertex: Shader.source('buildin.wireframe.vertex'),
+                    fragment: Shader.source('buildin.wireframe.fragment')
+                });
                 var material = new qtek.Material({
                     shader: shader,
                     transparent: true,
                     depthTest: false
-                })
-                material.set("width", 2);
+                });
+                material.set('width', 2);
 
                 camera.position.set(0, 1, 2);
                 camera.lookAt(scene.position);
@@ -47,12 +47,13 @@
                 });
                 scene.add(sphereMesh);
 
+                renderer.render(scene, camera);
                 setInterval(function() {
                     var renderInfo = renderer.render(scene, camera);
                     sphereMesh.rotation.rotateY(Math.PI/500);
                 }, 20);
-            })
-            
+            });
+
         </script>
     </body>
 </html>
