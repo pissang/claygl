@@ -51,18 +51,23 @@
                 }
 
                 var sphereGeo = new qtek.geometry.Sphere();
+
+                var sphereLights = [];
+                var HEIGHT = 150;
                 for (var i = 0; i < 10; i ++) {
                     for (var j = 0; j < 10; j ++) {
                         var sphereLight = new qtek.light.Sphere({
                             color: [Math.random(), Math.random(), Math.random()],
                             range: 400,
                             intensity: 2.0,
-                            radius: 60
+                            radius: 60,
+                            specularColor: [0.8, 0.8, 0.8],
+                            glossiness: 0.3
                         });
                         var x = (i - 5) * 400;
                         var z = (j - 5) * 400;
                         // var z =  0;
-                        var y = 150;
+                        var y = HEIGHT;
                         sphereLight.position.set(x, y, z);
                         scene.add(sphereLight);
 
@@ -70,7 +75,7 @@
                             material: new qtek.deferred.StandardMaterial({
                                 color: [0, 0, 0],
                                 specularColor: [0, 0, 0],
-                                glossiness: 0.0,
+                                glossiness: 0,
                                 emission: sphereLight.color
                             }),
                             geometry: sphereGeo
@@ -79,12 +84,14 @@
                         lightMesh.scale.set(r, r, r);
 
                         sphereLight.add(lightMesh);
+
+                        sphereLights.push(sphereLight);
                     }
                 }
                 // scene.add(new qtek.light.Directional({
                 // }));
 
-                camera.position.set(0, 50, 100);
+                camera.position.set(0, 300, 500);
                 camera.lookAt(scene.position);
 
                 var control = new qtek.plugin.OrbitControl({
@@ -97,15 +104,22 @@
                 var debugPass = new qtek.compositor.Pass({
                     fragment: qtek.Shader.source('buildin.compositor.output')
                 });
-                debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
+                var elpasedTime = 0;
+                // debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
                 animation.on('frame', function (deltaTime) {
                     control.update(deltaTime);
+
+                    elpasedTime += deltaTime;
+
+                    sphereLights.forEach(function (sphereLight, idx) {
+                        sphereLight.position.y = HEIGHT + 200 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
+                    });
+
                     deferredRenderer.render(renderer, scene, camera);
 
                     // renderer.gl.clear(renderer.gl.COLOR_BUFFER_BIT);
-                    // debugPass.setUniform('texture', deferredRenderer._lightAccumTex);
+                    // debugPass.setUniform('texture', deferredRenderer._depthTex);
                     // debugPass.render(renderer);
-
                     stats.update();
                 });
                 animation.start();

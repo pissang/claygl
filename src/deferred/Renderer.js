@@ -12,7 +12,6 @@ define(function (require) {
     var FullQuadPass = require('../compositor/Pass');
     var Texture2D = require('../Texture2D');
     var Texture = require('../Texture');
-    var BoundingBox = require('../math/BoundingBox');
     var Mesh = require('../Mesh');
     var SphereGeo = require('../geometry/Sphere');
     var ConeGeo = require('../geometry/Cone');
@@ -108,19 +107,31 @@ define(function (require) {
         cylinderGeo.applyTransform(mat);
 
         return {
+
+            /**
+             * If use depth texture extension
+             * @type {Boolean}
+             */
+            useDepthTexture: false,
+
             _outputFrameBuffer: new FrameBuffer(),
+
+            _depthMaterial: new Material({
+                shader: new Shader({
+                    vertex: Shader.source('buildin.deferred.depth.vertex'),
+                    fragment: Shader.source('buildin.deferred.depth.fragment')
+                })
+            }),
+
+            _depthFrameBuffer: new FrameBuffer(),
 
             // GBuffer shaders
             _gBufferShader: gBufferShader,
-
             _gBufferDiffShader: gBufferDiffShader,
-
             _gBufferDiffNormShader: gBufferDiffNormShader,
-
             _gBufferNormShader: gBufferNormShader,
 
             _outputShader: outputShader,
-
             _outputDiffShader: outputDiffShader,
 
             _gBufferFrameBuffer: new FrameBuffer(),
@@ -129,18 +140,15 @@ define(function (require) {
                 width: 0,
                 height: 0,
                 // FIXME Device not support float texture
-                // FIXME Half float seems has problem
-                // type: Texture.FLOAT,
+                type: Texture.HALF_FLOAT,
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST
             }),
 
             _depthTex: new Texture2D({
-                // FIXME UNSINGED_SHORT may have precision issue
-                type: Texture.UNSIGNED_INT,
-                format: Texture.DEPTH_COMPONENT,
                 minFilter: Texture.NEAREST,
-                magFilter: Texture.NEAREST
+                magFilter: Texture.NEAREST,
+                useMipmap: false
             }),
 
             _lightAccumFrameBuffer: new FrameBuffer(),
@@ -154,6 +162,7 @@ define(function (require) {
 
             _fullQuadPass: new FullQuadPass(),
 
+
             _directionalLightMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
                 fragment: Shader.source('buildin.deferred.directional_light')
@@ -162,14 +171,11 @@ define(function (require) {
                 vertex: fullQuadVertex,
                 fragment: Shader.source('buildin.deferred.ambient_light')
             })),
-
             _spotLightShader: createVolumeShader('spot_light'),
-
             _pointLightShader: createVolumeShader('point_light'),
-
             _sphereLightShader: createVolumeShader('sphere_light'),
-
             _tubeLightShader: createVolumeShader('tube_light'),
+
 
             _createLightPassMat: createLightPassMat,
 
@@ -206,6 +212,8 @@ define(function (require) {
             var gBufferTex = this._gBufferTex;
             var depthTex = this._depthTex;
             var lightAccumTex = this._lightAccumTex;
+
+            var useDepthTexture = this.useDepthTexture;
             if (width !== gBufferTex.width || height !== gBufferTex.height) {
                 gBufferTex.width = width;
                 gBufferTex.height = height;
@@ -218,16 +226,45 @@ define(function (require) {
                 depthTex.dirty();
                 lightAccumTex.dirty();
             }
+            if (useDepthTexture) {
+                if (depthTex.format !== Texture.DEPTH_COMPONENT) {
+                    depthTex.format = Texture.DEPTH_COMPONENT;
+                    // FIXME UNSINGED_SHORT may have precision issue
+                    depthTex.type = Texture.UNSIGNED_INT;
+                    depthTex.dirty();
+                }
+            }
+            else {
+                if (depthTex.format !== Texture.RGBA) {
+                    depthTex.format = Texture.RGBA;
+                    depthTex.type = Texture.UNSIGNED_BYTE;
+                    depthTex.dirty();
+                }
+            }
+
             // Render normal and glossiness to GBuffer
             gBufferFrameBuffer.attach(gl, gBufferTex);
             // FIXME Device that not support depth texture
-            gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
+            if (useDepthTexture) {
+                gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
+            }
             gBufferFrameBuffer.bind(renderer);
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             gl.disable(gl.BLEND);
             renderer.renderQueue(opaqueQueue, camera);
             gBufferFrameBuffer.unbind(renderer);
+
+            if (!useDepthTexture) {
+                var depthFrameBuffer = this._depthFrameBuffer;
+                depthFrameBuffer.attach(gl, depthTex);
+                depthFrameBuffer.bind(renderer);
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+                gl.disable(gl.BLEND);
+                renderer.renderQueue(opaqueQueue, camera, this._depthMaterial);
+                depthFrameBuffer.unbind(renderer);
+            }
 
             // Accumulate light buffer
             this._accumulateLightBuffer(renderer, scene, camera);
@@ -292,6 +329,14 @@ define(function (require) {
 
             var viewportSize = [lightAccumTex.width, lightAccumTex.height];
             var volumeMeshList = [];
+
+            var method = this.useDepthTexture ? 'unDefine' : 'define';
+            this._pointLightShader[method]('fragment', 'DEPTH_ENCODED');
+            this._spotLightShader[method]('fragment', 'DEPTH_ENCODED');
+            this._tubeLightShader[method]('fragment', 'DEPTH_ENCODED');
+            this._sphereLightShader[method]('fragment', 'DEPTH_ENCODED');
+            this._directionalLightMat.shader[method]('fragment', 'DEPTH_ENCODED');
+            this._ambientMat.shader[method]('fragment', 'DEPTH_ENCODED');
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];

@@ -11,11 +11,7 @@ attribute vec4 joint : JOINT;
 uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
 #endif
 
-varying vec4 v_ViewPosition;
-
-#ifdef SHADOW_TRANSPARENT
-varying vec2 v_Texcoord;
-#endif
+varying vec4 v_ProjPos;
 
 void main(){
 
@@ -28,23 +24,22 @@ void main(){
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
 
-    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
-    gl_Position = v_ViewPosition;
+    v_ProjPos = worldViewProjection * vec4(skinnedPosition, 1.0);
+    gl_Position = v_ProjPos;
 
-#ifdef SHADOW_TRANSPARENT
-    v_Texcoord = texcoord;
-#endif
 }
 @end
 
 
 @export buildin.deferred.depth.fragment
 
-varying vec4 v_ViewPosition;
+varying vec4 v_ProjPos;
 @import buildin.util.encode_float
+@import buildin.util.decode_float
 
-void main() {
-    float depth = v_ViewPosition.z / v_ViewPosition.w;
+void main()
+{
+    float depth = v_ProjPos.z / v_ProjPos.w;
 
     gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
 }

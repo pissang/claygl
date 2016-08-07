@@ -9,6 +9,12 @@ uniform vec2 viewportSize;
 uniform mat4 viewProjectionInv;
 
 const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
+
+
+#ifdef DEPTH_ENCODED
+@import buildin.util.decode_float
+#endif
+
 @end
 
 @export buildin.deferred.chunk.gbuffer_read
@@ -22,8 +28,15 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
 
     vec3 N = tex.rgb * 2.0 - 1.0;
 
+#ifdef DEPTH_ENCODED
+    // FXIME premultiplied alpha?
+    vec4 depthTexel = texture2D(depthTex, uv);
+    depthTexel.rgb /= depthTexel.a;
+    float z = decodeFloat(depthTexel) * 2.0 - 1.0;
+#else
     // Depth buffer range is 0.0 - 1.0
     float z = texture2D(depthTex, uv).r * 2.0 - 1.0;
+#endif
 
     float glossiness = tex.a;
 

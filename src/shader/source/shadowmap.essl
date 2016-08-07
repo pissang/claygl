@@ -201,6 +201,8 @@ uniform bool shadowEnabled : true;
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
+    // FIXME premultiplied alpha?
+    // tex.rgb /= tex.a;
     return decodeFloat(tex) * 2.0 - 1.0 < z ? 0.0 : 1.0;
 }
 

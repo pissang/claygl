@@ -2,7 +2,7 @@
  * Base class for all textures like compressed texture, texture2d, texturecube
  * TODO mapping
  */
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -86,13 +86,13 @@ define(function(require) {
         dynamic: false,
 
         NPOT: false
-    }, function() {
+    }, function () {
         this._cache = new Cache();
     },
     /** @lends qtek.Texture.prototype */
     {
 
-        getWebGLTexture: function(_gl) {
+        getWebGLTexture: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
 
@@ -111,20 +111,20 @@ define(function(require) {
             return cache.get('webgl_texture');
         },
 
-        bind: function() {},
-        unbind: function() {},
-        
+        bind: function () {},
+        unbind: function () {},
+
         /**
          * Mark texture is dirty and update in the next frame
          */
-        dirty: function() {
+        dirty: function () {
             this._cache.dirtyAll();
         },
 
-        update: function(_gl) {},
+        update: function (_gl) {},
 
         // Update the common parameters of texture
-        beforeUpdate: function(_gl) {
+        beforeUpdate: function (_gl) {
             _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
             _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
             _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
@@ -132,10 +132,10 @@ define(function(require) {
             this.fallBack();
         },
 
-        fallBack: function() {
+        fallBack: function () {
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-            
+
             var isPowerOfTwo = this.isPowerOfTwo();
 
             if (this.format === glenum.DEPTH_COMPONENT) {
@@ -181,7 +181,7 @@ define(function(require) {
 
         },
 
-        nextHighestPowerOfTwo: function(x) {
+        nextHighestPowerOfTwo: function (x) {
             --x;
             for (var i = 1; i < 32; i <<= 1) {
                 x = x | x >> i;
@@ -191,7 +191,7 @@ define(function(require) {
         /**
          * @param  {WebGLRenderingContext} _gl
          */
-        dispose: function(_gl) {
+        dispose: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
 
@@ -205,11 +205,11 @@ define(function(require) {
          * Test if image of texture is valid and loaded.
          * @return {boolean}
          */
-        isRenderable: function() {},
-        
-        isPowerOfTwo: function() {}
+        isRenderable: function () {},
+
+        isPowerOfTwo: function () {}
     });
-    
+
     /* DataType */
     Texture.BYTE = glenum.BYTE;
     Texture.UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
@@ -219,7 +219,7 @@ define(function(require) {
     Texture.UNSIGNED_INT = glenum.UNSIGNED_INT;
     Texture.FLOAT = glenum.FLOAT;
     Texture.HALF_FLOAT = 0x8D61;
-    
+
     /* PixelFormat */
     Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
     Texture.ALPHA = glenum.ALPHA;
@@ -237,7 +237,7 @@ define(function(require) {
     /* TextureMagFilter */
     Texture.NEAREST = glenum.NEAREST;
     Texture.LINEAR = glenum.LINEAR;
-    
+
     /* TextureMinFilter */
     /*      NEAREST */
     /*      LINEAR */
@@ -245,7 +245,7 @@ define(function(require) {
     Texture.LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
     Texture.NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
     Texture.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
-    
+
     /* TextureParameterName */
     Texture.TEXTURE_MAG_FILTER = glenum.TEXTURE_MAG_FILTER;
     Texture.TEXTURE_MIN_FILTER = glenum.TEXTURE_MIN_FILTER;

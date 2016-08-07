@@ -51,5 +51,6 @@ void main()
 
     // Specular luminance
     gl_FragColor.a = dot(LUM, gl_FragColor.rgb * D_Phong(glossiness, ndh));
+    // gl_FragColor.a = 1.0;
 }
 @end

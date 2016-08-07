@@ -1,6 +1,6 @@
 @export buildin.compositor.output
 
-#define OUTPUT_ALPHA;
+#define OUTPUT_ALPHA
 
 varying vec2 v_Texcoord;
 
