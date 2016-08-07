@@ -21,7 +21,7 @@ define(function(require) {
 
     var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\w\,]+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
     var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
-    var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*\n/g;
+    var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*;?\s*\n/g;
 
     var uniformTypeMap = {
         'bool': '1i',
