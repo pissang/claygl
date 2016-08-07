@@ -12,14 +12,22 @@
         <canvas id="main"></canvas>
         <script>
             require(['qtek', 'js/SSAOPass'], function(qtek, SSAOPass) {
+
+                var config = {
+                    kernelSize: 32,
+                    blurSize: 4,
+                    noiseSize: 4,
+                    radius: 4,
+                    power: 2
+                };
+
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0,
-                    antialias: false
+                    devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var deferredRenderer = new qtek.deferred.Renderer();
-                var ssaoPass = new SSAOPass();
+                var ssaoPass = new SSAOPass(config);
 
                 var camera = new qtek.camera.Perspective({
                     far: 10000,
@@ -32,7 +40,7 @@
                     return (Math.random() - 0.5) * size * 2;
                 }
 
-                var cubeGeo = new qtek.geometry.Sphere();
+                var cubeGeo = new qtek.geometry.Cube();
                 for (var i = 0; i < 20; i ++) {
                     for (var j = 0; j < 20; j ++) {
                         var mesh = new qtek.Mesh({
@@ -82,13 +90,6 @@
                 document.body.appendChild(stats.domElement);
 
                 var gui = new dat.GUI();
-                var config = {
-                    kernelSize: 64,
-                    blurSize: 4,
-                    noiseSize: 4,
-                    radius: 1.5,
-                    power: 2
-                };
 
                 gui.add(config, 'kernelSize', 12, 256).step(1).onChange(function () {
                     ssaoPass.setParameter('kernelSize', config.kernelSize);

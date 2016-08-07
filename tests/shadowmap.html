@@ -5,7 +5,7 @@
         <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
             require(['qtek',
                     'text!../tests/assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
@@ -13,7 +13,7 @@
                 var Vector3 = qtek.math.Vector3;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main"),
+                    canvas : document.getElementById('main'),
                     devicePixelRatio : 1.0
                 });
 
@@ -21,8 +21,8 @@
                     // useVSM : true
                 });
 
-                var scene = new qtek.Scene,
-                    camera = new qtek.camera.Perspective({
+                var scene = new qtek.Scene();
+                var camera = new qtek.camera.Perspective({
                         aspect : renderer.getViewportAspect(),
                         far : 100
                     });
@@ -46,7 +46,7 @@
                 });
 
                 var loader = new qtek.loader.ThreeModel({
-                    textureRootPath : "assets/models/nanosuit/tex"
+                    textureRootPath : 'assets/models/nanosuit/tex'
                 });
                 var data = JSON.parse(modelData);
                 var meshList = loader.parse(data);
@@ -55,7 +55,7 @@
 
                 qtek.core.util.each(meshList, function(mesh){
                     // mesh.material = material
-                    mesh.material.shader.disableTexture("normalMap");
+                    mesh.material.shader.disableTexture('normalMap');
                     root.add(mesh);
                 });
                 scene.add(root);

@@ -25,6 +25,10 @@ uniform float power : 2;
 
 varying vec2 v_Texcoord;
 
+#ifdef DEPTH_ENCODED
+@import buildin.util.decode_float
+#endif
+
 vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
     float occlusion = 0.0;
 
@@ -39,7 +43,13 @@ vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
         vec4 texCoord = projection * vec4(samplePos, 1.0);
         texCoord.xy /= texCoord.w;
 
-        float sampleDepth = texture2D(depthTex, texCoord.xy * 0.5 + 0.5).r * 2.0 - 1.0;
+        vec4 depthTexel = texture2D(depthTex, texCoord.xy * 0.5 + 0.5);
+#ifdef DEPTH_ENCODED
+        depthTexel.rgb /= depthTexel.a;
+        float sampleDepth = decodeFloat(depthTexel) * 2.0 - 1.0;
+#else
+        float sampleDepth = depthTexel.r * 2.0 - 1.0;
+#endif
 
         sampleDepth = projection[3][2] / (sampleDepth * projection[2][3] - projection[2][2]);
 
@@ -50,7 +60,8 @@ vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
     return vec3(pow(occlusion, power));
 }
 
-void main() {
+void main()
+{
     vec2 uv = gl_FragCoord.xy / viewportSize;
 
     vec4 tex = texture2D(gBufferTex, uv);
@@ -65,8 +76,14 @@ void main() {
     // Convert to view space
     N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
 
-    // float z = tex.b;
-    float z = texture2D(depthTex, uv).r * 2.0 - 1.0;
+
+    vec4 depthTexel = texture2D(depthTex, uv);
+#ifdef DEPTH_ENCODED
+    depthTexel.rgb /= depthTexel.a;
+    float z = decodeFloat(depthTexel) * 2.0 - 1.0;
+#else
+    float z = depthTexel.r * 2.0 - 1.0;
+#endif
 
     vec4 projectedPos = vec4(uv * 2.0 - 1.0, z, 1.0);
     vec4 p4 = projectionInv * projectedPos;
@@ -96,7 +113,8 @@ uniform vec2 textureSize;
 
 varying vec2 v_Texcoord;
 
-void main () {
+void main ()
+{
     vec2 texelSize = 1.0 / textureSize;
 
     // gl_FragColor.rgba = texture2D(texture, v_Texcoord);

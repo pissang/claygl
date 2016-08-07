@@ -44,7 +44,9 @@ define(function (require) {
         return kernel;
     }
 
-    function SSAOPass() {
+    function SSAOPass(opt) {
+        opt = opt || {};
+
         this._ssaoPass = new qtek.compositor.Pass({
             fragment: qtek.Shader.source('ssao.fragment')
         });
@@ -55,8 +57,14 @@ define(function (require) {
         this._ssaoTexture = new qtek.Texture2D();
 
         this.setNoiseSize(4);
-        this.setKernelSize(64);
-        this.setParameter('blurSize', 4);
+        this.setKernelSize(opt.kernelSize || 64);
+        this.setParameter('blurSize', opt.blurSize || 4);
+        if (opt.radius != null) {
+            this.setParameter('radius', opt.radius);
+        }
+        if (opt.power != null) {
+            this.setParameter('power', opt.power);
+        }
     }
 
     SSAOPass.prototype.render = function (deferredRenderer, forwardRenderer, camera) {
@@ -66,6 +74,12 @@ define(function (require) {
         var ssaoPass = this._ssaoPass;
         var blurPass = this._blurPass;
 
+        if (!deferredRenderer.useDepthTexture) {
+            ssaoPass.material.shader.define('fragment', 'DEPTH_ENCODED');
+        }
+        else {
+            ssaoPass.material.shader.unDefine('fragment', 'DEPTH_ENCODED');
+        }
         ssaoPass.setUniform('gBufferTex', gBufferTex);
         ssaoPass.setUniform('depthTex', deferredRenderer.getDepthBuffer());
         ssaoPass.setUniform('gBufferTexSize', [gBufferTex.width, gBufferTex.height]);

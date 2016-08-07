@@ -3,7 +3,7 @@
  * @see http://www.khronos.org/registry/webgl/extensions/
  */
 define(function() {
-    
+
     'use strict';
 
     var EXTENSION_LIST = [
@@ -24,7 +24,7 @@ define(function() {
     var PARAMETER_NAMES = [
         'MAX_TEXTURE_SIZE',
         'MAX_CUBE_MAP_TEXTURE_SIZE'
-    ]
+    ];
 
     var extensions = {};
     var parameters = {};

@@ -35,6 +35,7 @@
                 var plane = new qtek.Mesh({
                     material: new qtek.deferred.StandardMaterial({
                         glossiness: 0.5,
+                        specularColor: [0.5, 0.5, 0.5],
                         uvRepeat: [100, 100],
                         normalMap: texture
                     }),
@@ -58,11 +59,9 @@
                     for (var j = 0; j < 10; j ++) {
                         var sphereLight = new qtek.light.Sphere({
                             color: [Math.random(), Math.random(), Math.random()],
-                            range: 400,
+                            range: 600,
                             intensity: 2.0,
-                            radius: 60,
-                            specularColor: [0.8, 0.8, 0.8],
-                            glossiness: 0.3
+                            radius: 60
                         });
                         var x = (i - 5) * 400;
                         var z = (j - 5) * 400;
@@ -88,8 +87,33 @@
                         sphereLights.push(sphereLight);
                     }
                 }
-                // scene.add(new qtek.light.Directional({
-                // }));
+
+                var GLTFLoader = new qtek.loader.GLTF();
+                GLTFLoader.load('assets/models/suzanne.json');
+                GLTFLoader.on('success', function(res) {
+                    var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                    var material = new qtek.deferred.StandardMaterial({
+                        specularColor: [0.95, 0.64, 0.54],
+                        glossiness: 0.7
+                    });
+
+                    for (var i = 0; i < 5; i++) {
+                        for (var j = 0; j < 5; j++) {
+                            var mesh = new qtek.Mesh({
+                                material: material,
+                                geometry: suzanneGeometry
+                            });
+                            mesh.position.set(
+                                (i - 2.5) * 500,
+                                150,
+                                (j - 2.5) * 500
+                            );
+                            mesh.scale.set(100, 100, 100);
+                            scene.add(mesh);
+                        }
+                    }
+                });
+
 
                 camera.position.set(0, 300, 500);
                 camera.lookAt(scene.position);

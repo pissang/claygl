@@ -32,7 +32,7 @@ define(function(require) {
 
     /**
      * Pass rendering shadow map.
-     * 
+     *
      * @constructor qtek.prePass.ShadowMap
      * @extends qtek.core.Base
      * @example
@@ -53,7 +53,7 @@ define(function(require) {
              * @type {number}
              */
             softShadow: ShadowMapPass.PCF,
-            
+
             /**
              * Soft shadow blur size
              * @type {number}
@@ -179,7 +179,7 @@ define(function(require) {
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
-                            depthShader.define('vertex', 'JOINT_NUMBER', nJoints);   
+                            depthShader.define('vertex', 'JOINT_NUMBER', nJoints);
                         }
                         if (isShadowTransparent) {
                             depthShader.define('both', 'SHADOW_TRANSPARENT');
@@ -228,7 +228,7 @@ define(function(require) {
                         });
                         if (nJoints > 0) {
                             distanceMaterial.shader.define('vertex', 'SKINNING');
-                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', nJoints);   
+                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', nJoints);
                         }
                         this._distanceMaterials[nJoints] = distanceMaterial;
                     }
@@ -344,7 +344,7 @@ define(function(require) {
                     this._renderSpotLightShadow(
                         renderer,
                         light,
-                        this._opaqueCasters, 
+                        this._opaqueCasters,
                         spotLightMatrices,
                         spotLightShadowMaps
                     );
@@ -409,7 +409,7 @@ define(function(require) {
 
                 if (spotLightShadowMaps.length > 0) {
                     material.setUniform('spotLightShadowMaps', spotLightShadowMaps);
-                    material.setUniform('spotLightMatrices', spotLightMatrices);   
+                    material.setUniform('spotLightMatrices', spotLightMatrices);
                 }
                 if (directionalLightShadowMaps.length > 0) {
                     material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
@@ -417,11 +417,11 @@ define(function(require) {
                         material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
                         material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
                     }
-                    material.setUniform('directionalLightMatrices', directionalLightMatrices);   
+                    material.setUniform('directionalLightMatrices', directionalLightMatrices);
                 }
                 if (pointLightShadowMaps.length > 0) {
                     material.setUniform('pointLightShadowMaps', pointLightShadowMaps);
-                    material.setUniform('pointLightRanges', pointLightRanges);   
+                    material.setUniform('pointLightRanges', pointLightRanges);
                 }
                 material.__shadowUniformUpdated = true;
             }
@@ -456,7 +456,7 @@ define(function(require) {
                 depth += deltaDepth;
                 // TODO: add a bias
                 if (depth > sceneCamera.near) {
-                    sceneCamera.far = Math.min(sceneCamera.far, depth);   
+                    sceneCamera.far = Math.min(sceneCamera.far, depth);
                 }
                 sceneCamera.updateProjectionMatrix();
                 sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
@@ -599,7 +599,7 @@ define(function(require) {
             };
             var _gl = renderer.gl;
             var tmpTexture = this._texturePool.get(parameter);
-            
+
             this._frameBuffer.attach(_gl, tmpTexture);
             this._frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform('texture', texture);
@@ -632,8 +632,8 @@ define(function(require) {
                     texture.type = glenum.FLOAT;
                     texture.anisotropic = 4;
                 } else {
-                    texture.minFilter = glenum.LINEAR;
-                    texture.magFilter = glenum.LINEAR;
+                    texture.minFilter = glenum.NEAREST;
+                    texture.magFilter = glenum.NEAREST;
                     texture.useMipmap = false;
                 }
                 this._textures[key] = texture;
@@ -711,7 +711,7 @@ define(function(require) {
                     .copy(camera.worldTransform)
                     .invert()
                     .multiply(sceneCamera.worldTransform);
-                
+
                 sceneCamera.frustum.getTransformedBoundingBox(lightViewBBox, lightViewMatrix);
                 var min = lightViewBBox.min._array;
                 var max = lightViewBBox.max._array;
@@ -792,7 +792,7 @@ define(function(require) {
                     shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
                     shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_NUMBER');
                     shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_NUMBER');
-                    material.set('shadowEnabled', 0);   
+                    material.set('shadowEnabled', 0);
                 }
             }
 
@@ -801,18 +801,18 @@ define(function(require) {
             this._lightsCastShadow = [];
         }
     });
-    
+
     /**
      * @name qtek.prePass.ShadowMap.VSM
      * @type {number}
      */
     ShadowMapPass.VSM = 1;
-    
+
     /**
      * @name qtek.prePass.ShadowMap.PCF
      * @type {number}
      */
     ShadowMapPass.PCF = 2;
-    
+
     return ShadowMapPass;
 });

@@ -147,8 +147,7 @@ define(function (require) {
 
             _depthTex: new Texture2D({
                 minFilter: Texture.NEAREST,
-                magFilter: Texture.NEAREST,
-                useMipmap: false
+                magFilter: Texture.NEAREST
             }),
 
             _lightAccumFrameBuffer: new FrameBuffer(),
