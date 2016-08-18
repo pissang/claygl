@@ -233,7 +233,7 @@ define(function(require) {
                             }
                             break;
                         default:
-                            console.error('Unkown light uniform type '+uniformTpl.type);
+                            console.error('Unkown light uniform type ' + uniformTpl.type);
                     }
                 }
             }

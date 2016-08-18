@@ -35,7 +35,7 @@
                 var BRDFLookup = integrateBRDF(normalDistribution);
 
                 var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load("assets/models/suzanne.json");
+                GLTFLoader.load('assets/models/suzanne.json');
                 var suzanneGeometry;
                 GLTFLoader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
@@ -84,7 +84,7 @@
                                 scene.add(mesh);
                             }
 
-                            var monkeys = []
+                            var monkeys = [];
                             for (var i = 0; i < 4; i++) {
                                 var material = new qtek.Material({
                                     shader : shader
@@ -104,7 +104,7 @@
                             monkeys[0].material.set('specularColor', [1.0, 0.71, 0.29]);
                             monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
                             monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
-                            monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05])
+                            monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05]);
                             applyMaterial(monkeys[3].material, prefilteredEnvMap, mipmapNum, 0.2);
                         });
                     }
@@ -124,21 +124,21 @@
                 FXLoader.on('success', function(_compositor) {
                     compositor = _compositor;
                     var sceneNode = new qtek.compositor.SceneNode({
-                        name : "scene",
+                        name : 'scene',
                         scene : scene,
                         camera : camera,
                         outputs : {
-                            "color" : {
+                            'color' : {
                                 parameters : {
-                                    width : function(renderer) {return renderer.getWidth()}, 
-                                    height : function(renderer) {return renderer.getHeight()},
-                                    type : qtek.Texture.FLOAT   
+                                    width : function(renderer) { return renderer.getWidth(); },
+                                    height : function(renderer) { return renderer.getHeight(); },
+                                    type : qtek.Texture.FLOAT
                                 }
                             }
                         }
                     });
                     compositor.addNode(sceneNode);
-                })
+                });
 
 
                 var animation = new qtek.animation.Animation();
@@ -251,11 +251,9 @@
                     environmentMapPass.render(renderer, emptyScene);
                     skydome.detachScene(emptyScene);
 
-                    prefilteredEnvMap = new qtek.TextureCube({
+                    var prefilteredEnvMap = new qtek.TextureCube({
                         width: size,
                         height: size,
-                        minFilter: qtek.Texture.LINEAR,
-                        magFilter: qtek.Texture.LINEAR,
                         flipY: false
                     });
 
@@ -267,7 +265,7 @@
                             vertex : qtek.Shader.source('buildin.skybox.vertex'),
                             fragment : qtek.Shader.source('split_sum.prefilter_envmap')
                         })
-                    })
+                    });
                     prefilterMaterial.set('normalDistribution', normalDistribution);
                     prefilterMaterial.set('environmentMap', envMap);
                     skybox.material = prefilterMaterial;
@@ -287,8 +285,9 @@
                             };
                             prefilteredEnvMap.mipmaps.push(mipmap);
                             var gl = renderer.gl;
-                            roughness = mipmapLevel / mipmapNum;
+                            var roughness = mipmapLevel / mipmapNum;
                             prefilterMaterial.set('roughness', roughness);
+
                             ['px', 'nx', 'py', 'ny', 'pz', 'nz'].forEach(function (target) {
                                 var fb = frameBuffer;
                                 var camera = environmentMapPass._cameras[target];
@@ -309,7 +308,7 @@
                                 for (var i = 0; i < pixels.length; i++) {
                                     imageData.data[i] = pixels[i];
                                 }
-                                ctx.putImageData(imageData, 0, 0);
+
                                 mipmap.pixels[target] = pixels;
 
                                 document.body.appendChild(canvas);

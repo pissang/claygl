@@ -11,18 +11,18 @@
                 var Shader = qtek.Shader
 
                 var renderer = new qtek.Renderer({
-                    canvas: document.getElementById( "Main"),
+                    canvas: document.getElementById('Main'),
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
-                var scene = new qtek.Scene;
+                var scene = new qtek.Scene();
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
 
-                var shader = qtek.shader.library.get("buildin.basic", "diffuseMap");
+                var shader = qtek.shader.library.get('buildin.basic', 'diffuseMap');
 
                 var material = new qtek.Material({
                     shader: shader
@@ -30,17 +30,36 @@
                 var texture = new qtek.Texture2D({
                     wrapS: qtek.Texture.REPEAT,
                     wrapT: qtek.Texture.REPEAT,
+                    width: 32,
+                    height: 32,
                     mipmaps: [
                         createMipMap(32, '#000'),
-                        createMipMap(16, '#333'),
-                        createMipMap(8, '#666'),
+                        createMipMap(16, '#222'),
+                        createMipMap(8, '#555'),
                         createMipMap(4, '#999'),
-                        createMipMap(2, '#ccc'),
+                        createMipMap(2, '#aaa'),
                         createMipMap(1, '#fff')
                     ]
                 });
-                material.set("diffuseMap", texture);
-                material.set("uvRepeat", [100, 100])
+                var textureCube = new qtek.TextureCube({
+                    wrapS: qtek.Texture.REPEAT,
+                    wrapT: qtek.Texture.REPEAT,
+                    width: 128,
+                    height: 128,
+                    mipmaps: [
+                        createMipMapCube(128, '#02a'),
+                        createMipMapCube(64, '#000'),
+                        createMipMapCube(32, '#000'),
+                        createMipMapCube(16, '#f00'),
+                        createMipMapCube(8, '#f0f'),
+                        createMipMapCube(4, '#00f'),
+                        createMipMapCube(2, '#0f0'),
+                        createMipMapCube(1, '#f00')
+                    ]
+                });
+
+                material.set('diffuseMap', texture);
+                material.set('uvRepeat', [100, 100]);
 
                 function createMipMap(size, color) {
                     var canvas = document.createElement('canvas');
@@ -48,16 +67,33 @@
                     var ctx = canvas.getContext('2d');
                     ctx.fillStyle = color;
                     ctx.fillRect(0, 0, size, size);
+                    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
                     return {
-                        image: canvas
+                        pixels: new Uint8Array(imgData)
+                    };
+                }
+
+                function createMipMapCube(size, color) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = canvas.height = size;
+                    var ctx = canvas.getContext('2d');
+                    ctx.fillStyle = color;
+                    ctx.fillRect(0, 0, size, size);
+                    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+                    return {
+                        pixels: ['px', 'nx', 'py', 'ny', 'pz', 'nz'].reduce(function (obj, target) {
+                            obj[target] = new Uint8Array(imgData);
+                            return obj;
+                        }, {})
                     };
                 }
 
                 var root = new qtek.Node();
 
                 camera.position.set(0, 4, 14);
-                camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
+                camera.lookAt(new qtek.math.Vector3(0, 1, 0));
 
                 scene.add(root);
                 // Add Plane
@@ -74,11 +110,29 @@
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
-                setInterval(function(){
-                    renderer.render( scene, camera );
-                }, 20);
-            })
-            
+                var sphereGeo = new qtek.geometry.Sphere();
+                var envMapMaterial = new qtek.Material({
+                    shader: qtek.shader.library.get('buildin.phong', 'environmentMap')
+                });
+                envMapMaterial.set('reflectivity', 1.0);
+                envMapMaterial.set('environmentMap', textureCube);
+                for (var i = 0; i < 10; i++) {
+                    var sphere = new qtek.Mesh({
+                        geometry: sphereGeo,
+                        material: envMapMaterial
+                    });
+                    sphere.scale.set(5, 5, 5);
+                    sphere.position.set(-10, 5, -i * 10);
+                    root.add(sphere);
+                }
+
+                var animation = new qtek.animation.Animation();
+                animation.on('frame', function () {
+                    renderer.render(scene, camera);
+                });
+                animation.start();
+            });
+
         </script>
     </body>
 </html>

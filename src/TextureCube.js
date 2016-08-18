@@ -91,7 +91,7 @@ define(function(require) {
 
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.magFilter);
             _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.minFilter);
-            
+
             var anisotropicExt = glinfo.getExtension(_gl, 'EXT_texture_filter_anisotropic');
             if (anisotropicExt && this.anisotropic > 1) {
                 _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
@@ -125,7 +125,7 @@ define(function(require) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
-        
+
         _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
             for (var i = 0; i < 6; i++) {
                 var target = targetList[i];
@@ -204,7 +204,7 @@ define(function(require) {
                     loading --;
                     image.onerror = null;
                 };
-                
+
                 loading++;
                 image.src = src;
                 self.image[target] = image;
