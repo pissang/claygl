@@ -488,8 +488,8 @@ define(function(require) {
             } else {
                 // Shader for skinned mesh
                 shader = new Shader({
-                    vertex: Shader.source(shaderName+'.vertex'),
-                    fragment: Shader.source(shaderName+'.fragment')
+                    vertex: Shader.source(shaderName + '.vertex'),
+                    fragment: Shader.source(shaderName + '.fragment')
                 });
                 for (var i = 0; i < enabledTextures; i++) {
                     shader.enableTexture(enabledTextures[i]);

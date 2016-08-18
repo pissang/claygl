@@ -340,7 +340,8 @@ define(function(require) {
                         directionalLightMatrices,
                         directionalLightShadowMaps
                     );
-                } else if (light instanceof SpotLight) {
+                }
+                else if (light instanceof SpotLight) {
                     this._renderSpotLightShadow(
                         renderer,
                         light,
@@ -348,7 +349,8 @@ define(function(require) {
                         spotLightMatrices,
                         spotLightShadowMaps
                     );
-                } else if (light instanceof PointLight) {
+                }
+                else if (light instanceof PointLight) {
                     this._renderPointLightShadow(
                         renderer,
                         light,
@@ -376,6 +378,12 @@ define(function(require) {
             shadowCascadeClipsFar.reverse();
             directionalLightShadowMaps.reverse();
             directionalLightMatrices.reverse();
+
+            function getSize(texture) {
+                return texture.width;
+            }
+            var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
+            var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
 
             for (var i = 0; i < this._receivers.length; i++) {
                 var mesh = this._receivers[i];
@@ -410,6 +418,7 @@ define(function(require) {
                 if (spotLightShadowMaps.length > 0) {
                     material.setUniform('spotLightShadowMaps', spotLightShadowMaps);
                     material.setUniform('spotLightMatrices', spotLightMatrices);
+                    material.setUniform('spotLightShadowMapSizes', spotLightShadowMapSizes);
                 }
                 if (directionalLightShadowMaps.length > 0) {
                     material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
@@ -418,6 +427,7 @@ define(function(require) {
                         material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
                     }
                     material.setUniform('directionalLightMatrices', directionalLightMatrices);
+                    material.setUniform('directionalLightShadowMapSizes', directionalLightShadowMapSizes);
                 }
                 if (pointLightShadowMaps.length > 0) {
                     material.setUniform('pointLightShadowMaps', pointLightShadowMaps);
