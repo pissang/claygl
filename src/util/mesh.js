@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var Geometry = require('../Geometry');
@@ -70,8 +70,8 @@ define(function(require) {
                         currentGeo.boundingBox.applyTransform(applyWorldTransform ? meshes[k].worldTransform : meshes[k].localTransform);
                         geometry.boundingBox.union(currentGeo.boundingBox);
                     }
-                    nVertex += currentGeo.getVertexNumber();
-                    nFace += currentGeo.getFaceNumber();
+                    nVertex += currentGeo.vertexCount;
+                    nFace += currentGeo.faceCount;
                 }
                 for (var n = 0; n < attributeNames.length; n++) {
                     var name = attributeNames[n];
@@ -88,12 +88,12 @@ define(function(require) {
             var vertexOffset = 0;
             var faceOffset = 0;
             var useFaces = templateGeo.isUseFace();
-            
+
             for (var mm = 0; mm < meshes.length; mm++) {
-                var mesh = meshes[mm];  
+                var mesh = meshes[mm];
                 var currentGeo = mesh.geometry;
 
-                var nVertex = currentGeo.getVertexNumber();
+                var nVertex = currentGeo.vertexCount;
 
                 var matrix = applyWorldTransform ? mesh.worldTransform._array : mesh.localTransform._array;
                 mat4.invert(inverseTransposeMatrix, matrix);
@@ -156,7 +156,7 @@ define(function(require) {
                             newFace[2] = face[2] + vertexOffset;
 
                             faces.push(newFace);
-                        }   
+                        }
                     }
                 }
 
@@ -195,8 +195,8 @@ define(function(require) {
             var shaders = {};
 
             var faces = geometry.faces;
-            
-            var faceLen = geometry.getFaceNumber();
+
+            var faceLen = geometry.faceCount;
             var rest = faceLen;
             var isFaceAdded = [];
             var jointValues = geometry.attributes.joint.value;
@@ -225,9 +225,9 @@ define(function(require) {
                     var canAddToBucket = true;
                     var addedNumber = 0;
                     for (var i = 0; i < 3; i++) {
-                        
+
                         var idx = isStatic ? faces[f * 3 + i] : faces[f][i];
-                        
+
                         for (var j = 0; j < 4; j++) {
                             var jointIdx;
                             if (isStatic) {
@@ -275,7 +275,7 @@ define(function(require) {
             var root = new Node({
                 name : mesh.name
             });
-            var attribNames = geometry.getEnabledAttributes();            
+            var attribNames = geometry.getEnabledAttributes();
             // TODO
             if (!isStatic) {
                 attribNames = Object.keys(attribNames);
@@ -307,7 +307,7 @@ define(function(require) {
                     subMat.set(name, uniform.value);
                 }
                 var subGeo = isStatic ? new StaticGeometry() : new DynamicGeometry();
-                
+
                 var subMesh = new Mesh({
                     name : [mesh.name, i].join('-'),
                     material : subMat,
@@ -316,7 +316,7 @@ define(function(require) {
                     joints : bucket.joints.slice()
                 });
                 var nVertex = 0;
-                var nVertex2 = geometry.getVertexNumber();
+                var nVertex2 = geometry.vertexCount;
                 for (var i = 0; i < nVertex2; i++) {
                     newIndices[i] = -1;
                 }
@@ -359,7 +359,7 @@ define(function(require) {
                     }
                     var face = bucket.faces[f];
                     for (var i = 0; i < 3; i++) {
-                        
+
                         var idx = face[i];
 
                         if (newIndices[idx] === -1) {
@@ -379,7 +379,7 @@ define(function(require) {
                                         subAttrib.value[nVertex] = attrib.value[idx];
                                     } else {
                                         subAttrib.value[nVertex] = arraySlice.call(attrib.value[idx]);
-                                    }   
+                                    }
                                 }
                             }
                             if (isStatic) {

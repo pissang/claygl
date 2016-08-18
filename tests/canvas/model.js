@@ -30,13 +30,13 @@ define(function (require) {
         var mesh = res.meshes['Suzanne-mesh'][0];
         var geometry = mesh.geometry;
         var attributes = geometry.attributes;
-        attributes.color.init(geometry.getVertexNumber());
-        for (var i = 0; i < geometry.getVertexNumber(); i++) {
+        attributes.color.init(geometry.vertexCount);
+        for (var i = 0; i < geometry.vertexCount; i++) {
             var uv = attributes.normal.get(i, []);
             uv[3] = 1;
             attributes.color.set(i, uv);
         }
-    
+
         mesh.rotation.rotateX(-Math.PI / 2);
         mesh.material = new CanvasMaterial();
 

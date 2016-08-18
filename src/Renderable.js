@@ -124,7 +124,7 @@ define(function(require) {
 
             var glDrawMode = this.mode;
 
-            var nVertex = geometry.getVertexNumber();
+            var nVertex = geometry.vertexCount;
             var isUseFace = geometry.isUseFace();
 
             var uintExt = glinfo.getExtension(_gl, 'OES_element_index_uint');
@@ -169,7 +169,7 @@ define(function(require) {
                 }
                 else {
                     // FIXME Use vertex number in buffer
-                    // getVertexNumber may get the wrong value when geometry forget to mark dirty after update
+                    // vertexCount may get the wrong value when geometry forget to mark dirty after update
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
                 renderInfo.drawCallNumber = 1;

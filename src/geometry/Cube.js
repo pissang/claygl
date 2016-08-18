@@ -62,7 +62,7 @@ define(function(require) {
             var vertexNumber = 0;
             var faceNumber = 0;
             for (var pos in planes) {
-                vertexNumber += planes[pos].getVertexNumber();
+                vertexNumber += planes[pos].vertexCount;
                 faceNumber += planes[pos].faces.length;
             }
             for (var k = 0; k < attrList.length; k++) {
@@ -90,7 +90,7 @@ define(function(require) {
                     this.faces[i + faceOffset] = vertexOffset + plane.faces[i];
                 }
                 faceOffset += plane.faces.length;
-                vertexOffset += plane.getVertexNumber();
+                vertexOffset += plane.vertexCount;
             }
 
             this.boundingBox = new BoundingBox();

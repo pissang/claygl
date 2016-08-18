@@ -26,7 +26,8 @@ define(function (require) {
         heightSegments: 10
     });
     var attributes = sphereGeo.attributes;
-    for (var i = 0; i < sphereGeo.getVertexNumber(); i++) {
+    attributes.color.init(sphereGeo.vertexCount);
+    for (var i = 0; i < sphereGeo.vertexCount; i++) {
         var uv = attributes.texcoord0.get(i, []);
         uv[2] = uv[3] = 1;
         attributes.color.set(i, uv);

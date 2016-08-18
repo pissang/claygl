@@ -245,12 +245,12 @@ define(function (require) {
                     vec4.copy(matColor, material.color);
                 }
 
-                var nVertex = geometry.getVertexNumber();
+                var nVertex = geometry.vertexCount;
                 // Only support TRIANGLES, LINES, POINTS draw modes
                 switch (renderable.mode) {
                     case glenum.TRIANGLES:
                         if (geometry.isUseFace()) {
-                            var nFace = geometry.getFaceNumber();
+                            var nFace = geometry.faceCount;
                             for (var j = 0; j < nFace; j++) {
                                 geometry.getFace(j, indices);
 

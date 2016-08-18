@@ -96,20 +96,8 @@ define(function(require) {
             this._enabledAttributes = null;
         },
 
-        getVertexNumber: function() {
-            var mainAttribute = this.attributes[this.mainAttribute];
-            if (!mainAttribute || !mainAttribute.value) {
-                return 0;
-            }
-            return mainAttribute.value.length;
-        },
-
-        getFaceNumber: function() {
-            return this.faces.length;
-        },
-
         getFace: function (idx, out) {
-            if (idx < this.getFaceNumber() && idx >= 0) {
+            if (idx < this.faceCount && idx >= 0) {
                 if (!out) {
                     out = vec3.create();
                 }
@@ -124,7 +112,7 @@ define(function(require) {
         },
 
         isSplitted: function() {
-            return this.getVertexNumber() > 0xffff;
+            return this.vertexCount > 0xffff;
         },
 
         createAttribute: function(name, type, size, semantic) {
@@ -159,7 +147,7 @@ define(function(require) {
             }
 
             var result = {};
-            var nVertex = this.getVertexNumber();
+            var nVertex = this.vertexCount;
 
             for (var i = 0; i < attributeList.length; i++) {
                 var name = attributeList[i];
@@ -232,7 +220,7 @@ define(function(require) {
         _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty, useUintExtension) {
 
             var self = this;
-            var nVertex = this.getVertexNumber();
+            var nVertex = this.vertexCount;
 
             var verticesReorganizedMap = [];
             var reorganizedFaces = [];
@@ -240,7 +228,7 @@ define(function(require) {
             var ArrayConstructors = {};
             for (var name in attributes) {
                 // Type can be byte, ubyte, short, ushort, float
-                switch(type) {
+                switch (attributes[name].type) {
                     case 'byte':
                         ArrayConstructors[name] = vendor.Int8Array;
                         break;
@@ -312,7 +300,7 @@ define(function(require) {
                     var reorganizedFace = reorganizedFaces[i];
 
                     // newChunk
-                    if (vertexCount+3 > 0xffff) {
+                    if (vertexCount + 3 > 0xffff) {
                         chunkIdx++;
                         chunkFaceStart[chunkIdx] = i;
                         vertexCount = 0;
@@ -604,7 +592,7 @@ define(function(require) {
 
             var tan1 = [];
             var tan2 = [];
-            var nVertex = this.getVertexNumber();
+            var nVertex = this.vertexCount;
             for (var i = 0; i < nVertex; i++) {
                 tan1[i] = [0.0, 0.0, 0.0];
                 tan2[i] = [0.0, 0.0, 0.0];
@@ -673,7 +661,7 @@ define(function(require) {
 
         isUniqueVertex: function() {
             if (this.isUseFace()) {
-                return this.getVertexNumber() === this.faces.length * 3;
+                return this.vertexCount === this.faces.length * 3;
             } else {
                 return true;
             }
@@ -685,11 +673,11 @@ define(function(require) {
             // Intialize with empty value, read undefined value from array
             // is slow
             // http://jsperf.com/undefined-array-read
-            for (var i = 0; i < this.getVertexNumber(); i++) {
+            for (var i = 0; i < this.vertexCount; i++) {
                 vertexUseCount[i] = 0;
             }
 
-            var cursor = this.getVertexNumber();
+            var cursor = this.vertexCount;
             var attributes = this.getEnabledAttributes();
             var faces = this.faces;
 
@@ -835,6 +823,29 @@ define(function(require) {
             cache.deleteContext(_gl.__GLID__);
         }
     });
+
+    if (Object.defineProperty) {
+        Object.defineProperty(DynamicGeometry.prototype, 'vertexCount', {
+
+            enumerable: false,
+
+            get: function () {
+                var mainAttribute = this.attributes[this.mainAttribute];
+                if (!mainAttribute || !mainAttribute.value) {
+                    return 0;
+                }
+                return mainAttribute.value.length;
+            }
+        });
+        Object.defineProperty(DynamicGeometry.prototype, 'faceCount', {
+
+            enumerable: false,
+
+            get: function () {
+                return this.faces.length;
+            }
+        });
+    }
 
     return DynamicGeometry;
 });

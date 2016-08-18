@@ -91,25 +91,8 @@ define(function(require) {
             this._enabledAttributes = null;
         },
 
-        getVertexNumber: function() {
-            var mainAttribute = this.attributes[this.mainAttribute];
-            if (!mainAttribute || !mainAttribute.value) {
-                return 0;
-            }
-            return mainAttribute.value.length / mainAttribute.size;
-        },
-
-        getFaceNumber: function() {
-            var faces = this.faces;
-            if (!faces) {
-                return 0;
-            } else {
-                return faces.length / 3;
-            }
-        },
-
         getFace: function (idx, out) {
-            if (idx < this.getFaceNumber() && idx >= 0) {
+            if (idx < this.faceCount && idx >= 0) {
                 if (!out) {
                     out = vec3Create();
                 }
@@ -127,7 +110,7 @@ define(function(require) {
 
         initFaceFromArray: function (array) {
             var value;
-            var ArrayConstructor = this.getVertexNumber() > 0xffff
+            var ArrayConstructor = this.vertexCount > 0xffff
                 ? vendor.Uint32Array : vendor.Uint16Array;
             // Convert 2d array to flat
             if (array[0] && (array[0].length)) {
@@ -180,7 +163,7 @@ define(function(require) {
             }
 
             var result = [];
-            var nVertex = this.getVertexNumber();
+            var nVertex = this.vertexCount;
 
             for (var i = 0; i < attributeList.length; i++) {
                 var name = attributeList[i];
@@ -377,7 +360,7 @@ define(function(require) {
         },
 
         generateTangents: function() {
-            var nVertex = this.getVertexNumber();
+            var nVertex = this.vertexCount;
             var attributes = this.attributes;
             if (!attributes.tangent.value) {
                 attributes.tangent.value = new Float32Array(nVertex * 4);
@@ -472,7 +455,7 @@ define(function(require) {
 
         isUniqueVertex: function() {
             if (this.isUseFace()) {
-                return this.getVertexNumber() === this.faces.length;
+                return this.vertexCount === this.faces.length;
             } else {
                 return true;
             }
@@ -481,7 +464,7 @@ define(function(require) {
         generateUniqueVertex: function() {
             var vertexUseCount = [];
 
-            for (var i = 0, len = this.getVertexNumber(); i < len; i++) {
+            for (var i = 0, len = this.vertexCount; i < len; i++) {
                 vertexUseCount[i] = 0;
             }
             if (this.faces.length > 0xffff) {
@@ -637,5 +620,33 @@ define(function(require) {
         }
     });
 
+    if (Object.defineProperty) {
+        Object.defineProperty(StaticGeometry.prototype, 'vertexCount', {
+
+            enumerable: false,
+
+            get: function () {
+                var mainAttribute = this.attributes[this.mainAttribute];
+                if (!mainAttribute || !mainAttribute.value) {
+                    return 0;
+                }
+                return mainAttribute.value.length / mainAttribute.size;
+            }
+        });
+        Object.defineProperty(StaticGeometry.prototype, 'faceCount', {
+
+            enumerable: false,
+
+            get: function () {
+                var faces = this.faces;
+                if (!faces) {
+                    return 0;
+                }
+                else {
+                    return faces.length / 3;
+                }
+            }
+        });
+    }
     return StaticGeometry;
 });

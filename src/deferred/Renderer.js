@@ -1,5 +1,7 @@
 // Light-pre pass deferred rendering
 // http://www.realtimerendering.com/blog/deferred-lighting-approaches/
+
+// TODO Here actually can use more materials besides deferred.StandardMaterial
 define(function (require) {
 
     'use strict';
@@ -118,6 +120,8 @@ define(function (require) {
 
             _depthMaterial: new Material({
                 shader: new Shader({
+                    // mediump will have precision issue on mobile
+                    precision: 'highp',
                     vertex: Shader.source('buildin.deferred.depth.vertex'),
                     fragment: Shader.source('buildin.deferred.depth.fragment')
                 })
@@ -174,7 +178,6 @@ define(function (require) {
             _pointLightShader: createVolumeShader('point_light'),
             _sphereLightShader: createVolumeShader('sphere_light'),
             _tubeLightShader: createVolumeShader('tube_light'),
-
 
             _createLightPassMat: createLightPassMat,
 
@@ -248,6 +251,8 @@ define(function (require) {
                 gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
             }
             gBufferFrameBuffer.bind(renderer);
+            gl.colorMask(true, true, true, true);
+            gl.depthMask(true);
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             gl.disable(gl.BLEND);
@@ -258,9 +263,9 @@ define(function (require) {
                 var depthFrameBuffer = this._depthFrameBuffer;
                 depthFrameBuffer.attach(gl, depthTex);
                 depthFrameBuffer.bind(renderer);
-                gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
                 gl.disable(gl.BLEND);
+
                 renderer.renderQueue(opaqueQueue, camera, this._depthMaterial);
                 depthFrameBuffer.unbind(renderer);
             }
@@ -329,13 +334,7 @@ define(function (require) {
             var viewportSize = [lightAccumTex.width, lightAccumTex.height];
             var volumeMeshList = [];
 
-            var method = this.useDepthTexture ? 'unDefine' : 'define';
-            this._pointLightShader[method]('fragment', 'DEPTH_ENCODED');
-            this._spotLightShader[method]('fragment', 'DEPTH_ENCODED');
-            this._tubeLightShader[method]('fragment', 'DEPTH_ENCODED');
-            this._sphereLightShader[method]('fragment', 'DEPTH_ENCODED');
-            this._directionalLightMat.shader[method]('fragment', 'DEPTH_ENCODED');
-            this._ambientMat.shader[method]('fragment', 'DEPTH_ENCODED');
+            var setDefineMethod = this.useDepthTexture ? 'unDefine' : 'define';
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -347,6 +346,9 @@ define(function (require) {
 
                 if (volumeMesh) {
                     var material = volumeMesh.material;
+
+                    material.shader[setDefineMethod]('fragment', 'DEPTH_ENCODED');
+                    material.shader.define('fragment', 'PREMULTIPLIED_ALPHA');
                     // Volume mesh will affect the scene bounding box when rendering
                     // if castShadow is true
                     volumeMesh.castShadow = false;
@@ -407,6 +409,9 @@ define(function (require) {
                     pass.material.set('viewProjectionInv', viewProjectionInv._array);
                     pass.material.set('gBufferTex', this._gBufferTex);
                     pass.material.set('depthTex', this._depthTex);
+
+                    pass.material.shader[setDefineMethod]('fragment', 'DEPTH_ENCODED');
+                    pass.material.shader.define('fragment', 'PREMULTIPLIED_ALPHA');
 
                     pass.renderQuad(renderer);
                 }

@@ -263,7 +263,7 @@ define(function(require) {
         /**
          * @type {boolean}
          */
-        useFace : true
+        useFace: true
 
     }, function() {
         // Use cache
@@ -305,16 +305,7 @@ define(function(require) {
          * @param {string} name
          */
         removeAttribute: notImplementedWarn,
-        /**
-         * @method
-         * @return {number}
-         */
-        getVertexNumber: notImplementedWarn,
-        /**
-         * @method
-         * @return {number}
-         */
-        getFaceNumber: notImplementedWarn,
+
         /**
          * @method
          * @param {number} idx
