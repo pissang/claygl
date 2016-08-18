@@ -25,19 +25,19 @@ define(function(require) {
              * @type {qtek.Node}
              */
             target: null,
-            
+
             /**
              * Target dom to bind with mouse events
              * @type {HTMLElement}
              */
             domElement: null,
-            
+
             /**
              * Mouse move sensitivity
              * @type {number}
              */
             sensitivity: 1,
-            
+
             /**
              * Target move speed
              * @type {number}
@@ -118,7 +118,7 @@ define(function(require) {
             document.removeEventListener('pointerlockchange', this._lockChange);
             document.removeEventListener('mozpointerlockchange', this._lockChange);
             document.removeEventListener('webkitpointerlockchange', this._lockChange);
-            
+
             document.removeEventListener('keydown', this._keyDown);
             document.removeEventListener('keyup', this._keyUp);
         },
@@ -165,7 +165,7 @@ define(function(require) {
             }
 
             target.rotateAround(target.position, this.up, -this._offsetPitch * frameTime * Math.PI / 360);
-            var xAxis = target.localTransform.right;
+            var xAxis = target.localTransform.x;
             target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
 
             this._offsetRoll = this._offsetPitch = 0;
@@ -208,7 +208,7 @@ define(function(require) {
                 case 68: //d
                 case 39: //right arrow
                     this._moveRight = true;
-                    break; 
+                    break;
             }
         },
 
