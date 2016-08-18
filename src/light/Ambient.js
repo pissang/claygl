@@ -9,7 +9,9 @@ define(function(require) {
      * @extends qtek.Light
      */
     var AmbientLight = Light.derive({
+
         castShadow: false
+
     }, {
 
         type: 'AMBIENT_LIGHT',

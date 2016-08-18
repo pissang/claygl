@@ -1,4 +1,5 @@
 @export buildin.deferred.ambient_light
+
 uniform sampler2D gBufferTex;
 uniform vec3 lightColor;
 

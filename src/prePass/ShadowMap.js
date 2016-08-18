@@ -179,7 +179,7 @@ define(function(require) {
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
-                            depthShader.define('vertex', 'JOINT_NUMBER', nJoints);
+                            depthShader.define('vertex', 'JOINT_COUNT', nJoints);
                         }
                         if (isShadowTransparent) {
                             depthShader.define('both', 'SHADOW_TRANSPARENT');
@@ -228,7 +228,7 @@ define(function(require) {
                         });
                         if (nJoints > 0) {
                             distanceMaterial.shader.define('vertex', 'SKINNING');
-                            distanceMaterial.shader.define('vertex', 'JOINT_NUMBER', nJoints);
+                            distanceMaterial.shader.define('vertex', 'JOINT_COUNT', nJoints);
                         }
                         this._distanceMaterials[nJoints] = distanceMaterial;
                     }
@@ -389,7 +389,7 @@ define(function(require) {
                     var shaderNeedsUpdate = false;
                     for (var lightType in this._shadowMapNumber) {
                         var number = this._shadowMapNumber[lightType];
-                        var key = lightType + '_SHADOWMAP_NUMBER';
+                        var key = lightType + '_SHADOWMAP_COUNT';
 
                         if (shader.fragmentDefines[key] !== number && number > 0) {
                             shader.fragmentDefines[key] = number;
@@ -789,9 +789,9 @@ define(function(require) {
                 if (mesh.material && mesh.material.shader) {
                     var material = mesh.material;
                     var shader = material.shader;
-                    shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_NUMBER');
-                    shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_NUMBER');
-                    shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_NUMBER');
+                    shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
+                    shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
+                    shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
                     material.set('shadowEnabled', 0);
                 }
             }

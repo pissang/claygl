@@ -74,7 +74,7 @@ define(function(require) {
          * @return {Array.<qtek.Mesh>}
          */
         parse: function(data) {
-            
+
             var geometryList = this._parseGeometry(data);
 
             var dSkinIndices = data.skinIndices;
@@ -113,7 +113,7 @@ define(function(require) {
                     meshList.push(mesh);
                 }
             }
-            
+
             this.trigger('success', meshList);
 
             return meshList;
@@ -123,7 +123,7 @@ define(function(require) {
 
             var geometryList = [];
             var cursorList = [];
-            
+
             for (var i = 0; i < data.materials.length; i++) {
                 geometryList[i] = null;
                 cursorList[i] = 0;
@@ -177,7 +177,7 @@ define(function(require) {
             var isNew = [];
             function getNewIndex(oi, faceIndex) {
                 if ( newIndexMap[oi] >= 0) {
-                    // Switch to the geometry of existed index 
+                    // Switch to the geometry of existed index
                     currentGeometryIndex = geoIndexMap[oi];
                     geometry = geometryList[currentGeometryIndex];
                     attributes = geometry.attributes;
@@ -311,7 +311,7 @@ define(function(require) {
                             faceUvs[j][1] = uvLayer[uvIndex*2+1];
                         }
                         if (isQuad) {
-                            // Use array slice to clone array is incredibly faster than 
+                            // Use array slice to clone array is incredibly faster than
                             // Construct from Float32Array
                             // http://jsperf.com/typedarray-v-s-array-clone/2
                             isNew[0] && (texcoords[i][i1] = faceUvs[0].slice());
@@ -495,7 +495,7 @@ define(function(require) {
                     shader.enableTexture(enabledTextures[i]);
                 }
                 shader.define('vertex', 'SKINNING');
-                shader.define('vertex', 'JOINT_NUMBER', jointNumber);
+                shader.define('vertex', 'JOINT_COUNT', jointNumber);
             }
 
             var material = new Material({
@@ -518,7 +518,7 @@ define(function(require) {
             if (mConfig.depthWrite !== undefined) {
                 material.depthMask = mConfig.depthWrite;
             }
-            
+
             if (mConfig.transparency && mConfig.transparency < 1) {
                 material.set('opacity', mConfig.transparency);
             }

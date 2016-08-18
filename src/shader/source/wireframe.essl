@@ -10,7 +10,7 @@ attribute vec3 barycentric;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 varying vec3 v_Barycentric;

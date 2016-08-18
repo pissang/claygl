@@ -14,7 +14,7 @@ attribute vec3 barycentric;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 varying vec2 v_Texcoord;
@@ -26,7 +26,7 @@ void main()
 
 #ifdef SKINNING
     @import buildin.chunk.skin_matrix
-    
+
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
 
@@ -66,14 +66,14 @@ void main()
 #endif
 
     gl_FragColor = vec4(color, alpha);
-    
+
 #ifdef DIFFUSEMAP_ENABLED
     vec4 tex = texture2D( diffuseMap, v_Texcoord );
 
 #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));
 #endif
-    
+
 #if defined(DIFFUSEMAP_ALPHA_ALPHA)
     gl_FragColor.a = tex.a;
 #endif

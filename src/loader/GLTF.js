@@ -208,7 +208,7 @@ define(function(require) {
                         for (var name in lib.skeletons) {
                             lib.skeletons[name].addClip(clip);
                         }
-                    }   
+                    }
                 }
 
                 self.trigger('success', {
@@ -341,7 +341,7 @@ define(function(require) {
                         var material = node.material;
                         material.shader = material.shader.clone();
                         material.shader.define('vertex', 'SKINNING');
-                        material.shader.define('vertex', 'JOINT_NUMBER', jointIndices.length);
+                        material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
                     } else {
                         // Mesh have multiple primitives
                         for (var i = 0; i < node._children.length; i++) {
@@ -352,7 +352,7 @@ define(function(require) {
                                 var material = child.material;
                                 material.shader = material.shader.clone();
                                 material.shader.define('vertex', 'SKINNING');
-                                material.shader.define('vertex', 'JOINT_NUMBER', jointIndices.length);
+                                material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
                             }
                         }
                     }
@@ -384,7 +384,7 @@ define(function(require) {
                 }
                 skeleton.update();
             }
-        },     
+        },
 
         _parseTextures: function(json, lib) {
             var root = this.textureRootPath || this.rootPath;
@@ -399,7 +399,7 @@ define(function(require) {
                             // DEPRECATED, sampler parameter now use gl enum instead of string
                             value = glenum[value];
                         }
-                        parameters[name] = value;   
+                        parameters[name] = value;
                     }
                 });
 
@@ -594,7 +594,7 @@ define(function(require) {
                             }
                         }
                     }
-                    
+
                     // Parse indices
                     var indicesInfo = json.accessors[primitiveInfo.indices];
 
@@ -705,12 +705,12 @@ define(function(require) {
                             } else {
                                 node = new Node();
                                 node.setName(nodeInfo.name);
-                                for (var j = 0; j < primitives.length; j++) {                            
+                                for (var j = 0; j < primitives.length; j++) {
                                     if (nodeInfo.instanceSkin) {
                                         primitives[j].skeleton = nodeInfo.instanceSkin.skin;
                                     }
                                     node.add(primitives[j]);
-                                }   
+                                }
                             }
                         }
                     }

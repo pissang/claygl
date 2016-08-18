@@ -12,7 +12,7 @@ attribute vec2 texcoord : TEXCOORD_0;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 varying vec4 v_ViewPosition;
@@ -127,7 +127,7 @@ attribute vec3 position : POSITION;
 attribute vec3 boneWeight;
 attribute vec4 boneIndex;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 varying vec3 v_WorldPosition;
@@ -169,35 +169,35 @@ void main(){
 
 @export buildin.plugin.compute_shadow_map
 
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER) || defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
-#ifdef SPOT_LIGHT_SHADOWMAP_NUMBER
-uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_NUMBER];
-uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_NUMBER];
+#ifdef SPOT_LIGHT_SHADOWMAP_COUNT
+uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
 #endif
 
-#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER
+#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
 #if defined(SHADOW_CASCADE)
 uniform sampler2D directionalLightShadowMaps[SHADOW_CASCADE];
 uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
 uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
 uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
 #else
-uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
-uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER];
+uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
 #endif
 #endif
 
-#ifdef POINT_LIGHT_SHADOWMAP_NUMBER
-uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_NUMBER];
-uniform float pointLightRanges[POINT_LIGHT_SHADOWMAP_NUMBER];
+#ifdef POINT_LIGHT_SHADOWMAP_COUNT
+uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
+uniform float pointLightRanges[POINT_LIGHT_SHADOWMAP_COUNT];
 #endif
 
 uniform bool shadowEnabled : true;
 
 @import buildin.util.decode_float
 
-#if defined(DIRECTIONAL_LIGHT_NUMBER) || defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(DIRECTIONAL_LIGHT_COUNT) || defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
@@ -261,7 +261,7 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position){
 
 #endif
 
-#ifdef POINT_LIGHT_SHADOWMAP_NUMBER
+#ifdef POINT_LIGHT_SHADOWMAP_COUNT
 
 float computeShadowOfCube(samplerCube map, vec3 direction, float range){
     vec4 shadowTex = textureCube(map, direction);
@@ -287,15 +287,15 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
 }
 #endif
 
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
-void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_NUMBER] ){
-    for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_NUMBER; i++){
+void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ){
+    for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_COUNT; i++){
         float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
-    for(int i = SPOT_LIGHT_SHADOWMAP_NUMBER; i < SPOT_LIGHT_NUMBER; i++){
+    for(int i = SPOT_LIGHT_SHADOWMAP_COUNT; i < SPOT_LIGHT_COUNT; i++){
         shadowContribs[i] = 1.0;
     }
 }
@@ -303,11 +303,11 @@ void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LI
 #endif
 
 
-#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
 
 #ifdef SHADOW_CASCADE
 
-void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){
     // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
     float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
                     / (gl_DepthRange.far - gl_DepthRange.near);
@@ -327,20 +327,20 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
         }
     }
     // set default fallof of rest lights
-    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; i < DIRECTIONAL_LIGHT_COUNT; i++){
         shadowContribs[i] = 1.0;
     }
 }
 
 #else
 
-void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_NUMBER]){
-    for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i++){
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){
+    for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; i++){
         float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
-    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER; i < DIRECTIONAL_LIGHT_NUMBER; i++){
+    for(int i = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; i < DIRECTIONAL_LIGHT_COUNT; i++){
         shadowContribs[i] = 1.0;
     }
 }
@@ -349,15 +349,15 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
 #endif
 
 
-#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
-void computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_NUMBER] ){
-    for(int i = 0; i < POINT_LIGHT_SHADOWMAP_NUMBER; i++){
+void computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){
+    for(int i = 0; i < POINT_LIGHT_SHADOWMAP_COUNT; i++){
         vec3 lightPosition = pointLightPosition[i];
         vec3 direction = position - lightPosition;
         shadowContribs[i] = computeShadowOfCube(pointLightShadowMaps[i], direction, pointLightRanges[i]);
     }
-    for(int i = POINT_LIGHT_SHADOWMAP_NUMBER; i < POINT_LIGHT_NUMBER; i++){
+    for(int i = POINT_LIGHT_SHADOWMAP_COUNT; i < POINT_LIGHT_COUNT; i++){
         shadowContribs[i] = 1.0;
     }
 }

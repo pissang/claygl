@@ -211,7 +211,7 @@ define(function(require) {
                 for (symbol in light.uniformTemplates) {
 
                     var uniformTpl = light.uniformTemplates[symbol];
-                    if (! lightUniforms[symbol]) {
+                    if (!lightUniforms[symbol]) {
                         lightUniforms[symbol] = {
                             type: '',
                             value: []

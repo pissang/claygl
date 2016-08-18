@@ -25,7 +25,7 @@ attribute vec3 barycentric;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 varying vec2 v_Texcoord;
@@ -44,12 +44,12 @@ varying vec4 v_Color;
 
 void main()
 {
-    
+
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
     vec3 skinnedTangent = tangent.xyz;
 #ifdef SKINNING
-    
+
     @import buildin.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
@@ -65,7 +65,7 @@ void main()
     v_Barycentric = barycentric;
 
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
-    
+
 #ifdef NORMALMAP_ENABLED
     v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
@@ -112,16 +112,16 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
-#ifdef AMBIENT_LIGHT_NUMBER
+#ifdef AMBIENT_LIGHT_COUNT
 @import buildin.header.ambient_light
 #endif
-#ifdef POINT_LIGHT_NUMBER
+#ifdef POINT_LIGHT_COUNT
 @import buildin.header.point_light
 #endif
-#ifdef DIRECTIONAL_LIGHT_NUMBER
+#ifdef DIRECTIONAL_LIGHT_COUNT
 @import buildin.header.directional_light
 #endif
-#ifdef SPOT_LIGHT_NUMBER
+#ifdef SPOT_LIGHT_COUNT
 @import buildin.header.spot_light
 #endif
 
@@ -177,22 +177,22 @@ void main()
     vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
     vec3 specularTerm = vec3(0.0, 0.0, 0.0);
-    
-#ifdef AMBIENT_LIGHT_NUMBER
-    for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+
+#ifdef AMBIENT_LIGHT_COUNT
+    for(int i = 0; i < AMBIENT_LIGHT_COUNT; i++)
     {
         diffuseTerm += ambientLightColor[i];
     }
 #endif
-#ifdef POINT_LIGHT_NUMBER
-#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsPoint[POINT_LIGHT_NUMBER];
+#ifdef POINT_LIGHT_COUNT
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsPoint[POINT_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);
     }
 #endif
-    for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+    for(int i = 0; i < POINT_LIGHT_COUNT; i++)
     {
         vec3 lightPosition = pointLightPosition[i];
         vec3 lightColor = pointLightColor[i];
@@ -202,7 +202,7 @@ void main()
 
         // Calculate point light attenuation
         float dist = length(lightDirection);
-        float attenuation = lightAttenuation(dist, range); 
+        float attenuation = lightAttenuation(dist, range);
 
         // Normalize vectors
         lightDirection /= dist;
@@ -215,7 +215,7 @@ void main()
         ndl = clamp(ndl, 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
         if(shadowEnabled)
         {
             shadowContrib = shadowContribsPoint[i];
@@ -233,15 +233,15 @@ void main()
     }
 #endif
 
-#ifdef DIRECTIONAL_LIGHT_NUMBER
-#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsDir[DIRECTIONAL_LIGHT_NUMBER];
+#ifdef DIRECTIONAL_LIGHT_COUNT
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);
     }
 #endif
-    for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
+    for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)
     {
 
         vec3 lightDirection = -normalize(directionalLightDirection[i]);
@@ -256,7 +256,7 @@ void main()
         ndl = clamp(ndl, 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
         if(shadowEnabled)
         {
             shadowContrib = shadowContribsDir[i];
@@ -273,15 +273,15 @@ void main()
     }
 #endif
 
-#ifdef SPOT_LIGHT_NUMBER
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsSpot[SPOT_LIGHT_NUMBER];
+#ifdef SPOT_LIGHT_COUNT
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsSpot[SPOT_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);
     }
 #endif
-    for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)
     {
         vec3 lightPosition = spotLightPosition[i];
         vec3 spotLightDirection = -normalize(spotLightDirection[i]);
@@ -294,7 +294,7 @@ void main()
         vec3 lightDirection = lightPosition - v_WorldPosition;
         // Calculate attenuation
         float dist = length(lightDirection);
-        float attenuation = lightAttenuation(dist, range); 
+        float attenuation = lightAttenuation(dist, range);
 
         // Normalize light direction
         lightDirection /= dist;
@@ -315,7 +315,7 @@ void main()
         ndl = clamp(ndl, 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
         if (shadowEnabled)
         {
             shadowContrib = shadowContribsSpot[i];

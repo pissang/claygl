@@ -291,7 +291,7 @@ define(function(require) {
                 var subShader = shaders[subJointNumber];
                 if (!subShader) {
                     subShader = shader.clone();
-                    subShader.define('vertex', 'JOINT_NUMBER', subJointNumber);
+                    subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
                     shaders[subJointNumber] = subShader;
                 }
                 var subMat = new Material({

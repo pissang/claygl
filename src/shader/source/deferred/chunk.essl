@@ -29,9 +29,13 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     vec3 N = tex.rgb * 2.0 - 1.0;
 
 #ifdef DEPTH_ENCODED
-    // FXIME premultiplied alpha?
     vec4 depthTexel = texture2D(depthTex, uv);
+
+// FXIME premultiplied alpha?
+// FIXME Mobile and PC are different(mobile don't need it)
+#ifdef PREMULTIPLIED_ALPHA
     depthTexel.rgb /= depthTexel.a;
+#endif
     float z = decodeFloat(depthTexel) * 2.0 - 1.0;
 #else
     // Depth buffer range is 0.0 - 1.0

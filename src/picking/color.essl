@@ -8,7 +8,7 @@ attribute vec3 position : POSITION;
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-uniform mat4 skinMatrix[JOINT_NUMBER] : SKIN_MATRIX;
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
 void main(){
@@ -16,7 +16,7 @@ void main(){
     vec3 skinnedPosition = position;
 
     #ifdef SKINNING
-        
+
         @import buildin.chunk.skin_matrix
 
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;

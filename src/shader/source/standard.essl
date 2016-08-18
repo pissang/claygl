@@ -41,16 +41,16 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
-#ifdef AMBIENT_LIGHT_NUMBER
+#ifdef AMBIENT_LIGHT_COUNT
 @import buildin.header.ambient_light
 #endif
-#ifdef POINT_LIGHT_NUMBER
+#ifdef POINT_LIGHT_COUNT
 @import buildin.header.point_light
 #endif
-#ifdef DIRECTIONAL_LIGHT_NUMBER
+#ifdef DIRECTIONAL_LIGHT_COUNT
 @import buildin.header.directional_light
 #endif
-#ifdef SPOT_LIGHT_NUMBER
+#ifdef SPOT_LIGHT_COUNT
 @import buildin.header.spot_light
 #endif
 
@@ -144,26 +144,26 @@ void main()
     vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
     vec3 specularTerm = vec3(0.0, 0.0, 0.0);
-    
+
     vec3 fresnelTerm = F_Schlick(clamp(dot(N, V), 0.0, 1.0), spec);
-    
-#ifdef AMBIENT_LIGHT_NUMBER
-    for(int i = 0; i < AMBIENT_LIGHT_NUMBER; i++)
+
+#ifdef AMBIENT_LIGHT_COUNT
+    for(int i = 0; i < AMBIENT_LIGHT_COUNT; i++)
     {
         // Hemisphere ambient lighting from cryengine
         diffuseTerm += ambientLightColor[i] * (clamp(N.y * 0.7, 0.0, 1.0) + 0.3);
         // diffuseTerm += ambientLightColor[i];
     }
 #endif
-#ifdef POINT_LIGHT_NUMBER
-#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsPoint[POINT_LIGHT_NUMBER];
+#ifdef POINT_LIGHT_COUNT
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsPoint[POINT_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);
     }
 #endif
-    for(int i = 0; i < POINT_LIGHT_NUMBER; i++)
+    for(int i = 0; i < POINT_LIGHT_COUNT; i++)
     {
 
         vec3 lightPosition = pointLightPosition[i];
@@ -181,7 +181,7 @@ void main()
         float ndh = clamp(dot(N, H), 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(POINT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
         if(shadowEnabled)
         {
             shadowContrib = shadowContribsPoint[i];
@@ -194,15 +194,15 @@ void main()
     }
 #endif
 
-#ifdef DIRECTIONAL_LIGHT_NUMBER
-#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsDir[DIRECTIONAL_LIGHT_NUMBER];
+#ifdef DIRECTIONAL_LIGHT_COUNT
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);
     }
 #endif
-    for(int i = 0; i < DIRECTIONAL_LIGHT_NUMBER; i++)
+    for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)
     {
 
         vec3 L = -normalize(directionalLightDirection[i]);
@@ -213,7 +213,7 @@ void main()
         float ndh = clamp(dot(N, H), 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_NUMBER)
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
         if(shadowEnabled)
         {
             shadowContrib = shadowContribsDir[i];
@@ -227,15 +227,15 @@ void main()
     }
 #endif
 
-#ifdef SPOT_LIGHT_NUMBER
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
-    float shadowContribsSpot[SPOT_LIGHT_NUMBER];
+#ifdef SPOT_LIGHT_COUNT
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
+    float shadowContribsSpot[SPOT_LIGHT_COUNT];
     if(shadowEnabled)
     {
         computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);
     }
 #endif
-    for(int i = 0; i < SPOT_LIGHT_NUMBER; i++)
+    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)
     {
         vec3 lightPosition = spotLightPosition[i];
         vec3 spotLightDirection = -normalize(spotLightDirection[i]);
@@ -248,7 +248,7 @@ void main()
         vec3 L = lightPosition - v_WorldPosition;
         // Calculate attenuation
         float dist = length(L);
-        float attenuation = lightAttenuation(dist, range); 
+        float attenuation = lightAttenuation(dist, range);
 
         // Normalize light direction
         L /= dist;
@@ -265,7 +265,7 @@ void main()
         float ndh = clamp(dot(N, H), 0.0, 1.0);
 
         float shadowContrib = 1.0;
-#if defined(SPOT_LIGHT_SHADOWMAP_NUMBER)
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
         if (shadowEnabled)
         {
             shadowContrib = shadowContribsSpot[i];
