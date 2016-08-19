@@ -43,7 +43,6 @@ uniform float lineWidth : 1.0;
 
 varying vec3 v_Barycentric;
 
-#extension GL_OES_standard_derivatives : enable
 
 @import buildin.util.edge_factor
 

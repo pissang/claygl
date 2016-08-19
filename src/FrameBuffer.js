@@ -1,7 +1,7 @@
 define(function(require) {
-    
+
     'use strict';
-    
+
     var Base = require('./core/Base');
     var TextureCube = require('./TextureCube');
     var glinfo = require('./core/glinfo');
@@ -45,7 +45,7 @@ define(function(require) {
 
         this._attachedTextures = {};
     },
-    
+
     /**@lends qtek.FrameBuffer.prototype. */
     {
 
@@ -69,14 +69,14 @@ define(function(require) {
             var _gl = renderer.gl;
 
             if (!this._binded) {
-                _gl.bindFramebuffer(GL_FRAMEBUFFER, this.getFrameBuffer(_gl));
+                _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
                 this._binded = true;
             }
             var cache = this._cache;
 
             cache.put('viewport', renderer.viewport);
             renderer.setViewport(0, 0, this._width, this._height, 1);
-            if (! cache.get(KEY_DEPTHTEXTURE_ATTACHED) && this.depthBuffer) {
+            if (!cache.get(KEY_DEPTHTEXTURE_ATTACHED) && this.depthBuffer) {
                 // Create a new render buffer
                 if (cache.miss(KEY_RENDERBUFFER)) {
                     cache.put(KEY_RENDERBUFFER, _gl.createRenderbuffer());
@@ -91,9 +91,9 @@ define(function(require) {
                     _gl.renderbufferStorage(GL_RENDERBUFFER, _gl.DEPTH_COMPONENT16, width, height);
                     cache.put(KEY_RENDERBUFFER_WIDTH, width);
                     cache.put(KEY_RENDERBUFFER_HEIGHT, height);
-                    _gl.bindRenderbuffer(GL_RENDERBUFFER, null);                 
+                    _gl.bindRenderbuffer(GL_RENDERBUFFER, null);
                 }
-                if (! cache.get(KEY_RENDERBUFFER_ATTACHED)) {
+                if (!cache.get(KEY_RENDERBUFFER_ATTACHED)) {
                     _gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
                     cache.put(KEY_RENDERBUFFER_ATTACHED, true);
                 }
@@ -105,7 +105,7 @@ define(function(require) {
          */
         unbind: function(renderer) {
             var _gl = renderer.gl;
-            
+
             _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
             this._binded = false;
 
@@ -122,7 +122,7 @@ define(function(require) {
             // Here update the mipmaps of texture each time after rendered;
             for (var attachment in this._attachedTextures) {
                 var texture = this._attachedTextures[attachment];
-                if (! texture.NPOT && texture.useMipmap) {
+                if (!texture.NPOT && texture.useMipmap) {
                     var target = texture instanceof TextureCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                     _gl.generateMipmap(target);
@@ -131,7 +131,7 @@ define(function(require) {
             }
         },
 
-        getFrameBuffer: function(_gl) {
+        _getFrameBufferGL: function(_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
 
@@ -148,16 +148,16 @@ define(function(require) {
          * @param  {qtek.Texture} texture
          * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
          * @param  {number} [target=gl.TEXTURE_2D]
-         * @param  {number} [mipmapLevel=0]
          */
-        attach: function(_gl, texture, attachment, target, mipmapLevel) {
+        // FIXME First parameter should be renderer?
+        attach: function (_gl, texture, attachment, target) {
 
-            if (! texture.width) {
+            if (!texture.width) {
                 throw new Error('The texture attached to color buffer is not a valid.');
             }
 
             if (!this._binded) {
-                _gl.bindFramebuffer(GL_FRAMEBUFFER, this.getFrameBuffer(_gl));
+                _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
                 this._binded = true;
             }
 
@@ -169,8 +169,7 @@ define(function(require) {
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
             attachment = attachment || GL_COLOR_ATTACHMENT0;
             target = target || _gl.TEXTURE_2D;
-            mipmapLevel = mipmapLevel || 0;
-            
+
             if (attachment === GL_DEPTH_ATTACHMENT) {
 
                 var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
@@ -189,7 +188,8 @@ define(function(require) {
 
             this._attachedTextures[attachment] = texture;
 
-            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), mipmapLevel);
+            // Mipmap level can only be 0
+            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), 0);
         },
         // TODO
         detach: function() {},

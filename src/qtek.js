@@ -88,6 +88,7 @@ define(function(require) {
 	"Light": require('./Light'),
 	"light": {
 		"Ambient": require('./light/Ambient'),
+		"AmbientSH": require('./light/AmbientSH'),
 		"Directional": require('./light/Directional'),
 		"Point": require('./light/Point'),
 		"Sphere": require('./light/Sphere'),
@@ -159,8 +160,10 @@ define(function(require) {
 	"Texture2D": require('./Texture2D'),
 	"TextureCube": require('./TextureCube'),
 	"util": {
+		"cubemap": require('./util/cubemap'),
 		"dds": require('./util/dds'),
 		"delaunay": require('./util/delaunay'),
+		"earClipping": require('./util/earClipping'),
 		"hdr": require('./util/hdr'),
 		"mesh": require('./util/mesh'),
 		"texture": require('./util/texture')

@@ -56,8 +56,6 @@ uniform float slopeScale : 1.0;
 uniform sampler2D transparentMap;
 #endif
 
-#extension GL_OES_standard_derivatives : enable
-
 @import buildin.util.encode_float
 
 void main(){

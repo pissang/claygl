@@ -1,10 +1,9 @@
-define(function(require) {
+define(function (require) {
 
     var Mesh = require('../Mesh');
     var SphereGeometry = require('../geometry/Sphere');
     var Shader = require('../Shader');
     var Material = require('../Material');
-    var shaderLibrary = require('../shader/library');
 
     var skydomeShader;
 
@@ -19,7 +18,7 @@ define(function(require) {
      *     });
      *     skydome.material.set('diffuseMap', skyTex);
      */
-    var Skydome = Mesh.derive(function() {
+    var Skydome = Mesh.derive(function () {
 
         if (!skydomeShader) {
             skydomeShader = new Shader({
@@ -33,7 +32,7 @@ define(function(require) {
             shader: skydomeShader,
             depthMask: false
         });
-        
+
         return {
             /**
              * @type {qtek.Scene}
@@ -49,7 +48,7 @@ define(function(require) {
             material: material,
             culling: false
         };
-    }, function() {
+    }, function () {
         var scene = this.scene;
         if (scene) {
             this.attachScene(scene);
@@ -60,7 +59,7 @@ define(function(require) {
          * @param  {qtek.Scene} scene
          * @memberOf qtek.plugin.Skydome.prototype
          */
-        attachScene: function(scene) {
+        attachScene: function (scene) {
             if (this.scene) {
                 this.detachScene();
             }
@@ -71,21 +70,23 @@ define(function(require) {
          * Detach from scene
          * @memberOf qtek.plugin.Skydome.prototype
          */
-        detachScene: function() {
+        detachScene: function () {
             if (this.scene) {
-                this.scene.off('beforerender', this._beforeRenderScene, this);  
+                this.scene.off('beforerender', this._beforeRenderScene, this);
             }
             this.scene = null;
         },
 
-        _beforeRenderScene: function(renderer, scene, camera) {
+        _beforeRenderScene: function (renderer, scene, camera) {
             this.position.copy(camera.getWorldPosition());
             this.update();
             renderer.renderQueue([this], camera);
         },
 
-        dispose: function() {
+        dispose: function (gl) {
             this.detachScene();
+            this.geometry.dispose(gl);
+            this.material.dispose(gl);
         }
     });
 

@@ -3,15 +3,13 @@ define(function (require) {
     var Base = require('../core/Base');
     var Vector3 = require('../math/Vector3');
     var PerspectiveCamera = require('../camera/Perspective');
-    var glenum = require('../core/glenum');
     var FrameBuffer = require('../FrameBuffer');
-    var TextureCube = require('../TextureCube');
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
     /**
      * Pass rendering scene to a environment cube map
-     * 
+     *
      * @constructor qtek.prePass.EnvironmentMap
      * @extends qtek.core.Base
      * @example
@@ -58,24 +56,31 @@ define(function (require) {
              * @type {qtek.TextureCube}
              * @memberOf qtek.prePass.EnvironmentMap#
              */
-            texture: null
+            texture: null,
+
+            /**
+             * Mipmap Level. Userful when do cubemap prefiltering
+             * @type {number}
+             * @memberOf qtek.prePass.EnvironmentMap#
+             */
+            mipmapLevel: 0
 
             // frameBuffer: new FrameBuffer()
         };
-        ret._cameras = {
-            px: new PerspectiveCamera({fov: 90}),
-            nx: new PerspectiveCamera({fov: 90}),
-            py: new PerspectiveCamera({fov: 90}),
-            ny: new PerspectiveCamera({fov: 90}),
-            pz: new PerspectiveCamera({fov: 90}),
-            nz: new PerspectiveCamera({fov: 90})
+        var cameras = ret._cameras = {
+            px: new PerspectiveCamera({ fov: 90 }),
+            nx: new PerspectiveCamera({ fov: 90 }),
+            py: new PerspectiveCamera({ fov: 90 }),
+            ny: new PerspectiveCamera({ fov: 90 }),
+            pz: new PerspectiveCamera({ fov: 90 }),
+            nz: new PerspectiveCamera({ fov: 90 })
         };
-        ret._cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
-        ret._cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
-        ret._cameras.py.lookAt(Vector3.POSITIVE_Y, Vector3.POSITIVE_Z);
-        ret._cameras.ny.lookAt(Vector3.NEGATIVE_Y, Vector3.NEGATIVE_Z);
-        ret._cameras.pz.lookAt(Vector3.POSITIVE_Z, Vector3.NEGATIVE_Y);
-        ret._cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
+        cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
+        cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
+        cameras.py.lookAt(Vector3.POSITIVE_Y, Vector3.POSITIVE_Z);
+        cameras.ny.lookAt(Vector3.NEGATIVE_Y, Vector3.NEGATIVE_Z);
+        cameras.pz.lookAt(Vector3.POSITIVE_Z, Vector3.NEGATIVE_Y);
+        cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
 
         // FIXME In windows, use one framebuffer only renders one side of cubemap
         ret._frameBuffers = {
@@ -89,6 +94,13 @@ define(function (require) {
 
         return ret;
     }, {
+        /**
+         * @param  {string} target
+         * @return  {qtek.Camera}
+         */
+        getCamera: function (target) {
+            return this._cameras[target];
+        },
         /**
          * @param  {qtek.Renderer} renderer
          * @param  {qtek.Scene} scene
@@ -112,7 +124,8 @@ define(function (require) {
                 camera.fov = fov;
 
                 this._frameBuffers[target].attach(
-                    _gl, this.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
+                    _gl, this.texture, _gl.COLOR_ATTACHMENT0,
+                    _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
                 );
                 this._frameBuffers[target].bind(renderer);
                 renderer.render(scene, camera, true);
@@ -122,11 +135,10 @@ define(function (require) {
         /**
          * @param  {qtek.Renderer} renderer
          */
-        dispose: function(renderer) {
-            // this.frameBuffer.dispose(renderer.gl);
+        dispose: function(gl) {
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
-                this._frameBuffers[target].dispose(renderer.gl);
+                this._frameBuffers[target].dispose(gl);
             }
         }
     });

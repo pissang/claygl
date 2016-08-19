@@ -90,12 +90,20 @@ varying vec3 v_WorldPosition;
 #ifdef NORMALMAP_ENABLED
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
+uniform sampler2D normalMap;
 #endif
 
+#ifdef DIFFUSEMAP_ENABLED
 uniform sampler2D diffuseMap;
-uniform sampler2D normalMap;
+#endif
+
+#ifdef SPECULARMAP_ENABLED
 uniform sampler2D specularMap;
+#endif
+
+#ifdef ENVIRONMENTMAP_ENABLED
 uniform samplerCube environmentMap;
+#endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
@@ -125,7 +133,6 @@ varying vec3 v_Barycentric;
 @import buildin.header.spot_light
 #endif
 
-#extension GL_OES_standard_derivatives : enable
 // Import util functions and uniforms needed
 @import buildin.util.calculate_attenuation
 
@@ -135,11 +142,6 @@ varying vec3 v_Barycentric;
 
 void main()
 {
-#ifdef RENDER_TEXCOORD
-    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
-    return;
-#endif
-
     vec4 finalColor = vec4(color, alpha);
 
     vec3 eyePos = viewInverse[3].xyz;
@@ -166,11 +168,6 @@ void main()
     normal = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
     mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
     normal = normalize(tbn * normal);
-#endif
-
-#ifdef RENDER_NORMAL
-    gl_FragColor = vec4(normal, 1.0);
-    return;
 #endif
 
     // Diffuse part of all lights
@@ -337,8 +334,8 @@ void main()
     finalColor.rgb += emission;
 
 #ifdef ENVIRONMENTMAP_ENABLED
-    vec3 envTex = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
-    finalColor.rgb = finalColor.rgb + envTex * reflectivity;
+    vec3 envTexel = textureCube(environmentMap, reflect(-viewDirection, normal)).xyz;
+    finalColor.rgb = finalColor.rgb + envTexel * reflectivity;
 #endif
 
     if(lineWidth > 0.01)

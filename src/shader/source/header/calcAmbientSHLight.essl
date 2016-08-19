@@ -1,0 +1,12 @@
+vec3 calcAmbientSHLight(int idx, vec3 N) {
+    int offset = 9 * idx;
+    return ambientSHLightCoefficients[offset + 0]
+        + ambientSHLightCoefficients[offset + 1] * N.x
+        + ambientSHLightCoefficients[offset + 2] * N.y
+        + ambientSHLightCoefficients[offset + 3] * N.z
+        + ambientSHLightCoefficients[offset + 4] * N.x * N.z
+        + ambientSHLightCoefficients[offset + 5] * N.z * N.y
+        + ambientSHLightCoefficients[offset + 6] * N.y * N.x
+        + ambientSHLightCoefficients[offset + 7] * (3.0 * N.z * N.z - 1.0)
+        + ambientSHLightCoefficients[offset + 8] * (N.x * N.x - N.y * N.y);
+}

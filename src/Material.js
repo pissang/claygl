@@ -16,7 +16,7 @@ define(function(require) {
          * @type {string}
          */
         name: '',
-        
+
         /**
          * @type {Object}
          */
@@ -42,7 +42,7 @@ define(function(require) {
          */
         transparent: false,
         /**
-         * Blend func is a callback function when the material 
+         * Blend func is a callback function when the material
          * have custom blending
          * The gl context will be the only argument passed in tho the
          * blend function
@@ -87,7 +87,7 @@ define(function(require) {
                 // When binding two materials with the same shader
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
-                // 
+                //
                 // FIXME Small possibility enabledUniforms are not the same
                 if (sameShader) {
                     if (prevMaterial.uniforms[symbol].value === uniformValue) {
@@ -121,7 +121,8 @@ define(function(require) {
                     // Maybe texture is not loaded yet;
                     if (texture.isRenderable()) {
                         texture.bind(_gl);
-                    } else {
+                    }
+                    else {
                         // Bind texture to null
                         texture.unbind(_gl);
                     }
@@ -147,7 +148,8 @@ define(function(require) {
                             // Maybe texture is not loaded yet;
                             if (texture.isRenderable()) {
                                 texture.bind(_gl);
-                            } else {
+                            }
+                            else {
                                 texture.unbind(_gl);
                             }
 
@@ -155,7 +157,8 @@ define(function(require) {
                         }
 
                         this.shader.setUniform(_gl, '1iv', symbol, arr);
-                    } else {
+                    }
+                    else {
                         this.shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                     }
                 }
@@ -188,7 +191,7 @@ define(function(require) {
 
         /**
          * Enable a uniform
-         * It only have effect on the uniform exists in shader. 
+         * It only have effect on the uniform exists in shader.
          * @param  {string} symbol
          */
         enableUniform: function(symbol) {
@@ -228,7 +231,8 @@ define(function(require) {
                     var val = symbol[key];
                     this.set(key, val);
                 }
-            } else {
+            }
+            else {
                 var uniform = this.uniforms[symbol];
                 if (uniform) {
                     uniform.value = value;

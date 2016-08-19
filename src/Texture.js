@@ -142,7 +142,7 @@ define(function (require) {
                 this.useMipmap = false;
             }
 
-            if (! isPowerOfTwo || ! this.useMipmap) {
+            if (!isPowerOfTwo || !this.useMipmap) {
                 // none-power of two flag
                 this.NPOT = true;
                 // Save the original value for restore

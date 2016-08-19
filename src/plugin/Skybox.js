@@ -1,3 +1,4 @@
+// TODO Should not derived from mesh?
 define(function(require) {
 
     var Mesh = require('../Mesh');
@@ -25,11 +26,11 @@ define(function(require) {
      *     });
      *     skybox.material.set('environmentMap', skyTex);
      */
-    var Skybox = Mesh.derive(function() {
+    var Skybox = Mesh.derive(function () {
 
         if (!skyboxShader) {
             skyboxShader = new Shader({
-                vertex: Shader.source('buildin.skybox.vertex'), 
+                vertex: Shader.source('buildin.skybox.vertex'),
                 fragment: Shader.source('buildin.skybox.fragment')
             });
         }
@@ -37,7 +38,7 @@ define(function(require) {
             shader: skyboxShader,
             depthMask: false
         });
-        
+
         return {
             /**
              * @type {qtek.Scene}
@@ -49,7 +50,7 @@ define(function(require) {
             material: material,
             culling: false
         };
-    }, function() {
+    }, function () {
         var scene = this.scene;
         if (scene) {
             this.attachScene(scene);
@@ -60,7 +61,7 @@ define(function(require) {
          * @param  {qtek.Scene} scene
          * @memberOf qtek.plugin.Skybox.prototype
          */
-        attachScene: function(scene) {
+        attachScene: function (scene) {
             if (this.scene) {
                 this.detachScene();
             }
@@ -71,15 +72,21 @@ define(function(require) {
          * Detach from scene
          * @memberOf qtek.plugin.Skybox.prototype
          */
-        detachScene: function() {
+        detachScene: function () {
             if (this.scene) {
-                this.scene.off('beforerender', this._beforeRenderScene, this);  
+                this.scene.off('beforerender', this._beforeRenderScene, this);
             }
             this.scene = null;
         },
 
-        dispose: function() {
+        /**
+         * Dispose skybox
+         * @param  {WebGLRenderingContext} gl
+         */
+        dispose: function (gl) {
             this.detachScene();
+            this.geometry.dispose(gl);
+            this.material.dispose(gl);
         },
 
         _beforeRenderScene: function(renderer, scene, camera) {

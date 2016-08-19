@@ -87,7 +87,6 @@ varying vec3 v_Barycentric;
 @import buildin.header.spot_light
 #endif
 
-#extension GL_OES_standard_derivatives : enable
 // Import util functions and uniforms needed
 @import buildin.util.calculate_attenuation
 

@@ -1,4 +1,4 @@
-define(function () {
+define(function (require) {
     var uniformVec3Prefix = 'uniform vec3 ';
     var uniformFloatPrefix = 'uniform float ';
     var exportHeaderPrefix = '@export buildin.header.';
@@ -14,9 +14,11 @@ define(function () {
         uniformVec3Prefix + 'ambientLightColor[AMBIENT_LIGHT_COUNT]' + unconfigurable,
         exportEnd,
 
-        // exportHeaderPrefix + 'ambient_sh_light',
-        // uniformVec3Prefix + 'ambientLightColor[AMBIENT_SH_LIGHT_COUNT]' + unconfigurable,
-        // exportEnd,
+        exportHeaderPrefix + 'ambient_sh_light',
+        uniformVec3Prefix + 'ambientSHLightColor[AMBIENT_SH_LIGHT_COUNT]' + unconfigurable,
+        uniformVec3Prefix + 'ambientSHLightCoefficients[AMBIENT_SH_LIGHT_COUNT * 9]' + unconfigurable,
+        require('./calcAmbientSHLight.essl'),
+        exportEnd,
 
         exportHeaderPrefix + 'point_light',
         uniformVec3Prefix + 'pointLightPosition[POINT_LIGHT_COUNT]' + unconfigurable,

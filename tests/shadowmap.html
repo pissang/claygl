@@ -29,16 +29,24 @@
 
                 var light = new qtek.light.Spot({
                     position : new Vector3(0, 4, 4),
-                    intensity : 4.0,
-                    shadowBias : 0.002,
+                    intensity : 0.5,
+                    shadowBias : 0.001,
                     shadowResolution : 1024
                 });
                 scene.add(light);
 
+                var light2 = new qtek.light.Spot({
+                    position : new Vector3(0, 4, -4),
+                    intensity : 0.5,
+                    shadowBias : 0.001,
+                    shadowResolution : 1024
+                });
+                scene.add(light2);
+
                 var plane = new qtek.geometry.Plane({
                     widthSegments : 1,
                     heightSegments : 1
-                })
+                });
                 var shader = qtek.shader.library.get('buildin.phong');
 
                 var material = new qtek.Material({
@@ -76,15 +84,21 @@
 
                 // Shadow Map Pass
 
-                var time = 0;
                 var zeroVector = new Vector3();
                 var upAxis = new Vector3(0, 1, 0);
-                setInterval( function(){
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                // setInterval( function(){
+                animation.on('frame', function () {
                     light.rotateAround(zeroVector, upAxis, 0.01);
+                    light2.rotateAround(zeroVector, upAxis, -0.01);
                     light.lookAt(zeroVector);
+                    light2.lookAt(zeroVector);
                     shadowMapPass.render(renderer, scene, camera);
                     renderer.render(scene, camera);
-                }, 20);
+                });
+                // }, 1000);
 
             })
 

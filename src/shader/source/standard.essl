@@ -21,12 +21,24 @@ varying vec3 v_WorldPosition;
 #ifdef NORMALMAP_ENABLED
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
+uniform sampler2D normalMap;
 #endif
 
+#ifdef DIFFUSEMAP_ENABLED
 uniform sampler2D diffuseMap;
-uniform sampler2D normalMap;
+#endif
+
+#ifdef SPECULARMAP_ENABLED
 uniform sampler2D specularMap;
+#endif
+
+#ifdef ENVIRONMENTMAP_ENABLED
 uniform samplerCube environmentMap;
+#endif
+
+#ifdef BRDFLOOKUP_ENABLED
+uniform sampler2D brdfLookup;
+#endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
@@ -41,6 +53,11 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
+// Max mipmap level of environment map
+#ifdef ENVIRONMENTMAP_PREFILTER
+uniform float maxMipmapLevel: 5;
+#endif
+
 #ifdef AMBIENT_LIGHT_COUNT
 @import buildin.header.ambient_light
 #endif
@@ -53,8 +70,6 @@ varying vec3 v_Barycentric;
 #ifdef SPOT_LIGHT_COUNT
 @import buildin.header.spot_light
 #endif
-
-#extension GL_OES_standard_derivatives : enable
 
 // Import util functions and uniforms needed
 @import buildin.util.calculate_attenuation
@@ -93,12 +108,7 @@ float D_GGX(float g, float ndh) {
 
 void main()
 {
-#ifdef RENDER_TEXCOORD
-    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
-    return;
-#endif
-
-    vec4 finalColor = vec4(color, alpha);
+    vec4 outColor = vec4(color, alpha);
 
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
@@ -109,9 +119,9 @@ void main()
 #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));
 #endif
-    finalColor.rgb *= tex.rgb;
+    outColor.rgb *= tex.rgb;
 #ifdef DIFFUSEMAP_ALPHA_ALPHA
-    finalColor.a *= tex.a;
+    outColor.a *= tex.a;
 #endif
 #ifdef DIFFUSEMAP_ALPHA_GLOSS
     g *= tex.a;
@@ -130,31 +140,28 @@ void main()
     N = normalize(tbn * N);
 #endif
 
-#ifdef RENDER_NORMAL
-    gl_FragColor = vec4(N, 1.0);
-    return;
-#endif
-
-#ifdef RENDER_GLOSSINESS
-    gl_FragColor = vec4(vec3(g), 1.0);
-    return;
-#endif
-
     // Diffuse part of all lights
     vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);
     // Specular part of all lights
     vec3 specularTerm = vec3(0.0, 0.0, 0.0);
 
-    vec3 fresnelTerm = F_Schlick(clamp(dot(N, V), 0.0, 1.0), spec);
+    float ndv = clamp(dot(N, V), 0.0, 1.0);
+    vec3 fresnelTerm = F_Schlick(ndv, spec);
 
 #ifdef AMBIENT_LIGHT_COUNT
     for(int i = 0; i < AMBIENT_LIGHT_COUNT; i++)
     {
-        // Hemisphere ambient lighting from cryengine
-        diffuseTerm += ambientLightColor[i] * (clamp(N.y * 0.7, 0.0, 1.0) + 0.3);
-        // diffuseTerm += ambientLightColor[i];
+        diffuseTerm += ambientLightColor[i];
     }
 #endif
+
+#ifdef AMBIENT_SH_LIGHT_COUNT
+    for(int i = 0; i < AMBIENT_LIGHT_COUNT; i++)
+    {
+        diffuseTerm += calcAmbientSHLight(i) * ambientSHLightColor[i];
+    }
+#endif
+
 #ifdef POINT_LIGHT_COUNT
 #if defined(POINT_LIGHT_SHADOWMAP_COUNT)
     float shadowContribsPoint[POINT_LIGHT_COUNT];
@@ -279,24 +286,43 @@ void main()
     }
 #endif
 
-    finalColor.rgb *= diffuseTerm;
-    finalColor.rgb += specularTerm;
-    finalColor.rgb += emission;
+    outColor.rgb *= diffuseTerm;
+    outColor.rgb += specularTerm;
+    outColor.rgb += emission;
 
 #ifdef ENVIRONMENTMAP_ENABLED
-    vec3 envTex = textureCube(environmentMap, reflect(-V, N)).xyz;;
-    finalColor.rgb = finalColor.rgb + envTex * g * fresnelTerm;
+
+    vec3 envWeight = g * fresnelTerm;
+
+    #ifdef ENVIRONMENTMAP_PREFILTER
+    // FIXME simply 1 minus roughness ?
+    float roughness = clamp(1.0 - glossiness, 0.0, 1.0);
+    float bias = roughness * maxMipmapLevel;
+    vec3 L = reflect(-V, N);
+    vec3 envTexel = textureCubeLodEXT(environmentMap, L, bias).rgb;
+
+        #ifdef BRDFLOOKUP_ENABLED
+    vec2 brdfParam = texture2D(brdfLookup, vec2(roughness, ndv)).xy;
+    envWeight = spec * brdfParam.x + brdfParam.y;
+        #endif
+
+    #else
+    vec3 envTexel = textureCube(environmentMap, reflect(-V, N)).xyz;
+    #endif
+
+    outColor.rgb = outColor.rgb + envTexel * envWeight;
 #endif
 
     if(lineWidth > 0.)
     {
-        finalColor.rgb = finalColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+        outColor.rgb = outColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
 
 #ifdef GAMMA_ENCODE
-    finalColor.rgb = pow(finalColor.rgb, vec3(1 / 2.2));
+    outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));
 #endif
-    gl_FragColor = finalColor;
+
+    gl_FragColor = outColor;
 }
 
 @end

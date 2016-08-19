@@ -132,7 +132,8 @@ define(function(require) {
             if (this.image) {
                 width = this.image.width;
                 height = this.image.height;
-            } else {
+            }
+            else {
                 width = this.width;
                 height = this.height;
             }
@@ -145,8 +146,9 @@ define(function(require) {
                 return this.image.nodeName === 'CANVAS'
                     || this.image.nodeName === 'VIDEO'
                     || this.image.complete;
-            } else {
-                return this.width && this.height;
+            }
+            else {
+                return !!(this.width && this.height);
             }
         },
 

@@ -147,7 +147,6 @@ uniform float alpha : 1.0;
 
 uniform vec3 specularColor : [0.56, 0.57, 0.58];
 uniform float roughness : 0;
-uniform float envMapSize : 128;
 uniform float mipmapLevels: 8;
 
 #extension GL_EXT_shader_texture_lod : enable

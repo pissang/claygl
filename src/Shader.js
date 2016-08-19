@@ -165,6 +165,12 @@ define(function(require) {
              */
             fragmentDefines: {},
 
+            /**
+             * Enabled xtensions
+             * @type {Array.<string>}
+             */
+            extensions: ['GL_OES_standard_derivatives'],
+
             // Glue code
             // Defines the each type light number in the scene
             // AMBIENT_LIGHT
@@ -272,7 +278,7 @@ define(function(require) {
                 this._vertexPrev = this.vertex;
                 this._fragmentPrev = this.fragment;
             }
-            this._addDefine();
+            this._addDefineExtensionAndPrecision();
         },
 
         /**
@@ -601,8 +607,14 @@ define(function(require) {
 
         },
 
-        _addDefine: function() {
+        _addDefineExtensionAndPrecision: function() {
 
+            // Extension declaration must before all non-preprocessor codes
+            // TODO vertex ? extension enum ?
+            var extensionStr = [];
+            for (var i = 0; i < this.extensions.length; i++) {
+                extensionStr.push('#extension ' + this.extensions[i] + ' : enable');
+            }
             // Add defines
             // VERTEX
             var lightNumber = this.lightNumber;
@@ -657,7 +669,8 @@ define(function(require) {
             var code = defineStr.join('\n') + '\n' + this._fragmentProcessedNoDefine;
 
             // Add precision
-            this._fragmentProcessed = ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
+            this._fragmentProcessed = extensionStr.join('\n') + '\n'
+                + ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
         },
 
         _parseUniforms: function() {

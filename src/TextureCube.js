@@ -164,13 +164,14 @@ define(function(require) {
             if (this.image.px) {
                 return isPowerOfTwo(this.image.px.width)
                     && isPowerOfTwo(this.image.px.height);
-            } else {
+            }
+            else {
                 return isPowerOfTwo(this.width)
                     && isPowerOfTwo(this.height);
             }
 
             function isPowerOfTwo(value) {
-                return (value & (value-1)) === 0;
+                return (value & (value - 1)) === 0;
             }
         },
 
@@ -182,8 +183,9 @@ define(function(require) {
                     && isImageRenderable(this.image.ny)
                     && isImageRenderable(this.image.pz)
                     && isImageRenderable(this.image.nz);
-            } else {
-                return this.width && this.height;
+            }
+            else {
+                return !!(this.width && this.height);
             }
         },
 
