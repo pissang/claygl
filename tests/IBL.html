@@ -55,7 +55,6 @@
                         var shader = qtek.shader.library.get(
                             'buildin.standard', ['environmentMap', 'brdfLookup']
                         );
-                        shader.extensions.push('GL_EXT_shader_texture_lod');
                         shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
                         for (var i = 0; i < 10; i++) {
                             var material = new qtek.Material({

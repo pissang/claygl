@@ -54,7 +54,7 @@ define(function(require) {
             vertexDefines = option.vertexDefines || {};
             fragmentDefines = option.fragmentDefines || {};
         }
-        else if(option instanceof Array) {
+        else if (option instanceof Array) {
             enabledTextures = option;
         }
         var vertexDefineKeys = Object.keys(vertexDefines);

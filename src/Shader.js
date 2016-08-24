@@ -15,6 +15,7 @@ define(function(require) {
     var Cache = require('./core/Cache');
     var vendor = require('./core/vendor');
     var glMatrix = require('./dep/glmatrix');
+    var glInfo = require('./core/glinfo');
     var mat2 = glMatrix.mat2;
     var mat3 = glMatrix.mat3;
     var mat4 = glMatrix.mat4;
@@ -41,25 +42,25 @@ define(function(require) {
     };
 
     var uniformValueConstructor = {
-        'bool': function() {return true;},
-        'int': function() {return 0;},
-        'float': function() {return 0;},
-        'sampler2D': function() {return null;},
-        'samplerCube': function() {return null;},
+        'bool': function () {return true;},
+        'int': function () {return 0;},
+        'float': function () {return 0;},
+        'sampler2D': function () {return null;},
+        'samplerCube': function () {return null;},
 
-        'vec2': function() {return [0, 0];},
-        'vec3': function() {return [0, 0, 0];},
-        'vec4': function() {return [0, 0, 0, 0];},
+        'vec2': function () {return [0, 0];},
+        'vec3': function () {return [0, 0, 0];},
+        'vec4': function () {return [0, 0, 0, 0];},
 
-        'ivec2': function() {return [0, 0];},
-        'ivec3': function() {return [0, 0, 0];},
-        'ivec4': function() {return [0, 0, 0, 0];},
+        'ivec2': function () {return [0, 0];},
+        'ivec3': function () {return [0, 0, 0];},
+        'ivec4': function () {return [0, 0, 0, 0];},
 
-        'mat2': function() {return mat2.create();},
-        'mat3': function() {return mat3.create();},
-        'mat4': function() {return mat4.create();},
+        'mat2': function () {return mat2.create();},
+        'mat3': function () {return mat3.create();},
+        'mat4': function () {return mat4.create();},
 
-        'array': function() {return [];}
+        'array': function () {return [];}
     };
 
     var attribSemantics = [
@@ -128,7 +129,7 @@ define(function(require) {
      *     // Use alpha channel in diffuse texture
      *     shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
      */
-    var Shader = Base.derive(function() {
+    var Shader = Base.derive(function () {
         return /** @lends qtek.Shader# */ {
             /**
              * Vertex shader code
@@ -169,7 +170,10 @@ define(function(require) {
              * Enabled xtensions
              * @type {Array.<string>}
              */
-            extensions: ['GL_OES_standard_derivatives'],
+            extensions: [
+                'OES_standard_derivatives',
+                'EXT_shader_texture_lod'
+            ],
 
             // Glue code
             // Defines the each type light number in the scene
@@ -193,7 +197,7 @@ define(function(require) {
 
             _currentLocationsMap: {}
         };
-    }, function() {
+    }, function () {
 
         this._cache = new Cache();
 
@@ -233,7 +237,16 @@ define(function(require) {
             this._currentLocationsMap = cache.get('locations');
 
             if (cache.isDirty()) {
+                var availableExts = [];
+                var extensions = this.extensions;
+                for (var i = 0; i < extensions.length; i++) {
+                    if (glInfo.getExtension(_gl, extensions[i])) {
+                        availableExts.push(extensions[i]);
+                    }
+                }
+
                 this._updateShaderString();
+
                 var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
                 cache.fresh();
 
@@ -248,7 +261,7 @@ define(function(require) {
         /**
          * Mark dirty and update program in next frame
          */
-        dirty: function() {
+        dirty: function () {
             var cache = this._cache;
             cache.dirtyAll();
             for (var i = 0; i < cache._caches.length; i++) {
@@ -260,7 +273,7 @@ define(function(require) {
             }
         },
 
-        _updateShaderString: function() {
+        _updateShaderString: function (extensions) {
 
             if (this.vertex !== this._vertexPrev ||
                 this.fragment !== this._fragmentPrev) {
@@ -278,7 +291,8 @@ define(function(require) {
                 this._vertexPrev = this.vertex;
                 this._fragmentPrev = this.fragment;
             }
-            this._addDefineExtensionAndPrecision();
+
+            this._addDefineExtensionAndPrecision(extensions);
         },
 
         /**
@@ -359,7 +373,7 @@ define(function(require) {
          * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
          * @param  {string} symbol
          */
-        enableTexture: function(symbol) {
+        enableTexture: function (symbol) {
             var status = this._textureStatus[symbol];
             if (status) {
                 var isEnabled = status.enabled;
@@ -372,7 +386,7 @@ define(function(require) {
         /**
          * Enable all textures used in the shader
          */
-        enableTexturesAll: function() {
+        enableTexturesAll: function () {
             var textureStatus = this._textureStatus;
             for (var symbol in textureStatus) {
                 textureStatus[symbol].enabled = true;
@@ -384,7 +398,7 @@ define(function(require) {
          * Disable a texture, it remove a #define micro in the shader
          * @param  {string} symbol
          */
-        disableTexture: function(symbol) {
+        disableTexture: function (symbol) {
             var status = this._textureStatus[symbol];
             if (status) {
                 var isDisabled = ! status.enabled;
@@ -397,7 +411,7 @@ define(function(require) {
         /**
          * Disable all textures used in the shader
          */
-        disableTexturesAll: function() {
+        disableTexturesAll: function () {
             var textureStatus = this._textureStatus;
             for (var symbol in textureStatus) {
                 textureStatus[symbol].enabled = false;
@@ -409,8 +423,10 @@ define(function(require) {
          * @param  {string}  symbol
          * @return {boolean}
          */
-        isTextureEnabled: function(symbol) {
-            return this._textureStatus[symbol].enabled;
+        isTextureEnabled: function (symbol) {
+            var textureStatus = this._textureStatus;
+            return textureStatus[symbol]
+                && textureStatus[symbol].enabled;
         },
 
         getEnabledTextures: function () {
@@ -424,7 +440,7 @@ define(function(require) {
             return enabledTextures;
         },
 
-        hasUniform: function(symbol) {
+        hasUniform: function (symbol) {
             var location = this._currentLocationsMap[symbol];
             return location !== null && location !== undefined;
         },
@@ -600,20 +616,21 @@ define(function(require) {
             return locationList;
         },
 
-        _parseImport: function() {
+        _parseImport: function () {
 
             this._vertexProcessedNoDefine = Shader.parseImport(this.vertex);
             this._fragmentProcessedNoDefine = Shader.parseImport(this.fragment);
 
         },
 
-        _addDefineExtensionAndPrecision: function() {
+        _addDefineExtensionAndPrecision: function (extensions) {
 
+            extensions = extensions || this.extensions;
             // Extension declaration must before all non-preprocessor codes
             // TODO vertex ? extension enum ?
             var extensionStr = [];
             for (var i = 0; i < this.extensions.length; i++) {
-                extensionStr.push('#extension ' + this.extensions[i] + ' : enable');
+                extensionStr.push('#extension GL_' + this.extensions[i] + ' : enable');
             }
             // Add defines
             // VERTEX
@@ -673,7 +690,7 @@ define(function(require) {
                 + ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
         },
 
-        _parseUniforms: function() {
+        _parseUniforms: function () {
             var uniforms = {};
             var self = this;
             var shaderType = 'vertex';
@@ -764,7 +781,7 @@ define(function(require) {
                 var arrayStr = arrayRegex.exec(str)[1];
                 if (arrayStr) {
                     var arr = arrayStr.split(/\s*,\s*/);
-                    return function() {
+                    return function () {
                         return new vendor.Float32Array(arr);
                     };
                 } else {
@@ -772,18 +789,18 @@ define(function(require) {
                     return;
                 }
             } else if (type === 'bool') {
-                return function() {
+                return function () {
                     return str.toLowerCase() === 'true' ? true : false;
                 };
             } else if (type === 'float') {
-                return function() {
+                return function () {
                     return parseFloat(str);
                 };
             }
         },
 
         // Create a new uniform instance for material
-        createUniforms: function() {
+        createUniforms: function () {
             var uniforms = {};
 
             for (var symbol in this.uniformTemplates){
@@ -811,7 +828,7 @@ define(function(require) {
             return this._attacheMaterialNumber !== 0;
         },
 
-        _parseAttributes: function() {
+        _parseAttributes: function () {
             var attributes = {};
             var self = this;
             this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(
@@ -861,7 +878,7 @@ define(function(require) {
             this.attributeTemplates = attributes;
         },
 
-        _parseDefines: function() {
+        _parseDefines: function () {
             var self = this;
             var shaderType = 'vertex';
             this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(defineRegex, _defineParser);
@@ -942,7 +959,7 @@ define(function(require) {
          * Clone a new shader
          * @return {qtek.Shader}
          */
-        clone: function() {
+        clone: function () {
             var shader = new Shader({
                 vertex: this.vertex,
                 fragment: this.fragment,
