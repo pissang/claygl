@@ -15,7 +15,7 @@ define(function(require) {
      * @constructor qtek.plugin.OrbitControl
      *
      * @example
-     * 
+     *
      *     var control = new qtek.plugin.OrbitControl({
      *         target: camera,
      *         domElement: renderer.canvas
@@ -146,10 +146,13 @@ define(function(require) {
 
         _mouseWheel: function(e) {
             e.preventDefault();
-            var delta = e.wheelDelta // Webkit 
+            var delta = e.wheelDelta // Webkit
                         || -e.detail; // Firefox
 
             this._forward += delta * this.sensitivity;
+
+            // Trigger change event to remind renderer do render
+            this.trigger('change');
         },
 
         _mouseDown: function(e) {
@@ -201,7 +204,8 @@ define(function(require) {
             if (this._op === 0) {
                 this._offsetPitch += dx * this.sensitivity / 100;
                 this._offsetRoll += dy * this.sensitivity / 100;
-            } else if (this._op === 1) {
+            }
+            else if (this._op === 1) {
                 var len = this.origin.distance(this.target.position);
                 var divider;
                 if (this.target.fov) {
@@ -215,6 +219,9 @@ define(function(require) {
 
             this._offsetX = x;
             this._offsetY = y;
+
+            // Trigger change event to remind renderer do render
+            this.trigger('change');
         },
 
         _mouseUp: function() {
@@ -258,14 +265,15 @@ define(function(require) {
                     target.rotateAround(this.origin, xAxis, -phi + this.maxPolarAngle);
                 }
                 this._offsetRoll = this._offsetPitch = 0;
-            } else if (this._op === 1) {
+            }
+            else if (this._op === 1) {
                 // Pan
                 var xAxis = target.localTransform.x.normalize().scale(-this._panX);
                 var yAxis = target.localTransform.y.normalize().scale(this._panY);
                 target.position.add(xAxis).add(yAxis);
                 this.origin.add(xAxis).add(yAxis);
                 this._panX = this._panY = 0;
-            } 
+            }
             if (this._forward !== 0) {
                 // Zoom
                 var distance = target.position.distance(this.origin);

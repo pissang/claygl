@@ -2,8 +2,6 @@ define(function(require) {
 
     var Base = require('../core/Base');
     var Vector3 = require('../math/Vector3');
-    var Matrix4 = require('../math/Matrix4');
-    var Quaternion = require('../math/Quaternion');
 
     /**
      * @constructor qtek.plugin.FirstPersonControl
@@ -56,6 +54,11 @@ define(function(require) {
              */
             verticalMoveLock: false,
 
+            /**
+             * @type {qtek.animation.Animation}
+             */
+            animation: null,
+
             _moveForward: false,
             _moveBackward: false,
             _moveLeft: false,
@@ -94,6 +97,10 @@ define(function(require) {
 
             document.addEventListener('keydown', this._keyDown);
             document.addEventListener('keyup', this._keyUp);
+
+            if (this.animation) {
+                this.animation.on('frame', this._detectMovementChange, this);
+            }
         },
 
         /**
@@ -121,6 +128,10 @@ define(function(require) {
 
             document.removeEventListener('keydown', this._keyDown);
             document.removeEventListener('keyup', this._keyUp);
+
+            if (this.animation) {
+                this.animation.off('frame', this._detectMovementChange);
+            }
         },
 
         _requestPointerLock: function() {
@@ -189,6 +200,15 @@ define(function(require) {
 
             this._offsetPitch += dx * this.sensitivity / 200;
             this._offsetRoll += dy * this.sensitivity / 200;
+
+            // Trigger change event to remind renderer do render
+            this.trigger('change');
+        },
+
+        _detectMovementChange: function () {
+            if (this._moveForward || this._moveBackward || this._moveLeft || this._moveRight) {
+                this.trigger('change');
+            }
         },
 
         _keyDown: function(e) {
@@ -210,6 +230,8 @@ define(function(require) {
                     this._moveRight = true;
                     break;
             }
+            // Trigger change event to remind renderer do render
+            this.trigger('change');
         },
 
         _keyUp: function(e) {

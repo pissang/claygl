@@ -25,7 +25,7 @@ define(function() {
             var l = hdls.length, i = -1, args = arguments;
             // Optimize advise from backbone
             switch (args.length) {
-                case 1: 
+                case 1:
                     while (++i < l) {
                         hdls[i].action.call(hdls[i].context);
                     }
@@ -69,12 +69,13 @@ define(function() {
                 return;
             }
             var handlers = this.__handlers__ || (this.__handlers__={});
-            if (! handlers[name]) {
+            if (!handlers[name]) {
                 handlers[name] = [];
-            } else {
+            }
+            else {
                 if (this.has(name, action)) {
                     return;
-                }   
+                }
             }
             var handler = new Handler(action, context || this);
             handlers[name].push(handler);
@@ -158,7 +159,7 @@ define(function() {
          * @chainable
          */
         off: function(name, action) {
-            
+
             var handlers = this.__handlers__ || (this.__handlers__={});
 
             if (!action) {
@@ -174,7 +175,7 @@ define(function() {
                     }
                 }
                 handlers[name] = retains;
-            } 
+            }
 
             return this;
         },
@@ -200,6 +201,6 @@ define(function() {
             }
         }
     };
-    
+
     return notifier;
 });

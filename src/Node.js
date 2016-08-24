@@ -340,7 +340,7 @@ define(function(require) {
 
             this._inIterating = true;
 
-            if (ctor === undefined || this.constructor === ctor) {
+            if (ctor == null || this.constructor === ctor) {
                 callback.call(context, this);
             }
             var _children = this._children;

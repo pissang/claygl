@@ -187,7 +187,8 @@ define(function(require) {
 
                 this._width = width;
                 this._height = height;
-            } else {
+            }
+            else {
                 this._width = canvas.width / dpr;
                 this._height = canvas.height / dpr;
             }
@@ -404,11 +405,11 @@ define(function(require) {
          */
         renderQueue: function(queue, camera, globalMaterial, preZ) {
             var renderInfo = {
-                faceNumber: 0,
-                vertexNumber: 0,
-                drawCallNumber: 0,
-                meshNumber: queue.length,
-                renderedMeshNumber: 0
+                faceCount: 0,
+                vertexCount: 0,
+                drawCallCount: 0,
+                meshCount: queue.length,
+                renderedMeshCount: 0
             };
 
             // Calculate view and projection matrix
@@ -479,7 +480,8 @@ define(function(require) {
                 _gl.depthFunc(_gl.LEQUAL);
                 _gl.colorMask(true, true, true, true);
                 _gl.depthMask(false);
-            } else {
+            }
+            else {
                 culledRenderQueue = queue;
             }
 
@@ -602,10 +604,10 @@ define(function(require) {
                 var objectRenderInfo = renderable.render(_gl, globalMaterial);
 
                 if (objectRenderInfo) {
-                    renderInfo.faceNumber += objectRenderInfo.faceNumber;
-                    renderInfo.vertexNumber += objectRenderInfo.vertexNumber;
-                    renderInfo.drawCallNumber += objectRenderInfo.drawCallNumber;
-                    renderInfo.renderedMeshNumber ++;
+                    renderInfo.faceCount += objectRenderInfo.faceCount;
+                    renderInfo.vertexCount += objectRenderInfo.vertexCount;
+                    renderInfo.drawCallCount += objectRenderInfo.drawCallCount;
+                    renderInfo.renderedMeshCount ++;
                 }
             }
 

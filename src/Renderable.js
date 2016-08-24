@@ -15,9 +15,9 @@ define(function(require) {
     var currentDrawID;
 
     var RenderInfo = function() {
-        this.faceNumber = 0;
-        this.vertexNumber = 0;
-        this.drawCallNumber = 0;
+        this.faceCount = 0;
+        this.vertexCount = 0;
+        this.drawCallCount = 0;
     };
 
     function VertexArrayObject(
@@ -136,9 +136,9 @@ define(function(require) {
             var isStatic = !geometry.dynamic;
 
             var renderInfo = this._renderInfo;
-            renderInfo.vertexNumber = nVertex;
-            renderInfo.faceNumber = 0;
-            renderInfo.drawCallNumber = 0;
+            renderInfo.vertexCount = nVertex;
+            renderInfo.faceCount = 0;
+            renderInfo.drawCallCount = 0;
             // Draw each chunk
             var drawHashChanged = false;
             // Hash with shader id in case previous material has less attributes than next material
@@ -146,7 +146,8 @@ define(function(require) {
 
             if (currentDrawID !== prevDrawID) {
                 drawHashChanged = true;
-            } else {
+            }
+            else {
                 // The cache will be invalid in the following cases
                 // 1. Geometry is splitted to multiple chunks
                 // 2. VAO is enabled and is binded to null after render
@@ -165,14 +166,14 @@ define(function(require) {
                 // Direct draw
                 if (prevDrawIsUseFace) {
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, indicesType, 0);
-                    renderInfo.faceNumber = prevDrawIndicesBuffer.count / 3;
+                    renderInfo.faceCount = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
                     // FIXME Use vertex number in buffer
                     // vertexCount may get the wrong value when geometry forget to mark dirty after update
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
-                renderInfo.drawCallNumber = 1;
+                renderInfo.drawCallCount = 1;
             } else {
                 // Use the cache of static geometry
                 var vaoList = this._drawCache[currentDrawID];
@@ -291,7 +292,7 @@ define(function(require) {
                             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         }
                         _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
-                        renderInfo.faceNumber += indicesBuffer.count / 3;
+                        renderInfo.faceCount += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, nVertex);
                     }
@@ -300,7 +301,7 @@ define(function(require) {
                         vaoExt.bindVertexArrayOES(null);
                     }
 
-                    renderInfo.drawCallNumber++;
+                    renderInfo.drawCallCount++;
                 }
             }
 
