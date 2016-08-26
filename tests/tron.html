@@ -1,0 +1,123 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body>
+        <style>
+            body {
+                margin: 0;
+            }
+            #main {
+                background-color: #111;
+            }
+        </style>
+        <canvas id='main'></canvas>
+        <script type="text/javascript">
+            require(['qtek', 'text!./shader/tron.essl'], function (qtek, tronShader) {
+                var Shader = qtek.Shader;
+                Shader.import(tronShader);
+
+                var renderer = new qtek.Renderer({
+                    canvas : document.getElementById('main')
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var scene = new qtek.Scene();
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.getViewportAspect(),
+                    far : 500
+                });
+
+                var sphere = new qtek.geometry.Sphere({
+                    widthSegments : 20,
+                    heightSegments : 20
+                });
+                var cube = new qtek.geometry.Cube({
+                    widthSegments : 10,
+                    heightSegments : 10,
+                    depthSegments : 10
+                });
+                var plane = new qtek.geometry.Plane({
+                    widthSegments : 10,
+                    heightSegments : 10
+                });
+                var cone = new qtek.geometry.Cone({
+                    heightSegments : 10
+                });
+                var cylinder = new qtek.geometry.Cylinder({
+                    heightSegments : 10
+                });
+                sphere.generateBarycentric();
+                cube.generateBarycentric();
+                plane.generateBarycentric();
+                cone.generateBarycentric();
+                cylinder.generateBarycentric();
+
+                var shader = new qtek.Shader({
+                    vertex: Shader.source('tron.vertex'),
+                    fragment: Shader.source('tron.fragment')
+                });
+                var material = new qtek.Material({
+                    shader: shader
+                });
+
+                camera.position.set(0, 0, 7);
+
+                var sphereMesh = new qtek.Mesh({
+                    geometry : sphere,
+                    material : material,
+                    culling : false
+                });
+                var cubeMesh = new qtek.Mesh({
+                    geometry : cube,
+                    material : material,
+                    culling : false
+                });
+                var planeMesh = new qtek.Mesh({
+                    geometry : plane,
+                    material : material,
+                    culling : false
+                });
+                var coneMesh = new qtek.Mesh({
+                    geometry : cone,
+                    material : material,
+                    culling : false
+                });
+                var cylinderMesh = new qtek.Mesh({
+                    geometry : cylinder,
+                    material : material,
+                    culling : false
+                });
+                sphereMesh.position.x = -3;
+                cubeMesh.position.x = -1.5;
+                cubeMesh.scale.set(0.7, 0.7, 0.7);
+                coneMesh.position.x = 1.5;
+                cylinderMesh.position.x = 3;
+                scene.add(sphereMesh);
+                scene.add(planeMesh);
+                scene.add(cubeMesh);
+                scene.add(coneMesh);
+                scene.add(cylinderMesh);
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+
+                var control = new qtek.plugin.OrbitControl({
+                    domElement: renderer.canvas,
+                    target: camera
+                });
+                animation.on('frame', function(dTime) {
+                    renderer.render(scene, camera);
+                    control.update(dTime);
+                    cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                });
+            })
+
+        </script>
+    </body>
+</html>

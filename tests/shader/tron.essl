@@ -1,0 +1,29 @@
+@export tron.vertex
+
+@import buildin.basic.vertex
+
+@end
+
+
+
+
+@export tron.fragment
+
+varying vec2 v_Texcoord;
+uniform vec3 color : [0.0, 0.775, 0.189];
+
+uniform float sharpness : 30.0;
+uniform float substraction: 0.2;
+uniform float strength: 20.0;
+
+// https://www.youtube.com/watch?v=KHiZfy5OlO8
+void main()
+{
+    vec2 factor = vec2(1.0) - sin(v_Texcoord * 3.1415926);
+    factor = pow(factor, vec2(sharpness));
+    factor -= vec2(substraction);
+    float weight = clamp(mix(factor.x, factor.y, 0.5), 0.0, 1.0);
+    gl_FragColor = vec4(weight * color * strength, 1.0);
+}
+
+@end
