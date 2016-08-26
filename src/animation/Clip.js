@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -19,7 +19,7 @@ define(function(require) {
      * @param {Function} [opts.ondestroy]
      * @param {Function} [opts.onrestart]
      */
-    var Clip = function(opts) {
+    var Clip = function (opts) {
 
         opts = opts || {};
 
@@ -61,9 +61,7 @@ define(function(require) {
             this.playbackRate = 1;
         }
 
-        this._currentTime = new Date().getTime();
-        
-        this._startTime = this._currentTime + this.delay;
+        this._initialized = false;
 
         this._elapsedTime = 0;
 
@@ -104,25 +102,25 @@ define(function(require) {
         life: 0,
 
         delay: 0,
-        
+
         /**
          * @param {number|boolean} loop
          */
-        setLoop: function(loop) {
+        setLoop: function (loop) {
             this._loop = loop;
             if (loop) {
                 if (typeof(loop) == 'number') {
                     this._loopRemained = loop;
                 } else {
                     this._loopRemained = 1e8;
-                }   
+                }
             }
         },
 
         /**
          * @param {string|function} easing
          */
-        setEasing: function(easing) {
+        setEasing: function (easing) {
             if (typeof(easing) === 'string') {
                 easing = Easing[easing];
             }
@@ -133,7 +131,13 @@ define(function(require) {
          * @param  {number} time
          * @return {string}
          */
-        step: function(time) {
+        step: function (time) {
+            if (!this._initialized) {
+                this._currentTime = time;
+                this._startTime = this._currentTime + this.delay;
+                this._initialized = true;
+            }
+
             if (time < this._startTime) {
                 this._currentTime = time;
                 return;
@@ -160,10 +164,11 @@ define(function(require) {
 
             if (percent == 1) {
                 if (this._loop && this._loopRemained > 0) {
-                    this._restartInLoop();
+                    this._restartInLoop(time);
                     this._loopRemained--;
                     return 'restart';
-                } else {
+                }
+                else {
                     // Mark this clip to be deleted
                     // In the animation.update
                     this._needsRemove = true;
@@ -179,18 +184,22 @@ define(function(require) {
          * @param  {number} time
          * @return {string}
          */
-        setTime: function(time) {
+        setTime: function (time) {
             return this.step(time + this._startTime);
         },
 
-        restart: function() {
+        restart: function (time) {
             // If user leave the page for a while, when he gets back
             // All clips may be expired and all start from the beginning value(position)
             // It is clearly wrong, so we use remainder to add a offset
-            var time = new Date().getTime();
-            this._elapse(time);
 
-            var remainder = this._elapsedTime % this.life;
+            // It is ignored if restart is invoked manually
+            var remainder = 0;
+            if (time) {
+                this._elapse(time);
+                remainder = this._elapsedTime % this.life;
+            }
+
             this._startTime = time - remainder + this.delay;
             this._elapsedTime = 0;
             this._currentTime = time - remainder;
@@ -198,19 +207,18 @@ define(function(require) {
             this._needsRemove = false;
         },
 
-        _restartInLoop: function () {
-            var time = new Date().getTime();
+        _restartInLoop: function (time) {
             this._startTime = time + this.gap;
             this._currentTime = time;
             this._elapsedTime = 0;
         },
 
-        _elapse: function(time) {
+        _elapse: function (time) {
             this._elapsedTime += (time - this._currentTime) * this.playbackRate;
             this._currentTime = time;
         },
-        
-        fire: function(eventType, arg) {
+
+        fire: function (eventType, arg) {
             var eventName = 'on' + eventType;
             if (this[eventName]) {
                 this[eventName](this.target, arg);

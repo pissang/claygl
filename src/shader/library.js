@@ -66,16 +66,23 @@ define(function(require) {
         var keyArr = [name];
         keyArr = keyArr.concat(enabledTextures);
         for (var i = 0; i < vertexDefineKeys.length; i++) {
-            keyArr.push(vertexDefines[vertexDefineKeys[i]]);
+            keyArr.push(
+                vertexDefineKeys[i],
+                vertexDefines[vertexDefineKeys[i]]
+            );
         }
         for (var i = 0; i < fragmentDefineKeys.length; i++) {
-            keyArr.push(fragmentDefines[fragmentDefineKeys[i]]);
+            keyArr.push(
+                fragmentDefineKeys[i],
+                fragmentDefines[fragmentDefineKeys[i]]
+            );
         }
         var key = keyArr.join('_');
 
         if (this._pool[key]) {
             return this._pool[key];
-        } else {
+        }
+        else {
             var source = _library[name];
             if (!source) {
                 console.error('Shader "' + name + '"' + ' is not in the library');

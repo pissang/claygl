@@ -49,8 +49,9 @@ define(function(require) {
             sinom  = Math.sin(omega);
             scale0 = Math.sin((1.0 - t) * omega) / sinom;
             scale1 = Math.sin(t * omega) / sinom;
-        } else {        
-            // 'from' and 'to' quaternions are very close 
+        }
+        else {
+            // 'from' and 'to' quaternions are very close
             //  ... so we can do a linear interpolation
             scale0 = 1.0 - t;
             scale1 = t;
@@ -60,7 +61,7 @@ define(function(require) {
         out[1] = scale0 * ay + scale1 * by;
         out[2] = scale0 * az + scale1 * bz;
         out[3] = scale0 * aw + scale1 * bw;
-        
+
         return out;
     }
 
@@ -68,7 +69,7 @@ define(function(require) {
      * @constructor
      * @alias qtek.animation.SamplerClip
      * @extends qtek.animation.Clip
-     * 
+     *
      * @param {Object} [opts]
      * @param {string} [opts.name]
      * @param {Object} [opts.target]
@@ -191,7 +192,7 @@ define(function(require) {
         var minTime = this.channels.time[0];
         startTime = Math.min(Math.max(startTime, minTime), this.life);
         endTime = Math.min(Math.max(endTime, minTime), this.life);
-            
+
         var rangeStart = this._findRange(startTime);
         var rangeEnd = this._findRange(endTime);
 
@@ -228,7 +229,7 @@ define(function(require) {
                 subClip.channels.rotation[i * 4 + j] = this.channels.rotation[i2 * 4 + j];
                 subClip.channels.position[i * 3 + j] = this.channels.position[i2 * 3 + j];
                 subClip.channels.scale[i * 3 + j] = this.channels.scale[i2 * 3 + j];
-            }   
+            }
             subClip.channels.time[i] = this.channels.time[i2] - startTime;
             subClip.channels.rotation[i * 4 + 3] = this.channels.rotation[i2 * 4 + 3];
         }

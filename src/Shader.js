@@ -167,7 +167,7 @@ define(function(require) {
             fragmentDefines: {},
 
             /**
-             * Enabled xtensions
+             * Enabled extensions
              * @type {Array.<string>}
              */
             extensions: [
@@ -304,7 +304,7 @@ define(function(require) {
         define: function(shaderType, symbol, val) {
             var vertexDefines = this.vertexDefines;
             var fragmentDefines = this.fragmentDefines;
-            val = val !== undefined ? val : null;
+            val = val != null ? val : null;
             if (shaderType == 'vertex' || shaderType == 'both') {
                 if (vertexDefines[symbol] !== val) {
                     vertexDefines[symbol] = val;
@@ -654,7 +654,8 @@ define(function(require) {
                 var value = this.vertexDefines[symbol];
                 if (value === null) {
                     defineStr.push('#define ' + symbol);
-                }else{
+                }
+                else{
                     defineStr.push('#define ' + symbol + ' ' + value.toString());
                 }
             }

@@ -160,7 +160,7 @@ define(function(require) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
 
-        load: function(src) {
+        load: function (src) {
             var image = new Image();
             var self = this;
             image.onload = function() {

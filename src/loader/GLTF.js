@@ -202,11 +202,20 @@ define(function(require) {
                     self._parseSkins(json, lib);
                 }
 
+                var clips = {};
+                var skinningClip;
                 if (self.includeAnimation) {
-                    var clip = self._parseAnimations(json, lib);
-                    if (clip) {
+                    clips = self._parseAnimations(json, lib);
+                    if (Object.keys(clips).length) {
+                        skinningClip = new SkinningClip();
+                        // Default loop the skinning animation
+                        skinningClip.setLoop(true);
+                        for (var targetId in clips) {
+                            skinningClip.addJointClip(clips[targetId]);
+                        }
+
                         for (var name in lib.skeletons) {
-                            lib.skeletons[name].addClip(clip);
+                            lib.skeletons[name].addClip(skinningClip);
                         }
                     }
                 }
@@ -219,7 +228,9 @@ define(function(require) {
                     materials: lib.materials,
                     skeletons: lib.skeletons,
                     meshes: lib.meshes,
-                    clip: clip
+                    clips: lib.clips,
+                    // Main skinning clip
+                    clip: skinningClip
                 });
             }
 
@@ -342,7 +353,8 @@ define(function(require) {
                         material.shader = material.shader.clone();
                         material.shader.define('vertex', 'SKINNING');
                         material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
-                    } else {
+                    }
+                    else {
                         // Mesh have multiple primitives
                         for (var i = 0; i < node._children.length; i++) {
                             var child = node._children[i];
@@ -417,7 +429,8 @@ define(function(require) {
                     var imageInfo = json.images[textureInfo.source];
                     texture.load(util.relative2absolute(imageInfo.path, root));
                     lib.textures[name] = texture;
-                } else if(target === glenum.TEXTURE_CUBE_MAP) {
+                }
+                else if(target === glenum.TEXTURE_CUBE_MAP) {
                     // TODO
                 }
             }, this);
@@ -785,17 +798,12 @@ define(function(require) {
 
         _parseAnimations: function(json, lib) {
             // TODO Only support nodes animation now
-            var clip = new SkinningClip();
-            // Default loop the skinning animation
-            clip.setLoop(true);
-            var haveAnimation = false;
 
-            var jointClips = {};
+            var nodeAnimationClips = lib.clips = {};
 
             var quatTmp = quat.create();
 
             for (var animName in json.animations) {
-                haveAnimation = true;
                 var animationInfo = json.animations[animName];
                 var parameters = {};
 
@@ -852,29 +860,22 @@ define(function(require) {
                 }
 
                 // TODO
-                // if (jointClips[targetId]) {
+                // if (nodeAnimationClips[targetId]) {
                 //     continue;
                 // }
-                jointClips[targetId] = new SamplerClip({
-                    name: targetNode.name
+                nodeAnimationClips[targetId] = new SamplerClip({
+                    name: targetNode.name,
+                    target: targetNode
                 });
-                var jointClip = jointClips[targetId];
-                jointClip.channels.time = parameters.TIME;
-                jointClip.channels.rotation = parameters.rotation || null;
-                jointClip.channels.position = parameters.translation || null;
-                jointClip.channels.scale = parameters.scale || null;
-                jointClip.life = parameters.TIME[parameters.TIME.length - 1];
+                var nodeAnimationClip = nodeAnimationClips[targetId];
+                nodeAnimationClip.channels.time = parameters.TIME;
+                nodeAnimationClip.channels.rotation = parameters.rotation || null;
+                nodeAnimationClip.channels.position = parameters.translation || null;
+                nodeAnimationClip.channels.scale = parameters.scale || null;
+                nodeAnimationClip.life = parameters.TIME[parameters.TIME.length - 1];
             }
 
-            for (var targetId in jointClips) {
-                clip.addJointClip(jointClips[targetId]);
-            }
-
-            if (haveAnimation) {
-                return clip;
-            } else {
-                return null;
-            }
+            return nodeAnimationClips;
         }
     });
 
