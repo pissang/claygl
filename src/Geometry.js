@@ -26,7 +26,8 @@ define(function(require) {
         if (isDynamic) {
             this._isDynamic = true;
             this.value = [];
-        } else {
+        }
+        else {
             this._isDynamic = false;
             this.value = null;
         }
