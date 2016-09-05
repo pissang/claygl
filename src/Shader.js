@@ -305,14 +305,22 @@ define(function(require) {
             var vertexDefines = this.vertexDefines;
             var fragmentDefines = this.fragmentDefines;
             val = val != null ? val : null;
-            if (shaderType == 'vertex' || shaderType == 'both') {
+            if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
+                && arguments.legnth < 3
+            ) {
+                // shaderType default to be 'both'
+                val = symbol;
+                symbol = shaderType;
+                shaderType = 'both';
+            }
+            if (shaderType === 'vertex' || shaderType === 'both') {
                 if (vertexDefines[symbol] !== val) {
                     vertexDefines[symbol] = val;
                     // Mark as dirty
                     this.dirty();
                 }
             }
-            if (shaderType == 'fragment' || shaderType == 'both') {
+            if (shaderType === 'fragment' || shaderType === 'both') {
                 if (fragmentDefines[symbol] !== val) {
                     fragmentDefines[symbol] = val;
                     if (shaderType !== 'both') {
@@ -327,14 +335,21 @@ define(function(require) {
          * @param  {string} symbol
          */
         unDefine: function(shaderType, symbol) {
-            if (shaderType == 'vertex' || shaderType == 'both') {
+            if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
+                && arguments.legnth < 2
+            ) {
+                // shaderType default to be 'both'
+                symbol = shaderType;
+                shaderType = 'both';
+            }
+            if (shaderType === 'vertex' || shaderType === 'both') {
                 if (this.isDefined('vertex', symbol)) {
                     delete this.vertexDefines[symbol];
                     // Mark as dirty
                     this.dirty();
                 }
             }
-            if (shaderType == 'fragment' || shaderType == 'both') {
+            if (shaderType === 'fragment' || shaderType === 'both') {
                 if (this.isDefined('fragment', symbol)) {
                     delete this.fragmentDefines[symbol];
                     if (shaderType !== 'both') {
