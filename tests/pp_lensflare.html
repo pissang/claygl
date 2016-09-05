@@ -6,11 +6,11 @@
     <script type="text/javascript" src="js/config.js"></script>
 </head>
 <body style="margin:0px">
-    <canvas id="Main"></canvas>
+    <canvas id="main"></canvas>
     <script type="text/javascript">
         require(['qtek'], function(qtek) {
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById('Main'),
+                canvas : document.getElementById('main'),
                 devicePixelRatio : 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
@@ -37,7 +37,7 @@
                 cubeMap,
                 renderer,
                 {
-                    exposure: 10
+                    exposure: 2
                 }
             );
 
@@ -45,39 +45,20 @@
                 scene : scene
             });
             skybox.material.set('environmentMap', cubeMap);
+            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
 
             var animation = new qtek.animation.Animation();
             animation.start();
 
-            var FXLoader = new qtek.loader.FX();
+            var FXLoader = new qtek.loader.FX({
+                scene: scene,
+                camera: camera
+            });
             FXLoader.load('assets/fx/hdr.json');
 
-            var debugPass = new qtek.compositor.Pass({
-                fragment : qtek.Shader.source('buildin.compositor.output')
-            });
-
             FXLoader.success(function(compositor) {
-                var sceneNode = new qtek.compositor.SceneNode({
-                    name : 'scene',
-                    scene : scene,
-                    camera : camera,
-                    outputs : {
-                        color : {
-                            parameters : {
-                                width : function(renderer) {
-                                    return renderer.getWidth();
-                                },
-                                height : function(renderer) {
-                                    return renderer.getHeight();
-                                },
-                                type : qtek.Texture.FLOAT
-                            }
-                        }
-                    }
-                });
-                compositor.addNode(sceneNode);
-
                 animation.on('frame', function() {
+                    // renderer.render(scene, camera);
                     compositor.render(renderer);
                     control.update();
                 });

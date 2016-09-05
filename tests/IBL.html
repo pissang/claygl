@@ -5,11 +5,11 @@
         <script type="text/javascript" src="js/config.js"></script>
     </head>
     <body style="margin:0px;">
-        <canvas id="Main"></canvas>
+        <canvas id="main"></canvas>
         <script type="text/javascript">
             require(['qtek'], function(qtek) {
                 var renderer = new qtek.Renderer({
-                    canvas: document.getElementById('Main'),
+                    canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
@@ -56,6 +56,7 @@
                             'buildin.standard', ['environmentMap', 'brdfLookup']
                         );
                         shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
+                        shader.define('fragment', 'RGBM_ENCODE');
                         for (var i = 0; i < 10; i++) {
                             var material = new qtek.Material({
                                 shader: shader
@@ -128,25 +129,13 @@
                 });
 
                 var compositor;
-                var FXLoader = new qtek.loader.FX();
+                var FXLoader = new qtek.loader.FX({
+                    scene: scene,
+                    camera: camera
+                });
                 FXLoader.load('assets/fx/hdr.json');
                 FXLoader.on('success', function(_compositor) {
                     compositor = _compositor;
-                    var sceneNode = new qtek.compositor.SceneNode({
-                        name: 'scene',
-                        scene: scene,
-                        camera: camera,
-                        outputs: {
-                            'color': {
-                                parameters: {
-                                    width: function(renderer) { return renderer.getWidth(); },
-                                    height: function(renderer) { return renderer.getHeight(); },
-                                    type: qtek.Texture.FLOAT
-                                }
-                            }
-                        }
-                    });
-                    compositor.addNode(sceneNode);
                 });
 
 
@@ -158,10 +147,10 @@
                     // renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT | qtek.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {
                         compositor.render(renderer);
-                        // var lumAdaptionNode = compositor.findNode('lum_adaption');
-                        // var currentLumNode = compositor.findNode('avg_log_lum');
+                        // var lumAdaptionNode = compositor.getNodeByName('lum_adaption');
+                        // var currentLumNode = compositor.getNodeByName('avg_log_lum');
 
-                        var FXAANode = compositor.findNode('FXAA');
+                        var FXAANode = compositor.getNodeByName('FXAA');
                         if (FXAANode) {
                             FXAANode.setParameter('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
                         }

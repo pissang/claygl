@@ -49,7 +49,8 @@ define(function(require) {
 
                 renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
 
-            } else {
+            }
+            else {
 
                 var frameBuffer = this.frameBuffer;
                 for (var name in this.outputs) {

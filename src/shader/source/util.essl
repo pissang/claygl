@@ -70,19 +70,48 @@ float decodeFloat(const in vec4 color)
 @export buildin.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
+  // Premultiply alpha ?
+  // return range * rgbm.rgb;
 }
 @end
 
 @export buildin.util.rgbm_encode
 vec4 RGBMEncode(vec3 color, float range) {
     vec4 rgbm;
-    color *= 1.0 / range;
+    color /= range;
     rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);
     rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
     rgbm.rgb = color / rgbm.a;
     return rgbm;
 }
 @end
+
+@export buildin.util.rgbm
+@import buildin.util.rgbm_decode
+@import buildin.util.rgbm_encode
+
+vec4 decodeHDR(vec4 color)
+{
+#if defined(RGBM_DECODE) || defined(RGBM)
+    return vec4(RGBMDecode(color, 51.5), 1.0);
+#else
+    return color;
+#endif
+}
+
+vec4 encodeHDR(vec4 color)
+{
+#if defined(RGBM_ENCODE) || defined(RGBM)
+    return RGBMEncode(color.xyz, 51.5);
+#else
+    return color;
+#endif
+}
+
+@end
+
+
+
 
 @export buildin.chunk.skin_matrix
 

@@ -149,17 +149,17 @@ define(function(require) {
             // FIXME pixels may be discard
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
 
-            if (!frameBuffer) {
-                // Blend with previous rendered scene in the final output
-                // FIXME Configure blend.
-                // FIXME It will cause screen blink？
-                _gl.enable(_gl.BLEND);
-                this.material.transparent = true;
-            }
-            else {
+            // if (!frameBuffer) {
+            //     // Blend with previous rendered scene in the final output
+            //     // FIXME Configure blend.
+            //     // FIXME It will cause screen blink？
+            //     _gl.enable(_gl.BLEND);
+            //     this.material.transparent = true;
+            // }
+            // else {
                 _gl.disable(_gl.BLEND);
                 this.material.transparent = false;
-            }
+            // }
 
             this.renderQuad(renderer);
 

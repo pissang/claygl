@@ -14,7 +14,8 @@ define(function(require) {
             buffer[offset + 0] = rgbe[0] * f;
             buffer[offset + 1] = rgbe[1] * f;
             buffer[offset + 2] = rgbe[2] * f;
-        } else {
+        }
+        else {
             buffer[offset + 0] = 0;
             buffer[offset + 1] = 0;
             buffer[offset + 2] = 0;
@@ -103,7 +104,7 @@ define(function(require) {
         // Blender source
         // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
         parseRGBE: function(arrayBuffer, texture, exposure) {
-            if (exposure === undefined) {
+            if (exposure == null) {
                 exposure = 0;
             }
             var data = new Uint8Array(arrayBuffer);

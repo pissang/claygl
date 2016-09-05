@@ -6,6 +6,9 @@ define(function(require) {
     var Pass = require('./Pass');
     var FrameBuffer = require('../FrameBuffer');
 
+    // PENDING
+    // Use topological sort ?
+
     /**
      * Node of graph based post processing.
      *
@@ -183,13 +186,15 @@ define(function(require) {
             }
             var width, height;
             if (parameters.width instanceof Function) {
-                width = parameters.width(renderer);
-            } else {
+                width = parameters.width.call(this, renderer);
+            }
+            else {
                 width = parameters.width;
             }
             if (parameters.height instanceof Function) {
-                height = parameters.height(renderer);
-            } else {
+                height = parameters.height.call(this, renderer);
+            }
+            else {
                 height = parameters.height;
             }
             if (
@@ -248,7 +253,7 @@ define(function(require) {
                 return this._outputTextures[name];
             }
             var outputInfo = this.outputs[name];
-            if (! outputInfo) {
+            if (!outputInfo) {
                 return ;
             }
 
@@ -257,10 +262,12 @@ define(function(require) {
                 // Force return texture in last frame
                 if (outputInfo.outputLastFrame) {
                     return this._prevOutputTextures[name];
-                } else {
+                }
+                else {
                     return this._outputTextures[name];
                 }
-            } else if (
+            }
+            else if (
                 // TODO
                 this._rendering   // Solve Circular Reference
             ) {
@@ -352,7 +359,8 @@ define(function(require) {
                             this._compositor.releaseTexture(this._prevOutputTextures[name]);
                         }
                         this._prevOutputTextures[name] = this._outputTextures[name];
-                    } else {
+                    }
+                    else {
                         this._compositor.releaseTexture(this._outputTextures[name]);
                     }
                 }

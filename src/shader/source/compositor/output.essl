@@ -6,9 +6,11 @@ varying vec2 v_Texcoord;
 
 uniform sampler2D texture;
 
+@import buildin.util.rgbm
+
 void main()
 {
-    vec4 tex = texture2D(texture, v_Texcoord);
+    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
 
     gl_FragColor.rgb = tex.rgb;
 
@@ -18,6 +20,7 @@ void main()
     gl_FragColor.a = 1.0;
 #endif
 
+    gl_FragColor = encodeHDR(gl_FragColor);
 }
 
 @end

@@ -76,6 +76,8 @@ uniform float maxMipmapLevel: 5;
 
 @import buildin.util.edge_factor
 
+@import buildin.util.rgbm
+
 @import buildin.plugin.compute_shadow_map
 
 
@@ -319,10 +321,11 @@ void main()
     }
 
 #ifdef GAMMA_ENCODE
+    // Not linear
     outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));
 #endif
 
-    gl_FragColor = outColor;
+    gl_FragColor = encodeHDR(outColor);
 }
 
 @end

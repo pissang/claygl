@@ -14,15 +14,17 @@ uniform float distortion : 1.0;
 
 varying vec2 v_Texcoord;
 
+@import buildin.util.rgbm
+
 vec4 textureDistorted(
     in vec2 texcoord,
     in vec2 direction,
     in vec3 distortion
 ) {
     return vec4(
-        texture2D(texture, texcoord + direction * distortion.r).r,
-        texture2D(texture, texcoord + direction * distortion.g).g,
-        texture2D(texture, texcoord + direction * distortion.b).b,
+        decodeHDR(texture2D(texture, texcoord + direction * distortion.r)).r,
+        decodeHDR(texture2D(texture, texcoord + direction * distortion.g)).g,
+        decodeHDR(texture2D(texture, texcoord + direction * distortion.b)).b,
         1.0
     );
 }

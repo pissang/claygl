@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var Base = require('../core/Base');
@@ -7,6 +7,7 @@ define(function(require) {
     var util = require('../core/util');
     var Compositor = require('../compositor/Compositor');
     var CompoNode = require('../compositor/Node');
+    var CompoSceneNode = require('../compositor/SceneNode');
     var Shader = require('../Shader');
     var Texture = require('../Texture');
     var Texture2D = require('../Texture2D');
@@ -33,7 +34,17 @@ define(function(require) {
         /**
          * @type {string}
          */
-        shaderRootPath: ''
+        shaderRootPath: '',
+
+        /**
+         * @type {qtek.Scene}
+         */
+        scene: null,
+
+        /**
+         * @type {qtek.Camera}
+         */
+        camera: null
     },
     /** @lends qtek.loader.FX.prototype */
     {
@@ -106,9 +117,6 @@ define(function(require) {
         },
 
         _createNode: function(nodeInfo, lib) {
-            if (!nodeInfo.shader) {
-                return;
-            }
             var type = nodeInfo.type || 'filter';
             var shaderSource;
             var inputs;
@@ -119,7 +127,8 @@ define(function(require) {
                 var res = shaderSourceReg.exec(shaderExp);
                 if (res) {
                     shaderSource = Shader.source(res[1].trim());
-                } else if (shaderExp.charAt(0) === '#') {
+                }
+                else if (shaderExp.charAt(0) === '#') {
                     shaderSource = lib.shaders[shaderExp.substr(1)];
                 }
                 if (!shaderSource) {
@@ -131,7 +140,7 @@ define(function(require) {
             }
 
             if (nodeInfo.inputs) {
-                inputs = {};      
+                inputs = {};
                 for (var name in nodeInfo.inputs) {
                     inputs[name] = {
                         node: nodeInfo.inputs[name].node,
@@ -144,13 +153,13 @@ define(function(require) {
                 for (var name in nodeInfo.outputs) {
                     var outputInfo = nodeInfo.outputs[name];
                     outputs[name] = {};
-                    if (outputInfo.attachment !== undefined) {
+                    if (outputInfo.attachment != null) {
                         outputs[name].attachment = outputInfo.attachment;
                     }
-                    if (outputInfo.keepLastFrame !== undefined) {
+                    if (outputInfo.keepLastFrame != null) {
                         outputs[name].keepLastFrame = outputInfo.keepLastFrame;
                     }
-                    if (outputInfo.outputLastFrame !== undefined) {
+                    if (outputInfo.outputLastFrame != null) {
                         outputs[name].outputLastFrame = outputInfo.outputLastFrame;
                     }
                     if (typeof(outputInfo.parameters) === 'string') {
@@ -158,10 +167,11 @@ define(function(require) {
                         if (paramExp.charAt(0) === '#') {
                             outputs[name].parameters = lib.parameters[paramExp.substr(1)];
                         }
-                    } else if (outputInfo.parameters) {
+                    }
+                    else if (outputInfo.parameters) {
                         outputs[name].parameters = this._convertParameter(outputInfo.parameters);
                     }
-                }   
+                }
             }
             var node;
             if (type === 'filter') {
@@ -172,35 +182,35 @@ define(function(require) {
                     outputs: outputs
                 });
             }
+            else if (type === 'scene') {
+                var node = new CompoSceneNode({
+                    name: nodeInfo.name,
+                    scene: this.scene,
+                    camera: this.camera,
+                    outputs: outputs
+                });
+            }
             if (node) {
                 if (nodeInfo.parameters) {
                     for (var name in nodeInfo.parameters) {
                         var val = nodeInfo.parameters[name];
                         if (typeof(val) === 'string') {
                             val = val.trim();
-                            if (val.charAt(0) === '#'){
+                            if (val.charAt(0) === '#') {
                                 val = lib.textures[val.substr(1)];
-                            } else if (val.match(/%width$/)) {
-                                node.on('beforerender', createWidthSetHandler(name, val));
-                                continue;
-                            } else if (val.match(/%height$/)) {
-                                node.on('beforerender', createHeightSetHandler(name, val));
-                                continue;
                             }
-                        } else if (val instanceof Array) {
-                            if (
-                                typeof(val[0]) === 'string' && typeof(val[1]) === 'string'
-                                && (val[0].match(/%width$/))
-                                && (val[1].match(/%height$/))
-                            ) {
-                                node.on('beforerender', createSizeSetHandler(name, val));
-                                continue;
+                            else {
+                                node.on(
+                                    'beforerender', createSizeSetHandler(
+                                        name, tryConvertExpr(val)
+                                    )
+                                );
                             }
                         }
                         node.setParameter(name, val);
                     }
                 }
-                if (nodeInfo.defines) {
+                if (nodeInfo.defines && node.pass) {
                     for (var name in nodeInfo.defines) {
                         var val = nodeInfo.defines[name];
                         node.pass.material.shader.define('fragment', name, val);
@@ -218,7 +228,7 @@ define(function(require) {
             ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT']
                 .forEach(function(name) {
                     var val = paramInfo[name];
-                    if (val !== undefined) {
+                    if (val != null) {
                         // Convert string to enum
                         if (typeof(val) === 'string') {
                             val = Texture[val];
@@ -228,27 +238,25 @@ define(function(require) {
                 });
             ['width', 'height']
                 .forEach(function(name) {
-                    if (paramInfo[name] !== undefined) {
+                    if (paramInfo[name] != null) {
                         var val = paramInfo[name];
                         if (typeof val === 'string') {
                             val = val.trim();
-                            if (val.match(/%width$/)) {
-                                param[name] = percentToWidth.bind(null, parseFloat(val));
-                            }
-                            else if (val.match(/%height$/)) {
-                                param[name] = percentToHeight.bind(null, parseFloat(val));
-                            }
-                        } else {
+                            param[name] = createSizeParser(
+                                name, tryConvertExpr(val)
+                            );
+                        }
+                        else {
                             param[name] = val;
                         }
                     }
                 });
-            if (paramInfo.useMipmap !== undefined) {
+            if (paramInfo.useMipmap != null) {
                 param.useMipmap = paramInfo.useMipmap;
             }
             return param;
         },
-        
+
         _loadShaders: function(json, callback) {
             if (!json.shaders) {
                 callback({});
@@ -276,7 +284,8 @@ define(function(require) {
                             }
                         }
                     });
-                } else {
+                }
+                else {
                     shaders[name] = shaderExp;
                     // Try import shader
                     Shader['import'](shaderExp);
@@ -306,10 +315,12 @@ define(function(require) {
                         return util.relative2absolute(item, textureRootPath);
                     });
                     texture = new TextureCube(parameters);
-                } else if(typeof(path) === 'string') {
+                }
+                else if(typeof(path) === 'string') {
                     path = util.relative2absolute(path, textureRootPath);
                     texture = new Texture2D(parameters);
-                } else {
+                }
+                else {
                     return;
                 }
 
@@ -331,33 +342,34 @@ define(function(require) {
         }
     });
 
-    function createWidthSetHandler(name, val) {
-        val = parseFloat(val);
+    function createSizeSetHandler(name, exprFunc) {
         return function (renderer) {
-            this.setParameter(name, percentToWidth(val, renderer));
-        };
-    }
-    function createHeightSetHandler(name, val) {
-        val = parseFloat(val);
-        return function (renderer) {
-            this.setParameter(name, percentToWidth(val, renderer));
+            var result = exprFunc(renderer.getWidth(), renderer.getHeight());
+            this.setParameter(name, result);
         };
     }
 
-    function createSizeSetHandler(name, val) {
-        val[0] = parseFloat(val[0]);
-        val[1] = parseFloat(val[1]);
+    function createSizeParser(name, exprFunc) {
         return function (renderer) {
-            this.setParameter(name, [percentToWidth(val[0], renderer), percentToHeight(val[0], renderer)]);
+            return exprFunc(renderer.getWidth(), renderer.getHeight());
         };
     }
 
-    function percentToWidth(percent, renderer) {
-        return percent / 100 * renderer.getWidth();
-    }
+    function tryConvertExpr(string) {
+        // PENDING
+        var exprRes = /^expr\((.*)\)$/.exec(string);
+        if (exprRes) {
+            try {
+                var func = new Function('width', 'height', 'return ' + exprRes[1]);
+                // Try run t
+                func(1, 1);
 
-    function percentToHeight(percent, renderer) {
-        return percent / 100 * renderer.getHeight();
+                return func;
+            }
+            catch (e) {
+                throw new Error('Invalid expression.');
+            }
+        }
     }
 
     return FXLoader;

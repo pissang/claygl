@@ -107,7 +107,7 @@ define(function (require) {
 
         blurPass.material.blend = function (gl) {
             gl.blendEquation(gl.FUNC_ADD);
-            gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+            gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
         };
         blurPass.setUniform('textureSize', [width, height]);
         blurPass.setUniform('texture', ssaoTexture);

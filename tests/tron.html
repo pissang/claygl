@@ -1,8 +1,10 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body>
         <style>
@@ -20,7 +22,8 @@
                 Shader.import(tronShader);
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById('main')
+                    canvas : document.getElementById('main'),
+                    devicePixelRatio: 1
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene();
@@ -90,15 +93,16 @@
                     culling : false
                 });
                 sphereMesh.position.x = -3;
-                cubeMesh.position.x = -1.5;
-                cubeMesh.scale.set(0.7, 0.7, 0.7);
+                // cubeMesh.position.x = -1.5;
+                cubeMesh.scale.set(1.5, 1.5, 1.5);
+                // cubeMesh.scale.set(0.7, 0.7, 0.7);
                 coneMesh.position.x = 1.5;
                 cylinderMesh.position.x = 3;
-                scene.add(sphereMesh);
-                scene.add(planeMesh);
+                // scene.add(sphereMesh);
+                // scene.add(planeMesh);
                 scene.add(cubeMesh);
-                scene.add(coneMesh);
-                scene.add(cylinderMesh);
+                // scene.add(coneMesh);
+                // scene.add(cylinderMesh);
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
@@ -107,16 +111,52 @@
                     domElement: renderer.canvas,
                     target: camera
                 });
-                animation.on('frame', function(dTime) {
-                    renderer.render(scene, camera);
-                    control.update(dTime);
-                    cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
+
+                var compositor;
+                var FXLoader = new qtek.loader.FX({
+                    scene: scene,
+                    camera: camera
                 });
-            })
+                FXLoader.load('assets/fx/hdr.json');
+
+                FXLoader.on('success', function(_compositor) {
+                    compositor = _compositor;
+                });
+
+                animation.on('frame', function(dTime) {
+                    if (compositor) {
+                        compositor.render(renderer);
+                    }
+                    // renderer.render(scene, camera);
+                    control.update(dTime);
+                    // cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    // planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    // sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    // coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                    // cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                });
+
+                var gui = new dat.GUI();
+                var config = {
+                    sharpness: 10.0,
+                    substraction: 0.2,
+                    strength: 10.0,
+                    bloomIntensity: 0.25
+                };
+                function updateTronMat() {
+                    material.set('sharpness', config.sharpness);
+                    material.set('substraction', config.substraction);
+                    material.set('strength', config.strength);
+                }
+                function updateGlowMat() {
+                    var tonemappingNode = compositor.getNodeByName('tonemapping');
+                    tonemappingNode.setParameter('bloomIntensity', config.bloomIntensity);
+                }
+                gui.add(config, 'sharpness', 0, 100).onChange(updateTronMat);
+                gui.add(config, 'substraction', 0, 1).onChange(updateTronMat);
+                gui.add(config, 'strength', 0, 50).onChange(updateTronMat);
+                gui.add(config, 'bloomIntensity', 0, 1).onChange(updateGlowMat);
+            });
 
         </script>
     </body>

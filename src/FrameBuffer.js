@@ -120,6 +120,7 @@ define(function(require) {
 
             // Because the data of texture is changed over time,
             // Here update the mipmaps of texture each time after rendered;
+            // PENDGING
             for (var attachment in this._attachedTextures) {
                 var texture = this._attachedTextures[attachment];
                 if (!texture.NPOT && texture.useMipmap) {

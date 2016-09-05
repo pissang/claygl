@@ -9,7 +9,7 @@
     <canvas id="main"></canvas>
     <script type="text/javascript">
         require(['qtek'], function(qtek){
-            
+
             var Shader = qtek.Shader;
 
             var SIZE = 1024;
@@ -27,9 +27,9 @@
             fxLoader.on('success', function(compositor) {
                 var time = new Date().getTime();
                 var elapsedTime = 0;
-                var spawnNode = compositor.findNode('spawn');
-                var noiseNode = compositor.findNode('noise');
-                var particleNode = compositor.findNode('particle');
+                var spawnNode = compositor.getNodeByName('spawn');
+                var noiseNode = compositor.getNodeByName('noise');
+                var particleNode = compositor.getNodeByName('particle');
 
                 // Scene
                 var geo = new qtek.DynamicGeometry();
@@ -40,8 +40,8 @@
                 }
                 var mat = new qtek.Material({
                     shader : new qtek.Shader({
-                        vertex : Shader.source("curlnoise.vertex"),
-                        fragment : Shader.source("curlnoise.fragment")
+                        vertex : Shader.source('curlnoise.vertex'),
+                        fragment : Shader.source('curlnoise.fragment')
                     }),
                     transparent : true,
                     depthTest : false,

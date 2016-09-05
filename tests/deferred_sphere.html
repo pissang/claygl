@@ -2,13 +2,12 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
-
-        <script type="text/javascript" src="lib/stats.js"></script>
+        <script src="../thirdparty/require.js"></script>
+        <script src="js/config.js"></script>
+        <script src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
-        <canvas id="main"></canvas>
+        <canvas id="main" style="background: black;"></canvas>
         <script>
             require(['qtek'], function(qtek) {
                 var renderer = new qtek.Renderer({
@@ -115,7 +114,7 @@
                 });
 
 
-                camera.position.set(0, 300, 500);
+                camera.position.set(0, 1000, 100);
                 camera.lookAt(scene.position);
 
                 var control = new qtek.plugin.OrbitControl({
@@ -144,6 +143,7 @@
                     // renderer.gl.clear(renderer.gl.COLOR_BUFFER_BIT);
                     // debugPass.setUniform('texture', deferredRenderer._depthTex);
                     // debugPass.render(renderer);
+
                     stats.update();
                 });
                 animation.start();

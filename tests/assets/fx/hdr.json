@@ -1,5 +1,7 @@
 {
-    "meta" : {},
+    "meta" : {
+        "description": "Bloom from https://cdn2.unrealengine.com/Resources/files/The_Technology_Behind_the_Elemental_Demo_16x9-1248544805.pdf"
+    },
     "type" : "compositor",
     "textures" : {
         "lenscolor" : {
@@ -7,6 +9,18 @@
         }
     },
     "nodes" : [
+        {
+            "name": "scene",
+            "type": "scene",
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            }
+        },
         {
             "name" : "bright",
             "shader" : "#source(buildin.compositor.hdr.bright)",
@@ -20,13 +34,16 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 256,
-                        "height" : 256
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
                     }
                 }
             },
             "parameters" : {
-                "threshold" : 1
+                "threshold" : 10
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -42,20 +59,22 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 256,
-                        "height" : 256,
-                        "type" : 36193
+                        "width" : 512,
+                        "height" : 512
                     }
                 }
             },
             "parameters" : {
                 "threshold" : 50,
                 "scale" : 0.01
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
-            "name" : "blur_h_1",
-            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "name": "downsample_1",
+            "shader" : "#source(buildin.compositor.downsample)",
             "type" : "filter",
             "inputs" : {
                 "texture" : {
@@ -66,14 +85,144 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 256,
-                        "height" : 256,
-                        "type" : 36193
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "textureSize": "expr( [width, height] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "downsample_2",
+            "shader" : "#source(buildin.compositor.downsample)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_1",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "downsample_3",
+            "shader" : "#source(buildin.compositor.downsample)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_2",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 4, height / 4] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "downsample_4",
+            "shader" : "#source(buildin.compositor.downsample)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_3",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 8, height / 8] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "downsample_5",
+            "shader" : "#source(buildin.compositor.downsample)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_4",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 32)",
+                        "height" : "expr(height / 32)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 16, height / 16] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+        {
+            "name" : "blur_h_1",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_5",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 32 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -89,37 +238,46 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 256,
-                        "height" : 256,
-                        "type" : 36193
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 32 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
+
+
+
         {
             "name" : "blur_h_2",
             "shader" : "#source(buildin.compositor.gaussian_blur_h)",
             "type" : "filter",
             "inputs" : {
                 "texture" : {
-                    "node" : "bright",
+                    "node" : "downsample_4",
                     "pin" : "color"
                 }
             },
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 16 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -135,37 +293,76 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 16 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
-            "name" : "blur_h_3",
-            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "name" : "upsample_1",
+            "shader" : "#source(buildin.compositor.blend)",
             "type" : "filter",
             "inputs" : {
-                "texture" : {
-                    "node" : "bright",
+                "texture1" : {
+                    "node" : "blur_v_2",
+                    "pin" : "color"
+                },
+                "texture2" : {
+                    "node" : "blur_v_1",
                     "pin" : "color"
                 }
             },
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 64,
-                        "height" : 64,
-                        "type" : 36193
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+
+        {
+            "name" : "blur_h_3",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_3",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 8 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -181,49 +378,223 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 64,
-                        "height" : 64,
-                        "type" : 36193
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 1
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 8 )"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
-            "name" : "bloom",
+            "name" : "upsample_2",
             "shader" : "#source(buildin.compositor.blend)",
             "type" : "filter",
             "inputs" : {
                 "texture1" : {
-                    "node" : "blur_v_1",
+                    "node" : "blur_v_3",
                     "pin" : "color"
                 },
                 "texture2" : {
-                    "node" : "blur_v_2",
-                    "pin" : "color"
-                },
-                "texture3" : {
-                    "node" : "blur_v_3",
+                    "node" : "upsample_1",
                     "pin" : "color"
                 }
             },
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
                     }
                 }
             },
             "parameters" : {
-                "weight1" : 0.5,
-                "weight2" : 0.3,
-                "weight3" : 0.1
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
             }
         },
+
+
+
+
+
+        {
+            "name" : "blur_h_4",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_2",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 4 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "blur_v_4",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "blur_h_4",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 4 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "upsample_3",
+            "shader" : "#source(buildin.compositor.blend)",
+            "type" : "filter",
+            "inputs" : {
+                "texture1" : {
+                    "node" : "blur_v_4",
+                    "pin" : "color"
+                },
+                "texture2" : {
+                    "node" : "upsample_2",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+
+
+        {
+            "name" : "blur_h_5",
+            "shader" : "#source(buildin.compositor.gaussian_blur_h)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "downsample_1",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 2 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "blur_v_5",
+            "shader" : "#source(buildin.compositor.gaussian_blur_v)",
+            "type" : "filter",
+            "inputs" : {
+                "texture" : {
+                    "node" : "blur_h_5",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 2 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "upsample_4",
+            "shader" : "#source(buildin.compositor.blend)",
+            "type" : "filter",
+            "inputs" : {
+                "texture1" : {
+                    "node" : "blur_v_5",
+                    "pin" : "color"
+                },
+                "texture2" : {
+                    "node" : "upsample_3",
+                    "pin" : "color"
+                }
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
         {
             "name" : "lensflare",
             "shader" : "#source(buildin.compositor.lensflare)",
@@ -237,15 +608,17 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : 512,
+                        "height" : 512
                     }
                 }
             },
             "parameters" : {
-                "textureSize" : [256, 256],
+                "textureSize" : [512, 512],
                 "lensColor" : "#lenscolor"
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -261,14 +634,17 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : 256,
+                        "height" : 256
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 2
+                "blurSize" : 1,
+                "textureWidth": 256
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -284,14 +660,17 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
+                        "width" : 256,
+                        "height" : 256
                     }
                 }
             },
             "parameters" : {
-                "blurSize" : 2
+                "blurSize" : 1,
+                "textureHeight": 256
+            },
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -304,91 +683,24 @@
                     "pin" : "color"
                 },
                 "bloom" : {
-                    "node" : "bloom",
+                    "node" : "upsample_4",
                     "pin" : "color"
                 },
                 "lensflare" : {
                     "node" : "lensflare_blur_v",
                     "pin" : "color"
-                },
-                "lum" : {
-                    "node" : "lum_adaption",
-                    "pin" : "color"
                 }
             },
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : "100%width",
-                        "height" : "100%height"
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
                     }
                 }
-            }
-        },
-
-        {
-            "name" : "log_lum",
-            "shader" : "#source(buildin.compositor.hdr.log_lum)",
-            "type" : "filter",
-            "inputs" : {
-                "texture" : {
-                    "node" : "scene",
-                    "pin" : "color"
-                }
             },
-            "outputs" : {
-                "color" : {
-                    "parameters" : {
-                        "width" : 128,
-                        "height" : 128,
-                        "type" : 36193
-                    }
-                }
-            }
-        },
-        {
-            "name" : "avg_log_lum",
-            "shader" : "#source(buildin.compositor.output)",
-            "type" : "filter",
-            "inputs" : {
-                "texture" : {
-                    "node" : "log_lum",
-                    "pin" : "color"
-                }
-            },
-            "outputs" : {
-                "color" : {
-                    "parameters" : {
-                        "width" : 1,
-                        "height" : 1,
-                        "type" : 36193
-                    }
-                }
-            }
-        },
-        {
-            "name" : "lum_adaption",
-            "shader" : "#source(buildin.compositor.hdr.lum_adaption)",
-            "type" : "filter",
-            "inputs" : {
-                "adaptedLum" : {
-                    "node" : "lum_adaption",
-                    "pin" : "color"
-                },
-                "currentLum" : {
-                    "node" : "avg_log_lum",
-                    "pin" : "color"
-                }
-            },
-            "outputs" : {
-                "color" : {
-                    "parameters" : {
-                        "width" : 1,
-                        "height" : 1,
-                        "type" : 36193
-                    },
-                    "keepLastFrame" : true
-                }
+            "defines": {
+                "RGBM": null
             }
         },
         {
@@ -402,7 +714,10 @@
                 }
             },
             "parameters": {
-                "viewportSize": ["100%width", "100%height"]
+                "viewportSize": "expr( [width, height] )"
+            },
+            "defines": {
+                "RGBM_DECODE": null
             }
         }
     ]

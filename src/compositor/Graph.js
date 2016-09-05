@@ -39,7 +39,7 @@ define(function(require) {
          * @param {string} name
          * @return {qtek.compositor.Node}
          */
-        findNode: function(name) {
+        getNodeByName: function(name) {
             for (var i = 0; i < this.nodes.length; i++) {
                 if (this.nodes[i].name === name) {
                     return this.nodes[i];
@@ -82,7 +82,8 @@ define(function(require) {
                         node = tmp;
                     }
                 }
-            } else {
+            }
+            else {
                 node = input.node;
             }
             if (node) {
@@ -95,6 +96,6 @@ define(function(require) {
             }
         }
     });
-    
+
     return Graph;
 });

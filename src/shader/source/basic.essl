@@ -56,6 +56,8 @@ varying vec3 v_Barycentric;
 
 @import buildin.util.edge_factor
 
+@import buildin.util.rgbm
+
 void main()
 {
 
@@ -85,6 +87,14 @@ void main()
     {
         gl_FragColor.rgb = gl_FragColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
+
+#ifdef GAMMA_ENCODE
+    // Not linear
+    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1 / 2.2));
+#endif
+
+    gl_FragColor = encodeHDR(gl_FragColor);
+
 }
 
 @end
