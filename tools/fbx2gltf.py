@@ -252,7 +252,7 @@ def CreateTechnique(pMaterial):
         }
     }
     # Enable blend
-    try :  
+    try :
         # Old fbx version transparency is 0 if object is opaque
         if pMaterial.TransparencyFactor.Get() < 1 and pMaterial.TransparencyFactor.Get() > 0:
             lStates = lGLTFTechnique['passes']['defaultPass']['states']
@@ -276,7 +276,7 @@ def CreateImage(pPath):
     lImageKey = [name for name in lib_images.keys() if lib_images[name]['path'] == pPath]
     if len(lImageKey):
         return lImageKey[0]
-        
+
     lImageKey = 'image_' + str(len(lib_images.keys()))
     lib_images[lImageKey] = {
         'path' : pPath
@@ -296,7 +296,7 @@ def ConvertWrapMode(pWrap):
         return GL_REPEAT
     elif pWrap == FbxTexture.eClamp:
         return GL_CLAMP_TO_EDGE
-        
+
 _samplerHashMap = {}
 def CreateSampler(pTexture):
     lHashKey = HashSampler(pTexture)
@@ -307,7 +307,7 @@ def CreateSampler(pTexture):
         lib_samplers[lSamplerName] = {
             'wrapS' : ConvertWrapMode(pTexture.WrapModeU.Get()),
             'wrapT' : ConvertWrapMode(pTexture.WrapModeV.Get()),
-            # Texture filter in fbx ? 
+            # Texture filter in fbx ?
             'minFilter' : GL_LINEAR_MIPMAP_LINEAR,
             'magFilter' : GL_LINEAR
         }
@@ -525,16 +525,20 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
 
         ## Handle normals
         lLayerNormal = lLayer.GetNormals()
-        lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
+        if not lLayerNormal == None:
+            lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
+        else:
+            lNormalSplitted = False
 
         ## Handle uvs
         lLayerUV = lLayer.GetUVs()
         if not lLayerUV == None:
             lUVSPlitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
         else:
-            lUVSPlitted = True
+            ## Same with normal if don't have uv.
+            lUVSPlitted = lNormalSplitted
 
-        hasSkin = False;
+        hasSkin = False
         ## Handle Skinning data
         if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
             hasSkin = True;
@@ -625,7 +629,8 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
 
         lGLTFPrimitive['attributes'] = {}
         lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
-        lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
+        if not lLayerNormal == None:
+            lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
         if not lLayerUV == None:
             lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
         if hasSkin:
@@ -727,7 +732,7 @@ def ConvertSceneNode(pNode, fbxConverter):
         m[2][0], m[2][1], m[2][2], m[2][3],
         m[3][0], m[3][1], m[3][2], m[3][3],
     ]
-    
+
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
     lGeometry = pNode.GetGeometry()
@@ -845,7 +850,7 @@ def ConvertSceneNode(pNode, fbxConverter):
             ]
         else:
             lGLTFNode['meshes'] = [lMeshKey]
-                
+
     else:
         # Camera and light node attribute
         lNodeAttribute = pNode.GetNodeAttribute()
@@ -890,7 +895,7 @@ def CreateAnimation():
         'channels' : [],
         'count' : 0,
         'parameters' : {},
-        'samplers' : {} 
+        'samplers' : {}
     }
 
     return lAnimName, lGLTFAnimation
@@ -913,7 +918,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
     lTranslationCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
     lRotationCurve = pNode.LclRotation.GetCurve(pAnimLayer, 'X')
     lScalingCurve = pNode.LclScaling.GetCurve(pAnimLayer, 'X')
-    
+
     lHaveTranslation = not lTranslationCurve == None
     lHaveRotation = not lRotationCurve == None
     lHaveScaling = not lScalingCurve == None
@@ -924,7 +929,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
     lStartTimeDouble = lEndTimeDouble = lDuration = 0
     if lTranslationCurve:
         lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lTranslationCurve)
-        
+
     if lDuration < 1e-5 and lHaveRotation:
         lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lRotationCurve)
 
@@ -1126,7 +1131,7 @@ def Convert(path, animFrameRate = 1 / 30):
             'scene' : lSceneName
         }
 
-        out = open(lRoot + ".json", 'w')
+        out = open(lRoot + ".gltf", 'w')
         out.write(json.dumps(lOutput, indent = 4, sort_keys = True, separators=(',', ': ')))
         out.close()
 
@@ -1141,9 +1146,9 @@ if __name__ == "__main__":
         elif platform.system() == 'Linux':
             msg += '"/usr/local/lib/python2.6/site-packages"'
         elif platform.system() == 'Darwin':
-            msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'        
+            msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'
         msg += ' folder.'
-        print(msg) 
+        print(msg)
         sys.exit(1)
 
     if len(sys.argv) > 1:
