@@ -32,77 +32,51 @@
                     far : 500
                 });
 
-                var sphere = new qtek.geometry.Sphere({
-                    widthSegments : 20,
-                    heightSegments : 20
-                });
                 var cube = new qtek.geometry.Cube({
-                    widthSegments : 10,
-                    heightSegments : 10,
-                    depthSegments : 10
+                    widthSegments : 1,
+                    heightSegments : 1,
+                    depthSegments : 1
                 });
-                var plane = new qtek.geometry.Plane({
-                    widthSegments : 10,
-                    heightSegments : 10
-                });
-                var cone = new qtek.geometry.Cone({
-                    heightSegments : 10
-                });
-                var cylinder = new qtek.geometry.Cylinder({
-                    heightSegments : 10
-                });
-                sphere.generateBarycentric();
-                cube.generateBarycentric();
-                plane.generateBarycentric();
-                cone.generateBarycentric();
-                cylinder.generateBarycentric();
 
-                var shader = new qtek.Shader({
-                    vertex: Shader.source('tron.vertex'),
-                    fragment: Shader.source('tron.fragment')
+                var tronMaterial = new qtek.Material({
+                    shader: new qtek.Shader({
+                        vertex: Shader.source('tron.vertex'),
+                        fragment: Shader.source('tron.fragment')
+                    })
                 });
-                var material = new qtek.Material({
-                    shader: shader
-                });
+                tronMaterial.shader.define('fragment', 'RGBM_ENCODE');
 
                 camera.position.set(0, 0, 7);
 
-                var sphereMesh = new qtek.Mesh({
-                    geometry : sphere,
-                    material : material,
-                    culling : false
+                var cubeMeshTronOutline = new qtek.Mesh({
+                    geometry: cube,
+                    material: tronMaterial,
+                    culling: false,
+                    // transparent: true,
+                    // depthMask: false,
+                    // blend: function (gl) {
+                    //     gl.blendEquation(gl.FUNC_ADD);
+                    //     gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
+                    // }
                 });
-                var cubeMesh = new qtek.Mesh({
-                    geometry : cube,
-                    material : material,
-                    culling : false
-                });
-                var planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material,
-                    culling : false
-                });
-                var coneMesh = new qtek.Mesh({
-                    geometry : cone,
-                    material : material,
-                    culling : false
-                });
-                var cylinderMesh = new qtek.Mesh({
-                    geometry : cylinder,
-                    material : material,
-                    culling : false
-                });
-                sphereMesh.position.x = -3;
-                // cubeMesh.position.x = -1.5;
-                cubeMesh.scale.set(1.5, 1.5, 1.5);
-                // cubeMesh.scale.set(0.7, 0.7, 0.7);
-                coneMesh.position.x = 1.5;
-                cylinderMesh.position.x = 3;
-                // scene.add(sphereMesh);
-                // scene.add(planeMesh);
-                scene.add(cubeMesh);
-                // scene.add(coneMesh);
-                // scene.add(cylinderMesh);
+                // var cubeMesh = new qtek.Mesh({
+                //     geometry: cube,
+                //     material: new qtek.Material({
+                //         shader: qtek.shader.library.get('buildin.standard')
+                //     })
+                // });
+                cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
+                // cubeMesh.scale.set(1.5, 1.5, 1.5);
+
+                // scene.add(cubeMesh);
+                scene.add(cubeMeshTronOutline);
+
+                // var light = new qtek.light.Directional({
+                //     intensity: 100
+                // });
+                // light.position.set(2, 2, 2);
+                // light.lookAt(scene.position);
+                // scene.add(light);
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
@@ -129,24 +103,19 @@
                     }
                     // renderer.render(scene, camera);
                     control.update(dTime);
-                    // cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    // planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    // sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    // coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                    // cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
                 });
 
                 var gui = new dat.GUI();
                 var config = {
                     sharpness: 10.0,
                     substraction: 0.2,
-                    strength: 10.0,
+                    strength: 50.0,
                     bloomIntensity: 0.25
                 };
                 function updateTronMat() {
-                    material.set('sharpness', config.sharpness);
-                    material.set('substraction', config.substraction);
-                    material.set('strength', config.strength);
+                    tronMaterial.set('sharpness', config.sharpness);
+                    tronMaterial.set('substraction', config.substraction);
+                    tronMaterial.set('strength', config.strength);
                 }
                 function updateGlowMat() {
                     var tonemappingNode = compositor.getNodeByName('tonemapping');
@@ -154,7 +123,7 @@
                 }
                 gui.add(config, 'sharpness', 0, 100).onChange(updateTronMat);
                 gui.add(config, 'substraction', 0, 1).onChange(updateTronMat);
-                gui.add(config, 'strength', 0, 50).onChange(updateTronMat);
+                gui.add(config, 'strength', 0, 200).onChange(updateTronMat);
                 gui.add(config, 'bloomIntensity', 0, 1).onChange(updateGlowMat);
             });
 

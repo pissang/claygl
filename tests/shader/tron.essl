@@ -14,7 +14,7 @@ uniform vec3 color : [0.0, 0.775, 0.189];
 
 uniform float sharpness : 10.0;
 uniform float substraction: 0.3;
-uniform float strength: 10.0;
+uniform float strength: 50.0;
 
 @import buildin.util.rgbm
 // https://www.youtube.com/watch?v=KHiZfy5OlO8

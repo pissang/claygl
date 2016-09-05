@@ -40,7 +40,8 @@
                 }
             },
             "parameters" : {
-                "threshold" : 10
+                "threshold" : 4,
+                "scale": 4
             },
             "defines": {
                 "RGBM": null
