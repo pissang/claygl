@@ -474,6 +474,8 @@ define(function(require) {
 
                     var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
                     preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
+
+                    // PENDING If invoke beforeRender hook
                     renderable.render(_gl, preZPassMaterial);
                     culledRenderQueue.push(renderable);
                 }
@@ -519,6 +521,9 @@ define(function(require) {
                         continue;
                     }
                 }
+
+                // Before render hook
+                renderable.beforeRender(_gl);
 
                 if (prevShader !== shader) {
                     // Set lights number
@@ -603,12 +608,16 @@ define(function(require) {
 
                 var objectRenderInfo = renderable.render(_gl, globalMaterial);
 
+
                 if (objectRenderInfo) {
                     renderInfo.faceCount += objectRenderInfo.faceCount;
                     renderInfo.vertexCount += objectRenderInfo.vertexCount;
                     renderInfo.drawCallCount += objectRenderInfo.drawCallCount;
                     renderInfo.renderedMeshCount ++;
                 }
+
+                // After render hook
+                renderable.afterRender(_gl, objectRenderInfo);
             }
 
             if (preZ) {

@@ -113,6 +113,20 @@ define(function(require) {
         },
 
         /**
+         * Before render hook
+         * @type {Function}
+         * @memberOf qtek.Renderable
+         */
+        beforeRender: function (_gl) {},
+
+        /**
+         * Before render hook
+         * @type {Function}
+         * @memberOf qtek.Renderable
+         */
+        afterRender: function (_gl, renderStat) {},
+
+        /**
          * @param  {WebGLRenderingContext} _gl
          * @param  {qtek.Material} [globalMaterial]
          * @return {Object}
