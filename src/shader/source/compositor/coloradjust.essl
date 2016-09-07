@@ -27,7 +27,7 @@ void main()
     // saturation
     float luminance = dot( color, w );
     color = mix(vec3(luminance), color, saturation);
-    
+
     gl_FragColor = vec4(color, tex.a);
 }
 

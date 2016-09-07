@@ -744,7 +744,8 @@ define(function(require) {
                                     type: uniformType
                                 };
                                 isConfigurable = false;
-                            } else if (matrixSemantics.indexOf(semantic) >= 0) {
+                            }
+                            else if (matrixSemantics.indexOf(semantic) >= 0) {
                                 var isTranspose = false;
                                 var semanticNoTranspose = semantic;
                                 if (semantic.match(/TRANSPOSE$/)) {
@@ -758,12 +759,14 @@ define(function(require) {
                                     semanticNoTranspose: semanticNoTranspose
                                 };
                                 isConfigurable = false;
-                            } else {
+                            }
+                            else {
                                 // The uniform is not configurable, which means it will not appear
                                 // in the material uniform properties
                                 if (semantic === 'unconfigurable') {
                                     isConfigurable = false;
-                                } else {
+                                }
+                                else {
                                     // Uniform have a defalut value, like
                                     // uniform vec3 color: [1, 1, 1];
                                     defaultValueFunc = self._parseDefaultValue(type, semantic);
@@ -804,11 +807,13 @@ define(function(require) {
                     // Invalid value
                     return;
                 }
-            } else if (type === 'bool') {
+            }
+            else if (type === 'bool') {
                 return function () {
                     return str.toLowerCase() === 'true' ? true : false;
                 };
-            } else if (type === 'float') {
+            }
+            else if (type === 'float') {
                 return function () {
                     return parseFloat(str);
                 };

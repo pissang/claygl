@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="main"></canvas>
+        <script type="text/javascript">
+            require(['qtek'], function(qtek) {
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var camera = new qtek.camera.Perspective({
+                    aspect: renderer.getViewportAspect()
+                });
+                camera.position.set(0, 0, 6);
+
+                var scene = new qtek.Scene();
+
+                var GLTFLoader = new qtek.loader.GLTF();
+                GLTFLoader.load('assets/models/suzanne_full.gltf');
+                var suzanneGeometry;
+                GLTFLoader.on('success', function(res) {
+                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+                    var envMap = qtek.util.texture.loadTexture(
+                        'assets/textures/hdr/pisa.hdr',
+                        {
+                            exposure: 3
+                        },
+                        function () {
+                            envMap.flipY = false;
+
+                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                                renderer, envMap, {
+                                    width: 128,
+                                    height: 128
+                                }
+                            );
+
+                            var skybox = new qtek.plugin.Skybox({
+                                scene: scene
+                            });
+                            skybox.material.set('environmentMap', prefilterResult.environmentMap);
+                            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+
+                            var shader = qtek.shader.library.get(
+                                'buildin.standard', [
+                                    'environmentMap', 'brdfLookup',
+                                    'diffuseMap', 'normalMap', 'metalnessMap', 'roughnessMap'
+                                ]
+                            );
+                            shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
+                            shader.define('fragment', 'RGBM_ENCODE');
+                            shader.define('fragment', 'USE_METALNESS');
+
+                            var material = new qtek.Material({
+                                shader: shader
+                            });
+                            var mesh = new qtek.Mesh({
+                                geometry: suzanneGeometry,
+                                material: material
+                            });
+                            mesh.geometry.generateTangents();
+
+                            material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
+                            material.set('brdfLookup', prefilterResult.brdfLookup);
+                            material.set('environmentMap', prefilterResult.environmentMap);
+                            material.set('glossiness', 1);
+                            material.set('metalness', 0);
+                            material.set('uvRepeat', [2, 2]);
+
+                            [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
+                                var tex = new qtek.Texture2D({
+                                    wrapS: qtek.Texture.REPEAT,
+                                    wratT: qtek.Texture.REPEAT
+                                });
+                                tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+                                    .success(function () {
+                                        tex.wrapS = qtek.Texture.REPEAT;
+                                        tex.wrapT = qtek.Texture.REPEAT;
+                                    });
+                                material.set(mapInfo[0], tex);
+                            });
+
+                            mesh.scale.set(1.4, 1.4, 1.4);
+                            scene.add(mesh);
+                        }
+                    );
+                });
+
+                var control = new qtek.plugin.OrbitControl({
+                    target: camera,
+                    domElement: renderer.canvas
+                });
+
+                var compositor;
+                var FXLoader = new qtek.loader.FX({
+                    scene: scene,
+                    camera: camera
+                });
+                FXLoader.load('assets/fx/hdr.json');
+                FXLoader.on('success', function(_compositor) {
+                    compositor = _compositor;
+                });
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function(deltaTime) {
+                    control.update(deltaTime);
+                    if (compositor) {
+                        compositor.render(renderer);
+                    }
+                    // renderer.render(scene, camera);
+                });
+
+                window.onresize = function() {
+                    renderer.resize(window.innerWidth, window.innerHeight);
+                    camera.aspect = renderer.getViewportAspect();
+                };
+            });
+        </script>
+</html>

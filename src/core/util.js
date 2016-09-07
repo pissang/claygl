@@ -1,5 +1,5 @@
 define(function(require){
-    
+
     'use strict';
 
     var guid = 0;
@@ -110,7 +110,7 @@ define(function(require){
             if (source) {
                 for (var i = 0; i < propList.length; i++) {
                     var propName = propList[i];
-                    if (target[propName] === undefined) {
+                    if (target[propName] == null) {
                         target[propName] = source[propName];
                     }
                 }

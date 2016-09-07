@@ -52,31 +52,32 @@
                     geometry: cube,
                     material: tronMaterial,
                     culling: false,
-                    // transparent: true,
-                    // depthMask: false,
-                    // blend: function (gl) {
-                    //     gl.blendEquation(gl.FUNC_ADD);
-                    //     gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
-                    // }
+                    beforeRender: function (_gl) {
+                        _gl.clear(_gl.DEPTH_BUFFER_BIT);
+                    }
                 });
-                // var cubeMesh = new qtek.Mesh({
-                //     geometry: cube,
-                //     material: new qtek.Material({
-                //         shader: qtek.shader.library.get('buildin.standard')
-                //     })
-                // });
+                var cubeMesh = new qtek.Mesh({
+                    geometry: cube,
+                    material: new qtek.Material({
+                        shader: qtek.shader.library.get('buildin.standard', {
+                            fragmentDefines: {
+                                RGBM_ENCODE: null
+                            }
+                        })
+                    })
+                });
                 cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
-                // cubeMesh.scale.set(1.5, 1.5, 1.5);
+                cubeMesh.scale.set(1.5, 1.5, 1.5);
 
-                // scene.add(cubeMesh);
+                scene.add(cubeMesh);
                 scene.add(cubeMeshTronOutline);
 
-                // var light = new qtek.light.Directional({
-                //     intensity: 100
-                // });
-                // light.position.set(2, 2, 2);
-                // light.lookAt(scene.position);
-                // scene.add(light);
+                var light = new qtek.light.Directional({
+                    intensity: 0.5
+                });
+                light.position.set(4, 5, 2);
+                light.lookAt(scene.position);
+                scene.add(light);
 
                 var animation = new qtek.animation.Animation();
                 animation.start();

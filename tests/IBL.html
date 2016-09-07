@@ -24,101 +24,106 @@
                     heightSegments: 50
                 });
 
+                var normalDistribution = qtek.util.cubemap.generateNormalDistribution();
+                var brdfLookup = qtek.util.cubemap.integrateBrdf(renderer, normalDistribution);
+
                 var GLTFLoader = new qtek.loader.GLTF();
                 GLTFLoader.load('assets/models/suzanne.json');
                 var suzanneGeometry;
                 GLTFLoader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+                    var envMap = qtek.util.texture.loadTexture(
+                        'assets/textures/hdr/pisa.hdr',
+                        {
+                            exposure: 2
+                        },
+                        function () {
+                            envMap.flipY = false;
+
+                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                                renderer, envMap, {
+                                    width: 128,
+                                    height: 128
+                                    // type: qtek.Texture.UNSIGNED_BYTE
+                                }, normalDistribution, brdfLookup
+                            );
+
+                            var skybox = new qtek.plugin.Skybox({
+                                scene: scene
+                            });
+                            skybox.material.set('environmentMap', prefilterResult.environmentMap);
+                            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+
+                            var shader = qtek.shader.library.get(
+                                'buildin.standard', ['environmentMap', 'brdfLookup']
+                            );
+                            shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
+                            shader.define('fragment', 'RGBM_ENCODE');
+                            for (var i = 0; i < 10; i++) {
+                                var material = new qtek.Material({
+                                    shader: shader
+                                });
+                                var roughness = i / 9;
+                                var mesh = new qtek.Mesh({
+                                    geometry: sphereGeo,
+                                    material: material
+                                });
+                                applyMaterial(
+                                    material,
+                                    prefilterResult,
+                                    roughness
+                                );
+                                material.set('specularColor', [0.05, 0.05, 0.05]);
+                                mesh.position.x = i * 3 - 15;
+                                mesh.position.y = 3;
+                                mesh.scale.set(1.4, 1.4, 1.4);
+                                scene.add(mesh);
+                            }
+
+                            for (var i = 0; i < 10; i++) {
+                                var material = new qtek.Material({
+                                    shader: shader
+                                });
+                                var roughness = i / 9;
+                                var mesh = new qtek.Mesh({
+                                    geometry: sphereGeo,
+                                    material: material
+                                });
+                                material.set('specularColor', [1.0, 0.71, 0.29]);
+                                applyMaterial(material, prefilterResult, roughness);
+                                mesh.position.x = i * 3 - 15;
+                                mesh.position.y = 6;
+                                mesh.scale.set(1.4, 1.4, 1.4);
+                                scene.add(mesh);
+                            }
+
+                            var monkeys = [];
+                            for (var i = 0; i < 4; i++) {
+                                var material = new qtek.Material({
+                                    shader: shader
+                                });
+                                var roughness = 0.4;
+                                var mesh = new qtek.Mesh({
+                                    geometry: suzanneGeometry,
+                                    material: material
+                                });
+                                monkeys.push(mesh);
+                                applyMaterial(material, prefilterResult, roughness);
+                                mesh.position.x = i * 8 - 15;
+                                mesh.position.y = -2;
+                                mesh.scale.set(3, 3, 3);
+                                scene.add(mesh);
+                            }
+                            monkeys[0].material.set('specularColor', [1.0, 0.71, 0.29]);
+                            monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
+                            monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
+                            monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05]);
+                            applyMaterial(monkeys[3].material, prefilterResult, 0.2);
+                        }
+                    );
                 });
 
-                var normalDistribution = qtek.util.cubemap.generateNormalDistribution();
-                var brdfLookup = qtek.util.cubemap.integrateBrdf(renderer, normalDistribution);
-
-                var envMap = qtek.util.texture.loadTexture(
-                    'assets/textures/hdr/pisa.hdr',
-                    function () {
-                        envMap.flipY = false;
-
-                        var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
-                            renderer, envMap, {
-                                width: 128,
-                                height: 128,
-                                type: qtek.Texture.UNSIGNED_BYTE
-                            }, normalDistribution, brdfLookup
-                        );
-
-                        var skybox = new qtek.plugin.Skybox({
-                            scene: scene
-                        });
-                        skybox.material.set('environmentMap', prefilterResult.environmentMap);
-
-                        var shader = qtek.shader.library.get(
-                            'buildin.standard', ['environmentMap', 'brdfLookup']
-                        );
-                        shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-                        shader.define('fragment', 'RGBM_ENCODE');
-                        for (var i = 0; i < 10; i++) {
-                            var material = new qtek.Material({
-                                shader: shader
-                            });
-                            var roughness = i / 9;
-                            var mesh = new qtek.Mesh({
-                                geometry: sphereGeo,
-                                material: material
-                            });
-                            applyMaterial(
-                                material,
-                                prefilterResult,
-                                roughness
-                            );
-                            material.set('specularColor', [0.05, 0.05, 0.05]);
-                            mesh.position.x = i * 3 - 15;
-                            mesh.position.y = 3;
-                            mesh.scale.set(1.4, 1.4, 1.4);
-                            scene.add(mesh);
-                        }
-
-                        for (var i = 0; i < 10; i++) {
-                            var material = new qtek.Material({
-                                shader: shader
-                            });
-                            var roughness = i / 9;
-                            var mesh = new qtek.Mesh({
-                                geometry: sphereGeo,
-                                material: material
-                            });
-                            material.set('specularColor', [1.0, 0.71, 0.29]);
-                            applyMaterial(material, prefilterResult, roughness);
-                            mesh.position.x = i * 3 - 15;
-                            mesh.position.y = 6;
-                            mesh.scale.set(1.4, 1.4, 1.4);
-                            scene.add(mesh);
-                        }
-
-                        var monkeys = [];
-                        for (var i = 0; i < 4; i++) {
-                            var material = new qtek.Material({
-                                shader: shader
-                            });
-                            var roughness = 0.4;
-                            var mesh = new qtek.Mesh({
-                                geometry: suzanneGeometry,
-                                material: material
-                            });
-                            monkeys.push(mesh);
-                            applyMaterial(material, prefilterResult, roughness);
-                            mesh.position.x = i * 8 - 15;
-                            mesh.position.y = -2;
-                            mesh.scale.set(3, 3, 3);
-                            scene.add(mesh);
-                        }
-                        monkeys[0].material.set('specularColor', [1.0, 0.71, 0.29]);
-                        monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
-                        monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
-                        monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05]);
-                        applyMaterial(monkeys[3].material, prefilterResult, 0.2);
-                    }
-                );
                 var control = new qtek.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas
@@ -144,16 +149,8 @@
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     var viewport = renderer.viewport;
-                    // renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT | qtek.Renderer.COLOR_BUFFER_BIT;
                     if (compositor) {
                         compositor.render(renderer);
-                        // var lumAdaptionNode = compositor.getNodeByName('lum_adaption');
-                        // var currentLumNode = compositor.getNodeByName('avg_log_lum');
-
-                        var FXAANode = compositor.getNodeByName('FXAA');
-                        if (FXAANode) {
-                            FXAANode.setParameter('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
-                        }
                     }
 
                     var x = 0, y = 0;
@@ -168,16 +165,6 @@
                     debugPass.setUniform('texture', brdfLookup);
                     debugPass.render(renderer);
 
-                    // if (lumAdaptionNode) {
-                    //     x += width + 10;
-                    //     renderer.setViewport(x, y, width, height);
-                    //     debugPass.setUniform('texture', lumAdaptionNode._outputTextures['color']);
-                    //     debugPass.render(renderer);
-                    //     x += width + 10;
-                    //     renderer.setViewport(x, y, width, height);
-                    //     debugPass.setUniform('texture', currentLumNode._outputTextures['color']);
-                    //     debugPass.render(renderer);
-                    // }
                     renderer.setViewport(viewport);
                 });
 

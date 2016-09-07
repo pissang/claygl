@@ -32,7 +32,8 @@ define(function(require) {
                 onsuccess = option;
                 onerror = onsuccess;
                 option = {};
-            } else {
+            }
+            else {
                 option = option || {};
             }
             if (typeof(path) === 'string') {
@@ -88,7 +89,7 @@ define(function(require) {
          * @param  {object} [option]
          * @param  {Function} [onsuccess]
          * @param  {Function} [onerror]
-         * 
+         *
          * @memberOf qtek.util.texture
          */
         loadPanorama: function(path, cubeMap, renderer, option, onsuccess, onerror) {
@@ -103,7 +104,7 @@ define(function(require) {
             }
 
             textureUtil.loadTexture(path, option, function(texture) {
-                // PENDING 
+                // PENDING
                 texture.flipY = false;
                 self.panoramaToCubeMap(texture, cubeMap, renderer);
                 texture.dispose(renderer.gl);
@@ -116,7 +117,7 @@ define(function(require) {
          * @param  {qtek.Texture2D} panoramaMap
          * @param  {qtek.TextureCube} cubeMap
          * @param  {qtek.Renderer} renderer
-         * 
+         *
          * @memberOf qtek.util.texture
          */
         panoramaToCubeMap: function(panoramaMap, cubeMap, renderer) {
@@ -148,7 +149,7 @@ define(function(require) {
          * @param  {string} [color1]
          * @param  {string} [color2]
          * @return {qtek.Texture2D}
-         * 
+         *
          * @memberOf qtek.util.texture
          */
         createChessboard: function(size, unitSize, color1, color2) {
@@ -188,7 +189,7 @@ define(function(require) {
          * Create a blank pure color 1x1 texture
          * @param  {string} color
          * @return {qtek.Texture2D}
-         * 
+         *
          * @memberOf qtek.util.texture
          */
         createBlank: function(color) {

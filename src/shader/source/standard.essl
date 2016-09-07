@@ -12,6 +12,10 @@
 
 #define PI 3.14159265358979
 
+#define GLOSS_CHANEL 0
+#define ROUGHNESS_CHANEL 0
+#define METALNESS_CHANEL 1
+
 uniform mat4 viewInverse : VIEWINVERSE;
 
 varying vec2 v_Texcoord;
@@ -32,6 +36,16 @@ uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 #endif
 
+#ifdef GLOSSMAP_ENABLED
+uniform sampler2D glossinessMap;
+#elif defined(ROUGHNESSMAP_ENABLED)
+uniform sampler2D roughnessMap;
+#endif
+
+#ifdef METALNESSMAP_ENABLED
+uniform sampler2D metalnessMap;
+#endif
+
 #ifdef ENVIRONMENTMAP_ENABLED
 uniform samplerCube environmentMap;
 #endif
@@ -45,7 +59,14 @@ uniform float alpha : 1.0;
 
 uniform float glossiness : 0.5;
 
+#ifdef USE_METALNESS
+// metalness workflow
+uniform float metalness : 0.0;
+#else
+// specular workflow
 uniform vec3 specularColor : [0.1, 0.1, 0.1];
+#endif
+
 uniform vec3 emission : [0.0, 0.0, 0.0];
 
 // Uniforms for wireframe
@@ -111,26 +132,44 @@ float D_GGX(float g, float ndh) {
 void main()
 {
     vec4 outColor = vec4(color, alpha);
-
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
-    float g = glossiness;
 
 #ifdef DIFFUSEMAP_ENABLED
     vec4 tex = texture2D(diffuseMap, v_Texcoord);
-#ifdef SRGB_DECODE
+    #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));
-#endif
+    #endif
     outColor.rgb *= tex.rgb;
-#ifdef DIFFUSEMAP_ALPHA_ALPHA
+    #ifdef DIFFUSEMAP_ALPHA_ALPHA
     outColor.a *= tex.a;
-#endif
-#ifdef DIFFUSEMAP_ALPHA_GLOSS
-    g *= tex.a;
-#endif
+    #endif
 #endif
 
+
+#ifdef USE_METALNESS
+    float m = metalness;
+
+    #ifdef METALNESSMAP_ENABLED
+    m = texture2D(metalnessMap, v_Texcoord)[METALNESS_CHANEL];
+    #endif
+
+    vec3 baseColor = outColor.rgb;
+    outColor.rgb = baseColor * (1.0 - m);
+    vec3 spec = mix(vec3(0.04), baseColor, m);
+#else
     vec3 spec = specularColor;
+#endif
+
+    float g = glossiness;
+
+#ifdef GLOSSMAP_ENABLED
+    // PENDING Replace or multiply
+    g = texture2D(glossinessMap, v_Texcoord)[GLOSS_CHANEL];
+#elif defined(ROUGHNESSMAP_ENABLED)
+    g = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANEL];
+#endif
+
 #ifdef SPECULARMAP_ENABLED
     spec *= texture2D(specularMap, v_Texcoord).rgb;
 #endif
