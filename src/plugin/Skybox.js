@@ -30,8 +30,8 @@ define(function(require) {
 
         if (!skyboxShader) {
             skyboxShader = new Shader({
-                vertex: Shader.source('buildin.skybox.vertex'),
-                fragment: Shader.source('buildin.skybox.fragment')
+                vertex: Shader.source('qtek.skybox.vertex'),
+                fragment: Shader.source('qtek.skybox.fragment')
             });
         }
         var material = new Material({

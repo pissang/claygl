@@ -24,7 +24,7 @@
                 for (var i = 0; i < 5; i++) {
                     for (var j = 0; j < 5; j++) {
                         var material = new qtek.Material({
-                            shader : qtek.shader.library.get('buildin.lambert')
+                            shader : qtek.shader.library.get('qtek.lambert')
                         });
                         material.set('color', [Math.random(), Math.random(), Math.random()]);
                         var mesh = new qtek.Mesh({

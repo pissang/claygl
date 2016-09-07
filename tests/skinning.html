@@ -14,8 +14,8 @@
                 });
                 var sphereMat = new qtek.Material({
                     shader : new qtek.Shader({
-                        vertex : qtek.Shader.source("buildin.basic.vertex"),
-                        fragment : qtek.Shader.source("buildin.basic.fragment")
+                        vertex : qtek.Shader.source("qtek.basic.vertex"),
+                        fragment : qtek.Shader.source("qtek.basic.fragment")
                     })
                 });
                 sphereMat.set("color", [0.3, 0.3, 0.3]);
@@ -49,12 +49,12 @@
                         if (parentJoint) {
                             lineGeoVertices[0] = joint.node.getWorldPosition()._array;
                             lineGeoVertices[1] = parentJoint.node.getWorldPosition()._array;
-                        }  
+                        }
                         lineGeo.dirty('position');
                     });
 
                 });
-                
+
                 scene.before('render', function() {
                     for (var i = 0; i < updates.length; i++) {
                         updates[i]();
@@ -84,8 +84,8 @@
 
                 var loader = new qtek.loader.ThreeModel();
                 var meshList = loader.parse(data);
-                
-                var shader = qtek.shader.library.get("buildin.lambert");
+
+                var shader = qtek.shader.library.get("qtek.lambert");
 
                 var material = new qtek.Material({
                     shader : shader,
@@ -159,7 +159,7 @@
                     skeleton.setPose(0);
                 }, 20)
             })
-            
+
         </script>
     </body>
 </html>

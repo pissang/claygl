@@ -1,4 +1,4 @@
-@export buildin.deferred.depth.vertex
+@export qtek.deferred.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -19,7 +19,7 @@ void main(){
 
 #ifdef SKINNING
 
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -31,10 +31,10 @@ void main(){
 @end
 
 
-@export buildin.deferred.depth.fragment
+@export qtek.deferred.depth.fragment
 
 varying vec4 v_ProjPos;
-@import buildin.util.encode_float
+@import qtek.util.encode_float
 
 void main()
 {

@@ -14,8 +14,8 @@ define(function (require) {
     var Sprite = Mesh.derive(function () {
         if (!spriteShader) {
             spriteShader = new Shader({
-                vertex: Shader.source('buildin.basic.vertex'),
-                fragment: Shader.source('buildin.basic.fragment')
+                vertex: Shader.source('qtek.basic.vertex'),
+                fragment: Shader.source('qtek.basic.fragment')
             });
             spriteShader.enableTexture('diffuseMap');
         }

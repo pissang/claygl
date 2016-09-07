@@ -58,8 +58,8 @@ define(function (require) {
             this._frameBuffer = new FrameBuffer();
 
             this._shader = new Shader({
-                vertex: Shader.source('buildin.picking.color.vertex'),
-                fragment: Shader.source('buildin.picking.color.fragment')
+                vertex: Shader.source('qtek.picking.color.vertex'),
+                fragment: Shader.source('qtek.picking.color.fragment')
             });
         },
         /**

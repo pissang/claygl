@@ -1,5 +1,5 @@
 
-@export buildin.compositor.vertex
+@export qtek.compositor.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 

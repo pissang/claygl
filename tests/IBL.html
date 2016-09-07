@@ -56,7 +56,7 @@
                             skybox.material.shader.define('fragment', 'RGBM_ENCODE');
 
                             var shader = qtek.shader.library.get(
-                                'buildin.standard', ['environmentMap', 'brdfLookup']
+                                'qtek.standard', ['environmentMap', 'brdfLookup']
                             );
                             shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
                             shader.define('fragment', 'RGBM_ENCODE');
@@ -130,7 +130,7 @@
                 });
 
                 var debugPass = new qtek.compositor.Pass({
-                    fragment: qtek.Shader.source('buildin.compositor.output')
+                    fragment: qtek.Shader.source('qtek.compositor.output')
                 });
 
                 var compositor;

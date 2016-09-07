@@ -21,7 +21,7 @@
                 animation.start();
                 var shadowMapPass = new qtek.prePass.ShadowMap({
                     // softShadow : qtek.prePass.ShadowMap.VSM
-                    shadowCascade : 4
+                    // shadowCascade : 4
                 });
 
                 var scene = new qtek.Scene();
@@ -30,15 +30,15 @@
                     far : 100
                 });
 
-                
+
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.ThreeModel({
                     textureRootPath : "assets/models/nanosuit/tex"
                 });
                 var meshList = loader.parse(data);
-                
-                var shader = qtek.shader.library.get("buildin.lambert", "diffuseMap");
+
+                var shader = qtek.shader.library.get("qtek.lambert", "diffuseMap");
 
                 var material = new qtek.Material({
                     shader : shader
@@ -54,7 +54,7 @@
 
                 var root = new qtek.Node();
                 var meshNumber = 0;
-                var N = 10;
+                var N = 8;
                 for (var i = 0; i < N; i++) {
                     for (var j = 0; j < N; j++) {
                         var nanosuit = new qtek.Node();
@@ -98,8 +98,7 @@
 
                 var light = new qtek.light.Directional({
                     intensity : 1.0,
-                    position : new qtek.math.Vector3(10, 10, 10),
-                    shadowResolution : 512,
+                    shadowResolution : 4096,
                     shadowBias : 0.006
                 });
                 light.lookAt(root.position);
@@ -119,6 +118,7 @@
                     sensitivity : 0.4
                 });
 
+                var rot = 0;
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
 
@@ -131,15 +131,21 @@
                     renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.renderDebug(renderer, 200);
 
-                    document.getElementById('time').innerHTML = 
-                            'fps: ' + Math.round(1000 / deltaTime) + '<br />' 
+                    rot += deltaTime / 2000;
+                    light.position.x = Math.sin(rot);
+                    light.position.z = Math.cos(rot);
+                    light.position.y = Math.sin(rot) + 1;
+                    light.lookAt(root.position);
+
+                    document.getElementById('time').innerHTML =
+                            'fps: ' + Math.round(1000 / deltaTime) + '<br />'
                             + 'render time : ' + Math.round(renderTime) + '<br />'
                             + 'draw call: ' +  drawInfo.drawCallNumber + '(' + (meshNumber+1) + ')'+ '<br />'
                             + 'vertices: ' + drawInfo.vertexNumber+ '<br />'
                             + 'faces: ' + drawInfo.faceNumber;
                 });
             })
-            
+
         </script>
     </body>
 </html>

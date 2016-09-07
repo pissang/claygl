@@ -433,7 +433,7 @@ define(function(require) {
             var culledRenderQueue;
             if (preZ) {
                 var preZPassMaterial = new Material({
-                    shader: shaderLibrary.get('buildin.prez')
+                    shader: shaderLibrary.get('qtek.prez')
                 });
                 var preZPassShader = preZPassMaterial.shader;
 

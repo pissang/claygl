@@ -1,10 +1,10 @@
-@export buildin.deferred.spot_light
+@export qtek.deferred.spot_light
 
-@import buildin.deferred.chunk.light_head
+@import qtek.deferred.chunk.light_head
 
-@import buildin.deferred.chunk.light_equation
+@import qtek.deferred.chunk.light_equation
 
-@import buildin.util.calculate_attenuation
+@import qtek.util.calculate_attenuation
 
 uniform vec3 lightPosition;
 uniform vec3 lightDirection;
@@ -18,7 +18,7 @@ uniform vec3 eyePosition;
 
 void main()
 {
-    @import buildin.deferred.chunk.gbuffer_read
+    @import qtek.deferred.chunk.gbuffer_read
 
     vec3 L = lightPosition - position;
     vec3 V = normalize(eyePosition - position);

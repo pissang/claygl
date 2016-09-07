@@ -11,7 +11,7 @@ define(function(require) {
      */
     var TextureNode = Node.derive(function() {
         return /** @lends qtek.compositor.TextureNode# */ {
-            shader: Shader.source('buildin.compositor.output'),
+            shader: Shader.source('qtek.compositor.output'),
             /**
              * @type {qtek.Texture2D}
              */
@@ -24,12 +24,12 @@ define(function(require) {
 
             var _gl = renderer.gl;
             this.pass.setUniform('texture', this.texture);
-            
+
             if (! this.outputs) {
                 this.pass.outputs = null;
                 this.pass.render(renderer, frameBuffer);
             } else {
-                
+
                 this.pass.outputs = {};
 
                 for (var name in this.outputs) {

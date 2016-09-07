@@ -97,7 +97,7 @@ define(function(require) {
         /**
          * @type {string}
          */
-        shaderName: 'buildin.standard',
+        shaderName: 'qtek.standard',
 
         /**
          * @type {boolean}
@@ -445,8 +445,8 @@ define(function(require) {
                 var techniqueInfo = json.techniques[name];
                 // Default phong shader
                 // var shader = new Shader({
-                //     vertex: Shader.source('buildin.phong.vertex'),
-                //     fragment: Shader.source('buildin.phong.fragment')
+                //     vertex: Shader.source('qtek.phong.vertex'),
+                //     fragment: Shader.source('qtek.phong.fragment')
                 // });
                 techniques[name] = {
                     // shader: shader,

@@ -1,7 +1,7 @@
 define(function (require) {
     var uniformVec3Prefix = 'uniform vec3 ';
     var uniformFloatPrefix = 'uniform float ';
-    var exportHeaderPrefix = '@export buildin.header.';
+    var exportHeaderPrefix = '@export qtek.header.';
     var exportEnd = '@end';
     var unconfigurable = ':unconfigurable;';
     return [

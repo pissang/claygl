@@ -121,8 +121,8 @@ define(function(require) {
      * @example
      *     // Create a phong shader
      *     var shader = new qtek.Shader({
-     *         vertex: qtek.Shader.source('buildin.phong.vertex'),
-     *         fragment: qtek.Shader.source('buildin.phong.fragment')
+     *         vertex: qtek.Shader.source('qtek.phong.vertex'),
+     *         fragment: qtek.Shader.source('qtek.phong.fragment')
      *     });
      *     // Enable diffuse texture
      *     shader.enableTexture('diffuseMap');

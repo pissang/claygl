@@ -1,4 +1,4 @@
-@export buildin.compositor.coloradjust
+@export qtek.compositor.coloradjust
 
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
@@ -34,7 +34,7 @@ void main()
 @end
 
 // Seperate shader for float texture
-@export buildin.compositor.brightness
+@export qtek.compositor.brightness
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -48,7 +48,7 @@ void main()
 }
 @end
 
-@export buildin.compositor.contrast
+@export qtek.compositor.contrast
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -62,7 +62,7 @@ void main()
 }
 @end
 
-@export buildin.compositor.exposure
+@export qtek.compositor.exposure
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -76,7 +76,7 @@ void main()
 }
 @end
 
-@export buildin.compositor.gamma
+@export qtek.compositor.gamma
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -90,7 +90,7 @@ void main()
 }
 @end
 
-@export buildin.compositor.saturation
+@export qtek.compositor.saturation
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 

@@ -1,4 +1,4 @@
-@export buildin.deferred.light_volume.vertex
+@export qtek.deferred.light_volume.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 

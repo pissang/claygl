@@ -1,10 +1,10 @@
-@export buildin.deferred.sphere_light
+@export qtek.deferred.sphere_light
 
-@import buildin.deferred.chunk.light_head
+@import qtek.deferred.chunk.light_head
 
-@import buildin.util.calculate_attenuation
+@import qtek.util.calculate_attenuation
 
-@import buildin.deferred.chunk.light_equation
+@import qtek.deferred.chunk.light_equation
 
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
@@ -17,7 +17,7 @@ varying vec3 v_Position;
 
 void main()
 {
-    @import buildin.deferred.chunk.gbuffer_read
+    @import qtek.deferred.chunk.gbuffer_read
 
 
     vec3 L = lightPosition - position;

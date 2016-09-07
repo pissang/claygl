@@ -32,8 +32,8 @@ var planeMesh: qtek.Mesh = new qtek.Mesh({
     geometry: new qtek.geometry.Plane(),
     material: new qtek.Material({
         shader: new qtek.Shader({
-            vertex: qtek.Shader.source("buildin.lambert.vertex"),
-            fragment: qtek.Shader.source("buildin.lambert.fragment")
+            vertex: qtek.Shader.source("qtek.lambert.vertex"),
+            fragment: qtek.Shader.source("qtek.lambert.fragment")
         })
     })
 });

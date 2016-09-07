@@ -46,8 +46,8 @@ define(function (require) {
     var DeferredRenderer = Base.derive(function () {
 
         var gBufferShader = new Shader({
-            vertex: Shader.source('buildin.deferred.gbuffer.vertex'),
-            fragment: Shader.source('buildin.deferred.gbuffer.fragment')
+            vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
+            fragment: Shader.source('qtek.deferred.gbuffer.fragment')
         });
 
         var gBufferDiffShader = gBufferShader.clone();
@@ -58,14 +58,14 @@ define(function (require) {
         gBufferDiffNormShader.enableTexture('normalMap');
 
         var outputShader = new Shader({
-            vertex: Shader.source('buildin.deferred.output.vertex'),
-            fragment: Shader.source('buildin.deferred.output.fragment')
+            vertex: Shader.source('qtek.deferred.output.vertex'),
+            fragment: Shader.source('qtek.deferred.output.fragment')
         });
         var outputDiffShader = outputShader.clone();
         outputDiffShader.enableTexture('diffuseMap');
 
-        var fullQuadVertex = Shader.source('buildin.compositor.vertex');
-        var lightVolumeVertex = Shader.source('buildin.deferred.light_volume.vertex');
+        var fullQuadVertex = Shader.source('qtek.compositor.vertex');
+        var lightVolumeVertex = Shader.source('qtek.deferred.light_volume.vertex');
 
         var lightAccumulateBlendFunc = function (gl) {
             gl.blendEquation(gl.FUNC_ADD);
@@ -84,7 +84,7 @@ define(function (require) {
         var createVolumeShader = function (name) {
             return new Shader({
                 vertex: lightVolumeVertex,
-                fragment: Shader.source('buildin.deferred.' + name)
+                fragment: Shader.source('qtek.deferred.' + name)
             });
         };
 
@@ -122,8 +122,8 @@ define(function (require) {
                 shader: new Shader({
                     // mediump will have precision issue on mobile
                     precision: 'highp',
-                    vertex: Shader.source('buildin.deferred.depth.vertex'),
-                    fragment: Shader.source('buildin.deferred.depth.fragment')
+                    vertex: Shader.source('qtek.deferred.depth.vertex'),
+                    fragment: Shader.source('qtek.deferred.depth.fragment')
                 })
             }),
 
@@ -168,11 +168,11 @@ define(function (require) {
 
             _directionalLightMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
-                fragment: Shader.source('buildin.deferred.directional_light')
+                fragment: Shader.source('qtek.deferred.directional_light')
             })),
             _ambientMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
-                fragment: Shader.source('buildin.deferred.ambient_light')
+                fragment: Shader.source('qtek.deferred.ambient_light')
             })),
             _spotLightShader: createVolumeShader('spot_light'),
             _pointLightShader: createVolumeShader('point_light'),
@@ -488,8 +488,8 @@ define(function (require) {
             var worldView = new Matrix4();
             var preZMaterial = new Material({
                 shader: new Shader({
-                    vertex: Shader.source('buildin.prez.vertex'),
-                    fragment: Shader.source('buildin.prez.fragment')
+                    vertex: Shader.source('qtek.prez.vertex'),
+                    fragment: Shader.source('qtek.prez.fragment')
                 })
             });
             return function (renderer, camera, volumeMeshList) {

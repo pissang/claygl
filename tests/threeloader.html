@@ -25,8 +25,8 @@
                 console.profile("parse");
                 var meshList = loader.parse(data);
                 console.profileEnd("parse");
-                
-                var shader = qtek.shader.library.get("buildin.lambert");
+
+                var shader = qtek.shader.library.get("qtek.lambert");
 
                 var material = new qtek.Material({
                     shader : shader,
@@ -57,7 +57,7 @@
                     root.rotation.rotateY(Math.PI/500);
                 }, 20);
             })
-            
+
         </script>
     </body>
 </html>

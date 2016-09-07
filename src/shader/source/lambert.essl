@@ -2,7 +2,7 @@
  * http://en.wikipedia.org/wiki/Lambertian_reflectance
  */
 
-@export buildin.lambert.vertex
+@export qtek.lambert.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
@@ -37,7 +37,7 @@ void main()
 
 #ifdef SKINNING
 
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     // Upper 3x3 of skinMatrix is orthogonal
@@ -56,7 +56,7 @@ void main()
 @end
 
 
-@export buildin.lambert.fragment
+@export qtek.lambert.fragment
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -75,24 +75,24 @@ uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
 #ifdef AMBIENT_LIGHT_COUNT
-@import buildin.header.ambient_light
+@import qtek.header.ambient_light
 #endif
 #ifdef POINT_LIGHT_COUNT
-@import buildin.header.point_light
+@import qtek.header.point_light
 #endif
 #ifdef DIRECTIONAL_LIGHT_COUNT
-@import buildin.header.directional_light
+@import qtek.header.directional_light
 #endif
 #ifdef SPOT_LIGHT_COUNT
-@import buildin.header.spot_light
+@import qtek.header.spot_light
 #endif
 
 // Import util functions and uniforms needed
-@import buildin.util.calculate_attenuation
+@import qtek.util.calculate_attenuation
 
-@import buildin.util.edge_factor
+@import qtek.util.edge_factor
 
-@import buildin.plugin.compute_shadow_map
+@import qtek.plugin.compute_shadow_map
 
 void main()
 {

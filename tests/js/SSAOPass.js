@@ -109,6 +109,7 @@ define(function (require) {
             gl.blendEquation(gl.FUNC_ADD);
             gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
         };
+        blurPass.blendWithPrevious = true;
         blurPass.setUniform('textureSize', [width, height]);
         blurPass.setUniform('texture', ssaoTexture);
         blurPass.render(forwardRenderer);

@@ -1,4 +1,4 @@
-@export buildin.skybox.vertex
+@export qtek.skybox.vertex
 
 uniform mat4 world : WORLD;
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
@@ -15,14 +15,14 @@ void main()
 
 @end
 
-@export buildin.skybox.fragment
+@export qtek.skybox.fragment
 
 uniform mat4 viewInverse : VIEWINVERSE;
 uniform samplerCube environmentMap;
 
 varying vec3 v_WorldPosition;
 
-@import buildin.util.rgbm
+@import qtek.util.rgbm
 
 void main()
 {

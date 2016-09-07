@@ -20,7 +20,7 @@
                 var scene = new qtek.Scene;
 
                 var cube = new Cube();
-                var shader = shaderLibrary.get('buildin.basic', 'diffuseMap');
+                var shader = shaderLibrary.get('qtek.basic', 'diffuseMap');
                 shader.define('fragment', 'RENDER_NORMAL');
                 var material = new Material({
                     shader : shader
@@ -51,7 +51,7 @@
                     root.rotation.rotateY(Math.PI/500);
                 }, 1000);
             });
-            
+
         </script>
     </body>
 </html>

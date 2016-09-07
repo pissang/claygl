@@ -92,7 +92,7 @@
 
                 var animation = new qtek.animation.Animation();
                 // var debugPass = new qtek.compositor.Pass({
-                //     fragment: qtek.Shader.source('buildin.compositor.output')
+                //     fragment: qtek.Shader.source('qtek.compositor.output')
                 // });
                 // debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
                 animation.on('frame', function (deltaTime) {
@@ -100,7 +100,7 @@
                     deferredRenderer.render(renderer, scene, camera);
                     // debugPass.setUniform('texture', deferredRenderer._lightAccumTex);
                     // debugPass.render(renderer);
-                    
+
                     stats.update();
                 });
                 animation.start();

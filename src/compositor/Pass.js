@@ -39,12 +39,17 @@ define(function(require) {
             /**
              * @type {qtek.Material}
              */
-            material : null
+            material : null,
+
+            /**
+             * @type {Boolean}
+             */
+            blendWithPrevious: false
         };
     }, function() {
 
         var shader = new Shader({
-            vertex : Shader.source('buildin.compositor.vertex'),
+            vertex : Shader.source('qtek.compositor.vertex'),
             fragment : this.fragment
         });
         var material = new Material({
@@ -149,17 +154,17 @@ define(function(require) {
             // FIXME pixels may be discard
             _gl.clear(_gl.DEPTH_BUFFER_BIT);
 
-            // if (!frameBuffer) {
-            //     // Blend with previous rendered scene in the final output
-            //     // FIXME Configure blend.
-            //     // FIXME It will cause screen blink？
-            //     _gl.enable(_gl.BLEND);
-            //     this.material.transparent = true;
-            // }
-            // else {
+            if (this.blendWithPrevious) {
+                // Blend with previous rendered scene in the final output
+                // FIXME Configure blend.
+                // FIXME It will cause screen blink？
+                _gl.enable(_gl.BLEND);
+                this.material.transparent = true;
+            }
+            else {
                 _gl.disable(_gl.BLEND);
                 this.material.transparent = false;
-            // }
+            }
 
             this.renderQuad(renderer);
 

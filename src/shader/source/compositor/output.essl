@@ -1,4 +1,4 @@
-@export buildin.compositor.output
+@export qtek.compositor.output
 
 #define OUTPUT_ALPHA
 
@@ -6,7 +6,7 @@ varying vec2 v_Texcoord;
 
 uniform sampler2D texture;
 
-@import buildin.util.rgbm
+@import qtek.util.rgbm
 
 void main()
 {

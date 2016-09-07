@@ -51,7 +51,7 @@
                     type : qtek.Texture.FLOAT
                 }
                 var colorAdjustNode = new pp_Node({
-                    shader : Shader.source("buildin.compositor.coloradjust"),
+                    shader : Shader.source("qtek.compositor.coloradjust"),
                     name : "Color Adjust",
                     inputs : {
                         "texture" : {
@@ -68,7 +68,7 @@
                 });
 
                 var hexagonalBlur1 = new pp_Node({
-                    shader : Shader.source("buildin.compositor.hexagonal_blur_mrt_1"),
+                    shader : Shader.source("qtek.compositor.hexagonal_blur_mrt_1"),
                     name : "Hexagonal Blur Pass1",
                     inputs : {
                         "texture" : {
@@ -88,7 +88,7 @@
                     }
                 });
                 var hexagonalBlur2 = new pp_Node({
-                    shader : Shader.source("buildin.compositor.hexagonal_blur_mrt_2"),
+                    shader : Shader.source("qtek.compositor.hexagonal_blur_mrt_2"),
                     name : "Hexagonal Blur Pass2",
                     inputs : {
                         "texture0" : {
@@ -109,7 +109,7 @@
                 })
 
                 var colorAdjustNode2 = new pp_Node({
-                    shader : Shader.source("buildin.compositor.coloradjust"),
+                    shader : Shader.source("qtek.compositor.coloradjust"),
                     name : "Color Adjust",
                     inputs : {
                         "texture" : {
@@ -135,7 +135,7 @@
                     compositor.render(renderer);
                 }, 1000);
             })
-            
+
         </script>
     </body>
 </html>

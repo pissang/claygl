@@ -100,16 +100,16 @@ define(function(require) {
     }, function() {
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
-            fragment: Shader.source('buildin.compositor.gaussian_blur_h')
+            fragment: Shader.source('qtek.compositor.gaussian_blur_h')
         });
         this._gaussianPassV = new Pass({
-            fragment: Shader.source('buildin.compositor.gaussian_blur_v')
+            fragment: Shader.source('qtek.compositor.gaussian_blur_v')
         });
         this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
         this._gaussianPassV.setUniform('blurSize', this.shadowBlur);
 
         this._outputDepthPass = new Pass({
-            fragment: Shader.source('buildin.sm.debug_depth')
+            fragment: Shader.source('qtek.sm.debug_depth')
         });
     }, {
         /**
@@ -174,8 +174,8 @@ define(function(require) {
                 if (mesh.material !== depthMaterial) {  // Not binded yet
                     if (!depthShader) {
                         depthShader = new Shader({
-                            vertex: Shader.source('buildin.sm.depth.vertex'),
-                            fragment: Shader.source('buildin.sm.depth.fragment')
+                            vertex: Shader.source('qtek.sm.depth.vertex'),
+                            fragment: Shader.source('qtek.sm.depth.fragment')
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
@@ -222,8 +222,8 @@ define(function(require) {
                         // Skinned mesh
                         distanceMaterial = new Material({
                             shader: new Shader({
-                                vertex: Shader.source('buildin.sm.distance.vertex'),
-                                fragment: Shader.source('buildin.sm.distance.fragment')
+                                vertex: Shader.source('qtek.sm.distance.vertex'),
+                                fragment: Shader.source('qtek.sm.distance.fragment')
                             })
                         });
                         if (nJoints > 0) {

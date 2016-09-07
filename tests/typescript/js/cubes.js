@@ -13,7 +13,7 @@ camera.aspect = renderer.width / renderer.height;
 var rootNode = new qtek.Node();
 var cubeGeo = new qtek.geometry.Cube();
 var cubeMat = new qtek.Material({
-    shader: qtek.shader.library.get('buildin.basic', "diffuseMap")
+    shader: qtek.shader.library.get('qtek.basic', "diffuseMap")
 });
 var diffuseTexture = new qtek.Texture2D();
 diffuseTexture.load('../assets/textures/crate.gif');

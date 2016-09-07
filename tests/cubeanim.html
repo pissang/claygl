@@ -3,7 +3,7 @@
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
-        
+
         <style>
             body{
                 background: -webkit-radial-gradient(center, circle cover, #555a5f 0%, #1c1e20 100%);
@@ -135,7 +135,7 @@
                 });
                 camera.position.set(0, 0, 40);
 
-                var shader = qtek.shader.library.get('buildin.standard');
+                var shader = qtek.shader.library.get('qtek.standard');
 
                 var cubeMat = new qtek.Material({
                     shader : shader
@@ -191,8 +191,8 @@
                         var drawInfo = renderer.render(scene, camera);
                         var renderTime = new Date().getTime() - start;
 
-                        document.getElementById('fps').innerHTML = 
-                                Math.round(1000 / deltaTime) + '<br />' 
+                        document.getElementById('fps').innerHTML =
+                                Math.round(1000 / deltaTime) + '<br />'
                                 + renderTime + '<br />';
 
                         var color = document.getElementById('cubeColor').style.backgroundColor;
@@ -213,7 +213,7 @@
 
                         root.rotation.identity().rotateY(dx / 1000);
                     });
-                    
+
                     var obj = {
                         position : positionArr
                     }

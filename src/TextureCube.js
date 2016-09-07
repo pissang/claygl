@@ -14,7 +14,7 @@ define(function(require) {
      * @example
      *     ...
      *     var mat = new qtek.Material({
-     *         shader: qtek.shader.library.get('buildin.phong', 'environmentMap')
+     *         shader: qtek.shader.library.get('qtek.phong', 'environmentMap')
      *     });
      *     var envMap = new qtek.TextureCube();
      *     envMap.load({

@@ -1,14 +1,14 @@
 
 // http://blog.selfshadow.com/publications/s2013-shading-course/
 
-@export buildin.standard.vertex
+@export qtek.standard.vertex
 
-@import buildin.phong.vertex
+@import qtek.phong.vertex
 
 @end
 
 
-@export buildin.standard.fragment
+@export qtek.standard.fragment
 
 #define PI 3.14159265358979
 
@@ -54,6 +54,10 @@ uniform samplerCube environmentMap;
 uniform sampler2D brdfLookup;
 #endif
 
+#ifdef EMISSIVEMAP_ENABLED
+uniform sampler2D emissiveMap;
+#endif
+
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
@@ -69,10 +73,16 @@ uniform vec3 specularColor : [0.1, 0.1, 0.1];
 
 uniform vec3 emission : [0.0, 0.0, 0.0];
 
+uniform float emissionIntensity: 1;
+
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
+
+// For selection
+uniform vec3 mixColor: [1.0, 1.0, 0.0];
+uniform float mixIntensity: 0.0;
 
 // Max mipmap level of environment map
 #ifdef ENVIRONMENTMAP_PREFILTER
@@ -80,26 +90,26 @@ uniform float maxMipmapLevel: 5;
 #endif
 
 #ifdef AMBIENT_LIGHT_COUNT
-@import buildin.header.ambient_light
+@import qtek.header.ambient_light
 #endif
 #ifdef POINT_LIGHT_COUNT
-@import buildin.header.point_light
+@import qtek.header.point_light
 #endif
 #ifdef DIRECTIONAL_LIGHT_COUNT
-@import buildin.header.directional_light
+@import qtek.header.directional_light
 #endif
 #ifdef SPOT_LIGHT_COUNT
-@import buildin.header.spot_light
+@import qtek.header.spot_light
 #endif
 
 // Import util functions and uniforms needed
-@import buildin.util.calculate_attenuation
+@import qtek.util.calculate_attenuation
 
-@import buildin.util.edge_factor
+@import qtek.util.edge_factor
 
-@import buildin.util.rgbm
+@import qtek.util.rgbm
 
-@import buildin.plugin.compute_shadow_map
+@import qtek.plugin.compute_shadow_map
 
 
 float G_Smith(float glossiness, float ndv, float ndl)
@@ -320,7 +330,7 @@ void main()
         }
 #endif
 
-        vec3 li = lc * attenuation * (1.0-falloff) * shadowContrib * ndl;
+        vec3 li = lc * attenuation * (1.0 - falloff) * shadowContrib * ndl;
 
         diffuseTerm += li;
         specularTerm += li * fresnelTerm * D_Phong(g, ndh);
@@ -329,7 +339,12 @@ void main()
 
     outColor.rgb *= diffuseTerm;
     outColor.rgb += specularTerm;
-    outColor.rgb += emission;
+
+    vec3 lEmission = emission;
+#ifdef EMISSIVEMAP_ENABLED
+    lEmission *= texture2D(emissiveMap, v_Texcoord);
+#endif
+    outColor.rgb += lEmission * emissionIntensity;
 
 #ifdef ENVIRONMENTMAP_ENABLED
 
@@ -354,15 +369,17 @@ void main()
     outColor.rgb = outColor.rgb + envTexel * envWeight;
 #endif
 
-    if(lineWidth > 0.)
-    {
-        outColor.rgb = mix(lineColor, vec3(outColor.rgb), edgeFactor(lineWidth));
-    }
-
 #ifdef GAMMA_ENCODE
     // Not linear
     outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));
 #endif
+
+    outColor.rgb = mix(outColor.rgb, mixColor, mixIntensity);
+
+    if(lineWidth > 0.)
+    {
+        outColor.rgb = mix(lineColor, vec3(outColor.rgb), edgeFactor(lineWidth));
+    }
 
     gl_FragColor = encodeHDR(outColor);
 }
@@ -370,14 +387,14 @@ void main()
 @end
 
 
-@export buildin.physical.vertex
+@export qtek.physical.vertex
 
-@import buildin.standard.vertex
+@import qtek.standard.vertex
 
 @end
 
-@export buildin.physical.fragment
+@export qtek.physical.fragment
 
-@import buildin.standard.fragment
+@import qtek.standard.fragment
 
 @end

@@ -1,4 +1,4 @@
-@export buildin.picking.color.vertex
+@export qtek.picking.color.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -17,7 +17,7 @@ void main(){
 
     #ifdef SKINNING
 
-        @import buildin.chunk.skin_matrix
+        @import qtek.chunk.skin_matrix
 
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
@@ -28,7 +28,7 @@ void main(){
 @end
 
 @end
-@export buildin.picking.color.fragment
+@export qtek.picking.color.fragment
 
 uniform vec4 color : [1.0, 1.0, 1.0, 1.0];
 

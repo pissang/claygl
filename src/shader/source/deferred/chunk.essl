@@ -1,4 +1,4 @@
-@export buildin.deferred.chunk.light_head
+@export qtek.deferred.chunk.light_head
 
 uniform sampler2D gBufferTex;
 
@@ -12,12 +12,12 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
 
 
 #ifdef DEPTH_ENCODED
-@import buildin.util.decode_float
+@import qtek.util.decode_float
 #endif
 
 @end
 
-@export buildin.deferred.chunk.gbuffer_read
+@export qtek.deferred.chunk.gbuffer_read
     vec2 uv = gl_FragCoord.xy / viewportSize;
 
     vec4 tex = texture2D(gBufferTex, uv);
@@ -52,7 +52,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     vec3 position = p4.xyz / p4.w;
 @end
 
-@export buildin.deferred.chunk.light_equation
+@export qtek.deferred.chunk.light_equation
 
 float D_Phong(float g, float ndh) {
     // from black ops 2

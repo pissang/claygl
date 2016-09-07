@@ -46,8 +46,8 @@
                 });
 
                 var shader = new qtek.Shader({
-                    vertex: qtek.Shader.source('buildin.standard.vertex'),
-                    fragment: qtek.Shader.source('buildin.standard.fragment')
+                    vertex: qtek.Shader.source('qtek.standard.vertex'),
+                    fragment: qtek.Shader.source('qtek.standard.fragment')
                 });
                 shader.enableTexture('environmentMap');
                 var material = new qtek.Material({
@@ -125,7 +125,7 @@
                     });
                     var downSampleNode = new qtek.compositor.Node({
                         name: "downSample",
-                        shader: qtek.Shader.source('buildin.compositor.output'),
+                        shader: qtek.Shader.source('qtek.compositor.output'),
                         inputs: {
                             texture: {
                                 node: "scene",
@@ -148,7 +148,7 @@
                     for (var i = 0; i < blurRepeat; i++) {
                         var blurNodeH = new qtek.compositor.Node({
                             name: 'blur_h_' + i,
-                            shader: qtek.Shader.source('buildin.compositor.gaussian_blur_h'),
+                            shader: qtek.Shader.source('qtek.compositor.gaussian_blur_h'),
                             inputs: {
                                 texture: {
                                     node: i == 0 ? "downSample" : "blur_v_" + (i - 1),
@@ -168,7 +168,7 @@
                         });
                         var blurNodeV = new qtek.compositor.Node({
                             name: 'blur_v_' + i,
-                            shader: qtek.Shader.source('buildin.compositor.gaussian_blur_v'),
+                            shader: qtek.Shader.source('qtek.compositor.gaussian_blur_v'),
                             inputs: {
                                 texture: {
                                     node: "blur_h_" + i,
@@ -227,7 +227,7 @@
                     });
                     var toneMappingNode = new qtek.compositor.Node({
                         name: "toneMapping",
-                        shader: qtek.Shader.source('buildin.compositor.hdr.tonemapping'),
+                        shader: qtek.Shader.source('qtek.compositor.hdr.tonemapping'),
                         inputs: {
                             "texture": {
                                 node: "composite",
@@ -252,7 +252,7 @@
 
                         compositor.render(renderer);
                         // renderer.render(scene, camera);
-                        
+
                         for (var i = 0; i < blurNodes.length; i++) {
                             blurNodes[i].setParameter('blurSize', config.blurSize);
                         }
@@ -277,7 +277,7 @@
                     gui.add(config, 'focalPlane', 1, 100);
                 });
             })
-            
+
         </script>
     </body>
 </html>

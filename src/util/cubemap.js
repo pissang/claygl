@@ -59,7 +59,7 @@ define(function (require) {
 
         var prefilterMaterial = new Material({
             shader: new Shader({
-                vertex: Shader.source('buildin.skybox.vertex'),
+                vertex: Shader.source('qtek.skybox.vertex'),
                 fragment: prefilterFragCode
             })
         });

@@ -1,4 +1,4 @@
-@export buildin.basic.vertex
+@export qtek.basic.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -25,7 +25,7 @@ void main()
     vec3 skinnedPosition = position;
 
 #ifdef SKINNING
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -41,7 +41,7 @@ void main()
 
 
 
-@export buildin.basic.fragment
+@export qtek.basic.fragment
 
 varying vec2 v_Texcoord;
 uniform sampler2D diffuseMap;
@@ -54,9 +54,9 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
-@import buildin.util.edge_factor
+@import qtek.util.edge_factor
 
-@import buildin.util.rgbm
+@import qtek.util.rgbm
 
 void main()
 {

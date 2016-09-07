@@ -11,7 +11,7 @@ define(function(require) {
      * @example
      *     ...
      *     var mat = new qtek.Material({
-     *         shader: qtek.shader.library.get('buildin.phong', 'diffuseMap')
+     *         shader: qtek.shader.library.get('qtek.phong', 'diffuseMap')
      *     });
      *     var diffuseMap = new qtek.Texture2D();
      *     diffuseMap.load('assets/textures/diffuse.jpg');

@@ -21,7 +21,7 @@
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var animation = new qtek.animation.Animation();
                 animation.start();
-                
+
                 var shadowMapPass = new qtek.prePass.ShadowMap();
 
                 var scene = new qtek.Scene,
@@ -31,7 +31,7 @@
                     });
 
                 var cube = new Cube();
-                var shader = shaderLibrary.get('buildin.lambert');
+                var shader = shaderLibrary.get('qtek.lambert');
                 var material = new Material({
                     shader : shader
                 });
@@ -57,7 +57,7 @@
                         inside : true
                     }),
                     material : new qtek.Material({
-                        shader : qtek.shader.library.get("buildin.lambert")
+                        shader : qtek.shader.library.get("qtek.lambert")
                     }),
                     culling : false,
                     scale : new qtek.math.Vector3(10, 10, 10)
@@ -87,7 +87,7 @@
                     // light.position.z = 0.2 + 7 * Math.sin(elapsedTime + 0.3);
                 });
             })
-            
+
         </script>
     </body>
 </html>

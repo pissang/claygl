@@ -1,4 +1,4 @@
-@export buildin.deferred.output.vertex
+@export qtek.deferred.output.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 world: WORLD;
@@ -28,7 +28,7 @@ void main()
 
 #ifdef SKINNING
 
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -43,7 +43,7 @@ void main()
 }
 @end
 
-@export buildin.deferred.output.fragment
+@export qtek.deferred.output.fragment
 
 uniform sampler2D diffuseMap;
 

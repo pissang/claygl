@@ -25,7 +25,7 @@
                 var plane = new qtek.plugin.InfinitePlane({
                     camera : camera,
                     material : new qtek.Material({
-                        shader : qtek.shader.library.get('buildin.lambert'),
+                        shader : qtek.shader.library.get('qtek.lambert'),
                         transparent : true
                     }),
                     culling : false
@@ -34,7 +34,7 @@
                 scene.add(plane);
                 var cube = new qtek.Mesh({
                     material : new qtek.Material({
-                        shader : qtek.shader.library.get('buildin.basic', 'diffuseMap')
+                        shader : qtek.shader.library.get('qtek.basic', 'diffuseMap')
                     }),
                     geometry : new qtek.geometry.Cube()
                 });
@@ -63,7 +63,7 @@
                     renderer.render(scene, camera);
                 });
             })
-            
+
         </script>
     </body>
 </html>

@@ -22,8 +22,8 @@
                 });
                 var cube = new qtek.geometry.Cube();
                 var shader = new Shader({
-                    vertex : Shader.source("buildin.phong.vertex"),
-                    fragment : Shader.source("buildin.phong.fragment")
+                    vertex : Shader.source("qtek.phong.vertex"),
+                    fragment : Shader.source("qtek.phong.fragment")
                 })
                 shader.enableTexture("diffuseMap");
                 var material = new qtek.Material({
@@ -54,7 +54,7 @@
                     height : 1024,
                 });
                 frameBuffer.attach( renderer.gl, rtt );
-                var rttShader = qtek.shader.library.get("buildin.basic", "diffuseMap");
+                var rttShader = qtek.shader.library.get("qtek.basic", "diffuseMap");
                 rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
                 var rttMesh = new qtek.Mesh({
                     geometry : new qtek.geometry.Plane(),
@@ -76,11 +76,11 @@
                     frameBuffer.unbind( renderer );
 
                     renderer.render( rttScene, orthCamera );
-                    
+
                     mesh.rotation.rotateY(Math.PI/500);
                 });
             })
-            
+
         </script>
     </body>
 </html>

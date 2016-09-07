@@ -1,4 +1,4 @@
-@export buildin.sm.depth.vertex
+@export qtek.sm.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -27,7 +27,7 @@ void main(){
 
 #ifdef SKINNING
 
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -41,7 +41,7 @@ void main(){
 }
 @end
 
-@export buildin.sm.depth.fragment
+@export qtek.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
 
@@ -56,7 +56,7 @@ uniform float slopeScale : 1.0;
 uniform sampler2D transparentMap;
 #endif
 
-@import buildin.util.encode_float
+@import qtek.util.encode_float
 
 void main(){
     // Whats the difference between gl_FragCoord.z and this v_ViewPosition
@@ -94,12 +94,12 @@ void main(){
 }
 @end
 
-@export buildin.sm.debug_depth
+@export qtek.sm.debug_depth
 
 uniform sampler2D depthMap;
 varying vec2 v_Texcoord;
 
-@import buildin.util.decode_float
+@import qtek.util.decode_float
 
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
@@ -114,7 +114,7 @@ void main() {
 @end
 
 
-@export buildin.sm.distance.vertex
+@export qtek.sm.distance.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 world : WORLD;
@@ -134,7 +134,7 @@ void main (){
 
     vec3 skinnedPosition = position;
 #ifdef SKINNING
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -145,14 +145,14 @@ void main (){
 
 @end
 
-@export buildin.sm.distance.fragment
+@export qtek.sm.distance.fragment
 
 uniform vec3 lightPosition;
 uniform float range : 100;
 
 varying vec3 v_WorldPosition;
 
-@import buildin.util.encode_float
+@import qtek.util.encode_float
 
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
@@ -165,7 +165,7 @@ void main(){
 }
 @end
 
-@export buildin.plugin.compute_shadow_map
+@export qtek.plugin.compute_shadow_map
 
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
@@ -185,21 +185,21 @@ uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
 #else
 uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
 uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-uniform float directionalLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
 #endif
 #endif
 
 #ifdef POINT_LIGHT_SHADOWMAP_COUNT
 uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
 uniform float pointLightRanges[POINT_LIGHT_SHADOWMAP_COUNT];
-uniform float pointLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];
 #endif
 
 uniform bool shadowEnabled : true;
 
-@import buildin.util.decode_float
+@import qtek.util.decode_float
 
-#if defined(DIRECTIONAL_LIGHT_COUNT) || defined(SPOT_LIGHT_SHADOWMAP_COUNT)
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);

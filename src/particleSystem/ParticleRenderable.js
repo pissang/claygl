@@ -16,8 +16,8 @@ define(function(require) {
     Shader['import'](require('./particle.essl'));
 
     var particleShader = new Shader({
-        vertex: Shader.source('buildin.particle.vertex'),
-        fragment: Shader.source('buildin.particle.fragment')
+        vertex: Shader.source('qtek.particle.vertex'),
+        fragment: Shader.source('qtek.particle.fragment')
     });
     particleShader.enableTexture('sprite');
 

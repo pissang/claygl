@@ -1,5 +1,5 @@
 
-@export buildin.compositor.lum
+@export qtek.compositor.lum
 
 varying vec2 v_Texcoord;
 

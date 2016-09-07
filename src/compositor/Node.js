@@ -18,7 +18,7 @@ define(function(require) {
      * @example
         var node = new qtek.compositor.Node({
             name: 'fxaa',
-            shader: qtek.Shader.source('buildin.compositor.fxaa'),
+            shader: qtek.Shader.source('qtek.compositor.fxaa'),
             inputs: {
                 texture: {
                      node: 'scene',

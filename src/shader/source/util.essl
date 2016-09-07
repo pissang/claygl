@@ -1,6 +1,6 @@
 // Use light attenuation formula in
 // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
-@export buildin.util.calculate_attenuation
+@export qtek.util.calculate_attenuation
 
 uniform float attenuationFactor : 5.0;
 
@@ -19,7 +19,7 @@ float lightAttenuation(float dist, float range)
 @end
 
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-@export buildin.util.edge_factor
+@export qtek.util.edge_factor
 
 float edgeFactor(float width)
 {
@@ -32,7 +32,7 @@ float edgeFactor(float width)
 
 // Pack depth
 // Float value can only be [0.0 - 1.0) ?
-@export buildin.util.encode_float
+@export qtek.util.encode_float
 vec4 encodeFloat(const in float depth)
 {
     // const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
@@ -52,7 +52,7 @@ vec4 encodeFloat(const in float depth)
 }
 @end
 
-@export buildin.util.decode_float
+@export qtek.util.decode_float
 float decodeFloat(const in vec4 color)
 {
     // const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
@@ -67,7 +67,7 @@ float decodeFloat(const in vec4 color)
 @end
 
 // http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
-@export buildin.util.rgbm_decode
+@export qtek.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
   // Premultiply alpha ?
@@ -75,7 +75,7 @@ vec3 RGBMDecode(vec4 rgbm, float range) {
 }
 @end
 
-@export buildin.util.rgbm_encode
+@export qtek.util.rgbm_encode
 vec4 RGBMEncode(vec3 color, float range) {
     vec4 rgbm;
     color /= range;
@@ -86,9 +86,9 @@ vec4 RGBMEncode(vec3 color, float range) {
 }
 @end
 
-@export buildin.util.rgbm
-@import buildin.util.rgbm_decode
-@import buildin.util.rgbm_encode
+@export qtek.util.rgbm
+@import qtek.util.rgbm_decode
+@import qtek.util.rgbm_encode
 
 vec4 decodeHDR(vec4 color)
 {
@@ -113,7 +113,7 @@ vec4 encodeHDR(vec4 color)
 
 
 
-@export buildin.chunk.skin_matrix
+@export qtek.chunk.skin_matrix
 
 // Weighted Sum Skinning Matrix
 mat4 skinMatrixWS;

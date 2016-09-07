@@ -1,11 +1,11 @@
-@export buildin.compositor.downsample
+@export qtek.compositor.downsample
 
 uniform sampler2D texture;
 uniform vec2 textureSize : [512, 512];
 
 varying vec2 v_Texcoord;
 
-@import buildin.util.rgbm
+@import qtek.util.rgbm
 // Brightness function
 float brightness(vec3 c)
 {

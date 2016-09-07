@@ -470,10 +470,10 @@ define(function(require) {
         },
 
         _parseMaterial: function(mConfig, jointNumber) {
-            var shaderName = 'buildin.lambert';
+            var shaderName = 'qtek.lambert';
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
             if (shading === 'phong' || shading === 'lambert') {
-                shaderName = 'buildin.' + shading;
+                shaderName = 'qtek.' + shading;
             }
             var enabledTextures = [];
             if (mConfig.mapDiffuse) {

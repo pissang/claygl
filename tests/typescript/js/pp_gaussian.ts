@@ -11,8 +11,8 @@ camera.position.z = 5;
 
 var cubeMat: qtek.Material = new qtek.Material({
     shader: new qtek.Shader({
-        vertex: qtek.Shader.source("buildin.lambert.vertex"),
-        fragment: qtek.Shader.source("buildin.lambert.fragment")
+        vertex: qtek.Shader.source("qtek.lambert.vertex"),
+        fragment: qtek.Shader.source("qtek.lambert.fragment")
     })
 });
 cubeMat.shader.enableTexture("diffuseMap");
@@ -51,7 +51,7 @@ var sceneNode = new qtek.compositor.SceneNode({
 });
 var gaussianNodeH = new qtek.compositor.Node({
     name: "gaussian1",
-    shader: qtek.Shader.source("buildin.compositor.gaussian_blur_h"),
+    shader: qtek.Shader.source("qtek.compositor.gaussian_blur_h"),
     inputs: {
         texture: {
             node: "scene",
@@ -69,7 +69,7 @@ var gaussianNodeH = new qtek.compositor.Node({
 });
 var gaussianNodeV = new qtek.compositor.Node({
     name: "gaussian2",
-    shader: qtek.Shader.source("buildin.compositor.gaussian_blur_v"),
+    shader: qtek.Shader.source("qtek.compositor.gaussian_blur_v"),
     inputs: {
         texture: {
             node: "gaussian1",

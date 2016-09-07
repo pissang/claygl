@@ -17,11 +17,11 @@ define(function(require) {
 
     /**
      * ### Builin shaders
-     * + buildin.standard
-     * + buildin.basic
-     * + buildin.lambert
-     * + buildin.phong
-     * + buildin.wireframe
+     * + qtek.standard
+     * + qtek.basic
+     * + qtek.lambert
+     * + qtek.phong
+     * + qtek.wireframe
      *
      * @namespace qtek.shader.library
      */
@@ -34,9 +34,9 @@ define(function(require) {
      * @return {qtek.Shader}
      *
      * @example
-     *     qtek.shader.library.get('buildin.phong', 'diffuseMap', 'normalMap');
-     *     qtek.shader.library.get('buildin.phong', ['diffuseMap', 'normalMap']);
-     *     qtek.shader.library.get('buildin.phong', {
+     *     qtek.shader.library.get('qtek.phong', 'diffuseMap', 'normalMap');
+     *     qtek.shader.library.get('qtek.phong', ['diffuseMap', 'normalMap']);
+     *     qtek.shader.library.get('qtek.phong', {
      *         textures: ['diffuseMap'],
      *         vertexDefines: {},
      *         fragmentDefines: {}

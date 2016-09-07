@@ -20,14 +20,14 @@
                             canvas : document.getElementById('Main')
                         });
                         var pass = new qtek.compositor.Pass({
-                            fragment : qtek.Shader.source('buildin.compositor.output')
+                            fragment : qtek.Shader.source('qtek.compositor.output')
                         });
                         pass.setUniform('texture', texture);
                         pass.render(renderer);
                     }
                 })
             });
-            
+
         </script>
     </body>
 </html>

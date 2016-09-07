@@ -1,4 +1,4 @@
-@export buildin.deferred.gbuffer.vertex
+@export qtek.deferred.gbuffer.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
@@ -39,7 +39,7 @@ void main()
 #endif
 #ifdef SKINNING
 
-    @import buildin.chunk.skin_matrix
+    @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     // Upper skinMatrix
@@ -67,7 +67,7 @@ void main()
 @end
 
 
-@export buildin.deferred.gbuffer.fragment
+@export qtek.deferred.gbuffer.fragment
 
 uniform sampler2D diffuseMap;
 uniform float glossiness;
