@@ -884,7 +884,8 @@ define(function(require) {
                     if (semantic) {
                         if (attribSemantics.indexOf(semantic) < 0) {
                             throw new Error('Unkown semantic "' + semantic + '"');
-                        }else{
+                        }
+                        else {
                             self.attribSemantics[semantic] = {
                                 symbol: symbol,
                                 type: type
@@ -951,7 +952,8 @@ define(function(require) {
             // Force the position bind to location 0;
             if (this.attribSemantics['POSITION']) {
                 _gl.bindAttribLocation(program, 0, this.attribSemantics['POSITION'].symbol);
-            } else {
+            }
+            else {
                 // Else choose an attribute and bind to location 0;
                 var keys = Object.keys(this.attributeTemplates);
                 _gl.bindAttribLocation(program, 0, keys[0]);

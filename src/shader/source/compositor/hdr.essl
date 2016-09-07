@@ -79,6 +79,7 @@ void main()
 uniform sampler2D texture;
 uniform sampler2D bloom;
 uniform sampler2D lensflare;
+
 uniform sampler2D lum;
 
 uniform float exposure : 1.0;

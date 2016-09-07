@@ -58,6 +58,12 @@ uniform sampler2D brdfLookup;
 uniform sampler2D emissiveMap;
 #endif
 
+#ifdef SSAOMAP_ENABLED
+// For ssao prepass
+uniform sampler2D ssaoMap;
+uniform vec2 viewportSize;
+#endif
+
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
@@ -338,13 +344,8 @@ void main()
 #endif
 
     outColor.rgb *= diffuseTerm;
-    outColor.rgb += specularTerm;
 
-    vec3 lEmission = emission;
-#ifdef EMISSIVEMAP_ENABLED
-    lEmission *= texture2D(emissiveMap, v_Texcoord);
-#endif
-    outColor.rgb += lEmission * emissionIntensity;
+    outColor.rgb += specularTerm;
 
 #ifdef ENVIRONMENTMAP_ENABLED
 
@@ -366,8 +367,19 @@ void main()
     vec3 envTexel = textureCube(environmentMap, reflect(-V, N)).xyz;
     #endif
 
-    outColor.rgb = outColor.rgb + envTexel * envWeight;
+    outColor.rgb += envTexel * envWeight;
 #endif
+
+
+#ifdef SSAOMAP_ENABLED
+    outColor.rgb *= texture2D(ssaoMap, gl_FragCoord.xy / viewportSize).rgb;
+#endif
+
+    vec3 lEmission = emission;
+#ifdef EMISSIVEMAP_ENABLED
+    lEmission *= texture2D(emissiveMap, v_Texcoord);
+#endif
+    outColor.rgb += lEmission * emissionIntensity;
 
 #ifdef GAMMA_ENCODE
     // Not linear

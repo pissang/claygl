@@ -8,6 +8,7 @@ define(function(require) {
     var Compositor = require('../compositor/Compositor');
     var CompoNode = require('../compositor/Node');
     var CompoSceneNode = require('../compositor/SceneNode');
+    var CompoTextureNode = require('../compositor/TextureNode');
     var Shader = require('../Shader');
     var Texture = require('../Texture');
     var Texture2D = require('../Texture2D');
@@ -174,19 +175,26 @@ define(function(require) {
                 }
             }
             var node;
-            if (type === 'filter') {
+            if (type === 'scene') {
+                node = new CompoSceneNode({
+                    name: nodeInfo.name,
+                    scene: this.scene,
+                    camera: this.camera,
+                    outputs: outputs
+                });
+            }
+            else if (type === 'texture') {
+                node = new CompoTextureNode({
+                    name: nodeInfo.name,
+                    outputs: outputs
+                });
+            }
+            // Default is filter
+            else {
                 node = new CompoNode({
                     name: nodeInfo.name,
                     shader: shaderSource,
                     inputs: inputs,
-                    outputs: outputs
-                });
-            }
-            else if (type === 'scene') {
-                var node = new CompoSceneNode({
-                    name: nodeInfo.name,
-                    scene: this.scene,
-                    camera: this.camera,
                     outputs: outputs
                 });
             }

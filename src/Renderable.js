@@ -212,7 +212,8 @@ define(function(require) {
                             if (semantic) {
                                 var semanticInfo = shader.attribSemantics[semantic];
                                 symbol = semanticInfo && semanticInfo.symbol;
-                            } else {
+                            }
+                            else {
                                 symbol = name;
                             }
                             if (symbol && shader.attributeTemplates[symbol]) {
