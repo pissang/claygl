@@ -172,7 +172,7 @@ void main(){
 #ifdef SPOT_LIGHT_SHADOWMAP_COUNT
 uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
 uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
-uniform float splotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
@@ -293,7 +293,7 @@ float computeShadowOfCube(samplerCube map, vec3 direction, float range){
 
 void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ){
     for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_COUNT; i++){
-        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position, splotLightShadowMapSizes[i]);
+        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightShadowMapSizes[i]);
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
