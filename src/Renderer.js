@@ -31,7 +31,7 @@ define(function(require) {
     /**
      * @constructor qtek.Renderer
      */
-    var Renderer = Base.derive(function() {
+    var Renderer = Base.derive(function () {
         return /** @lends qtek.Renderer# */ {
 
             /**
@@ -281,14 +281,14 @@ define(function(require) {
         /**
          * Push current viewport into a stack
          */
-        saveViewport: function() {
+        saveViewport: function () {
             this._viewportStack.push(this.viewport);
         },
 
         /**
          * Pop viewport from stack, restore in the renderer
          */
-        restoreViewport: function() {
+        restoreViewport: function () {
             if (this._viewportStack.length > 0) {
                 this.setViewport(this._viewportStack.pop());
             }
@@ -297,18 +297,22 @@ define(function(require) {
         /**
          * Push current clear into a stack
          */
-        saveClear: function() {
+        saveClear: function () {
             this._clearStack.push(this.clear);
         },
 
         /**
          * Pop clear from stack, restore in the renderer
          */
-        restoreClear: function() {
+        restoreClear: function () {
             if (this._clearStack.length > 0) {
                 this.clear = this._clearStack.pop();
             }
         },
+
+        // Hook before and after render each object
+        beforeRenderObject: function () {},
+        afterRenderObject: function () {},
         /**
          * Render the scene in camera to the screen or binded offline framebuffer
          * @param  {qtek.Scene}       scene
@@ -524,6 +528,7 @@ define(function(require) {
 
                 // Before render hook
                 renderable.beforeRender(_gl);
+                this.beforeRenderObject(renderable);
 
                 if (prevShader !== shader) {
                     // Set lights number
@@ -617,6 +622,7 @@ define(function(require) {
                 }
 
                 // After render hook
+                this.afterRenderObject(renderable, objectRenderInfo);
                 renderable.afterRender(_gl, objectRenderInfo);
             }
 
@@ -638,7 +644,7 @@ define(function(require) {
          * @param {Array.<number>} worldViewMat represented with array
          * @param {Array.<number>} projectionMat represented with array
          */
-        isFrustumCulled: (function() {
+        isFrustumCulled: (function () {
             // Frustum culling
             // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
             var cullingBoundingBox = new BoundingBox();
@@ -763,7 +769,7 @@ define(function(require) {
         /**
          * Dispose renderer
          */
-        dispose: function() {
+        dispose: function () {
             glinfo.dispose(this.gl);
         },
 

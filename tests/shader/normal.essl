@@ -1,0 +1,80 @@
+@export normal.vertex
+
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
+
+attribute vec3 position : POSITION;
+attribute vec3 normal : NORMAL;
+
+varying vec3 v_Normal;
+
+#ifdef NORMALMAP_ENABLED
+attribute vec4 tangent : TANGENT;
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+void main()
+{
+#ifdef NORMALMAP_ENABLED
+    vec3 skinnedTangent = tangent.xyz;
+#endif
+
+    gl_Position = worldViewProjection * vec4(position, 1.0);
+    v_Normal = normalize((worldInverseTranspose * vec4(normal, 0.0)).xyz);
+
+#ifdef NORMALMAP_ENABLED
+    v_Tangent = normalize((worldInverseTranspose * vec4(tangent, 0.0)).xyz);
+    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+#endif
+}
+
+
+@end
+
+
+@export normal.fragment
+
+#define GLOSS_CHANEL 0;
+#define ROUGHNESS_CHANEL 0;
+
+uniform sampler2D diffuseMap;
+uniform float glossiness;
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+
+#ifdef NORMALMAP_ENABLED
+uniform sampler2D normalMap;
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+#ifdef GLOSSMAP_ENABLED
+uniform sampler2D glossinessMap;
+#elif defined(ROUGHNESSMAP_ENABLED)
+uniform sampler2D roughnessMap;
+#endif
+
+void main()
+{
+    vec3 N = v_Normal;
+#ifdef NORMALMAP_ENABLED
+    N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+    mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+    N = tbn * N;
+#endif
+
+    float g = glossiness;
+
+#ifdef GLOSSMAP_ENABLED
+    // PENDING Replace or multiply
+    g = texture2D(glossinessMap, v_Texcoord)[GLOSS_CHANEL];
+#elif defined(ROUGHNESSMAP_ENABLED)
+    g = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANEL];
+#endif
+
+    gl_FragColor.rgb = N.xyz * 0.5 + 0.5;
+    gl_FragColor.a = g;
+}
+@end

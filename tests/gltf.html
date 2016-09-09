@@ -49,7 +49,7 @@
                     minPolarAngle : 0.1
                 });
 
-                var light = scene.getNode("Spot");
+                var light = scene.getNode('Spot');
                 light.range = 30;
                 light.umbraAngle = 10;
                 light.penumbraAngle = 25;
@@ -72,8 +72,8 @@
 
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
-                    environmentMapPass.render(renderer, scene);
                     shadowMapPass.render(renderer, scene);
+                    environmentMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
                     shadowMapPass.renderDebug(renderer);
                 });

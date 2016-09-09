@@ -31,7 +31,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
 #ifdef DEPTH_ENCODED
     vec4 depthTexel = texture2D(depthTex, uv);
 
-// FXIME premultiplied alpha?
+// FXIME premultiplied alpha when blend is enabled?
 // FIXME Mobile and PC are different(mobile don't need it)
 #ifdef PREMULTIPLIED_ALPHA
     depthTexel.rgb /= depthTexel.a;

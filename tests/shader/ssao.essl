@@ -32,10 +32,6 @@ varying vec2 v_Texcoord;
 vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {
     float occlusion = 0.0;
 
-    vec3 tmp = kernelBasis * kernel[0] * radius + originPos;
-    vec4 texCoord = projection * vec4(tmp, 1.0);
-    texCoord.xy /= texCoord.w;
-
     for (int i = 0; i < KERNEL_SIZE; i++) {
         vec3 samplePos = kernelBasis * kernel[i];
         samplePos = samplePos * radius + originPos;
