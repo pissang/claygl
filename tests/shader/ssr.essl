@@ -24,6 +24,7 @@ uniform float screenEdgeFadeStart: 0.9; // distance to screen edge that ray hits
 uniform float eyeFadeStart : 0.4; // ray direction's Z that ray hits will start to fade (0.0 -> 1.0)
 uniform float eyeFadeEnd: 0.8; // ray direction's Z that ray hits will be cut (0.0 -> 1.0)
 
+uniform float minGlossiness: 0.2; // Object larger than minGlossiness will have ssr effect
 
 uniform float nearZ;
 uniform vec2 viewportSize;
@@ -56,7 +57,7 @@ bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
     float cameraZ = linearDepth(fetchDepth(depthTex, hitPixel));
     float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
-    return rayZFar <= cameraZ && rayZNear >= cameraBackZ;
+    return rayZFar <= cameraZ && rayZNear >= min(cameraBackZ, cameraZ);
 }
 
 // Trace a ray in screenspace from rayOrigin (in camera space) pointing in rayDir (in camera space)
@@ -209,7 +210,7 @@ float calculateAlpha(
     vec2 hitPixel, vec3 hitPoint, float dist, vec3 rayDir
 )
 {
-    float alpha = min(1.0, reflectivity + 0.1);
+    float alpha = min(1.0, reflectivity);
     // Fade ray hits that approach the maximum iterations
     alpha *= 1.0 - (iterationCount / float(MAX_ITERATION));
     // Fade ray hits that approach the screen edge
@@ -246,10 +247,15 @@ void main()
         discard;
     }
 
+    float g = normalAndGloss.a;
+    if (g <= minGlossiness) {
+        discard;
+        return;
+    }
+
     vec3 N = normalAndGloss.rgb * 2.0 - 1.0;
     N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
 
-    float g = normalAndGloss.a;
     // Position in view
     vec4 projectedPos = vec4(v_Texcoord * 2.0 - 1.0, fetchDepth(depthTex, v_Texcoord), 1.0);
     vec4 pos = projectionInv * projectedPos;
@@ -319,13 +325,12 @@ void main()
     vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
     for (int i = 0; i < 9; i++) {
         vec2 coord = vec2(clamp(v_Texcoord.x + float(i - 4) * off, 0.0, 1.0), v_Texcoord.y);
-        float w = weights[i] * dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0);
+        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;
     }
 
-   gl_FragColor = encodeHDR(sum / weightAll);
-
+    gl_FragColor = encodeHDR(sum / weightAll);
 }
 
 @end
@@ -368,7 +373,7 @@ void main()
 
     for (int i = 0; i < 9; i++) {
         vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + float(i - 4) * off, 0.0, 1.0));
-        float w = weights[i] * dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0);
+        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;
     }

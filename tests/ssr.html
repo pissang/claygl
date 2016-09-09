@@ -7,14 +7,19 @@
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body style="margin:0px;">
+        <style>
+            #main {
+                background: #000;
+            }
+        </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
             require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
 
                 var config = {
-                    maxIteration: 16,
+                    maxIteration: 20,
                     maxBinarySearchIteration: 5,
-                    maxRayDistance: 4,
+                    maxRayDistance: 7.5,
                     pixelStride: 16,
                     pixelStrideZCutoff: 50,
                     screenEdgeFadeStart: 0.9,
@@ -45,16 +50,33 @@
                 var plane = new qtek.Mesh({
                     geometry: planeGeo,
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                        shader: qtek.shader.library.get('qtek.standard', ['diffuseMap', 'normalMap'])
                     })
                 });
-                plane.scale.set(10, 10, 1);
+                plane.scale.set(14, 14, 1);
                 plane.rotation.rotateX(-Math.PI / 2);
-                plane.material.set('color', [0.2, 0.2, 0.2]);
+                // plane.material.set('color', [0.2, 0.2, 0.2]);
+
+                var diffuseTex = new qtek.Texture2D({
+                    wrapS: qtek.Texture.REPEAT,
+                    wrapT: qtek.Texture.REPEAT
+                });
+                var normalTex = new qtek.Texture2D({
+                    wrapS: qtek.Texture.REPEAT,
+                    wrapT: qtek.Texture.REPEAT
+                });
+                diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
+                normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
+                plane.geometry.generateTangents();
+                plane.material.set('diffuseMap', diffuseTex);
+                plane.material.set('normalMap', normalTex);
+                plane.material.set('uvRepeat', [5, 5]);
 
                 scene.add(plane);
-                var mainLight = new qtek.light.Directional();
-                mainLight.position.set(10, 10, 10);
+                var mainLight = new qtek.light.Directional({
+                    intensity: 2
+                });
+                mainLight.position.set(12, 12, 12);
                 mainLight.lookAt(scene.position);
                 scene.add(mainLight);
 
@@ -78,23 +100,25 @@
                 var loader = new qtek.loader.GLTF();
                 loader.load('assets/models/suzanne.json');
                 var suzanneGeometry;
+                var monkeys = [];
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    for (var i = 0; i < 5; i++) {
-                        for (var j = 0; j < 5; j++) {
+                    for (var i = 0; i < 8; i++) {
+                        for (var j = 0; j < 8; j++) {
                             var mesh = new qtek.Mesh({
                                 geometry: suzanneGeometry,
                                 material: new qtek.Material({
                                     shader: qtek.shader.library.get('qtek.standard')
                                 })
                             });
-                            mesh.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
+                            mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
                             scene.add(mesh);
 
                             mesh.material.set('glossiness', 0);
                             mesh.material.set('color', [0, 0, 0]);
                             mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
+                            monkeys.push(mesh);
                         }
                     }
                 });
@@ -117,9 +141,15 @@
                 var frameBuffer = new qtek.FrameBuffer();
                 var colorTex = new qtek.Texture2D();
                 var animation = new qtek.animation.Animation();
+                var elpasedTime = 0;
                 animation.start();
                 animation.on('frame', function(deltaTime) {
+                    elpasedTime += deltaTime;
                     control.update(deltaTime);
+
+                    monkeys.forEach(function (monkey, idx) {
+                        monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
+                    });
                     // if (compositor) {
                     //     compositor.render(renderer);
                     // }
