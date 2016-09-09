@@ -118,10 +118,10 @@ uniform float maxMipmapLevel: 5;
 @import qtek.plugin.compute_shadow_map
 
 
-float G_Smith(float glossiness, float ndv, float ndl)
+float G_Smith(float g, float ndv, float ndl)
 {
     // float k = (roughness+1.0) * (roughness+1.0) * 0.125;
-    float roughness = 1.0 - glossiness;
+    float roughness = 1.0 - g;
     float k = roughness * roughness / 2.0;
     float G1V = ndv / (ndv * (1.0 - k) + k);
     float G1L = ndl / (ndl * (1.0 - k) + k);
@@ -353,7 +353,7 @@ void main()
 
     #ifdef ENVIRONMENTMAP_PREFILTER
     // FIXME simply 1 minus roughness ?
-    float roughness = clamp(1.0 - glossiness, 0.0, 1.0);
+    float roughness = clamp(1.0 - g, 0.0, 1.0);
     float bias = roughness * maxMipmapLevel;
     vec3 L = reflect(-V, N);
     vec3 envTexel = textureCubeLodEXT(environmentMap, L, bias).rgb;
