@@ -162,7 +162,8 @@ define(function(require) {
             }
 
             this.resize();
-        } catch(e) {
+        }
+        catch(e) {
             throw 'Error creating WebGL Context ' + e;
         }
     },
@@ -546,7 +547,8 @@ define(function(require) {
 
                         if (this.throwError) {
                             throw new Error(errMsg);
-                        } else {
+                        }
+                        else {
                             this.trigger('error', errMsg);
                         }
                     }

@@ -14,7 +14,7 @@ uniform mat4 projection;
 uniform mat4 projectionInv;
 uniform mat4 viewInverseTranspose;
 
-uniform float maxRayDistance: 2;
+uniform float maxRayDistance: 4;
 
 uniform float pixelStride: 16;
 uniform float pixelStrideZCutoff: 10; // ray origin Z at this distance will have a pixel stride of 1.0
@@ -288,30 +288,43 @@ uniform sampler2D normalTex;
 varying vec2 v_Texcoord;
 
 uniform vec2 textureSize;
-uniform float blurSize : 1.5;
+uniform float blurSize : 4.0;
 
 @import qtek.util.rgbm
 
+
 void main()
 {
-    float g = texture2D(normalTex, v_Texcoord).a;
+    // array constructor supported in GLSL ES 3.00 only
+    float weights[9];
+    weights[0] = 0.05;
+    weights[1] = 0.09;
+    weights[2] = 0.12;
+    weights[3] = 0.15;
+    weights[4] = 0.18;
+    weights[5] = 0.15;
+    weights[6] = 0.12;
+    weights[7] = 0.09;
+    weights[7] = 0.05;
+
+    vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
+    float g = centerNormalTexel.a;
     // Add 0.3 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) + 0.3) / textureSize.x * blurSize;
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.x;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
+    float weightAll = 0.0;
 
-    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 4.0*off, 0.0), coord.y))) * 0.05;
-    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 3.0*off, 0.0), coord.y))) * 0.09;
-    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 2.0*off, 0.0), coord.y))) * 0.12;
-    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - off, 0.0), coord.y))) * 0.15;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, coord.y))) * 0.18;
-    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + off, 1.0), coord.y))) * 0.15;
-    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 2.0*off, 1.0), coord.y))) * 0.12;
-    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 3.0*off, 1.0), coord.y))) * 0.09;
-    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 4.0*off, 1.0), coord.y))) * 0.05;
+    vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
+    for (int i = 0; i < 9; i++) {
+        vec2 coord = vec2(clamp(v_Texcoord.x + float(i - 4) * off, 0.0, 1.0), v_Texcoord.y);
+        float w = weights[i] * dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0);
+        weightAll += w;
+        sum += decodeHDR(texture2D(colorTex, coord)) * w;
+    }
 
-   gl_FragColor = encodeHDR(sum);
+   gl_FragColor = encodeHDR(sum / weightAll);
 
 }
 
@@ -324,29 +337,43 @@ uniform sampler2D normalTex;
 varying vec2 v_Texcoord;
 
 uniform vec2 textureSize;
-uniform float blurSize : 1.5;
+uniform float blurSize : 4.0;
 
 @import qtek.util.rgbm
 
 void main()
 {
-    float g = texture2D(normalTex, v_Texcoord).a;
-    float off = (clamp(1.0 - g, 0.0, 1.0) + 0.3) / textureSize.y * blurSize;
+    // array constructor supported in GLSL ES 3.00 only
+    float weights[9];
+    weights[0] = 0.05;
+    weights[1] = 0.09;
+    weights[2] = 0.12;
+    weights[3] = 0.15;
+    weights[4] = 0.18;
+    weights[5] = 0.15;
+    weights[6] = 0.12;
+    weights[7] = 0.09;
+    weights[7] = 0.05;
+
+    vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
+    float g = centerNormalTexel.a;
+    // Add 0.3 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.x;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
+    float weightAll = 0.0;
 
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 4.0*off, 0.0)))) * 0.05;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 3.0*off, 0.0)))) * 0.09;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 2.0*off, 0.0)))) * 0.12;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - off, 0.0)))) * 0.15;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, coord.y))) * 0.18;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + off, 1.0)))) * 0.15;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 2.0*off, 1.0)))) * 0.12;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 3.0*off, 1.0)))) * 0.09;
-    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 4.0*off, 1.0)))) * 0.05;
+    vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
 
-    gl_FragColor = encodeHDR(sum);
+    for (int i = 0; i < 9; i++) {
+        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + float(i - 4) * off, 0.0, 1.0));
+        float w = weights[i] * dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0);
+        weightAll += w;
+        sum += decodeHDR(texture2D(colorTex, coord)) * w;
+    }
+
+   gl_FragColor = encodeHDR(sum / weightAll);
 }
 
 @end

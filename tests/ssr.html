@@ -14,7 +14,7 @@
                 var config = {
                     maxIteration: 16,
                     maxBinarySearchIteration: 5,
-                    maxRayDistance: 2,
+                    maxRayDistance: 4,
                     pixelStride: 16,
                     pixelStrideZCutoff: 50,
                     screenEdgeFadeStart: 0.9,
@@ -31,7 +31,7 @@
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
-                camera.position.set(0, 4, 0.1);
+                camera.position.set(0, 4, 4);
                 camera.lookAt(qtek.math.Vector3.ZERO);
 
                 var gBuffer = new GBuffer();
