@@ -7,7 +7,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek) {
+            require(['qtek', 'js/createHDRCompositor'], function(qtek, createHDRCompositor) {
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
@@ -133,14 +133,9 @@
                     fragment: qtek.Shader.source('qtek.compositor.output')
                 });
 
-                var compositor;
-                var FXLoader = new qtek.loader.FX({
+                var compositor = createHDRCompositor({
                     scene: scene,
                     camera: camera
-                });
-                FXLoader.load('assets/fx/hdr.json');
-                FXLoader.on('success', function(_compositor) {
-                    compositor = _compositor;
                 });
 
 
@@ -149,9 +144,7 @@
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     var viewport = renderer.viewport;
-                    if (compositor) {
-                        compositor.render(renderer);
-                    }
+                    compositor.render(renderer);
 
                     var x = 0, y = 0;
                     var width = viewport.width / 10;

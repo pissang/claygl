@@ -111,6 +111,7 @@ define(function(require) {
 		"Plane": require('./math/Plane'),
 		"Quaternion": require('./math/Quaternion'),
 		"Ray": require('./math/Ray'),
+		"util": require('./math/util'),
 		"Value": require('./math/Value'),
 		"Vector2": require('./math/Vector2'),
 		"Vector3": require('./math/Vector3'),

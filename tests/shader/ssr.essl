@@ -324,7 +324,7 @@ void main()
 
     vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(clamp(v_Texcoord.x + float(i - 4) * off, 0.0, 1.0), v_Texcoord.y);
+        vec2 coord = vec2(clamp(v_Texcoord.x + (float(i) - 4.0) * off, 0.0, 1.0), v_Texcoord.y);
         float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;
@@ -363,7 +363,7 @@ void main()
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
     // Add 0.3 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.x;
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.y;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
@@ -372,7 +372,7 @@ void main()
     vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
 
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + float(i - 4) * off, 0.0, 1.0));
+        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + (float(i) - 4.0) * off, 0.0, 1.0));
         float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;

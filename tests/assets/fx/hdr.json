@@ -10,24 +10,12 @@
     },
     "nodes" : [
         {
-            "name": "scene",
-            "type": "scene",
-            "outputs" : {
-                "color" : {
-                    "parameters" : {
-                        "width" : "expr(width)",
-                        "height" : "expr(height)"
-                    }
-                }
-            }
-        },
-        {
             "name" : "bright",
             "shader" : "#source(qtek.compositor.hdr.bright)",
             "type" : "filter",
             "inputs" : {
                 "texture" : {
-                    "node" : "scene",
+                    "node" : "source",
                     "pin" : "color"
                 }
             },
@@ -53,7 +41,7 @@
             "type" : "filter",
             "inputs" : {
                 "texture" : {
-                    "node" : "scene",
+                    "node" : "source",
                     "pin" : "color"
                 }
             },
@@ -680,7 +668,7 @@
             "type" : "filter",
             "inputs" : {
                 "texture" : {
-                    "node" : "scene",
+                    "node" : "source",
                     "pin" : "color"
                 },
                 "bloom" : {

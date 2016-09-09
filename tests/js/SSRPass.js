@@ -15,7 +15,7 @@ define(function (require) {
         this._blurPass1 = new PostProcessPass(qtek.Shader.source('ssr.blur_h'), true);
         this._blurPass2 = new PostProcessPass(qtek.Shader.source('ssr.blur_v'), true);
 
-        this._blendPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.blend'), false, true);
+        this._blendPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.blend'), opt.renderToTexture, true);
         // Pass texture will all be enabled
         this._blendPass.getShader().disableTexturesAll();
         this._blendPass.getShader().enableTexture(['texture1', 'texture2']);
@@ -31,6 +31,15 @@ define(function (require) {
         this._blurPass2.setUniform('normalTex', this._gBuffer.getNormalTex());
 
         this._blendPass.setUniform('texture1', this._blurPass2.getTargetTexture());
+
+        // this._blendPass.setUniform('weight2', 0);
+
+        if (opt.RGBM) {
+            this._ssrPass.getShader().define('fragment', 'RGBM');
+            this._blurPass1.getShader().define('fragment', 'RGBM');
+            this._blurPass2.getShader().define('fragment', 'RGBM');
+            this._blendPass.getShader().define('fragment', 'RGBM');
+        }
 
         this._width;
         this._height;
@@ -98,6 +107,10 @@ define(function (require) {
         else {
             this._ssrPass.setUniform(name, val);
         }
+    };
+
+    SSRPass.prototype.getTargetTexture = function () {
+        return this._blendPass.getTargetTexture();
     };
 
     return SSRPass;

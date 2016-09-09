@@ -7,7 +7,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek) {
+            require(['qtek', 'js/createHDRCompositor'], function(qtek, createHDRCompositor) {
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
@@ -56,6 +56,7 @@
                             shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
                             shader.define('fragment', 'RGBM_ENCODE');
                             shader.define('fragment', 'USE_METALNESS');
+                            shader.define('fragment', 'SRGB_DECODE');
 
                             var material = new qtek.Material({
                                 shader: shader
@@ -80,6 +81,7 @@
                                 });
                                 tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
                                     .success(function () {
+                                        // FIXME
                                         tex.wrapS = qtek.Texture.REPEAT;
                                         tex.wrapT = qtek.Texture.REPEAT;
                                     });
@@ -97,23 +99,17 @@
                     domElement: renderer.canvas
                 });
 
-                var compositor;
-                var FXLoader = new qtek.loader.FX({
+                var compositor = createHDRCompositor({
                     scene: scene,
                     camera: camera
                 });
-                FXLoader.load('assets/fx/hdr.json');
-                FXLoader.on('success', function(_compositor) {
-                    compositor = _compositor;
-                });
+
 
                 var animation = new qtek.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
-                    if (compositor) {
-                        compositor.render(renderer);
-                    }
+                    compositor.render(renderer);
                     // renderer.render(scene, camera);
                 });
 

@@ -14,12 +14,12 @@
         </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
+            require(['qtek', 'js/SSRPass', 'js/GBuffer', 'js/createHDRCompositor'], function(qtek, SSRPass, GBuffer, createHDRCompositor) {
 
                 var config = {
-                    maxIteration: 20,
+                    maxIteration: 16,
                     maxBinarySearchIteration: 5,
-                    maxRayDistance: 7.5,
+                    maxRayDistance: 4,
                     pixelStride: 16,
                     pixelStrideZCutoff: 50,
                     screenEdgeFadeStart: 0.9,
@@ -41,7 +41,9 @@
 
                 var gBuffer = new GBuffer();
                 var ssrPass = new SSRPass({
-                    gBuffer: gBuffer
+                    gBuffer: gBuffer,
+                    renderToTexture: true,
+                    RGBM: true
                 });
 
                 var scene = new qtek.Scene();
@@ -49,10 +51,16 @@
                 var plane = new qtek.Mesh({
                     geometry: planeGeo,
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard', ['diffuseMap', 'normalMap'])
+                        shader: qtek.shader.library.get('qtek.standard', {
+                            textures: ['diffuseMap', 'normalMap'],
+                            fragmentDefines: {
+                                RGBM_ENCODE: null,
+                                SRGB_DECODE: null
+                            }
+                        })
                     })
                 });
-                plane.scale.set(14, 14, 1);
+                plane.scale.set(10, 10, 1);
                 plane.rotation.rotateX(-Math.PI / 2);
                 // plane.material.set('color', [0.2, 0.2, 0.2]);
 
@@ -73,53 +81,87 @@
 
                 scene.add(plane);
                 var mainLight = new qtek.light.Directional({
-                    intensity: 2
+                    intensity: 1
                 });
-                mainLight.position.set(12, 12, 12);
+                mainLight.position.set(10, 10, 10);
                 mainLight.lookAt(scene.position);
                 scene.add(mainLight);
 
-                // for (var i = 0; i < 5; i++) {
-                //     for (var j = 0; j < 5; j++) {
-                //         var sphere = new qtek.Mesh({
-                //             geometry: sphereGeo,
-                //             material: new qtek.Material({
-                //                 shader: qtek.shader.library.get('qtek.standard')
-                //             })
-                //         });
-                //         sphere.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
-                //         scene.add(sphere);
-
-                //         sphere.material.set('glossiness', 0);
-                //         sphere.material.set('color', [0, 0, 0]);
-                //         sphere.material.set('emission', [Math.random(), Math.random(), Math.random()]);
-                //     }
-                // }
-
                 var loader = new qtek.loader.GLTF();
-                loader.load('assets/models/suzanne.json');
+                loader.load('assets/models/suzanne_full.gltf');
                 var suzanneGeometry;
-                var monkeys = [];
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    for (var i = 0; i < 8; i++) {
-                        for (var j = 0; j < 8; j++) {
+                    var envMap = qtek.util.texture.loadTexture(
+                        'assets/textures/hdr/pisa.hdr',
+                        {
+                            exposure: 4
+                        },
+                        function () {
+                            envMap.flipY = false;
+
+                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                                renderer, envMap, {
+                                    width: 128,
+                                    height: 128
+                                }
+                            );
+
+                            var skybox = new qtek.plugin.Skybox({
+                                scene: scene
+                            });
+                            skybox.material.set('environmentMap', prefilterResult.environmentMap);
+                            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+
+                            var shader = qtek.shader.library.get(
+                                'qtek.standard', {
+                                    textures: [
+                                        'environmentMap', 'brdfLookup',
+                                        'diffuseMap', 'normalMap', 'metalnessMap', 'roughnessMap'
+                                    ],
+                                    fragmentDefines: {
+                                        ENVIRONMENTMAP_PREFILTER: null,
+                                        RGBM_ENCODE: null,
+                                        USE_METALNESS: null,
+                                        SRGB_DECODE: null
+                                    }
+                                }
+                            );
+
+                            var material = new qtek.Material({
+                                shader: shader
+                            });
                             var mesh = new qtek.Mesh({
                                 geometry: suzanneGeometry,
-                                material: new qtek.Material({
-                                    shader: qtek.shader.library.get('qtek.standard')
-                                })
+                                material: material
                             });
-                            mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
-                            scene.add(mesh);
+                            mesh.geometry.generateTangents();
 
-                            mesh.material.set('glossiness', 0);
-                            mesh.material.set('color', [0, 0, 0]);
-                            mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
-                            monkeys.push(mesh);
-                        }
-                    }
+                            material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
+                            material.set('brdfLookup', prefilterResult.brdfLookup);
+                            material.set('environmentMap', prefilterResult.environmentMap);
+                            material.set('glossiness', 0);
+                            material.set('metalness', 0);
+                            material.set('uvRepeat', [2, 2]);
+
+                            [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
+                                var tex = new qtek.Texture2D({
+                                    wrapS: qtek.Texture.REPEAT,
+                                    wratT: qtek.Texture.REPEAT
+                                });
+                                tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+                                    .success(function () {
+                                        tex.wrapS = qtek.Texture.REPEAT;
+                                        tex.wrapT = qtek.Texture.REPEAT;
+                                    });
+                                material.set(mapInfo[0], tex);
+                            });
+
+                            mesh.scale.set(1, 1, 1);
+                            mesh.position.y = 1;
+                            scene.add(mesh);
+                        });
                 });
 
                 var control = new qtek.plugin.OrbitControl({
@@ -127,31 +169,17 @@
                     domElement: renderer.canvas
                 });
 
-                var compositor;
-                var FXLoader = new qtek.loader.FX({
-                    scene: scene,
-                    camera: camera
-                });
-                FXLoader.load('assets/fx/hdr.json');
-                FXLoader.on('success', function(_compositor) {
-                    compositor = _compositor;
-                });
-
                 var frameBuffer = new qtek.FrameBuffer();
                 var colorTex = new qtek.Texture2D();
                 var animation = new qtek.animation.Animation();
-                var elpasedTime = 0;
                 animation.start();
+
+                var compositor = createHDRCompositor({
+                    texture: ssrPass.getTargetTexture()
+                });
                 animation.on('frame', function(deltaTime) {
-                    elpasedTime += deltaTime;
                     control.update(deltaTime);
 
-                    monkeys.forEach(function (monkey, idx) {
-                        monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
-                    });
-                    // if (compositor) {
-                    //     compositor.render(renderer);
-                    // }
                     frameBuffer.attach(renderer.gl, colorTex);
                     frameBuffer.bind(renderer);
                     renderer.render(scene, camera);
@@ -159,6 +187,9 @@
 
                     gBuffer.update(renderer, scene, camera);
                     ssrPass.render(renderer, camera, colorTex);
+
+
+                    compositor.render(renderer);
                 });
 
                 window.onresize = function() {
