@@ -528,7 +528,7 @@ define(function(require) {
 
                 // Before render hook
                 renderable.beforeRender(_gl);
-                this.beforeRenderObject(renderable);
+                this.beforeRenderObject(renderable, prevMaterial);
 
                 if (prevShader !== shader) {
                     // Set lights number

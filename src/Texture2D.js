@@ -3,6 +3,8 @@ define(function(require) {
     var Texture = require('./Texture');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
+    var mathUtil = require('./math/util');
+    var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
     /**
      * @constructor qtek.Texture2D
@@ -137,8 +139,7 @@ define(function(require) {
                 width = this.width;
                 height = this.height;
             }
-            return (width & (width-1)) === 0
-                && (height & (height-1)) === 0;
+            return isPowerOfTwo(width) && isPowerOfTwo(height);
         },
 
         isRenderable: function() {

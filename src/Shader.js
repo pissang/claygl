@@ -389,6 +389,13 @@ define(function(require) {
          * @param  {string} symbol
          */
         enableTexture: function (symbol) {
+            if (symbol instanceof Array) {
+                for (var i = 0; i < symbol.length; i++) {
+                    this.enableTexture(symbol[i]);
+                }
+                return;
+            }
+
             var status = this._textureStatus[symbol];
             if (status) {
                 var isEnabled = status.enabled;
@@ -414,6 +421,13 @@ define(function(require) {
          * @param  {string} symbol
          */
         disableTexture: function (symbol) {
+            if (symbol instanceof Array) {
+                for (var i = 0; i < symbol.length; i++) {
+                    this.disableTexture(symbol[i]);
+                }
+                return;
+            }
+
             var status = this._textureStatus[symbol];
             if (status) {
                 var isDisabled = ! status.enabled;

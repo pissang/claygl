@@ -4,6 +4,8 @@ define(function(require) {
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
     var util = require('./core/util');
+    var mathUtil = require('./math/util');
+    var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
     var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
@@ -168,10 +170,6 @@ define(function(require) {
             else {
                 return isPowerOfTwo(this.width)
                     && isPowerOfTwo(this.height);
-            }
-
-            function isPowerOfTwo(value) {
-                return (value & (value - 1)) === 0;
             }
         },
 

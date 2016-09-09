@@ -44,7 +44,12 @@ define(function(require) {
             /**
              * @type {Boolean}
              */
-            blendWithPrevious: false
+            blendWithPrevious: false,
+
+            /**
+             * @type {Boolean}
+             */
+            clearColor: false
         };
     }, function() {
 
@@ -150,9 +155,17 @@ define(function(require) {
 
             this.trigger('beforerender', this, renderer);
 
-            // Don't clear in each pass, let the color overwrite the buffer
+            // Don't clear in each pass in default, let the color overwrite the buffer
             // FIXME pixels may be discard
-            _gl.clear(_gl.DEPTH_BUFFER_BIT);
+            var clearBit = _gl.DEPTH_BUFFER_BIT;
+            if (this.clearColor) {
+                clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
+                var cc = this.clearColor;
+                if (cc instanceof Array) {
+                    _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+                }
+            }
+            _gl.clear(clearBit);
 
             if (this.blendWithPrevious) {
                 // Blend with previous rendered scene in the final output
