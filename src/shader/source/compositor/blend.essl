@@ -1,5 +1,5 @@
 @export qtek.compositor.blend
-// Blend at most 4 textures
+// Blend at most 6 textures
 #ifdef TEXTURE1_ENABLED
 uniform sampler2D texture1;
 uniform float weight1 : 1.0;

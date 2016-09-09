@@ -12,15 +12,16 @@
             require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
 
                 var config = {
-                    maxIteration: 20,
+                    maxIteration: 16,
                     maxBinarySearchIteration: 5,
                     maxRayDistance: 2,
-                    zThickness: 0.5,
                     pixelStride: 16,
-                    pixelStrideZCutoff: 10,
+                    pixelStrideZCutoff: 50,
                     screenEdgeFadeStart: 0.9,
                     eyeFadeStart: 0.4,
-                    eyeFadeEnd: 0.8
+                    eyeFadeEnd: 0.8,
+
+                    glossiness: 0.5
                 };
 
                 var renderer = new qtek.Renderer({
@@ -52,25 +53,51 @@
                 plane.material.set('color', [0.2, 0.2, 0.2]);
 
                 scene.add(plane);
-                var pointLight = new qtek.light.Point();
-                pointLight.position.set(0, 10, 0);
-                scene.add(pointLight);
+                var mainLight = new qtek.light.Directional();
+                mainLight.position.set(10, 10, 10);
+                mainLight.lookAt(scene.position);
+                scene.add(mainLight);
 
-                for (var i = 0; i < 5; i++) {
-                    for (var j = 0; j < 5; j++) {
-                        var sphere = new qtek.Mesh({
-                            geometry: sphereGeo,
-                            material: new qtek.Material({
-                                shader: qtek.shader.library.get('qtek.standard')
-                            })
-                        });
-                        sphere.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
-                        scene.add(sphere);
+                // for (var i = 0; i < 5; i++) {
+                //     for (var j = 0; j < 5; j++) {
+                //         var sphere = new qtek.Mesh({
+                //             geometry: sphereGeo,
+                //             material: new qtek.Material({
+                //                 shader: qtek.shader.library.get('qtek.standard')
+                //             })
+                //         });
+                //         sphere.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
+                //         scene.add(sphere);
 
-                        sphere.material.set('glossiness', 0);
-                        sphere.material.set('emission', [Math.random(), Math.random(), Math.random()]);
+                //         sphere.material.set('glossiness', 0);
+                //         sphere.material.set('color', [0, 0, 0]);
+                //         sphere.material.set('emission', [Math.random(), Math.random(), Math.random()]);
+                //     }
+                // }
+
+                var loader = new qtek.loader.GLTF();
+                loader.load('assets/models/suzanne.json');
+                var suzanneGeometry;
+                loader.on('success', function(res) {
+                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+                    for (var i = 0; i < 5; i++) {
+                        for (var j = 0; j < 5; j++) {
+                            var mesh = new qtek.Mesh({
+                                geometry: suzanneGeometry,
+                                material: new qtek.Material({
+                                    shader: qtek.shader.library.get('qtek.standard')
+                                })
+                            });
+                            mesh.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
+                            scene.add(mesh);
+
+                            mesh.material.set('glossiness', 0);
+                            mesh.material.set('color', [0, 0, 0]);
+                            mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
+                        }
                     }
-                }
+                });
 
                 var control = new qtek.plugin.OrbitControl({
                     target: camera,
@@ -109,7 +136,6 @@
                     var width = window.innerWidth;
                     var height = window.innerHeight;
                     renderer.resize(width, height);
-                    gBuffer.resize(width, height);
                     colorTex.width = width;
                     colorTex.height = height;
                     colorTex.dirty();
@@ -128,12 +154,14 @@
                 gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
                 gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
                 gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
-                gui.add(config, 'zThickness', 0, 5).onChange(updateConfig);
                 gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
                 gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
                 gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
+                gui.add(config, 'glossiness', 0, 1).onChange(function (val) {
+                    plane.material.set('glossiness', val);
+                });
             });
         </script>
 </html>

@@ -20,10 +20,10 @@
 
                 var scene = new qtek.Scene();
 
-                var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load('assets/models/suzanne_full.gltf');
+                var loader = new qtek.loader.GLTF();
+                loader.load('assets/models/suzanne_full.gltf');
                 var suzanneGeometry;
-                GLTFLoader.on('success', function(res) {
+                loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
                     var envMap = qtek.util.texture.loadTexture(

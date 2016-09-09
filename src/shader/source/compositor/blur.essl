@@ -5,9 +5,9 @@
 // PENDING
 vec4 sample(const in sampler2D texture, const in vec2 coord)
 {
-   vec4 tex = decodeHDR(texture2D(texture, coord));
-   // tex.rgb *= tex.a;
-   return tex;
+    vec4 tex = decodeHDR(texture2D(texture, coord));
+    // tex.rgb *= tex.a;
+    return tex;
 }
 @end
 
@@ -23,23 +23,23 @@ uniform float textureWidth : 512.0;
 
 void main (void)
 {
-   vec4 sum = vec4(0.0);
-   float blurOffset = blurSize / textureWidth;
-   // blur in y (vertical)
-   // take nine samples, with the distance blurSize between them
-   sum += sample(texture, vec2(max(v_Texcoord.x - 4.0*blurOffset, 0.0), v_Texcoord.y)) * 0.05;
-   sum += sample(texture, vec2(max(v_Texcoord.x - 3.0*blurOffset, 0.0), v_Texcoord.y)) * 0.09;
-   sum += sample(texture, vec2(max(v_Texcoord.x - 2.0*blurOffset, 0.0), v_Texcoord.y)) * 0.12;
-   sum += sample(texture, vec2(max(v_Texcoord.x - blurOffset, 0.0), v_Texcoord.y)) * 0.15;
-   sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += sample(texture, vec2(min(v_Texcoord.x + blurOffset, 1.0), v_Texcoord.y)) * 0.15;
-   sum += sample(texture, vec2(min(v_Texcoord.x + 2.0*blurOffset, 1.0), v_Texcoord.y)) * 0.12;
-   sum += sample(texture, vec2(min(v_Texcoord.x + 3.0*blurOffset, 1.0), v_Texcoord.y)) * 0.09;
-   sum += sample(texture, vec2(min(v_Texcoord.x + 4.0*blurOffset, 1.0), v_Texcoord.y)) * 0.05;
+    vec4 sum = vec4(0.0);
+    float blurOffset = blurSize / textureWidth;
+    // blur in y (vertical)
+    // take nine samples, with the distance blurSize between them
+    sum += sample(texture, vec2(max(v_Texcoord.x - 4.0*blurOffset, 0.0), v_Texcoord.y)) * 0.05;
+    sum += sample(texture, vec2(max(v_Texcoord.x - 3.0*blurOffset, 0.0), v_Texcoord.y)) * 0.09;
+    sum += sample(texture, vec2(max(v_Texcoord.x - 2.0*blurOffset, 0.0), v_Texcoord.y)) * 0.12;
+    sum += sample(texture, vec2(max(v_Texcoord.x - blurOffset, 0.0), v_Texcoord.y)) * 0.15;
+    sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
+    sum += sample(texture, vec2(min(v_Texcoord.x + blurOffset, 1.0), v_Texcoord.y)) * 0.15;
+    sum += sample(texture, vec2(min(v_Texcoord.x + 2.0*blurOffset, 1.0), v_Texcoord.y)) * 0.12;
+    sum += sample(texture, vec2(min(v_Texcoord.x + 3.0*blurOffset, 1.0), v_Texcoord.y)) * 0.09;
+    sum += sample(texture, vec2(min(v_Texcoord.x + 4.0*blurOffset, 1.0), v_Texcoord.y)) * 0.05;
 
-   // sum.rgb /= sum.a + 0.0000001;
+    // sum.rgb /= sum.a + 0.0000001;
 
-   gl_FragColor = encodeHDR(sum);
+    gl_FragColor = encodeHDR(sum);
 }
 
 @end
@@ -56,23 +56,23 @@ uniform float textureHeight : 512.0;
 
 void main(void)
 {
-   vec4 sum = vec4(0.0);
-   float blurOffset = blurSize / textureHeight;
-   // blur in y (vertical)
-   // take nine samples, with the distance blurSize between them
-   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurOffset, 0.0))) * 0.05;
-   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 3.0*blurOffset, 0.0))) * 0.09;
-   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 2.0*blurOffset, 0.0))) * 0.12;
-   sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - blurOffset, 0.0))) * 0.15;
-   sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
-   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + blurOffset, 1.0))) * 0.15;
-   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 2.0*blurOffset, 1.0))) * 0.12;
-   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 3.0*blurOffset, 1.0))) * 0.09;
-   sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 4.0*blurOffset, 1.0))) * 0.05;
+    vec4 sum = vec4(0.0);
+    float blurOffset = blurSize / textureHeight;
+    // blur in y (vertical)
+    // take nine samples, with the distance blurSize between them
+    sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 4.0*blurOffset, 0.0))) * 0.05;
+    sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 3.0*blurOffset, 0.0))) * 0.09;
+    sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - 2.0*blurOffset, 0.0))) * 0.12;
+    sum += sample(texture, vec2(v_Texcoord.x, max(v_Texcoord.y - blurOffset, 0.0))) * 0.15;
+    sum += sample(texture, vec2(v_Texcoord.x, v_Texcoord.y)) * 0.18;
+    sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + blurOffset, 1.0))) * 0.15;
+    sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 2.0*blurOffset, 1.0))) * 0.12;
+    sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 3.0*blurOffset, 1.0))) * 0.09;
+    sum += sample(texture, vec2(v_Texcoord.x, min(v_Texcoord.y + 4.0*blurOffset, 1.0))) * 0.05;
 
-   // sum.rgb /= sum.a + 0.0000001;
+    // sum.rgb /= sum.a + 0.0000001;
 
-   gl_FragColor = encodeHDR(sum);
+    gl_FragColor = encodeHDR(sum);
 }
 
 @end
@@ -90,23 +90,23 @@ uniform vec2 textureSize : [512.0, 512.0];
 void main(void)
 {
 
-   vec4 tex = texture2D(texture, v_Texcoord);
-   vec2 offset = blurSize / textureSize;
+    vec4 tex = texture2D(texture, v_Texcoord);
+    vec2 offset = blurSize / textureSize;
 
-   tex += sample(texture, v_Texcoord + vec2(offset.x, 0.0) );
-   tex += sample(texture, v_Texcoord + vec2(offset.x, offset.y) );
-   tex += sample(texture, v_Texcoord + vec2(-offset.x, offset.y) );
-   tex += sample(texture, v_Texcoord + vec2(0.0, offset.y) );
-   tex += sample(texture, v_Texcoord + vec2(-offset.x, 0.0) );
-   tex += sample(texture, v_Texcoord + vec2(-offset.x, -offset.y) );
-   tex += sample(texture, v_Texcoord + vec2(offset.x, -offset.y) );
-   tex += sample(texture, v_Texcoord + vec2(0.0, -offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(offset.x, 0.0) );
+    tex += sample(texture, v_Texcoord + vec2(offset.x, offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(-offset.x, offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(0.0, offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(-offset.x, 0.0) );
+    tex += sample(texture, v_Texcoord + vec2(-offset.x, -offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(offset.x, -offset.y) );
+    tex += sample(texture, v_Texcoord + vec2(0.0, -offset.y) );
 
-   tex /= 9.0;
+    tex /= 9.0;
 
-   // tex.rgb /= tex.a + 0.0000001;
+    // tex.rgb /= tex.a + 0.0000001;
 
-   gl_FragColor = encodeHDR(tex);
+    gl_FragColor = encodeHDR(tex);
 }
 
 @end
@@ -130,20 +130,20 @@ uniform float blurSize : 2.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = blurSize / textureSize;
+    vec2 offset = blurSize / textureSize;
 
-   vec4 color = vec4(0.0);
-   // Top
-   for(int i = 0; i < 10; i++){
-      color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
-   }
-   gl_FragData[0] = color;
-   vec4 color2 = vec4(0.0);
-   // Down left
-   for(int i = 0; i < 10; i++){
-      color2 += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
-   }
-   gl_FragData[1] = (color + color2) / 2.0;
+    vec4 color = vec4(0.0);
+    // Top
+    for(int i = 0; i < 10; i++){
+        color += 1.0/10.0 * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
+    }
+    gl_FragData[0] = color;
+    vec4 color2 = vec4(0.0);
+    // Down left
+    for(int i = 0; i < 10; i++){
+        color2 += 1.0/10.0 * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+    }
+    gl_FragData[1] = (color + color2) / 2.0;
 }
 
 @end
@@ -160,20 +160,20 @@ uniform float blurSize : 2.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = blurSize / textureSize;
+    vec2 offset = blurSize / textureSize;
 
-   vec4 color1 = vec4(0.0);
-   // Down left
-   for(int i = 0; i < 10; i++){
-      color1 += 1.0/10.0 * texture2D(texture0, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
-   }
-   vec4 color2 = vec4(0.0);
-   // Down right
-   for(int i = 0; i < 10; i++){
-      color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
-   }
+    vec4 color1 = vec4(0.0);
+    // Down left
+    for(int i = 0; i < 10; i++){
+        color1 += 1.0/10.0 * texture2D(texture0, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+    }
+    vec4 color2 = vec4(0.0);
+    // Down right
+    for(int i = 0; i < 10; i++){
+        color2 += 1.0/10.0 * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+    }
 
-   gl_FragColor = (color1 + color2) / 2.0;
+    gl_FragColor = (color1 + color2) / 2.0;
 }
 
 @end
@@ -191,15 +191,15 @@ uniform float blurSize : 1.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = blurSize / textureSize;
+    vec2 offset = blurSize / textureSize;
 
-   vec4 color = vec4(0.0);
-   float fKernelSize = float(KERNEL_SIZE);
-   // Top
-   for(int i = 0; i < KERNEL_SIZE; i++){
-      color += 1.0 / fKernelSize * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
-   }
-   gl_FragColor = color;
+    vec4 color = vec4(0.0);
+    float fKernelSize = float(KERNEL_SIZE);
+    // Top
+    for(int i = 0; i < KERNEL_SIZE; i++){
+        color += 1.0 / fKernelSize * texture2D(texture, v_Texcoord + vec2(0.0, offset.y * float(i)) );
+    }
+    gl_FragColor = color;
 }
 
 @end
@@ -216,16 +216,16 @@ uniform float blurSize : 1.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = blurSize / textureSize;
-   offset.y /= 2.0;
+    vec2 offset = blurSize / textureSize;
+    offset.y /= 2.0;
 
-   vec4 color = vec4(0.0);
-   float fKernelSize = float(KERNEL_SIZE);
-   // Down left
-   for(int i = 0; i < KERNEL_SIZE; i++){
-      color += 1.0/fKernelSize * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
-   }
-   gl_FragColor = color;
+    vec4 color = vec4(0.0);
+    float fKernelSize = float(KERNEL_SIZE);
+    // Down left
+    for(int i = 0; i < KERNEL_SIZE; i++){
+        color += 1.0/fKernelSize * texture2D(texture, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+    }
+    gl_FragColor = color;
 }
 @end
 
@@ -243,28 +243,28 @@ uniform float blurSize : 1.0;
 uniform vec2 textureSize : [512.0, 512.0];
 
 void main(void){
-   vec2 offset = blurSize / textureSize;
-   offset.y /= 2.0;
+    vec2 offset = blurSize / textureSize;
+    offset.y /= 2.0;
 
-   vec4 color1 = vec4(0.0);
-   float fKernelSize = float(KERNEL_SIZE);
-   // Down left
-   for(int i = 0; i < KERNEL_SIZE; i++){
-      color1 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
-   }
-   vec4 color2 = vec4(0.0);
-   // Down right
-   for(int i = 0; i < KERNEL_SIZE; i++){
-      color2 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
-   }
+    vec4 color1 = vec4(0.0);
+    float fKernelSize = float(KERNEL_SIZE);
+    // Down left
+    for(int i = 0; i < KERNEL_SIZE; i++){
+        color1 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord - vec2(offset.x * float(i), offset.y * float(i)) );
+    }
+    vec4 color2 = vec4(0.0);
+    // Down right
+    for(int i = 0; i < KERNEL_SIZE; i++){
+        color2 += 1.0/fKernelSize * texture2D(texture1, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+    }
 
-   vec4 color3 = vec4(0.0);
-   // Down right
-   for(int i = 0; i < KERNEL_SIZE; i++){
-      color3 += 1.0/fKernelSize * texture2D(texture2, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
-   }
+    vec4 color3 = vec4(0.0);
+    // Down right
+    for(int i = 0; i < KERNEL_SIZE; i++){
+        color3 += 1.0/fKernelSize * texture2D(texture2, v_Texcoord + vec2(offset.x * float(i), -offset.y * float(i)) );
+    }
 
-   gl_FragColor = (color1 + color2 + color3) / 3.0;
+    gl_FragColor = (color1 + color2 + color3) / 3.0;
 }
 
 @end

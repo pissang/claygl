@@ -8,14 +8,13 @@
 uniform sampler2D colorTex;
 uniform sampler2D normalTex;
 uniform sampler2D depthTex;
+uniform sampler2D backDepthTex;
 
 uniform mat4 projection;
 uniform mat4 projectionInv;
 uniform mat4 viewInverseTranspose;
 
 uniform float maxRayDistance: 2;
-
-uniform float zThickness: 0.5;
 
 uniform float pixelStride: 16;
 uniform float pixelStrideZCutoff: 10; // ray origin Z at this distance will have a pixel stride of 1.0
@@ -29,15 +28,17 @@ uniform float eyeFadeEnd: 0.8; // ray direction's Z that ray hits will be cut (0
 uniform float nearZ;
 uniform vec2 viewportSize;
 
+uniform float maxMipmapLevel: 5;
+
 varying vec2 v_Texcoord;
 
 #ifdef DEPTH_DECODE
 @import qtek.util.decode_float
 #endif
 
-float fetchDepth(vec2 uv)
+float fetchDepth(sampler2D depthTexture, vec2 uv)
 {
-    vec4 depthTexel = texture2D(depthTex, uv);
+    vec4 depthTexel = texture2D(depthTexture, uv);
 #ifdef DEPTH_DECODE
     return decodeFloat(depthTexel) * 2.0 - 1.0;
 #else
@@ -52,9 +53,10 @@ float linearDepth(float depth)
 
 bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
 {
-    float cameraZ = linearDepth(fetchDepth(hitPixel));
+    float cameraZ = linearDepth(fetchDepth(depthTex, hitPixel));
+    float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
-    return rayZFar <= cameraZ && rayZNear >= (cameraZ - zThickness);
+    return rayZFar <= cameraZ && rayZNear >= cameraBackZ;
 }
 
 // Trace a ray in screenspace from rayOrigin (in camera space) pointing in rayDir (in camera space)
@@ -204,11 +206,10 @@ bool traceScreenSpaceRay(
 
 float calculateAlpha(
     float iterationCount, float reflectivity,
-    vec2 hitPixel, vec3 hitPoint, vec3 rayOrigin, vec3 rayDir
+    vec2 hitPixel, vec3 hitPoint, float dist, vec3 rayDir
 )
 {
-    // float alpha = min(1.0, reflectivity);
-    float alpha = 1.0;
+    float alpha = min(1.0, reflectivity + 0.1);
     // Fade ray hits that approach the maximum iterations
     alpha *= 1.0 - (iterationCount / float(MAX_ITERATION));
     // Fade ray hits that approach the screen edge
@@ -229,7 +230,7 @@ float calculateAlpha(
     alpha *= 1.0 - (eyeDir - _eyeFadeStart) / (_eyeFadeEnd - _eyeFadeStart);
 
     // Fade ray hits based on distance from ray origin
-    alpha *= 1.0 - clamp(distance(rayOrigin, hitPoint) / maxRayDistance, 0.0, 1.0);
+    alpha *= 1.0 - clamp(dist / maxRayDistance, 0.0, 1.0);
 
     return alpha;
 }
@@ -248,8 +249,9 @@ void main()
     vec3 N = normalAndGloss.rgb * 2.0 - 1.0;
     N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
 
+    float g = normalAndGloss.a;
     // Position in view
-    vec4 projectedPos = vec4(v_Texcoord * 2.0 - 1.0, fetchDepth(v_Texcoord), 1.0);
+    vec4 projectedPos = vec4(v_Texcoord * 2.0 - 1.0, fetchDepth(depthTex, v_Texcoord), 1.0);
     vec4 pos = projectionInv * projectedPos;
     vec3 rayOrigin = pos.xyz / pos.w;
 
@@ -262,17 +264,89 @@ void main()
     float jitter = fract((uv2.x + uv2.y) * 0.25);
 
     bool intersect = traceScreenSpaceRay(rayOrigin, rayDir, jitter, hitPixel, hitPoint, iterationCount);
-    float alpha = calculateAlpha(iterationCount, normalAndGloss.a, hitPixel, hitPoint, rayOrigin, rayDir) * float(intersect);
+
+    float dist = distance(rayOrigin, hitPoint);
+
+    float alpha = calculateAlpha(iterationCount, g, hitPixel, hitPoint, dist, rayDir) * float(intersect);
     hitPixel = mix(v_Texcoord, hitPixel, float(intersect));
 
-    vec4 color = decodeHDR(texture2D(colorTex, hitPixel));
-    gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a) + decodeHDR(texture2D(colorTex, v_Texcoord)));
+    vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
+    gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
 
-    // if (!intersect) {
-    //     discard;
-    // }
-    // gl_FragColor = vec4(hitPixel, 1.0, 1.0);
-
-    // gl_FragColor = vec4(vec3(iterationCount / float(MAX_ITERATION)), 1.0);
+    if (!intersect) {
+        discard;
+    }
 }
+@end
+
+// https://bartwronski.com/2014/03/23/gdc-follow-up-screenspace-reflections-filtering-and-up-sampling/
+@export ssr.blur_h
+
+uniform sampler2D colorTex;
+uniform sampler2D normalTex;
+
+varying vec2 v_Texcoord;
+
+uniform vec2 textureSize;
+uniform float blurSize : 1.5;
+
+@import qtek.util.rgbm
+
+void main()
+{
+    float g = texture2D(normalTex, v_Texcoord).a;
+    // Add 0.3 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) + 0.3) / textureSize.x * blurSize;
+    vec2 coord = v_Texcoord;
+
+    vec4 sum = vec4(0.0);
+
+    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 4.0*off, 0.0), coord.y))) * 0.05;
+    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 3.0*off, 0.0), coord.y))) * 0.09;
+    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - 2.0*off, 0.0), coord.y))) * 0.12;
+    sum += decodeHDR(texture2D(colorTex, vec2(max(coord.x - off, 0.0), coord.y))) * 0.15;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, coord.y))) * 0.18;
+    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + off, 1.0), coord.y))) * 0.15;
+    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 2.0*off, 1.0), coord.y))) * 0.12;
+    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 3.0*off, 1.0), coord.y))) * 0.09;
+    sum += decodeHDR(texture2D(colorTex, vec2(min(coord.x + 4.0*off, 1.0), coord.y))) * 0.05;
+
+   gl_FragColor = encodeHDR(sum);
+
+}
+
+@end
+@export ssr.blur_v
+
+uniform sampler2D colorTex;
+uniform sampler2D normalTex;
+
+varying vec2 v_Texcoord;
+
+uniform vec2 textureSize;
+uniform float blurSize : 1.5;
+
+@import qtek.util.rgbm
+
+void main()
+{
+    float g = texture2D(normalTex, v_Texcoord).a;
+    float off = (clamp(1.0 - g, 0.0, 1.0) + 0.3) / textureSize.y * blurSize;
+    vec2 coord = v_Texcoord;
+
+    vec4 sum = vec4(0.0);
+
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 4.0*off, 0.0)))) * 0.05;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 3.0*off, 0.0)))) * 0.09;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - 2.0*off, 0.0)))) * 0.12;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, max(coord.y - off, 0.0)))) * 0.15;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, coord.y))) * 0.18;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + off, 1.0)))) * 0.15;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 2.0*off, 1.0)))) * 0.12;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 3.0*off, 1.0)))) * 0.09;
+    sum += decodeHDR(texture2D(colorTex, vec2(coord.x, min(coord.y + 4.0*off, 1.0)))) * 0.05;
+
+    gl_FragColor = encodeHDR(sum);
+}
+
 @end
