@@ -17,7 +17,7 @@
             require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
 
                 var config = {
-                    maxIteration: 64,
+                    maxIteration: 32,
                     maxBinarySearchIteration: 5,
                     maxRayDistance: 10,
                     pixelStride: 16,
@@ -26,7 +26,8 @@
                     eyeFadeStart: 0.8,
                     eyeFadeEnd: 1,
 
-                    glossiness: 1
+                    glossiness: 1,
+                    minGlossiness: 0.55
                 };
 
                 var renderer = new qtek.Renderer({
@@ -36,7 +37,7 @@
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
-                camera.position.set(0, 4, 0.1);
+                camera.position.set(0, 4, 4);
                 camera.lookAt(qtek.math.Vector3.ZERO);
 
                 var gBuffer = new GBuffer();
@@ -97,13 +98,43 @@
                 scene.add(pic);
                 pic.position.y = 1;
 
+                var sphereGeo = new qtek.geometry.Sphere({
+                    widthSegments: 50,
+                    heightSegments: 50
+                });
+                var sphere1 = new qtek.Mesh({
+                    geometry: sphereGeo,
+                    material: new qtek.Material({
+                        shader: qtek.shader.library.get('qtek.standard')
+                    })
+                });
+                sphere1.position.set(2, 1, 0);
+                scene.add(sphere1);
+                var sphere2 = new qtek.Mesh({
+                    geometry: sphereGeo,
+                    material: new qtek.Material({
+                        shader: qtek.shader.library.get('qtek.standard')
+                    })
+                });
+                sphere2.position.set(-2, 1, 0);
+                scene.add(sphere2);
+
+                sphere1.material.set('color', [2, 0, 0]);
+                sphere2.material.set('color', [0, 2, 0]);
+
                 scene.add(plane);
                 var mainLight = new qtek.light.Directional({
-                    intensity: 1
+                    intensity: 0.5
                 });
                 mainLight.position.set(10, 10, 10);
                 mainLight.lookAt(scene.position);
                 scene.add(mainLight);
+                var fillLight = new qtek.light.Directional({
+                    intensity: 0.3
+                });
+                fillLight.position.set(5, 5, -10);
+                fillLight.lookAt(scene.position);
+                scene.add(fillLight);
 
                 var control = new qtek.plugin.OrbitControl({
                     target: camera,
@@ -154,9 +185,7 @@
                 gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'glossiness', 0, 1).onChange(function (val) {
-                    plane.material.set('glossiness', val);
-                });
+                gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
             });
         </script>
 </html>

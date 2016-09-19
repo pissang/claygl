@@ -54,10 +54,15 @@ float linearDepth(float depth)
 
 bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
 {
+    // Swap if bigger
+    if (rayZFar > rayZNear)
+    {
+        float t = rayZFar; rayZFar = rayZNear; rayZNear = t;
+    }
     float cameraZ = linearDepth(fetchDepth(depthTex, hitPixel));
     float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
-    return rayZFar <= cameraZ && rayZNear >= min(cameraZ, cameraBackZ) - 0.1;
+    return rayZFar <= cameraZ && rayZNear >= min(cameraBackZ, cameraZ) - 0.1;
 }
 
 // Trace a ray in screenspace from rayOrigin (in camera space) pointing in rayDir (in camera space)
@@ -138,7 +143,7 @@ bool traceScreenSpaceRay(
 
     pqk += dPQK * jitter;
     float rayZFar = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
-    float rayZNear = rayZFar;
+    float rayZNear;
 
     bool intersect = false;
 
@@ -151,11 +156,7 @@ bool traceScreenSpaceRay(
 
         rayZNear = rayZFar;
         rayZFar = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
-        // Swap if bigger
-        if (rayZFar > rayZNear)
-        {
-            float t = rayZFar; rayZFar = rayZNear; rayZNear = t;
-        }
+
         hitPixel = permute ? pqk.yx : pqk.xy;
         hitPixel *= texelSize;
 
@@ -186,11 +187,6 @@ bool traceScreenSpaceRay(
             pqk += dPQK * stride;
             rayZNear = rayZFar;
             rayZFar = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
-            // Swap if bigger
-            if (rayZFar > rayZNear)
-            {
-                float t = rayZFar; rayZFar = rayZNear; rayZNear = t;
-            }
             hitPixel = permute ? pqk.yx : pqk.xy;
             hitPixel *= texelSize;
 
@@ -211,7 +207,7 @@ float calculateAlpha(
     vec2 hitPixel, vec3 hitPoint, float dist, vec3 rayDir
 )
 {
-    float alpha = min(1.0, reflectivity);
+    float alpha = clamp(reflectivity, 0.0, 1.0);
     // Fade ray hits that approach the maximum iterations
     alpha *= 1.0 - (iterationCount / float(MAX_ITERATION));
     // Fade ray hits that approach the screen edge
@@ -255,28 +251,29 @@ void main()
         return;
     }
 
+    float reflectivity = (g - minGlossiness) / (1.0 - minGlossiness);
+
     vec3 N = normalAndGloss.rgb * 2.0 - 1.0;
-    N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
+    N = normalize((viewInverseTranspose * vec4(N, 0.0)).xyz);
 
     // Position in view
     vec4 projectedPos = vec4(v_Texcoord * 2.0 - 1.0, fetchDepth(depthTex, v_Texcoord), 1.0);
     vec4 pos = projectionInv * projectedPos;
     vec3 rayOrigin = pos.xyz / pos.w;
 
-    vec3 rayDir = normalize(reflect(normalize(rayOrigin), normalize(N)));
+    vec3 rayDir = normalize(reflect(normalize(rayOrigin), N));
     vec2 hitPixel;
     vec3 hitPoint;
     float iterationCount;
 
     vec2 uv2 = v_Texcoord * viewportSize;
     float jitter = fract((uv2.x + uv2.y) * 0.25);
-    // float jitter = 0.2;
 
     bool intersect = traceScreenSpaceRay(rayOrigin, rayDir, jitter, hitPixel, hitPoint, iterationCount);
 
     float dist = distance(rayOrigin, hitPoint);
 
-    float alpha = calculateAlpha(iterationCount, g, hitPixel, hitPoint, dist, rayDir) * float(intersect);
+    float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
 
     vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 
@@ -284,6 +281,7 @@ void main()
         discard;
     }
     gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
+
 }
 @end
 
@@ -317,8 +315,8 @@ void main()
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
-    // Add 0.100 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.100) / textureSize.x;
+    // Add 0.1000 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / textureSize.x;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
@@ -364,8 +362,8 @@ void main()
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
-    // Add 0.100 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.100) / textureSize.y;
+    // Add 0.1000 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / textureSize.y;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
