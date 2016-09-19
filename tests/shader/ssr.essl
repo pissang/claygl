@@ -24,7 +24,7 @@ uniform float screenEdgeFadeStart: 0.9; // distance to screen edge that ray hits
 uniform float eyeFadeStart : 0.4; // ray direction's Z that ray hits will start to fade (0.0 -> 1.0)
 uniform float eyeFadeEnd: 0.8; // ray direction's Z that ray hits will be cut (0.0 -> 1.0)
 
-uniform float minGlossiness: 0.2; // Object larger than minGlossiness will have ssr effect
+uniform float minGlossiness: 0.; // Object larger than minGlossiness will have ssr effect
 
 uniform float nearZ;
 uniform vec2 viewportSize;
@@ -186,7 +186,7 @@ bool traceScreenSpaceRay(
         {
             pqk += dPQK * stride;
             rayZNear = rayZFar;
-            rayZFar = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
+            rayZFar = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
             hitPixel = permute ? pqk.yx : pqk.xy;
             hitPixel *= texelSize;
 
@@ -275,7 +275,8 @@ void main()
 
     float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
 
-    vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
+    vec4 color = decodeHDR(texture2D(colorTex, hitPixel));
+    // vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 
     if (!intersect) {
         discard;

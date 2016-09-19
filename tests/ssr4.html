@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/stats.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <style>
+            #main {
+                background: #000;
+            }
+        </style>
+        <canvas id="main"></canvas>
+        <script type="text/javascript">
+            require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
+
+                var config = {
+                    maxIteration: 32,
+                    maxBinarySearchIteration: 5,
+                    maxRayDistance: 10,
+                    pixelStride: 16,
+                    pixelStrideZCutoff: 50,
+                    screenEdgeFadeStart: 0.9,
+                    eyeFadeStart: 0.8,
+                    eyeFadeEnd: 1,
+
+                    glossiness: 1,
+                    minGlossiness: 0.1
+                };
+
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0
+                });
+                var camera = new qtek.camera.Perspective({
+                    aspect: renderer.getViewportAspect()
+                });
+                camera.position.set(0, 4, 4);
+                camera.lookAt(qtek.math.Vector3.ZERO);
+
+                var gBuffer = new GBuffer();
+                var ssrPass = new SSRPass({
+                    gBuffer: gBuffer
+                });
+
+                var frameBuffer = new qtek.FrameBuffer();
+                var colorTex = new qtek.Texture2D();
+                var animation = new qtek.animation.Animation();
+                animation.start();
+
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.getViewportAspect(),
+                    far : 100
+                });
+
+                camera.position.set(2, 2, 2);
+                camera.lookAt(qtek.math.Vector3.ZERO);
+
+                var control = new qtek.plugin.OrbitControl({
+                    target : camera,
+                    domElement : renderer.canvas,
+                    sensitivity : 0.4,
+                    maxPolarAngle : Math.PI / 1.8,
+                    minPolarAngle : 0.1
+                });
+
+                var loader = new qtek.loader.GLTF();
+                loader.load('assets/scenes/gltf/scene.json');
+
+                loader.success(function (res) {
+                    var scene = res.scene;
+                    scene.rotation.rotateX(-Math.PI / 2);
+
+                    var light = scene.getNode('Spot');
+                    light.range = 30;
+                    light.umbraAngle = 10;
+                    light.penumbraAngle = 25;
+                    light.lookAt(scene.position);
+
+                    scene.traverse(function (node) {
+                        if (node.material) {
+                            node.material.set('glossiness', 1);
+                        }
+                    });
+                    scene.getNode('Plane').culling = false;
+                    scene.getNode('Plane_001').culling = false;
+
+                    animation.on('frame', function(deltaTime) {
+                        control.update(deltaTime);
+
+                        frameBuffer.attach(renderer.gl, colorTex);
+                        frameBuffer.bind(renderer);
+                        renderer.render(scene, camera);
+                        frameBuffer.unbind(renderer);
+
+                        gBuffer.update(renderer, scene, camera);
+                        ssrPass.render(renderer, camera, colorTex);
+                    });
+                });
+
+                window.onresize = function() {
+                    var width = window.innerWidth;
+                    var height = window.innerHeight;
+                    renderer.resize(width, height);
+                    colorTex.width = width;
+                    colorTex.height = height;
+                    colorTex.dirty();
+                    camera.aspect = renderer.getViewportAspect();
+                };
+                window.onresize();
+
+                function updateConfig() {
+                    for (var name in config) {
+                        ssrPass.setParameter(name, config[name]);
+                    }
+                }
+                updateConfig();
+
+                var gui = new dat.GUI();
+                gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
+                gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
+                gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
+                gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
+                gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
+                gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
+                gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
+                gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
+                gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
+            });
+        </script>
+</html>

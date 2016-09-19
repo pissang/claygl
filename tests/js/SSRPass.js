@@ -9,7 +9,7 @@ define(function (require) {
         opt = opt || {};
         this._gBuffer = opt.gBuffer;
 
-        this._mipmapPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.output'), true);
+        // this._mipmapPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.output'), true);
         // FXIME Why ssr needs to clear color buffer
         this._ssrPass = new PostProcessPass(qtek.Shader.source('ssr.fragment'), true, true);
         this._blurPass1 = new PostProcessPass(qtek.Shader.source('ssr.blur_h'), true);
@@ -23,7 +23,8 @@ define(function (require) {
         this._ssrPass.setUniform('normalTex', this._gBuffer.getNormalTex());
         this._ssrPass.setUniform('depthTex', this._gBuffer.getDepthTex());
         this._ssrPass.setUniform('backDepthTex', this._gBuffer.getBackDepthTex());
-        this._ssrPass.setUniform('colorTex', this._mipmapPass.getTargetTexture());
+
+        // this._ssrPass.setUniform('colorTex', this._mipmapPass.getTargetTexture());
 
         this._blurPass1.setUniform('colorTex', this._ssrPass.getTargetTexture());
         this._blurPass1.setUniform('normalTex', this._gBuffer.getNormalTex());
@@ -49,13 +50,13 @@ define(function (require) {
         this._width = width;
         this._height = height;
 
-        var mathUtil = qtek.math.util;
-        var widthPOT = mathUtil.nearestPowerOfTwo(width);
-        var heightPOT = mathUtil.nearestPowerOfTwo(height);
+        // var mathUtil = qtek.math.util;
+        // var widthPOT = mathUtil.nearestPowerOfTwo(width);
+        // var heightPOT = mathUtil.nearestPowerOfTwo(height);
 
-        this._maxMipmapLevel = Math.log(Math.max(widthPOT, heightPOT)) / Math.log(2);
+        // this._maxMipmapLevel = Math.log(Math.max(widthPOT, heightPOT)) / Math.log(2);
 
-        this._mipmapPass.resize(widthPOT, heightPOT);
+        // this._mipmapPass.resize(widthPOT, heightPOT);
 
         this._ssrPass.resize(width / 2, height / 2);
         this._blurPass1.resize(width, height);
@@ -68,15 +69,16 @@ define(function (require) {
             this._resize(renderer.getWidth(), renderer.getHeight());
         }
 
-        var mipmapPass = this._mipmapPass;
-        mipmapPass.setUniform('texture', colorTex);
-        mipmapPass.render(renderer);
+        // var mipmapPass = this._mipmapPass;
+        // mipmapPass.setUniform('texture', colorTex);
+        // mipmapPass.render(renderer);
 
         var ssrPass = this._ssrPass;
 
         var viewInverseTranspose = new qtek.math.Matrix4();
         qtek.math.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
 
+        ssrPass.setUniform('colorTex', colorTex);
         ssrPass.setUniform('projection', camera.projectionMatrix._array);
         ssrPass.setUniform('projectionInv', camera.invProjectionMatrix._array);
         ssrPass.setUniform('viewInverseTranspose', viewInverseTranspose._array);
@@ -84,7 +86,7 @@ define(function (require) {
         ssrPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
         ssrPass.setUniform('nearZ', camera.near);
 
-        ssrPass.setUniform('maxMipmapLevel', this._maxMipmapLevel);
+        // ssrPass.setUniform('maxMipmapLevel', this._maxMipmapLevel);
 
         ssrPass.render(renderer);
         var ssrTex = ssrPass.getTargetTexture();
