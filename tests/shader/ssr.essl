@@ -57,7 +57,7 @@ bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
     float cameraZ = linearDepth(fetchDepth(depthTex, hitPixel));
     float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
-    return rayZFar <= cameraZ && rayZNear >= min(cameraBackZ, cameraZ);
+    return rayZFar <= cameraZ && rayZNear >= min(cameraZ, cameraBackZ) - 0.1;
 }
 
 // Trace a ray in screenspace from rayOrigin (in camera space) pointing in rayDir (in camera space)
@@ -131,13 +131,14 @@ bool traceScreenSpaceRay(
 
     // Scale derivatives by the desired pixel stride and the offset the starting values by the jitter fraction
     dP *= pixStride; dQ *= pixStride; dk *= pixStride;
-    P0 += dP * jitter; Q0 += dQ * jitter; k0 += dk * jitter;
 
-    float rayZNear = rayOrigin.z;
-    float rayZFar = rayOrigin.z;
     // Track ray step and derivatives in a vec4 to parallelize
     vec4 pqk = vec4(P0, Q0.z, k0);
     vec4 dPQK = vec4(dP, dQ.z, dk);
+
+    pqk += dPQK * jitter;
+    float rayZFar = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
+    float rayZNear = rayZFar;
 
     bool intersect = false;
 
@@ -245,6 +246,7 @@ void main()
     // Is empty
     if (dot(normalAndGloss.rgb, vec3(1.0)) == 0.0) {
         discard;
+        return;
     }
 
     float g = normalAndGloss.a;
@@ -268,20 +270,20 @@ void main()
 
     vec2 uv2 = v_Texcoord * viewportSize;
     float jitter = fract((uv2.x + uv2.y) * 0.25);
+    // float jitter = 0.2;
 
     bool intersect = traceScreenSpaceRay(rayOrigin, rayDir, jitter, hitPixel, hitPoint, iterationCount);
 
     float dist = distance(rayOrigin, hitPoint);
 
     float alpha = calculateAlpha(iterationCount, g, hitPixel, hitPoint, dist, rayDir) * float(intersect);
-    hitPixel = mix(v_Texcoord, hitPixel, float(intersect));
 
     vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
-    gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
 
     if (!intersect) {
         discard;
     }
+    gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
 }
 @end
 
@@ -315,8 +317,8 @@ void main()
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
-    // Add 0.3 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.x;
+    // Add 0.100 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.100) / textureSize.x;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);
@@ -362,8 +364,8 @@ void main()
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
-    // Add 0.3 bias to filling holes from missed rays.
-    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.3) / textureSize.y;
+    // Add 0.100 bias to filling holes from missed rays.
+    float off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.100) / textureSize.y;
     vec2 coord = v_Texcoord;
 
     vec4 sum = vec4(0.0);

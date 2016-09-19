@@ -3,6 +3,28 @@ define(function (require) {
 
     qtek.Shader.import(require('text!../shader/normal.essl'));
 
+    function createFillCanvas(color) {
+        var canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 1;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = color || '#000';
+        ctx.fillRect(0, 0, 1, 1);
+
+        return canvas;
+    }
+
+    function createBlankNormalTex() {
+        return new qtek.Texture2D({
+            image: createFillCanvas('#000')
+        });
+    }
+
+    function createBlankRoughnessTex() {
+        return new qtek.Texture2D({
+            image: createFillCanvas('#000')
+        });
+    }
+
     function GBuffer() {
         this._globalGBufferMat = new qtek.Material({
             shader: new qtek.Shader({
@@ -10,6 +32,8 @@ define(function (require) {
                 fragment: qtek.Shader.source('normal.fragment')
             })
         });
+
+        this._globalGBufferMat.shader.enableTexture(['normalMap', 'roughnessMap']);
 
         this._gBufferFramebuffer = new qtek.FrameBuffer();
 
@@ -30,6 +54,9 @@ define(function (require) {
             format: qtek.Texture.DEPTH_COMPONENT,
             type: qtek.Texture.UNSIGNED_INT
         });
+
+        this._defaultNormalMap = createBlankNormalTex();
+        this._defaultRoughnessMap = createBlankRoughnessTex();
     }
 
     GBuffer.prototype._resize = function (width, height) {
@@ -48,6 +75,8 @@ define(function (require) {
 
     GBuffer.prototype.update = function (renderer, scene, camera) {
 
+        var gl = renderer.gl;
+
         if (renderer.getWidth() !== this._normalTex.width ||
             renderer.getHeight() !== this._normalTex.height
         ) {
@@ -57,25 +86,69 @@ define(function (require) {
         this._gBufferFramebuffer.bind(renderer);
         this._gBufferFramebuffer.attach(renderer.gl, this._normalTex);
         this._gBufferFramebuffer.attach(renderer.gl, this._depthTex, renderer.gl.DEPTH_ATTACHMENT);
-        renderer.gl.clearColor(0, 0, 0, 0);
-        renderer.gl.depthMask(true);
-        renderer.gl.colorMask(true, true, true, true);
-        renderer.gl.clear(renderer.gl.COLOR_BUFFER_BIT | renderer.gl.DEPTH_BUFFER_BIT);
-        renderer.gl.disable(renderer.gl.BLEND);
+        gl.clearColor(0, 0, 0, 0);
+        gl.depthMask(true);
+        gl.colorMask(true, true, true, true);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.disable(gl.BLEND);
 
         var oldBeforeRender = renderer.beforeRenderObject;
         var globalGBufferMat = this._globalGBufferMat;
+
+        function attachTextureToSlot(shader, symbol, texture, slot) {
+            shader.setUniform(gl, '1i', symbol, slot);
+
+            gl.activeTexture(gl.TEXTURE0 + slot);
+            // Maybe texture is not loaded yet;
+            if (texture.isRenderable()) {
+                texture.bind(gl);
+            }
+            else {
+                // Bind texture to null
+                texture.unbind(gl);
+            }
+        }
+
+        var previousNormalMap;
+        var previousRougnessMap;
+        var defaultNormalMap = this._defaultNormalMap;
+        var defaultRougnessMap = this._defaultRoughnessMap;
         renderer.beforeRenderObject = function (renderable, prevMaterial) {
+            var material = renderable.material;
             // TODO Texture
-            var glossiness = renderable.material.get('glossiness');
+            var glossiness = material.get('glossiness');
+            var normalMap = material.get('normalMap') || defaultNormalMap;
+            var roughnessMap = material.get('roughnessMap');
+            var uvRepeat = material.get('uvRepeat');
+            var uvOffset = material.get('uvOffset');
+            var tintGloss = !roughnessMap;
+            roughnessMap = roughnessMap || defaultRougnessMap;
+
             if (!prevMaterial) {
                 globalGBufferMat.set('glossiness', glossiness);
+                globalGBufferMat.set('normalMap', normalMap);
+                globalGBufferMat.set('roughnessMap', roughnessMap);
+                globalGBufferMat.set('tintGloss', +tintGloss);
+                globalGBufferMat.set('uvRepeat', uvRepeat);
+                globalGBufferMat.set('uvOffset', uvOffset);
             }
             else {
                 globalGBufferMat.shader.setUniform(
-                    renderer.gl, '1f', 'glossiness', glossiness
+                    gl, '1f', 'glossiness', glossiness
                 );
+                if (previousNormalMap !== normalMap) {
+                    attachTextureToSlot(material.shader, 'normalMap', normalMap, 0);
+                }
+                if (previousRougnessMap !== roughnessMap) {
+                    attachTextureToSlot(material.shader, 'roughnessMap', roughnessMap, 1);
+                }
+                globalGBufferMat.shader.setUniform(gl, '1i', 'tintGloss', +tintGloss);
+                globalGBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+                globalGBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
             }
+
+            previousNormalMap = normalMap;
+            previousRougnessMap = roughnessMap;
         };
 
         renderer.renderQueue(scene.opaqueQueue, camera, globalGBufferMat);
@@ -89,14 +162,14 @@ define(function (require) {
         // http://www.kode80.com/blog/2015/03/11/screen-space-reflections-in-unity-5/
         this._gBufferFramebuffer.bind(renderer);
         this._gBufferFramebuffer.attach(renderer.gl, this._backDepthTex, renderer.gl.DEPTH_ATTACHMENT);
-        renderer.gl.depthMask(true);
-        renderer.gl.colorMask(false, false, false, false);
-        renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
+        gl.depthMask(true);
+        gl.colorMask(false, false, false, false);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
 
         function updateCullface(renderable) {
             var oldCullFace = renderable.cullFace;
-            renderable.cullFace = oldCullFace === renderer.gl.FRONT
-                ? renderer.gl.BACK : renderer.gl.FRONT;
+            renderable.cullFace = oldCullFace === gl.FRONT
+                ? gl.BACK : gl.FRONT;
             renderable.__cullFace = oldCullFace;
         }
         function restoreCullface(renderable) {
@@ -111,7 +184,7 @@ define(function (require) {
         scene.opaqueQueue.forEach(restoreCullface);
         scene.transparentQueue.forEach(restoreCullface);
         this._gBufferFramebuffer.unbind(renderer);
-        renderer.gl.colorMask(true, true, true, true);
+        gl.colorMask(true, true, true, true);
     };
 
     GBuffer.prototype.getNormalTex = function () {

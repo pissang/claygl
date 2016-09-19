@@ -543,6 +543,7 @@ define(function(require) {
                     _gl.uniformMatrix3fv(location, false, value);
                     break;
                 case 'm4v':
+                    // Raw value
                     if (value instanceof Array) {
                         var array = new vendor.Float32Array(value.length * 16);
                         var cursor = 0;
@@ -553,7 +554,6 @@ define(function(require) {
                             }
                         }
                         _gl.uniformMatrix4fv(location, false, array);
-                    // Raw value
                     }
                     else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
                         _gl.uniformMatrix4fv(location, false, value);

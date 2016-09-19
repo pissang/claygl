@@ -34,6 +34,8 @@ void main()
 
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
+
+    bool hasTangent = dot(tangent, tangent) > 0.0;
 #ifdef NORMALMAP_ENABLED
     vec3 skinnedTangent = tangent.xyz;
 #endif
@@ -45,7 +47,9 @@ void main()
     // Upper skinMatrix
     skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
 #ifdef NORMALMAP_ENABLED
-    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+    if (hasTangent) {
+        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+    }
 #endif
 #endif
 
@@ -56,8 +60,10 @@ void main()
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
 
 #ifdef NORMALMAP_ENABLED
-    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
-    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+    if (hasTangent) {
+        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
+        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+    }
 #endif
 
     v_ProjPos = gl_Position;
@@ -87,9 +93,11 @@ void main()
 {
     vec3 N = v_Normal;
 #ifdef NORMALMAP_ENABLED
-    N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
-    mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
-    N = tbn * N;
+    if (dot(v_Tangent, v_Tangent) > 0.0) {
+        N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
+        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+        N = tbn * N;
+    }
 #endif
 
     gl_FragColor.rgb = (N.xyz + 1.0) * 0.5;
