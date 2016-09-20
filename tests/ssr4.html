@@ -27,7 +27,9 @@
                     eyeFadeEnd: 1,
 
                     glossiness: 1,
-                    minGlossiness: 0.1
+                    minGlossiness: 0.1,
+
+                    zThicknessThreshold: 0.1
                 };
 
                 var renderer = new qtek.Renderer({
@@ -79,13 +81,16 @@
                     light.penumbraAngle = 25;
                     light.lookAt(scene.position);
 
-                    scene.traverse(function (node) {
-                        if (node.material) {
-                            node.material.set('glossiness', 1);
-                        }
-                    });
+                    // scene.traverse(function (node) {
+                    //     if (node.material) {
+                    //         node.material.set('glossiness', 0.8);
+                    //     }
+                    // });
                     scene.getNode('Plane').culling = false;
                     scene.getNode('Plane_001').culling = false;
+
+                    scene.getNode('Plane').material.set('glossiness', 0.8);
+                    scene.getNode('Plane').material.set('color', [0.4, 0.4, 0.4]);
 
                     animation.on('frame', function(deltaTime) {
                         control.update(deltaTime);
@@ -128,6 +133,7 @@
                 gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
                 gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
+                gui.add(config, 'zThicknessThreshold', 0, 2).onChange(updateConfig);
             });
         </script>
 </html>

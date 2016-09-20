@@ -24,7 +24,8 @@ uniform float screenEdgeFadeStart: 0.9; // distance to screen edge that ray hits
 uniform float eyeFadeStart : 0.4; // ray direction's Z that ray hits will start to fade (0.0 -> 1.0)
 uniform float eyeFadeEnd: 0.8; // ray direction's Z that ray hits will be cut (0.0 -> 1.0)
 
-uniform float minGlossiness: 0.; // Object larger than minGlossiness will have ssr effect
+uniform float minGlossiness: 0.2; // Object larger than minGlossiness will have ssr effect
+uniform float zThicknessThreshold: 0.1;
 
 uniform float nearZ;
 uniform vec2 viewportSize;
@@ -62,7 +63,7 @@ bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
     float cameraZ = linearDepth(fetchDepth(depthTex, hitPixel));
     float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
-    return rayZFar <= cameraZ && rayZNear >= min(cameraBackZ, cameraZ) - 0.1;
+    return rayZFar <= cameraZ && rayZNear >= min(cameraBackZ, cameraZ) - zThicknessThreshold;
 }
 
 // Trace a ray in screenspace from rayOrigin (in camera space) pointing in rayDir (in camera space)
@@ -150,6 +151,7 @@ bool traceScreenSpaceRay(
     vec2 texelSize = 1.0 / viewportSize;
 
     iterationCount = 0.0;
+
     for (int i = 0; i < MAX_ITERATION; i++)
     {
         pqk += dPQK;
@@ -171,12 +173,14 @@ bool traceScreenSpaceRay(
     }
 
     // Binary search refinement
-    if (pixelStride > 1.0 && intersect)
+    // FIXME If intersect in first iteration binary search may easily lead to the pixel of reflect object it self
+    if (pixStride > 1.0 && intersect && iterationCount > 1.0)
     {
+        // Roll back
         pqk -= dPQK;
-        dPQK /= pixelStride;
+        dPQK /= pixStride;
 
-        float originalStride = pixelStride * 0.5;
+        float originalStride = pixStride * 0.5;
         float stride = originalStride;
 
         rayZNear = pqk.z / pqk.w;
@@ -186,7 +190,7 @@ bool traceScreenSpaceRay(
         {
             pqk += dPQK * stride;
             rayZNear = rayZFar;
-            rayZFar = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
+            rayZFar = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
             hitPixel = permute ? pqk.yx : pqk.xy;
             hitPixel *= texelSize;
 
@@ -283,6 +287,7 @@ void main()
     }
     gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
 
+    // gl_FragColor = vec4(vec3(iterationCount / 2.0), 1.0);
 }
 @end
 
