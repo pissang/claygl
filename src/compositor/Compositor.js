@@ -7,10 +7,10 @@ define(function(require){
 
     /**
      * Compositor provide graph based post processing
-     * 
+     *
      * @constructor qtek.compositor.Compositor
      * @extends qtek.compositor.Graph
-     * 
+     *
      */
     var Compositor = Graph.derive(function() {
         return {

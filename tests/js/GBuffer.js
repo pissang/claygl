@@ -137,10 +137,10 @@ define(function (require) {
                     gl, '1f', 'glossiness', glossiness
                 );
                 if (previousNormalMap !== normalMap) {
-                    attachTextureToSlot(material.shader, 'normalMap', normalMap, 0);
+                    attachTextureToSlot(globalGBufferMat.shader, 'normalMap', normalMap, 0);
                 }
                 if (previousRougnessMap !== roughnessMap) {
-                    attachTextureToSlot(material.shader, 'roughnessMap', roughnessMap, 1);
+                    attachTextureToSlot(globalGBufferMat.shader, 'roughnessMap', roughnessMap, 1);
                 }
                 globalGBufferMat.shader.setUniform(gl, '1i', 'tintGloss', +tintGloss);
                 globalGBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);

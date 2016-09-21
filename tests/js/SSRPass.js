@@ -58,8 +58,10 @@ define(function (require) {
 
         // this._mipmapPass.resize(widthPOT, heightPOT);
 
-        this._ssrPass.resize(width / 2, height / 2);
+        this._ssrPass.resize(Math.round(width / 2), Math.round(height / 2));
         this._blurPass1.resize(width, height);
+        this._blurPass2.resize(width, height);
+        this._blendPass.resize(width, height);
     };
 
     SSRPass.prototype.render = function (renderer, camera, colorTex) {
@@ -90,9 +92,10 @@ define(function (require) {
 
         ssrPass.render(renderer);
         var ssrTex = ssrPass.getTargetTexture();
+        var blurPass1Tex = this._blurPass1.getTargetTexture();
         this._blurPass1.setUniform('textureSize', [ssrTex.width, ssrTex.height]);
         this._blurPass1.render(renderer);
-        this._blurPass2.setUniform('textureSize', [ssrTex.width, ssrTex.height]);
+        this._blurPass2.setUniform('textureSize', [blurPass1Tex.width, blurPass1Tex.height]);
         this._blurPass2.render(renderer);
 
         this._blendPass.setUniform('texture2', colorTex);
