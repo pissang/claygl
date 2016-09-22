@@ -29,7 +29,7 @@ void main()
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);
 
-    vec3 tex = textureCube(environmentMap, viewDirection).xyz;
+    vec3 tex = decodeHDR(textureCube(environmentMap, viewDirection)).rgb;
 
 #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));

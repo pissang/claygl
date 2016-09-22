@@ -69,7 +69,7 @@ void main()
     gl_FragColor = vec4(color, alpha);
 
 #ifdef DIFFUSEMAP_ENABLED
-    vec4 tex = texture2D( diffuseMap, v_Texcoord );
+    vec4 tex = texture2D(diffuseMap, v_Texcoord);
 
 #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));
