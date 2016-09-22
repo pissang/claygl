@@ -158,8 +158,10 @@ define(function(require) {
             // Don't clear in each pass in default, let the color overwrite the buffer
             // FIXME pixels may be discard
             var clearBit = _gl.DEPTH_BUFFER_BIT;
+            _gl.depthMask(true);
             if (this.clearColor) {
                 clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
+                _gl.colorMask(true, true, true, true);
                 var cc = this.clearColor;
                 if (cc instanceof Array) {
                     _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
