@@ -362,7 +362,8 @@ void main()
     float roughness = clamp(1.0 - g, 0.0, 1.0);
     float bias = roughness * maxMipmapLevel;
     vec3 L = reflect(-V, N);
-    vec3 envTexel = textureCubeLodEXT(environmentMap, L, bias).rgb;
+    // Only env map can have HDR
+    vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
 
         #ifdef BRDFLOOKUP_ENABLED
     vec2 brdfParam = texture2D(brdfLookup, vec2(roughness, ndv)).xy;
@@ -375,7 +376,6 @@ void main()
 
     outColor.rgb += envTexel * envWeight;
 #endif
-
 
 #ifdef SSAOMAP_ENABLED
     outColor.rgb *= texture2D(ssaoMap, gl_FragCoord.xy / viewportSize).rgb;

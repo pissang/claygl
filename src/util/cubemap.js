@@ -2,6 +2,7 @@
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
 // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 define(function (require) {
+
     var Texture2D = require('../Texture2D');
     var TextureCube = require('../TextureCube');
     var Texture = require('../Texture');
@@ -15,6 +16,7 @@ define(function (require) {
     var EnvironmentMapPass = require('../prePass/EnvironmentMap');
     var Renderer = require('../Renderer');
     var vendor = require('../core/vendor');
+    var textureUtil = require('./texture');
 
     var integrateBRDFShaderCode = require('./shader/integrateBRDF.essl');
     var prefilterFragCode = require('./shader/prefilter.essl');
@@ -23,6 +25,18 @@ define(function (require) {
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
+    /**
+     * @param  {qtek.Renderer} renderer
+     * @param  {qtek.Texture} envMap
+     * @param  {Object} [textureOpts]
+     * @param  {number} [textureOpts.width]
+     * @param  {number} [textureOpts.height]
+     * @param  {number} [textureOpts.type]
+     * @param  {boolean} [textureOpts.encodeRGBM]
+     * @param  {boolean} [textureOpts.decodeRGBM]
+     * @param  {qtek.Texture2D} [normalDistribution]
+     * @param  {qtek.Texture2D} [brdfLookup]
+     */
     cubemapUtil.prefilterEnvironmentMap = function (
         renderer, envMap, textureOpts, normalDistribution, brdfLookup
     ) {
@@ -31,6 +45,7 @@ define(function (require) {
             brdfLookup = cubemapUtil.integrateBrdf(renderer, normalDistribution);
         }
         textureOpts =  textureOpts || {};
+
         var width = textureOpts.width || 64;
         var height = textureOpts.height || 64;
 
@@ -65,21 +80,30 @@ define(function (require) {
         });
         prefilterMaterial.set('normalDistribution', normalDistribution);
 
+        textureOpts.encodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_ENCODE');
+        textureOpts.decodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_DECODE');
+
         var dummyScene = new Scene();
         var skyEnv;
-        if (envMap instanceof TextureCube) {
-            skyEnv = new Skybox({
-                scene: dummyScene
+
+        if (envMap instanceof Texture2D) {
+            // Convert panorama to cubemap
+            var envCubemap = new TextureCube({
+                width: textureOpts.width,
+                height: textureOpts.height,
+                type: textureType
             });
-            skyEnv.material.set('environmentMap', envMap);
-        }
-        // Panorama
-        else {
-            skyEnv = new Skydome({
-                scene: dummyScene
+            textureUtil.panoramaToCubeMap(cubeMapRenderer, envMap, envCubemap, {
+                // encodeRGBM so it can be decoded as RGBM
+                encodeRGBM: textureOpts.decodeRGBM
             });
-            skyEnv.material.set('diffuseMap', envMap);
+            envMap = envCubemap;
         }
+        skyEnv = new Skybox({
+            scene: dummyScene,
+            material: prefilterMaterial
+        });
+        skyEnv.material.set('environmentMap', envMap);
 
         var envMapPass = new EnvironmentMapPass({
             texture: prefilteredCubeMap
@@ -96,10 +120,13 @@ define(function (require) {
             prefilteredCubeMap.mipmaps[i] = {
                 pixels: {}
             };
+            skyEnv.material.set('roughness', i / (targets.length - 1));
+
             for (var j = 0; j < targets.length; j++) {
                 var pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
                 frameBuffer.attach(cubeMapRenderer.gl, renderTargetTmp);
                 frameBuffer.bind(cubeMapRenderer);
+
                 cubeMapRenderer.render(dummyScene, envMapPass.getCamera(targets[j]));
                 cubeMapRenderer.gl.readPixels(
                     0, 0, renderTargetTmp.width, renderTargetTmp.height,

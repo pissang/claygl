@@ -1,8 +1,7 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
-    var Texture = require('../Texture');
     var Texture2D = require('../Texture2D');
     var TextureCube = require('../TextureCube');
     var request = require('../core/request');
@@ -26,7 +25,7 @@ define(function(require) {
          *
          * @memberOf qtek.util.texture
          */
-        loadTexture: function(path, option, onsuccess, onerror) {
+        loadTexture: function (path, option, onsuccess, onerror) {
             var texture;
             if (typeof(option) === 'function') {
                 onsuccess = option;
@@ -52,7 +51,8 @@ define(function(require) {
                         onerror
                     );
                     return texture;
-                } else if (path.match(/.dds$/)) {
+                }
+                else if (path.match(/.dds$/)) {
                     texture = new Texture2D({
                         width: 0,
                         height: 0
@@ -66,13 +66,15 @@ define(function(require) {
                         },
                         onerror
                     );
-                } else {
+                }
+                else {
                     texture = new Texture2D();
                     texture.load(path);
                     texture.success(onsuccess);
                     texture.error(onerror);
                 }
-            } else if (typeof(path) == 'object' && typeof(path.px) !== 'undefined') {
+            }
+            else if (typeof(path) == 'object' && typeof(path.px) !== 'undefined') {
                 var texture = new TextureCube();
                 texture.load(path);
                 texture.success(onsuccess);
@@ -83,30 +85,33 @@ define(function(require) {
 
         /**
          * Load a panorama texture and render it to a cube map
+         * @param  {qtek.Renderer} renderer
          * @param  {string} path
          * @param  {qtek.TextureCube} cubeMap
-         * @param  {qtek.Renderer} renderer
          * @param  {object} [option]
+         * @param  {boolean} [option.encodeRGBM]
+         * @param  {number} [option.exposure]
          * @param  {Function} [onsuccess]
          * @param  {Function} [onerror]
          *
          * @memberOf qtek.util.texture
          */
-        loadPanorama: function(path, cubeMap, renderer, option, onsuccess, onerror) {
+        loadPanorama: function (renderer, path, cubeMap, option, onsuccess, onerror) {
             var self = this;
 
             if (typeof(option) === 'function') {
                 onsuccess = option;
                 onerror = onsuccess;
                 option = {};
-            } else {
+            }
+            else {
                 option = option || {};
             }
 
-            textureUtil.loadTexture(path, option, function(texture) {
+            textureUtil.loadTexture(path, option, function (texture) {
                 // PENDING
                 texture.flipY = false;
-                self.panoramaToCubeMap(texture, cubeMap, renderer);
+                self.panoramaToCubeMap(renderer, texture, cubeMap, option);
                 texture.dispose(renderer.gl);
                 onsuccess && onsuccess(cubeMap);
             }, onerror);
@@ -114,18 +119,26 @@ define(function(require) {
 
         /**
          * Render a panorama texture to a cube map
+         * @param  {qtek.Renderer} renderer
          * @param  {qtek.Texture2D} panoramaMap
          * @param  {qtek.TextureCube} cubeMap
-         * @param  {qtek.Renderer} renderer
+         * @param  {Object} option
+         * @param  {boolean} [option.encodeRGBM]
          *
          * @memberOf qtek.util.texture
          */
-        panoramaToCubeMap: function(panoramaMap, cubeMap, renderer) {
+        panoramaToCubeMap: function (renderer, panoramaMap, cubeMap, option) {
             var environmentMapPass = new EnvironmentMapPass();
             var skydome = new Skydome({
                 scene: new Scene()
             });
             skydome.material.set('diffuseMap', panoramaMap);
+
+            option = option || {};
+            if (option.encodeRGBM) {
+                skydome.material.shader.define('fragment', 'RGBM_ENCODE');
+            }
+
             environmentMapPass.texture = cubeMap;
             environmentMapPass.render(renderer, skydome.scene);
             environmentMapPass.texture = null;
@@ -133,7 +146,7 @@ define(function(require) {
             return cubeMap;
         },
 
-        _fetchTexture: function(path, onsuccess, onerror) {
+        _fetchTexture: function (path, onsuccess, onerror) {
             request.get({
                 url: path,
                 responseType: 'arraybuffer',
@@ -152,7 +165,7 @@ define(function(require) {
          *
          * @memberOf qtek.util.texture
          */
-        createChessboard: function(size, unitSize, color1, color2) {
+        createChessboard: function (size, unitSize, color1, color2) {
             size = size || 512;
             unitSize = unitSize || 64;
             color1 = color1 || 'black';
@@ -192,7 +205,7 @@ define(function(require) {
          *
          * @memberOf qtek.util.texture
          */
-        createBlank: function(color) {
+        createBlank: function (color) {
             var canvas = document.createElement('canvas');
             canvas.width = 1;
             canvas.height = 1;

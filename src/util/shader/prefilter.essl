@@ -12,6 +12,8 @@ varying vec3 v_WorldPosition;
 
 const float fSampleNumber = float(SAMPLE_NUMBER);
 
+@import qtek.util.rgbm
+
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
     vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;
 
@@ -39,11 +41,10 @@ void main() {
 
         float NoL = clamp(dot(N, L), 0.0, 1.0);
         if (NoL > 0.0) {
-            prefilteredColor += textureCube(environmentMap, L).rgb * NoL;
+            prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;
             totalWeight += NoL;
         }
     }
 
-    gl_FragColor.rgb = prefilteredColor / totalWeight;
-    gl_FragColor.a = 1.0;
+    gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));
 }
