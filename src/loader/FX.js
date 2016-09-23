@@ -107,6 +107,7 @@ define(function(require) {
                 lib.parameters[name] = this._convertParameter(paramInfo);
             }
             this._loadShaders(json, function(shaderLib) {
+                // TODO load texture asynchronous
                 self._loadTextures(json, lib, function(textureLib) {
                     lib.textures = textureLib;
                     lib.shaders = shaderLib;
@@ -233,7 +234,7 @@ define(function(require) {
             if (!paramInfo) {
                 return param;
             }
-            ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT']
+            ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT', 'flipY', 'useMipmap']
                 .forEach(function(name) {
                     var val = paramInfo[name];
                     if (val != null) {
