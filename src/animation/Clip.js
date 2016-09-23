@@ -33,60 +33,61 @@ define(function (require) {
          */
         this.target = opts.target;
 
-        if (typeof(opts.life) !== 'undefined') {
+        if (opts.life == null) {
             /**
              * @type {number}
              */
             this.life = opts.life;
         }
-        if (typeof(opts.delay) !== 'undefined') {
+        if (opts.delay == null) {
             /**
              * @type {number}
              */
             this.delay = opts.delay;
         }
-        if (typeof(opts.gap) !== 'undefined') {
+        if (opts.gap == null) {
             /**
              * @type {number}
              */
             this.gap = opts.gap;
         }
 
-        if (typeof(opts.playbackRate) !== 'undefined') {
+        if (opts.playbackRate == null) {
+            this.playbackRate = 1;
+        }
+        else {
             /**
              * @type {number}
              */
             this.playbackRate = opts.playbackRate;
-        } else {
-            this.playbackRate = 1;
         }
 
         this._initialized = false;
 
         this._elapsedTime = 0;
 
-        this._loop = opts.loop === undefined ? false : opts.loop;
+        this._loop = opts.loop == null ? false : opts.loop;
         this.setLoop(this._loop);
 
-        if (typeof(opts.easing) !== 'undefined') {
+        if (opts.easing == null) {
             this.setEasing(opts.easing);
         }
 
-        if (typeof(opts.onframe) !== 'undefined') {
+        if (opts.onframe == null) {
             /**
              * @type {Function}
              */
             this.onframe = opts.onframe;
         }
 
-        if (typeof(opts.ondestroy) !== 'undefined') {
+        if (opts.ondestroy == null) {
             /**
              * @type {Function}
              */
             this.ondestroy = opts.ondestroy;
         }
 
-        if (typeof(opts.onrestart) !== 'undefined') {
+        if (opts.onrestart == null) {
             /**
              * @type {Function}
              */
@@ -157,7 +158,8 @@ define(function (require) {
             var schedule;
             if (this.easing) {
                 schedule = this.easing(percent);
-            }else{
+            }
+            else {
                 schedule = percent;
             }
             this.fire('frame', schedule);
@@ -175,7 +177,8 @@ define(function (require) {
 
                     return 'destroy';
                 }
-            } else {
+            }
+            else {
                 return null;
             }
         },
@@ -193,12 +196,15 @@ define(function (require) {
             // All clips may be expired and all start from the beginning value(position)
             // It is clearly wrong, so we use remainder to add a offset
 
-            // It is ignored if restart is invoked manually
             var remainder = 0;
+
+            time = time;
+            // Remainder ignored if restart is invoked manually
             if (time) {
                 this._elapse(time);
                 remainder = this._elapsedTime % this.life;
             }
+            time = time || new Date().getTime();
 
             this._startTime = time - remainder + this.delay;
             this._elapsedTime = 0;

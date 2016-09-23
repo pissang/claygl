@@ -118,7 +118,7 @@ define(function(require) {
 
     SamplerClip.prototype.constructor = SamplerClip;
 
-    SamplerClip.prototype.step = function(time) {
+    SamplerClip.prototype.step = function (time) {
 
         var ret = Clip.prototype.step.call(this, time);
 
@@ -129,7 +129,7 @@ define(function(require) {
         return ret;
     };
 
-    SamplerClip.prototype.setTime = function(time) {
+    SamplerClip.prototype.setTime = function (time) {
         if (!this.channels.time) {
             return;
         }

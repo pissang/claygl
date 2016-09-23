@@ -67,7 +67,9 @@ define(function(require) {
          * @param {qtek.animation.Clip} clip
          */
         addClip: function(clip) {
-            this._clips.push(clip);
+            if (this._clips.indexOf(clip) < 0) {
+                this._clips.push(clip);
+            }
         },
 
         /**
@@ -75,7 +77,9 @@ define(function(require) {
          */
         removeClip: function(clip) {
             var idx = this._clips.indexOf(clip);
-            this._clips.splice(idx, 1);
+            if (idx >= 0) {
+                this._clips.splice(idx, 1);
+            }
         },
 
         /**
