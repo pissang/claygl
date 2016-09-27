@@ -35,9 +35,9 @@ void main()
     vec3 skinnedPosition = position;
     vec3 skinnedNormal = normal;
 
-    bool hasTangent = dot(tangent, tangent) > 0.0;
 #ifdef NORMALMAP_ENABLED
     vec3 skinnedTangent = tangent.xyz;
+    bool hasTangent = dot(tangent, tangent) > 0.0;
 #endif
 #ifdef SKINNING
 
@@ -94,9 +94,13 @@ void main()
     vec3 N = v_Normal;
 #ifdef NORMALMAP_ENABLED
     if (dot(v_Tangent, v_Tangent) > 0.0) {
-        N = texture2D(normalMap, v_Texcoord).xyz * 2.0 - 1.0;
-        mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
-        N = tbn * N;
+        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;
+        if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
+            N = normalTexel * 2.0 - 1.0;
+            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+            // FIXME Why need to normalize again?
+            N = normalize(tbn * N);
+        }
     }
 #endif
 

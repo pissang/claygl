@@ -12,25 +12,29 @@ define(function(require) {
     /** @lends qtek.camera.Perspective# */
     {
         /**
+         * Vertical field of view in radians
          * @type {number}
          */
         fov: 50,
         /**
+         * Aspect ratio, typically viewport width / height
          * @type {number}
          */
         aspect: 1,
         /**
+         * Near bound of the frustum
          * @type {number}
          */
         near: 0.1,
         /**
+         * Far bound of the frustum
          * @type {number}
          */
         far: 2000
     },
     /** @lends qtek.camera.Perspective.prototype */
     {
-        
+
         updateProjectionMatrix: function() {
             var rad = this.fov / 180 * Math.PI;
             this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);

@@ -1,3 +1,11 @@
+
+@export qtek.util.rand
+// http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+@end
+
 // Use light attenuation formula in
 // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
 @export qtek.util.calculate_attenuation

@@ -1,0 +1,133 @@
+@export alchemy.fragment
+
+uniform sampler2D normalTex;
+
+uniform sampler2D depthTex;
+
+uniform vec2 textureSize;
+
+uniform mat4 projection;
+
+uniform mat4 projectionInv;
+
+uniform mat4 viewInverseTranspose;
+
+uniform vec2 kernel[KERNEL_SIZE];
+
+uniform float radius : 1.5;
+
+uniform float scale: 1;
+
+uniform float power: 1;
+
+uniform float bias: 1e-4;
+
+varying vec2 v_Texcoord;
+
+#ifdef DEPTH_DECODE
+@import qtek.util.decode_float
+#endif
+
+float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float sRadius) {
+    float occlusion = 0.0;
+
+    for (int i = 0; i < KERNEL_SIZE; i++) {
+        vec2 dir = kernelBasis * kernel[i];
+        vec2 uv = dir * sRadius + sOrigin;
+
+        vec4 depthTexel = texture2D(depthTex, uv);
+#ifdef DEPTH_DECODE
+        depthTexel.rgb /= depthTexel.a;
+        float z = decodeFloat(depthTexel) * 2.0 - 1.0;
+#else
+        float z = depthTexel.r * 2.0 - 1.0;
+#endif
+
+        vec4 projectedPos = vec4(uv * 2.0 - 1.0, z, 1.0);
+        vec4 p4 = projectionInv * projectedPos;
+
+        vec3 cPos = p4.xyz / p4.w;
+
+        vec3 cDir = normalize(cPos - cOrigin);
+
+        // Estimator from original alchemy paper
+        occlusion += max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4);
+    }
+    occlusion = max(1.0 - 2.0 * scale * occlusion / float(KERNEL_SIZE), 0.0);
+
+    return pow(occlusion, power);
+}
+
+@import qtek.util.rand
+
+void main()
+{
+    vec4 tex = texture2D(normalTex, v_Texcoord);
+
+    // Is empty
+    if (dot(tex.rgb, vec3(1.0)) == 0.0) {
+        discard;
+    }
+
+    vec3 N = tex.rgb * 2.0 - 1.0;
+
+    // Convert to view space
+    N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
+
+    vec4 depthTexel = texture2D(depthTex, v_Texcoord);
+#ifdef DEPTH_DECODE
+    depthTexel.rgb /= depthTexel.a;
+    float z = decodeFloat(depthTexel) * 2.0 - 1.0;
+#else
+    float z = depthTexel.r * 2.0 - 1.0;
+#endif
+
+    vec4 projectedPos = vec4(v_Texcoord * 2.0 - 1.0, z, 1.0);
+    vec4 p4 = projectionInv * projectedPos;
+
+    vec3 cOrigin = p4.xyz / p4.w;
+
+    // Screen radius on height
+    float sRadius = radius / (projection[0][0] * cOrigin.z);
+
+    float rad = rand(v_Texcoord) * 6.283185307179586;
+    mat2 kernelBasis = mat2(
+        vec2(cos(rad), sin(rad)),
+        vec2(-sin(rad), cos(rad))
+    );
+
+    gl_FragColor = vec4(vec3(ssaoEstimator(kernelBasis, v_Texcoord, cOrigin, N, sRadius)), 1.0);
+
+    // gl_FragColor = vec4(tex.rgb, 1.0);
+}
+
+@end
+
+
+
+
+
+@export alchemy.blur.fragment
+
+uniform sampler2D texture;
+
+uniform vec2 textureSize;
+
+varying vec2 v_Texcoord;
+
+void main ()
+{
+    vec2 texelSize = 1.0 / textureSize;
+
+    vec4 color = vec4(0.0);
+    vec2 hlim = vec2(float(-BLUR_SIZE) * 0.5 + 0.5);
+    for (int x = 0; x < BLUR_SIZE; x++) {
+        for (int y = 0; y < BLUR_SIZE; y++) {
+            vec2 coord = (vec2(float(x), float(y)) + hlim) * texelSize + v_Texcoord;
+            color += texture2D(texture, coord);
+        }
+    }
+
+    gl_FragColor = color / (float(BLUR_SIZE) * float(BLUR_SIZE));
+}
+@end

@@ -14,6 +14,10 @@ define(function (require) {
     PostProcessPass.prototype.setUniform = function (key, val) {
         this._pass.setUniform(key, val);
     };
+    PostProcessPass.prototype.getUniform = function (key) {
+        return this._pass.getUniform(key);
+    };
+
     PostProcessPass.prototype.render = function (renderer) {
         if (this._frameBuffer) {
             this._frameBuffer.attach(renderer.gl, this._targetTexture);
