@@ -4,6 +4,7 @@ define(function (require) {
 
     var Easing = require('./easing');
 
+    function noop () {}
     /**
      * @constructor
      * @alias qtek.animation.Clip
@@ -33,34 +34,26 @@ define(function (require) {
          */
         this.target = opts.target;
 
-        if (opts.life == null) {
-            /**
-             * @type {number}
-             */
-            this.life = opts.life;
-        }
-        if (opts.delay == null) {
-            /**
-             * @type {number}
-             */
-            this.delay = opts.delay;
-        }
-        if (opts.gap == null) {
-            /**
-             * @type {number}
-             */
-            this.gap = opts.gap;
-        }
+        /**
+         * @type {number}
+         */
+        this.life = opts.life || 1000;
 
-        if (opts.playbackRate == null) {
-            this.playbackRate = 1;
-        }
-        else {
-            /**
-             * @type {number}
-             */
-            this.playbackRate = opts.playbackRate;
-        }
+        /**
+         * @type {number}
+         */
+        this.delay = opts.delay || 0;
+
+        /**
+         * @type {number}
+         */
+        this.gap = opts.gap || 0;
+
+        /**
+         * @type {number}
+         */
+        this.playbackRate = opts.playbackRate || 1;
+
 
         this._initialized = false;
 
@@ -69,30 +62,24 @@ define(function (require) {
         this._loop = opts.loop == null ? false : opts.loop;
         this.setLoop(this._loop);
 
-        if (opts.easing == null) {
+        if (opts.easing != null) {
             this.setEasing(opts.easing);
         }
 
-        if (opts.onframe == null) {
-            /**
-             * @type {Function}
-             */
-            this.onframe = opts.onframe;
-        }
+        /**
+         * @type {Function}
+         */
+        this.onframe = opts.onframe || noop;
 
-        if (opts.ondestroy == null) {
-            /**
-             * @type {Function}
-             */
-            this.ondestroy = opts.ondestroy;
-        }
+        /**
+         * @type {Function}
+         */
+        this.ondestroy = opts.ondestroy || noop;
 
-        if (opts.onrestart == null) {
-            /**
-             * @type {Function}
-             */
-            this.onrestart = opts.onrestart;
-        }
+        /**
+         * @type {Function}
+         */
+        this.onrestart = opts.onrestart || noop;
 
     };
 
@@ -112,7 +99,8 @@ define(function (require) {
             if (loop) {
                 if (typeof(loop) == 'number') {
                     this._loopRemained = loop;
-                } else {
+                }
+                else {
                     this._loopRemained = 1e8;
                 }
             }
