@@ -1,6 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
     </head>
@@ -67,7 +68,7 @@
                             });
                             mesh.geometry.generateTangents();
 
-                            material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
+                            material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
                             material.set('brdfLookup', prefilterResult.brdfLookup);
                             material.set('environmentMap', prefilterResult.environmentMap);
                             material.set('glossiness', 1);

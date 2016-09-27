@@ -79,23 +79,6 @@
                 mainLight.lookAt(scene.position);
                 scene.add(mainLight);
 
-                // for (var i = 0; i < 5; i++) {
-                //     for (var j = 0; j < 5; j++) {
-                //         var sphere = new qtek.Mesh({
-                //             geometry: sphereGeo,
-                //             material: new qtek.Material({
-                //                 shader: qtek.shader.library.get('qtek.standard')
-                //             })
-                //         });
-                //         sphere.position.set((i - 2.5) * 3, 0.6, (j - 2.5) * 3);
-                //         scene.add(sphere);
-
-                //         sphere.material.set('glossiness', 0);
-                //         sphere.material.set('color', [0, 0, 0]);
-                //         sphere.material.set('emission', [Math.random(), Math.random(), Math.random()]);
-                //     }
-                // }
-
                 var loader = new qtek.loader.GLTF();
                 loader.load('assets/models/suzanne.json');
                 var suzanneGeometry;

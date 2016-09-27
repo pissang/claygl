@@ -1,6 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
     </head>
@@ -30,7 +31,7 @@
                 var GLTFLoader = new qtek.loader.GLTF();
                 GLTFLoader.load('assets/models/suzanne.json');
                 var suzanneGeometry;
-                GLTFLoader.on('success', function(res) {
+                GLTFLoader.on('success', function (res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
                     var envMap = qtek.util.texture.loadTexture(
@@ -44,7 +45,8 @@
                             var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
-                                    height: 128
+                                    height: 128,
+                                    encodeRGBM: true
                                     // type: qtek.Texture.UNSIGNED_BYTE
                                 }, normalDistribution, brdfLookup
                             );
@@ -53,13 +55,13 @@
                                 scene: scene
                             });
                             skybox.material.set('environmentMap', prefilterResult.environmentMap);
-                            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+                            skybox.material.shader.define('fragment', 'RGBM');
 
                             var shader = qtek.shader.library.get(
                                 'qtek.standard', ['environmentMap', 'brdfLookup']
                             );
                             shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-                            shader.define('fragment', 'RGBM_ENCODE');
+                            shader.define('fragment', 'RGBM');
                             for (var i = 0; i < 10; i++) {
                                 var material = new qtek.Material({
                                     shader: shader
@@ -162,7 +164,8 @@
                 });
 
                 function applyMaterial(material, prefilterResult, roughness) {
-                    material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
+                    // Ignore too small mip have seam artifacts
+                    material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
                     material.set('brdfLookup', prefilterResult.brdfLookup);
                     material.set('environmentMap', prefilterResult.environmentMap);
                     material.set('glossiness', 1 - roughness);

@@ -17,7 +17,7 @@
         </style>
         <canvas id='main'></canvas>
         <script type="text/javascript">
-            require(['qtek', 'text!./shader/tron.essl'], function (qtek, tronShader) {
+            require(['qtek', 'text!./shader/tron.essl', 'js/createHDRCompositor'], function (qtek, tronShader, createHDRCompositor) {
                 var Shader = qtek.Shader;
                 Shader.import(tronShader);
 
@@ -87,21 +87,13 @@
                     target: camera
                 });
 
-                var compositor;
-                var FXLoader = new qtek.loader.FX({
+                var compositor = createHDRCompositor({
                     scene: scene,
                     camera: camera
                 });
-                FXLoader.load('assets/fx/hdr.json');
-
-                FXLoader.on('success', function(_compositor) {
-                    compositor = _compositor;
-                });
 
                 animation.on('frame', function(dTime) {
-                    if (compositor) {
-                        compositor.render(renderer);
-                    }
+                    compositor.render(renderer);
                     // renderer.render(scene, camera);
                     control.update(dTime);
                 });

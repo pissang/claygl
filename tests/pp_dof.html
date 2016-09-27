@@ -33,13 +33,13 @@
                 });
 
                 qtek.util.texture.loadPanorama(
+                    renderer,
                     'assets/textures/hdr/pisa.hdr',
-                    cubeMap,
-                    renderer
+                    cubeMap
                 );
 
                 var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load("assets/models/suzanne.json");
+                GLTFLoader.load('assets/models/suzanne.json');
                 var control = new qtek.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas
@@ -58,14 +58,14 @@
                 material.set('environmentMap', cubeMap);
 
                 GLTFLoader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                    var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
                     var size = 10;
                     for (var i = 0; i < size; i++) {
                         for (var j = 0; j < size; j++) {
                             for (var k = 0; k < size; k++) {
                                 var mesh = new qtek.Mesh({
-                                    material : material,
-                                    geometry :suzanneGeometry
+                                    material: material,
+                                    geometry: suzanneGeometry
                                 });
                                 mesh.scale.set(1.5, 1.5, 1.5);
                                 mesh.position.set((i - size / 2) * size / 2, (k - size / 2) * size / 2, (j - size / 2) * size / 2);
