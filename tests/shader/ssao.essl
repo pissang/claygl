@@ -109,19 +109,27 @@ varying vec2 v_Texcoord;
 
 void main ()
 {
-    vec2 texelSize = 1.0 / textureSize;
 
-    // gl_FragColor.rgba = texture2D(texture, v_Texcoord);
+    vec2 texelSize = 1.0 / textureSize;
 
     vec4 color = vec4(0.0);
     vec2 hlim = vec2(float(-BLUR_SIZE) * 0.5 + 0.5);
+    vec4 centerColor = texture2D(texture, v_Texcoord);
+    float weightAll = 0.0;
+    float boxWeight = 1.0 / float(BLUR_SIZE) * float(BLUR_SIZE);
     for (int x = 0; x < BLUR_SIZE; x++) {
         for (int y = 0; y < BLUR_SIZE; y++) {
             vec2 coord = (vec2(float(x), float(y)) + hlim) * texelSize + v_Texcoord;
-            color += texture2D(texture, coord);
+            vec4 sample = texture2D(texture, coord);
+            // http://stackoverflow.com/questions/6538310/anyone-know-where-i-can-find-a-glsl-implementation-of-a-bilateral-filter-blur
+            // PENDING
+            float closeness = 1.0 - distance(sample, centerColor) / sqrt(3.0);
+            float weight = boxWeight * closeness;
+            color += weight * sample;
+            weightAll += weight;
         }
     }
 
-    gl_FragColor = color / (float(BLUR_SIZE) * float(BLUR_SIZE));
+    gl_FragColor = color / weightAll;
 }
 @end

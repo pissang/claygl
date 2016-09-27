@@ -4,7 +4,11 @@ uniform sampler2D normalTex;
 
 uniform sampler2D depthTex;
 
+uniform sampler2D noiseTex;
+
 uniform vec2 textureSize;
+
+uniform vec2 noiseTexSize;
 
 uniform mat4 projection;
 
@@ -20,7 +24,7 @@ uniform float scale: 1;
 
 uniform float power: 1;
 
-uniform float bias: 1e-4;
+uniform float bias: 5e-4;
 
 varying vec2 v_Texcoord;
 
@@ -37,7 +41,6 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
 
         vec4 depthTexel = texture2D(depthTex, uv);
 #ifdef DEPTH_DECODE
-        depthTexel.rgb /= depthTexel.a;
         float z = decodeFloat(depthTexel) * 2.0 - 1.0;
 #else
         float z = depthTexel.r * 2.0 - 1.0;
@@ -48,17 +51,15 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
 
         vec3 cPos = p4.xyz / p4.w;
 
-        vec3 cDir = normalize(cPos - cOrigin);
+        vec3 cDir = cPos - cOrigin;
 
         // Estimator from original alchemy paper
-        occlusion += max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4);
+        occlusion += clamp(max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4), 0.0, 1.0) * step(length(cDir), radius);
     }
     occlusion = max(1.0 - 2.0 * scale * occlusion / float(KERNEL_SIZE), 0.0);
 
     return pow(occlusion, power);
 }
-
-@import qtek.util.rand
 
 void main()
 {
@@ -88,17 +89,18 @@ void main()
     vec3 cOrigin = p4.xyz / p4.w;
 
     // Screen radius on height
-    float sRadius = radius / (projection[0][0] * cOrigin.z);
+    float sRadius = radius / (projection[0][0] * -cOrigin.z);
 
-    float rad = rand(v_Texcoord) * 6.283185307179586;
+    // Use 4x4 noise texture instead of completely random can reduce noise problem after filtering
+    // http://www.gamedev.net/topic/648090-alchemy-ambient-occlusion/#entry5096131
+    vec2 noiseTexCoord = textureSize / vec2(noiseTexSize) * v_Texcoord;
+    vec2 rvec = normalize(texture2D(noiseTex, noiseTexCoord).rg * 2.0 - 1.0);
+
     mat2 kernelBasis = mat2(
-        vec2(cos(rad), sin(rad)),
-        vec2(-sin(rad), cos(rad))
+        rvec, vec2(-rvec.y, rvec.x)
     );
 
     gl_FragColor = vec4(vec3(ssaoEstimator(kernelBasis, v_Texcoord, cOrigin, N, sRadius)), 1.0);
-
-    // gl_FragColor = vec4(tex.rgb, 1.0);
 }
 
 @end
@@ -107,27 +109,92 @@ void main()
 
 
 
-@export alchemy.blur.fragment
+@export alchemy.blur_h
 
-uniform sampler2D texture;
-
-uniform vec2 textureSize;
+uniform sampler2D colorTex;
+uniform sampler2D normalTex;
 
 varying vec2 v_Texcoord;
 
-void main ()
-{
-    vec2 texelSize = 1.0 / textureSize;
+uniform vec2 textureSize;
+uniform float blurSize : 1.0;
 
-    vec4 color = vec4(0.0);
-    vec2 hlim = vec2(float(-BLUR_SIZE) * 0.5 + 0.5);
-    for (int x = 0; x < BLUR_SIZE; x++) {
-        for (int y = 0; y < BLUR_SIZE; y++) {
-            vec2 coord = (vec2(float(x), float(y)) + hlim) * texelSize + v_Texcoord;
-            color += texture2D(texture, coord);
-        }
+void main()
+{
+    // array constructor supported in GLSL ES 3.00 only
+    float weights[9];
+    weights[0] = 0.05;
+    weights[1] = 0.09;
+    weights[2] = 0.12;
+    weights[3] = 0.15;
+    weights[4] = 0.18;
+    weights[5] = 0.15;
+    weights[6] = 0.12;
+    weights[7] = 0.09;
+    weights[7] = 0.05;
+
+    vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
+    float g = centerNormalTexel.a;
+    float off = blurSize / textureSize.x;
+    vec2 coord = v_Texcoord;
+
+    vec4 sum = vec4(0.0);
+    float weightAll = 0.0;
+
+    vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
+    for (int i = 0; i < 9; i++) {
+        vec2 coord = vec2(clamp(v_Texcoord.x + (float(i) - 4.0) * off, 0.0, 1.0), v_Texcoord.y);
+        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
+        weightAll += w;
+        sum += texture2D(colorTex, coord) * w;
     }
 
-    gl_FragColor = color / (float(BLUR_SIZE) * float(BLUR_SIZE));
+    gl_FragColor = sum / weightAll;
 }
+
+@end
+@export alchemy.blur_v
+
+uniform sampler2D colorTex;
+uniform sampler2D normalTex;
+
+varying vec2 v_Texcoord;
+
+uniform vec2 textureSize;
+uniform float blurSize : 1.0;
+
+void main()
+{
+    // array constructor supported in GLSL ES 3.00 only
+    float weights[9];
+    weights[0] = 0.05;
+    weights[1] = 0.09;
+    weights[2] = 0.12;
+    weights[3] = 0.15;
+    weights[4] = 0.18;
+    weights[5] = 0.15;
+    weights[6] = 0.12;
+    weights[7] = 0.09;
+    weights[7] = 0.05;
+
+    vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
+    // Add 0.1000 bias to filling holes from missed rays.
+    float off = blurSize / textureSize.y;
+    vec2 coord = v_Texcoord;
+
+    vec4 sum = vec4(0.0);
+    float weightAll = 0.0;
+
+    vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
+
+    for (int i = 0; i < 9; i++) {
+        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + (float(i) - 4.0) * off, 0.0, 1.0));
+        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
+        weightAll += w;
+        sum += texture2D(colorTex, coord) * w;
+    }
+
+   gl_FragColor = sum / weightAll;
+}
+
 @end
