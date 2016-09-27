@@ -11,7 +11,6 @@ define(function (require) {
     var Material = require('../Material');
     var Shader = require('../Shader');
     var Skybox = require('../plugin/Skybox');
-    var Skydome = require('../plugin/Skydome');
     var Scene = require('../Scene');
     var EnvironmentMapPass = require('../prePass/EnvironmentMap');
     var Renderer = require('../Renderer');
@@ -122,12 +121,19 @@ define(function (require) {
             };
             skyEnv.material.set('roughness', i / (targets.length - 1));
 
+            // Tweak fov
+            // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+            var n = renderTargetTmp.width;
+            var fov = 2 * Math.atan(n / (n - 0.5)) / Math.PI * 180;
+
             for (var j = 0; j < targets.length; j++) {
                 var pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
                 frameBuffer.attach(cubeMapRenderer.gl, renderTargetTmp);
                 frameBuffer.bind(cubeMapRenderer);
 
-                cubeMapRenderer.render(dummyScene, envMapPass.getCamera(targets[j]));
+                var camera = envMapPass.getCamera(targets[j]);
+                camera.fov = fov;
+                cubeMapRenderer.render(dummyScene, camera);
                 cubeMapRenderer.gl.readPixels(
                     0, 0, renderTargetTmp.width, renderTargetTmp.height,
                     Texture.RGBA, textureType, pixels
