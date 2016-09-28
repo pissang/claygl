@@ -13,7 +13,7 @@ define(function(require) {
     /**
      * @constructor
      * @alias qtek.animation.SkinningClip
-     * 
+     *
      * @extends qtek.animation.Clip
      * @param {Object} [opts]
      * @param {string} [opts.name]
@@ -25,19 +25,19 @@ define(function(require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|function} [opts.easing]
      * @param {function} [opts.onframe]
-     * @param {function} [opts.ondestroy]
+     * @param {function} [opts.onfinish]
      * @param {function} [opts.onrestart]
      */
     var SkinningClip = function(opts) {
 
         opts = opts || {};
-        
+
         Clip.call(this, opts);
 
         this.jointClips = [];
 
         this.life = 0;
-        if (opts.jointClips && opts.jointClips.length > 0) {    
+        if (opts.jointClips && opts.jointClips.length > 0) {
             for (var j = 0; j < opts.jointClips.length; j++) {
                 var jointPoseCfg = opts.jointClips[j];
                 var jointClip = new TransformClip({
@@ -59,7 +59,7 @@ define(function(require) {
 
         var ret = Clip.prototype.step.call(this, time);
 
-        if (ret !== 'destroy') {
+        if (ret !== 'finish') {
             this.setTime(this._elapsedTime);
         }
 
@@ -107,7 +107,7 @@ define(function(require) {
             subClip.setLoop(isLoop);
         }
 
-        return subClip; 
+        return subClip;
     };
 
     /**

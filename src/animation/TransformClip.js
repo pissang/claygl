@@ -1,7 +1,7 @@
 define(function(require) {
 
     'use strict';
-    
+
     var Clip = require('./Clip');
 
     var glMatrix = require('../dep/glmatrix');
@@ -16,7 +16,7 @@ define(function(require) {
      * @constructor
      * @alias qtek.animation.TransformClip
      * @extends qtek.animation.Clip
-     * 
+     *
      * @param {Object} [opts]
      * @param {string} [opts.name]
      * @param {Object} [opts.target]
@@ -27,12 +27,12 @@ define(function(require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
-     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onfinish]
      * @param {Function} [opts.onrestart]
      * @param {object[]} [opts.keyFrames]
      */
     var TransformClip = function(opts) {
-        
+
         opts = opts || {};
 
         Clip.call(this, opts);
@@ -74,7 +74,7 @@ define(function(require) {
 
         var ret = Clip.prototype.step.call(this, time);
 
-        if (ret !== 'destroy') {
+        if (ret !== 'finish') {
             this.setTime(this._elapsedTime);
         }
 
@@ -84,7 +84,7 @@ define(function(require) {
     TransformClip.prototype.setTime = function(time) {
         this._interpolateField(time, 'position');
         this._interpolateField(time, 'rotation');
-        this._interpolateField(time, 'scale');   
+        this._interpolateField(time, 'scale');
     };
     /**
      * Add a key frame

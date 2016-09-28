@@ -107,7 +107,7 @@ define(function(require) {
                 var clip = clips[i];
                 var e = clip.step(time);
                 // Throw out the events need to be called after
-                // stage.render, like destroy
+                // stage.render, like finish
                 if (e) {
                     deferredEvents.push(e);
                     deferredClips.push(clip);

@@ -16,14 +16,14 @@ define(function(require) {
      * @property {qtek.animation.Clip} clip
      * @property {number} offset
      */
-    
+
     /**
      * 1d blending node in animation blend tree.
      * output clip must have blend1D and copy method
      * @constructor
      * @alias qtek.animation.Blend1DClip
      * @extends qtek.animation.Clip
-     * 
+     *
      * @param {Object} [opts]
      * @param {string} [opts.name]
      * @param {Object} [opts.target]
@@ -34,7 +34,7 @@ define(function(require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
-     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onfinish]
      * @param {Function} [opts.onrestart]
      * @param {object[]} [opts.inputs]
      * @param {number} [opts.position]
@@ -103,7 +103,7 @@ define(function(require) {
 
         var ret = Clip.prototype.step.call(this, time);
 
-        if (ret !== 'destroy') {
+        if (ret !== 'finish') {
             this.setTime(this._elapsedTime);
         }
 
@@ -156,12 +156,12 @@ define(function(require) {
         var clip = Clip.prototype.clone.call(this);
         clip.output = this.output.clone();
         for (var i = 0; i < this.inputs.length; i++) {
-            var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip; 
+            var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
             clip.addInput(this.inputs[i].position, inputClip, this.inputs[i].offset);
         }
         return clip;
     };
-    
+
     // Find the key where position in range [inputs[key].position, inputs[key+1].position)
     Blend1DClip.prototype._findKey = function(position) {
         var key = -1;

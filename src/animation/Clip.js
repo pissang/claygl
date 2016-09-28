@@ -17,7 +17,7 @@ define(function (require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
-     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onfinish]
      * @param {Function} [opts.onrestart]
      */
     var Clip = function (opts) {
@@ -74,7 +74,7 @@ define(function (require) {
         /**
          * @type {Function}
          */
-        this.ondestroy = opts.ondestroy || noop;
+        this.onfinish = opts.onfinish || noop;
 
         /**
          * @type {Function}
@@ -152,7 +152,7 @@ define(function (require) {
             }
             this.fire('frame', schedule);
 
-            if (percent == 1) {
+            if (percent === 1) {
                 if (this._loop && this._loopRemained > 0) {
                     this._restartInLoop(time);
                     this._loopRemained--;
@@ -163,7 +163,7 @@ define(function (require) {
                     // In the animation.update
                     this._needsRemove = true;
 
-                    return 'destroy';
+                    return 'finish';
                 }
             }
             else {

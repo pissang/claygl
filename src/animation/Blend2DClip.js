@@ -15,14 +15,14 @@ define(function(require) {
      * @property {qtek.animation.Clip} clip
      * @property {number} offset
      */
-    
+
     /**
      * 2d blending node in animation blend tree.
      * output clip must have blend2D method
      * @constructor
      * @alias qtek.animation.Blend2DClip
      * @extends qtek.animation.Clip
-     * 
+     *
      * @param {Object} [opts]
      * @param {string} [opts.name]
      * @param {Object} [opts.target]
@@ -33,7 +33,7 @@ define(function(require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
-     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onfinish]
      * @param {Function} [opts.onrestart]
      * @param {object[]} [opts.inputs]
      * @param {qtek.math.Vector2} [opts.position]
@@ -42,7 +42,7 @@ define(function(require) {
     var Blend2DClip = function(opts) {
 
         opts = opts || {};
-        
+
         Clip.call(this, opts);
         /**
          * Output clip must have blend2D method
@@ -99,7 +99,7 @@ define(function(require) {
 
         var ret = Clip.prototype.step.call(this, time);
 
-        if (ret !== 'destroy') {
+        if (ret !== 'finish') {
             this.setTime(this._elapsedTime);
         }
 
@@ -127,7 +127,7 @@ define(function(require) {
         clip1.setTime((time + in1.offset) % clip1.life);
         clip2.setTime((time + in2.offset) % clip2.life);
         clip3.setTime((time + in3.offset) % clip3.life);
-        
+
         var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
         var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
         var c3 = clip3.output instanceof Clip ? clip3.output : clip3;
@@ -144,7 +144,7 @@ define(function(require) {
         var clip = Clip.prototype.clone.call(this);
         clip.output = this.output.clone();
         for (var i = 0; i < this.inputs.length; i++) {
-            var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip; 
+            var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
             clip.addInput(this.inputs[i].position, inputClip, this.inputs[i].offset);
         }
         return clip;

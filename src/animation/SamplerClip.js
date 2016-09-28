@@ -80,7 +80,7 @@ define(function(require) {
      * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
      * @param {string|Function} [opts.easing]
      * @param {Function} [opts.onframe]
-     * @param {Function} [opts.ondestroy]
+     * @param {Function} [opts.onfinish]
      * @param {Function} [opts.onrestart]
      */
     var SamplerClip = function(opts) {
@@ -122,7 +122,7 @@ define(function(require) {
 
         var ret = Clip.prototype.step.call(this, time);
 
-        if (ret !== 'destroy') {
+        if (ret !== 'finish') {
             this.setTime(this._elapsedTime);
         }
 

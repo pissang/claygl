@@ -332,7 +332,7 @@ define(function (require) {
             loop: animator._loop,
             delay: animator._delay,
             onframe: onframe,
-            ondestroy: oneTrackDone
+            onfinish: oneTrackDone
         });
 
         if (easing && easing !== 'spline') {
