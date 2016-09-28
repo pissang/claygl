@@ -35,6 +35,7 @@ varying vec2 v_Texcoord;
 float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float sRadius) {
     float occlusion = 0.0;
 
+
     for (int i = 0; i < KERNEL_SIZE; i++) {
         vec2 dir = kernelBasis * kernel[i];
         vec2 uv = dir * sRadius + sOrigin;
@@ -54,7 +55,7 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
         vec3 cDir = cPos - cOrigin;
 
         // Estimator from original alchemy paper
-        occlusion += clamp(max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4), 0.0, 1.0) * step(length(cDir), radius);
+        occlusion += max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4) * step(length(cDir), radius);
     }
     occlusion = max(1.0 - 2.0 * scale * occlusion / float(KERNEL_SIZE), 0.0);
 
@@ -68,6 +69,7 @@ void main()
     // Is empty
     if (dot(tex.rgb, vec3(1.0)) == 0.0) {
         discard;
+        return;
     }
 
     vec3 N = tex.rgb * 2.0 - 1.0;

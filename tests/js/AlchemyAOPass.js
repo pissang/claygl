@@ -9,9 +9,18 @@ define(function (require) {
     function generateKernel(size) {
         var kernel = new Float32Array(size * 2);
         var v2 = new Vector2();
+
+        // Most 32 samples one circle
+        var repeat = Math.ceil(size / 32);
+        // Spiral sample
         for (var i = 0; i < size; i++) {
-            v2.set(Math.random() * 2 - 1, Math.random() * 2 - 1)
-                .normalize().scale(Math.random());
+            var angle = i / size * Math.PI * 2 * repeat;
+            v2.set(
+                i / size * Math.cos(angle),
+                i / size * Math.sin(angle)
+            );
+            // v2.set(Math.random() * 2 - 1, Math.random() * 2 - 1)
+            //     .normalize().scale(Math.random());
             kernel[i * 2] = v2.x;
             kernel[i * 2 + 1] = v2.y;
         }
