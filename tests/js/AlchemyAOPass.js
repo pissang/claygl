@@ -24,6 +24,7 @@ define(function (require) {
             kernel[i * 2] = v2.x;
             kernel[i * 2 + 1] = v2.y;
         }
+
         return kernel;
     }
 

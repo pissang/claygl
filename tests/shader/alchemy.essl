@@ -1,5 +1,7 @@
 @export alchemy.fragment
 
+#define VARIATION 1
+
 uniform sampler2D normalTex;
 
 uniform sampler2D depthTex;
@@ -26,6 +28,8 @@ uniform float power: 1;
 
 uniform float bias: 5e-4;
 
+uniform float epsilon: 0.01;
+
 varying vec2 v_Texcoord;
 
 #ifdef DEPTH_DECODE
@@ -34,7 +38,6 @@ varying vec2 v_Texcoord;
 
 float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float sRadius) {
     float occlusion = 0.0;
-
 
     for (int i = 0; i < KERNEL_SIZE; i++) {
         vec2 dir = kernelBasis * kernel[i];
@@ -54,8 +57,39 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
 
         vec3 cDir = cPos - cOrigin;
 
+        float vv = dot(cDir, cDir);
+        float vn = dot(cDir, cN);
+
+        float radius2 = radius * radius;
+
+#if VARIATION == 0
+
+          // (from the HPG12 paper)
+          // Note large epsilon to avoid overdarkening within cracks
+          occlusion += float(vv < radius2) * max(vn / (epsilon + vv), 0.0);
+
+#elif VARIATION == 1 // default / recommended
+
+          // Smoother transition to zero (lowers contrast, smoothing out corners). [Recommended]
+          float f = max(radius2 - vv, 0.0) / radius2;
+          occlusion += f * f * f * max(vn / (epsilon + vv), 0.0);
+
+#elif VARIATION == 2
+
+          // Medium contrast (which looks better at high radii), no division.  Note that the
+          // contribution still falls off with radius^2, but we've adjusted the rate in a way that is
+          // more computationally efficient and happens to be aesthetically pleasing.
+          float invRadius2 = 1.0 / radius2;
+          occlusion += 4.0 * max(1.0 - vv * invRadius2, 0.0) * max(vn, 0.0);
+
+#else
+
+          // Low contrast, no division operation
+          occlusion += 2.0 * float(vv < radius2) * max(vn, 0.0);
+#endif
+
         // Estimator from original alchemy paper
-        occlusion += max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-4) * step(length(cDir), radius);
+        // occlusion += max(0.0, dot(cDir, cN) + bias * cPos.z) / (dot(cDir, cDir) + 1e-1) * step(length(cDir), radius);
     }
     occlusion = max(1.0 - 2.0 * scale * occlusion / float(KERNEL_SIZE), 0.0);
 
@@ -69,7 +103,6 @@ void main()
     // Is empty
     if (dot(tex.rgb, vec3(1.0)) == 0.0) {
         discard;
-        return;
     }
 
     vec3 N = tex.rgb * 2.0 - 1.0;
@@ -91,7 +124,7 @@ void main()
     vec3 cOrigin = p4.xyz / p4.w;
 
     // Screen radius on height
-    float sRadius = radius / (projection[0][0] * -cOrigin.z);
+    float sRadius = min(radius / (projection[0][0] * -cOrigin.z), -cOrigin.z);
 
     // Use 4x4 noise texture instead of completely random can reduce noise problem after filtering
     // http://www.gamedev.net/topic/648090-alchemy-ambient-occlusion/#entry5096131

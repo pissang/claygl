@@ -14,11 +14,11 @@
             require(['qtek', 'js/AlchemyAOPass', 'js/GBuffer'], function(qtek, AlchemyAOPass, GBuffer) {
 
                 var config = {
-                    kernelSize: 16,
-                    blurSize: 4,
-                    noiseSize: 4,
+                    kernelSize: 12,
+                    bias: 5e-4,
                     radius: 4,
-                    power: 2
+                    scale: 1,
+                    power: 1
                 };
 
                 var gBuffer = new GBuffer();
@@ -98,21 +98,19 @@
 
                 var gui = new dat.GUI();
 
-                gui.add(config, 'kernelSize', 4, 64).step(1).onChange(function () {
-                    ssaoPass.setParameter('kernelSize', config.kernelSize);
-                });
-                gui.add(config, 'blurSize', 1, 10).step(1).onChange(function () {
-                    ssaoPass.setParameter('blurSize', config.blurSize);
-                });
-                // gui.add(config, 'noiseSize', 1, 16).step(1).onChange(function () {
-                //     ssaoPass.setParameter('noiseSize', config.noiseSize);
-                // });
-                gui.add(config, 'radius', 0.1, 10).onChange(function () {
-                    ssaoPass.setParameter('radius', config.radius);
-                });
-                gui.add(config, 'power', 0.1, 6).onChange(function () {
-                    ssaoPass.setParameter('power', config.power);
-                });
+                function updateConfig() {
+                    for (var name in config) {
+                        ssaoPass.setParameter(name, config[name]);
+                    }
+                }
+
+                gui.add(config, 'kernelSize', 4, 64).step(1).onChange(updateConfig);
+                gui.add(config, 'radius', 0, 10).onChange(updateConfig);
+                gui.add(config, 'scale', 0, 2).onChange(updateConfig);
+                gui.add(config, 'power', 0.1, 6).onChange(updateConfig);
+                gui.add(config, 'bias').onChange(updateConfig);
+
+                updateConfig();
             });
         </script>
     </body>
