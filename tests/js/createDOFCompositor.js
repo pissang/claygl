@@ -3,6 +3,22 @@ define(function (require) {
 
     qtek.Shader.import(require('text!../shader/dof.essl'));
 
+    function getCommonParameters(downScale) {
+        downScale = downScale || 1;
+        var parameters = {
+            // FIXME RGBM will have artifacts in highlight edge if using bilinear filter
+            minFilter: qtek.Texture.NEAREST,
+            magFilter: qtek.Texture.NEAREST,
+            width: function (renderer) {
+                return renderer.getWidth() / downScale;
+            },
+            height: function (renderer) {
+                return renderer.getHeight() / downScale;
+            }
+        };
+        return parameters;
+    }
+
     function createDOFCompositor(renderer, scene, camera) {
         var compositor = new qtek.compositor.Compositor();
         var sceneNode = new qtek.compositor.SceneNode({
@@ -12,16 +28,7 @@ define(function (require) {
             preZ: false,
             outputs: {
                 color: {
-                    parameters: {
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
-                        //
-                        // FIXME RGBM will have artifacts in highlight edge if using bilinear filter
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        width: function(renderer) {return renderer.getWidth();},
-                        height: function(renderer) {return renderer.getHeight();}
-                    }
+                    parameters: getCommonParameters()
                 },
                 depth: {
                     attachment: 'DEPTH_ATTACHMENT',
@@ -45,13 +52,7 @@ define(function (require) {
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth();},
-                        height: function(renderer) {return renderer.getHeight();}
-                    }
+                    parameters: getCommonParameters()
                 }
             }
         });
@@ -63,20 +64,11 @@ define(function (require) {
                     node: 'scene',
                     pin: 'color'
                 },
-                coc: {
-                    node: 'coc',
-                    pin: 'color'
-                }
+                coc: 'coc'
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth();},
-                        height: function(renderer) {return renderer.getHeight();}
-                    }
+                    parameters: getCommonParameters()
                 }
             }
         });
@@ -91,21 +83,11 @@ define(function (require) {
                 name: 'downSample' + i,
                 shader: qtek.Shader.source('qtek.compositor.downsample'),
                 inputs: {
-                    texture: {
-                        node: i === 0 ? 'premultiply' : 'downSample' + (i - 1),
-                        pin: 'color'
-                    }
+                    texture: i === 0 ? 'premultiply' : 'downSample' + (i - 1)
                 },
                 outputs: {
                     color: {
-                        parameters: {
-                            minFilter: qtek.Texture.NEAREST,
-                            magFilter: qtek.Texture.NEAREST,
-                            // Half Float
-                            // type: qtek.Texture.HALF_FLOAT,
-                            width: function (renderer) {return renderer.getWidth() / downSampleScale;},
-                            height: function (renderer) {return renderer.getHeight() / downSampleScale;}
-                        }
+                        parameters: getCommonParameters(downSampleScale)
                     }
                 }
             });
@@ -121,25 +103,12 @@ define(function (require) {
             name: 'blur_1',
             shader: qtek.Shader.source('dof.hexagonal_blur_1'),
             inputs: {
-                texture: {
-                    node: 'downSample' + (i - 1),
-                    pin: 'color'
-                },
-                coc: {
-                    node: 'coc',
-                    pin: 'color'
-                }
+                texture: 'downSample' + (i - 1),
+                coc: 'coc'
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth() / 2;},
-                        height: function(renderer) {return renderer.getHeight() / 2;}
-                    }
+                    parameters: getCommonParameters(2)
                 }
             }
         });
@@ -147,25 +116,12 @@ define(function (require) {
             name: 'blur_2',
             shader: qtek.Shader.source('dof.hexagonal_blur_2'),
             inputs: {
-                texture: {
-                    node: 'downSample' + (i - 1),
-                    pin: 'color'
-                },
-                coc: {
-                    node: 'coc',
-                    pin: 'color'
-                }
+                texture: 'downSample' + (i - 1),
+                coc: 'coc'
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth() / 2;},
-                        height: function(renderer) {return renderer.getHeight() / 2;}
-                    }
+                    parameters: getCommonParameters(2)
                 }
             }
         });
@@ -173,29 +129,13 @@ define(function (require) {
             name: 'blur_3',
             shader: qtek.Shader.source('dof.hexagonal_blur_3'),
             inputs: {
-                texture1: {
-                    node: 'blur_1',
-                    pin: 'color'
-                },
-                texture2: {
-                    node: 'blur_2',
-                    pin: 'color'
-                },
-                coc: {
-                    node: 'coc',
-                    pin: 'color'
-                }
+                texture1: 'blur_1',
+                texture2: 'blur_2',
+                coc: 'coc'
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth() / 2;},
-                        height: function(renderer) {return renderer.getHeight() / 2;}
-                    }
+                    parameters: getCommonParameters(2)
                 }
             }
         });
@@ -204,21 +144,11 @@ define(function (require) {
             name: 'upsample',
             shader: qtek.Shader.source('qtek.compositor.upsample'),
             inputs: {
-                texture: {
-                    node: 'blur_3',
-                    pin: 'color'
-                }
+                texture: 'blur_3'
             },
             outputs: {
                 color: {
-                    parameters: {
-                        minFilter: qtek.Texture.NEAREST,
-                        magFilter: qtek.Texture.NEAREST,
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
-                        width: function(renderer) {return renderer.getWidth() / 2;},
-                        height: function(renderer) {return renderer.getHeight() / 2;}
-                    }
+                    parameters: getCommonParameters(2)
                 }
             }
         });
@@ -241,20 +171,12 @@ define(function (require) {
                     node: 'scene',
                     pin: 'color'
                 },
-                blurred: {
-                    node: 'upsample',
-                    pin: 'color'
-                },
-                coc: {
-                    node: 'coc',
-                    pin: 'color'
-                }
+                blurred: 'upsample',
+                coc: 'coc'
             },
             outputs: {
                 color: {
                     parameters: {
-                        // Half Float
-                        // type: qtek.Texture.HALF_FLOAT,
                         width: function(renderer) {return renderer.getWidth();},
                         height: function(renderer) {return renderer.getHeight();}
                     }
@@ -265,10 +187,7 @@ define(function (require) {
             name: 'toneMapping',
             shader: qtek.Shader.source('qtek.compositor.hdr.tonemapping'),
             inputs: {
-                'texture': {
-                    node: 'composite',
-                    pin: 'color'
-                }
+                'texture': 'composite'
             }
         });
         toneMappingNode.setParameter('exposure', 2.0);

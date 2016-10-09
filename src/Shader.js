@@ -5,6 +5,7 @@
  * http://www.nvidia.com/object/using_sas.html
  * https://github.com/KhronosGroup/collada2json/issues/45
  *
+ * TODO: Use etpl or other string template engine
  */
 define(function(require) {
 

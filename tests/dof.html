@@ -84,7 +84,7 @@
                     var envMap = qtek.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
-                            exposure: 2
+                            exposure: 1
                         },
                         function () {
                             envMap.flipY = false;
@@ -130,6 +130,7 @@
                         }
                         cocNode.setParameter('focalPlane', config.focalPlane);
                         cocNode.setParameter('fstop', config.fstop);
+                        cocNode.setParameter('focalRange', config.focalRange);
                         compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
                         compositeNode.setParameter('blurredSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
 
@@ -143,12 +144,14 @@
                     var config = {
                         blurSize: 1,
                         focalPlane: 1,
+                        focalRange: 0.2,
                         fstop: 2
                     };
 
                     gui.add(config, 'blurSize', 0, 4);
                     gui.add(config, 'fstop', 1.4, 8);
                     gui.add(config, 'focalPlane', 0.1, 3);
+                    gui.add(config, 'focalRange', 0, 1);
                 });
 
 

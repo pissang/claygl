@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -8,7 +8,7 @@ define(function(require) {
      * @constructor qtek.compositor.Graph
      * @extends qtek.core.Base
      */
-    var Graph = Base.derive(function() {
+    var Graph = Base.derive(function () {
         return /** @lends qtek.compositor.Graph# */ {
             /**
              * @type {Array.<qtek.compositor.Node>}
@@ -21,7 +21,7 @@ define(function(require) {
         /**
          * @param {qtek.compositor.Node} node
          */
-        addNode: function(node) {
+        addNode: function (node) {
 
             this.nodes.push(node);
 
@@ -30,7 +30,7 @@ define(function(require) {
         /**
          * @param  {qtek.compositor.Node} node
          */
-        removeNode: function(node) {
+        removeNode: function (node) {
             this.nodes.splice(this.nodes.indexOf(node), 1);
 
             this._dirty = true;
@@ -39,7 +39,7 @@ define(function(require) {
          * @param {string} name
          * @return {qtek.compositor.Node}
          */
-        getNodeByName: function(name) {
+        getNodeByName: function (name) {
             for (var i = 0; i < this.nodes.length; i++) {
                 if (this.nodes[i].name === name) {
                     return this.nodes[i];
@@ -49,7 +49,7 @@ define(function(require) {
         /**
          * Update links of graph
          */
-        update: function() {
+        update: function () {
             for (var i = 0; i < this.nodes.length; i++) {
                 this.nodes[i].clear();
             }
@@ -66,16 +66,25 @@ define(function(require) {
                     var fromPin = this.findPin(fromPinInfo);
                     if (fromPin) {
                         node.link(inputName, fromPin.node, fromPin.pin);
-                    }else{
+                    }
+                    else {
                         console.warn('Pin of ' + fromPinInfo.node + '.' + fromPinInfo.pin + ' not exist');
                     }
                 }
             }
         },
 
-        findPin: function(input) {
+        findPin: function (input) {
             var node;
-            if (typeof(input.node) === 'string') {
+            // Try to take input as a directly a node if node parameter not exist
+            // PENDING
+            if (!input.node) {
+                input = {
+                    node: input
+                };
+            }
+
+            if (typeof input.node === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {
                     var tmp = this.nodes[i];
                     if (tmp.name === input.node) {
@@ -87,6 +96,10 @@ define(function(require) {
                 node = input.node;
             }
             if (node) {
+                if (!input.pin) {
+                    // Use first pin defaultly
+                    input.pin = Object.keys(node.outputs)[0];
+                }
                 if (node.outputs[input.pin]) {
                     return {
                         node: node,

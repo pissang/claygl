@@ -325,13 +325,14 @@ define(function (require) {
                 node: fromNode,
                 pin: fromPinName
             };
-            if (! fromNode.outputLinks[fromPinName]) {
+            if (!fromNode.outputLinks[fromPinName]) {
                 fromNode.outputLinks[fromPinName] = [];
             }
             fromNode.outputLinks[ fromPinName ].push({
                 node: this,
                 pin: inputPinName
             });
+
             // Enabled the pin texture in shader
             var shader = this.pass.material.shader;
             shader.enableTexture(inputPinName);
@@ -342,6 +343,7 @@ define(function (require) {
             this.outputLinks = {};
 
             var shader = this.pass.material.shader;
+            // Default disable all texture
             shader.disableTexturesAll();
         },
 

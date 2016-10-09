@@ -37,6 +37,7 @@ define(function(require){
                 this.update();
                 this._dirty = false;
             }
+
             for (var i = 0; i < this.nodes.length; i++) {
                 // Update the reference number of each output texture
                 this.nodes[i].beforeFrame();
