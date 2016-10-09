@@ -437,7 +437,8 @@ define(function(require) {
                     this._parent.worldTransform._array,
                     localTransform
                 );
-            } else {
+            }
+            else {
                 mat4.copy(worldTransform, localTransform );
             }
         },
@@ -449,7 +450,8 @@ define(function(require) {
         update: function(forceUpdateWorld) {
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
-            } else {
+            }
+            else {
                 // Transform is manually setted
                 forceUpdateWorld = true;
             }

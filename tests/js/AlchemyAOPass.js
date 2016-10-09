@@ -10,8 +10,8 @@ define(function (require) {
         var kernel = new Float32Array(size * 2);
         var v2 = new Vector2();
 
-        // Most 32 samples one circle
-        var repeat = Math.ceil(size / 32);
+        // Hardcoded 3 REPEAT
+        var repeat = 3;
         // Spiral sample
         for (var i = 0; i < size; i++) {
             var angle = i / size * Math.PI * 2 * repeat;
@@ -80,6 +80,14 @@ define(function (require) {
         if (opt.power != null) {
             this.setParameter('power', opt.power);
         }
+
+        if (!opt.renderToTexture) {
+            this._blurPass2._pass.material.blend = function (gl) {
+                gl.blendEquation(gl.FUNC_ADD);
+                gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
+            };
+            this._blurPass2._pass.blendWithPrevious = true;
+        }
     }
 
     AlchemyAO.prototype.render = function (renderer, camera) {
@@ -112,6 +120,7 @@ define(function (require) {
         this._blurPass1.render(renderer);
         this._blurPass2.setUniform('textureSize', [width, height]);
         this._blurPass2.render(renderer);
+
     };
 
     AlchemyAO.prototype.setParameter = function (name, val) {

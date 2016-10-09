@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -43,7 +43,7 @@ define(function(require) {
         });
      *
      */
-    var Node = Base.derive(function() {
+    var Node = Base.derive(function () {
         return /** @lends qtek.compositor.Node# */ {
             /**
              * @type {string}
@@ -106,7 +106,7 @@ define(function(require) {
 
             _compositor: null
         };
-    }, function() {
+    }, function () {
 
         var pass = new Pass({
             fragment: this.shader
@@ -124,7 +124,7 @@ define(function(require) {
         /**
          * @param  {qtek.Renderer} renderer
          */
-        render: function(renderer, frameBuffer) {
+        render: function (renderer, frameBuffer) {
             this.trigger('beforerender', renderer);
 
             this._rendering = true;
@@ -140,7 +140,8 @@ define(function(require) {
             if (!this.outputs) {
                 this.pass.outputs = null;
                 this.pass.render(renderer, frameBuffer);
-            } else {
+            }
+            else {
                 this.pass.outputs = {};
 
                 for (var name in this.outputs) {
@@ -170,7 +171,7 @@ define(function(require) {
         },
 
         // TODO Remove parameter function callback
-        updateParameter: function(outputName, renderer) {
+        updateParameter: function (outputName, renderer) {
             var outputInfo = this.outputs[outputName];
             var parameters = outputInfo.parameters;
             var parametersCopy = outputInfo._parametersCopy;
@@ -216,7 +217,7 @@ define(function(require) {
          * @param {string} name
          * @param {} value
          */
-        setParameter: function(name, value) {
+        setParameter: function (name, value) {
             this.pass.setUniform(name, value);
         },
         /**
@@ -224,14 +225,14 @@ define(function(require) {
          * @param  {string} name
          * @return {}
          */
-        getParameter: function(name) {
+        getParameter: function (name) {
             return this.pass.getUniform(name);
         },
         /**
          * Set parameters
          * @param {Object} obj
          */
-        setParameters: function(obj) {
+        setParameters: function (obj) {
             for (var name in obj) {
                 this.setParameter(name, obj[name]);
             }
@@ -240,14 +241,30 @@ define(function(require) {
          * Set shader code
          * @param {string} shaderStr
          */
-        setShader: function(shaderStr) {
+        setShader: function (shaderStr) {
             var material = this.pass.material;
             material.shader.setFragment(shaderStr);
             material.attachShader(material.shader, true);
         },
+        /**
+         * Proxy of pass.material.shader.define('fragment', xxx);
+         * @param  {string} symbol
+         * @param  {number} [val]
+         */
+        shaderDefine: function (symbol, val) {
+            this.pass.material.shader.define('fragment', symbol, val);
+        },
 
-        getOutput: function(renderer /*optional*/, name) {
-            if (name === undefined) {
+        /**
+         * Proxy of pass.material.shader.unDefine('fragment', xxx)
+         * @param  {string} symbol
+         */
+        shaderUnDefine: function (symbol) {
+            this.pass.material.shader.unDefine('fragment', symbol);
+        },
+
+        getOutput: function (renderer /*optional*/, name) {
+            if (name == null) {
                 // Return the output texture without rendering
                 name = renderer;
                 return this._outputTextures[name];
@@ -283,7 +300,7 @@ define(function(require) {
             return this._outputTextures[name];
         },
 
-        removeReference: function(outputName) {
+        removeReference: function (outputName) {
             this._outputReferences[outputName]--;
             if (this._outputReferences[outputName] === 0) {
                 var outputInfo = this.outputs[outputName];
@@ -292,7 +309,8 @@ define(function(require) {
                         this._compositor.releaseTexture(this._prevOutputTextures[outputName]);
                     }
                     this._prevOutputTextures[outputName] = this._outputTextures[outputName];
-                } else {
+                }
+                else {
                     // Output of this node have alreay been used by all other nodes
                     // Put the texture back to the pool.
                     this._compositor.releaseTexture(this._outputTextures[outputName]);
@@ -300,7 +318,7 @@ define(function(require) {
             }
         },
 
-        link: function(inputPinName, fromNode, fromPinName) {
+        link: function (inputPinName, fromNode, fromPinName) {
 
             // The relationship from output pin to input pin is one-on-multiple
             this.inputLinks[inputPinName] = {
@@ -319,7 +337,7 @@ define(function(require) {
             shader.enableTexture(inputPinName);
         },
 
-        clear: function() {
+        clear: function () {
             this.inputLinks = {};
             this.outputLinks = {};
 
@@ -327,7 +345,7 @@ define(function(require) {
             shader.disableTexturesAll();
         },
 
-        updateReference: function(outputName) {
+        updateReference: function (outputName) {
             if (!this._rendering) {
                 this._rendering = true;
                 for (var inputName in this.inputLinks) {
@@ -341,7 +359,7 @@ define(function(require) {
             }
         },
 
-        beforeFrame: function() {
+        beforeFrame: function () {
             this._rendered = false;
 
             for (var name in this.outputLinks) {
@@ -349,7 +367,7 @@ define(function(require) {
             }
         },
 
-        afterFrame: function() {
+        afterFrame: function () {
             // Put back all the textures to pool
             for (var name in this.outputLinks) {
                 if (this._outputReferences[name] > 0) {

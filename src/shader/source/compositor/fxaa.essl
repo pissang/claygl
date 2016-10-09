@@ -57,13 +57,13 @@ void main()
 
     if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) )
     {
-
-        gl_FragColor = encodeHDR( vec4( rgbA, opacity ) );
+        // FXAA Must be last step
+        gl_FragColor = vec4( rgbA, opacity );
 
     }
     else {
 
-        gl_FragColor = encodeHDR( vec4( rgbB, opacity ) );
+        gl_FragColor = vec4( rgbB, opacity );
 
     }
 }
