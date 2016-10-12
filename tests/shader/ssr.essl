@@ -279,12 +279,18 @@ void main()
 
     float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
 
-    vec4 color = decodeHDR(texture2D(colorTex, hitPixel));
+    // vec3 hitNormal = texture2D(normalTex, hitPixel).rgb * 2.0 - 1.0;
+    // hitNormal = normalize((viewInverseTranspose * vec4(hitNormal, 0.0)).xyz);
+    // // Fadeout the pixel not face the ray
+    // // PENDING Can be configured?
+    // alpha *= 1.0 - clamp(dot(hitNormal, rayDir), 0.0, 1.0);
+
     // vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 
     if (!intersect) {
         discard;
     }
+    vec4 color = decodeHDR(texture2D(colorTex, hitPixel));
     gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
 
     // gl_FragColor = vec4(vec3(iterationCount / 2.0), 1.0);
@@ -307,17 +313,7 @@ uniform float blurSize : 2.0;
 
 void main()
 {
-    // array constructor supported in GLSL ES 3.00 only
-    float weights[9];
-    weights[0] = 0.05;
-    weights[1] = 0.09;
-    weights[2] = 0.12;
-    weights[3] = 0.15;
-    weights[4] = 0.18;
-    weights[5] = 0.15;
-    weights[6] = 0.12;
-    weights[7] = 0.09;
-    weights[7] = 0.05;
+    @import qtek.compositor.kernel.gaussian_9
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
@@ -331,7 +327,7 @@ void main()
     vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
     for (int i = 0; i < 9; i++) {
         vec2 coord = vec2(clamp(v_Texcoord.x + (float(i) - 4.0) * off, 0.0, 1.0), v_Texcoord.y);
-        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
+        float w = gaussianKernel[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;
     }
@@ -354,17 +350,7 @@ uniform float blurSize : 2.0;
 
 void main()
 {
-    // array constructor supported in GLSL ES 3.00 only
-    float weights[9];
-    weights[0] = 0.05;
-    weights[1] = 0.09;
-    weights[2] = 0.12;
-    weights[3] = 0.15;
-    weights[4] = 0.18;
-    weights[5] = 0.15;
-    weights[6] = 0.12;
-    weights[7] = 0.09;
-    weights[7] = 0.05;
+    @import qtek.compositor.kernel.gaussian_9
 
     vec4 centerNormalTexel = texture2D(normalTex, v_Texcoord);
     float g = centerNormalTexel.a;
@@ -379,12 +365,34 @@ void main()
 
     for (int i = 0; i < 9; i++) {
         vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + (float(i) - 4.0) * off, 0.0, 1.0));
-        float w = weights[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
+        float w = gaussianKernel[i] * clamp(dot(centerNormal, texture2D(normalTex, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
         weightAll += w;
         sum += decodeHDR(texture2D(colorTex, coord)) * w;
     }
 
    gl_FragColor = encodeHDR(sum / weightAll);
 }
+
+@end
+
+
+@export ssr.blend
+
+uniform sampler2D ssrTex;
+uniform sampler2D ssaoTex;
+uniform sampler2D colorTex;
+
+varying vec2 v_Texcoord;
+
+@import qtek.util.rgbm
+
+void main()
+{
+    gl_FragColor = encodeHDR(
+        decodeHDR(texture2D(ssrTex, v_Texcoord)) * texture2D(ssaoTex, v_Texcoord).r
+        + decodeHDR(texture2D(colorTex, v_Texcoord))
+    );
+}
+
 
 @end

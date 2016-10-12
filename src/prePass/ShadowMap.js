@@ -117,11 +117,12 @@ define(function(require) {
          * @param  {qtek.Renderer} renderer
          * @param  {qtek.Scene} scene
          * @param  {qtek.Camera} sceneCamera
+         * @param  {boolean} [notUpdateScene=false]
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        render: function(renderer, scene, sceneCamera) {
+        render: function(renderer, scene, sceneCamera, notUpdateScene) {
             this.trigger('beforerender', this, renderer, scene, sceneCamera);
-            this._renderShadowPass(renderer, scene, sceneCamera);
+            this._renderShadowPass(renderer, scene, sceneCamera, notUpdateScene);
             this.trigger('afterrender', this, renderer, scene, sceneCamera);
         },
 
@@ -140,7 +141,8 @@ define(function(require) {
             var height = width;
             if (this.softShadow === ShadowMapPass.VSM) {
                 this._outputDepthPass.material.shader.define('fragment', 'USE_VSM');
-            } else {
+            }
+            else {
                 this._outputDepthPass.material.shader.unDefine('fragment', 'USE_VSM');
             }
             for (var name in this._textures) {
@@ -199,7 +201,8 @@ define(function(require) {
 
                     if (this.softShadow === ShadowMapPass.VSM) {
                         depthShader.define('fragment', 'USE_VSM');
-                    } else {
+                    }
+                    else {
                         depthShader.unDefine('fragment', 'USE_VSM');
                     }
 
@@ -238,7 +241,8 @@ define(function(require) {
 
                     if (this.softShadow === ShadowMapPass.VSM) {
                         distanceMaterial.shader.define('fragment', 'USE_VSM');
-                    } else {
+                    }
+                    else {
                         distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
                     }
                     distanceMaterial.set('lightPosition', light.position._array);
@@ -263,12 +267,14 @@ define(function(require) {
                 mesh.material.__shadowUniformUpdated = false;
                 mesh.material.shader.__shadowDefineUpdated = false;
                 mesh.material.set('shadowEnabled', 1);
-            } else {
+            }
+            else {
                 mesh.material.set('shadowEnabled', 0);
             }
             if (this.softShadow === ShadowMapPass.VSM) {
                 mesh.material.shader.define('fragment', 'USE_VSM');
-            } else {
+            }
+            else {
                 mesh.material.shader.unDefine('fragment', 'USE_VSM');
             }
         },
@@ -290,7 +296,7 @@ define(function(require) {
             }
         },
 
-        _renderShadowPass: function(renderer, scene, sceneCamera) {
+        _renderShadowPass: function(renderer, scene, sceneCamera, notUpdateScene) {
             // reset
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
@@ -301,7 +307,9 @@ define(function(require) {
 
             var _gl = renderer.gl;
 
-            scene.update();
+            if (!notUpdateScene) {
+                scene.update();
+            }
 
             this._update(scene);
 

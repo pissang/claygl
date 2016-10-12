@@ -21,7 +21,7 @@
                 var camera = new qtek.camera.Perspective({
                     aspect : renderer.getViewportAspect()
                 });
-                camera.position.set(1, 1, 2);
+                camera.position.set(0, 0.5, 3);
                 camera.lookAt(qtek.math.Vector3.ZERO);
 
                 var scene = new qtek.Scene();
@@ -116,6 +116,7 @@
                     var blurNodes = compositor.getBlurNodes();
                     var cocNode = compositor.getNodeByName('coc');
                     var compositeNode = compositor.getNodeByName('composite');
+                    var tonemappingNode = compositor.getNodeByName('tonemapping');
 
                     var animation = new qtek.animation.Animation();
                     animation.start();
@@ -124,15 +125,6 @@
 
                         compositor.render(renderer);
                         // renderer.render(scene, camera);
-
-                        for (var i = 0; i < blurNodes.length; i++) {
-                            blurNodes[i].setParameter('blurSize', config.blurSize);
-                        }
-                        cocNode.setParameter('focalPlane', config.focalPlane);
-                        cocNode.setParameter('fstop', config.fstop);
-                        cocNode.setParameter('focalRange', config.focalRange);
-                        compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
-                        compositeNode.setParameter('blurredSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
 
                         stats.update();
                     });
@@ -143,15 +135,53 @@
                     var gui = new dat.GUI();
                     var config = {
                         blurSize: 1,
-                        focalPlane: 1,
+                        focalPlane: 4,
                         focalRange: 0.2,
-                        fstop: 2
+                        fstop: 1.4,
+                        debug: 'none'
                     };
 
-                    gui.add(config, 'blurSize', 0, 4);
-                    gui.add(config, 'fstop', 1.4, 8);
-                    gui.add(config, 'focalPlane', 0.1, 3);
-                    gui.add(config, 'focalRange', 0, 1);
+                    function updateParameters() {
+                        for (var i = 0; i < blurNodes.length; i++) {
+                            blurNodes[i].setParameter('blurSize', config.blurSize);
+                        }
+
+                        cocNode.setParameter('focalPlane', config.focalPlane);
+                        cocNode.setParameter('fstop', config.fstop);
+                        cocNode.setParameter('focalRange', config.focalRange);
+                        compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
+                        compositeNode.setParameter('blurredSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
+
+                    }
+
+                    function updateDebugConfig() {
+                        if (config.debug === 'COC' || config.debug === 'Near COC') {
+                            compositeNode.shaderUnDefine('RGBM');
+                            tonemappingNode.shaderUnDefine('RGBM_DECODE');
+                            tonemappingNode.shaderDefine('DEBUG', 1);
+                        }
+                        else {
+                            compositeNode.shaderDefine('RGBM');
+                            tonemappingNode.shaderDefine('RGBM_DECODE');
+
+                            tonemappingNode.shaderDefine('DEBUG', 0);
+                        }
+                        compositeNode.shaderDefine('DEBUG', debugConfigValueMap[config.debug]);
+                    }
+
+                    var debugConfigs = ['none', 'COC', 'Near COC', 'Blurred', 'Blurred Near'];
+                    var debugConfigValueMap = debugConfigs.reduce(function (obj, val, idx) {
+                        obj[val] = idx;
+                        return obj;
+                    }, {});
+
+                    gui.add(config, 'blurSize', 0, 4).onChange(updateParameters);
+                    gui.add(config, 'fstop', 0.2, 8).onChange(updateParameters);
+                    gui.add(config, 'focalPlane', 0.1, 8).onChange(updateParameters);
+                    gui.add(config, 'focalRange', 0, 1).onChange(updateParameters);
+                    gui.add(config, 'debug', debugConfigs).onChange(updateDebugConfig);
+
+                    updateParameters();
                 });
 
 

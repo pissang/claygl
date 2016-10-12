@@ -74,6 +74,13 @@ float decodeFloat(const in vec4 color)
 }
 @end
 
+
+@export qtek.util.float
+@import qtek.util.encode_float
+@import qtek.util.decode_float
+@end
+
+
 // http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
 @export qtek.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
@@ -85,6 +92,9 @@ vec3 RGBMDecode(vec4 rgbm, float range) {
 
 @export qtek.util.rgbm_encode
 vec4 RGBMEncode(vec3 color, float range) {
+    if (dot(color, color) == 0.0) {
+        return vec4(0.0);
+    }
     vec4 rgbm;
     color /= range;
     rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);

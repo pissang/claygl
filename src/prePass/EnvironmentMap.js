@@ -59,13 +59,10 @@ define(function (require) {
             texture: null,
 
             /**
-             * Mipmap Level. Userful when do cubemap prefiltering
-             * @type {number}
-             * @memberOf qtek.prePass.EnvironmentMap#
+             * Used if you wan't have shadow in environment map
+             * @type {qtek.prePass.ShadowMap}
              */
-            mipmapLevel: 0
-
-            // frameBuffer: new FrameBuffer()
+            shadowMapPass: null,
         };
         var cameras = ret._cameras = {
             px: new PerspectiveCamera({ fov: 90 }),
@@ -115,6 +112,7 @@ define(function (require) {
             // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
             var n = this.texture.width;
             var fov = 2 * Math.atan(n / (n - 0.5)) / Math.PI * 180;
+
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._cameras[target];
@@ -123,6 +121,9 @@ define(function (require) {
                 camera.near = this.near;
                 camera.fov = fov;
 
+                if (this._shadowMapPass) {
+                    this._shadowMapPass.render(renderer, scene, camera, true);
+                }
                 this._frameBuffers[target].attach(
                     _gl, this.texture, _gl.COLOR_ATTACHMENT0,
                     _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i

@@ -1,4 +1,5 @@
 // Sousa_Graphics_Gems_CryENGINE3, Siggraph 2013
+// The Skylanders SWAP Force Depth-of-Field Shader in GPU Pro 4
 @export dof.coc
 
 uniform sampler2D depth;
@@ -39,11 +40,16 @@ void main()
         float focalAdjusted = dist > uppper ? uppper : lower;
 
         // GPU Gems Depth of Field: A Survey of Techniques
-        coc = aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength));
+        coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));
         // Clamp on the near focus plane and far focus plane
         // PENDING
         // Float value can only be [0.0 - 1.0)
-        coc = clamp(coc, -0.4, 0.4) / 0.4001;
+        coc = clamp(coc, 0.0, 0.4) / 0.4000001;
+
+        // Near field
+        if (dist < lower) {
+            coc = -coc;
+        }
         coc = coc * 0.5 + 0.5;
     }
 
@@ -65,7 +71,7 @@ varying vec2 v_Texcoord;
 @import qtek.util.decode_float
 
 void main() {
-    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.01);
+    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);
     gl_FragColor = encodeHDR(
         vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)
     );
@@ -83,15 +89,14 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 void main()
 {
-
     vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
 
-    float coc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));
-    coc = min(coc, decodeFloat(texture2D(texture, v_Texcoord + d.zy)));
-    coc = min(coc, decodeFloat(texture2D(texture, v_Texcoord + d.xw)));
-    coc = min(coc, decodeFloat(texture2D(texture, v_Texcoord + d.zw)));
+    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));
+    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));
+    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));
+    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));
 
-    gl_FragColor = encodeFloat(coc);
+    gl_FragColor = encodeFloat(fCoc);
 }
 
 @end
@@ -110,38 +115,89 @@ void main()
 
     vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
 
-    float coc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));
-    coc = max(coc, decodeFloat(texture2D(texture, v_Texcoord + d.zy)));
-    coc = max(coc, decodeFloat(texture2D(texture, v_Texcoord + d.xw)));
-    coc = max(coc, decodeFloat(texture2D(texture, v_Texcoord + d.zw)));
+    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));
+    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));
+    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));
+    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));
 
-    gl_FragColor = encodeFloat(coc);
+    gl_FragColor = encodeFloat(fCoc);
 }
 
 @end
 
 
+
+@export dof.coc_helper
+
+void packCocToRGBM(inout vec4 rgbm, float coc) {
+#if defined(RGBM_ENCODE) || defined(RGBM)
+    // Pack alpha with two half byte value, coc and multiplier of RGBM
+
+    // There is no round function in the glsl
+    float m = floor(rgbm.a * 123.0 + 0.5);
+    coc = floor(coc + 0.5);
+
+    rgbm.a = (m * 4.0 + coc) / 255.0;
+#else
+    rgbm.a = coc;
+#endif
+}
+
+float unpackCocFromRGBM(inout vec4 rgbm) {
+#if defined(RGBM_DECODE) || defined(RGBM)
+    float a = rgbm.a * 255.0;
+    rgbm.a = floor(a);
+    float coc = a - rgbm.a * 4.0;
+    rgbm.a /= 123.0;
+    return coc;
+#else
+    float coc = rgbm.a;
+    return coc;
+#endif
+}
+@end
+
+
+
 @export dof.hexagonal_blur_frag
 
-@import qtek.util.decode_float
+@import qtek.util.float
 
-vec4 doBlur(sampler2D colorTexture, vec2 offset) {
+
+vec4 doBlur(sampler2D targetTexture, vec2 offset) {
+#ifdef BLUR_COC
+    float cocSum = 0.0;
+#else
     vec4 color = vec4(0.0);
-    float weightAll = 0.0;
+#endif
+
+    float weightSum = 0.0;
     float kernelWeight = 1.0 / float(KERNEL_SIZE);
-    for(int i = 0; i < KERNEL_SIZE; i++){
+
+    for (int i = 0; i < KERNEL_SIZE; i++) {
         vec2 coord = v_Texcoord + offset * float(i);
-        vec4 cocTexel = texture2D(coc, coord);
 
         float w = kernelWeight;
-#ifdef COC_ENABLED
-        w *= abs(decodeFloat(cocTexel) * 2.0 - 1.0);
+#ifdef BLUR_COC
+        float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;
+        // Blur coc in nearfield
+        cocSum += clamp(fCoc, -1.0, 0.0) * w;
+#else
+        float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;
+        vec4 texel = texture2D(targetTexture, coord);
+    #if !defined(BLUR_NEARFIELD)
+        w *= abs(fCoc);
+    #endif
+        color += decodeHDR(texel) * w;
 #endif
-        weightAll += w;
-        color += decodeHDR(texture2D(colorTexture, coord)) * w;
-    }
 
-    return color / weightAll;
+        weightSum += w;
+    }
+#ifdef BLUR_COC
+    return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);
+#else
+    return color / weightSum;
+#endif
 }
 
 @end
@@ -152,11 +208,7 @@ vec4 doBlur(sampler2D colorTexture, vec2 offset) {
 #define KERNEL_SIZE 5
 
 uniform sampler2D texture;
-
-#ifdef COC_ENABLED
 uniform sampler2D coc;
-#endif
-
 varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
@@ -170,12 +222,16 @@ uniform vec2 textureSize : [512.0, 512.0];
 void main()
 {
     vec2 offset = blurSize / textureSize;
-#ifdef COC_ENABLED
+
+#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)
     offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);
 #endif
 
-    // Top
-    gl_FragColor = encodeHDR(doBlur(texture, vec2(0.0, offset.y)));
+    // TOP
+    gl_FragColor = doBlur(texture, vec2(0.0, offset.y));
+#if !defined(BLUR_COC)
+    gl_FragColor = encodeHDR(gl_FragColor);
+#endif
 }
 
 @end
@@ -185,11 +241,7 @@ void main()
 #define KERNEL_SIZE 5
 
 uniform sampler2D texture;
-
-#ifdef COC_ENABLED
 uniform sampler2D coc;
-#endif
-
 varying vec2 v_Texcoord;
 
 uniform float blurSize : 1.0;
@@ -203,13 +255,17 @@ uniform vec2 textureSize : [512.0, 512.0];
 void main()
 {
     vec2 offset = blurSize / textureSize;
-#ifdef COC_ENABLED
+#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)
     offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);
 #endif
+
     offset.y /= 2.0;
 
-    // Down left
-    gl_FragColor = encodeHDR(doBlur(texture, -offset));
+    // BOTTOM LEFT
+    gl_FragColor = doBlur(texture, -offset);
+#if !defined(BLUR_COC)
+    gl_FragColor = encodeHDR(gl_FragColor);
+#endif
 }
 @end
 
@@ -219,10 +275,7 @@ void main()
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
-
-#ifdef COC_ENABLED
 uniform sampler2D coc;
-#endif
 
 varying vec2 v_Texcoord;
 
@@ -238,7 +291,7 @@ void main()
 {
     vec2 offset = blurSize / textureSize;
 
-#ifdef COC_ENABLED
+#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)
     offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);
 #endif
 
@@ -246,13 +299,24 @@ void main()
     vec2 vDownRight = vec2(offset.x, -offset.y);
 
     // Down left
-    vec4 color1 = doBlur(texture1, -offset);
+    vec4 texel1 = doBlur(texture1, -offset);
     // Down right
-    vec4 color2 = doBlur(texture1, vDownRight);
+    vec4 texel2 = doBlur(texture1, vDownRight);
     // Down right
-    vec4 color3 = doBlur(texture2, vDownRight);
+    vec4 texel3 = doBlur(texture2, vDownRight);
 
-    gl_FragColor = encodeHDR((color1 + color2 + color3) / 3.0);
+#ifdef BLUR_COC
+    float coc1 = decodeFloat(texel1) * 2.0 - 1.0;
+    float coc2 = decodeFloat(texel2) * 2.0 - 1.0;
+    float coc3 = decodeFloat(texel3) * 2.0 - 1.0;
+    gl_FragColor = encodeFloat(
+        ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5
+    );
+
+#else
+    vec4 color = (texel1 + texel2 + texel3) / 3.0;
+    gl_FragColor = encodeHDR(color);
+#endif
 }
 
 @end
@@ -260,26 +324,54 @@ void main()
 
 @export dof.composite
 
+#define DEBUG 0
+
 uniform sampler2D original;
 uniform sampler2D blurred;
+uniform sampler2D nearfield;
 uniform sampler2D coc;
+uniform sampler2D nearcoc;
 varying vec2 v_Texcoord;
 
-@import qtek.util.decode_float
 @import qtek.util.rgbm
+@import qtek.util.float
 
 void main()
 {
     vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));
     vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));
-    vec4 cocTexel = texture2D(coc, v_Texcoord);
-    float fCoc = abs(decodeFloat(cocTexel) * 2.0 - 1.0);
-    blurredColor.rgb /= max(fCoc, 0.01);
-    fCoc = smoothstep(0.0, 1.0, fCoc);
+    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));
 
-    gl_FragColor = encodeHDR(vec4(mix(originalColor.rgb, blurredColor.rgb, fCoc), 1.0));
+    float fCoc = decodeFloat(texture2D(coc, v_Texcoord));
+    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));
 
-    // gl_FragColor = vec4(texture2D(coc, v_Texcoord).rgb, 1.0);
+    // FIXME blur after premultiply will have white edge
+    fCoc = abs(fCoc * 2.0 - 1.0);
+    fNearCoc = abs(fNearCoc * 2.0 - 1.0);
+
+    float weight = smoothstep(0.0, 1.0, fCoc);
+
+    fNearCoc = sqrt(fNearCoc);
+    // blurredColor.rgb /= max(fCoc, 0.1);
+    // nearfieldColor.rgb /= max(fCoc, 0.1);
+    // FIXME
+    gl_FragColor = encodeHDR(
+        nearfieldColor * fNearCoc +
+        (1.0 - fNearCoc) * vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0)
+    );
+
+#if DEBUG == 1
+    // Show coc
+    gl_FragColor = vec4(vec3(fCoc), 1.0);
+#elif DEBUG == 2
+    // Show near coc
+    gl_FragColor = vec4(vec3(fNearCoc), 1.0);
+#elif DEBUG == 3
+    gl_FragColor = encodeHDR(blurredColor);
+#elif DEBUG == 4
+    // gl_FragColor = vec4(vec3(nearfieldTexel.a), 1.0);
+    gl_FragColor = encodeHDR(nearfieldColor);
+#endif
 }
 
 @end

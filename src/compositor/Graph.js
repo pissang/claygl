@@ -61,6 +61,12 @@ define(function (require) {
                     continue;
                 }
                 for (var inputName in node.inputs) {
+                    if (!node.inputs[inputName]) {
+                        continue;
+                    }
+                    if (node.pass && !node.pass.material.isUniformEnabled(inputName)) {
+                        console.warn('Pin '  + node.name + '.' + inputName + ' not used.');
+                    }
                     var fromPinInfo = node.inputs[inputName];
 
                     var fromPin = this.findPin(fromPinInfo);
@@ -68,7 +74,12 @@ define(function (require) {
                         node.link(inputName, fromPin.node, fromPin.pin);
                     }
                     else {
-                        console.warn('Pin of ' + fromPinInfo.node + '.' + fromPinInfo.pin + ' not exist');
+                        if (typeof fromPinInfo === 'string') {
+                            console.warn('Node ' + fromPinInfo + ' not exist');
+                        }
+                        else {
+                            console.warn('Pin of ' + fromPinInfo.node + '.' + fromPinInfo.pin + ' not exist');
+                        }
                     }
                 }
             }
@@ -83,6 +94,7 @@ define(function (require) {
                     node: input
                 };
             }
+
 
             if (typeof input.node === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {
