@@ -127,6 +127,62 @@ void main()
 
 
 
+
+@export dof.coc_upsample
+
+#define HIGH_QUALITY
+
+uniform sampler2D coc;
+uniform vec2 textureSize : [512, 512];
+
+varying vec2 v_Texcoord;
+
+@import qtek.util.float
+
+void main()
+{
+
+#ifdef HIGH_QUALITY
+    // 9-tap bilinear upsampler (tent filter)
+    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy;
+
+    float s;
+    s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));
+    s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;
+    s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));
+
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;
+    s += decodeFloat(texture2D(coc, v_Texcoord       )) * 4.0;
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;
+
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));
+
+    gl_FragColor = encodeFloat(s / 16.0);
+#else
+    // 4-tap bilinear upsampler
+    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;
+
+    float s;
+    s  = decodeFloat(texture2D(coc, v_Texcoord + d.xy));
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));
+    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));
+
+    gl_FragColor = encodeFloat(s / 4.0);
+#endif
+}
+
+@end
+
+
+
+
+
+
+
+
 @export dof.coc_helper
 
 void packCocToRGBM(inout vec4 rgbm, float coc) {
@@ -321,7 +377,6 @@ void main()
 
 @end
 
-
 @export dof.composite
 
 #define DEBUG 0
@@ -340,25 +395,33 @@ void main()
 {
     vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));
     vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));
-    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));
 
     float fCoc = decodeFloat(texture2D(coc, v_Texcoord));
-    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));
 
     // FIXME blur after premultiply will have white edge
     fCoc = abs(fCoc * 2.0 - 1.0);
-    fNearCoc = abs(fNearCoc * 2.0 - 1.0);
 
     float weight = smoothstep(0.0, 1.0, fCoc);
 
-    fNearCoc = sqrt(fNearCoc);
+#ifdef NEARFIELD_ENABLED
+    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));
+    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));
+    fNearCoc = abs(fNearCoc * 2.0 - 1.0);
+
+
     // blurredColor.rgb /= max(fCoc, 0.1);
     // nearfieldColor.rgb /= max(fCoc, 0.1);
     // FIXME
     gl_FragColor = encodeHDR(
-        nearfieldColor * fNearCoc +
-        (1.0 - fNearCoc) * vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0)
+        mix(
+            nearfieldColor, vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0),
+            // near field blur is too unobvious if use linear blending
+            pow(1.0 - fNearCoc, 4.0)
+        )
     );
+#else
+    gl_FragColor = encodeHDR(vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0));
+#endif
 
 #if DEBUG == 1
     // Show coc

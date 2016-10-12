@@ -195,6 +195,7 @@ define(function (require) {
             .concat(createBlurNodes('near'))
             .concat(createBlurNodes('coc'));
 
+        var upsampleTextureSize = [renderer.getWidth() / 2, renderer.getHeight() / 2];
         var upSampleNode = new qtek.compositor.Node({
             name: 'upsample',
             shader: qtek.Shader.source('qtek.compositor.upsample'),
@@ -208,7 +209,7 @@ define(function (require) {
             }
         });
 
-        upSampleNode.setParameter('textureSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
+        upSampleNode.setParameter('textureSize', upsampleTextureSize);
 
         var upSampleNearNode = new qtek.compositor.Node({
             name: 'upsample_near',
@@ -222,6 +223,22 @@ define(function (require) {
                 }
             }
         });
+        upSampleNearNode.setParameter('textureSize', upsampleTextureSize);
+
+
+        var upSampleCocNode = new qtek.compositor.Node({
+            name: 'upsample_coc',
+            shader: qtek.Shader.source('dof.coc_upsample'),
+            inputs: {
+                coc: 'coc_blur_3'
+            },
+            outputs: {
+                color: {
+                    parameters: getCommonParameters(1)
+                }
+            }
+        });
+        upSampleCocNode.setParameter('textureSize', upsampleTextureSize);
 
 
         var compositeNode = new qtek.compositor.Node({
@@ -235,7 +252,7 @@ define(function (require) {
                 blurred: 'upsample',
                 nearfield: 'upsample_near',
                 coc: 'coc',
-                nearcoc: 'coc_blur_3'
+                nearcoc: 'upsample_coc'
             },
             outputs: {
                 color: {
@@ -265,6 +282,7 @@ define(function (require) {
 
         compositor.addNode(upSampleNode);
         compositor.addNode(upSampleNearNode);
+        compositor.addNode(upSampleCocNode);
 
         premutiplyNode.shaderDefine('RGBM');
         compositeNode.shaderDefine('RGBM');
