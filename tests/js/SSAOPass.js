@@ -58,7 +58,7 @@ define(function (require) {
 
         this.setNoiseSize(4);
         this.setKernelSize(opt.kernelSize || 64);
-        this.setParameter('blurSize', opt.blurSize || 4);
+        this.setParameter('blurSize', Math.round(opt.blurSize || 4));
         if (opt.radius != null) {
             this.setParameter('radius', opt.radius);
         }
@@ -109,7 +109,7 @@ define(function (require) {
             gl.blendEquation(gl.FUNC_ADD);
             gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
         };
-        blurPass.blendWithPrevious = true;
+        // blurPass.blendWithPrevious = true;
         blurPass.setUniform('textureSize', [width, height]);
         blurPass.setUniform('texture', ssaoTexture);
         blurPass.render(forwardRenderer);

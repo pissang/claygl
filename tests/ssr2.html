@@ -14,7 +14,7 @@
         </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek', 'js/SSRPass', 'js/GBuffer', 'js/createHDRCompositor'], function(qtek, SSRPass, GBuffer, createHDRCompositor) {
+            require(['qtek', 'js/SSRPass', 'js/GBuffer', 'js/createCompositor'], function(qtek, SSRPass, GBuffer, createCompositor) {
 
                 var config = {
                     maxIteration: 16,
@@ -174,7 +174,7 @@
                 var animation = new qtek.animation.Animation();
                 animation.start();
 
-                var compositor = createHDRCompositor({
+                var compositor = createCompositor({
                     texture: ssrPass.getTargetTexture()
                 });
                 animation.on('frame', function(deltaTime) {

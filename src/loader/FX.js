@@ -144,10 +144,15 @@ define(function(require) {
             if (nodeInfo.inputs) {
                 inputs = {};
                 for (var name in nodeInfo.inputs) {
-                    inputs[name] = {
-                        node: nodeInfo.inputs[name].node,
-                        pin: nodeInfo.inputs[name].pin
-                    };
+                    if (typeof nodeInfo.inputs[name] === 'string') {
+                        inputs[name] = nodeInfo.inputs[name];
+                    }
+                    else {
+                        inputs[name] = {
+                            node: nodeInfo.inputs[name].node,
+                            pin: nodeInfo.inputs[name].pin
+                        };
+                    }
                 }
             }
             if (nodeInfo.outputs) {
@@ -239,7 +244,7 @@ define(function(require) {
                     var val = paramInfo[name];
                     if (val != null) {
                         // Convert string to enum
-                        if (typeof(val) === 'string') {
+                        if (typeof val === 'string') {
                             val = Texture[val];
                         }
                         param[name] = val;
@@ -325,7 +330,7 @@ define(function(require) {
                     });
                     texture = new TextureCube(parameters);
                 }
-                else if(typeof(path) === 'string') {
+                else if(typeof path === 'string') {
                     path = util.relative2absolute(path, textureRootPath);
                     texture = new Texture2D(parameters);
                 }

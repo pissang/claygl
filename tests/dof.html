@@ -135,7 +135,7 @@
                     var gui = new dat.GUI();
                     var config = {
                         blurSize: 1,
-                        focalPlane: 4,
+                        focalDist: 4,
                         focalRange: 0.2,
                         fstop: 1.4,
                         debug: 'none'
@@ -146,7 +146,7 @@
                             blurNodes[i].setParameter('blurSize', config.blurSize);
                         }
 
-                        cocNode.setParameter('focalPlane', config.focalPlane);
+                        cocNode.setParameter('focalDist', config.focalDist);
                         cocNode.setParameter('fstop', config.fstop);
                         cocNode.setParameter('focalRange', config.focalRange);
                         compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
@@ -177,7 +177,7 @@
 
                     gui.add(config, 'blurSize', 0, 4).onChange(updateParameters);
                     gui.add(config, 'fstop', 0.2, 8).onChange(updateParameters);
-                    gui.add(config, 'focalPlane', 0.1, 8).onChange(updateParameters);
+                    gui.add(config, 'focalDist', 0.1, 8).onChange(updateParameters);
                     gui.add(config, 'focalRange', 0, 1).onChange(updateParameters);
                     gui.add(config, 'debug', debugConfigs).onChange(updateDebugConfig);
 

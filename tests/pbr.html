@@ -8,7 +8,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek', 'js/createHDRCompositor'], function(qtek, createHDRCompositor) {
+            require(['qtek', 'js/createCompositor'], function(qtek, createCompositor) {
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
@@ -30,7 +30,7 @@
                     var envMap = qtek.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
-                            exposure: 3
+                            exposure: 4
                         },
                         function () {
                             envMap.flipY = false;
@@ -100,9 +100,10 @@
                     domElement: renderer.canvas
                 });
 
-                var compositor = createHDRCompositor({
+                var compositor = createCompositor({
                     scene: scene,
-                    camera: camera
+                    camera: camera,
+                    enableBloom: true
                 });
 
 

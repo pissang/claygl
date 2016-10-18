@@ -36,6 +36,7 @@ define(function (require) {
     Shader['import'](require('./source/compositor/downsample.essl'));
     Shader['import'](require('./source/compositor/upsample.essl'));
     Shader['import'](require('./source/compositor/hdr.essl'));
+    Shader['import'](require('./source/compositor/dof.essl'));
     Shader['import'](require('./source/compositor/lensflare.essl'));
     Shader['import'](require('./source/compositor/blend.essl'));
     Shader['import'](require('./source/compositor/fxaa.essl'));

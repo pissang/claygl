@@ -1,0 +1,939 @@
+{
+    "meta" : {
+        "description": "Bloom from https://cdn2.unrealengine.com/Resources/files/The_Technology_Behind_the_Elemental_Demo_16x9-1248544805.pdf"
+    },
+    "type" : "compositor",
+    "nodes" : [
+        {
+            "name": "source_half",
+            "shader": "#source(qtek.compositor.downsample)",
+            "inputs": {
+                "texture": "source"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+        {
+            "name" : "bright",
+            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "inputs" : {
+                "texture" : "source_half"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "threshold" : 4,
+                "scale": 4
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright2",
+            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "inputs" : {
+                "texture": "source_half"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 512,
+                        "height" : 512
+                    }
+                }
+            },
+            "parameters" : {
+                "threshold": 20,
+                "scale": 0.01
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+        {
+            "name": "bright_downsample_4",
+            "shader" : "#source(qtek.compositor.downsample)",
+            "inputs" : {
+                "texture" : "bright"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "bright_downsample_8",
+            "shader" : "#source(qtek.compositor.downsample)",
+            "inputs" : {
+                "texture" : "bright_downsample_4"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 4, height / 4] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "bright_downsample_16",
+            "shader" : "#source(qtek.compositor.downsample)",
+            "inputs" : {
+                "texture" : "bright_downsample_8"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 8, height / 8] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "bright_downsample_32",
+            "shader" : "#source(qtek.compositor.downsample)",
+            "inputs" : {
+                "texture" : "bright_downsample_16"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 32)",
+                        "height" : "expr(height / 32)"
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize": "expr( [width / 16, height / 16] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+        {
+            "name" : "bright_upsample_16_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "bright_downsample_32"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 32 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_16_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "bright_upsample_16_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 16)",
+                        "height" : "expr(height / 16)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 32 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+
+        {
+            "name" : "bright_upsample_8_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "bright_downsample_16"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 16 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_8_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "bright_upsample_8_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 16 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_8_blend",
+            "shader" : "#source(qtek.compositor.blend)",
+            "inputs" : {
+                "texture1" : "bright_upsample_8_blur_v",
+                "texture2" : "bright_upsample_16_blur_v"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 8)",
+                        "height" : "expr(height / 8)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+        {
+            "name" : "bright_upsample_4_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "bright_downsample_8"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 8 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_4_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "bright_upsample_4_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 8 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_4_blend",
+            "shader" : "#source(qtek.compositor.blend)",
+            "inputs" : {
+                "texture1" : "bright_upsample_4_blur_v",
+                "texture2" : "bright_upsample_8_blend"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 4)",
+                        "height" : "expr(height / 4)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+
+
+
+        {
+            "name" : "bright_upsample_2_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "bright_downsample_4"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 4 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_2_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "bright_upsample_2_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 4 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_2_blend",
+            "shader" : "#source(qtek.compositor.blend)",
+            "inputs" : {
+                "texture1" : "bright_upsample_2_blur_v",
+                "texture2" : "bright_upsample_4_blend"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+
+
+        {
+            "name" : "bright_upsample_full_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "bright"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": "expr( width / 2 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_full_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "bright_upsample_full_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": "expr( height / 2 )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "bright_upsample_full_blend",
+            "shader" : "#source(qtek.compositor.blend)",
+            "inputs" : {
+                "texture1" : "bright_upsample_full_blur_v",
+                "texture2" : "bright_upsample_2_blend"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "parameters" : {
+                "weight1" : 0.3,
+                "weight2" : 0.7
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+
+        {
+            "name": "coc",
+            "shader": "#source(qtek.compositor.dof.coc)",
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width)",
+                        "height": "expr(height)"
+                    }
+                }
+            }
+        },
+
+        {
+            "name": "coc_half",
+            "shader": "#source(qtek.compositor.dof.min_coc)",
+            "inputs": {
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            }
+        },
+
+        {
+            "name": "dof_far_blur_hexangonal_1",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "inputs": {
+                "texture": "source_half",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "dof_far_blur_hexangonal_2",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "inputs": {
+                "texture": "source_half",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name": "dof_far_blur_hexangonal_3",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "inputs": {
+                "texture1": "dof_far_blur_hexangonal_1",
+                "texture2": "dof_far_blur_hexangonal_2",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+        {
+            "name": "dof_near_blur_hexangonal_1",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "inputs": {
+                "texture": "source_half",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null,
+                "BLUR_NEARFIELD": null
+            }
+        },
+        {
+            "name": "dof_near_blur_hexangonal_2",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "inputs": {
+                "texture": "source_half",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null,
+                "BLUR_NEARFIELD": null
+            }
+        },
+        {
+            "name": "dof_near_blur_hexangonal_3",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "inputs": {
+                "texture1": "dof_near_blur_hexangonal_1",
+                "texture2": "dof_near_blur_hexangonal_2",
+                "coc": "coc"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null,
+                "BLUR_NEARFIELD": null
+            }
+        },
+
+
+        {
+            "name": "dof_coc_blur_hexangonal_1",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "inputs": {
+                "texture": "coc_half"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "BLUR_COC": null
+            }
+        },
+        {
+            "name": "dof_coc_blur_hexangonal_2",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "inputs": {
+                "texture": "coc_half"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "BLUR_COC": null
+            }
+        },
+        {
+            "name": "dof_coc_blur_hexangonal_3",
+            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "inputs": {
+                "texture1": "dof_coc_blur_hexangonal_1",
+                "texture2": "dof_coc_blur_hexangonal_2"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width / 2)",
+                        "height": "expr(height / 2)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "BLUR_COC": null
+            }
+        },
+
+        {
+            "name": "dof_far_blur_upsample",
+            "shader": "#source(qtek.compositor.upsample)",
+            "inputs": {
+                "texture": "dof_far_blur_hexangonal_3"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width)",
+                        "height": "expr(height)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+        {
+            "name": "dof_near_blur_upsample",
+            "shader": "#source(qtek.compositor.upsample)",
+            "inputs": {
+                "texture": "dof_near_blur_hexangonal_3"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width)",
+                        "height": "expr(height)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+        {
+            "name": "dof_coc_blur_upsample",
+            "shader": "#source(qtek.compositor.dof.coc_upsample)",
+            "inputs": {
+                "coc": "dof_coc_blur_hexangonal_3"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width)",
+                        "height": "expr(height)"
+                    }
+                }
+            },
+            "parameters": {
+                "textureSize": "expr( [width / 2, height / 2] )"
+            }
+        },
+
+        {
+            "name": "dof_composite",
+            "shader": "#source(qtek.compositor.dof.composite)",
+            "inputs": {
+                "original": "source",
+                "blurred": "dof_far_blur_upsample",
+                "nearfield": "dof_near_blur_upsample",
+                "coc": "coc",
+                "nearcoc": "dof_coc_blur_upsample"
+            },
+            "outputs": {
+                "color": {
+                    "parameters": {
+                        "minFilter": "NEAREST",
+                        "magFilter": "NEAREST",
+                        "width": "expr(width)",
+                        "height": "expr(height)"
+                    }
+                }
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+
+        {
+            "name" : "lensflare",
+            "shader" : "#source(qtek.compositor.lensflare)",
+            "inputs" : {
+                "texture" : "bright2"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 512,
+                        "height" : 512
+                    }
+                }
+            },
+            "parameters" : {
+                "textureSize" : [512, 512],
+                "lensColor" : "#lenscolor"
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "lensflare_blur_h",
+            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "inputs" : {
+                "texture" : "lensflare"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 512,
+                        "height" : 512
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureWidth": 512
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "lensflare_blur_v",
+            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "inputs" : {
+                "texture" : "lensflare_blur_h"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : 512,
+                        "height" : 512
+                    }
+                }
+            },
+            "parameters" : {
+                "blurSize" : 1,
+                "textureHeight": 512
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "tonemapping",
+            "shader" : "#source(qtek.compositor.hdr.tonemapping)",
+            "inputs" : {
+                "texture" : "dof_composite",
+                "bloom" : "bright_upsample_full_blend",
+                "lensflare" : "lensflare_blur_v"
+            },
+            "outputs" : {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
+            },
+            "defines": {
+                "RGBM": null
+            }
+        },
+        {
+            "name" : "FXAA",
+            "shader" : "#source(qtek.compositor.fxaa)",
+            "inputs" : {
+                "texture" : "tonemapping"
+            },
+            "parameters": {
+                "viewportSize": "expr( [width, height] )"
+            },
+            "defines": {
+                "RGBM_DECODE": null
+            }
+        }
+    ]
+}

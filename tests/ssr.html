@@ -110,16 +110,6 @@
                     domElement: renderer.canvas
                 });
 
-                var compositor;
-                var FXLoader = new qtek.loader.FX({
-                    scene: scene,
-                    camera: camera
-                });
-                FXLoader.load('assets/fx/hdr.json');
-                FXLoader.on('success', function(_compositor) {
-                    compositor = _compositor;
-                });
-
                 var frameBuffer = new qtek.FrameBuffer();
                 var colorTex = new qtek.Texture2D();
                 var animation = new qtek.animation.Animation();
@@ -132,9 +122,6 @@
                     monkeys.forEach(function (monkey, idx) {
                         monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
                     });
-                    // if (compositor) {
-                    //     compositor.render(renderer);
-                    // }
                     frameBuffer.attach(renderer.gl, colorTex);
                     frameBuffer.bind(renderer);
                     renderer.render(scene, camera);

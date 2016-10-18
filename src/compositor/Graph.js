@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var Base = require('../core/Base');
+    var GraphNode = require('./Node');
 
     /**
      * @constructor qtek.compositor.Graph
@@ -18,6 +19,13 @@ define(function (require) {
     },
     /** @lends qtek.compositor.Graph.prototype */
     {
+
+        /**
+         * Mark to update
+         */
+        dirty: function () {
+            this._dirty = true;
+        },
         /**
          * @param {qtek.compositor.Node} node
          */
@@ -66,6 +74,7 @@ define(function (require) {
                     }
                     if (node.pass && !node.pass.material.isUniformEnabled(inputName)) {
                         console.warn('Pin '  + node.name + '.' + inputName + ' not used.');
+                        continue;
                     }
                     var fromPinInfo = node.inputs[inputName];
 
@@ -87,14 +96,12 @@ define(function (require) {
 
         findPin: function (input) {
             var node;
-            // Try to take input as a directly a node if node parameter not exist
-            // PENDING
-            if (!input.node) {
+            // Try to take input as a directly a node
+            if (typeof input === 'string' || input instanceof GraphNode) {
                 input = {
                     node: input
                 };
             }
-
 
             if (typeof input.node === 'string') {
                 for (var i = 0; i < this.nodes.length; i++) {
@@ -108,14 +115,17 @@ define(function (require) {
                 node = input.node;
             }
             if (node) {
-                if (!input.pin) {
+                var inputPin = input.pin;
+                if (!inputPin) {
                     // Use first pin defaultly
-                    input.pin = Object.keys(node.outputs)[0];
+                    if (node.outputs) {
+                        inputPin = Object.keys(node.outputs)[0];
+                    }
                 }
-                if (node.outputs[input.pin]) {
+                if (node.outputs[inputPin]) {
                     return {
                         node: node,
-                        pin: input.pin
+                        pin: inputPin
                     };
                 }
             }

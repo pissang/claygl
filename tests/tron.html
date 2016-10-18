@@ -17,7 +17,7 @@
         </style>
         <canvas id='main'></canvas>
         <script type="text/javascript">
-            require(['qtek', 'text!./shader/tron.essl', 'js/createHDRCompositor'], function (qtek, tronShader, createHDRCompositor) {
+            require(['qtek', 'text!./shader/tron.essl', 'js/createCompositor'], function (qtek, tronShader, createCompositor) {
                 var Shader = qtek.Shader;
                 Shader.import(tronShader);
 
@@ -87,7 +87,7 @@
                     target: camera
                 });
 
-                var compositor = createHDRCompositor({
+                var compositor = createCompositor({
                     scene: scene,
                     camera: camera
                 });

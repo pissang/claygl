@@ -8,7 +8,7 @@
 <body style="margin:0px">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['qtek', 'js/createHDRCompositor'], function(qtek, createHDRCompositor) {
+        require(['qtek', 'js/createCompositor'], function(qtek, createCompositor) {
             var renderer = new qtek.Renderer({
                 canvas : document.getElementById('main'),
                 devicePixelRatio : 1.0
@@ -50,7 +50,7 @@
             var animation = new qtek.animation.Animation();
             animation.start();
 
-            var compositor = createHDRCompositor({
+            var compositor = createCompositor({
                 scene: scene,
                 camera: camera
             });

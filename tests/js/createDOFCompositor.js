@@ -3,8 +3,6 @@ define(function (require) {
 
     var DOWNSAMPLE_REPEAT = 2;
 
-    qtek.Shader.import(require('text!../shader/dof.essl'));
-
     function getCommonParameters(downScale) {
         downScale = downScale || 1;
         var parameters = {
@@ -45,7 +43,7 @@ define(function (require) {
         });
         var cocNode = new qtek.compositor.Node({
             name: 'coc',
-            shader: qtek.Shader.source('dof.coc'),
+            shader: qtek.Shader.source('qtek.compositor.dof.coc'),
             inputs: {
                 depth: {
                     node: 'scene',
@@ -60,7 +58,7 @@ define(function (require) {
         });
         var premutiplyNode = new qtek.compositor.Node({
             name: 'premutiply',
-            shader: qtek.Shader.source('dof.premutiply'),
+            shader: qtek.Shader.source('qtek.compositor.dof.premutiply'),
             inputs: {
                 texture: {
                     node: 'scene',
@@ -103,7 +101,7 @@ define(function (require) {
             // Downsample coc
             var cocDownSampleNode = new qtek.compositor.Node({
                 name: 'coc_downsample' + i,
-                shader: qtek.Shader.source('dof.min_coc'),
+                shader: qtek.Shader.source('qtek.compositor.dof.min_coc'),
                 inputs: {
                     coc: i === 0 ? 'coc' : 'coc_downsample' + (i - 1)
                 },
@@ -127,7 +125,7 @@ define(function (require) {
             // Separable hexagonal blur
             var blurNode1 = new qtek.compositor.Node({
                 name: prefix + 'blur_1',
-                shader: qtek.Shader.source('dof.hexagonal_blur_1'),
+                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_1'),
                 inputs: {
                     texture: target === 'coc' ? lastCocDownSampleName : lastDownSampleName,
                     coc: target === 'coc' ? null : 'coc'
@@ -140,7 +138,7 @@ define(function (require) {
             });
             var blurNode2 = new qtek.compositor.Node({
                 name: prefix + 'blur_2',
-                shader: qtek.Shader.source('dof.hexagonal_blur_2'),
+                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_2'),
                 inputs: {
                     texture: target === 'coc' ? lastCocDownSampleName : lastDownSampleName,
                     coc: target === 'coc' ? null : 'coc'
@@ -153,7 +151,7 @@ define(function (require) {
             });
             var blurNode3 = new qtek.compositor.Node({
                 name: prefix + 'blur_3',
-                shader: qtek.Shader.source('dof.hexagonal_blur_3'),
+                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_3'),
                 inputs: {
                     texture1: prefix + 'blur_1',
                     texture2: prefix + 'blur_2',
@@ -228,7 +226,7 @@ define(function (require) {
 
         var upSampleCocNode = new qtek.compositor.Node({
             name: 'upsample_coc',
-            shader: qtek.Shader.source('dof.coc_upsample'),
+            shader: qtek.Shader.source('qtek.compositor.dof.coc_upsample'),
             inputs: {
                 coc: 'coc_blur_3'
             },
@@ -243,7 +241,7 @@ define(function (require) {
 
         var compositeNode = new qtek.compositor.Node({
             name: 'composite',
-            shader: qtek.Shader.source('dof.composite'),
+            shader: qtek.Shader.source('qtek.compositor.dof.composite'),
             inputs: {
                 original: {
                     node: 'scene',

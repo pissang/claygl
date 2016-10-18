@@ -10,14 +10,15 @@ define(function (require) {
         var kernel = new Float32Array(size * 2);
         var v2 = new Vector2();
 
-        // Hardcoded 3 REPEAT
-        var repeat = 3;
+        // Hardcoded 7 REPEAT
+        // repeat should not be dividable by kernel size
+        var repeat = 7;
         // Spiral sample
         for (var i = 0; i < size; i++) {
-            var angle = i / size * Math.PI * 2 * repeat;
+            var angle = (i + 0.5) / size * Math.PI * 2 * repeat;
             v2.set(
-                i / size * Math.cos(angle),
-                i / size * Math.sin(angle)
+                (i + 0.5) / size * Math.cos(angle),
+                (i + 0.5) / size * Math.sin(angle)
             );
             // v2.set(Math.random() * 2 - 1, Math.random() * 2 - 1)
             //     .normalize().scale(Math.random());
@@ -67,9 +68,9 @@ define(function (require) {
         this._blurPass2 = new PostProcessPass(qtek.Shader.source('alchemy.blur_v'), opt.renderToTexture);
 
         this._blurPass1.setUniform('colorTex', this._ssaoPass.getTargetTexture());
-        this._blurPass1.setUniform('normalTex', this._gBuffer.getNormalTex());
+        this._blurPass1.setUniform('depthTex', this._gBuffer.getDepthTex());
         this._blurPass2.setUniform('colorTex', this._blurPass1.getTargetTexture());
-        this._blurPass2.setUniform('normalTex', this._gBuffer.getNormalTex());
+        this._blurPass2.setUniform('depthTex', this._gBuffer.getDepthTex());
 
         this.setKernelSize(opt.kernelSize || 12);
         this.setParameter('blurSize', opt.blurSize || 1);
@@ -110,15 +111,16 @@ define(function (require) {
 
         var ssaoTexture = this._ssaoPass.getTargetTexture();
         if (width !== ssaoTexture.width || height !== ssaoTexture.height) {
-            this._ssaoPass.resize(width, height);
+            // FIXME
+            this._ssaoPass.resize(width / 2, height / 2);
             this._blurPass1.resize(width, height);
             this._blurPass2.resize(width, height);
         }
         ssaoPass.render(renderer);
 
-        this._blurPass1.setUniform('textureSize', [width, height]);
+        this._blurPass1.setUniform('textureSize', [width / 2, height / 2]);
         this._blurPass1.render(renderer);
-        this._blurPass2.setUniform('textureSize', [width, height]);
+        this._blurPass2.setUniform('textureSize', [width / 2, height / 2]);
         this._blurPass2.render(renderer);
 
     };
@@ -152,7 +154,7 @@ define(function (require) {
             this._ssaoPass.setUniform('noiseTex', generateNoiseTexture(size));
         }
         else {
-            texture.data = generateNoiseData(size);
+            texture.pixels = generateNoiseData(size);
             texture.width = texture.height = size;
             texture.dirty();
         }

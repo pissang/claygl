@@ -1,13 +1,13 @@
 // Sousa_Graphics_Gems_CryENGINE3, Siggraph 2013
 // The Skylanders SWAP Force Depth-of-Field Shader in GPU Pro 4
-@export dof.coc
+@export qtek.compositor.dof.coc
 
 uniform sampler2D depth;
 
 uniform float zNear: 0.1;
 uniform float zFar: 2000;
 
-uniform float focalPlane: 6;
+uniform float focalDist: 3;
 // Object in range are perfectly in focus
 uniform float focalRange: 1;
 // 30mm
@@ -29,14 +29,14 @@ void main()
 
     float coc;
 
-    float uppper = focalPlane + focalRange;
-    float lower = focalPlane - focalRange;
+    float uppper = focalDist + focalRange;
+    float lower = focalDist - focalRange;
     if (dist <= uppper && dist >= lower) {
         // Object in range are perfectly in focus
         coc = 0.5;
     }
     else {
-        // Adjust focalPlane
+        // Adjust focalDist
         float focalAdjusted = dist > uppper ? uppper : lower;
 
         // GPU Gems Depth of Field: A Survey of Techniques
@@ -60,7 +60,7 @@ void main()
 @end
 
 // Premutiply with coc to avoid bleeding in upsampling
-@export dof.premutiply
+@export qtek.compositor.dof.premutiply
 
 uniform sampler2D texture;
 uniform sampler2D coc;
@@ -80,7 +80,7 @@ void main() {
 
 
 // Get min coc tile
-@export dof.min_coc
+@export qtek.compositor.dof.min_coc
 uniform sampler2D coc;
 varying vec2 v_Texcoord;
 uniform vec2 textureSize : [512.0, 512.0];
@@ -103,7 +103,7 @@ void main()
 
 
 // Get max coc tile
-@export dof.max_coc
+@export qtek.compositor.dof.max_coc
 uniform sampler2D coc;
 varying vec2 v_Texcoord;
 uniform vec2 textureSize : [512.0, 512.0];
@@ -128,7 +128,7 @@ void main()
 
 
 
-@export dof.coc_upsample
+@export qtek.compositor.dof.coc_upsample
 
 #define HIGH_QUALITY
 
@@ -183,7 +183,7 @@ void main()
 
 
 
-@export dof.coc_helper
+@export qtek.compositor.dof.coc_helper
 
 void packCocToRGBM(inout vec4 rgbm, float coc) {
 #if defined(RGBM_ENCODE) || defined(RGBM)
@@ -215,7 +215,7 @@ float unpackCocFromRGBM(inout vec4 rgbm) {
 
 
 
-@export dof.hexagonal_blur_frag
+@export qtek.compositor.dof.hexagonal_blur_frag
 
 @import qtek.util.float
 
@@ -259,7 +259,7 @@ vec4 doBlur(sampler2D targetTexture, vec2 offset) {
 @end
 
 
-@export dof.hexagonal_blur_1
+@export qtek.compositor.dof.hexagonal_blur_1
 
 #define KERNEL_SIZE 5
 
@@ -273,7 +273,7 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 @import qtek.util.rgbm
 
-@import dof.hexagonal_blur_frag
+@import qtek.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -292,7 +292,7 @@ void main()
 
 @end
 
-@export dof.hexagonal_blur_2
+@export qtek.compositor.dof.hexagonal_blur_2
 
 #define KERNEL_SIZE 5
 
@@ -306,7 +306,7 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 @import qtek.util.rgbm
 
-@import dof.hexagonal_blur_frag
+@import qtek.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -325,7 +325,7 @@ void main()
 }
 @end
 
-@export dof.hexagonal_blur_3
+@export qtek.compositor.dof.hexagonal_blur_3
 
 #define KERNEL_SIZE 5
 
@@ -341,7 +341,7 @@ uniform vec2 textureSize : [512.0, 512.0];
 
 @import qtek.util.rgbm
 
-@import dof.hexagonal_blur_frag
+@import qtek.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -377,7 +377,7 @@ void main()
 
 @end
 
-@export dof.composite
+@export qtek.compositor.dof.composite
 
 #define DEBUG 0
 
