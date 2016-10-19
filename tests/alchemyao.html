@@ -1,4 +1,4 @@
-<html>
+\<html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,10 +15,11 @@
 
                 var config = {
                     kernelSize: 12,
-                    bias: 5e-4,
+                    bias: 0.05,
                     radius: 4,
                     scale: 1,
-                    power: 1
+                    power: 1,
+                    epsilon: 0.0001
                 };
 
                 var gBuffer = new GBuffer();
@@ -43,7 +44,7 @@
                     return (Math.random() - 0.5) * size * 2;
                 }
 
-                var cubeGeo = new qtek.geometry.Cube();
+                var cubeGeo = new qtek.geometry.Sphere();
                 for (var i = 0; i < 20; i ++) {
                     for (var j = 0; j < 20; j ++) {
                         var mesh = new qtek.Mesh({
@@ -60,13 +61,9 @@
                         scene.add(mesh);
                     }
                 }
-                // scene.add(new qtek.light.Ambient({
-                //     intensity: 5
-                // }));
-                // var directionalLight = new qtek.light.Directional();
-                // directionalLight.position.set(1, 1, 1);
-                // directionalLight.lookAt(scene.position);
-                // scene.add(directionalLight);
+                scene.add(new qtek.light.Ambient({
+                    intensity: 5
+                }));
 
                 camera.position.set(0, 80, 150);
                 camera.lookAt(scene.position);
@@ -82,7 +79,7 @@
                     control.update(deltaTime);
                     stats.update();
 
-                    // renderer.render(scene, camera);
+                    renderer.render(scene, camera);
                     scene.update();
                     camera.update();
                     gBuffer.update(renderer, scene, camera);
@@ -98,17 +95,32 @@
 
                 var gui = new dat.GUI();
 
+                var kernelCanvas = document.createElement('canvas');
+                kernelCanvas.width = kernelCanvas.height = 100;
+                var kernelCtx = kernelCanvas.getContext('2d');
+                kernelCanvas.style.cssText = 'position:absolute;left:0;bottom:0;z-index:100;';
+                document.body.appendChild(kernelCanvas);
+
                 function updateConfig() {
                     for (var name in config) {
                         ssaoPass.setParameter(name, config[name]);
                     }
+                    kernelCtx.clearRect(0, 0, 100, 100);
+                    var kernel = ssaoPass._ssaoPass.getUniform('kernel');
+                    for (var i = 0; i < kernel.length;) {
+                        var x = kernel[i++];
+                        var y = kernel[i++];
+                        kernelCtx.rect(x * 50 + 50, y * 50 + 50, 2, 2);
+                        kernelCtx.fill();
+                    }
                 }
 
-                gui.add(config, 'kernelSize', 4, 64).step(1).onChange(updateConfig);
+                gui.add(config, 'kernelSize', 4, 128).step(1).onChange(updateConfig);
                 gui.add(config, 'radius', 0, 10).onChange(updateConfig);
                 gui.add(config, 'scale', 0, 2).onChange(updateConfig);
                 gui.add(config, 'power', 0.1, 6).onChange(updateConfig);
                 gui.add(config, 'bias').onChange(updateConfig);
+                gui.add(config, 'epsilon').onChange(updateConfig);
 
                 updateConfig();
             });

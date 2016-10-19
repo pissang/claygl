@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -9,7 +9,7 @@ define(function(require) {
      * @constructor qtek.Scene
      * @extends qtek.Node
      */
-    var Scene = Node.derive(function() {
+    var Scene = Node.derive(function () {
         return /** @lends qtek.Scene# */ {
             /**
              * Global material of scene
@@ -43,18 +43,20 @@ define(function(require) {
             _lightUniforms: {},
 
             _lightNumber: {
-                'POINT_LIGHT': 0,
-                'DIRECTIONAL_LIGHT': 0,
-                'SPOT_LIGHT': 0,
-                'AMBIENT_LIGHT': 0
+                // POINT_LIGHT: 0,
+                // DIRECTIONAL_LIGHT: 0,
+                // SPOT_LIGHT: 0,
+                // AMBIENT_LIGHT: 0,
+                // AMBIENT_SH_LIGHT: 0
             },
 
             _opaqueObjectCount: 0,
             _transparentObjectCount: 0,
 
-            _nodeRepository: {}
+            _nodeRepository: {},
+
         };
-    }, function() {
+    }, function () {
         this._scene = this;
     },
     /** @lends qtek.Scene.prototype. */
@@ -63,7 +65,7 @@ define(function(require) {
          * Add node to scene
          * @param {Node} node
          */
-        addToScene: function(node) {
+        addToScene: function (node) {
             if (node.name) {
                 this._nodeRepository[node.name] = node;
             }
@@ -73,7 +75,7 @@ define(function(require) {
          * Remove node from scene
          * @param {Node} node
          */
-        removeFromScene: function(node) {
+        removeFromScene: function (node) {
             if (node.name) {
                 delete this._nodeRepository[node.name];
             }
@@ -85,7 +87,7 @@ define(function(require) {
          * @return {Node}
          * @DEPRECATED
          */
-        getNode: function(name) {
+        getNode: function (name) {
             return this._nodeRepository[name];
         },
 
@@ -137,7 +139,7 @@ define(function(require) {
          * @param  {boolean} notUpdateLights
          *         Useful in deferred pipeline
          */
-        update: function(force, notUpdateLights) {
+        update: function (force, notUpdateLights) {
             if (!(this.autoUpdate || force)) {
                 return;
             }
@@ -158,11 +160,14 @@ define(function(require) {
 
             // reset
             if (!notUpdateLights) {
+                // Reset light numbers
                 for (var type in this._lightNumber) {
                     this._lightNumber[type] = 0;
                 }
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
+                    // User can use any type of light
+                    this._lightNumber[light.type] = this._lightNumber[light.type] || 0;
                     this._lightNumber[light.type]++;
                 }
                 this._updateLightUniforms();
@@ -171,7 +176,7 @@ define(function(require) {
 
         // Traverse the scene and add the renderable
         // object to the render queue
-        _updateRenderQueue: function(parent, sceneMaterialTransparent) {
+        _updateRenderQueue: function (parent, sceneMaterialTransparent) {
             if (parent.invisible) {
                 return;
             }
@@ -195,7 +200,7 @@ define(function(require) {
             }
         },
 
-        _updateLightUniforms: function() {
+        _updateLightUniforms: function () {
             var lights = this.lights;
             // Put the light cast shadow before the light not cast shadow
             lights.sort(lightSortFunc);
@@ -239,21 +244,29 @@ define(function(require) {
             }
         },
 
-        isShaderLightNumberChanged: function(shader) {
-            return shader.lightNumber.POINT_LIGHT !== this._lightNumber.POINT_LIGHT
-                || shader.lightNumber.DIRECTIONAL_LIGHT !== this._lightNumber.DIRECTIONAL_LIGHT
-                || shader.lightNumber.SPOT_LIGHT !== this._lightNumber.SPOT_LIGHT
-                || shader.lightNumber.AMBIENT_LIGHT !== this._lightNumber.AMBIENT_LIGHT;
+        isShaderLightNumberChanged: function (shader) {
+            // PENDING Performance
+            for (var type in this._lightNumber) {
+                if (this._lightNumber[type] !== shader.lightNumber[type]) {
+                    return true;
+                }
+            }
+            for (var type in shader.lightNumber) {
+                if (this._lightNumber[type] !== shader.lightNumber[type]) {
+                    return true;
+                }
+            }
+            return false;
         },
 
-        setShaderLightNumber: function(shader) {
+        setShaderLightNumber: function (shader) {
             for (var type in this._lightNumber) {
                 shader.lightNumber[type] = this._lightNumber[type];
             }
             shader.dirty();
         },
 
-        setLightUniforms: function(shader, _gl) {
+        setLightUniforms: function (shader, _gl) {
             for (var symbol in this._lightUniforms) {
                 var lu = this._lightUniforms[symbol];
                 shader.setUniform(_gl, lu.type, symbol, lu.value);
@@ -265,7 +278,7 @@ define(function(require) {
          * But resources of gl like texuture, shader will not be disposed.
          * Mostly you should use disposeScene method in Renderer to do dispose.
          */
-        dispose: function() {
+        dispose: function () {
             this.material = null;
             this.opaqueQueue = [];
             this.transparentQueue = [];

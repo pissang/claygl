@@ -179,6 +179,7 @@ define(function(require) {
             // Glue code
             // Defines the each type light number in the scene
             // AMBIENT_LIGHT
+            // AMBIENT_SH_LIGHT
             // POINT_LIGHT
             // SPOT_LIGHT
             // AREA_LIGHT

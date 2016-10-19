@@ -17,7 +17,7 @@ define(function(require) {
 
         /**
          * Spherical Harmonic Coefficients
-         * @type {Array.<Array.<number>>}
+         * @type {Array.<number>}
          */
         coefficients: [],
 
@@ -40,14 +40,11 @@ define(function(require) {
             ambientSHLightCoefficients: {
                 type: '3f',
                 value: function (instance) {
-                    var coefficients = instance.coefficients;
-                    var offset = 0;
-                    var coefficientsTmpArr = this._coefficientsTmpArr;
-                    for (var i = 0; i < coefficients.length; i++) {
-                        coefficientsTmpArr[offset++] = coefficients[i][0];
-                        coefficientsTmpArr[offset++] = coefficients[i][1];
-                        coefficientsTmpArr[offset++] = coefficients[i][2];
+                    var coefficientsTmpArr = instance._coefficientsTmpArr;
+                    for (var i = 0; i < instance.coefficients.length; i++) {
+                        coefficientsTmpArr[i] = instance.coefficients[i];
                     }
+                    return coefficientsTmpArr;
                 }
             }
         }

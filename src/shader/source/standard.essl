@@ -98,6 +98,11 @@ uniform float maxMipmapLevel: 5;
 #ifdef AMBIENT_LIGHT_COUNT
 @import qtek.header.ambient_light
 #endif
+
+#ifdef AMBIENT_SH_LIGHT_COUNT
+@import qtek.header.ambient_sh_light
+#endif
+
 #ifdef POINT_LIGHT_COUNT
 @import qtek.header.point_light
 #endif
@@ -219,9 +224,9 @@ void main()
 #endif
 
 #ifdef AMBIENT_SH_LIGHT_COUNT
-    for(int i = 0; i < AMBIENT_LIGHT_COUNT; i++)
+    for(int i = 0; i < AMBIENT_SH_LIGHT_COUNT; i++)
     {
-        diffuseTerm += calcAmbientSHLight(i) * ambientSHLightColor[i];
+        diffuseTerm += calcAmbientSHLight(i, N) * ambientSHLightColor[i];
     }
 #endif
 

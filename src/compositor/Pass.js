@@ -23,12 +23,13 @@ define(function(require) {
      * @constructor qtek.compositor.Pass
      * @extends qtek.core.Base
      */
-    var Pass = Base.derive(function() {
+    var Pass = Base.derive(function () {
         return /** @lends qtek.compositor.Pass# */ {
             /**
              * Fragment shader string
              * @type {string}
              */
+            // PENDING shader or fragment ?
             fragment : '',
 
             /**
