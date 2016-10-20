@@ -197,6 +197,13 @@ define(function(require) {
         renderQuad: function (renderer) {
             mesh.material = this.material;
             renderer.renderQueue([mesh], camera);
+        },
+
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         */
+        dispose: function (gl) {
+            this.material.dispose(gl);
         }
     });
 

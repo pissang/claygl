@@ -39,6 +39,8 @@ define(function (require) {
     cubemapUtil.prefilterEnvironmentMap = function (
         renderer, envMap, textureOpts, normalDistribution, brdfLookup
     ) {
+        // Not create other renderer, it is easy having issue of cross reference of resources like framebuffer
+        // PENDING preserveDrawingBuffer?
         if (!brdfLookup || !normalDistribution) {
             normalDistribution = cubemapUtil.generateNormalDistribution();
             brdfLookup = cubemapUtil.integrateBrdf(renderer, normalDistribution);
@@ -57,11 +59,6 @@ define(function (require) {
             type: textureType,
             flipY: false,
             mipmaps: []
-        });
-
-        // Needs a renderer with preserveDrawingBuffer
-        var cubeMapRenderer = new Renderer({
-            preserveDrawingBuffer: true
         });
 
         if (!prefilteredCubeMap.isPowerOfTwo()) {
@@ -92,7 +89,7 @@ define(function (require) {
                 height: textureOpts.height,
                 type: textureType
             });
-            textureUtil.panoramaToCubeMap(cubeMapRenderer, envMap, envCubemap, {
+            textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
                 // encodeRGBM so it can be decoded as RGBM
                 encodeRGBM: textureOpts.decodeRGBM
             });
@@ -128,13 +125,13 @@ define(function (require) {
 
             for (var j = 0; j < targets.length; j++) {
                 var pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
-                frameBuffer.attach(cubeMapRenderer.gl, renderTargetTmp);
-                frameBuffer.bind(cubeMapRenderer);
+                frameBuffer.attach(renderer.gl, renderTargetTmp);
+                frameBuffer.bind(renderer);
 
                 var camera = envMapPass.getCamera(targets[j]);
                 camera.fov = fov;
-                cubeMapRenderer.render(dummyScene, camera);
-                cubeMapRenderer.gl.readPixels(
+                renderer.render(dummyScene, camera);
+                renderer.gl.readPixels(
                     0, 0, renderTargetTmp.width, renderTargetTmp.height,
                     Texture.RGBA, textureType, pixels
                 );
@@ -150,7 +147,7 @@ define(function (require) {
                 // ctx.putImageData(imageData, 0, 0);
                 // document.body.appendChild(canvas);
 
-                frameBuffer.unbind(cubeMapRenderer);
+                frameBuffer.unbind(renderer);
                 prefilteredCubeMap.mipmaps[i].pixels[targets[j]] = pixels;
             }
 
@@ -159,13 +156,13 @@ define(function (require) {
             renderTargetTmp.dirty();
         }
 
-        frameBuffer.dispose(cubeMapRenderer.gl);
-        renderTargetTmp.dispose(cubeMapRenderer.gl);
-        skyEnv.dispose(cubeMapRenderer.gl);
-        // Remove gpu resource allucated in cubeMapRenderer
-        normalDistribution.dispose(cubeMapRenderer.gl);
+        frameBuffer.dispose(renderer.gl);
+        renderTargetTmp.dispose(renderer.gl);
+        skyEnv.dispose(renderer.gl);
+        // Remove gpu resource allucated in renderer
+        normalDistribution.dispose(renderer.gl);
 
-        cubeMapRenderer.dispose();
+        // renderer.dispose();
 
         return {
             environmentMap: prefilteredCubeMap,

@@ -35,6 +35,7 @@ void main() {
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
 
+
     for (int i = 0; i < SAMPLE_NUMBER; i++) {
         vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);
         vec3 L = reflect(-V, H);

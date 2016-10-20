@@ -121,8 +121,8 @@ define(function (require) {
                 camera.near = this.near;
                 camera.fov = fov;
 
-                if (this._shadowMapPass) {
-                    this._shadowMapPass.render(renderer, scene, camera, true);
+                if (this.shadowMapPass) {
+                    this.shadowMapPass.render(renderer, scene, camera, true);
                 }
                 this._frameBuffers[target].attach(
                     _gl, this.texture, _gl.COLOR_ATTACHMENT0,

@@ -7,7 +7,6 @@ define(function (require) {
     var TextureCube = require('../TextureCube');
     var textureUtil = require('./texture');
     var Pass = require('../compositor/Pass');
-    var Renderer = require('../Renderer');
     var vendor = require('../core/vendor');
 
     var sh = {};
@@ -16,9 +15,6 @@ define(function (require) {
 
     sh.projectEnvironmentMap = function (renderer, envMap) {
 
-        var shRenderer = new Renderer({
-            preserveDrawingBuffer: true
-        });
         if (envMap instanceof Texture2D) {
             // Convert panorama to cubemap
             var envCubemap = new TextureCube({
@@ -26,7 +22,7 @@ define(function (require) {
                 height: 64,
                 type: Texture.FLOAT
             });
-            textureUtil.panoramaToCubeMap(shRenderer, envMap, envCubemap);
+            textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap);
             envMap = envCubemap;
         }
 
@@ -42,12 +38,12 @@ define(function (require) {
         pass.setUniform('environmentMap', envMap);
 
         var framebuffer = new FrameBuffer();
-        framebuffer.attach(shRenderer.gl, shTexture);
-        pass.render(shRenderer, framebuffer);
+        framebuffer.attach(renderer.gl, shTexture);
+        pass.render(renderer, framebuffer);
 
-        framebuffer.bind(shRenderer);
+        framebuffer.bind(renderer);
         var pixels = new vendor.Float32Array(9 * 4);
-        shRenderer.gl.readPixels(0, 0, 9, 1, Texture.RGBA, Texture.FLOAT, pixels);
+        renderer.gl.readPixels(0, 0, 9, 1, Texture.RGBA, Texture.FLOAT, pixels);
 
         var coeff = new vendor.Float32Array(9 * 3);
         for (var i = 0; i < 9; i++) {
@@ -55,6 +51,10 @@ define(function (require) {
             coeff[i * 3 + 1] = pixels[i * 4 + 1];
             coeff[i * 3 + 2] = pixels[i * 4 + 2];
         }
+        framebuffer.unbind(renderer);
+
+        framebuffer.dispose(renderer.gl);
+        pass.dispose(renderer.gl);
 
         return coeff;
     };
