@@ -358,6 +358,7 @@ void main()
 
     outColor.rgb += specularTerm;
 
+
 #ifdef ENVIRONMENTMAP_ENABLED
 
     vec3 envWeight = g * fresnelTerm;

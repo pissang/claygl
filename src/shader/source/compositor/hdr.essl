@@ -79,6 +79,7 @@ void main()
 uniform sampler2D texture;
 uniform sampler2D bloom;
 uniform sampler2D lensflare;
+uniform sampler2D lensdirt;
 
 uniform sampler2D lum;
 
@@ -129,7 +130,7 @@ void main()
 #endif
 
 #ifdef LENSFLARE_ENABLED
-    tex += decodeHDR(texture2D(lensflare, v_Texcoord)).rgb;
+    tex += decodeHDR(texture2D(lensflare, v_Texcoord)).rgb * texture2D(lensdirt, v_Texcoord).rgb;
 #endif
 
 // Adjust exposure
