@@ -1,0 +1,317 @@
+#version 100
+
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+ precision highp float;
+ #else
+ precision mediump float;
+#endif
+
+
+
+uniform sampler2D Texture2;
+uniform float uDofScale;
+uniform float uRGBMRange;
+uniform int uOutputLinear;
+uniform sampler2D Texture0;
+uniform sampler2D Texture1;
+uniform sampler2D Texture3;
+uniform vec2 RenderSize;
+uniform vec3 uDofBlurNearFarFocal;
+
+varying vec2 FragTexCoord0;
+
+
+vec3 textureRGB(const in sampler2D texture, const in vec2 uv) {
+    return texture2D(texture, uv.xy ).rgb;
+}
+
+vec4 textureRGBA(const in sampler2D texture, const in vec2 uv) {
+    return texture2D(texture, uv.xy ).rgba;
+}
+
+float textureIntensity(const in sampler2D texture, const in vec2 uv) {
+    return texture2D(texture, uv).r;
+}
+
+float textureAlpha(const in sampler2D texture, const in vec2 uv) {
+    return texture2D(texture, uv.xy ).a;
+}
+
+// the approximation :
+// http://chilliant.blogspot.fr/2012/08/srgb-approximations-for-hlsl.html
+// introduced slightly darker colors and more slight banding in the darks.
+// The reference implementation (or even a single pow approx) did not introduced these effects.
+
+// so for now we stick with the reference implementation :
+// https://www.khronos.org/registry/gles/extensions/EXT/EXT_sRGB.txt
+// with the slight changes :
+// - we always assume the color is >= 0.0 (so no check)
+// - unlike the previous approximation, linear to srgb is monotonic so we don't need to check if the color is > 1
+
+#define LIN_SRGB(x) x < 0.0031308 ? x * 12.92 : 1.055 * pow(x, 1.0/2.4) - 0.055
+float linearTosRGB(const in float c) {
+    return LIN_SRGB(c);
+}
+vec3 linearTosRGB(const in vec3 c) {
+    return vec3(LIN_SRGB(c.r), LIN_SRGB(c.g), LIN_SRGB(c.b));
+}
+vec4 linearTosRGB(const in vec4 c) {
+    return vec4(LIN_SRGB(c.r), LIN_SRGB(c.g), LIN_SRGB(c.b), c.a);
+}
+
+#define SRGB_LIN(x) x < 0.04045 ? x * (1.0 / 12.92) : pow((x + 0.055) * (1.0 / 1.055), 2.4)
+float sRGBToLinear(const in float c) {
+    return SRGB_LIN(c);
+}
+vec3 sRGBToLinear(const in vec3 c) {
+    return vec3(SRGB_LIN(c.r), SRGB_LIN(c.g), SRGB_LIN(c.b));
+}
+vec4 sRGBToLinear(const in vec4 c) {
+    return vec4(SRGB_LIN(c.r), SRGB_LIN(c.g), SRGB_LIN(c.b), c.a);
+}
+
+//http://graphicrants.blogspot.fr/2009/04/rgbm-color-encoding.html
+vec3 RGBMToRGB( const in vec4 rgba ) {
+    const float maxRange = 8.0;
+    return rgba.rgb * maxRange * rgba.a;
+}
+
+const mat3 LUVInverse = mat3( 6.0013,    -2.700,   -1.7995,
+                              -1.332,    3.1029,   -5.7720,
+                              0.3007,    -1.088,    5.6268 );
+
+vec3 LUVToRGB( const in vec4 vLogLuv ) {
+    float Le = vLogLuv.z * 255.0 + vLogLuv.w;
+    vec3 Xp_Y_XYZp;
+    Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);
+    Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;
+    Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;
+    vec3 vRGB = LUVInverse * Xp_Y_XYZp;
+    return max(vRGB, 0.0);
+}
+
+// http://graphicrants.blogspot.fr/2009/04/rgbm-color-encoding.html
+vec4 encodeRGBM(const in vec3 col, const in float range) {
+    if(range <= 0.0)
+        return vec4(col, 1.0);
+    vec4 rgbm;
+    vec3 color = col / range;
+    rgbm.a = clamp( max( max( color.r, color.g ), max( color.b, 1e-6 ) ), 0.0, 1.0 );
+    rgbm.a = ceil( rgbm.a * 255.0 ) / 255.0;
+    rgbm.rgb = color / rgbm.a;
+    return rgbm;
+}
+
+vec3 decodeRGBM(const in vec4 col, const in float range) {
+    if(range <= 0.0)
+        return col.rgb;
+    return range * col.rgb * col.a;
+}
+
+
+const float MAX_BLUR = 16.0;
+const float EPS_EARLY_OUT = 0.01; // early out (typically when we move the camera fast and the dof might be not effective)
+
+float texDepthToCoC(const in sampler2D texDepth, const in vec2 uv, const in vec3 dofBlurNearFarFocal) {
+    vec4 fetch = texture2D(texDepth, uv).rgba;
+    // background should be always max blurred so that the near blur can expand onto the background (because of special dilate background codepath below)
+    if(fetch.x == 1.0) return max(dofBlurNearFarFocal.x, dofBlurNearFarFocal.y);
+    float coc = dot(fetch, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
+    coc = clamp((coc - dofBlurNearFarFocal.z) / coc, -1.0, 1.0);
+    return (coc < 0.0 ? coc * dofBlurNearFarFocal.x : coc * dofBlurNearFarFocal.y);
+}
+
+// ------- DOWNSAMPLE INIT ---------
+vec4 dofDownsampleInit(const in sampler2D tex, const in sampler2D texDepth, const in vec2 uv, const in vec2 texSize, const in float ntime,
+    const in float dofScale, const in vec3 dofBlurNearFarFocal) {
+
+    if(dofBlurNearFarFocal.x < EPS_EARLY_OUT && dofBlurNearFarFocal.y < EPS_EARLY_OUT) return vec4(0.0);
+
+    return vec4(decodeRGBM(texture2D(tex, uv), 7.0), texDepthToCoC(texDepth, uv, dofBlurNearFarFocal) * 0.5 + 0.5);
+}
+
+float dilateNear(const in sampler2D tex, const in vec2 uv, const in vec2 offset, const in bool isBG) {
+    // TODO DOF both the weights and the formula can be tweaked, also we could add a bit of jitter or something
+
+    float coc = 0.0;
+    vec2 ofs = MAX_BLUR * offset / 5.0;
+
+    float coc0 = texture2D(tex, uv).a * 2.0 - 1.0;
+    float coc1 = texture2D(tex, uv - 5.0 * ofs).a * 2.0 - 1.0;
+    float coc2 = texture2D(tex, uv - 4.0 * ofs).a * 2.0 - 1.0;
+    float coc3 = texture2D(tex, uv - 3.0 * ofs).a * 2.0 - 1.0;
+    float coc4 = texture2D(tex, uv - 2.0 * ofs).a * 2.0 - 1.0;
+    float coc5 = texture2D(tex, uv - 1.0 * ofs).a * 2.0 - 1.0;
+    float coc6 = texture2D(tex, uv + 1.0 * ofs).a * 2.0 - 1.0;
+    float coc7 = texture2D(tex, uv + 2.0 * ofs).a * 2.0 - 1.0;
+    float coc8 = texture2D(tex, uv + 3.0 * ofs).a * 2.0 - 1.0;
+    float coc9 = texture2D(tex, uv + 4.0 * ofs).a * 2.0 - 1.0;
+    float coc10 = texture2D(tex, uv + 5.0 * ofs).a * 2.0 - 1.0;
+
+    if(isBG == true){
+        // avoid "shrink" effect on the out of focus far part on the model edges
+        // gaussian weights (sigma 10), (doesn't have to be gaussian though), but the sum must be 1.0
+        // http://dev.theomader.com/gaussian-kernel-calculator/
+        coc = abs(coc0) * 0.095474 +
+        (abs(coc1) + abs(coc10)) * 0.084264 +
+        (abs(coc2) + abs(coc9)) * 0.088139 +
+        (abs(coc3) + abs(coc8)) * 0.091276 +
+        (abs(coc4) + abs(coc7)) * 0.093585 +
+        (abs(coc5) + abs(coc6)) * 0.094998;
+    } else {
+        // blur only near field (expand)
+        coc = min(coc0, 0.0);
+        coc = min(coc1 * 0.3, coc);
+        coc = min(coc2 * 0.5, coc);
+        coc = min(coc3 * 0.75, coc);
+        coc = min(coc4 * 0.8, coc);
+        coc = min(coc5 * 0.95, coc);
+        coc = min(coc6 * 0.95, coc);
+        coc = min(coc7 * 0.8, coc);
+        coc = min(coc8 * 0.75, coc);
+        coc = min(coc9 * 0.5, coc);
+        coc = min(coc10 * 0.3, coc);
+        if(abs(coc0) > abs(coc))
+            coc = coc0;
+    }
+
+    return coc;
+}
+
+// ------- DILATE NEAR H ---------
+vec4 dofDilateNearH(const in sampler2D tex, const in sampler2D texDepth, const in vec2 uv, const in vec2 texSize, const in float ntime,
+    const in float dofScale, const in vec3 dofBlurNearFarFocal) {
+
+    if(dofBlurNearFarFocal.x < EPS_EARLY_OUT && dofBlurNearFarFocal.y < EPS_EARLY_OUT) return vec4(0.0);
+
+    vec2 offset = vec2( dofScale / texSize.x, 0.0);
+    float coc = dilateNear(tex, uv, offset, texture2D(texDepth, uv).x == 1.0);
+
+    return vec4(texture2D(tex, uv).rgb, coc * 0.5 + 0.5);
+}
+
+// ------- DILATE NEAR V ---------
+vec4 dofDilateNearV(const in sampler2D tex, const in sampler2D texDepth, const in vec2 uv, const in vec2 texSize, const in float ntime,
+    const in float dofScale, const in vec3 dofBlurNearFarFocal) {
+
+    if(dofBlurNearFarFocal.x < EPS_EARLY_OUT && dofBlurNearFarFocal.y < EPS_EARLY_OUT) return vec4(0.0);
+
+    vec2 offset = vec2(0.0, dofScale / texSize.y);
+    float coc = dilateNear(tex, uv, offset, texture2D(texDepth, uv).x == 1.0);
+
+    return vec4(texture2D(tex, uv).rgb, coc * 0.5 + 0.5);
+}
+
+
+float nrand(const in vec2 n) {
+    return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+
+// ------- BLUR CIRCULAR ---------
+vec4 dofBlurCircular(const in sampler2D tex, const in sampler2D texDepth, const in vec2 uv, const in vec2 texSize, const in float ntime,
+    const in float dofScale, const in vec3 dofBlurNearFarFocal) {
+
+    if(dofBlurNearFarFocal.x < EPS_EARLY_OUT && dofBlurNearFarFocal.y < EPS_EARLY_OUT) return vec4(0.0);
+
+    const int NUM_TAPS = 16;
+    vec2 fTaps_Poisson[NUM_TAPS];
+    // https://github.com/bartwronski/PoissonSamplingGenerator
+    fTaps_Poisson[0] = vec2(-0.399691779231, 0.728591545584);
+    fTaps_Poisson[1] = vec2(-0.48622557676, -0.84016533712);
+    fTaps_Poisson[2] = vec2(0.770309468987, -0.24906070432);
+    fTaps_Poisson[3] = vec2(0.556596796154, 0.820359876432);
+    fTaps_Poisson[4] = vec2(-0.933902004071, 0.0600539051593);
+    fTaps_Poisson[5] = vec2(0.330144964342, 0.207477293384);
+    fTaps_Poisson[6] = vec2(0.289013230975, -0.686749271417);
+    fTaps_Poisson[7] = vec2(-0.0832470893559, -0.187351643125);
+    fTaps_Poisson[8] = vec2(-0.296314525615, 0.254474834305);
+    fTaps_Poisson[9] = vec2(-0.850977666059, 0.484642744689);
+    fTaps_Poisson[10] = vec2(0.829287915319, 0.2345063545);
+    fTaps_Poisson[11] = vec2(-0.773042143899, -0.543741521254);
+    fTaps_Poisson[12] = vec2(0.0561133030864, 0.928419742597);
+    fTaps_Poisson[13] = vec2(-0.205799249508, -0.562072714492);
+    fTaps_Poisson[14] = vec2(-0.526991665882, -0.193690188118);
+    fTaps_Poisson[15] = vec2(-0.051789270667, -0.935374050821);
+
+    vec4 centerFetch = texture2D(tex, uv);
+
+    float blurDist = MAX_BLUR * (centerFetch.a * 2.0 - 1.0) * dofScale;
+
+    float rnd = 6.28318 * nrand( uv + 0.07 * fract(ntime) );
+    float cosa = cos(rnd);
+    float sina = sin(rnd);
+    vec4 basis = vec4(cosa, -sina, sina, cosa);
+
+    vec3 sumcol = vec3(0.0);
+    float total = 0.0;
+
+    for (int i = 0; i < NUM_TAPS; i++) {
+        vec2 ofs = fTaps_Poisson[i];
+
+        ofs = vec2(dot(ofs, basis.xy), dot(ofs, basis.zw) );
+
+        vec2 texcoord = uv + blurDist * ofs / texSize.xy;
+        vec4 sample = texture2D(tex, texcoord);
+
+        // TODO DOF premult to avoid bleeding, can be tweaked (currently x^3)
+        // tradeoff between bleeding dof and out of focus object that shrinks too much
+        float cocWeight = abs(sample.a * 2.0 - 1.0);
+        cocWeight *= cocWeight * cocWeight;
+
+        sumcol += sample.rgb * cocWeight;
+        total += cocWeight;
+    }
+
+    sumcol /= total;
+
+    return encodeRGBM(sumcol, 7.0);
+}
+
+// ------- DOF COMBINE ---------
+vec3 dofCombine(const in vec3 color, const in sampler2D texBlur, const in sampler2D texCoc, const in sampler2D texDepth, const in vec2 uv,
+    const in float range, const in vec2 texSize, const in float dofScale, const in vec3 dofBlurNearFarFocal) {
+
+    if(dofBlurNearFarFocal.x < EPS_EARLY_OUT && dofBlurNearFarFocal.y < EPS_EARLY_OUT) return color;
+
+    vec3 blur = decodeRGBM(texture2D(texBlur, uv), range);
+
+    vec2 off = vec2(1.0, -1.0) * dofScale;
+    blur += decodeRGBM(texture2D(texBlur, uv + off.xx / texSize), range);
+    blur += decodeRGBM(texture2D(texBlur, uv + off.yy / texSize), range);
+    blur += decodeRGBM(texture2D(texBlur, uv + off.xy / texSize), range);
+    blur += decodeRGBM(texture2D(texBlur, uv + off.yx / texSize), range);
+    blur /= 5.0;
+
+    // try to merged the half coc haf res near blurred with the full res coc
+    float coc = abs(min(texture2D(texCoc, uv).a * 2.0 - 1.0, texDepthToCoC(texDepth, uv, dofBlurNearFarFocal)));
+
+    // TODO DOF can be tweaked, it merges full and half res buffers
+    return mix(color, blur, clamp(coc * coc * 16.0, 0.0, 1.0));
+}
+
+
+
+void main() {
+// vars
+
+vec3 tmp_0; vec4 tmp_3; vec3 tmp_4; float tmp_5 = 7e+0; vec4 tmp_6; float tmp_7 = 1.0; vec3 tmp_15; float tmp_17 = 7e+0;
+
+// end vars
+
+tmp_3 = textureRGBA( Texture0, FragTexCoord0.xy );
+
+tmp_4 = decodeRGBM( tmp_3, tmp_5 );
+
+tmp_6 = vec4( tmp_4.rgb, tmp_7 );
+tmp_0 = dofCombine( tmp_6.rgb, Texture1, Texture2, Texture3, FragTexCoord0, uRGBMRange, RenderSize, uDofScale, uDofBlurNearFarFocal );
+
+if(uOutputLinear == 1 ) {
+tmp_15= tmp_0;
+} else {
+tmp_15 = linearTosRGB( tmp_0 );
+}
+gl_FragColor = encodeRGBM( tmp_15, tmp_17 );
+
+}
+#define SHADER_NAME DofCombine

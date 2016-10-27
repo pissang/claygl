@@ -33,17 +33,19 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : "expr(width)",
-                        "height" : "expr(height)"
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
             "parameters" : {
                 "threshold" : 4,
-                "scale": 4
+                "scale": 4,
+                "textureSize": "expr([width / 2, height / 2])"
             },
             "defines": {
-                "RGBM": null
+                "RGBM": null,
+                "ANTI_FLICKER": null
             }
         },
         {
@@ -919,20 +921,36 @@
                 }
             },
             "defines": {
-                "RGBM": null
+                "RGBM_DECODE": null
+            }
+        },
+        {
+            "name": "vignette",
+            "shader": "#source(qtek.compositor.vignette)",
+            "type": "filter",
+            "inputs": {
+                "texture": {
+                    "node": "tonemapping",
+                    "pin": "color"
+                }
+            },
+            "outputs": {
+                "color" : {
+                    "parameters" : {
+                        "width" : "expr(width)",
+                        "height" : "expr(height)"
+                    }
+                }
             }
         },
         {
             "name" : "FXAA",
-            "shader" : "#source(qtek.compositor.fxaa)",
+            "shader" : "#source(qtek.compositor.fxaa3)",
             "inputs" : {
-                "texture" : "tonemapping"
+                "texture" : "vignette"
             },
             "parameters": {
                 "viewportSize": "expr( [width, height] )"
-            },
-            "defines": {
-                "RGBM_DECODE": null
             }
         }
     ]

@@ -69,7 +69,11 @@ define(function (require) {
 
         var lensColorTex = new qtek.Texture2D();
         lensColorTex.load('assets/textures/lensflare/lenscolor.png');
-        compositor.getNodeByName('lensflare').setParameter('lensColor', lensColorTex);
+        var lensDirtTex = new qtek.Texture2D();
+        lensDirtTex.load('assets/textures/lensflare/lensdirt2.jpg');
+
+        compositor.getNodeByName('lensflare').setParameter('lensColor', lensDirtTex);
+        tonemappingNode.setParameter('lensdirt', lensDirtTex);
 
         // Inject methods
         compositor.enableBloom = function () {

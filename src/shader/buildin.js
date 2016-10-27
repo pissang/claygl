@@ -32,6 +32,7 @@ define(function (require) {
     Shader['import'](require('./source/compositor/blur.essl'));
     Shader['import'](require('./source/compositor/lum.essl'));
     Shader['import'](require('./source/compositor/lut.essl'));
+    Shader['import'](require('./source/compositor/vignette.essl'));
     Shader['import'](require('./source/compositor/output.essl'));
     Shader['import'](require('./source/compositor/downsample.essl'));
     Shader['import'](require('./source/compositor/upsample.essl'));
@@ -39,6 +40,8 @@ define(function (require) {
     Shader['import'](require('./source/compositor/dof.essl'));
     Shader['import'](require('./source/compositor/lensflare.essl'));
     Shader['import'](require('./source/compositor/blend.essl'));
+
     Shader['import'](require('./source/compositor/fxaa.essl'));
+    Shader['import'](require('./source/compositor/fxaa3.essl'));
 
 });
