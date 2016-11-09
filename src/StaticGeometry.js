@@ -606,28 +606,19 @@ define(function(require) {
 
             var cache = this._cache;
 
-            if (_gl) {
-                dispose(_gl.__GLID__);
-            }
-            else {
-                cache.eachContext(dispose);
-            }
+            cache.use(_gl.__GLID__);
+            var chunks = cache.get('chunks');
+            if (chunks) {
+                for (var c = 0; c < chunks.length; c++) {
+                    var chunk = chunks[c];
 
-            function dispose(contextId) {
-                cache.use(contextId);
-                var chunks = cache.get('chunks');
-                if (chunks) {
-                    for (var c = 0; c < chunks.length; c++) {
-                        var chunk = chunks[c];
-
-                        for (var k = 0; k < chunk.attributeBuffers.length; k++) {
-                            var attribs = chunk.attributeBuffers[k];
-                            _gl.deleteBuffer(attribs.buffer);
-                        }
+                    for (var k = 0; k < chunk.attributeBuffers.length; k++) {
+                        var attribs = chunk.attributeBuffers[k];
+                        _gl.deleteBuffer(attribs.buffer);
                     }
                 }
-                cache.deleteContext(contextId);
             }
+            cache.deleteContext(_gl.__GLID__);
         }
     });
 

@@ -36,7 +36,7 @@ define(function (require) {
      * @param  {qtek.Texture2D} [normalDistribution]
      * @param  {qtek.Texture2D} [brdfLookup]
      */
-    cubemapUtil.prefilterEnvMap = function (
+    cubemapUtil.prefilterEnvironmentMap = function (
         renderer, envMap, textureOpts, normalDistribution, brdfLookup
     ) {
         // Not create other renderer, it is easy having issue of cross reference of resources like framebuffer

@@ -23,7 +23,7 @@ define(function (require) {
 
         environmentMap: 256 * 16,
 
-        envMapPrefiltered: 256 * 32,
+        environmentMapPrefiltered: 256 * 32,
 
         brdfLookup: 256 * 64,
 
@@ -32,14 +32,14 @@ define(function (require) {
         encodeRGBM: 256 * 256
     };
 
-    function makeKey (enabledMaps, jointCount, envMapPrefiltered, linear, encodeRGBM) {
+    function makeKey (enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM) {
         // jointCount from 0 to 255
         var key = jointCount;
         for (var i = 0; i < enabledMaps.length; i++) {
             key += keyOffsets[enabledMaps[i]];
         }
-        if (envMapPrefiltered) {
-            key += keyOffsets.envMapPrefiltered;
+        if (environmentMapPrefiltered) {
+            key += keyOffsets.environmentMapPrefiltered;
         }
         if (linear) {
             key += keyOffsets.linear;
@@ -51,8 +51,8 @@ define(function (require) {
         return key;
     }
 
-    function allocateShader (enabledMaps, jointCount, envMapPrefiltered, linear, encodeRGBM) {
-        var key = makeKey(enabledMaps, jointCount, envMapPrefiltered, linear, encodeRGBM);
+    function allocateShader (enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM) {
+        var key = makeKey(enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM);
         var shader = shaderLibrary[key];
 
         if (!shader) {
@@ -66,7 +66,7 @@ define(function (require) {
                 shader.define('vertex', 'SKINNING');
                 shader.define('vertex', 'JOINT_COUNT', jointCount);
             }
-            if (envMapPrefiltered) {
+            if (environmentMapPrefiltered) {
                 shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
             }
             if (linear) {
@@ -85,14 +85,18 @@ define(function (require) {
 
         return shader;
     }
-    function releaseShader (shader) {
+    function releaseShader (shader, _gl) {
         var key = shader.__key__;
         if (shaderLibrary[key]) {
             shaderUsedCount[key]--;
             if (!shaderUsedCount[key]) {
                 delete shaderLibrary[key];
                 delete shaderUsedCount[key];
-                shader.dispose();
+
+                if (_gl) {
+                    // Since shader may not be used on any material. We need to dispose it
+                    shader.dispose(_gl);
+                }
             }
         }
     }
@@ -179,7 +183,7 @@ define(function (require) {
 
         /**
          * @type {boolean}
-         * @name envMapPrefiltered
+         * @name environmentMapPrefiltered
          */
 
         /**
@@ -214,24 +218,24 @@ define(function (require) {
         this.uvOffset = this.uvOffset || [0, 0];
 
         // TODO Fixed maxMipmapLevel 5
-        this.envMapPrefiltered = this.envMapPrefiltered || false;
+        this.environmentMapPrefiltered = this.environmentMapPrefiltered || false;
 
         this.linear = this.linear || false;
 
         this.encodeRGBM = this.encodeRGBM || false;
     }, {
 
-        _updateShader: function () {
+        _doUpdateShader: function (gl) {
             var enabledTextures = textureProperties.filter(function (name) {
                 return !!this[name];
             }, this);
             if (this._shader) {
-                releaseShader(this._shader);
+                releaseShader(this._shader, gl);
                 this._shader.detached();
             }
 
             var shader = allocateShader(
-                enabledTextures, this.jointCount || 0, this.envMapPrefiltered, this.linear, this.encodeRGBM
+                enabledTextures, this.jointCount || 0, this.environmentMapPrefiltered, this.linear, this.encodeRGBM
             );
             var originalUniforms = this.uniforms;
 
@@ -252,6 +256,13 @@ define(function (require) {
             shader.attached();
 
             this._shaderDirty = false;
+        },
+
+        updateShader: function (gl) {
+            if (this._shaderDirty) {
+                this._doUpdateShader(gl);
+                this._shaderDirty = false;
+            }
         },
 
         attachShader: function () {
@@ -312,9 +323,9 @@ define(function (require) {
 
     Object.defineProperty(StandardMaterial.prototype, 'shader', {
         get: function () {
-            if (this._shaderDirty || !this._shader) {
-                this._updateShader();
-                this._shaderDirty = false;
+            if (!this._shader) {
+                this._shaderDirty = true;
+                this.updateShader();
             }
             return this._shader;
         },

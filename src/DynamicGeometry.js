@@ -3,7 +3,7 @@
  * PENDING: use perfermance hint and remove the array after the data is transfered?
  * static draw & dynamic draw?
  */
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -27,7 +27,7 @@ define(function(require) {
      * @constructor qtek.DynamicGeometry
      * @extends qtek.Geometry
      */
-    var DynamicGeometry = Geometry.derive(function() {
+    var DynamicGeometry = Geometry.derive(function () {
         return /** @lends qtek.DynamicGeometry# */ {
             attributes: {
                  position: new Attribute('position', 'float', 3, 'POSITION', true),
@@ -73,7 +73,7 @@ define(function(require) {
     },
     /** @lends qtek.DynamicGeometry.prototype */
     {
-        updateBoundingBox: function() {
+        updateBoundingBox: function () {
             var bbox = this.boundingBox;
             if (! bbox) {
                 bbox = this.boundingBox = new BoundingBox();
@@ -81,7 +81,7 @@ define(function(require) {
             bbox.updateFromVertices(this.attributes.position.value);
         },
         // Overwrite the dirty method
-        dirty: function(field) {
+        dirty: function (field) {
             if (!field) {
                 this.dirty('indices');
                 for (var name in this.attributes) {
@@ -107,22 +107,22 @@ define(function(require) {
             }
         },
 
-        isUseFace: function() {
+        isUseFace: function () {
             return this.useFace && (this.faces.length > 0);
         },
 
-        isSplitted: function() {
+        isSplitted: function () {
             return this.vertexCount > 0xffff;
         },
 
-        createAttribute: function(name, type, size, semantic) {
+        createAttribute: function (name, type, size, semantic) {
             var attrib = new Attribute(name, type, size, semantic, true);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
         },
 
-        removeAttribute: function(name) {
+        removeAttribute: function (name) {
             var attributeList = this._attributeList;
             var idx = attributeList.indexOf(name);
             if (idx >= 0) {
@@ -138,7 +138,7 @@ define(function(require) {
          * Attribute that has same vertex number with position is treated as an enabled attribute
          * @return {Object}
          */
-        getEnabledAttributes: function() {
+        getEnabledAttributes: function () {
             var enabledAttributes = this._enabledAttributes;
             var attributeList = this._attributeList;
             // Cache
@@ -164,14 +164,15 @@ define(function(require) {
             return result;
         },
 
-        _getDirtyAttributes: function() {
+        _getDirtyAttributes: function () {
 
             var attributes = this.getEnabledAttributes();
             var cache = this._cache;
 
             if (cache.miss('chunks')) {
                 return attributes;
-            } else {
+            }
+            else {
                 var result = {};
                 var noDirtyAttributes = true;
                 for (var name in attributes) {
@@ -186,11 +187,11 @@ define(function(require) {
             }
         },
 
-        getChunkNumber: function() {
+        getChunkNumber: function () {
             return this._arrayChunks.length;
         },
 
-        getBufferChunks: function(_gl) {
+        getBufferChunks: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
 
@@ -217,7 +218,7 @@ define(function(require) {
             return cache.get('chunks');
         },
 
-        _updateAttributesAndIndicesArrays: function(attributes, isFacesDirty, useUintExtension) {
+        _updateAttributesAndIndicesArrays: function (attributes, isFacesDirty, useUintExtension) {
 
             var self = this;
             var nVertex = this.vertexCount;
@@ -247,7 +248,7 @@ define(function(require) {
                 }
             }
 
-            var newChunk = function(chunkIdx) {
+            var newChunk = function (chunkIdx) {
                 if (self._arrayChunks[chunkIdx]) {
                     return self._arrayChunks[chunkIdx];
                 }
@@ -334,7 +335,8 @@ define(function(require) {
                             verticesReorganizedMap[ii] = vertexCount;
                             reorganizedFace[f] = vertexCount;
                             vertexCount++;
-                        } else {
+                        }
+                        else {
                             reorganizedFace[f] = verticesReorganizedMap[ii];
                         }
                     }
@@ -369,7 +371,8 @@ define(function(require) {
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 var chunk = newChunk(0);
                 // Use faces
                 if (isFacesDirty) {
@@ -402,7 +405,8 @@ define(function(require) {
                         for (var i = 0; i < values.length; i++) {
                             attribArray[i] = values[i];
                         }
-                    } else {
+                    }
+                    else {
                         var cursor = 0;
                         for (var i = 0; i < values.length; i++) {
                             for (var j = 0; j < size; j++) {
@@ -414,7 +418,7 @@ define(function(require) {
             }
         },
 
-        _updateBuffer: function(_gl, dirtyAttributes, isFacesDirty) {
+        _updateBuffer: function (_gl, dirtyAttributes, isFacesDirty) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
@@ -475,7 +479,8 @@ define(function(require) {
                     var buffer;
                     if (bufferInfo) {
                         buffer = bufferInfo.buffer;
-                    } else {
+                    }
+                    else {
                         buffer = _gl.createBuffer();
                     }
                     //TODO: Use BufferSubData?
@@ -498,7 +503,7 @@ define(function(require) {
             }
         },
 
-        generateVertexNormals: function() {
+        generateVertexNormals: function () {
             var faces = this.faces;
             var len = faces.length;
             var attributes = this.attributes;
@@ -539,7 +544,7 @@ define(function(require) {
             }
         },
 
-        generateFaceNormals: function() {
+        generateFaceNormals: function () {
             if (! this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
@@ -574,7 +579,8 @@ define(function(require) {
                     vec3.copy(normals[i1], normal);
                     vec3.copy(normals[i2], normal);
                     vec3.copy(normals[i3], normal);
-                } else {
+                }
+                else {
                     normals[i1] = normals[i2] = normals[i3] = arrSlice.call(normal);
                 }
             }
@@ -582,7 +588,7 @@ define(function(require) {
         // 'Mathmatics for 3D programming and computer graphics, third edition'
         // section 7.8.2
         // http://www.crytek.com/download/Triangle_mesh_tangent_space_calculation.pdf
-        generateTangents: function() {
+        generateTangents: function () {
 
             var attributes = this.attributes;
             var texcoords = attributes.texcoord0.value;
@@ -659,15 +665,16 @@ define(function(require) {
             }
         },
 
-        isUniqueVertex: function() {
+        isUniqueVertex: function () {
             if (this.isUseFace()) {
                 return this.vertexCount === this.faces.length * 3;
-            } else {
+            }
+            else {
                 return true;
             }
         },
 
-        generateUniqueVertex: function() {
+        generateUniqueVertex: function () {
 
             var vertexUseCount = [];
             // Intialize with empty value, read undefined value from array
@@ -711,11 +718,11 @@ define(function(require) {
 
         // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
         // http://en.wikipedia.org/wiki/Barycentric_coordinate_system_(mathematics)
-        generateBarycentric: (function() {
+        generateBarycentric: (function () {
             var a = [1, 0, 0];
             var b = [0, 0, 1];
             var c = [0, 1, 0];
-            return function() {
+            return function () {
 
                 if (! this.isUniqueVertex()) {
                     this.generateUniqueVertex();
@@ -739,7 +746,7 @@ define(function(require) {
             };
         })(),
 
-        convertToStatic: function(geometry, useUintExtension) {
+        convertToStatic: function (geometry, useUintExtension) {
             this._updateAttributesAndIndicesArrays(this.getEnabledAttributes(), true, useUintExtension);
 
             if (this._arrayChunks.length > 1) {
@@ -777,7 +784,7 @@ define(function(require) {
             return geometry;
         },
 
-        applyTransform: function(matrix) {
+        applyTransform: function (matrix) {
             var attributes = this.attributes;
             var positions = attributes.position.value;
             var normals = attributes.normal.value;
@@ -807,31 +814,20 @@ define(function(require) {
             }
         },
 
-        dispose: function(_gl) {
-
+        dispose: function (_gl) {
             var cache = this._cache;
-
-            if (_gl) {
-                dispose(_gl.__GLID__);
-            }
-            else {
-                cache.eachContext(dispose);
-            }
-
-            function dispose(contextId) {
-                cache.use(contextId);
-                var chunks = cache.get('chunks');
-                if (chunks) {
-                    for (var c = 0; c < chunks.length; c++) {
-                        var chunk = chunks[c];
-                        for (var k = 0; k < chunk.attributeBuffers.length; k++) {
-                            var attribs = chunk.attributeBuffers[k];
-                            _gl.deleteBuffer(attribs.buffer);
-                        }
+            cache.use(_gl.__GLID__);
+            var chunks = cache.get('chunks');
+            if (chunks) {
+                for (var c = 0; c < chunks.length; c++) {
+                    var chunk = chunks[c];
+                    for (var k = 0; k < chunk.attributeBuffers.length; k++) {
+                        var attribs = chunk.attributeBuffers[k];
+                        _gl.deleteBuffer(attribs.buffer);
                     }
                 }
-                cache.deleteContext(contextId);
             }
+            cache.deleteContext(_gl.__GLID__);
         }
     });
 

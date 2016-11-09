@@ -1012,26 +1012,17 @@ define(function (require) {
         },
         /**
          * Dispose given context
-         * @param  {WebGLRenderingContext} [_gl]
+         * @param  {WebGLRenderingContext} _gl
          */
         dispose: function (_gl) {
             var cache = this._cache;
 
-            if (_gl) {
-                dispose(_gl.__GLID__);
+            cache.use(_gl.__GLID__);
+            var program = cache.get('program');
+            if (program) {
+                _gl.deleteProgram(program);
             }
-            else {
-                cache.eachContext(dispose);
-            }
-
-            function dispose(contextId) {
-                cache.use(contextId);
-                var program = cache.get('program');
-                if (program) {
-                    _gl.deleteProgram(program);
-                }
-                cache.deleteContext(contextId);
-            }
+            cache.deleteContext(_gl.__GLID__);
 
             this._locations = {};
         }

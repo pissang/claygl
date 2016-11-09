@@ -190,28 +190,19 @@ define(function (require) {
             return x + 1;
         },
         /**
-         * @param  {WebGLRenderingContext} [_gl]
+         * @param  {WebGLRenderingContext} _gl
          */
         dispose: function (_gl) {
 
             var cache = this._cache;
 
-            if (_gl) {
-                dispose(_gl.__GLID__);
-            }
-            else {
-                cache.eachContext(dispose);
-            }
+            cache.use(_gl.__GLID__);
 
-            function dispose(contextId) {
-                cache.use(contextId);
-
-                var webglTexture = cache.get('webgl_texture');
-                if (webglTexture){
-                    _gl.deleteTexture(webglTexture);
-                }
-                cache.deleteContext(contextId);
+            var webglTexture = cache.get('webgl_texture');
+            if (webglTexture){
+                _gl.deleteTexture(webglTexture);
             }
+            cache.deleteContext(_gl.__GLID__);
 
         },
         /**

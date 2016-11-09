@@ -196,32 +196,23 @@ define(function(require) {
         detach: function() {},
         /**
          * Dispose
-         * @param  {WebGLRenderingContext} [_gl]
+         * @param  {WebGLRenderingContext} _gl
          */
         dispose: function (_gl) {
 
             var cache = this._cache;
 
-            if (_gl) {
-                dispose(_gl.__GLID__);
-            }
-            else {
-                cache.eachContext(dispose);
-            }
+            cache.use(_gl.__GLID__);
 
-            function dispose(contextId) {
-                cache.use(contextId);
-
-                var renderBuffer = cache.get(KEY_RENDERBUFFER);
-                if (renderBuffer) {
-                    _gl.deleteRenderbuffer(renderBuffer);
-                }
-                var frameBuffer = cache.get(KEY_FRAMEBUFFER);
-                if (frameBuffer) {
-                    _gl.deleteFramebuffer(frameBuffer);
-                }
-                cache.deleteContext(contextId);
+            var renderBuffer = cache.get(KEY_RENDERBUFFER);
+            if (renderBuffer) {
+                _gl.deleteRenderbuffer(renderBuffer);
             }
+            var frameBuffer = cache.get(KEY_FRAMEBUFFER);
+            if (frameBuffer) {
+                _gl.deleteFramebuffer(frameBuffer);
+            }
+            cache.deleteContext(_gl.__GLID__);
 
             // Clear cache for reusing
             this._attachedTextures = {};

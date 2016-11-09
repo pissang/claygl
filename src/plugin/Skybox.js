@@ -60,7 +60,7 @@ define(function(require) {
             this.attachScene(scene);
         }
         if (this.environmentMap) {
-            this.setEnvMap(this.environmentMap);
+            this.setEnvironmentMap(this.environmentMap);
         }
     }, {
         /**
@@ -96,7 +96,7 @@ define(function(require) {
             this.material.dispose(gl);
         },
 
-        setEnvMap: function (envMap) {
+        setEnvironmentMap: function (envMap) {
             this.material.set('environmentMap', envMap);
         },
 

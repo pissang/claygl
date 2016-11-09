@@ -1,5 +1,5 @@
-define(function(require) {
-    
+define(function (require) {
+
     'use strict';
 
     var Texture2D = require('../Texture2D');
@@ -7,7 +7,7 @@ define(function(require) {
     var util = require('../core/util');
 
     var TexturePool = function () {
-        
+
         this._pool = {};
 
         this._allocatedTextures = [];
@@ -17,7 +17,7 @@ define(function(require) {
 
         constructor: TexturePool,
 
-        get: function(parameters) {
+        get: function (parameters) {
             var key = generateKey(parameters);
             if (!this._pool.hasOwnProperty(key)) {
                 this._pool[key] = [];
@@ -31,7 +31,7 @@ define(function(require) {
             return list.pop();
         },
 
-        put: function(texture) {
+        put: function (texture) {
             var key = generateKey(texture);
             if (!this._pool.hasOwnProperty(key)) {
                 this._pool[key] = [];
@@ -40,7 +40,7 @@ define(function(require) {
             list.push(texture);
         },
 
-        clear: function(gl) {
+        clear: function (gl) {
             for (var i = 0; i < this._allocatedTextures.length; i++) {
                 this._allocatedTextures[i].dispose(gl);
             }

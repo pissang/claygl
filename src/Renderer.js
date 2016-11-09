@@ -499,6 +499,11 @@ define(function(require) {
             for (var i =0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
                 var material = globalMaterial || renderable.material;
+                // StandardMaterial needs updateShader method so shader can be created on demand.
+                if (material !== prevMaterial) {
+                    material.updateShader && material.updateShader(_gl);
+                }
+
                 var shader = material.shader;
                 var geometry = renderable.geometry;
 

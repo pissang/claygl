@@ -2,7 +2,7 @@
  * @namespace qtek.core.glinfo
  * @see http://www.khronos.org/registry/webgl/extensions/
  */
-define(function() {
+define(function () {
 
     'use strict';
 
@@ -35,7 +35,7 @@ define(function() {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.core.glinfo
          */
-        initialize: function(_gl) {
+        initialize: function (_gl) {
             var glid = _gl.__GLID__;
             if (extensions[glid]) {
                 return;
@@ -62,7 +62,7 @@ define(function() {
          * @return {WebGLExtension}
          * @memberOf qtek.core.glinfo
          */
-        getExtension: function(_gl, name) {
+        getExtension: function (_gl, name) {
             var glid = _gl.__GLID__;
             if (extensions[glid]) {
                 if (typeof(extensions[glid][name]) == 'undefined') {
@@ -78,7 +78,7 @@ define(function() {
          * @param {string} name Parameter name
          * @return {*}
          */
-        getParameter: function(_gl, name) {
+        getParameter: function (_gl, name) {
             var glid = _gl.__GLID__;
             if (parameters[glid]) {
                 return parameters[glid][name];
@@ -90,12 +90,12 @@ define(function() {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.core.glinfo
          */
-        dispose: function(_gl) {
+        dispose: function (_gl) {
             delete extensions[_gl.__GLID__];
             delete parameters[_gl.__GLID__];
         },
 
-        _createExtension: function(_gl, name) {
+        _createExtension: function (_gl, name) {
             var ext = _gl.getExtension(name);
             if (!ext) {
                 ext = _gl.getExtension('MOZ_' + name);

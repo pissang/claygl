@@ -59,7 +59,7 @@ define(function (require) {
         }
 
         if (this.environmentMap) {
-            this.setEnvMap(this.environmentMap);
+            this.setEnvironmentMap(this.environmentMap);
         }
     }, {
         /**
@@ -91,7 +91,7 @@ define(function (require) {
             renderer.renderQueue([this], camera);
         },
 
-        setEnvMap: function (envMap) {
+        setEnvironmentMap: function (envMap) {
             this.material.set('diffuseMap', envMap);
         },
 
