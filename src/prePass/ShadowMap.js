@@ -766,11 +766,12 @@ define(function(require) {
         },
 
         /**
-         * @param  {qtek.Renderer} renderer
+         * @param  {qtek.Renderer} [renderer]
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        dispose: function(renderer) {
-            var _gl = renderer.gl;
+        // PENDING Renderer or WebGLRenderingContext
+        dispose: function (renderer) {
+            var _gl = renderer && renderer.gl;
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
                 mat.dispose(_gl);

@@ -110,7 +110,8 @@ define(function(require) {
                     && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
                 ) {
                     _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
-                } else {
+                }
+                else {
                     // Is a render target if pixels is null
                     _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, glFormat, glType, data.pixels);
                 }

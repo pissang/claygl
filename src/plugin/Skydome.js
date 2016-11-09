@@ -45,13 +45,21 @@ define(function (require) {
                 heightSegments: 30,
                 // thetaLength: Math.PI / 2
             }),
+
             material: material,
+
+            environmentMap: null,
+
             culling: false
         };
     }, function () {
         var scene = this.scene;
         if (scene) {
             this.attachScene(scene);
+        }
+
+        if (this.environmentMap) {
+            this.setEnvMap(this.environmentMap);
         }
     }, {
         /**
@@ -81,6 +89,10 @@ define(function (require) {
             this.position.copy(camera.getWorldPosition());
             this.update();
             renderer.renderQueue([this], camera);
+        },
+
+        setEnvMap: function (envMap) {
+            this.material.set('diffuseMap', envMap);
         },
 
         dispose: function (gl) {

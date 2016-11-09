@@ -35,7 +35,7 @@
                         function () {
                             envMap.flipY = false;
 
-                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                            var prefilterResult = qtek.util.cubemap.prefilterEnvMap(
                                 renderer, envMap, {
                                     width: 128,
                                     height: 128
@@ -43,37 +43,26 @@
                             );
 
                             var skybox = new qtek.plugin.Skybox({
-                                scene: scene
+                                scene: scene,
+                                environmentMap: prefilterResult.environmentMap
                             });
-                            skybox.material.set('environmentMap', prefilterResult.environmentMap);
                             skybox.material.shader.define('fragment', 'RGBM_ENCODE');
 
-                            var shader = qtek.shader.library.get(
-                                'qtek.standard', [
-                                    'environmentMap', 'brdfLookup',
-                                    'diffuseMap', 'normalMap', 'metalnessMap', 'roughnessMap'
-                                ]
-                            );
-                            shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-                            shader.define('fragment', 'RGBM_ENCODE');
-                            shader.define('fragment', 'USE_METALNESS');
-                            shader.define('fragment', 'SRGB_DECODE');
-
-                            var material = new qtek.Material({
-                                shader: shader
+                            var material = new qtek.StandardMaterial({
+                                brdfLookup: prefilterResult.brdfLookup,
+                                environmentMap: prefilterResult.environmentMap,
+                                envMapPrefiltered: true,
+                                encodeRGBM: true,
+                                linear: true,
+                                metalness: 0,
+                                uvRepeat: [3, 3],
+                                roughness: 0.2
                             });
                             var mesh = new qtek.Mesh({
                                 geometry: suzanneGeometry,
                                 material: material
                             });
                             mesh.geometry.generateTangents();
-
-                            material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
-                            material.set('brdfLookup', prefilterResult.brdfLookup);
-                            material.set('environmentMap', prefilterResult.environmentMap);
-                            material.set('glossiness', 1);
-                            material.set('metalness', 0);
-                            material.set('uvRepeat', [2, 2]);
 
                             [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
                                 var tex = new qtek.Texture2D({
@@ -86,7 +75,7 @@
                                         tex.wrapS = qtek.Texture.REPEAT;
                                         tex.wrapT = qtek.Texture.REPEAT;
                                     });
-                                material.set(mapInfo[0], tex);
+                                material[mapInfo[0]] = tex;
                             });
 
                             mesh.scale.set(1.4, 1.4, 1.4);

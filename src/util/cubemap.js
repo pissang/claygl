@@ -36,7 +36,7 @@ define(function (require) {
      * @param  {qtek.Texture2D} [normalDistribution]
      * @param  {qtek.Texture2D} [brdfLookup]
      */
-    cubemapUtil.prefilterEnvironmentMap = function (
+    cubemapUtil.prefilterEnvMap = function (
         renderer, envMap, textureOpts, normalDistribution, brdfLookup
     ) {
         // Not create other renderer, it is easy having issue of cross reference of resources like framebuffer
@@ -174,7 +174,7 @@ define(function (require) {
 
     cubemapUtil.integrateBrdf = function (renderer, normalDistribution) {
         normalDistribution = normalDistribution || cubemapUtil.generateNormalDistribution();
-        var frameBuffer = new FrameBuffer();
+        var framebuffer = new FrameBuffer();
         var pass = new Pass({
             fragment : integrateBRDFShaderCode
         });
@@ -190,9 +190,20 @@ define(function (require) {
         pass.setUniform('normalDistribution', normalDistribution);
         pass.setUniform('viewportSize', [512, 256]);
         pass.attachOutput(texture);
-        pass.render(renderer, frameBuffer);
+        pass.render(renderer, framebuffer);
 
-        frameBuffer.dispose(renderer.gl);
+        framebuffer.bind(renderer);
+        var pixels = new Float32Array(512 * 256 * 4);
+        renderer.gl.readPixels(
+            0, 0, texture.width, texture.height,
+            Texture.RGBA, Texture.FLOAT, pixels
+        );
+        texture.pixels = pixels;
+        texture.flipY = false;
+        texture.dirty();
+        framebuffer.unbind(renderer);
+
+        framebuffer.dispose(renderer.gl);
 
         return texture;
     };

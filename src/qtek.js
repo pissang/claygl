@@ -68,8 +68,8 @@ define(function(require) {
 		"vendor": require('./core/vendor')
 	},
 	"deferred": {
-		"Renderer": require('./deferred/Renderer'),
-		"StandardMaterial": require('./deferred/StandardMaterial')
+		"GBuffer": require('./deferred/GBuffer'),
+		"Renderer": require('./deferred/Renderer')
 	},
 	"dep": {
 		"glmatrix": require('./dep/glmatrix')
@@ -156,6 +156,7 @@ define(function(require) {
 		}
 	},
 	"Skeleton": require('./Skeleton'),
+	"StandardMaterial": require('./StandardMaterial'),
 	"StaticGeometry": require('./StaticGeometry'),
 	"Texture": require('./Texture'),
 	"Texture2D": require('./Texture2D'),
@@ -167,6 +168,7 @@ define(function(require) {
 		"earClipping": require('./util/earClipping'),
 		"hdr": require('./util/hdr'),
 		"mesh": require('./util/mesh'),
+		"sh": require('./util/sh'),
 		"texture": require('./util/texture')
 	}
 };

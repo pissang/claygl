@@ -47,13 +47,20 @@ define(function(require) {
             scene: null,
 
             geometry: new CubeGeometry(),
+
             material: material,
+
+            environmentMap: null,
+
             culling: false
         };
     }, function () {
         var scene = this.scene;
         if (scene) {
             this.attachScene(scene);
+        }
+        if (this.environmentMap) {
+            this.setEnvMap(this.environmentMap);
         }
     }, {
         /**
@@ -87,6 +94,10 @@ define(function(require) {
             this.detachScene();
             this.geometry.dispose(gl);
             this.material.dispose(gl);
+        },
+
+        setEnvMap: function (envMap) {
+            this.material.set('environmentMap', envMap);
         },
 
         _beforeRenderScene: function(renderer, scene, camera) {

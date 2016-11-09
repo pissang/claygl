@@ -196,26 +196,37 @@ define(function(require) {
         detach: function() {},
         /**
          * Dispose
-         * @param  {WebGLRenderingContext} _gl
+         * @param  {WebGLRenderingContext} [_gl]
          */
-        dispose: function(_gl) {
-            var cache = this._cache;
-            cache.use(_gl.__GLID__);
+        dispose: function (_gl) {
 
-            var renderBuffer = cache.get(KEY_RENDERBUFFER);
-            if (renderBuffer) {
-                _gl.deleteRenderbuffer(renderBuffer);
+            var cache = this._cache;
+
+            if (_gl) {
+                dispose(_gl.__GLID__);
             }
-            var frameBuffer = cache.get(KEY_FRAMEBUFFER);
-            if (frameBuffer) {
-                _gl.deleteFramebuffer(frameBuffer);
+            else {
+                cache.eachContext(dispose);
+            }
+
+            function dispose(contextId) {
+                cache.use(contextId);
+
+                var renderBuffer = cache.get(KEY_RENDERBUFFER);
+                if (renderBuffer) {
+                    _gl.deleteRenderbuffer(renderBuffer);
+                }
+                var frameBuffer = cache.get(KEY_FRAMEBUFFER);
+                if (frameBuffer) {
+                    _gl.deleteFramebuffer(frameBuffer);
+                }
+                cache.deleteContext(contextId);
             }
 
             // Clear cache for reusing
             this._attachedTextures = {};
             this._width = this._height = 0;
 
-            cache.deleteContext(_gl.__GLID__);
         }
     });
 

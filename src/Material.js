@@ -6,7 +6,7 @@ define(function(require) {
     var Texture = require('./Texture');
 
     /**
-     * #constructor qtek.Material
+     * @constructor qtek.Material
      * @extends qtek.core.Base
      */
     var Material = Base.derive(
@@ -20,12 +20,12 @@ define(function(require) {
         /**
          * @type {Object}
          */
-        uniforms: null,
+        // uniforms: null,
 
         /**
          * @type {qtek.Shader}
          */
-        shader: null,
+        // shader: null,
 
         /**
          * @type {boolean}
@@ -60,7 +60,7 @@ define(function(require) {
         // shadowTransparentMap : null
 
         _enabledUniforms: null,
-    }, function() {
+    }, function () {
         if (!this.name) {
             this.name = 'MATERIAL_' + this.__GUID__;
         }
@@ -261,6 +261,8 @@ define(function(require) {
             }
 
             var originalUniforms = this.uniforms;
+
+            // Ignore if uniform can use in shader.
             this.uniforms = shader.createUniforms();
             this.shader = shader;
 
@@ -317,7 +319,7 @@ define(function(require) {
             if (disposeTexture) {
                 for (var name in this.uniforms) {
                     var val = this.uniforms[name].value;
-                    if (!val ) {
+                    if (!val) {
                         continue;
                     }
                     if (val instanceof Texture) {

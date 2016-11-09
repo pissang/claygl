@@ -1,10 +1,10 @@
-define(function() {
+define(function () {
 
     'use strict';
 
     var DIRTY_PREFIX = '__dirty__';
 
-    var Cache = function() {
+    var Cache = function () {
 
         this._contextId = 0;
 
@@ -15,9 +15,9 @@ define(function() {
 
     Cache.prototype = {
 
-        use: function(contextId, documentSchema) {
+        use: function (contextId, documentSchema) {
             var caches = this._caches;
-            if (! caches[contextId]) {
+            if (!caches[contextId]) {
                 caches[contextId] = {};
 
                 if (documentSchema) {
@@ -29,21 +29,21 @@ define(function() {
             this._context = caches[contextId];
         },
 
-        put: function(key, value) {
+        put: function (key, value) {
             this._context[key] = value;
         },
 
-        get: function(key) {
+        get: function (key) {
             return this._context[key];
         },
 
-        dirty: function(field) {
+        dirty: function (field) {
             field = field || '';
             var key = DIRTY_PREFIX + field;
             this.put(key, true);
         },
-        
-        dirtyAll: function(field) {
+
+        dirtyAll: function (field) {
             field = field || '';
             var key = DIRTY_PREFIX + field;
             var caches = this._caches;
@@ -54,13 +54,13 @@ define(function() {
             }
         },
 
-        fresh: function(field) {
+        fresh: function (field) {
             field = field || '';
             var key = DIRTY_PREFIX + field;
             this.put(key, false);
         },
 
-        freshAll: function(field) {
+        freshAll: function (field) {
             field = field || '';
             var key = DIRTY_PREFIX + field;
             var caches = this._caches;
@@ -71,7 +71,7 @@ define(function() {
             }
         },
 
-        isDirty: function(field) {
+        isDirty: function (field) {
             field = field || '';
             var key = DIRTY_PREFIX + field;
             var context = this._context;
@@ -79,24 +79,31 @@ define(function() {
                 || context[key] === true;
         },
 
-        deleteContext: function(contextId) {
+        deleteContext: function (contextId) {
             delete this._caches[contextId];
             this._context = {};
         },
 
-        'delete': function(key) {
+        delete: function (key) {
             delete this._context[key];
         },
 
-        clearAll: function() {
+        clearAll: function () {
             this._caches = {};
         },
 
-        getContext: function() {
+        getContext: function () {
             return this._context;
         },
 
-        miss: function(key) {
+        eachContext : function (cb, context) {
+            var keys = Object.keys(this._caches);
+            keys.forEach(function (key) {
+                cb && cb.call(context, key);
+            });
+        },
+
+        miss: function (key) {
             return ! this._context.hasOwnProperty(key);
         }
     };

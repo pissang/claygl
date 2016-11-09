@@ -355,7 +355,7 @@ define(function(require) {
         applyTransform: notImplementedWarn,
         /**
          * @method
-         * @param {WebGLRenderingContext} gl
+         * @param {WebGLRenderingContext} [gl]
          */
         dispose: notImplementedWarn
     });

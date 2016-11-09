@@ -927,7 +927,6 @@
         {
             "name": "vignette",
             "shader": "#source(qtek.compositor.vignette)",
-            "type": "filter",
             "inputs": {
                 "texture": {
                     "node": "tonemapping",

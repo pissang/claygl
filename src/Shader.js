@@ -7,7 +7,7 @@
  *
  * TODO: Use etpl or other string template engine
  */
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -211,7 +211,7 @@ define(function(require) {
          * Set vertex shader code
          * @param {string} str
          */
-        setVertex: function(str) {
+        setVertex: function (str) {
             this.vertex = str;
             this._updateShaderString();
             this.dirty();
@@ -221,7 +221,7 @@ define(function(require) {
          * Set fragment shader code
          * @param {string} str
          */
-        setFragment: function(str) {
+        setFragment: function (str) {
             this.fragment = str;
             this._updateShaderString();
             this.dirty();
@@ -232,7 +232,7 @@ define(function(require) {
          * Return true or error msg if error happened
          * @param {WebGLRenderingContext} _gl
          */
-        bind: function(_gl) {
+        bind: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__, getCacheSchema);
 
@@ -303,7 +303,7 @@ define(function(require) {
          * @param  {string} symbol
          * @param  {number} [val]
          */
-        define: function(shaderType, symbol, val) {
+        define: function (shaderType, symbol, val) {
             var vertexDefines = this.vertexDefines;
             var fragmentDefines = this.fragmentDefines;
             val = val != null ? val : null;
@@ -336,7 +336,7 @@ define(function(require) {
          * @param  {string} shaderType Can be vertex, fragment or both
          * @param  {string} symbol
          */
-        unDefine: function(shaderType, symbol) {
+        unDefine: function (shaderType, symbol) {
             if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
                 && arguments.legnth < 2
             ) {
@@ -365,7 +365,7 @@ define(function(require) {
          * @param  {string} shaderType Can be vertex, fragment or both
          * @param  {string} symbol
          */
-        isDefined: function(shaderType, symbol) {
+        isDefined: function (shaderType, symbol) {
             switch(shaderType) {
                 case 'vertex':
                     return this.vertexDefines[symbol] !== undefined;
@@ -377,7 +377,7 @@ define(function(require) {
          * @param  {string} shaderType Can be vertex, fragment or both
          * @param  {string} symbol
          */
-        getDefine: function(shaderType, symbol) {
+        getDefine: function (shaderType, symbol) {
             switch(shaderType) {
                 case 'vertex':
                     return this.vertexDefines[symbol];
@@ -476,7 +476,7 @@ define(function(require) {
             return location !== null && location !== undefined;
         },
 
-        setUniform: function(_gl, type, symbol, value) {
+        setUniform: function (_gl, type, symbol, value) {
             var locationMap = this._currentLocationsMap;
             var location = locationMap[symbol];
             // Uniform is not existed in the shader
@@ -565,7 +565,7 @@ define(function(require) {
             return true;
         },
 
-        setUniformBySemantic: function(_gl, semantic, val) {
+        setUniformBySemantic: function (_gl, semantic, val) {
             var semanticInfo = this.attribSemantics[semantic];
             if (semanticInfo) {
                 return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
@@ -576,7 +576,7 @@ define(function(require) {
         // Enable the attributes passed in and disable the rest
         // Example Usage:
         // enableAttributes(_gl, ["position", "texcoords"])
-        enableAttributes: function(_gl, attribList, vao) {
+        enableAttributes: function (_gl, attribList, vao) {
 
             var program = this._cache.get('program');
 
@@ -810,7 +810,7 @@ define(function(require) {
             this.uniformTemplates = uniforms;
         },
 
-        _parseDefaultValue: function(type, str) {
+        _parseDefaultValue: function (type, str) {
             var arrayRegex = /\[\s*(.*)\s*\]/;
             if (type === 'vec2' || type === 'vec3' || type === 'vec4') {
                 var arrayStr = arrayRegex.exec(str)[1];
@@ -939,7 +939,7 @@ define(function(require) {
         },
 
         // Return true or error msg if error happened
-        _buildProgram: function(_gl, vertexShaderString, fragmentShaderString) {
+        _buildProgram: function (_gl, vertexShaderString, fragmentShaderString) {
             var cache = this._cache;
             if (cache.get('program')) {
                 _gl.deleteProgram(cache.get('program'));
@@ -1011,15 +1011,28 @@ define(function(require) {
             return shader;
         },
         /**
-         * @param  {WebGLRenderingContext} _gl
+         * Dispose given context
+         * @param  {WebGLRenderingContext} [_gl]
          */
-        dispose: function(_gl) {
-            this._cache.use(_gl.__GLID__);
-            var program = this._cache.get('program');
-            if (program) {
-                _gl.deleteProgram(program);
+        dispose: function (_gl) {
+            var cache = this._cache;
+
+            if (_gl) {
+                dispose(_gl.__GLID__);
             }
-            this._cache.deleteContext(_gl.__GLID__);
+            else {
+                cache.eachContext(dispose);
+            }
+
+            function dispose(contextId) {
+                cache.use(contextId);
+                var program = cache.get('program');
+                if (program) {
+                    _gl.deleteProgram(program);
+                }
+                cache.deleteContext(contextId);
+            }
+
             this._locations = {};
         }
     });
@@ -1050,8 +1063,8 @@ define(function(require) {
     }
 
     var importRegex = /(@import)\s*([0-9a-zA-Z_\-\.]*)/g;
-    Shader.parseImport = function(shaderStr) {
-        shaderStr = shaderStr.replace(importRegex, function(str, importSymbol, importName) {
+    Shader.parseImport = function (shaderStr) {
+        shaderStr = shaderStr.replace(importRegex, function (str, importSymbol, importName) {
             var str = Shader.source(importName);
             if (str) {
                 // Recursively parse
@@ -1071,8 +1084,8 @@ define(function(require) {
      * @param  {string} shaderStr
      * @memberOf qtek.Shader
      */
-    Shader['import'] = function(shaderStr) {
-        shaderStr.replace(exportRegex, function(str, exportSymbol, exportName, code) {
+    Shader['import'] = function (shaderStr) {
+        shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
             var code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
             if (code) {
                 var parts = exportName.split('.');
@@ -1107,7 +1120,7 @@ define(function(require) {
      * @return {string}
      * @memberOf qtek.Shader
      */
-    Shader.source = function(name) {
+    Shader.source = function (name) {
         var parts = name.split('.');
         var obj = Shader.codes;
         var i = 0;

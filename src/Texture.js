@@ -64,7 +64,7 @@ define(function (require) {
          * @type {number}
          */
         anisotropic: 1,
-        // pixelStorei parameters
+        // pixelStorei parameters, not available when texture is used as render target
         // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
         /**
          * @type {boolean}
@@ -190,17 +190,29 @@ define(function (require) {
             return x + 1;
         },
         /**
-         * @param  {WebGLRenderingContext} _gl
+         * @param  {WebGLRenderingContext} [_gl]
          */
         dispose: function (_gl) {
-            var cache = this._cache;
-            cache.use(_gl.__GLID__);
 
-            var webglTexture = cache.get('webgl_texture');
-            if (webglTexture){
-                _gl.deleteTexture(webglTexture);
+            var cache = this._cache;
+
+            if (_gl) {
+                dispose(_gl.__GLID__);
             }
-            cache.deleteContext(_gl.__GLID__);
+            else {
+                cache.eachContext(dispose);
+            }
+
+            function dispose(contextId) {
+                cache.use(contextId);
+
+                var webglTexture = cache.get('webgl_texture');
+                if (webglTexture){
+                    _gl.deleteTexture(webglTexture);
+                }
+                cache.deleteContext(contextId);
+            }
+
         },
         /**
          * Test if image of texture is valid and loaded.

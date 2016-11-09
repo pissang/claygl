@@ -120,6 +120,8 @@ uniform float maxMipmapLevel: 5;
 
 @import qtek.util.rgbm
 
+@import qtek.util.srgb
+
 @import qtek.plugin.compute_shadow_map
 
 
@@ -159,7 +161,7 @@ void main()
 #ifdef DIFFUSEMAP_ENABLED
     vec4 tex = texture2D(diffuseMap, v_Texcoord);
     #ifdef SRGB_DECODE
-    tex.rgb = pow(tex.rgb, vec3(2.2));
+    tex = sRGBToLinear(tex);
     #endif
     outColor.rgb *= tex.rgb;
     #ifdef DIFFUSEMAP_ALPHA_ALPHA

@@ -36,13 +36,14 @@ define(function(require) {
             _super.apply(this, arguments);
 
             if (makeDefaultOpt instanceof Function) {
-                // Invoke makeDefaultOpt each time if it is a function, So we can make sure each 
+                // Invoke makeDefaultOpt each time if it is a function, So we can make sure each
                 // property in the object will not be shared by mutiple instances
-                extend(this, makeDefaultOpt.call(this));
-            } else {
+                extend(this, makeDefaultOpt.call(this, options));
+            }
+            else {
                 extendWithPropList(this, makeDefaultOpt, propList);
             }
-            
+
             if (this.constructor === sub) {
                 // Initialize function will be called in the order of inherit
                 var initializers = sub.__initializers__;
@@ -68,7 +69,7 @@ define(function(require) {
         sub.prototype = new Ctor();
         sub.prototype.constructor = sub;
         extend(sub.prototype, proto);
-        
+
         // extend the derive method as a static method;
         sub.derive = _super.derive;
 
@@ -90,7 +91,7 @@ define(function(require) {
         for (var i = 0; i < propList.length; i++) {
             var propName = propList[i];
             target[propName] = source[propName];
-        }   
+        }
     }
 
     /**
