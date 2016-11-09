@@ -15,7 +15,7 @@ define(function(require) {
          * Vertical field of view in radians
          * @type {number}
          */
-        fov: 50,
+        fov: 70,
         /**
          * Aspect ratio, typically viewport width / height
          * @type {number}
