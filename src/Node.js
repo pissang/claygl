@@ -81,7 +81,7 @@ define(function(require) {
         // Depth for transparent queue sorting
         __depth: 0
 
-    }, function() {
+    }, function () {
 
         if (!this.name) {
             this.name = 'NODE_' + (nameId++);
@@ -346,6 +346,21 @@ define(function(require) {
             var _children = this._children;
             for(var i = 0, len = _children.length; i < len; i++) {
                 _children[i].traverse(callback, context, ctor);
+            }
+
+            this._inIterating = false;
+        },
+
+        eachChild: function (callback, context, ctor) {
+            this._inIterating = true;
+
+            var _children = this._children;
+            var noCtor = ctor == null;
+            for(var i = 0, len = _children.length; i < len; i++) {
+                var child = _children[i];
+                if (noCtor || child.constructor === ctor) {
+                    callback.call(context, child, i);
+                }
             }
 
             this._inIterating = false;
