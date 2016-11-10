@@ -35,7 +35,7 @@
                         function () {
                             envMap.flipY = false;
 
-                            var prefilterResult = qtek.util.cubemap.prefilterEnvMap(
+                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
                                     height: 128
@@ -51,7 +51,7 @@
                             var material = new qtek.StandardMaterial({
                                 brdfLookup: prefilterResult.brdfLookup,
                                 environmentMap: prefilterResult.environmentMap,
-                                envMapPrefiltered: true,
+                                environmentMapPrefiltered: true,
                                 encodeRGBM: true,
                                 linear: true,
                                 metalness: 0,

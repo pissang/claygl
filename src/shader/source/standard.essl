@@ -36,10 +36,17 @@ uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 #endif
 
-#ifdef GLOSSMAP_ENABLED
-uniform sampler2D glossinessMap;
-#elif defined(ROUGHNESSMAP_ENABLED)
+// I don't know why rougnessMap must be put before environmentMap. Or it will be wrong.
+#ifdef USE_ROUGHNESS
+uniform float roughness : 0.5;
+    #ifdef ROUGHNESSMAP_ENABLED
 uniform sampler2D roughnessMap;
+    #endif
+#else
+uniform float glossiness: 0.5;
+    #ifdef GLOSSMAP_ENABLED
+uniform sampler2D glossMap;
+    #endif
 #endif
 
 #ifdef METALNESSMAP_ENABLED
@@ -67,7 +74,6 @@ uniform vec2 viewportSize;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform float alpha : 1.0;
 
-uniform float glossiness : 0.5;
 
 #ifdef USE_METALNESS
 // metalness workflow
@@ -184,14 +190,19 @@ void main()
     vec3 spec = specularColor;
 #endif
 
-    float g = glossiness;
-
-#ifdef GLOSSMAP_ENABLED
+#ifdef USE_ROUGHNESS
+    float g = 1.0 - roughness;
+    #ifdef ROUGHNESSMAP_ENABLED
     // PENDING Replace or multiply
-    g = texture2D(glossinessMap, v_Texcoord)[GLOSS_CHANEL];
-#elif defined(ROUGHNESSMAP_ENABLED)
     g = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANEL];
+    #endif
+#else
+    float g = glossiness;
+    #ifdef GLOSSMAP_ENABLED
+    g = texture2D(glossMap, v_Texcoord)[GLOSS_CHANEL];
+    #endif
 #endif
+
 
 #ifdef SPECULARMAP_ENABLED
     spec *= texture2D(specularMap, v_Texcoord).rgb;

@@ -746,9 +746,10 @@
 
         {
             "name": "dof_far_blur_upsample",
-            "shader": "#source(qtek.compositor.upsample)",
+            "shader": "#source(qtek.compositor.dof.upsample)",
             "inputs": {
-                "texture": "dof_far_blur_hexangonal_3"
+                "texture": "dof_far_blur_hexangonal_3",
+                "coc": "coc"
             },
             "outputs": {
                 "color": {
@@ -770,9 +771,10 @@
 
         {
             "name": "dof_near_blur_upsample",
-            "shader": "#source(qtek.compositor.upsample)",
+            "shader": "#source(qtek.compositor.dof.upsample)",
             "inputs": {
-                "texture": "dof_near_blur_hexangonal_3"
+                "texture": "dof_near_blur_hexangonal_3",
+                "coc": "coc"
             },
             "outputs": {
                 "color": {

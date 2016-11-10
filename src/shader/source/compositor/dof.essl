@@ -59,8 +59,8 @@ void main()
 
 @end
 
-// Premutiply with coc to avoid bleeding in upsampling
-@export qtek.compositor.dof.premutiply
+// Premultiply with coc to avoid bleeding in upsampling
+@export qtek.compositor.dof.premultiply
 
 uniform sampler2D texture;
 uniform sampler2D coc;
@@ -178,39 +178,99 @@ void main()
 
 
 
+@export qtek.compositor.dof.upsample
+
+#define HIGH_QUALITY
+
+uniform sampler2D coc;
+uniform sampler2D texture;
+uniform vec2 textureSize : [512, 512];
+
+varying vec2 v_Texcoord;
 
 
+@import qtek.util.rgbm
 
+@import qtek.util.decode_float
 
+float tap(vec2 uv, inout vec4 color, float baseWeight) {
+    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;
+    color += decodeHDR(texture2D(texture, uv)) * weight;
+    return weight;
+}
 
-@export qtek.compositor.dof.coc_helper
+void main()
+{
+#ifdef HIGH_QUALITY
+    // 9-tap bilinear upsampler (tent filter)
+    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy;
 
-void packCocToRGBM(inout vec4 rgbm, float coc) {
-#if defined(RGBM_ENCODE) || defined(RGBM)
-    // Pack alpha with two half byte value, coc and multiplier of RGBM
+    vec4 color = vec4(0.0);
+    float baseWeight = 1.0 / 16.0;
+    float w  = tap(v_Texcoord - d.xy, color, baseWeight);
+    w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);
+    w += tap(v_Texcoord - d.zy, color, baseWeight);
 
-    // There is no round function in the glsl
-    float m = floor(rgbm.a * 123.0 + 0.5);
-    coc = floor(coc + 0.5);
+    w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);
+    w += tap(v_Texcoord       , color, baseWeight * 4.0);
+    w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);
 
-    rgbm.a = (m * 4.0 + coc) / 255.0;
+    w += tap(v_Texcoord + d.zy, color, baseWeight);
+    w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);
+    w += tap(v_Texcoord + d.xy, color, baseWeight);
+
+    gl_FragColor = encodeHDR(color / w);
 #else
-    rgbm.a = coc;
+    // 4-tap bilinear upsampler
+    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;
+
+    vec4 color = vec4(0.0);
+    float baseWeight = 1.0 / 4.0;
+    float w  = tap(v_Texcoord + d.xy, color, baseWeight);
+    w += tap(v_Texcoord + d.zy, color, baseWeight);
+    w += tap(v_Texcoord + d.xw, color, baseWeight);
+    w += tap(v_Texcoord + d.zw, color, baseWeight);
+
+    gl_FragColor = encodeHDR(color / w);
 #endif
 }
 
-float unpackCocFromRGBM(inout vec4 rgbm) {
-#if defined(RGBM_DECODE) || defined(RGBM)
-    float a = rgbm.a * 255.0;
-    rgbm.a = floor(a);
-    float coc = a - rgbm.a * 4.0;
-    rgbm.a /= 123.0;
-    return coc;
-#else
-    float coc = rgbm.a;
-    return coc;
-#endif
+@end
+
+
+
+@export qtek.compositor.dof.downsample
+
+uniform sampler2D texture;
+uniform sampler2D coc;
+uniform vec2 textureSize : [512, 512];
+
+varying vec2 v_Texcoord;
+
+@import qtek.util.rgbm
+
+@import qtek.util.decode_float
+
+float tap(vec2 uv, inout vec4 color) {
+    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;
+    color += decodeHDR(texture2D(texture, uv)) * weight;
+    return weight;
 }
+
+void main()
+{
+    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
+
+    vec4 color = vec4(0.0);
+    float weight = tap(v_Texcoord + d.xy, color);
+    weight += tap(v_Texcoord + d.zy, color);
+    weight += tap(v_Texcoord + d.xw, color);
+    weight += tap(v_Texcoord + d.zw, color);
+    color /= weight;
+
+    gl_FragColor = encodeHDR(color);
+}
+
 @end
 
 
@@ -399,6 +459,7 @@ void main()
     float fCoc = decodeFloat(texture2D(coc, v_Texcoord));
 
     // FIXME blur after premultiply will have white edge
+    // blurredColor.rgb /= max(fCoc, 0.1);
     fCoc = abs(fCoc * 2.0 - 1.0);
 
     float weight = smoothstep(0.0, 1.0, fCoc);
@@ -409,7 +470,6 @@ void main()
     fNearCoc = abs(fNearCoc * 2.0 - 1.0);
 
 
-    // blurredColor.rgb /= max(fCoc, 0.1);
     // nearfieldColor.rgb /= max(fCoc, 0.1);
     // FIXME
     gl_FragColor = encodeHDR(

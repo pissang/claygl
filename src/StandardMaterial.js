@@ -62,6 +62,7 @@ define(function (require) {
             });
             shader.enableTexture(enabledMaps);
             shader.define('fragment', 'USE_METALNESS');
+            shader.define('fragment', 'USE_ROUGHNESS');
             if (jointCount) {
                 shader.define('vertex', 'SKINNING');
                 shader.define('vertex', 'JOINT_COUNT', jointCount);
@@ -102,7 +103,7 @@ define(function (require) {
     }
 
     var textureProperties = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'environmentMap', 'brdfLookup'];
-    var simpleProperties = ['color', 'emission', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
+    var simpleProperties = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
     var allProperties = textureProperties.concat(simpleProperties);
 
     var StandardMaterial = Material.derive(function () {
@@ -121,6 +122,12 @@ define(function (require) {
 
         /**
          * @type {number}
+         * @name emissionIntensity
+         * @default 0
+         */
+
+        /**
+         * @type {number}
          * @name roughness
          * @default 0.5
          */
@@ -128,6 +135,18 @@ define(function (require) {
         /**
          * @type {number}
          * @name metalness
+         * @default 0.5
+         */
+
+        /**
+         * @type {number}
+         * @name alpha
+         * @default 1
+         */
+
+        /**
+         * @type {boolean}
+         * @name transparent
          * @default 0.5
          */
 
@@ -211,6 +230,9 @@ define(function (require) {
         // Default values
         this.color = this.color || [1, 1, 1];
         this.emission = this.emission || [0, 0, 0];
+        this.emissionIntensity = this.emissionIntensity || 0;
+        this.alpha = this.alpha || 1;
+
         this.roughness = this.roughness || 0.5;
         this.metalness = this.metalness || 0;
 
@@ -223,6 +245,7 @@ define(function (require) {
         this.linear = this.linear || false;
 
         this.encodeRGBM = this.encodeRGBM || false;
+
     }, {
 
         _doUpdateShader: function (gl) {

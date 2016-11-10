@@ -51,6 +51,7 @@
                         fragmentDefines: {
                             'ENVIRONMENTMAP_PREFILTER': null,
                             'USE_METALNESS': null,
+                            'USE_ROUGHNESS': null,
                             'SRGB_DECODE': null,
                             'RGBM_ENCODE': null
                         }
@@ -84,7 +85,7 @@
                     var envMap = qtek.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
-                            exposure: 1
+                            exposure: 3
                         },
                         function () {
                             envMap.flipY = false;
@@ -94,6 +95,9 @@
                                     height: 128
                                 }
                             );
+                            var suzanneMesh = scene.getNode('Suzanne');
+                            suzanneMesh.material.set('metalness', 1);
+                            suzanneMesh.material.set('color', [1, 1, 1]);
                             // var skydome = new qtek.plugin.Skydome({
                             //     scene: scene
                             // });
@@ -105,7 +109,7 @@
                                     mesh.material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
                                     mesh.material.set('brdfLookup', prefilterResult.brdfLookup);
                                     mesh.material.set('environmentMap', prefilterResult.environmentMap);
-                                    mesh.material.set('glossiness', 0.8);
+                                    mesh.material.set('roughness', 0.2);
                                 }
                             });
                         }

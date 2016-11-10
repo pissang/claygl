@@ -26,7 +26,7 @@
                     eyeFadeStart: 0.4,
                     eyeFadeEnd: 0.8,
 
-                    glossiness: 0.5
+                    roughness: 0.5
                 };
 
                 var renderer = new qtek.Renderer({
@@ -55,7 +55,8 @@
                             textures: ['diffuseMap', 'normalMap'],
                             fragmentDefines: {
                                 RGBM_ENCODE: null,
-                                SRGB_DECODE: null
+                                SRGB_DECODE: null,
+                                USE_ROUGHNESS: null
                             }
                         })
                     })
@@ -124,6 +125,7 @@
                                         ENVIRONMENTMAP_PREFILTER: null,
                                         RGBM_ENCODE: null,
                                         USE_METALNESS: null,
+                                        USE_ROUGHNESS: null,
                                         SRGB_DECODE: null
                                     }
                                 }
@@ -141,7 +143,7 @@
                             material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
                             material.set('brdfLookup', prefilterResult.brdfLookup);
                             material.set('environmentMap', prefilterResult.environmentMap);
-                            material.set('glossiness', 0);
+                            material.set('roughness', 0);
                             material.set('metalness', 0);
                             material.set('uvRepeat', [2, 2]);
 
@@ -219,8 +221,8 @@
                 gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'glossiness', 0, 1).onChange(function (val) {
-                    plane.material.set('glossiness', val);
+                gui.add(config, 'roughness', 0, 1).onChange(function (val) {
+                    plane.material.set('roughness', val);
                 });
             });
         </script>

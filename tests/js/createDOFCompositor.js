@@ -56,9 +56,9 @@ define(function (require) {
                 }
             }
         });
-        var premutiplyNode = new qtek.compositor.Node({
-            name: 'premutiply',
-            shader: qtek.Shader.source('qtek.compositor.dof.premutiply'),
+        var premultiplyNode = new qtek.compositor.Node({
+            name: 'premultiply',
+            shader: qtek.Shader.source('qtek.compositor.dof.premultiply'),
             inputs: {
                 texture: {
                     node: 'scene',
@@ -82,11 +82,12 @@ define(function (require) {
             downSampleScale *= 2;
             var downSampleNode = new qtek.compositor.Node({
                 name: 'downsample' + i,
-                shader: qtek.Shader.source('qtek.compositor.downsample'),
+                shader: qtek.Shader.source('qtek.compositor.dof.downsample'),
                 inputs: {
                     // FIXME blur after premultiply will have white edge
-                    // texture: i === 0 ? 'premutiply' : 'downsample' + (i - 1)
-                    texture: i === 0 ? 'scene' : 'downsample' + (i - 1)
+                    texture: i === 0 ? 'scene' : 'downsample' + (i - 1),
+                    coc: 'coc'
+                    // texture: i === 0 ? 'scene' : 'downsample' + (i - 1)
                 },
                 outputs: {
                     color: {
@@ -196,9 +197,10 @@ define(function (require) {
         var upsampleTextureSize = [renderer.getWidth() / 2, renderer.getHeight() / 2];
         var upSampleNode = new qtek.compositor.Node({
             name: 'upsample',
-            shader: qtek.Shader.source('qtek.compositor.upsample'),
+            shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
             inputs: {
-                texture: 'blur_3'
+                texture: 'blur_3',
+                coc: 'coc'
             },
             outputs: {
                 color: {
@@ -211,9 +213,10 @@ define(function (require) {
 
         var upSampleNearNode = new qtek.compositor.Node({
             name: 'upsample_near',
-            shader: qtek.Shader.source('qtek.compositor.upsample'),
+            shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
             inputs: {
-                texture: 'near_blur_3'
+                texture: 'near_blur_3',
+                coc: 'coc'
             },
             outputs: {
                 color: {
@@ -272,7 +275,7 @@ define(function (require) {
         cocNode.setParameter('zNear', camera.near);
         cocNode.setParameter('zFar', camera.far);
 
-        compositor.addNode(premutiplyNode);
+        compositor.addNode(premultiplyNode);
         compositor.addNode(sceneNode);
         compositor.addNode(cocNode);
         compositor.addNode(compositeNode);
@@ -282,7 +285,7 @@ define(function (require) {
         compositor.addNode(upSampleNearNode);
         compositor.addNode(upSampleCocNode);
 
-        premutiplyNode.shaderDefine('RGBM');
+        premultiplyNode.shaderDefine('RGBM');
         compositeNode.shaderDefine('RGBM');
         toneMappingNode.shaderDefine('RGBM_DECODE');
         upSampleNode.shaderDefine('RGBM');
