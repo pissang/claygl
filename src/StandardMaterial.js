@@ -11,48 +11,42 @@ define(function (require) {
     var shaderLibrary = {};
     var shaderUsedCount = {};
 
-    var keyOffsets = {
+    var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
+    var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
+    var ALL_PROPERTIES = TEXTURE_PROPERTIES.concat(SIMPLE_PROPERTIES);
 
-        diffuseMap: 256,
 
-        normalMap: 256 * 2,
+    var OTHER_SHADER_KEYS = [
+        'environmentMapPrefiltered',
+        'linear',
+        'encodeRGBM',
+        'parallaxCorrected'
+    ];
+    var SHADER_KEYS = TEXTURE_PROPERTIES.concat(OTHER_SHADER_KEYS);
 
-        roughnessMap: 256 * 4,
+    var KEY_OFFSETS = SHADER_KEYS.reduce(function (obj, name, idx) {
+        obj[name] = 256 << idx;
+        return obj;
+    }, {});
 
-        metalnessMap: 256 * 8,
-
-        environmentMap: 256 * 16,
-
-        environmentMapPrefiltered: 256 * 32,
-
-        brdfLookup: 256 * 64,
-
-        linear: 256 * 128,
-
-        encodeRGBM: 256 * 256
-    };
-
-    function makeKey (enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM) {
+    function makeKey (enabledMaps, jointCount, shaderDefines) {
         // jointCount from 0 to 255
         var key = jointCount;
         for (var i = 0; i < enabledMaps.length; i++) {
-            key += keyOffsets[enabledMaps[i]];
+            key += KEY_OFFSETS[enabledMaps[i]];
         }
-        if (environmentMapPrefiltered) {
-            key += keyOffsets.environmentMapPrefiltered;
-        }
-        if (linear) {
-            key += keyOffsets.linear;
-        }
-        if (encodeRGBM) {
-            key += keyOffsets.encodeRGBM;
+        for (var i = 0; i < OTHER_SHADER_KEYS.length; i++) {
+            var propName = OTHER_SHADER_KEYS[i];
+            if (shaderDefines[propName]) {
+                key += KEY_OFFSETS[propName];
+            }
         }
 
         return key;
     }
 
-    function allocateShader (enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM) {
-        var key = makeKey(enabledMaps, jointCount, environmentMapPrefiltered, linear, encodeRGBM);
+    function allocateShader (enabledMaps, jointCount, shaderDefines) {
+        var key = makeKey(enabledMaps, jointCount, shaderDefines);
         var shader = shaderLibrary[key];
 
         if (!shader) {
@@ -67,14 +61,17 @@ define(function (require) {
                 shader.define('vertex', 'SKINNING');
                 shader.define('vertex', 'JOINT_COUNT', jointCount);
             }
-            if (environmentMapPrefiltered) {
+            if (shaderDefines.environmentMapPrefiltered) {
                 shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
             }
-            if (linear) {
+            if (shaderDefines.linear) {
                 shader.define('fragment', 'SRGB_DECODE');
             }
-            if (encodeRGBM) {
+            if (shaderDefines.encodeRGBM) {
                 shader.define('fragment', 'RGBM_ENCODE');
+            }
+            if (shaderDefines.parallaxCorrected) {
+                shader.define('fragment', 'PARALLAX_CORRECTED');
             }
 
             shaderLibrary[key] = shader;
@@ -102,158 +99,142 @@ define(function (require) {
         }
     }
 
-    var textureProperties = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
-    var simpleProperties = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
-    var allProperties = textureProperties.concat(simpleProperties);
-
     var StandardMaterial = Material.derive(function () {
 
-        /**
-         * @type {Array.<number>}
-         * @name color
-         * @default [1, 1, 1]
-         */
-
-        /**
-         * @type {Array.<number>}
-         * @name emission
-         * @default [0, 0, 0]
-         */
-
-        /**
-         * @type {number}
-         * @name emissionIntensity
-         * @default 0
-         */
-
-        /**
-         * @type {number}
-         * @name roughness
-         * @default 0.5
-         */
-
-        /**
-         * @type {number}
-         * @name metalness
-         * @default 0.5
-         */
-
-        /**
-         * @type {number}
-         * @name alpha
-         * @default 1
-         */
-
-        /**
-         * @type {boolean}
-         * @name transparent
-         * @default 0.5
-         */
-
-        /**
-         * @type {qtek.Texture2D}
-         * @name diffuseMap
-         */
-
-        /**
-         * @type {qtek.Texture2D}
-         * @name normalMap
-         */
-
-        /**
-         * @type {qtek.Texture2D}
-         * @name roughnessMap
-         */
-
-        /**
-         * @type {qtek.Texture2D}
-         * @name metalnessMap
-         */
-        /**
-         * @type {qtek.Texture2D}
-         * @name emissionMap
-         */
-
-        /**
-         * @type {qtek.TextureCube}
-         * @name environmentMap
-         */
-
-        /**
-         * BRDF Lookup is generated by qtek.util.cubemap.integrateBrdf
-         * @type {qtek.Texture2D}
-         * @name brdfLookup
-         */
-
-
-        /**
-         * @type {Array.<number>}
-         * @name uvRepeat
-         * @default [1, 1]
-         */
-
-        /**
-         * @type {Array.<number>}
-         * @name uvOffset
-         * @default [0, 0]
-         */
-
-        /**
-         * @type {number}
-         * @name jointCount
-         * @default 0
-         */
-
-        /**
-         * @type {boolean}
-         * @name environmentMapPrefiltered
-         */
-
-        /**
-         * @type {boolean}
-         * @name linear
-         */
-
-        /**
-         * @type {boolean}
-         * @name encodeRGBM
-         */
-
-        // Dummy uniforms to avoid property setting not work on initializing.
-        var uniforms = {};
-        for (var i = 0; i < allProperties.length; i++) {
-            uniforms[allProperties[i]] = {
-                // type: 'dummy',
-                value: null
-            };
-        }
         return {
-            uniforms: uniforms
+
+            /**
+             * @type {Array.<number>}
+             * @name color
+             * @default [1, 1, 1]
+             */
+            color: [1, 1, 1],
+
+            /**
+             * @type {Array.<number>}
+             * @name emission
+             * @default [0, 0, 0]
+             */
+            emission: [0, 0, 0],
+
+            /**
+             * @type {number}
+             * @name emissionIntensity
+             * @default 0
+             */
+            emissionIntensity: 0,
+
+            /**
+             * @type {number}
+             * @name roughness
+             * @default 0.5
+             */
+            roughness: 0.5,
+
+            /**
+             * @type {number}
+             * @name metalness
+             * @default 0.5
+             */
+            metalness: 0.5,
+
+            /**
+             * @type {number}
+             * @name alpha
+             * @default 1
+             */
+            alpha: 1,
+
+            /**
+             * @type {boolean}
+             * @name transparent
+             * @default 0.5
+             */
+            transparent: 0.5,
+
+            /**
+             * @type {qtek.Texture2D}
+             * @name diffuseMap
+             */
+
+            /**
+             * @type {qtek.Texture2D}
+             * @name normalMap
+             */
+
+            /**
+             * @type {qtek.Texture2D}
+             * @name roughnessMap
+             */
+
+            /**
+             * @type {qtek.Texture2D}
+             * @name metalnessMap
+             */
+            /**
+             * @type {qtek.Texture2D}
+             * @name emissionMap
+             */
+
+            /**
+             * @type {qtek.TextureCube}
+             * @name environmentMap
+             */
+
+            /**
+             * @type {qtek.math.BoundingBox}
+             * @name environmentBox
+             */
+
+            /**
+             * BRDF Lookup is generated by qtek.util.cubemap.integrateBrdf
+             * @type {qtek.Texture2D}
+             * @name brdfLookup
+             */
+
+            /**
+             * @type {Array.<number>}
+             * @name uvRepeat
+             * @default [1, 1]
+             */
+            uvRepeat: [1, 1],
+
+            /**
+             * @type {Array.<number>}
+             * @name uvOffset
+             * @default [0, 0]
+             */
+            uvOffset: [0, 0],
+
+            /**
+             * @type {number}
+             * @name jointCount
+             * @default 0
+             */
+            jointCount: 0,
+
+            /**
+             * @type {boolean}
+             * @name environmentMapPrefiltered
+             */
+            environmentMapPrefiltered: false,
+
+            /**
+             * @type {boolean}
+             * @name linear
+             */
+            linear: false,
+
+            /**
+             * @type {boolean}
+             * @name encodeRGBM
+             */
+            encodeRGBM: false
         };
-    }, function () {
-        // Default values
-        this.color = this.color || [1, 1, 1];
-        this.emission = this.emission || [0, 0, 0];
-        this.emissionIntensity = this.emissionIntensity || 0;
-        this.alpha = this.alpha == null ? 1 : this.alpha;
-
-        this.roughness = this.roughness == null ? 0.5 : this.roughness;
-        this.metalness = this.metalness || 0;
-
-        this.uvRepeat = this.uvRepeat || [1, 1];
-        this.uvOffset = this.uvOffset || [0, 0];
-
-        // TODO Fixed maxMipmapLevel 5
-        this.environmentMapPrefiltered = this.environmentMapPrefiltered || false;
-
-        this.linear = this.linear || false;
-
-        this.encodeRGBM = this.encodeRGBM || false;
-
     }, {
 
         _doUpdateShader: function (gl) {
-            var enabledTextures = textureProperties.filter(function (name) {
+            var enabledTextures = TEXTURE_PROPERTIES.filter(function (name) {
                 return !!this[name];
             }, this);
             if (this._shader) {
@@ -262,7 +243,12 @@ define(function (require) {
             }
 
             var shader = allocateShader(
-                enabledTextures, this.jointCount || 0, this.environmentMapPrefiltered, this.linear, this.encodeRGBM
+                enabledTextures, this.jointCount || 0, {
+                    environmentMapPrefiltered: this.environmentMapPrefiltered,
+                    linear: this.linear,
+                    encodeRGBM: this.encodeRGBM,
+                    parallaxCorrected: !!this._environmentBox
+                }
             );
             var originalUniforms = this.uniforms;
 
@@ -305,23 +291,32 @@ define(function (require) {
         }
     });
 
-    simpleProperties.forEach(function (propName) {
+    SIMPLE_PROPERTIES.forEach(function (propName) {
         Object.defineProperty(StandardMaterial.prototype, propName, {
             get: function () {
                 return this.get(propName);
             },
             set: function (value) {
+                var uniforms = this.uniforms = this.uniforms || {};
+                uniforms[propName] = uniforms[propName] || {
+                    value: null
+                };
                 this.setUniform(propName, value);
             }
         });
     });
 
-    textureProperties.forEach(function (propName) {
+    TEXTURE_PROPERTIES.forEach(function (propName) {
         Object.defineProperty(StandardMaterial.prototype, propName, {
             get: function () {
                 return this.get(propName);
             },
             set: function (value) {
+                var uniforms = this.uniforms = this.uniforms || {};
+                uniforms[propName] = uniforms[propName] || {
+                    value: null
+                };
+
                 var oldVal = this.get(propName);
                 this.setUniform(propName, value);
 
@@ -348,8 +343,41 @@ define(function (require) {
         });
     });
 
+    Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
+        get: function () {
+            var envBox = this._environmentBox;
+            if (envBox) {
+                envBox.min.setArray(this.get('environmentBoxMin'));
+                envBox.max.setArray(this.get('environmentBoxMax'));
+            }
+            return envBox;
+        },
+
+        set: function (value) {
+            var oldVal = this._environmentBox;
+            this._environmentBox = value;
+
+            var uniforms = this.uniforms = this.uniforms || {};
+            uniforms['environmentBoxMin'] = uniforms['environmentBoxMin'] || {
+                value: null
+            };
+            uniforms['environmentBoxMax'] = uniforms['environmentBoxMax'] || {
+                value: null
+            };
+
+            // TODO Can't detect operation like box.min = new Vector()
+            this.setUniform('environmentBoxMin', value.min._array);
+            this.setUniform('environmentBoxMax', value.max._array);
+
+            if (oldVal !== value) {
+                this._shaderDirty = true;
+            }
+        }
+    });
+
     Object.defineProperty(StandardMaterial.prototype, 'shader', {
         get: function () {
+            // PENDING
             if (!this._shader) {
                 this._shaderDirty = true;
                 this.updateShader();

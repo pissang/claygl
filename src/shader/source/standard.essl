@@ -55,6 +55,13 @@ uniform sampler2D metalnessMap;
 
 #ifdef ENVIRONMENTMAP_ENABLED
 uniform samplerCube environmentMap;
+
+// https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+    #ifdef PARALLAX_CORRECTED
+uniform vec3 environmentBoxMin;
+uniform vec3 environmentBoxMax;
+    #endif
+
 #endif
 
 #ifdef BRDFLOOKUP_ENABLED
@@ -130,6 +137,8 @@ uniform float maxMipmapLevel: 5;
 
 @import qtek.plugin.compute_shadow_map
 
+@import qtek.util.parallax_correct
+
 
 float G_Smith(float g, float ndv, float ndl)
 {
@@ -157,6 +166,7 @@ float D_GGX(float g, float ndh) {
     float tmp = ndh * ndh * (a - 1.0) + 1.0;
     return a / (PI * tmp * tmp);
 }
+
 
 void main()
 {
@@ -375,12 +385,16 @@ void main()
 #ifdef ENVIRONMENTMAP_ENABLED
 
     vec3 envWeight = g * fresnelTerm;
+    vec3 L = reflect(-V, N);
+
+    #ifdef PARALLAX_CORRECTED
+    L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);
+    #endif
 
     #ifdef ENVIRONMENTMAP_PREFILTER
     // FIXME simply 1 minus roughness ?
     float roughness = clamp(1.0 - g, 0.0, 1.0);
     float bias = roughness * maxMipmapLevel;
-    vec3 L = reflect(-V, N);
     // Only env map can have HDR
     vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
 
@@ -390,7 +404,7 @@ void main()
         #endif
 
     #else
-    vec3 envTexel = textureCube(environmentMap, reflect(-V, N)).xyz;
+    vec3 envTexel = textureCube(environmentMap, L).xyz;
     #endif
 
     outColor.rgb += envTexel * envWeight;

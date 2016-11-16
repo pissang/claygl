@@ -115,8 +115,14 @@ define(function (require) {
         var defaultRougnessMap = this._defaultRoughnessMap;
         renderer.beforeRenderObject = function (renderable, prevMaterial) {
             var material = renderable.material;
-            // TODO Texture
-            var glossiness = material.get('glossiness');
+            var shader = material.shader;
+            var glossiness;
+            if (shader.isDefined('fragment', 'USE_ROUGHNESS')) {
+                glossiness = 1.0 - material.get('roughness');
+            }
+            else {
+                glossiness = material.get('glossiness');
+            }
             var normalMap = material.get('normalMap') || defaultNormalMap;
             var roughnessMap = material.get('roughnessMap');
             var uvRepeat = material.get('uvRepeat');
