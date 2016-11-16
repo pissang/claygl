@@ -4,7 +4,7 @@
 #define SAMPLE_NUMBER 8
 
 uniform sampler2D texture;
-uniform sampler2D lensColor;
+uniform sampler2D lenscolor;
 
 uniform vec2 textureSize : [512, 512];
 
@@ -50,7 +50,7 @@ void main()
         result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;
     }
 
-    result *= texture2D(lensColor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));
+    result *= texture2D(lenscolor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));
     //Sample halo
     float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));
     weight = pow(1.0 - weight, 10.0);

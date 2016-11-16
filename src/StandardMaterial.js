@@ -102,7 +102,7 @@ define(function (require) {
         }
     }
 
-    var textureProperties = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'environmentMap', 'brdfLookup'];
+    var textureProperties = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
     var simpleProperties = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
     var allProperties = textureProperties.concat(simpleProperties);
 
@@ -169,6 +169,10 @@ define(function (require) {
          * @type {qtek.Texture2D}
          * @name metalnessMap
          */
+        /**
+         * @type {qtek.Texture2D}
+         * @name emissionMap
+         */
 
         /**
          * @type {qtek.TextureCube}
@@ -231,9 +235,9 @@ define(function (require) {
         this.color = this.color || [1, 1, 1];
         this.emission = this.emission || [0, 0, 0];
         this.emissionIntensity = this.emissionIntensity || 0;
-        this.alpha = this.alpha || 1;
+        this.alpha = this.alpha == null ? 1 : this.alpha;
 
-        this.roughness = this.roughness || 0.5;
+        this.roughness = this.roughness == null ? 0.5 : this.roughness;
         this.metalness = this.metalness || 0;
 
         this.uvRepeat = this.uvRepeat || [1, 1];

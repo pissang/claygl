@@ -279,11 +279,15 @@ void main()
 
     float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
 
-    // vec3 hitNormal = texture2D(normalTex, hitPixel).rgb * 2.0 - 1.0;
-    // hitNormal = normalize((viewInverseTranspose * vec4(hitNormal, 0.0)).xyz);
-    // // Fadeout the pixel not face the ray
-    // // PENDING Can be configured?
-    // alpha *= 1.0 - clamp(dot(hitNormal, rayDir), 0.0, 1.0);
+    vec3 hitNormal = texture2D(normalTex, hitPixel).rgb * 2.0 - 1.0;
+    hitNormal = normalize((viewInverseTranspose * vec4(hitNormal, 0.0)).xyz);
+
+    // Ignore the pixel not face the ray
+    // TODO fadeout ?
+    // PENDING Can be configured?
+    if (dot(hitNormal, rayDir) >= 0.0) {
+        discard;
+    }
 
     // vec4 color = decodeHDR(texture2DLodEXT(colorTex, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 

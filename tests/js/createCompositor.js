@@ -72,7 +72,7 @@ define(function (require) {
         var lensDirtTex = new qtek.Texture2D();
         lensDirtTex.load('assets/textures/lensflare/lensdirt2.jpg');
 
-        compositor.getNodeByName('lensflare').setParameter('lensColor', lensDirtTex);
+        compositor.getNodeByName('lensflare').setParameter('lenscolor', lensDirtTex);
         tonemappingNode.setParameter('lensdirt', lensDirtTex);
 
         // Inject methods
