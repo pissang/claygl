@@ -57,8 +57,8 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 512,
-                        "height" : 512
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
@@ -849,13 +849,13 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 512,
-                        "height" : 512
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
             "parameters" : {
-                "textureSize" : [512, 512],
+                "textureSize" : "expr([width / 2, height / 2])",
                 "lensColor" : "#lenscolor"
             },
             "defines": {
@@ -871,14 +871,14 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 512,
-                        "height" : 512
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": 512
+                "textureSize" : "expr([width / 2, height / 2])"
             },
             "defines": {
                 "RGBM": null
@@ -893,14 +893,14 @@
             "outputs" : {
                 "color" : {
                     "parameters" : {
-                        "width" : 512,
-                        "height" : 512
+                        "width" : "expr(width / 2)",
+                        "height" : "expr(height / 2)"
                     }
                 }
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": 512
+                "textureSize" : "expr([width / 2, height / 2])"
             },
             "defines": {
                 "RGBM": null

@@ -167,3 +167,24 @@ if (joint.w >= 0.0)
     skinMatrixWS += skinMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
 }
 @end
+
+
+@export qtek.util.parallax_correct
+
+// https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
+    // Find ray box intersect point using slab method
+    // https://tavianator.com/fast-branchless-raybounding-box-intersections/
+    vec3 first = (boxMax - pos) / dir;
+    vec3 second = (boxMin - pos) / dir;
+
+    vec3 further = max(first, second);
+    float dist = min(further.x, min(further.y, further.z));
+
+    vec3 fixedPos = pos + dir * dist;
+    vec3 boxCenter = (boxMax + boxMin) * 0.5;
+
+    return normalize(fixedPos - boxCenter);
+}
+
+@end
