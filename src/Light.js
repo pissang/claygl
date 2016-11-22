@@ -8,7 +8,7 @@ define(function(require){
      * @constructor qtek.Light
      * @extends qtek.Node
      */
-    var Light = Node.derive(function(){
+    var Light = Node.extend(function(){
         return /** @lends qtek.Light# */ {
             /**
              * Light RGB color
@@ -21,7 +21,7 @@ define(function(require){
              * @type {number}
              */
             intensity: 1.0,
-            
+
             // Config for shadow map
             /**
              * If light cast shadow

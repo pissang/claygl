@@ -9,7 +9,7 @@ define(function(require) {
      * @constructor qtek.particleSystem.ForceField
      * @extends qtek.particleSystem.Field
      */
-    var ForceField = Field.derive(function() {
+    var ForceField = Field.extend(function() {
         return {
             force: new Vector3()
         };

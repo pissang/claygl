@@ -8,7 +8,7 @@ define(function (require) {
      * @constructor qtek.light.Sphere
      * @extends {qtek.Light}
      */
-    var SphereLight = Light.derive(
+    var SphereLight = Light.extend(
     /** @lends qtek.light.Sphere# */
     {
         /**
@@ -21,7 +21,7 @@ define(function (require) {
          */
         radius: 5
     }, {
-        
+
         type: 'SPHERE_LIGHT',
 
         uniformTemplates: {

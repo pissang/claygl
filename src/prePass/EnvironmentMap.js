@@ -31,7 +31,7 @@ define(function (require) {
      *         renderer.render(scene, camera);
      *     });
      */
-    var EnvironmentMapPass = Base.derive(function() {
+    var EnvironmentMapPass = Base.extend(function() {
         var ret = {
             /**
              * Camera position

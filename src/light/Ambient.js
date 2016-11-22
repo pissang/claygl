@@ -8,7 +8,7 @@ define(function(require) {
      * @constructor qtek.light.Ambient
      * @extends qtek.Light
      */
-    var AmbientLight = Light.derive({
+    var AmbientLight = Light.extend({
 
         castShadow: false
 

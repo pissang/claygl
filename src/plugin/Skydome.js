@@ -18,7 +18,7 @@ define(function (require) {
      *     });
      *     skydome.material.set('diffuseMap', skyTex);
      */
-    var Skydome = Mesh.derive(function () {
+    var Skydome = Mesh.extend(function () {
 
         if (!skydomeShader) {
             skydomeShader = new Shader({

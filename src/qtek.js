@@ -60,7 +60,7 @@ define(function(require) {
 		"LinkedList": require('./core/LinkedList'),
 		"LRU": require('./core/LRU'),
 		"mixin": {
-			"derive": require('./core/mixin/derive'),
+			"extend": require('./core/mixin/extend'),
 			"notifier": require('./core/mixin/notifier')
 		},
 		"request": require('./core/request'),

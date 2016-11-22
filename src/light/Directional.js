@@ -18,7 +18,7 @@ define(function(require) {
      *     light.lookAt(qtek.math.Vector3.ZERO);
      *     scene.add(light);
      */
-    var DirectionalLight = Light.derive(
+    var DirectionalLight = Light.extend(
     /** @lends qtek.light.Directional# */
     {
         /**

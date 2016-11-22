@@ -462,7 +462,8 @@ void main()
     // blurredColor.rgb /= max(fCoc, 0.1);
     fCoc = abs(fCoc * 2.0 - 1.0);
 
-    float weight = smoothstep(0.0, 1.0, fCoc);
+    // float weight = smoothstep(0.0, 1.0, fCoc);
+    float weight = fCoc;
 
 #ifdef NEARFIELD_ENABLED
     vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));

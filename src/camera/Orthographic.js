@@ -7,7 +7,7 @@ define(function(require) {
      * @constructor qtek.camera.Orthographic
      * @extends qtek.Camera
      */
-    var Orthographic = Camera.derive(
+    var Orthographic = Camera.extend(
     /** @lends qtek.camera.Orthographic# */
     {
         /**
@@ -37,7 +37,7 @@ define(function(require) {
     },
     /** @lends qtek.camera.Orthographic.prototype */
     {
-        
+
         updateProjectionMatrix: function() {
             this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
         },

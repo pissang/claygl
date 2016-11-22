@@ -11,7 +11,7 @@ define(function (require) {
     /**
      * @constructor qtek.plugin.Sprite
      */
-    var Sprite = Mesh.derive(function () {
+    var Sprite = Mesh.extend(function () {
         if (!spriteShader) {
             spriteShader = new Shader({
                 vertex: Shader.source('qtek.basic.vertex'),
@@ -43,4 +43,6 @@ define(function (require) {
             Mesh.prototype.update.call(this, forceUpdateWorld);
         }
     });
+
+    return Sprite;
 });

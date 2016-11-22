@@ -239,7 +239,7 @@ define(function(require) {
      * @constructor qtek.Geometry
      * @extends qtek.core.Base
      */
-    var Geometry = Base.derive(
+    var Geometry = Base.extend(
     /** @lends qtek.Geometry# */
     {
         /**

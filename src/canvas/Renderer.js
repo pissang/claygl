@@ -98,7 +98,7 @@ define(function (require) {
         return 'rgba(' + round(v4[0] * 255) + ',' + round(v4[1] * 255) + ',' + round(v4[2] * 255) + ',' + v4[3] + ')';
     }
 
-    var CanvasRenderer = Base.derive({
+    var CanvasRenderer = Base.extend({
 
         canvas: null,
 

@@ -28,7 +28,7 @@ define(function(require) {
      *         renderer.render(scene, camera);
      *     });
      */
-    var OrbitControl = Base.derive(function() {
+    var OrbitControl = Base.extend(function() {
         return /** @lends qtek.plugin.OrbitControl# */ {
             /**
              * Scene node to control, mostly it is a camera

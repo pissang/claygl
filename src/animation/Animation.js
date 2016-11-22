@@ -33,7 +33,7 @@ define(function(require) {
      *         })
      *         .start('spline');
      */
-    var Animation = Base.derive(function() {
+    var Animation = Base.extend(function() {
         return /** @lends qtek.animation.Animation# */{
             /**
              * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called

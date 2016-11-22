@@ -8,7 +8,7 @@ define(function(require) {
      * @constructor qtek.light.Point
      * @extends qtek.Light
      */
-    var PointLight = Light.derive(
+    var PointLight = Light.extend(
     /** @lends qtek.light.Point# */
     {
         /**

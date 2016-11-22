@@ -10,7 +10,7 @@ define(function(require) {
      * @constructor qtek.compositor.SceneNode
      * @extends qtek.compositor.Node
      */
-    var SceneNode = Node.derive(
+    var SceneNode = Node.extend(
     /** @lends qtek.compositor.SceneNode# */
     {
         name: 'scene',

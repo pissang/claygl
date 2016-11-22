@@ -1,5 +1,5 @@
 define(function (require) {
-    
+
     'use strict';
 
     var Light = require('../Light');
@@ -9,9 +9,9 @@ define(function (require) {
      * @constructor qtek.light.Tube
      * @extends {qtek.Light}
      */
-    var TubeLight = Light.derive(
+    var TubeLight = Light.extend(
     /** @lends qtek.light.Tube# */
-    {   
+    {
         /**
          * @type {number}
          */

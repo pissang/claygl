@@ -4,7 +4,7 @@ define( function(require) {
 
     var Base = require('./Base');
 
-    var QEvent = Base.derive({
+    var QEvent = Base.extend({
         cancelBubble : false
     }, {
         stopPropagation : function() {
@@ -13,7 +13,7 @@ define( function(require) {
     });
 
     QEvent['throw'] = function(eventType, target, props) {
-        
+
         var e = new QEvent(props);
 
         e.type = eventType;

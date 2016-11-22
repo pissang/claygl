@@ -246,13 +246,11 @@ void main()
     // Is empty
     if (dot(normalAndGloss.rgb, vec3(1.0)) == 0.0) {
         discard;
-        return;
     }
 
     float g = normalAndGloss.a;
     if (g <= minGlossiness) {
         discard;
-        return;
     }
 
     float reflectivity = (g - minGlossiness) / (1.0 - minGlossiness);

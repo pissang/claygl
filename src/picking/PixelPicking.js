@@ -14,7 +14,7 @@ define(function (require) {
      * @constructor qtek.picking.PixelPicking
      * @extends qtek.core.Base
      */
-    var PixelPicking = Base.derive(function() {
+    var PixelPicking = Base.extend(function() {
         return /** @lends qtek.picking.PixelPicking# */ {
             /**
              * Target renderer

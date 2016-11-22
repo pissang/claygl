@@ -20,7 +20,7 @@ define(function(require) {
      * @param {number} [thetaLength]
      * @param {number} [radius]
      */
-    var Sphere = StaticGeometry.derive(
+    var Sphere = StaticGeometry.extend(
     /** @lends qtek.geometry.Sphere# */
     {
         /**

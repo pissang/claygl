@@ -2,7 +2,7 @@ define(function (require) {
 
     var Base = require('../core/Base');
 
-    var CanvasMaterial = Base.derive({
+    var CanvasMaterial = Base.extend({
 
         color: [1, 1, 1, 1],
 

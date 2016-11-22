@@ -17,7 +17,7 @@ define(function(require) {
      * @constructor qtek.Camera
      * @extends qtek.Node
      */
-    var Camera = Node.derive(function() {
+    var Camera = Node.extend(function() {
         return /** @lends qtek.Camera# */ {
             /**
              * Camera projection matrix
@@ -49,7 +49,7 @@ define(function(require) {
              * so that the view frustum contains the visible objects as tightly as possible.
              * Notice:
              *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
-             *  
+             *
              * @type {qtek.math.BoundingBox}
              */
             //TODO In case of one camera to multiple scenes
@@ -60,11 +60,11 @@ define(function(require) {
     },
     /** @lends qtek.Camera.prototype */
     {
-        
+
         update: function(force) {
             Node.prototype.update.call(this, force);
             mat4.invert(this.viewMatrix._array, this.worldTransform._array);
-            
+
             this.updateProjectionMatrix();
             mat4.invert(this.invProjectionMatrix._array, this.projectionMatrix._array);
 
@@ -102,7 +102,7 @@ define(function(require) {
                 vec3.normalize(ray.direction._array, ray.direction._array);
                 ray.direction._dirty = true;
                 ray.origin._dirty = true;
-                
+
                 return ray;
             };
         })()

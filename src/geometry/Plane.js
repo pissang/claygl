@@ -12,7 +12,7 @@ define(function(require) {
      * @param {number} [opt.widthSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Plane = StaticGeometry.derive(
+    var Plane = StaticGeometry.extend(
     /** @lends qtek.geometry.Plane# */
     {
         /**

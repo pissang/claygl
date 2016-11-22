@@ -26,7 +26,7 @@ define(function(require) {
      *         });
      *     });
      */
-    var Texture2D = Texture.derive(function() {
+    var Texture2D = Texture.extend(function() {
         return /** @lends qtek.Texture2D# */ {
             /**
              * @type {HTMLImageElement|HTMLCanvasElemnet}

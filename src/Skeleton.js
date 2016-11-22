@@ -13,7 +13,7 @@ define(function(require) {
     /**
      * @constructor qtek.Skeleton
      */
-    var Skeleton = Base.derive(function() {
+    var Skeleton = Base.extend(function() {
         return /** @lends qtek.Skeleton# */{
             /**
              * @type {string}
@@ -76,7 +76,7 @@ define(function(require) {
          * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
          */
         addClip: function(clip, mapRule) {
-            // Clip have been exists in 
+            // Clip have been exists in
             for (var i = 0; i < this._clips.length; i++) {
                 if (this._clips[i].clip === clip) {
                     return;
@@ -175,7 +175,7 @@ define(function(require) {
                             m4,
                             m4,
                             joint.node.worldTransform._array
-                        );   
+                        );
                         mat4.invert(m4, m4);
                     } else {
                         mat4.copy(m4, joint.node.worldTransform._array);
@@ -234,7 +234,7 @@ define(function(require) {
         getSubSkinMatrices: function(meshId, joints) {
             var subArray = this._subSkinMatricesArray[meshId];
             if (!subArray) {
-                subArray 
+                subArray
                     = this._subSkinMatricesArray[meshId]
                     = new Float32Array(joints.length * 16);
             }
@@ -256,7 +256,7 @@ define(function(require) {
             if (!this._clips[clipIndex]) {
                 return;
             }
-            
+
             var clip = this._clips[clipIndex].clip;
             var maps = this._clips[clipIndex].maps;
 

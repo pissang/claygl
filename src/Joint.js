@@ -3,12 +3,12 @@ define(function(require) {
     'use strict';
 
     var Base = require('./core/Base');
-    
+
     /**
      * @constructor qtek.Joint
      * @extends qtek.core.Base
      */
-    var Joint = Base.derive(
+    var Joint = Base.extend(
     /** @lends qtek.Joint# */
     {
         // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576

@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     var Mesh = require('../Mesh');
     var DynamicGeometry = require('../DynamicGeometry');
     var Plane = require('../math/Plane');
@@ -17,8 +17,8 @@ define(function(require) {
     var uvs = [[0, 0], [0, 1], [1, 1], [1, 0]];
     var tris = [0, 1, 2, 2, 3, 0];
 
-    var InfinitePlane = Mesh.derive({
-        
+    var InfinitePlane = Mesh.extend({
+
         camera: null,
 
         plane: null,
@@ -71,7 +71,7 @@ define(function(require) {
 
         // http://fileadmin.cs.lth.se/graphics/theses/projects/projgrid/
         _unProjectGrid: (function() {
-            
+
             var planeViewSpace = new Plane();
             var lines = [
                 0, 1, 0, 2, 1, 3, 2, 3,

@@ -14,7 +14,7 @@ define(function(require) {
      * @param {number} [opt.capSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Cylinder = StaticGeometry.derive(
+    var Cylinder = StaticGeometry.extend(
     /** @lends qtek.geometry.Cylinder# */
     {
         /**

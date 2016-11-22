@@ -9,7 +9,7 @@ define(function(require) {
      * @constructor qtek.Material
      * @extends qtek.core.Base
      */
-    var Material = Base.derive(
+    var Material = Base.extend(
     /** @lends qtek.Material# */
     {
         /**

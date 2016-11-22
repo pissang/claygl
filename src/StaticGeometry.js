@@ -22,7 +22,7 @@ define(function(require) {
      * @constructor qtek.StaticGeometry
      * @extends qtek.Geometry
      */
-    var StaticGeometry = Geometry.derive(function() {
+    var StaticGeometry = Geometry.extend(function() {
         return /** @lends qtek.StaticGeometry# */ {
             attributes: {
                  position: new Attribute('position', 'float', 3, 'POSITION', false),

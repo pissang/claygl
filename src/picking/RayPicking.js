@@ -13,7 +13,7 @@ define(function(require) {
      * @constructor qtek.picking.RayPicking
      * @extends qtek.core.Base
      */
-    var RayPicking = Base.derive(
+    var RayPicking = Base.extend(
     /** @lends qtek.picking.RayPicking# */
     {
         /**

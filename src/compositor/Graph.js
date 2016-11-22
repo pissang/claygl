@@ -9,7 +9,7 @@ define(function (require) {
      * @constructor qtek.compositor.Graph
      * @extends qtek.core.Base
      */
-    var Graph = Base.derive(function () {
+    var Graph = Base.extend(function () {
         return /** @lends qtek.compositor.Graph# */ {
             /**
              * @type {Array.<qtek.compositor.Node>}

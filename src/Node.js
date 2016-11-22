@@ -15,7 +15,7 @@ define(function(require) {
      * @constructor qtek.Node
      * @extends qtek.core.Base
      */
-    var Node = Base.derive(
+    var Node = Base.extend(
     /** @lends qtek.Node# */
     {
         /**

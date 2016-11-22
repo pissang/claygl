@@ -21,7 +21,7 @@ define(function(require) {
      * @constructor qtek.loader.FX
      * @extends qtek.core.Base
      */
-    var FXLoader = Base.derive(
+    var FXLoader = Base.extend(
     /** @lends qtek.loader.FX# */
     {
         /**

@@ -43,7 +43,7 @@ define(function (require) {
         });
      *
      */
-    var Node = Base.derive(function () {
+    var Node = Base.extend(function () {
         return /** @lends qtek.compositor.Node# */ {
             /**
              * @type {string}

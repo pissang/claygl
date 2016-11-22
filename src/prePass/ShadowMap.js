@@ -45,7 +45,7 @@ define(function(require) {
      *         renderer.render(scene, camera);
      *     });
      */
-    var ShadowMapPass = Base.derive(function() {
+    var ShadowMapPass = Base.extend(function() {
         return /** @lends qtek.prePass.ShadowMap# */ {
             /**
              * Soft shadow technique.

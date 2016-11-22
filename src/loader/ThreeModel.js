@@ -32,7 +32,7 @@ define(function(require) {
      * @constructor qtek.loader.ThreeModel
      * @extends qtek.core.Base
      */
-    var Loader = Base.derive(
+    var Loader = Base.extend(
     /** @lends qtek.loader.ThreeModel# */
     {
         /**

@@ -9,7 +9,7 @@ define(function (require) {
      * @constructor qtek.Scene
      * @extends qtek.Node
      */
-    var Scene = Node.derive(function () {
+    var Scene = Node.extend(function () {
         return /** @lends qtek.Scene# */ {
             /**
              * Global material of scene

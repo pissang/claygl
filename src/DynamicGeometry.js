@@ -27,7 +27,7 @@ define(function (require) {
      * @constructor qtek.DynamicGeometry
      * @extends qtek.Geometry
      */
-    var DynamicGeometry = Geometry.derive(function () {
+    var DynamicGeometry = Geometry.extend(function () {
         return /** @lends qtek.DynamicGeometry# */ {
             attributes: {
                  position: new Attribute('position', 'float', 3, 'POSITION', true),

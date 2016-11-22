@@ -5,7 +5,7 @@ define(function(require) {
      * @constructor qtek.particleSystem.Field
      * @extends qtek.core.Base
      */
-    var Field = Base.derive({}, {
+    var Field = Base.extend({}, {
         /**
          * Apply a field to the particle and update the particle velocity
          * @param  {qtek.math.Vector3} velocity

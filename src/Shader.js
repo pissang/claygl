@@ -130,7 +130,7 @@ define(function (require) {
      *     // Use alpha channel in diffuse texture
      *     shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
      */
-    var Shader = Base.derive(function () {
+    var Shader = Base.extend(function () {
         return /** @lends qtek.Shader# */ {
             /**
              * Vertex shader code

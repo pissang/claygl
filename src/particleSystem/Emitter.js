@@ -11,7 +11,7 @@ define(function(require) {
      * @constructor qtek.particleSystem.Emitter
      * @extends qtek.core.Base
      */
-    var Emitter = Base.derive(
+    var Emitter = Base.extend(
     /** @lends qtek.particleSystem.Emitter# */
     {
         /**
@@ -63,9 +63,9 @@ define(function(require) {
         weight: null,
 
         _particlePool: null
-        
+
     }, function() {
-        
+
         this._particlePool = [];
 
         // TODO Reduce heap memory
@@ -129,7 +129,7 @@ define(function(require) {
             this._particlePool.push(particle);
         }
     });
-    
+
     /**
      * Create a constant 1d value generator. Alias for {@link qtek.math.Value.constant}
      * @method qtek.particleSystem.Emitter.constant

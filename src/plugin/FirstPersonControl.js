@@ -16,7 +16,7 @@ define(function(require) {
      *         renderer.render(scene, camera);
      *     });
      */
-    var FirstPersonControl = Base.derive(function() {
+    var FirstPersonControl = Base.extend(function() {
         return /** @lends qtek.plugin.FirstPersonControl# */ {
             /**
              * Scene node to control, mostly it is a camera

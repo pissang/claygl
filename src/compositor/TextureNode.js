@@ -9,7 +9,7 @@ define(function(require) {
      * @constructor qtek.compositor.TextureNode
      * @extends qtek.compositor.Node
      */
-    var TextureNode = Node.derive(function() {
+    var TextureNode = Node.extend(function() {
         return /** @lends qtek.compositor.TextureNode# */ {
             shader: Shader.source('qtek.compositor.output'),
             /**

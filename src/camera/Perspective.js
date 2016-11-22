@@ -8,7 +8,7 @@ define(function(require) {
      * @constructor qtek.camera.Perspective
      * @extends qtek.Camera
      */
-    var Perspective = Camera.derive(
+    var Perspective = Camera.extend(
     /** @lends qtek.camera.Perspective# */
     {
         /**

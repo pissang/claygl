@@ -26,7 +26,7 @@ define(function(require) {
      *     });
      *     skybox.material.set('environmentMap', skyTex);
      */
-    var Skybox = Mesh.derive(function () {
+    var Skybox = Mesh.extend(function () {
 
         if (!skyboxShader) {
             skyboxShader = new Shader({

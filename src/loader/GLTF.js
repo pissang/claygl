@@ -72,7 +72,7 @@ define(function(require) {
      * @constructor qtek.loader.GLTF
      * @extends qtek.core.Base
      */
-    var GLTFLoader = Base.derive(
+    var GLTFLoader = Base.extend(
     /** @lends qtek.loader.GLTF# */
     {
         /**
@@ -169,7 +169,14 @@ define(function(require) {
             // Load buffers
             util.each(json.buffers, function(bufferInfo, name) {
                 loading++;
-                self._loadBuffer(bufferInfo.path, function(buffer) {
+                var path = bufferInfo.uri;
+
+                // DEPRECATED compatible with older version(< 1.0)
+                // https://github.com/KhronosGroup/glTF/wiki/glTF-0.8-to-1.0-Guide
+                if (path == null) {
+                    path = bufferInfo.path;
+                }
+                self._loadBuffer(path, function(buffer) {
                     lib.buffers[name] = buffer;
                     loading--;
                     if (loading === 0) {
@@ -406,7 +413,7 @@ define(function(require) {
                 ['wrapS', 'wrapT', 'magFilter', 'minFilter']
                 .forEach(function(name) {
                     var value = samplerInfo[name];
-                    if (value !== undefined) {
+                    if (value != null) {
                         if (typeof(value) === 'string') {
                             // DEPRECATED, sampler parameter now use gl enum instead of string
                             value = glenum[value];
@@ -443,25 +450,33 @@ define(function(require) {
             // Parse techniques
             for (var name in json.techniques) {
                 var techniqueInfo = json.techniques[name];
-                // Default phong shader
-                // var shader = new Shader({
-                //     vertex: Shader.source('qtek.phong.vertex'),
-                //     fragment: Shader.source('qtek.phong.fragment')
-                // });
-                techniques[name] = {
-                    // shader: shader,
-                    pass: techniqueInfo.passes[techniqueInfo.pass]
-                };
+
+                // DEPRECATED compatible with older version(< 1.0)
+                // There are no passes in techniques now
+                // https://github.com/KhronosGroup/glTF/wiki/glTF-0.8-to-1.0-Guide
+                if (techniqueInfo.passes) {
+                    techniques[name] = techniqueInfo.passes[techniqueInfo.pass];
+                }
+                else {
+                    techniques[name] = techniqueInfo;
+                }
             }
             for (var name in json.materials) {
                 var materialInfo = json.materials[name];
 
-                var instanceTechniqueInfo = materialInfo.instanceTechnique;
-                var technique = techniques[instanceTechniqueInfo.technique];
-                var pass = technique.pass;
+                // DEPRECATED compatible with older version(< 1.0)
+                // There no instanceTechnique in material now.
+                // https://github.com/KhronosGroup/glTF/wiki/glTF-0.8-to-1.0-Guide
+                if (materialInfo.instanceTechnique) {
+                    for (var key in materialInfo.instanceTechnique) {
+                        materialInfo[key] = materialInfo.instanceTechnique[key];
+                    }
+                    materialInfo.instanceTechnique = null;
+                }
+                var technique = techniques[materialInfo.technique];
                 var uniforms = {};
 
-                uniforms = instanceTechniqueInfo.values;
+                uniforms = materialInfo.values;
                 for (var symbol in uniforms) {
                     var value = uniforms[symbol];
                     // TODO: texture judgement should be more robust
@@ -480,14 +495,14 @@ define(function(require) {
                     name: materialInfo.name,
                     shader: shaderLibrary.get(this.shaderName, enabledTextures)
                 });
-                if (pass.states.depthMask !== undefined) {
-                    material.depthMask = pass.states.depthMask;
+                if (technique.states.depthMask != null) {
+                    material.depthMask = technique.states.depthMask;
                 }
-                if (pass.states.depthTestEnable !== undefined) {
-                    material.depthTest = pass.states.depthTestEnable;
+                if (technique.states.depthTestEnable != null) {
+                    material.depthTest = technique.states.depthTestEnable;
                 }
-                material.cullFace = pass.states.cullFaceEnable || false;
-                if (pass.states.blendEnable) {
+                material.cullFace = technique.states.cullFaceEnable || false;
+                if (technique.states.blendEnable) {
                     material.transparent = true;
                     // TODO blend Func and blend Equation
                 }
@@ -500,23 +515,24 @@ define(function(require) {
                         material.set('diffuseMap', uniforms['diffuse']);
                     }
                 }
-                if (uniforms['normalMap'] !== undefined) {
+                if (uniforms['normalMap'] != null) {
                     material.set('normalMap', uniforms['normalMap']);
                 }
-                if (uniforms['emission'] !== undefined) {
+                if (uniforms['emission'] != null) {
                     material.set('emission', uniforms['emission'].slice(0, 3));
                 }
-                if (uniforms['shininess'] !== undefined) {
+                if (uniforms['shininess'] != null) {
+                    // Uniform glossiness
                     material.set('glossiness', Math.log(uniforms['shininess']) / Math.log(8192));
                     material.set('shininess', uniforms['shininess']);
                 } else {
                     material.set('glossiness', 0.5);
                     material.set('shininess', 0.5);
                 }
-                if (uniforms['specular'] !== undefined) {
+                if (uniforms['specular'] != null) {
                     material.set('specularColor', uniforms['specular'].slice(0, 3));
                 }
-                if (uniforms['transparency'] !== undefined) {
+                if (uniforms['transparency'] != null) {
                     material.set('alpha', uniforms['transparency']);
                 }
 
@@ -549,7 +565,11 @@ define(function(require) {
                         if (!attributeName) {
                             continue;
                         }
-                        var attributeType = attributeInfo.type;
+                        var attributeType = attributeInfo.componentType;
+                        // DEPRECATED compatible with older version(< 1.0)
+                        if (attributeType == null) {
+                            attributeType = attributeInfo.type;
+                        }
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
                         var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
@@ -579,7 +599,7 @@ define(function(require) {
                                 ArrayCtor = vendor.Float32Array;
                                 break;
                             default:
-                                console.warn('Attribute type '+attributeInfo.type+' not support yet');
+                                console.warn('Attribute type ' + attributeInfo.type + ' not support yet');
                                 break;
                         }
                         var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
@@ -592,7 +612,8 @@ define(function(require) {
                                 weightArray[i * 3 + 2] = attributeArray[i * 4 + 2];
                             }
                             geometry.attributes[attributeName].value = weightArray;
-                        } else {
+                        }
+                        else {
                             geometry.attributes[attributeName].value = attributeArray;
                         }
                         if (semantic === 'POSITION') {
@@ -616,7 +637,7 @@ define(function(require) {
                     var byteOffset = bufferViewInfo.byteOffset + indicesInfo.byteOffset;
 
                     // index uint
-                    if (indicesInfo.type === 0x1405) { // UNSIGNED_INT
+                    if (indicesInfo.componentType === 0x1405) { // UNSIGNED_INT
                         geometry.faces = new vendor.Uint32Array(buffer, byteOffset, indicesInfo.count);
                     }
                     else { // UNSIGNED_SHORT, 0x1403
@@ -743,8 +764,12 @@ define(function(require) {
                     if (nodeInfo.rotation) {
                         // glTF use axis angle in rotation
                         // https://github.com/KhronosGroup/glTF/issues/144
-                        quat.setAxisAngle(node.rotation._array, nodeInfo.rotation.slice(0, 3), nodeInfo.rotation[3]);
-                        node.rotation._dirty = true;
+                        // quat.setAxisAngle(node.rotation._array, nodeInfo.rotation.slice(0, 3), nodeInfo.rotation[3]);
+                        // node.rotation._dirty = true;
+
+                        // https://github.com/KhronosGroup/glTF/wiki/glTF-0.8-to-1.0-Guide
+                        // From 1.0 rotation use quaternion instead
+                        node.rotation.setArray(nodeInfo.rotation);
                     }
                     if (nodeInfo.scale) {
                         node.scale.setArray(nodeInfo.scale);

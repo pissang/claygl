@@ -12,7 +12,7 @@ define(function(require){
      * @extends qtek.compositor.Graph
      *
      */
-    var Compositor = Graph.derive(function() {
+    var Compositor = Graph.extend(function() {
         return {
             // Output node
             _outputs: [],

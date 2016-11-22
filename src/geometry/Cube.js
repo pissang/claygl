@@ -20,7 +20,7 @@ define(function(require) {
      * @param {number} [opt.depthSegments]
      * @param {boolean} [opt.inside]
      */
-    var Cube = StaticGeometry.derive(
+    var Cube = StaticGeometry.extend(
     /**@lends qtek.geometry.Cube# */
     {
         /**

@@ -99,7 +99,7 @@ define(function (require) {
         }
     }
 
-    var StandardMaterial = Material.derive(function () {
+    var StandardMaterial = Material.extend(function () {
 
         return {
 

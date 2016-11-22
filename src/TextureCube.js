@@ -36,7 +36,7 @@ define(function(require) {
      *         });
      *     });
      */
-    var TextureCube = Texture.derive(function() {
+    var TextureCube = Texture.extend(function() {
         return /** @lends qtek.TextureCube# */{
             /**
              * @type {Object}

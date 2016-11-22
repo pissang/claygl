@@ -35,7 +35,7 @@ define(function(require) {
      * @constructor qtek.Renderable
      * @extends qtek.Node
      */
-    var Renderable = Node.derive(
+    var Renderable = Node.extend(
     /** @lends qtek.Renderable# */
     {
         /**

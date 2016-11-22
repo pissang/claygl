@@ -31,7 +31,7 @@ define(function(require) {
     /**
      * @constructor qtek.Renderer
      */
-    var Renderer = Base.derive(function () {
+    var Renderer = Base.extend(function () {
         return /** @lends qtek.Renderer# */ {
 
             /**

@@ -18,7 +18,7 @@ define(function(require) {
      * @param {number} [opt.capSegments]
      * @param {number} [opt.heightSegments]
      */
-    var Cone = StaticGeometry.derive(
+    var Cone = StaticGeometry.extend(
     /** @lends qtek.geometry.Cone# */
     {
         /**

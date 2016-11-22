@@ -53,7 +53,7 @@ define(function(require) {
      *         renderer.render(scene, camera);
      *     });
      */
-    var ParticleRenderable = Renderable.derive(
+    var ParticleRenderable = Renderable.extend(
     /** @lends qtek.particleSystem.ParticleRenderable# */
     {
         /**

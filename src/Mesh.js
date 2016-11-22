@@ -9,7 +9,7 @@ define(function(require) {
      * @constructor qtek.Mesh
      * @extends qtek.Renderable
      */
-    var Mesh = Renderable.derive(
+    var Mesh = Renderable.extend(
     /** @lends qtek.Mesh# */
     {
         /**
