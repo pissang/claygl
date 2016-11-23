@@ -73,6 +73,9 @@ define(function(require) {
         // extend the derive method as a static method;
         sub.extend = _super.extend;
 
+        // DEPCRATED
+        sub.derive = _super.extend;
+
         return sub;
     }
 
@@ -100,6 +103,9 @@ define(function(require) {
      */
     return {
 
-        extend: derive
+        extend: derive,
+
+        // DEPCRATED
+        derive: derive
     };
 });

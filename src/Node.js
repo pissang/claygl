@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -7,6 +7,7 @@ define(function(require) {
     var Quaternion = require('./math/Quaternion');
     var Matrix4 = require('./math/Matrix4');
     var glMatrix = require('./dep/glmatrix');
+    var BoundingBox = require('./math/BoundingBox');
     var mat4 = glMatrix.mat4;
 
     var nameId = 0;
@@ -84,7 +85,7 @@ define(function(require) {
     }, function () {
 
         if (!this.name) {
-            this.name = 'NODE_' + (nameId++);
+            this.name = (this.type || 'NODE') + '_' + (nameId++);
         }
 
         if (!this.position) {
@@ -118,7 +119,7 @@ define(function(require) {
          * Return true if it is a renderable scene node, like Mesh and ParticleSystem
          * @return {boolean}
          */
-        isRenderable: function() {
+        isRenderable: function () {
             return false;
         },
 
@@ -126,7 +127,7 @@ define(function(require) {
          * Set the name of the scene node
          * @param {string} name
          */
-        setName: function(name) {
+        setName: function (name) {
             var scene = this._scene;
             if (scene) {
                 var nodeRepository = scene._nodeRepository;
@@ -140,7 +141,7 @@ define(function(require) {
          * Add a child node
          * @param {qtek.Node} node
          */
-        add: function(node) {
+        add: function (node) {
             if (this._inIterating) {
                 console.warn('Add operation can cause unpredictable error when in iterating');
             }
@@ -164,7 +165,7 @@ define(function(require) {
          * Remove the given child scene node
          * @param {qtek.Node} node
          */
-        remove: function(node) {
+        remove: function (node) {
             if (this._inIterating) {
                 console.warn('Remove operation can cause unpredictable error when in iterating');
             }
@@ -198,12 +199,12 @@ define(function(require) {
             return this._parent;
         },
 
-        _removeSelfFromScene: function(descendant) {
+        _removeSelfFromScene: function (descendant) {
             descendant._scene.removeFromScene(descendant);
             descendant._scene = null;
         },
 
-        _addSelfToScene: function(descendant) {
+        _addSelfToScene: function (descendant) {
             this._scene.addToScene(descendant);
             descendant._scene = this._scene;
         },
@@ -212,7 +213,7 @@ define(function(require) {
          * Return true if it is ancestor of the given scene node
          * @param {qtek.Node} node
          */
-        isAncestor: function(node) {
+        isAncestor: function (node) {
             var parent = node._parent;
             while(parent) {
                 if (parent === this) {
@@ -227,11 +228,11 @@ define(function(require) {
          * Get a new created array of all its children nodes
          * @return {qtek.Node[]}
          */
-        children: function() {
+        children: function () {
             return this._children.slice();
         },
 
-        childAt: function(idx) {
+        childAt: function (idx) {
             return this._children[idx];
         },
 
@@ -240,7 +241,7 @@ define(function(require) {
          * @param {string} name
          * @return {qtek.Node}
          */
-        getChildByName: function(name) {
+        getChildByName: function (name) {
             var children = this._children;
             for (var i = 0; i < children.length; i++) {
                 if (children[i].name === name) {
@@ -254,7 +255,7 @@ define(function(require) {
          * @param {string} name
          * @return {qtek.Node}
          */
-        getDescendantByName: function(name) {
+        getDescendantByName: function (name) {
             var children = this._children;
             for (var i = 0; i < children.length; i++) {
                 var child = children[i];
@@ -336,7 +337,7 @@ define(function(require) {
          * @param {Node} [context]
          * @param {Function} [ctor]
          */
-        traverse: function(callback, context, ctor) {
+        traverse: function (callback, context, ctor) {
 
             this._inIterating = true;
 
@@ -370,7 +371,7 @@ define(function(require) {
          * Set the local transform and decompose to SRT
          * @param {qtek.math.Matrix4} matrix
          */
-        setLocalTransform: function(matrix) {
+        setLocalTransform: function (matrix) {
             mat4.copy(this.localTransform._array, matrix._array);
             this.decomposeLocalTransform();
         },
@@ -378,7 +379,7 @@ define(function(require) {
         /**
          * Decompose the local transform to SRT
          */
-        decomposeLocalTransform: function(keepScale) {
+        decomposeLocalTransform: function (keepScale) {
             var scale = !keepScale ? this.scale: null;
             this.localTransform.decomposeMatrix(scale, this.rotation, this.position);
         },
@@ -387,7 +388,7 @@ define(function(require) {
          * Set the world transform and decompose to SRT
          * @param {qtek.math.Matrix4} matrix
          */
-        setWorldTransform: function(matrix) {
+        setWorldTransform: function (matrix) {
             mat4.copy(this.worldTransform._array, matrix._array);
             this.decomposeWorldTransform();
         },
@@ -396,11 +397,11 @@ define(function(require) {
          * Decompose the world transform to SRT
          * @method
          */
-        decomposeWorldTransform: (function() {
+        decomposeWorldTransform: (function () {
 
             var tmp = mat4.create();
 
-            return function(keepScale) {
+            return function (keepScale) {
                 var localTransform = this.localTransform;
                 var worldTransform = this.worldTransform;
                 // Assume world transform is updated
@@ -419,7 +420,7 @@ define(function(require) {
          * Update local transform from SRT
          * Notice that local transform will not be updated if _dirty mark of position, rotation, scale is all false
          */
-        updateLocalTransform: function() {
+        updateLocalTransform: function () {
             var position = this.position;
             var rotation = this.rotation;
             var scale = this.scale;
@@ -443,7 +444,7 @@ define(function(require) {
         /**
          * Update world transform, assume its parent world transform have been updated
          */
-        updateWorldTransform: function() {
+        updateWorldTransform: function () {
             var localTransform = this.localTransform._array;
             var worldTransform = this.worldTransform._array;
             if (this._parent) {
@@ -462,7 +463,7 @@ define(function(require) {
          * Update local transform and world transform recursively
          * @param {boolean} forceUpdateWorld
          */
-        update: function(forceUpdateWorld) {
+        update: function (forceUpdateWorld) {
             if (this.autoUpdateLocalTransform) {
                 this.updateLocalTransform();
             }
@@ -484,11 +485,56 @@ define(function(require) {
         },
 
         /**
-         * Get world position, extracted from world transform
-         * @param  {math.Vector3} [out]
-         * @return {math.Vector3}
+         * Get bounding box of node
+         * @param  {Function} [filter]
+         * @param  {qtek.math.BoundingBox} [out]
+         * @return {qtek.math.BoundingBox}
          */
-        getWorldPosition: function(out) {
+        getBoundingBox: (function () {
+
+            function defaultFilteer (el) {
+                return !el.ignore;
+            }
+            return function (filter, out) {
+                out = out || new BoundingBox();
+                filter = filter || defaultFilteer;
+
+                var children = this._children;
+                if (children.length === 0) {
+                    out.max.set(-Infinity, -Infinity, -Infinity);
+                    out.min.set(Infinity, Infinity, Infinity);
+                }
+
+                var tmpBBox = new BoundingBox();
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    if (!filter(child)) {
+                        continue;
+                    }
+                    child.getBoundingBox(filter, tmpBBox);
+                    child.updateLocalTransform();
+                    if (tmpBBox.isFinite()) {
+                        tmpBBox.applyTransform(child.localTransform);
+                    }
+                    if (i === 0) {
+                        out.copy(tmpBBox);
+                    }
+                    else {
+                        out.union(tmpBBox);
+                    }
+
+                }
+
+                return out;
+            };
+        })(),
+
+        /**
+         * Get world position, extracted from world transform
+         * @param  {qtek.math.Vector3} [out]
+         * @return {qtek.math.Vector3}
+         */
+        getWorldPosition: function (out) {
             var m = this.worldTransform._array;
             if (out) {
                 var arr = out._array;
@@ -505,7 +551,7 @@ define(function(require) {
          * Clone a new node
          * @return {Node}
          */
-        clone: function() {
+        clone: function () {
             var node = new this.constructor();
             var children = this._children;
 
@@ -522,18 +568,18 @@ define(function(require) {
 
         /**
          * Rotate the node around a axis by angle degrees, axis passes through point
-         * @param {math.Vector3} point Center point
-         * @param {math.Vector3} axis  Center axis
+         * @param {qtek.math.Vector3} point Center point
+         * @param {qtek.math.Vector3} axis  Center axis
          * @param {number}       angle Rotation angle
          * @see http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
          * @method
          */
-        rotateAround: (function() {
+        rotateAround: (function () {
             var v = new Vector3();
             var RTMatrix = new Matrix4();
 
             // TODO improve performance
-            return function(point, axis, angle) {
+            return function (point, axis, angle) {
 
                 v.copy(this.position).subtract(point);
 
@@ -553,14 +599,14 @@ define(function(require) {
         })(),
 
         /**
-         * @param {math.Vector3} target
-         * @param {math.Vector3} [up]
+         * @param {qtek.math.Vector3} target
+         * @param {qtek.math.Vector3} [up]
          * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
          * @method
          */
-        lookAt: (function() {
+        lookAt: (function () {
             var m = new Matrix4();
-            return function(target, up) {
+            return function (target, up) {
                 m.lookAt(this.position, target, up || this.localTransform.y).invert();
                 m.decomposeMatrix(null, this.rotation, this.position);
             };

@@ -73,7 +73,7 @@ define(function(require) {
         /**
          * Update projection matrix, called after update
          */
-        updateProjectionMatrix: function(){},
+        updateProjectionMatrix: function() {},
 
         /**
          * Cast a picking ray from camera near plane to far plane

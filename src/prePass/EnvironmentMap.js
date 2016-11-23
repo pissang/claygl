@@ -106,7 +106,7 @@ define(function (require) {
         render: function(renderer, scene, notUpdateScene) {
             var _gl = renderer.gl;
             if (!notUpdateScene) {
-                scene.update(true);
+                scene.update();
             }
             // Tweak fov
             // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
@@ -117,11 +117,21 @@ define(function (require) {
                 var target = targets[i];
                 var camera = this._cameras[target];
                 Vector3.copy(camera.position, this.position);
+
                 camera.far = this.far;
                 camera.near = this.near;
                 camera.fov = fov;
 
                 if (this.shadowMapPass) {
+                    camera.update();
+
+                    // update sceneBoundingBoxLastFrame
+                    var bbox = scene.getBoundingBox(function (el) {
+                        return !el.ignore;
+                    });
+                    bbox.applyTransform(camera.viewMatrix);
+                    camera.sceneBoundingBoxLastFrame.copy(bbox);
+
                     this.shadowMapPass.render(renderer, scene, camera, true);
                 }
                 this._frameBuffers[target].attach(

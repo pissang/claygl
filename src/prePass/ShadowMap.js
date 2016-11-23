@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     var Base = require('../core/Base');
     var glenum = require('../core/glenum');
@@ -40,12 +40,12 @@ define(function(require) {
      *         softShadow: qtek.prePass.ShadowMap.VSM
      *     });
      *     ...
-     *     animation.on('frame', function(frameTime) {
+     *     animation.on('frame', function (frameTime) {
      *         shadowMapPass.render(renderer, scene, camera);
      *         renderer.render(scene, camera);
      *     });
      */
-    var ShadowMapPass = Base.extend(function() {
+    var ShadowMapPass = Base.extend(function () {
         return /** @lends qtek.prePass.ShadowMap# */ {
             /**
              * Soft shadow technique.
@@ -97,7 +97,7 @@ define(function(require) {
 
             _texturePool: new TexturePool()
         };
-    }, function() {
+    }, function () {
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
             fragment: Shader.source('qtek.compositor.gaussian_blur_h')
@@ -120,7 +120,7 @@ define(function(require) {
          * @param  {boolean} [notUpdateScene=false]
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        render: function(renderer, scene, sceneCamera, notUpdateScene) {
+        render: function (renderer, scene, sceneCamera, notUpdateScene) {
             this.trigger('beforerender', this, renderer, scene, sceneCamera);
             this._renderShadowPass(renderer, scene, sceneCamera, notUpdateScene);
             this.trigger('afterrender', this, renderer, scene, sceneCamera);
@@ -132,7 +132,7 @@ define(function(require) {
          * @param  {number} size
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
-        renderDebug: function(renderer, size) {
+        renderDebug: function (renderer, size) {
             var prevClear = renderer.clear;
             renderer.clear = glenum.DEPTH_BUFFER_BIT;
             var viewport = renderer.viewport;
@@ -155,7 +155,7 @@ define(function(require) {
             renderer.clear = prevClear;
         },
 
-        _bindDepthMaterial: function(casters, bias, slopeScale) {
+        _bindDepthMaterial: function (casters, bias, slopeScale) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
@@ -215,7 +215,7 @@ define(function(require) {
             }
         },
 
-        _bindDistanceMaterial: function(casters, light) {
+        _bindDistanceMaterial: function (casters, light) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var nJoints = mesh.joints && mesh.joints.length;
@@ -251,14 +251,14 @@ define(function(require) {
             }
         },
 
-        _restoreMaterial: function(casters) {
+        _restoreMaterial: function (casters) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 mesh.material = this._meshMaterials[mesh.__GUID__];
             }
         },
 
-        _updateCaster: function(mesh) {
+        _updateCaster: function (mesh) {
             if (mesh.castShadow) {
                 this._opaqueCasters.push(mesh);
             }
@@ -277,7 +277,7 @@ define(function(require) {
             }
         },
 
-        _update: function(scene) {
+        _update: function (scene) {
             for (var i = 0; i < scene.opaqueQueue.length; i++) {
                 this._updateCaster(scene.opaqueQueue[i]);
             }
@@ -294,7 +294,7 @@ define(function(require) {
             }
         },
 
-        _renderShadowPass: function(renderer, scene, sceneCamera, notUpdateScene) {
+        _renderShadowPass: function (renderer, scene, sceneCamera, notUpdateScene) {
             // reset
             for (var name in this._shadowMapNumber) {
                 this._shadowMapNumber[name] = 0;
@@ -442,7 +442,7 @@ define(function(require) {
             }
         },
 
-        _renderDirectionalLightShadow: (function() {
+        _renderDirectionalLightShadow: (function () {
 
             var splitFrustum = new Frustum();
             var splitProjMatrix = new Matrix4();
@@ -453,7 +453,7 @@ define(function(require) {
 
             var prevDepth = 0;
             var deltaDepth = 0;
-            return function(renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
+            return function (renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
                 var shadowBias = light.shadowBias;
                 this._bindDepthMaterial(casters, shadowBias, light.shadowSlopeScale);
@@ -465,6 +465,7 @@ define(function(require) {
 
                 // Considering moving speed since the bounding box is from last frame
                 // verlet integration ?
+                // FIXME First shot?
                 var depth = -sceneCamera.sceneBoundingBoxLastFrame.min.z;
                 deltaDepth = Math.max(depth - prevDepth, 0);
                 prevDepth = depth;
@@ -552,7 +553,7 @@ define(function(require) {
             };
         })(),
 
-        _renderSpotLightShadow: function(renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
+        _renderSpotLightShadow: function (renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
             this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
             casters.sort(Renderer.opaqueSortFunc);
@@ -584,7 +585,7 @@ define(function(require) {
             spotLightMatrices.push(matrix._array);
         },
 
-        _renderPointLightShadow: function(renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
+        _renderPointLightShadow: function (renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
             var texture = this._getTexture(light.__GUID__, light);
             var _gl = renderer.gl;
             pointLightShadowMaps.push(texture);
@@ -606,7 +607,7 @@ define(function(require) {
             }
         },
 
-        _gaussianFilter: function(renderer, texture, size) {
+        _gaussianFilter: function (renderer, texture, size) {
             var parameter = {
                 width: size,
                 height: size,
@@ -632,7 +633,7 @@ define(function(require) {
             this._texturePool.put(tmpTexture);
         },
 
-        _getTexture: function(key, light) {
+        _getTexture: function (key, light) {
             var texture = this._textures[key];
             var resolution = light.shadowResolution || 512;
             if (!texture) {
@@ -657,7 +658,7 @@ define(function(require) {
             return texture;
         },
 
-        _getPointLightCamera: function(light, target) {
+        _getPointLightCamera: function (light, target) {
             if (!this._lightCameras.point) {
                 this._lightCameras.point = {
                     px: new PerspectiveCamera(),
@@ -699,12 +700,12 @@ define(function(require) {
             return camera;
         },
 
-        _getDirectionalLightCamera: (function() {
+        _getDirectionalLightCamera: (function () {
             var lightViewMatrix = new Matrix4();
             var lightViewBBox = new BoundingBox();
             // Camera of directional light will be adjusted
             // to contain the view frustum and scene bounding box as tightly as possible
-            return function(light, scene, sceneCamera) {
+            return function (light, scene, sceneCamera) {
                 if (!this._lightCameras.directional) {
                     this._lightCameras.directional = new OrthoCamera();
                 }
@@ -747,7 +748,7 @@ define(function(require) {
             };
         })(),
 
-        _getSpotLightCamera: function(light) {
+        _getSpotLightCamera: function (light) {
             if (!this._lightCameras.spot) {
                 this._lightCameras.spot = new PerspectiveCamera();
             }

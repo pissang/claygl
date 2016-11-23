@@ -126,12 +126,21 @@ define(function(require) {
          */
         afterRender: function (_gl, renderStat) {},
 
+        getBoundingBox: function (filter, out) {
+            out = Node.prototype.getBoundingBox.call(this, filter,  out);
+            if (this.geometry && this.geometry.boundingBox) {
+                out.union(this.geometry.boundingBox);
+            }
+
+            return out;
+        },
+
         /**
          * @param  {WebGLRenderingContext} _gl
          * @param  {qtek.Material} [globalMaterial]
          * @return {Object}
          */
-        render: function(_gl, globalMaterial) {
+        render: function (_gl, globalMaterial) {
             var material = globalMaterial || this.material;
             var shader = material.shader;
             var geometry = this.geometry;
