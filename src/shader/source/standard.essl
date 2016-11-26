@@ -75,7 +75,7 @@ uniform sampler2D emissiveMap;
 #ifdef SSAOMAP_ENABLED
 // For ssao prepass
 uniform sampler2D ssaoMap;
-uniform vec2 viewportSize;
+uniform vec2 viewportSize : VIEWPORT_SIZE;
 #endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];

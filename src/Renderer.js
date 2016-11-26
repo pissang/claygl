@@ -9,6 +9,7 @@ define(function(require) {
     var Base = require('./core/Base');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
+    var vendor = require('./core/vendor');
     var BoundingBox = require('./math/BoundingBox');
     var Matrix4 = require('./math/Matrix4');
     var shaderLibrary = require('./shader/library');
@@ -179,7 +180,7 @@ define(function(require) {
             // http://www.khronos.org/webgl/wiki/HandlingHighDPI
             // set the display size of the canvas.
             var dpr = this.devicePixelRatio;
-            if (typeof(width) !== 'undefined') {
+            if (width != null) {
                 canvas.style.width = width + 'px';
                 canvas.style.height = height + 'px';
                 // set the size of the drawingBuffer
@@ -417,6 +418,8 @@ define(function(require) {
                 renderedMeshCount: 0
             };
 
+            var viewportSize = [this._width, this._height];
+
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
             mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
@@ -424,6 +427,7 @@ define(function(require) {
             mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
             mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
             mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
+
 
             var _gl = this.gl;
             var scene = this._sceneRendering;
@@ -541,7 +545,6 @@ define(function(require) {
                     if (scene && scene.isShaderLightNumberChanged(shader)) {
                         scene.setShaderLightNumber(shader);
                     }
-
                     var errMsg = shader.bind(_gl);
                     if (errMsg) {
 
@@ -557,6 +560,8 @@ define(function(require) {
                             this.trigger('error', errMsg);
                         }
                     }
+                    // Set some common uniforms
+                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSize);
 
                     // Set lights uniforms
                     // TODO needs optimized

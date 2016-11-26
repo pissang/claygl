@@ -197,7 +197,8 @@ define(function(require) {
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
                 renderInfo.drawCallCount = 1;
-            } else {
+            }
+            else {
                 // Use the cache of static geometry
                 var vaoList = this._drawCache[currentDrawID];
                 if (!vaoList) {

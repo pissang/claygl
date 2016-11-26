@@ -33,7 +33,7 @@ define(function(require) {
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
                 var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
-                material.shader.setUniformBySemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+                material.shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
             }
 
             return Renderable.prototype.render.call(this, _gl, globalMaterial);

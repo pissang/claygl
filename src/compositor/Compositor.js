@@ -46,6 +46,7 @@ define(function(require){
             for (var i = 0; i < this._outputs.length; i++) {
                 this._outputs[i].updateReference();
             }
+
             for (var i = 0; i < this._outputs.length; i++) {
                 this._outputs[i].render(renderer, frameBuffer);
             }

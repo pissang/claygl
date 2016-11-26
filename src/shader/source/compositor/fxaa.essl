@@ -2,7 +2,7 @@
 @export qtek.compositor.fxaa
 
 uniform sampler2D texture;
-uniform vec2 viewportSize : [512, 512];
+uniform vec2 viewportSize : VIEWPORT_SIZE;
 
 varying vec2 v_Texcoord;
 
