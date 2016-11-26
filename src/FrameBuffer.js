@@ -157,9 +157,10 @@ define(function(require) {
                 throw new Error('The texture attached to color buffer is not a valid.');
             }
 
+            var bindOnce = false;
             if (!this._binded) {
+                bindOnce = true;
                 _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
-                this._binded = true;
             }
 
             this._width = texture.width;
@@ -191,6 +192,10 @@ define(function(require) {
 
             // Mipmap level can only be 0
             _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), 0);
+
+            if (bindOnce) {
+                _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
+            }
         },
         // TODO
         detach: function() {},

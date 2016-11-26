@@ -115,6 +115,7 @@ define(function (require) {
 
         if (this.outputs) {
             this.frameBuffer = new FrameBuffer({
+                // Not create depth buffer storage
                 depthBuffer: false
             });
         }
