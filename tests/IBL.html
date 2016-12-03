@@ -26,7 +26,7 @@
                 });
 
                 var normalDistribution = qtek.util.cubemap.generateNormalDistribution();
-                var brdfLookup = qtek.util.cubemap.integrateBrdf(renderer, normalDistribution);
+                var brdfLookup = qtek.util.cubemap.integrateBRDF(renderer, normalDistribution);
 
                 var GLTFLoader = new qtek.loader.GLTF();
                 GLTFLoader.load('assets/models/suzanne.json');

@@ -1,5 +1,5 @@
 define(function(require) {
-    
+
     'use strict';
 
     var glMatrix = require('../dep/glmatrix');
@@ -13,7 +13,7 @@ define(function(require) {
      * @param {number} z
      */
     var Vector3 = function(x, y, z) {
-        
+
         x = x || 0;
         y = y || 0;
         z = z || 0;
@@ -44,7 +44,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        add : function(b) {
+        add: function (b) {
             vec3.add(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -57,7 +57,7 @@ define(function(require) {
          * @param  {number}  z
          * @return {qtek.math.Vector3}
          */
-        set : function(x, y, z) {
+        set: function (x, y, z) {
             this._array[0] = x;
             this._array[1] = y;
             this._array[2] = z;
@@ -70,7 +70,7 @@ define(function(require) {
          * @param  {Float32Array|number[]} arr
          * @return {qtek.math.Vector3}
          */
-        setArray : function(arr) {
+        setArray: function (arr) {
             this._array[0] = arr[0];
             this._array[1] = arr[1];
             this._array[2] = arr[2];
@@ -83,7 +83,7 @@ define(function(require) {
          * Clone a new Vector3
          * @return {qtek.math.Vector3}
          */
-        clone : function() {
+        clone: function () {
             return new Vector3(this.x, this.y, this.z);
         },
 
@@ -92,7 +92,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        copy : function(b) {
+        copy: function (b) {
             vec3.copy(this._array, b._array);
             this._dirty = true;
             return this;
@@ -104,7 +104,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        cross : function(a, b) {
+        cross: function (a, b) {
             vec3.cross(this._array, a._array, b._array);
             this._dirty = true;
             return this;
@@ -115,7 +115,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {number}
          */
-        dist : function(b) {
+        dist: function (b) {
             return vec3.dist(this._array, b._array);
         },
 
@@ -124,7 +124,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {number}
          */
-        distance : function(b) {
+        distance: function (b) {
             return vec3.distance(this._array, b._array);
         },
 
@@ -133,7 +133,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        div : function(b) {
+        div: function (b) {
             vec3.div(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -144,7 +144,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        divide : function(b) {
+        divide: function (b) {
             vec3.divide(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -155,7 +155,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {number}
          */
-        dot : function(b) {
+        dot: function (b) {
             return vec3.dot(this._array, b._array);
         },
 
@@ -163,7 +163,7 @@ define(function(require) {
          * Alias of length
          * @return {number}
          */
-        len : function() {
+        len: function () {
             return vec3.len(this._array);
         },
 
@@ -171,7 +171,7 @@ define(function(require) {
          * Calculate the length
          * @return {number}
          */
-        length : function() {
+        length: function () {
             return vec3.length(this._array);
         },
         /**
@@ -181,7 +181,7 @@ define(function(require) {
          * @param  {number}  t
          * @return {qtek.math.Vector3}
          */
-        lerp : function(a, b, t) {
+        lerp: function (a, b, t) {
             vec3.lerp(this._array, a._array, b._array, t);
             this._dirty = true;
             return this;
@@ -192,7 +192,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        min : function(b) {
+        min: function (b) {
             vec3.min(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -203,7 +203,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        max : function(b) {
+        max: function (b) {
             vec3.max(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -214,7 +214,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        mul : function(b) {
+        mul: function (b) {
             vec3.mul(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -225,7 +225,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        multiply : function(b) {
+        multiply: function (b) {
             vec3.multiply(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -235,7 +235,7 @@ define(function(require) {
          * Negate self
          * @return {qtek.math.Vector3}
          */
-        negate : function() {
+        negate: function () {
             vec3.negate(this._array, this._array);
             this._dirty = true;
             return this;
@@ -245,7 +245,7 @@ define(function(require) {
          * Normalize self
          * @return {qtek.math.Vector3}
          */
-        normalize : function() {
+        normalize: function () {
             vec3.normalize(this._array, this._array);
             this._dirty = true;
             return this;
@@ -256,7 +256,7 @@ define(function(require) {
          * @param  {number} scale
          * @return {qtek.math.Vector3}
          */
-        random : function(scale) {
+        random: function (scale) {
             vec3.random(this._array, scale);
             this._dirty = true;
             return this;
@@ -267,7 +267,7 @@ define(function(require) {
          * @param  {number}  scale
          * @return {qtek.math.Vector3}
          */
-        scale : function(s) {
+        scale: function (s) {
             vec3.scale(this._array, this._array, s);
             this._dirty = true;
             return this;
@@ -279,7 +279,7 @@ define(function(require) {
          * @param  {number}  scale
          * @return {qtek.math.Vector3}
          */
-        scaleAndAdd : function(b, s) {
+        scaleAndAdd: function (b, s) {
             vec3.scaleAndAdd(this._array, this._array, b._array, s);
             this._dirty = true;
             return this;
@@ -290,7 +290,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {number}
          */
-        sqrDist : function(b) {
+        sqrDist: function (b) {
             return vec3.sqrDist(this._array, b._array);
         },
 
@@ -299,7 +299,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {number}
          */
-        squaredDistance : function(b) {
+        squaredDistance: function (b) {
             return vec3.squaredDistance(this._array, b._array);
         },
 
@@ -307,7 +307,7 @@ define(function(require) {
          * Alias for squaredLength
          * @return {number}
          */
-        sqrLen : function() {
+        sqrLen: function () {
             return vec3.sqrLen(this._array);
         },
 
@@ -315,7 +315,7 @@ define(function(require) {
          * Squared length of self
          * @return {number}
          */
-        squaredLength : function() {
+        squaredLength: function () {
             return vec3.squaredLength(this._array);
         },
 
@@ -324,7 +324,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        sub : function(b) {
+        sub: function (b) {
             vec3.sub(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -335,7 +335,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} b
          * @return {qtek.math.Vector3}
          */
-        subtract : function(b) {
+        subtract: function (b) {
             vec3.subtract(this._array, this._array, b._array);
             this._dirty = true;
             return this;
@@ -346,7 +346,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix3} m
          * @return {qtek.math.Vector3}
          */
-        transformMat3 : function(m) {
+        transformMat3: function (m) {
             vec3.transformMat3(this._array, this._array, m._array);
             this._dirty = true;
             return this;
@@ -357,7 +357,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} m
          * @return {qtek.math.Vector3}
          */
-        transformMat4 : function(m) {
+        transformMat4: function (m) {
             vec3.transformMat4(this._array, this._array, m._array);
             this._dirty = true;
             return this;
@@ -367,7 +367,7 @@ define(function(require) {
          * @param  {qtek.math.Quaternion} q
          * @return {qtek.math.Vector3}
          */
-        transformQuat : function(q) {
+        transformQuat: function (q) {
             vec3.transformQuat(this._array, this._array, q._array);
             this._dirty = true;
             return this;
@@ -378,7 +378,7 @@ define(function(require) {
          * @param  {qtek.math.Matrix4} m
          * @return {qtek.math.Vector3}
          */
-        applyProjection : function(m) {
+        applyProjection: function (m) {
             var v = this._array;
             m = m._array;
 
@@ -397,12 +397,16 @@ define(function(require) {
 
             return this;
         },
-        
-        eulerFromQuaternion : function(q, order) {
-            Vector3.eulerFromQuaternion(this, q, order);
+
+        eulerFromQuat: function(q, order) {
+            Vector3.eulerFromQuat(this, q, order);
         },
 
-        toString : function() {
+        eulerFromMat3: function (m, order) {
+            Vector3.eulerFromMat3(this, m, order);
+        },
+
+        toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
     };
@@ -463,7 +467,7 @@ define(function(require) {
 
 
     // Supply methods that are not in place
-    
+
     /**
      * @param  {qtek.math.Vector3} out
      * @param  {qtek.math.Vector3} a
@@ -481,7 +485,7 @@ define(function(require) {
      * @param  {number}  x
      * @param  {number}  y
      * @param  {number}  z
-     * @return {qtek.math.Vector3}  
+     * @return {qtek.math.Vector3}
      */
     Vector3.set = function(out, x, y, z) {
         vec3.set(out._array, x, y, z);
@@ -761,57 +765,156 @@ define(function(require) {
 
     function clamp(val, min, max) {
         return val < min ? min : (val > max ? max : val);
-    };
+    }
+    var atan2 = Math.atan2;
+    var asin = Math.asin;
+    var abs = Math.abs;
     /**
      * Convert quaternion to euler angle
      * Quaternion must be normalized
      * From three.js
      */
-    Vector3.eulerFromQuaternion = function (v, q, order) {
-        v = v._array;
+    Vector3.eulerFromQuat = function (out, q, order) {
+        out._dirty = true;
         q = q._array;
+
+        var target = out._array;
         var x = q[0], y = q[1], z = q[2], w = q[3];
         var x2 = x * x;
         var y2 = y * y;
         var z2 = z * z;
         var w2 = w * w;
-        var atan2 = Math.atan2;
-        var asin = Math.asin;
-        switch (order && order.toUpperCase()) {
+
+        var order = (order || 'XYZ').toUpperCase();
+
+        switch (order) {
+            case 'XYZ':
+                target[0] = atan2(2 * (x * w - y * z), (w2 - x2 - y2 + z2));
+                target[1] = asin(clamp(2 * (x * z + y * w), - 1, 1));
+                target[2] = atan2(2 * (z * w - x * y), (w2 + x2 - y2 - z2));
+                break;
             case 'YXZ':
-                v[0] = asin(clamp(2 * (x * w - y * z), - 1, 1));
-                v[1] = atan2(2 * (x * z + y * w), (w2 - x2 - y2 + z2));
-                v[2] = atan2(2 * (x * y + z * w), (w2 - x2 + y2 - z2));
+                target[0] = asin(clamp(2 * (x * w - y * z), - 1, 1));
+                target[1] = atan2(2 * (x * z + y * w), (w2 - x2 - y2 + z2));
+                target[2] = atan2(2 * (x * y + z * w), (w2 - x2 + y2 - z2));
                 break;
             case 'ZXY':
-                v[0] = asin(clamp(2 * (x * w + y * z), - 1, 1));
-                v[1] = atan2(2 * (y * w - z * x), (w2 - x2 - y2 + z2));
-                v[2] = atan2(2 * (z * w - x * y), (w2 - x2 + y2 - z2));
+                target[0] = asin(clamp(2 * (x * w + y * z), - 1, 1));
+                target[1] = atan2(2 * (y * w - z * x), (w2 - x2 - y2 + z2));
+                target[2] = atan2(2 * (z * w - x * y), (w2 - x2 + y2 - z2));
                 break;
             case 'ZYX':
-                v[0] = atan2(2 * (x * w + z * y), (w2 - x2 - y2 + z2));
-                v[1] = asin(clamp(2 * (y * w - x * z), - 1, 1));
-                v[2] = atan2(2 * (x * y + z * w), (w2 + x2 - y2 - z2));
+                target[0] = atan2(2 * (x * w + z * y), (w2 - x2 - y2 + z2));
+                target[1] = asin(clamp(2 * (y * w - x * z), - 1, 1));
+                target[2] = atan2(2 * (x * y + z * w), (w2 + x2 - y2 - z2));
                 break;
             case 'YZX':
-                v[0] = atan2(2 * (x * w - z * y), (w2 - x2 + y2 - z2));
-                v[1] = atan2(2 * (y * w - x * z), (w2 + x2 - y2 - z2));
-                v[2] = asin(clamp(2 * (x * y + z * w), - 1, 1));
+                target[0] = atan2(2 * (x * w - z * y), (w2 - x2 + y2 - z2));
+                target[1] = atan2(2 * (y * w - x * z), (w2 + x2 - y2 - z2));
+                target[2] = asin(clamp(2 * (x * y + z * w), - 1, 1));
                 break;
             case 'XZY':
-                v[0] = atan2(2 * (x * w + y * z), (w2 - x2 + y2 - z2));
-                v[1] = atan2(2 * (x * z + y * w), (w2 + x2 - y2 - z2));
-                v[2] = asin(clamp(2 * (z * w - x * y), - 1, 1));
+                target[0] = atan2(2 * (x * w + y * z), (w2 - x2 + y2 - z2));
+                target[1] = atan2(2 * (x * z + y * w), (w2 + x2 - y2 - z2));
+                target[2] = asin(clamp(2 * (z * w - x * y), - 1, 1));
                 break;
-            case 'XYZ':
             default:
-                v[0] = atan2(2 * (x * w - y * z), (w2 - x2 - y2 + z2));
-                v[1] = asin(clamp(2 * (x * z + y * w), - 1, 1));
-                v[2] = atan2(2 * (z * w - x * y), (w2 + x2 - y2 - z2));
-                break;
+                console.warn('Unkown order: ' + order);
         }
-        v._dirty = true;
-        return v;
+        return out;
+    };
+
+    /**
+     * Convert rotation matrix to euler angle
+     * from three.js
+     * @param  {[type]} v     [description]
+     * @param  {[type]} m     [description]
+     * @param  {[type]} order [description]
+     * @return {[type]}       [description]
+     */
+    Vector3.eulerFromMat3 = function (out, m, order) {
+        // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+        var te = m._array;
+        var m11 = te[0], m12 = te[3], m13 = te[6];
+        var m21 = te[1], m22 = te[4], m23 = te[7];
+        var m31 = te[2], m32 = te[5], m33 = te[8];
+        var target = out._array;
+
+        var order = (order || 'XYZ').toUpperCase();
+
+        switch (order) {
+            case 'XYZ':
+                target[1] = asin(clamp(m13, -1, 1));
+                if (abs(m13) < 0.99999) {
+                    target[0] = atan2(-m23, m33);
+                    target[2] = atan2(-m12, m11);
+                }
+                else {
+                    target[0] = atan2(m32, m22);
+                    target[2] = 0;
+                }
+                break;
+            case 'YXZ':
+                target[0] = asin(-clamp(m23, -1, 1));
+                if (abs(m23) < 0.99999) {
+                    target[1] = atan2(m13, m33);
+                    target[2] = atan2(m21, m22);
+                }
+                else {
+                    target[1] = atan2(-m31, m11);
+                    target[2] = 0;
+                }
+                break;
+            case 'ZXY':
+                target[0] = asin(clamp(m32, -1, 1));
+                if (abs(m32) < 0.99999) {
+                    target[1] = atan2(-m31, m33);
+                    target[2] = atan2(-m12, m22);
+                }
+                else {
+                    target[1] = 0;
+                    target[2] = atan2(m21, m11);
+                }
+                break;
+            case 'ZYX':
+                target[1] = asin(-clamp(m31, -1, 1));
+                if (abs(m31) < 0.99999) {
+                    target[0] = atan2(m32, m33);
+                    target[2] = atan2(m21, m11);
+                }
+                else {
+                    target[0] = 0;
+                    target[2] = atan2(-m12, m22);
+                }
+                break;
+            case 'YZX':
+                target[2] = asin(clamp(m21, -1, 1));
+                if (abs(m21) < 0.99999) {
+                    target[0] = atan2(-m23, m22);
+                    target[1] = atan2(-m31, m11);
+                }
+                else {
+                    target[0] = 0;
+                    target[1] = atan2(m13, m33);
+                }
+                break;
+            case 'XZY':
+                target[2] = asin(-clamp(m12, -1, 1));
+                if (abs(m12) < 0.99999) {
+                    target[0] = atan2(m32, m22);
+                    target[1] = atan2(m13, m11);
+                }
+                else {
+                    target[0] = atan2(-m23, m33);
+                    target[1] = 0;
+                }
+                break;
+            default:
+                console.warn('Unkown order: ' + order);
+        }
+        out._dirty = true;
+
+        return out;
     };
 
     /**

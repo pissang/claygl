@@ -13,7 +13,6 @@ define(function (require) {
     var Skybox = require('../plugin/Skybox');
     var Scene = require('../Scene');
     var EnvironmentMapPass = require('../prePass/EnvironmentMap');
-    var Renderer = require('../Renderer');
     var vendor = require('../core/vendor');
     var textureUtil = require('./texture');
 
@@ -43,7 +42,7 @@ define(function (require) {
         // PENDING preserveDrawingBuffer?
         if (!brdfLookup || !normalDistribution) {
             normalDistribution = cubemapUtil.generateNormalDistribution();
-            brdfLookup = cubemapUtil.integrateBrdf(renderer, normalDistribution);
+            brdfLookup = cubemapUtil.integrateBRDF(renderer, normalDistribution);
         }
         textureOpts =  textureOpts || {};
 
@@ -172,7 +171,7 @@ define(function (require) {
         };
     };
 
-    cubemapUtil.integrateBrdf = function (renderer, normalDistribution) {
+    cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
         normalDistribution = normalDistribution || cubemapUtil.generateNormalDistribution();
         var framebuffer = new FrameBuffer();
         var pass = new Pass({

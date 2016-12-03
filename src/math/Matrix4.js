@@ -118,7 +118,7 @@ define(function(require) {
          * @param  {number} far
          * @return {qtek.math.Matrix4}
          */
-        frustum: function(left, right, bottom, top, near, far) {
+        frustum: function (left, right, bottom, top, near, far) {
             mat4.frustum(this._array, left, right, bottom, top, near, far);
             this._dirty = true;
             return this;
@@ -496,7 +496,7 @@ define(function(require) {
         out._dirty = true;
         return out;
     };
-    
+
     /**
      * @param  {qtek.math.Matrix4} out
      * @param  {number}  left
