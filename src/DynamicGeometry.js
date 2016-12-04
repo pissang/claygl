@@ -21,7 +21,8 @@ define(function (require) {
     var vec3Create = vec3.create;
 
     var arrSlice = Array.prototype.slice;
-    var Attribute = Geometry.Attribute;
+
+    var DynamicAttribute = Geometry.DynamicAttribute;
 
     /**
      * @constructor qtek.DynamicGeometry
@@ -30,21 +31,21 @@ define(function (require) {
     var DynamicGeometry = Geometry.extend(function () {
         return /** @lends qtek.DynamicGeometry# */ {
             attributes: {
-                 position: new Attribute('position', 'float', 3, 'POSITION', true),
-                 texcoord0: new Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', true),
-                 texcoord1: new Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', true),
-                 normal: new Attribute('normal', 'float', 3, 'NORMAL', true),
-                 tangent: new Attribute('tangent', 'float', 4, 'TANGENT', true),
-                 color: new Attribute('color', 'float', 4, 'COLOR', true),
+                 position: new DynamicAttribute('position', 'float', 3, 'POSITION'),
+                 texcoord0: new DynamicAttribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
+                 texcoord1: new DynamicAttribute('texcoord1', 'float', 2, 'TEXCOORD_1'),
+                 normal: new DynamicAttribute('normal', 'float', 3, 'NORMAL'),
+                 tangent: new DynamicAttribute('tangent', 'float', 4, 'TANGENT'),
+                 color: new DynamicAttribute('color', 'float', 4, 'COLOR'),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight: new Attribute('weight', 'float', 3, 'WEIGHT', true),
-                 joint: new Attribute('joint', 'float', 4, 'JOINT', true),
+                 weight: new DynamicAttribute('weight', 'float', 3, 'WEIGHT'),
+                 joint: new DynamicAttribute('joint', 'float', 4, 'JOINT'),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric: new Attribute('barycentric', 'float', 3, null, true)
+                 barycentric: new DynamicAttribute('barycentric', 'float', 3, null)
             },
 
             dynamic: true,
@@ -116,7 +117,7 @@ define(function (require) {
         },
 
         createAttribute: function (name, type, size, semantic) {
-            var attrib = new Attribute(name, type, size, semantic, true);
+            var attrib = new DynamicAttribute(name, type, size, semantic);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;

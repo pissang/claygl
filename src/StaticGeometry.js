@@ -13,7 +13,7 @@ define(function(require) {
     var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
 
-    var Attribute = Geometry.Attribute;
+    var StaticAttribute = Geometry.StaticAttribute;
     var vec3Create = vec3.create;
     var vec3Add = vec3.add;
     var vec3Set = vec3.set;
@@ -25,21 +25,21 @@ define(function(require) {
     var StaticGeometry = Geometry.extend(function() {
         return /** @lends qtek.StaticGeometry# */ {
             attributes: {
-                 position: new Attribute('position', 'float', 3, 'POSITION', false),
-                 texcoord0: new Attribute('texcoord0', 'float', 2, 'TEXCOORD_0', false),
-                 texcoord1: new Attribute('texcoord1', 'float', 2, 'TEXCOORD_1', false),
-                 normal: new Attribute('normal', 'float', 3, 'NORMAL', false),
-                 tangent: new Attribute('tangent', 'float', 4, 'TANGENT', false),
-                 color: new Attribute('color', 'float', 4, 'COLOR', false),
+                 position: new StaticAttribute('position', 'float', 3, 'POSITION'),
+                 texcoord0: new StaticAttribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
+                 texcoord1: new StaticAttribute('texcoord1', 'float', 2, 'TEXCOORD_1'),
+                 normal: new StaticAttribute('normal', 'float', 3, 'NORMAL'),
+                 tangent: new StaticAttribute('tangent', 'float', 4, 'TANGENT'),
+                 color: new StaticAttribute('color', 'float', 4, 'COLOR'),
                  // Skinning attributes
                  // Each vertex can be bind to 4 bones, because the
                  // sum of weights is 1, so the weights is stored in vec3 and the last
                  // can be calculated by 1-w.x-w.y-w.z
-                 weight: new Attribute('weight', 'float', 3, 'WEIGHT', false),
-                 joint: new Attribute('joint', 'float', 4, 'JOINT', false),
+                 weight: new StaticAttribute('weight', 'float', 3, 'WEIGHT'),
+                 joint: new StaticAttribute('joint', 'float', 4, 'JOINT'),
                  // For wireframe display
                  // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                 barycentric: new Attribute('barycentric', 'float', 3, null, false),
+                 barycentric: new StaticAttribute('barycentric', 'float', 3, null),
             },
 
             hint: glenum.STATIC_DRAW,
@@ -132,7 +132,7 @@ define(function(require) {
         },
 
         createAttribute: function(name, type, size, semantic) {
-            var attrib = new Attribute(name, type, size, semantic, false);
+            var attrib = new StaticAttribute(name, type, size, semantic);
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;

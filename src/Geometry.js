@@ -15,136 +15,6 @@ define(function(require) {
     var vec3Copy = vec3.copy;
     var vec2Copy = vec2.copy;
 
-    // PENDING put the buffer data in attribute ?
-    function Attribute(name, type, size, semantic, isDynamic) {
-        this.name = name;
-        this.type = type;
-        this.size = size;
-        if (semantic) {
-            this.semantic = semantic;
-        }
-        if (isDynamic) {
-            this._isDynamic = true;
-            this.value = [];
-        }
-        else {
-            this._isDynamic = false;
-            this.value = null;
-        }
-
-        // Init getter setter
-        switch (size) {
-            case 1:
-                this.get = function (idx) {
-                    return this.value[idx];
-                };
-                this.set = function (idx, value) {
-                    this.value[idx] = value;
-                };
-                break;
-            case 2:
-                if (isDynamic) {
-                    this.get = function (idx, out) {
-                        var item = this.value[idx];
-                        if (item) {
-                            vec2Copy(out, item);
-                        }
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var item = this.value[idx];
-                        if (!item) {
-                            item = this.value[idx] = vec2.create();
-                        }
-                        vec2Copy(item, val);
-                    };
-                } else {
-                    this.get = function (idx, out) {
-                        var arr = this.value;
-                        out[0] = arr[idx * 2];
-                        out[1] = arr[idx * 2 + 1];
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var arr = this.value;
-                        arr[idx * 2] = val[0];
-                        arr[idx * 2 + 1] = val[1];
-                    };
-                }
-                break;
-            case 3:
-                if (isDynamic) {
-                    this.get = function (idx, out) {
-                        var item = this.value[idx];
-                        if (item) {
-                            vec3Copy(out, item);
-                        }
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var item = this.value[idx];
-                        if (!item) {
-                            item = this.value[idx] = vec3.create();
-                        }
-                        vec3Copy(item, val);
-                    };
-                } else {
-                    this.get = function (idx, out) {
-                        var idx3 = idx * 3;
-                        var arr = this.value;
-                        out[0] = arr[idx3++];
-                        out[1] = arr[idx3++];
-                        out[2] = arr[idx3++];
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var idx3 = idx * 3;
-                        var arr = this.value;
-                        arr[idx3++] = val[0];
-                        arr[idx3++] = val[1];
-                        arr[idx3++] = val[2];
-                    };
-                }
-                break;
-            case 4:
-                if (isDynamic) {
-                    this.get = function (idx, out) {
-                        var item = this.value[idx];
-                        if (item) {
-                            vec4Copy(out, item);
-                        }
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var item = this.value[idx];
-                        if (!item) {
-                            item = this.value[idx] = vec4.create();
-                        }
-                        vec4Copy(item, val);
-                    };
-                } else {
-                    this.get = function (idx, out) {
-                        var arr = this.value;
-                        var idx4 = idx * 4;
-                        out[0] = arr[idx4++];
-                        out[1] = arr[idx4++];
-                        out[2] = arr[idx4++];
-                        out[3] = arr[idx4++];
-                        return out;
-                    };
-                    this.set = function (idx, val) {
-                        var arr = this.value;
-                        var idx4 = idx * 4;
-                        arr[idx4++] = val[0];
-                        arr[idx4++] = val[1];
-                        arr[idx4++] = val[2];
-                        arr[idx4++] = val[3];
-                    };
-                }
-                break;
-        }
-    }
-
     function getArrayCtorByType (type) {
         var ArrayConstructor;
         switch(type) {
@@ -167,45 +37,17 @@ define(function(require) {
         return ArrayConstructor;
     }
 
-    Attribute.prototype.init = function (nVertex) {
-        if (!this._isDynamic) {
-            if (!this.value || this.value.length != nVertex * this.size) {
-                var ArrayConstructor = getArrayCtorByType(this.type);
-                this.value = new ArrayConstructor(nVertex * this.size);
-            }
-        }
-        else {
-            console.warn('Dynamic geometry not support init method');
-        }
-    };
 
-    Attribute.prototype.fromArray = function (array) {
-        if (!this._isDynamic) {
-            var ArrayConstructor = getArrayCtorByType(this.type);
-            var value;
-            // Convert 2d array to flat
-            if (array[0] && (array[0].length)) {
-                var n = 0;
-                var size = this.size;
-                value = new ArrayConstructor(array.length * size);
-                for (var i = 0; i < array.length; i++) {
-                    for (var j = 0; j < size; j++) {
-                        value[n++] = array[i][j];
-                    }
-                }
-            }
-            else {
-                value = new ArrayConstructor(array);
-            }
-            this.value = value;
+    function Attribute(name, type, size, semantic) {
+        this.name = name;
+        this.type = type;
+        this.size = size;
+        if (semantic) {
+            this.semantic = semantic;
         }
-        else {
-            console.warn('Dynamic geometry not support fromArray method');
-        }
-    };
-
+    }
     Attribute.prototype.clone = function(copyValue) {
-        var ret = new Attribute(this.name, this.type, this.size, this.semantic, this._isDynamic);
+        var ret = new this.constructor(this.name, this.type, this.size, this.semantic);
         // FIXME
         if (copyValue) {
             console.warn('todo');
@@ -213,6 +55,178 @@ define(function(require) {
         return ret;
     };
 
+
+    /**
+     * Attribute for static geometry
+     */
+    function StaticAttribute (name, type, size, semantic) {
+        Attribute.call(this, name, type, size, semantic);
+        this.value = null;
+
+        // Init getter setter
+        switch (size) {
+            case 1:
+                this.get = function (idx) {
+                    return this.value[idx];
+                };
+                this.set = function (idx, value) {
+                    this.value[idx] = value;
+                };
+                break;
+            case 2:
+                this.get = function (idx, out) {
+                    var arr = this.value;
+                    out[0] = arr[idx * 2];
+                    out[1] = arr[idx * 2 + 1];
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var arr = this.value;
+                    arr[idx * 2] = val[0];
+                    arr[idx * 2 + 1] = val[1];
+                };
+            case 3:
+                this.get = function (idx, out) {
+                    var idx3 = idx * 3;
+                    var arr = this.value;
+                    out[0] = arr[idx3++];
+                    out[1] = arr[idx3++];
+                    out[2] = arr[idx3++];
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var idx3 = idx * 3;
+                    var arr = this.value;
+                    arr[idx3++] = val[0];
+                    arr[idx3++] = val[1];
+                    arr[idx3++] = val[2];
+                };
+            case 4:
+                this.get = function (idx, out) {
+                    var arr = this.value;
+                    var idx4 = idx * 4;
+                    out[0] = arr[idx4++];
+                    out[1] = arr[idx4++];
+                    out[2] = arr[idx4++];
+                    out[3] = arr[idx4++];
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var arr = this.value;
+                    var idx4 = idx * 4;
+                    arr[idx4++] = val[0];
+                    arr[idx4++] = val[1];
+                    arr[idx4++] = val[2];
+                    arr[idx4++] = val[3];
+                };
+        }
+    }
+
+    StaticAttribute.prototype.constructor = new Attribute();
+
+    StaticAttribute.prototype.init = function (nVertex) {
+        if (!this.value || this.value.length != nVertex * this.size) {
+            var ArrayConstructor = getArrayCtorByType(this.type);
+            this.value = new ArrayConstructor(nVertex * this.size);
+        }
+    };
+
+    StaticAttribute.prototype.fromArray = function (array) {
+        var ArrayConstructor = getArrayCtorByType(this.type);
+        var value;
+        // Convert 2d array to flat
+        if (array[0] && (array[0].length)) {
+            var n = 0;
+            var size = this.size;
+            value = new ArrayConstructor(array.length * size);
+            for (var i = 0; i < array.length; i++) {
+                for (var j = 0; j < size; j++) {
+                    value[n++] = array[i][j];
+                }
+            }
+        }
+        else {
+            value = new ArrayConstructor(array);
+        }
+        this.value = value;
+    };
+
+    /**
+     * Attribute for dynamic geometry
+     */
+    function DynamicAttribute (name, type, size, semantic) {
+        Attribute.call(this, name, type, size, semantic);
+        this.value = [];
+
+        // Init getter setter
+        switch (size) {
+            case 1:
+                this.get = function (idx) {
+                    return this.value[idx];
+                };
+                this.set = function (idx, value) {
+                    this.value[idx] = value;
+                };
+                break;
+            case 2:
+                this.get = function (idx, out) {
+                    var item = this.value[idx];
+                    if (item) {
+                        vec2Copy(out, item);
+                    }
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var item = this.value[idx];
+                    if (!item) {
+                        item = this.value[idx] = vec2.create();
+                    }
+                    vec2Copy(item, val);
+                };
+                break;
+            case 3:
+                this.get = function (idx, out) {
+                    var item = this.value[idx];
+                    if (item) {
+                        vec3Copy(out, item);
+                    }
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var item = this.value[idx];
+                    if (!item) {
+                        item = this.value[idx] = vec3.create();
+                    }
+                    vec3Copy(item, val);
+                };
+                break;
+            case 4:
+                this.get = function (idx, out) {
+                    var item = this.value[idx];
+                    if (item) {
+                        vec4Copy(out, item);
+                    }
+                    return out;
+                };
+                this.set = function (idx, val) {
+                    var item = this.value[idx];
+                    if (!item) {
+                        item = this.value[idx] = vec4.create();
+                    }
+                    vec4Copy(item, val);
+                };
+                break;
+        }
+    }
+    DynamicAttribute.prototype.constructor = new Attribute();
+
+    DynamicAttribute.prototype.init = function (nVertex) {
+        console.warn('Dynamic geometry not support init method');
+    };
+
+    DynamicAttribute.prototype.fromArray = function (array) {
+        console.warn('Dynamic geometry not support fromArray method');
+    };
 
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
@@ -367,6 +381,8 @@ define(function(require) {
     Geometry.AttributeBuffer = AttributeBuffer;
     Geometry.IndicesBuffer = IndicesBuffer;
     Geometry.Attribute = Attribute;
+    Geometry.StaticAttribute = StaticAttribute;
+    Geometry.DynamicAttribute = DynamicAttribute;
 
     return Geometry;
 });
