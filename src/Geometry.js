@@ -85,6 +85,7 @@ define(function(require) {
                     arr[idx * 2] = val[0];
                     arr[idx * 2 + 1] = val[1];
                 };
+                break;
             case 3:
                 this.get = function (idx, out) {
                     var idx3 = idx * 3;
@@ -101,6 +102,7 @@ define(function(require) {
                     arr[idx3++] = val[1];
                     arr[idx3++] = val[2];
                 };
+                break;
             case 4:
                 this.get = function (idx, out) {
                     var arr = this.value;

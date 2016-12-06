@@ -134,9 +134,9 @@ define(function (require) {
             /**
              * @type {number}
              * @name metalness
-             * @default 0.5
+             * @default 0
              */
-            metalness: 0.5,
+            metalness: 0,
 
             /**
              * @type {number}
@@ -366,8 +366,10 @@ define(function (require) {
             };
 
             // TODO Can't detect operation like box.min = new Vector()
-            this.setUniform('environmentBoxMin', value.min._array);
-            this.setUniform('environmentBoxMax', value.max._array);
+            if (value) {
+                this.setUniform('environmentBoxMin', value.min._array);
+                this.setUniform('environmentBoxMax', value.max._array);
+            }
 
             if (oldVal !== value) {
                 this._shaderDirty = true;
