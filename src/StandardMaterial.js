@@ -13,7 +13,6 @@ define(function (require) {
 
     var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
     var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
-    var ALL_PROPERTIES = TEXTURE_PROPERTIES.concat(SIMPLE_PROPERTIES);
 
 
     var OTHER_SHADER_KEYS = [
@@ -145,12 +144,6 @@ define(function (require) {
              */
             alpha: 1,
 
-            /**
-             * @type {boolean}
-             * @name transparent
-             * @default 0.5
-             */
-            transparent: 0.5,
 
             /**
              * @type {qtek.Texture2D}
