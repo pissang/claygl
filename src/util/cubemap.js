@@ -84,8 +84,8 @@ define(function (require) {
         if (envMap instanceof Texture2D) {
             // Convert panorama to cubemap
             var envCubemap = new TextureCube({
-                width: textureOpts.width,
-                height: textureOpts.height,
+                width: width,
+                height: height,
                 type: textureType
             });
             textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
