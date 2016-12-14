@@ -846,6 +846,11 @@ define(function (require) {
                     return parseFloat(str);
                 };
             }
+            else if (type === 'int') {
+                return function () {
+                    return parseInt(str);
+                };
+            }
         },
 
         // Create a new uniform instance for material
