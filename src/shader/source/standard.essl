@@ -190,7 +190,9 @@ void main()
     float m = metalness;
 
     #ifdef METALNESSMAP_ENABLED
-    m = texture2D(metalnessMap, v_Texcoord)[METALNESS_CHANEL];
+    float m2 = texture2D(metalnessMap, v_Texcoord)[METALNESS_CHANEL];
+    // Adjust the brightness
+    m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);
     #endif
 
     vec3 baseColor = outColor.rgb;
@@ -203,16 +205,18 @@ void main()
 #ifdef USE_ROUGHNESS
     float g = 1.0 - roughness;
     #ifdef ROUGHNESSMAP_ENABLED
-    // PENDING Replace or multiply
-    g = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANEL];
+    float g2 = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANEL];
+    // Adjust the brightness
+    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     #endif
 #else
     float g = glossiness;
     #ifdef GLOSSMAP_ENABLED
-    g = texture2D(glossMap, v_Texcoord)[GLOSS_CHANEL];
+    float g2 = texture2D(glossMap, v_Texcoord)[GLOSS_CHANEL];
+    // Adjust the brightness
+    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     #endif
 #endif
-
 
 #ifdef SPECULARMAP_ENABLED
     spec *= texture2D(specularMap, v_Texcoord).rgb;

@@ -143,8 +143,8 @@
                             material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel);
                             material.set('brdfLookup', prefilterResult.brdfLookup);
                             material.set('environmentMap', prefilterResult.environmentMap);
-                            material.set('roughness', 0);
-                            material.set('metalness', 0);
+                            material.set('roughness', 0.4);
+                            material.set('metalness', 0.5);
                             material.set('uvRepeat', [2, 2]);
 
                             [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
