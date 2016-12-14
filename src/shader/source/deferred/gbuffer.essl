@@ -9,7 +9,10 @@ uniform vec2 uvOffset;
 
 attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
+
+#ifdef FIRST_PASS
 attribute vec3 normal : NORMAL;
+#endif
 
 #ifdef SKINNING
 attribute vec3 weight : WEIGHT;
@@ -18,48 +21,52 @@ attribute vec4 joint : JOINT;
 uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 #endif
 
-varying vec2 v_Texcoord;
+
+#ifdef FIRST_PASS
 varying vec3 v_Normal;
 
-#ifdef NORMALMAP_ENABLED
 attribute vec4 tangent : TANGENT;
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 #endif
 
+
+varying vec2 v_Texcoord;
 varying vec4 v_ProjPos;
 
 void main()
 {
 
     vec3 skinnedPosition = position;
-    vec3 skinnedNormal = normal;
 
-#ifdef NORMALMAP_ENABLED
+#ifdef FIRST_PASS
+    vec3 skinnedNormal = normal;
     vec3 skinnedTangent = tangent.xyz;
     bool hasTangent = dot(tangent, tangent) > 0.0;
 #endif
+
 #ifdef SKINNING
 
     @import qtek.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+
+    #ifdef FIRST_PASS
     // Upper skinMatrix
     skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
-#ifdef NORMALMAP_ENABLED
     if (hasTangent) {
         skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
     }
-#endif
+    #endif
 #endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
 
     v_Texcoord = texcoord * uvRepeat + uvOffset;
 
+#ifdef FIRST_PASS
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
 
-#ifdef NORMALMAP_ENABLED
     if (hasTangent) {
         v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
         v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
@@ -73,9 +80,13 @@ void main()
 @end
 
 
-@export qtek.deferred.gbuffer.fragment
+@export qtek.deferred.gbuffer1.fragment
 
-uniform sampler2D diffuseMap;
+// First pass
+// - R: normal.x
+// - G: normal.y
+// - B: glossiness
+// - A: metalness + sign(normal.z)
 uniform float glossiness;
 uniform float metalness;
 
@@ -136,6 +147,24 @@ void main()
 }
 @end
 
+@export qtek.deferred.gbuffer2.fragment
+
+// Second pass
+// - R: albedo.r
+// - G: albedo.g
+// - B: albedo.b
+uniform sampler2D diffuseMap;
+uniform vec3 color;
+varying vec2 v_Texcoord;
+
+void main ()
+{
+    gl_FragColor.rgb = texture2D(diffuseMap, v_Texcoord).rgb * color;
+    gl_FragColor.a = 1.0;
+}
+
+@end
+
 
 @export qtek.deferred.gbuffer.debug
 
@@ -146,6 +175,7 @@ void main()
 // - 2: position
 // - 3: glossiness
 // - 4: metalness
+// - 5: albedo
 uniform int debug: 0;
 
 void main ()
@@ -164,8 +194,11 @@ void main ()
     else if (debug == 3) {
         gl_FragColor = vec4(vec3(glossiness), 1.0);
     }
-    else {
+    else if (debug == 4) {
         gl_FragColor = vec4(vec3(metalness), 1.0);
+    }
+    else {
+        gl_FragColor = vec4(albedo, 1.0);
     }
 }
 @end

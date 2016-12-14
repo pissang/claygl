@@ -1,8 +1,8 @@
 @export qtek.deferred.chunk.light_head
 
-uniform sampler2D gBufferTexture;
-
-uniform sampler2D depthTexture;
+uniform sampler2D gBufferTexture1;
+uniform sampler2D gBufferTexture2;
+uniform sampler2D gBufferTexture3;
 
 uniform vec2 viewportSize: VIEWPORT_SIZE;
 
@@ -18,9 +18,12 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
 @end
 
 @export qtek.deferred.chunk.gbuffer_read
+    // Extract
+    // - N, z, position, albedo
+
     vec2 uv = gl_FragCoord.xy / viewportSize;
 
-    vec4 texel = texture2D(gBufferTexture, uv);
+    vec4 texel = texture2D(gBufferTexture1, uv);
     // Is empty
     if (dot(texel.rgb, vec3(1.0)) == 0.0) {
         discard;
@@ -36,7 +39,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     metalness = abs(metalness);
 
 #ifdef DEPTH_ENCODED
-    vec4 depthTexel = texture2D(depthTexture, uv);
+    vec4 depthTexel = texture2D(gBufferTexture2, uv);
 
 // FXIME premultiplied alpha when blend is enabled?
 // FIXME Mobile and PC are different(mobile don't need it)
@@ -46,7 +49,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     float z = decodeFloat(depthTexel) * 2.0 - 1.0;
 #else
     // Depth buffer range is 0.0 - 1.0
-    float z = texture2D(depthTexture, uv).r * 2.0 - 1.0;
+    float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;
 #endif
 
     vec2 xy = uv * 2.0 - 1.0;
@@ -55,6 +58,8 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     vec4 p4 = viewProjectionInv * projectedPos;
 
     vec3 position = p4.xyz / p4.w;
+
+    vec3 albedo = texture2D(gBufferTexture3, uv).rgb;
 @end
 
 @export qtek.deferred.chunk.light_equation
