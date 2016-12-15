@@ -18,7 +18,7 @@
                 var deferredRenderer = new qtek.deferred.Renderer();
 
                 var camera = new qtek.camera.Perspective({
-                    far: 1000,
+                    far: 10000,
                     aspect: renderer.getViewportAspect()
                 });
 
@@ -53,11 +53,12 @@
                 }
 
                 var spotLight = new qtek.light.Spot({
-                    color: [Math.random(), Math.random(), Math.random()],
-                    range: 100
+                    color: [1, 0, 0],
+                    range: 500,
+                    intensity: 10
                 });
-                spotLight.position.set(0, 100, -20);
-                spotLight.rotation.rotateX(-Math.PI / 2);
+                spotLight.position.set(0, 50, 0);
+                spotLight.rotation.rotateX(-Math.PI / 4);
                 scene.add(spotLight);
 
                 for (var i = 0; i < 100; i ++) {
@@ -78,6 +79,10 @@
                 directionalLight.lookAt(scene.position);
 
                 scene.add(directionalLight);
+
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.2
+                }));
 
                 camera.position.set(0, 50, 100);
                 camera.lookAt(scene.position);

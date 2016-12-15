@@ -18,7 +18,7 @@
                 var deferredRenderer = new qtek.deferred.Renderer();
 
                 var camera = new qtek.camera.Perspective({
-                    far: 2000,
+                    far: 5000,
                     aspect: renderer.getViewportAspect()
                 });
 
@@ -56,7 +56,7 @@
                 var HEIGHT = 150;
                 for (var i = 0; i < 10; i ++) {
                     for (var j = 0; j < 10; j ++) {
-                        var sphereLight = new qtek.light.Point({
+                        var sphereLight = new qtek.light.Sphere({
                             color: [Math.random(), Math.random(), Math.random()],
                             range: 600,
                             intensity: 2.0,
@@ -92,7 +92,7 @@
                     var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
                     var material = new qtek.StandardMaterial({
                         specularColor: [0.95, 0.64, 0.54],
-                        metalness: 1,
+                        // metalness: 1,
                         roughness: 0.5
                     });
 

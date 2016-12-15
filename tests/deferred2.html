@@ -1,25 +1,26 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
+
+        <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
-        <script type="text/javascript">
+        <script>
             require(['qtek'], function(qtek) {
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
-                var gbuffer = new qtek.deferred.GBuffer();
                 renderer.resize(window.innerWidth, window.innerHeight);
+                var deferredRenderer = new qtek.deferred.Renderer();
+
                 var camera = new qtek.camera.Perspective({
+                    far: 10000,
                     aspect: renderer.getViewportAspect()
                 });
-                camera.position.set(0, 0, 6);
 
                 var scene = new qtek.Scene();
 
@@ -58,34 +59,69 @@
                     scene.add(mesh);
                 });
 
+
+                function randomInSquare(size) {
+                    return (Math.random() - 0.5) * size * 2
+                }
+
+                var lights = [];
+                var sphereGeo = new qtek.geometry.Sphere();
+                for (var i = 0; i < 100; i ++) {
+                    var rotNode = new qtek.Node();
+                    var pointLight = new qtek.light.Point({
+                        color: [Math.random(), Math.random(), Math.random()],
+                        range: 4 + Math.random() * 3
+                    });
+                    pointLight.position.set(0, 0, 4);
+                    rotNode.add(pointLight);
+
+                    rotNode.rotation
+                        .rotateZ(Math.random() * 6.28)
+                        .rotateY(Math.random() * 6.28);
+
+                    lights.push(rotNode);
+                    scene.add(rotNode);
+
+                    var debugMesh = new qtek.Mesh({
+                        material: new qtek.StandardMaterial({
+                            color: [0, 0, 0],
+                            rougness: 1,
+                            emission: pointLight.color
+                        }),
+                        geometry: sphereGeo
+                    });
+                    debugMesh.scale.set(0.1, 0.1, 0.1);
+                    pointLight.add(debugMesh);
+                }
+
+                camera.position.set(0, 0, 6);
+                camera.lookAt(scene.position);
+
                 var control = new qtek.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
+                    domElement: renderer.canvas,
+                    target: camera
                 });
 
                 var animation = new qtek.animation.Animation();
-                animation.start();
-                animation.on('frame', function(deltaTime) {
+
+                animation.on('frame', function (deltaTime) {
+                    lights.forEach(function (light) {
+                        light.rotation.rotateX(0.01);
+                    });
+
                     control.update(deltaTime);
-                    scene.update();
-                    camera.update();
-                    gbuffer.update(renderer, scene, camera);
-                    gbuffer.renderDebug(renderer, camera, config.debugType);
+                    deferredRenderer.render(renderer, scene, camera);
+
+                    stats.update();
                 });
+                animation.start();
 
-                window.onresize = function() {
-                    renderer.resize(window.innerWidth, window.innerHeight);
-                    camera.aspect = renderer.getViewportAspect();
-                };
-
-                var config = {
-                    debugType: 'normal'
-                }
-                var gui = new dat.GUI();
-
-                gui.add(config, 'debugType', [
-                    'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo'
-                ]);
+                var stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                stats.domElement.style.right = '0px';
+                document.body.appendChild( stats.domElement )
             });
         </script>
+    </body>
 </html>
