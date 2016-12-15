@@ -16,7 +16,7 @@
                 var shaderLibrary = qtek.shader.library;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById("Main")
+                    canvas: document.getElementById("Main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var animation = new qtek.animation.Animation();
@@ -24,16 +24,16 @@
 
                 var shadowMapPass = new qtek.prePass.ShadowMap();
 
-                var scene = new qtek.Scene,
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer.getViewportAspect(),
-                        far : 500
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                        aspect: renderer.getViewportAspect(),
+                        far: 500
                     });
 
                 var cube = new Cube();
                 var shader = shaderLibrary.get('qtek.lambert');
                 var material = new Material({
-                    shader : shader
+                    shader: shader
                 });
 
                 var root = new qtek.Node();
@@ -41,8 +41,8 @@
                     for(var j = 0; j < 2; j++){
                         for(var k = 0; k < 2; k++){
                             var mesh = new Mesh({
-                                geometry : cube,
-                                material : material
+                                geometry: cube,
+                                material: material
                             });
                             mesh.scale.set(0.5, 0.5, 0.5);
                             mesh.position.set((i-0.5) * 5, (j-0.5) * 5, (k-0.5)*5);
@@ -53,14 +53,14 @@
                 scene.add(root);
 
                 var bigCube = new qtek.Mesh({
-                    geometry : new qtek.geometry.Cube({
-                        inside : true
+                    geometry: new qtek.geometry.Cube({
+                        inside: true
                     }),
-                    material : new qtek.Material({
-                        shader : qtek.shader.library.get("qtek.lambert")
+                    material: new qtek.Material({
+                        shader: qtek.shader.library.get("qtek.lambert")
                     }),
-                    culling : false,
-                    scale : new qtek.math.Vector3(10, 10, 10)
+                    culling: false,
+                    scale: new qtek.math.Vector3(10, 10, 10)
                 });
                 root.add(bigCube);
 
@@ -68,10 +68,10 @@
                 camera.lookAt(new qtek.math.Vector3(0, 0, 0));
 
                 var light = new qtek.light.Point({
-                    color : [1.5, 1.5, 1.5],
-                    shadowResolution : 512,
-                    range : 40,
-                    castShadow : true
+                    color: [1.5, 1.5, 1.5],
+                    shadowResolution: 512,
+                    range: 40,
+                    castShadow: true
                 })
                 light.position.set(0.2, 0.2, 0.2);
                 scene.add(light);

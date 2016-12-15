@@ -9,6 +9,14 @@ uniform vec3 lightColor;
 
 uniform vec3 eyePosition;
 
+#ifdef SHADOWMAP_ENABLED
+uniform samplerCube lightShadowMaps[SHADOW_CASCADE];
+uniform mat4 lightMatrices[SHADOW_CASCADE];
+uniform float lightShadowMapSize;
+#endif
+
+@import qtek.plugin.shadow_map_common
+
 void main()
 {
     @import qtek.deferred.chunk.gbuffer_read
@@ -24,6 +32,24 @@ void main()
     gl_FragColor.rgb = lightEquation(
         lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
     );
+
+#ifdef SHADOWMAP_ENABLED
+    // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
+    float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
+                    / (gl_DepthRange.far - gl_DepthRange.near);
+    float shadowContrib = 1.0;
+    for (int i = 0; i < SHADOW_CASCADE; i++) {
+        if (
+            depth >= shadowCascadeClipsNear[i] &&
+            depth <= shadowCascadeClipsFar[i]
+        ) {
+            shadowContrib = computeShadowContrib(lightShadowMaps[i], lightMatrices[i], position, lightShadowMapSize);
+        }
+    }
+
+    gl_FragColor.rgb *= shadowContrib;
+#endif
+
     gl_FragColor.a = 1.0;
 }
 @end

@@ -246,12 +246,12 @@ define(function (require) {
                         distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
                     }
                     distanceMaterial.set('lightPosition', light.position._array);
-                    distanceMaterial.set('range', light.range * 5);
+                    distanceMaterial.set('range', light.range);
                 }
             }
         },
 
-        _restoreMaterial: function (casters) {
+        restoreMaterial: function (casters) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 mesh.material = this._meshMaterials[mesh.__GUID__];
@@ -330,17 +330,16 @@ define(function (require) {
             var directionalLightMatrices = [];
             var shadowCascadeClips = [];
             var pointLightShadowMaps = [];
-            var pointLightRanges = [];
 
             // Create textures for shadow map
             for (var i = 0; i < this._lightsCastShadow.length; i++) {
                 var light = this._lightsCastShadow[i];
                 if (light instanceof DirectionalLight) {
-                    this._renderDirectionalLightShadow(
+                    this.renderDirectionalLightShadow(
                         renderer,
-                        light,
                         scene,
                         sceneCamera,
+                        light,
                         this._opaqueCasters,
                         shadowCascadeClips,
                         directionalLightMatrices,
@@ -348,7 +347,7 @@ define(function (require) {
                     );
                 }
                 else if (light instanceof SpotLight) {
-                    this._renderSpotLightShadow(
+                    this.renderSpotLightShadow(
                         renderer,
                         light,
                         this._opaqueCasters,
@@ -357,18 +356,17 @@ define(function (require) {
                     );
                 }
                 else if (light instanceof PointLight) {
-                    this._renderPointLightShadow(
+                    this.renderPointLightShadow(
                         renderer,
                         light,
                         this._opaqueCasters,
-                        pointLightRanges,
                         pointLightShadowMaps
                     );
                 }
 
                 this._shadowMapNumber[light.type]++;
             }
-            this._restoreMaterial(this._opaqueCasters);
+            this.restoreMaterial(this._opaqueCasters);
 
             if (this.shadowCascade > 1 && this._shadowMapNumber.DIRECTIONAL_LIGHT > 1) {
                 console.warn('There is only one directional light can cast shadow when using cascaded shadow map');
@@ -437,12 +435,11 @@ define(function (require) {
                 }
                 if (pointLightShadowMaps.length > 0) {
                     material.setUniform('pointLightShadowMaps', pointLightShadowMaps);
-                    material.setUniform('pointLightRanges', pointLightRanges);
                 }
             }
         },
 
-        _renderDirectionalLightShadow: (function () {
+        renderDirectionalLightShadow: (function () {
 
             var splitFrustum = new Frustum();
             var splitProjMatrix = new Matrix4();
@@ -453,7 +450,7 @@ define(function (require) {
 
             var prevDepth = 0;
             var deltaDepth = 0;
-            return function (renderer, light, scene, sceneCamera, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
+            return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
                 var shadowBias = light.shadowBias;
                 this._bindDepthMaterial(casters, shadowBias, light.shadowSlopeScale);
@@ -553,7 +550,7 @@ define(function (require) {
             };
         })(),
 
-        _renderSpotLightShadow: function (renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
+        renderSpotLightShadow: function (renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
             this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
             casters.sort(Renderer.opaqueSortFunc);
@@ -585,11 +582,10 @@ define(function (require) {
             spotLightMatrices.push(matrix._array);
         },
 
-        _renderPointLightShadow: function (renderer, light, casters, pointLightRanges, pointLightShadowMaps) {
+        renderPointLightShadow: function (renderer, light, casters, pointLightShadowMaps) {
             var texture = this._getTexture(light.__GUID__, light);
             var _gl = renderer.gl;
             pointLightShadowMaps.push(texture);
-            pointLightRanges.push(light.range * 5);
 
             this._bindDistanceMaterial(casters, light);
             for (var i = 0; i < 6; i++) {

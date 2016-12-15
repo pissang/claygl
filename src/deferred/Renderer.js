@@ -39,6 +39,16 @@ define(function (require) {
         var fullQuadVertex = Shader.source('qtek.compositor.vertex');
         var lightVolumeVertex = Shader.source('qtek.deferred.light_volume.vertex');
 
+        var directionalLightShader = new Shader({
+            vertex: fullQuadVertex,
+            fragment: Shader.source('qtek.deferred.directional_light')
+        });
+        var directionalLightShaderWithShadow = new Shader({
+            vertex: fullQuadVertex,
+            fragment: Shader.source('qtek.deferred.directional_light')
+        });
+        directionalLightShaderWithShadow.define('fragment', 'SHADOWMAP_ENABLED');
+
         var lightAccumulateBlendFunc = function (gl) {
             gl.blendEquation(gl.FUNC_ADD);
             gl.blendFunc(gl.ONE, gl.ONE);
@@ -53,11 +63,15 @@ define(function (require) {
             });
         };
 
-        var createVolumeShader = function (name) {
-            return new Shader({
+        var createVolumeShader = function (name, enableShadow) {
+            var shader = new Shader({
                 vertex: lightVolumeVertex,
                 fragment: Shader.source('qtek.deferred.' + name)
             });
+            if (enableShadow) {
+                shader.define('fragment', 'SHADOWMAP_ENABLED');
+            }
+            return shader;
         };
 
         // Rotate and positioning to fit the spot light
@@ -77,10 +91,11 @@ define(function (require) {
         });
         // Align with x axis
         mat.identity().rotateZ(Math.PI / 2);
-
         cylinderGeo.applyTransform(mat);
 
         return {
+
+            shadowMapPass: null,
 
             _gBuffer: new GBuffer(),
 
@@ -97,16 +112,19 @@ define(function (require) {
                 blendWithPrevious: true
             }),
 
-            _directionalLightMat: createLightPassMat(new Shader({
-                vertex: fullQuadVertex,
-                fragment: Shader.source('qtek.deferred.directional_light')
-            })),
+            _directionalLightMat: createLightPassMat(directionalLightShader),
+            _directionalLightMatWithShadow: createLightPassMat(directionalLightShaderWithShadow),
+
             _ambientMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
                 fragment: Shader.source('qtek.deferred.ambient_light')
             })),
+
             _spotLightShader: createVolumeShader('spot_light'),
             _pointLightShader: createVolumeShader('point_light'),
+            _spotLightShaderWithShadow: createVolumeShader('spot_light', true),
+            _pointLightShaderWithShadow: createVolumeShader('point_light', true),
+
             _sphereLightShader: createVolumeShader('sphere_light'),
             _tubeLightShader: createVolumeShader('tube_light'),
 
@@ -130,7 +148,6 @@ define(function (require) {
 
             scene.update(false, true);
             camera.update(true);
-
 
             this._gBuffer.update(renderer, scene, camera);
 
@@ -171,6 +188,16 @@ define(function (require) {
 
             var eyePosition = camera.getWorldPosition()._array;
 
+            // Update volume meshes
+            for (var i = 0; i < scene.lights.length; i++) {
+                this._updateLightProxy(scene.lights[i]);
+            }
+
+            var shadowMapPass = this.shadowMapPass;
+            if (shadowMapPass) {
+                this._prepareLightShadow(renderer, scene, camera);
+            }
+
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
             gl.clearColor(0, 0, 0, 1);
@@ -183,11 +210,10 @@ define(function (require) {
             var volumeMeshList = [];
             var viewportSize = [lightAccumTex.width, lightAccumTex.height];
 
+
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 var uTpl = light.uniformTemplates;
-
-                this._updateLightProxy(light);
 
                 var volumeMesh = light.volumeMesh || light.__volumeMesh;
 
@@ -235,6 +261,7 @@ define(function (require) {
                     }
 
                     volumeMeshList.push(volumeMesh);
+
                 }
                 else {
                     var pass = this._fullQuadPass;
@@ -245,7 +272,13 @@ define(function (require) {
                             pass.material.setUniform('lightColor', uTpl.ambientLightColor.value(light));
                             break;
                         case 'DIRECTIONAL_LIGHT':
-                            pass.material = this._directionalLightMat;
+                            var hasShadow = shadowMapPass && light.castShadow;
+                            pass.material = hasShadow
+                                ? this._directionalLightMatWithShadow
+                                : this._directionalLightMat;
+                            if (hasShadow) {
+                                pass.material.shader.define('fragment', 'SHADOW_CASCADE', shadowMapPass.shadowCascade);
+                            }
                             pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
                             pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
                             break;
@@ -257,13 +290,92 @@ define(function (require) {
                     pass.material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     pass.material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
+                    // if (shadowMapPass) {
+                    //     this._prepareLightShadow(
+                    //         renderer, scene, camera, light, shadowCasters, pass.material
+                    //     );
+                    //     shadowMapPass.restoreMaterial(shadowCasters);
+                    // }
+
                     pass.renderQuad(renderer);
                 }
             }
 
             this._renderVolumeMeshList(renderer, camera, volumeMeshList);
 
+            if (shadowMapPass) {
+                shadowMapPass.restoreMaterial(
+                    this._shadowCasters
+                );
+            }
+
             lightAccumFrameBuffer.unbind(renderer);
+        },
+
+        _prepareLightShadow: function (renderer, scene, camera) {
+            var shadowMapPass = this.shadowMapPass;
+            var shadowCasters;
+            if (shadowMapPass) {
+                shadowCasters = this._shadowCasters || (this._shadowCasters = []);
+                var count = 0;
+                var queue = scene.opaqueQueue;
+                for (var i = 0; i < queue.length; i++) {
+                    if (queue[i].castShadow) {
+                        shadowCasters[count++] = queue[i];
+                    }
+                }
+                shadowCasters.length = count;
+            }
+
+            for (var i = 0; i < scene.lights.length; i++) {
+                var light = scene.lights[i];
+                var volumeMesh = light.volumeMesh || light.__volumeMesh;
+
+                switch (light.type) {
+                    case 'POINT_LIGHT':
+                    case 'SPOT_LIGHT':
+                        if (light.castShadow) {
+                            this._prepareSingleLightShadow(
+                                renderer, scene, camera, light, shadowCasters, volumeMesh.material
+                            );
+                        }
+                        this._prepareSingleLightShadow(
+                            renderer, scene, camera, light, shadowCasters, volumeMesh.material
+                        );
+                        break;
+                }
+            }
+        },
+
+        _prepareSingleLightShadow: function (renderer, scene, camera, light, casters, material) {
+            switch (light.type) {
+                case 'POINT_LIGHT':
+                    var shadowMaps = [];
+                    this.shadowMapPass.renderPointLightShadow(
+                        renderer, light, casters, shadowMaps
+                    );
+                    material.setUniform('lightShadowMap', shadowMaps[0]);
+                    break;
+                case 'SPOT_LIGHT':
+                    var shadowMaps = [];
+                    var lightMtrices = [];
+                    this.shadowMapPass.renderSpotLightShadow(
+                        renderer, light, casters, lightMtrices, shadowMaps
+                    );
+                    material.setUniform('lightShadowMap', shadowMaps[0]);
+                    material.setUniform('lightMatrix', lightMtrices[0]);
+                    break;
+                case 'DIRECTIONAL_LIGHT':
+                    var shadowMaps = [];
+                    var lightMtrices = [];
+                    this.shadowMapPass.renderDirectionalLightShadow(
+                        renderer, light, scene, camera, casters, lightMtrices, shadowMaps
+                    );
+                    material.setUniform('lightShadowMaps', shadowMaps);
+                    material.setUniform('lightMatrices', lightMtrices);
+                    break;
+            }
+            material.setUniform('lightShadowMapSize', light.shadowResolution);
         },
 
         // Update light volume mesh
@@ -278,13 +390,16 @@ define(function (require) {
                 volumeMesh = light.volumeMesh;
             }
             else {
+                var hasShadow = this.shadowMapPass && light.castShadow;
                 switch (light.type) {
                     // Only local light (point and spot) needs volume mesh.
                     // Directional and ambient light renders in full quad
                     case 'POINT_LIGHT':
                     case 'SPHERE_LIGHT':
                         // Volume mesh created automatically
-                        var shader = light.type === 'SPHERE_LIGHT' ? this._sphereLightShader : this._pointLightShader;
+                        var shader = light.type === 'SPHERE_LIGHT'
+                            ? this._sphereLightShader
+                            : (hasShadow ? this._pointLightShaderWithShadow : this._pointLightShader);
                         light.__volumeMesh = light.__volumeMesh || new Mesh({
                             material: this._createLightPassMat(shader),
                             geometry: this._lightSphereGeo,
@@ -294,16 +409,27 @@ define(function (require) {
                             culling: false
                         });
                         volumeMesh = light.__volumeMesh;
+                        // castShadow changed
+                        if (volumeMesh.material.shader !== shader) {
+                            volumeMesh.material.attachShader(shader, true);
+                        }
                         var r = light.range + (light.radius || 0);
                         volumeMesh.scale.set(r, r, r);
                         break;
                     case 'SPOT_LIGHT':
                         light.__volumeMesh = light.__volumeMesh || new Mesh({
-                            material: this._createLightPassMat(this._spotLightShader),
+                            material: this._createLightPassMat(
+                                hasShadow ? this._spotLightShaderWithShadow : this._spotLightShader
+                            ),
                             geometry: this._lightConeGeo,
                             culling: false
                         });
                         volumeMesh = light.__volumeMesh;
+                        // castShadow changed
+                        if (volumeMesh.material.shader !== shader) {
+                            volumeMesh.material.attachShader(shader, true);
+                        }
+
                         var aspect = Math.tan(light.penumbraAngle * Math.PI / 180);
                         var range = light.range;
                         volumeMesh.scale.set(aspect * range, aspect * range, range / 2);

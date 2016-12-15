@@ -12,7 +12,14 @@ uniform float lightRange;
 
 uniform vec3 eyePosition;
 
+#ifdef SHADOWMAP_ENABLED
+uniform samplerCube lightShadowMap;
+uniform float lightShadowMapSize;
+#endif
+
 varying vec3 v_Position;
+
+@import qtek.plugin.shadow_map_common
 
 void main()
 {
@@ -34,6 +41,13 @@ void main()
     gl_FragColor.rgb = attenuation * lightEquation(
         lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
     );
+
+#ifdef SHADOWMAP_ENABLED
+    float shadowContrib = computeShadowContribOmni(
+        lightShadowMap, -L * dist, lightRange
+    );
+    gl_FragColor.rgb *= shadowContrib;
+#endif
 
     gl_FragColor.a = 1.0;
 }

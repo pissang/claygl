@@ -5,6 +5,7 @@
         <script type="text/javascript" src="js/config.js"></script>
 
         <script type="text/javascript" src="lib/stats.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
@@ -27,14 +28,14 @@
                 var loader = new qtek.loader.GLTF();
                 loader.load('assets/models/suzanne_full.gltf');
                 var suzanneGeometry;
+                var material = new qtek.StandardMaterial({
+                    metalness: 0.5,
+                    uvRepeat: [3, 3],
+                    roughness: 0.5
+                });
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    var material = new qtek.StandardMaterial({
-                        metalness: 0.5,
-                        uvRepeat: [3, 3],
-                        roughness: 0.5
-                    });
                     var mesh = new qtek.Mesh({
                         geometry: suzanneGeometry,
                         material: material
@@ -59,10 +60,6 @@
                     scene.add(mesh);
                 });
 
-
-                function randomInSquare(size) {
-                    return (Math.random() - 0.5) * size * 2
-                }
 
                 var lights = [];
                 var sphereGeo = new qtek.geometry.Sphere();
@@ -108,6 +105,8 @@
                     lights.forEach(function (light) {
                         light.rotation.rotateX(0.01);
                     });
+                    material.metalness = config.metalness;
+                    material.roughness = config.roughness;
 
                     control.update(deltaTime);
                     deferredRenderer.render(renderer, scene, camera);
@@ -119,8 +118,18 @@
                 var stats = new Stats();
                 stats.domElement.style.position = 'absolute';
                 stats.domElement.style.top = '0px';
-                stats.domElement.style.right = '0px';
-                document.body.appendChild( stats.domElement )
+                stats.domElement.style.left = '0px';
+                document.body.appendChild(stats.domElement);
+
+
+                var config = {
+                    roughness: 0.5,
+                    metalness: 0.5
+                }
+                var gui = new dat.GUI();
+
+                gui.add(config, 'roughness', 0, 1);
+                gui.add(config, 'metalness', 0, 1);
             });
         </script>
     </body>

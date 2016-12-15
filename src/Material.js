@@ -108,7 +108,7 @@ define(function(require) {
                     continue;
                 }
                 else if (uniformValue instanceof Array
-                    && ! uniformValue.length) {
+                    && !uniformValue.length) {
                     continue;
                 }
                 else if (uniformValue instanceof Texture) {
@@ -173,6 +173,9 @@ define(function(require) {
          * @param {number|array|qtek.Texture|ArrayBufferView} value
          */
         setUniform: function (symbol, value) {
+            if (value === undefined) {
+                console.warn('Uniform value "' + symbol + '" is undefined');
+            }
             var uniform = this.uniforms[symbol];
             if (uniform) {
                 uniform.value = value;

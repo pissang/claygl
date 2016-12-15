@@ -16,6 +16,14 @@ uniform float falloffFactor;
 
 uniform vec3 eyePosition;
 
+#ifdef SHADOWMAP_ENABLED
+uniform samplerCube lightShadowMap;
+uniform mat4 lightMatrix;
+uniform float lightShadowMapSize;
+#endif
+
+@import qtek.plugin.shadow_map_common
+
 void main()
 {
     @import qtek.deferred.chunk.gbuffer_read
@@ -41,6 +49,13 @@ void main()
     gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(
         lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
     );
+
+#ifdef SHADOWMAP_ENABLED
+    float shadowContrib = computeShadowContrib(
+        lightShadowMap, lightMatrix, position, lightShadowMapSize
+    );
+    gl_FragColor.rgb *= shadowContrib;
+#endif
 
     gl_FragColor.a = 1.0;
 }
