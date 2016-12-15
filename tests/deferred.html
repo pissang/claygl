@@ -18,14 +18,14 @@
                 var deferredRenderer = new qtek.deferred.Renderer();
 
                 var camera = new qtek.camera.Perspective({
-                    far: 10000,
+                    far: 1000,
                     aspect: renderer.getViewportAspect()
                 });
 
                 var scene = new qtek.Scene();
 
                 var plane = new qtek.Mesh({
-                    material: new qtek.deferred.StandardMaterial({
+                    material: new qtek.StandardMaterial({
                         glossiness: 0.1
                     }),
                     geometry: new qtek.geometry.Plane()
@@ -36,7 +36,7 @@
                 var sphereGeo = new qtek.geometry.Sphere();
                 for (var i = 0; i < 100; i++) {
                     var sphere = new qtek.Mesh({
-                        material: new qtek.deferred.StandardMaterial({
+                        material: new qtek.StandardMaterial({
                             glossiness: 0.1
                         }),
                         geometry: sphereGeo
@@ -72,15 +72,12 @@
                     scene.add(pointLight);
                 }
                 var directionalLight = new qtek.light.Directional({
-                    intensity: 0.1
+                    intensity: 0.5
                 });
                 directionalLight.position.set(10, 10, 10);
                 directionalLight.lookAt(scene.position);
 
                 scene.add(directionalLight);
-                scene.add(new qtek.light.Ambient({
-                    intensity: 0.1
-                }));
 
                 camera.position.set(0, 50, 100);
                 camera.lookAt(scene.position);
@@ -91,15 +88,10 @@
                 });
 
                 var animation = new qtek.animation.Animation();
-                // var debugPass = new qtek.compositor.Pass({
-                //     fragment: qtek.Shader.source('qtek.compositor.output')
-                // });
-                // debugPass.material.shader.unDefine('fragment', 'OUTPUT_ALPHA');
+
                 animation.on('frame', function (deltaTime) {
                     control.update(deltaTime);
                     deferredRenderer.render(renderer, scene, camera);
-                    // debugPass.setUniform('texture', deferredRenderer._lightAccumTex);
-                    // debugPass.render(renderer);
 
                     stats.update();
                 });

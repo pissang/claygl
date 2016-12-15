@@ -43,19 +43,25 @@ define(function (require) {
         var previousNormalMap;
         var previousRougnessMap;
         var previousMetalnessMap;
+        var previousRenderable;
 
         return function (renderable, prevMaterial) {
-            var originalMaterial = renderable.__standardMat;
+            // Material not change
+            if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+                return;
+            }
+
+            var standardMaterial = renderable.__standardMat;
             var gBufferMat = renderable.material;
 
-            var roughness = originalMaterial.get('roughness');
-            var metalness = originalMaterial.get('metalness');
+            var roughness = standardMaterial.get('roughness');
+            var metalness = standardMaterial.get('metalness');
 
-            var normalMap = originalMaterial.get('normalMap') || defaultNormalMap;
-            var roughnessMap = originalMaterial.get('roughnessMap') || defaultRoughnessMap;
-            var metalnessMap = originalMaterial.get('metalnessMap') || defaultMetalnessMap;
-            var uvRepeat = originalMaterial.get('uvRepeat');
-            var uvOffset = originalMaterial.get('uvOffset');
+            var normalMap = standardMaterial.get('normalMap') || defaultNormalMap;
+            var roughnessMap = standardMaterial.get('roughnessMap');
+            var metalnessMap = standardMaterial.get('metalnessMap');
+            var uvRepeat = standardMaterial.get('uvRepeat');
+            var uvOffset = standardMaterial.get('uvOffset');
             var useRoughnessMap = !!roughnessMap;
             var useMetalnessMap = !!metalnessMap;
 
@@ -101,21 +107,29 @@ define(function (require) {
             previousNormalMap = normalMap;
             previousRougnessMap = roughnessMap;
             previousMetalnessMap = metalnessMap;
+
+            previousRenderable = renderable;
         };
     }
 
     function getBeforeRenderHook2(gl, defaultDiffuseMap) {
         var previousDiffuseMap;
+        var previousRenderable;
 
         return function (renderable, prevMaterial) {
-            var originalMaterial = renderable.__standardMat;
+            // Material not change
+            if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+                return;
+            }
+
+            var standardMaterial = renderable.__standardMat;
             var gBufferMat = renderable.material;
 
-            var color = originalMaterial.get('color');
+            var color = standardMaterial.get('color');
 
-            var diffuseMap = originalMaterial.get('diffuseMap') || defaultDiffuseMap;
-            var uvRepeat = originalMaterial.get('uvRepeat');
-            var uvOffset = originalMaterial.get('uvOffset');
+            var diffuseMap = standardMaterial.get('diffuseMap');
+            var uvRepeat = standardMaterial.get('uvRepeat');
+            var uvOffset = standardMaterial.get('uvOffset');
 
             diffuseMap = diffuseMap || defaultDiffuseMap;
 
@@ -128,14 +142,15 @@ define(function (require) {
             else {
                 gBufferMat.shader.setUniform(gl, '3f', 'color', color);
                 if (previousDiffuseMap !== diffuseMap) {
-                    attachTextureToSlot(gl, gBufferMat.shader, 'diffuseMap', metalnessMap, 2);
+                    attachTextureToSlot(gl, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
                 }
                 gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
             }
 
             previousDiffuseMap = diffuseMap;
-        }
+            previousRenderable = renderable;
+        };
     }
 
     Shader.import(require('../shader/source/deferred/gbuffer.essl'));
@@ -290,6 +305,7 @@ define(function (require) {
             var viewProjectionInv = new Matrix4();
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
+            this._debugPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
             this._debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
             this._debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
             this._debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
@@ -301,15 +317,15 @@ define(function (require) {
             renderer.restoreClear();
         },
 
-        getGBufferTexture1: function () {
+        getTargetTexture1: function () {
             return this._gBufferTex1;
         },
 
-        getGBufferTexture2: function () {
+        getTargetTexture2: function () {
             return this._gBufferTex2;
         },
 
-        getGBufferTexture3: function () {
+        getTargetTexture3: function () {
             return this._gBufferTex3;
         },
 

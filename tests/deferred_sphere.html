@@ -18,7 +18,7 @@
                 var deferredRenderer = new qtek.deferred.Renderer();
 
                 var camera = new qtek.camera.Perspective({
-                    far: 10000,
+                    far: 2000,
                     aspect: renderer.getViewportAspect()
                 });
 
@@ -32,7 +32,7 @@
                 var scene = new qtek.Scene();
 
                 var plane = new qtek.Mesh({
-                    material: new qtek.deferred.StandardMaterial({
+                    material: new qtek.StandardMaterial({
                         glossiness: 0.5,
                         specularColor: [0.5, 0.5, 0.5],
                         uvRepeat: [100, 100],
@@ -56,7 +56,7 @@
                 var HEIGHT = 150;
                 for (var i = 0; i < 10; i ++) {
                     for (var j = 0; j < 10; j ++) {
-                        var sphereLight = new qtek.light.Sphere({
+                        var sphereLight = new qtek.light.Point({
                             color: [Math.random(), Math.random(), Math.random()],
                             range: 600,
                             intensity: 2.0,
@@ -70,10 +70,9 @@
                         scene.add(sphereLight);
 
                         var lightMesh = new qtek.Mesh({
-                            material: new qtek.deferred.StandardMaterial({
+                            material: new qtek.StandardMaterial({
                                 color: [0, 0, 0],
-                                specularColor: [0, 0, 0],
-                                glossiness: 0,
+                                rougness: 1,
                                 emission: sphereLight.color
                             }),
                             geometry: sphereGeo
@@ -91,9 +90,10 @@
                 GLTFLoader.load('assets/models/suzanne.json');
                 GLTFLoader.on('success', function(res) {
                     var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-                    var material = new qtek.deferred.StandardMaterial({
+                    var material = new qtek.StandardMaterial({
                         specularColor: [0.95, 0.64, 0.54],
-                        glossiness: 0.7
+                        metalness: 1,
+                        roughness: 0.5
                     });
 
                     for (var i = 0; i < 5; i++) {

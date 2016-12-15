@@ -40,11 +40,11 @@
                     return (Math.random() - 0.5) * size * 2;
                 }
 
-                var cubeGeo = new qtek.geometry.Cube();
+                var cubeGeo = new qtek.geometry.Sphere();
                 for (var i = 0; i < 20; i ++) {
                     for (var j = 0; j < 20; j ++) {
                         var mesh = new qtek.Mesh({
-                            material: new qtek.deferred.StandardMaterial({
+                            material: new qtek.StandardMaterial({
                                 color: [Math.random(), Math.random(), Math.random()]
                             }),
                             geometry: cubeGeo

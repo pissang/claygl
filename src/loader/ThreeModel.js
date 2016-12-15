@@ -87,7 +87,8 @@ define(function(require) {
             if (skinned) {
                 skeleton = this._parseSkeleton(data);
                 jointNumber = skeleton.joints.length;
-            } else {
+            }
+            else {
                 jointNumber = 0;
             }
 
@@ -268,7 +269,8 @@ define(function(require) {
                     i5 = getNewIndex(i3o, 4);
                     i6 = getNewIndex(i4o, 5);
                     faces.push([i1, i2, i3], [i4, i5, i6]);
-                } else {
+                }
+                else {
                     i1 = dFaces[offset++];
                     i2 = dFaces[offset++];
                     i3 = dFaces[offset++];
@@ -295,7 +297,8 @@ define(function(require) {
                             isNew[3] && (texcoords[i][i4] = [u, v]);
                             isNew[4] && (texcoords[i][i5] = [u, v]);
                             isNew[5] && (texcoords[i][i6] = [u, v]);
-                        } else {
+                        }
+                        else {
                             isNew[0] && (texcoords[i][i1] = [u, v]);
                             isNew[1] && (texcoords[i][i2] = [u, v]);
                             isNew[2] && (texcoords[i][i3] = [u, v]);
@@ -320,7 +323,8 @@ define(function(require) {
                             isNew[3] && (texcoords[i][i4] = faceUvs[1].slice());
                             isNew[4] && (texcoords[i][i5] = faceUvs[2].slice());
                             isNew[5] && (texcoords[i][i6] = faceUvs[3].slice());
-                        } else {
+                        }
+                        else {
                             isNew[0] && (texcoords[i][i1] = faceUvs[0].slice());
                             isNew[1] && (texcoords[i][i2] = faceUvs[1].slice());
                             isNew[2] && (texcoords[i][i3] = faceUvs[2].slice());
@@ -359,7 +363,8 @@ define(function(require) {
                         isNew[3] && (normals[i4] = faceNormals[1].slice());
                         isNew[4] && (normals[i5] = faceNormals[2].slice());
                         isNew[5] && (normals[i6] = faceNormals[3].slice());
-                    } else {
+                    }
+                    else {
                         isNew[0] && (normals[i1] = faceNormals[0].slice());
                         isNew[1] && (normals[i2] = faceNormals[1].slice());
                         isNew[2] && (normals[i3] = faceNormals[2].slice());
@@ -376,7 +381,8 @@ define(function(require) {
                         isNew[3] && (colors[i4] = color);
                         isNew[4] && (colors[i5] = color);
                         isNew[5] && (colors[i6] = color);
-                    } else {
+                    }
+                    else {
                         isNew[0] && (colors[i1] = color);
                         isNew[1] && (colors[i2] = color);
                         isNew[2] && (colors[i3] = color);
@@ -394,7 +400,8 @@ define(function(require) {
                         isNew[3] && (colors[i4] = faceColors[1].slice());
                         isNew[4] && (colors[i5] = faceColors[2].slice());
                         isNew[5] && (colors[i6] = faceColors[3].slice());
-                    } else {
+                    }
+                    else {
                         isNew[0] && (colors[i1] = faceColors[0].slice());
                         isNew[1] && (colors[i2] = faceColors[1].slice());
                         isNew[2] && (colors[i3] = faceColors[2].slice());
@@ -485,7 +492,8 @@ define(function(require) {
             var shader;
             if (jointNumber === 0) {
                 shader = shaderLibrary.get(shaderName, enabledTextures);
-            } else {
+            }
+            else {
                 // Shader for skinned mesh
                 shader = new Shader({
                     vertex: Shader.source(shaderName + '.vertex'),
@@ -503,7 +511,8 @@ define(function(require) {
             });
             if (mConfig.colorDiffuse) {
                 material.set('color', mConfig.colorDiffuse );
-            } else if (mConfig.DbgColor) {
+            }
+            else if (mConfig.DbgColor) {
                 material.set('color', hex2rgb(mConfig.DbgColor));
             }
             if (mConfig.colorSpecular) {

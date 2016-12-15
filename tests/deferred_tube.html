@@ -32,7 +32,7 @@
                 var scene = new qtek.Scene();
 
                 var plane = new qtek.Mesh({
-                    material: new qtek.deferred.StandardMaterial({
+                    material: new qtek.StandardMaterial({
                         glossiness: 0.5,
                         uvRepeat: [100, 100],
                         normalMap: texture
@@ -67,7 +67,7 @@
                     scene.add(tubeLight);
 
                     var lightMesh = new qtek.Mesh({
-                        material: new qtek.deferred.StandardMaterial({
+                        material: new qtek.StandardMaterial({
                             color: [0, 0, 0],
                             specularColor: [0, 0, 0],
                             glossiness: 0.0,
@@ -89,7 +89,7 @@
                 for (var i = 0; i < 10; i++) {
                     for (var j = 0; j < 10; j++) {
                         var sphere = new qtek.Mesh({
-                            material: new qtek.deferred.StandardMaterial({
+                            material: new qtek.StandardMaterial({
                                 glossiness: 0.4,
                                 color: [0, 0, 0]
                             }),

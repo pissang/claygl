@@ -45,19 +45,15 @@ void main()
     vec3 H = normalize(L + V);
 
     float ndh = clamp(dot(N, H), 0.0, 1.0);
-
-    // Diffuse term
-
-    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange);
-    if (dot(gl_FragColor.rgb, vec3(1.0)) == 0.0) // Reduce blending
-    {
-        discard;
-    }
+    float ndv = clamp(dot(N, V), 0.0, 1.0);
 
     // Specular fix
     // glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);
 
+    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)
+        * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));
+
     // Specular luminance
-    gl_FragColor.a = dot(LUM, gl_FragColor.rgb * D_Phong(glossiness, ndh));
+    gl_FragColor.a = 1.0;
 }
 @end

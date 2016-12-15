@@ -40,19 +40,19 @@
                     });
                     mesh.geometry.generateTangents();
 
-                    [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                        var tex = new qtek.Texture2D({
-                            wrapS: qtek.Texture.REPEAT,
-                            wratT: qtek.Texture.REPEAT
-                        });
-                        tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-                            .success(function () {
-                                // FIXME
-                                tex.wrapS = qtek.Texture.REPEAT;
-                                tex.wrapT = qtek.Texture.REPEAT;
-                            });
-                        material[mapInfo[0]] = tex;
-                    });
+                    // [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
+                    //     var tex = new qtek.Texture2D({
+                    //         wrapS: qtek.Texture.REPEAT,
+                    //         wratT: qtek.Texture.REPEAT
+                    //     });
+                    //     tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+                    //         .success(function () {
+                    //             // FIXME
+                    //             tex.wrapS = qtek.Texture.REPEAT;
+                    //             tex.wrapT = qtek.Texture.REPEAT;
+                    //         });
+                    //     material[mapInfo[0]] = tex;
+                    // });
 
                     mesh.scale.set(1.4, 1.4, 1.4);
                     scene.add(mesh);

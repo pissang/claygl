@@ -1,14 +1,11 @@
 // Light-pre pass deferred rendering
 // http://www.realtimerendering.com/blog/deferred-lighting-approaches/
-
-// TODO Here actually can use more materials besides deferred.StandardMaterial
 define(function (require) {
 
     'use strict';
 
     var Base = require('../core/Base');
     var Shader = require('../Shader');
-    var StandardMaterial = require('./StandardMaterial');
     var Material = require('../Material');
     var FrameBuffer = require('../FrameBuffer');
     var FullQuadPass = require('../compositor/Pass');
@@ -20,13 +17,9 @@ define(function (require) {
     var CylinderGeo = require('../geometry/Cylinder');
     var Matrix4 = require('../math/Matrix4');
     var Vector3 = require('../math/Vector3');
-    var ForwardRenderer = require('../Renderer');
+    var GBuffer = require('./GBuffer');
 
     Shader.import(require('../shader/source/util.essl'));
-    Shader.import(require('../shader/source/deferred/gbuffer.essl'));
-    Shader.import(require('../shader/source/deferred/depth.essl'));
-    Shader.import(require('../shader/source/deferred/chunk.essl'));
-
     Shader.import(require('../shader/source/deferred/lightvolume.essl'));
 
     // Light shaders
@@ -37,32 +30,11 @@ define(function (require) {
     Shader.import(require('../shader/source/deferred/sphere.essl'));
     Shader.import(require('../shader/source/deferred/tube.essl'));
 
-    Shader.import(require('../shader/source/deferred/output.essl'));
-
     Shader.import(require('../shader/source/prez.essl'));
 
     var errorShader = {};
 
-    var DeferredRenderer = Base.derive(function () {
-
-        var gBufferShader = new Shader({
-            vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
-            fragment: Shader.source('qtek.deferred.gbuffer.fragment')
-        });
-
-        var gBufferDiffShader = gBufferShader.clone();
-        gBufferDiffShader.enableTexture('diffuseMap');
-        var gBufferNormShader = gBufferShader.clone();
-        gBufferNormShader.enableTexture('normalMap');
-        var gBufferDiffNormShader = gBufferDiffShader.clone();
-        gBufferDiffNormShader.enableTexture('normalMap');
-
-        var outputShader = new Shader({
-            vertex: Shader.source('qtek.deferred.output.vertex'),
-            fragment: Shader.source('qtek.deferred.output.fragment')
-        });
-        var outputDiffShader = outputShader.clone();
-        outputDiffShader.enableTexture('diffuseMap');
+    var DeferredRenderer = Base.extend(function () {
 
         var fullQuadVertex = Shader.source('qtek.compositor.vertex');
         var lightVolumeVertex = Shader.source('qtek.deferred.light_volume.vertex');
@@ -110,49 +82,7 @@ define(function (require) {
 
         return {
 
-            /**
-             * If use depth texture extension
-             * @type {Boolean}
-             */
-            useDepthTexture: false,
-
-            _outputFrameBuffer: new FrameBuffer(),
-
-            _depthMaterial: new Material({
-                shader: new Shader({
-                    // mediump will have precision issue on mobile
-                    precision: 'highp',
-                    vertex: Shader.source('qtek.deferred.depth.vertex'),
-                    fragment: Shader.source('qtek.deferred.depth.fragment')
-                })
-            }),
-
-            _depthFrameBuffer: new FrameBuffer(),
-
-            // GBuffer shaders
-            _gBufferShader: gBufferShader,
-            _gBufferDiffShader: gBufferDiffShader,
-            _gBufferDiffNormShader: gBufferDiffNormShader,
-            _gBufferNormShader: gBufferNormShader,
-
-            _outputShader: outputShader,
-            _outputDiffShader: outputDiffShader,
-
-            _gBufferFrameBuffer: new FrameBuffer(),
-
-            _gBufferTex: new Texture2D({
-                width: 0,
-                height: 0,
-                // FIXME Device not support float texture
-                type: Texture.HALF_FLOAT,
-                minFilter: Texture.NEAREST,
-                magFilter: Texture.NEAREST
-            }),
-
-            _depthTex: new Texture2D({
-                minFilter: Texture.NEAREST,
-                magFilter: Texture.NEAREST
-            }),
+            _gBuffer: new GBuffer(),
 
             _lightAccumFrameBuffer: new FrameBuffer(),
 
@@ -163,8 +93,9 @@ define(function (require) {
                 magFilter: Texture.NEAREST
             }),
 
-            _fullQuadPass: new FullQuadPass(),
-
+            _fullQuadPass: new FullQuadPass({
+                blendWithPrevious: true
+            }),
 
             _directionalLightMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
@@ -188,153 +119,69 @@ define(function (require) {
 
             _lightConeGeo: coneGeo,
 
-            _lightCylinderGeo: cylinderGeo
+            _lightCylinderGeo: cylinderGeo,
+
+            _outputPass: new FullQuadPass({
+                fragment: Shader.source('qtek.compositor.output')
+            })
         };
     }, {
-        render: function (renderer, scene, camera, outputTexture) {
-
-            var gl = renderer.gl;
+        render: function (renderer, scene, camera, notDirectOutput) {
 
             scene.update(false, true);
-
             camera.update(true);
 
-            var opaqueQueue = scene.opaqueQueue;
-            opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
 
-            // Replace material
-            for (var i = 0; i < opaqueQueue.length; i++) {
-                this._replaceGBufferMaterial(opaqueQueue[i]);
-            }
+            this._gBuffer.update(renderer, scene, camera);
 
-            // Resize GBuffer
-            var width = renderer.getWidth();
-            var height = renderer.getHeight();
-            var gBufferFrameBuffer = this._gBufferFrameBuffer;
-            var gBufferTex = this._gBufferTex;
-            var depthTex = this._depthTex;
-            var lightAccumTex = this._lightAccumTex;
-
-            var useDepthTexture = this.useDepthTexture;
-            if (width !== gBufferTex.width || height !== gBufferTex.height) {
-                gBufferTex.width = width;
-                gBufferTex.height = height;
-                depthTex.width = width;
-                depthTex.height = height;
-
-                lightAccumTex.width = width;
-                lightAccumTex.height = height;
-                gBufferTex.dirty();
-                depthTex.dirty();
-                lightAccumTex.dirty();
-            }
-            if (useDepthTexture) {
-                if (depthTex.format !== Texture.DEPTH_COMPONENT) {
-                    depthTex.format = Texture.DEPTH_COMPONENT;
-                    // FIXME UNSINGED_SHORT may have precision issue
-                    depthTex.type = Texture.UNSIGNED_INT;
-                    depthTex.dirty();
-                }
-            }
-            else {
-                if (depthTex.format !== Texture.RGBA) {
-                    depthTex.format = Texture.RGBA;
-                    depthTex.type = Texture.UNSIGNED_BYTE;
-                    depthTex.dirty();
-                }
-            }
-
-            // Render normal and glossiness to GBuffer
-            gBufferFrameBuffer.attach(gl, gBufferTex);
-            // FIXME Device that not support depth texture
-            if (useDepthTexture) {
-                gBufferFrameBuffer.attach(gl, depthTex, gl.DEPTH_ATTACHMENT);
-            }
-            gBufferFrameBuffer.bind(renderer);
-            gl.colorMask(true, true, true, true);
-            gl.depthMask(true);
-            gl.clearColor(0, 0, 0, 0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.disable(gl.BLEND);
-            renderer.renderQueue(opaqueQueue, camera);
-            gBufferFrameBuffer.unbind(renderer);
-
-            if (!useDepthTexture) {
-                var depthFrameBuffer = this._depthFrameBuffer;
-                depthFrameBuffer.attach(gl, depthTex);
-                depthFrameBuffer.bind(renderer);
-                gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-                gl.disable(gl.BLEND);
-
-                renderer.renderQueue(opaqueQueue, camera, this._depthMaterial);
-                depthFrameBuffer.unbind(renderer);
+            if (renderer.getWidth() !== this._lightAccumTex.width
+                && renderer.getHeight() !== this._lightAccumTex.height
+            ) {
+                this._resize(renderer.getWidth(), renderer.getHeight());
             }
 
             // Accumulate light buffer
             this._accumulateLightBuffer(renderer, scene, camera);
 
-            // Final output rendering
-            var eyePosition = camera.getWorldPosition()._array;
-            for (var i = 0; i < opaqueQueue.length; i++) {
-                this._swapOutputMaterial(opaqueQueue[i], eyePosition);
+            if (!notDirectOutput) {
+                this._outputPass.setUniform('texture', this._lightAccumTex);
+                this._outputPass.render(renderer);
+                // this._gBuffer.renderDebug(renderer, camera, 'normal');
             }
+        },
 
-            // Clear
-            if (renderer.clear) {
-                var cc = renderer.color;
-                gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
-                gl.clear(renderer.clear);
-            }
-
-            gl.disable(gl.BLEND);
-
-            var outputFrameBuffer = this._outputFrameBuffer;
-            if (outputTexture) {
-                outputFrameBuffer.attach(gl, outputTexture);
-                outputFrameBuffer.bind(renderer);
-            }
-            gl.clearColor(renderer.color[0], renderer.color[1], renderer.color[2], renderer.color[3]);
-            gl.clear(renderer.clear);
-            renderer.renderQueue(opaqueQueue, camera);
-            if (outputTexture) {
-                outputFrameBuffer.unbind(renderer);
-            }
-
-            for (var i = 0; i < opaqueQueue.length; i++) {
-                // Swap material back
-                opaqueQueue[i].material = opaqueQueue[i].__standardMat;
-            }
+        getTargetTexture: function () {
+            return this._lightAccumTex;
         },
 
         getGBuffer: function () {
-            return this._gBufferTex;
+            return this._gBuffer;
         },
 
-        getDepthBuffer: function () {
-            return this._depthTex;
+        _resize: function (width, height) {
+            this._lightAccumTex.width = width;
+            this._lightAccumTex.height = height;
+            this._lightAccumTex.dirty();
         },
 
         _accumulateLightBuffer: function (renderer, scene, camera) {
             var gl = renderer.gl;
             var lightAccumTex = this._lightAccumTex;
             var lightAccumFrameBuffer = this._lightAccumFrameBuffer;
-            // var lightVolumeMeshList = this._lightVolumeMeshList;
-            // var listLen = 0;
+
             var eyePosition = camera.getWorldPosition()._array;
 
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
-            gl.clearColor(0, 0, 0, 0);
+            gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.enable(gl.BLEND);
 
             var viewProjectionInv = new Matrix4();
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
-            var viewportSize = [lightAccumTex.width, lightAccumTex.height];
             var volumeMeshList = [];
-
-            var setDefineMethod = this.useDepthTexture ? 'unDefine' : 'define';
+            var viewportSize = [lightAccumTex.width, lightAccumTex.height];
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -347,8 +194,6 @@ define(function (require) {
                 if (volumeMesh) {
                     var material = volumeMesh.material;
 
-                    material.shader[setDefineMethod]('fragment', 'DEPTH_ENCODED');
-                    material.shader.define('fragment', 'PREMULTIPLIED_ALPHA');
                     // Volume mesh will affect the scene bounding box when rendering
                     // if castShadow is true
                     volumeMesh.castShadow = false;
@@ -356,8 +201,9 @@ define(function (require) {
                     material.setUniform('eyePosition', eyePosition);
                     material.setUniform('viewportSize', viewportSize);
                     material.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    material.setUniform('depthTex', this._depthTex);
-                    material.setUniform('gBufferTex', this._gBufferTex);
+                    material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
+                    material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
+                    material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
                     switch (light.type) {
                         case 'POINT_LIGHT':
@@ -396,22 +242,20 @@ define(function (require) {
                     switch (light.type) {
                         case 'AMBIENT_LIGHT':
                             pass.material = this._ambientMat;
-                            pass.material.set('lightColor', uTpl.ambientLightColor.value(light));
+                            pass.material.setUniform('lightColor', uTpl.ambientLightColor.value(light));
                             break;
                         case 'DIRECTIONAL_LIGHT':
                             pass.material = this._directionalLightMat;
-                            pass.material.set('lightColor', uTpl.directionalLightColor.value(light));
-                            pass.material.set('lightDirection', uTpl.directionalLightDirection.value(light));
+                            pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
+                            pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
                             break;
                     }
-                    pass.material.set('eyePosition', eyePosition);
-                    pass.material.set('viewportSize', viewportSize);
-                    pass.material.set('viewProjectionInv', viewProjectionInv._array);
-                    pass.material.set('gBufferTex', this._gBufferTex);
-                    pass.material.set('depthTex', this._depthTex);
-
-                    pass.material.shader[setDefineMethod]('fragment', 'DEPTH_ENCODED');
-                    pass.material.shader.define('fragment', 'PREMULTIPLIED_ALPHA');
+                    pass.material.setUniform('eyePosition', eyePosition);
+                    pass.material.setUniform('viewportSize', viewportSize);
+                    pass.material.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    pass.material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
+                    pass.material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
+                    pass.material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
                     pass.renderQuad(renderer);
                 }
@@ -495,8 +339,6 @@ define(function (require) {
             return function (renderer, camera, volumeMeshList) {
                 var gl = renderer.gl;
 
-                gl.clear(gl.DEPTH_BUFFER_BIT);
-
                 gl.enable(gl.DEPTH_TEST);
                 gl.disable(gl.CULL_FACE);
                 gl.blendEquation(gl.FUNC_ADD);
@@ -558,92 +400,6 @@ define(function (require) {
                 } else {
                     renderer.trigger('error', errMsg);
                 }
-            }
-        },
-
-        _replaceGBufferMaterial: function (renderable) {
-            if (renderable.material instanceof StandardMaterial) {
-                var standardMat = renderable.material;
-                renderable.__standardMat = standardMat;
-                var isDiffuseAlphaGlossiness = standardMat.diffuseMap
-                    && standardMat.diffuseAlphaUsage === 'glossiness';
-                renderable.__gBufferMat = renderable.__gBufferMat || new Material();
-                var gBufferMat = renderable.__gBufferMat;
-
-                if (standardMat.normalMap) {
-                    if (isDiffuseAlphaGlossiness) {
-                        // FIXME Toggle shader may be too frequently
-                        if (gBufferMat.shader !== this._gBufferDiffNormShader) {
-                            gBufferMat.attachShader(this._gBufferDiffNormShader, true);
-                        }
-                        gBufferMat.setUniform('diffuseMap', standardMat.diffuseMap);
-                    }
-                    else {
-                        if (gBufferMat.shader !== this._gBufferNormShader) {
-                            gBufferMat.attachShader(this._gBufferNormShader, true);
-                        }
-                    }
-                    gBufferMat.setUniform('normalMap', standardMat.normalMap);
-                }
-                else {
-                    if (isDiffuseAlphaGlossiness) {
-                        if (gBufferMat.shader !== this._gBufferDiffShader) {
-                            gBufferMat.attachShader(this._gBufferDiffShader, true);
-                        }
-                        gBufferMat.setUniform('diffuseMap', standardMat.diffuseMap);
-                    }
-                    else {
-                        if (gBufferMat.shader !== this._gBufferShader) {
-                            gBufferMat.attachShader(this._gBufferShader, true);
-                        }
-                    }
-                }
-
-                gBufferMat.set('uvOffset', standardMat.uvOffset);
-                gBufferMat.set('uvRepeat', standardMat.uvRepeat);
-                gBufferMat.setUniform('glossiness', standardMat.glossiness);
-
-                renderable.material = gBufferMat;
-            }
-            else {
-                console.warn('Deferred renderer only support StandardMaterial');
-            }
-        },
-
-        _swapOutputMaterial: function (renderable, eyePosition) {
-            if (renderable.__standardMat) {
-                var standardMat = renderable.__standardMat;
-
-                renderable.__deferredOutputMat = renderable.__deferredOutputMat || new Material();
-                var outputMat = renderable.__deferredOutputMat;
-
-                if (standardMat.diffuseMap) {
-                    if (outputMat.shader !== this._outputDiffShader) {
-                        outputMat.attachShader(this._outputDiffShader, true);
-                    }
-
-                    outputMat.setUniform('diffuseMap', standardMat.diffuseMap);
-                }
-                else {
-                    if (outputMat.shader !== this._outputShader) {
-                        outputMat.attachShader(this._outputShader, true);
-                    }
-                }
-
-                outputMat.set('eyePosition', eyePosition);
-
-                outputMat.set('color', standardMat.color);
-                outputMat.set('emission', standardMat.emission);
-                outputMat.set('specularColor', standardMat.specularColor);
-
-                outputMat.set('uvRepeat', standardMat.uvRepeat);
-                outputMat.set('uvOffset', standardMat.uvOffset);
-                outputMat.set('specularColor', standardMat.specularColor);
-
-                outputMat.set('lightAccumTex', this._lightAccumTex);
-                outputMat.set('gBufferTex', this._gBufferTex);
-
-                renderable.material = outputMat;
             }
         }
     });
