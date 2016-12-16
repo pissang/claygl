@@ -36,13 +36,10 @@ define(function (require) {
         }
     }
 
-    function getBeforeRenderHook1 (
-        gl, defaultNormalMap, defaultRoughnessMap, defaultMetalnessMap
-    ) {
+    function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
 
         var previousNormalMap;
         var previousRougnessMap;
-        var previousMetalnessMap;
         var previousRenderable;
 
         return function (renderable, prevMaterial) {
@@ -55,27 +52,20 @@ define(function (require) {
             var gBufferMat = renderable.material;
 
             var roughness = standardMaterial.get('roughness');
-            var metalness = standardMaterial.get('metalness');
 
             var normalMap = standardMaterial.get('normalMap') || defaultNormalMap;
             var roughnessMap = standardMaterial.get('roughnessMap');
-            var metalnessMap = standardMaterial.get('metalnessMap');
             var uvRepeat = standardMaterial.get('uvRepeat');
             var uvOffset = standardMaterial.get('uvOffset');
             var useRoughnessMap = !!roughnessMap;
-            var useMetalnessMap = !!metalnessMap;
 
             roughnessMap = roughnessMap || defaultRoughnessMap;
-            metalnessMap = metalnessMap || defaultMetalnessMap;
 
             if (!prevMaterial) {
                 gBufferMat.set('glossiness', 1.0 - roughness);
-                gBufferMat.set('metalness', metalness);
                 gBufferMat.set('normalMap', normalMap);
                 gBufferMat.set('roughnessMap', roughnessMap);
-                gBufferMat.set('metalnessMap', metalnessMap);
                 gBufferMat.set('useRoughnessMap', +useRoughnessMap);
-                gBufferMat.set('useMetalnessMap', +useMetalnessMap);
                 gBufferMat.set('uvRepeat', uvRepeat);
                 gBufferMat.set('uvOffset', uvOffset);
             }
@@ -84,21 +74,13 @@ define(function (require) {
                     gl, '1f', 'glossiness', 1.0 - roughness
                 );
 
-                gBufferMat.shader.setUniform(
-                    gl, '1f', 'metalness', metalness
-                );
-
                 if (previousNormalMap !== normalMap) {
                     attachTextureToSlot(gl, gBufferMat.shader, 'normalMap', normalMap, 0);
                 }
                 if (previousRougnessMap !== roughnessMap) {
                     attachTextureToSlot(gl, gBufferMat.shader, 'roughnessMap', roughnessMap, 1);
                 }
-                if (previousMetalnessMap !== metalnessMap) {
-                    attachTextureToSlot(gl, gBufferMat.shader, 'metalnessMap', metalnessMap, 2);
-                }
                 gBufferMat.shader.setUniform(gl, '1i', 'useRoughnessMap', +useRoughnessMap);
-                gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
 
                 gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
@@ -106,15 +88,15 @@ define(function (require) {
 
             previousNormalMap = normalMap;
             previousRougnessMap = roughnessMap;
-            previousMetalnessMap = metalnessMap;
 
             previousRenderable = renderable;
         };
     }
 
-    function getBeforeRenderHook2(gl, defaultDiffuseMap) {
+    function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
         var previousDiffuseMap;
         var previousRenderable;
+        var previousMetalnessMap;
 
         return function (renderable, prevMaterial) {
             // Material not change
@@ -126,29 +108,48 @@ define(function (require) {
             var gBufferMat = renderable.material;
 
             var color = standardMaterial.get('color');
+            var metalness = standardMaterial.get('metalness');
 
             var diffuseMap = standardMaterial.get('diffuseMap');
+            var metalnessMap = standardMaterial.get('metalnessMap');
+
             var uvRepeat = standardMaterial.get('uvRepeat');
             var uvOffset = standardMaterial.get('uvOffset');
 
+            var useMetalnessMap = !!metalnessMap;
+
             diffuseMap = diffuseMap || defaultDiffuseMap;
+            metalnessMap = metalnessMap || defaultMetalnessMap;
 
             if (!prevMaterial) {
                 gBufferMat.set('color', color);
+                gBufferMat.set('metalness', metalness);
                 gBufferMat.set('diffuseMap', diffuseMap);
+                gBufferMat.set('metalnessMap', metalnessMap);
+                gBufferMat.set('useMetalnessMap', +useMetalnessMap);
                 gBufferMat.set('uvRepeat', uvRepeat);
                 gBufferMat.set('uvOffset', uvOffset);
             }
             else {
+                gBufferMat.shader.setUniform(
+                    gl, '1f', 'metalness', metalness
+                );
+
                 gBufferMat.shader.setUniform(gl, '3f', 'color', color);
                 if (previousDiffuseMap !== diffuseMap) {
                     attachTextureToSlot(gl, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
                 }
+                if (previousMetalnessMap !== metalnessMap) {
+                    attachTextureToSlot(gl, gBufferMat.shader, 'metalnessMap', metalnessMap, 1);
+                }
+                gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
             }
 
             previousDiffuseMap = diffuseMap;
+            previousMetalnessMap = metalnessMap;
+
             previousRenderable = renderable;
         };
     }
@@ -162,11 +163,12 @@ define(function (require) {
 
             // - R: normal.x
             // - G: normal.y
-            // - B: glossiness
-            // - A: metalness + sign(normal.z)
+            // - B: normal.z
+            // - A: glossiness
             _gBufferTex1: new Texture2D({
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST
+                // type: Texture.HALF_FLOAT
             }),
 
             // - R: depth
@@ -180,6 +182,7 @@ define(function (require) {
             // - R: albedo.r
             // - G: albedo.g
             // - B: albedo.b
+            // - A: metalness
             _gBufferTex3: new Texture2D({
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST
@@ -256,8 +259,7 @@ define(function (require) {
             renderer.beforeRenderObject = getBeforeRenderHook1(
                 gl,
                 this._defaultNormalMap,
-                this._defaultRoughnessMap,
-                this._defaultMetalnessMap
+                this._defaultRoughnessMap
             );
             renderer.renderQueue(opaqueQueue, camera);
 
@@ -266,7 +268,9 @@ define(function (require) {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             this._replaceGBufferMat(opaqueQueue, 2);
             renderer.beforeRenderObject = getBeforeRenderHook2(
-                gl, this._defaultDiffuseMap
+                gl,
+                this._defaultDiffuseMap,
+                this._defaultMetalnessMap
             );
             renderer.renderQueue(opaqueQueue, camera);
 

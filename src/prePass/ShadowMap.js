@@ -255,7 +255,11 @@ define(function (require) {
         restoreMaterial: function (casters) {
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
-                mesh.material = this._meshMaterials[mesh.__GUID__];
+                var material = this._meshMaterials[mesh.__GUID__];
+                // In case restoreMaterial when no shadowMap is rendered
+                if (material) {
+                    mesh.material = material;
+                }
             }
         },
 

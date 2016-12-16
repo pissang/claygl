@@ -88,7 +88,6 @@ void main()
 // - B: glossiness
 // - A: metalness + sign(normal.z)
 uniform float glossiness;
-uniform float metalness;
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -99,10 +98,7 @@ varying vec3 v_Bitangent;
 
 uniform sampler2D roughnessMap;
 
-uniform sampler2D metalnessMap;
-
 uniform bool useRoughnessMap;
-uniform bool useMetalnessMap;
 
 varying vec4 v_ProjPos;
 
@@ -120,8 +116,11 @@ void main()
         }
     }
 
+    gl_FragColor.rgb = (N + 1.0) * 0.5;
+
+    // FIXME Have precision problem http://aras-p.info/texts/CompactNormalStorage.html
     // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
-    gl_FragColor.rg = (N.xy + 1.0) * 0.5;
+    // gl_FragColor.rg = (N.xy + 1.0) * 0.5;
 
     float g = glossiness;
 
@@ -133,18 +132,11 @@ void main()
     }
 
 
-    float m = metalness;
-
-    if (useMetalnessMap) {
-        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);
-        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
-    }
-
-    gl_FragColor.b = g;
+    gl_FragColor.a = g;
 
     // Pack sign of normal to metalness
-    // Add 0.001 to avoid m is 0 and sign of N.z lost.
-    gl_FragColor.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
+    // Add 0.001 to avoid m is 0
+    // gl_FragColor.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
 }
 @end
 
@@ -155,13 +147,27 @@ void main()
 // - G: albedo.g
 // - B: albedo.b
 uniform sampler2D diffuseMap;
+uniform sampler2D metalnessMap;
+
 uniform vec3 color;
+uniform float metalness;
+
+uniform bool useMetalnessMap;
+
 varying vec2 v_Texcoord;
 
 void main ()
 {
+    float m = metalness;
+
+    if (useMetalnessMap) {
+        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);
+        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
+    }
+
     gl_FragColor.rgb = texture2D(diffuseMap, v_Texcoord).rgb * color;
-    gl_FragColor.a = 1.0;
+
+    gl_FragColor.a = m;
 }
 
 @end
