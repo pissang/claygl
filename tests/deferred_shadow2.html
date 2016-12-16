@@ -22,20 +22,15 @@
             var animation = new qtek.animation.Animation();
             animation.start();
 
-            var rootNode = new qtek.Node();
             var GLTFLoader = new qtek.loader.GLTF({
-                includeLight: false,
-                rootNode: rootNode
+                includeLight: false
             });
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
 
             GLTFLoader.on('success', function(res) {
-                var scene = new qtek.Scene();
-                // FIXME Scene rotate may affect point light shadow
-                rootNode.rotation.rotateX(-Math.PI / 2);
-                scene.add(rootNode);
-
+                var scene = res.scene;
+                scene.rotation.rotateX(-Math.PI / 2);
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect(),
                     far: 500
@@ -61,10 +56,9 @@
                     shadowBias: 0.001,
                     castShadow: true
                 });
-                light.position.set(-3, 2, 4);
+                light.position.set(-3, -4, 2);
                 light.lookAt(scene.position);
                 scene.add(light);
-
 
                 var light2 = new qtek.light.Spot({
                     color: [0.3, 1, 0.3],
@@ -76,21 +70,18 @@
                     shadowBias: 0.001,
                     castShadow: true
                 });
-                light2.position.set(3, 2, 4);
+                light2.position.set(3, -4, 2);
                 light2.lookAt(scene.position);
                 scene.add(light2);
 
-                var light3 = new qtek.light.Spot({
+                var light3 = new qtek.light.Point({
                     color: [0.3, 0.3, 1],
-                    range: 30,
-                    umbraAngle: 10,
-                    penumbraAngle: 25,
-                    intensity: 1,
+                    range: 50,
                     shadowResolution: 1024,
                     shadowBias: 0.001,
                     castShadow: true
                 });
-                light3.position.set(0, 2, 4);
+                light3.position.set(0, -4, 5);
                 light3.lookAt(scene.position);
                 scene.add(light3);
 

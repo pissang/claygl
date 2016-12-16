@@ -316,19 +316,19 @@ define(function (require) {
         _prepareLightShadow: (function () {
             var worldView = new Matrix4();
             return function (renderer, scene, camera) {
-                var shadowMapPass = this.shadowMapPass;
                 var shadowCasters;
-                if (shadowMapPass) {
-                    shadowCasters = this._shadowCasters || (this._shadowCasters = []);
-                    var count = 0;
-                    var queue = scene.opaqueQueue;
-                    for (var i = 0; i < queue.length; i++) {
-                        if (queue[i].castShadow) {
-                            shadowCasters[count++] = queue[i];
-                        }
+
+                shadowCasters = this._shadowCasters || (this._shadowCasters = []);
+                var count = 0;
+                var queue = scene.opaqueQueue;
+                for (var i = 0; i < queue.length; i++) {
+                    if (queue[i].castShadow) {
+                        shadowCasters[count++] = queue[i];
                     }
-                    shadowCasters.length = count;
                 }
+                shadowCasters.length = count;
+
+                this.shadowMapPass.saveMaterial(shadowCasters);
 
                 for (var i = 0; i < scene.lights.length; i++) {
                     var light = scene.lights[i];

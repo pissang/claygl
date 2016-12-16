@@ -542,7 +542,8 @@ define(function (require) {
                 arr[1] = m[13];
                 arr[2] = m[14];
                 return out;
-            } else {
+            }
+            else {
                 return new Vector3(m[12], m[13], m[14]);
             }
         },

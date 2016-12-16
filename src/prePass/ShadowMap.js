@@ -197,7 +197,6 @@ define(function (require) {
                         this._depthMaterials[matHashKey] = depthMaterial;
                     }
 
-                    this._meshMaterials[mesh.__GUID__] = mesh.material;
                     mesh.material = depthMaterial;
 
                     if (this.softShadow === ShadowMapPass.VSM) {
@@ -237,8 +236,6 @@ define(function (require) {
                         }
                         this._distanceMaterials[nJoints] = distanceMaterial;
                     }
-
-                    this._meshMaterials[mesh.__GUID__] = mesh.material;
                     mesh.material = distanceMaterial;
 
                     if (this.softShadow === ShadowMapPass.VSM) {
@@ -251,6 +248,13 @@ define(function (require) {
 
                 distanceMaterial.set('lightPosition', lightPosition);
                 distanceMaterial.set('range', light.range);
+            }
+        },
+
+        saveMaterial: function (casters) {
+            for (var i = 0; i < casters.length; i++) {
+                var mesh = casters[i];
+                this._meshMaterials[mesh.__GUID__] = mesh.material;
             }
         },
 
@@ -337,6 +341,8 @@ define(function (require) {
             var directionalLightMatrices = [];
             var shadowCascadeClips = [];
             var pointLightShadowMaps = [];
+
+            this.saveMaterial(this._opaqueCasters);
 
             // Create textures for shadow map
             for (var i = 0; i < this._lightsCastShadow.length; i++) {
