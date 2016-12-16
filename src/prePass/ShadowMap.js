@@ -166,7 +166,8 @@ define(function (require) {
                 if (isShadowTransparent) {
                     matHashKey = nJoints + '-' + transparentMap.__GUID__;
                     shaderHashKey = nJoints + 's';
-                } else {
+                }
+                else {
                     matHashKey = nJoints;
                     shaderHashKey = nJoints;
                 }
@@ -216,6 +217,7 @@ define(function (require) {
         },
 
         _bindDistanceMaterial: function (casters, light) {
+            var lightPosition = light.getWorldPosition()._array;
             for (var i = 0; i < casters.length; i++) {
                 var mesh = casters[i];
                 var nJoints = mesh.joints && mesh.joints.length;
@@ -247,7 +249,7 @@ define(function (require) {
                     }
                 }
 
-                distanceMaterial.set('lightPosition', light.position._array);
+                distanceMaterial.set('lightPosition', lightPosition);
                 distanceMaterial.set('range', light.range);
             }
         },
@@ -695,7 +697,7 @@ define(function (require) {
                     camera.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
                     break;
             }
-            camera.position.copy(light.position);
+            light.getWorldPosition(camera.position);
             camera.update();
 
             return camera;
