@@ -22,7 +22,9 @@
             var animation = new qtek.animation.Animation();
             animation.start();
 
-            var GLTFLoader = new qtek.loader.GLTF();
+            var GLTFLoader = new qtek.loader.GLTF({
+                includeLight: false
+            });
 
             GLTFLoader.load("assets/scenes/gltf/scene.json");
 
@@ -44,20 +46,47 @@
                     sensitivity: 0.4,
                     maxPolarAngle: Math.PI / 1.8,
                     minPolarAngle: 0.1
-                    // includeLight: false
                 });
 
-                var light = scene.getNode('Spot');
-                light.range = 30;
-                light.umbraAngle = 10;
-                light.penumbraAngle = 25;
-                light.shadowResolution = 2048;
-
+                var light = new qtek.light.Spot({
+                    color: [1, 0, 0],
+                    range: 30,
+                    umbraAngle: 10,
+                    penumbraAngle: 25,
+                    intensity: 1,
+                    shadowResolution: 512,
+                    shadowBias: 0.001
+                });
+                light.position.set(-3, -4, 2);
                 light.lookAt(scene.position);
+                scene.add(light);
 
-                scene.add(new qtek.light.Ambient({
-                    intensity: 0.1
-                }));
+                var light2 = new qtek.light.Spot({
+                    color: [0, 1, 0],
+                    range: 50,
+                    umbraAngle: 10,
+                    penumbraAngle: 25,
+                    shadowResolution: 512,
+                    intensity: 1,
+                    shadowBias: 0.001
+                });
+                light2.position.set(3, -4, 2);
+                light2.lookAt(scene.position);
+                scene.add(light2);
+
+                var light3 = new qtek.light.Spot({
+                    color: [0, 0, 1],
+                    range: 30,
+                    umbraAngle: 10,
+                    penumbraAngle: 25,
+                    intensity: 1,
+                    shadowResolution: 512,
+                    shadowBias: 0.001
+                });
+                light3.position.set(0, -4, 5);
+                light3.lookAt(scene.position);
+                scene.add(light3);
+
 
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);

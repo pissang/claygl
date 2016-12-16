@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -43,47 +43,45 @@ define(function(require) {
         uniformTemplates: {
             spotLightPosition: {
                 type: '3f',
-                value: function(instance) {
+                value: function (instance) {
                     return instance.getWorldPosition()._array;
                 }
             },
             spotLightRange: {
                 type: '1f',
-                value: function(instance) {
+                value: function (instance) {
                     return instance.range;
                 }
             },
             spotLightUmbraAngleCosine: {
                 type: '1f',
-                value: function(instance) {
+                value: function (instance) {
                     return Math.cos(instance.umbraAngle * Math.PI / 180);
                 }
             },
             spotLightPenumbraAngleCosine: {
                 type: '1f',
-                value: function(instance) {
+                value: function (instance) {
                     return Math.cos(instance.penumbraAngle * Math.PI / 180);
                 }
             },
             spotLightFalloffFactor: {
                 type: '1f',
-                value: function(instance) {
+                value: function (instance) {
                     return instance.falloffFactor;
                 }
             },
             spotLightDirection: {
                 type: '3f',
-                value: (function() {
-                    var z = new Vector3();
-                    return function(instance) {
-                        // Direction is target to eye
-                        return z.copy(instance.worldTransform.z).negate()._array;
-                    };
-                })()
+                value: function (instance) {
+                    instance.__dir = instance.__dir || new Vector3();
+                    // Direction is target to eye
+                    return instance.__dir.copy(instance.worldTransform.z).negate()._array;
+                }
             },
             spotLightColor: {
                 type: '3f',
-                value: function(instance) {
+                value: function (instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
                     return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
@@ -94,7 +92,7 @@ define(function(require) {
          * @return {qtek.light.Spot}
          * @memberOf qtek.light.Spot.prototype
          */
-        clone: function() {
+        clone: function () {
             var light = Light.prototype.clone.call(this);
             light.range = this.range;
             light.umbraAngle = this.umbraAngle;

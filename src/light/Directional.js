@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -36,16 +36,15 @@ define(function(require) {
         uniformTemplates: {
             directionalLightDirection: {
                 type: '3f',
-                value: (function() {
-                    var z = new Vector3();
-                    return function(instance) {
-                        return z.copy(instance.worldTransform.z).negate()._array;
-                    };
-                })()
+                value: function (instance) {
+                    instance.__dir = instance.__dir || new Vector3();
+                    // Direction is target to eye
+                    return instance.__dir.copy(instance.worldTransform.z).negate()._array;
+                }
             },
             directionalLightColor: {
                 type: '3f',
-                value: function(instance) {
+                value: function (instance) {
                     var color = instance.color;
                     var intensity = instance.intensity;
                     return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
@@ -56,7 +55,7 @@ define(function(require) {
          * @return {qtek.light.Directional}
          * @memberOf qtek.light.Directional.prototype
          */
-        clone: function() {
+        clone: function () {
             var light = Light.prototype.clone.call(this);
             light.shadowBias = this.shadowBias;
             light.shadowSlopeScale = this.shadowSlopeScale;
