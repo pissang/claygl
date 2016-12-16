@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Deferred Pointlight Shadow</title>
         <meta charset="utf-8">
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
@@ -72,7 +73,7 @@
                     var pointLight = new qtek.light.Point({
                         color: [Math.random(), Math.random(), Math.random()],
                         range: 40,
-                        intensity: 0.1,
+                        intensity: 0.15,
                         castShadow: true,
                         shadowResolution: 512
                     });
@@ -92,7 +93,7 @@
 
                     var animator = animation.animate(pointLight.position, { loop: true });
                     for (var k = 0; k < 10; k++) {
-                        animator.when(k * 5000, {
+                        animator.when(k * 4000 + i * 1000, {
                             x: randomInSquare(5),
                             y: randomInSquare(5),
                             z: randomInSquare(5)

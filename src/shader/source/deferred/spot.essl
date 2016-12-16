@@ -34,8 +34,9 @@ void main()
     float dist = length(L);
     L /= dist;
 
+
     float attenuation = lightAttenuation(dist, lightRange);
-    float c = dot(-lightDirection, L);
+    float c = dot(-normalize(lightDirection), L);
 
     float falloff = clamp((c - umbraAngleCosine) / (penumbraAngleCosine - umbraAngleCosine), 0.0, 1.0);
     falloff = pow(falloff, falloffFactor);
