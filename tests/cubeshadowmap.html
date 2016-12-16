@@ -70,11 +70,22 @@
                 var light = new qtek.light.Point({
                     color: [1.5, 1.5, 1.5],
                     shadowResolution: 512,
+                    intensity: 0.5,
                     range: 40,
                     castShadow: true
                 })
                 light.position.set(0.2, 0.2, 0.2);
                 scene.add(light);
+
+                var light2 = new qtek.light.Point({
+                    color: [1.5, 1.5, 1.5],
+                    shadowResolution: 512,
+                    range: 40,
+                    intensity: 0.5,
+                    castShadow: true
+                })
+                light2.position.set(-0.2, -0.2, -0.2);
+                scene.add(light2);
 
                 var elapsedTime = 0;
                 animation.on('frame', function(deltaTime){

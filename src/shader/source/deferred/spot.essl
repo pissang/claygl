@@ -17,7 +17,7 @@ uniform float falloffFactor;
 uniform vec3 eyePosition;
 
 #ifdef SHADOWMAP_ENABLED
-uniform samplerCube lightShadowMap;
+uniform sampler2D lightShadowMap;
 uniform mat4 lightMatrix;
 uniform float lightShadowMapSize;
 #endif

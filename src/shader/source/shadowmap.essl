@@ -173,7 +173,7 @@ float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
     // FIXME premultiplied alpha?
     // tex.rgb /= tex.a;
-    return decodeFloat(tex) * 2.0 - 1.0 < z ? 0.0 : 1.0;
+    return step(z, decodeFloat(tex) * 2.0 - 1.0);
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize){
@@ -231,8 +231,8 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float te
 
 float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
 {
-    vec4 shadowTex = textureCube(map, direction);
     float dist = length(direction);
+    vec4 shadowTex = textureCube(map, direction);
 
 #ifdef USE_VSM
     vec2 moments = shadowTex.xy;
@@ -245,11 +245,7 @@ float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
         return 1.0;
     }
 #else
-    if((decodeFloat(shadowTex) + 0.0002) * range < dist){
-        return 0.0;
-    }else{
-        return 1.0;
-    }
+    return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);
 #endif
 }
 

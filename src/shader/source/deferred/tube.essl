@@ -48,7 +48,7 @@ void main()
     float ndv = clamp(dot(N, V), 0.0, 1.0);
 
     // Specular fix
-    // glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);
+    glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);
 
     gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)
         * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));

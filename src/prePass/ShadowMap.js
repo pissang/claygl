@@ -245,9 +245,10 @@ define(function (require) {
                     else {
                         distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
                     }
-                    distanceMaterial.set('lightPosition', light.position._array);
-                    distanceMaterial.set('range', light.range);
                 }
+
+                distanceMaterial.set('lightPosition', light.position._array);
+                distanceMaterial.set('range', light.range);
             }
         },
 

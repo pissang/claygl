@@ -46,7 +46,7 @@ void main()
     float shadowContrib = computeShadowContribOmni(
         lightShadowMap, -L * dist, lightRange
     );
-    gl_FragColor.rgb *= shadowContrib;
+    gl_FragColor.rgb *= clamp(shadowContrib, 0.0, 1.0);
 #endif
 
     gl_FragColor.a = 1.0;

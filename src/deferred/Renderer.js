@@ -290,6 +290,7 @@ define(function (require) {
                     pass.material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     pass.material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
+                    // TODO
                     // if (shadowMapPass) {
                     //     this._prepareLightShadow(
                     //         renderer, scene, camera, light, shadowCasters, pass.material
@@ -312,40 +313,48 @@ define(function (require) {
             lightAccumFrameBuffer.unbind(renderer);
         },
 
-        _prepareLightShadow: function (renderer, scene, camera) {
-            var shadowMapPass = this.shadowMapPass;
-            var shadowCasters;
-            if (shadowMapPass) {
-                shadowCasters = this._shadowCasters || (this._shadowCasters = []);
-                var count = 0;
-                var queue = scene.opaqueQueue;
-                for (var i = 0; i < queue.length; i++) {
-                    if (queue[i].castShadow) {
-                        shadowCasters[count++] = queue[i];
+        _prepareLightShadow: (function () {
+            var worldView = new Matrix4();
+            return function (renderer, scene, camera) {
+                var shadowMapPass = this.shadowMapPass;
+                var shadowCasters;
+                if (shadowMapPass) {
+                    shadowCasters = this._shadowCasters || (this._shadowCasters = []);
+                    var count = 0;
+                    var queue = scene.opaqueQueue;
+                    for (var i = 0; i < queue.length; i++) {
+                        if (queue[i].castShadow) {
+                            shadowCasters[count++] = queue[i];
+                        }
+                    }
+                    shadowCasters.length = count;
+                }
+
+                for (var i = 0; i < scene.lights.length; i++) {
+                    var light = scene.lights[i];
+                    var volumeMesh = light.volumeMesh || light.__volumeMesh;
+
+                    switch (light.type) {
+                        case 'POINT_LIGHT':
+                        case 'SPOT_LIGHT':
+                            if (light.castShadow) {
+                                // Frustum culling
+                                Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
+                                if (renderer.isFrustumCulled(
+                                    volumeMesh, camera, worldView._array, camera.projectionMatrix._array
+                                )) {
+                                    continue;
+                                }
+
+                                this._prepareSingleLightShadow(
+                                    renderer, scene, camera, light, shadowCasters, volumeMesh.material
+                                );
+                            }
+                            break;
                     }
                 }
-                shadowCasters.length = count;
-            }
-
-            for (var i = 0; i < scene.lights.length; i++) {
-                var light = scene.lights[i];
-                var volumeMesh = light.volumeMesh || light.__volumeMesh;
-
-                switch (light.type) {
-                    case 'POINT_LIGHT':
-                    case 'SPOT_LIGHT':
-                        if (light.castShadow) {
-                            this._prepareSingleLightShadow(
-                                renderer, scene, camera, light, shadowCasters, volumeMesh.material
-                            );
-                        }
-                        this._prepareSingleLightShadow(
-                            renderer, scene, camera, light, shadowCasters, volumeMesh.material
-                        );
-                        break;
-                }
-            }
-        },
+            };
+        })(),
 
         _prepareSingleLightShadow: function (renderer, scene, camera, light, casters, material) {
             switch (light.type) {
@@ -417,10 +426,9 @@ define(function (require) {
                         volumeMesh.scale.set(r, r, r);
                         break;
                     case 'SPOT_LIGHT':
+                        var shader = hasShadow ? this._spotLightShaderWithShadow : this._spotLightShader;
                         light.__volumeMesh = light.__volumeMesh || new Mesh({
-                            material: this._createLightPassMat(
-                                hasShadow ? this._spotLightShaderWithShadow : this._spotLightShader
-                            ),
+                            material: this._createLightPassMat(shader),
                             geometry: this._lightConeGeo,
                             culling: false
                         });
@@ -523,7 +531,8 @@ define(function (require) {
 
                 if (renderer.throwError) {
                     throw new Error(errMsg);
-                } else {
+                }
+                else {
                     renderer.trigger('error', errMsg);
                 }
             }
