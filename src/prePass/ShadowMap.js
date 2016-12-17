@@ -463,6 +463,8 @@ define(function (require) {
 
             var prevDepth = 0;
             var deltaDepth = 0;
+
+            var sceneCameraProxy = new PerspectiveCamera();
             return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
                 var shadowBias = light.shadowBias;
@@ -480,13 +482,20 @@ define(function (require) {
                 deltaDepth = Math.max(depth - prevDepth, 0);
                 prevDepth = depth;
                 depth += deltaDepth;
+
+                // Use a sceneCameraProxy to avoid modify the camera property.
+                sceneCameraProxy.near = sceneCamera.near;
+                sceneCameraProxy.far = sceneCamera.far;
+                sceneCameraProxy.aspect = sceneCamera.aspect;
+                sceneCameraProxy.fov = sceneCamera.fov;
+                sceneCameraProxy.setWorldTransform(sceneCamera.worldTransform);
                 // TODO: add a bias
-                if (depth > sceneCamera.near) {
-                    sceneCamera.far = Math.min(sceneCamera.far, depth);
+                if (depth > sceneCameraProxy.near) {
+                    sceneCameraProxy.far = Math.min(sceneCameraProxy.far, depth);
                 }
-                sceneCamera.updateProjectionMatrix();
-                sceneCamera.frustum.setFromProjection(sceneCamera.projectionMatrix);
-                var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
+                sceneCameraProxy.updateProjectionMatrix();
+                sceneCameraProxy.frustum.setFromProjection(sceneCameraProxy.projectionMatrix);
+                var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCameraProxy);
 
                 var lvpMat4Arr = lightViewProjMatrix._array;
                 mat4.copy(lvpMat4Arr, lightCamera.worldTransform._array);
@@ -497,10 +506,10 @@ define(function (require) {
                 lightProjMatrix.copy(lightCamera.projectionMatrix);
 
                 var clipPlanes = [];
-                var near = sceneCamera.near;
-                var far = sceneCamera.far;
-                var rad = sceneCamera.fov / 180 * Math.PI;
-                var aspect = sceneCamera.aspect;
+                var near = sceneCameraProxy.near;
+                var far = sceneCameraProxy.far;
+                var rad = sceneCameraProxy.fov / 180 * Math.PI;
+                var aspect = sceneCameraProxy.aspect;
 
                 var scaleZ = (near + originalFar) / (near - originalFar);
                 var offsetZ = 2 * near * originalFar / (near - originalFar);
@@ -630,10 +639,8 @@ define(function (require) {
             this._gaussianPassH.setUniform('texture', texture);
             this._gaussianPassH.setUniform('textureWidth', size);
             this._gaussianPassH.render(renderer);
-            this._frameBuffer.unbind(renderer);
 
             this._frameBuffer.attach(_gl, texture);
-            this._frameBuffer.bind(renderer);
             this._gaussianPassV.setUniform('texture', tmpTexture);
             this._gaussianPassV.setUniform('textureHeight', size);
             this._gaussianPassV.render(renderer);
@@ -648,7 +655,8 @@ define(function (require) {
             if (!texture) {
                 if (light instanceof PointLight) {
                     texture = new TextureCube();
-                } else {
+                }
+                else {
                     texture = new Texture2D();
                 }
                 texture.width = resolution;
@@ -773,12 +781,13 @@ define(function (require) {
         },
 
         /**
-         * @param  {qtek.Renderer} [renderer]
+         * @param  {qtek.Renderer|WebGLRenderingContext} [renderer]
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
         // PENDING Renderer or WebGLRenderingContext
         dispose: function (renderer) {
-            var _gl = renderer && renderer.gl;
+            var _gl = renderer.gl || renderer;
+
             for (var guid in this._depthMaterials) {
                 var mat = this._depthMaterials[guid];
                 mat.dispose(_gl);
