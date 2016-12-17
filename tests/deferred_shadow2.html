@@ -2,6 +2,7 @@
 <head>
     <title>Deferred Spotlight Shadow</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="text/javascript" src="../thirdparty/require.js"></script>
     <script type="text/javascript" src="js/config.js"></script>
 </head>
@@ -52,7 +53,7 @@
                     umbraAngle: 10,
                     penumbraAngle: 25,
                     intensity: 1,
-                    shadowResolution: 1024,
+                    shadowResolution: 512,
                     shadowBias: 0.001,
                     castShadow: true
                 });
@@ -65,7 +66,7 @@
                     range: 50,
                     umbraAngle: 10,
                     penumbraAngle: 25,
-                    shadowResolution: 1024,
+                    shadowResolution: 512,
                     intensity: 1,
                     shadowBias: 0.001,
                     castShadow: true
@@ -77,7 +78,7 @@
                 var light3 = new qtek.light.Point({
                     color: [0.3, 0.3, 1],
                     range: 50,
-                    shadowResolution: 1024,
+                    shadowResolution: 512,
                     shadowBias: 0.001,
                     castShadow: true
                 });

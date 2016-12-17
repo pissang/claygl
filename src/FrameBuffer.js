@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -39,7 +39,7 @@ define(function(require) {
         _height: 0,
 
         _binded: false,
-    }, function() {
+    }, function () {
         // Use cache
         this._cache = new Cache();
 
@@ -55,7 +55,7 @@ define(function(require) {
          * @param  {number} width
          * @param  {number} height
          */
-        resize: function(width, height) {
+        resize: function (width, height) {
             this._width = width;
             this._height = height;
         },
@@ -64,7 +64,7 @@ define(function(require) {
          * Bind the framebuffer to given renderer before rendering
          * @param  {qtek.Renderer} renderer
          */
-        bind: function(renderer) {
+        bind: function (renderer) {
 
             var _gl = renderer.gl;
 
@@ -103,7 +103,7 @@ define(function(require) {
          * Unbind the frame buffer after rendering
          * @param  {qtek.Renderer} renderer
          */
-        unbind: function(renderer) {
+        unbind: function (renderer) {
             var _gl = renderer.gl;
 
             _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
@@ -132,7 +132,7 @@ define(function(require) {
             }
         },
 
-        _getFrameBufferGL: function(_gl) {
+        _getFrameBufferGL: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
 
@@ -198,7 +198,7 @@ define(function(require) {
             }
         },
         // TODO
-        detach: function() {},
+        detach: function () {},
         /**
          * Dispose
          * @param  {WebGLRenderingContext} _gl

@@ -10,8 +10,13 @@ uniform vec3 lightColor;
 uniform vec3 eyePosition;
 
 #ifdef SHADOWMAP_ENABLED
+uniform float zNear;
+uniform float zFar;
+
 uniform sampler2D lightShadowMaps[SHADOW_CASCADE];
 uniform mat4 lightMatrices[SHADOW_CASCADE];
+uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
+uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
 uniform float lightShadowMapSize;
 #endif
 
@@ -34,14 +39,11 @@ void main()
     );
 
 #ifdef SHADOWMAP_ENABLED
-    // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
-    float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
-                    / (gl_DepthRange.far - gl_DepthRange.near);
     float shadowContrib = 1.0;
     for (int i = 0; i < SHADOW_CASCADE; i++) {
         if (
-            depth >= shadowCascadeClipsNear[i] &&
-            depth <= shadowCascadeClipsFar[i]
+            z >= shadowCascadeClipsNear[i] &&
+            z <= shadowCascadeClipsFar[i]
         ) {
             shadowContrib = computeShadowContrib(lightShadowMaps[i], lightMatrices[i], position, lightShadowMapSize);
         }

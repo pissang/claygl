@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <title>Deferred Directional Light Shadow</title>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+
+        <script type="text/javascript" src="lib/stats.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="main"></canvas>
+        <script>
+            require(['qtek'], function(qtek) {
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var shadowMapPass = new qtek.prePass.ShadowMap({
+                    shadowCascade: 2
+                });
+                var deferredRenderer = new qtek.deferred.Renderer({
+                    shadowMapPass: shadowMapPass
+                });
+
+                var camera = new qtek.camera.Perspective({
+                    far: 1000,
+                    aspect: renderer.getViewportAspect()
+                });
+
+                var scene = new qtek.Scene();
+
+                var cubeGeo = new qtek.geometry.Cube();
+
+                var cubes = [];
+                for (var i = 0; i < 24; i++) {
+                    for (var j = 0; j < 24; j++) {
+                        var mesh = new qtek.Mesh({
+                            geometry: cubeGeo,
+                            material: new qtek.StandardMaterial({
+                                color: [i / 24, j / 24, 0.5]
+                            })
+                        });
+                        mesh.position.x = i - 12;
+                        mesh.position.z = j - 12;
+                        mesh.scale.set(0.5, 0, 0.5);
+
+                        cubes.push(mesh);
+
+                        scene.add(mesh);
+                    }
+                }
+                var directionalLight = new qtek.light.Directional({
+                    intensity: 1.2,
+                    shadowBias: 0.004,
+                    shadowResolution: 2048
+                });
+                directionalLight.position.set(10, 10, 10);
+                directionalLight.lookAt(scene.position);
+
+                scene.add(directionalLight);
+
+                scene.add(new qtek.light.Point({
+                    intensity: 0.4,
+                    range: 100,
+                    position: new qtek.math.Vector3(-10, 24, 0)
+                }));
+
+                camera.position.set(10, 20, 20);
+                camera.lookAt(scene.position);
+
+                var control = new qtek.plugin.OrbitControl({
+                    domElement: renderer.canvas,
+                    target: camera
+                });
+
+                var animation = new qtek.animation.Animation();
+
+                var elapsedTime = 0;
+                animation.on('frame', function (deltaTime) {
+                    control.update(deltaTime);
+
+                    elapsedTime += deltaTime;
+                    cubes.forEach(function (cube, idx) {
+                        var x = Math.round(idx / 24);
+                        var y = idx % 24;
+                        cube.scale.y = (Math.sin(x / 3 + elapsedTime / 1000) * Math.cos(y / 3 + elapsedTime / 1000) + 1) * 2;
+                    })
+                    // shadowMapPass.render(renderer, scene, camera);
+                    // renderer.render(scene, camera);
+                    deferredRenderer.render(renderer, scene, camera);
+
+                    // shadowMapPass.renderDebug(renderer);
+
+                    stats.update();
+                });
+                animation.start();
+
+                var stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                stats.domElement.style.right = '0px';
+                document.body.appendChild(stats.domElement);
+            });
+        </script>
+    </body>
+</html>

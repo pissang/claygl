@@ -167,8 +167,9 @@ define(function (require) {
             // - A: glossiness
             _gBufferTex1: new Texture2D({
                 minFilter: Texture.NEAREST,
-                magFilter: Texture.NEAREST
-                // type: Texture.HALF_FLOAT
+                magFilter: Texture.NEAREST,
+                // PENDING
+                type: Texture.HALF_FLOAT
             }),
 
             // - R: depth
@@ -412,7 +413,9 @@ define(function (require) {
 
         dispose: function (gl) {
             for (var name in this._gBufferMaterials) {
-                this._gBufferMaterials[name].dispose(gl);
+                var matObj = this._gBufferMaterials[name];
+                matObj.material1.dispose(gl);
+                matObj.material2.dispose(gl);
             }
         }
     });

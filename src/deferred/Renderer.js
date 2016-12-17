@@ -43,10 +43,7 @@ define(function (require) {
             vertex: fullQuadVertex,
             fragment: Shader.source('qtek.deferred.directional_light')
         });
-        var directionalLightShaderWithShadow = new Shader({
-            vertex: fullQuadVertex,
-            fragment: Shader.source('qtek.deferred.directional_light')
-        });
+        var directionalLightShaderWithShadow = directionalLightShader.clone();
         directionalLightShaderWithShadow.define('fragment', 'SHADOWMAP_ENABLED');
 
         var lightAccumulateBlendFunc = function (gl) {
@@ -97,6 +94,8 @@ define(function (require) {
 
             shadowMapPass: null,
 
+            _createLightPassMat: createLightPassMat,
+
             _gBuffer: new GBuffer(),
 
             _lightAccumFrameBuffer: new FrameBuffer(),
@@ -127,8 +126,6 @@ define(function (require) {
 
             _sphereLightShader: createVolumeShader('sphere_light'),
             _tubeLightShader: createVolumeShader('tube_light'),
-
-            _createLightPassMat: createLightPassMat,
 
             _lightSphereGeo: new SphereGeo({
                 widthSegments: 10,
@@ -200,7 +197,8 @@ define(function (require) {
 
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
-            gl.clearColor(0, 0, 0, 1);
+            var color = renderer.color;
+            gl.clearColor(color[0], color[1], color[2], color[3]);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.enable(gl.BLEND);
 
@@ -283,20 +281,24 @@ define(function (require) {
                             pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
                             break;
                     }
-                    pass.material.setUniform('eyePosition', eyePosition);
-                    pass.material.setUniform('viewportSize', viewportSize);
-                    pass.material.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    pass.material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
-                    pass.material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
-                    pass.material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
+
+                    var passMaterial = pass.material;
+                    passMaterial.setUniform('eyePosition', eyePosition);
+                    passMaterial.setUniform('viewportSize', viewportSize);
+                    passMaterial.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
+                    passMaterial.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
+                    passMaterial.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
                     // TODO
-                    // if (shadowMapPass) {
-                    //     this._prepareLightShadow(
-                    //         renderer, scene, camera, light, shadowCasters, pass.material
-                    //     );
-                    //     shadowMapPass.restoreMaterial(shadowCasters);
-                    // }
+                    if (shadowMapPass && light.castShadow) {
+                        passMaterial.setUniform('lightShadowMaps', light.__shadowMaps);
+                        passMaterial.setUniform('lightMatrices', light.__lightMatrices);
+                        passMaterial.setUniform('shadowCascadeClipsNear', light.__cascadeClipsNear);
+                        passMaterial.setUniform('shadowCascadeClipsFar', light.__cascadeClipsFar);
+
+                        passMaterial.setUniform('lightShadowMapSize', light.shadowResolution);
+                    }
 
                     pass.renderQuad(renderer);
                 }
@@ -333,24 +335,29 @@ define(function (require) {
                 for (var i = 0; i < scene.lights.length; i++) {
                     var light = scene.lights[i];
                     var volumeMesh = light.volumeMesh || light.__volumeMesh;
+                    if (!light.castShadow) {
+                        continue;
+                    }
 
                     switch (light.type) {
                         case 'POINT_LIGHT':
                         case 'SPOT_LIGHT':
-                            if (light.castShadow) {
-                                // Frustum culling
-                                Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
-                                if (renderer.isFrustumCulled(
-                                    volumeMesh, camera, worldView._array, camera.projectionMatrix._array
-                                )) {
-                                    continue;
-                                }
-
-                                this._prepareSingleLightShadow(
-                                    renderer, scene, camera, light, shadowCasters, volumeMesh.material
-                                );
+                            // Frustum culling
+                            Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
+                            if (renderer.isFrustumCulled(
+                                volumeMesh, camera, worldView._array, camera.projectionMatrix._array
+                            )) {
+                                continue;
                             }
+
+                            this._prepareSingleLightShadow(
+                                renderer, scene, camera, light, shadowCasters, volumeMesh.material
+                            );
                             break;
+                        case 'DIRECTIONAL_LIGHT':
+                            this._prepareSingleLightShadow(
+                                renderer, scene, camera, light, shadowCasters, null
+                            );
                     }
                 }
             };
@@ -364,27 +371,42 @@ define(function (require) {
                         renderer, light, casters, shadowMaps
                     );
                     material.setUniform('lightShadowMap', shadowMaps[0]);
+                    material.setUniform('lightShadowMapSize', light.shadowResolution);
                     break;
                 case 'SPOT_LIGHT':
                     var shadowMaps = [];
-                    var lightMtrices = [];
+                    var lightMatrices = [];
                     this.shadowMapPass.renderSpotLightShadow(
-                        renderer, light, casters, lightMtrices, shadowMaps
+                        renderer, light, casters, lightMatrices, shadowMaps
                     );
                     material.setUniform('lightShadowMap', shadowMaps[0]);
-                    material.setUniform('lightMatrix', lightMtrices[0]);
+                    material.setUniform('lightMatrix', lightMatrices[0]);
+                    material.setUniform('lightShadowMapSize', light.shadowResolution);
                     break;
                 case 'DIRECTIONAL_LIGHT':
                     var shadowMaps = [];
-                    var lightMtrices = [];
+                    var lightMatrices = [];
+                    var cascadeClips = [];
                     this.shadowMapPass.renderDirectionalLightShadow(
-                        renderer, light, scene, camera, casters, lightMtrices, shadowMaps
+                        renderer, scene, camera, light, casters, cascadeClips, lightMatrices, shadowMaps
                     );
-                    material.setUniform('lightShadowMaps', shadowMaps);
-                    material.setUniform('lightMatrices', lightMtrices);
+                    var cascadeClipsNear = cascadeClips.slice();
+                    var cascadeClipsFar = cascadeClips.slice();
+                    cascadeClipsNear.pop();
+                    cascadeClipsFar.shift();
+
+                    // Iterate from far to near
+                    cascadeClipsNear.reverse();
+                    cascadeClipsFar.reverse();
+                    shadowMaps.reverse();
+                    lightMatrices.reverse();
+
+                    light.__cascadeClipsNear = cascadeClipsNear;
+                    light.__cascadeClipsFar = cascadeClipsFar;
+                    light.__shadowMaps = shadowMaps;
+                    light.__lightMatrices = lightMatrices;
                     break;
             }
-            material.setUniform('lightShadowMapSize', light.shadowResolution);
         },
 
         // Update light volume mesh
@@ -536,6 +558,38 @@ define(function (require) {
                     renderer.trigger('error', errMsg);
                 }
             }
+        },
+
+
+        /**
+         * @param  {qtek.Renderer|WebGLRenderingContext} [renderer]
+         */
+        dispose: function (renderer) {
+            var gl = renderer.gl || renderer;
+
+            this._gBuffer.dispose(gl);
+
+            this._lightAccumFrameBuffer.dispose(gl);
+            this._lightAccumTex.dispose(gl);
+
+            this._pointLightShader.dispose(gl);
+            this._pointLightShaderWithShadow.dispose(gl);
+            this._spotLightShader.dispose(gl);
+            this._spotLightShaderWithShadow.dispose(gl);
+            this._sphereLightShader.dispose(gl);
+            this._tubeLightShader.dispose(gl);
+
+            this._lightConeGeo.dispose(gl);
+            this._lightCylinderGeo.dispose(gl);
+            this._lightSphereGeo.dispose(gl);
+
+            this._fullQuadPass.dispose(gl);
+            this._outputPass.dispose(gl);
+
+            this._directionalLightMat.dispose(gl);
+            this._directionalLightMatWithShadow.dispose(gl);
+
+            this.shadowMapPass.dispose(gl);
         }
     });
 

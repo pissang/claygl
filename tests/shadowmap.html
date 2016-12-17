@@ -13,48 +13,48 @@
                 var Vector3 = qtek.math.Vector3;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById('main'),
-                    devicePixelRatio : 1.0
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1.0
                 });
 
                 var shadowMapPass = new qtek.prePass.ShadowMap({
-                    // useVSM : true
+                    softShadow: qtek.prePass.ShadowMap.VSM
                 });
 
                 var scene = new qtek.Scene();
                 var camera = new qtek.camera.Perspective({
-                        aspect : renderer.getViewportAspect(),
-                        far : 100
-                    });
+                    aspect: renderer.getViewportAspect(),
+                    far: 100
+                });
 
                 var light = new qtek.light.Spot({
-                    position : new Vector3(0, 4, 4),
-                    intensity : 0.5,
-                    shadowBias : 0.001,
-                    shadowResolution : 1024
+                    position: new Vector3(0, 4, 4),
+                    intensity: 0.5,
+                    shadowBias: 0.001,
+                    shadowResolution: 512
                 });
                 scene.add(light);
 
                 var light2 = new qtek.light.Spot({
-                    position : new Vector3(0, 4, -4),
-                    intensity : 0.5,
-                    shadowBias : 0.001,
-                    shadowResolution : 1024
+                    position: new Vector3(0, 4, -4),
+                    intensity: 0.5,
+                    shadowBias: 0.001,
+                    shadowResolution: 512
                 });
                 scene.add(light2);
 
                 var plane = new qtek.geometry.Plane({
-                    widthSegments : 1,
-                    heightSegments : 1
+                    widthSegments: 1,
+                    heightSegments: 1
                 });
                 var shader = qtek.shader.library.get('qtek.phong');
 
                 var material = new qtek.Material({
-                    shader : shader
+                    shader: shader
                 });
 
                 var loader = new qtek.loader.ThreeModel({
-                    textureRootPath : 'assets/models/nanosuit/tex'
+                    textureRootPath: 'assets/models/nanosuit/tex'
                 });
                 var data = JSON.parse(modelData);
                 var meshList = loader.parse(data);
@@ -74,8 +74,8 @@
                 camera.lookAt( new Vector3(0, 1, 0) );
 
                 var planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material
+                    geometry: plane,
+                    material: material
                 });
                 planeMesh.rotation.rotateX( -Math.PI/2 );
                 planeMesh.scale.set(10, 10, 10);
