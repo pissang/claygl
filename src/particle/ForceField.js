@@ -6,8 +6,8 @@ define(function(require) {
     var vec3 =  glMatrix.vec3;
 
     /**
-     * @constructor qtek.particleSystem.ForceField
-     * @extends qtek.particleSystem.Field
+     * @constructor qtek.particle.ForceField
+     * @extends qtek.particle.Field
      */
     var ForceField = Field.extend(function() {
         return {

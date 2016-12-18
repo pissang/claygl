@@ -2,7 +2,7 @@ define(function(require) {
 
     var Base = require('../core/Base');
     /**
-     * @constructor qtek.particleSystem.Field
+     * @constructor qtek.particle.Field
      * @extends qtek.core.Base
      */
     var Field = Base.extend({}, {
@@ -12,7 +12,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} position
          * @param  {number} weight
          * @param  {number} deltaTime
-         * @memberOf qtek.particleSystem.Field.prototype
+         * @memberOf qtek.particle.Field.prototype
          */
         applyTo: function(velocity, position, weight, deltaTime) {}
     });

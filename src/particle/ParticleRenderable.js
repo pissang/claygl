@@ -3,15 +3,10 @@ define(function(require) {
     'use strict';
 
     var Renderable = require('../Renderable');
-    var Vector3 = require('../math/Vector3');
-    var glenum = require('../core/glenum');
 
     var StaticGeometry = require('../StaticGeometry');
     var Material = require('../Material');
     var Shader = require('../Shader');
-
-    var glMatrix = require('../dep/glmatrix');
-    var vec3 = glMatrix.vec3;
 
     Shader['import'](require('./particle.essl'));
 
@@ -22,11 +17,11 @@ define(function(require) {
     particleShader.enableTexture('sprite');
 
     /**
-     * @constructor qtek.particleSystem.ParticleRenderable
+     * @constructor qtek.particle.ParticleRenderable
      * @extends qtek.Renderable
      *
      * @example
-     *     var particleRenderable = new qtek.particleSystem.ParticleRenderable({
+     *     var particleRenderable = new qtek.particle.ParticleRenderable({
      *         spriteAnimationTileX: 4,
      *         spriteAnimationTileY: 4,
      *         spriteAnimationRepeat: 1
@@ -34,7 +29,7 @@ define(function(require) {
      *     scene.add(particleRenderable);
      *     // Enable uv animation in the shader
      *     particleRenderable.material.shader.define('both', 'UV_ANIMATION');
-     *     var Emitter = qtek.particleSystem.Emitter;
+     *     var Emitter = qtek.particle.Emitter;
      *     var Vector3 = qtek.math.Vector3;
      *     var emitter = new Emitter({
      *         max: 2000,
@@ -44,7 +39,7 @@ define(function(require) {
      *         velocity: Emitter.random3D(new Vector3(-10, 0, -10), new Vector3(10, 0, 10));
      *     });
      *     particleRenderable.addEmitter(emitter);
-     *     var gravityField = new qtek.particleSystem.ForceField();
+     *     var gravityField = new qtek.particle.ForceField();
      *     gravityField.force.y = -10;
      *     particleRenderable.addField(gravityField);
      *     ...
@@ -54,7 +49,7 @@ define(function(require) {
      *     });
      */
     var ParticleRenderable = Renderable.extend(
-    /** @lends qtek.particleSystem.ParticleRenderable# */
+    /** @lends qtek.particle.ParticleRenderable# */
     {
         /**
          * @type {boolean}
@@ -110,7 +105,7 @@ define(function(require) {
         this._fields = [];
         this._emitters = [];
     },
-    /** @lends qtek.particleSystem.ParticleRenderable.prototype */
+    /** @lends qtek.particle.ParticleRenderable.prototype */
     {
 
         culling: false,
@@ -122,7 +117,7 @@ define(function(require) {
 
         /**
          * Add emitter
-         * @param {qtek.particleSystem.Emitter} emitter
+         * @param {qtek.particle.Emitter} emitter
          */
         addEmitter: function(emitter) {
             this._emitters.push(emitter);
@@ -130,7 +125,7 @@ define(function(require) {
 
         /**
          * Remove emitter
-         * @param {qtek.particleSystem.Emitter} emitter
+         * @param {qtek.particle.Emitter} emitter
          */
         removeEmitter: function(emitter) {
             this._emitters.splice(this._emitters.indexOf(emitter), 1);
@@ -138,7 +133,7 @@ define(function(require) {
 
         /**
          * Add field
-         * @param {qtek.particleSystem.Field} field
+         * @param {qtek.particle.Field} field
          */
         addField: function(field) {
             this._fields.push(field);
@@ -146,7 +141,7 @@ define(function(require) {
 
         /**
          * Remove field
-         * @param {qtek.particleSystem.Field} field
+         * @param {qtek.particle.Field} field
          */
         removeField: function(field) {
             this._fields.splice(this._fields.indexOf(field), 1);
@@ -292,27 +287,27 @@ define(function(require) {
         },
 
         /**
-         * @return {qtek.particleSystem.ParticleRenderable}
+         * @return {qtek.particle.ParticleRenderable}
          */
         clone: function() {
-            var particleSystem = new ParticleRenderable({
+            var particleRenderable = new ParticleRenderable({
                 material: this.material
             });
-            particleSystem.loop = this.loop;
-            particleSystem.duration = this.duration;
-            particleSystem.oneshot = this.oneshot;
-            particleSystem.spriteAnimationRepeat = this.spriteAnimationRepeat;
-            particleSystem.spriteAnimationTileY = this.spriteAnimationTileY;
-            particleSystem.spriteAnimationTileX = this.spriteAnimationTileX;
+            particleRenderable.loop = this.loop;
+            particleRenderable.duration = this.duration;
+            particleRenderable.oneshot = this.oneshot;
+            particleRenderable.spriteAnimationRepeat = this.spriteAnimationRepeat;
+            particleRenderable.spriteAnimationTileY = this.spriteAnimationTileY;
+            particleRenderable.spriteAnimationTileX = this.spriteAnimationTileX;
 
-            particleSystem.position.copy(this.position);
-            particleSystem.rotation.copy(this.rotation);
-            particleSystem.scale.copy(this.scale);
+            particleRenderable.position.copy(this.position);
+            particleRenderable.rotation.copy(this.rotation);
+            particleRenderable.scale.copy(this.scale);
 
             for (var i = 0; i < this._children.length; i++) {
-                particleSystem.add(this._children[i].clone());
+                particleRenderable.add(this._children[i].clone());
             }
-            return particleSystem;
+            return particleRenderable;
         }
     });
 

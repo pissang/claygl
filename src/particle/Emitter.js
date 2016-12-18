@@ -8,11 +8,11 @@ define(function(require) {
     var vec3 =  glMatrix.vec3;
 
     /**
-     * @constructor qtek.particleSystem.Emitter
+     * @constructor qtek.particle.Emitter
      * @extends qtek.core.Base
      */
     var Emitter = Base.extend(
-    /** @lends qtek.particleSystem.Emitter# */
+    /** @lends qtek.particle.Emitter# */
     {
         /**
          * Maximum number of particles created by this emitter
@@ -82,11 +82,11 @@ define(function(require) {
             }
         }
     },
-    /** @lends qtek.particleSystem.Emitter.prototype */
+    /** @lends qtek.particle.Emitter.prototype */
     {
         /**
          * Emitter number of particles and push them to a given particle list. Emmit number is defined by amount property
-         * @param  {Array.<qtek.particleSystem.Particle>} out
+         * @param  {Array.<qtek.particle.Particle>} out
          */
         emit: function(out) {
             var amount = Math.min(this._particlePool.length, this.amount);
@@ -123,7 +123,7 @@ define(function(require) {
         },
         /**
          * Kill a dead particle and put it back in the pool
-         * @param  {qtek.particleSystem.Particle} particle
+         * @param  {qtek.particle.Particle} particle
          */
         kill: function(particle) {
             this._particlePool.push(particle);
@@ -132,31 +132,31 @@ define(function(require) {
 
     /**
      * Create a constant 1d value generator. Alias for {@link qtek.math.Value.constant}
-     * @method qtek.particleSystem.Emitter.constant
+     * @method qtek.particle.Emitter.constant
      */
     Emitter.constant = Value.constant;
 
     /**
      * Create a constant vector value(2d or 3d) generator. Alias for {@link qtek.math.Value.vector}
-     * @method qtek.particleSystem.Emitter.vector
+     * @method qtek.particle.Emitter.vector
      */
     Emitter.vector = Value.vector;
 
     /**
      * Create a random 1d value generator. Alias for {@link qtek.math.Value.random1D}
-     * @method qtek.particleSystem.Emitter.random1D
+     * @method qtek.particle.Emitter.random1D
      */
     Emitter.random1D = Value.random1D;
 
     /**
      * Create a random 2d value generator. Alias for {@link qtek.math.Value.random2D}
-     * @method qtek.particleSystem.Emitter.random2D
+     * @method qtek.particle.Emitter.random2D
      */
     Emitter.random2D = Value.random2D;
 
     /**
      * Create a random 3d value generator. Alias for {@link qtek.math.Value.random3D}
-     * @method qtek.particleSystem.Emitter.random3D
+     * @method qtek.particle.Emitter.random3D
      */
     Emitter.random3D = Value.random3D;
 

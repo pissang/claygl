@@ -6,7 +6,7 @@ define(function(require) {
 
     /**
      * @constructor
-     * @alias qtek.particleSystem.Particle
+     * @alias qtek.particle.Particle
      */
     var Particle = function() {
         /**
@@ -51,7 +51,7 @@ define(function(require) {
         this.weight = 1;
 
         /**
-         * @type {qtek.particleSystem.Emitter}
+         * @type {qtek.particle.Emitter}
          */
         this.emitter = null;
     };
