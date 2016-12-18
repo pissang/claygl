@@ -10,8 +10,8 @@ camera.position.z = 120;
 
 document.body.appendChild(renderer.canvas);
 
-var particleRenderable = new qtek.particleSystem.ParticleRenderable();
-var emitter = new qtek.particleSystem.Emitter({
+var particleRenderable = new qtek.particle.ParticleRenderable();
+var emitter = new qtek.particle.Emitter({
     max: 5000,
     amount: 7,
     life: qtek.math.Value.constant(2),

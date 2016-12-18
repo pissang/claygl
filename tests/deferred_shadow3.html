@@ -2,6 +2,7 @@
     <head>
         <title>Deferred Directional Light Shadow</title>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script type="text/javascript" src="../thirdparty/require.js"></script>
         <script type="text/javascript" src="js/config.js"></script>
 
@@ -17,7 +18,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var shadowMapPass = new qtek.prePass.ShadowMap({
-                    shadowCascade: 2
+                    shadowCascade: 1
                 });
                 var deferredRenderer = new qtek.deferred.Renderer({
                     shadowMapPass: shadowMapPass
@@ -33,16 +34,18 @@
                 var cubeGeo = new qtek.geometry.Cube();
 
                 var cubes = [];
-                for (var i = 0; i < 24; i++) {
-                    for (var j = 0; j < 24; j++) {
+
+                var CUBE_COUNT = 24;
+                for (var i = 0; i < CUBE_COUNT; i++) {
+                    for (var j = 0; j < CUBE_COUNT; j++) {
                         var mesh = new qtek.Mesh({
                             geometry: cubeGeo,
                             material: new qtek.StandardMaterial({
-                                color: [i / 24, j / 24, 0.5]
+                                color: [i / CUBE_COUNT, j / CUBE_COUNT, 0.5]
                             })
                         });
-                        mesh.position.x = i - 12;
-                        mesh.position.z = j - 12;
+                        mesh.position.x = i - CUBE_COUNT / 2;
+                        mesh.position.z = j - CUBE_COUNT / 2;
                         mesh.scale.set(0.5, 0, 0.5);
 
                         cubes.push(mesh);
@@ -63,7 +66,7 @@
                 scene.add(new qtek.light.Point({
                     intensity: 0.4,
                     range: 100,
-                    position: new qtek.math.Vector3(-10, 24, 0)
+                    position: new qtek.math.Vector3(-10, CUBE_COUNT, 0)
                 }));
 
                 camera.position.set(10, 20, 20);
@@ -82,8 +85,8 @@
 
                     elapsedTime += deltaTime;
                     cubes.forEach(function (cube, idx) {
-                        var x = Math.round(idx / 24);
-                        var y = idx % 24;
+                        var x = Math.round(idx / CUBE_COUNT);
+                        var y = idx % CUBE_COUNT;
                         cube.scale.y = (Math.sin(x / 3 + elapsedTime / 1000) * Math.cos(y / 3 + elapsedTime / 1000) + 1) * 2;
                     })
                     // shadowMapPass.render(renderer, scene, camera);
