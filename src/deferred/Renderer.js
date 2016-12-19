@@ -275,7 +275,7 @@ define(function (require) {
                                 ? this._directionalLightMatWithShadow
                                 : this._directionalLightMat;
                             if (hasShadow) {
-                                pass.material.shader.define('fragment', 'SHADOW_CASCADE', shadowMapPass.shadowCascade);
+                                pass.material.shader.define('fragment', 'SHADOW_CASCADE', light.shadowCascade);
                             }
                             pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
                             pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
@@ -292,7 +292,7 @@ define(function (require) {
 
                     // TODO
                     if (shadowMapPass && light.castShadow) {
-                        passMaterial.setUniform('lightShadowMaps', light.__shadowMaps);
+                        passMaterial.setUniform('lightShadowMap', light.__shadowMap);
                         passMaterial.setUniform('lightMatrices', light.__lightMatrices);
                         passMaterial.setUniform('shadowCascadeClipsNear', light.__cascadeClipsNear);
                         passMaterial.setUniform('shadowCascadeClipsFar', light.__cascadeClipsFar);
@@ -398,12 +398,11 @@ define(function (require) {
                     // Iterate from far to near
                     cascadeClipsNear.reverse();
                     cascadeClipsFar.reverse();
-                    shadowMaps.reverse();
                     lightMatrices.reverse();
 
                     light.__cascadeClipsNear = cascadeClipsNear;
                     light.__cascadeClipsFar = cascadeClipsFar;
-                    light.__shadowMaps = shadowMaps;
+                    light.__shadowMap = shadowMaps[0];
                     light.__lightMatrices = lightMatrices;
                     break;
             }

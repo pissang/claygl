@@ -32,6 +32,11 @@ define(function (require) {
          */
         depthBuffer: true,
 
+        /**
+         * @type {Object}
+         */
+        viewport: null,
+
         //Save attached texture and target
         _attachedTextures: null,
 
@@ -75,7 +80,13 @@ define(function (require) {
             var cache = this._cache;
 
             cache.put('viewport', renderer.viewport);
-            renderer.setViewport(0, 0, this._width, this._height, 1);
+
+            if (this.viewport) {
+                renderer.setViewport(this.viewport, 1);
+            }
+            else {
+                renderer.setViewport(0, 0, this._width, this._height, 1);
+            }
             if (!cache.get(KEY_DEPTHTEXTURE_ATTACHED) && this.depthBuffer) {
                 // Create a new render buffer
                 if (cache.miss(KEY_RENDERBUFFER)) {
@@ -113,9 +124,7 @@ define(function (require) {
             var viewport = this._cache.get('viewport');
             // Reset viewport;
             if (viewport) {
-                renderer.setViewport(
-                    viewport.x, viewport.y, viewport.width, viewport.height
-                );
+                renderer.setViewport(viewport);
             }
 
             // Because the data of texture is changed over time,

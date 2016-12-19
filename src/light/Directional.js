@@ -28,7 +28,19 @@ define(function (require) {
         /**
          * @type {number}
          */
-        shadowSlopeScale: 2.0
+        shadowSlopeScale: 2.0,
+        /**
+         * Shadow cascade.
+         * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
+         * @type {number}
+         */
+        shadowCascade: 1,
+
+        /**
+         * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
+         * @type {number}
+         */
+        cascadeSplitLogFactor: 0.2
     }, {
 
         type: 'DIRECTIONAL_LIGHT',

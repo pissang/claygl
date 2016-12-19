@@ -256,11 +256,22 @@ define(function(require) {
          * @param {number} [devicePixelRatio]
          *        Defaultly use the renderere devicePixelRatio
          *        It needs to be 1 when setViewport is called by frameBuffer
+         *
+         * @example
+         *  setViewport(0,0,width,height,1)
+         *  setViewport({
+         *      x: 0,
+         *      y: 0,
+         *      width: width,
+         *      height: height
+         *  }, 1)
          */
-        setViewport: function(x, y, width, height, dpr) {
+        setViewport: function (x, y, width, height, dpr) {
 
             if (typeof(x) === 'object') {
                 var obj = x;
+                dpr = y;
+
                 x = obj.x;
                 y = obj.y;
                 width = obj.width;

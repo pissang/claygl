@@ -88,6 +88,7 @@ define(function(require) {
 	"Light": require('./Light'),
 	"light": {
 		"Ambient": require('./light/Ambient'),
+		"AmbientCubemap": require('./light/AmbientCubemap'),
 		"AmbientSH": require('./light/AmbientSH'),
 		"Directional": require('./light/Directional'),
 		"Point": require('./light/Point'),
@@ -119,12 +120,12 @@ define(function(require) {
 	},
 	"Mesh": require('./Mesh'),
 	"Node": require('./Node'),
-	"particleSystem": {
-		"Emitter": require('./particleSystem/Emitter'),
-		"Field": require('./particleSystem/Field'),
-		"ForceField": require('./particleSystem/ForceField'),
-		"Particle": require('./particleSystem/Particle'),
-		"ParticleRenderable": require('./particleSystem/ParticleRenderable')
+	"particle": {
+		"Emitter": require('./particle/Emitter'),
+		"Field": require('./particle/Field'),
+		"ForceField": require('./particle/ForceField'),
+		"Particle": require('./particle/Particle'),
+		"ParticleRenderable": require('./particle/ParticleRenderable')
 	},
 	"picking": {
 		"PixelPicking": require('./picking/PixelPicking'),

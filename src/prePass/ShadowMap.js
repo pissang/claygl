@@ -60,19 +60,6 @@ define(function (require) {
              */
             shadowBlur: 1.0,
 
-            /**
-             * Shadow cascade.
-             * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
-             * @type {number}
-             */
-            shadowCascade: 1,
-
-            /**
-             * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
-             * @type {number}
-             */
-            cascadeSplitLogFactor: 0.2,
-
             lightFrustumBias: 10,
 
             _frameBuffer: new FrameBuffer(),
@@ -146,10 +133,11 @@ define(function (require) {
                 this._outputDepthPass.material.shader.unDefine('fragment', 'USE_VSM');
             }
             for (var name in this._textures) {
-                renderer.setViewport(x, y, width, height);
-                this._outputDepthPass.setUniform('depthMap', this._textures[name]);
+                var texture = this._textures[name];
+                renderer.setViewport(x, y, width * texture.width / texture.height, height);
+                this._outputDepthPass.setUniform('depthMap', texture);
                 this._outputDepthPass.render(renderer);
-                x += width;
+                x += width * texture.width / texture.height;
             }
             renderer.setViewport(viewport);
             renderer.clear = prevClear;
@@ -344,10 +332,25 @@ define(function (require) {
 
             this.saveMaterial(this._opaqueCasters);
 
+            var dirLightHasCascade;
             // Create textures for shadow map
             for (var i = 0; i < this._lightsCastShadow.length; i++) {
                 var light = this._lightsCastShadow[i];
                 if (light instanceof DirectionalLight) {
+
+                    if (dirLightHasCascade) {
+                        console.warn('Only one dire light supported with shadow cascade');
+                        continue;
+                    }
+                    if (light.shadowCascade > 1) {
+                        dirLightHasCascade = light;
+
+                        if (light.shadowCascade > 4) {
+                            console.warn('Support at most 4 cascade');
+                            continue;
+                        }
+                    }
+
                     this.renderDirectionalLightShadow(
                         renderer,
                         scene,
@@ -381,10 +384,6 @@ define(function (require) {
             }
             this.restoreMaterial(this._opaqueCasters);
 
-            if (this.shadowCascade > 1 && this._shadowMapNumber.DIRECTIONAL_LIGHT > 1) {
-                console.warn('There is only one directional light can cast shadow when using cascaded shadow map');
-            }
-
             var shadowCascadeClipsNear = shadowCascadeClips.slice();
             var shadowCascadeClipsFar = shadowCascadeClips.slice();
             shadowCascadeClipsNear.pop();
@@ -393,11 +392,11 @@ define(function (require) {
             // Iterate from far to near
             shadowCascadeClipsNear.reverse();
             shadowCascadeClipsFar.reverse();
-            directionalLightShadowMaps.reverse();
+            // directionalLightShadowMaps.reverse();
             directionalLightMatrices.reverse();
 
             function getSize(texture) {
-                return texture.width;
+                return texture.height;
             }
             var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
             var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
@@ -424,9 +423,10 @@ define(function (require) {
                     if (shaderNeedsUpdate) {
                         shader.dirty();
                     }
-                    if (this.shadowCascade > 1) {
-                        shader.define('fragment', 'SHADOW_CASCADE', this.shadowCascade);
-                    } else {
+                    if (dirLightHasCascade) {
+                        shader.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
+                    }
+                    else {
                         shader.unDefine('fragment', 'SHADOW_CASCADE');
                     }
                     shadowDefineUpdatedShader[shader.__GUID__] = true;
@@ -439,7 +439,7 @@ define(function (require) {
                 }
                 if (directionalLightShadowMaps.length > 0) {
                     material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
-                    if (this.shadowCascade > 1) {
+                    if (dirLightHasCascade) {
                         material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
                         material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
                     }
@@ -471,9 +471,6 @@ define(function (require) {
                 this._bindDepthMaterial(casters, shadowBias, light.shadowSlopeScale);
 
                 casters.sort(Renderer.opaqueSortFunc);
-
-                // Adjust scene camera
-                var originalFar = sceneCamera.far;
 
                 // Considering moving speed since the bounding box is from last frame
                 // verlet integration ?
@@ -511,18 +508,26 @@ define(function (require) {
                 var rad = sceneCameraProxy.fov / 180 * Math.PI;
                 var aspect = sceneCameraProxy.aspect;
 
-                var scaleZ = (near + originalFar) / (near - originalFar);
-                var offsetZ = 2 * near * originalFar / (near - originalFar);
-                for (var i = 0; i <= this.shadowCascade; i++) {
-                    var clog = near * Math.pow(far / near, i / this.shadowCascade);
-                    var cuni = near + (far - near) * i / this.shadowCascade;
-                    var c = clog * this.cascadeSplitLogFactor + cuni * (1 - this.cascadeSplitLogFactor);
+                var scaleZ = (near + sceneCamera.far) / (near - sceneCamera.far);
+                var offsetZ = 2 * near * sceneCamera.far / (near - sceneCamera.far);
+                for (var i = 0; i <= light.shadowCascade; i++) {
+                    var clog = near * Math.pow(far / near, i / light.shadowCascade);
+                    var cuni = near + (far - near) * i / light.shadowCascade;
+                    var c = clog * light.cascadeSplitLogFactor + cuni * (1 - light.cascadeSplitLogFactor);
                     clipPlanes.push(c);
                     shadowCascadeClips.push(-(-c * scaleZ + offsetZ) / -c);
                 }
-                for (var i = 0; i < this.shadowCascade; i++) {
-                    var texture = this._getTexture(light.__GUID__ + '_' + i, light);
+                var texture = this._getTexture(light, light.shadowCascade);
+                directionalLightShadowMaps.push(texture);
 
+                var viewport = renderer.viewport;
+
+                var _gl = renderer.gl;
+                this._frameBuffer.attach(_gl, texture);
+                this._frameBuffer.bind(renderer);
+                _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+
+                for (var i = 0; i < light.shadowCascade; i++) {
                     // Get the splitted frustum
                     var nearPlane = clipPlanes[i];
                     var farPlane = clipPlanes[i+1];
@@ -534,12 +539,10 @@ define(function (require) {
                     cropMatrix.ortho(_min[0], _max[0], _min[1], _max[1], 1, -1);
                     lightCamera.projectionMatrix.multiplyLeft(cropMatrix);
 
-                    var _gl = renderer.gl;
+                    var shadowSize = light.shadowResolution || 512;
 
-                    this._frameBuffer.attach(_gl, texture);
-                    this._frameBuffer.bind(renderer);
-
-                    _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+                    // Reversed, left to right => far to near
+                    renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
                     // Set bias seperately for each cascade
                     // TODO Simply divide 1.5 ?
@@ -548,8 +551,6 @@ define(function (require) {
                     }
 
                     renderer.renderQueue(casters, lightCamera);
-
-                    this._frameBuffer.unbind(renderer);
 
                     // Filter for VSM
                     if (this.softShadow === ShadowMapPass.VSM) {
@@ -561,14 +562,14 @@ define(function (require) {
                         .invert()
                         .multiplyLeft(lightCamera.projectionMatrix);
 
-                    directionalLightShadowMaps.push(texture);
                     directionalLightMatrices.push(matrix._array);
 
                     lightCamera.projectionMatrix.copy(lightProjMatrix);
                 }
 
-                // set back
-                sceneCamera.far = originalFar;
+                this._frameBuffer.unbind(renderer);
+
+                renderer.setViewport(viewport);
             };
         })(),
 
@@ -577,7 +578,7 @@ define(function (require) {
             this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
             casters.sort(Renderer.opaqueSortFunc);
 
-            var texture = this._getTexture(light.__GUID__, light);
+            var texture = this._getTexture(light);
             var camera = this._getSpotLightCamera(light);
             var _gl = renderer.gl;
 
@@ -605,7 +606,7 @@ define(function (require) {
         },
 
         renderPointLightShadow: function (renderer, light, casters, pointLightShadowMaps) {
-            var texture = this._getTexture(light.__GUID__, light);
+            var texture = this._getTexture(light);
             var _gl = renderer.gl;
             pointLightShadowMaps.push(texture);
 
@@ -649,9 +650,11 @@ define(function (require) {
             this._texturePool.put(tmpTexture);
         },
 
-        _getTexture: function (key, light) {
+        _getTexture: function (light, cascade) {
+            var key = light.__GUID__;
             var texture = this._textures[key];
             var resolution = light.shadowResolution || 512;
+            cascade = cascade || 1;
             if (!texture) {
                 if (light instanceof PointLight) {
                     texture = new TextureCube();
@@ -659,12 +662,15 @@ define(function (require) {
                 else {
                     texture = new Texture2D();
                 }
-                texture.width = resolution;
+                // At most 4 cascade
+                // TODO share with height ?
+                texture.width = resolution * cascade;
                 texture.height = resolution;
                 if (this.softShadow === ShadowMapPass.VSM) {
                     texture.type = glenum.FLOAT;
                     texture.anisotropic = 4;
-                } else {
+                }
+                else {
                     texture.minFilter = glenum.NEAREST;
                     texture.magFilter = glenum.NEAREST;
                     texture.useMipmap = false;

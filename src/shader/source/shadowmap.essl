@@ -176,21 +176,26 @@ float tapShadowMap(sampler2D map, vec2 uv, float z){
     return step(z, decodeFloat(tex) * 2.0 - 1.0);
 }
 
-float pcf(sampler2D map, vec2 uv, float z, float textureSize){
+float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
 
     float shadowContrib = tapShadowMap(map, uv, z);
-    float offset = 1.0 / textureSize;
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, 0.0), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, offset), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, offset), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, 0.0), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(-offset, -offset), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(offset, -offset), z);
-    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset), z);
+    vec2 offset = vec2(1.0 / textureSize) * scale;
+    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);
+    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);
 
     return shadowContrib / 9.0;
 }
+
+float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
+    return pcf(map, uv, z, textureSize, vec2(1.0));
+}
+
 float chebyshevUpperBound(vec2 moments, float z){
     float p = 0.0;
     z = z * 0.5 + 0.5;
@@ -208,7 +213,9 @@ float chebyshevUpperBound(vec2 moments, float z){
     pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);
     return max(p, pMax);
 }
-float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize){
+float computeShadowContrib(
+    sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset
+) {
 
     vec4 posInLightSpace = lightVPM * vec4(position, 1.0);
     posInLightSpace.xyz /= posInLightSpace.w;
@@ -220,13 +227,17 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float te
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
 
         #ifdef USE_VSM
-            vec2 moments = texture2D(map, uv).xy;
+            vec2 moments = texture2D(map, uv * scale + offset).xy;
             return chebyshevUpperBound(moments, z);
         #else
-            return pcf(map, uv, z, textureSize);
+            return pcf(map, uv * scale + offset, z, textureSize);
         #endif
     }
     return 1.0;
+}
+
+float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {
+    return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));
 }
 
 float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
@@ -265,9 +276,9 @@ uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
 #if defined(SHADOW_CASCADE)
-uniform sampler2D directionalLightShadowMaps[SHADOW_CASCADE];
+uniform sampler2D directionalLightShadowMaps[1];
 uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
-uniform float directionalLightShadowMapSizes[SHADOW_CASCADE];
+uniform float directionalLightShadowMapSizes[1];
 uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
 uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
 #else
@@ -289,8 +300,11 @@ uniform bool shadowEnabled : true;
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
 void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ){
-    for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_COUNT; i++){
-        float shadowContrib = computeShadowContrib(spotLightShadowMaps[i], spotLightMatrices[i], position, spotLightShadowMapSizes[i]);
+    for(int i = 0; i < SPOT_LIGHT_SHADOWMAP_COUNT; i++) {
+        float shadowContrib = computeShadowContrib(
+            spotLightShadowMaps[i], spotLightMatrices[i], position,
+            spotLightShadowMapSizes[i]
+        );
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
@@ -320,7 +334,12 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
             depth >= shadowCascadeClipsNear[i] &&
             depth <= shadowCascadeClipsFar[i]
         ) {
-            float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightShadowMapSizes[i]);
+            float shadowContrib = computeShadowContrib(
+                directionalLightShadowMaps[0], directionalLightMatrices[i], position,
+                directionalLightShadowMapSizes[0],
+                vec2(1.0 / float(SHADOW_CASCADE), 1.0),
+                vec2(float(i) / float(SHADOW_CASCADE), 0.0)
+            );
             // TODO Will get a sampler needs to be be uniform error in native gl
             shadowContribs[0] = shadowContrib;
         }
@@ -335,7 +354,10 @@ void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[
 
 void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){
     for(int i = 0; i < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; i++){
-        float shadowContrib = computeShadowContrib(directionalLightShadowMaps[i], directionalLightMatrices[i], position, directionalLightShadowMapSizes[i]);
+        float shadowContrib = computeShadowContrib(
+            directionalLightShadowMaps[i], directionalLightMatrices[i], position,
+            directionalLightShadowMapSizes[i]
+        );
         shadowContribs[i] = shadowContrib;
     }
     // set default fallof of rest lights
