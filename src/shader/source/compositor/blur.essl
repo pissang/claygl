@@ -72,7 +72,7 @@ void main (void)
 
     // blur in y (horizontal)
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(clamp(v_Texcoord.x + (float(i) - 4.0) * off, 0.0, 1.0), v_Texcoord.y);
+        vec2 coord = vec2(clamp(v_Texcoord.x + float(i - 4) * off, 0.0, 1.0), v_Texcoord.y);
         float w = gaussianKernel[i];
         sum += decodeHDR(texture2D(texture, coord)) * w;
         weightAll += w;
@@ -106,7 +106,7 @@ void main(void)
 
     // blur in y (vertical)
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + (float(i) - 4.0) * off, 0.0, 1.0));
+        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + float(i - 4) * off, 0.0, 1.0));
         float w = gaussianKernel[i];
         sum += decodeHDR(texture2D(texture, coord)) * w;
         weightAll += w;
