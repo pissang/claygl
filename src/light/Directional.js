@@ -24,7 +24,7 @@ define(function (require) {
         /**
          * @type {number}
          */
-        shadowBias: 0.0002,
+        shadowBias: 0.001,
         /**
          * @type {number}
          */
