@@ -45,6 +45,7 @@ define(function (require) {
             minFilter: qtek.Texture.NEAREST,
             magFilter: qtek.Texture.NEAREST,
             format: qtek.Texture.DEPTH_COMPONENT,
+            // FIXME SSAO needs depth precision to be high
             type: qtek.Texture.UNSIGNED_INT
         });
         // Use depth back texture to calculate thickness

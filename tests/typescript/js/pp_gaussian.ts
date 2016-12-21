@@ -78,8 +78,7 @@ var gaussianNodeV = new qtek.compositor.Node({
     }
 });
 
-gaussianNodeH.setParameter("textureWidth", renderer.getWidth());
-gaussianNodeV.setParameter("textureHeight", renderer.getHeight());
+gaussianNodeH.setParameter("textureSize", [renderer.getWidth(), renderer.getHeight()]);
 compositor.addNode(gaussianNodeH);
 compositor.addNode(gaussianNodeV);
 compositor.addNode(sceneNode);

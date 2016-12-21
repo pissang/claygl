@@ -173,7 +173,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": "expr( width / 32 )"
+                "textureSize": "expr( [width / 32, height / 32] )"
             },
             "defines": {
                 "RGBM": null
@@ -195,7 +195,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": "expr( height / 32 )"
+                "textureSize": "expr( [width / 32, height / 32] )"
             },
             "defines": {
                 "RGBM": null
@@ -220,7 +220,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": "expr( width / 16 )"
+                "textureSize": "expr( [width / 16, height / 16] )"
             },
             "defines": {
                 "RGBM": null
@@ -242,7 +242,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": "expr( height / 16 )"
+                "textureSize": "expr( [width / 16, height / 16] )"
             },
             "defines": {
                 "RGBM": null
@@ -289,7 +289,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": "expr( width / 8 )"
+                "textureSize": "expr( [width / 8, height / 8] )"
             },
             "defines": {
                 "RGBM": null
@@ -311,7 +311,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": "expr( height / 8 )"
+                "textureSize": "expr( [width / 8, height / 8] )"
             },
             "defines": {
                 "RGBM": null
@@ -361,7 +361,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": "expr( width / 4 )"
+                "textureSize": "expr( [width / 4, height / 4] )"
             },
             "defines": {
                 "RGBM": null
@@ -383,7 +383,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": "expr( height / 4 )"
+                "textureSize": "expr( [width / 4, height / 4] )"
             },
             "defines": {
                 "RGBM": null
@@ -432,7 +432,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureWidth": "expr( width / 2 )"
+                "textureSize": "expr( [width / 2, height / 2] )"
             },
             "defines": {
                 "RGBM": null
@@ -454,7 +454,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureHeight": "expr( height / 2 )"
+                "textureSize": "expr( [width / 2, height / 2] )"
             },
             "defines": {
                 "RGBM": null

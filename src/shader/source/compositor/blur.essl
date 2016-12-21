@@ -57,7 +57,7 @@ uniform sampler2D texture; // the texture with the scene you want to blur
 varying vec2 v_Texcoord;
 
 uniform float blurSize : 2.0;
-uniform float textureWidth : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 @import qtek.compositor.util.sample
 
@@ -65,14 +65,15 @@ void main (void)
 {
     @import qtek.compositor.kernel.gaussian_9
 
-    float off = blurSize / textureWidth;
+    vec2 off = vec2(blurSize / textureSize);
+    off.y = 0.0;
 
     vec4 sum = vec4(0.0);
     float weightAll = 0.0;
 
     // blur in y (horizontal)
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(clamp(v_Texcoord.x + float(i - 4) * off, 0.0, 1.0), v_Texcoord.y);
+        vec2 coord = clamp(v_Texcoord + float(i - 4) * off, vec2(0.0), vec2(1.0));
         float w = gaussianKernel[i];
         sum += decodeHDR(texture2D(texture, coord)) * w;
         weightAll += w;
@@ -91,7 +92,7 @@ uniform sampler2D texture;
 varying vec2 v_Texcoord;
 
 uniform float blurSize : 2.0;
-uniform float textureHeight : 512.0;
+uniform vec2 textureSize : [512.0, 512.0];
 
 @import qtek.compositor.util.sample
 
@@ -99,14 +100,15 @@ void main(void)
 {
     @import qtek.compositor.kernel.gaussian_9
 
-    float off = blurSize / textureHeight;
+    vec2 off = vec2(blurSize / textureSize);
+    off.x = 0.0;
 
     vec4 sum = vec4(0.0);
     float weightAll = 0.0;
 
     // blur in y (vertical)
     for (int i = 0; i < 9; i++) {
-        vec2 coord = vec2(v_Texcoord.x, clamp(v_Texcoord.y + float(i - 4) * off, 0.0, 1.0));
+        vec2 coord = clamp(v_Texcoord + float(i - 4) * off, vec2(0.0), vec2(1.0));
         float w = gaussianKernel[i];
         sum += decodeHDR(texture2D(texture, coord)) * w;
         weightAll += w;
