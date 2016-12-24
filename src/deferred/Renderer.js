@@ -206,8 +206,6 @@ define(function (require) {
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
             var volumeMeshList = [];
-            var viewportSize = [lightAccumTex.width, lightAccumTex.height];
-
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -217,18 +215,11 @@ define(function (require) {
 
                 if (volumeMesh) {
                     var material = volumeMesh.material;
-
                     // Volume mesh will affect the scene bounding box when rendering
                     // if castShadow is true
                     volumeMesh.castShadow = false;
 
-                    material.setUniform('eyePosition', eyePosition);
-                    material.setUniform('viewportSize', viewportSize);
-                    material.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
-                    material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
-                    material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
-
+                    var unknownLightType = false;
                     switch (light.type) {
                         case 'POINT_LIGHT':
                             material.setUniform('lightColor', uTpl.pointLightColor.value(light));
@@ -256,13 +247,26 @@ define(function (require) {
                             material.setUniform('lightExtend', uTpl.tubeLightExtend.value(light));
                             material.setUniform('lightPosition', uTpl.tubeLightPosition.value(light));
                             break;
+                        default:
+                            unknownLightType = true;
                     }
+
+                    if (unknownLightType) {
+                        continue;
+                    }
+
+                    material.setUniform('eyePosition', eyePosition);
+                    material.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
+                    material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
+                    material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
 
                     volumeMeshList.push(volumeMesh);
 
                 }
                 else {
                     var pass = this._fullQuadPass;
+                    var unknownLightType = false;
                     // Full quad light
                     switch (light.type) {
                         case 'AMBIENT_LIGHT':
@@ -280,11 +284,16 @@ define(function (require) {
                             pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
                             pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
                             break;
+                        default:
+                            // Unkonw light type
+                            unknownLightType = true;
+                    }
+                    if (unknownLightType) {
+                        continue;
                     }
 
                     var passMaterial = pass.material;
                     passMaterial.setUniform('eyePosition', eyePosition);
-                    passMaterial.setUniform('viewportSize', viewportSize);
                     passMaterial.setUniform('viewProjectionInv', viewProjectionInv._array);
                     passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                     passMaterial.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
@@ -311,6 +320,8 @@ define(function (require) {
                     this._shadowCasters
                 );
             }
+
+            this.trigger('lightaccumulate');
 
             lightAccumFrameBuffer.unbind(renderer);
         },
@@ -499,6 +510,9 @@ define(function (require) {
                 gl.blendEquation(gl.FUNC_ADD);
                 gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
                 gl.depthFunc(gl.LEQUAL);
+
+                var viewportSize = [renderer.viewport.width, renderer.viewport.height];
+
                 for (var i = 0; i < volumeMeshList.length; i++) {
                     var volumeMesh = volumeMeshList[i];
 
@@ -532,7 +546,10 @@ define(function (require) {
                     this._bindShader(renderer, shader);
 
                     var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
+                    // Set some common uniforms
                     shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                    shader.setUniformOfSemantic(gl, 'VIEWPORT_SIZE', viewportSize);
+
                     volumeMesh.material.bind(gl);
                     volumeMesh.render(gl);
                 }
@@ -591,6 +608,10 @@ define(function (require) {
             this.shadowMapPass.dispose(gl);
         }
     });
+
+    // DeferredRenderer.registerLight = function () {
+
+    // };
 
     return DeferredRenderer;
 });

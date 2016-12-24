@@ -1,3 +1,3 @@
 define(function () {
-return "@export qtek.deferred.ambient_light\n\nuniform sampler2D gBufferTex;\nuniform vec3 lightColor;\n\nvarying vec2 v_Texcoord;\n\nvoid main()\n{\n    vec4 tex = texture2D(gBufferTex, v_Texcoord);\n    vec3 normal = tex.rgb * 2.0 - 1.0;\n\n    gl_FragColor.rgb = lightColor;\n    gl_FragColor.a = 0.0;\n}\n@end";
+return "@export qtek.deferred.ambient_light\n\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture3;\nuniform vec3 lightColor;\n\nvarying vec2 v_Texcoord;\n\nvoid main()\n{\n    vec4 texel1 = texture2D(gBufferTexture1, v_Texcoord);\n    // Is empty\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n\n    vec3 albedo = texture2D(gBufferTexture3, v_Texcoord).rgb;\n    gl_FragColor.rgb = lightColor * albedo;\n    gl_FragColor.a = 1.0;\n}\n@end";
 });

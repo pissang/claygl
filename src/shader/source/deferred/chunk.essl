@@ -4,12 +4,11 @@ uniform sampler2D gBufferTexture1;
 uniform sampler2D gBufferTexture2;
 uniform sampler2D gBufferTexture3;
 
-uniform vec2 viewportSize;
+uniform vec2 viewportSize : VIEWPORT_SIZE;
 
 uniform mat4 viewProjectionInv;
 
 const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
-
 
 #ifdef DEPTH_ENCODED
 @import qtek.util.decode_float
@@ -30,6 +29,7 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     if (dot(texel1.rgb, vec3(1.0)) == 0.0) {
         discard;
     }
+
     float glossiness = texel1.a;
     float metalness = texel3.a;
 

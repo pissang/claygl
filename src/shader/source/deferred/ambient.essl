@@ -1,16 +1,21 @@
 @export qtek.deferred.ambient_light
 
-uniform sampler2D gBufferTex;
+uniform sampler2D gBufferTexture1;
+uniform sampler2D gBufferTexture3;
 uniform vec3 lightColor;
 
 varying vec2 v_Texcoord;
 
 void main()
 {
-    vec4 tex = texture2D(gBufferTex, v_Texcoord);
-    vec3 normal = tex.rgb * 2.0 - 1.0;
+    vec4 texel1 = texture2D(gBufferTexture1, v_Texcoord);
+    // Is empty
+    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {
+        discard;
+    }
 
-    gl_FragColor.rgb = lightColor;
-    gl_FragColor.a = 0.0;
+    vec3 albedo = texture2D(gBufferTexture3, v_Texcoord).rgb;
+    gl_FragColor.rgb = lightColor * albedo;
+    gl_FragColor.a = 1.0;
 }
 @end

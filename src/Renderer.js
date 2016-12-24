@@ -429,7 +429,7 @@ define(function(require) {
                 renderedMeshCount: 0
             };
 
-            var viewportSize = [this._width, this._height];
+            var viewportSize = [this.viewport.width, this.viewport.height];
 
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
