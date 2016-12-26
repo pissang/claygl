@@ -172,6 +172,10 @@ define(function (require) {
             return this._gBuffer;
         },
 
+        // getFullQuadLightPass: function () {
+        //     return this._fullQuadPass;
+        // },
+
         _resize: function (width, height) {
             this._lightAccumTex.width = width;
             this._lightAccumTex.height = height;
@@ -192,8 +196,11 @@ define(function (require) {
 
             var shadowMapPass = this.shadowMapPass;
             if (shadowMapPass) {
+                gl.clearColor(1, 1, 1, 1);
                 this._prepareLightShadow(renderer, scene, camera);
             }
+
+            this.trigger('beforelightaccumulate');
 
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
