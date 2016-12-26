@@ -129,6 +129,8 @@ define(function (require) {
                 gBufferMat.set('useMetalnessMap', +useMetalnessMap);
                 gBufferMat.set('uvRepeat', uvRepeat);
                 gBufferMat.set('uvOffset', uvOffset);
+
+                gBufferMat.set('linear', +standardMaterial.linear);
             }
             else {
                 gBufferMat.shader.setUniform(
@@ -145,6 +147,8 @@ define(function (require) {
                 gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
                 gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+
+                gBufferMat.shader.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
             }
 
             previousDiffuseMap = diffuseMap;

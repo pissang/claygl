@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -10,7 +10,7 @@ define(function(require) {
      * @alias qtek.async.TaskGroup
      * @extends qtek.async.Task
      */
-    var TaskGroup = function() {
+    var TaskGroup = function () {
 
         Task.apply(this, arguments);
 
@@ -21,7 +21,7 @@ define(function(require) {
         this._rejectedNumber = 0;
     };
 
-    var Ctor = function(){};
+    var Ctor = function (){};
     Ctor.prototype = Task.prototype;
     TaskGroup.prototype = new Ctor();
 
@@ -34,17 +34,17 @@ define(function(require) {
      * @example
      *     // Load texture list
      *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
-     *     var textures = list.map(function(src) {
+     *     var textures = list.map(function (src) {
      *         var texture = new qtek.Texture2D();
      *         texture.load(src);
      *         return texture;
      *     });
      *     var taskGroup = new qtek.async.TaskGroup();
-     *     taskGroup.all(textures).success(function() {
+     *     taskGroup.all(textures).success(function () {
      *         // Do some thing after all textures loaded
      *     });
      */
-    TaskGroup.prototype.all = function(tasks) {
+    TaskGroup.prototype.all = function (tasks) {
         var count = 0;
         var self = this;
         var data = [];
@@ -52,12 +52,12 @@ define(function(require) {
         this._fulfilledNumber = 0;
         this._rejectedNumber = 0;
 
-        util.each(tasks, function(task, idx) {
+        util.each(tasks, function (task, idx) {
             if (!task || !task.once) {
                 return;
             }
             count++;
-            task.once('success', function(res) {
+            task.once('success', function (res) {
                 count--;
 
                 self._fulfilledNumber++;
@@ -72,8 +72,8 @@ define(function(require) {
                     self.resolve(data);
                 }
             });
-            task.once('error', function() {
-                
+            task.once('error', function () {
+
                 self._rejectedNumber ++;
 
                 task._fulfilled = false;
@@ -83,7 +83,7 @@ define(function(require) {
             });
         });
         if (count === 0) {
-            setTimeout(function() {
+            setTimeout(function () {
                 self.resolve(data);
             });
             return this;
@@ -95,26 +95,26 @@ define(function(require) {
      * @param  {Array.<qtek.async.Task>} tasks
      * @return {qtek.async.TaskGroup}
      */
-    TaskGroup.prototype.allSettled = function(tasks) {
+    TaskGroup.prototype.allSettled = function (tasks) {
         var count = 0;
         var self = this;
         var data = [];
         if (tasks.length === 0) {
-            setTimeout(function() {
+            setTimeout(function () {
                 self.trigger('success', data);
             });
             return this;
         }
         this._tasks = tasks;
 
-        util.each(tasks, function(task, idx) {
+        util.each(tasks, function (task, idx) {
             if (!task || !task.once) {
                 return;
             }
             count++;
-            task.once('success', function(res) {
+            task.once('success', function (res) {
                 count--;
-                
+
                 self._fulfilledNumber++;
 
                 task._fulfilled = true;
@@ -125,7 +125,7 @@ define(function(require) {
                     self.resolve(data);
                 }
             });
-            task.once('error', function(err) {
+            task.once('error', function (err) {
                 count--;
 
                 self._rejectedNumber++;
@@ -133,7 +133,7 @@ define(function(require) {
                 task._fulfilled = false;
                 task._rejected = true;
 
-                // TODO 
+                // TODO
                 data[idx] = null;
                 if (count === 0) {
                     self.resolve(data);
@@ -147,7 +147,7 @@ define(function(require) {
      * @param  {boolean} [recursive]
      * @return {number}
      */
-    TaskGroup.prototype.getFulfilledNumber = function(recursive) {
+    TaskGroup.prototype.getFulfilledNumber = function (recursive) {
         if (recursive) {
             var nFulfilled = 0;
             for (var i = 0; i < this._tasks.length; i++) {
@@ -169,7 +169,7 @@ define(function(require) {
      * @param  {boolean} [recursive]
      * @return {number}
      */
-    TaskGroup.prototype.getRejectedNumber = function(recursive) {
+    TaskGroup.prototype.getRejectedNumber = function (recursive) {
         if (recursive) {
             var nRejected = 0;
             for (var i = 0; i < this._tasks.length; i++) {
@@ -191,7 +191,7 @@ define(function(require) {
      * @param  {boolean} [recursive]
      * @return {number}
      */
-    TaskGroup.prototype.getSettledNumber = function(recursive) {
+    TaskGroup.prototype.getSettledNumber = function (recursive) {
 
         if (recursive) {
             var nSettled = 0;
@@ -214,7 +214,7 @@ define(function(require) {
      * @param  {boolean} [recursive]
      * @return {number}
      */
-    TaskGroup.prototype.getTaskNumber = function(recursive) {
+    TaskGroup.prototype.getTaskNumber = function (recursive) {
         if (recursive) {
             var nTask = 0;
             for (var i = 0; i < this._tasks.length; i++) {
