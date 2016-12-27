@@ -397,13 +397,13 @@ void main()
 
     #ifdef ENVIRONMENTMAP_PREFILTER
     // FIXME simply 1 minus roughness ?
-    float roughness = clamp(1.0 - g, 0.0, 1.0);
-    float bias = roughness * maxMipmapLevel;
+    float rough = clamp(1.0 - g, 0.0, 1.0);
+    float bias = rough * maxMipmapLevel;
     // Only env map can have HDR
     vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
 
         #ifdef BRDFLOOKUP_ENABLED
-    vec2 brdfParam = texture2D(brdfLookup, vec2(roughness, ndv)).xy;
+    vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
     envWeight = spec * brdfParam.x + brdfParam.y;
         #endif
 

@@ -18,7 +18,8 @@ define(function () {
         'WEBGL_depth_texture',
         'EXT_texture_filter_anisotropic',
         'EXT_shader_texture_lod',
-        'WEBGL_draw_buffers'
+        'WEBGL_draw_buffers',
+        'EXT_frag_depth'
     ];
 
     var PARAMETER_NAMES = [
