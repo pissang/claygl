@@ -10,9 +10,6 @@ uniform vec3 lightColor;
 uniform vec3 eyePosition;
 
 #ifdef SHADOWMAP_ENABLED
-uniform float zNear;
-uniform float zFar;
-
 uniform sampler2D lightShadowMap;
 uniform float lightShadowMapSize;
 uniform mat4 lightMatrices[SHADOW_CASCADE];

@@ -16,6 +16,7 @@ define(function(require) {
     var Scene = require('../Scene');
     var Shader = require('../Shader');
     var Material = require('../Material');
+    var StandardMaterial = require('../StandardMaterial');
     var Mesh = require('../Mesh');
     var Node = require('../Node');
     var Texture = require('../Texture');
@@ -491,10 +492,18 @@ define(function(require) {
                 if (uniforms['normalMap'] instanceof Texture2D) {
                     enabledTextures.push('normalMap');
                 }
-                var material = new Material({
-                    name: materialInfo.name,
-                    shader: shaderLibrary.get(this.shaderName, enabledTextures)
-                });
+                var material;
+                if (this.shaderName === 'qtek.standard') {
+                    material = new StandardMaterial({
+                        name: materialInfo.name
+                    });
+                }
+                else {
+                    material = new Material({
+                        name: materialInfo.name,
+                        shader: shaderLibrary.get(this.shaderName, enabledTextures)
+                    });
+                }
                 if (technique.states.depthMask != null) {
                     material.depthMask = technique.states.depthMask;
                 }
@@ -522,10 +531,13 @@ define(function(require) {
                     material.set('emission', uniforms['emission'].slice(0, 3));
                 }
                 if (uniforms['shininess'] != null) {
+                    var glossiness = Math.log(uniforms['shininess']) / Math.log(8192);
                     // Uniform glossiness
-                    material.set('glossiness', Math.log(uniforms['shininess']) / Math.log(8192));
+                    material.set('glossiness', glossiness);
+                    material.set('roughness', 1 - glossiness);
                     material.set('shininess', uniforms['shininess']);
-                } else {
+                }
+                else {
                     material.set('glossiness', 0.5);
                     material.set('shininess', 0.5);
                 }

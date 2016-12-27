@@ -153,8 +153,11 @@ uniform vec3 color;
 uniform float metalness;
 
 uniform bool useMetalnessMap;
+uniform bool linear;
 
 varying vec2 v_Texcoord;
+
+@import qtek.util.srgb
 
 void main ()
 {
@@ -164,8 +167,12 @@ void main ()
         vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);
         m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
     }
+    vec4 texel = texture2D(diffuseMap, v_Texcoord);
+    if (linear) {
+        texel = sRGBToLinear(texel);
+    }
 
-    gl_FragColor.rgb = texture2D(diffuseMap, v_Texcoord).rgb * color;
+    gl_FragColor.rgb = texel.rgb * color;
 
     gl_FragColor.a = m;
 }

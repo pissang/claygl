@@ -65,7 +65,7 @@ void main (void)
 {
     @import qtek.compositor.kernel.gaussian_9
 
-    vec2 off = vec2(blurSize / textureSize);
+    vec2 off = blurSize / textureSize;
     off.y = 0.0;
 
     vec4 sum = vec4(0.0);
@@ -100,7 +100,7 @@ void main(void)
 {
     @import qtek.compositor.kernel.gaussian_9
 
-    vec2 off = vec2(blurSize / textureSize);
+    vec2 off = blurSize / textureSize;
     off.x = 0.0;
 
     vec4 sum = vec4(0.0);
