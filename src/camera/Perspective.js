@@ -39,6 +39,14 @@ define(function(require) {
             var rad = this.fov / 180 * Math.PI;
             this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
         },
+        decomposeProjectionMatrix: function () {
+            var m = this.projectionMatrix._array;
+            var rad = Math.atan(1 / m[5]) * 2;
+            this.fov = rad / Math.PI * 180;
+            this.aspect = m[5] / m[0];
+            this.near = m[14] / (m[10] - 1);
+            this.far = m[14] / (m[10] + 1);
+        },
         /**
          * @return {qtek.camera.Perspective}
          */

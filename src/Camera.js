@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -17,7 +17,7 @@ define(function(require) {
      * @constructor qtek.Camera
      * @extends qtek.Node
      */
-    var Camera = Node.extend(function() {
+    var Camera = Node.extend(function () {
         return /** @lends qtek.Camera# */ {
             /**
              * Camera projection matrix
@@ -55,25 +55,38 @@ define(function(require) {
             //TODO In case of one camera to multiple scenes
             sceneBoundingBoxLastFrame: new BoundingBox()
         };
-    }, function() {
+    }, function () {
         this.update(true);
     },
     /** @lends qtek.Camera.prototype */
     {
 
-        update: function(force) {
+        update: function (force) {
             Node.prototype.update.call(this, force);
-            mat4.invert(this.viewMatrix._array, this.worldTransform._array);
+            Matrix4.invert(this.viewMatrix, this.worldTransform);
 
             this.updateProjectionMatrix();
-            mat4.invert(this.invProjectionMatrix._array, this.projectionMatrix._array);
+            Matrix4.invert(this.invProjectionMatrix, this.projectionMatrix);
 
             this.frustum.setFromProjection(this.projectionMatrix);
         },
+
+        /**
+         * Set camera view matrix
+         */
+        setViewMatrix: function (viewMatrix) {
+            Matrix4.invert(this.worldTransform, viewMatrix);
+            this.decomposeWorldTransform();
+        },
+
+        /**
+         * Decompose camera projection matrix
+         */
+        decomposeProjectionMatrix: function () {},
         /**
          * Update projection matrix, called after update
          */
-        updateProjectionMatrix: function() {},
+        updateProjectionMatrix: function () {},
 
         /**
          * Cast a picking ray from camera near plane to far plane
@@ -82,9 +95,9 @@ define(function(require) {
          * @param {qtek.math.Ray} [out]
          * @return {qtek.math.Ray}
          */
-        castRay: (function() {
+        castRay: (function () {
             var v4 = vec4.create();
-            return function(ndc, out) {
+            return function (ndc, out) {
                 var ray = out !== undefined ? out : new Ray();
                 var x = ndc._array[0];
                 var y = ndc._array[1];

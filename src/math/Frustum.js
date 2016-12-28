@@ -70,19 +70,19 @@ define(function(require) {
             vec3Set(planes[1].normal._array, m3 + m0, m7 + m4, m11 + m8);
             planes[1].distance = -(m15 + m12);
             planes[1].normalize();
-            
+
             vec3Set(planes[2].normal._array, m3 + m1, m7 + m5, m11 + m9);
             planes[2].distance = -(m15 + m13);
             planes[2].normalize();
-            
+
             vec3Set(planes[3].normal._array, m3 - m1, m7 - m5, m11 - m9);
             planes[3].distance = -(m15 - m13);
             planes[3].normalize();
-            
+
             vec3Set(planes[4].normal._array, m3 - m2, m7 - m6, m11 - m10);
             planes[4].distance = -(m15 - m14);
             planes[4].normalize();
-            
+
             vec3Set(planes[5].normal._array, m3 + m2, m7 + m6, m11 + m10);
             planes[5].distance = -(m15 + m14);
             planes[5].normalize();
@@ -112,7 +112,8 @@ define(function(require) {
                 vec3Set(vertices[5], -nearY * aspect, nearY, zNear);
                 vec3Set(vertices[6], nearY * aspect, -nearY, zNear);
                 vec3Set(vertices[7], nearY * aspect, nearY, zNear);
-            } else { // Orthographic projection
+            }
+            else { // Orthographic projection
                 var left = (-1 - m12) / m0;
                 var right = (1 - m12) / m0;
                 var top = (1 - m13) / m5;
@@ -137,7 +138,7 @@ define(function(require) {
          * @return {qtek.math.BoundingBox}
          */
         getTransformedBoundingBox: (function() {
-            
+
             var tmpVec3 = vec3.create();
 
             return function(bbox, matrix) {

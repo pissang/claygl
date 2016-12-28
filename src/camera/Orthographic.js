@@ -41,6 +41,16 @@ define(function(require) {
         updateProjectionMatrix: function() {
             this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
         },
+
+        decomposeProjectionMatrix: function () {
+            var m = this.projectionMatrix._array;
+            this.left = (-1 - m[12]) / m[0];
+            this.right = (1 - m[12]) / m[0];
+            this.top = (1 - m[13]) / m[5];
+            this.bottom = (-1 - m[13]) / m[5];
+            this.near = -(-1 - m[14]) / m[10];
+            this.far = -(1 - m[14]) / m[10];
+        },
         /**
          * @return {qtek.camera.Orthographic}
          */
