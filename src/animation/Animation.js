@@ -171,7 +171,7 @@ define(function(require) {
             this._clips = [];
         },
         /**
-         * Create a deferred animating object
+         * Create a animator
          * @param  {Object} target
          * @param  {Object} [options]
          * @param  {boolean} [options.loop]
@@ -182,15 +182,15 @@ define(function(require) {
          */
         animate: function(target, options) {
             options = options || {};
-            var deferred = new Animator(
+            var animator = new Animator(
                 target,
                 options.loop,
                 options.getter,
                 options.setter,
                 options.interpolater
             );
-            deferred.animation = this;
-            return deferred;
+            animator.animation = this;
+            return animator;
         }
     });
 

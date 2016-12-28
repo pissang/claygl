@@ -39,17 +39,18 @@ void main()
 #endif
 
     float lum = dot(texel, lumWeight);
+    vec4 color;
     if (lum > threshold)
     {
-        gl_FragColor.rgb = texel * scale;
+        color.rgb = texel * scale;
     }
     else
     {
-        gl_FragColor.rgb = vec3(0.0);
+        color.rgb = vec3(0.0);
     }
-    gl_FragColor.a = 1.0;
+    color.a = 1.0;
 
-    gl_FragColor = encodeHDR(gl_FragColor);
+    gl_FragColor = encodeHDR(color);
 }
 @end
 
@@ -107,6 +108,7 @@ uniform sampler2D lum;
 
 uniform float exposure : 1.0;
 uniform float bloomIntensity : 0.25;
+uniform float lensflareIntensity : 1;
 
 varying vec2 v_Texcoord;
 
@@ -162,7 +164,7 @@ void main()
 #endif
 
 #ifdef LENSFLARE_ENABLED
-    tex += decodeHDR(texture2D(lensflare, v_Texcoord)).rgb * texture2D(lensdirt, v_Texcoord).rgb;
+    tex += decodeHDR(texture2D(lensflare, v_Texcoord)).rgb * texture2D(lensdirt, v_Texcoord).rgb * lensflareIntensity;
 #endif
 
 // Adjust exposure
@@ -194,7 +196,7 @@ void main()
     gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)).rgb * bloomIntensity);
     // Debug output lensflare
     #elif DEBUG == 3
-    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord)));
+    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord).rgb * lensflareIntensity));
     #endif
 #endif
 }
