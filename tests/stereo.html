@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/stats.js"></script>
+    </head>
+    <body style="margin:0px;background-color:#20242B;">
+        <canvas width="1200" height="640" id="Main"></canvas>
+        <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
+        <script type="text/javascript">
+            require(['qtek'], function(qtek){
+                var Material = qtek.Material;
+                var Mesh = qtek.Mesh;
+                var Cube = qtek.geometry.Cube;
+                var meshUtil = qtek.util.mesh;
+                var animation = new qtek.animation.Animation;
+                animation.start();
+
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById("Main"),
+                    devicePixelRatio: 1.0
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var scene = new qtek.Scene;
+                var camera = new qtek.camera.Perspective({
+                    aspect: renderer.getViewportAspect(),
+                    far: 500
+                });
+                var stereoCamera = new qtek.vr.StereoCamera();
+
+                var cube = new Cube();
+                cube.generateTangents();
+                var shader = qtek.shader.library.get('qtek.standard', 'diffuseMap', 'normalMap');
+                var material = new Material({
+                    shader: shader
+                });
+                material.set('glossiness', 0.4);
+                var diffuse = new qtek.Texture2D;
+                diffuse.load("assets/textures/crate.gif");
+                var normal = new qtek.Texture2D;
+                normal.load("assets/textures/normal_map.jpg");
+                material.set('diffuseMap', diffuse);
+                material.set('normalMap', normal);
+
+                var root = new qtek.Node();
+                scene.add(root);
+                var cubeMesh = new Mesh({
+                    geometry: cube,
+                    material: material
+                });
+                for( var i = 0; i < 10; i++){
+                    for(var j = 0; j < 10; j++){
+                        for( var k = 0; k < 10; k++){
+                            var mesh = new qtek.Mesh({
+                                geometry: cube,
+                                material: material
+                            });
+                            mesh.position.set(50 - Math.random() * 100, 50 - Math.random() * 100, 50-Math.random() * 100);
+                            mesh.scale.set(1, 1, 1);
+                            root.add(mesh);
+                        }
+                    }
+                }
+                var light = new qtek.light.Point({
+                    range: 200
+                });
+                scene.add(light);
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.4
+                }))
+
+                camera.position.set(0, 0, 10);
+
+                animation.on('frame', function(deltaTime) {
+                    var start = new Date().getTime();
+
+                    camera.aspect = renderer.getViewportAspect();
+                    camera.update();
+                    stereoCamera.updateFromCamera(camera);
+
+                    renderer.clear = null;
+
+                    renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT | renderer.gl.COLOR_BUFFER_BIT);
+                    renderer.setViewport(0, 0, renderer.getWidth() / 2, renderer.getHeight());
+                    renderer.render(scene, stereoCamera.getLeftCamera());
+
+                    renderer.setViewport(renderer.getWidth() / 2, 0, renderer.getWidth() / 2, renderer.getHeight());
+                    renderer.render(scene, stereoCamera.getRightCamera());
+
+                    root.rotation.rotateY(Math.PI / 2000);
+                });
+
+                window.onresize = function () {
+                    renderer.resize(window.innerWidth, window.innerHeight);
+                }
+            })
+
+        </script>
+    </body>
+</html>

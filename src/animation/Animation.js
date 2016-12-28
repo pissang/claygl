@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -9,7 +9,7 @@ define(function(require) {
                                 || window.msRequestAnimationFrame
                                 || window.mozRequestAnimationFrame
                                 || window.webkitRequestAnimationFrame
-                                || function(func){ setTimeout(func, 16); };
+                                || function (func){ setTimeout(func, 16); };
 
     /**
      * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
@@ -33,7 +33,7 @@ define(function(require) {
      *         })
      *         .start('spline');
      */
-    var Animation = Base.extend(function() {
+    var Animation = Base.extend(function () {
         return /** @lends qtek.animation.Animation# */{
             /**
              * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
@@ -66,7 +66,7 @@ define(function(require) {
         /**
          * @param {qtek.animation.Clip} clip
          */
-        addClip: function(clip) {
+        addClip: function (clip) {
             if (this._clips.indexOf(clip) < 0) {
                 this._clips.push(clip);
             }
@@ -75,7 +75,7 @@ define(function(require) {
         /**
          * @param  {qtek.animation.Clip} clip
          */
-        removeClip: function(clip) {
+        removeClip: function (clip) {
             var idx = this._clips.indexOf(clip);
             if (idx >= 0) {
                 this._clips.splice(idx, 1);
@@ -94,7 +94,7 @@ define(function(require) {
             animator.animation = null;
         },
 
-        _update: function() {
+        _update: function () {
 
             var time = new Date().getTime();
             var delta = time - this._time;
@@ -141,7 +141,7 @@ define(function(require) {
         /**
          * Start running animation
          */
-        start: function() {
+        start: function () {
             var self = this;
 
             this._running = true;
@@ -161,13 +161,13 @@ define(function(require) {
         /**
          * Stop running animation
          */
-        stop: function() {
+        stop: function () {
             this._running = false;
         },
         /**
          * Remove all clips
          */
-        removeClipsAll: function() {
+        removeClipsAll: function () {
             this._clips = [];
         },
         /**
@@ -180,7 +180,7 @@ define(function(require) {
          * @param  {Function} [options.interpolater]
          * @return {qtek.animation.Animator}
          */
-        animate: function(target, options) {
+        animate: function (target, options) {
             options = options || {};
             var animator = new Animator(
                 target,

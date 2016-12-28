@@ -29,6 +29,17 @@ define(function(require) {
         constructor: Matrix2d,
 
         /**
+         * Set components from array
+         * @param  {Float32Array|number[]} arr
+         */
+        setArray: function (arr) {
+            for (var i = 0; i < this._array.length; i++) {
+                this._array[i] = arr[i];
+            }
+            this._dirty = true;
+            return this;
+        },
+        /**
          * Clone a new Matrix2d
          * @return {qtek.math.Matrix2d}
          */

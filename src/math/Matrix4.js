@@ -38,6 +38,17 @@ define(function(require) {
         constructor: Matrix4,
 
         /**
+         * Set components from array
+         * @param  {Float32Array|number[]} arr
+         */
+        setArray: function (arr) {
+            for (var i = 0; i < this._array.length; i++) {
+                this._array[i] = arr[i];
+            }
+            this._dirty = true;
+            return this;
+        },
+        /**
          * Calculate the adjugate of self, in-place
          * @return {qtek.math.Matrix4}
          */

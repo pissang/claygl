@@ -30,6 +30,17 @@ define(function(require) {
         constructor: Matrix2,
 
         /**
+         * Set components from array
+         * @param  {Float32Array|number[]} arr
+         */
+        setArray: function (arr) {
+            for (var i = 0; i < this._array.length; i++) {
+                this._array[i] = arr[i];
+            }
+            this._dirty = true;
+            return this;
+        },
+        /**
          * Clone a new Matrix2
          * @return {qtek.math.Matrix2}
          */

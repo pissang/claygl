@@ -268,7 +268,7 @@ define(function(require) {
          */
         setViewport: function (x, y, width, height, dpr) {
 
-            if (typeof(x) === 'object') {
+            if (typeof x === 'object') {
                 var obj = x;
                 dpr = y;
 
@@ -746,7 +746,7 @@ define(function(require) {
                 if (node.material) {
                     materials[node.material.__GUID__] = node.material;
                 }
-                // Particle system need to dispose
+                // Particle system and AmbientCubemap light need to dispose
                 if (node.dispose) {
                     node.dispose(_gl);
                 }

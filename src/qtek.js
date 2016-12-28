@@ -171,6 +171,9 @@ define(function(require) {
 		"mesh": require('./util/mesh'),
 		"sh": require('./util/sh'),
 		"texture": require('./util/texture')
+	},
+	"vr": {
+		"StereoCamera": require('./vr/StereoCamera')
 	}
 };
 
