@@ -10,8 +10,7 @@ gaussianKernel[4] = 0.16;
 gaussianKernel[5] = 0.14;
 gaussianKernel[6] = 0.12;
 gaussianKernel[7] = 0.09;
-gaussianKernel[7] = 0.07;
-
+gaussianKernel[8] = 0.07;
 @end
 
 @export qtek.compositor.kernel.gaussian_13
