@@ -16,7 +16,9 @@ define(function (require) {
             _rightCamera: new Camera(),
 
             _eyeLeft: new Matrix4(),
-            _eyeRight: new Matrix4()
+            _eyeRight: new Matrix4(),
+
+            _frameData: null
         };
     }, {
 
@@ -77,7 +79,12 @@ define(function (require) {
 
         updateFromVRDisplay: function (vrDisplay) {
 
-            var frameData = vrDisplay.getFrameData();
+            if (typeof VRFrameData === 'undefined') {
+                return;
+            }
+
+            var frameData = this._frameData || (this._frameData = new VRFrameData());
+            vrDisplay.getFrameData(frameData);
             var leftCamera = this._leftCamera;
             var rightCamera = this._rightCamera;
 

@@ -224,8 +224,12 @@ define(function (require) {
     Texture.FLOAT = glenum.FLOAT;
     Texture.HALF_FLOAT = 0x8D61;
 
+    // ext.UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
+    Texture.UNSIGNED_INT_24_8_WEBGL = 34042;
+
     /* PixelFormat */
     Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
+    Texture.DEPTH_STENCIL = glenum.DEPTH_STENCIL;
     Texture.ALPHA = glenum.ALPHA;
     Texture.RGB = glenum.RGB;
     Texture.RGBA = glenum.RGBA;

@@ -181,18 +181,27 @@ define(function (require) {
             attachment = attachment || GL_COLOR_ATTACHMENT0;
             target = target || _gl.TEXTURE_2D;
 
-            if (attachment === GL_DEPTH_ATTACHMENT) {
-
+            if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
                 var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
 
                 if (!extension) {
                     console.error('Depth texture is not supported by the browser');
                     return;
                 }
-                if (texture.format !== glenum.DEPTH_COMPONENT) {
+                if (texture.format !== glenum.DEPTH_COMPONENT
+                    && texture.format !== glenum.DEPTH_STENCIL
+                ) {
                     console.error('The texture attached to depth buffer is not a valid.');
                     return;
                 }
+
+                // Dispose render buffer created previous
+                var renderBuffer = this._cache.get(KEY_RENDERBUFFER);
+                if (renderBuffer) {
+                    _gl.deleteRenderbuffer(renderBuffer);
+                    this._cache.put(KEY_RENDERBUFFER, false);
+                }
+
                 this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
                 this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
             }
