@@ -151,7 +151,8 @@ define(function (require) {
             if (renderer.getWidth() !== this._lightAccumTex.width
                 && renderer.getHeight() !== this._lightAccumTex.height
             ) {
-                this._resize(renderer.getWidth(), renderer.getHeight());
+                var dpr = renderer.getDevicePixelRatio();
+                this._resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
             }
 
             // Accumulate light buffer
@@ -518,7 +519,7 @@ define(function (require) {
                 gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
                 gl.depthFunc(gl.LEQUAL);
 
-                var viewportSize = [renderer.viewport.width, renderer.viewport.height];
+                var viewportSize = [this._lightAccumTex.width, this._lightAccumTex.height];
 
                 for (var i = 0; i < volumeMeshList.length; i++) {
                     var volumeMesh = volumeMeshList[i];

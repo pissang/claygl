@@ -12,7 +12,7 @@
             require(['qtek'], function(qtek) {
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
+                    // devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var deferredRenderer = new qtek.deferred.Renderer();

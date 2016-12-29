@@ -7,7 +7,7 @@
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;background-color:#20242B;">
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
             require(['qtek'], function(qtek){
@@ -19,8 +19,7 @@
                 animation.start();
 
                 var renderer = new qtek.Renderer({
-                    canvas: document.getElementById("Main"),
-                    devicePixelRatio: 1.0
+                    canvas: document.getElementById("main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene;
@@ -76,7 +75,7 @@
                 animation.on('frame', function(deltaTime) {
                     var start = new Date().getTime();
 
-                    camera.aspect = renderer.getViewportAspect();
+                    camera.aspect = renderer.getWidth() / renderer.getHeight();
                     camera.update();
                     stereoCamera.updateFromCamera(camera);
 

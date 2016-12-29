@@ -9,7 +9,7 @@ define(function (require) {
     var StereoCamera = Base.extend(function () {
         return {
 
-            aspect: 1,
+            aspect: 0.5,
 
             _leftCamera: new Camera(),
 

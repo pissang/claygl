@@ -287,7 +287,8 @@ define(function(require) {
                 x: x,
                 y: y,
                 width: width,
-                height: height
+                height: height,
+                devicePixelRatio: dpr
             };
         },
 
@@ -429,7 +430,8 @@ define(function(require) {
                 renderedMeshCount: 0
             };
 
-            var viewportSize = [this.viewport.width, this.viewport.height];
+            var dpr = this.viewport.devicePixelRatio;
+            var viewportSize = [this.viewport.width * dpr, this.viewport.height * dpr];
 
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);

@@ -31,7 +31,8 @@
                 var material = new qtek.StandardMaterial({
                     metalness: 0.5,
                     uvRepeat: [3, 3],
-                    roughness: 0.5
+                    roughness: 0.5,
+                    linear: true
                 });
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
@@ -90,7 +91,6 @@
                     debugMesh.scale.set(0.1, 0.1, 0.1);
                     pointLight.add(debugMesh);
                 }
-
                 camera.position.set(0, 0, 6);
                 camera.lookAt(scene.position);
 
