@@ -725,6 +725,7 @@ define(function (require) {
             this._fragmentProcessed = extensionStr.join('\n') + '\n'
                 + ['precision', this.precision, 'float'].join(' ') + ';\n'
                 + ['precision', this.precision, 'int'].join(' ') + ';\n'
+                // depth texture may have precision problem on iOS device.
                 + ['precision', this.precision, 'sampler2D'].join(' ') + ';\n'
                 + code;
         },
