@@ -11,6 +11,7 @@ define(function (require) {
     var ForwardRenderer = require('../Renderer');
     var Pass = require('../compositor/Pass');
     var Matrix4 = require('../math/Matrix4');
+    var glinfo = require('../core/glinfo');
 
     function createFillCanvas(color) {
         var canvas = document.createElement('canvas');
@@ -180,8 +181,13 @@ define(function (require) {
             _gBufferTex2: new Texture2D({
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST,
-                format: Texture.DEPTH_COMPONENT,
-                type: Texture.UNSIGNED_INT
+                // format: Texture.DEPTH_COMPONENT,
+                // FIXME UNSIGNED_INT Can be 16 bit on ios. which is too low
+                // https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/
+                // type: Texture.UNSIGNED_INT
+
+                format: Texture.DEPTH_STENCIL,
+                type: Texture.UNSIGNED_INT_24_8_WEBGL
             }),
 
             // - R: albedo.r
@@ -242,9 +248,9 @@ define(function (require) {
             }
 
             var frameBuffer = this._frameBuffer;
-            frameBuffer.bind(renderer);
             frameBuffer.attach(renderer.gl, this._gBufferTex1);
-            frameBuffer.attach(renderer.gl, this._gBufferTex2, renderer.gl.DEPTH_ATTACHMENT);
+            frameBuffer.attach(renderer.gl, this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
+            frameBuffer.bind(renderer);
             gl.clearColor(0, 0, 0, 0);
             gl.depthMask(true);
             gl.colorMask(true, true, true, true);

@@ -723,7 +723,10 @@ define(function (require) {
 
             // Add precision
             this._fragmentProcessed = extensionStr.join('\n') + '\n'
-                + ['precision', this.precision, 'float'].join(' ') + ';\n' + code;
+                + ['precision', this.precision, 'float'].join(' ') + ';\n'
+                + ['precision', this.precision, 'int'].join(' ') + ';\n'
+                + ['precision', this.precision, 'sampler2D'].join(' ') + ';\n'
+                + code;
         },
 
         _parseUniforms: function () {
