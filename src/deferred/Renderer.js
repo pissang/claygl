@@ -94,6 +94,8 @@ define(function (require) {
 
             shadowMapPass: null,
 
+            autoResize: true,
+
             _createLightPassMat: createLightPassMat,
 
             _gBuffer: new GBuffer(),
@@ -165,18 +167,21 @@ define(function (require) {
 
             this._gBuffer.update(renderer, scene, camera);
 
-            if (renderer.getWidth() !== this._lightAccumTex.width
-                && renderer.getHeight() !== this._lightAccumTex.height
+            // PENDING For stereo rendering
+            var dpr = renderer.getDevicePixelRatio();
+            if (this.autoResize
+                && (renderer.getWidth() * dpr !== this._lightAccumTex.width
+                || renderer.getHeight() * dpr !== this._lightAccumTex.height)
             ) {
-                var dpr = renderer.getDevicePixelRatio();
-                this._resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
+                this.resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
             }
 
             // Accumulate light buffer
             this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
 
             if (!opts.renderToTarget) {
-                this._outputPass.setUniform('texture', this._lightAccumTex);
+                // this._outputPass.setUniform('texture', this._lightAccumTex);
+
                 this._outputPass.render(renderer);
                 // this._gBuffer.renderDebug(renderer, camera, 'normal');
             }
@@ -194,10 +199,12 @@ define(function (require) {
         //     return this._fullQuadPass;
         // },
 
-        _resize: function (width, height) {
+        resize: function (width, height) {
             this._lightAccumTex.width = width;
             this._lightAccumTex.height = height;
             this._lightAccumTex.dirty();
+
+            this._gBuffer.resize(width, height);
         },
 
         _accumulateLightBuffer: function (renderer, scene, camera, updateShadow) {
@@ -341,7 +348,7 @@ define(function (require) {
             this._renderVolumeMeshList(renderer, camera, volumeMeshList);
 
             // if (shadowMapPass && updateShadow) { // FIXME Extension may have shadow rendered ignore updateShadow flag
-            if (shadowMapPass) {
+            if (shadowMapPass && this._shadowCasters) {
                 shadowMapPass.restoreMaterial(
                     this._shadowCasters
                 );

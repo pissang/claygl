@@ -15,7 +15,6 @@
                     // devicePixelRatio: 1.0
                 });
                 var gbuffer = new qtek.deferred.GBuffer();
-                renderer.resize(window.innerWidth, window.innerHeight);
                 var camera = new qtek.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
@@ -75,8 +74,13 @@
 
                 window.onresize = function() {
                     renderer.resize(window.innerWidth, window.innerHeight);
+                    gbuffer.resize(
+                        renderer.getWidth() * renderer.getDevicePixelRatio(),
+                        renderer.getHeight() * renderer.getDevicePixelRatio()
+                    );
                     camera.aspect = renderer.getViewportAspect();
                 };
+                window.onresize();
 
                 var config = {
                     debugType: 'normal'

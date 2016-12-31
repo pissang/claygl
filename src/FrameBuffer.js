@@ -82,7 +82,7 @@ define(function (require) {
             cache.put('viewport', renderer.viewport);
 
             if (this.viewport) {
-                renderer.setViewport(this.viewport, 1);
+                renderer.setViewport(this.viewport);
             }
             else {
                 renderer.setViewport(0, 0, this._width, this._height, 1);

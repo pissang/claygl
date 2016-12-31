@@ -225,7 +225,7 @@ define(function (require) {
         };
     }, {
 
-        _resize: function (width, height) {
+        resize: function (width, height) {
             this._gBufferTex1.width = width;
             this._gBufferTex1.height = height;
             this._gBufferTex1.dirty();
@@ -240,15 +240,8 @@ define(function (require) {
         },
 
         update: function (renderer, scene, camera) {
-            var width = renderer.getWidth();
-            var height = renderer.getHeight();
-            var dpr = renderer.getDevicePixelRatio();
 
             var gl = renderer.gl;
-
-            if (width !== this._gBufferTex1.width || height !== this._gBufferTex1.height) {
-                this._resize(width * dpr, height * dpr);
-            }
 
             var frameBuffer = this._frameBuffer;
             frameBuffer.attach(renderer.gl, this._gBufferTex1);

@@ -263,19 +263,20 @@ define(function(require) {
          *      x: 0,
          *      y: 0,
          *      width: width,
-         *      height: height
-         *  }, 1)
+         *      height: height,
+         *      devicePixelRatio: 1
+         *  })
          */
         setViewport: function (x, y, width, height, dpr) {
 
             if (typeof x === 'object') {
                 var obj = x;
-                dpr = y;
 
                 x = obj.x;
                 y = obj.y;
                 width = obj.width;
                 height = obj.height;
+                dpr = obj.devicePixelRatio;
             }
             dpr = dpr || this.devicePixelRatio;
 
