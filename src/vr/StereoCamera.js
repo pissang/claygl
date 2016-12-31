@@ -1,6 +1,6 @@
 define(function (require) {
 
-    var Base = require('../core/Base');
+    var Base = require('../Node');
     var Camera = require('../camera/Perspective');
     var Matrix4 = require('../math/Matrix4');
 
@@ -23,6 +23,10 @@ define(function (require) {
     }, {
 
         updateFromCamera: function (camera, focus, zoom, eyeSep) {
+            if (camera.transformNeedsUpdate()) {
+                console.warn('Node transform is not updated');
+            }
+
             focus = focus == null ? 10 : focus;
             zoom = zoom == null ? 1 : zoom;
             eyeSep = eyeSep == null ? 0.064 : eyeSep;
@@ -77,7 +81,7 @@ define(function (require) {
             this._rightCamera.decomposeProjectionMatrix();
         },
 
-        updateFromVRDisplay: function (vrDisplay) {
+        updateFromVRDisplay: function (vrDisplay, parentNode) {
 
             if (typeof VRFrameData === 'undefined') {
                 return;
@@ -98,6 +102,15 @@ define(function (require) {
             rightCamera.viewMatrix.setArray(frameData.rightViewMatrix);
             rightCamera.setViewMatrix(rightCamera.viewMatrix);
 
+            if (parentNode && parentNode.worldTransform) {
+                if (parentNode.transformNeedsUpdate()) {
+                    console.warn('Node transform is not updated');
+                }
+                leftCamera.worldTransform.multiplyLeft(parentNode.worldTransform);
+                leftCamera.decomposeWorldTransform();
+                rightCamera.worldTransform.multiplyLeft(parentNode.worldTransform);
+                rightCamera.decomposeWorldTransform();
+            }
         },
 
         getLeftCamera: function () {

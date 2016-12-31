@@ -416,6 +416,12 @@ define(function (require) {
             };
         })(),
 
+        transformNeedsUpdate: function () {
+            return this.position._dirty
+                || this.rotation._dirty
+                || this.scale._dirty;
+        },
+
         /**
          * Update local transform from SRT
          * Notice that local transform will not be updated if _dirty mark of position, rotation, scale is all false
@@ -425,7 +431,7 @@ define(function (require) {
             var rotation = this.rotation;
             var scale = this.scale;
 
-            if (position._dirty || scale._dirty || rotation._dirty) {
+            if (this.transformNeedsUpdate()) {
                 var m = this.localTransform._array;
 
                 // Transform order, scale->rotation->position
