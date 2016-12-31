@@ -82,9 +82,12 @@ define(function (require) {
                     attachTextureToSlot(gl, gBufferMat.shader, 'roughnessMap', roughnessMap, 1);
                 }
                 gBufferMat.shader.setUniform(gl, '1i', 'useRoughnessMap', +useRoughnessMap);
-
-                gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-                gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+                if (uvRepeat != null) {
+                    gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+                }
+                if (uvOffset != null) {
+                    gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+                }
             }
 
             previousNormalMap = normalMap;

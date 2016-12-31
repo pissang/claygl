@@ -141,9 +141,26 @@ define(function (require) {
             })
         };
     }, {
-        render: function (renderer, scene, camera, notDirectOutput) {
+        /**
+         * @param {qtek.Renderer} renderer
+         * @param {qtek.Scene} scene
+         * @param {qtek.Camera} camera
+         * @param {Object} [opts]
+         * @param {boolean} [opts.renderToTarget = false]
+         * @param {boolean} [opts.notUpdateShadow = true]
+         * @param {boolean} [opts.notUpdateScene = true]
+         */
+        render: function (renderer, scene, camera, opts) {
 
-            scene.update(false, true);
+            opts = opts || {};
+            opts.renderToTarget = opts.renderToTarget || false;
+            opts.notUpdateShadow = opts.notUpdateShadow || false;
+            opts.notUpdateScene = opts.notUpdateScene || false;
+
+            if (!opts.notUpdateScene) {
+                scene.update(false, true);
+            }
+
             camera.update(true);
 
             this._gBuffer.update(renderer, scene, camera);
@@ -156,9 +173,9 @@ define(function (require) {
             }
 
             // Accumulate light buffer
-            this._accumulateLightBuffer(renderer, scene, camera);
+            this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
 
-            if (!notDirectOutput) {
+            if (!opts.renderToTarget) {
                 this._outputPass.setUniform('texture', this._lightAccumTex);
                 this._outputPass.render(renderer);
                 // this._gBuffer.renderDebug(renderer, camera, 'normal');
@@ -183,7 +200,7 @@ define(function (require) {
             this._lightAccumTex.dirty();
         },
 
-        _accumulateLightBuffer: function (renderer, scene, camera) {
+        _accumulateLightBuffer: function (renderer, scene, camera, updateShadow) {
             var gl = renderer.gl;
             var lightAccumTex = this._lightAccumTex;
             var lightAccumFrameBuffer = this._lightAccumFrameBuffer;
@@ -196,12 +213,12 @@ define(function (require) {
             }
 
             var shadowMapPass = this.shadowMapPass;
-            if (shadowMapPass) {
+            if (shadowMapPass && updateShadow) {
                 gl.clearColor(1, 1, 1, 1);
                 this._prepareLightShadow(renderer, scene, camera);
             }
 
-            this.trigger('beforelightaccumulate');
+            this.trigger('beforelightaccumulate', renderer, scene, camera, updateShadow);
 
             lightAccumFrameBuffer.attach(gl, lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
@@ -323,13 +340,14 @@ define(function (require) {
 
             this._renderVolumeMeshList(renderer, camera, volumeMeshList);
 
+            // if (shadowMapPass && updateShadow) { // FIXME Extension may have shadow rendered ignore updateShadow flag
             if (shadowMapPass) {
                 shadowMapPass.restoreMaterial(
                     this._shadowCasters
                 );
             }
 
-            this.trigger('lightaccumulate');
+            this.trigger('lightaccumulate', renderer, scene, camera);
 
             lightAccumFrameBuffer.unbind(renderer);
         },
