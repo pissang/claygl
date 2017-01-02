@@ -180,7 +180,7 @@ define(function (require) {
             this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
 
             if (!opts.renderToTarget) {
-                // this._outputPass.setUniform('texture', this._lightAccumTex);
+                this._outputPass.setUniform('texture', this._lightAccumTex);
 
                 this._outputPass.render(renderer);
                 // this._gBuffer.renderDebug(renderer, camera, 'normal');
