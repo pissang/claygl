@@ -101,6 +101,11 @@ define(function(require) {
         shaderName: 'qtek.standard',
 
         /**
+         * @type {string}
+         */
+        useStandardMaterial: false,
+
+        /**
          * @type {boolean}
          */
         includeCamera: true,
@@ -493,7 +498,8 @@ define(function(require) {
                     enabledTextures.push('normalMap');
                 }
                 var material;
-                if (this.shaderName === 'qtek.standard') {
+                var isStandardMaterial = this.useStandardMaterial;
+                if (isStandardMaterial) {
                     material = new StandardMaterial({
                         name: materialInfo.name
                     });
@@ -516,16 +522,33 @@ define(function(require) {
                     // TODO blend Func and blend Equation
                 }
 
-                if (uniforms['diffuse']) {
+                var diffuseProp = uniforms['diffuse'];
+                if (diffuseProp) {
                     // Color
-                    if (uniforms['diffuse'] instanceof Array) {
-                        material.set('color', uniforms['diffuse'].slice(0, 3));
-                    } else { // Texture
-                        material.set('diffuseMap', uniforms['diffuse']);
+                    if (diffuseProp instanceof Array) {
+                        if (isStandardMaterial) {
+                            material.color = diffuseProp.slice(0, 3);
+                        }
+                        else {
+                            material.set('color', diffuseProp.slice(0, 3));
+                        }
+                    }
+                    else { // Texture
+                        if (isStandardMaterial) {
+                            material.diffuseMap = diffuseProp;
+                        }
+                        else {
+                            material.set('diffuseMap', diffuseProp);
+                        }
                     }
                 }
                 if (uniforms['normalMap'] != null) {
-                    material.set('normalMap', uniforms['normalMap']);
+                    if (isStandardMaterial) {
+                        material.normalMap = uniforms['normalMap'];
+                    }
+                    else {
+                        material.set('normalMap', uniforms['normalMap']);
+                    }
                 }
                 if (uniforms['emission'] != null) {
                     material.set('emission', uniforms['emission'].slice(0, 3));

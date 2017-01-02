@@ -13,40 +13,40 @@
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById("Main")
+                    canvas: document.getElementById("Main")
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
 
                 var animation = new qtek.animation.Animation;
                 animation.start();
                 var shadowMapPass = new qtek.prePass.ShadowMap({
-                    // softShadow : qtek.prePass.ShadowMap.VSM
-                    // shadowCascade : 4
+                    // softShadow: qtek.prePass.ShadowMap.VSM
+                    // shadowCascade: 4
                 });
 
                 var scene = new qtek.Scene();
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.getViewportAspect(),
-                    far : 100
+                    aspect: renderer.getViewportAspect(),
+                    far: 100
                 });
 
 
                 var data = JSON.parse(modelData);
 
                 var loader = new qtek.loader.ThreeModel({
-                    textureRootPath : "assets/models/nanosuit/tex"
+                    textureRootPath: "assets/models/nanosuit/tex"
                 });
                 var meshList = loader.parse(data);
 
                 var shader = qtek.shader.library.get("qtek.lambert", "diffuseMap");
 
                 var material = new qtek.Material({
-                    shader : shader
+                    shader: shader
                 });
                 var texture = new qtek.Texture2D({
-                    wrapS : qtek.Texture.REPEAT,
-                    wrapT : qtek.Texture.REPEAT,
-                    anisotropic : 8
+                    wrapS: qtek.Texture.REPEAT,
+                    wrapT: qtek.Texture.REPEAT,
+                    anisotropic: 8
                 });
                 texture.load("assets/textures/ground_tile.jpg");
                 material.set("diffuseMap", texture);
@@ -60,8 +60,8 @@
                         var nanosuit = new qtek.Node();
                         meshList.forEach(function(_mesh){
                             var mesh = new qtek.Mesh({
-                                geometry : _mesh.geometry,
-                                material : _mesh.material
+                                geometry: _mesh.geometry,
+                                material: _mesh.material
                             });
                             mesh.material.set("shininess", 50);
                             mesh.material.shader.disableTexture("normalMap");
@@ -82,13 +82,13 @@
                 root.scale.set(0.2, 0.2, 0.2);
                 // Add Plane
                 var plane = new qtek.geometry.Plane({
-                    widthSegments : 1,
-                    heightSegments : 1
+                    widthSegments: 1,
+                    heightSegments: 1
                 });
                 var planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material,
-                    name : "plane"
+                    geometry: plane,
+                    material: material,
+                    name: "plane"
                 });
                 planeMesh.position.y = -0.1;
                 planeMesh.rotation.rotateX(-Math.PI/2);
@@ -97,25 +97,27 @@
                 scene.add(planeMesh);
 
                 var light = new qtek.light.Directional({
-                    intensity : 1.0,
-                    shadowResolution : 4096,
-                    shadowBias : 0.006
+                    intensity: 1.0,
+                    shadowResolution: 2048,
+                    shadowBias: 0.006,
+
+                    shadowCascade: 2
                 });
                 light.lookAt(root.position);
                 scene.add(light);
 
                 var aidLight = new qtek.light.Directional({
-                    intensity : 0.3,
-                    position : new qtek.math.Vector3(2, 2, -1),
-                    castShadow : false
+                    intensity: 0.3,
+                    position: new qtek.math.Vector3(2, 2, -1),
+                    castShadow: false
                 });
                 aidLight.lookAt(root.position);
                 // scene.add(aidLight);
 
                 var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas,
-                    sensitivity : 0.4
+                    target: camera,
+                    domElement: renderer.canvas,
+                    sensitivity: 0.4
                 });
 
                 var rot = 0;
@@ -139,7 +141,7 @@
 
                     document.getElementById('time').innerHTML =
                             'fps: ' + Math.round(1000 / deltaTime) + '<br />'
-                            + 'render time : ' + Math.round(renderTime) + '<br />'
+                            + 'render time: ' + Math.round(renderTime) + '<br />'
                             + 'draw call: ' +  drawInfo.drawCallNumber + '(' + (meshNumber+1) + ')'+ '<br />'
                             + 'vertices: ' + drawInfo.vertexNumber+ '<br />'
                             + 'faces: ' + drawInfo.faceNumber;

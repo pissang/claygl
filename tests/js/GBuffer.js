@@ -85,8 +85,8 @@ define(function (require) {
         }
 
         this._gBufferFramebuffer.bind(renderer);
-        this._gBufferFramebuffer.attach(renderer.gl, this._normalTex);
-        this._gBufferFramebuffer.attach(renderer.gl, this._depthTex, renderer.gl.DEPTH_ATTACHMENT);
+        this._gBufferFramebuffer.attach(this._normalTex);
+        this._gBufferFramebuffer.attach(this._depthTex, renderer.gl.DEPTH_ATTACHMENT);
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
         gl.colorMask(true, true, true, true);
@@ -168,7 +168,7 @@ define(function (require) {
         // Render buffer back
         // http://www.kode80.com/blog/2015/03/11/screen-space-reflections-in-unity-5/
         this._gBufferFramebuffer.bind(renderer);
-        this._gBufferFramebuffer.attach(renderer.gl, this._backDepthTex, renderer.gl.DEPTH_ATTACHMENT);
+        this._gBufferFramebuffer.attach(this._backDepthTex, renderer.gl.DEPTH_ATTACHMENT);
         gl.depthMask(true);
         gl.colorMask(false, false, false, false);
         gl.clear(gl.DEPTH_BUFFER_BIT);

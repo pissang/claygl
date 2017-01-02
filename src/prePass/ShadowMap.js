@@ -523,7 +523,7 @@ define(function (require) {
                 var viewport = renderer.viewport;
 
                 var _gl = renderer.gl;
-                this._frameBuffer.attach(_gl, texture);
+                this._frameBuffer.attach(texture);
                 this._frameBuffer.bind(renderer);
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
@@ -582,7 +582,7 @@ define(function (require) {
             var camera = this._getSpotLightCamera(light);
             var _gl = renderer.gl;
 
-            this._frameBuffer.attach(_gl, texture);
+            this._frameBuffer.attach(texture);
             this._frameBuffer.bind(renderer);
 
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
@@ -611,19 +611,18 @@ define(function (require) {
             pointLightShadowMaps.push(texture);
 
             this._bindDistanceMaterial(casters, light);
+            this._frameBuffer.bind(renderer);
             for (var i = 0; i < 6; i++) {
                 var target = targets[i];
                 var camera = this._getPointLightCamera(light, target);
 
-                this._frameBuffer.attach(renderer.gl, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
-                this._frameBuffer.bind(renderer);
+                this._frameBuffer.attach(texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
 
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
                 renderer.renderQueue(casters, camera);
-
-                this._frameBuffer.unbind(renderer);
             }
+            this._frameBuffer.unbind(renderer);
         },
 
         _gaussianFilter: function (renderer, texture, size) {
@@ -635,13 +634,13 @@ define(function (require) {
             var _gl = renderer.gl;
             var tmpTexture = this._texturePool.get(parameter);
 
-            this._frameBuffer.attach(_gl, tmpTexture);
+            this._frameBuffer.attach(tmpTexture);
             this._frameBuffer.bind(renderer);
             this._gaussianPassH.setUniform('texture', texture);
             this._gaussianPassH.setUniform('textureWidth', size);
             this._gaussianPassH.render(renderer);
 
-            this._frameBuffer.attach(_gl, texture);
+            this._frameBuffer.attach(texture);
             this._gaussianPassV.setUniform('texture', tmpTexture);
             this._gaussianPassV.setUniform('textureHeight', size);
             this._gaussianPassV.render(renderer);

@@ -20,7 +20,7 @@ define(function (require) {
 
     PostProcessPass.prototype.render = function (renderer) {
         if (this._frameBuffer) {
-            this._frameBuffer.attach(renderer.gl, this._targetTexture);
+            this._frameBuffer.attach(this._targetTexture);
         }
         this._pass.render(renderer, this._frameBuffer);
     };

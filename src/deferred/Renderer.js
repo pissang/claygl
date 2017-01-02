@@ -165,8 +165,6 @@ define(function (require) {
 
             camera.update(true);
 
-            this._gBuffer.update(renderer, scene, camera);
-
             // PENDING For stereo rendering
             var dpr = renderer.getDevicePixelRatio();
             if (this.autoResize
@@ -175,6 +173,8 @@ define(function (require) {
             ) {
                 this.resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
             }
+
+            this._gBuffer.update(renderer, scene, camera);
 
             // Accumulate light buffer
             this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
@@ -227,7 +227,7 @@ define(function (require) {
 
             this.trigger('beforelightaccumulate', renderer, scene, camera, updateShadow);
 
-            lightAccumFrameBuffer.attach(gl, lightAccumTex);
+            lightAccumFrameBuffer.attach(lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
             var color = renderer.color;
             gl.clearColor(color[0], color[1], color[2], color[3]);
@@ -357,6 +357,9 @@ define(function (require) {
             this.trigger('lightaccumulate', renderer, scene, camera);
 
             lightAccumFrameBuffer.unbind(renderer);
+
+            this.trigger('afterlightaccumulate', renderer, scene, camera);
+
         },
 
         _prepareLightShadow: (function () {

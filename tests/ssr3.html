@@ -149,7 +149,7 @@
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
 
-                    frameBuffer.attach(renderer.gl, colorTex);
+                    frameBuffer.attach(colorTex);
                     frameBuffer.bind(renderer);
                     renderer.render(scene, camera);
                     frameBuffer.unbind(renderer);

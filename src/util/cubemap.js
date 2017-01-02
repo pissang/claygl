@@ -124,7 +124,7 @@ define(function (require) {
 
             for (var j = 0; j < targets.length; j++) {
                 var pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
-                frameBuffer.attach(renderer.gl, renderTargetTmp);
+                frameBuffer.attach(renderTargetTmp);
                 frameBuffer.bind(renderer);
 
                 var camera = envMapPass.getCamera(targets[j]);

@@ -38,7 +38,7 @@ define(function (require) {
         pass.setUniform('environmentMap', envMap);
 
         var framebuffer = new FrameBuffer();
-        framebuffer.attach(renderer.gl, shTexture);
+        framebuffer.attach(shTexture);
         pass.render(renderer, framebuffer);
 
         framebuffer.bind(renderer);

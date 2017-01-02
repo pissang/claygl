@@ -80,14 +80,7 @@ define(function (require) {
         cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
 
         // FIXME In windows, use one framebuffer only renders one side of cubemap
-        ret._frameBuffers = {
-            px: new FrameBuffer(),
-            nx: new FrameBuffer(),
-            py: new FrameBuffer(),
-            ny: new FrameBuffer(),
-            pz: new FrameBuffer(),
-            nz: new FrameBuffer()
-        };
+        ret._frameBuffer = new FrameBuffer()
 
         return ret;
     }, {
@@ -134,23 +127,20 @@ define(function (require) {
 
                     this.shadowMapPass.render(renderer, scene, camera, true);
                 }
-                this._frameBuffers[target].attach(
-                    _gl, this.texture, _gl.COLOR_ATTACHMENT0,
+                this._frameBuffer.bind(renderer);
+                this._frameBuffer.attach(
+                    this.texture, _gl.COLOR_ATTACHMENT0,
                     _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
                 );
-                this._frameBuffers[target].bind(renderer);
                 renderer.render(scene, camera, true);
-                this._frameBuffers[target].unbind(renderer);
+                this._frameBuffer.unbind(renderer);
             }
         },
         /**
          * @param  {qtek.Renderer} renderer
          */
         dispose: function(gl) {
-            for (var i = 0; i < 6; i++) {
-                var target = targets[i];
-                this._frameBuffers[target].dispose(gl);
-            }
+            this._frameBuffer.dispose(gl);
         }
     });
 

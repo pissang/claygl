@@ -70,10 +70,10 @@
                 suzanneMaterial.set('environmentMap', environmentMap);
                 suzanneMaterial.set('specularColor', [0.95, 0.64, 0.54]);
 
+                environmentMapPass.render(renderer, scene);
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     shadowMapPass.render(renderer, scene);
-                    environmentMapPass.render(renderer, scene);
                     renderer.render(scene, camera);
                     shadowMapPass.renderDebug(renderer);
                 });

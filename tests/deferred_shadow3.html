@@ -18,7 +18,7 @@
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var shadowMapPass = new qtek.prePass.ShadowMap({
-                    shadowCascade: 1
+                    shadowCascade: 2
                 });
                 var deferredRenderer = new qtek.deferred.Renderer({
                     shadowMapPass: shadowMapPass

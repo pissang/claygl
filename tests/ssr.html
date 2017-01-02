@@ -122,7 +122,7 @@
                     monkeys.forEach(function (monkey, idx) {
                         monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
                     });
-                    frameBuffer.attach(renderer.gl, colorTex);
+                    frameBuffer.attach(colorTex);
                     frameBuffer.bind(renderer);
                     renderer.render(scene, camera);
                     frameBuffer.unbind(renderer);

@@ -98,7 +98,7 @@ define(function (require) {
             ssaoTexture.height = height;
             ssaoTexture.dirty();
         }
-        this._framebuffer.attach(forwardRenderer.gl, ssaoTexture);
+        this._framebuffer.attach(ssaoTexture);
         this._framebuffer.bind(forwardRenderer);
         forwardRenderer.gl.clearColor(1, 1, 1, 1);
         forwardRenderer.gl.clear(forwardRenderer.gl.COLOR_BUFFER_BIT);

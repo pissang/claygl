@@ -244,8 +244,8 @@ define(function (require) {
             var gl = renderer.gl;
 
             var frameBuffer = this._frameBuffer;
-            frameBuffer.attach(renderer.gl, this._gBufferTex1);
-            frameBuffer.attach(renderer.gl, this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
+            frameBuffer.attach(this._gBufferTex1);
+            frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
             frameBuffer.bind(renderer);
             gl.clearColor(0, 0, 0, 0);
             gl.depthMask(true);
@@ -272,7 +272,7 @@ define(function (require) {
             renderer.renderQueue(opaqueQueue, camera);
 
             // Pass 2
-            frameBuffer.attach(renderer.gl, this._gBufferTex3);
+            frameBuffer.attach(this._gBufferTex3);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             this._replaceGBufferMat(opaqueQueue, 2);
             renderer.beforeRenderObject = getBeforeRenderHook2(

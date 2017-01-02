@@ -116,7 +116,7 @@ define(function(require) {
                 for (var attachment in this.outputs) {
                     var texture = this.outputs[attachment];
                     if (texture) {
-                        frameBuffer.attach(renderer.gl, texture, attachment);
+                        frameBuffer.attach(texture, attachment);
                     }
                 }
             }

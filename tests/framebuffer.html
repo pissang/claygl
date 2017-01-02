@@ -53,7 +53,7 @@
                     width : 1024,
                     height : 1024,
                 });
-                frameBuffer.attach( renderer.gl, rtt );
+                frameBuffer.attach( rtt );
                 var rttShader = qtek.shader.library.get("qtek.basic", "diffuseMap");
                 rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
                 var rttMesh = new qtek.Mesh({

@@ -37,34 +37,21 @@ define(function (require) {
          */
         viewport: null,
 
-        //Save attached texture and target
-        _attachedTextures: null,
+        _textures: null,
 
         _width: 0,
         _height: 0,
 
-        _binded: false,
+        _boundGL: null,
     }, function () {
         // Use cache
         this._cache = new Cache();
 
-        this._attachedTextures = {};
+        this._textures = {};
     },
 
     /**@lends qtek.FrameBuffer.prototype. */
     {
-
-        /**
-         * Resize framebuffer.
-         * It is not recommanded use this methods to change the framebuffer size because the size will still be changed when attaching a new texture
-         * @param  {number} width
-         * @param  {number} height
-         */
-        resize: function (width, height) {
-            this._width = width;
-            this._height = height;
-        },
-
         /**
          * Bind the framebuffer to given renderer before rendering
          * @param  {qtek.Renderer} renderer
@@ -73,10 +60,8 @@ define(function (require) {
 
             var _gl = renderer.gl;
 
-            if (!this._binded) {
-                _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
-                this._binded = true;
-            }
+            _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
+            this._boundGL = _gl;
             var cache = this._cache;
 
             cache.put('viewport', renderer.viewport);
@@ -86,6 +71,22 @@ define(function (require) {
             }
             else {
                 renderer.setViewport(0, 0, this._width, this._height, 1);
+            }
+
+            for (var attachment in this._textures) {
+                var obj = this._textures[attachment];
+                // Attach textures
+                this._doAttach(_gl, obj.texture, attachment, obj.target);
+            }
+
+            var attachedTextures = cache.get('attached_textures');
+            if (attachedTextures) {
+                for (var attachment in attachedTextures) {
+                    if (!this._textures[attachment]) {
+                        var target = attachedTextures[attachment];
+                        this._doDetach(_gl, attachment, target);
+                    }
+                }
             }
             if (!cache.get(KEY_DEPTHTEXTURE_ATTACHED) && this.depthBuffer) {
                 // Create a new render buffer
@@ -118,7 +119,7 @@ define(function (require) {
             var _gl = renderer.gl;
 
             _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
-            this._binded = false;
+            this._boundGL = null;
 
             this._cache.use(_gl.__GLID__);
             var viewport = this._cache.get('viewport');
@@ -130,10 +131,10 @@ define(function (require) {
             // Because the data of texture is changed over time,
             // Here update the mipmaps of texture each time after rendered;
             // PENDGING
-            for (var attachment in this._attachedTextures) {
-                var texture = this._attachedTextures[attachment];
+            for (var attachment in this._textures) {
+                var texture = this._textures[attachment].texture;
                 if (!texture.NPOT && texture.useMipmap) {
-                    var target = texture instanceof TextureCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+                    var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                     _gl.generateMipmap(target);
                     _gl.bindTexture(target, null);
@@ -154,69 +155,144 @@ define(function (require) {
 
         /**
          * Attach a texture(RTT) to the framebuffer
-         * @param  {WebGLRenderingContext} _gl
          * @param  {qtek.Texture} texture
          * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
          * @param  {number} [target=gl.TEXTURE_2D]
          */
-        // FIXME First parameter should be renderer?
-        attach: function (_gl, texture, attachment, target) {
+        attach: function (texture, attachment, target) {
 
             if (!texture.width) {
                 throw new Error('The texture attached to color buffer is not a valid.');
             }
-
-            var bindOnce = false;
-            if (!this._binded) {
-                bindOnce = true;
-                _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
-            }
-
-            this._width = texture.width;
-            this._height = texture.height;
+            // TODO width and height check
 
             // If the depth_texture extension is enabled, developers
             // Can attach a depth texture to the depth buffer
             // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
             attachment = attachment || GL_COLOR_ATTACHMENT0;
-            target = target || _gl.TEXTURE_2D;
+            target = target || glenum.TEXTURE_2D;
 
+            var _gl = this._boundGL;
+            var attachedTextures;
+
+            if (_gl) {
+                var cache = this._cache;
+                cache.use(_gl.__GLID__);
+                attachedTextures = cache.get('attached_textures');
+            }
+            // Always update width and height
+            this._width = texture.width;
+            this._height = texture.height;
+
+            // Check if texture attached
+            var previous = this._textures[attachment];
+            if (previous && previous.target === target
+                && previous.texture === texture
+                && (attachedTextures && attachedTextures[attachment] != null)
+            ) {
+                return;
+            }
+
+            var canAttach = true;
+            if (_gl) {
+                canAttach = this._doAttach(_gl, texture, attachment, target);
+            }
+
+            if (canAttach) {
+                this._textures[attachment] = this._textures[attachment] || {};
+                this._textures[attachment].texture = texture;
+                this._textures[attachment].target = target;
+            }
+        },
+
+        _doAttach: function (_gl, texture, attachment, target) {
+
+            // Make sure texture is always updated
+            // Because texture width or height may be changed and in this we can't be notified
+            // FIXME awkward;
+            var webglTexture = texture.getWebGLTexture(_gl);
+            // Assume cache has been used.
+            var attachedTextures = this._cache.get('attached_textures');
+            if (attachedTextures && attachedTextures[attachment]) {
+                var obj = attachedTextures[attachment];
+                // Check if texture and target not changed
+                if (obj.texture === texture && obj.target === target) {
+                    return;
+                }
+            }
+            attachment = +attachment;
+
+            var canAttach = true;
             if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
                 var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
 
                 if (!extension) {
                     console.error('Depth texture is not supported by the browser');
-                    return;
+                    canAttach = false;
                 }
                 if (texture.format !== glenum.DEPTH_COMPONENT
                     && texture.format !== glenum.DEPTH_STENCIL
                 ) {
                     console.error('The texture attached to depth buffer is not a valid.');
-                    return;
+                    canAttach = false;
                 }
 
                 // Dispose render buffer created previous
-                var renderBuffer = this._cache.get(KEY_RENDERBUFFER);
-                if (renderBuffer) {
-                    _gl.deleteRenderbuffer(renderBuffer);
-                    this._cache.put(KEY_RENDERBUFFER, false);
+                if (canAttach) {
+                    var renderBuffer = this._cache.get(KEY_RENDERBUFFER);
+                    if (renderBuffer) {
+                        _gl.deleteRenderbuffer(renderBuffer);
+                        this._cache.put(KEY_RENDERBUFFER, false);
+                    }
+
+                    this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
+                    this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
                 }
-
-                this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
-                this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
             }
-
-            this._attachedTextures[attachment] = texture;
 
             // Mipmap level can only be 0
-            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, texture.getWebGLTexture(_gl), 0);
+            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, webglTexture, 0);
 
-            if (bindOnce) {
-                _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
+            if (!attachedTextures) {
+                attachedTextures = {};
+                this._cache.put('attached_textures', attachedTextures);
+            }
+            attachedTextures[attachment] = attachedTextures[attachment] || {};
+            attachedTextures[attachment].texture = texture;
+            attachedTextures[attachment].target = target;
+
+            return canAttach;
+        },
+
+        _doDetach: function (_gl, attachment, target) {
+            // Detach a texture from framebuffer
+            // https://github.com/KhronosGroup/WebGL/blob/master/conformance-suites/1.0.0/conformance/framebuffer-test.html#L145
+            _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, null, 0);
+
+            // Assume cache has been used.
+            var attachedTextures = this._cache.get('attached_textures');
+            if (attachedTextures && attachedTextures[attachment]) {
+                attachedTextures[attachment] = null;
+            }
+
+            this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
+            this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
+        },
+
+        /**
+         * Detach a texture
+         * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
+         * @param  {number} [target=gl.TEXTURE_2D]
+         */
+        detach: function (attachment, target) {
+            // TODO depth extension check ?
+            this._textures[attachment] = null;
+            if (this._boundGL) {
+                var cache = this._cache;
+                cache.use(this._boundGL.__GLID__);
+                this._doDetach(this._boundGL, attachment, target);
             }
         },
-        // TODO
-        detach: function () {},
         /**
          * Dispose
          * @param  {WebGLRenderingContext} _gl
@@ -238,7 +314,7 @@ define(function (require) {
             cache.deleteContext(_gl.__GLID__);
 
             // Clear cache for reusing
-            this._attachedTextures = {};
+            this._textures = {};
             this._width = this._height = 0;
 
         }

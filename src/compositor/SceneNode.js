@@ -63,7 +63,7 @@ define(function(require) {
                     if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
-                    frameBuffer.attach(renderer.gl, texture, attachment);
+                    frameBuffer.attach(texture, attachment);
                 }
                 frameBuffer.bind(renderer);
 

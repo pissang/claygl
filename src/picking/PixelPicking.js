@@ -88,7 +88,7 @@ define(function (require) {
                 this.resize(renderer.width, renderer.height);
             }
 
-            this._frameBuffer.attach(renderer.gl, this._texture);
+            this._frameBuffer.attach(this._texture);
             this._frameBuffer.bind(renderer);
             this._idOffset = this.lookupOffset;
             this._setMaterial(scene);
