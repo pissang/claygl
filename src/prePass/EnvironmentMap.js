@@ -127,11 +127,11 @@ define(function (require) {
 
                     this.shadowMapPass.render(renderer, scene, camera, true);
                 }
-                this._frameBuffer.bind(renderer);
                 this._frameBuffer.attach(
                     this.texture, _gl.COLOR_ATTACHMENT0,
                     _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
                 );
+                this._frameBuffer.bind(renderer);
                 renderer.render(scene, camera, true);
                 this._frameBuffer.unbind(renderer);
             }

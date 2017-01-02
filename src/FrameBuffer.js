@@ -73,10 +73,17 @@ define(function (require) {
                 renderer.setViewport(0, 0, this._width, this._height, 1);
             }
 
+            var hasTextureAttached = false;
             for (var attachment in this._textures) {
+                hasTextureAttached = true;
                 var obj = this._textures[attachment];
-                // Attach textures
-                this._doAttach(_gl, obj.texture, attachment, obj.target);
+                if (obj) {
+                    // Attach textures
+                    this._doAttach(_gl, obj.texture, attachment, obj.target);
+                }
+            }
+            if (!hasTextureAttached && this.depthBuffer) {
+                console.error('Must attach texture before bind, or renderbuffer may have incorrect width and height.')
             }
 
             var attachedTextures = cache.get('attached_textures');
@@ -132,12 +139,15 @@ define(function (require) {
             // Here update the mipmaps of texture each time after rendered;
             // PENDGING
             for (var attachment in this._textures) {
-                var texture = this._textures[attachment].texture;
-                if (!texture.NPOT && texture.useMipmap) {
-                    var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
-                    _gl.bindTexture(target, texture.getWebGLTexture(_gl));
-                    _gl.generateMipmap(target);
-                    _gl.bindTexture(target, null);
+                var obj = this._textures[attachment];
+                if (obj) {
+                    var texture = obj.texture;
+                    if (!texture.NPOT && texture.useMipmap) {
+                        var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
+                        _gl.bindTexture(target, texture.getWebGLTexture(_gl));
+                        _gl.generateMipmap(target);
+                        _gl.bindTexture(target, null);
+                    }
                 }
             }
         },
@@ -239,9 +249,10 @@ define(function (require) {
 
                 // Dispose render buffer created previous
                 if (canAttach) {
-                    var renderBuffer = this._cache.get(KEY_RENDERBUFFER);
-                    if (renderBuffer) {
-                        _gl.deleteRenderbuffer(renderBuffer);
+                    var renderbuffer = this._cache.get(KEY_RENDERBUFFER);
+                    if (renderbuffer) {
+                        _gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, null);
+                        _gl.deleteRenderbuffer(renderbuffer);
                         this._cache.put(KEY_RENDERBUFFER, false);
                     }
 
@@ -275,8 +286,9 @@ define(function (require) {
                 attachedTextures[attachment] = null;
             }
 
-            this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
-            this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
+            if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
+                this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, false);
+            }
         },
 
         /**

@@ -282,7 +282,6 @@ define(function (require) {
             );
             renderer.renderQueue(opaqueQueue, camera);
 
-
             renderer.beforeRenderObject = oldBeforeRender;
 
             this._cleanGBufferMaterials(renderer.gl);

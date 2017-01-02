@@ -110,7 +110,7 @@ define(function (require) {
 
             textureUtil.loadTexture(path, option, function (texture) {
                 // PENDING
-                texture.flipY = false;
+                texture.flipY = option.flipY || false;
                 self.panoramaToCubeMap(renderer, texture, cubeMap, option);
                 texture.dispose(renderer.gl);
                 onsuccess && onsuccess(cubeMap);

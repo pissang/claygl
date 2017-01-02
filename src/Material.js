@@ -79,6 +79,7 @@ define(function(require) {
             var slot = 0;
 
             var sameShader = prevMaterial && prevMaterial.shader === this.shader;
+            // FIXME Null texture may cause weird error in console
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];

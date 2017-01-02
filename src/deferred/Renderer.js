@@ -100,7 +100,9 @@ define(function (require) {
 
             _gBuffer: new GBuffer(),
 
-            _lightAccumFrameBuffer: new FrameBuffer(),
+            _lightAccumFrameBuffer: new FrameBuffer({
+                depthBuffer: false
+            }),
 
             _lightAccumTex: new Texture2D({
                 // FIXME Device not support float texture
@@ -187,8 +189,18 @@ define(function (require) {
             }
         },
 
+        /**
+         * @return {qtek.Texture2D}
+         */
         getTargetTexture: function () {
             return this._lightAccumTex;
+        },
+
+        /**
+         * @return {qtek.FrameBuffer}
+         */
+        getTargetFrameBuffer: function () {
+            return this._lightAccumFrameBuffer;
         },
 
         getGBuffer: function () {
