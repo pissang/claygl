@@ -316,13 +316,14 @@ define(function (require) {
             var viewProjectionInv = new Matrix4();
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
-            this._debugPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
-            this._debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
-            this._debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
-            this._debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
-            this._debugPass.setUniform('debug', debugTypes[type]);
-            this._debugPass.setUniform('viewProjectionInv', viewProjectionInv._array);
-            this._debugPass.render(renderer);
+            var debugPass = this._debugPass;
+            debugPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
+            debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
+            debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
+            debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
+            debugPass.setUniform('debug', debugTypes[type]);
+            debugPass.setUniform('viewProjectionInv', viewProjectionInv._array);
+            debugPass.render(renderer);
 
             renderer.restoreViewport();
             renderer.restoreClear();

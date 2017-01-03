@@ -8,6 +8,7 @@ define(function(require) {
     var Mesh = require('../Mesh');
     var Node = require('../Node');
     var Material = require('../Material');
+    var StandardMaterial = require('../StandardMaterial');
     var Shader = require('../Shader');
     var BoundingBox = require('../math/BoundingBox');
     var glMatrix = require('../dep/glmatrix');
@@ -210,7 +211,7 @@ define(function(require) {
             var getJointByIndex = function(idx) {
                 return joints[idx];
             };
-            while(rest > 0) {
+            while (rest > 0) {
                 var bucketFaces = [];
                 var bucketJointReverseMap = [];
                 var bucketJoints = [];
@@ -241,7 +242,8 @@ define(function(require) {
                                         bucketJointReverseMap[jointIdx] = subJointNumber;
                                         bucketJoints[subJointNumber++] = jointIdx;
                                         addedJointIdxPerFace[addedNumber++] = jointIdx;
-                                    } else {
+                                    }
+                                    else {
                                         canAddToBucket = false;
                                     }
                                 }
@@ -255,10 +257,12 @@ define(function(require) {
                             bucketJoints.pop();
                             subJointNumber--;
                         }
-                    } else {
+                    }
+                    else {
                         if (isStatic) {
                             bucketFaces.push(faces.subarray(f * 3, (f + 1) * 3));
-                        } else {
+                        }
+                        else {
                             bucketFaces.push(faces[f]);
                         }
                         isFaceAdded[f] = true;
@@ -288,32 +292,30 @@ define(function(require) {
                 var bucket = buckets[b];
                 var jointReverseMap = bucket.jointReverseMap;
                 var subJointNumber = bucket.joints.length;
-                var subShader = shaders[subJointNumber];
-                if (!subShader) {
-                    subShader = shader.clone();
-                    subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
-                    shaders[subJointNumber] = subShader;
+
+                var subMat = material.clone();
+                if (material instanceof StandardMaterial) {
+                    subMat.jointCount = subJointNumber;
                 }
-                var subMat = new Material({
-                    name : [material.name, b].join('-'),
-                    shader : subShader,
-                    transparent : material.transparent,
-                    depthTest : material.depthTest,
-                    depthMask : material.depthMask,
-                    blend : material.blend
-                });
-                for (var name in material.uniforms) {
-                    var uniform = material.uniforms[name];
-                    subMat.set(name, uniform.value);
+                else {
+                    var subShader = shaders[subJointNumber];
+                    if (!subShader) {
+                        subShader = shader.clone();
+                        subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
+                        shaders[subJointNumber] = subShader;
+                    }
+                    material.attachShader(subShader, true);
                 }
+                material.name = [material.name, b].join('-');
+
                 var subGeo = isStatic ? new StaticGeometry() : new DynamicGeometry();
 
                 var subMesh = new Mesh({
-                    name : [mesh.name, i].join('-'),
-                    material : subMat,
-                    geometry : subGeo,
-                    skeleton : skeleton,
-                    joints : bucket.joints.slice()
+                    name: [mesh.name, i].join('-'),
+                    material: subMat,
+                    geometry: subGeo,
+                    skeleton: skeleton,
+                    joints: bucket.joints.slice()
                 });
                 var nVertex = 0;
                 var nVertex2 = geometry.vertexCount;

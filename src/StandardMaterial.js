@@ -13,7 +13,7 @@ define(function (require) {
 
     var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
     var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
-
+    var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM'];
 
     var OTHER_SHADER_KEYS = [
         'environmentMapPrefiltered',
@@ -282,6 +282,22 @@ define(function (require) {
                 releaseShader(this._shader);
             }
             Material.prototype.dispose.call(gl, disposeTexture);
+        },
+
+
+        clone: function () {
+            var material = new StandardMaterial({
+                name: this.name
+            });
+            TEXTURE_PROPERTIES.forEach(function (propName) {
+                if (this[propName]) {
+                    material[propName] = this[propName];
+                }
+            }, this);
+            SIMPLE_PROPERTIES.concat(PROPERTIES_CHANGE_SHADER).forEach(function (propName) {
+                material[propName] = this[propName];
+            }, this);
+            return material;
         }
     });
 
@@ -321,7 +337,7 @@ define(function (require) {
         });
     });
 
-    ['jointCount', 'linear', 'encodeRGBM'].forEach(function (propName) {
+    PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
         var privateKey = '_' + propName;
         Object.defineProperty(StandardMaterial.prototype, propName, {
             get: function () {

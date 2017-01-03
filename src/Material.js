@@ -298,7 +298,7 @@ define(function(require) {
          * @return {qtek.Material}
          */
         clone: function () {
-            var material = new Material({
+            var material = new this.constructor({
                 name: this.name,
                 shader: this.shader
             });
