@@ -363,9 +363,14 @@ define(function(require) {
                         node.skeleton = skeleton;
                         node.joints = jointIndices;
                         var material = node.material;
-                        material.shader = material.shader.clone();
-                        material.shader.define('vertex', 'SKINNING');
-                        material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
+                        if (material instanceof StandardMaterial) {
+                            material.jointCount = jointIndices.length;
+                        }
+                        else {
+                            material.shader = material.shader.clone();
+                            material.shader.define('vertex', 'SKINNING');
+                            material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
+                        }
                     }
                     else {
                         // Mesh have multiple primitives
@@ -375,9 +380,14 @@ define(function(require) {
                                 child.skeleton = skeleton;
                                 child.joints = jointIndices;
                                 var material = child.material;
-                                material.shader = material.shader.clone();
-                                material.shader.define('vertex', 'SKINNING');
-                                material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
+                                if (material instanceof StandardMaterial) {
+                                    material.jointCount = jointIndices.length;
+                                }
+                                else {
+                                    material.shader = material.shader.clone();
+                                    material.shader.define('vertex', 'SKINNING');
+                                    material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
+                                }
                             }
                         }
                     }
