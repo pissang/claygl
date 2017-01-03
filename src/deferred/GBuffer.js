@@ -62,7 +62,7 @@ define(function (require) {
 
             roughnessMap = roughnessMap || defaultRoughnessMap;
 
-            if (!prevMaterial) {
+            if (prevMaterial !== gBufferMat) {
                 gBufferMat.set('glossiness', 1.0 - roughness);
                 gBufferMat.set('normalMap', normalMap);
                 gBufferMat.set('roughnessMap', roughnessMap);
@@ -125,7 +125,7 @@ define(function (require) {
             diffuseMap = diffuseMap || defaultDiffuseMap;
             metalnessMap = metalnessMap || defaultMetalnessMap;
 
-            if (!prevMaterial) {
+            if (prevMaterial !== gBufferMat) {
                 gBufferMat.set('color', color);
                 gBufferMat.set('metalness', metalness);
                 gBufferMat.set('diffuseMap', diffuseMap);
@@ -361,6 +361,8 @@ define(function (require) {
                 if (nJoints > 0) {
                     mat1.shader.define('vertex', 'SKINNING');
                     mat1.shader.define('vertex', 'JOINT_COUNT', nJoints);
+                    mat2.shader.define('vertex', 'SKINNING');
+                    mat2.shader.define('vertex', 'JOINT_COUNT', nJoints);
                 }
 
                 obj = {

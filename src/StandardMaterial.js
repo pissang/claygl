@@ -204,6 +204,7 @@ define(function (require) {
              * @name jointCount
              * @default 0
              */
+            // FIXME Redundant with mesh
             jointCount: 0,
 
             /**
