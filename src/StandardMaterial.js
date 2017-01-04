@@ -13,12 +13,13 @@ define(function (require) {
 
     var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup'];
     var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
-    var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM'];
+    var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM'];
 
     var OTHER_SHADER_KEYS = [
         'environmentMapPrefiltered',
         'linear',
         'encodeRGBM',
+        'decodeRGBM',
         'parallaxCorrected'
     ];
     var SHADER_KEYS = TEXTURE_PROPERTIES.concat(OTHER_SHADER_KEYS);
@@ -68,6 +69,9 @@ define(function (require) {
             }
             if (shaderDefines.encodeRGBM) {
                 shader.define('fragment', 'RGBM_ENCODE');
+            }
+            if (shaderDefines.decodeRGBM) {
+                shader.define('fragment', 'RGBM_DECODE');
             }
             if (shaderDefines.parallaxCorrected) {
                 shader.define('fragment', 'PARALLAX_CORRECTED');
@@ -223,7 +227,13 @@ define(function (require) {
              * @type {boolean}
              * @name encodeRGBM
              */
-            encodeRGBM: false
+            encodeRGBM: false,
+
+            /**
+             * @type {boolean}
+             * @name decodeRGBM
+             */
+            decodeRGBM: false
         };
     }, {
 
@@ -241,6 +251,7 @@ define(function (require) {
                     environmentMapPrefiltered: this.environmentMapPrefiltered,
                     linear: this.linear,
                     encodeRGBM: this.encodeRGBM,
+                    decodeRGBM: this.decodeRGBM,
                     parallaxCorrected: !!this._environmentBox
                 }
             );

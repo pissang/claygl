@@ -86,10 +86,12 @@ define(function (require) {
             var envCubemap = new TextureCube({
                 width: width,
                 height: height,
-                type: textureType
+                // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
+                type: textureType === Texture.FLOAT ?
+                     Texture.HALF_FLOAT : textureType
             });
             textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
-                // encodeRGBM so it can be decoded as RGBM
+                // PENDING encodeRGBM so it can be decoded as RGBM
                 encodeRGBM: textureOpts.decodeRGBM
             });
             envMap = envCubemap;
@@ -104,12 +106,19 @@ define(function (require) {
             texture: prefilteredCubeMap
         });
 
+        // Force to be UNSIGNED_BYTE
+        if (textureOpts.encodeRGBM) {
+            textureType = prefilteredCubeMap.type = Texture.UNSIGNED_BYTE;
+        }
+
         var renderTargetTmp = new Texture2D({
             width: width,
             height: height,
             type: textureType
         });
-        var frameBuffer = new FrameBuffer();
+        var frameBuffer = new FrameBuffer({
+            depthBuffer: false
+        });
         var ArrayCtor = vendor[textureType === Texture.UNSIGNED_BYTE ? 'Uint8Array' : 'Float32Array'];
         for (var i = 0; i < mipmapNum; i++) {
             prefilteredCubeMap.mipmaps[i] = {
@@ -173,9 +182,11 @@ define(function (require) {
 
     cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
         normalDistribution = normalDistribution || cubemapUtil.generateNormalDistribution();
-        var framebuffer = new FrameBuffer();
+        var framebuffer = new FrameBuffer({
+            depthBuffer: false
+        });
         var pass = new Pass({
-            fragment : integrateBRDFShaderCode
+            fragment: integrateBRDFShaderCode
         });
 
         var texture = new Texture2D({
@@ -191,16 +202,17 @@ define(function (require) {
         pass.attachOutput(texture);
         pass.render(renderer, framebuffer);
 
-        framebuffer.bind(renderer);
-        var pixels = new Float32Array(512 * 256 * 4);
-        renderer.gl.readPixels(
-            0, 0, texture.width, texture.height,
-            Texture.RGBA, Texture.FLOAT, pixels
-        );
-        texture.pixels = pixels;
-        texture.flipY = false;
-        texture.dirty();
-        framebuffer.unbind(renderer);
+        // FIXME Only chrome and firefox can readPixels with float type.
+        // framebuffer.bind(renderer);
+        // var pixels = new Float32Array(512 * 256 * 4);
+        // renderer.gl.readPixels(
+        //     0, 0, texture.width, texture.height,
+        //     Texture.RGBA, Texture.FLOAT, pixels
+        // );
+        // texture.pixels = pixels;
+        // texture.flipY = false;
+        // texture.dirty();
+        // framebuffer.unbind(renderer);
 
         framebuffer.dispose(renderer.gl);
 

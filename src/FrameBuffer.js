@@ -152,6 +152,10 @@ define(function (require) {
             }
         },
 
+        checkStatus: function (_gl) {
+            return _gl.checkFramebufferStatus(GL_FRAMEBUFFER);
+        },
+
         _getFrameBufferGL: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);

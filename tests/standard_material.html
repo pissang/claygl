@@ -30,7 +30,7 @@
                     var envMap = qtek.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
-                            exposure: 4
+                            exposure: 3
                         },
                         function () {
                             envMap.flipY = false;
@@ -38,7 +38,8 @@
                             var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
-                                    height: 128
+                                    height: 128,
+                                    encodeRGBM: true
                                 }
                             );
 
@@ -47,12 +48,14 @@
                                 environmentMap: prefilterResult.environmentMap
                             });
                             skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+                            skybox.material.shader.define('fragment', 'RGBM_DECODE');
 
                             var material = new qtek.StandardMaterial({
                                 brdfLookup: prefilterResult.brdfLookup,
                                 environmentMap: prefilterResult.environmentMap,
                                 environmentMapPrefiltered: true,
                                 encodeRGBM: true,
+                                decodeRGBM: true,
                                 linear: true,
                                 metalness: 0.5,
                                 uvRepeat: [3, 3],

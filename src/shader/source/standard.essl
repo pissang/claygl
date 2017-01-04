@@ -399,7 +399,7 @@ void main()
     // FIXME simply 1 minus roughness ?
     float rough = clamp(1.0 - g, 0.0, 1.0);
     float bias = rough * maxMipmapLevel;
-    // Only env map can have HDR
+    // PENDING Only env map can have HDR
     vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
 
         #ifdef BRDFLOOKUP_ENABLED
