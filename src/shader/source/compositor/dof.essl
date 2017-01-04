@@ -135,6 +135,8 @@ void main()
 uniform sampler2D coc;
 uniform vec2 textureSize : [512, 512];
 
+uniform float sampleScale: 0.5;
+
 varying vec2 v_Texcoord;
 
 @import qtek.util.float
@@ -144,7 +146,7 @@ void main()
 
 #ifdef HIGH_QUALITY
     // 9-tap bilinear upsampler (tent filter)
-    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy;
+    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;
 
     float s;
     s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));
@@ -186,6 +188,8 @@ uniform sampler2D coc;
 uniform sampler2D texture;
 uniform vec2 textureSize : [512, 512];
 
+uniform float sampleScale: 0.5;
+
 varying vec2 v_Texcoord;
 
 
@@ -203,7 +207,7 @@ void main()
 {
 #ifdef HIGH_QUALITY
     // 9-tap bilinear upsampler (tent filter)
-    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy;
+    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;
 
     vec4 color = vec4(0.0);
     float baseWeight = 1.0 / 16.0;
@@ -459,7 +463,7 @@ void main()
     float fCoc = decodeFloat(texture2D(coc, v_Texcoord));
 
     // FIXME blur after premultiply will have white edge
-    // blurredColor.rgb /= max(fCoc, 0.1);
+    blurredColor.rgb /= max(fCoc, 0.1);
     fCoc = abs(fCoc * 2.0 - 1.0);
 
     // float weight = smoothstep(0.0, 1.0, fCoc);
@@ -470,8 +474,6 @@ void main()
     float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));
     fNearCoc = abs(fNearCoc * 2.0 - 1.0);
 
-
-    // nearfieldColor.rgb /= max(fCoc, 0.1);
     // FIXME
     gl_FragColor = encodeHDR(
         mix(

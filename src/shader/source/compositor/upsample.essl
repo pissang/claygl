@@ -7,6 +7,8 @@
 uniform sampler2D texture;
 uniform vec2 textureSize : [512, 512];
 
+uniform float sampleScale: 0.5;
+
 varying vec2 v_Texcoord;
 
 @import qtek.util.rgbm
@@ -16,7 +18,7 @@ void main()
 
 #ifdef HIGH_QUALITY
     // 9-tap bilinear upsampler (tent filter)
-    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy;
+    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;
 
     vec4 s;
     s  = decodeHDR(texture2D(texture, v_Texcoord - d.xy));
