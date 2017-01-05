@@ -479,8 +479,11 @@ define(function(require) {
         _parseMaterial: function(mConfig, jointNumber) {
             var shaderName = 'qtek.lambert';
             var shading = mConfig.shading && mConfig.shading.toLowerCase();
-            if (shading === 'phong' || shading === 'lambert') {
+            if (shading === 'lambert') {
                 shaderName = 'qtek.' + shading;
+            }
+            else if (shading === 'phong') {
+                shaderName = 'qtek.standard';
             }
             var enabledTextures = [];
             if (mConfig.mapDiffuse) {

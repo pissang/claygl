@@ -44,8 +44,8 @@ define(function(require) {
     var glMatrix = require('../dep/glmatrix');
     var quat = glMatrix.quat;
 
-    // Import buildin shader
-    require('../shader/buildin');
+    // Import builtin shader
+    require('../shader/builtin');
 
     var semanticAttributeMap = {
         'NORMAL': 'normal',

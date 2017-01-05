@@ -3,7 +3,78 @@
 
 @export qtek.standard.vertex
 
-@import qtek.phong.vertex
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
+uniform mat4 world : WORLD;
+
+uniform vec2 uvRepeat : [1.0, 1.0];
+uniform vec2 uvOffset : [0.0, 0.0];
+
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 normal : NORMAL;
+attribute vec4 tangent : TANGENT;
+
+#ifdef VERTEX_COLOR
+attribute vec4 color : COLOR;
+#endif
+
+attribute vec3 barycentric;
+
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
+#endif
+
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+varying vec3 v_Barycentric;
+
+#ifdef NORMALMAP_ENABLED
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+#ifdef VERTEX_COLOR
+varying vec4 v_Color;
+#endif
+
+void main()
+{
+
+    vec3 skinnedPosition = position;
+    vec3 skinnedNormal = normal;
+    vec3 skinnedTangent = tangent.xyz;
+#ifdef SKINNING
+
+    @import qtek.chunk.skin_matrix
+
+    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    // Upper 3x3 of skinMatrix is orthogonal
+    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
+    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+#endif
+
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
+    v_Texcoord = texcoord * uvRepeat + uvOffset;
+    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
+    v_Barycentric = barycentric;
+
+    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
+
+#ifdef NORMALMAP_ENABLED
+    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
+    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+#endif
+
+#ifdef VERTEX_COLOR
+    v_Color = color;
+#endif
+}
 
 @end
 
@@ -438,18 +509,5 @@ void main()
 
     gl_FragColor = encodeHDR(outColor);
 }
-
-@end
-
-
-@export qtek.physical.vertex
-
-@import qtek.standard.vertex
-
-@end
-
-@export qtek.physical.fragment
-
-@import qtek.standard.fragment
 
 @end

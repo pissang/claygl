@@ -25,7 +25,7 @@
                 cube.generateUniqueVertex();
                 cube.generateTangents();
 
-                var shader = qtek.shader.library.get("qtek.phong", ["normalMap", "diffuseMap"]);
+                var shader = qtek.shader.library.get("qtek.standard", ["normalMap", "diffuseMap"]);
                 var material = new qtek.Material({
                     shader : shader
                 });
