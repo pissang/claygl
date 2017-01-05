@@ -150,7 +150,8 @@ define(function(require) {
                 out.format = textures[0].format;
                 out.pixels = textures[0].pixels;
                 out.mipmaps = textures[0].mipmaps;
-            } else {
+            }
+            else {
                 return textures[0];
             }
         }

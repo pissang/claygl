@@ -192,7 +192,7 @@ define(function (require) {
         var texture = new Texture2D({
             width: 512,
             height: 256,
-            type: Texture.FLOAT,
+            type: Texture.HALF_FLOAT,
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
             useMipmap: false
