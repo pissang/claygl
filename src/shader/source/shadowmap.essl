@@ -230,7 +230,7 @@ float computeShadowContrib(
             vec2 moments = texture2D(map, uv * scale + offset).xy;
             return chebyshevUpperBound(moments, z);
         #else
-            return pcf(map, uv * scale + offset, z, textureSize);
+            return pcf(map, uv * scale + offset, z, textureSize, scale);
         #endif
     }
     return 1.0;
