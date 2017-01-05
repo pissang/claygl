@@ -76,10 +76,15 @@ define(function(require) {
 
         bind: function(_gl, prevMaterial) {
 
-            var slot = 0;
-
             var sameShader = prevMaterial && prevMaterial.shader === this.shader;
-            // FIXME Null texture may cause weird error in console
+
+            var shader = this.shader;
+
+            if (sameShader) {
+                // shader may use some slot by others before material bind.
+                shader.resetTextureSlot(prevMaterial.__textureSlotBase || 0);
+            }
+
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
@@ -88,8 +93,6 @@ define(function(require) {
                 // When binding two materials with the same shader
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
-                //
-                // FIXME Small possibility enabledUniforms are not the same
                 if (sameShader) {
                     if (prevMaterial.uniforms[symbol].value === uniformValue) {
                         continue;
@@ -100,12 +103,7 @@ define(function(require) {
                     console.warn('Uniform value "' + symbol + '" is undefined');
                     continue;
                 }
-                else if (uniformValue === null) {
-                    // if (uniform.type == 't') {
-                    //     // PENDING
-                    //     _gl.bindTexture(_gl.TEXTURE_2D, null);
-                    //     _gl.bindTexture(_gl.TEXTURE_CUBE, null);
-                    // }
+                else if (uniformValue === null && uniform.type !== 't') {
                     continue;
                 }
                 else if (uniformValue instanceof Array
@@ -113,22 +111,20 @@ define(function(require) {
                     continue;
                 }
                 else if (uniformValue instanceof Texture) {
-                    var res = this.shader.setUniform(_gl, '1i', symbol, slot);
+                    // FIXME Assume material with same shader have same order uniforms
+                    // Or if different material use same textures,
+                    // the slot will be different and still skipped because optimization
+                    if (uniformValue === null) {
+                        // Still occupy the slot to make sure same texture in different materials have same slot.
+                        shader.useCurrentTextureSlot(_gl, null);
+                    }
+
+                    var slot = shader.currentTextureSlot();
+                    var res = shader.setUniform(_gl, '1i', symbol, slot);
                     if (!res) { // Texture is not enabled
                         continue;
                     }
-                    var texture = uniformValue;
-                    _gl.activeTexture(_gl.TEXTURE0 + slot);
-                    // Maybe texture is not loaded yet;
-                    if (texture.isRenderable()) {
-                        texture.bind(_gl);
-                    }
-                    else {
-                        // Bind texture to null
-                        texture.unbind(_gl);
-                    }
-
-                    slot++;
+                    shader.useCurrentTextureSlot(_gl, uniformValue);
                 }
                 else if (uniformValue instanceof Array) {
                     if (uniformValue.length === 0) {
@@ -138,35 +134,32 @@ define(function(require) {
                     var exampleValue = uniformValue[0];
 
                     if (exampleValue instanceof Texture) {
-                        if (!this.shader.hasUniform(symbol)) {
+                        if (!shader.hasUniform(symbol)) {
                             continue;
                         }
 
                         var arr = [];
                         for (var i = 0; i < uniformValue.length; i++) {
                             var texture = uniformValue[i];
-                            _gl.activeTexture(_gl.TEXTURE0 + slot);
-                            // Maybe texture is not loaded yet;
-                            if (texture.isRenderable()) {
-                                texture.bind(_gl);
-                            }
-                            else {
-                                texture.unbind(_gl);
-                            }
 
-                            arr.push(slot++);
+                            var slot = shader.currentTextureSlot();
+                            arr.push(slot);
+
+                            shader.useCurrentTextureSlot(_gl, texture);
                         }
 
-                        this.shader.setUniform(_gl, '1iv', symbol, arr);
+                        shader.setUniform(_gl, '1iv', symbol, arr);
                     }
                     else {
-                        this.shader.setUniform(_gl, uniform.type, symbol, uniformValue);
+                        shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                     }
                 }
                 else{
-                    this.shader.setUniform(_gl, uniform.type, symbol, uniformValue);
+                    shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                 }
             }
+
+            this.__textureSlotBase = shader.currentTextureSlot();
         },
 
         /**
@@ -198,23 +191,23 @@ define(function(require) {
          * It only have effect on the uniform exists in shader.
          * @param  {string} symbol
          */
-        enableUniform: function (symbol) {
-            if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
-                this._enabledUniforms.push(symbol);
-            }
-        },
+        // enableUniform: function (symbol) {
+        //     if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
+        //         this._enabledUniforms.push(symbol);
+        //     }
+        // },
 
-        /**
-         * Disable a uniform
-         * It will not affect the uniform state in the shader. Because the shader uniforms is parsed from shader code with naive regex. When using micro to disable some uniforms in the shader. It will still try to set these uniforms in each rendering pass. We can disable these uniforms manually if we need this bit performance improvement. Mostly we can simply ignore it.
-         * @param  {string} symbol
-         */
-        disableUniform: function (symbol) {
-            var idx = this._enabledUniforms.indexOf(symbol);
-            if (idx >= 0) {
-                this._enabledUniforms.splice(idx, 1);
-            }
-        },
+        // /**
+        //  * Disable a uniform
+        //  * It will not affect the uniform state in the shader. Because the shader uniforms is parsed from shader code with naive regex. When using micro to disable some uniforms in the shader. It will still try to set these uniforms in each rendering pass. We can disable these uniforms manually if we need this bit performance improvement. Mostly we can simply ignore it.
+        //  * @param  {string} symbol
+        //  */
+        // disableUniform: function (symbol) {
+        //     var idx = this._enabledUniforms.indexOf(symbol);
+        //     if (idx >= 0) {
+        //         this._enabledUniforms.splice(idx, 1);
+        //     }
+        // },
 
         /**
          * @param  {string}  symbol

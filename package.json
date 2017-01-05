@@ -10,6 +10,16 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   }],
+  "watch": {
+    "essl2js": {
+      "patterns": ["src"],
+      "extensions": "essl"
+    },
+    "amd2common": {
+      "patterns": ["src"],
+      "extensions": "js"
+    }
+  },
   "scripts": {
     "genentry": "node build/genentry.js",
     "essl2js": "node build/essl2js.js",

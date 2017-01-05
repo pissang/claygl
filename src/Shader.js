@@ -180,14 +180,16 @@ define(function (require) {
                 'EXT_shader_texture_lod'
             ],
 
-            // Glue code
             // Defines the each type light number in the scene
             // AMBIENT_LIGHT
             // AMBIENT_SH_LIGHT
+            // AMBIENT_CUBEMAP_LIGHT
             // POINT_LIGHT
             // SPOT_LIGHT
             // AREA_LIGHT
             lightNumber: {},
+
+            _textureSlot: 0,
 
             _attacheMaterialNumber: 0,
 
@@ -241,6 +243,9 @@ define(function (require) {
             cache.use(_gl.__GLID__, getCacheSchema);
 
             this._currentLocationsMap = cache.get('locations');
+
+            // Reset slot
+            this._textureSlot = 0;
 
             if (cache.isDirty()) {
                 var availableExts = [];
@@ -478,6 +483,38 @@ define(function (require) {
         hasUniform: function (symbol) {
             var location = this._currentLocationsMap[symbol];
             return location !== null && location !== undefined;
+        },
+
+        currentTextureSlot: function () {
+            return this._textureSlot;
+        },
+
+        resetTextureSlot: function (slot) {
+            this._textureSlot = slot || 0;
+        },
+
+        useCurrentTextureSlot: function (_gl, texture) {
+            var textureSlot = this._textureSlot;
+
+            this.useTextureSlot(_gl, texture, textureSlot);
+
+            this._textureSlot++;
+
+            return textureSlot;
+        },
+
+        useTextureSlot: function (_gl, texture, slot) {
+            if (texture) {
+                _gl.activeTexture(_gl.TEXTURE0 + slot);
+                // Maybe texture is not loaded yet;
+                if (texture.isRenderable()) {
+                    texture.bind(_gl);
+                }
+                else {
+                    // Bind texture to null
+                    texture.unbind(_gl);
+                }
+            }
         },
 
         setUniform: function (_gl, type, symbol, value) {

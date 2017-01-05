@@ -47,6 +47,8 @@
                                 scene: scene,
                                 environmentMap: prefilterResult.environmentMap
                             });
+                            skybox.material.set('lod', 1.0);
+
                             skybox.material.shader.define('fragment', 'RGBM_ENCODE');
                             skybox.material.shader.define('fragment', 'RGBM_DECODE');
 

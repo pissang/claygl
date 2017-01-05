@@ -190,7 +190,8 @@ define(function (require) {
                 if (child.isRenderable()) {
                     if (child.material.transparent || sceneMaterialTransparent) {
                         this.transparentQueue[this._transparentObjectCount++] = child;
-                    } else {
+                    }
+                    else {
                         this.opaqueQueue[this._opaqueObjectCount++] = child;
                     }
                 }
@@ -228,6 +229,7 @@ define(function (require) {
                     switch (uniformTpl.type) {
                         case '1i':
                         case '1f':
+                        case 't':
                             lu.value.push(value);
                             break;
                         case '2f':
@@ -269,7 +271,19 @@ define(function (require) {
         setLightUniforms: function (shader, _gl) {
             for (var symbol in this._lightUniforms) {
                 var lu = this._lightUniforms[symbol];
-                shader.setUniform(_gl, lu.type, symbol, lu.value);
+                if (lu.type === 'tv') {
+                    for (var i = 0; i < lu.value.length; i++) {
+                        var texture = lu.value[i];
+                        var slot = shader.currentTextureSlot();
+                        var result = shader.setUniform(_gl, '1i', symbol, slot);
+                        if (result) {
+                            shader.useCurrentTextureSlot(_gl, texture);
+                        }
+                    }
+                }
+                else {
+                    shader.setUniform(_gl, lu.type, symbol, lu.value);
+                }
             }
         },
 

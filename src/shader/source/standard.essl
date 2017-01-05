@@ -187,6 +187,10 @@ uniform float maxMipmapLevel: 5;
 @import qtek.header.ambient_sh_light
 #endif
 
+#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
+@import qtek.header.ambient_cubemap_light
+#endif
+
 #ifdef POINT_LIGHT_COUNT
 @import qtek.header.point_light
 #endif
@@ -457,6 +461,23 @@ void main()
     outColor.rgb += specularTerm;
 
 
+#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
+    vec3 L = reflect(-V, N);
+    float rough2 = clamp(1.0 - g, 0.0, 1.0);
+    // FIXME fixed maxMipmapLevel ?
+    float bias2 = rough2 * 5.0;
+    // One brdf lookup is enough
+    vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;
+    vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;
+    for(int i = 0; i < AMBIENT_CUBEMAP_LIGHT_COUNT; i++)
+    {
+        // PENDING Only env map can have HDR
+        vec3 envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[i], L, bias2), 51.5);
+        // TODO mix ?
+        outColor.rgb += ambientCubemapLightColor[i] * envTexel2 * envWeight2;
+    }
+#endif
+
 #ifdef ENVIRONMENTMAP_ENABLED
 
     vec3 envWeight = g * fresnelTerm;
@@ -467,7 +488,6 @@ void main()
     #endif
 
     #ifdef ENVIRONMENTMAP_PREFILTER
-    // FIXME simply 1 minus roughness ?
     float rough = clamp(1.0 - g, 0.0, 1.0);
     float bias = rough * maxMipmapLevel;
     // PENDING Only env map can have HDR

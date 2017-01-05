@@ -54,6 +54,7 @@ define(function(require) {
 	"core": {
 		"Base": require('./core/Base'),
 		"Cache": require('./core/Cache'),
+		"env": require('./core/env'),
 		"Event": require('./core/Event'),
 		"glenum": require('./core/glenum'),
 		"glinfo": require('./core/glinfo'),
@@ -148,7 +149,7 @@ define(function(require) {
 	"Scene": require('./Scene'),
 	"Shader": require('./Shader'),
 	"shader": {
-		"buildin": require('./shader/buildin'),
+		"builtin": require('./shader/builtin'),
 		"library": require('./shader/library'),
 		"source": {
 			"header": {

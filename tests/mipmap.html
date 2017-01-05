@@ -112,7 +112,7 @@
 
                 var sphereGeo = new qtek.geometry.Sphere();
                 var envMapMaterial = new qtek.Material({
-                    shader: qtek.shader.library.get('qtek.phong', 'environmentMap')
+                    shader: qtek.shader.library.get('qtek.standard', 'environmentMap')
                 });
                 envMapMaterial.set('reflectivity', 1.0);
                 envMapMaterial.set('environmentMap', textureCube);

@@ -19,6 +19,7 @@ void main()
 
 uniform mat4 viewInverse : VIEWINVERSE;
 uniform samplerCube environmentMap;
+uniform float lod: 0.0;
 
 varying vec3 v_WorldPosition;
 
@@ -29,7 +30,7 @@ void main()
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);
 
-    vec3 tex = decodeHDR(textureCube(environmentMap, viewDirection)).rgb;
+    vec3 tex = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod)).rgb;
 
 #ifdef SRGB_DECODE
     tex.rgb = pow(tex.rgb, vec3(2.2));
