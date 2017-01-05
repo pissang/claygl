@@ -80,6 +80,8 @@ define(function(require) {
 
             var shader = this.shader;
 
+            this.__textureSlotBase = shader.currentTextureSlot();
+
             if (sameShader) {
                 // shader may use some slot by others before material bind.
                 shader.resetTextureSlot(prevMaterial.__textureSlotBase || 0);
@@ -103,7 +105,18 @@ define(function(require) {
                     console.warn('Uniform value "' + symbol + '" is undefined');
                     continue;
                 }
-                else if (uniformValue === null && uniform.type !== 't') {
+                else if (uniformValue === null) {
+                    // FIXME Assume material with same shader have same order uniforms
+                    // Or if different material use same textures,
+                    // the slot will be different and still skipped because optimization
+                    if (uniform.type === 't') {
+                        var slot = shader.currentTextureSlot();
+                        var res = shader.setUniform(_gl, '1i', symbol, slot);
+                        if (res) { // Texture is enabled
+                            // Still occupy the slot to make sure same texture in different materials have same slot.
+                            shader.useCurrentTextureSlot(_gl, null);
+                        }
+                    }
                     continue;
                 }
                 else if (uniformValue instanceof Array
@@ -111,14 +124,6 @@ define(function(require) {
                     continue;
                 }
                 else if (uniformValue instanceof Texture) {
-                    // FIXME Assume material with same shader have same order uniforms
-                    // Or if different material use same textures,
-                    // the slot will be different and still skipped because optimization
-                    if (uniformValue === null) {
-                        // Still occupy the slot to make sure same texture in different materials have same slot.
-                        shader.useCurrentTextureSlot(_gl, null);
-                    }
-
                     var slot = shader.currentTextureSlot();
                     var res = shader.setUniform(_gl, '1i', symbol, slot);
                     if (!res) { // Texture is not enabled
@@ -158,8 +163,6 @@ define(function(require) {
                     shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                 }
             }
-
-            this.__textureSlotBase = shader.currentTextureSlot();
         },
 
         /**
