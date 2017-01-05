@@ -122,7 +122,11 @@ define(function(require) {
         /**
          * @type {boolean}
          */
-        includeMesh: true
+        includeMesh: true,
+        /**
+         * @type {boolean}
+         */
+        includeTexture: true
     },
 
     /** @lends qtek.loader.GLTF.prototype */
@@ -198,7 +202,9 @@ define(function(require) {
 
             function afterLoadBuffer() {
                 if (self.includeMesh) {
-                    self._parseTextures(json, lib);
+                    if (self.includeTexture) {
+                        self._parseTextures(json, lib);
+                    }
                     self._parseMaterials(json, lib);
                     self._parseMeshes(json, lib);
                 }
@@ -496,8 +502,13 @@ define(function(require) {
                 for (var symbol in uniforms) {
                     var value = uniforms[symbol];
                     // TODO: texture judgement should be more robust
-                    if (typeof(value) === 'string' && lib.textures[value]) {
-                        uniforms[symbol] = lib.textures[value];
+                    if (typeof(value) === 'string') {
+                        if (lib.textures[value]) {
+                            uniforms[symbol] = lib.textures[value];
+                        }
+                        else {
+                            uniforms[symbol] = null;
+                        }
                     }
                 }
                 var enabledTextures = [];
