@@ -89,6 +89,7 @@ float decodeFloat(const in vec4 color)
 @end
 
 
+
 // http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
 @export qtek.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
@@ -169,6 +170,7 @@ if (joint.w >= 0.0)
 @end
 
 
+
 @export qtek.util.parallax_correct
 
 // https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
@@ -187,4 +189,22 @@ vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
     return normalize(fixedPos - boxCenter);
 }
 
+@end
+
+
+
+@export qtek.util.clamp_sample
+// Sample with stereo clamp
+vec4 clampSample(const in sampler2D texture, const in vec2 coord)
+{
+#ifdef STEREO
+    // Left is 0.0 - 0.5, Right is 0.5 - 1.0, avoid leaking
+    // FIXME fetch with linear filtering will still have leak!
+    float eye = step(0.5, coord.x) * 0.5;
+    vec2 coordClamped = clamp(coord, vec2(eye, 0.0), vec2(0.5 + eye, 1.0));
+#else
+    vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));
+#endif
+    return texture2D(texture, coordClamped);
+}
 @end

@@ -1,0 +1,196 @@
+<html>
+    <head>
+        <title>Tron Effect</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script type="text/javascript" src="../thirdparty/require.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
+    </head>
+    <body>
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+            #main {
+                background-color: #111;
+            }
+            #split-line {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                width: 0;
+                border: 1px solid #fff;
+                height: 100%;
+            }
+        </style>
+        <canvas id='main'></canvas>
+        <!--<div id="split-line"></div>-->
+        <script type="text/javascript">
+            require(['qtek', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (qtek, tronShader, createCompositor) {
+                var Shader = qtek.Shader;
+                Shader.import(tronShader);
+
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main'),
+                    devicePixelRatio: 1
+                });
+                var scene = new qtek.Scene();
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.getViewportAspect(),
+                    far : 500
+                });
+                var stereoCamera = new qtek.vr.StereoCamera();
+
+                var cube = new qtek.geometry.Cube({
+                    widthSegments : 1,
+                    heightSegments : 1,
+                    depthSegments : 1
+                });
+
+                var tronMaterial = new qtek.Material({
+                    shader: new qtek.Shader({
+                        vertex: Shader.source('tron.vertex'),
+                        fragment: Shader.source('tron.fragment')
+                    })
+                });
+                tronMaterial.shader.define('fragment', 'RGBM_ENCODE');
+
+                camera.position.set(0, 0, 7);
+
+                var cubeMeshTronOutline = new qtek.Mesh({
+                    geometry: cube,
+                    material: tronMaterial,
+                    culling: false,
+                    beforeRender: function (_gl) {
+                        _gl.clear(_gl.DEPTH_BUFFER_BIT);
+                    }
+                });
+                var cubeMesh = new qtek.Mesh({
+                    geometry: cube,
+                    material: new qtek.Material({
+                        shader: qtek.shader.library.get('qtek.standard', {
+                            fragmentDefines: {
+                                RGBM_ENCODE: null
+                            }
+                        })
+                    })
+                });
+                cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
+                cubeMesh.scale.set(1.5, 1.5, 1.5);
+
+                scene.add(cubeMesh);
+                scene.add(cubeMeshTronOutline);
+
+                var light = new qtek.light.Directional({
+                    intensity: 0.5
+                });
+                light.position.set(4, 5, 2);
+                light.lookAt(scene.position);
+                scene.add(light);
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+
+                var control = new qtek.plugin.OrbitControl({
+                    domElement: renderer.canvas,
+                    target: camera
+                });
+
+                var sourceTexture = new qtek.Texture2D({
+                    type: qtek.Texture.HALF_FLOAT
+                });
+
+                var compositor = createCompositor({
+                    texture: sourceTexture,
+                    stereo: true,
+                    enableLensflare: false
+                });
+
+                var frameBuffer = new qtek.FrameBuffer();
+                frameBuffer.attach(sourceTexture);
+
+                animation.on('frame', function(dTime) {
+                    control.update(dTime);
+                });
+
+                function start(vrDisplay) {
+                    animation.on('frame', function(deltaTime) {
+                        var start = new Date().getTime();
+
+                        camera.update();
+                        if (vrDisplay) {
+                            stereoCamera.updateFromVRDisplay(vrDisplay, camera);
+                        }
+                        else {
+                            camera.aspect = renderer.getWidth() / renderer.getHeight();
+                            stereoCamera.updateFromCamera(camera);
+                        }
+
+                        renderer.clear = null;
+
+                        renderer.saveViewport();
+
+                        frameBuffer.bind(renderer);
+                        renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT | renderer.gl.COLOR_BUFFER_BIT);
+                        renderer.setViewport(0, 0, sourceTexture.width / 2, sourceTexture.height);
+                        renderer.render(scene, stereoCamera.getLeftCamera());
+
+                        renderer.setViewport(sourceTexture.width / 2, 0, sourceTexture.width / 2, sourceTexture.height);
+                        renderer.render(scene, stereoCamera.getRightCamera());
+                        frameBuffer.unbind(renderer);
+
+                        renderer.restoreViewport();
+                        compositor.render(renderer);
+
+                        if (vrDisplay) {
+                            vrDisplay.submitFrame();
+                        }
+                    });
+
+                }
+
+                window.onresize = function () {
+                    var width = window.innerWidth;
+                    var height =  window.innerHeight;
+                    renderer.resize(width, height);
+                    sourceTexture.width = width;
+                    sourceTexture.height = height;
+                    sourceTexture.dirty();
+                }
+                window.onresize();
+
+                tronMaterial.set('sharpness', 10.0);
+                tronMaterial.set('strength', 100.0);
+                tronMaterial.set('substraction', 0.4);
+                compositor.getNodeByName('tonemapping').setParameter('bloomIntensity', 0.5);
+
+                if (navigator.getVRDisplays) {
+                    navigator.getVRDisplays().then(function (displays) {
+                        if (displays.length > 0)  {
+                            var vrDisplay = displays[0];
+                            vrDisplay.requestPresent({
+                                source: renderer.canvas
+                            }).then(function () {
+                                start(vrDisplay);
+                            }).catch(function () {
+                                console.error('VRDisplay is not capable of presenting');
+
+                                start();
+                            });
+                        }
+                    }).catch(function () {
+                        console.error('VRDisplay is not capable of presenting');
+
+                        start();
+                    });
+                }
+                else {
+                    start();
+                }
+            });
+
+        </script>
+    </body>
+</html>

@@ -39,9 +39,6 @@ define(function (require) {
 
         _textures: null,
 
-        _width: 0,
-        _height: 0,
-
         _boundGL: null,
     }, function () {
         // Use cache
@@ -66,24 +63,29 @@ define(function (require) {
 
             cache.put('viewport', renderer.viewport);
 
-            if (this.viewport) {
-                renderer.setViewport(this.viewport);
-            }
-            else {
-                renderer.setViewport(0, 0, this._width, this._height, 1);
-            }
-
             var hasTextureAttached = false;
+            var width;
+            var height;
             for (var attachment in this._textures) {
                 hasTextureAttached = true;
                 var obj = this._textures[attachment];
                 if (obj) {
+                    // TODO Do width, height checking, make sure size are same
+                    width = obj.texture.width;
+                    height = obj.texture.height;
                     // Attach textures
                     this._doAttach(_gl, obj.texture, attachment, obj.target);
                 }
             }
             if (!hasTextureAttached && this.depthBuffer) {
                 console.error('Must attach texture before bind, or renderbuffer may have incorrect width and height.')
+            }
+
+            if (this.viewport) {
+                renderer.setViewport(this.viewport);
+            }
+            else {
+                renderer.setViewport(0, 0, width, height, 1);
             }
 
             var attachedTextures = cache.get('attached_textures');
@@ -100,8 +102,6 @@ define(function (require) {
                 if (cache.miss(KEY_RENDERBUFFER)) {
                     cache.put(KEY_RENDERBUFFER, _gl.createRenderbuffer());
                 }
-                var width = this._width;
-                var height = this._height;
                 var renderbuffer = cache.get(KEY_RENDERBUFFER);
 
                 if (width !== cache.get(KEY_RENDERBUFFER_WIDTH)
@@ -194,9 +194,6 @@ define(function (require) {
                 cache.use(_gl.__GLID__);
                 attachedTextures = cache.get('attached_textures');
             }
-            // Always update width and height
-            this._width = texture.width;
-            this._height = texture.height;
 
             // Check if texture attached
             var previous = this._textures[attachment];
@@ -331,7 +328,6 @@ define(function (require) {
 
             // Clear cache for reusing
             this._textures = {};
-            this._width = this._height = 0;
 
         }
     });

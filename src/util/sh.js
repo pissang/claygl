@@ -42,6 +42,7 @@ define(function (require) {
         pass.render(renderer, framebuffer);
 
         framebuffer.bind(renderer);
+        // TODO Only chrome and firefox support Float32Array
         var pixels = new vendor.Float32Array(9 * 4);
         renderer.gl.readPixels(0, 0, 9, 1, Texture.RGBA, Texture.FLOAT, pixels);
 

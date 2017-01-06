@@ -358,14 +358,21 @@ define(function(require) {
 
     function createSizeSetHandler(name, exprFunc) {
         return function (renderer) {
-            var result = exprFunc(renderer.getWidth(), renderer.getHeight());
+            var dpr = renderer.viewport.devicePixelRatio ;
+            // PENDING If multiply dpr ?
+            var width = renderer.viewport.width;
+            var height = renderer.viewport.height;
+            var result = exprFunc(width, height, dpr);
             this.setParameter(name, result);
         };
     }
 
     function createSizeParser(name, exprFunc) {
         return function (renderer) {
-            return exprFunc(renderer.getWidth(), renderer.getHeight());
+            var dpr = renderer.viewport.devicePixelRatio;
+            var width = renderer.viewport.width;
+            var height = renderer.viewport.height;
+            return exprFunc(width, height, dpr);
         };
     }
 
@@ -374,7 +381,7 @@ define(function(require) {
         var exprRes = /^expr\((.*)\)$/.exec(string);
         if (exprRes) {
             try {
-                var func = new Function('width', 'height', 'return ' + exprRes[1]);
+                var func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
                 // Try run t
                 func(1, 1);
 

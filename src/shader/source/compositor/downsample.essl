@@ -12,6 +12,8 @@ float brightness(vec3 c)
     return max(max(c.r, c.g), c.b);
 }
 
+@import qtek.util.clamp_sample
+
 void main()
 {
     vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
@@ -19,10 +21,10 @@ void main()
 #ifdef ANTI_FLICKER
     // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
     // TODO
-    vec3 s1 = decodeHDR(texture2D(texture, v_Texcoord + d.xy)).rgb;
-    vec3 s2 = decodeHDR(texture2D(texture, v_Texcoord + d.zy)).rgb;
-    vec3 s3 = decodeHDR(texture2D(texture, v_Texcoord + d.xw)).rgb;
-    vec3 s4 = decodeHDR(texture2D(texture, v_Texcoord + d.zw)).rgb;
+    vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;
+    vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;
+    vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;
+    vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;
 
     // Karis's luma weighted average (using brightness instead of luma)
     float s1w = 1.0 / (brightness(s1) + 1.0);
@@ -36,10 +38,10 @@ void main()
         1.0
     );
 #else
-    vec4 color = decodeHDR(texture2D(texture, v_Texcoord + d.xy));
-    color += decodeHDR(texture2D(texture, v_Texcoord + d.zy));
-    color += decodeHDR(texture2D(texture, v_Texcoord + d.xw));
-    color += decodeHDR(texture2D(texture, v_Texcoord + d.zw));
+    vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));
+    color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));
+    color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));
+    color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));
     color *= 0.25;
 #endif
 
