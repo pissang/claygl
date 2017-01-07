@@ -255,8 +255,8 @@ define(function (require) {
     Texture.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
 
     /* TextureParameterName */
-    Texture.TEXTURE_MAG_FILTER = glenum.TEXTURE_MAG_FILTER;
-    Texture.TEXTURE_MIN_FILTER = glenum.TEXTURE_MIN_FILTER;
+    // Texture.TEXTURE_MAG_FILTER = glenum.TEXTURE_MAG_FILTER;
+    // Texture.TEXTURE_MIN_FILTER = glenum.TEXTURE_MIN_FILTER;
 
     /* TextureWrapMode */
     Texture.REPEAT = glenum.REPEAT;

@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var Base = require('./core/Base');
+    var Texture = require('./Texture');
     var TextureCube = require('./TextureCube');
     var glinfo = require('./core/glinfo');
     var glenum = require('./core/glenum');
@@ -137,12 +138,14 @@ define(function (require) {
 
             // Because the data of texture is changed over time,
             // Here update the mipmaps of texture each time after rendered;
-            // PENDGING
+            // PENDING
             for (var attachment in this._textures) {
                 var obj = this._textures[attachment];
                 if (obj) {
                     var texture = obj.texture;
-                    if (!texture.NPOT && texture.useMipmap) {
+                    // FIXME some texture format can't generate mipmap
+                    if (!texture.NPOT && texture.useMipmap
+                        && texture.minFilter === Texture.LINEAR_MIPMAP_LINEAR) {
                         var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
                         _gl.bindTexture(target, texture.getWebGLTexture(_gl));
                         _gl.generateMipmap(target);

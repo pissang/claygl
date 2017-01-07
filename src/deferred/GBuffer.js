@@ -185,8 +185,6 @@ define(function (require) {
                 minFilter: Texture.NEAREST,
                 magFilter: Texture.NEAREST,
                 // format: Texture.DEPTH_COMPONENT,
-                // FIXME UNSIGNED_INT Can be 16 bit on ios. which is too low
-                // https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/
                 // type: Texture.UNSIGNED_INT
 
                 format: Texture.DEPTH_STENCIL,

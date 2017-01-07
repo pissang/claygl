@@ -57,7 +57,7 @@ define(function (require) {
         });
     }
 
-    function AlchemyAO(opt) {
+    function AlchemyAO (opt) {
         opt = opt || {};
 
         this._gBuffer = opt.gBuffer;
@@ -68,9 +68,9 @@ define(function (require) {
         this._blurPass2 = new PostProcessPass(qtek.Shader.source('alchemy.blur_v'), opt.renderToTexture);
 
         this._blurPass1.setUniform('colorTex', this._ssaoPass.getTargetTexture());
-        this._blurPass1.setUniform('depthTex', this._gBuffer.getDepthTex());
+        this._blurPass1.setUniform('depthTex', this._gBuffer.getTargetTexture2());
         this._blurPass2.setUniform('colorTex', this._blurPass1.getTargetTexture());
-        this._blurPass2.setUniform('depthTex', this._gBuffer.getDepthTex());
+        this._blurPass2.setUniform('depthTex', this._gBuffer.getTargetTexture2());
 
         this.setKernelSize(opt.kernelSize || 12);
         this.setParameter('blurSize', opt.blurSize || 1);
@@ -97,8 +97,9 @@ define(function (require) {
         var gBuffer = this._gBuffer;
         var ssaoPass = this._ssaoPass;
 
-        ssaoPass.setUniform('normalTex', gBuffer.getNormalTex());
-        ssaoPass.setUniform('depthTex', gBuffer.getDepthTex());
+        ssaoPass.setUniform('gBufferTexture1', gBuffer.getTargetTexture1());
+        ssaoPass.setUniform('gBufferTexture2', gBuffer.getTargetTexture2());
+
         ssaoPass.setUniform('textureSize', [width, height]);
         ssaoPass.setUniform('viewportSize', [width, height]);
 

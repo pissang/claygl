@@ -116,6 +116,12 @@ define(function (require) {
 
         compositor.setDepthTexture(opt.depthTexture);
 
+        if (opt.stereo) {
+            compositor.nodes.forEach(function (node) {
+                node.shaderDefine('STEREO');
+            });
+        }
+
         return compositor;
     };
 

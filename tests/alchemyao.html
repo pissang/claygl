@@ -11,7 +11,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            require(['qtek', 'js/AlchemyAOPass', 'js/GBuffer'], function(qtek, AlchemyAOPass, GBuffer) {
+            require(['qtek', 'js/AlchemyAOPass'], function(qtek, AlchemyAOPass) {
 
                 var config = {
                     kernelSize: 12,
@@ -22,12 +22,13 @@
                     epsilon: 0.0001
                 };
 
-                var gBuffer = new GBuffer();
+                var gBuffer = new qtek.deferred.GBuffer();
                 var renderer = new qtek.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
+                gBuffer.resize(renderer.getWidth(), renderer.getHeight());
 
                 var ssaoPass = new AlchemyAOPass({
                     gBuffer: gBuffer
@@ -44,7 +45,7 @@
                     return (Math.random() - 0.5) * size * 2;
                 }
 
-                var cubeGeo = new qtek.geometry.Sphere();
+                var cubeGeo = new qtek.geometry.Cube();
                 for (var i = 0; i < 20; i ++) {
                     for (var j = 0; j < 20; j ++) {
                         var mesh = new qtek.Mesh({
@@ -54,7 +55,7 @@
                             geometry: cubeGeo
                         });
                         mesh.position.set(
-                            randomInSquare(50), randomInSquare(50), randomInSquare(50)
+                            randomInSquare(20), randomInSquare(20), randomInSquare(20)
                         );
                         var scale = Math.random() * 5 + 5;
                         mesh.scale.set(scale, scale, scale);
@@ -107,12 +108,14 @@
                     }
                     kernelCtx.clearRect(0, 0, 100, 100);
                     var kernel = ssaoPass._ssaoPass.getUniform('kernel');
+
+                    kernelCtx.beginPath();
                     for (var i = 0; i < kernel.length;) {
                         var x = kernel[i++];
                         var y = kernel[i++];
                         kernelCtx.rect(x * 50 + 50, y * 50 + 50, 2, 2);
-                        kernelCtx.fill();
                     }
+                    kernelCtx.fill();
                 }
 
                 gui.add(config, 'kernelSize', 4, 128).step(1).onChange(updateConfig);
