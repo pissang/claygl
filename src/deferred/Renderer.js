@@ -26,6 +26,8 @@ define(function (require) {
     Shader.import(require('../shader/source/deferred/spot.essl'));
     Shader.import(require('../shader/source/deferred/directional.essl'));
     Shader.import(require('../shader/source/deferred/ambient.essl'));
+    Shader.import(require('../shader/source/deferred/ambientsh.essl'));
+    Shader.import(require('../shader/source/deferred/ambientcubemap.essl'));
     Shader.import(require('../shader/source/deferred/point.essl'));
     Shader.import(require('../shader/source/deferred/sphere.essl'));
     Shader.import(require('../shader/source/deferred/tube.essl'));
@@ -121,6 +123,14 @@ define(function (require) {
             _ambientMat: createLightPassMat(new Shader({
                 vertex: fullQuadVertex,
                 fragment: Shader.source('qtek.deferred.ambient_light')
+            })),
+            _ambientSHMat: createLightPassMat(new Shader({
+                vertex: fullQuadVertex,
+                fragment: Shader.source('qtek.deferred.ambient_sh_light')
+            })),
+            _ambientCubemapMat: createLightPassMat(new Shader({
+                vertex: fullQuadVertex,
+                fragment: Shader.source('qtek.deferred.ambient_cubemap_light')
             })),
 
             _spotLightShader: createVolumeShader('spot_light'),
@@ -316,6 +326,17 @@ define(function (require) {
                         case 'AMBIENT_LIGHT':
                             pass.material = this._ambientMat;
                             pass.material.setUniform('lightColor', uTpl.ambientLightColor.value(light));
+                            break;
+                        case 'AMBIENT_SH_LIGHT':
+                            pass.material = this._ambientSHMat;
+                            pass.material.setUniform('lightColor', uTpl.ambientSHLightColor.value(light));
+                            pass.material.setUniform('lightCoefficients', uTpl.ambientSHLightCoefficients.value(light));
+                            break;
+                        case 'AMBIENT_CUBEMAP_LIGHT':
+                            pass.material = this._ambientCubemapMat;
+                            pass.material.setUniform('lightColor', uTpl.ambientCubemapLightColor.value(light));
+                            pass.material.setUniform('lightCubemap', uTpl.ambientCubemapLightCubemap.value(light));
+                            pass.material.setUniform('brdfLookup', uTpl.ambientCubemapLightBRDFLookup.value(light));
                             break;
                         case 'DIRECTIONAL_LIGHT':
                             var hasShadow = shadowMapPass && light.castShadow;

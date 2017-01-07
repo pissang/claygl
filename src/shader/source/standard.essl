@@ -471,7 +471,6 @@ void main()
     vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;
     for(int i = 0; i < AMBIENT_CUBEMAP_LIGHT_COUNT; i++)
     {
-        // PENDING Only env map can have HDR
         vec3 envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[i], L, bias2), 51.5);
         // TODO mix ?
         outColor.rgb += ambientCubemapLightColor[i] * envTexel2 * envWeight2;

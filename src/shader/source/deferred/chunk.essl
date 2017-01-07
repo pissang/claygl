@@ -8,8 +8,6 @@ uniform vec2 viewportSize : VIEWPORT_SIZE;
 
 uniform mat4 viewProjectionInv;
 
-const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
-
 #ifdef DEPTH_ENCODED
 @import qtek.util.decode_float
 #endif
@@ -39,19 +37,8 @@ const vec3 LUM = vec3(0.2125, 0.7154, 0.0721);
     // N = normalize(N);
     vec3 N = texel1.rgb * 2.0 - 1.0;
 
-#ifdef DEPTH_ENCODED
-    vec4 depthTexel = texture2D(gBufferTexture2, uv);
-
-    // FXIME premultiplied alpha when blend is enabled?
-    // FIXME Mobile and PC are different(mobile don't need it)
-    #ifdef PREMULTIPLIED_ALPHA
-    depthTexel.rgb /= depthTexel.a;
-    #endif
-    float z = decodeFloat(depthTexel) * 2.0 - 1.0;
-#else
     // Depth buffer range is 0.0 - 1.0
     float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;
-#endif
 
     vec2 xy = uv * 2.0 - 1.0;
 

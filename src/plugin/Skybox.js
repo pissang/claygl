@@ -101,6 +101,10 @@ define(function(require) {
         },
 
         _beforeRenderScene: function(renderer, scene, camera) {
+            this.renderSkybox(renderer, camera);
+        },
+
+        renderSkybox: function (renderer, camera) {
             this.position.copy(camera.getWorldPosition());
             this.update();
             renderer.renderQueue([this], camera);
