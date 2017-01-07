@@ -344,12 +344,28 @@ define(function(require) {
             var color = this.color;
 
             if (this.clear) {
+
                 // Must set depth and color mask true before clear
                 _gl.colorMask(true, true, true, true);
                 _gl.depthMask(true);
-
+                var viewport = this.viewport;
+                var needsScissor = false;
+                var viewportDpr = viewport.devicePixelRatio;
+                if (viewport.width !== this._width || viewport.height !== this._height
+                    || viewportDpr && viewportDpr !== this.devicePixelRatio
+                    || viewport.x || viewport.y
+                ) {
+                    needsScissor = true;
+                    // http://stackoverflow.com/questions/11544608/how-to-clear-a-rectangle-area-in-webgl
+                    // Only clear the viewport
+                    _gl.enable(_gl.SCISSOR_TEST);
+                    _gl.scissor(viewport.x * viewportDpr, viewport.y * viewportDpr, viewport.width * viewportDpr, viewport.height * viewportDpr);
+                }
                 _gl.clearColor(color[0], color[1], color[2], color[3]);
                 _gl.clear(this.clear);
+                if (needsScissor) {
+                    _gl.disable(_gl.SCISSOR_TEST);
+                }
             }
 
             // If the scene have been updated in the prepass like shadow map
@@ -432,7 +448,15 @@ define(function(require) {
             };
 
             var dpr = this.viewport.devicePixelRatio;
-            var viewportSize = [this.viewport.width * dpr, this.viewport.height * dpr];
+            var viewport = this.viewport;
+            var viewportUniform = [
+                viewport.x * dpr, viewport.y * dpr,
+                viewport.width * dpr, viewport.height * dpr
+            ];
+            // DEPRECATED
+            var viewportSizeUniform = [
+                viewportUniform[2], viewportUniform[3]
+            ];
 
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
@@ -575,7 +599,9 @@ define(function(require) {
                         }
                     }
                     // Set some common uniforms
-                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSize);
+                    shader.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
+                    // DEPRECATED
+                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 
                     // Set lights uniforms
                     // TODO needs optimized

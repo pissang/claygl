@@ -80,9 +80,6 @@
                     camera.update();
                     stereoCamera.updateFromCamera(camera);
 
-                    renderer.clear = null;
-
-                    renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT | renderer.gl.COLOR_BUFFER_BIT);
                     renderer.setViewport(0, 0, renderer.getWidth() / 2, renderer.getHeight());
                     renderer.render(scene, stereoCamera.getLeftCamera());
 

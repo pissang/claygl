@@ -80,7 +80,8 @@ define(function (require) {
     ];
     var uniformSemantics = [
         'SKIN_MATRIX',
-        'VIEWPORT_SIZE'
+        'VIEWPORT_SIZE',
+        'VIEWPORT'
     ];
     var matrixSemantics = [
         'WORLD',

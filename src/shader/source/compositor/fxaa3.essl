@@ -2,7 +2,7 @@
 @export qtek.compositor.fxaa3
 
 uniform sampler2D texture;
-uniform vec2 viewportSize : VIEWPORT_SIZE;
+uniform vec4 viewport : VIEWPORT;
 
 uniform float subpixel: 0.75;
 uniform float edgeThreshold: 0.125;
@@ -183,7 +183,7 @@ void main()
     vec4 color = FxaaPixelShader(
         v_Texcoord,
         texture,
-        vec2(1.0) / viewportSize,
+        vec2(1.0) / viewport.zw,
         subpixel,
         edgeThreshold,
         edgeThresholdMin

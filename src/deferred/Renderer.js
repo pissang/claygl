@@ -217,6 +217,28 @@ define(function (require) {
             return this._gBuffer;
         },
 
+        // TODO is dpr needed?
+        setViewport: function (x, y, width, height, dpr) {
+            var viewport;
+            if (typeof x === 'object') {
+                viewport = x;
+            }
+            else {
+                viewport = {
+                    x: x, y: y,
+                    width: width, height: height,
+                    devicePixelRatio: dpr || 1
+                };
+            }
+            this._lightAccumFrameBuffer.viewport = viewport;
+
+            var dpr = viewport.devicePixelRatio;
+            this._gBuffer.resize(
+                viewport.width * dpr,
+                viewport.height * dpr
+            );
+        },
+
         // getFullQuadLightPass: function () {
         //     return this._fullQuadPass;
         // },
@@ -226,6 +248,7 @@ define(function (require) {
             this._lightAccumTex.height = height;
             this._lightAccumTex.dirty();
 
+            // PENDING viewport ?
             this._gBuffer.resize(width, height);
         },
 
@@ -252,9 +275,20 @@ define(function (require) {
             lightAccumFrameBuffer.attach(lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
             var color = renderer.color;
+
+            var viewport = lightAccumFrameBuffer.viewport;
+            if (viewport) {
+                var dpr = viewport.devicePixelRatio;
+                // use scissor to make sure only clear the viewport
+                gl.enable(gl.SCISSOR_TEST);
+                gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
+            }
             gl.clearColor(color[0], color[1], color[2], color[3]);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.enable(gl.BLEND);
+            if (viewport) {
+                gl.disable(gl.SCISSOR_TEST);
+            }
 
             var viewProjectionInv = new Matrix4();
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
@@ -580,8 +614,12 @@ define(function (require) {
                 gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
                 gl.depthFunc(gl.LEQUAL);
 
-                var viewportSize = [this._lightAccumTex.width, this._lightAccumTex.height];
-
+                var viewport = renderer.viewport;
+                var dpr = viewport.devicePixelRatio;
+                var viewportUniform = [
+                    viewport.x * dpr, viewport.y * dpr,
+                    viewport.width * dpr, viewport.height * dpr
+                ];
                 for (var i = 0; i < volumeMeshList.length; i++) {
                     var volumeMesh = volumeMeshList[i];
 
@@ -617,7 +655,7 @@ define(function (require) {
                     var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
                     // Set some common uniforms
                     shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
-                    shader.setUniformOfSemantic(gl, 'VIEWPORT_SIZE', viewportSize);
+                    shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
                     volumeMesh.material.bind(gl);
                     volumeMesh.render(gl);

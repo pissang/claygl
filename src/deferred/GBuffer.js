@@ -224,6 +224,11 @@ define(function (require) {
     }, {
 
         resize: function (width, height) {
+            if (this._gBufferTex1.width === width
+                && this._gBufferTex1.height === height
+            ) {
+                return;
+            }
             this._gBufferTex1.width = width;
             this._gBufferTex1.height = height;
             this._gBufferTex1.dirty();
@@ -248,7 +253,9 @@ define(function (require) {
             gl.clearColor(0, 0, 0, 0);
             gl.depthMask(true);
             gl.colorMask(true, true, true, true);
+
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
             gl.disable(gl.BLEND);
 
             var opaqueQueue = scene.opaqueQueue;

@@ -4,9 +4,10 @@ uniform sampler2D gBufferTexture1;
 uniform sampler2D gBufferTexture2;
 uniform sampler2D gBufferTexture3;
 
-uniform vec2 viewportSize : VIEWPORT_SIZE;
+uniform vec4 viewport : VIEWPORT;
 
 uniform mat4 viewProjectionInv;
+
 
 #ifdef DEPTH_ENCODED
 @import qtek.util.decode_float
@@ -19,7 +20,7 @@ uniform mat4 viewProjectionInv;
     // - N, z, position
     // - albedo, metalness, specularColor, diffuseColor
 
-    vec2 uv = gl_FragCoord.xy / viewportSize;
+    vec2 uv = (gl_FragCoord.xy - viewport.xy) / viewport.zw;
 
     vec4 texel1 = texture2D(gBufferTexture1, uv);
     vec4 texel3 = texture2D(gBufferTexture3, uv);
