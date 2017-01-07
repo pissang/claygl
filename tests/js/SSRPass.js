@@ -20,16 +20,16 @@ define(function (require) {
         this._blendPass.getShader().disableTexturesAll();
         this._blendPass.getShader().enableTexture(['texture1', 'texture2']);
 
-        this._ssrPass.setUniform('normalTex', this._gBuffer.getNormalTex());
-        this._ssrPass.setUniform('depthTex', this._gBuffer.getDepthTex());
-        this._ssrPass.setUniform('backDepthTex', this._gBuffer.getBackDepthTex());
+        this._ssrPass.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
+        this._ssrPass.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
+        // this._ssrPass.setUniform('backDepthTex', this._gBuffer.getBackDepthTex());
 
         // this._ssrPass.setUniform('colorTex', this._mipmapPass.getTargetTexture());
 
         this._blurPass1.setUniform('colorTex', this._ssrPass.getTargetTexture());
-        this._blurPass1.setUniform('normalTex', this._gBuffer.getNormalTex());
+        this._blurPass1.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
         this._blurPass2.setUniform('colorTex', this._blurPass1.getTargetTexture());
-        this._blurPass2.setUniform('normalTex', this._gBuffer.getNormalTex());
+        this._blurPass2.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
 
         this._blendPass.setUniform('texture1', this._blurPass2.getTargetTexture());
 

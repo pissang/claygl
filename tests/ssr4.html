@@ -14,7 +14,7 @@
         </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek', 'js/SSRPass', 'js/GBuffer'], function(qtek, SSRPass, GBuffer) {
+            require(['qtek', 'js/SSRPass'], function(qtek, SSRPass) {
 
                 var config = {
                     maxIteration: 32,
@@ -42,7 +42,7 @@
                 camera.position.set(0, 4, 4);
                 camera.lookAt(qtek.math.Vector3.ZERO);
 
-                var gBuffer = new GBuffer();
+                var gBuffer = new qtek.deferred.GBuffer();
                 var ssrPass = new SSRPass({
                     gBuffer: gBuffer
                 });
@@ -109,6 +109,7 @@
                     var width = window.innerWidth;
                     var height = window.innerHeight;
                     renderer.resize(width, height);
+                    gBuffer.resize(width, height);
                     colorTex.width = width;
                     colorTex.height = height;
                     colorTex.dirty();
