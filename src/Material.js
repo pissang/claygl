@@ -80,12 +80,11 @@ define(function(require) {
 
             var shader = this.shader;
 
-            this.__textureSlotBase = shader.currentTextureSlot();
-
             if (sameShader) {
                 // shader may use some slot by others before material bind.
                 shader.resetTextureSlot(prevMaterial.__textureSlotBase || 0);
             }
+            this.__textureSlotBase = shader.currentTextureSlot();
 
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
@@ -268,6 +267,8 @@ define(function(require) {
 
             var uniforms = this.uniforms;
             this._enabledUniforms = Object.keys(uniforms);
+            // Make sure uniforms are set in same order to avoid texture slot wrong
+            this._enabledUniforms.sort();
 
             if (keepUniform) {
                 for (var symbol in originalUniforms) {

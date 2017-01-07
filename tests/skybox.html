@@ -12,31 +12,31 @@
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main")
+                    canvas: document.getElementById( "Main")
                 });
                 var scene = new qtek.Scene;
                 var camera = new qtek.camera.Perspective({
-                        aspect : renderer.getViewportAspect(),
-                        far : 500
+                        aspect: renderer.getViewportAspect(),
+                        far: 500
                     });
                 var animation = new qtek.animation.Animation();
                 animation.start();
 
                 var texture = new qtek.TextureCube({
-                    flipY : false
+                    flipY: false
                 });
                 texture.load({
-                    px : 'assets/textures/cube/skybox/px.jpg',
-                    nx : 'assets/textures/cube/skybox/nx.jpg',
-                    py : 'assets/textures/cube/skybox/py.jpg',
-                    ny : 'assets/textures/cube/skybox/ny.jpg',
-                    pz : 'assets/textures/cube/skybox/pz.jpg',
-                    nz : 'assets/textures/cube/skybox/nz.jpg',
+                    px: 'assets/textures/cube/skybox/px.jpg',
+                    nx: 'assets/textures/cube/skybox/nx.jpg',
+                    py: 'assets/textures/cube/skybox/py.jpg',
+                    ny: 'assets/textures/cube/skybox/ny.jpg',
+                    pz: 'assets/textures/cube/skybox/pz.jpg',
+                    nz: 'assets/textures/cube/skybox/nz.jpg',
                 });
 
                 var data = JSON.parse(modelData);
                 var loader = new qtek.loader.ThreeModel({
-                    textureRootPath : "assets/models/nanosuit/tex"
+                    textureRootPath: "assets/models/nanosuit/tex"
                 });
                 var meshList = loader.parse(data);
                 var root = new qtek.Node();
@@ -45,13 +45,12 @@
                     material.shader.enableTexture('environmentMap');
                     material.shader.disableTexture('normalMap');
                     material.set("environmentMap", texture);
-                    material.set("reflectivity", 0.4);
                     root.add(mesh);
                 });
                 scene.add(root);
 
                 var skybox = new qtek.plugin.Skybox({
-                    scene : scene                 
+                    scene: scene
                 });
                 skybox.material.set("environmentMap", texture);
 
@@ -59,16 +58,16 @@
                 camera.lookAt( new qtek.math.Vector3(0, 8, 0) );
 
                 var light = new qtek.light.Directional({
-                    intensity : 4.0,
-                    position : new qtek.math.Vector3(2, 2, 2)
+                    intensity: 4.0,
+                    position: new qtek.math.Vector3(2, 2, 2)
                 });
                 light.lookAt(root.position, new qtek.math.Vector3(0, 1, 0));
                 scene.add(light);
 
                 var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas,
-                    sensitivity : 0.4
+                    target: camera,
+                    domElement: renderer.canvas,
+                    sensitivity: 0.4
                 });
 
                 renderer.render(scene, camera);
@@ -77,7 +76,7 @@
                     renderer.render(scene, camera);
                 });
             })
-            
+
         </script>
     </body>
 </html>
