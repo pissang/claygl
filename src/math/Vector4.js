@@ -14,7 +14,7 @@ define(function(require) {
      * @param {number} w
      */
     var Vector4 = function(x, y, z, w) {
-        
+
         x = x || 0;
         y = y || 0;
         z = z || 0;
@@ -353,10 +353,14 @@ define(function(require) {
             vec4.transformQuat(this._array, this._array, q._array);
             this._dirty = true;
             return this;
-        },     
+        },
 
         toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        },
+
+        toArray: function () {
+            return Array.prototype.slice.call(this._array);
         }
     };
 
@@ -431,7 +435,7 @@ define(function(require) {
     }
 
     // Supply methods that are not in place
-    
+
     /**
      * @param  {qtek.math.Vector4} out
      * @param  {qtek.math.Vector4} a
@@ -449,7 +453,7 @@ define(function(require) {
      * @param  {number}  x
      * @param  {number}  y
      * @param  {number}  z
-     * @return {qtek.math.Vector4}  
+     * @return {qtek.math.Vector4}
      */
     Vector4.set = function(out, x, y, z, w) {
         vec4.set(out._array, x, y, z, w);

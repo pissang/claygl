@@ -228,6 +228,10 @@ define(function (require) {
 
         toString: function () {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        },
+
+        toArray: function () {
+            return Array.prototype.slice.call(this._array);
         }
     };
     /**

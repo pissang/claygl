@@ -162,8 +162,13 @@ define(function(require) {
             this._dirty = true;
             return this;
         },
+
         toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        },
+
+        toArray: function () {
+            return Array.prototype.slice.call(this._array);
         }
     };
 

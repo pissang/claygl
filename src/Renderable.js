@@ -127,7 +127,7 @@ define(function(require) {
         afterRender: function (_gl, renderStat) {},
 
         getBoundingBox: function (filter, out) {
-            out = Node.prototype.getBoundingBox.call(this, filter,  out);
+            out = Node.prototype.getBoundingBox.call(this, filter, out);
             if (this.geometry && this.geometry.boundingBox) {
                 out.union(this.geometry.boundingBox);
             }

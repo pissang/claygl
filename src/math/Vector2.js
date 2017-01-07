@@ -12,7 +12,7 @@ define(function(require) {
      * @param {number} y
      */
     var Vector2 = function(x, y) {
-        
+
         x = x || 0;
         y = y || 0;
 
@@ -169,7 +169,7 @@ define(function(require) {
         length: function() {
             return vec2.length(this._array);
         },
-        
+
         /**
          * Linear interpolation between a and b
          * @param  {qtek.math.Vector2} a
@@ -384,6 +384,10 @@ define(function(require) {
         toString: function() {
             return '[' + Array.prototype.join.call(this._array, ',') + ']';
         },
+
+        toArray: function () {
+            return Array.prototype.slice.call(this._array);
+        }
     };
 
     // Getter and Setter
@@ -424,7 +428,7 @@ define(function(require) {
     }
 
     // Supply methods that are not in place
-    
+
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -441,7 +445,7 @@ define(function(require) {
      * @param  {qtek.math.Vector2} out
      * @param  {number}  x
      * @param  {number}  y
-     * @return {qtek.math.Vector2}  
+     * @return {qtek.math.Vector2}
      */
     Vector2.set = function(out, x, y) {
         vec2.set(out._array, x, y);
@@ -523,7 +527,7 @@ define(function(require) {
     };
 
     // Vector2.length = Vector2.len;
-    
+
     /**
      * @param  {qtek.math.Vector2} out
      * @param  {qtek.math.Vector2} a
@@ -646,7 +650,7 @@ define(function(require) {
      * @return {number}
      */
     Vector2.squaredDistance = Vector2.sqrDist;
-    
+
     /**
      * @param  {qtek.math.Vector2} a
      * @return {number}
