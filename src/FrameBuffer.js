@@ -38,6 +38,9 @@ define(function (require) {
          */
         viewport: null,
 
+        _width: 0,
+        _height: 0,
+
         _textures: null,
 
         _boundGL: null,
@@ -51,10 +54,32 @@ define(function (require) {
     /**@lends qtek.FrameBuffer.prototype. */
     {
         /**
+         * Get attached texture width
+         * {number}
+         */
+        // FIXME Can't use before #bind
+        getTextureWidth: function () {
+            return this._width;
+        },
+
+        /**
+         * Get attached texture height
+         * {number}
+         */
+        getTextureHeight: function () {
+            return this._height;
+        },
+
+        /**
          * Bind the framebuffer to given renderer before rendering
          * @param  {qtek.Renderer} renderer
          */
         bind: function (renderer) {
+
+            if (renderer.__currentFrameBuffer) {
+                console.warn('Renderer already bound with another framebuffer. Unbind it first');
+            }
+            renderer.__currentFrameBuffer = this;
 
             var _gl = renderer.gl;
 
@@ -78,6 +103,10 @@ define(function (require) {
                     this._doAttach(_gl, obj.texture, attachment, obj.target);
                 }
             }
+
+            this._width = width;
+            this._height = height;
+
             if (!hasTextureAttached && this.depthBuffer) {
                 console.error('Must attach texture before bind, or renderbuffer may have incorrect width and height.')
             }
@@ -119,11 +148,15 @@ define(function (require) {
                 }
             }
         },
+
         /**
          * Unbind the frame buffer after rendering
          * @param  {qtek.Renderer} renderer
          */
         unbind: function (renderer) {
+            // Remove status record on renderer
+            renderer.__currentFrameBuffer = null;
+
             var _gl = renderer.gl;
 
             _gl.bindFramebuffer(GL_FRAMEBUFFER, null);

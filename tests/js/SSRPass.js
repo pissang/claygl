@@ -85,7 +85,6 @@ define(function (require) {
         ssrPass.setUniform('projectionInv', camera.invProjectionMatrix._array);
         ssrPass.setUniform('viewInverseTranspose', viewInverseTranspose._array);
 
-        ssrPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
         ssrPass.setUniform('nearZ', camera.near);
 
         // ssrPass.setUniform('maxMipmapLevel', this._maxMipmapLevel);

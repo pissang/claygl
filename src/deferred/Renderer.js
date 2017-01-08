@@ -281,7 +281,6 @@ define(function (require) {
 
             var volumeMeshList = [];
 
-            var windowSize = [lightAccumTex.width, lightAccumTex.height];
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 var uTpl = light.uniformTemplates;
@@ -332,7 +331,6 @@ define(function (require) {
 
                     material.setUniform('eyePosition', eyePosition);
                     material.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    material.setUniform('windowSize', windowSize);
                     material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                     material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -382,7 +380,6 @@ define(function (require) {
                     var passMaterial = pass.material;
                     passMaterial.setUniform('eyePosition', eyePosition);
                     passMaterial.setUniform('viewProjectionInv', viewProjectionInv._array);
-                    passMaterial.setUniform('windowSize', windowSize);
                     passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                     passMaterial.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     passMaterial.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -610,6 +607,11 @@ define(function (require) {
                     viewport.width * dpr, viewport.height * dpr
                 ];
 
+                var windowSizeUniform = [
+                    this._lightAccumTex.width,
+                    this._lightAccumTex.height
+                ];
+
                 for (var i = 0; i < volumeMeshList.length; i++) {
                     var volumeMesh = volumeMeshList[i];
 
@@ -644,7 +646,8 @@ define(function (require) {
 
                     var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
                     // Set some common uniforms
-                    shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);                    shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
+                    shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                    shader.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
                     shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
                     volumeMesh.material.bind(gl);

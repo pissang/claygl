@@ -126,6 +126,9 @@ define(function(require) {
              */
             viewport: {},
 
+            // Set by FrameBuffer#bind
+            __currentFrameBuffer: null,
+
             _viewportStack: [],
             _clearStack: [],
 
@@ -447,16 +450,22 @@ define(function(require) {
                 renderedMeshCount: 0
             };
 
+            // Some common builtin uniforms
             var viewport = this.viewport;
             var vDpr = viewport.devicePixelRatio;
             var viewportUniform = [
                 viewport.x * vDpr, viewport.y * vDpr,
                 viewport.width * vDpr, viewport.height * vDpr
             ];
+            var windowDpr = this.devicePixelRatio;
+            var windowSizeUniform = this.__currentFrameBuffer
+                ? [this.__currentFrameBuffer.getTextureWidth(), this.__currentFrameBuffer.getTextureHeight()]
+                : [this._width * windowDpr, this._height * windowDpr];
             // DEPRECATED
             var viewportSizeUniform = [
                 viewportUniform[2], viewportUniform[3]
             ];
+
 
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
@@ -600,6 +609,7 @@ define(function(require) {
                     }
                     // Set some common uniforms
                     shader.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
+                    shader.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
                     // DEPRECATED
                     shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 

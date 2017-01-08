@@ -6,7 +6,7 @@ uniform sampler2D gBufferTexture3;
 uniform vec3 lightColor;
 uniform vec3 lightCoefficients[9];
 
-uniform vec2 windowSize;
+uniform vec2 windowSize: WINDOW_SIZE;
 
 vec3 calcAmbientSHLight(vec3 N) {
     // FIXME Index expression must be constant

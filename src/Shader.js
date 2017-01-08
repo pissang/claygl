@@ -82,11 +82,11 @@ define(function (require) {
         'SKIN_MATRIX',
         // Information about viewport
         'VIEWPORT_SIZE',
-        'VIEWPORT'
+        'VIEWPORT',
 
         // Window size for window relative coordinate
         // https://www.opengl.org/sdk/docs/man/html/gl_FragCoord.xhtml
-        // 'WINDOW_SIZE'
+        'WINDOW_SIZE'
     ];
     var matrixSemantics = [
         'WORLD',

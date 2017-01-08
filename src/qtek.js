@@ -54,7 +54,6 @@ define(function(require) {
 	"core": {
 		"Base": require('./core/Base'),
 		"Cache": require('./core/Cache'),
-		"env": require('./core/env'),
 		"Event": require('./core/Event'),
 		"glenum": require('./core/glenum'),
 		"glinfo": require('./core/glinfo'),
