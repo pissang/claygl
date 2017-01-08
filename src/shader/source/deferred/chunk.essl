@@ -4,7 +4,11 @@ uniform sampler2D gBufferTexture1;
 uniform sampler2D gBufferTexture2;
 uniform sampler2D gBufferTexture3;
 
-uniform vec4 viewport : VIEWPORT;
+// Window size for window relative coordinate
+// https://www.opengl.org/sdk/docs/man/html/gl_FragCoord.xhtml
+uniform vec2 windowSize;
+
+uniform vec4 viewport: VIEWPORT;
 
 uniform mat4 viewProjectionInv;
 
@@ -20,7 +24,11 @@ uniform mat4 viewProjectionInv;
     // - N, z, position
     // - albedo, metalness, specularColor, diffuseColor
 
-    vec2 uv = (gl_FragCoord.xy - viewport.xy) / viewport.zw;
+    // uv in window
+    vec2 uv = gl_FragCoord.xy / windowSize;
+
+    // uv in viewport, for position reconstruct
+    vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;
 
     vec4 texel1 = texture2D(gBufferTexture1, uv);
     vec4 texel3 = texture2D(gBufferTexture3, uv);
@@ -41,7 +49,7 @@ uniform mat4 viewProjectionInv;
     // Depth buffer range is 0.0 - 1.0
     float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;
 
-    vec2 xy = uv * 2.0 - 1.0;
+    vec2 xy = uv2 * 2.0 - 1.0;
 
     vec4 projectedPos = vec4(xy, z, 1.0);
     vec4 p4 = viewProjectionInv * projectedPos;

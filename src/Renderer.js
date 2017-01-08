@@ -447,11 +447,11 @@ define(function(require) {
                 renderedMeshCount: 0
             };
 
-            var dpr = this.viewport.devicePixelRatio;
             var viewport = this.viewport;
+            var vDpr = viewport.devicePixelRatio;
             var viewportUniform = [
-                viewport.x * dpr, viewport.y * dpr,
-                viewport.width * dpr, viewport.height * dpr
+                viewport.x * vDpr, viewport.y * vDpr,
+                viewport.width * vDpr, viewport.height * vDpr
             ];
             // DEPRECATED
             var viewportSizeUniform = [

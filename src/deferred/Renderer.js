@@ -219,24 +219,8 @@ define(function (require) {
 
         // TODO is dpr needed?
         setViewport: function (x, y, width, height, dpr) {
-            var viewport;
-            if (typeof x === 'object') {
-                viewport = x;
-            }
-            else {
-                viewport = {
-                    x: x, y: y,
-                    width: width, height: height,
-                    devicePixelRatio: dpr || 1
-                };
-            }
-            this._lightAccumFrameBuffer.viewport = viewport;
-
-            var dpr = viewport.devicePixelRatio;
-            this._gBuffer.resize(
-                viewport.width * dpr,
-                viewport.height * dpr
-            );
+            this._gBuffer.setViewport(x, y, width, height, dpr);
+            this._lightAccumFrameBuffer.viewport = this._gBuffer.getViewport();
         },
 
         // getFullQuadLightPass: function () {
@@ -290,11 +274,14 @@ define(function (require) {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
+            this.trigger('startlightaccumulate', renderer, scene, camera);
+
             var viewProjectionInv = new Matrix4();
             Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
             var volumeMeshList = [];
 
+            var windowSize = [lightAccumTex.width, lightAccumTex.height];
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 var uTpl = light.uniformTemplates;
@@ -345,6 +332,7 @@ define(function (require) {
 
                     material.setUniform('eyePosition', eyePosition);
                     material.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    material.setUniform('windowSize', windowSize);
                     material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                     material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -394,6 +382,7 @@ define(function (require) {
                     var passMaterial = pass.material;
                     passMaterial.setUniform('eyePosition', eyePosition);
                     passMaterial.setUniform('viewProjectionInv', viewProjectionInv._array);
+                    passMaterial.setUniform('windowSize', windowSize);
                     passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                     passMaterial.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                     passMaterial.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -620,6 +609,7 @@ define(function (require) {
                     viewport.x * dpr, viewport.y * dpr,
                     viewport.width * dpr, viewport.height * dpr
                 ];
+
                 for (var i = 0; i < volumeMeshList.length; i++) {
                     var volumeMesh = volumeMeshList[i];
 
@@ -654,7 +644,7 @@ define(function (require) {
 
                     var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
                     // Set some common uniforms
-                    shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                    shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);                    shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
                     shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
                     volumeMesh.material.bind(gl);

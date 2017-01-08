@@ -242,6 +242,36 @@ define(function (require) {
             this._gBufferTex3.dirty();
         },
 
+        // TODO is dpr needed?
+        setViewport: function (x, y, width, height, dpr) {
+            var viewport;
+            if (typeof x === 'object') {
+                viewport = x;
+            }
+            else {
+                viewport = {
+                    x: x, y: y,
+                    width: width, height: height,
+                    devicePixelRatio: dpr || 1
+                };
+            }
+            this._frameBuffer.viewport = viewport;
+        },
+
+        getViewport: function () {
+            if (this._frameBuffer.viewport) {
+                return this._frameBuffer.viewport;
+            }
+            else {
+                return {
+                    x: 0, y: 0,
+                    width: this._gBufferTex1.width,
+                    height: this._gBufferTex1.height,
+                    devicePixelRatio: 1
+                };
+            }
+        },
+
         update: function (renderer, scene, camera) {
 
             var gl = renderer.gl;
@@ -254,7 +284,17 @@ define(function (require) {
             gl.depthMask(true);
             gl.colorMask(true, true, true, true);
 
+            var viewport = frameBuffer.viewport;
+            if (viewport) {
+                var dpr = viewport.devicePixelRatio;
+                // use scissor to make sure only clear the viewport
+                gl.enable(gl.SCISSOR_TEST);
+                gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
+            }
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            if (viewport) {
+                gl.disable(gl.SCISSOR_TEST);
+            }
 
             gl.disable(gl.BLEND);
 

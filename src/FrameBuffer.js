@@ -155,6 +155,13 @@ define(function (require) {
             }
         },
 
+        /**
+         * 0x8CD5, 36053, FRAMEBUFFER_COMPLETE
+         * 0x8CD6, 36054, FRAMEBUFFER_INCOMPLETE_ATTACHMENT
+         * 0x8CD7, 36055, FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+         * 0x8CD9, 36057, FRAMEBUFFER_INCOMPLETE_DIMENSIONS
+         * 0x8CDD, 36061, FRAMEBUFFER_UNSUPPORTED
+         */
         checkStatus: function (_gl) {
             return _gl.checkFramebufferStatus(GL_FRAMEBUFFER);
         },
