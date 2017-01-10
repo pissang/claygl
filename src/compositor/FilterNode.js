@@ -112,13 +112,6 @@ define(function (require) {
             fragment: this.shader
         });
         this.pass = pass;
-
-        if (this.outputs) {
-            this.frameBuffer = new FrameBuffer({
-                // Not create depth buffer storage
-                depthBuffer: false
-            });
-        }
     },
     /** @lends qtek.compositor.Node.prototype */
     {
@@ -140,13 +133,20 @@ define(function (require) {
             // Output
             if (!this.outputs) {
                 this.pass.outputs = null;
+
+                this._compositor.getFrameBuffer().unbind(renderer);
+
                 this.pass.render(renderer, frameBuffer);
             }
             else {
                 this.pass.outputs = {};
 
+                var attachedTextures = {};
                 for (var name in this.outputs) {
                     var parameters = this.updateParameter(name, renderer);
+                    if (isNaN(parameters.width)) {
+                        this.updateParameter(name, renderer);
+                    }
                     var outputInfo = this.outputs[name];
                     var texture = this._compositor.allocateTexture(parameters);
                     this._outputTextures[name] = texture;
@@ -154,10 +154,22 @@ define(function (require) {
                     if (typeof(attachment) == 'string') {
                         attachment = _gl[attachment];
                     }
-                    this.pass.outputs[attachment] = texture;
+                    attachedTextures[attachment] = texture;
+                }
+                this._compositor.getFrameBuffer().bind(renderer);
+
+                for (var attachment in attachedTextures) {
+                    // FIXME attachment changes in different nodes
+                    this._compositor.getFrameBuffer().attach(
+                        attachedTextures[attachment], attachment
+                    );
                 }
 
-                this.pass.render(renderer, this.frameBuffer);
+                this.pass.render(renderer);
+
+                // Because the data of texture is changed over time,
+                // Here update the mipmaps of texture each time after rendered;
+                this._compositor.getFrameBuffer().updateMipmap(renderer.gl);
             }
 
             for (var inputName in this.inputLinks) {

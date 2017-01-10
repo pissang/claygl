@@ -4,6 +4,7 @@ define(function(require){
 
     var Graph = require('./Graph');
     var TexturePool = require('./TexturePool');
+    var FrameBuffer = require('../FrameBuffer');
 
     /**
      * Compositor provide graph based post processing
@@ -17,7 +18,11 @@ define(function(require){
             // Output node
             _outputs: [],
 
-            _texturePool: new TexturePool()
+            _texturePool: new TexturePool(),
+
+            _frameBuffer: new FrameBuffer({
+                depthBuffer: false
+            })
         };
     },
     /** @lends qtek.compositor.Compositor.prototype */
@@ -73,6 +78,10 @@ define(function(require){
 
         releaseTexture: function (parameters) {
             this._texturePool.put(parameters);
+        },
+
+        getFrameBuffer: function () {
+            return this._frameBuffer;
         },
 
         dispose: function (renderer) {

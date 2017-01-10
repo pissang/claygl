@@ -43,7 +43,7 @@ define(function (require) {
 
         _textures: null,
 
-        _boundGL: null,
+        _boundRenderer: null,
     }, function () {
         // Use cache
         this._cache = new Cache();
@@ -77,6 +77,11 @@ define(function (require) {
         bind: function (renderer) {
 
             if (renderer.__currentFrameBuffer) {
+                // Already bound
+                if (renderer.__currentFrameBuffer === this) {
+                    return;
+                }
+
                 console.warn('Renderer already bound with another framebuffer. Unbind it first');
             }
             renderer.__currentFrameBuffer = this;
@@ -84,7 +89,7 @@ define(function (require) {
             var _gl = renderer.gl;
 
             _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
-            this._boundGL = _gl;
+            this._boundRenderer = renderer;
             var cache = this._cache;
 
             cache.put('viewport', renderer.viewport);
@@ -160,7 +165,7 @@ define(function (require) {
             var _gl = renderer.gl;
 
             _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
-            this._boundGL = null;
+            this._boundRenderer = null;
 
             this._cache.use(_gl.__GLID__);
             var viewport = this._cache.get('viewport');
@@ -169,9 +174,12 @@ define(function (require) {
                 renderer.setViewport(viewport);
             }
 
-            // Because the data of texture is changed over time,
-            // Here update the mipmaps of texture each time after rendered;
-            // PENDING
+            this.updateMipmap(_gl);
+        },
+
+        // Because the data of texture is changed over time,
+        // Here update the mipmaps of texture each time after rendered;
+        updateMipmap: function (_gl) {
             for (var attachment in this._textures) {
                 var obj = this._textures[attachment];
                 if (obj) {
@@ -229,7 +237,8 @@ define(function (require) {
             attachment = attachment || GL_COLOR_ATTACHMENT0;
             target = target || glenum.TEXTURE_2D;
 
-            var _gl = this._boundGL;
+            var boundRenderer = this._boundRenderer;
+            var _gl = boundRenderer && boundRenderer.gl;
             var attachedTextures;
 
             if (_gl) {
@@ -250,6 +259,10 @@ define(function (require) {
             var canAttach = true;
             if (_gl) {
                 canAttach = this._doAttach(_gl, texture, attachment, target);
+                // Set viewport again incase attached to different size textures.
+                if (!this.viewport) {
+                    boundRenderer.setViewport(0, 0, texture.width, texture.height, 1);
+                }
             }
 
             if (canAttach) {
@@ -343,10 +356,11 @@ define(function (require) {
         detach: function (attachment, target) {
             // TODO depth extension check ?
             this._textures[attachment] = null;
-            if (this._boundGL) {
+            if (this._boundRenderer) {
+                var gl = this._boundRenderer.gl;
                 var cache = this._cache;
-                cache.use(this._boundGL.__GLID__);
-                this._doDetach(this._boundGL, attachment, target);
+                cache.use(gl.__GLID__);
+                this._doDetach(gl, attachment, target);
             }
         },
         /**

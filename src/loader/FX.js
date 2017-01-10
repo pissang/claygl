@@ -359,10 +359,11 @@ define(function(require) {
 
     function createSizeSetHandler(name, exprFunc) {
         return function (renderer) {
-            var dpr = renderer.viewport.devicePixelRatio ;
+            // PENDING viewport size or window size
+            var dpr = renderer.getDevicePixelRatio();
             // PENDING If multiply dpr ?
-            var width = renderer.viewport.width;
-            var height = renderer.viewport.height;
+            var width = renderer.getWidth();
+            var height = renderer.getHeight();
             var result = exprFunc(width, height, dpr);
             this.setParameter(name, result);
         };
@@ -370,9 +371,9 @@ define(function(require) {
 
     function createSizeParser(name, exprFunc) {
         return function (renderer) {
-            var dpr = renderer.viewport.devicePixelRatio;
-            var width = renderer.viewport.width;
-            var height = renderer.viewport.height;
+            var dpr = renderer.getDevicePixelRatio();
+            var width = renderer.getWidth();
+            var height = renderer.getHeight();
             return exprFunc(width, height, dpr);
         };
     }
