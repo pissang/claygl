@@ -5,6 +5,7 @@ define(function(require) {
     var Node = require('./Node');
     var glinfo = require('../core/glinfo');
     var glenum = require('../core/glenum');
+    var FrameBuffer = require('../FrameBuffer');
 
     /**
      * @constructor qtek.compositor.SceneNode
@@ -32,9 +33,7 @@ define(function(require) {
         preZ: false
 
     }, function() {
-        if (this.frameBuffer) {
-            this.frameBuffer.depthBuffer = true;
-        }
+        this.frameBuffer = new FrameBuffer();
     }, {
         render: function(renderer) {
 

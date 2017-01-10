@@ -2,24 +2,68 @@ define(function (require) {
 
     'use strict';
 
-    var Base = require('../core/Base');
+    var Pass = require('./Pass');
+    var FrameBuffer = require('../FrameBuffer');
+    var Node = require('./Node');
 
     // PENDING
     // Use topological sort ?
 
     /**
-     * Node of graph based post processing.
+     * Filter node
      *
-     * @constructor qtek.compositor.Node
-     * @extends qtek.core.Base
+     * @constructor qtek.compositor.FilterNode
+     * @extends qtek.compositor.Node
+     *
+     * @example
+        var node = new qtek.compositor.Node({
+            name: 'fxaa',
+            shader: qtek.Shader.source('qtek.compositor.fxaa'),
+            inputs: {
+                texture: {
+                     node: 'scene',
+                     pin: 'color'
+                }
+            },
+            // Multiple outputs is preserved for MRT support in WebGL2.0
+            outputs: {
+                color: {
+                    attachment: qtek.FrameBuffer.COLOR_ATTACHMENT0
+                    parameters: {
+                        format: qtek.Texture.RGBA,
+                        width: 512,
+                        height: 512
+                    },
+                    // Node will keep the RTT rendered in last frame
+                    keepLastFrame: true,
+                    // Force the node output the RTT rendered in last frame
+                    outputLastFrame: true
+                }
+            }
+        });
      *
      */
-    var Node = Base.extend(function () {
+    var FilterNode = Node.extend(function () {
         return /** @lends qtek.compositor.Node# */ {
             /**
              * @type {string}
              */
             name: '',
+
+            /**
+             * @type {Object}
+             */
+            inputs: {},
+
+            /**
+             * @type {Object}
+             */
+            outputs: null,
+
+            /**
+             * @type {string}
+             */
+            shader: '',
 
             /**
              * Input links, will be updated by the graph
@@ -43,6 +87,11 @@ define(function (require) {
              */
             outputLinks: {},
 
+            /**
+             * @type {qtek.compositor.Pass}
+             */
+            pass: null,
+
             // Save the output texture of previous frame
             // Will be used when there exist a circular reference
             _prevOutputTextures: {},
@@ -57,9 +106,70 @@ define(function (require) {
 
             _compositor: null
         };
+    }, function () {
+
+        var pass = new Pass({
+            fragment: this.shader
+        });
+        this.pass = pass;
+
+        if (this.outputs) {
+            this.frameBuffer = new FrameBuffer({
+                // Not create depth buffer storage
+                depthBuffer: false
+            });
+        }
     },
     /** @lends qtek.compositor.Node.prototype */
     {
+        /**
+         * @param  {qtek.Renderer} renderer
+         */
+        render: function (renderer, frameBuffer) {
+            this.trigger('beforerender', renderer);
+
+            this._rendering = true;
+
+            var _gl = renderer.gl;
+
+            for (var inputName in this.inputLinks) {
+                var link = this.inputLinks[inputName];
+                var inputTexture = link.node.getOutput(renderer, link.pin);
+                this.pass.setUniform(inputName, inputTexture);
+            }
+            // Output
+            if (!this.outputs) {
+                this.pass.outputs = null;
+                this.pass.render(renderer, frameBuffer);
+            }
+            else {
+                this.pass.outputs = {};
+
+                for (var name in this.outputs) {
+                    var parameters = this.updateParameter(name, renderer);
+                    var outputInfo = this.outputs[name];
+                    var texture = this._compositor.allocateTexture(parameters);
+                    this._outputTextures[name] = texture;
+                    var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
+                    if (typeof(attachment) == 'string') {
+                        attachment = _gl[attachment];
+                    }
+                    this.pass.outputs[attachment] = texture;
+                }
+
+                this.pass.render(renderer, this.frameBuffer);
+            }
+
+            for (var inputName in this.inputLinks) {
+                var link = this.inputLinks[inputName];
+                link.node.removeReference(link.pin);
+            }
+
+            this._rendering = false;
+            this._rendered = true;
+
+            this.trigger('afterrender', renderer);
+        },
 
         // TODO Remove parameter function callback
         updateParameter: function (outputName, renderer) {
@@ -108,13 +218,17 @@ define(function (require) {
          * @param {string} name
          * @param {} value
          */
-        setParameter: function (name, value) {},
+        setParameter: function (name, value) {
+            this.pass.setUniform(name, value);
+        },
         /**
          * Get parameter value
          * @param  {string} name
          * @return {}
          */
-        getParameter: function (name) {},
+        getParameter: function (name) {
+            return this.pass.getUniform(name);
+        },
         /**
          * Set parameters
          * @param {Object} obj
@@ -124,44 +238,30 @@ define(function (require) {
                 this.setParameter(name, obj[name]);
             }
         },
+        /**
+         * Set shader code
+         * @param {string} shaderStr
+         */
+        setShader: function (shaderStr) {
+            var material = this.pass.material;
+            material.shader.setFragment(shaderStr);
+            material.attachShader(material.shader, true);
+        },
+        /**
+         * Proxy of pass.material.shader.define('fragment', xxx);
+         * @param  {string} symbol
+         * @param  {number} [val]
+         */
+        shaderDefine: function (symbol, val) {
+            this.pass.material.shader.define('fragment', symbol, val);
+        },
 
-        render: function () {},
-
-        getOutput: function (renderer /*optional*/, name) {
-            if (name == null) {
-                // Return the output texture without rendering
-                name = renderer;
-                return this._outputTextures[name];
-            }
-            var outputInfo = this.outputs[name];
-            if (!outputInfo) {
-                return ;
-            }
-
-            // Already been rendered in this frame
-            if (this._rendered) {
-                // Force return texture in last frame
-                if (outputInfo.outputLastFrame) {
-                    return this._prevOutputTextures[name];
-                }
-                else {
-                    return this._outputTextures[name];
-                }
-            }
-            else if (
-                // TODO
-                this._rendering   // Solve Circular Reference
-            ) {
-                if (!this._prevOutputTextures[name]) {
-                    // Create a blank texture at first pass
-                    this._prevOutputTextures[name] = this._compositor.allocateTexture(outputInfo.parameters || {});
-                }
-                return this._prevOutputTextures[name];
-            }
-
-            this.render(renderer);
-
-            return this._outputTextures[name];
+        /**
+         * Proxy of pass.material.shader.unDefine('fragment', xxx)
+         * @param  {string} symbol
+         */
+        shaderUnDefine: function (symbol) {
+            this.pass.material.shader.unDefine('fragment', symbol);
         },
 
         removeReference: function (outputName) {
@@ -192,7 +292,7 @@ define(function (require) {
             if (!fromNode.outputLinks[fromPinName]) {
                 fromNode.outputLinks[fromPinName] = [];
             }
-            fromNode.outputLinks[fromPinName].push({
+            fromNode.outputLinks[ fromPinName ].push({
                 node: this,
                 pin: inputPinName
             });
@@ -203,8 +303,11 @@ define(function (require) {
         },
 
         clear: function () {
-            this.inputLinks = {};
-            this.outputLinks = {};
+            Node.prototype.clear.call(this);
+
+            var shader = this.pass.material.shader;
+            // Default disable all texture
+            shader.disableTexturesAll();
         },
 
         updateReference: function (outputName) {
@@ -248,5 +351,5 @@ define(function (require) {
         }
     });
 
-    return Node;
+    return FilterNode;
 });

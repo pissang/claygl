@@ -26,7 +26,7 @@
                     eyeFadeStart: 0.4,
                     eyeFadeEnd: 0.8,
 
-                    glossiness: 0.5
+                    roughness: 0.5
                 };
 
                 var renderer = new qtek.Renderer({
@@ -97,7 +97,7 @@
                             mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
                             scene.add(mesh);
 
-                            mesh.material.set('glossiness', 0);
+                            mesh.material.set('roughness', 0.5);
                             mesh.material.set('color', [0, 0, 0]);
                             mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
                             monkeys.push(mesh);
@@ -159,8 +159,8 @@
                 gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
                 gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'glossiness', 0, 1).onChange(function (val) {
-                    plane.material.set('glossiness', val);
+                gui.add(config, 'roughness', 0, 1).onChange(function (val) {
+                    plane.material.set('roughness', val);
                 });
             });
         </script>

@@ -1,7 +1,7 @@
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
 //
-// TODO prez shader dependency
+// TODO prez skinning
 define(function(require) {
 
     'use strict';
@@ -512,7 +512,7 @@ define(function(require) {
                             continue;
                         }
                     }
-                    if (renderable.skeleton) {  // Skip skinned mesh
+                    if (renderable.skeleton) {  // Simply skip skinned mesh
                         continue;
                     }
                     if (renderable.cullFace !== cullFace) {

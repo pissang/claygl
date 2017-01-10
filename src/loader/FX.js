@@ -9,6 +9,7 @@ define(function(require) {
     var CompoNode = require('../compositor/Node');
     var CompoSceneNode = require('../compositor/SceneNode');
     var CompoTextureNode = require('../compositor/TextureNode');
+    var CompoFilterNode = require('../compositor/FilterNode');
     var Shader = require('../Shader');
     var Texture = require('../Texture');
     var Texture2D = require('../Texture2D');
@@ -197,7 +198,7 @@ define(function(require) {
             }
             // Default is filter
             else {
-                node = new CompoNode({
+                node = new CompoFilterNode({
                     name: nodeInfo.name,
                     shader: shaderSource,
                     inputs: inputs,
