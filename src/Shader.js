@@ -24,6 +24,7 @@ define(function (require) {
     var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\w\,]+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
     var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
     var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*;?\s*\n/g;
+    var loopRegex = /for\s*?\(int\s*?_idx_\s*\=\s*([\w-]+)\;\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
 
     var uniformTypeMap = {
         'bool': '1i',
@@ -293,7 +294,8 @@ define(function (require) {
         _updateShaderString: function (extensions) {
 
             if (this.vertex !== this._vertexPrev ||
-                this.fragment !== this._fragmentPrev) {
+                this.fragment !== this._fragmentPrev
+            ) {
 
                 this._parseImport();
 
@@ -310,6 +312,9 @@ define(function (require) {
             }
 
             this._addDefineExtensionAndPrecision(extensions);
+
+            this._vertexProcessed = this._unrollLoop(this._vertexProcessed, this.vertexDefines);
+            this._fragmentProcessed = this._unrollLoop(this._fragmentProcessed, this.fragmentDefines);
         },
 
         /**
@@ -632,7 +637,8 @@ define(function (require) {
             var enabledAttributeListInContext;
             if (vao) {
                 enabledAttributeListInContext = vao.__enabledAttributeList;
-            } else {
+            }
+            else {
                 enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
             }
             if (! enabledAttributeListInContext) {
@@ -642,7 +648,8 @@ define(function (require) {
                     enabledAttributeListInContext
                         = vao.__enabledAttributeList
                         = [];
-                } else {
+                }
+                else {
                     enabledAttributeListInContext
                         = enabledAttributeList[_gl.__GLID__]
                         = [];
@@ -669,7 +676,8 @@ define(function (require) {
 
                 if (!enabledAttributeListInContext[location]) {
                     enabledAttributeListInContext[location] = SHADER_STATE_TO_ENABLE;
-                } else {
+                }
+                else {
                     enabledAttributeListInContext[location] = SHADER_STATE_KEEP_ENABLE;
                 }
             }
@@ -696,8 +704,8 @@ define(function (require) {
 
         _parseImport: function () {
 
-            this._vertexProcessedNoDefine = Shader.parseImport(this.vertex);
-            this._fragmentProcessedNoDefine = Shader.parseImport(this.fragment);
+            this._vertexProcessedWithoutDefine = Shader.parseImport(this.vertex);
+            this._fragmentProcessedWithoutDefine = Shader.parseImport(this.fragment);
 
         },
 
@@ -710,8 +718,27 @@ define(function (require) {
             for (var i = 0; i < this.extensions.length; i++) {
                 extensionStr.push('#extension GL_' + this.extensions[i] + ' : enable');
             }
+
             // Add defines
             // VERTEX
+            var defineStr = this._getDefineStr(this.vertexDefines);
+            this._vertexProcessed = defineStr + '\n' + this._vertexProcessedWithoutDefine;
+
+            // FRAGMENT
+            var defineStr = this._getDefineStr(this.fragmentDefines);
+            var code = defineStr + '\n' + this._fragmentProcessedWithoutDefine;
+
+            // Add precision
+            this._fragmentProcessed = extensionStr.join('\n') + '\n'
+                + ['precision', this.precision, 'float'].join(' ') + ';\n'
+                + ['precision', this.precision, 'int'].join(' ') + ';\n'
+                // depth texture may have precision problem on iOS device.
+                + ['precision', this.precision, 'sampler2D'].join(' ') + ';\n'
+                + code;
+        },
+
+        _getDefineStr: function (defines) {
+
             var lightNumber = this.lightNumber;
             var textureStatus = this._textureStatus;
             var defineStr = [];
@@ -728,8 +755,8 @@ define(function (require) {
                 }
             }
             // Custom Defines
-            for (var symbol in this.vertexDefines) {
-                var value = this.vertexDefines[symbol];
+            for (var symbol in defines) {
+                var value = defines[symbol];
                 if (value === null) {
                     defineStr.push('#define ' + symbol);
                 }
@@ -737,40 +764,52 @@ define(function (require) {
                     defineStr.push('#define ' + symbol + ' ' + value.toString());
                 }
             }
-            this._vertexProcessed = defineStr.join('\n') + '\n' + this._vertexProcessedNoDefine;
+            return defineStr.join('\n');
+        },
 
-            // FRAGMENT
-            defineStr = [];
-            for (var lightType in lightNumber) {
-                var count = lightNumber[lightType];
-                if (count > 0) {
-                    defineStr.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
-                }
-            }
-            for (var symbol in textureStatus) {
-                var status = textureStatus[symbol];
-                if (status.enabled) {
-                    defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
-                }
-            }
-            // Custom Defines
-            for (var symbol in this.fragmentDefines) {
-                var value = this.fragmentDefines[symbol];
-                if (value === null) {
-                    defineStr.push('#define ' + symbol);
-                }else{
-                    defineStr.push('#define ' + symbol + ' ' + value.toString());
-                }
-            }
-            var code = defineStr.join('\n') + '\n' + this._fragmentProcessedNoDefine;
+        _unrollLoop: function (shaderStr, defines) {
+            // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
+            // In some case like shadowMap in loop use 'i' to index value much slower.
 
-            // Add precision
-            this._fragmentProcessed = extensionStr.join('\n') + '\n'
-                + ['precision', this.precision, 'float'].join(' ') + ';\n'
-                + ['precision', this.precision, 'int'].join(' ') + ';\n'
-                // depth texture may have precision problem on iOS device.
-                + ['precision', this.precision, 'sampler2D'].join(' ') + ';\n'
-                + code;
+            // Loop use _idx_ and increased with _idx_++ will be unrolled
+            // Use {{ }} to match the pair so the if statement will not be affected
+            // Write like following
+            // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
+            //     vec3 color = texture2D(textures[_idx_], uv).rgb;
+            // }}
+            function replace(match, start, end, snippet) {
+                var unroll = '';
+                // Try to treat as define
+                if (isNaN(start)) {
+                    if (start in defines) {
+                        start = defines[start];
+                    }
+                    else {
+                        start = lightNumberDefines[start];
+                    }
+                }
+                if (isNaN(end)) {
+                    if (end in defines) {
+                        end = defines[end];
+                    }
+                    else {
+                        end = lightNumberDefines[end];
+                    }
+                }
+                // TODO Error checking
+
+                for (var i = parseInt(start); i < parseInt(end); i++) {
+                    unroll += snippet.replace(/_idx_/g, i) + '\n';
+                }
+
+                return unroll;
+            }
+
+            var lightNumberDefines = {};
+            for (var lightType in this.lightNumber) {
+                lightNumberDefines[lightType + '_COUNT'] = this.lightNumber[lightType];
+            }
+            return shaderStr.replace(loopRegex, replace);
         },
 
         _parseUniforms: function () {
@@ -779,9 +818,9 @@ define(function (require) {
             var shaderType = 'vertex';
             this._uniformList = [];
 
-            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(uniformRegex, _uniformParser);
+            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
             shaderType = 'fragment';
-            this._fragmentProcessedNoDefine = this._fragmentProcessedNoDefine.replace(uniformRegex, _uniformParser);
+            this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
 
             self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
@@ -878,7 +917,8 @@ define(function (require) {
                     return function () {
                         return new vendor.Float32Array(arr);
                     };
-                } else {
+                }
+                else {
                     // Invalid value
                     return;
                 }
@@ -932,7 +972,7 @@ define(function (require) {
         _parseAttributes: function () {
             var attributes = {};
             var self = this;
-            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(
+            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(
                 attributeRegex, _attributeParser
             );
 
@@ -983,18 +1023,20 @@ define(function (require) {
         _parseDefines: function () {
             var self = this;
             var shaderType = 'vertex';
-            this._vertexProcessedNoDefine = this._vertexProcessedNoDefine.replace(defineRegex, _defineParser);
+            this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(defineRegex, _defineParser);
             shaderType = 'fragment';
-            this._fragmentProcessedNoDefine = this._fragmentProcessedNoDefine.replace(defineRegex, _defineParser);
+            this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(defineRegex, _defineParser);
 
             function _defineParser(str, symbol, value) {
                 var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
                 if (!defines[symbol]) { // Haven't been defined by user
                     if (value == 'false') {
                         defines[symbol] = false;
-                    } else if (value == 'true') {
+                    }
+                    else if (value == 'true') {
                         defines[symbol] = true;
-                    } else {
+                    }
+                    else {
                         defines[symbol] = value ? parseFloat(value) : null;
                     }
                 }
@@ -1124,7 +1166,8 @@ define(function (require) {
             if (str) {
                 // Recursively parse
                 return Shader.parseImport(str);
-            } else {
+            }
+            else {
                 console.warn('Shader chunk "' + importName + '" not existed in library');
                 return '';
             }
