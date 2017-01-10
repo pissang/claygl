@@ -299,9 +299,7 @@ uniform bool shadowEnabled : true;
 
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
-void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ){
-    // Loop will be unrolled. so can't define variable inside the Loop
-    // Or may cause redefinition error
+void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {
     float shadowContrib;
     for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{
         shadowContrib = computeShadowContrib(

@@ -3,8 +3,9 @@ define(function (require) {
     'use strict';
 
     var Pass = require('./Pass');
-    var FrameBuffer = require('../FrameBuffer');
     var Node = require('./Node');
+
+    // TODO curlnoise demo wrong
 
     // PENDING
     // Use topological sort ?

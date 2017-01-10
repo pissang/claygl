@@ -469,12 +469,13 @@ void main()
     // One brdf lookup is enough
     vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;
     vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;
-    for(int i = 0; i < AMBIENT_CUBEMAP_LIGHT_COUNT; i++)
-    {
-        vec3 envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[i], L, bias2), 51.5);
+    vec3 envTexel2;
+    for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)
+    {{
+        envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 51.5);
         // TODO mix ?
-        outColor.rgb += ambientCubemapLightColor[i] * envTexel2 * envWeight2;
-    }
+        outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
+    }}
 #endif
 
 #ifdef ENVIRONMENTMAP_ENABLED
