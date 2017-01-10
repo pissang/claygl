@@ -105,6 +105,23 @@ define(function (require) {
         },
 
         /**
+         * If contain another bounding box entirely
+         * @param  {qtek.math.BoundingBox} bbox
+         * @return {boolean}
+         */
+        containBoundingBox: function (bbox) {
+
+            var _min = this.min._array;
+            var _max = this.max._array;
+
+            var _min2 = bbox.min._array;
+            var _max2 = bbox.max._array;
+
+            return _min[0] <= _min2[0] && _min[1] <= _min2[1] && _min[2] <= _min2[2]
+                && _max[0] >= _max2[0] && _max[1] >= _max2[1] && _max[2] >= _max2[2];
+        },
+
+        /**
          * If bounding box is finite
          */
         isFinite: function () {
