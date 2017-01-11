@@ -420,7 +420,8 @@ define(function(require) {
                 var skeleton = instanceSkins[name];
                 if (haveInvBindMatrices) {
                     skeleton.updateMatricesSubArrays();
-                } else {
+                }
+                else {
                     skeleton.updateJointMatrices();
                 }
                 skeleton.update();
