@@ -512,7 +512,7 @@ define(function(require) {
                             continue;
                         }
                     }
-                    if (renderable.skeleton) {  // Simply skip skinned mesh
+                    if (renderable.skeleton) {  // FIXME  skinned mesh
                         continue;
                     }
                     if (renderable.cullFace !== cullFace) {

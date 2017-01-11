@@ -461,7 +461,7 @@ define(function (require) {
                 );
             }
             else {
-                mat4.copy(worldTransform, localTransform );
+                mat4.copy(worldTransform, localTransform);
             }
         },
 
@@ -541,6 +541,17 @@ define(function (require) {
          * @return {qtek.math.Vector3}
          */
         getWorldPosition: function (out) {
+            // TODO If update when get worldTransform
+            if (this.transformNeedsUpdate()) {
+                // Find the root node which transform needs update;
+                var rootNodeDirty = this;
+                while (rootNodeDirty && rootNodeDirty.getParent()
+                    && rootNodeDirty.getParent().transformNeedsUpdate()
+                ) {
+                    rootNodeDirty = rootNodeDirty.getParent();
+                }
+                rootNodeDirty.update();
+            }
             var m = this.worldTransform._array;
             if (out) {
                 var arr = out._array;
@@ -613,9 +624,12 @@ define(function (require) {
          */
         lookAt: (function () {
             var m = new Matrix4();
+            var worldPosition = new Vector3();
             return function (target, up) {
-                m.lookAt(this.position, target, up || this.localTransform.y).invert();
-                m.decomposeMatrix(null, this.rotation, this.position);
+                this.getWorldPosition(worldPosition);
+                m.lookAt(worldPosition, target, up || this.worldTransform.y).invert();
+
+                this.setWorldTransform(m);
             };
         })()
     });

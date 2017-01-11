@@ -245,7 +245,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
-                "textureSize": "expr( [width * dpr / 16, height * drp / 16] )"
+                "textureSize": "expr( [width * dpr / 16, height * dpr / 16] )"
             },
             "defines": {
                 "RGBM": null
