@@ -618,10 +618,10 @@ define(function (require) {
                 this._frameBuffer.attach(texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
                 this._frameBuffer.bind(renderer);
                 _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
-                this._frameBuffer.unbind(renderer);
 
                 renderer.renderQueue(casters, camera);
             }
+                this._frameBuffer.unbind(renderer);
         },
 
         _gaussianFilter: function (renderer, texture, size) {
