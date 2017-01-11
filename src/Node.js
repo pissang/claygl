@@ -498,12 +498,12 @@ define(function (require) {
          */
         getBoundingBox: (function () {
 
-            function defaultFilteer (el) {
-                return !el.ignore;
+            function defaultFilter (el) {
+                return !el.invisible;
             }
             return function (filter, out) {
                 out = out || new BoundingBox();
-                filter = filter || defaultFilteer;
+                filter = filter || defaultFilter;
 
                 var children = this._children;
                 if (children.length === 0) {
@@ -564,6 +564,8 @@ define(function (require) {
                 return new Vector3(m[12], m[13], m[14]);
             }
         },
+
+        // TODO Set world transform
 
         /**
          * Clone a new node

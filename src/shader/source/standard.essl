@@ -146,7 +146,7 @@ uniform sampler2D emissiveMap;
 #ifdef SSAOMAP_ENABLED
 // For ssao prepass
 uniform sampler2D ssaoMap;
-uniform vec2 viewportSize : VIEWPORT_SIZE;
+uniform vec4 viewport : VIEWPORT;
 #endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -506,7 +506,8 @@ void main()
 #endif
 
 #ifdef SSAOMAP_ENABLED
-    outColor.rgb *= texture2D(ssaoMap, gl_FragCoord.xy / viewportSize).rgb;
+    // PENDING
+    outColor.rgb *= texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).rgb;
 #endif
 
     vec3 lEmission = emission;
