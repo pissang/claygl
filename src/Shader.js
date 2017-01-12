@@ -798,9 +798,11 @@ define(function (require) {
                 }
                 // TODO Error checking
 
-                for (var i = parseInt(start); i < parseInt(end); i++) {
+                for (var idx = parseInt(start); idx < parseInt(end); idx++) {
                     // PENDING Add scope?
-                    unroll += '{' + snippet.replace(/_idx_/g, i) + '\n' + '}';
+                    unroll += '{'
+                        + snippet.replace(/_idx_/g, idx).replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+                    + '\n' + '}';
                 }
 
                 return unroll;

@@ -169,6 +169,12 @@ define(function (require) {
 
         return {
 
+            enableTargetTexture1: true,
+
+            enableTargetTexture2: true,
+
+            enableTargetTexture3: true,
+
             // - R: normal.x
             // - G: normal.y
             // - B: normal.z
@@ -277,60 +283,88 @@ define(function (require) {
             var gl = renderer.gl;
 
             var frameBuffer = this._frameBuffer;
-            frameBuffer.attach(this._gBufferTex1);
-            frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
-            frameBuffer.bind(renderer);
+            var viewport = frameBuffer.viewport;
+            var opaqueQueue = scene.opaqueQueue;
+            var oldBeforeRender = renderer.beforeRenderObject;
+
             gl.clearColor(0, 0, 0, 0);
             gl.depthMask(true);
             gl.colorMask(true, true, true, true);
-
-            var viewport = frameBuffer.viewport;
-            if (viewport) {
-                var dpr = viewport.devicePixelRatio;
-                // use scissor to make sure only clear the viewport
-                gl.enable(gl.SCISSOR_TEST);
-                gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
-            }
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            if (viewport) {
-                gl.disable(gl.SCISSOR_TEST);
-            }
-
             gl.disable(gl.BLEND);
 
-            var opaqueQueue = scene.opaqueQueue;
+            var enableTargetTexture1 = this.enableTargetTexture1;
+            var enableTargetTexture2 = this.enableTargetTexture2;
+            var enableTargetTexture3 = this.enableTargetTexture3;
+            if (!enableTargetTexture1 && !enableTargetTexture3) {
+                console.warn('Can\'t disable targetTexture1 targetTexture2 both');
+                enableTargetTexture1 = true;
+            }
 
-            this._resetGBufferMaterials();
+            if (enableTargetTexture2) {
+                frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
+            }
 
-            this._replaceGBufferMat(opaqueQueue, 1);
-            opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
+            if (enableTargetTexture1) {
+                // Pass 1
+                frameBuffer.attach(this._gBufferTex1);
+                frameBuffer.bind(renderer);
 
-            var oldBeforeRender = renderer.beforeRenderObject;
+                if (viewport) {
+                    var dpr = viewport.devicePixelRatio;
+                    // use scissor to make sure only clear the viewport
+                    gl.enable(gl.SCISSOR_TEST);
+                    gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
+                }
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                if (viewport) {
+                    gl.disable(gl.SCISSOR_TEST);
+                }
 
-            // FIXME Use MRT if possible
-            // Pass 1
-            renderer.beforeRenderObject = getBeforeRenderHook1(
-                gl,
-                this._defaultNormalMap,
-                this._defaultRoughnessMap
-            );
-            renderer.renderQueue(opaqueQueue, camera);
+                this._resetGBufferMaterials();
 
-            // Pass 2
-            frameBuffer.attach(this._gBufferTex3);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            this._replaceGBufferMat(opaqueQueue, 2);
-            renderer.beforeRenderObject = getBeforeRenderHook2(
-                gl,
-                this._defaultDiffuseMap,
-                this._defaultMetalnessMap
-            );
-            renderer.renderQueue(opaqueQueue, camera);
+                this._replaceGBufferMat(opaqueQueue, 1);
+                opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
+
+
+                // FIXME Use MRT if possible
+                // Pass 1
+                renderer.beforeRenderObject = getBeforeRenderHook1(
+                    gl,
+                    this._defaultNormalMap,
+                    this._defaultRoughnessMap
+                );
+                renderer.renderQueue(opaqueQueue, camera);
+
+            }
+            if (enableTargetTexture3) {
+
+                // Pass 2
+                frameBuffer.attach(this._gBufferTex3);
+                frameBuffer.bind(renderer);
+
+                if (viewport) {
+                    var dpr = viewport.devicePixelRatio;
+                    // use scissor to make sure only clear the viewport
+                    gl.enable(gl.SCISSOR_TEST);
+                    gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
+                }
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                if (viewport) {
+                    gl.disable(gl.SCISSOR_TEST);
+                }
+
+                this._replaceGBufferMat(opaqueQueue, 2);
+                renderer.beforeRenderObject = getBeforeRenderHook2(
+                    gl,
+                    this._defaultDiffuseMap,
+                    this._defaultMetalnessMap
+                );
+                renderer.renderQueue(opaqueQueue, camera);
+
+            }
 
             renderer.beforeRenderObject = oldBeforeRender;
-
             this._cleanGBufferMaterials(renderer.gl);
-
             this._restoreMaterial(opaqueQueue);
 
             frameBuffer.unbind(renderer);
