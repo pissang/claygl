@@ -37,18 +37,18 @@ void main()
 
 #ifdef SHADOWMAP_ENABLED
     float shadowContrib = 1.0;
-    for (int i = 0; i < SHADOW_CASCADE; i++) {
+    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{
         if (
-            z >= shadowCascadeClipsNear[i] &&
-            z <= shadowCascadeClipsFar[i]
+            z >= shadowCascadeClipsNear[_idx_] &&
+            z <= shadowCascadeClipsFar[_idx_]
         ) {
             shadowContrib = computeShadowContrib(
-                lightShadowMap, lightMatrices[i], position, lightShadowMapSize,
+                lightShadowMap, lightMatrices[_idx_], position, lightShadowMapSize,
                 vec2(1.0 / float(SHADOW_CASCADE), 1.0),
-                vec2(float(i) / float(SHADOW_CASCADE), 0.0)
+                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)
             );
         }
-    }
+    }}
 
     gl_FragColor.rgb *= shadowContrib;
 #endif

@@ -17,9 +17,7 @@
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var shadowMapPass = new qtek.prePass.ShadowMap({
-                    shadowCascade: 2
-                });
+                var shadowMapPass = new qtek.prePass.ShadowMap();
                 var deferredRenderer = new qtek.deferred.Renderer({
                     shadowMapPass: shadowMapPass
                 });
@@ -56,7 +54,8 @@
                 var directionalLight = new qtek.light.Directional({
                     intensity: 1.2,
                     shadowBias: 0.004,
-                    shadowResolution: 2048
+                    shadowResolution: 2048,
+                    shadowCascade: 2
                 });
                 directionalLight.position.set(10, 10, 10);
                 directionalLight.lookAt(scene.position);

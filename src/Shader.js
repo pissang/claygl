@@ -801,7 +801,9 @@ define(function (require) {
                 for (var idx = parseInt(start); idx < parseInt(end); idx++) {
                     // PENDING Add scope?
                     unroll += '{'
-                        + snippet.replace(/_idx_/g, idx).replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+                        + snippet
+                            .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+                            .replace(/_idx_/g, idx)
                     + '\n' + '}';
                 }
 
