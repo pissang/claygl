@@ -11,7 +11,7 @@ define(function (require) {
     var shaderLibrary = {};
     var shaderUsedCount = {};
 
-    var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup', 'ssaoMap'];
+    var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
     var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
     var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM'];
 
@@ -192,6 +192,11 @@ define(function (require) {
             /**
              * @type {qtek.Texture2D}
              * @name ssaoMap
+             */
+
+            /**
+             * @type {qtek.Texture2D}
+             * @name aoMap
              */
 
             /**

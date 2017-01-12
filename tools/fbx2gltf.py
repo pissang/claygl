@@ -501,6 +501,7 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
     lPositions = []
     lNormals = []
     lTexcoords = []
+    lTexcoords2 = []
     lIndices = []
 
     lWeights = []
@@ -510,12 +511,16 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
 
     # Only consider layer 0
     lLayer = pMesh.GetLayer(0)
+    # Uv of lightmap on layer 1
+    # PENDING Uv2 always on layer 1?
+    lLayer2 = pMesh.GetLayer(1)
+
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
-        if lLayerMaterial == None:
+        if not lLayerMaterial:
             print("Mesh " + pNode.GetName() + " doesn't have material")
-            return None;
+            return None
         # Mapping Mode of material must be eAllSame
         # Because the mesh has been splitted by material
         idx = lLayerMaterial.GetIndexArray()[0];
@@ -523,28 +528,36 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
         lMaterialKey = ConvertMaterial(lMaterial)
         lGLTFPrimitive["material"] = lMaterialKey
 
+        lNormalSplitted = False
+        lUvSplitted = False
+        lUv2Splitted = False
         ## Handle normals
         lLayerNormal = lLayer.GetNormals()
-        if not lLayerNormal == None:
+        if lLayerNormal:
             lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
-        else:
-            lNormalSplitted = False
 
         ## Handle uvs
         lLayerUV = lLayer.GetUVs()
-        if not lLayerUV == None:
-            lUVSPlitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
-        else:
-            ## Same with normal if don't have uv.
-            lUVSPlitted = lNormalSplitted
+
+        lLayer2Uv = None
+
+        if lLayerUV:
+            lUvSplitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
+
+        if lLayer2:
+            lLayer2Uv = lLayer2.GetUVs()
+            if lLayer2Uv:
+                lUv2Splitted = ConvertVertexLayer(pMesh, lLayer2Uv, lTexcoords2)
 
         hasSkin = False
+        moreThanFourJoints = False
+        lMaxJointCount = 0
         ## Handle Skinning data
         if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
-            hasSkin = True;
+            hasSkin = True
             lControlPointsCount = pMesh.GetControlPointsCount()
             for i in range(lControlPointsCount):
-                lWeights.append([0, 0, 0])
+                lWeights.append([0, 0, 0, 0])
                 lJoints.append([-1, -1, -1, -1])
                 lJointCounts.append(0)
 
@@ -565,6 +578,7 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
 
                     lControlPointIndices = lCluster.GetControlPointIndices()
                     lControlPointWeights = lCluster.GetControlPointWeights()
+
                     for i3 in range(lCluster.GetControlPointIndicesCount()):
                         lControlPointIndex = lControlPointIndices[i3]
                         lControlPointWeight = lControlPointWeights[i3]
@@ -573,16 +587,29 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
                         if lJointCount <= 3:
                             # Joint index
                             lJoints[lControlPointIndex][lJointCount] = lJointIndex
-                            # Weight is FLOAT_3 because it is normalized
-                            if lJointCount < 3:
-                                lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
-                            lJointCounts[lControlPointIndex] += 1
+                            lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
+                        else:
+                            moreThanFourJoints = True
+                            # More than four joints, replace joint of minimum Weight
+                            lMinW, lMinIdx = min( (lWeights[lControlPointIndex][i], i) for i in range(len(lWeights[lControlPointIndex])) )
+                            lJoints[lControlPointIndex][lMinIdx] = lJointIndex
+                            lWeights[lControlPointIndex][lMinIdx] = lControlPointWeight
+                            lMaxJointCount = max(lMaxJointCount, lJointIndex)
+                        lJointCounts[lControlPointIndex] += 1
 
-        if lNormalSplitted or lUVSPlitted:
+        if moreThanFourJoints:
+            print('More than 4 joints (%d joints) bound to per vertex. ' % lMaxJointCount)
+
+        # Weight is FLOAT_3 because it is normalized
+        for i in range(len(lWeights)):
+            lWeights[i] = lWeights[i][:3]
+
+        if lNormalSplitted or lUvSplitted or lUv2Splitted:
             lCount = 0
             lVertexCount = 0
             lNormalsTmp = []
             lTexcoordsTmp = []
+            lTexcoords2Tmp = []
             lJointsTmp = []
             lWeightsTmp = []
             lVertexMap = {}
@@ -594,23 +621,44 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
                     lNormal = lNormals[idx]
                 else:
                     lNormal = lNormals[lCount]
-                if not lUVSPlitted:
-                    lTexcoord = lTexcoords[idx]
-                elif not lLayerUV == None:
-                    lTexcoord = lTexcoords[lCount]
+
+                if lLayerUV:
+                    if not lUvSplitted:
+                        lTexcoord = lTexcoords[idx]
+                    else:
+                        lTexcoord = lTexcoords[lCount]
+
+                if lLayer2Uv:
+                    if not lUv2Splitted:
+                        lTexcoord = lTexcoords2[idx]
+                    else:
+                        lTexcoord2 = lTexcoords2[lCount]
+
                 lCount += 1
+
                 #Compress vertex, hashed with position and normal
-                if not lLayerUV == None:
+                if lLayer2Uv:
+                    if lLayer2Uv:
+                        lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1], lTexcoord2[0], lTexcoord2[1])
+                    else:
+                        lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord2[0], lTexcoord2[1])
+                elif lLayerUV:
                     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1])
                 else:
                     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
+
                 if lKey in lVertexMap:
                     lIndices.append(lVertexMap[lKey])
                 else:
                     lPositions.append(lPosition)
                     lNormalsTmp.append(lNormal)
-                    if not lLayerUV == None:
+
+                    if lLayerUV:
                         lTexcoordsTmp.append(lTexcoord)
+
+                    if lLayer2Uv:
+                        lTexcoords2Tmp.append(lTexcoord2)
+
                     if hasSkin:
                         lWeightsTmp.append(lWeights[idx])
                         lJointsTmp.append(lJoints[idx])
@@ -620,6 +668,8 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
 
             lNormals = lNormalsTmp
             lTexcoords = lTexcoordsTmp
+            lTexcoords2 = lTexcoords2Tmp
+
             if hasSkin:
                 lWeights = lWeightsTmp
                 lJoints = lJointsTmp
@@ -631,8 +681,10 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
         lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
         if not lLayerNormal == None:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
-        if not lLayerUV == None:
+        if lLayerUV:
             lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
+        if lLayer2Uv:
+            lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lTexcoords2, 'f', 2)
         if hasSkin:
             # PENDING Joint indices use other data type ?
             lGLTFPrimitive['attributes']['JOINT'] = CreateAttributeBuffer(lJoints, 'f', 4)

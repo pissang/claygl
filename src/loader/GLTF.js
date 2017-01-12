@@ -51,6 +51,7 @@ define(function(require) {
         'NORMAL': 'normal',
         'POSITION': 'position',
         'TEXCOORD_0': 'texcoord0',
+        'TEXCOORD_1': 'texcoord1',
         'WEIGHT': 'weight',
         'JOINT': 'joint',
         'COLOR': 'color'
