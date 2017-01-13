@@ -11,8 +11,8 @@ define(function (require) {
     var shaderLibrary = {};
     var shaderUsedCount = {};
 
-    var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissionMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
-    var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset'];
+    var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
+    var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity'];
     var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM'];
 
     var OTHER_SHADER_KEYS = [
@@ -170,7 +170,7 @@ define(function (require) {
              */
             /**
              * @type {qtek.Texture2D}
-             * @name emissionMap
+             * @name emissiveMap
              */
 
             /**
@@ -212,6 +212,12 @@ define(function (require) {
              * @default [0, 0]
              */
             uvOffset: [0, 0],
+
+            /**
+             * @type {number}
+             * @default 1
+             */
+            aoIntensity: 1,
 
             /**
              * @type {number}

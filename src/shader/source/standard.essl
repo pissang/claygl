@@ -165,6 +165,7 @@ uniform vec4 viewport : VIEWPORT;
 
 #ifdef AOMAP_ENABLED
 uniform sampler2D aoMap;
+uniform float aoIntensity;
 varying vec2 v_Texcoord2;
 #endif
 
@@ -531,14 +532,14 @@ void main()
 #endif
 
 #ifdef AOMAP_ENABLED
-    aoFactor = min(texture2D(aoMap, v_Texcoord2).r, aoFactor);
+    aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);
 #endif
 
     outColor.rgb *= aoFactor;
 
     vec3 lEmission = emission;
 #ifdef EMISSIVEMAP_ENABLED
-    lEmission *= texture2D(emissiveMap, v_Texcoord);
+    lEmission *= texture2D(emissiveMap, v_Texcoord).rgb;
 #endif
     outColor.rgb += lEmission * emissionIntensity;
 
