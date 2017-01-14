@@ -20,8 +20,6 @@
                 var animation = new qtek.animation.Animation;
                 animation.start();
                 var shadowMapPass = new qtek.prePass.ShadowMap({
-                    // softShadow: qtek.prePass.ShadowMap.VSM
-                    // shadowCascade: 4
                 });
 
                 var scene = new qtek.Scene();
@@ -54,7 +52,7 @@
 
                 var root = new qtek.Node();
                 var meshNumber = 0;
-                var N = 8;
+                var N = 3;
                 for (var i = 0; i < N; i++) {
                     for (var j = 0; j < N; j++) {
                         var nanosuit = new qtek.Node();

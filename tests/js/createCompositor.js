@@ -64,7 +64,7 @@ define(function (require) {
             compositor.addNode(textureNode);
         }
 
-        var tonemappingNode = compositor.getNodeByName('tonemapping');
+        var finalCompositeNode = compositor.getNodeByName('composite');
         var cocNode = compositor.getNodeByName('coc');
 
         var lensColorTex = new qtek.Texture2D();
@@ -73,36 +73,36 @@ define(function (require) {
         lensDirtTex.load('assets/textures/lensflare/lensdirt2.jpg');
 
         compositor.getNodeByName('lensflare').setParameter('lenscolor', lensDirtTex);
-        tonemappingNode.setParameter('lensdirt', lensDirtTex);
+        finalCompositeNode.setParameter('lensdirt', lensDirtTex);
 
         // Inject methods
         compositor.enableBloom = function () {
-            tonemappingNode.inputs.bloom = 'bright_upsample_full_blend';
+            finalCompositeNode.inputs.bloom = 'bloom_composite';
             compositor.dirty();
         };
 
         compositor.disableBloom = function () {
-            tonemappingNode.inputs.bloom = null;
+            finalCompositeNode.inputs.bloom = null;
             compositor.dirty();
         };
 
         compositor.enableLensflare = function () {
-            tonemappingNode.inputs.lensflare = 'lensflare_blur_v';
+            finalCompositeNode.inputs.lensflare = 'lensflare_blur_v';
             compositor.dirty();
         };
 
         compositor.disableLensflare = function () {
-            tonemappingNode.inputs.lensflare = null;
+            finalCompositeNode.inputs.lensflare = null;
             compositor.dirty();
         };
 
         compositor.enableDepthOfField = function () {
-            tonemappingNode.inputs.texture = 'dof_composite';
+            finalCompositeNode.inputs.texture = 'dof_composite';
             compositor.dirty();
         };
 
         compositor.disableDepthOfField = function () {
-            tonemappingNode.inputs.texture = 'source';
+            finalCompositeNode.inputs.texture = 'source';
             compositor.dirty();
         };
 
@@ -118,7 +118,7 @@ define(function (require) {
 
         if (opt.stereo) {
             compositor.nodes.forEach(function (node) {
-                node.shaderDefine('STEREO');
+                node.shaderDefine && node.shaderDefine('STEREO');
             });
         }
 

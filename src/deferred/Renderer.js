@@ -445,7 +445,7 @@ define(function (require) {
                             // Frustum culling
                             Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
                             if (renderer.isFrustumCulled(
-                                volumeMesh, camera, worldView._array, camera.projectionMatrix._array
+                                volumeMesh, null, camera, worldView._array, camera.projectionMatrix._array
                             )) {
                                 continue;
                             }
@@ -618,7 +618,7 @@ define(function (require) {
                     // Frustum culling
                     Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
                     if (renderer.isFrustumCulled(
-                        volumeMesh, camera, worldView._array, camera.projectionMatrix._array
+                        volumeMesh, null, camera, worldView._array, camera.projectionMatrix._array
                     )) {
                         continue;
                     }

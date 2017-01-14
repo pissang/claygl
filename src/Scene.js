@@ -4,6 +4,7 @@ define(function (require) {
 
     var Node = require('./Node');
     var Light = require('./Light');
+    var BoundingBox = require('./math/BoundingBox');
 
     /**
      * @constructor qtek.Scene
@@ -37,6 +38,18 @@ define(function (require) {
             transparentQueue: [],
 
             lights: [],
+
+
+            /**
+             * Scene bounding box in view space.
+             * Used when camera needs to adujst the near and far plane automatically
+             * so that the view frustum contains the visible objects as tightly as possible.
+             * Notice:
+             *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
+             *
+             * @type {qtek.math.BoundingBox}
+             */
+            viewBoundingBoxLastFrame: new BoundingBox(),
 
             // Properties to save the light information in the scene
             // Will be set in the render function

@@ -5,7 +5,6 @@ define(function (require) {
     var Node = require('./Node');
     var Matrix4 = require('./math/Matrix4');
     var Frustum = require('./math/Frustum');
-    var BoundingBox = require('./math/BoundingBox');
     var Ray = require('./math/Ray');
 
     var glMatrix = require('./dep/glmatrix');
@@ -41,19 +40,7 @@ define(function (require) {
              * Camera frustum in view space
              * @type {qtek.math.Frustum}
              */
-            frustum: new Frustum(),
-
-            /**
-             * Scene bounding box in view space.
-             * Used when camera needs to adujst the near and far plane automatically
-             * so that the view frustum contains the visible objects as tightly as possible.
-             * Notice:
-             *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
-             *
-             * @type {qtek.math.BoundingBox}
-             */
-            //TODO In case of one camera to multiple scenes
-            sceneBoundingBoxLastFrame: new BoundingBox()
+            frustum: new Frustum()
         };
     }, function () {
         this.update(true);

@@ -475,7 +475,7 @@ define(function (require) {
                 // Considering moving speed since the bounding box is from last frame
                 // verlet integration ?
                 // FIXME First shot?
-                var depth = -sceneCamera.sceneBoundingBoxLastFrame.min.z;
+                var depth = -scene.viewBoundingBoxLastFrame.min.z;
                 deltaDepth = Math.max(depth - prevDepth, 0);
                 prevDepth = depth;
                 depth += deltaDepth;

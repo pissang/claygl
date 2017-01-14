@@ -10,7 +10,7 @@
         <script type="text/javascript">
             require(['qtek'], function(qtek){
                 var Shader = qtek.Shader;
-                var pp_Node = qtek.compositor.Node;
+                var pp_FilterNode = qtek.compositor.FilterNode;
                 var pp_SceneNode = qtek.compositor.SceneNode;
                 var compositor = new qtek.compositor.Compositor();
 
@@ -70,7 +70,7 @@
                         }
                     }
                 }) );
-                var colorAdjustNode = new pp_Node({
+                var colorAdjustNode = new pp_FilterNode({
                     name : "coloradjust",
                     shader : Shader.source("qtek.compositor.coloradjust"),
                     inputs : {

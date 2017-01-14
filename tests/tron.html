@@ -24,7 +24,7 @@
 
                 var renderer = new qtek.Renderer({
                     canvas : document.getElementById('main'),
-                    devicePixelRatio: 1
+                    // devicePixelRatio: 1
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
                 var scene = new qtek.Scene();
@@ -90,7 +90,9 @@
 
                 var compositor = createCompositor({
                     scene: scene,
-                    camera: camera
+                    camera: camera,
+                    // enableBloom: false,
+                    enableLensflare: false
                 });
 
                 animation.on('frame', function(dTime) {
@@ -112,8 +114,8 @@
                     tronMaterial.set('strength', config.strength);
                 }
                 function updateGlowMat() {
-                    var tonemappingNode = compositor.getNodeByName('tonemapping');
-                    tonemappingNode.setParameter('bloomIntensity', config.bloomIntensity);
+                    var finalCompositeNode = compositor.getNodeByName('composite');
+                    finalCompositeNode.setParameter('bloomIntensity', config.bloomIntensity);
                 }
                 gui.add(config, 'sharpness', 0, 100).onChange(updateTronMat);
                 gui.add(config, 'substraction', 0, 1).onChange(updateTronMat);

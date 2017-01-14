@@ -405,8 +405,8 @@ define(function(require) {
             scene.trigger('beforerender:opaque', this, opaqueQueue);
 
             // Reset the scene bounding box;
-            camera.sceneBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
-            camera.sceneBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+            scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+            scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
 
             _gl.disable(_gl.BLEND);
             _gl.enable(_gl.DEPTH_TEST);
@@ -507,7 +507,7 @@ define(function(require) {
 
                     if (geometry.boundingBox) {
                         if (this.isFrustumCulled(
-                            renderable, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                            renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
                         )) {
                             continue;
                         }
@@ -577,7 +577,7 @@ define(function(require) {
                 }
                 if (geometry.boundingBox && ! preZ) {
                     if (this.isFrustumCulled(
-                        renderable, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                        renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
                     )) {
                         continue;
                     }
@@ -711,7 +711,7 @@ define(function(require) {
             // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
             var cullingBoundingBox = new BoundingBox();
             var cullingMatrix = new Matrix4();
-            return function(object, camera, worldViewMat, projectionMat) {
+            return function(object, scene, camera, worldViewMat, projectionMat) {
                 // Bounding box can be a property of object(like light) or renderable.geometry
                 var geoBBox = object.boundingBox || object.geometry.boundingBox;
                 cullingMatrix._array = worldViewMat;
@@ -721,8 +721,8 @@ define(function(require) {
                 // Passingly update the scene bounding box
                 // FIXME exclude very large mesh like ground plane or terrain ?
                 // FIXME Only rendererable which cast shadow ?
-                if (object.isRenderable() && object.castShadow) {
-                    camera.sceneBoundingBoxLastFrame.union(cullingBoundingBox);
+                if (scene && object.isRenderable() && object.castShadow) {
+                    scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
                 }
 
                 if (object.frustumCulling)  {

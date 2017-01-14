@@ -119,8 +119,8 @@
                     var compositor = createDOFCompositor(renderer, scene, camera);
                     var blurNodes = compositor.getBlurNodes();
                     var cocNode = compositor.getNodeByName('coc');
+                    var dofCompositeNode = compositor.getNodeByName('dof_composite');
                     var compositeNode = compositor.getNodeByName('composite');
-                    var tonemappingNode = compositor.getNodeByName('tonemapping');
 
                     var animation = new qtek.animation.Animation();
                     animation.start();
@@ -153,24 +153,24 @@
                         cocNode.setParameter('focalDist', config.focalDist);
                         cocNode.setParameter('fstop', config.fstop);
                         cocNode.setParameter('focalRange', config.focalRange);
-                        compositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
-                        compositeNode.setParameter('blurredSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
+                        dofCompositeNode.setParameter('textureSize', [renderer.getWidth(), renderer.getHeight()]);
+                        dofCompositeNode.setParameter('blurredSize', [renderer.getWidth() / 2, renderer.getHeight() / 2]);
 
                     }
 
                     function updateDebugConfig() {
                         if (config.debug === 'COC' || config.debug === 'Near COC') {
-                            compositeNode.shaderUnDefine('RGBM');
-                            tonemappingNode.shaderUnDefine('RGBM_DECODE');
-                            tonemappingNode.shaderDefine('DEBUG', 1);
+                            dofCompositeNode.shaderUnDefine('RGBM');
+                            compositeNode.shaderUnDefine('RGBM_DECODE');
+                            compositeNode.shaderDefine('DEBUG', 1);
                         }
                         else {
-                            compositeNode.shaderDefine('RGBM');
-                            tonemappingNode.shaderDefine('RGBM_DECODE');
+                            dofCompositeNode.shaderDefine('RGBM');
+                            compositeNode.shaderDefine('RGBM_DECODE');
 
-                            tonemappingNode.shaderDefine('DEBUG', 0);
+                            compositeNode.shaderDefine('DEBUG', 0);
                         }
-                        compositeNode.shaderDefine('DEBUG', debugConfigValueMap[config.debug]);
+                        dofCompositeNode.shaderDefine('DEBUG', debugConfigValueMap[config.debug]);
                     }
 
                     var debugConfigs = ['none', 'COC', 'Near COC', 'Blurred', 'Blurred Near'];

@@ -45,7 +45,11 @@ define(function (require) {
 
             _running: false,
 
-            _time: 0
+            _time: 0,
+
+            _paused: false,
+
+            _pausedTime: 0
         };
     },
     /** @lends qtek.animation.Animation.prototype */
@@ -96,7 +100,7 @@ define(function (require) {
 
         _update: function () {
 
-            var time = new Date().getTime();
+            var time = new Date().getTime() - this._pausedTime;
             var delta = time - this._time;
             var clips = this._clips;
             var len = clips.length;
@@ -147,6 +151,8 @@ define(function (require) {
             this._running = true;
             this._time = new Date().getTime();
 
+            this._pausedTime = 0;
+
             function step() {
                 if (self._running) {
 
@@ -157,6 +163,7 @@ define(function (require) {
             }
 
             requestAnimationFrame(step);
+
         },
         /**
          * Stop running animation
@@ -164,6 +171,27 @@ define(function (require) {
         stop: function () {
             this._running = false;
         },
+
+        /**
+         * Pause
+         */
+        pause: function () {
+            if (!this._paused) {
+                this._pauseStart = new Date().getTime();
+                this._paused = true;
+            }
+        },
+
+        /**
+         * Resume
+         */
+        resume: function () {
+            if (this._paused) {
+                this._pausedTime += (new Date().getTime()) - this._pauseStart;
+                this._paused = false;
+            }
+        },
+
         /**
          * Remove all clips
          */

@@ -118,12 +118,12 @@ define(function (require) {
                 if (this.shadowMapPass) {
                     camera.update();
 
-                    // update sceneBoundingBoxLastFrame
+                    // update boundingBoxLastFrame
                     var bbox = scene.getBoundingBox(function (el) {
                         return !el.ignore;
                     });
                     bbox.applyTransform(camera.viewMatrix);
-                    camera.sceneBoundingBoxLastFrame.copy(bbox);
+                    scene.viewBoundingBoxLastFrame.copy(bbox);
 
                     this.shadowMapPass.render(renderer, scene, camera, true);
                 }

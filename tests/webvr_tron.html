@@ -164,7 +164,7 @@
                 tronMaterial.set('sharpness', 10.0);
                 tronMaterial.set('strength', 100.0);
                 tronMaterial.set('substraction', 0.4);
-                compositor.getNodeByName('tonemapping').setParameter('bloomIntensity', 0.5);
+                compositor.getNodeByName('composite').setParameter('bloomIntensity', 0.5);
 
                 if (navigator.getVRDisplays) {
                     navigator.getVRDisplays().then(function (displays) {

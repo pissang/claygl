@@ -1,7 +1,7 @@
 define(function (require) {
     var qtek = require('qtek');
 
-    var DOWNSAMPLE_REPEAT = 2;
+    var DOWNSAMPLE_REPEAT = 1;
 
     function getCommonParameters(downScale) {
         downScale = downScale || 1;
@@ -41,7 +41,7 @@ define(function (require) {
                 }
             }
         });
-        var cocNode = new qtek.compositor.Node({
+        var cocNode = new qtek.compositor.FilterNode({
             name: 'coc',
             shader: qtek.Shader.source('qtek.compositor.dof.coc'),
             inputs: {
@@ -56,7 +56,7 @@ define(function (require) {
                 }
             }
         });
-        var premultiplyNode = new qtek.compositor.Node({
+        var premultiplyNode = new qtek.compositor.FilterNode({
             name: 'premultiply',
             shader: qtek.Shader.source('qtek.compositor.dof.premultiply'),
             inputs: {
@@ -80,7 +80,7 @@ define(function (require) {
             // Downsample input texture
             var textureSize = [renderer.getWidth() / downSampleScale, renderer.getHeight() / downSampleScale];
             downSampleScale *= 2;
-            var downSampleNode = new qtek.compositor.Node({
+            var downSampleNode = new qtek.compositor.FilterNode({
                 name: 'downsample' + i,
                 shader: qtek.Shader.source('qtek.compositor.dof.downsample'),
                 inputs: {
@@ -100,7 +100,7 @@ define(function (require) {
             compositor.addNode(downSampleNode);
 
             // Downsample coc
-            var cocDownSampleNode = new qtek.compositor.Node({
+            var cocDownSampleNode = new qtek.compositor.FilterNode({
                 name: 'coc_downsample' + i,
                 shader: qtek.Shader.source('qtek.compositor.dof.min_coc'),
                 inputs: {
@@ -124,7 +124,7 @@ define(function (require) {
             var blurNodes = [];
             var prefix = target ? target + '_' : '';
             // Separable hexagonal blur
-            var blurNode1 = new qtek.compositor.Node({
+            var blurNode1 = new qtek.compositor.FilterNode({
                 name: prefix + 'blur_1',
                 shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_1'),
                 inputs: {
@@ -137,7 +137,7 @@ define(function (require) {
                     }
                 }
             });
-            var blurNode2 = new qtek.compositor.Node({
+            var blurNode2 = new qtek.compositor.FilterNode({
                 name: prefix + 'blur_2',
                 shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_2'),
                 inputs: {
@@ -150,7 +150,7 @@ define(function (require) {
                     }
                 }
             });
-            var blurNode3 = new qtek.compositor.Node({
+            var blurNode3 = new qtek.compositor.FilterNode({
                 name: prefix + 'blur_3',
                 shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_3'),
                 inputs: {
@@ -177,6 +177,10 @@ define(function (require) {
             blurNode2.setParameter('textureSize', textureSize);
             blurNode3.setParameter('textureSize', textureSize);
 
+            blurNode1.shaderDefine('KERNEL_SIZE', 10);
+            blurNode2.shaderDefine('KERNEL_SIZE', 10);
+            blurNode3.shaderDefine('KERNEL_SIZE', 10);
+
             if (target === 'near') {
                 blurNode1.shaderDefine('BLUR_NEARFIELD');
                 blurNode2.shaderDefine('BLUR_NEARFIELD');
@@ -195,7 +199,7 @@ define(function (require) {
             .concat(createBlurNodes('coc'));
 
         var upsampleTextureSize = [renderer.getWidth() / 2, renderer.getHeight() / 2];
-        var upSampleNode = new qtek.compositor.Node({
+        var upSampleNode = new qtek.compositor.FilterNode({
             name: 'upsample',
             shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
             inputs: {
@@ -211,7 +215,7 @@ define(function (require) {
 
         upSampleNode.setParameter('textureSize', upsampleTextureSize);
 
-        var upSampleNearNode = new qtek.compositor.Node({
+        var upSampleNearNode = new qtek.compositor.FilterNode({
             name: 'upsample_near',
             shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
             inputs: {
@@ -227,7 +231,7 @@ define(function (require) {
         upSampleNearNode.setParameter('textureSize', upsampleTextureSize);
 
 
-        var upSampleCocNode = new qtek.compositor.Node({
+        var upSampleCocNode = new qtek.compositor.FilterNode({
             name: 'upsample_coc',
             shader: qtek.Shader.source('qtek.compositor.dof.coc_upsample'),
             inputs: {
@@ -242,8 +246,8 @@ define(function (require) {
         upSampleCocNode.setParameter('textureSize', upsampleTextureSize);
 
 
-        var compositeNode = new qtek.compositor.Node({
-            name: 'composite',
+        var dofCompositeNode = new qtek.compositor.FilterNode({
+            name: 'dof_composite',
             shader: qtek.Shader.source('qtek.compositor.dof.composite'),
             inputs: {
                 original: {
@@ -264,30 +268,30 @@ define(function (require) {
                 }
             }
         });
-        var toneMappingNode = new qtek.compositor.Node({
-            name: 'tonemapping',
-            shader: qtek.Shader.source('qtek.compositor.hdr.tonemapping'),
+        var compositeNode = new qtek.compositor.FilterNode({
+            name: 'composite',
+            shader: qtek.Shader.source('qtek.compositor.hdr.composite'),
             inputs: {
-                'texture': 'composite'
+                'texture': 'dof_composite'
             }
         });
-        toneMappingNode.setParameter('exposure', 2.0);
+        compositeNode.setParameter('exposure', 2.0);
         cocNode.setParameter('zNear', camera.near);
         cocNode.setParameter('zFar', camera.far);
 
         compositor.addNode(premultiplyNode);
         compositor.addNode(sceneNode);
         compositor.addNode(cocNode);
+        compositor.addNode(dofCompositeNode);
         compositor.addNode(compositeNode);
-        compositor.addNode(toneMappingNode);
 
         compositor.addNode(upSampleNode);
         compositor.addNode(upSampleNearNode);
         compositor.addNode(upSampleCocNode);
 
         premultiplyNode.shaderDefine('RGBM');
-        compositeNode.shaderDefine('RGBM');
-        toneMappingNode.shaderDefine('RGBM_DECODE');
+        dofCompositeNode.shaderDefine('RGBM');
+        compositeNode.shaderDefine('RGBM_DECODE');
         upSampleNode.shaderDefine('RGBM');
         upSampleNearNode.shaderDefine('RGBM');
         downSampleNodes.forEach(function (downSampleNode) {

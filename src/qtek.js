@@ -44,6 +44,7 @@ define(function(require) {
 	},
 	"compositor": {
 		"Compositor": require('./compositor/Compositor'),
+		"FilterNode": require('./compositor/FilterNode'),
 		"Graph": require('./compositor/Graph'),
 		"Node": require('./compositor/Node'),
 		"Pass": require('./compositor/Pass'),
