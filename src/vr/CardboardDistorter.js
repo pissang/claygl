@@ -30,9 +30,9 @@ define(function (require) {
                 geometry: new StaticGeometry(),
                 culling: false,
                 material: new Material({
-                    // FIXME Why disable depthMask and depthTest will be wrong
+                    // FIXME Why disable depthMask will be wrong
                     // depthMask: false,
-                    // depthTest: false,
+                    depthTest: false,
                     shader: new Shader({
                         vertex: Shader.source('qtek.vr.disorter.output.vertex'),
                         fragment: Shader.source('qtek.vr.disorter.output.fragment')
@@ -47,7 +47,7 @@ define(function (require) {
             var color = this.color;
             var gl = renderer.gl;
             gl.clearColor(color[0], color[1], color[2], color[3]);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.disable(gl.BLEND);
 
