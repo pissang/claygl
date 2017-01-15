@@ -1,0 +1,3 @@
+define(function () {
+return "@export qtek.vr.disorter.output.vertex\n\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\n\nvarying vec2 v_Texcoord;\n\nvoid main()\n{\n\n    v_Texcoord = texcoord;\n\n    gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n\n@end\n\n@export qtek.vr.disorter.output.fragment\n\nuniform sampler2D texture;\n\nvarying vec2 v_Texcoord;\n\nvoid main()\n{\n    gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
+});

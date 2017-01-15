@@ -174,6 +174,7 @@ define(function(require) {
 		"texture": require('./util/texture')
 	},
 	"vr": {
+		"CardboardDistorter": require('./vr/CardboardDistorter'),
 		"StereoCamera": require('./vr/StereoCamera')
 	}
 };
