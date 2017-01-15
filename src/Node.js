@@ -159,6 +159,9 @@ define(function (require) {
             if (scene && scene !== node.scene) {
                 node.traverse(this._addSelfToScene, this);
             }
+            // Mark children needs update transform
+            // In case child are remove and added again after parent moved
+            node._needsUpdateWorldTransform = true;
         },
 
         /**
