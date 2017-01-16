@@ -120,7 +120,7 @@ define(function (require) {
 
                     // update boundingBoxLastFrame
                     var bbox = scene.getBoundingBox(function (el) {
-                        return !el.ignore;
+                        return !el.invisible;
                     });
                     bbox.applyTransform(camera.viewMatrix);
                     scene.viewBoundingBoxLastFrame.copy(bbox);

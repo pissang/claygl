@@ -304,6 +304,8 @@ define(function (require) {
                 frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
             }
 
+            // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
+            renderer.bindSceneRendering(scene);
             if (enableTargetTexture1) {
                 // Pass 1
                 frameBuffer.attach(this._gBufferTex1);
@@ -362,6 +364,8 @@ define(function (require) {
                 renderer.renderQueue(opaqueQueue, camera);
 
             }
+
+            renderer.bindSceneRendering(null);
 
             renderer.beforeRenderObject = oldBeforeRender;
             this._cleanGBufferMaterials(renderer.gl);

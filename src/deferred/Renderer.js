@@ -250,6 +250,7 @@ define(function (require) {
 
             var shadowMapPass = this.shadowMapPass;
             if (shadowMapPass && updateShadow) {
+
                 gl.clearColor(1, 1, 1, 1);
                 this._prepareLightShadow(renderer, scene, camera);
             }

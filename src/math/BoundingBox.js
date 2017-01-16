@@ -122,6 +122,21 @@ define(function (require) {
         },
 
         /**
+         * If contain point entirely
+         * @param  {qtek.math.Vector3} point
+         * @return {boolean}
+         */
+        containPoint: function (p) {
+            var _min = this.min._array;
+            var _max = this.max._array;
+
+            var _p = p._array;
+
+            return _min[0] <= _p[0] && _min[1] <= _p[1] && _min[2] <= _p[2]
+                && _max[0] >= _p[0] && _max[1] >= _p[1] && _max[2] >= _p[2];
+        },
+
+        /**
          * If bounding box is finite
          */
         isFinite: function () {

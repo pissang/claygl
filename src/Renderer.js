@@ -328,6 +328,10 @@ define(function(require) {
             }
         },
 
+        bindSceneRendering: function (scene) {
+            this._sceneRendering = scene;
+        },
+
         // Hook before and after render each object
         beforeRenderObject: function () {},
         afterRenderObject: function () {},
