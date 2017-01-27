@@ -123,10 +123,22 @@ define(function(require) {
 
                 boundingBox.min.set(left, bottom, far);
                 boundingBox.max.set(right, top, near);
-                // Copy the vertices from bounding box directly
-                for (var i = 0; i < 8; i++) {
-                    vec3Copy(this.vertices[i], this.boundingBox.vertices[i]);
-                }
+
+                var min = boundingBox.min._array;
+                var max = boundingBox.max._array;
+                var vertices = this.vertices;
+                //--- min z
+                // min x
+                vec3Set(vertices[0], min[0], min[1], min[2]);
+                vec3Set(vertices[1], min[0], max[1], min[2]);
+                // max x
+                vec3Set(vertices[2], max[0], min[1], min[2]);
+                vec3Set(vertices[3], max[0], max[1], min[2]);
+                //-- max z
+                vec3Set(vertices[4], min[0], min[1], max[2]);
+                vec3Set(vertices[5], min[0], max[1], max[2]);
+                vec3Set(vertices[6], max[0], min[1], max[2]);
+                vec3Set(vertices[7], max[0], max[1], max[2]);
             }
         },
 
