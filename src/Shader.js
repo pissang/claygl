@@ -187,6 +187,11 @@ define(function (require) {
                 'EXT_shader_texture_lod'
             ],
 
+            /**
+             * Used light group. default is all zero
+             */
+            lightGroup: 0,
+
             // Defines the each type light number in the scene
             // AMBIENT_LIGHT
             // AMBIENT_SH_LIGHT

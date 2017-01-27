@@ -33,7 +33,15 @@ define(function(require){
              * Shadow map size
              * @type {number}
              */
-            shadowResolution: 512
+            shadowResolution: 512,
+
+            /**
+             * Light group, shader with same `lightGroup` will be affected
+             *
+             * Only useful in forward rendering
+             * @type {number}
+             */
+            group: 0
         };
     },
     /** @lends qtek.Light.prototype. */

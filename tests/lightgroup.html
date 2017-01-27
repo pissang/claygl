@@ -32,40 +32,64 @@
 
                 var cube = new Cube();
                 cube.generateTangents();
-                var shader = shaderLibrary.get('qtek.standard', 'diffuseMap', 'normalMap');
-                var material = new Material({
-                    shader : shader
-                });
-                material.set('glossiness', 0.4);
+
                 var diffuse = new qtek.Texture2D;
                 diffuse.load("assets/textures/crate.gif");
                 var normal = new qtek.Texture2D;
                 normal.load("assets/textures/normal_map.jpg");
-                material.set('diffuseMap', diffuse);
-                material.set('normalMap', normal);
+
+                var material1 = new Material({
+                    shader: new Shader({
+                        vertex: Shader.source('qtek.standard.vertex'),
+                        fragment: Shader.source('qtek.standard.fragment')
+                    })
+                });
+                material1.set('diffuseMap', diffuse);
+                material1.set('normalMap', normal);
+                var material2 = new Material({
+                    shader: new Shader({
+                        vertex: Shader.source('qtek.standard.vertex'),
+                        fragment: Shader.source('qtek.standard.fragment')
+                    })
+                });
+                material2.set('diffuseMap', diffuse);
+                material2.set('normalMap', normal);
+                material1.shader.enableTexture(['diffuseMap', 'normalMap']);
+                material2.shader.enableTexture(['diffuseMap', 'normalMap']);
+
+                material1.shader.lightGroup = 0;
+                material2.shader.lightGroup = 1;
 
                 var root = new qtek.Node({
-                    name: 'ROOT'
+                    name : 'ROOT'
                 });
                 scene.add(root);
-                for( var i = 0; i < 20; i++){
-                    for(var j = 0; j < 10; j++){
-                        for( var k = 0; k < 50; k++){
+                for (var i = 0; i < 20; i++) {
+                    for (var j = 0; j < 10; j++) {
+                        for ( var k = 0; k < 50; k++) {
                             var mesh = new qtek.Mesh({
                                 geometry: cube,
-                                material: material
+                                material: i % 2 ? material1 : material2
                             });
                             mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
                             root.add(mesh);
                         }
                     }
                 }
-                var light = new qtek.light.Point({
-                    range: 200
+                var light1 = new qtek.light.Point({
+                    range: 200,
+                    group: 0,
+                    color: [1, 0.5, 0]
                 });
-                scene.add(light);
+                var light2 = new qtek.light.Point({
+                    range: 200,
+                    group: 1,
+                    color: [0, 0.5, 1]
+                });
+                scene.add(light1);
+                scene.add(light2);
                 scene.add(new qtek.light.Ambient({
-                    intensity: 0.4
+                    intensity: 0.3
                 }))
 
                 camera.position.set(0, 0, 10);

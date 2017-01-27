@@ -56,11 +56,13 @@ define(function (require) {
             _lightUniforms: {},
 
             _lightNumber: {
-                // POINT_LIGHT: 0,
-                // DIRECTIONAL_LIGHT: 0,
-                // SPOT_LIGHT: 0,
-                // AMBIENT_LIGHT: 0,
-                // AMBIENT_SH_LIGHT: 0
+                // groupId: {
+                    // POINT_LIGHT: 0,
+                    // DIRECTIONAL_LIGHT: 0,
+                    // SPOT_LIGHT: 0,
+                    // AMBIENT_LIGHT: 0,
+                    // AMBIENT_SH_LIGHT: 0
+                // }
             },
 
             _opaqueObjectCount: 0,
@@ -173,16 +175,25 @@ define(function (require) {
 
             // reset
             if (!notUpdateLights) {
+                var lightNumber = this._lightNumber;
                 // Reset light numbers
-                for (var type in this._lightNumber) {
-                    this._lightNumber[type] = 0;
+                for (var group in lightNumber) {
+                    for (var type in lightNumber[group]) {
+                        lightNumber[group][type] = 0;
+                    }
                 }
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
+                    var group = light.group;
+                    if (!lightNumber[group]) {
+                        lightNumber[group] = {};
+                    }
                     // User can use any type of light
-                    this._lightNumber[light.type] = this._lightNumber[light.type] || 0;
-                    this._lightNumber[light.type]++;
+                    lightNumber[group][light.type] = lightNumber[group][light.type] || 0;
+                    lightNumber[group][light.type]++;
                 }
+                // PENDING Remove unused group?
+
                 this._updateLightUniforms();
             }
         },
@@ -220,24 +231,30 @@ define(function (require) {
             lights.sort(lightSortFunc);
 
             var lightUniforms = this._lightUniforms;
-            for (var symbol in lightUniforms) {
-                lightUniforms[symbol].value.length = 0;
+            for (var group in lightUniforms) {
+                for (var symbol in lightUniforms[group]) {
+                    lightUniforms[group][symbol].value.length = 0;
+                }
             }
             for (var i = 0; i < lights.length; i++) {
 
                 var light = lights[i];
+                var group = light.group;
 
-                for (symbol in light.uniformTemplates) {
+                for (var symbol in light.uniformTemplates) {
 
                     var uniformTpl = light.uniformTemplates[symbol];
-                    if (!lightUniforms[symbol]) {
-                        lightUniforms[symbol] = {
+                    if (!lightUniforms[group]) {
+                        lightUniforms[group] = {};
+                    }
+                    if (!lightUniforms[group][symbol]) {
+                        lightUniforms[group][symbol] = {
                             type: '',
                             value: []
                         };
                     }
                     var value = uniformTpl.value(light);
-                    var lu = lightUniforms[symbol];
+                    var lu = lightUniforms[group][symbol];
                     lu.type = uniformTpl.type + 'v';
                     switch (uniformTpl.type) {
                         case '1i':
@@ -260,14 +277,15 @@ define(function (require) {
         },
 
         isShaderLightNumberChanged: function (shader) {
+            var group = shader.lightGroup;
             // PENDING Performance
-            for (var type in this._lightNumber) {
-                if (this._lightNumber[type] !== shader.lightNumber[type]) {
+            for (var type in this._lightNumber[group]) {
+                if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
                     return true;
                 }
             }
             for (var type in shader.lightNumber) {
-                if (this._lightNumber[type] !== shader.lightNumber[type]) {
+                if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
                     return true;
                 }
             }
@@ -275,15 +293,17 @@ define(function (require) {
         },
 
         setShaderLightNumber: function (shader) {
-            for (var type in this._lightNumber) {
-                shader.lightNumber[type] = this._lightNumber[type];
+            var group = shader.lightGroup;
+            for (var type in this._lightNumber[group]) {
+                shader.lightNumber[type] = this._lightNumber[group][type];
             }
             shader.dirty();
         },
 
         setLightUniforms: function (shader, _gl) {
-            for (var symbol in this._lightUniforms) {
-                var lu = this._lightUniforms[symbol];
+            var group = shader.lightGroup;
+            for (var symbol in this._lightUniforms[group]) {
+                var lu = this._lightUniforms[group][symbol];
                 if (lu.type === 'tv') {
                     for (var i = 0; i < lu.value.length; i++) {
                         var texture = lu.value[i];
