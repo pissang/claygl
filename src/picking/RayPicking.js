@@ -53,13 +53,14 @@ define(function(require) {
          * Pick all intersection objects, wich will be sorted from near to far
          * @param  {number} x Mouse position x
          * @param  {number} y Mouse position y
+         * @param  {Array} [output]
          * @return {Array.<qtek.picking.RayPicking~Intersection>}
          */
-        pickAll: function (x, y) {
+        pickAll: function (x, y, output) {
             this.renderer.screenToNdc(x, y, this._ndc);
             this.camera.castRay(this._ndc, this._ray);
 
-            var output = [];
+            output = output || [];
 
             this._intersectNode(this.scene, output);
 

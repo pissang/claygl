@@ -16,6 +16,7 @@ define(function(require) {
     var Material = require('./Material');
     var Vector2 = require('./math/Vector2');
 
+    // Light header
     var Shader = require('./Shader');
     Shader['import'](require('./shader/source/header/light'));
 

@@ -187,6 +187,23 @@ define(function (require) {
         },
 
         /**
+         * Remove all children
+         */
+        removeAll: function () {
+            var children = this._children;
+
+            for (var idx = 0; idx < children.length; idx++) {
+                children[idx]._parent = null;
+
+                if (this._scene) {
+                    children[idx].traverse(this._removeSelfFromScene, this);
+                }
+            }
+
+            this._children = [];
+        },
+
+        /**
          * Get the scene mounted
          * @return {qtek.Scene}
          */

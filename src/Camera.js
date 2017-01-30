@@ -8,7 +8,6 @@ define(function (require) {
     var Ray = require('./math/Ray');
 
     var glMatrix = require('./dep/glmatrix');
-    var mat4 = glMatrix.mat4;
     var vec3 = glMatrix.vec3;
     var vec4 = glMatrix.vec4;
 
@@ -70,6 +69,15 @@ define(function (require) {
          * Decompose camera projection matrix
          */
         decomposeProjectionMatrix: function () {},
+
+        /**
+         * Set camera projection matrix
+         */
+        setProjectionMatrix: function (projectionMatrix) {
+            Matrix4.copy(this.projectionMatrix, projectionMatrix);
+            Matrix4.invert(this.invProjectionMatrix, projectionMatrix);
+            this.decomposeProjectionMatrix();
+        },
         /**
          * Update projection matrix, called after update
          */
