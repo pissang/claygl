@@ -474,7 +474,7 @@ define(function (require) {
             var localTransform = this.localTransform._array;
             var worldTransform = this.worldTransform._array;
             if (this._parent) {
-                mat4.multiply(
+                mat4.multiplyAffine(
                     worldTransform,
                     this._parent.worldTransform._array,
                     localTransform

@@ -268,7 +268,7 @@ define(function (require) {
                     }
                 }
 
-                this._updateShaderString();
+                this._updateShaderString(availableExts);
 
                 var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
                 cache.fresh();
@@ -720,8 +720,8 @@ define(function (require) {
             // Extension declaration must before all non-preprocessor codes
             // TODO vertex ? extension enum ?
             var extensionStr = [];
-            for (var i = 0; i < this.extensions.length; i++) {
-                extensionStr.push('#extension GL_' + this.extensions[i] + ' : enable');
+            for (var i = 0; i < extensions.length; i++) {
+                extensionStr.push('#extension GL_' + extensions[i] + ' : enable');
             }
 
             // Add defines

@@ -398,7 +398,7 @@ define(function(require) {
                 var posViewSpace = vec3.create();
                 for (var i = 0; i < transparentQueue.length; i++) {
                     var node = transparentQueue[i];
-                    mat4.multiply(worldViewMat, camera.viewMatrix._array, node.worldTransform._array);
+                    mat4.multiplyAffine(worldViewMat, camera.viewMatrix._array, node.worldTransform._array);
                     vec3.transformMat4(posViewSpace, node.position._array, worldViewMat);
                     node.__depth = posViewSpace[2];
                 }
@@ -507,8 +507,8 @@ define(function(require) {
                     var renderable = queue[i];
                     var worldM = renderable.worldTransform._array;
                     var geometry = renderable.geometry;
-                    mat4.multiply(matrices.WORLDVIEW, matrices.VIEW , worldM);
-                    mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+
+                    mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
 
                     if (geometry.boundingBox) {
                         if (this.isFrustumCulled(
@@ -520,6 +520,9 @@ define(function(require) {
                     if (renderable.skeleton) {  // FIXME  skinned mesh
                         continue;
                     }
+
+                    mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+
                     if (renderable.cullFace !== cullFace) {
                         cullFace = renderable.cullFace;
                         _gl.cullFace(cullFace);
@@ -554,6 +557,19 @@ define(function(require) {
 
             for (var i =0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
+                var geometry = renderable.geometry;
+
+                var worldM = renderable.worldTransform._array;
+                // All matrices ralated to world matrix will be updated on demand;
+                mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
+                if (geometry.boundingBox && !preZ) {
+                    if (this.isFrustumCulled(
+                        renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                    )) {
+                        continue;
+                    }
+                }
+
                 var material = globalMaterial || renderable.material;
                 // StandardMaterial needs updateShader method so shader can be created on demand.
                 if (material !== prevMaterial) {
@@ -561,12 +577,8 @@ define(function(require) {
                 }
 
                 var shader = material.shader;
-                var geometry = renderable.geometry;
 
-                var worldM = renderable.worldTransform._array;
-                // All matrices ralated to world matrix will be updated on demand;
                 mat4.copy(matrices.WORLD, worldM);
-                mat4.multiply(matrices.WORLDVIEW, matrices.VIEW , worldM);
                 mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
                 if (shader.matrixSemantics.WORLDINVERSE ||
                     shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
@@ -579,13 +591,6 @@ define(function(require) {
                 if (shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSE ||
                     shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE) {
                     mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
-                }
-                if (geometry.boundingBox && ! preZ) {
-                    if (this.isFrustumCulled(
-                        renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
-                    )) {
-                        continue;
-                    }
                 }
 
                 // Before render hook
@@ -757,6 +762,7 @@ define(function(require) {
                         return true;
                     }
                 }
+
                 return false;
             };
         })(),
