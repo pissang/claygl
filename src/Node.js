@@ -644,14 +644,12 @@ define(function (require) {
          * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
          * @method
          */
+        // TODO world space ?
         lookAt: (function () {
             var m = new Matrix4();
-            var worldPosition = new Vector3();
             return function (target, up) {
-                this.getWorldPosition(worldPosition);
-                m.lookAt(worldPosition, target, up || this.worldTransform.y).invert();
-
-                this.setWorldTransform(m);
+                m.lookAt(this.position, target, up || this.localTransform.y).invert();
+                this.setLocalTransform(m);
             };
         })()
     });

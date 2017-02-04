@@ -72,6 +72,10 @@ define(function(require) {
                 this.set = function (idx, value) {
                     this.value[idx] = value;
                 };
+                // Copy from source to target
+                this.copy = function (target, source) {
+                    this.value[target] = this.value[target];
+                };
                 break;
             case 2:
                 this.get = function (idx, out) {
@@ -84,6 +88,13 @@ define(function(require) {
                     var arr = this.value;
                     arr[idx * 2] = val[0];
                     arr[idx * 2 + 1] = val[1];
+                };
+                this.copy = function (target, source) {
+                    var arr = this.value;
+                    source *= 2;
+                    target *= 2;
+                    arr[target] = arr[source];
+                    arr[target + 1] = arr[source + 1];
                 };
                 break;
             case 3:
@@ -101,6 +112,14 @@ define(function(require) {
                     arr[idx3++] = val[0];
                     arr[idx3++] = val[1];
                     arr[idx3++] = val[2];
+                };
+                this.copy = function (target, source) {
+                    var arr = this.value;
+                    source *= 3;
+                    target *= 3;
+                    arr[target] = arr[source];
+                    arr[target + 1] = arr[source + 1];
+                    arr[target + 2] = arr[source + 2];
                 };
                 break;
             case 4:
@@ -120,6 +139,16 @@ define(function(require) {
                     arr[idx4++] = val[1];
                     arr[idx4++] = val[2];
                     arr[idx4++] = val[3];
+                };
+                this.copy = function (target, source) {
+                    var arr = this.value;
+                    source *= 4;
+                    target *= 4;
+                    // copyWithin is extremely slow
+                    arr[target] = arr[source];
+                    arr[target + 1] = arr[source + 1];
+                    arr[target + 2] = arr[source + 2];
+                    arr[target + 3] = arr[source + 3];
                 };
         }
     }
