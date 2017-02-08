@@ -1,7 +1,7 @@
 /**
  * StaticGeometry can not be changed once they've been setup
  */
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -22,7 +22,7 @@ define(function(require) {
      * @constructor qtek.StaticGeometry
      * @extends qtek.Geometry
      */
-    var StaticGeometry = Geometry.extend(function() {
+    var StaticGeometry = Geometry.extend(function () {
         return /** @lends qtek.StaticGeometry# */ {
             attributes: {
                  position: new StaticAttribute('position', 'float', 3, 'POSITION'),
@@ -56,7 +56,7 @@ define(function(require) {
     },
     /** @lends qtek.StaticGeometry.prototype */
     {
-        updateBoundingBox: function() {
+        updateBoundingBox: function () {
             var bbox = this.boundingBox;
             if (!bbox) {
                 bbox = this.boundingBox = new BoundingBox();
@@ -86,7 +86,7 @@ define(function(require) {
             }
         },
 
-        dirty: function() {
+        dirty: function () {
             this._cache.dirtyAll();
             this._enabledAttributes = null;
         },
@@ -104,7 +104,14 @@ define(function(require) {
             }
         },
 
-        isUseFace: function() {
+        setFace: function (idx, arr) {
+            var faces = this.faces;
+            faces[idx * 3] = arr[0];
+            faces[idx * 3 + 1] = arr[1];
+            faces[idx * 3 + 2] = arr[2];
+        },
+
+        isUseFace: function () {
             return this.useFace && (this.faces != null);
         },
 
@@ -131,14 +138,17 @@ define(function(require) {
             this.faces = value;
         },
 
-        createAttribute: function(name, type, size, semantic) {
+        createAttribute: function (name, type, size, semantic) {
             var attrib = new StaticAttribute(name, type, size, semantic);
+            if (this.attributes[name]) {
+                this.removeAttribute(name);
+            }
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
         },
 
-        removeAttribute: function(name) {
+        removeAttribute: function (name) {
             var attributeList = this._attributeList;
             var idx = attributeList.indexOf(name);
             if (idx >= 0) {
@@ -154,7 +164,7 @@ define(function(require) {
          * Attribute which has the same vertex number with position is treated as a enabled attribute
          * @return {string[]}
          */
-        getEnabledAttributes: function() {
+        getEnabledAttributes: function () {
             var enabledAttributes = this._enabledAttributes;
             var attributeList = this._attributeList;
             // Cache
@@ -180,7 +190,7 @@ define(function(require) {
             return result;
         },
 
-        getBufferChunks: function(_gl) {
+        getBufferChunks: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
             if (cache.isDirty()) {
@@ -190,10 +200,10 @@ define(function(require) {
             return cache.get('chunks');
         },
 
-        _updateBuffer: function(_gl) {
+        _updateBuffer: function (_gl) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
-            if (! chunks) {
+            if (!chunks) {
                 chunks = [];
                 // Intialize
                 chunks[0] = {
@@ -210,6 +220,8 @@ define(function(require) {
             var attributeList = this.getEnabledAttributes();
             var prevSearchIdx = 0;
             var count = 0;
+
+            // PENDING  If some attributes removed
             for (var k = 0; k < attributeList.length; k++) {
                 var name = attributeList[k];
                 var attribute = this.attributes[name];
@@ -238,7 +250,8 @@ define(function(require) {
                 var buffer;
                 if (bufferInfo) {
                     buffer = bufferInfo.buffer;
-                } else {
+                }
+                else {
                     buffer = _gl.createBuffer();
                 }
                 //TODO: Use BufferSubData?
@@ -260,7 +273,7 @@ define(function(require) {
             }
         },
 
-        generateVertexNormals: function() {
+        generateVertexNormals: function () {
             var faces = this.faces;
             var attributes = this.attributes;
             var positions = attributes.position.value;
@@ -314,7 +327,7 @@ define(function(require) {
             this.dirty();
         },
 
-        generateFaceNormals: function() {
+        generateFaceNormals: function () {
             if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
@@ -359,7 +372,7 @@ define(function(require) {
             this.dirty();
         },
 
-        generateTangents: function() {
+        generateTangents: function () {
             var nVertex = this.vertexCount;
             var attributes = this.attributes;
             if (!attributes.tangent.value) {
@@ -453,7 +466,7 @@ define(function(require) {
             this.dirty();
         },
 
-        isUniqueVertex: function() {
+        isUniqueVertex: function () {
             if (this.isUseFace()) {
                 return this.vertexCount === this.faces.length;
             } else {
@@ -461,7 +474,7 @@ define(function(require) {
             }
         },
 
-        generateUniqueVertex: function() {
+        generateUniqueVertex: function () {
             var vertexUseCount = [];
 
             for (var i = 0, len = this.vertexCount; i < len; i++) {
@@ -513,7 +526,7 @@ define(function(require) {
             this.dirty();
         },
 
-        generateBarycentric: function() {
+        generateBarycentric: function () {
 
             if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();
@@ -536,7 +549,7 @@ define(function(require) {
             this.dirty();
         },
 
-        convertToDynamic: function(geometry) {
+        convertToDynamic: function (geometry) {
             for (var i = 0; i < this.faces.length; i+=3) {
                 geometry.faces.push(this.face.subarray(i, i + 3));
             }
@@ -574,7 +587,7 @@ define(function(require) {
             return geometry;
         },
 
-        applyTransform: function(matrix) {
+        applyTransform: function (matrix) {
 
             var attributes = this.attributes;
             var positions = attributes.position.value;
@@ -602,7 +615,7 @@ define(function(require) {
             }
         },
 
-        dispose: function(_gl) {
+        dispose: function (_gl) {
 
             var cache = this._cache;
 
@@ -650,5 +663,8 @@ define(function(require) {
             }
         });
     }
+
+    StaticGeometry.Attribute = Geometry.StaticAttribute;
+
     return StaticGeometry;
 });

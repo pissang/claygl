@@ -109,7 +109,8 @@ define(function(require) {
          * @return {boolean}
          */
         isRenderable: function() {
-            return this.geometry && this.material && !this.invisible;
+            return this.geometry && this.material && !this.invisible
+                && this.geometry.vertexCount > 0;
         },
 
         /**

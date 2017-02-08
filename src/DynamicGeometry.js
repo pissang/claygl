@@ -108,6 +108,11 @@ define(function (require) {
             }
         },
 
+        setFace: function (idx, arr) {
+            this.faces[idx] = this.faces[idx] || vec3Create();
+            vec3.copy(this.faces[idx], arr);
+        },
+
         isUseFace: function () {
             return this.useFace && (this.faces.length > 0);
         },
@@ -118,6 +123,9 @@ define(function (require) {
 
         createAttribute: function (name, type, size, semantic) {
             var attrib = new DynamicAttribute(name, type, size, semantic);
+            if (this.attributes[name]) {
+                this.removeAttribute(name);
+            }
             this.attributes[name] = attrib;
             this._attributeList.push(name);
             return attrib;
@@ -854,6 +862,9 @@ define(function (require) {
             }
         });
     }
+
+
+    DynamicAttribute.Attribute = Geometry.DynamicAttribute;
 
     return DynamicGeometry;
 });

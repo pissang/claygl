@@ -359,6 +359,13 @@ define(function(require) {
          * @return {Array.<number>}
          */
         getFace: notImplementedWarn,
+
+        /**
+         * @method
+         * @param {number} idx
+         * @param {Array.<number>} face
+         */
+        setFace: notImplementedWarn,
         /**
          * @method
          * @return {boolean}
