@@ -16,7 +16,7 @@
 /** @namespace qtek.texture */
 /** @namespace qtek.util */
 define(function(require) {
-	
+
 	var exportsObject = {
 	"animation": {
 		"Animation": require('./animation/Animation'),
@@ -173,13 +173,12 @@ define(function(require) {
 		"sh": require('./util/sh'),
 		"texture": require('./util/texture')
 	},
+	"version": require('./version'),
 	"vr": {
 		"CardboardDistorter": require('./vr/CardboardDistorter'),
 		"StereoCamera": require('./vr/StereoCamera')
 	}
 };
-
-    exportsObject.version = '0.2.1';
 
     return exportsObject;
 });
