@@ -221,10 +221,29 @@ define(function (require) {
 
         this._cache = new Cache();
 
+        // All context use same code
+        this._codeDirty = true;
+
         this._updateShaderString();
     },
     /** @lends qtek.Shader.prototype */
     {
+        isEqual: function (otherShader) {
+            if (!otherShader) {
+                return false;
+            }
+            if (this === otherShader) {
+                return true;
+            }
+            if (otherShader._codeDirty) {
+                otherShader._updateShaderString();
+            }
+            if (this._codeDirty) {
+                this._updateShaderString();
+            }
+            return !(otherShader._vertexProcessed !== this._vertexProcessed
+                || otherShader._fragmentProcessed !== this._fragmentProcessed);
+        },
         /**
          * Set vertex shader code
          * @param {string} str
@@ -259,19 +278,21 @@ define(function (require) {
             // Reset slot
             this._textureSlot = 0;
 
-            if (cache.isDirty()) {
-                var availableExts = [];
-                var extensions = this.extensions;
-                for (var i = 0; i < extensions.length; i++) {
-                    if (glInfo.getExtension(_gl, extensions[i])) {
-                        availableExts.push(extensions[i]);
-                    }
-                }
+            if (this._codeDirty) {
+                // PENDING
+                // var availableExts = [];
+                // var extensions = this.extensions;
+                // for (var i = 0; i < extensions.length; i++) {
+                //     if (glInfo.getExtension(_gl, extensions[i])) {
+                //         availableExts.push(extensions[i]);
+                //     }
+                // }
+                this._updateShaderString();
+            }
 
-                this._updateShaderString(availableExts);
-
+            if (cache.isDirty('program')) {
                 var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
-                cache.fresh();
+                cache.fresh('program');
 
                 if (errMsg) {
                     return errMsg;
@@ -286,7 +307,8 @@ define(function (require) {
          */
         dirty: function () {
             var cache = this._cache;
-            cache.dirtyAll();
+            this._codeDirty = true;
+            cache.dirtyAll('program');
             for (var i = 0; i < cache._caches.length; i++) {
                 if (cache._caches[i]) {
                     var context = cache._caches[i];
@@ -320,6 +342,8 @@ define(function (require) {
 
             this._vertexProcessed = this._unrollLoop(this._vertexProcessed, this.vertexDefines);
             this._fragmentProcessed = this._unrollLoop(this._fragmentProcessed, this.fragmentDefines);
+
+            this._codeDirty = false;
         },
 
         /**

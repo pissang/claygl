@@ -67,25 +67,28 @@ define(function(require) {
         if (this.shader) {
             this.attachShader(this.shader);
         }
-        if (! this.uniforms) {
+        if (!this.uniforms) {
             this.uniforms = {};
         }
     },
     /** @lends qtek.Material.prototype */
     {
 
-        bind: function(_gl, prevMaterial) {
+        /**
+         * @param  {WebGLRenderingContext} _gl
+         * @param  {qtek.Shader} [shader]
+         * @param  {qtek.Material} [prevMaterial]
+         * @param  {qtek.Shader} [prevShader]
+         * @return {Object}
+         */
+        bind: function(_gl, shader, prevMaterial, prevShader) {
 
-            var sameShader = prevMaterial && prevMaterial.shader === this.shader;
+            // May use shader of other material if shader code are same
+            var shader = shader || this.shader;
 
-            var shader = this.shader;
+            var sameShader = prevShader === shader;
 
-            if (sameShader) {
-                // shader may use some slot by others before material bind.
-                shader.resetTextureSlot(prevMaterial.__textureSlotBase || 0);
-            }
-            this.__textureSlotBase = shader.currentTextureSlot();
-
+            var currentTextureSlot = shader.currentTextureSlot();
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
@@ -94,7 +97,7 @@ define(function(require) {
                 // When binding two materials with the same shader
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
-                if (sameShader) {
+                if (prevMaterial && sameShader) {
                     if (prevMaterial.uniforms[symbol].value === uniformValue) {
                         continue;
                     }
@@ -162,6 +165,8 @@ define(function(require) {
                     shader.setUniform(_gl, uniform.type, symbol, uniformValue);
                 }
             }
+            // Texture slot maybe used out of material.
+            shader.resetTextureSlot(currentTextureSlot);
         },
 
         /**

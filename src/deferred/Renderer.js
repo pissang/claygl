@@ -637,7 +637,7 @@ define(function (require) {
 
                     var semanticInfo = prezShader.matrixSemantics.WORLDVIEWPROJECTION;
                     prezShader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
-                    volumeMesh.render(gl, preZMaterial);
+                    volumeMesh.render(gl, prezShader);
 
                     // Render light
                     gl.colorMask(true, true, true, true);
@@ -652,10 +652,12 @@ define(function (require) {
                     shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
                     volumeMesh.material.bind(gl);
-                    volumeMesh.render(gl);
+                    volumeMesh.render(gl, shader);
                 }
 
                 gl.depthFunc(gl.LESS);
+
+                renderer.resetRenderStatus();
             };
         })(),
 

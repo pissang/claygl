@@ -43,7 +43,7 @@ define(function (require) {
         var previousRougnessMap;
         var previousRenderable;
 
-        return function (renderable, prevMaterial) {
+        return function (renderable, prevMaterial, prevShader) {
             // Material not change
             if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
                 return;
@@ -102,7 +102,7 @@ define(function (require) {
         var previousRenderable;
         var previousMetalnessMap;
 
-        return function (renderable, prevMaterial) {
+        return function (renderable, prevMaterial, prevShader) {
             // Material not change
             if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
                 return;

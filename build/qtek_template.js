@@ -16,10 +16,8 @@
 /** @namespace qtek.texture */
 /** @namespace qtek.util */
 define(function(require) {
-	
-	var exportsObject = {{$exportsObject}};
 
-    exportsObject.version = '0.2.1';
+	var exportsObject = {{$exportsObject}};
 
     return exportsObject;
 });

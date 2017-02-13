@@ -138,12 +138,12 @@ define(function(require) {
 
         /**
          * @param  {WebGLRenderingContext} _gl
-         * @param  {qtek.Material} [globalMaterial]
+         * @param  {qtek.Shader} [shader] May use shader of other material if shader code are same
          * @return {Object}
          */
-        render: function (_gl, globalMaterial) {
-            var material = globalMaterial || this.material;
-            var shader = material.shader;
+        render: function (_gl, shader) {
+            // May use shader of other material if shader code are same
+            var shader = shader || this.material.shader;
             var geometry = this.geometry;
 
             var glDrawMode = this.mode;

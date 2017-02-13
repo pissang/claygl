@@ -87,13 +87,15 @@ define(function (require) {
     }, function () {
         // Gaussian filter pass for VSM
         this._gaussianPassH = new Pass({
-            fragment: Shader.source('qtek.compositor.gaussian_blur_h')
+            fragment: Shader.source('qtek.compositor.gaussian_blur')
         });
         this._gaussianPassV = new Pass({
-            fragment: Shader.source('qtek.compositor.gaussian_blur_v')
+            fragment: Shader.source('qtek.compositor.gaussian_blur')
         });
         this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
+        this._gaussianPassH.setUniform('blurDir', 0.0);
         this._gaussianPassV.setUniform('blurSize', this.shadowBlur);
+        this._gaussianPassV.setUniform('blurDir', 1.0);
 
         this._outputDepthPass = new Pass({
             fragment: Shader.source('qtek.sm.debug_depth')

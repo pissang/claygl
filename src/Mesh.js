@@ -28,15 +28,15 @@ define(function(require) {
             this.joints = [];
         }
     }, {
-        render: function(_gl, globalMaterial) {
-            var material = globalMaterial || this.material;
+        render: function(_gl, shader) {
+            shader = shader || this.material.shader;
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
                 var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
-                material.shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+                shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
             }
 
-            return Renderable.prototype.render.call(this, _gl, globalMaterial);
+            return Renderable.prototype.render.call(this, _gl, shader);
         }
     });
 

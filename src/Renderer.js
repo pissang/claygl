@@ -437,6 +437,9 @@ define(function(require) {
             return renderInfo;
         },
 
+        resetRenderStatus: function () {
+            this._currentShader = null;
+        },
         /**
          * Render a single renderable list in camera in sequence
          * @param  {qtek.Renderable[]} queue       List of all renderables.
@@ -485,7 +488,6 @@ define(function(require) {
             var scene = this._sceneRendering;
 
             var prevMaterial;
-            var prevShader;
 
             // Status
             var depthTest, depthMask;
@@ -540,12 +542,15 @@ define(function(require) {
                     preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
 
                     // PENDING If invoke beforeRender hook
-                    renderable.render(_gl, preZPassMaterial);
+                    renderable.render(_gl, preZPassMaterial.shader);
                     culledRenderQueue.push(renderable);
                 }
                 _gl.depthFunc(_gl.LEQUAL);
                 _gl.colorMask(true, true, true, true);
                 _gl.depthMask(false);
+
+                // Reset current shader.
+                this._currentShader = null;
             }
             else {
                 culledRenderQueue = queue;
@@ -593,11 +598,13 @@ define(function(require) {
                     mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
                 }
 
+                var prevShader = this._currentShader;
+
                 // Before render hook
                 renderable.beforeRender(_gl);
-                this.beforeRenderObject(renderable, prevMaterial);
+                this.beforeRenderObject(renderable, prevMaterial, prevShader);
 
-                if (prevShader !== shader) {
+                if (!shader.isEqual(prevShader)) {
                     // Set lights number
                     if (scene && scene.isShaderLightNumberChanged(shader)) {
                         scene.setShaderLightNumber(shader);
@@ -628,8 +635,15 @@ define(function(require) {
                     if (scene) {
                         scene.setLightUniforms(shader, _gl);
                     }
-                    prevShader = shader;
+
+                    // Save current used shader in the renderer
+                    // ALWAYS USE RENDERER TO DRAW THE MESH
+                    this._currentShader = shader;
                 }
+                else {
+                    shader = prevShader;
+                }
+
                 if (prevMaterial !== material) {
                     if (!preZ) {
                         if (material.depthTest !== depthTest) {
@@ -643,7 +657,7 @@ define(function(require) {
                             depthMask = material.depthMask;
                         }
                     }
-                    material.bind(_gl, prevMaterial);
+                    material.bind(_gl, shader, prevMaterial, prevShader);
                     prevMaterial = material;
 
                     // TODO cache blending
@@ -683,8 +697,7 @@ define(function(require) {
                     culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
                 }
 
-                var objectRenderInfo = renderable.render(_gl, globalMaterial);
-
+                var objectRenderInfo = renderable.render(_gl, shader);
 
                 if (objectRenderInfo) {
                     renderInfo.faceCount += objectRenderInfo.faceCount;

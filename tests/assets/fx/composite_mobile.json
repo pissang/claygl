@@ -161,7 +161,7 @@
 
         {
             "name" : "bright_upsample_16_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_32"
             },
@@ -175,6 +175,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 0.0,
                 "textureSize": "expr( [width * dpr / 32, height * dpr / 32] )"
             },
             "defines": {
@@ -183,7 +184,7 @@
         },
         {
             "name" : "bright_upsample_16_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_16_blur_h"
             },
@@ -197,6 +198,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 1.0,
                 "textureSize": "expr( [width * dpr / 32, height * dpr / 32] )"
             },
             "defines": {
@@ -208,7 +210,7 @@
 
         {
             "name" : "bright_upsample_8_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_16"
             },
@@ -222,6 +224,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 0.0,
                 "textureSize": "expr( [width * dpr / 16, height * dpr / 16] )"
             },
             "defines": {
@@ -230,7 +233,7 @@
         },
         {
             "name" : "bright_upsample_8_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_8_blur_h"
             },
@@ -244,6 +247,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 1.0,
                 "textureSize": "expr( [width * dpr / 16, height * dpr / 16] )"
             },
             "defines": {
@@ -277,7 +281,7 @@
 
         {
             "name" : "bright_upsample_4_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_8"
             },
@@ -291,6 +295,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 0.0,
                 "textureSize": "expr( [width * dpr / 8, height * dpr / 8] )"
             },
             "defines": {
@@ -299,7 +304,7 @@
         },
         {
             "name" : "bright_upsample_4_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_4_blur_h"
             },
@@ -313,6 +318,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 1.0,
                 "textureSize": "expr( [width * dpr / 8, height * dpr / 8] )"
             },
             "defines": {
@@ -747,7 +753,7 @@
         },
         {
             "name" : "lensflare_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur_h)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "lensflare"
             },
@@ -761,6 +767,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 0.0,
                 "textureSize" : "expr([width * dpr / 4, height * dpr / 4])"
             },
             "defines": {
@@ -769,7 +776,7 @@
         },
         {
             "name" : "lensflare_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur_v)",
+            "shader" : "#source(qtek.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "lensflare_blur_h"
             },
@@ -783,6 +790,7 @@
             },
             "parameters" : {
                 "blurSize" : 1,
+                "blurDir": 1.0,
                 "textureSize" : "expr([width * dpr / 4, height * dpr / 4])"
             },
             "defines": {
