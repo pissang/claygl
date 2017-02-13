@@ -60,6 +60,7 @@ void main (void)
     // blur in y (horizontal)
     for (int i = 0; i < 9; i++) {
         float w = gaussianKernel[i];
+        // TODO alpha blend?
         sum += decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off)) * w;
         weightAll += w;
     }
