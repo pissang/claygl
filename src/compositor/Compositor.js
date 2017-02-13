@@ -84,8 +84,12 @@ define(function(require){
             return this._frameBuffer;
         },
 
+        /**
+         * Dispose compositor
+         * @param {WebGLRenderingContext|qtek.Renderer} renderer
+         */
         dispose: function (renderer) {
-            this._texturePool.clear(renderer.gl);
+            this._texturePool.clear(renderer.gl || renderer);
         }
     });
 
