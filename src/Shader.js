@@ -1202,7 +1202,7 @@ define(function (require) {
                 return Shader.parseImport(str);
             }
             else {
-                console.warn('Shader chunk "' + importName + '" not existed in library');
+                console.error('Shader chunk "' + importName + '" not existed in library');
                 return '';
             }
         });
@@ -1262,7 +1262,7 @@ define(function (require) {
         }
         if (typeof obj !== 'string') {
             // FIXME Use default instead
-            console.warn('Shader "' + name + '" not existed in library');
+            console.error('Shader "' + name + '" not existed in library');
             return '';
         }
         return obj;

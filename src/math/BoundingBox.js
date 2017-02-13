@@ -152,14 +152,14 @@ define(function (require) {
 
                 var m = matrix._array;
 
-                xa[0] = m[0] * min[0]; xa[1] = m[1] * min[1]; xa[2] = m[2] * min[2];
-                xb[0] = m[0] * max[0]; xb[1] = m[1] * max[1]; xb[2] = m[2] * max[2];
+                xa[0] = m[0] * min[0]; xa[1] = m[1] * min[0]; xa[2] = m[2] * min[0];
+                xb[0] = m[0] * max[0]; xb[1] = m[1] * max[0]; xb[2] = m[2] * max[0];
 
-                ya[0] = m[4] * min[0]; ya[1] = m[5] * min[1]; ya[2] = m[6] * min[2];
-                yb[0] = m[4] * max[0]; yb[1] = m[5] * max[1]; yb[2] = m[6] * max[2];
+                ya[0] = m[4] * min[1]; ya[1] = m[5] * min[1]; ya[2] = m[6] * min[1];
+                yb[0] = m[4] * max[1]; yb[1] = m[5] * max[1]; yb[2] = m[6] * max[1];
 
-                za[0] = m[8] * min[0]; za[1] = m[9] * min[1]; za[2] = m[10] * min[2];
-                zb[0] = m[8] * max[0]; zb[1] = m[9] * max[1]; zb[2] = m[10] * max[2];
+                za[0] = m[8] * min[2]; za[1] = m[9] * min[2]; za[2] = m[10] * min[2];
+                zb[0] = m[8] * max[2]; zb[1] = m[9] * max[2]; zb[2] = m[10] * max[2];
 
                 min[0] = Math.min(xa[0], xb[0]) + Math.min(ya[0], yb[0]) + Math.min(za[0], zb[0]) + m[12];
                 min[1] = Math.min(xa[1], xb[1]) + Math.min(ya[1], yb[1]) + Math.min(za[1], zb[1]) + m[13];

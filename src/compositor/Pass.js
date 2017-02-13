@@ -15,7 +15,8 @@ define(function(require) {
 
     var planeGeo = new Plane();
     var mesh = new Mesh({
-        geometry : planeGeo
+        geometry: planeGeo,
+        frustumCulling: false
     });
     var camera = new OrthoCamera();
 
