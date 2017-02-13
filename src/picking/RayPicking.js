@@ -137,7 +137,8 @@ define(function(require) {
 
                         if (cullBack) {
                             point = ray.intersectTriangle(v1, v2, v3, renderable.culling);
-                        } else {
+                        }
+                        else {
                             point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
                         }
                         if (point) {
@@ -149,7 +150,8 @@ define(function(require) {
                             ));
                         }
                     }
-                } else {
+                }
+                else {
                     var faces = geometry.faces;
                     var positions = geometry.attributes.position.value;
                     for (var i = 0; i < faces.length; i++) {
@@ -164,7 +166,8 @@ define(function(require) {
 
                         if (cullBack) {
                             point = ray.intersectTriangle(v1, v2, v3, renderable.culling);
-                        } else {
+                        }
+                        else {
                             point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
                         }
                         if (point) {

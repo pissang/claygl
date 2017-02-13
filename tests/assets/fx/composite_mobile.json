@@ -48,7 +48,7 @@
 
         {
             "name" : "bright_quad",
-            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "shader" : "#source(qtek.compositor.bright)",
             "inputs" : {
                 "texture" : "source_quad"
             },
@@ -73,7 +73,7 @@
 
         {
             "name" : "bright2",
-            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "shader" : "#source(qtek.compositor.bright)",
             "inputs" : {
                 "texture": "source_quad"
             },

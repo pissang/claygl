@@ -29,7 +29,7 @@
 
         {
             "name" : "bright",
-            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "shader" : "#source(qtek.compositor.bright)",
             "inputs" : {
                 "texture" : "source_half"
             },
@@ -53,7 +53,7 @@
         },
         {
             "name" : "bright2",
-            "shader" : "#source(qtek.compositor.hdr.bright)",
+            "shader" : "#source(qtek.compositor.bright)",
             "inputs" : {
                 "texture": "source_half"
             },

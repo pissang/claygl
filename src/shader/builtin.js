@@ -30,6 +30,7 @@ define(function (require) {
     Shader['import'](require('./source/compositor/lut.essl'));
     Shader['import'](require('./source/compositor/vignette.essl'));
     Shader['import'](require('./source/compositor/output.essl'));
+    Shader['import'](require('./source/compositor/bright.essl'));
     Shader['import'](require('./source/compositor/downsample.essl'));
     Shader['import'](require('./source/compositor/upsample.essl'));
     Shader['import'](require('./source/compositor/hdr.essl'));

@@ -5,7 +5,7 @@ define(function(require) {
     var Vector3 = require('./Vector3');
     var glMatrix = require('../dep/glmatrix');
     var vec3 = glMatrix.vec3;
-    
+
     var EPSILON = 1e-5;
 
     /**
@@ -26,7 +26,7 @@ define(function(require) {
     };
 
     Ray.prototype = {
-        
+
         constructor: Ray,
 
         // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
@@ -122,11 +122,13 @@ define(function(require) {
                 if (t0 < 0) {
                     if (t1 < 0) {
                         return null;
-                    } else {
+                    }
+                    else {
                         vec3.scaleAndAdd(out._array, origin, direction, t1);
                         return out;
                     }
-                } else {
+                }
+                else {
                     vec3.scaleAndAdd(out._array, origin, direction, t0);
                     return out;
                 }
@@ -154,14 +156,16 @@ define(function(require) {
             if (invdirx >= 0) {
                 tmin = (min[0] - origin[0]) * invdirx;
                 tmax = (max[0] - origin[0]) * invdirx;
-            } else {
+            }
+            else {
                 tmax = (min[0] - origin[0]) * invdirx;
                 tmin = (max[0] - origin[0]) * invdirx;
             }
             if (invdiry >= 0) {
                 tymin = (min[1] - origin[1]) * invdiry;
                 tymax = (max[1] - origin[1]) * invdiry;
-            } else {
+            }
+            else {
                 tymax = (min[1] - origin[1]) * invdiry;
                 tymin = (max[1] - origin[1]) * invdiry;
             }
@@ -180,7 +184,8 @@ define(function(require) {
             if (invdirz >= 0) {
                 tzmin = (min[2] - origin[2]) * invdirz;
                 tzmax = (max[2] - origin[2]) * invdirz;
-            } else {
+            }
+            else {
                 tzmax = (min[2] - origin[2]) * invdirz;
                 tzmin = (max[2] - origin[2]) * invdirz;
             }
@@ -220,7 +225,7 @@ define(function(require) {
          * @return {qtek.math.Vector3}
          */
         intersectTriangle: (function() {
-            
+
             var eBA = vec3.create();
             var eCA = vec3.create();
             var AO = vec3.create();
