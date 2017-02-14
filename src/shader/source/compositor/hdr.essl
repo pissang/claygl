@@ -150,7 +150,7 @@ void main()
 #endif
 
 #ifdef LENSFLARE_ENABLED
-    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord).rgb * lensflareIntensity;
+    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;
 #endif
 
 // Adjust exposure

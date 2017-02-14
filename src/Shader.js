@@ -233,6 +233,10 @@ define(function (require) {
                 return false;
             }
             if (this === otherShader) {
+                if (this._codeDirty) {
+                    // Still needs update and rebind.
+                    return false;
+                }
                 return true;
             }
             if (otherShader._codeDirty) {
