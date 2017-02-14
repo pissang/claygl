@@ -4,12 +4,11 @@
 // float rand(vec2 co){
 //     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 // }
-
 // expects values in the range of [0,1]x[0,1], returns values in the [0,1] range.
 // do not collapse into a single function per: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
 highp float rand(vec2 uv) {
     const highp float a = 12.9898, b = 78.233, c = 43758.5453;
-    highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, 3.141592653589793 );
+    highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);
     return fract(sin(sn) * c);
 }
 @end
@@ -52,7 +51,7 @@ float edgeFactor(float width)
 vec4 encodeFloat(const in float depth)
 {
     // const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
-    // const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+    // const vec3 PackFactors = vec3(256. * 256. * 256., 256. * 256.,  256.);
     // const float ShiftRight8 = 1. / 256.;
 
     // vec4 r = vec4(fract(depth * PackFactors), depth);
@@ -72,12 +71,12 @@ vec4 encodeFloat(const in float depth)
 float decodeFloat(const in vec4 color)
 {
     // const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
-    // const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+    // const vec3 PackFactors = vec3(256. * 256. * 256., 256. * 256.,  256.);
     // const vec4 UnpackFactors = UnpackDownscale / vec4(PackFactors, 1.);
 
     // return dot(color, UnpackFactors);
 
-    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0 );
+    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);
     return dot(color, bitShifts);
 }
 @end
@@ -106,7 +105,7 @@ vec4 RGBMEncode(vec3 color, float range) {
     }
     vec4 rgbm;
     color /= range;
-    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6 ) ), 0.0, 1.0);
+    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6)), 0.0, 1.0);
     rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
     rgbm.rgb = color / rgbm.a;
     return rgbm;
@@ -140,10 +139,13 @@ vec4 encodeHDR(vec4 color)
 
 @export qtek.util.srgb
 
-vec4 sRGBToLinear(vec4 value) {
+vec4 sRGBToLinear(in vec4 value) {
     return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);
 }
 
+vec4 linearTosRGB(in vec4 value) {
+    return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);
+}
 @end
 
 

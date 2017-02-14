@@ -270,13 +270,13 @@ void main()
     vec3 V = normalize(eyePos - v_WorldPosition);
 
 #ifdef DIFFUSEMAP_ENABLED
-    vec4 tex = texture2D(diffuseMap, v_Texcoord);
+    vec4 texel = texture2D(diffuseMap, v_Texcoord);
     #ifdef SRGB_DECODE
-    tex = sRGBToLinear(tex);
+    texel = sRGBToLinear(texel);
     #endif
-    outColor.rgb *= tex.rgb;
+    outColor.rgb *= texel.rgb;
     #ifdef DIFFUSEMAP_ALPHA_ALPHA
-    outColor.a *= tex.a;
+    outColor.a *= texel.a;
     #endif
 #endif
 
