@@ -115,7 +115,7 @@ define(function (require) {
             return this.useFace && (this.faces != null);
         },
 
-        initFaceFromArray: function (array) {
+        initFacesFromArray: function (array) {
             var value;
             var ArrayConstructor = this.vertexCount > 0xffff
                 ? vendor.Uint32Array : vendor.Uint16Array;
@@ -221,7 +221,7 @@ define(function (require) {
             var prevSearchIdx = 0;
             var count = 0;
 
-            // PENDING  If some attributes removed
+            // FIXME If some attributes removed
             for (var k = 0; k < attributeList.length; k++) {
                 var name = attributeList[k];
                 var attribute = this.attributes[name];

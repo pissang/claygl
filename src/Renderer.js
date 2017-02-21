@@ -629,6 +629,8 @@ define(function(require) {
                     shader.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
                     // DEPRECATED
                     shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
+                    shader.setUniformOfSemantic(_gl, 'NEAR', camera.near);
+                    shader.setUniformOfSemantic(_gl, 'FAR', camera.far);
 
                     // Set lights uniforms
                     // TODO needs optimized

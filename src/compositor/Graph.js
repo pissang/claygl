@@ -31,17 +31,26 @@ define(function (require) {
          */
         addNode: function (node) {
 
+            if (this.nodes.indexOf(node) >= 0) {
+                return;
+            }
+
             this.nodes.push(node);
 
             this._dirty = true;
         },
         /**
-         * @param  {qtek.compositor.Node} node
+         * @param  {qtek.compositor.Node|string} node
          */
         removeNode: function (node) {
-            this.nodes.splice(this.nodes.indexOf(node), 1);
-
-            this._dirty = true;
+            if (typeof node === 'string') {
+                node = this.getNodeByName(node);
+            }
+            var idx = this.nodes.indexOf(node);
+            if (idx >= 0) {
+                this.nodes.splice(idx, 1);
+                this._dirty = true;
+            }
         },
         /**
          * @param {string} name

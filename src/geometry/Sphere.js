@@ -124,7 +124,7 @@ define(function(require) {
             attributes.texcoord0.fromArray(texcoords);
             attributes.normal.fromArray(normals);
 
-            this.initFaceFromArray(faces);
+            this.initFacesFromArray(faces);
 
 
             this.boundingBox = new BoundingBox();

@@ -832,10 +832,6 @@ define(function(require) {
     /**
      * Convert rotation matrix to euler angle
      * from three.js
-     * @param  {[type]} v     [description]
-     * @param  {[type]} m     [description]
-     * @param  {[type]} order [description]
-     * @return {[type]}       [description]
      */
     Vector3.eulerFromMat3 = function (out, m, order) {
         // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)

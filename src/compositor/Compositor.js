@@ -29,9 +29,6 @@ define(function(require){
     {
         addNode: function(node) {
             Graph.prototype.addNode.call(this, node);
-            if (!node.outputs) {
-                this.addOutput(node);
-            }
             node._compositor = this;
         },
         /**
@@ -41,6 +38,13 @@ define(function(require){
             if (this._dirty) {
                 this.update();
                 this._dirty = false;
+
+                this._outputs.length = 0;
+                for (var i = 0; i < this.nodes.length; i++) {
+                    if (!this.nodes[i].outputs) {
+                        this._outputs.push(this.nodes[i]);
+                    }
+                }
             }
 
             for (var i = 0; i < this.nodes.length; i++) {
@@ -60,16 +64,6 @@ define(function(require){
                 // Clear up
                 this.nodes[i].afterFrame();
             }
-        },
-
-        addOutput: function(node) {
-            if (this._outputs.indexOf(node) < 0) {
-                this._outputs.push(node);
-            }
-        },
-
-        removeOutput: function(node) {
-            this._outputs.splice(this._outputs.indexOf(node), 1);
         },
 
         allocateTexture: function (parameters) {
