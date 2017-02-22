@@ -281,7 +281,8 @@ define(function (require) {
 
             if (!normals || normals.length !== positions.length) {
                 normals = attributes.normal.value = new vendor.Float32Array(positions.length);
-            } else {
+            }
+            else {
                 // Reset
                 for (var i = 0; i < normals.length; i++) {
                     normals[i] = 0;

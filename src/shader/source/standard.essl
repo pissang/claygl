@@ -190,10 +190,6 @@ uniform float lineWidth : 0.0;
 uniform vec3 lineColor : [0.0, 0.0, 0.0];
 varying vec3 v_Barycentric;
 
-// For selection
-uniform vec3 mixColor: [1.0, 1.0, 0.0];
-uniform float mixIntensity: 0.0;
-
 // Max mipmap level of environment map
 #ifdef ENVIRONMENTMAP_PREFILTER
 uniform float maxMipmapLevel: 5;
@@ -265,7 +261,8 @@ float D_GGX(float g, float ndh) {
 
 void main()
 {
-    vec4 outColor = vec4(color, alpha);
+    // TODO If sRGB decode color?
+    vec4 albedoColor = vec4(color, alpha);
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
 
@@ -274,9 +271,9 @@ void main()
     #ifdef SRGB_DECODE
     texel = sRGBToLinear(texel);
     #endif
-    outColor.rgb *= texel.rgb;
+    albedoColor.rgb *= texel.rgb;
     #ifdef DIFFUSEMAP_ALPHA_ALPHA
-    outColor.a *= texel.a;
+    albedoColor.a *= texel.a;
     #endif
 #endif
 
@@ -290,8 +287,8 @@ void main()
     m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);
     #endif
 
-    vec3 baseColor = outColor.rgb;
-    outColor.rgb = baseColor * (1.0 - m);
+    vec3 baseColor = albedoColor.rgb;
+    albedoColor.rgb = baseColor * (1.0 - m);
     vec3 spec = mix(vec3(0.04), baseColor, m);
 #else
     vec3 spec = specularColor;
@@ -361,7 +358,7 @@ void main()
     }
 #endif
     for(int _idx_ = 0; _idx_ < POINT_LIGHT_COUNT; _idx_++)
-    {
+    {{
 
         vec3 lightPosition = pointLightPosition[_idx_];
         vec3 lc = pointLightColor[_idx_];
@@ -388,7 +385,7 @@ void main()
         vec3 li = lc * ndl * attenuation * shadowContrib;
         diffuseTerm += li;
         specularTerm += li * fresnelTerm * D_Phong(g, ndh);
-    }
+    }}
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_COUNT
@@ -399,11 +396,11 @@ void main()
         computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);
     }
 #endif
-    for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)
-    {
+    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++)
+    {{
 
-        vec3 L = -normalize(directionalLightDirection[i]);
-        vec3 lc = directionalLightColor[i];
+        vec3 L = -normalize(directionalLightDirection[_idx_]);
+        vec3 lc = directionalLightColor[_idx_];
 
         vec3 H = normalize(L + V);
         float ndl = clamp(dot(N, L), 0.0, 1.0);
@@ -413,7 +410,7 @@ void main()
 #if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
         if(shadowEnabled)
         {
-            shadowContrib = shadowContribsDir[i];
+            shadowContrib = shadowContribsDir[_idx_];
         }
 #endif
 
@@ -421,7 +418,7 @@ void main()
 
         diffuseTerm += li;
         specularTerm += li * fresnelTerm * D_Phong(g, ndh);
-    }
+    }}
 #endif
 
 #ifdef SPOT_LIGHT_COUNT
@@ -476,6 +473,7 @@ void main()
     }
 #endif
 
+    vec4 outColor = albedoColor;
     outColor.rgb *= diffuseTerm;
 
     outColor.rgb += specularTerm;
@@ -547,8 +545,6 @@ void main()
     // Not linear
     outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));
 #endif
-
-    outColor.rgb = mix(outColor.rgb, mixColor, mixIntensity);
 
     if(lineWidth > 0.)
     {

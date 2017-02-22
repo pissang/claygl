@@ -168,6 +168,7 @@ define(function(require) {
             texture.width = width;
             texture.height = height;
             texture.pixels = pixels;
+            // HALF_FLOAT can't use Float32Array
             texture.type = Texture.FLOAT;
             return texture;
         },

@@ -6,7 +6,6 @@ define(function(require) {
     var Shader = require('../Shader');
     var Material = require('../Material');
 
-    var skyboxShader;
 
     /**
      * @constructor qtek.plugin.Skybox
@@ -28,12 +27,10 @@ define(function(require) {
      */
     var Skybox = Mesh.extend(function () {
 
-        if (!skyboxShader) {
-            skyboxShader = new Shader({
-                vertex: Shader.source('qtek.skybox.vertex'),
-                fragment: Shader.source('qtek.skybox.fragment')
-            });
-        }
+        var skyboxShader = new Shader({
+            vertex: Shader.source('qtek.skybox.vertex'),
+            fragment: Shader.source('qtek.skybox.fragment')
+        });
         var material = new Material({
             shader: skyboxShader,
             depthMask: false

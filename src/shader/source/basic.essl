@@ -58,6 +58,8 @@ varying vec3 v_Barycentric;
 
 @import qtek.util.rgbm
 
+@import qtek.util.srgb
+
 void main()
 {
 
@@ -69,10 +71,10 @@ void main()
     gl_FragColor = vec4(color, alpha);
 
 #ifdef DIFFUSEMAP_ENABLED
-    vec4 tex = texture2D(diffuseMap, v_Texcoord);
+    vec4 tex = decodeHDR(texture2D(diffuseMap, v_Texcoord));
 
 #ifdef SRGB_DECODE
-    tex.rgb = pow(tex.rgb, vec3(2.2));
+    tex = sRGBToLinear(tex);
 #endif
 
 #if defined(DIFFUSEMAP_ALPHA_ALPHA)

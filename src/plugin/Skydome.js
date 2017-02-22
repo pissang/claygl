@@ -5,8 +5,6 @@ define(function (require) {
     var Shader = require('../Shader');
     var Material = require('../Material');
 
-    var skydomeShader;
-
     /**
      * @constructor qtek.plugin.Skydome
      *
@@ -20,13 +18,11 @@ define(function (require) {
      */
     var Skydome = Mesh.extend(function () {
 
-        if (!skydomeShader) {
-            skydomeShader = new Shader({
-                vertex: Shader.source('qtek.basic.vertex'),
-                fragment: Shader.source('qtek.basic.fragment')
-            });
-            skydomeShader.enableTexture('diffuseMap');
-        }
+        var skydomeShader = new Shader({
+            vertex: Shader.source('qtek.basic.vertex'),
+            fragment: Shader.source('qtek.basic.fragment')
+        });
+        skydomeShader.enableTexture('diffuseMap');
 
         var material = new Material({
             shader: skydomeShader,
