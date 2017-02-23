@@ -291,6 +291,7 @@ define(function (require) {
 
             var n = vec3Create();
 
+            // TODO if no faces
             for (var f = 0; f < faces.length;) {
                 var i1 = faces[f++];
                 var i2 = faces[f++];
@@ -303,7 +304,7 @@ define(function (require) {
                 vec3.sub(v21, p1, p2);
                 vec3.sub(v32, p2, p3);
                 vec3.cross(n, v21, v32);
-                // Weighted by the triangle area
+                // Already be weighted by the triangle area
                 for (var i = 0; i < 3; i++) {
                     normals[i1*3+i] = normals[i1*3+i] + n[i];
                     normals[i2*3+i] = normals[i2*3+i] + n[i];

@@ -361,15 +361,15 @@ define(function (require) {
         define: function (shaderType, symbol, val) {
             var vertexDefines = this.vertexDefines;
             var fragmentDefines = this.fragmentDefines;
-            val = val != null ? val : null;
             if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
-                && arguments.legnth < 3
+                && arguments.length < 3
             ) {
                 // shaderType default to be 'both'
                 val = symbol;
                 symbol = shaderType;
                 shaderType = 'both';
             }
+            val = val != null ? val : null;
             if (shaderType === 'vertex' || shaderType === 'both') {
                 if (vertexDefines[symbol] !== val) {
                     vertexDefines[symbol] = val;
@@ -393,7 +393,7 @@ define(function (require) {
          */
         unDefine: function (shaderType, symbol) {
             if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
-                && arguments.legnth < 2
+                && arguments.length < 2
             ) {
                 // shaderType default to be 'both'
                 symbol = shaderType;
