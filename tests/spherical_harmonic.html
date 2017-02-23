@@ -43,6 +43,7 @@
                             var light = new qtek.light.AmbientSH({
                                 coefficients: coeff
                             });
+                            console.log(coeff);
                             scene.add(light);
 
                             var material = new qtek.Material({
@@ -64,9 +65,9 @@
                             scene.add(monkey);
 
                             var skydome = new qtek.plugin.Skydome({
-                                scene: scene
+                                scene: scene,
+                                environmentMap: envMap
                             });
-                            skydome.material.set('diffuseMap', envMap);
                         }
                     );
                 });

@@ -69,14 +69,14 @@ define(function(require) {
              * Clear color
              * @type {number[]}
              */
-            color: [0.0, 0.0, 0.0, 0.0],
+            clearColor: [0.0, 0.0, 0.0, 0.0],
 
             /**
              * Default:
              *     _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
              * @type {number}
              */
-            clear: 17664,
+            clearBit: 17664,
 
             // Settings when getting context
             // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -317,7 +317,10 @@ define(function(require) {
          * Push current clear into a stack
          */
         saveClear: function () {
-            this._clearStack.push(this.clear);
+            this._clearStack.push({
+                clearBit: this.clearBit,
+                clearColor: this.clearColor
+            });
         },
 
         /**
@@ -325,7 +328,9 @@ define(function(require) {
          */
         restoreClear: function () {
             if (this._clearStack.length > 0) {
-                this.clear = this._clearStack.pop();
+                var opt = this._clearStack.pop();
+                this.clearColor = opt.clearColor;
+                this.clearBit = opt.clearBit;
             }
         },
 
@@ -349,9 +354,9 @@ define(function(require) {
 
             this._sceneRendering = scene;
 
-            var color = this.color;
+            var clearColor = this.clearColor;
 
-            if (this.clear) {
+            if (this.clearBit) {
 
                 // Must set depth and color mask true before clear
                 _gl.colorMask(true, true, true, true);
@@ -360,7 +365,7 @@ define(function(require) {
                 var needsScissor = false;
                 var viewportDpr = viewport.devicePixelRatio;
                 if (viewport.width !== this._width || viewport.height !== this._height
-                    || viewportDpr && viewportDpr !== this.devicePixelRatio
+                    || (viewportDpr && viewportDpr !== this.devicePixelRatio)
                     || viewport.x || viewport.y
                 ) {
                     needsScissor = true;
@@ -369,8 +374,8 @@ define(function(require) {
                     _gl.enable(_gl.SCISSOR_TEST);
                     _gl.scissor(viewport.x * viewportDpr, viewport.y * viewportDpr, viewport.width * viewportDpr, viewport.height * viewportDpr);
                 }
-                _gl.clearColor(color[0], color[1], color[2], color[3]);
-                _gl.clear(this.clear);
+                _gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+                _gl.clear(this.clearBit);
                 if (needsScissor) {
                     _gl.disable(_gl.SCISSOR_TEST);
                 }

@@ -27,21 +27,13 @@
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    var cubemap = new qtek.TextureCube({
-                        type: qtek.Texture.HALF_FLOAT,
-                        width: 128,
-                        height: 128
-                    });
-                    qtek.util.texture.loadPanorama(
-                        renderer,
+                    var cubemap = qtek.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
-                        cubemap,
                         {
-                            exposure: 3,
-                            flipY: false
+                            exposure: 3
                         },
                         function () {
-
+                            cubemap.flipY = false;
                             var ambientCubemapLight = new qtek.light.AmbientCubemap({
                                 cubemap: cubemap
                             });

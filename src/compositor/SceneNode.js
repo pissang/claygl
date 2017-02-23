@@ -83,7 +83,7 @@ define(function(require) {
                 // Always clear
                 // PENDING
                 renderer.saveClear();
-                renderer.clear = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
+                renderer.clearBit = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
                 renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
                 renderer.restoreClear();
 

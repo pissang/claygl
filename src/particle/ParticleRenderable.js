@@ -206,6 +206,8 @@ define(function(require) {
                 }
                 p.update(deltaTime);
             }
+
+            this._updateVertices();
         },
 
         _updateVertices: function() {
@@ -259,11 +261,6 @@ define(function(require) {
             }
 
             geometry.dirty();
-        },
-
-        render: function(_gl) {
-            this._updateVertices();
-            return Renderable.prototype.render.call(this, _gl);
         },
 
         /**

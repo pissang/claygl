@@ -141,7 +141,7 @@
 
                 var time = 0;
                 var skeletonDebugScene = createSkeletonDebugScene(skeleton, qtek);
-                var clearAll = renderer.clear;
+                var clearAll = renderer.clearBit;
                 skeletonDebugScene.position.x -= 6;
 
                 var animation = new qtek.animation.Animation();
@@ -151,9 +151,9 @@
                 animation.on('frame', function() {
                     control.update();
                     shadowMapPass.render(renderer, scene, camera);
-                    renderer.clear = clearAll;
+                    renderer.clearBit = clearAll;
                     renderer.render(scene, camera);
-                    renderer.clear = 0;
+                    renderer.clearBit = 0;
                     renderer.render(skeletonDebugScene, camera);
 
                     skeleton.setPose(0);

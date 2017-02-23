@@ -1,0 +1,143 @@
+<html>
+<head>
+    <title>Deferred Skinning</title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../thirdparty/require.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
+</head>
+<body style="margin:0px">
+    <canvas id="Main"></canvas>
+
+    <script type="text/javascript">
+
+        function createSkeletonDebugScene(skeleton, qtek) {
+            var scene = new qtek.Scene();
+            var sphereGeo = new qtek.geometry.Sphere({
+                radius : 0.1
+            });
+            var sphereMat = new qtek.Material({
+                shader : new qtek.Shader({
+                    vertex : qtek.Shader.source("qtek.basic.vertex"),
+                    fragment : qtek.Shader.source("qtek.basic.fragment")
+                })
+            });
+            sphereMat.set("color", [0.3, 0.3, 0.3]);
+
+            var jointDebugSpheres = [];
+
+            var updates = [];
+            skeleton.joints.forEach(function(joint) {
+
+                var parentJoint = skeleton.joints[joint.parentIndex];
+                var sphere = new qtek.Mesh({
+                    geometry : sphereGeo,
+                    material : sphereMat,
+                    autoUpdateLocalTransform : false
+                });
+                scene.add(sphere);
+
+                var lineGeo = new qtek.DynamicGeometry();
+                var lineGeoVertices = lineGeo.attributes.position.value;
+                lineGeoVertices.push([0, 0, 0], [0, 0, 0]);
+                var line = new qtek.Mesh({
+                    geometry : lineGeo,
+                    material : sphereMat,
+                    mode : qtek.Mesh.LINES,
+                    lineWidth : 2
+                });
+                scene.add(line);
+
+                updates.push(function() {
+                    sphere.localTransform.copy(joint.node.worldTransform);
+                    if (parentJoint) {
+                        lineGeoVertices[0] = joint.node.getWorldPosition()._array;
+                        lineGeoVertices[1] = parentJoint.node.getWorldPosition()._array;
+                    }
+                    lineGeo.dirty('position');
+                });
+
+            });
+
+            scene.before('render', function() {
+                for (var i = 0; i < updates.length; i++) {
+                    updates[i]();
+                }
+            });
+            return scene;
+        }
+
+        require(['qtek'], function(qtek) {
+
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById("Main")
+            });
+            var deferredRenderer = new qtek.deferred.Renderer();
+
+            renderer.resize(window.innerWidth, window.innerHeight);
+
+            var GLTFLoader = new qtek.loader.GLTF({
+                useStandardMaterial: true
+            });
+
+            GLTFLoader.load("assets/models/whale/whale-anim.gltf");
+
+            GLTFLoader.on('success', function(res) {
+                var scene = res.scene;
+                var skeleton = res.skeletons['skin_0'];
+                var camera = new qtek.camera.Perspective({
+                    aspect : renderer.getViewportAspect()
+                });
+
+                camera.position.set(0, 10, 30);
+                camera.lookAt(new qtek.math.Vector3(0, 2, 0));
+
+                camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+                var control = new qtek.plugin.OrbitControl({
+                    target: camera,
+                    domElement: renderer.canvas,
+                    sensitivity: 0.4
+                });
+
+                light = new qtek.light.Directional({
+                    intensity: 1
+                });
+                light.position.set(1, 1, 1);
+                light.lookAt(scene.position);
+                scene.add(light);
+
+                var plane = new qtek.Mesh({
+                    geometry: new qtek.geometry.Plane(),
+                    material: new qtek.StandardMaterial()
+                });
+                plane.rotation.rotateX(-Math.PI / 2);
+                plane.scale.set(20, 20, 1);
+                scene.add(plane);
+
+                scene.add(new qtek.light.Ambient({
+                    intensity : 0.2
+                }));
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.addClip(skeleton.getClip(0));
+                skeleton.getClip(0).setLoop(true);
+
+                var skeletonDebugScene = createSkeletonDebugScene(skeleton, qtek);
+                skeletonDebugScene.position.x = -10;
+                animation.on('frame', function() {
+                    control.update(50);
+                    skeleton.setPose(0);
+                    // renderer.render(scene, camera);
+                    deferredRenderer.render(renderer, scene, camera);
+
+                    renderer.saveClear();
+                    renderer.clearBit = renderer.gl.DEPTH_BUFFER_BIT;
+                    renderer.render(skeletonDebugScene, camera);
+                    renderer.restoreClear();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -391,7 +391,7 @@ define(function (require) {
 
             renderer.saveClear();
             renderer.saveViewport();
-            renderer.clear = renderer.gl.DEPTH_BUFFER_BIT;
+            renderer.clearBit = renderer.gl.DEPTH_BUFFER_BIT;
 
             if (viewport) {
                 renderer.setViewport(viewport);

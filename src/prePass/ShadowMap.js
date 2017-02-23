@@ -122,8 +122,7 @@ define(function (require) {
          * @memberOf qtek.prePass.ShadowMap.prototype
          */
         renderDebug: function (renderer, size) {
-            var prevClear = renderer.clear;
-            renderer.clear = glenum.DEPTH_BUFFER_BIT;
+            renderer.saveClear();
             var viewport = renderer.viewport;
             var x = 0, y = 0;
             var width = size || viewport.width / 4;
@@ -142,7 +141,7 @@ define(function (require) {
                 x += width * texture.width / texture.height;
             }
             renderer.setViewport(viewport);
-            renderer.clear = prevClear;
+            renderer.restoreClear();
         },
 
         _bindDepthMaterial: function (casters, bias, slopeScale) {

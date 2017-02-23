@@ -24,7 +24,7 @@ define(function (require) {
     var CardboardDistorter = Base.extend(function () {
         return {
 
-            color: [0, 0, 0, 1],
+            clearColor: [0, 0, 0, 1],
 
             _mesh: new Mesh({
                 geometry: new StaticGeometry(),
@@ -44,9 +44,9 @@ define(function (require) {
     }, {
 
         render: function (renderer, sourceTexture) {
-            var color = this.color;
+            var clearColor = this.clearColor;
             var gl = renderer.gl;
-            gl.clearColor(color[0], color[1], color[2], color[3]);
+            gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.disable(gl.BLEND);

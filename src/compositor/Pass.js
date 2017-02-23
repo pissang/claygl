@@ -157,7 +157,7 @@ define(function(require) {
 
             this.trigger('beforerender', this, renderer);
 
-            // Don't clear in each pass in default, let the color overwrite the buffer
+            // FIXME Don't clear in each pass in default, let the color overwrite the buffer
             // FIXME pixels may be discard
             var clearBit = _gl.DEPTH_BUFFER_BIT;
             _gl.depthMask(true);

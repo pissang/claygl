@@ -14,9 +14,8 @@ define(function (require) {
     var Scene = require('../Scene');
     var glmatrix = require('../dep/glmatrix');
     var vec3 = glmatrix.vec3;
-    var mat3 = glmatrix.mat3;
-
     var sh = {};
+
 
     var projectEnvMapShaderCode = require('./shader/projectEnvMap.essl');
 
@@ -160,6 +159,8 @@ define(function (require) {
      * @param  {boolean} [textureOpts.decodeRGBM]
      */
     sh.projectEnvironmentMap = function (renderer, envMap, opts) {
+
+        // TODO sRGB
 
         opts = opts || {};
         opts.lod = opts.lod || 0;

@@ -259,7 +259,7 @@ define(function (require) {
 
             lightAccumFrameBuffer.attach(lightAccumTex);
             lightAccumFrameBuffer.bind(renderer);
-            var color = renderer.color;
+            var clearColor = renderer.clearColor;
 
             var viewport = lightAccumFrameBuffer.viewport;
             if (viewport) {
@@ -268,7 +268,7 @@ define(function (require) {
                 gl.enable(gl.SCISSOR_TEST);
                 gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
             }
-            gl.clearColor(color[0], color[1], color[2], color[3]);
+            gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.enable(gl.BLEND);
             if (viewport) {

@@ -7,6 +7,7 @@ define(function(require) {
     var Material = require('../Material');
 
 
+    Shader.import(require('../shader/source/skybox.essl'));
     /**
      * @constructor qtek.plugin.Skybox
      *

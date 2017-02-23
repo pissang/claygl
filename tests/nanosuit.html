@@ -52,7 +52,7 @@
 
                 var root = new qtek.Node();
                 var meshNumber = 0;
-                var N = 3;
+                var N = 5;
                 for (var i = 0; i < N; i++) {
                     for (var j = 0; j < N; j++) {
                         var nanosuit = new qtek.Node();
@@ -123,12 +123,12 @@
                     control.update(deltaTime);
 
                     var start = performance.now();
-                    renderer.clear = qtek.Renderer.COLOR_BUFFER_BIT | qtek.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clearBit = qtek.Renderer.COLOR_BUFFER_BIT | qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.render(renderer, scene, camera);
                     var drawInfo = renderer.render(scene, camera);
                     var renderTime = performance.now() - start;
 
-                    renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clearBit = qtek.Renderer.DEPTH_BUFFER_BIT;
                     shadowMapPass.renderDebug(renderer, 200);
 
                     rot += deltaTime / 2000;

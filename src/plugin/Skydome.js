@@ -5,6 +5,7 @@ define(function (require) {
     var Shader = require('../Shader');
     var Material = require('../Material');
 
+    Shader.import(require('../shader/source/basic.essl'));
     /**
      * @constructor qtek.plugin.Skydome
      *

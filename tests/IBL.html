@@ -151,7 +151,7 @@
                     var x = 0, y = 0;
                     var width = viewport.width / 10;
                     var height = width;
-                    renderer.clear = qtek.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clearBit = qtek.Renderer.DEPTH_BUFFER_BIT;
                     renderer.setViewport(x, y, width, height);
                     debugPass.setUniform('texture', normalDistribution);
                     debugPass.render(renderer);
