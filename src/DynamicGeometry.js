@@ -1,7 +1,5 @@
 /**
- *
- * PENDING: use perfermance hint and remove the array after the data is transfered?
- * static draw & dynamic draw?
+ * DEPCRATED
  */
 define(function (require) {
 
@@ -428,6 +426,7 @@ define(function (require) {
         },
 
         _updateBuffer: function (_gl, dirtyAttributes, isFacesDirty) {
+            var enabledAttributes = this.getEnabledAttributes();
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (! chunks) {
@@ -444,7 +443,7 @@ define(function (require) {
             }
             for (var cc = 0; cc < this._arrayChunks.length; cc++) {
                 var chunk = chunks[cc];
-                if (! chunk) {
+                if (!chunk) {
                     chunk = chunks[cc] = {
                         attributeBuffers: [],
                         indicesBuffer: null
@@ -457,34 +456,21 @@ define(function (require) {
                 var attributeArrays = arrayChunk.attributeArrays;
                 var indicesArray = arrayChunk.indicesArray;
 
+                var attributeBufferMap = {};
+                if (!firstUpdate) {
+                    for (var i = 0; i < attributeBuffers.length; i++) {
+                        attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
+                    }
+                }
                 var count = 0;
-                var prevSearchIdx = 0;
-                for (var name in dirtyAttributes) {
-                    var attribute = dirtyAttributes[name];
-                    var type = attribute.type;
-                    var semantic = attribute.semantic;
-                    var size = attribute.size;
+                for (var name in enabledAttributes) {
+                    var attribute = enabledAttributes[name];
 
                     var bufferInfo;
-                    if (!firstUpdate) {
-                        for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
-                            if (attributeBuffers[i].name === name) {
-                                bufferInfo = attributeBuffers[i];
-                                prevSearchIdx = i + 1;
-                                break;
-                            }
-                        }
-                        if (!bufferInfo) {
-                            for (var i = prevSearchIdx - 1; i >= 0; i--) {
-                                if (attributeBuffers[i].name === name) {
-                                    bufferInfo = attributeBuffers[i];
-                                    prevSearchIdx = i;
-                                    break;
-                                }
-                            }
-                        }
-                    }
 
+                    if (!firstUpdate) {
+                        bufferInfo = attributeBufferMap[name];
+                    }
                     var buffer;
                     if (bufferInfo) {
                         buffer = bufferInfo.buffer;
@@ -496,7 +482,10 @@ define(function (require) {
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                     _gl.bufferData(_gl.ARRAY_BUFFER, attributeArrays[name], this.hint);
 
-                    attributeBuffers[count++] = new Geometry.AttributeBuffer(name, type, buffer, size, semantic);
+                    attributeBuffers[count++] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
+                }
+                for (var i = count; i < attributeBuffers.length; i++) {
+                    _gl.deleteBuffer(attributeBuffers[i].buffer);
                 }
                 attributeBuffers.length = count;
 
