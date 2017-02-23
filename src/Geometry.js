@@ -269,6 +269,9 @@ define(function(require) {
         // To be set in mesh
         // symbol in the shader
         this.symbol = '';
+
+        // Needs remove flag
+        this.needsRemove = false;
     }
 
     function IndicesBuffer(buffer) {

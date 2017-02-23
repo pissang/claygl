@@ -218,9 +218,13 @@ define(function (require) {
             var indicesBuffer = chunk.indicesBuffer;
 
             var attributeList = this.getEnabledAttributes();
-            var prevSearchIdx = 0;
-            var count = 0;
 
+            var attributeBufferMap = {};
+            if (!firstUpdate) {
+                for (var i = 0; i < attributeBuffers.length; i++) {
+                    attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
+                }
+            }
             // FIXME If some attributes removed
             for (var k = 0; k < attributeList.length; k++) {
                 var name = attributeList[k];
@@ -229,23 +233,7 @@ define(function (require) {
                 var bufferInfo;
 
                 if (!firstUpdate) {
-                    // Search for created buffer
-                    for (var i = prevSearchIdx; i < attributeBuffers.length; i++) {
-                        if (attributeBuffers[i].name === name) {
-                            bufferInfo = attributeBuffers[i];
-                            prevSearchIdx = i + 1;
-                            break;
-                        }
-                    }
-                    if (!bufferInfo) {
-                        for (var i = prevSearchIdx - 1; i >= 0; i--) {
-                            if (attributeBuffers[i].name === name) {
-                                bufferInfo = attributeBuffers[i];
-                                prevSearchIdx = i;
-                                break;
-                            }
-                        }
-                    }
+                    bufferInfo = attributeBufferMap[name];
                 }
                 var buffer;
                 if (bufferInfo) {
@@ -258,9 +246,14 @@ define(function (require) {
                 _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                 _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
 
-                attributeBuffers[count++] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
+                attributeBuffers[k] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
             }
-            attributeBuffers.length = count;
+            // Remove unused attributes buffers.
+            // PENDING
+            for (var i = k; i < attributeBuffers.length; i++) {
+                _gl.deleteBuffer(attributeBuffers[i].buffer);
+            }
+            attributeBuffers.length = k;
 
             if (this.isUseFace()) {
                 if (!indicesBuffer) {
