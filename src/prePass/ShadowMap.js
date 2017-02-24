@@ -16,6 +16,7 @@ define(function (require) {
     var shaderLibrary = require('../shader/library');
     var Material = require('../Material');
     var FrameBuffer = require('../FrameBuffer');
+    var Texture = require('../Texture');
     var Texture2D = require('../Texture2D');
     var TextureCube = require('../TextureCube');
     var PerspectiveCamera = require('../camera/Perspective');
@@ -29,6 +30,8 @@ define(function (require) {
     var vec3 = glMatrix.vec3;
 
     var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+
+    Shader['import'](require('../shader/source/shadowmap.essl'));
 
     /**
      * Pass rendering shadow map.
@@ -321,6 +324,7 @@ define(function (require) {
 
             // Clear with high-z, so the part not rendered will not been shadowed
             // TODO
+            // TODO restore
             _gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
             // Shadow uniforms
@@ -629,7 +633,7 @@ define(function (require) {
             var parameter = {
                 width: size,
                 height: size,
-                type: glenum.FLOAT
+                type: Texture.FLOAT
             };
             var _gl = renderer.gl;
             var tmpTexture = this._texturePool.get(parameter);
@@ -666,7 +670,7 @@ define(function (require) {
                 texture.width = resolution * cascade;
                 texture.height = resolution;
                 if (this.softShadow === ShadowMapPass.VSM) {
-                    texture.type = glenum.FLOAT;
+                    texture.type = Texture.FLOAT;
                     texture.anisotropic = 4;
                 }
                 else {

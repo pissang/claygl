@@ -14,8 +14,6 @@ define(function (require) {
     Shader['import'](require('./source/skybox.essl'));
     Shader['import'](require('./source/prez.essl'));
 
-    Shader['import'](require('./source/shadowmap.essl'));
-
     library.template('qtek.basic', Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
     library.template('qtek.lambert', Shader.source('qtek.lambert.vertex'), Shader.source('qtek.lambert.fragment'));
     library.template('qtek.wireframe', Shader.source('qtek.wireframe.vertex'), Shader.source('qtek.wireframe.fragment'));
