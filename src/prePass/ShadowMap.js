@@ -63,7 +63,7 @@ define(function (require) {
              */
             shadowBlur: 1.0,
 
-            lightFrustumBias: 10,
+            lightFrustumBias: 2,
 
             _frameBuffer: new FrameBuffer(),
 
@@ -463,13 +463,10 @@ define(function (require) {
             var splitProjMatrix = new Matrix4();
             var cropBBox = new BoundingBox();
             var cropMatrix = new Matrix4();
+            var lightViewMatrix = new Matrix4();
             var lightViewProjMatrix = new Matrix4();
             var lightProjMatrix = new Matrix4();
 
-            var prevDepth = 0;
-            var deltaDepth = 0;
-
-            var sceneCameraProxy = new PerspectiveCamera();
             return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
                 var shadowBias = light.shadowBias;
@@ -478,46 +475,27 @@ define(function (require) {
                 casters.sort(Renderer.opaqueSortFunc);
 
                 // Considering moving speed since the bounding box is from last frame
-                // verlet integration ?
-                // FIXME First shot?
-                var depth = -scene.viewBoundingBoxLastFrame.min.z;
-                deltaDepth = Math.max(depth - prevDepth, 0);
-                prevDepth = depth;
-                depth += deltaDepth;
-
-                // Use a sceneCameraProxy to avoid modify the camera property.
-                sceneCameraProxy.near = sceneCamera.near;
-                sceneCameraProxy.far = sceneCamera.far;
-                sceneCameraProxy.aspect = sceneCamera.aspect;
-                sceneCameraProxy.fov = sceneCamera.fov;
-                sceneCameraProxy.setWorldTransform(sceneCamera.worldTransform);
                 // TODO: add a bias
-                if (depth > sceneCameraProxy.near) {
-                    sceneCameraProxy.far = Math.min(sceneCameraProxy.far, depth);
-                }
-                sceneCameraProxy.updateProjectionMatrix();
-                sceneCameraProxy.frustum.setFromProjection(sceneCameraProxy.projectionMatrix);
-                var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCameraProxy);
+                var clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, sceneCamera.far);
+                var clippedNear = Math.max(-scene.viewBoundingBoxLastFrame.max.z, sceneCamera.near);
+
+                var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
                 var lvpMat4Arr = lightViewProjMatrix._array;
-                mat4.copy(lvpMat4Arr, lightCamera.worldTransform._array);
-                mat4.invert(lvpMat4Arr, lvpMat4Arr);
-                mat4.multiply(lvpMat4Arr, lightCamera.projectionMatrix._array, lvpMat4Arr);
-                mat4.multiply(lvpMat4Arr, lvpMat4Arr, sceneCamera.worldTransform._array);
-
                 lightProjMatrix.copy(lightCamera.projectionMatrix);
+                mat4.invert(lightViewMatrix._array, lightCamera.worldTransform._array);
+                mat4.multiply(lightViewMatrix._array, lightViewMatrix._array, sceneCamera.worldTransform._array);
+                mat4.multiply(lvpMat4Arr, lightProjMatrix._array, lightViewMatrix._array);
 
                 var clipPlanes = [];
-                var near = sceneCameraProxy.near;
-                var far = sceneCameraProxy.far;
-                var rad = sceneCameraProxy.fov / 180 * Math.PI;
-                var aspect = sceneCameraProxy.aspect;
+                var rad = sceneCamera.fov / 180 * Math.PI;
+                var aspect = sceneCamera.aspect;
 
-                var scaleZ = (near + sceneCamera.far) / (near - sceneCamera.far);
-                var offsetZ = 2 * near * sceneCamera.far / (near - sceneCamera.far);
+                var scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
+                var offsetZ = 2 * sceneCamera.near * sceneCamera.far / (sceneCamera.near - sceneCamera.far);
                 for (var i = 0; i <= light.shadowCascade; i++) {
-                    var clog = near * Math.pow(far / near, i / light.shadowCascade);
-                    var cuni = near + (far - near) * i / light.shadowCascade;
+                    var clog = clippedNear * Math.pow(clippedFar / clippedNear, i / light.shadowCascade);
+                    var cuni = clippedNear + (clippedFar - clippedNear) * i / light.shadowCascade;
                     var c = clog * light.cascadeSplitLogFactor + cuni * (1 - light.cascadeSplitLogFactor);
                     clipPlanes.push(c);
                     shadowCascadeClips.push(-(-c * scaleZ + offsetZ) / -c);
@@ -538,7 +516,8 @@ define(function (require) {
                     var farPlane = clipPlanes[i+1];
                     mat4.perspective(splitProjMatrix._array, rad, aspect, nearPlane, farPlane);
                     splitFrustum.setFromProjection(splitProjMatrix);
-                    splitFrustum.getTransformedBoundingBox(cropBBox, lightViewProjMatrix);
+                    splitFrustum.getTransformedBoundingBox(cropBBox, lightViewMatrix);
+                    cropBBox.applyProjection(lightProjMatrix);
                     var _min = cropBBox.min._array;
                     var _max = cropBBox.max._array;
                     cropMatrix.ortho(_min[0], _max[0], _min[1], _max[1], 1, -1);
@@ -728,6 +707,7 @@ define(function (require) {
 
         _getDirectionalLightCamera: (function () {
             var lightViewMatrix = new Matrix4();
+            var sceneViewBoundingBox = new BoundingBox();
             var lightViewBBox = new BoundingBox();
             // Camera of directional light will be adjusted
             // to contain the view frustum and scene bounding box as tightly as possible
@@ -737,10 +717,12 @@ define(function (require) {
                 }
                 var camera = this._lightCameras.directional;
 
+                sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
+                sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
                 // Move to the center of frustum(in world space)
                 camera.position
-                    .copy(sceneCamera.frustum.boundingBox.min)
-                    .add(sceneCamera.frustum.boundingBox.max)
+                    .copy(sceneViewBoundingBox.min)
+                    .add(sceneViewBoundingBox.max)
                     .scale(0.5)
                     .transformMat4(sceneCamera.worldTransform);
                 camera.rotation.copy(light.rotation);
@@ -754,7 +736,8 @@ define(function (require) {
                     .invert()
                     .multiply(sceneCamera.worldTransform);
 
-                sceneCamera.frustum.getTransformedBoundingBox(lightViewBBox, lightViewMatrix);
+                // FIXME boundingBox becomes much larger after transformd.
+                lightViewBBox.copy(sceneViewBoundingBox).applyTransform(lightViewMatrix);
                 var min = lightViewBBox.min._array;
                 var max = lightViewBBox.max._array;
 

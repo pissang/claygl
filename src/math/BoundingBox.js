@@ -73,6 +73,21 @@ define(function (require) {
             vec3.max(max._array, max._array, bbox.max._array);
             min._dirty = true;
             max._dirty = true;
+            return this;
+        },
+
+        /**
+         * Intersection operation with another bounding box
+         * @param  {qtek.math.BoundingBox} bbox
+         */
+        intersection: function (bbox) {
+            var min = this.min;
+            var max = this.max;
+            vec3.max(min._array, min._array, bbox.min._array);
+            vec3.min(max._array, max._array, bbox.max._array);
+            min._dirty = true;
+            max._dirty = true;
+            return this;
         },
 
         /**
@@ -171,6 +186,8 @@ define(function (require) {
 
                 this.min._dirty = true;
                 this.max._dirty = true;
+
+                return this;
             };
         })(),
 
@@ -220,6 +237,8 @@ define(function (require) {
             }
             this.min._dirty = true;
             this.max._dirty = true;
+
+            return this;
         },
 
         updateVertices: function () {
@@ -252,6 +271,8 @@ define(function (require) {
             vec3Set(vertices[5], min[0], max[1], max[2]);
             vec3Set(vertices[6], max[0], min[1], max[2]);
             vec3Set(vertices[7], max[0], max[1], max[2]);
+
+            return this;
         },
         /**
          * Copy values from another bounding box
@@ -264,6 +285,7 @@ define(function (require) {
             vec3Copy(max._array, bbox.max._array);
             min._dirty = true;
             max._dirty = true;
+            return this;
         },
 
         /**

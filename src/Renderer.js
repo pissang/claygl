@@ -751,6 +751,8 @@ define(function(require) {
                 // Passingly update the scene bounding box
                 // FIXME exclude very large mesh like ground plane or terrain ?
                 // FIXME Only rendererable which cast shadow ?
+
+                // FIXME boundingBox becomes much larger after transformd.
                 if (scene && object.isRenderable() && object.castShadow) {
                     scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
                 }
