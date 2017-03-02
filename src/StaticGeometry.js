@@ -87,8 +87,13 @@ define(function (require) {
         },
 
         dirty: function () {
-            this._cache.dirtyAll();
+            this._cache.dirtyAll('attributes');
+            this.dirtyFaces();
             this._enabledAttributes = null;
+        },
+
+        dirtyFaces: function () {
+            this._cache.dirtyAll('faces');
         },
 
         getFace: function (idx, out) {
@@ -193,14 +198,16 @@ define(function (require) {
         getBufferChunks: function (_gl) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
-            if (cache.isDirty()) {
-                this._updateBuffer(_gl);
+            var isAttributesDirty = cache.isDirty('attributes');
+            var isFacesDirty = cache.isDirty('faces');
+            if (isAttributesDirty || isFacesDirty) {
+                this._updateBuffer(_gl, isAttributesDirty, isFacesDirty);
                 cache.fresh();
             }
             return cache.get('chunks');
         },
 
-        _updateBuffer: function (_gl) {
+        _updateBuffer: function (_gl, isAttributesDirty, isFacesDirty) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (!chunks) {
@@ -213,49 +220,53 @@ define(function (require) {
                 this._cache.put('chunks', chunks);
                 firstUpdate = true;
             }
+
             var chunk = chunks[0];
             var attributeBuffers = chunk.attributeBuffers;
             var indicesBuffer = chunk.indicesBuffer;
 
-            var attributeList = this.getEnabledAttributes();
+            if (isAttributesDirty || firstUpdate) {
+                var attributeList = this.getEnabledAttributes();
 
-            var attributeBufferMap = {};
-            if (!firstUpdate) {
-                for (var i = 0; i < attributeBuffers.length; i++) {
-                    attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
-                }
-            }
-            // FIXME If some attributes removed
-            for (var k = 0; k < attributeList.length; k++) {
-                var name = attributeList[k];
-                var attribute = this.attributes[name];
-
-                var bufferInfo;
-
+                var attributeBufferMap = {};
                 if (!firstUpdate) {
-                    bufferInfo = attributeBufferMap[name];
+                    for (var i = 0; i < attributeBuffers.length; i++) {
+                        attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
+                    }
                 }
-                var buffer;
-                if (bufferInfo) {
-                    buffer = bufferInfo.buffer;
-                }
-                else {
-                    buffer = _gl.createBuffer();
-                }
-                //TODO: Use BufferSubData?
-                _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
+                // FIXME If some attributes removed
+                for (var k = 0; k < attributeList.length; k++) {
+                    var name = attributeList[k];
+                    var attribute = this.attributes[name];
 
-                attributeBuffers[k] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
-            }
-            // Remove unused attributes buffers.
-            // PENDING
-            for (var i = k; i < attributeBuffers.length; i++) {
-                _gl.deleteBuffer(attributeBuffers[i].buffer);
-            }
-            attributeBuffers.length = k;
+                    var bufferInfo;
 
-            if (this.isUseFace()) {
+                    if (!firstUpdate) {
+                        bufferInfo = attributeBufferMap[name];
+                    }
+                    var buffer;
+                    if (bufferInfo) {
+                        buffer = bufferInfo.buffer;
+                    }
+                    else {
+                        buffer = _gl.createBuffer();
+                    }
+                    //TODO: Use BufferSubData?
+                    _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
+
+                    attributeBuffers[k] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
+                }
+                // Remove unused attributes buffers.
+                // PENDING
+                for (var i = k; i < attributeBuffers.length; i++) {
+                    _gl.deleteBuffer(attributeBuffers[i].buffer);
+                }
+                attributeBuffers.length = k;
+
+            }
+
+            if (this.isUseFace() && (isFacesDirty || firstUpdate)) {
                 if (!indicesBuffer) {
                     indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer());
                     chunk.indicesBuffer = indicesBuffer;
@@ -267,6 +278,10 @@ define(function (require) {
         },
 
         generateVertexNormals: function () {
+            if (!this.vertexCount) {
+                return;
+            }
+
             var faces = this.faces;
             var attributes = this.attributes;
             var positions = attributes.position.value;
@@ -323,6 +338,10 @@ define(function (require) {
         },
 
         generateFaceNormals: function () {
+            if (!this.vertexCount) {
+                return;
+            }
+
             if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();
             }
@@ -368,6 +387,10 @@ define(function (require) {
         },
 
         generateTangents: function () {
+            if (!this.vertexCount) {
+                return;
+            }
+
             var nVertex = this.vertexCount;
             var attributes = this.attributes;
             if (!attributes.tangent.value) {
@@ -470,6 +493,10 @@ define(function (require) {
         },
 
         generateUniqueVertex: function () {
+            if (!this.vertexCount) {
+                return;
+            }
+
             var vertexUseCount = [];
 
             for (var i = 0, len = this.vertexCount; i < len; i++) {
@@ -522,6 +549,9 @@ define(function (require) {
         },
 
         generateBarycentric: function () {
+            if (!this.vertexCount) {
+                return;
+            }
 
             if (!this.isUniqueVertex()) {
                 this.generateUniqueVertex();

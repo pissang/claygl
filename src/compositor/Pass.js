@@ -51,7 +51,12 @@ define(function(require) {
             /**
              * @type {Boolean}
              */
-            clearColor: false
+            clearColor: false,
+
+            /**
+             * @type {Boolean}
+             */
+            clearDepth: true
         };
     }, function() {
 
@@ -159,7 +164,7 @@ define(function(require) {
 
             // FIXME Don't clear in each pass in default, let the color overwrite the buffer
             // FIXME pixels may be discard
-            var clearBit = _gl.DEPTH_BUFFER_BIT;
+            var clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT : 0;
             _gl.depthMask(true);
             if (this.clearColor) {
                 clearBit = clearBit | _gl.COLOR_BUFFER_BIT;

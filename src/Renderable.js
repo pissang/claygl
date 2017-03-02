@@ -64,7 +64,7 @@ define(function(require) {
     {
 
         /**
-         * Render order
+         * Render order, Nodes with smaller value renders before nodes with larger values.
          * @type {Number}
          */
         renderOrder: 0,

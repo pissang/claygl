@@ -1,5 +1,5 @@
-define(function(require) {
-    
+define(function (require) {
+
     'use strict';
 
     /**
@@ -7,7 +7,7 @@ define(function(require) {
      * @constructor
      * @alias qtek.core.LinkedList
      */
-    var LinkedList = function() {
+    var LinkedList = function () {
 
         /**
          * @type {qtek.core.LinkedList.Entry}
@@ -27,7 +27,7 @@ define(function(require) {
      * @param  {} val
      * @return {qtek.core.LinkedList.Entry}
      */
-    LinkedList.prototype.insert = function(val) {
+    LinkedList.prototype.insert = function (val) {
         var entry = new LinkedList.Entry(val);
         this.insertEntry(entry);
         return entry;
@@ -39,7 +39,7 @@ define(function(require) {
      * @param  {} val
      * @return {qtek.core.LinkedList.Entry}
      */
-    LinkedList.prototype.insertAt = function(idx, val) {
+    LinkedList.prototype.insertAt = function (idx, val) {
         if (idx < 0) {
             return;
         }
@@ -52,23 +52,44 @@ define(function(require) {
         if (next) {
             var entry = new LinkedList.Entry(val);
             var prev = next.prev;
-            prev.next = entry;
-            entry.prev = prev;
+            if (!prev) { //next is head
+                this.head = entry;
+            }
+            else {
+                prev.next = entry;
+                entry.prev = prev;
+            }
             entry.next = next;
             next.prev = entry;
-        } else {
+        }
+        else {
             this.insert(val);
         }
+    };
+
+    LinkedList.prototype.insertBeforeEntry = function (val, next) {
+        var entry = new LinkedList.Entry(val);
+        var prev = next.prev;
+        if (!prev) { //next is head
+            this.head = entry;
+        }
+        else {
+            prev.next = entry;
+            entry.prev = prev;
+        }
+        entry.next = next;
+        next.prev = entry;
     };
 
     /**
      * Insert an entry at the tail
      * @param  {qtek.core.LinkedList.Entry} entry
      */
-    LinkedList.prototype.insertEntry = function(entry) {
+    LinkedList.prototype.insertEntry = function (entry) {
         if (!this.head) {
             this.head = this.tail = entry;
-        } else {
+        }
+        else {
             this.tail.next = entry;
             entry.prev = this.tail;
             this.tail = entry;
@@ -80,18 +101,20 @@ define(function(require) {
      * Remove entry.
      * @param  {qtek.core.LinkedList.Entry} entry
      */
-    LinkedList.prototype.remove = function(entry) {
+    LinkedList.prototype.remove = function (entry) {
         var prev = entry.prev;
         var next = entry.next;
         if (prev) {
             prev.next = next;
-        } else {
+        }
+        else {
             // Is head
             this.head = next;
         }
         if (next) {
             next.prev = prev;
-        } else {
+        }
+        else {
             // Is tail
             this.tail = prev;
         }
@@ -104,7 +127,7 @@ define(function(require) {
      * @param  {number} idx
      * @return {}
      */
-    LinkedList.prototype.removeAt = function(idx) {
+    LinkedList.prototype.removeAt = function (idx) {
         if (idx < 0) {
             return;
         }
@@ -123,7 +146,7 @@ define(function(require) {
      * Get head value
      * @return {}
      */
-    LinkedList.prototype.getHead = function() {
+    LinkedList.prototype.getHead = function () {
         if (this.head) {
             return this.head.value;
         }
@@ -132,17 +155,17 @@ define(function(require) {
      * Get tail value
      * @return {}
      */
-    LinkedList.prototype.getTail = function() {
+    LinkedList.prototype.getTail = function () {
         if (this.tail) {
             return this.tail.value;
         }
     };
     /**
-     * Get value at idx 
+     * Get value at idx
      * @param {number} idx
      * @return {}
      */
-    LinkedList.prototype.getAt = function(idx) {
+    LinkedList.prototype.getAt = function (idx) {
         if (idx < 0) {
             return;
         }
@@ -159,7 +182,7 @@ define(function(require) {
      * @param  {} value
      * @return {number}
      */
-    LinkedList.prototype.indexOf = function(value) {
+    LinkedList.prototype.indexOf = function (value) {
         var curr = this.head;
         var cursor = 0;
         while (curr) {
@@ -174,14 +197,14 @@ define(function(require) {
     /**
      * @return {number}
      */
-    LinkedList.prototype.length = function() {
+    LinkedList.prototype.length = function () {
         return this._length;
     };
 
     /**
      * If list is empty
      */
-    LinkedList.prototype.isEmpty = function() {
+    LinkedList.prototype.isEmpty = function () {
         return this._length === 0;
     };
 
@@ -189,14 +212,15 @@ define(function(require) {
      * @param  {Function} cb
      * @param  {} context
      */
-    LinkedList.prototype.forEach = function(cb, context) {
+    LinkedList.prototype.forEach = function (cb, context) {
         var curr = this.head;
         var idx = 0;
         var haveContext = typeof(context) != 'undefined';
         while (curr) {
             if (haveContext) {
                 cb.call(context, curr.value, idx);
-            } else {
+            }
+            else {
                 cb(curr.value, idx);
             }
             curr = curr.next;
@@ -207,7 +231,7 @@ define(function(require) {
     /**
      * Clear the list
      */
-    LinkedList.prototype.clear = function() {
+    LinkedList.prototype.clear = function () {
         this.tail = this.head = null;
         this._length = 0;
     };
@@ -216,12 +240,12 @@ define(function(require) {
      * @constructor
      * @param {} val
      */
-    LinkedList.Entry = function(val) {
+    LinkedList.Entry = function (val) {
         /**
          * @type {}
          */
         this.value = val;
-        
+
         /**
          * @type {qtek.core.LinkedList.Entry}
          */

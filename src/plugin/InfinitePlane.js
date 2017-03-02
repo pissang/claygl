@@ -1,13 +1,11 @@
-define(function(require) {
+define(function (require) {
 
     var Mesh = require('../Mesh');
-    var DynamicGeometry = require('../DynamicGeometry');
+    var StaticGeometry = require('../StaticGeometry');
     var Plane = require('../math/Plane');
     var Vector3 = require('../math/Vector3');
     var Matrix4 = require('../math/Matrix4');
     var Ray = require('../math/Ray');
-
-    var PerspectiveCamera = require('../camera/Perspective');
 
     var glMatrix = require('../dep/glmatrix');
     var mat4 = glMatrix.mat4;
@@ -23,54 +21,45 @@ define(function(require) {
 
         plane: null,
 
-        gridSize: 1,
-
         maxGrid: 0,
 
         // TODO
         frustumCulling: false
 
-    }, function() {
+    }, function () {
         if (!this.geometry) {
-            this.geometry = new DynamicGeometry();
+            this.geometry = new StaticGeometry({
+                dynamic: true
+            });
         }
         if (!this.plane) {
             this.plane = new Plane();
         }
     }, {
 
-        updateGeometry: function() {
+        updateGeometry: function () {
 
             var coords = this._unProjectGrid();
             if (!coords) {
                 return;
             }
-            var positions = this.geometry.attributes.position.value;
-            var normals = this.geometry.attributes.normal.value;
-            var texcoords = this.geometry.attributes.texcoord0.value;
+            var positionAttr = this.geometry.attributes.position;
+            var normalAttr = this.geometry.attributes.normal;
+            var texcoords = this.geometry.attributes.texcoord0;
             var faces = this.geometry.faces;
-            var nVertices = 0;
-            var normal = vec3.clone(this.plane.normal._array);
 
-            // if (this.gridSize > 0) {
-                // TODO
-
-            // } else {
             for (var i = 0; i < 6; i++) {
                 var idx = tris[i];
-                positions[nVertices] = coords[idx]._array;
-                normals[nVertices] = normal;
-                texcoords[nVertices] = uvs[idx];
-                nVertices++;
+                positionAttr.set(i, coords[idx]._array);
+                normalAttr.set(i, this.plane.normal._array);
+                texcoords.set(i, uvs[idx]);
+                faces[i] = i;
             }
-            faces[0] = [0, 1, 2];
-            faces[1] = [3, 4, 5];
             this.geometry.dirty();
-            // }
         },
 
         // http://fileadmin.cs.lth.se/graphics/theses/projects/projgrid/
-        _unProjectGrid: (function() {
+        _unProjectGrid: (function () {
 
             var planeViewSpace = new Plane();
             var lines = [
@@ -94,7 +83,7 @@ define(function(require) {
 
             var ray = new Ray();
 
-            return function() {
+            return function () {
                 planeViewSpace.copy(this.plane);
                 planeViewSpace.applyTransform(this.camera.viewMatrix);
 
