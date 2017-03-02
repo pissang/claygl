@@ -45,9 +45,9 @@ define(function (require) {
             hint: glenum.STATIC_DRAW,
 
             /**
-             * @type {Uint16Array}
+             * @type {Uint16Array|Uint32Array}
              */
-            faces: null,
+            indices: null,
 
             _normalType: 'vertex',
 
@@ -88,39 +88,39 @@ define(function (require) {
 
         dirty: function () {
             this._cache.dirtyAll('attributes');
-            this.dirtyFaces();
+            this.dirtyIndices();
             this._enabledAttributes = null;
         },
 
-        dirtyFaces: function () {
-            this._cache.dirtyAll('faces');
+        dirtyIndices: function () {
+            this._cache.dirtyAll('indices');
         },
 
-        getFace: function (idx, out) {
-            if (idx < this.faceCount && idx >= 0) {
+        getTriangleIndices: function (idx, out) {
+            if (idx < this.triangleCount && idx >= 0) {
                 if (!out) {
                     out = vec3Create();
                 }
-                var faces = this.faces;
-                out[0] = faces[idx * 3];
-                out[1] = faces[idx * 3 + 1];
-                out[2] = faces[idx * 3 + 2];
+                var indices = this.indices;
+                out[0] = indices[idx * 3];
+                out[1] = indices[idx * 3 + 1];
+                out[2] = indices[idx * 3 + 2];
                 return out;
             }
         },
 
-        setFace: function (idx, arr) {
-            var faces = this.faces;
-            faces[idx * 3] = arr[0];
-            faces[idx * 3 + 1] = arr[1];
-            faces[idx * 3 + 2] = arr[2];
+        setTriangleIndices: function (idx, arr) {
+            var indices = this.indices;
+            indices[idx * 3] = arr[0];
+            indices[idx * 3 + 1] = arr[1];
+            indices[idx * 3 + 2] = arr[2];
         },
 
-        isUseFace: function () {
-            return this.useFace && (this.faces != null);
+        isUseIndices: function () {
+            return this.indices;
         },
 
-        initFacesFromArray: function (array) {
+        initIndicesFromArray: function (array) {
             var value;
             var ArrayConstructor = this.vertexCount > 0xffff
                 ? vendor.Uint32Array : vendor.Uint16Array;
@@ -140,7 +140,7 @@ define(function (require) {
                 value = new ArrayConstructor(array);
             }
 
-            this.faces = value;
+            this.indices = value;
         },
 
         createAttribute: function (name, type, size, semantic) {
@@ -199,15 +199,15 @@ define(function (require) {
             var cache = this._cache;
             cache.use(_gl.__GLID__);
             var isAttributesDirty = cache.isDirty('attributes');
-            var isFacesDirty = cache.isDirty('faces');
-            if (isAttributesDirty || isFacesDirty) {
-                this._updateBuffer(_gl, isAttributesDirty, isFacesDirty);
+            var isIndicesDirty = cache.isDirty('indices');
+            if (isAttributesDirty || isIndicesDirty) {
+                this._updateBuffer(_gl, isAttributesDirty, isIndicesDirty);
                 cache.fresh();
             }
             return cache.get('chunks');
         },
 
-        _updateBuffer: function (_gl, isAttributesDirty, isFacesDirty) {
+        _updateBuffer: function (_gl, isAttributesDirty, isIndicesDirty) {
             var chunks = this._cache.get('chunks');
             var firstUpdate = false;
             if (!chunks) {
@@ -266,14 +266,14 @@ define(function (require) {
 
             }
 
-            if (this.isUseFace() && (isFacesDirty || firstUpdate)) {
+            if (this.isUseIndices() && (isIndicesDirty || firstUpdate)) {
                 if (!indicesBuffer) {
                     indicesBuffer = new Geometry.IndicesBuffer(_gl.createBuffer());
                     chunk.indicesBuffer = indicesBuffer;
                 }
-                indicesBuffer.count = this.faces.length;
+                indicesBuffer.count = this.indices.length;
                 _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.faces, this.hint);
+                _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.indices, this.hint);
             }
         },
 
@@ -282,7 +282,7 @@ define(function (require) {
                 return;
             }
 
-            var faces = this.faces;
+            var indices = this.indices;
             var attributes = this.attributes;
             var positions = attributes.position.value;
             var normals = attributes.normal.value;
@@ -306,11 +306,11 @@ define(function (require) {
 
             var n = vec3Create();
 
-            // TODO if no faces
-            for (var f = 0; f < faces.length;) {
-                var i1 = faces[f++];
-                var i2 = faces[f++];
-                var i3 = faces[f++];
+            // TODO if no indices
+            for (var f = 0; f < indices.length;) {
+                var i1 = indices[f++];
+                var i2 = indices[f++];
+                var i3 = indices[f++];
 
                 vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
                 vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
@@ -346,7 +346,7 @@ define(function (require) {
                 this.generateUniqueVertex();
             }
 
-            var faces = this.faces;
+            var indices = this.indices;
             var attributes = this.attributes;
             var positions = attributes.position.value;
             var normals = attributes.normal.value;
@@ -362,10 +362,10 @@ define(function (require) {
             if (!normals) {
                 normals = attributes.normal.value = new Float32Array(positions.length);
             }
-            for (var f = 0; f < faces.length;) {
-                var i1 = faces[f++];
-                var i2 = faces[f++];
-                var i3 = faces[f++];
+            for (var f = 0; f < indices.length;) {
+                var i1 = indices[f++];
+                var i2 = indices[f++];
+                var i3 = indices[f++];
 
                 vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
                 vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
@@ -410,11 +410,11 @@ define(function (require) {
 
             var sdir = [0.0, 0.0, 0.0];
             var tdir = [0.0, 0.0, 0.0];
-            var faces = this.faces;
-            for (var i = 0; i < faces.length;) {
-                var i1 = faces[i++],
-                    i2 = faces[i++],
-                    i3 = faces[i++],
+            var indices = this.indices;
+            for (var i = 0; i < indices.length;) {
+                var i1 = indices[i++],
+                    i2 = indices[i++],
+                    i3 = indices[i++],
 
                     st1s = texcoords[i1 * 2],
                     st2s = texcoords[i2 * 2],
@@ -485,9 +485,10 @@ define(function (require) {
         },
 
         isUniqueVertex: function () {
-            if (this.isUseFace()) {
-                return this.vertexCount === this.faces.length;
-            } else {
+            if (this.isUseIndices()) {
+                return this.vertexCount === this.indices.length;
+            }
+            else {
                 return true;
             }
         },
@@ -502,17 +503,17 @@ define(function (require) {
             for (var i = 0, len = this.vertexCount; i < len; i++) {
                 vertexUseCount[i] = 0;
             }
-            if (this.faces.length > 0xffff) {
-                this.faces = new vendor.Uint32Array(this.faces);
+            if (this.indices.length > 0xffff) {
+                this.indices = new vendor.Uint32Array(this.indices);
             }
 
             var cursor = 0;
             var attributes = this.attributes;
-            var faces = this.faces;
+            var indices = this.indices;
 
             // Cursor not use vertexNumber in case vertex array length is larger than face used.
-            for (var i = 0; i < faces.length; i++) {
-                cursor = Math.max(cursor, faces[i] + 1);
+            for (var i = 0; i < indices.length; i++) {
+                cursor = Math.max(cursor, indices[i] + 1);
             }
 
             var attributeNameList = this.getEnabledAttributes();
@@ -520,15 +521,15 @@ define(function (require) {
             for (var a = 0; a < attributeNameList.length; a++) {
                 var name = attributeNameList[a];
                 var valueArr = attributes[name].value;
-                attributes[name].init(this.faces.length);
+                attributes[name].init(this.indices.length);
                 var expandedArray = attributes[name].value;
                 for (var i = 0; i < valueArr.length; i++) {
                     expandedArray[i] = valueArr[i];
                 }
             }
 
-            for (var i = 0; i < faces.length; i++) {
-                var ii = faces[i];
+            for (var i = 0; i < indices.length; i++) {
+                var ii = indices[i];
                 if (vertexUseCount[ii] > 0) {
                     for (var a = 0; a < attributeNameList.length; a++) {
                         var name = attributeNameList[a];
@@ -539,7 +540,7 @@ define(function (require) {
                             array[cursor * size + k] = array[ii * size + k];
                         }
                     }
-                    faces[i] = cursor;
+                    indices[i] = cursor;
                     cursor++;
                 }
                 vertexUseCount[ii]++;
@@ -559,57 +560,19 @@ define(function (require) {
 
             var attributes = this.attributes;
             var array = attributes.barycentric.value;
-            var faces = this.faces;
+            var indices = this.indices;
             // Already existed;
-            if (array && array.length === faces.length * 3) {
+            if (array && array.length === indices.length * 3) {
                 return;
             }
-            array = attributes.barycentric.value = new Float32Array(faces.length * 3);
-            for (var i = 0; i < faces.length;) {
+            array = attributes.barycentric.value = new Float32Array(indices.length * 3);
+            for (var i = 0; i < indices.length;) {
                 for (var j = 0; j < 3; j++) {
-                    var ii = faces[i++];
+                    var ii = indices[i++];
                     array[ii * 3 + j] = 1;
                 }
             }
             this.dirty();
-        },
-
-        convertToDynamic: function (geometry) {
-            for (var i = 0; i < this.faces.length; i+=3) {
-                geometry.faces.push(this.face.subarray(i, i + 3));
-            }
-
-            var attributes = this.getEnabledAttributes();
-            for (var name in attributes) {
-                var attrib = attributes[name];
-                var geoAttrib = geometry.attributes[name];
-                if (!geoAttrib) {
-                    geoAttrib = geometry.attributes[name] = {
-                        type: attrib.type,
-                        size: attrib.size,
-                        value: []
-                    };
-                    if (attrib.semantic) {
-                        geoAttrib.semantic = attrib.semantic;
-                    }
-                }
-                for (var i = 0; i < attrib.value.length; i+= attrib.size) {
-                    if (attrib.size === 1) {
-                        geoAttrib.value.push(attrib.array[i]);
-                    } else {
-                        geoAttrib.value.push(attrib.subarray(i, i + attrib.size));
-                    }
-                }
-            }
-
-            if (this.boundingBox) {
-                geometry.boundingBox = new BoundingBox();
-                geometry.boundingBox.min.copy(this.boundingBox.min);
-                geometry.boundingBox.max.copy(this.boundingBox.max);
-            }
-            // PENDING copy buffer ?
-
-            return geometry;
         },
 
         applyTransform: function (matrix) {
@@ -673,17 +636,17 @@ define(function (require) {
                 return mainAttribute.value.length / mainAttribute.size;
             }
         });
-        Object.defineProperty(StaticGeometry.prototype, 'faceCount', {
+        Object.defineProperty(StaticGeometry.prototype, 'triangleCount', {
 
             enumerable: false,
 
             get: function () {
-                var faces = this.faces;
-                if (!faces) {
+                var indices = this.indices;
+                if (!indices) {
                     return 0;
                 }
                 else {
-                    return faces.length / 3;
+                    return indices.length / 3;
                 }
             }
         });

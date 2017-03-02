@@ -5,17 +5,16 @@ define(function(require) {
     var Node = require('./Node');
     var glenum = require('./core/glenum');
     var glinfo = require('./core/glinfo');
-    var DynamicGeometry = require('./DynamicGeometry');
 
     // Cache
     var prevDrawID = 0;
     var prevDrawIndicesBuffer = null;
-    var prevDrawIsUseFace = true;
+    var prevDrawIsUseIndices = true;
 
     var currentDrawID;
 
     var RenderInfo = function() {
-        this.faceCount = 0;
+        this.triangleCount = 0;
         this.vertexCount = 0;
         this.drawCallCount = 0;
     };
@@ -149,7 +148,7 @@ define(function(require) {
             var glDrawMode = this.mode;
 
             var nVertex = geometry.vertexCount;
-            var isUseFace = geometry.isUseFace();
+            var isUseIndices = geometry.isUseIndices();
 
             var uintExt = glinfo.getExtension(_gl, 'OES_element_index_uint');
             var useUintExt = uintExt && nVertex > 0xffff;
@@ -161,7 +160,7 @@ define(function(require) {
 
             var renderInfo = this._renderInfo;
             renderInfo.vertexCount = nVertex;
-            renderInfo.faceCount = 0;
+            renderInfo.triangleCount = 0;
             renderInfo.drawCallCount = 0;
             // Draw each chunk
             var drawHashChanged = false;
@@ -177,7 +176,7 @@ define(function(require) {
                 // 2. VAO is enabled and is binded to null after render
                 // 3. Geometry needs update
                 if (
-                    ((geometry instanceof DynamicGeometry) && (nVertex > 0xffff && !uintExt) && isUseFace)
+                    ((nVertex > 0xffff && !uintExt) && isUseIndices)
                  || (vaoExt && isStatic)
                  || geometry._cache.isDirty()
                 ) {
@@ -188,9 +187,9 @@ define(function(require) {
 
             if (!drawHashChanged) {
                 // Direct draw
-                if (prevDrawIsUseFace) {
+                if (prevDrawIsUseIndices) {
                     _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, indicesType, 0);
-                    renderInfo.faceCount = prevDrawIndicesBuffer.count / 3;
+                    renderInfo.triangleCount = prevDrawIndicesBuffer.count / 3;
                 }
                 else {
                     // FIXME Use vertex number in buffer
@@ -311,14 +310,14 @@ define(function(require) {
                     }
 
                     prevDrawIndicesBuffer = indicesBuffer;
-                    prevDrawIsUseFace = geometry.isUseFace();
+                    prevDrawIsUseIndices = geometry.isUseIndices();
                     // Do drawing
-                    if (prevDrawIsUseFace) {
+                    if (prevDrawIsUseIndices) {
                         if (needsBindAttributes) {
                             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
                         }
                         _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
-                        renderInfo.faceCount += indicesBuffer.count / 3;
+                        renderInfo.triangleCount += indicesBuffer.count / 3;
                     } else {
                         _gl.drawArrays(glDrawMode, 0, nVertex);
                     }

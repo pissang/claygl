@@ -63,12 +63,12 @@ define(function(require) {
             var faceNumber = 0;
             for (var pos in planes) {
                 vertexNumber += planes[pos].vertexCount;
-                faceNumber += planes[pos].faces.length;
+                faceNumber += planes[pos].indices.length;
             }
             for (var k = 0; k < attrList.length; k++) {
                 this.attributes[attrList[k]].init(vertexNumber);
             }
-            this.faces = new vendor.Uint16Array(faceNumber);
+            this.indices = new vendor.Uint16Array(faceNumber);
             var faceOffset = 0;
             var vertexOffset = 0;
             for (var pos in planes) {
@@ -86,10 +86,10 @@ define(function(require) {
                         this.attributes[attrName].value[i + attrSize * vertexOffset] = value;
                     }
                 }
-                for (var i = 0; i < plane.faces.length; i++) {
-                    this.faces[i + faceOffset] = vertexOffset + plane.faces[i];
+                for (var i = 0; i < plane.indices.length; i++) {
+                    this.indices[i + faceOffset] = vertexOffset + plane.indices[i];
                 }
-                faceOffset += plane.faces.length;
+                faceOffset += plane.indices.length;
                 vertexOffset += plane.vertexCount;
             }
 

@@ -95,9 +95,6 @@ define(function(require) {
                     if (node) {
                         compositor.addNode(node);
                     }
-                    if (nodeInfo.output) {
-                        compositor.addOutput(node);
-                    }
                 }
 
                 self.trigger('success', compositor);

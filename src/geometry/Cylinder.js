@@ -56,7 +56,7 @@ define(function(require) {
             this.attributes.position.value = cone.attributes.position.value;
             this.attributes.normal.value = cone.attributes.normal.value;
             this.attributes.texcoord0.value = cone.attributes.texcoord0.value;
-            this.faces = cone.faces;
+            this.indices = cone.indices;
 
             this.boundingBox = cone.boundingBox;
         }

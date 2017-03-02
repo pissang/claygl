@@ -27,14 +27,15 @@ define(function (require) {
         frustumCulling: false
 
     }, function () {
-        if (!this.geometry) {
-            this.geometry = new StaticGeometry({
-                dynamic: true
-            });
-        }
-        if (!this.plane) {
-            this.plane = new Plane();
-        }
+        var geometry = this.geometry = new StaticGeometry({
+            dynamic: true
+        });
+        geometry.attributes.position.init(6);
+        geometry.attributes.normal.init(6);
+        geometry.attributes.texcoord0.init(6);
+        geometry.indices = new Uint16Array(6);
+
+        this.plane = new Plane();
     }, {
 
         updateGeometry: function () {
@@ -46,14 +47,14 @@ define(function (require) {
             var positionAttr = this.geometry.attributes.position;
             var normalAttr = this.geometry.attributes.normal;
             var texcoords = this.geometry.attributes.texcoord0;
-            var faces = this.geometry.faces;
+            var indices = this.geometry.indices;
 
             for (var i = 0; i < 6; i++) {
                 var idx = tris[i];
                 positionAttr.set(i, coords[idx]._array);
                 normalAttr.set(i, this.plane.normal._array);
                 texcoords.set(i, uvs[idx]);
-                faces[i] = i;
+                indices[i] = i;
             }
             this.geometry.dirty();
         },

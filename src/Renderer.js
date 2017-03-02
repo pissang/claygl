@@ -456,7 +456,7 @@ define(function(require) {
          */
         renderQueue: function(queue, camera, globalMaterial, preZ) {
             var renderInfo = {
-                faceCount: 0,
+                triangleCount: 0,
                 vertexCount: 0,
                 drawCallCount: 0,
                 meshCount: queue.length,
@@ -707,7 +707,7 @@ define(function(require) {
                 var objectRenderInfo = renderable.render(_gl, shader);
 
                 if (objectRenderInfo) {
-                    renderInfo.faceCount += objectRenderInfo.faceCount;
+                    renderInfo.triangleCount += objectRenderInfo.triangleCount;
                     renderInfo.vertexCount += objectRenderInfo.vertexCount;
                     renderInfo.drawCallCount += objectRenderInfo.drawCallCount;
                     renderInfo.renderedMeshCount ++;

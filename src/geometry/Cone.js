@@ -130,7 +130,7 @@ define(function(require) {
             this.attributes.position.fromArray(positions);
             this.attributes.texcoord0.fromArray(texcoords);
 
-            this.initFacesFromArray(faces);
+            this.initIndicesFromArray(faces);
 
             this.generateVertexNormals();
 

@@ -64,7 +64,7 @@ define(function(require) {
             attributes.texcoord0.fromArray(texcoords);
             attributes.normal.fromArray(normals);
 
-            this.initFacesFromArray(faces);
+            this.initIndicesFromArray(faces);
 
             this.boundingBox = new BoundingBox();
             this.boundingBox.min.set(-1, -1, 0);

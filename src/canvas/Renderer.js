@@ -249,8 +249,8 @@ define(function (require) {
                 // Only support TRIANGLES, LINES, POINTS draw modes
                 switch (renderable.mode) {
                     case glenum.TRIANGLES:
-                        if (geometry.isUseFace()) {
-                            var nFace = geometry.faceCount;
+                        if (geometry.isUseIndices()) {
+                            var nFace = geometry.triangleCount;
                             for (var j = 0; j < nFace; j++) {
                                 geometry.getFace(j, indices);
 

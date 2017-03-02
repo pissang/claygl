@@ -182,83 +182,6 @@ define(function(require) {
         this.value = value;
     };
 
-    /**
-     * Attribute for dynamic geometry
-     */
-    function DynamicAttribute (name, type, size, semantic) {
-        Attribute.call(this, name, type, size, semantic);
-        this.value = [];
-
-        // Init getter setter
-        switch (size) {
-            case 1:
-                this.get = function (idx) {
-                    return this.value[idx];
-                };
-                this.set = function (idx, value) {
-                    this.value[idx] = value;
-                };
-                break;
-            case 2:
-                this.get = function (idx, out) {
-                    var item = this.value[idx];
-                    if (item) {
-                        vec2Copy(out, item);
-                    }
-                    return out;
-                };
-                this.set = function (idx, val) {
-                    var item = this.value[idx];
-                    if (!item) {
-                        item = this.value[idx] = vec2.create();
-                    }
-                    vec2Copy(item, val);
-                };
-                break;
-            case 3:
-                this.get = function (idx, out) {
-                    var item = this.value[idx];
-                    if (item) {
-                        vec3Copy(out, item);
-                    }
-                    return out;
-                };
-                this.set = function (idx, val) {
-                    var item = this.value[idx];
-                    if (!item) {
-                        item = this.value[idx] = vec3.create();
-                    }
-                    vec3Copy(item, val);
-                };
-                break;
-            case 4:
-                this.get = function (idx, out) {
-                    var item = this.value[idx];
-                    if (item) {
-                        vec4Copy(out, item);
-                    }
-                    return out;
-                };
-                this.set = function (idx, val) {
-                    var item = this.value[idx];
-                    if (!item) {
-                        item = this.value[idx] = vec4.create();
-                    }
-                    vec4Copy(item, val);
-                };
-                break;
-        }
-    }
-    DynamicAttribute.prototype.constructor = new Attribute();
-
-    DynamicAttribute.prototype.init = function (nVertex) {
-        console.warn('Dynamic geometry not support init method');
-    };
-
-    DynamicAttribute.prototype.fromArray = function (array) {
-        console.warn('Dynamic geometry not support fromArray method');
-    };
-
     function AttributeBuffer(name, type, buffer, size, semantic) {
         this.name = name;
         this.type = type;
@@ -280,7 +203,7 @@ define(function(require) {
     }
 
     function notImplementedWarn() {
-        console.warn('Geometry doesn\'t implement this method, use DynamicGeometry or StaticGeometry instead');
+        console.warn('Geometry doesn\'t implement this method, use StaticGeometry instead');
     }
 
     /**
@@ -301,18 +224,13 @@ define(function(require) {
          */
         attributes : {},
 
-        faces : null,
+        indices : null,
 
         /**
          * Is vertices data dynamically updated
          * @type {boolean}
          */
         dynamic: false,
-
-        /**
-         * @type {boolean}
-         */
-        useFace: true
 
     }, function() {
         // Use cache
@@ -361,19 +279,19 @@ define(function(require) {
          * @param {Array.<number>} out
          * @return {Array.<number>}
          */
-        getFace: notImplementedWarn,
+        getTriangleIndices: notImplementedWarn,
 
         /**
          * @method
          * @param {number} idx
          * @param {Array.<number>} face
          */
-        setFace: notImplementedWarn,
+        setTriangleIndices: notImplementedWarn,
         /**
          * @method
          * @return {boolean}
          */
-        isUseFace: notImplementedWarn,
+        isUseIndices: notImplementedWarn,
 
         getEnabledAttributes: notImplementedWarn,
         getBufferChunks: notImplementedWarn,
@@ -423,7 +341,6 @@ define(function(require) {
     Geometry.IndicesBuffer = IndicesBuffer;
     Geometry.Attribute = Attribute;
     Geometry.StaticAttribute = StaticAttribute;
-    Geometry.DynamicAttribute = DynamicAttribute;
 
     return Geometry;
 });

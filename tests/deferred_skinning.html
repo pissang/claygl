@@ -36,26 +36,25 @@
                 });
                 scene.add(sphere);
 
-                var lineGeo = new qtek.DynamicGeometry();
-                var lineGeoVertices = lineGeo.attributes.position.value;
-                lineGeoVertices.push([0, 0, 0], [0, 0, 0]);
+                var lineGeo = new qtek.StaticGeometry();
+                var lineGeoVertices = lineGeo.attributes.position;
+                lineGeoVertices.fromArray([0, 0, 0, 0, 0, 0]);
                 var line = new qtek.Mesh({
-                    geometry : lineGeo,
-                    material : sphereMat,
-                    mode : qtek.Mesh.LINES,
-                    lineWidth : 2
+                    geometry: lineGeo,
+                    material: sphereMat,
+                    mode: qtek.Mesh.LINES,
+                    lineWidth: 2
                 });
                 scene.add(line);
 
                 updates.push(function() {
                     sphere.localTransform.copy(joint.node.worldTransform);
                     if (parentJoint) {
-                        lineGeoVertices[0] = joint.node.getWorldPosition()._array;
-                        lineGeoVertices[1] = parentJoint.node.getWorldPosition()._array;
+                        lineGeoVertices.set(0, joint.node.getWorldPosition()._array);
+                        lineGeoVertices.set(1, parentJoint.node.getWorldPosition()._array);
                     }
-                    lineGeo.dirty('position');
+                    lineGeo.dirty();
                 });
-
             });
 
             scene.before('render', function() {

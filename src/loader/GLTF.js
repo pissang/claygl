@@ -696,10 +696,10 @@ define(function(require) {
 
                     // index uint
                     if (indicesInfo.componentType === 0x1405) { // UNSIGNED_INT
-                        geometry.faces = new vendor.Uint32Array(buffer, byteOffset, indicesInfo.count);
+                        geometry.indices = new vendor.Uint32Array(buffer, byteOffset, indicesInfo.count);
                     }
                     else { // UNSIGNED_SHORT, 0x1403
-                        geometry.faces = new vendor.Uint16Array(buffer, byteOffset, indicesInfo.count);
+                        geometry.indices = new vendor.Uint16Array(buffer, byteOffset, indicesInfo.count);
                     }
 
                     var material = lib.materials[primitiveInfo.material];

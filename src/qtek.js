@@ -75,7 +75,6 @@ define(function(require) {
 	"dep": {
 		"glmatrix": require('./dep/glmatrix')
 	},
-	"DynamicGeometry": require('./DynamicGeometry'),
 	"FrameBuffer": require('./FrameBuffer'),
 	"Geometry": require('./Geometry'),
 	"geometry": {
@@ -99,8 +98,7 @@ define(function(require) {
 	},
 	"loader": {
 		"FX": require('./loader/FX'),
-		"GLTF": require('./loader/GLTF'),
-		"ThreeModel": require('./loader/ThreeModel')
+		"GLTF": require('./loader/GLTF')
 	},
 	"Material": require('./Material'),
 	"math": {

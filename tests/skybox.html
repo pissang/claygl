@@ -7,8 +7,7 @@
     <body>
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
-            require(['qtek',
-                    'text!assets/models/nanosuit/nanosuit.js'], function(qtek, modelData){
+            require(['qtek'], function(qtek){
                 var Shader = qtek.Shader;
 
                 var renderer = new qtek.Renderer({
@@ -34,21 +33,6 @@
                     nz: 'assets/textures/cube/skybox/nz.jpg',
                 });
 
-                var data = JSON.parse(modelData);
-                var loader = new qtek.loader.ThreeModel({
-                    textureRootPath: "assets/models/nanosuit/tex"
-                });
-                var meshList = loader.parse(data);
-                var root = new qtek.Node();
-                meshList.forEach(function(mesh) {
-                    var material = mesh.material;
-                    material.shader.enableTexture('environmentMap');
-                    material.shader.disableTexture('normalMap');
-                    material.set("environmentMap", texture);
-                    root.add(mesh);
-                });
-                scene.add(root);
-
                 var skybox = new qtek.plugin.Skybox({
                     scene: scene
                 });
@@ -56,13 +40,6 @@
 
                 camera.position.set(5, 12, 10);
                 camera.lookAt( new qtek.math.Vector3(0, 8, 0) );
-
-                var light = new qtek.light.Directional({
-                    intensity: 4.0,
-                    position: new qtek.math.Vector3(2, 2, 2)
-                });
-                light.lookAt(root.position, new qtek.math.Vector3(0, 1, 0));
-                scene.add(light);
 
                 var control = new qtek.plugin.OrbitControl({
                     target: camera,

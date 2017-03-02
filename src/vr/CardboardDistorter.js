@@ -179,7 +179,7 @@ define(function (require) {
                 }
             }
 
-            this._mesh.geometry.faces = indices;
+            this._mesh.geometry.indices = indices;
 
             this._mesh.geometry.dirty();
         }
