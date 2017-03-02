@@ -79,6 +79,8 @@ define(function (require) {
         }
         entry.next = next;
         next.prev = entry;
+
+        this._length++;
     };
 
     /**
