@@ -202,7 +202,8 @@ define(function (require) {
             var isIndicesDirty = cache.isDirty('indices');
             if (isAttributesDirty || isIndicesDirty) {
                 this._updateBuffer(_gl, isAttributesDirty, isIndicesDirty);
-                cache.fresh();
+                cache.fresh('attributes');
+                cache.fresh('indices');
             }
             return cache.get('chunks');
         },
