@@ -231,7 +231,7 @@ define(function(require) {
             var AO = vec3.create();
             var vCross = vec3.create();
 
-            return function(a, b, c, singleSided, out, barycenteric) {
+            return function (a, b, c, singleSided, out, barycenteric) {
                 var dir = this.direction._array;
                 var origin = this.origin._array;
                 a = a._array;

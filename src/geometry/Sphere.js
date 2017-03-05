@@ -64,18 +64,25 @@ define(function(require) {
          * Build sphere geometry
          */
         build: function() {
-            var positions = [];
-            var texcoords = [];
-            var normals = [];
-            var faces = [];
+            var heightSegments = this.heightSegments;
+            var widthSegments = this.widthSegments;
+
+            var positionAttr = this.attributes.position;
+            var texcoordAttr = this.attributes.texcoord0;
+            var normalAttr = this.attributes.normal;
+
+            var vertexCount = (widthSegments + 1) * (heightSegments + 1);
+            positionAttr.init(vertexCount);
+            texcoordAttr.init(vertexCount);
+            normalAttr.init(vertexCount);
+
+            var IndicesCtor = vertexCount > 0xffff ? Uint32Array : Uint16Array;
+            var indices = this.indices = new IndicesCtor(widthSegments * heightSegments * 6);
 
             var x, y, z,
                 u, v,
                 i, j;
-            var normal;
 
-            var heightSegments = this.heightSegments;
-            var widthSegments = this.widthSegments;
             var radius = this.radius;
             var phiStart = this.phiStart;
             var phiLength = this.phiLength;
@@ -83,6 +90,9 @@ define(function(require) {
             var thetaLength = this.thetaLength;
             var radius = this.radius;
 
+            var pos = [];
+            var uv = [];
+            var offset = 0;
             for (j = 0; j <= heightSegments; j ++) {
                 for (i = 0; i <= widthSegments; i ++) {
                     u = i / widthSegments;
@@ -93,12 +103,13 @@ define(function(require) {
                     y = radius * Math.cos(thetaStart + v * thetaLength);
                     z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
 
-                    positions.push(vec3.fromValues(x, y, z));
-                    texcoords.push(vec2.fromValues(u, v));
-
-                    normal = vec3.fromValues(x, y, z);
-                    vec3.normalize(normal, normal);
-                    normals.push(normal);
+                    pos[0] = x; pos[1] = y; pos[2] = z;
+                    uv[0] = u; uv[1] = v;
+                    positionAttr.set(offset, pos);
+                    texcoordAttr.set(offset, uv);
+                    vec3.scale(pos, pos, 1 / radius);
+                    normalAttr.set(offset, pos);
+                    offset++;
                 }
             }
 
@@ -106,6 +117,7 @@ define(function(require) {
 
             var len = widthSegments + 1;
 
+            var n = 0;
             for (j = 0; j < heightSegments; j ++) {
                 for (i = 0; i < widthSegments; i ++) {
                     i2 = j * len + i;
@@ -113,19 +125,15 @@ define(function(require) {
                     i4 = (j + 1) * len + i + 1;
                     i3 = (j + 1) * len + i;
 
-                    faces.push(vec3.fromValues(i1, i2, i4));
-                    faces.push(vec3.fromValues(i2, i3, i4));
+                    indices[n++] = i1;
+                    indices[n++] = i2;
+                    indices[n++] = i4;
+
+                    indices[n++] = i2;
+                    indices[n++] = i3;
+                    indices[n++] = i4;
                 }
             }
-
-            var attributes = this.attributes;
-
-            attributes.position.fromArray(positions);
-            attributes.texcoord0.fromArray(texcoords);
-            attributes.normal.fromArray(normals);
-
-            this.initIndicesFromArray(faces);
-
 
             this.boundingBox = new BoundingBox();
             this.boundingBox.max.set(radius, radius, radius);
