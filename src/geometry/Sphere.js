@@ -93,6 +93,7 @@ define(function(require) {
             var pos = [];
             var uv = [];
             var offset = 0;
+            var divider = 1 / radius;
             for (j = 0; j <= heightSegments; j ++) {
                 for (i = 0; i <= widthSegments; i ++) {
                     u = i / widthSegments;
@@ -107,7 +108,9 @@ define(function(require) {
                     uv[0] = u; uv[1] = v;
                     positionAttr.set(offset, pos);
                     texcoordAttr.set(offset, uv);
-                    vec3.scale(pos, pos, 1 / radius);
+                    pos[0] *= divider;
+                    pos[1] *= divider;
+                    pos[2] *= divider;
                     normalAttr.set(offset, pos);
                     offset++;
                 }
