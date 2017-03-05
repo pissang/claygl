@@ -2,7 +2,7 @@ define(function () {
 
     'use strict';
 
-    var DIRTY_PREFIX = '__dirty__';
+    var DIRTY_PREFIX = '__dt__';
 
     var Cache = function () {
 

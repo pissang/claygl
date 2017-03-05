@@ -18,6 +18,9 @@ define(function (require) {
     var vec3Add = vec3.add;
     var vec3Set = vec3.set;
 
+    function makeAttrKey(attrName) {
+        return 'attr_' + attrName;
+    }
     /**
      * @constructor qtek.StaticGeometry
      * @extends qtek.Geometry
@@ -87,13 +90,21 @@ define(function (require) {
         },
 
         dirty: function () {
-            this._cache.dirtyAll('attributes');
+            var enabledAttributes = this.getEnabledAttributes();
+            for (var i = 0; i < enabledAttributes.length; i++) {
+                this.dirtyAttribute(enabledAttributes[i]);
+            }
             this.dirtyIndices();
             this._enabledAttributes = null;
         },
 
         dirtyIndices: function () {
             this._cache.dirtyAll('indices');
+        },
+
+        dirtyAttribute: function (attrName) {
+            this._cache.dirtyAll(makeAttrKey(attrName));
+            this._cache.dirtyAll('attributes');
         },
 
         getTriangleIndices: function (idx, out) {
@@ -202,6 +213,10 @@ define(function (require) {
             var isIndicesDirty = cache.isDirty('indices');
             if (isAttributesDirty || isIndicesDirty) {
                 this._updateBuffer(_gl, isAttributesDirty, isIndicesDirty);
+                var enabledAttributes = this.getEnabledAttributes();
+                for (var i = 0; i < enabledAttributes.length; i++) {
+                    cache.fresh(makeAttrKey(enabledAttributes[i]));
+                }
                 cache.fresh('attributes');
                 cache.fresh('indices');
             }
@@ -209,7 +224,8 @@ define(function (require) {
         },
 
         _updateBuffer: function (_gl, isAttributesDirty, isIndicesDirty) {
-            var chunks = this._cache.get('chunks');
+            var cache = this._cache;
+            var chunks = cache.get('chunks');
             var firstUpdate = false;
             if (!chunks) {
                 chunks = [];
@@ -218,7 +234,7 @@ define(function (require) {
                     attributeBuffers: [],
                     indicesBuffer: null
                 };
-                this._cache.put('chunks', chunks);
+                cache.put('chunks', chunks);
                 firstUpdate = true;
             }
 
@@ -252,9 +268,12 @@ define(function (require) {
                     else {
                         buffer = _gl.createBuffer();
                     }
-                    //TODO: Use BufferSubData?
-                    _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
+                    if (cache.isDirty(makeAttrKey(name))) {
+                        // Only update when they are dirty.
+                        // TODO: Use BufferSubData?
+                        _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                        _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.hint);
+                    }
 
                     attributeBuffers[k] = new Geometry.AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
                 }
