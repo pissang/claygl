@@ -61,21 +61,29 @@ define(function(require) {
 
             output = output || [];
 
-            this._intersectNode(this.scene, output);
+            this._intersectNode(x, y, this.scene, output);
 
             output.sort(this._intersectionCompareFunc);
 
             return output;
         },
 
-        _intersectNode: function (node, out) {
+        _intersectNode: function (x, y, node, out) {
             if ((node instanceof Renderable) && node.isRenderable()) {
-                if (!node.ignorePicking && node.geometry.isUseIndices()) {
-                    this._intersectRenderable(node, out);
+                if (!node.ignorePicking
+                    && (
+                        // Only triangle mesh support ray picking
+                        (node.mode === glenum.TRIANGLES && node.geometry.isUseIndices())
+                        // Or if geometry has it's own pickByRay, pick, implementation
+                        || node.geometry.pickByRay
+                        || node.geometry.pick
+                    )
+                ) {
+                    this._intersectRenderable(x, y, node, out);
                 }
             }
             for (var i = 0; i < node._children.length; i++) {
-                this._intersectNode(node._children[i], out);
+                this._intersectNode(x, y, node._children[i], out);
             }
         },
 
@@ -87,7 +95,7 @@ define(function(require) {
             var ray = new Ray();
             var worldInverse = new Matrix4();
 
-            return function (renderable, out) {
+            return function (x, y, renderable, out) {
 
                 ray.copy(this._ray);
                 Matrix4.invert(worldInverse, renderable.worldTransform);
@@ -100,12 +108,14 @@ define(function(require) {
                         return;
                     }
                 }
+                // Use user defined picking algorithm
+                if (geometry.pick) {
+                    geometry.pick(x, y, renderable, out);
+                    return;
+                }
                 // Use user defined ray picking algorithm
-                if (geometry.pickByRay) {
-                    var intersection = geometry.pickByRay(ray);
-                    if (intersection) {
-                        out.push(intersection);
-                    }
+                else if (geometry.pickByRay) {
+                    geometry.pickByRay(ray, renderable, out);
                     return;
                 }
 

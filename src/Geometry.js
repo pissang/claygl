@@ -6,14 +6,6 @@ define(function(require) {
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
     var vendor = require('./core/vendor');
-    var glmatrix = require('./dep/glmatrix');
-    var vec2 = glmatrix.vec2;
-    var vec3 = glmatrix.vec3;
-    var vec4 = glmatrix.vec4;
-
-    var vec4Copy = vec4.copy;
-    var vec3Copy = vec3.copy;
-    var vec2Copy = vec2.copy;
 
     function getArrayCtorByType (type) {
         var ArrayConstructor;
@@ -243,9 +235,18 @@ define(function(require) {
         /**
          * User defined ray picking algorithm instead of default
          * triangle ray intersection
+         * (x: number, y: number, renderable: qtek.Renderable, out: Array) => boolean
          * @type {Function}
          */
         pickByRay: null,
+
+        /**
+         * User defined picking algorithm instead of default
+         * triangle ray intersection
+         * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
+         * @type {Function}
+         */
+        pick: null,
 
         /**
          * Main attribute will be used to count vertex number
