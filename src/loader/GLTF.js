@@ -623,43 +623,59 @@ define(function(require) {
                         if (!attributeName) {
                             continue;
                         }
-                        var attributeType = attributeInfo.componentType;
+                        var componentType = attributeInfo.componentType;
                         // DEPRECATED compatible with older version(< 1.0)
-                        if (attributeType == null) {
-                            attributeType = attributeInfo.type;
+                        if (componentType == null) {
+                            var attributeType = attributeInfo.type;
+                            switch(attributeType) {
+                                case 0x8B50:     // FLOAT_VEC2
+                                    size = 2;
+                                    ArrayCtor = vendor.Float32Array;
+                                    break;
+                                case 0x8B51:     // FLOAT_VEC3
+                                    size = 3;
+                                    ArrayCtor = vendor.Float32Array;
+                                    break;
+                                case 0x8B52:     // FLOAT_VEC4
+                                    size = 4;
+                                    ArrayCtor = vendor.Float32Array;
+                                    break;
+                                case 0x1406:     // FLOAT
+                                    size = 1;
+                                    ArrayCtor = vendor.Float32Array;
+                                    break;
+                                default:
+                                    console.warn('Attribute type ' + attributeInfo.type + ' not support yet');
+                                    break;
+                            }
                         }
+                        else {
+                            var attributeType = attributeInfo.type;
+                            ArrayCtor = ({
+                                5120: vendor.Int8Array,
+                                5121: vendor.Uint8Array,
+                                5122: vendor.Int16Array,
+                                5123: vendor.Uint16Array,
+                                5126: vendor.Float32Array
+                            })[componentType] || vendor.Float32Array;
+
+                            size = ({
+                                SCALAR: 1,
+                                VEC2: 2,
+                                VEC3: 3,
+                                VEC4: 4,
+                                MAT2: 4,
+                                MAT3: 9,
+                                MAT4: 16
+                            })[attributeType];
+                        }
+
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
                         var buffer = lib.buffers[bufferViewInfo.buffer];
                         var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
 
                         var size;
                         var ArrayCtor;
-                        var type;
-                        switch(attributeType) {
-                            case 0x8B50:     // FLOAT_VEC2
-                                size = 2;
-                                type = 'float';
-                                ArrayCtor = vendor.Float32Array;
-                                break;
-                            case 0x8B51:     // FLOAT_VEC3
-                                size = 3;
-                                type = 'float';
-                                ArrayCtor = vendor.Float32Array;
-                                break;
-                            case 0x8B52:     // FLOAT_VEC4
-                                size = 4;
-                                type = 'float';
-                                ArrayCtor = vendor.Float32Array;
-                                break;
-                            case 0x1406:     // FLOAT
-                                size = 1;
-                                type = 'float';
-                                ArrayCtor = vendor.Float32Array;
-                                break;
-                            default:
-                                console.warn('Attribute type ' + attributeInfo.type + ' not support yet');
-                                break;
-                        }
                         var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
                         if (semantic === 'WEIGHT' && size === 4) {
                             // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
