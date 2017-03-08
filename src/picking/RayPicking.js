@@ -115,10 +115,10 @@ define(function(require) {
                 var point;
                 var indices = geometry.indices;
                 var positionsAttr = geometry.attributes.position;
-                for (var i = 0; i < indices.length;) {
-                    var i1 = indices[i++];
-                    var i2 = indices[i++];
-                    var i3 = indices[i++];
+                for (var i = 0; i < indices.length; i += 3) {
+                    var i1 = indices[i];
+                    var i2 = indices[i + 1];
+                    var i3 = indices[i + 2];
                     positionsAttr.get(i1, v1._array);
                     positionsAttr.get(i2, v2._array);
                     positionsAttr.get(i3, v3._array);
@@ -133,7 +133,7 @@ define(function(require) {
                         var pointW = new Vector3();
                         Vector3.transformMat4(pointW, point, renderable.worldTransform);
                         out.push(new RayPicking.Intersection(
-                            point, pointW, renderable, [i1, i2, i3],
+                            point, pointW, renderable, [i1, i2, i3], i / 3,
                             Vector3.dist(pointW, this._ray.origin)
                         ));
                     }
@@ -152,9 +152,10 @@ define(function(require) {
      * @param {qtek.math.Vector3} pointWorld
      * @param {qtek.Node} target
      * @param {Array.<number>} triangle
+     * @param {number} triangleIndex
      * @param {number} distance
      */
-    RayPicking.Intersection = function (point, pointWorld, target, triangle, distance) {
+    RayPicking.Intersection = function (point, pointWorld, target, triangle, triangleIndex, distance) {
         /**
          * Intersection point in local transform coordinates
          * @type {qtek.math.Vector3}
@@ -175,6 +176,10 @@ define(function(require) {
          * @type {Array.<number>}
          */
         this.triangle = triangle;
+        /**
+         * Index of intersection triangle.
+         */
+        this.triangleIndex = triangleIndex;
         /**
          * Distance from intersection point to ray origin
          * @type {number}
