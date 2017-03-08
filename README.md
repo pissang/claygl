@@ -1,8 +1,8 @@
 #QTEK
 
-QTEK is a webgl graphic library.
+QTEK is a WebGL graphic library.
 
-### [Download v0.2.1](https://github.com/pissang/qtek/archive/0.2.1.zip)
+### [Download v0.3.0](https://github.com/pissang/qtek/archive/0.3.0.zip)
 
 ### [API](http://pissang.github.io/qtek/doc/api)
 
@@ -32,28 +32,35 @@ QTEK is a webgl graphic library.
 ### Quick Examples
 + [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/tests/cubes.html)
 + [Cube animation](http://pissang.github.io/qtek/tests/cubeanim.html)
-+ [Physically based rendering with HDR IBL](http://pissang.github.io/qtek/tests/IBL.html)
 + [A simple glTF scene](http://pissang.github.io/qtek/tests/gltf.html)
-+ [3d model loader of THREE.js format](http://pissang.github.io/qtek/tests/threeloader.html)
 + [Skinning](http://pissang.github.io/qtek/tests/skinning.html)
 + [Particle effects](http://pissang.github.io/qtek/tests/particle.html)
-+ [Curl noise particle effects](http://pissang.github.io/qtek/tests/curlnoise.html)
-+ [Cascade shadow mapping](http://pissang.github.io/qtek/tests/nanosuit.html)
++ [Shadowmap](http://pissang.github.io/qtek/tests/shadowmap.html)
 + [Omni light shadow mapping](http://pissang.github.io/qtek/tests/cubeshadowmap.html)
-+ [Post processing - Depth of field](http://pissang.github.io/qtek/tests/pp_dof.html)
-+ [Post processing - Lensflare](http://pissang.github.io/qtek/tests/pp_lensflare.html)
 + [RGBE Decoder](http://pissang.github.io/qtek/tests/rgbedecoder.html)
 + [Skybox](http://pissang.github.io/qtek/tests/skybox.html)
 + [Draggable cubes](http://pissang.github.io/qtek/tests/picking.html)
++ [Ambient Cubemap](http://pissang.github.io/qtek/tests/ambientcubemap.html)
++ [Spherical Harmonic Ambient](http://pissang.github.io/qtek/tests/spherical_harmonic.html)
++ [Physically based rendering with HDR IBL](http://pissang.github.io/qtek/tests/IBL.html)
++ [Standard Material](http://pissang.github.io/qtek/tests/standard_material.html)
++ [Post processing - Depth of field](http://pissang.github.io/qtek/tests/dof.html)
++ [Post processing - Bloom](http://pissang.github.io/qtek/tests/tron.html)
++ [Post Processing - SSR](http://pissang.github.io/qtek/tests/ssr3.html)
++ [Post Processing - Alchemy AO](http://pissang.github.io/qtek/tests/alchemyao.html)
++ [GBuffer preview](http://pissang.github.io/qtek/tests/gbuffer.html)
 + [Deferred rendering](http://pissang.github.io/qtek/tests/deferred.html)
++ [Deferred cascade light shadow](http://pissang.github.io/qtek/tests/deferred_shadow3.html)
++ [Deferred omni light light shadow](http://pissang.github.io/qtek/tests/deferred_shadow.html)
++ [Deferred skinning](http://pissang.github.io/qtek/tests/deferred_skinning.html)
++ [Stereo rendering](http://pissang.github.io/qtek/tests/stereo.html)
 
-### Features 
+### Features
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
 + Basic primitive geometry procedural generate
     + Cube, sphere, cylinder, cone, plane
 + Phong and lambert buildin shaders which support normal map and environment map
-+ Physically based shader
 + Point, directional, spot light
 + Orthographic, perspective camera
 + Graph based post processing
@@ -61,7 +68,7 @@ QTEK is a webgl graphic library.
     + PCF or VSM soft shadow
     + PSSM for sun light in large scene
     + Omni light shadow support
-+ Geometory processing like normal and tangent generate
++ High performance geometry processing
 + GPU based skinning
     + Support 1D and 2D animation blending with blend tree
 + First person camera control, orbit camera control
@@ -69,10 +76,11 @@ QTEK is a webgl graphic library.
 + Particle System
 + Support both ray picking and GPU Picking
 + Loader
-    + three.js model loader
     + glTF loader
 + Timeline based animation, support spline interpolation between keyframes.
-+ Light-pre-pass deferred pipeline.
++ Full deferred pipeline.
++ Physically based rendering, Full HDR pipeline.
++ Stereo rendering, VR prepared.
 
 ### FBX2GLTF Converter
 
@@ -84,15 +92,4 @@ Have been updated to the latest glTF specification
 + Skinning
 + Animation
 
-### Physics Component
-
-[https://github.com/pissang/qtek-physics](https://github.com/pissang/qtek-physics)
-
-### 3D Application Framework
-
-[https://github.com/pissang/qtek-app](https://github.com/pissang/qtek-app)
-
-### 2D Component
-
-[https://github.com/pissang/qtek-2d](https://github.com/pissang/qtek-2d)
 
