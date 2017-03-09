@@ -112,7 +112,8 @@ define(function(require) {
                 if (geometry.pick) {
                     geometry.pick(
                         this._ndc.x, this._ndc.y,
-                        this.renderer.viewport,
+                        this.renderer,
+                        this.camera,
                         renderable, out
                     );
                     return;
