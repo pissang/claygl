@@ -61,14 +61,14 @@ define(function(require) {
 
             output = output || [];
 
-            this._intersectNode(x, y, this.scene, output);
+            this._intersectNode(this.scene, output);
 
             output.sort(this._intersectionCompareFunc);
 
             return output;
         },
 
-        _intersectNode: function (x, y, node, out) {
+        _intersectNode: function (node, out) {
             if ((node instanceof Renderable) && node.isRenderable()) {
                 if (!node.ignorePicking
                     && (
@@ -79,11 +79,11 @@ define(function(require) {
                         || node.geometry.pick
                     )
                 ) {
-                    this._intersectRenderable(x, y, node, out);
+                    this._intersectRenderable(node, out);
                 }
             }
             for (var i = 0; i < node._children.length; i++) {
-                this._intersectNode(x, y, node._children[i], out);
+                this._intersectNode(node._children[i], out);
             }
         },
 
@@ -95,7 +95,7 @@ define(function(require) {
             var ray = new Ray();
             var worldInverse = new Matrix4();
 
-            return function (x, y, renderable, out) {
+            return function (renderable, out) {
 
                 ray.copy(this._ray);
                 Matrix4.invert(worldInverse, renderable.worldTransform);
@@ -110,7 +110,11 @@ define(function(require) {
                 }
                 // Use user defined picking algorithm
                 if (geometry.pick) {
-                    geometry.pick(x, y, renderable, out);
+                    geometry.pick(
+                        this._ndc.x, this._ndc.y,
+                        this.renderer.viewport,
+                        renderable, out
+                    );
                     return;
                 }
                 // Use user defined ray picking algorithm

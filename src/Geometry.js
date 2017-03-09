@@ -235,7 +235,8 @@ define(function(require) {
         /**
          * User defined ray picking algorithm instead of default
          * triangle ray intersection
-         * (x: number, y: number, renderable: qtek.Renderable, out: Array) => boolean
+         * x, y are NDC.
+         * (x: number, y: number, viewport: {x, y, width, height}, renderable: qtek.Renderable, out: Array) => boolean
          * @type {Function}
          */
         pickByRay: null,

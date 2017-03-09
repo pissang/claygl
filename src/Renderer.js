@@ -287,7 +287,7 @@ define(function(require) {
             this.gl.viewport(
                 x * dpr, y * dpr, width * dpr, height * dpr
             );
-
+            // Use a fresh new object, not write property.
             this.viewport = {
                 x: x,
                 y: y,
