@@ -72,7 +72,7 @@
                         plane.normal.copy(camera.worldTransform.z);
                         plane.distance = point.dot(plane.normal);
 
-                        var ndc = renderer.screenToNdc(e.offsetX, e.offsetY);
+                        var ndc = renderer.screenToNDC(e.offsetX, e.offsetY);
                         var ray = camera.castRay(ndc);
                         ray.intersectPlane(plane, currentCube.position);
                         currentCube.position.sub(offset);

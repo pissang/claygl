@@ -56,7 +56,7 @@ define(function(require) {
          * @return {Array.<qtek.picking.RayPicking~Intersection>}
          */
         pickAll: function (x, y, output) {
-            this.renderer.screenToNdc(x, y, this._ndc);
+            this.renderer.screenToNDC(x, y, this._ndc);
             this.camera.castRay(this._ndc, this._ray);
 
             output = output || [];

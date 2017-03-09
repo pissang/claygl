@@ -878,7 +878,7 @@ define(function(require) {
          * @param  {qtek.math.Vector2} [out]
          * @return {qtek.math.Vector2}
          */
-        screenToNdc: function(x, y, out) {
+        screenToNDC: function(x, y, out) {
             if (!out) {
                 out = new Vector2();
             }
@@ -893,7 +893,7 @@ define(function(require) {
             arr[1] = arr[1] * 2 - 1;
 
             return out;
-        },
+        }
     });
 
     /**
