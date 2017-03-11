@@ -84,6 +84,7 @@ define(function (require) {
         // Information about viewport
         'VIEWPORT_SIZE',
         'VIEWPORT',
+        'DEVICEPIXELRATIO',
         // Window size for window relative coordinate
         // https://www.opengl.org/sdk/docs/man/html/gl_FragCoord.xhtml
         'WINDOW_SIZE',

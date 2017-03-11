@@ -479,7 +479,6 @@ define(function(require) {
                 viewportUniform[2], viewportUniform[3]
             ];
 
-
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
             mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
@@ -487,7 +486,6 @@ define(function(require) {
             mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
             mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
             mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
-
 
             var _gl = this.gl;
             var scene = this._sceneRendering;
@@ -565,7 +563,7 @@ define(function(require) {
             cullFace = null;
             frontFace = null;
 
-            for (var i =0; i < culledRenderQueue.length; i++) {
+            for (var i = 0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
                 var geometry = renderable.geometry;
 
@@ -603,13 +601,16 @@ define(function(require) {
                     mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
                 }
 
-                var prevShader = this._currentShader;
+                // FIXME Optimize for compositing.
+                // var prevShader = this._sceneRendering ? null : this._currentShader;
+                var prevShader = null;
 
                 // Before render hook
                 renderable.beforeRender(_gl);
                 this.beforeRenderObject(renderable, prevMaterial, prevShader);
 
-                if (!shader.isEqual(prevShader)) {
+                var shaderChanged = !shader.isEqual(prevShader);
+                if (shaderChanged) {
                     // Set lights number
                     if (scene && scene.isShaderLightNumberChanged(shader)) {
                         scene.setShaderLightNumber(shader);
@@ -632,10 +633,11 @@ define(function(require) {
                     // Set some common uniforms
                     shader.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
                     shader.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
-                    // DEPRECATED
-                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
                     shader.setUniformOfSemantic(_gl, 'NEAR', camera.near);
                     shader.setUniformOfSemantic(_gl, 'FAR', camera.far);
+                    shader.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
+                    // DEPRECATED
+                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 
                     // Set lights uniforms
                     // TODO needs optimized
@@ -645,7 +647,7 @@ define(function(require) {
 
                     // Save current used shader in the renderer
                     // ALWAYS USE RENDERER TO DRAW THE MESH
-                    this._currentShader = shader;
+                    // this._currentShader = shader;
                 }
                 else {
                     shader = prevShader;
