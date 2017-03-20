@@ -44,7 +44,7 @@ define(function (require) {
             normalDistribution = cubemapUtil.generateNormalDistribution();
             brdfLookup = cubemapUtil.integrateBRDF(renderer, normalDistribution);
         }
-        textureOpts =  textureOpts || {};
+        textureOpts = textureOpts || {};
 
         var width = textureOpts.width || 64;
         var height = textureOpts.height || 64;

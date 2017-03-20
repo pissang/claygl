@@ -167,6 +167,7 @@ define(function (require) {
 
         var skybox;
         var dummyScene = new Scene();
+        var size = 64;
         if (envMap instanceof Texture2D) {
             skybox = new Skydome({
                 scene: dummyScene,
@@ -174,14 +175,15 @@ define(function (require) {
             });
         }
         else {
+            size = (envMap.image && envMap.image.px) ? envMap.image.px.width : envMap.width;
             skybox = new Skybox({
                 scene: dummyScene,
                 environmentMap: envMap
             });
         }
         // Convert to rgbm
-        var width = 128;
-        var height = 128;
+        var width = Math.ceil(size / Math.pow(2, opts.lod));
+        var height = Math.ceil(size / Math.pow(2, opts.lod));
         var rgbmTexture = new Texture2D({
             width: width,
             height: height

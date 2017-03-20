@@ -29,7 +29,7 @@ define(function(require) {
 
         type: 'AMBIENT_CUBEMAP_LIGHT',
 
-        prefilter: function (renderer) {
+        prefilter: function (renderer, size) {
             if (!this._brdfLookup) {
                 this._normalDistribution = cubemapUtil.generateNormalDistribution();
                 this._brdfLookup = cubemapUtil.integrateBRDF(renderer, this._normalDistribution);
@@ -41,7 +41,9 @@ define(function(require) {
 
             var result = cubemapUtil.prefilterEnvironmentMap(
                 renderer, cubemap, {
-                    encodeRGBM: true
+                    encodeRGBM: true,
+                    width: size,
+                    height: size
                 }, this._normalDistribution, this._brdfLookup
             );
             this.cubemap = result.environmentMap;
