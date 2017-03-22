@@ -65,6 +65,17 @@ define(function (require) {
 
             lightFrustumBias: 2,
 
+            kernelPCF: new Float32Array([
+                1, 0,
+                1, 1,
+                -1, 1,
+                0, 1,
+                -1, 0,
+                -1, -1,
+                1, -1,
+                0, -1
+            ]),
+
             _frameBuffer: new FrameBuffer(),
 
             _textures: {},
@@ -261,33 +272,45 @@ define(function (require) {
             }
         },
 
-        _updateCaster: function (mesh) {
+        _updateCasterAndReceiver: function (mesh) {
             if (mesh.castShadow) {
                 this._opaqueCasters.push(mesh);
             }
             if (mesh.receiveShadow) {
                 this._receivers.push(mesh);
                 mesh.material.set('shadowEnabled', 1);
+
+                mesh.material.set('pcfKernel', this.kernelPCF);
             }
             else {
                 mesh.material.set('shadowEnabled', 0);
             }
+
+            var shader = mesh.material.shader;
             if (this.softShadow === ShadowMapPass.VSM) {
-                mesh.material.shader.define('fragment', 'USE_VSM');
+                shader.define('fragment', 'USE_VSM');
+                shader.unDefine('fragment', 'PCF_KERNEL_SIZE');
             }
             else {
-                mesh.material.shader.unDefine('fragment', 'USE_VSM');
+                shader.unDefine('fragment', 'USE_VSM');
+                var kernelPCF = this.kernelPCF;
+                if (kernelPCF && kernelPCF.length) {
+                    shader.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
+                }
+                else {
+                    shader.unDefine('fragment', 'PCF_KERNEL_SIZE');
+                }
             }
         },
 
         _update: function (scene) {
             for (var i = 0; i < scene.opaqueQueue.length; i++) {
-                this._updateCaster(scene.opaqueQueue[i]);
+                this._updateCasterAndReceiver(scene.opaqueQueue[i]);
             }
             for (var i = 0; i < scene.transparentQueue.length; i++) {
                 // TODO Transparent object receive shadow will be very slow
                 // in stealth demo, still not find the reason
-                this._updateCaster(scene.transparentQueue[i]);
+                this._updateCasterAndReceiver(scene.transparentQueue[i]);
             }
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];

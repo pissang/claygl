@@ -180,6 +180,13 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
 
     float shadowContrib = tapShadowMap(map, uv, z);
     vec2 offset = vec2(1.0 / textureSize) * scale;
+#ifdef PCF_KERNEL_SIZE
+    for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{
+        shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);
+    }}
+
+    return shadowContrib / float(PCF_KERNEL_SIZE + 1);
+#endif
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);
     shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);
@@ -189,7 +196,7 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);
     shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);
 
-    return shadowContrib / 9.0;
+    return shadowContrib;
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
@@ -294,6 +301,10 @@ uniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];
 #endif
 
 uniform bool shadowEnabled : true;
+
+#ifdef PCF_KERNEL_SIZE
+uniform vec2 pcfKernel[PCF_KERNEL_SIZE];
+#endif
 
 @import qtek.plugin.shadow_map_common
 
