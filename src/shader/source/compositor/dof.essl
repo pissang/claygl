@@ -477,13 +477,13 @@ void main()
     // FIXME
     gl_FragColor = encodeHDR(
         mix(
-            nearfieldColor, vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0),
+            nearfieldColor, mix(originalColor, blurredColor, weight),
             // near field blur is too unobvious if use linear blending
             pow(1.0 - fNearCoc, 4.0)
         )
     );
 #else
-    gl_FragColor = encodeHDR(vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0));
+    gl_FragColor = encodeHDR(mix(originalColor, blurredColor, weight));
 #endif
 
 #if DEBUG == 1
