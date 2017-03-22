@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     var Base = require('../core/Base');
     var Ray = require('../math/Ray');
@@ -30,7 +30,7 @@ define(function(require) {
          * @type {qtek.Renderer}
          */
         renderer: null
-    }, function() {
+    }, function () {
         this._ray = new Ray();
         this._ndc = new Vector2();
     },
@@ -41,10 +41,11 @@ define(function(require) {
          * Pick the nearest intersection object in the scene
          * @param  {number} x Mouse position x
          * @param  {number} y Mouse position y
+         * @param  {boolean} [forcePickAll=false] ignore ignorePicking
          * @return {qtek.picking.RayPicking~Intersection}
          */
-        pick: function (x, y) {
-            var out = this.pickAll(x, y);
+        pick: function (x, y, forcePickAll) {
+            var out = this.pickAll(x, y, [], forcePickAll);
             return out[0] || null;
         },
 
@@ -53,24 +54,25 @@ define(function(require) {
          * @param  {number} x Mouse position x
          * @param  {number} y Mouse position y
          * @param  {Array} [output]
+         * @param  {boolean} [forcePickAll=false] ignore ignorePicking
          * @return {Array.<qtek.picking.RayPicking~Intersection>}
          */
-        pickAll: function (x, y, output) {
+        pickAll: function (x, y, output, forcePickAll) {
             this.renderer.screenToNDC(x, y, this._ndc);
             this.camera.castRay(this._ndc, this._ray);
 
             output = output || [];
 
-            this._intersectNode(this.scene, output);
+            this._intersectNode(this.scene, output, forcePickAll || false);
 
             output.sort(this._intersectionCompareFunc);
 
             return output;
         },
 
-        _intersectNode: function (node, out) {
+        _intersectNode: function (node, out, forcePickAll) {
             if ((node instanceof Renderable) && node.isRenderable()) {
-                if (!node.ignorePicking
+                if ((!node.ignorePicking || forcePickAll)
                     && (
                         // Only triangle mesh support ray picking
                         (node.mode === glenum.TRIANGLES && node.geometry.isUseIndices())
@@ -83,7 +85,7 @@ define(function(require) {
                 }
             }
             for (var i = 0; i < node._children.length; i++) {
-                this._intersectNode(node._children[i], out);
+                this._intersectNode(node._children[i], out, forcePickAll);
             }
         },
 

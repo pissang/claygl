@@ -21,7 +21,7 @@ varying vec2 v_Texcoord;
 
 void main()
 {
-    float z = texture2D(depth, v_Texcoord).r;
+    float z = texture2D(depth, v_Texcoord).r * 2.0 - 1.0;
 
     float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));
 

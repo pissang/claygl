@@ -190,10 +190,10 @@ void main()
     gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));
     // Debug output bloom
     #elif DEBUG == 2
-    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)).rgb * bloomIntensity);
+    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);
     // Debug output lensflare
     #elif DEBUG == 3
-    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord).rgb * lensflareIntensity));
+    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));
     #endif
 #endif
 }
