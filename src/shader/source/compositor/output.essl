@@ -21,6 +21,12 @@ void main()
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);
+
+    // Premultiply alpha
+    // or webgl will divide alpha.
+#ifdef PREMULTIPLY_ALPHA
+    gl_FragColor.rgb *= gl_FragColor.a;
+#endif
 }
 
 @end

@@ -196,6 +196,11 @@ void main()
     gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));
     #endif
 #endif
+    // Premultiply alpha
+    // or webgl will divide alpha.
+#ifdef PREMULTIPLY_ALPHA
+    gl_FragColor.rgb *= gl_FragColor.a;
+#endif
 }
 
 @end
