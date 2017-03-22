@@ -463,7 +463,7 @@ void main()
     float fCoc = decodeFloat(texture2D(coc, v_Texcoord));
 
     // FIXME blur after premultiply will have white edge
-    blurredColor.rgb /= max(fCoc, 0.1);
+    // blurredColor.rgb /= max(fCoc, 0.1);
     fCoc = abs(fCoc * 2.0 - 1.0);
 
     // float weight = smoothstep(0.0, 1.0, fCoc);

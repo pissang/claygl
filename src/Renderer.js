@@ -478,6 +478,7 @@ define(function(require) {
             var viewportSizeUniform = [
                 viewportUniform[2], viewportUniform[3]
             ];
+            var time = Date.now();
 
             // Calculate view and projection matrix
             mat4.copy(matrices.VIEW, camera.viewMatrix._array);
@@ -636,6 +637,7 @@ define(function(require) {
                     shader.setUniformOfSemantic(_gl, 'NEAR', camera.near);
                     shader.setUniformOfSemantic(_gl, 'FAR', camera.far);
                     shader.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
+                    shader.setUniformOfSemantic(_gl, 'TIME', time);
                     // DEPRECATED
                     shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 

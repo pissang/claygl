@@ -90,7 +90,9 @@ define(function (require) {
         'WINDOW_SIZE',
         // Infomation about camera
         'NEAR',
-        'FAR'
+        'FAR',
+        // Time
+        'TIME'
     ];
     var matrixSemantics = [
         'WORLD',
