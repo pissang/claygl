@@ -79,7 +79,7 @@ define(function(require) {
          */
         detachScene: function () {
             if (this.scene) {
-                this.scene.off('beforerender', this._beforeRenderScene, this);
+                this.scene.off('beforerender', this._beforeRenderScene);
             }
             this.scene = null;
         },
@@ -96,6 +96,10 @@ define(function(require) {
 
         setEnvironmentMap: function (envMap) {
             this.material.set('environmentMap', envMap);
+        },
+
+        getEnvironmentMap: function () {
+            return this.material.get('environmentMap');
         },
 
         _beforeRenderScene: function(renderer, scene, camera) {

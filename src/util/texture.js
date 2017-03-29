@@ -36,7 +36,7 @@ define(function (require) {
                 option = option || {};
             }
             if (typeof(path) === 'string') {
-                if (path.match(/.hdr$/)) {
+                if (path.match(/.hdr$/) || option.fileType === 'hdr') {
                     texture = new Texture2D({
                         width: 0,
                         height: 0
@@ -52,7 +52,7 @@ define(function (require) {
                     );
                     return texture;
                 }
-                else if (path.match(/.dds$/)) {
+                else if (path.match(/.dds$/) || option.fileType === 'dds') {
                     texture = new Texture2D({
                         width: 0,
                         height: 0
