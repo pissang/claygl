@@ -394,7 +394,7 @@ define(function (require) {
          * @param  {string} shaderType Can be vertex, fragment or both
          * @param  {string} symbol
          */
-        unDefine: function (shaderType, symbol) {
+        undefine: function (shaderType, symbol) {
             if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
                 && arguments.length < 2
             ) {

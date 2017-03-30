@@ -270,11 +270,11 @@ define(function (require) {
         },
 
         /**
-         * Proxy of pass.material.shader.unDefine('fragment', xxx)
+         * Proxy of pass.material.shader.undefine('fragment', xxx)
          * @param  {string} symbol
          */
-        shaderUnDefine: function (symbol) {
-            this.pass.material.shader.unDefine('fragment', symbol);
+        shaderUndefine: function (symbol) {
+            this.pass.material.shader.undefine('fragment', symbol);
         },
 
         removeReference: function (outputName) {

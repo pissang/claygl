@@ -145,7 +145,7 @@ define(function (require) {
                 this._outputDepthPass.material.shader.define('fragment', 'USE_VSM');
             }
             else {
-                this._outputDepthPass.material.shader.unDefine('fragment', 'USE_VSM');
+                this._outputDepthPass.material.shader.undefine('fragment', 'USE_VSM');
             }
             for (var name in this._textures) {
                 var texture = this._textures[name];
@@ -206,7 +206,7 @@ define(function (require) {
                         depthShader.define('fragment', 'USE_VSM');
                     }
                     else {
-                        depthShader.unDefine('fragment', 'USE_VSM');
+                        depthShader.undefine('fragment', 'USE_VSM');
                     }
 
                     depthMaterial.setUniform('bias', bias);
@@ -245,7 +245,7 @@ define(function (require) {
                         distanceMaterial.shader.define('fragment', 'USE_VSM');
                     }
                     else {
-                        distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
+                        distanceMaterial.shader.undefine('fragment', 'USE_VSM');
                     }
                 }
 
@@ -289,16 +289,16 @@ define(function (require) {
             var shader = mesh.material.shader;
             if (this.softShadow === ShadowMapPass.VSM) {
                 shader.define('fragment', 'USE_VSM');
-                shader.unDefine('fragment', 'PCF_KERNEL_SIZE');
+                shader.undefine('fragment', 'PCF_KERNEL_SIZE');
             }
             else {
-                shader.unDefine('fragment', 'USE_VSM');
+                shader.undefine('fragment', 'USE_VSM');
                 var kernelPCF = this.kernelPCF;
                 if (kernelPCF && kernelPCF.length) {
                     shader.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
                 }
                 else {
-                    shader.unDefine('fragment', 'PCF_KERNEL_SIZE');
+                    shader.undefine('fragment', 'PCF_KERNEL_SIZE');
                 }
             }
         },
@@ -455,7 +455,7 @@ define(function (require) {
                         shader.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
                     }
                     else {
-                        shader.unDefine('fragment', 'SHADOW_CASCADE');
+                        shader.undefine('fragment', 'SHADOW_CASCADE');
                     }
                     shadowDefineUpdatedShader[shader.__GUID__] = true;
                 }
@@ -839,9 +839,9 @@ define(function (require) {
                 if (mesh.material && mesh.material.shader) {
                     var material = mesh.material;
                     var shader = material.shader;
-                    shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
-                    shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
-                    shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
+                    shader.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
+                    shader.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
+                    shader.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
                     material.set('shadowEnabled', 0);
                 }
             }

@@ -160,8 +160,8 @@
 
                     function updateDebugConfig() {
                         if (config.debug === 'COC' || config.debug === 'Near COC') {
-                            dofCompositeNode.shaderUnDefine('RGBM');
-                            compositeNode.shaderUnDefine('RGBM_DECODE');
+                            dofCompositeNode.shaderUndefine('RGBM');
+                            compositeNode.shaderUndefine('RGBM_DECODE');
                             compositeNode.shaderDefine('DEBUG', 1);
                         }
                         else {

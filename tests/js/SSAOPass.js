@@ -78,7 +78,7 @@ define(function (require) {
             ssaoPass.material.shader.define('fragment', 'DEPTH_ENCODED');
         }
         else {
-            ssaoPass.material.shader.unDefine('fragment', 'DEPTH_ENCODED');
+            ssaoPass.material.shader.undefine('fragment', 'DEPTH_ENCODED');
         }
         ssaoPass.setUniform('gBufferTex', gBufferTex);
         ssaoPass.setUniform('depthTex', deferredRenderer.getDepthBuffer());
