@@ -13,7 +13,7 @@ uniform float focalRange: 1;
 // 30mm
 uniform float focalLength: 30;
 // f/2.8
-uniform float fstop: 0.36;
+uniform float fstop: 2.8;
 
 varying vec2 v_Texcoord;
 
@@ -25,7 +25,7 @@ void main()
 
     float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));
 
-    float aperture = 1.0 / fstop;
+    float aperture = focalLength / fstop;
 
     float coc;
 

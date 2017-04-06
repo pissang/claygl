@@ -16720,11 +16720,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 
 	        /**
-	         * Proxy of pass.material.shader.unDefine('fragment', xxx)
+	         * Proxy of pass.material.shader.undefine('fragment', xxx)
 	         * @param  {string} symbol
 	         */
-	        shaderUnDefine: function (symbol) {
-	            this.pass.material.shader.unDefine('fragment', symbol);
+	        shaderUndefine: function (symbol) {
+	            this.pass.material.shader.undefine('fragment', symbol);
 	        },
 
 	        removeReference: function (outputName) {
@@ -17811,14 +17811,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var glenum = __webpack_require__(34);
 	    var Cache = __webpack_require__(41);
 	    var vendor = __webpack_require__(51);
-	    var glmatrix = __webpack_require__(14);
-	    var vec2 = glmatrix.vec2;
-	    var vec3 = glmatrix.vec3;
-	    var vec4 = glmatrix.vec4;
-
-	    var vec4Copy = vec4.copy;
-	    var vec3Copy = vec3.copy;
-	    var vec2Copy = vec2.copy;
 
 	    function getArrayCtorByType (type) {
 	        var ArrayConstructor;
@@ -18048,9 +18040,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * User defined ray picking algorithm instead of default
 	         * triangle ray intersection
+	         * x, y are NDC.
+	         * (x, y, renderer, camera, renderable, out) => boolean
 	         * @type {Function}
 	         */
 	        pickByRay: null,
+
+	        /**
+	         * User defined picking algorithm instead of default
+	         * triangle ray intersection
+	         * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
+	         * @type {Function}
+	         */
+	        pick: null,
 
 	        /**
 	         * Main attribute will be used to count vertex number
@@ -18285,12 +18287,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Information about viewport
 	        'VIEWPORT_SIZE',
 	        'VIEWPORT',
+	        'DEVICEPIXELRATIO',
 	        // Window size for window relative coordinate
 	        // https://www.opengl.org/sdk/docs/man/html/gl_FragCoord.xhtml
 	        'WINDOW_SIZE',
 	        // Infomation about camera
 	        'NEAR',
-	        'FAR'
+	        'FAR',
+	        // Time
+	        'TIME'
 	    ];
 	    var matrixSemantics = [
 	        'WORLD',
@@ -18592,7 +18597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param  {string} shaderType Can be vertex, fragment or both
 	         * @param  {string} symbol
 	         */
-	        unDefine: function (shaderType, symbol) {
+	        undefine: function (shaderType, symbol) {
 	            if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
 	                && arguments.length < 2
 	            ) {
@@ -19040,7 +19045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        + snippet
 	                            .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
 	                            .replace(/_idx_/g, idx)
-	                    + '\n' + '}';
+	                    + '}';
 	                }
 
 	                return unroll;
@@ -21649,7 +21654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.gl.viewport(
 	                x * dpr, y * dpr, width * dpr, height * dpr
 	            );
-
+	            // Use a fresh new object, not write property.
 	            this.viewport = {
 	                x: x,
 	                y: y,
@@ -21840,7 +21845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var viewportSizeUniform = [
 	                viewportUniform[2], viewportUniform[3]
 	            ];
-
+	            var time = Date.now();
 
 	            // Calculate view and projection matrix
 	            mat4.copy(matrices.VIEW, camera.viewMatrix._array);
@@ -21849,7 +21854,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
 	            mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
 	            mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
-
 
 	            var _gl = this.gl;
 	            var scene = this._sceneRendering;
@@ -21927,7 +21931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            cullFace = null;
 	            frontFace = null;
 
-	            for (var i =0; i < culledRenderQueue.length; i++) {
+	            for (var i = 0; i < culledRenderQueue.length; i++) {
 	                var renderable = culledRenderQueue[i];
 	                var geometry = renderable.geometry;
 
@@ -21965,13 +21969,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
 	                }
 
-	                var prevShader = this._currentShader;
+	                // FIXME Optimize for compositing.
+	                // var prevShader = this._sceneRendering ? null : this._currentShader;
+	                var prevShader = null;
 
 	                // Before render hook
 	                renderable.beforeRender(_gl);
 	                this.beforeRenderObject(renderable, prevMaterial, prevShader);
 
-	                if (!shader.isEqual(prevShader)) {
+	                var shaderChanged = !shader.isEqual(prevShader);
+	                if (shaderChanged) {
 	                    // Set lights number
 	                    if (scene && scene.isShaderLightNumberChanged(shader)) {
 	                        scene.setShaderLightNumber(shader);
@@ -21994,10 +22001,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Set some common uniforms
 	                    shader.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
 	                    shader.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
-	                    // DEPRECATED
-	                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 	                    shader.setUniformOfSemantic(_gl, 'NEAR', camera.near);
 	                    shader.setUniformOfSemantic(_gl, 'FAR', camera.far);
+	                    shader.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
+	                    shader.setUniformOfSemantic(_gl, 'TIME', time);
+	                    // DEPRECATED
+	                    shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 
 	                    // Set lights uniforms
 	                    // TODO needs optimized
@@ -22007,7 +22016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                    // Save current used shader in the renderer
 	                    // ALWAYS USE RENDERER TO DRAW THE MESH
-	                    this._currentShader = shader;
+	                    // this._currentShader = shader;
 	                }
 	                else {
 	                    shader = prevShader;
@@ -22240,7 +22249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param  {qtek.math.Vector2} [out]
 	         * @return {qtek.math.Vector2}
 	         */
-	        screenToNdc: function(x, y, out) {
+	        screenToNDC: function(x, y, out) {
 	            if (!out) {
 	                out = new Vector2();
 	            }
@@ -22255,7 +22264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            arr[1] = arr[1] * 2 - 1;
 
 	            return out;
-	        },
+	        }
 	    });
 
 	    /**
@@ -24094,7 +24103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        type: 'AMBIENT_CUBEMAP_LIGHT',
 
-	        prefilter: function (renderer) {
+	        prefilter: function (renderer, size) {
 	            if (!this._brdfLookup) {
 	                this._normalDistribution = cubemapUtil.generateNormalDistribution();
 	                this._brdfLookup = cubemapUtil.integrateBRDF(renderer, this._normalDistribution);
@@ -24106,7 +24115,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var result = cubemapUtil.prefilterEnvironmentMap(
 	                renderer, cubemap, {
-	                    encodeRGBM: true
+	                    encodeRGBM: true,
+	                    width: size,
+	                    height: size
 	                }, this._normalDistribution, this._brdfLookup
 	            );
 	            this.cubemap = result.environmentMap;
@@ -24200,7 +24211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            normalDistribution = cubemapUtil.generateNormalDistribution();
 	            brdfLookup = cubemapUtil.integrateBRDF(renderer, normalDistribution);
 	        }
-	        textureOpts =  textureOpts || {};
+	        textureOpts = textureOpts || {};
 
 	        var width = textureOpts.width || 64;
 	        var height = textureOpts.height || 64;
@@ -24511,7 +24522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        detachScene: function () {
 	            if (this.scene) {
-	                this.scene.off('beforerender', this._beforeRenderScene, this);
+	                this.scene.off('beforerender', this._beforeRenderScene);
 	            }
 	            this.scene = null;
 	        },
@@ -24528,6 +24539,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        setEnvironmentMap: function (envMap) {
 	            this.material.set('environmentMap', envMap);
+	        },
+
+	        getEnvironmentMap: function () {
+	            return this.material.get('environmentMap');
 	        },
 
 	        _beforeRenderScene: function(renderer, scene, camera) {
@@ -25101,7 +25116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                option = option || {};
 	            }
 	            if (typeof(path) === 'string') {
-	                if (path.match(/.hdr$/)) {
+	                if (path.match(/.hdr$/) || option.fileType === 'hdr') {
 	                    texture = new Texture2D({
 	                        width: 0,
 	                        height: 0
@@ -25117,7 +25132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    );
 	                    return texture;
 	                }
-	                else if (path.match(/.dds$/)) {
+	                else if (path.match(/.dds$/) || option.fileType === 'dds') {
 	                    texture = new Texture2D({
 	                        width: 0,
 	                        height: 0
@@ -25372,7 +25387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        detachScene: function () {
 	            if (this.scene) {
-	                this.scene.off('beforerender', this._beforeRenderScene, this);
+	                this.scene.off('beforerender', this._beforeRenderScene);
 	            }
 	            this.scene = null;
 	        },
@@ -25385,6 +25400,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        setEnvironmentMap: function (envMap) {
 	            this.material.set('diffuseMap', envMap);
+	        },
+
+	        getEnvironmentMap: function () {
+	            return this.material.get('diffuseMap');
 	        },
 
 	        dispose: function (gl) {
@@ -27257,43 +27276,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        if (!attributeName) {
 	                            continue;
 	                        }
-	                        var attributeType = attributeInfo.componentType;
+	                        var componentType = attributeInfo.componentType;
 	                        // DEPRECATED compatible with older version(< 1.0)
-	                        if (attributeType == null) {
-	                            attributeType = attributeInfo.type;
+	                        if (componentType == null) {
+	                            var attributeType = attributeInfo.type;
+	                            switch(attributeType) {
+	                                case 0x8B50:     // FLOAT_VEC2
+	                                    size = 2;
+	                                    ArrayCtor = vendor.Float32Array;
+	                                    break;
+	                                case 0x8B51:     // FLOAT_VEC3
+	                                    size = 3;
+	                                    ArrayCtor = vendor.Float32Array;
+	                                    break;
+	                                case 0x8B52:     // FLOAT_VEC4
+	                                    size = 4;
+	                                    ArrayCtor = vendor.Float32Array;
+	                                    break;
+	                                case 0x1406:     // FLOAT
+	                                    size = 1;
+	                                    ArrayCtor = vendor.Float32Array;
+	                                    break;
+	                                default:
+	                                    console.warn('Attribute type ' + attributeInfo.type + ' not support yet');
+	                                    break;
+	                            }
 	                        }
+	                        else {
+	                            var attributeType = attributeInfo.type;
+	                            ArrayCtor = ({
+	                                5120: vendor.Int8Array,
+	                                5121: vendor.Uint8Array,
+	                                5122: vendor.Int16Array,
+	                                5123: vendor.Uint16Array,
+	                                5126: vendor.Float32Array
+	                            })[componentType] || vendor.Float32Array;
+
+	                            size = ({
+	                                SCALAR: 1,
+	                                VEC2: 2,
+	                                VEC3: 3,
+	                                VEC4: 4,
+	                                MAT2: 4,
+	                                MAT3: 9,
+	                                MAT4: 16
+	                            })[attributeType];
+	                        }
+
 	                        var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
 	                        var buffer = lib.buffers[bufferViewInfo.buffer];
 	                        var byteOffset = bufferViewInfo.byteOffset + attributeInfo.byteOffset;
 
 	                        var size;
 	                        var ArrayCtor;
-	                        var type;
-	                        switch(attributeType) {
-	                            case 0x8B50:     // FLOAT_VEC2
-	                                size = 2;
-	                                type = 'float';
-	                                ArrayCtor = vendor.Float32Array;
-	                                break;
-	                            case 0x8B51:     // FLOAT_VEC3
-	                                size = 3;
-	                                type = 'float';
-	                                ArrayCtor = vendor.Float32Array;
-	                                break;
-	                            case 0x8B52:     // FLOAT_VEC4
-	                                size = 4;
-	                                type = 'float';
-	                                ArrayCtor = vendor.Float32Array;
-	                                break;
-	                            case 0x1406:     // FLOAT
-	                                size = 1;
-	                                type = 'float';
-	                                ArrayCtor = vendor.Float32Array;
-	                                break;
-	                            default:
-	                                console.warn('Attribute type ' + attributeInfo.type + ' not support yet');
-	                                break;
-	                        }
 	                        var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
 	                        if (semantic === 'WEIGHT' && size === 4) {
 	                            // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
@@ -28481,7 +28516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.compositor.output\n\n#define OUTPUT_ALPHA\n\nvarying vec2 v_Texcoord;\n\nuniform sampler2D texture;\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n\n    gl_FragColor.rgb = tex.rgb;\n\n#ifdef OUTPUT_ALPHA\n    gl_FragColor.a = tex.a;\n#else\n    gl_FragColor.a = 1.0;\n#endif\n\n    gl_FragColor = encodeHDR(gl_FragColor);\n}\n\n@end";
+	module.exports = "@export qtek.compositor.output\n\n#define OUTPUT_ALPHA\n\nvarying vec2 v_Texcoord;\n\nuniform sampler2D texture;\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n\n    gl_FragColor.rgb = tex.rgb;\n\n#ifdef OUTPUT_ALPHA\n    gl_FragColor.a = tex.a;\n#else\n    gl_FragColor.a = 1.0;\n#endif\n\n    gl_FragColor = encodeHDR(gl_FragColor);\n\n        #ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n\n@end";
 
 
 /***/ },
@@ -28513,7 +28548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.compositor.hdr.log_lum\n\nvarying vec2 v_Texcoord;\n\nuniform sampler2D texture;\n\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    float luminance = dot(tex.rgb, w);\n    luminance = log(luminance + 0.001);\n\n    gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));\n}\n\n@end\n\n@export qtek.compositor.hdr.lum_adaption\nvarying vec2 v_Texcoord;\n\nuniform sampler2D adaptedLum;\nuniform sampler2D currentLum;\n\nuniform float frameTime : 0.02;\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;\n    float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);\n\n    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));\n    gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));\n}\n@end\n\n@export qtek.compositor.hdr.composite\n\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\n\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\n\nvarying vec2 v_Texcoord;\n\nconst vec3 whiteScale = vec3(11.2);\n\n@import qtek.util.srgb\n\nvec3 uncharted2ToneMap(vec3 x)\n{\n    const float A = 0.22;       const float B = 0.30;       const float C = 0.10;       const float D = 0.20;       const float E = 0.01;       const float F = 0.30;   \n    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;\n}\n\nvec3 filmicToneMap(vec3 color)\n{\n    vec3 x = max(vec3(0.0), color - 0.004);\n    return (x*(6.2*x+0.5))/(x*(6.2*x+1.7)+0.06);\n}\n\nvec3 ACESToneMapping(vec3 color)\n{\n    const float A = 2.51;\n    const float B = 0.03;\n    const float C = 2.43;\n    const float D = 0.59;\n    const float E = 0.14;\n    return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\n\nfloat eyeAdaption(float fLum)\n{\n    return mix(0.2, fLum, 0.5);\n}\n\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n    float blueColor = color.b * 63.0;\n\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n\n    vec4 newColor1 = texture2D(lut, texPos1);\n    vec4 newColor2 = texture2D(lut, texPos2);\n\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor.rgb;\n}\n#endif\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n        vec4 texel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n    texel += decodeHDR(texture2D(texture, v_Texcoord));\n#endif\n\n#ifdef BLOOM_ENABLED\n    texel += decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity;\n#endif\n\n#ifdef LENSFLARE_ENABLED\n    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n\n#ifdef LUM_ENABLED\n    float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n    float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n    float exposureBias = adaptedLumDest * exposure;\n#else\n    float exposureBias = exposure;\n#endif\n    texel.rgb *= exposureBias;\n\n                texel.rgb = ACESToneMapping(texel.rgb);\n    texel = linearTosRGB(texel);\n\n#ifdef LUT_ENABLED\n    texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n\n#ifdef VIGNETTE\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n    texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n\n    gl_FragColor = encodeHDR(texel);\n\n#ifdef DEBUG\n        #if DEBUG == 1\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n        #elif DEBUG == 2\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)).rgb * bloomIntensity);\n        #elif DEBUG == 3\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord).rgb * lensflareIntensity));\n    #endif\n#endif\n}\n\n@end";
+	module.exports = "@export qtek.compositor.hdr.log_lum\n\nvarying vec2 v_Texcoord;\n\nuniform sampler2D texture;\n\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    float luminance = dot(tex.rgb, w);\n    luminance = log(luminance + 0.001);\n\n    gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));\n}\n\n@end\n\n@export qtek.compositor.hdr.lum_adaption\nvarying vec2 v_Texcoord;\n\nuniform sampler2D adaptedLum;\nuniform sampler2D currentLum;\n\nuniform float frameTime : 0.02;\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n    float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;\n    float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);\n\n    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));\n    gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));\n}\n@end\n\n@export qtek.compositor.hdr.composite\n\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\n\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\n\nvarying vec2 v_Texcoord;\n\nconst vec3 whiteScale = vec3(11.2);\n\n@import qtek.util.srgb\n\nvec3 uncharted2ToneMap(vec3 x)\n{\n    const float A = 0.22;       const float B = 0.30;       const float C = 0.10;       const float D = 0.20;       const float E = 0.01;       const float F = 0.30;   \n    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;\n}\n\nvec3 filmicToneMap(vec3 color)\n{\n    vec3 x = max(vec3(0.0), color - 0.004);\n    return (x*(6.2*x+0.5))/(x*(6.2*x+1.7)+0.06);\n}\n\nvec3 ACESToneMapping(vec3 color)\n{\n    const float A = 2.51;\n    const float B = 0.03;\n    const float C = 2.43;\n    const float D = 0.59;\n    const float E = 0.14;\n    return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\n\nfloat eyeAdaption(float fLum)\n{\n    return mix(0.2, fLum, 0.5);\n}\n\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n    float blueColor = color.b * 63.0;\n\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n\n    vec4 newColor1 = texture2D(lut, texPos1);\n    vec4 newColor2 = texture2D(lut, texPos2);\n\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor.rgb;\n}\n#endif\n\n@import qtek.util.rgbm\n\nvoid main()\n{\n        vec4 texel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n    texel += decodeHDR(texture2D(texture, v_Texcoord));\n#endif\n\n#ifdef BLOOM_ENABLED\n    texel += decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity;\n#endif\n\n#ifdef LENSFLARE_ENABLED\n    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n\n#ifdef LUM_ENABLED\n    float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n    float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n    float exposureBias = adaptedLumDest * exposure;\n#else\n    float exposureBias = exposure;\n#endif\n    texel.rgb *= exposureBias;\n\n                texel.rgb = ACESToneMapping(texel.rgb);\n    texel = linearTosRGB(texel);\n\n#ifdef LUT_ENABLED\n    texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n\n#ifdef VIGNETTE\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n    texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n\n    gl_FragColor = encodeHDR(texel);\n\n#ifdef DEBUG\n        #if DEBUG == 1\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n        #elif DEBUG == 2\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);\n        #elif DEBUG == 3\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));\n    #endif\n#endif\n        #ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n\n@end";
 
 
 /***/ },
@@ -28521,7 +28556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.compositor.dof.coc\n\nuniform sampler2D depth;\n\nuniform float zNear: 0.1;\nuniform float zFar: 2000;\n\nuniform float focalDist: 3;\nuniform float focalRange: 1;\nuniform float focalLength: 30;\nuniform float fstop: 0.36;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.encode_float\n\nvoid main()\n{\n    float z = texture2D(depth, v_Texcoord).r;\n\n    float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));\n\n    float aperture = 1.0 / fstop;\n\n    float coc;\n\n    float uppper = focalDist + focalRange;\n    float lower = focalDist - focalRange;\n    if (dist <= uppper && dist >= lower) {\n                coc = 0.5;\n    }\n    else {\n                float focalAdjusted = dist > uppper ? uppper : lower;\n\n                coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));\n                                coc = clamp(coc, 0.0, 0.4) / 0.4000001;\n\n                if (dist < lower) {\n            coc = -coc;\n        }\n        coc = coc * 0.5 + 0.5;\n    }\n\n        gl_FragColor = encodeFloat(coc);\n}\n\n@end\n\n@export qtek.compositor.dof.premultiply\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nvoid main() {\n    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);\n    gl_FragColor = encodeHDR(\n        vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)\n    );\n}\n@end\n\n\n@export qtek.compositor.dof.min_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.float\n\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n\n    gl_FragColor = encodeFloat(fCoc);\n}\n\n@end\n\n\n@export qtek.compositor.dof.max_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.float\n\nvoid main()\n{\n\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n\n    gl_FragColor = encodeFloat(fCoc);\n}\n\n@end\n\n\n\n\n@export qtek.compositor.dof.coc_upsample\n\n#define HIGH_QUALITY\n\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\n\nuniform float sampleScale: 0.5;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.float\n\nvoid main()\n{\n\n#ifdef HIGH_QUALITY\n        vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));\n\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord       )) * 4.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;\n\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n\n    gl_FragColor = encodeFloat(s / 16.0);\n#else\n        vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));\n\n    gl_FragColor = encodeFloat(s / 4.0);\n#endif\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.upsample\n\n#define HIGH_QUALITY\n\nuniform sampler2D coc;\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\n\nuniform float sampleScale: 0.5;\n\nvarying vec2 v_Texcoord;\n\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nfloat tap(vec2 uv, inout vec4 color, float baseWeight) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\n\nvoid main()\n{\n#ifdef HIGH_QUALITY\n        vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 16.0;\n    float w  = tap(v_Texcoord - d.xy, color, baseWeight);\n    w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord - d.zy, color, baseWeight);\n\n    w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord       , color, baseWeight * 4.0);\n    w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);\n\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.xy, color, baseWeight);\n\n    gl_FragColor = encodeHDR(color / w);\n#else\n        vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 4.0;\n    float w  = tap(v_Texcoord + d.xy, color, baseWeight);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.xw, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight);\n\n    gl_FragColor = encodeHDR(color / w);\n#endif\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.downsample\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nfloat tap(vec2 uv, inout vec4 color) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\n\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    vec4 color = vec4(0.0);\n    float weight = tap(v_Texcoord + d.xy, color);\n    weight += tap(v_Texcoord + d.zy, color);\n    weight += tap(v_Texcoord + d.xw, color);\n    weight += tap(v_Texcoord + d.zw, color);\n    color /= weight;\n\n    gl_FragColor = encodeHDR(color);\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.hexagonal_blur_frag\n\n@import qtek.util.float\n\n\nvec4 doBlur(sampler2D targetTexture, vec2 offset) {\n#ifdef BLUR_COC\n    float cocSum = 0.0;\n#else\n    vec4 color = vec4(0.0);\n#endif\n\n    float weightSum = 0.0;\n    float kernelWeight = 1.0 / float(KERNEL_SIZE);\n\n    for (int i = 0; i < KERNEL_SIZE; i++) {\n        vec2 coord = v_Texcoord + offset * float(i);\n\n        float w = kernelWeight;\n#ifdef BLUR_COC\n        float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;\n                cocSum += clamp(fCoc, -1.0, 0.0) * w;\n#else\n        float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;\n        vec4 texel = texture2D(targetTexture, coord);\n    #if !defined(BLUR_NEARFIELD)\n        w *= abs(fCoc);\n    #endif\n        color += decodeHDR(texel) * w;\n#endif\n\n        weightSum += w;\n    }\n#ifdef BLUR_COC\n    return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);\n#else\n    return color / weightSum;\n#endif\n}\n\n@end\n\n\n@export qtek.compositor.dof.hexagonal_blur_1\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n        gl_FragColor = doBlur(texture, vec2(0.0, offset.y));\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n\n@end\n\n@export qtek.compositor.dof.hexagonal_blur_2\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n    offset.y /= 2.0;\n\n        gl_FragColor = doBlur(texture, -offset);\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n\n@export qtek.compositor.dof.hexagonal_blur_3\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform sampler2D coc;\n\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n    offset.y /= 2.0;\n    vec2 vDownRight = vec2(offset.x, -offset.y);\n\n        vec4 texel1 = doBlur(texture1, -offset);\n        vec4 texel2 = doBlur(texture1, vDownRight);\n        vec4 texel3 = doBlur(texture2, vDownRight);\n\n#ifdef BLUR_COC\n    float coc1 = decodeFloat(texel1) * 2.0 - 1.0;\n    float coc2 = decodeFloat(texel2) * 2.0 - 1.0;\n    float coc3 = decodeFloat(texel3) * 2.0 - 1.0;\n    gl_FragColor = encodeFloat(\n        ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5\n    );\n\n#else\n    vec4 color = (texel1 + texel2 + texel3) / 3.0;\n    gl_FragColor = encodeHDR(color);\n#endif\n}\n\n@end\n\n@export qtek.compositor.dof.composite\n\n#define DEBUG 0\n\nuniform sampler2D original;\nuniform sampler2D blurred;\nuniform sampler2D nearfield;\nuniform sampler2D coc;\nuniform sampler2D nearcoc;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n@import qtek.util.float\n\nvoid main()\n{\n    vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));\n    vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord));\n\n        blurredColor.rgb /= max(fCoc, 0.1);\n    fCoc = abs(fCoc * 2.0 - 1.0);\n\n        float weight = fCoc;\n\n#ifdef NEARFIELD_ENABLED\n    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));\n    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));\n    fNearCoc = abs(fNearCoc * 2.0 - 1.0);\n\n        gl_FragColor = encodeHDR(\n        mix(\n            nearfieldColor, vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0),\n                        pow(1.0 - fNearCoc, 4.0)\n        )\n    );\n#else\n    gl_FragColor = encodeHDR(vec4(mix(originalColor.rgb, blurredColor.rgb, weight), 1.0));\n#endif\n\n#if DEBUG == 1\n        gl_FragColor = vec4(vec3(fCoc), 1.0);\n#elif DEBUG == 2\n        gl_FragColor = vec4(vec3(fNearCoc), 1.0);\n#elif DEBUG == 3\n    gl_FragColor = encodeHDR(blurredColor);\n#elif DEBUG == 4\n        gl_FragColor = encodeHDR(nearfieldColor);\n#endif\n}\n\n@end";
+	module.exports = "@export qtek.compositor.dof.coc\n\nuniform sampler2D depth;\n\nuniform float zNear: 0.1;\nuniform float zFar: 2000;\n\nuniform float focalDist: 3;\nuniform float focalRange: 1;\nuniform float focalLength: 30;\nuniform float fstop: 2.8;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.encode_float\n\nvoid main()\n{\n    float z = texture2D(depth, v_Texcoord).r * 2.0 - 1.0;\n\n    float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));\n\n    float aperture = focalLength / fstop;\n\n    float coc;\n\n    float uppper = focalDist + focalRange;\n    float lower = focalDist - focalRange;\n    if (dist <= uppper && dist >= lower) {\n                coc = 0.5;\n    }\n    else {\n                float focalAdjusted = dist > uppper ? uppper : lower;\n\n                coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));\n                                coc = clamp(coc, 0.0, 0.4) / 0.4000001;\n\n                if (dist < lower) {\n            coc = -coc;\n        }\n        coc = coc * 0.5 + 0.5;\n    }\n\n        gl_FragColor = encodeFloat(coc);\n}\n\n@end\n\n@export qtek.compositor.dof.premultiply\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nvoid main() {\n    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);\n    gl_FragColor = encodeHDR(\n        vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)\n    );\n}\n@end\n\n\n@export qtek.compositor.dof.min_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.float\n\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n\n    gl_FragColor = encodeFloat(fCoc);\n}\n\n@end\n\n\n@export qtek.compositor.dof.max_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.float\n\nvoid main()\n{\n\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n\n    gl_FragColor = encodeFloat(fCoc);\n}\n\n@end\n\n\n\n\n@export qtek.compositor.dof.coc_upsample\n\n#define HIGH_QUALITY\n\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\n\nuniform float sampleScale: 0.5;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.float\n\nvoid main()\n{\n\n#ifdef HIGH_QUALITY\n        vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));\n\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord       )) * 4.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;\n\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n\n    gl_FragColor = encodeFloat(s / 16.0);\n#else\n        vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));\n\n    gl_FragColor = encodeFloat(s / 4.0);\n#endif\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.upsample\n\n#define HIGH_QUALITY\n\nuniform sampler2D coc;\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\n\nuniform float sampleScale: 0.5;\n\nvarying vec2 v_Texcoord;\n\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nfloat tap(vec2 uv, inout vec4 color, float baseWeight) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\n\nvoid main()\n{\n#ifdef HIGH_QUALITY\n        vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 16.0;\n    float w  = tap(v_Texcoord - d.xy, color, baseWeight);\n    w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord - d.zy, color, baseWeight);\n\n    w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord       , color, baseWeight * 4.0);\n    w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);\n\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.xy, color, baseWeight);\n\n    gl_FragColor = encodeHDR(color / w);\n#else\n        vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 4.0;\n    float w  = tap(v_Texcoord + d.xy, color, baseWeight);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.xw, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight);\n\n    gl_FragColor = encodeHDR(color / w);\n#endif\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.downsample\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n\n@import qtek.util.decode_float\n\nfloat tap(vec2 uv, inout vec4 color) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\n\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n\n    vec4 color = vec4(0.0);\n    float weight = tap(v_Texcoord + d.xy, color);\n    weight += tap(v_Texcoord + d.zy, color);\n    weight += tap(v_Texcoord + d.xw, color);\n    weight += tap(v_Texcoord + d.zw, color);\n    color /= weight;\n\n    gl_FragColor = encodeHDR(color);\n}\n\n@end\n\n\n\n@export qtek.compositor.dof.hexagonal_blur_frag\n\n@import qtek.util.float\n\n\nvec4 doBlur(sampler2D targetTexture, vec2 offset) {\n#ifdef BLUR_COC\n    float cocSum = 0.0;\n#else\n    vec4 color = vec4(0.0);\n#endif\n\n    float weightSum = 0.0;\n    float kernelWeight = 1.0 / float(KERNEL_SIZE);\n\n    for (int i = 0; i < KERNEL_SIZE; i++) {\n        vec2 coord = v_Texcoord + offset * float(i);\n\n        float w = kernelWeight;\n#ifdef BLUR_COC\n        float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;\n                cocSum += clamp(fCoc, -1.0, 0.0) * w;\n#else\n        float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;\n        vec4 texel = texture2D(targetTexture, coord);\n    #if !defined(BLUR_NEARFIELD)\n        w *= abs(fCoc);\n    #endif\n        color += decodeHDR(texel) * w;\n#endif\n\n        weightSum += w;\n    }\n#ifdef BLUR_COC\n    return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);\n#else\n    return color / weightSum;\n#endif\n}\n\n@end\n\n\n@export qtek.compositor.dof.hexagonal_blur_1\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n        gl_FragColor = doBlur(texture, vec2(0.0, offset.y));\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n\n@end\n\n@export qtek.compositor.dof.hexagonal_blur_2\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n    offset.y /= 2.0;\n\n        gl_FragColor = doBlur(texture, -offset);\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n\n@export qtek.compositor.dof.hexagonal_blur_3\n\n#define KERNEL_SIZE 5\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform sampler2D coc;\n\nvarying vec2 v_Texcoord;\n\nuniform float blurSize : 1.0;\n\nuniform vec2 textureSize : [512.0, 512.0];\n\n@import qtek.util.rgbm\n\n@import qtek.compositor.dof.hexagonal_blur_frag\n\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n\n    offset.y /= 2.0;\n    vec2 vDownRight = vec2(offset.x, -offset.y);\n\n        vec4 texel1 = doBlur(texture1, -offset);\n        vec4 texel2 = doBlur(texture1, vDownRight);\n        vec4 texel3 = doBlur(texture2, vDownRight);\n\n#ifdef BLUR_COC\n    float coc1 = decodeFloat(texel1) * 2.0 - 1.0;\n    float coc2 = decodeFloat(texel2) * 2.0 - 1.0;\n    float coc3 = decodeFloat(texel3) * 2.0 - 1.0;\n    gl_FragColor = encodeFloat(\n        ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5\n    );\n\n#else\n    vec4 color = (texel1 + texel2 + texel3) / 3.0;\n    gl_FragColor = encodeHDR(color);\n#endif\n}\n\n@end\n\n@export qtek.compositor.dof.composite\n\n#define DEBUG 0\n\nuniform sampler2D original;\nuniform sampler2D blurred;\nuniform sampler2D nearfield;\nuniform sampler2D coc;\nuniform sampler2D nearcoc;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.rgbm\n@import qtek.util.float\n\nvoid main()\n{\n    vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));\n    vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));\n\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord));\n\n            fCoc = abs(fCoc * 2.0 - 1.0);\n\n    float weight = smoothstep(0.0, 1.0, fCoc);\n    \n#ifdef NEARFIELD_ENABLED\n    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));\n    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));\n    fNearCoc = abs(fNearCoc * 2.0 - 1.0);\n\n        gl_FragColor = encodeHDR(\n        mix(\n            nearfieldColor, mix(originalColor, blurredColor, weight),\n                        pow(1.0 - fNearCoc, 4.0)\n        )\n    );\n#else\n    gl_FragColor = encodeHDR(mix(originalColor, blurredColor, weight));\n#endif\n\n#if DEBUG == 1\n        gl_FragColor = vec4(vec3(fCoc), 1.0);\n#elif DEBUG == 2\n        gl_FragColor = vec4(vec3(fNearCoc), 1.0);\n#elif DEBUG == 3\n    gl_FragColor = encodeHDR(blurredColor);\n#elif DEBUG == 4\n        gl_FragColor = encodeHDR(nearfieldColor);\n#endif\n}\n\n@end";
 
 
 /***/ },
@@ -31270,7 +31305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @type {qtek.Renderer}
 	         */
 	        renderer: null
-	    }, function() {
+	    }, function () {
 	        this._ray = new Ray();
 	        this._ndc = new Vector2();
 	    },
@@ -31281,10 +31316,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Pick the nearest intersection object in the scene
 	         * @param  {number} x Mouse position x
 	         * @param  {number} y Mouse position y
+	         * @param  {boolean} [forcePickAll=false] ignore ignorePicking
 	         * @return {qtek.picking.RayPicking~Intersection}
 	         */
-	        pick: function (x, y) {
-	            var out = this.pickAll(x, y);
+	        pick: function (x, y, forcePickAll) {
+	            var out = this.pickAll(x, y, [], forcePickAll);
 	            return out[0] || null;
 	        },
 
@@ -31293,29 +31329,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param  {number} x Mouse position x
 	         * @param  {number} y Mouse position y
 	         * @param  {Array} [output]
+	         * @param  {boolean} [forcePickAll=false] ignore ignorePicking
 	         * @return {Array.<qtek.picking.RayPicking~Intersection>}
 	         */
-	        pickAll: function (x, y, output) {
-	            this.renderer.screenToNdc(x, y, this._ndc);
+	        pickAll: function (x, y, output, forcePickAll) {
+	            this.renderer.screenToNDC(x, y, this._ndc);
 	            this.camera.castRay(this._ndc, this._ray);
 
 	            output = output || [];
 
-	            this._intersectNode(this.scene, output);
+	            this._intersectNode(this.scene, output, forcePickAll || false);
 
 	            output.sort(this._intersectionCompareFunc);
 
 	            return output;
 	        },
 
-	        _intersectNode: function (node, out) {
+	        _intersectNode: function (node, out, forcePickAll) {
 	            if ((node instanceof Renderable) && node.isRenderable()) {
-	                if (!node.ignorePicking && node.geometry.isUseIndices()) {
+	                if ((!node.ignorePicking || forcePickAll)
+	                    && (
+	                        // Only triangle mesh support ray picking
+	                        (node.mode === glenum.TRIANGLES && node.geometry.isUseIndices())
+	                        // Or if geometry has it's own pickByRay, pick, implementation
+	                        || node.geometry.pickByRay
+	                        || node.geometry.pick
+	                    )
+	                ) {
 	                    this._intersectRenderable(node, out);
 	                }
 	            }
 	            for (var i = 0; i < node._children.length; i++) {
-	                this._intersectNode(node._children[i], out);
+	                this._intersectNode(node._children[i], out, forcePickAll);
 	            }
 	        },
 
@@ -31340,12 +31385,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return;
 	                    }
 	                }
+	                // Use user defined picking algorithm
+	                if (geometry.pick) {
+	                    geometry.pick(
+	                        this._ndc.x, this._ndc.y,
+	                        this.renderer,
+	                        this.camera,
+	                        renderable, out
+	                    );
+	                    return;
+	                }
 	                // Use user defined ray picking algorithm
-	                if (geometry.pickByRay) {
-	                    var intersection = geometry.pickByRay(ray);
-	                    if (intersection) {
-	                        out.push(intersection);
-	                    }
+	                else if (geometry.pickByRay) {
+	                    geometry.pickByRay(ray, renderable, out);
 	                    return;
 	                }
 
@@ -32233,6 +32285,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            lightFrustumBias: 2,
 
+	            kernelPCF: new Float32Array([
+	                1, 0,
+	                1, 1,
+	                -1, 1,
+	                0, 1,
+	                -1, 0,
+	                -1, -1,
+	                1, -1,
+	                0, -1
+	            ]),
+
 	            _frameBuffer: new FrameBuffer(),
 
 	            _textures: {},
@@ -32302,7 +32365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._outputDepthPass.material.shader.define('fragment', 'USE_VSM');
 	            }
 	            else {
-	                this._outputDepthPass.material.shader.unDefine('fragment', 'USE_VSM');
+	                this._outputDepthPass.material.shader.undefine('fragment', 'USE_VSM');
 	            }
 	            for (var name in this._textures) {
 	                var texture = this._textures[name];
@@ -32363,7 +32426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        depthShader.define('fragment', 'USE_VSM');
 	                    }
 	                    else {
-	                        depthShader.unDefine('fragment', 'USE_VSM');
+	                        depthShader.undefine('fragment', 'USE_VSM');
 	                    }
 
 	                    depthMaterial.setUniform('bias', bias);
@@ -32402,7 +32465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        distanceMaterial.shader.define('fragment', 'USE_VSM');
 	                    }
 	                    else {
-	                        distanceMaterial.shader.unDefine('fragment', 'USE_VSM');
+	                        distanceMaterial.shader.undefine('fragment', 'USE_VSM');
 	                    }
 	                }
 
@@ -32429,33 +32492,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        },
 
-	        _updateCaster: function (mesh) {
+	        _updateCasterAndReceiver: function (mesh) {
 	            if (mesh.castShadow) {
 	                this._opaqueCasters.push(mesh);
 	            }
 	            if (mesh.receiveShadow) {
 	                this._receivers.push(mesh);
 	                mesh.material.set('shadowEnabled', 1);
+
+	                mesh.material.set('pcfKernel', this.kernelPCF);
 	            }
 	            else {
 	                mesh.material.set('shadowEnabled', 0);
 	            }
+
+	            var shader = mesh.material.shader;
 	            if (this.softShadow === ShadowMapPass.VSM) {
-	                mesh.material.shader.define('fragment', 'USE_VSM');
+	                shader.define('fragment', 'USE_VSM');
+	                shader.undefine('fragment', 'PCF_KERNEL_SIZE');
 	            }
 	            else {
-	                mesh.material.shader.unDefine('fragment', 'USE_VSM');
+	                shader.undefine('fragment', 'USE_VSM');
+	                var kernelPCF = this.kernelPCF;
+	                if (kernelPCF && kernelPCF.length) {
+	                    shader.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
+	                }
+	                else {
+	                    shader.undefine('fragment', 'PCF_KERNEL_SIZE');
+	                }
 	            }
 	        },
 
 	        _update: function (scene) {
 	            for (var i = 0; i < scene.opaqueQueue.length; i++) {
-	                this._updateCaster(scene.opaqueQueue[i]);
+	                this._updateCasterAndReceiver(scene.opaqueQueue[i]);
 	            }
 	            for (var i = 0; i < scene.transparentQueue.length; i++) {
 	                // TODO Transparent object receive shadow will be very slow
 	                // in stealth demo, still not find the reason
-	                this._updateCaster(scene.transparentQueue[i]);
+	                this._updateCasterAndReceiver(scene.transparentQueue[i]);
 	            }
 	            for (var i = 0; i < scene.lights.length; i++) {
 	                var light = scene.lights[i];
@@ -32600,7 +32675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        shader.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
 	                    }
 	                    else {
-	                        shader.unDefine('fragment', 'SHADOW_CASCADE');
+	                        shader.undefine('fragment', 'SHADOW_CASCADE');
 	                    }
 	                    shadowDefineUpdatedShader[shader.__GUID__] = true;
 	                }
@@ -32984,9 +33059,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (mesh.material && mesh.material.shader) {
 	                    var material = mesh.material;
 	                    var shader = material.shader;
-	                    shader.unDefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
-	                    shader.unDefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
-	                    shader.unDefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
+	                    shader.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
+	                    shader.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
+	                    shader.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
 	                    material.set('shadowEnabled', 0);
 	                }
 	            }
@@ -33017,7 +33092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.sm.depth.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\n\nattribute vec3 position : POSITION;\n\n#ifdef SHADOW_TRANSPARENT\nattribute vec2 texcoord : TEXCOORD_0;\n#endif\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvarying vec4 v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\n\nvoid main(){\n\n    vec3 skinnedPosition = position;\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n    gl_Position = v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\n    v_Texcoord = texcoord;\n#endif\n}\n@end\n\n@export qtek.sm.depth.fragment\n\nvarying vec4 v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\n\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\n\n#ifdef SHADOW_TRANSPARENT\nuniform sampler2D transparentMap;\n#endif\n\n@import qtek.util.encode_float\n\nvoid main(){\n            float depth = v_ViewPosition.z / v_ViewPosition.w;\n    \n#ifdef USE_VSM\n    depth = depth * 0.5 + 0.5;\n    float moment1 = depth;\n    float moment2 = depth * depth;\n\n        float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    moment2 += 0.25*(dx*dx+dy*dy);\n\n    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n        float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n\n#ifdef SHADOW_TRANSPARENT\n    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {\n                gl_FragColor = encodeFloat(0.9999);\n        return;\n    }\n#endif\n\n    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n\n@export qtek.sm.debug_depth\n\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.decode_float\n\nvoid main() {\n    vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n    gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n    float depth = decodeFloat(tex);\n    gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n\n@end\n\n\n@export qtek.sm.distance.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\n\nattribute vec3 position : POSITION;\n\n#ifdef SKINNING\nattribute vec3 boneWeight;\nattribute vec4 boneIndex;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvarying vec3 v_WorldPosition;\n\nvoid main (){\n\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n\n@end\n\n@export qtek.sm.distance.fragment\n\nuniform vec3 lightPosition;\nuniform float range : 100;\n\nvarying vec3 v_WorldPosition;\n\n@import qtek.util.encode_float\n\nvoid main(){\n    float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n    dist = dist / range;\n    gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n\n@export qtek.plugin.shadow_map_common\n\n@import qtek.util.decode_float\n\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n    vec4 tex = texture2D(map, uv);\n            return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\n\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n\n    float shadowContrib = tapShadowMap(map, uv, z);\n    vec2 offset = vec2(1.0 / textureSize) * scale;\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n\n    return shadowContrib / 9.0;\n}\n\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n    return pcf(map, uv, z, textureSize, vec2(1.0));\n}\n\nfloat chebyshevUpperBound(vec2 moments, float z){\n    float p = 0.0;\n    z = z * 0.5 + 0.5;\n    if (z <= moments.x) {\n        p = 1.0;\n    }\n    float variance = moments.y - moments.x * moments.x;\n        variance = max(variance, 0.0000001);\n        float mD = moments.x - z;\n    float pMax = variance / (variance + mD * mD);\n            pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n    return max(p, pMax);\n}\nfloat computeShadowContrib(\n    sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n\n    vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n    posInLightSpace.xyz /= posInLightSpace.w;\n    float z = posInLightSpace.z;\n        if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n        all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n                vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n\n        #ifdef USE_VSM\n            vec2 moments = texture2D(map, uv * scale + offset).xy;\n            return chebyshevUpperBound(moments, z);\n        #else\n            return pcf(map, uv * scale + offset, z, textureSize, scale);\n        #endif\n    }\n    return 1.0;\n}\n\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n    return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\n\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n    float dist = length(direction);\n    vec4 shadowTex = textureCube(map, direction);\n\n#ifdef USE_VSM\n    vec2 moments = shadowTex.xy;\n    float variance = moments.y - moments.x * moments.x;\n    float mD = moments.x - dist;\n    float p = variance / (variance + mD * mD);\n    if(moments.x + 0.001 < dist){\n        return clamp(p, 0.0, 1.0);\n    }else{\n        return 1.0;\n    }\n#else\n    return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n\n@end\n\n\n\n@export qtek.plugin.compute_shadow_map\n\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];\n#endif\n\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1];\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE];\nuniform float directionalLightShadowMapSizes[1];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\n#endif\n#endif\n\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];\nuniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];\n#endif\n\nuniform bool shadowEnabled : true;\n\n@import qtek.plugin.shadow_map_common\n\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n            spotLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n        for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#endif\n\n\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n\n#ifdef SHADOW_CASCADE\n\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n        float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n                    / (gl_DepthRange.far - gl_DepthRange.near);\n\n    float shadowContrib;\n            shadowContribs[0] = 1.0;\n\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            depth >= shadowCascadeClipsNear[_idx_] &&\n            depth <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n                directionalLightShadowMapSizes[0],\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n                        shadowContribs[0] = shadowContrib;\n        }\n    }}\n        for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#else\n\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float shadowContrib;\n\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n            directionalLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n        for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n\n#endif\n\n\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n    vec3 lightPosition;\n    vec3 direction;\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        lightPosition = pointLightPosition[_idx_];\n        direction = position - lightPosition;\n        shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n    }}\n    for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#endif\n\n#endif\n\n@end";
+	module.exports = "@export qtek.sm.depth.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\n\nattribute vec3 position : POSITION;\n\n#ifdef SHADOW_TRANSPARENT\nattribute vec2 texcoord : TEXCOORD_0;\n#endif\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvarying vec4 v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\n\nvoid main(){\n\n    vec3 skinnedPosition = position;\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n    gl_Position = v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\n    v_Texcoord = texcoord;\n#endif\n}\n@end\n\n@export qtek.sm.depth.fragment\n\nvarying vec4 v_ViewPosition;\n\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\n\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\n\n#ifdef SHADOW_TRANSPARENT\nuniform sampler2D transparentMap;\n#endif\n\n@import qtek.util.encode_float\n\nvoid main(){\n            float depth = v_ViewPosition.z / v_ViewPosition.w;\n    \n#ifdef USE_VSM\n    depth = depth * 0.5 + 0.5;\n    float moment1 = depth;\n    float moment2 = depth * depth;\n\n        float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    moment2 += 0.25*(dx*dx+dy*dy);\n\n    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n        float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n\n#ifdef SHADOW_TRANSPARENT\n    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {\n                gl_FragColor = encodeFloat(0.9999);\n        return;\n    }\n#endif\n\n    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n\n@export qtek.sm.debug_depth\n\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n\n@import qtek.util.decode_float\n\nvoid main() {\n    vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n    gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n    float depth = decodeFloat(tex);\n    gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n\n@end\n\n\n@export qtek.sm.distance.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\n\nattribute vec3 position : POSITION;\n\n#ifdef SKINNING\nattribute vec3 boneWeight;\nattribute vec4 boneIndex;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvarying vec3 v_WorldPosition;\n\nvoid main (){\n\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n\n@end\n\n@export qtek.sm.distance.fragment\n\nuniform vec3 lightPosition;\nuniform float range : 100;\n\nvarying vec3 v_WorldPosition;\n\n@import qtek.util.encode_float\n\nvoid main(){\n    float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n    dist = dist / range;\n    gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n\n@export qtek.plugin.shadow_map_common\n\n@import qtek.util.decode_float\n\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n    vec4 tex = texture2D(map, uv);\n            return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\n\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n\n    float shadowContrib = tapShadowMap(map, uv, z);\n    vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n    for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n        shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n    }}\n\n    return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#endif\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n\n    return shadowContrib;\n}\n\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n    return pcf(map, uv, z, textureSize, vec2(1.0));\n}\n\nfloat chebyshevUpperBound(vec2 moments, float z){\n    float p = 0.0;\n    z = z * 0.5 + 0.5;\n    if (z <= moments.x) {\n        p = 1.0;\n    }\n    float variance = moments.y - moments.x * moments.x;\n        variance = max(variance, 0.0000001);\n        float mD = moments.x - z;\n    float pMax = variance / (variance + mD * mD);\n            pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n    return max(p, pMax);\n}\nfloat computeShadowContrib(\n    sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n\n    vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n    posInLightSpace.xyz /= posInLightSpace.w;\n    float z = posInLightSpace.z;\n        if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n        all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n                vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n\n        #ifdef USE_VSM\n            vec2 moments = texture2D(map, uv * scale + offset).xy;\n            return chebyshevUpperBound(moments, z);\n        #else\n            return pcf(map, uv * scale + offset, z, textureSize, scale);\n        #endif\n    }\n    return 1.0;\n}\n\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n    return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\n\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n    float dist = length(direction);\n    vec4 shadowTex = textureCube(map, direction);\n\n#ifdef USE_VSM\n    vec2 moments = shadowTex.xy;\n    float variance = moments.y - moments.x * moments.x;\n    float mD = moments.x - dist;\n    float p = variance / (variance + mD * mD);\n    if(moments.x + 0.001 < dist){\n        return clamp(p, 0.0, 1.0);\n    }else{\n        return 1.0;\n    }\n#else\n    return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n\n@end\n\n\n\n@export qtek.plugin.compute_shadow_map\n\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];\n#endif\n\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1];\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE];\nuniform float directionalLightShadowMapSizes[1];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\n#endif\n#endif\n\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];\nuniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];\n#endif\n\nuniform bool shadowEnabled : true;\n\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n\n@import qtek.plugin.shadow_map_common\n\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n            spotLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n        for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#endif\n\n\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n\n#ifdef SHADOW_CASCADE\n\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n        float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n                    / (gl_DepthRange.far - gl_DepthRange.near);\n\n    float shadowContrib;\n            shadowContribs[0] = 1.0;\n\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            depth >= shadowCascadeClipsNear[_idx_] &&\n            depth <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n                directionalLightShadowMapSizes[0],\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n                        shadowContribs[0] = shadowContrib;\n        }\n    }}\n        for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#else\n\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float shadowContrib;\n\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n            directionalLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n        for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n\n#endif\n\n\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n    vec3 lightPosition;\n    vec3 direction;\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        lightPosition = pointLightPosition[_idx_];\n        direction = position - lightPosition;\n        shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n    }}\n    for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n\n#endif\n\n#endif\n\n@end";
 
 
 /***/ },
@@ -33963,6 +34038,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var skybox;
 	        var dummyScene = new Scene();
+	        var size = 64;
 	        if (envMap instanceof Texture2D) {
 	            skybox = new Skydome({
 	                scene: dummyScene,
@@ -33970,14 +34046,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	        else {
+	            size = (envMap.image && envMap.image.px) ? envMap.image.px.width : envMap.width;
 	            skybox = new Skybox({
 	                scene: dummyScene,
 	                environmentMap: envMap
 	            });
 	        }
 	        // Convert to rgbm
-	        var width = 128;
-	        var height = 128;
+	        var width = Math.ceil(size / Math.pow(2, opts.lod));
+	        var height = Math.ceil(size / Math.pow(2, opts.lod));
 	        var rgbmTexture = new Texture2D({
 	            width: width,
 	            height: height
@@ -34029,7 +34106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	    module.exports = '0.3.0';
+	    module.exports = '0.3.1';
 
 
 /***/ },
