@@ -34110,7 +34110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	    module.exports = '0.3.1';
+	    module.exports = '0.3.2';
 
 
 /***/ },

@@ -1,6 +1,6 @@
 {
   "name" : "qtek",
-  "version" : "0.3.1",
+  "version" : "0.3.2",
   "description": "WebGL graphic library",
   "keywords": [
     "graphic",
