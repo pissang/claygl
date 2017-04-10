@@ -132,6 +132,10 @@ define(function (require) {
                 var point;
                 var indices = geometry.indices;
                 var positionsAttr = geometry.attributes.position;
+                // Check if valid.
+                if (!positionsAttr || !positionsAttr.value || !indices) {
+                    return;
+                }
                 for (var i = 0; i < indices.length; i += 3) {
                     var i1 = indices[i];
                     var i2 = indices[i + 1];
