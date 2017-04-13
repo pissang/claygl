@@ -61,6 +61,12 @@ uniform sampler2D lum;
 uniform sampler2D lut;
 #endif
 
+#ifdef COLOR_CORRECTION
+uniform float brightness : 0.0;
+uniform float contrast : 1.0;
+uniform float saturation : 1.0;
+#endif
+
 #ifdef VIGNETTE
 uniform float vignetteDarkness: 1.0;
 uniform float vignetteOffset: 1.0;
@@ -175,6 +181,16 @@ void main()
 // Color lut
 #ifdef LUT_ENABLED
     texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));
+#endif
+
+#ifdef COLOR_CORRECTION
+    // brightness
+    texel.rgb = clamp(texel.rgb + vec3(brightness), 0.0, 1.0);
+    // contrast
+    texel.rgb = clamp((texel.rgb - vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);
+    // saturation
+    float lum = dot(texel.rgb, vec3(0.2125, 0.7154, 0.0721));
+    texel.rgb = mix(vec3(lum), texel.rgb, saturation);
 #endif
 
 #ifdef VIGNETTE
