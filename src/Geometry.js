@@ -93,17 +93,17 @@ define(function(require) {
                 this.get = function (idx, out) {
                     var idx3 = idx * 3;
                     var arr = this.value;
-                    out[0] = arr[idx3++];
-                    out[1] = arr[idx3++];
-                    out[2] = arr[idx3++];
+                    out[0] = arr[idx3];
+                    out[1] = arr[idx3 + 1];
+                    out[2] = arr[idx3 + 2];
                     return out;
                 };
                 this.set = function (idx, val) {
                     var idx3 = idx * 3;
                     var arr = this.value;
-                    arr[idx3++] = val[0];
-                    arr[idx3++] = val[1];
-                    arr[idx3++] = val[2];
+                    arr[idx3] = val[0];
+                    arr[idx3 + 1] = val[1];
+                    arr[idx3 + 2] = val[2];
                 };
                 this.copy = function (target, source) {
                     var arr = this.value;
@@ -118,19 +118,19 @@ define(function(require) {
                 this.get = function (idx, out) {
                     var arr = this.value;
                     var idx4 = idx * 4;
-                    out[0] = arr[idx4++];
-                    out[1] = arr[idx4++];
-                    out[2] = arr[idx4++];
-                    out[3] = arr[idx4++];
+                    out[0] = arr[idx4];
+                    out[1] = arr[idx4 + 1];
+                    out[2] = arr[idx4 + 2];
+                    out[3] = arr[idx4 + 3];
                     return out;
                 };
                 this.set = function (idx, val) {
                     var arr = this.value;
                     var idx4 = idx * 4;
-                    arr[idx4++] = val[0];
-                    arr[idx4++] = val[1];
-                    arr[idx4++] = val[2];
-                    arr[idx4++] = val[3];
+                    arr[idx4] = val[0];
+                    arr[idx4 + 1] = val[1];
+                    arr[idx4 + 2] = val[2];
+                    arr[idx4 + 3] = val[3];
                 };
                 this.copy = function (target, source) {
                     var arr = this.value;

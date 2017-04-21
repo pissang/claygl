@@ -19,6 +19,7 @@ define(function(require) {
     // Light header
     var Shader = require('./Shader');
     Shader['import'](require('./shader/source/header/light'));
+    Shader['import'](require('./shader/source/prez.essl'));
 
     var glMatrix = require('./dep/glmatrix');
     var mat4 = glMatrix.mat4;
@@ -499,9 +500,13 @@ define(function(require) {
 
             var culledRenderQueue;
             if (preZ) {
-                var preZPassMaterial = new Material({
-                    shader: shaderLibrary.get('qtek.prez')
+                var preZPassMaterial = this._prezMaterial || new Material({
+                    shader: new Shader({
+                        vertex: Shader.source('qtek.prez.vertex'),
+                        fragment: Shader.source('qtek.prez.fragment')
+                    })
                 });
+                this._prezMaterial = preZPassMaterial;
                 var preZPassShader = preZPassMaterial.shader;
 
                 culledRenderQueue = [];
