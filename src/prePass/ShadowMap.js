@@ -174,8 +174,9 @@ define(function (require) {
                     matHashKey = nJoints;
                     shaderHashKey = nJoints;
                 }
-                var depthMaterial = this._depthMaterials[matHashKey];
-                var depthShader = this._depthShaders[shaderHashKey];
+                // Use custom shadow depth material
+                var depthMaterial = mesh.shadowDepthMaterial || this._depthMaterials[matHashKey];
+                var depthShader = mesh.shadowDepthMaterial ? mesh.shadowDepthMaterial.shader : this._depthShaders[shaderHashKey];
 
                 if (mesh.material !== depthMaterial) {  // Not binded yet
                     if (!depthShader) {
