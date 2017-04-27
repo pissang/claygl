@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		"deferred": {
 			"GBuffer": __webpack_require__(62),
-			"Renderer": __webpack_require__(69)
+			"Renderer": __webpack_require__(70)
 		},
 		"dep": {
 			"glmatrix": __webpack_require__(14)
@@ -140,11 +140,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		"FrameBuffer": __webpack_require__(44),
 		"Geometry": __webpack_require__(50),
 		"geometry": {
-			"Cone": __webpack_require__(71),
+			"Cone": __webpack_require__(72),
 			"Cube": __webpack_require__(84),
-			"Cylinder": __webpack_require__(72),
+			"Cylinder": __webpack_require__(73),
 			"Plane": __webpack_require__(48),
-			"Sphere": __webpack_require__(70)
+			"Sphere": __webpack_require__(71)
 		},
 		"Joint": __webpack_require__(85),
 		"Light": __webpack_require__(86),
@@ -17898,17 +17898,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.get = function (idx, out) {
 	                    var idx3 = idx * 3;
 	                    var arr = this.value;
-	                    out[0] = arr[idx3++];
-	                    out[1] = arr[idx3++];
-	                    out[2] = arr[idx3++];
+	                    out[0] = arr[idx3];
+	                    out[1] = arr[idx3 + 1];
+	                    out[2] = arr[idx3 + 2];
 	                    return out;
 	                };
 	                this.set = function (idx, val) {
 	                    var idx3 = idx * 3;
 	                    var arr = this.value;
-	                    arr[idx3++] = val[0];
-	                    arr[idx3++] = val[1];
-	                    arr[idx3++] = val[2];
+	                    arr[idx3] = val[0];
+	                    arr[idx3 + 1] = val[1];
+	                    arr[idx3 + 2] = val[2];
 	                };
 	                this.copy = function (target, source) {
 	                    var arr = this.value;
@@ -17923,19 +17923,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.get = function (idx, out) {
 	                    var arr = this.value;
 	                    var idx4 = idx * 4;
-	                    out[0] = arr[idx4++];
-	                    out[1] = arr[idx4++];
-	                    out[2] = arr[idx4++];
-	                    out[3] = arr[idx4++];
+	                    out[0] = arr[idx4];
+	                    out[1] = arr[idx4 + 1];
+	                    out[2] = arr[idx4 + 2];
+	                    out[3] = arr[idx4 + 3];
 	                    return out;
 	                };
 	                this.set = function (idx, val) {
 	                    var arr = this.value;
 	                    var idx4 = idx * 4;
-	                    arr[idx4++] = val[0];
-	                    arr[idx4++] = val[1];
-	                    arr[idx4++] = val[2];
-	                    arr[idx4++] = val[3];
+	                    arr[idx4] = val[0];
+	                    arr[idx4 + 1] = val[1];
+	                    arr[idx4 + 2] = val[2];
+	                    arr[idx4 + 3] = val[3];
 	                };
 	                this.copy = function (target, source) {
 	                    var arr = this.value;
@@ -21009,8 +21009,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    }
 
-	    Shader.import(__webpack_require__(67));
 	    Shader.import(__webpack_require__(68));
+	    Shader.import(__webpack_require__(69));
 
 	    var GBuffer = Base.extend(function () {
 
@@ -21386,6 +21386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Light header
 	    var Shader = __webpack_require__(52);
 	    Shader['import'](__webpack_require__(65));
+	    Shader['import'](__webpack_require__(67));
 
 	    var glMatrix = __webpack_require__(14);
 	    var mat4 = glMatrix.mat4;
@@ -21866,9 +21867,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var culledRenderQueue;
 	            if (preZ) {
-	                var preZPassMaterial = new Material({
-	                    shader: shaderLibrary.get('qtek.prez')
+	                var preZPassMaterial = this._prezMaterial || new Material({
+	                    shader: new Shader({
+	                        vertex: Shader.source('qtek.prez.vertex'),
+	                        fragment: Shader.source('qtek.prez.fragment')
+	                    })
 	                });
+	                this._prezMaterial = preZPassMaterial;
 	                var preZPassShader = preZPassMaterial.shader;
 
 	                culledRenderQueue = [];
@@ -22563,7 +22568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.deferred.gbuffer.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\n\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\n\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\n\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\n\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n\n\nvarying vec2 v_Texcoord;\nvarying vec4 v_ProjPos;\n\nvoid main()\n{\n\n    vec3 skinnedPosition = position;\n\n#ifdef FIRST_PASS\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n    bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n\n    #ifdef FIRST_PASS\n        skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    if (hasTangent) {\n        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n    }\n    #endif\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n\n#ifdef FIRST_PASS\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n\n    if (hasTangent) {\n        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n    }\n#endif\n\n    v_ProjPos = gl_Position;\n}\n\n\n@end\n\n\n@export qtek.deferred.gbuffer1.fragment\n\nuniform float glossiness;\n\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\n\nuniform sampler2D normalMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n\nuniform sampler2D roughnessMap;\n\nuniform bool useRoughnessMap;\n\nvarying vec4 v_ProjPos;\n\nvoid main()\n{\n    vec3 N = v_Normal;\n\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {             N = normalTexel * 2.0 - 1.0;\n            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n                        N = normalize(tbn * N);\n        }\n    }\n\n    gl_FragColor.rgb = (N + 1.0) * 0.5;\n\n            \n    float g = glossiness;\n\n    if (useRoughnessMap) {\n        vec4 glossTexel = texture2D(roughnessMap, v_Texcoord);\n                        g = clamp(-glossTexel.r + g * 2.0, 0.0, 1.0);\n    }\n\n\n    gl_FragColor.a = g;\n\n            }\n@end\n\n@export qtek.deferred.gbuffer2.fragment\n\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\n\nuniform vec3 color;\nuniform float metalness;\n\nuniform bool useMetalnessMap;\nuniform bool linear;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.srgb\n\nvoid main ()\n{\n    float m = metalness;\n\n    if (useMetalnessMap) {\n        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n    }\n    vec4 texel = texture2D(diffuseMap, v_Texcoord);\n    if (linear) {\n        texel = sRGBToLinear(texel);\n    }\n\n    gl_FragColor.rgb = texel.rgb * color;\n\n    gl_FragColor.a = m;\n}\n\n@end\n\n\n@export qtek.deferred.gbuffer.debug\n\n@import qtek.deferred.chunk.light_head\nuniform int debug: 0;\n\nvoid main ()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n\n    if (debug == 0) {\n        gl_FragColor = vec4(N, 1.0);\n    }\n    else if (debug == 1) {\n        gl_FragColor = vec4(vec3(z), 1.0);\n    }\n    else if (debug == 2) {\n        gl_FragColor = vec4(position, 1.0);\n    }\n    else if (debug == 3) {\n        gl_FragColor = vec4(vec3(glossiness), 1.0);\n    }\n    else if (debug == 4) {\n        gl_FragColor = vec4(vec3(metalness), 1.0);\n    }\n    else {\n        gl_FragColor = vec4(albedo, 1.0);\n    }\n}\n@end";
+	module.exports = "@export qtek.prez.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\n\nattribute vec3 position : POSITION;\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvoid main()\n{\n\n    vec3 skinnedPosition = position;\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n\n@end\n\n\n@export qtek.prez.fragment\n\nvoid main()\n{\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n\n@end";
 
 
 /***/ },
@@ -22571,11 +22576,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.deferred.chunk.light_head\n\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\n\nuniform vec2 windowSize: WINDOW_SIZE;\n\nuniform vec4 viewport: VIEWPORT;\n\nuniform mat4 viewProjectionInv;\n\n\n#ifdef DEPTH_ENCODED\n@import qtek.util.decode_float\n#endif\n\n@end\n\n@export qtek.deferred.chunk.gbuffer_read\n            \n        vec2 uv = gl_FragCoord.xy / windowSize;\n\n        vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    vec4 texel3 = texture2D(gBufferTexture3, uv);\n        if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n\n    float glossiness = texel1.a;\n    float metalness = texel3.a;\n\n                    vec3 N = texel1.rgb * 2.0 - 1.0;\n\n        float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n\n    vec2 xy = uv2 * 2.0 - 1.0;\n\n    vec4 projectedPos = vec4(xy, z, 1.0);\n    vec4 p4 = viewProjectionInv * projectedPos;\n\n    vec3 position = p4.xyz / p4.w;\n\n    vec3 albedo = texel3.rgb;\n\n    vec3 diffuseColor = albedo * (1.0 - metalness);\n    vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n\n@export qtek.deferred.chunk.light_equation\n\nfloat D_Phong(in float g, in float ndh) {\n        float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\n\nfloat D_GGX(in float g, in float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (3.1415926 * tmp * tmp);\n}\n\nvec3 F_Schlick(in float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\n\nvec3 lightEquation(\n    in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n    in float ndl, in float ndh, in float ndv, in float g\n)\n{\n    return ndl * lightColor\n        * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n\n@end";
+	module.exports = "@export qtek.deferred.gbuffer.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\n\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\n\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\n\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\n\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n\n\nvarying vec2 v_Texcoord;\nvarying vec4 v_ProjPos;\n\nvoid main()\n{\n\n    vec3 skinnedPosition = position;\n\n#ifdef FIRST_PASS\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n    bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n\n    #ifdef FIRST_PASS\n        skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    if (hasTangent) {\n        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n    }\n    #endif\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n\n#ifdef FIRST_PASS\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n\n    if (hasTangent) {\n        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n    }\n#endif\n\n    v_ProjPos = gl_Position;\n}\n\n\n@end\n\n\n@export qtek.deferred.gbuffer1.fragment\n\nuniform float glossiness;\n\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\n\nuniform sampler2D normalMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n\nuniform sampler2D roughnessMap;\n\nuniform bool useRoughnessMap;\n\nvarying vec4 v_ProjPos;\n\nvoid main()\n{\n    vec3 N = v_Normal;\n\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {             N = normalTexel * 2.0 - 1.0;\n            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n                        N = normalize(tbn * N);\n        }\n    }\n\n    gl_FragColor.rgb = (N + 1.0) * 0.5;\n\n            \n    float g = glossiness;\n\n    if (useRoughnessMap) {\n        vec4 glossTexel = texture2D(roughnessMap, v_Texcoord);\n                        g = clamp(-glossTexel.r + g * 2.0, 0.0, 1.0);\n    }\n\n\n    gl_FragColor.a = g;\n\n            }\n@end\n\n@export qtek.deferred.gbuffer2.fragment\n\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\n\nuniform vec3 color;\nuniform float metalness;\n\nuniform bool useMetalnessMap;\nuniform bool linear;\n\nvarying vec2 v_Texcoord;\n\n@import qtek.util.srgb\n\nvoid main ()\n{\n    float m = metalness;\n\n    if (useMetalnessMap) {\n        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n    }\n    vec4 texel = texture2D(diffuseMap, v_Texcoord);\n    if (linear) {\n        texel = sRGBToLinear(texel);\n    }\n\n    gl_FragColor.rgb = texel.rgb * color;\n\n    gl_FragColor.a = m;\n}\n\n@end\n\n\n@export qtek.deferred.gbuffer.debug\n\n@import qtek.deferred.chunk.light_head\nuniform int debug: 0;\n\nvoid main ()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n\n    if (debug == 0) {\n        gl_FragColor = vec4(N, 1.0);\n    }\n    else if (debug == 1) {\n        gl_FragColor = vec4(vec3(z), 1.0);\n    }\n    else if (debug == 2) {\n        gl_FragColor = vec4(position, 1.0);\n    }\n    else if (debug == 3) {\n        gl_FragColor = vec4(vec3(glossiness), 1.0);\n    }\n    else if (debug == 4) {\n        gl_FragColor = vec4(vec3(metalness), 1.0);\n    }\n    else {\n        gl_FragColor = vec4(albedo, 1.0);\n    }\n}\n@end";
 
 
 /***/ },
 /* 69 */
+/***/ function(module, exports) {
+
+	
+	module.exports = "@export qtek.deferred.chunk.light_head\n\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\n\nuniform vec2 windowSize: WINDOW_SIZE;\n\nuniform vec4 viewport: VIEWPORT;\n\nuniform mat4 viewProjectionInv;\n\n\n#ifdef DEPTH_ENCODED\n@import qtek.util.decode_float\n#endif\n\n@end\n\n@export qtek.deferred.chunk.gbuffer_read\n            \n        vec2 uv = gl_FragCoord.xy / windowSize;\n\n        vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    vec4 texel3 = texture2D(gBufferTexture3, uv);\n        if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n\n    float glossiness = texel1.a;\n    float metalness = texel3.a;\n\n                    vec3 N = texel1.rgb * 2.0 - 1.0;\n\n        float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n\n    vec2 xy = uv2 * 2.0 - 1.0;\n\n    vec4 projectedPos = vec4(xy, z, 1.0);\n    vec4 p4 = viewProjectionInv * projectedPos;\n\n    vec3 position = p4.xyz / p4.w;\n\n    vec3 albedo = texel3.rgb;\n\n    vec3 diffuseColor = albedo * (1.0 - metalness);\n    vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n\n@export qtek.deferred.chunk.light_equation\n\nfloat D_Phong(in float g, in float ndh) {\n        float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\n\nfloat D_GGX(in float g, in float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (3.1415926 * tmp * tmp);\n}\n\nvec3 F_Schlick(in float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\n\nvec3 lightEquation(\n    in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n    in float ndl, in float ndh, in float ndv, in float g\n)\n{\n    return ndl * lightColor\n        * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n\n@end";
+
+
+/***/ },
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22591,18 +22604,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var Texture2D = __webpack_require__(39);
 	    var Texture = __webpack_require__(40);
 	    var Mesh = __webpack_require__(54);
-	    var SphereGeo = __webpack_require__(70);
-	    var ConeGeo = __webpack_require__(71);
-	    var CylinderGeo = __webpack_require__(72);
+	    var SphereGeo = __webpack_require__(71);
+	    var ConeGeo = __webpack_require__(72);
+	    var CylinderGeo = __webpack_require__(73);
 	    var Matrix4 = __webpack_require__(25);
 	    var Vector3 = __webpack_require__(23);
 	    var GBuffer = __webpack_require__(62);
 
-	    Shader.import(__webpack_require__(73));
 	    Shader.import(__webpack_require__(74));
+	    Shader.import(__webpack_require__(75));
 
 	    // Light shaders
-	    Shader.import(__webpack_require__(75));
 	    Shader.import(__webpack_require__(76));
 	    Shader.import(__webpack_require__(77));
 	    Shader.import(__webpack_require__(78));
@@ -22610,8 +22622,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Shader.import(__webpack_require__(80));
 	    Shader.import(__webpack_require__(81));
 	    Shader.import(__webpack_require__(82));
-
 	    Shader.import(__webpack_require__(83));
+
+	    Shader.import(__webpack_require__(67));
 
 	    var errorShader = {};
 
@@ -23299,7 +23312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23451,7 +23464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23600,14 +23613,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 
 	    var StaticGeometry = __webpack_require__(49);
-	    var ConeGeometry = __webpack_require__(71);
+	    var ConeGeometry = __webpack_require__(72);
 
 	    /**
 	     * @constructor qtek.geometry.Cylinder
@@ -23670,7 +23683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports) {
 
 	
@@ -23678,7 +23691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports) {
 
 	
@@ -23686,7 +23699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports) {
 
 	
@@ -23694,7 +23707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports) {
 
 	
@@ -23702,7 +23715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports) {
 
 	
@@ -23710,7 +23723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports) {
 
 	
@@ -23718,7 +23731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 79 */
+/* 80 */
 /***/ function(module, exports) {
 
 	
@@ -23726,7 +23739,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports) {
 
 	
@@ -23734,7 +23747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports) {
 
 	
@@ -23742,19 +23755,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 82 */
-/***/ function(module, exports) {
-
-	
-	module.exports = "@export qtek.deferred.tube_light\n\n@import qtek.deferred.chunk.light_head\n\n@import qtek.util.calculate_attenuation\n\n@import qtek.deferred.chunk.light_equation\n\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 lightExtend;\n\nuniform vec3 eyePosition;\n\nvarying vec3 v_Position;\n\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n\n    vec3 L = lightPosition - position;\n\n    vec3 V = normalize(eyePosition - position);\n\n        vec3 R = reflect(V, N);\n\n    vec3 L0 = lightPosition - lightExtend - position;\n    vec3 L1 = lightPosition + lightExtend - position;\n    vec3 LD = L1 - L0;\n\n    float len0 = length(L0);\n    float len1 = length(L1);\n    float irra = 2.0 * clamp(dot(N, L0) / (2.0 * len0) + dot(N, L1) / (2.0 * len1), 0.0, 1.0);\n\n    float LDDotR = dot(R, LD);\n    float t = (LDDotR * dot(R, L0) - dot(L0, LD)) / (dot(LD, LD) - LDDotR * LDDotR);\n    t = clamp(t, 0.0, 1.0);\n    L = L0 + t * LD;\n        float dist = length(L);\n    L /= dist;\n\n    vec3 H = normalize(L + V);\n\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n\n        glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);\n\n    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)\n        * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));\n\n        gl_FragColor.a = 1.0;\n}\n@end";
-
-
-/***/ },
 /* 83 */
 /***/ function(module, exports) {
 
 	
-	module.exports = "@export qtek.prez.vertex\n\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\n\nattribute vec3 position : POSITION;\n\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\n#endif\n\nvoid main()\n{\n\n    vec3 skinnedPosition = position;\n\n#ifdef SKINNING\n\n    @import qtek.chunk.skin_matrix\n\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n\n@end\n\n\n@export qtek.prez.fragment\n\nvoid main()\n{\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n\n@end";
+	module.exports = "@export qtek.deferred.tube_light\n\n@import qtek.deferred.chunk.light_head\n\n@import qtek.util.calculate_attenuation\n\n@import qtek.deferred.chunk.light_equation\n\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 lightExtend;\n\nuniform vec3 eyePosition;\n\nvarying vec3 v_Position;\n\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n\n    vec3 L = lightPosition - position;\n\n    vec3 V = normalize(eyePosition - position);\n\n        vec3 R = reflect(V, N);\n\n    vec3 L0 = lightPosition - lightExtend - position;\n    vec3 L1 = lightPosition + lightExtend - position;\n    vec3 LD = L1 - L0;\n\n    float len0 = length(L0);\n    float len1 = length(L1);\n    float irra = 2.0 * clamp(dot(N, L0) / (2.0 * len0) + dot(N, L1) / (2.0 * len1), 0.0, 1.0);\n\n    float LDDotR = dot(R, LD);\n    float t = (LDDotR * dot(R, L0) - dot(L0, LD)) / (dot(LD, LD) - LDDotR * LDDotR);\n    t = clamp(t, 0.0, 1.0);\n    L = L0 + t * LD;\n        float dist = length(L);\n    L /= dist;\n\n    vec3 H = normalize(L + V);\n\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n\n        glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);\n\n    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)\n        * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));\n\n        gl_FragColor.a = 1.0;\n}\n@end";
 
 
 /***/ },
@@ -25311,7 +25316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 
 	    var Mesh = __webpack_require__(54);
-	    var SphereGeometry = __webpack_require__(70);
+	    var SphereGeometry = __webpack_require__(71);
 	    var Shader = __webpack_require__(52);
 	    var Material = __webpack_require__(53);
 
@@ -28418,7 +28423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var Shader = __webpack_require__(52);
 
 
-	    Shader['import'](__webpack_require__(73));
+	    Shader['import'](__webpack_require__(74));
 
 	    // Some build in shaders
 	    Shader['import'](__webpack_require__(96));
@@ -28426,7 +28431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Shader['import'](__webpack_require__(110));
 	    Shader['import'](__webpack_require__(114));
 	    Shader['import'](__webpack_require__(91));
-	    Shader['import'](__webpack_require__(83));
+	    Shader['import'](__webpack_require__(67));
 
 	    library.template('qtek.basic', Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
 	    library.template('qtek.lambert', Shader.source('qtek.lambert.vertex'), Shader.source('qtek.lambert.fragment'));
@@ -32398,8 +32403,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    matHashKey = nJoints;
 	                    shaderHashKey = nJoints;
 	                }
-	                var depthMaterial = this._depthMaterials[matHashKey];
-	                var depthShader = this._depthShaders[shaderHashKey];
+	                // Use custom shadow depth material
+	                var depthMaterial = mesh.shadowDepthMaterial || this._depthMaterials[matHashKey];
+	                var depthShader = mesh.shadowDepthMaterial ? mesh.shadowDepthMaterial.shader : this._depthShaders[shaderHashKey];
 
 	                if (mesh.material !== depthMaterial) {  // Not binded yet
 	                    if (!depthShader) {
