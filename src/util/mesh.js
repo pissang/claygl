@@ -332,6 +332,7 @@ define(function(require) {
                         subGeo.indices[indicesOffset++] = newIndices[idx];
                     }
                 }
+                subGeo.updateBoundingBox();
 
                 root.add(subMesh);
             }
