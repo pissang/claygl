@@ -496,7 +496,13 @@ def CreateSkin():
 
     return lSkinName
 
-def ConvertMesh(pMesh, pNode, pSkin, pClusters):
+_defaultMaterialName = 'DEFAULT_MAT_'
+_defaultMaterialIndex = 0
+
+def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
+
+    global _defaultMaterialIndex;
+
     lGLTFPrimitive = {}
     lPositions = []
     lNormals = []
@@ -518,13 +524,16 @@ def ConvertMesh(pMesh, pNode, pSkin, pClusters):
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
+        lMaterial = None;
         if not lLayerMaterial:
             print("Mesh " + pNode.GetName() + " doesn't have material")
-            return None
-        # Mapping Mode of material must be eAllSame
-        # Because the mesh has been splitted by material
-        idx = lLayerMaterial.GetIndexArray()[0];
-        lMaterial = pNode.GetMaterial(idx)
+            lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
+            _defaultMaterialIndex += 1;
+        else:
+            # Mapping Mode of material must be eAllSame
+            # Because the mesh has been splitted by material
+            idx = lLayerMaterial.GetIndexArray()[0];
+            lMaterial = pNode.GetMaterial(idx)
         lMaterialKey = ConvertMaterial(lMaterial)
         lGLTFPrimitive["material"] = lMaterialKey
 
@@ -770,7 +779,7 @@ def ConvertCamera(pCamera):
     lib_cameras[lCameraName] = lGLTFCamera
     return lCameraName
 
-def ConvertSceneNode(pNode, fbxConverter):
+def ConvertSceneNode(pScene, pNode, fbxConverter):
     lGLTFNode = {}
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = lNodeName
@@ -821,7 +830,7 @@ def ConvertSceneNode(pNode, fbxConverter):
         for i in range(pNode.GetNodeAttributeCount()):
             lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
             if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
-                lPrimitive = ConvertMesh(lNodeAttribute, pNode, lGLTFSkin, lClusters)
+                lPrimitive = ConvertMesh(pScene, lNodeAttribute, pNode, lGLTFSkin, lClusters)
                 if not lPrimitive == None:
                     lGLTFMesh["primitives"].append(lPrimitive)
 
@@ -921,7 +930,7 @@ def ConvertSceneNode(pNode, fbxConverter):
 
     lGLTFNode['children'] = []
     for i in range(pNode.GetChildCount()):
-        lChildNodeName = ConvertSceneNode(pNode.GetChild(i), fbxConverter)
+        lChildNodeName = ConvertSceneNode(pScene, pNode.GetChild(i), fbxConverter)
         lGLTFNode['children'].append(lChildNodeName)
 
     return lNodeName
@@ -936,7 +945,7 @@ def ConvertScene(pScene, fbxConverter):
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
 
     for i in range(lRoot.GetChildCount()):
-        lNodeName = ConvertSceneNode(lRoot.GetChild(i), fbxConverter)
+        lNodeName = ConvertSceneNode(pScene, lRoot.GetChild(i), fbxConverter)
         lGLTFScene['nodes'].append(lNodeName)
 
     return lSceneName
