@@ -250,9 +250,9 @@ define(function(require) {
                         subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
                         shaders[subJointNumber] = subShader;
                     }
-                    material.attachShader(subShader, true);
+                    subMat.attachShader(subShader, true);
                 }
-                material.name = [material.name, b].join('-');
+                subMat.name = [material.name, b].join('-');
 
                 var subGeo = new StaticGeometry();
 
