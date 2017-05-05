@@ -182,5 +182,44 @@ define(function(require) {
         }
     });
 
+    Object.defineProperty(Texture2D.prototype, 'width', {
+        get: function () {
+            if (this.image) {
+                return this.image.width;
+            }
+            return this._width;
+        },
+        set: function (value) {
+            if (this.image) {
+                console.warn('Texture from image can\'t set width');
+            }
+            else {
+                if (this._width !== value) {
+                    this.dirty();
+                }
+                this._width = value;
+            }
+        }
+    });
+    Object.defineProperty(Texture2D.prototype, 'height', {
+        get: function () {
+            if (this.image) {
+                return this.image.height;
+            }
+            return this._height;
+        },
+        set: function (value) {
+            if (this.image) {
+                console.warn('Texture from image can\'t set height');
+            }
+            else {
+                if (this._height !== value) {
+                    this.dirty();
+                }
+                this._height = value;
+            }
+        }
+    });
+
     return Texture2D;
 });

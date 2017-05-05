@@ -256,7 +256,8 @@ define(function(require) {
                         // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
                         if (vao.vao == null) {
                             vao.vao = vaoExt.createVertexArrayOES();
-                        } else {
+                        }
+                        else {
                             needsBindAttributes = false;
                         }
                         vaoExt.bindVertexArrayOES(vao.vao);

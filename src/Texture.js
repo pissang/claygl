@@ -118,7 +118,9 @@ define(function (require) {
          * Mark texture is dirty and update in the next frame
          */
         dirty: function () {
-            this._cache.dirtyAll();
+            if (this._cache) {
+                this._cache.dirtyAll();
+            }
         },
 
         update: function (_gl) {},
@@ -212,6 +214,23 @@ define(function (require) {
         isRenderable: function () {},
 
         isPowerOfTwo: function () {}
+    });
+
+    Object.defineProperty(Texture.prototype, 'width', {
+        get: function () {
+            return this._width;
+        },
+        set: function (value) {
+            this._width = value;
+        }
+    });
+    Object.defineProperty(Texture.prototype, 'height', {
+        get: function () {
+            return this._height;
+        },
+        set: function (value) {
+            this._height = value;
+        }
     });
 
     /* DataType */

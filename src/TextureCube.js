@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     var Texture = require('./Texture');
     var glinfo = require('./core/glinfo');
@@ -29,14 +29,14 @@ define(function(require) {
      *     });
      *     mat.set('environmentMap', envMap);
      *     ...
-     *     envMap.success(function() {
+     *     envMap.success(function () {
      *         // Wait for the sky texture loaded
-     *         animation.on('frame', function(frameTime) {
+     *         animation.on('frame', function (frameTime) {
      *             renderer.render(scene, camera);
      *         });
      *     });
      */
-    var TextureCube = Texture.extend(function() {
+    var TextureCube = Texture.extend(function () {
         return /** @lends qtek.TextureCube# */{
             /**
              * @type {Object}
@@ -79,7 +79,7 @@ define(function(require) {
             mipmaps: []
        };
     }, {
-        update: function(_gl) {
+        update: function (_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
@@ -145,24 +145,24 @@ define(function(require) {
          * @param  {WebGLRenderingContext} _gl
          * @memberOf qtek.TextureCube.prototype
          */
-        generateMipmap: function(_gl) {
+        generateMipmap: function (_gl) {
             if (this.useMipmap && !this.NPOT) {
                 _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
                 _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
             }
         },
 
-        bind: function(_gl) {
+        bind: function (_gl) {
 
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
         },
 
-        unbind: function(_gl) {
+        unbind: function (_gl) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
         },
 
         // Overwrite the isPowerOfTwo method
-        isPowerOfTwo: function() {
+        isPowerOfTwo: function () {
             if (this.image.px) {
                 return isPowerOfTwo(this.image.px.width)
                     && isPowerOfTwo(this.image.px.height);
@@ -173,7 +173,7 @@ define(function(require) {
             }
         },
 
-        isRenderable: function() {
+        isRenderable: function () {
             if (this.image.px) {
                 return isImageRenderable(this.image.px)
                     && isImageRenderable(this.image.nx)
@@ -187,12 +187,12 @@ define(function(require) {
             }
         },
 
-        load: function(imageList) {
+        load: function (imageList) {
             var loading = 0;
             var self = this;
-            util.each(imageList, function(src, target){
+            util.each(imageList, function (src, target){
                 var image = new Image();
-                image.onload = function() {
+                image.onload = function () {
                     loading --;
                     if (loading === 0){
                         self.dirty();
@@ -200,7 +200,7 @@ define(function(require) {
                     }
                     image.onload = null;
                 };
-                image.onerror = function() {
+                image.onerror = function () {
                     loading --;
                     image.onerror = null;
                 };
@@ -214,6 +214,44 @@ define(function(require) {
         }
     });
 
+    Object.defineProperty(TextureCube.prototype, 'width', {
+        get: function () {
+            if (this.image && this.image.px) {
+                return this.image.px.width;
+            }
+            return this._width;
+        },
+        set: function (value) {
+            if (this.image && this.image.px) {
+                console.warn('Texture from image can\'t set width');
+            }
+            else {
+                if (this._width !== value) {
+                    this.dirty();
+                }
+                this._width = value;
+            }
+        }
+    });
+    Object.defineProperty(TextureCube.prototype, 'height', {
+        get: function () {
+            if (this.image && this.image.px) {
+                return this.image.px.height;
+            }
+            return this._height;
+        },
+        set: function (value) {
+            if (this.image && this.image.px) {
+                console.warn('Texture from image can\'t set height');
+            }
+            else {
+                if (this._height !== value) {
+                    this.dirty();
+                }
+                this._height = value;
+            }
+        }
+    });
     function isImageRenderable(image) {
         return image.nodeName === 'CANVAS' ||
                 image.nodeName === 'VIDEO' ||

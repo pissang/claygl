@@ -237,15 +237,12 @@ define(function (require) {
             }
             this._gBufferTex1.width = width;
             this._gBufferTex1.height = height;
-            this._gBufferTex1.dirty();
 
             this._gBufferTex2.width = width;
             this._gBufferTex2.height = height;
-            this._gBufferTex2.dirty();
 
             this._gBufferTex3.width = width;
             this._gBufferTex3.height = height;
-            this._gBufferTex3.dirty();
         },
 
         // TODO is dpr needed?

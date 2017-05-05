@@ -230,7 +230,6 @@ define(function (require) {
         resize: function (width, height) {
             this._lightAccumTex.width = width;
             this._lightAccumTex.height = height;
-            this._lightAccumTex.dirty();
 
             // PENDING viewport ?
             this._gBuffer.resize(width, height);
