@@ -155,6 +155,7 @@ define(function(require) {
             var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
             var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+            // var vaoExt = null;
 
             var isStatic = !geometry.dynamic;
 

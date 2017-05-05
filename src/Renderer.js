@@ -446,6 +446,11 @@ define(function(require) {
         resetRenderStatus: function () {
             this._currentShader = null;
         },
+
+        ifRenderObject: function (obj) {
+            return true;
+        },
+
         /**
          * Render a single renderable list in camera in sequence
          * @param  {qtek.Renderable[]} queue       List of all renderables.
@@ -516,6 +521,10 @@ define(function(require) {
                 _gl.enable(_gl.DEPTH_TEST);
                 for (var i = 0; i < queue.length; i++) {
                     var renderable = queue[i];
+                    if (!this.ifRenderObject(renderable)) {
+                        continue;
+                    }
+
                     var worldM = renderable.worldTransform._array;
                     var geometry = renderable.geometry;
 
@@ -563,6 +572,7 @@ define(function(require) {
             }
             else {
                 culledRenderQueue = queue;
+                _gl.depthFunc(_gl.LESS);
             }
 
             culling = null;
@@ -571,6 +581,10 @@ define(function(require) {
 
             for (var i = 0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
+                if (!this.ifRenderObject(renderable)) {
+                    continue;
+                }
+
                 var geometry = renderable.geometry;
 
                 var worldM = renderable.worldTransform._array;
@@ -725,11 +739,6 @@ define(function(require) {
                 // After render hook
                 this.afterRenderObject(renderable, objectRenderInfo);
                 renderable.afterRender(_gl, objectRenderInfo);
-            }
-
-            if (preZ) {
-                // default depth func
-                _gl.depthFunc(_gl.LESS);
             }
 
             return renderInfo;
