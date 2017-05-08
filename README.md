@@ -1,4 +1,4 @@
-#QTEK
+# QTEK
 
 QTEK is a WebGL graphic library.
 
