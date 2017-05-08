@@ -194,15 +194,16 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		"plugin": {
 			"FirstPersonControl": __webpack_require__(144),
-			"InfinitePlane": __webpack_require__(145),
-			"OrbitControl": __webpack_require__(146),
+			"GestureMgr": __webpack_require__(145),
+			"InfinitePlane": __webpack_require__(146),
+			"OrbitControl": __webpack_require__(147),
 			"Skybox": __webpack_require__(90),
 			"Skydome": __webpack_require__(95)
 		},
 		"prePass": {
 			"EnvironmentMap": __webpack_require__(93),
-			"Reflection": __webpack_require__(147),
-			"ShadowMap": __webpack_require__(148)
+			"Reflection": __webpack_require__(148),
+			"ShadowMap": __webpack_require__(149)
 		},
 		"Renderable": __webpack_require__(55),
 		"Renderer": __webpack_require__(63),
@@ -227,16 +228,16 @@ return /******/ (function(modules) { // webpackBootstrap
 			"cubemap": __webpack_require__(89),
 			"dds": __webpack_require__(97),
 			"delaunay": __webpack_require__(12),
-			"earClipping": __webpack_require__(150),
+			"earClipping": __webpack_require__(151),
 			"hdr": __webpack_require__(98),
-			"mesh": __webpack_require__(151),
-			"sh": __webpack_require__(152),
+			"mesh": __webpack_require__(152),
+			"sh": __webpack_require__(153),
 			"texture": __webpack_require__(94)
 		},
-		"version": __webpack_require__(154),
+		"version": __webpack_require__(155),
 		"vr": {
-			"CardboardDistorter": __webpack_require__(155),
-			"StereoCamera": __webpack_require__(157)
+			"CardboardDistorter": __webpack_require__(156),
+			"StereoCamera": __webpack_require__(158)
 		}
 	};
 
@@ -15272,6 +15273,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 
+	    Object.defineProperty(Texture2D.prototype, 'width', {
+	        get: function () {
+	            if (this.image) {
+	                return this.image.width;
+	            }
+	            return this._width;
+	        },
+	        set: function (value) {
+	            if (this.image) {
+	                console.warn('Texture from image can\'t set width');
+	            }
+	            else {
+	                if (this._width !== value) {
+	                    this.dirty();
+	                }
+	                this._width = value;
+	            }
+	        }
+	    });
+	    Object.defineProperty(Texture2D.prototype, 'height', {
+	        get: function () {
+	            if (this.image) {
+	                return this.image.height;
+	            }
+	            return this._height;
+	        },
+	        set: function (value) {
+	            if (this.image) {
+	                console.warn('Texture from image can\'t set height');
+	            }
+	            else {
+	                if (this._height !== value) {
+	                    this.dirty();
+	                }
+	                this._height = value;
+	            }
+	        }
+	    });
+
 	    module.exports = Texture2D;
 
 
@@ -15398,7 +15438,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Mark texture is dirty and update in the next frame
 	         */
 	        dirty: function () {
-	            this._cache.dirtyAll();
+	            if (this._cache) {
+	                this._cache.dirtyAll();
+	            }
 	        },
 
 	        update: function (_gl) {},
@@ -15492,6 +15534,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isRenderable: function () {},
 
 	        isPowerOfTwo: function () {}
+	    });
+
+	    Object.defineProperty(Texture.prototype, 'width', {
+	        get: function () {
+	            return this._width;
+	        },
+	        set: function (value) {
+	            this._width = value;
+	        }
+	    });
+	    Object.defineProperty(Texture.prototype, 'height', {
+	        get: function () {
+	            return this._height;
+	        },
+	        set: function (value) {
+	            this._height = value;
+	        }
 	    });
 
 	    /* DataType */
@@ -16251,14 +16310,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *     });
 	     *     mat.set('environmentMap', envMap);
 	     *     ...
-	     *     envMap.success(function() {
+	     *     envMap.success(function () {
 	     *         // Wait for the sky texture loaded
-	     *         animation.on('frame', function(frameTime) {
+	     *         animation.on('frame', function (frameTime) {
 	     *             renderer.render(scene, camera);
 	     *         });
 	     *     });
 	     */
-	    var TextureCube = Texture.extend(function() {
+	    var TextureCube = Texture.extend(function () {
 	        return /** @lends qtek.TextureCube# */{
 	            /**
 	             * @type {Object}
@@ -16301,7 +16360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            mipmaps: []
 	       };
 	    }, {
-	        update: function(_gl) {
+	        update: function (_gl) {
 
 	            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
@@ -16367,24 +16426,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param  {WebGLRenderingContext} _gl
 	         * @memberOf qtek.TextureCube.prototype
 	         */
-	        generateMipmap: function(_gl) {
+	        generateMipmap: function (_gl) {
 	            if (this.useMipmap && !this.NPOT) {
 	                _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 	                _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
 	            }
 	        },
 
-	        bind: function(_gl) {
+	        bind: function (_gl) {
 
 	            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
 	        },
 
-	        unbind: function(_gl) {
+	        unbind: function (_gl) {
 	            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
 	        },
 
 	        // Overwrite the isPowerOfTwo method
-	        isPowerOfTwo: function() {
+	        isPowerOfTwo: function () {
 	            if (this.image.px) {
 	                return isPowerOfTwo(this.image.px.width)
 	                    && isPowerOfTwo(this.image.px.height);
@@ -16395,7 +16454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        },
 
-	        isRenderable: function() {
+	        isRenderable: function () {
 	            if (this.image.px) {
 	                return isImageRenderable(this.image.px)
 	                    && isImageRenderable(this.image.nx)
@@ -16409,12 +16468,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        },
 
-	        load: function(imageList) {
+	        load: function (imageList) {
 	            var loading = 0;
 	            var self = this;
-	            util.each(imageList, function(src, target){
+	            util.each(imageList, function (src, target){
 	                var image = new Image();
-	                image.onload = function() {
+	                image.onload = function () {
 	                    loading --;
 	                    if (loading === 0){
 	                        self.dirty();
@@ -16422,7 +16481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                    image.onload = null;
 	                };
-	                image.onerror = function() {
+	                image.onerror = function () {
 	                    loading --;
 	                    image.onerror = null;
 	                };
@@ -16436,6 +16495,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 
+	    Object.defineProperty(TextureCube.prototype, 'width', {
+	        get: function () {
+	            if (this.image && this.image.px) {
+	                return this.image.px.width;
+	            }
+	            return this._width;
+	        },
+	        set: function (value) {
+	            if (this.image && this.image.px) {
+	                console.warn('Texture from image can\'t set width');
+	            }
+	            else {
+	                if (this._width !== value) {
+	                    this.dirty();
+	                }
+	                this._width = value;
+	            }
+	        }
+	    });
+	    Object.defineProperty(TextureCube.prototype, 'height', {
+	        get: function () {
+	            if (this.image && this.image.px) {
+	                return this.image.px.height;
+	            }
+	            return this._height;
+	        },
+	        set: function (value) {
+	            if (this.image && this.image.px) {
+	                console.warn('Texture from image can\'t set height');
+	            }
+	            else {
+	                if (this._height !== value) {
+	                    this.dirty();
+	                }
+	                this._height = value;
+	            }
+	        }
+	    });
 	    function isImageRenderable(image) {
 	        return image.nodeName === 'CANVAS' ||
 	                image.nodeName === 'VIDEO' ||
@@ -18627,7 +18724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param  {string} symbol
 	         */
 	        isDefined: function (shaderType, symbol) {
-	            switch(shaderType) {
+	            switch (shaderType) {
 	                case 'vertex':
 	                    return this.vertexDefines[symbol] !== undefined;
 	                case 'fragment':
@@ -20064,6 +20161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
 	            var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+	            // var vaoExt = null;
 
 	            var isStatic = !geometry.dynamic;
 
@@ -20164,7 +20262,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
 	                        if (vao.vao == null) {
 	                            vao.vao = vaoExt.createVertexArrayOES();
-	                        } else {
+	                        }
+	                        else {
 	                            needsBindAttributes = false;
 	                        }
 	                        vaoExt.bindVertexArrayOES(vao.vao);
@@ -20884,6 +20983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
+	    // TODO Use globalShader insteadof globalMaterial?
 	    function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
 
 	        var previousNormalMap;
@@ -21084,15 +21184,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            this._gBufferTex1.width = width;
 	            this._gBufferTex1.height = height;
-	            this._gBufferTex1.dirty();
 
 	            this._gBufferTex2.width = width;
 	            this._gBufferTex2.height = height;
-	            this._gBufferTex2.dirty();
 
 	            this._gBufferTex3.width = width;
 	            this._gBufferTex3.height = height;
-	            this._gBufferTex3.dirty();
 	        },
 
 	        // TODO is dpr needed?
@@ -21813,6 +21910,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        resetRenderStatus: function () {
 	            this._currentShader = null;
 	        },
+
+	        ifRenderObject: function (obj) {
+	            return true;
+	        },
+
 	        /**
 	         * Render a single renderable list in camera in sequence
 	         * @param  {qtek.Renderable[]} queue       List of all renderables.
@@ -21883,6 +21985,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _gl.enable(_gl.DEPTH_TEST);
 	                for (var i = 0; i < queue.length; i++) {
 	                    var renderable = queue[i];
+	                    if (!this.ifRenderObject(renderable)) {
+	                        continue;
+	                    }
+
 	                    var worldM = renderable.worldTransform._array;
 	                    var geometry = renderable.geometry;
 
@@ -21930,6 +22036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else {
 	                culledRenderQueue = queue;
+	                _gl.depthFunc(_gl.LESS);
 	            }
 
 	            culling = null;
@@ -21938,6 +22045,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            for (var i = 0; i < culledRenderQueue.length; i++) {
 	                var renderable = culledRenderQueue[i];
+	                if (!this.ifRenderObject(renderable)) {
+	                    continue;
+	                }
+
 	                var geometry = renderable.geometry;
 
 	                var worldM = renderable.worldTransform._array;
@@ -22092,11 +22203,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // After render hook
 	                this.afterRenderObject(renderable, objectRenderInfo);
 	                renderable.afterRender(_gl, objectRenderInfo);
-	            }
-
-	            if (preZ) {
-	                // default depth func
-	                _gl.depthFunc(_gl.LESS);
 	            }
 
 	            return renderInfo;
@@ -22822,7 +22928,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        resize: function (width, height) {
 	            this._lightAccumTex.width = width;
 	            this._lightAccumTex.height = height;
-	            this._lightAccumTex.dirty();
 
 	            // PENDING viewport ?
 	            this._gBuffer.resize(width, height);
@@ -31758,6 +31863,127 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 145 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/**
+	 * Only implements needed gestures for mobile.
+	 */
+
+
+	    var GestureMgr = function () {
+
+	        /**
+	         * @private
+	         * @type {Array.<Object>}
+	         */
+	        this._track = [];
+	    };
+
+	    GestureMgr.prototype = {
+
+	        constructor: GestureMgr,
+
+	        recognize: function (event, target, root) {
+	            this._doTrack(event, target, root);
+	            return this._recognize(event);
+	        },
+
+	        clear: function () {
+	            this._track.length = 0;
+	            return this;
+	        },
+
+	        _doTrack: function (event, target, root) {
+	            var touches = event.touches;
+
+	            if (!touches) {
+	                return;
+	            }
+
+	            var trackItem = {
+	                points: [],
+	                touches: [],
+	                target: target,
+	                event: event
+	            };
+
+	            for (var i = 0, len = touches.length; i < len; i++) {
+	                var touch = touches[i];
+	                trackItem.points.push([touch.clientX, touch.clientY]);
+	                trackItem.touches.push(touch);
+	            }
+
+	            this._track.push(trackItem);
+	        },
+
+	        _recognize: function (event) {
+	            for (var eventName in recognizers) {
+	                if (recognizers.hasOwnProperty(eventName)) {
+	                    var gestureInfo = recognizers[eventName](this._track, event);
+	                    if (gestureInfo) {
+	                        return gestureInfo;
+	                    }
+	                }
+	            }
+	        }
+	    };
+
+	    function dist(pointPair) {
+	        var dx = pointPair[1][0] - pointPair[0][0];
+	        var dy = pointPair[1][1] - pointPair[0][1];
+
+	        return Math.sqrt(dx * dx + dy * dy);
+	    }
+
+	    function center(pointPair) {
+	        return [
+	            (pointPair[0][0] + pointPair[1][0]) / 2,
+	            (pointPair[0][1] + pointPair[1][1]) / 2
+	        ];
+	    }
+
+	    var recognizers = {
+
+	        pinch: function (track, event) {
+	            var trackLen = track.length;
+
+	            if (!trackLen) {
+	                return;
+	            }
+
+	            var pinchEnd = (track[trackLen - 1] || {}).points;
+	            var pinchPre = (track[trackLen - 2] || {}).points || pinchEnd;
+
+	            if (pinchPre
+	                && pinchPre.length > 1
+	                && pinchEnd
+	                && pinchEnd.length > 1
+	            ) {
+	                var pinchScale = dist(pinchEnd) / dist(pinchPre);
+	                !isFinite(pinchScale) && (pinchScale = 1);
+
+	                event.pinchScale = pinchScale;
+
+	                var pinchCenter = center(pinchEnd);
+	                event.pinchX = pinchCenter[0];
+	                event.pinchY = pinchCenter[1];
+
+	                return {
+	                    type: 'pinch',
+	                    target: track[0].target,
+	                    event: event
+	                };
+	            }
+	        }
+	    };
+
+	    module.exports = GestureMgr;
+
+
+
+/***/ },
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -31908,7 +32134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 146 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32204,7 +32430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 147 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32224,7 +32450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 148 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32260,7 +32486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
-	    Shader['import'](__webpack_require__(149));
+	    Shader['import'](__webpack_require__(150));
 
 	    /**
 	     * Pass rendering shadow map.
@@ -33098,7 +33324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 149 */
+/* 150 */
 /***/ function(module, exports) {
 
 	
@@ -33106,7 +33332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Ear clipping polygon triangulation
@@ -33514,7 +33740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33768,9 +33994,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
 	                        shaders[subJointNumber] = subShader;
 	                    }
-	                    material.attachShader(subShader, true);
+	                    subMat.attachShader(subShader, true);
 	                }
-	                material.name = [material.name, b].join('-');
+	                subMat.name = [material.name, b].join('-');
 
 	                var subGeo = new StaticGeometry();
 
@@ -33850,6 +34076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        subGeo.indices[indicesOffset++] = newIndices[idx];
 	                    }
 	                }
+	                subGeo.updateBoundingBox();
 
 	                root.add(subMesh);
 	            }
@@ -33876,7 +34103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Spherical Harmonic Helpers
@@ -33898,7 +34125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sh = {};
 
 
-	    var projectEnvMapShaderCode = __webpack_require__(153);
+	    var projectEnvMapShaderCode = __webpack_require__(154);
 
 	    var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
@@ -34104,7 +34331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports) {
 
 	
@@ -34112,15 +34339,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports) {
 
 	
-	    module.exports = '0.3.4';
+	    module.exports = '0.3.5';
 
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/googlevr/webvr-polyfill/blob/master/src/cardboard-distorter.js
@@ -34140,7 +34367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var Base = __webpack_require__(3);
 	    var PerspectiveCamera = __webpack_require__(31);
 
-	    Shader.import(__webpack_require__(156));
+	    Shader.import(__webpack_require__(157));
 
 	    function lerp (a, b, t) {
 	        return a * (1 - t) + b * t;
@@ -34314,7 +34541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports) {
 
 	
@@ -34322,7 +34549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	

@@ -37,6 +37,7 @@ define(function (require) {
         }
     }
 
+    // TODO Use globalShader insteadof globalMaterial?
     function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
 
         var previousNormalMap;

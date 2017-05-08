@@ -424,7 +424,7 @@ define(function (require) {
          * @param  {string} symbol
          */
         isDefined: function (shaderType, symbol) {
-            switch(shaderType) {
+            switch (shaderType) {
                 case 'vertex':
                     return this.vertexDefines[symbol] !== undefined;
                 case 'fragment':
