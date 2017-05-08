@@ -194,16 +194,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		"plugin": {
 			"FirstPersonControl": __webpack_require__(144),
-			"GestureMgr": __webpack_require__(145),
-			"InfinitePlane": __webpack_require__(146),
-			"OrbitControl": __webpack_require__(147),
+			"InfinitePlane": __webpack_require__(145),
+			"OrbitControl": __webpack_require__(146),
 			"Skybox": __webpack_require__(90),
 			"Skydome": __webpack_require__(95)
 		},
 		"prePass": {
 			"EnvironmentMap": __webpack_require__(93),
-			"Reflection": __webpack_require__(148),
-			"ShadowMap": __webpack_require__(149)
+			"Reflection": __webpack_require__(147),
+			"ShadowMap": __webpack_require__(148)
 		},
 		"Renderable": __webpack_require__(55),
 		"Renderer": __webpack_require__(63),
@@ -228,16 +227,16 @@ return /******/ (function(modules) { // webpackBootstrap
 			"cubemap": __webpack_require__(89),
 			"dds": __webpack_require__(97),
 			"delaunay": __webpack_require__(12),
-			"earClipping": __webpack_require__(151),
+			"earClipping": __webpack_require__(150),
 			"hdr": __webpack_require__(98),
-			"mesh": __webpack_require__(152),
-			"sh": __webpack_require__(153),
+			"mesh": __webpack_require__(151),
+			"sh": __webpack_require__(152),
 			"texture": __webpack_require__(94)
 		},
-		"version": __webpack_require__(155),
+		"version": __webpack_require__(154),
 		"vr": {
-			"CardboardDistorter": __webpack_require__(156),
-			"StereoCamera": __webpack_require__(158)
+			"CardboardDistorter": __webpack_require__(155),
+			"StereoCamera": __webpack_require__(157)
 		}
 	};
 
@@ -31863,127 +31862,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 145 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/**
-	 * Only implements needed gestures for mobile.
-	 */
-
-
-	    var GestureMgr = function () {
-
-	        /**
-	         * @private
-	         * @type {Array.<Object>}
-	         */
-	        this._track = [];
-	    };
-
-	    GestureMgr.prototype = {
-
-	        constructor: GestureMgr,
-
-	        recognize: function (event, target, root) {
-	            this._doTrack(event, target, root);
-	            return this._recognize(event);
-	        },
-
-	        clear: function () {
-	            this._track.length = 0;
-	            return this;
-	        },
-
-	        _doTrack: function (event, target, root) {
-	            var touches = event.touches;
-
-	            if (!touches) {
-	                return;
-	            }
-
-	            var trackItem = {
-	                points: [],
-	                touches: [],
-	                target: target,
-	                event: event
-	            };
-
-	            for (var i = 0, len = touches.length; i < len; i++) {
-	                var touch = touches[i];
-	                trackItem.points.push([touch.clientX, touch.clientY]);
-	                trackItem.touches.push(touch);
-	            }
-
-	            this._track.push(trackItem);
-	        },
-
-	        _recognize: function (event) {
-	            for (var eventName in recognizers) {
-	                if (recognizers.hasOwnProperty(eventName)) {
-	                    var gestureInfo = recognizers[eventName](this._track, event);
-	                    if (gestureInfo) {
-	                        return gestureInfo;
-	                    }
-	                }
-	            }
-	        }
-	    };
-
-	    function dist(pointPair) {
-	        var dx = pointPair[1][0] - pointPair[0][0];
-	        var dy = pointPair[1][1] - pointPair[0][1];
-
-	        return Math.sqrt(dx * dx + dy * dy);
-	    }
-
-	    function center(pointPair) {
-	        return [
-	            (pointPair[0][0] + pointPair[1][0]) / 2,
-	            (pointPair[0][1] + pointPair[1][1]) / 2
-	        ];
-	    }
-
-	    var recognizers = {
-
-	        pinch: function (track, event) {
-	            var trackLen = track.length;
-
-	            if (!trackLen) {
-	                return;
-	            }
-
-	            var pinchEnd = (track[trackLen - 1] || {}).points;
-	            var pinchPre = (track[trackLen - 2] || {}).points || pinchEnd;
-
-	            if (pinchPre
-	                && pinchPre.length > 1
-	                && pinchEnd
-	                && pinchEnd.length > 1
-	            ) {
-	                var pinchScale = dist(pinchEnd) / dist(pinchPre);
-	                !isFinite(pinchScale) && (pinchScale = 1);
-
-	                event.pinchScale = pinchScale;
-
-	                var pinchCenter = center(pinchEnd);
-	                event.pinchX = pinchCenter[0];
-	                event.pinchY = pinchCenter[1];
-
-	                return {
-	                    type: 'pinch',
-	                    target: track[0].target,
-	                    event: event
-	                };
-	            }
-	        }
-	    };
-
-	    module.exports = GestureMgr;
-
-
-
-/***/ },
-/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32134,7 +32012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 147 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32430,7 +32308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 148 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32450,7 +32328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 149 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -32486,7 +32364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
-	    Shader['import'](__webpack_require__(150));
+	    Shader['import'](__webpack_require__(149));
 
 	    /**
 	     * Pass rendering shadow map.
@@ -33324,7 +33202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 150 */
+/* 149 */
 /***/ function(module, exports) {
 
 	
@@ -33332,7 +33210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 151 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Ear clipping polygon triangulation
@@ -33740,7 +33618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 152 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34103,7 +33981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 153 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Spherical Harmonic Helpers
@@ -34125,7 +34003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sh = {};
 
 
-	    var projectEnvMapShaderCode = __webpack_require__(154);
+	    var projectEnvMapShaderCode = __webpack_require__(153);
 
 	    var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
@@ -34331,7 +34209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 154 */
+/* 153 */
 /***/ function(module, exports) {
 
 	
@@ -34339,7 +34217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 155 */
+/* 154 */
 /***/ function(module, exports) {
 
 	
@@ -34347,7 +34225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 156 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/googlevr/webvr-polyfill/blob/master/src/cardboard-distorter.js
@@ -34367,7 +34245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var Base = __webpack_require__(3);
 	    var PerspectiveCamera = __webpack_require__(31);
 
-	    Shader.import(__webpack_require__(157));
+	    Shader.import(__webpack_require__(156));
 
 	    function lerp (a, b, t) {
 	        return a * (1 - t) + b * t;
@@ -34541,7 +34419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 157 */
+/* 156 */
 /***/ function(module, exports) {
 
 	
@@ -34549,7 +34427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 158 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
