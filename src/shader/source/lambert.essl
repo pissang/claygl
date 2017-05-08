@@ -58,6 +58,8 @@ void main()
 
 @export qtek.lambert.fragment
 
+#define ALPHA_TEST_THRESHOLD 0.5
+
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
@@ -243,6 +245,14 @@ void main()
     {
         gl_FragColor.rgb = gl_FragColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
     }
+
+#ifdef ALPHA_TEST
+    if (gl_FragColor.a < ALPHA_TEST_THRESHOLD) {
+        discard;
+    }
+#endif
+
+    gl_FragColor = encodeHDR(gl_FragColor);
 }
 
 @end

@@ -96,6 +96,7 @@ void main()
 @export qtek.standard.fragment
 
 #define PI 3.14159265358979
+#define ALPHA_TEST_THRESHOLD 0.5
 
 #define GLOSS_CHANEL 0
 #define ROUGHNESS_CHANEL 0
@@ -275,6 +276,7 @@ void main()
     #ifdef DIFFUSEMAP_ALPHA_ALPHA
     albedoColor.a *= texel.a;
     #endif
+
 #endif
 
 
@@ -550,6 +552,12 @@ void main()
     {
         outColor.rgb = mix(lineColor, vec3(outColor.rgb), edgeFactor(lineWidth));
     }
+
+#ifdef ALPHA_TEST
+    if (outColor.a < ALPHA_TEST_THRESHOLD) {
+        discard;
+    }
+#endif
 
     gl_FragColor = encodeHDR(outColor);
 }

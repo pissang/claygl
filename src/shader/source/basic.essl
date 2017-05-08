@@ -43,6 +43,8 @@ void main()
 
 @export qtek.basic.fragment
 
+#define ALPHA_TEST_THRESHOLD 0.5
+
 varying vec2 v_Texcoord;
 uniform sampler2D diffuseMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -93,6 +95,12 @@ void main()
 #ifdef GAMMA_ENCODE
     // Not linear
     gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1 / 2.2));
+#endif
+
+#ifdef ALPHA_TEST
+    if (gl_FragColor.a < ALPHA_TEST_THRESHOLD) {
+        discard;
+    }
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);
