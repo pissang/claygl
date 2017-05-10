@@ -888,10 +888,12 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
                 lCluster = lClusters[lJointName]
 
                 # Inverse Bind Pose Matrix
+                # Matrix of Mesh
                 lCluster.GetTransformMatrix(lReferenceGlobalInitMatrix)
+                # Matrix of Joint
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
                 # Matrix in fbx is column major
-                # (root-1 * reference-1 * cluster)-1 = cluster-1 * reference * root
+                # 1/(1/root * 1/reference * cluster) = 1/cluster * reference * root
                 # http://blog.csdn.net/bugrunner/article/details/7232291
                 m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * lRootNodeTransform
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
@@ -902,12 +904,14 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
 
             lGLTFSkin['joints'] += lExtraJoints
 
-            # PENDING
+            # Mesh with skin should have identity global transform.
+            # Since vertices have all been transformed to skeleton spaces.
+            m = FbxAMatrix()
+            if not pNode.GetParent() == None:
+                m = pNode.GetParent().EvaluateGlobalTransform()
+            m = m.Inverse()
             lGLTFNode['matrix'] = [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
+                m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]
             ]
         else:
             lGLTFNode['meshes'] = [lMeshKey]
