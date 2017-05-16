@@ -128,7 +128,7 @@ define(function (require) {
         },
 
         isUseIndices: function () {
-            return this.indices;
+            return !!this.indices;
         },
 
         initIndicesFromArray: function (array) {
@@ -518,52 +518,36 @@ define(function (require) {
                 return;
             }
 
-            var vertexUseCount = [];
-
-            for (var i = 0, len = this.vertexCount; i < len; i++) {
-                vertexUseCount[i] = 0;
-            }
             if (this.indices.length > 0xffff) {
                 this.indices = new vendor.Uint32Array(this.indices);
             }
 
-            var cursor = 0;
             var attributes = this.attributes;
             var indices = this.indices;
 
-            // Cursor not use vertexNumber in case vertex array length is larger than face used.
-            for (var i = 0; i < indices.length; i++) {
-                cursor = Math.max(cursor, indices[i] + 1);
-            }
-
             var attributeNameList = this.getEnabledAttributes();
 
+            var oldAttrValues = {};
             for (var a = 0; a < attributeNameList.length; a++) {
                 var name = attributeNameList[a];
-                var valueArr = attributes[name].value;
+                oldAttrValues[name] = attributes[name].value;
                 attributes[name].init(this.indices.length);
-                var expandedArray = attributes[name].value;
-                for (var i = 0; i < valueArr.length; i++) {
-                    expandedArray[i] = valueArr[i];
-                }
             }
 
+            var cursor = 0;
             for (var i = 0; i < indices.length; i++) {
                 var ii = indices[i];
-                if (vertexUseCount[ii] > 0) {
-                    for (var a = 0; a < attributeNameList.length; a++) {
-                        var name = attributeNameList[a];
-                        var array = attributes[name].value;
-                        var size = attributes[name].size;
+                for (var a = 0; a < attributeNameList.length; a++) {
+                    var name = attributeNameList[a];
+                    var array = attributes[name].value;
+                    var size = attributes[name].size;
 
-                        for (var k = 0; k < size; k++) {
-                            array[cursor * size + k] = array[ii * size + k];
-                        }
+                    for (var k = 0; k < size; k++) {
+                        array[cursor * size + k] = oldAttrValues[name][ii * size + k];
                     }
-                    indices[i] = cursor;
-                    cursor++;
                 }
-                vertexUseCount[ii]++;
+                indices[i] = cursor;
+                cursor++;
             }
 
             this.dirty();
