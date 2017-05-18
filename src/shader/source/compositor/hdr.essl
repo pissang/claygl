@@ -114,12 +114,19 @@ void main()
 
 #ifdef BLOOM_ENABLED
     vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));
-    texel.rgb += bloomTexel.rgb * bloomTexel.a * bloomIntensity;
+    if (texel.a > 0.0) {
+        // pending
+        bloomTexel.rgb *= bloomTexel.a;
+    }
+    texel.rgb += bloomTexel.rgb * bloomIntensity;
+    texel.a += bloomTexel.a;
 #endif
 
 #ifdef LENSFLARE_ENABLED
-    texel.rgb += decodeHDR(texture2D(lensflare, v_Texcoord)).rgb * texture2D(lensdirt, v_Texcoord).rgb * lensflareIntensity;
+    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;
 #endif
+
+    texel.a = min(texel.a, 1.0);
 
 // Adjust exposure
 // From KlayGE
