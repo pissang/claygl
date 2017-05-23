@@ -8,6 +8,7 @@ glob(ROOT + '**/*.essl', function (err, files) {
         var esslCode = fs.readFileSync(filePath, 'utf-8');
         // TODO Remove comment
         esslCode = esslCode.replace(/\/\/.*\n/g, '');
+        esslCode = esslCode.replace(/ +/g, ' ');
 
         // var dir = path.dirname(filePath);
         // var baseName = path.basename(filePath, '.essl');
