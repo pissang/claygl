@@ -1,9 +1,8 @@
 # ############################################
 # fbx to glTF converter
 # glTF spec : https://github.com/KhronosGroup/glTF
-# fbx version 2014.2/2015.1
+# fbx version 2018.1.1
 # TODO: support python2.7
-# TODO: 2014.2 python3.3 LoadScene is too slow
 # TODO: exportAnimation, exportMesh, exportCamera, exportLight configuration
 # http://github.com/pissang/
 # ############################################
@@ -320,19 +319,19 @@ def CreateTexture(pProperty):
     lTextureList = []
 
     lFileTextures = []
-    lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxLayeredTexture.ClassId)
+    lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
     if lLayeredTextureCount > 0:
         for i in range(lLayeredTextureCount):
-            lLayeredTexture = pProperty.GetSrcObject(FbxLayeredTexture.ClassId, i)
-            for j in range(lLayeredTexture.GetSrcObjectCount(FbxTexture.ClassId)):
-                lTexture = lLayeredTexture.GetSrcObject(FbxTexture.ClassId, j)
+            lLayeredTexture = pProperty.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), i)
+            for j in range(lLayeredTexture.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))):
+                lTexture = lLayeredTexture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId), j)
                 if lTexture and lTexture.__class__ == FbxFileTexture:
                     lFileTextures.append(lTexture)
         pass
     else:
-        lTextureCount = pProperty.GetSrcObjectCount(FbxTexture.ClassId)
+        lTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
         for t in range(lTextureCount):
-            lTexture = pProperty.GetSrcObject(FbxTexture.ClassId, t)
+            lTexture = pProperty.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId), t)
             if lTexture and lTexture.__class__ == FbxFileTexture:
                 lFileTextures.append(lTexture)
 
@@ -1067,10 +1066,10 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
 
 def ConvertAnimation(pScene, pSampleRate):
     lRoot = pScene.GetRootNode()
-    for i in range(pScene.GetSrcObjectCount(FbxAnimStack.ClassId)):
-        lAnimStack = pScene.GetSrcObject(FbxAnimStack.ClassId, i)
-        for j in range(lAnimStack.GetSrcObjectCount(FbxAnimLayer.ClassId)):
-            lAnimLayer = lAnimStack.GetSrcObject(FbxAnimLayer.ClassId, j)
+    for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
+        lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
+        for j in range(lAnimStack.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimLayer.ClassId))):
+            lAnimLayer = lAnimStack.GetSrcObject(FbxCriteria.ObjectType(FbxAnimLayer.ClassId), j)
             for k in range(lRoot.GetChildCount()):
                 ConvertNodeAnimation(lAnimLayer, lRoot.GetChild(k), pSampleRate)
 
