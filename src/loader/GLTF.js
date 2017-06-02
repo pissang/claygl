@@ -4,7 +4,7 @@
  *
  * TODO https://github.com/KhronosGroup/glTF/issues/298
  */
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -84,17 +84,17 @@ define(function(require) {
         /**
          * @type {string}
          */
-        rootPath: '',
+        rootPath: null,
 
         /**
          * @type {string}
          */
-        textureRootPath: '',
+        textureRootPath: null,
 
         /**
          * @type {string}
          */
-        bufferRootPath: '',
+        bufferRootPath: null,
 
         /**
          * @type {string}
@@ -135,23 +135,23 @@ define(function(require) {
         /**
          * @param  {string} url
          */
-        load: function(url) {
+        load: function (url) {
             var self = this;
 
-            if (!this.rootPath) {
+            if (this.rootPath == null) {
                 this.rootPath = url.slice(0, url.lastIndexOf('/'));
             }
 
             request.get({
                 url: url,
-                onprogress: function(percent, loaded, total) {
+                onprogress: function (percent, loaded, total) {
                     self.trigger('progress', percent, loaded, total);
                 },
-                onerror: function(e) {
+                onerror: function (e) {
                     self.trigger('error', e);
                 },
                 responseType: 'text',
-                onload: function(data) {
+                onload: function (data) {
                     self.parse(JSON.parse(data));
                 }
             });
@@ -161,7 +161,7 @@ define(function(require) {
          * @param {Object} json
          * @return {qtek.loader.GLTF.IResult}
          */
-        parse: function(json) {
+        parse: function (json) {
             var self = this;
             var loading = 0;
 
@@ -178,7 +178,7 @@ define(function(require) {
             // Mount on the root node if given
             var rootNode = this.rootNode || new Scene();
             // Load buffers
-            util.each(json.buffers, function(bufferInfo, name) {
+            util.each(json.buffers, function (bufferInfo, name) {
                 loading++;
                 var path = bufferInfo.uri;
 
@@ -187,13 +187,13 @@ define(function(require) {
                 if (path == null) {
                     path = bufferInfo.path;
                 }
-                self._loadBuffer(path, function(buffer) {
+                self._loadBuffer(path, function (buffer) {
                     lib.buffers[name] = buffer;
                     loading--;
                     if (loading === 0) {
                         afterLoadBuffer();
                     }
-                }, function() {
+                }, function () {
                     loading--;
                     if (loading === 0) {
                         afterLoadBuffer();
@@ -266,18 +266,21 @@ define(function(require) {
             };
         },
 
-        _loadBuffer: function(path, onsuccess, onerror) {
-            var root = this.bufferRootPath || this.rootPath;
-            if (root) {
-                path = root + '/' + path;
+        _loadBuffer: function (path, onsuccess, onerror) {
+            var rootPath = this.bufferRootPath;
+            if (rootPath == null) {
+                rootPath = this.rootPath;
+            }
+            if (rootPath) {
+                path = rootPath + '/' + path;
             }
             request.get({
                 url: path,
                 responseType: 'arraybuffer',
-                onload: function(buffer) {
+                onload: function (buffer) {
                     onsuccess && onsuccess(buffer);
                 },
-                onerror: function(buffer) {
+                onerror: function (buffer) {
                     onerror && onerror(buffer);
                 }
             });
@@ -285,7 +288,7 @@ define(function(require) {
 
         // https://github.com/KhronosGroup/glTF/issues/100
         // https://github.com/KhronosGroup/glTF/issues/193
-        _parseSkins: function(json, lib) {
+        _parseSkins: function (json, lib) {
 
             // Create skeletons and joints
             var haveInvBindMatrices = false;
@@ -320,7 +323,7 @@ define(function(require) {
                 lib.skeletons[name] = skeleton;
             }
 
-            var bindNodeToJoint = function(jointsMap, nodeName, parentIndex, rootNode) {
+            var bindNodeToJoint = function (jointsMap, nodeName, parentIndex, rootNode) {
                 var node = lib.nodes[nodeName];
                 var nodeInfo = json.nodes[nodeName];
                 var joint = jointsMap[nodeInfo.jointId];
@@ -349,7 +352,7 @@ define(function(require) {
                 return joint;
             };
 
-            var getJointIndex = function(joint) {
+            var getJointIndex = function (joint) {
                 return joint.index;
             };
 
@@ -429,13 +432,16 @@ define(function(require) {
             }
         },
 
-        _parseTextures: function(json, lib) {
-            var root = this.textureRootPath || this.rootPath;
-            util.each(json.textures, function(textureInfo, name){
+        _parseTextures: function (json, lib) {
+            var rootPath = this.textureRootPath;
+            if (rootPath == null) {
+                rootPath = this.rootPath;
+            }
+            util.each(json.textures, function (textureInfo, name){
                 var samplerInfo = json.samplers[textureInfo.sampler];
                 var parameters = {};
                 ['wrapS', 'wrapT', 'magFilter', 'minFilter']
-                .forEach(function(name) {
+                .forEach(function (name) {
                     var value = samplerInfo[name];
                     if (value != null) {
                         if (typeof(value) === 'string') {
@@ -458,7 +464,7 @@ define(function(require) {
                 if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
                     var imageInfo = json.images[textureInfo.source];
-                    texture.load(util.relative2absolute(imageInfo.path, root));
+                    texture.load(util.relative2absolute(imageInfo.path, rootPath));
                     lib.textures[name] = texture;
                 }
                 else if(target === glenum.TEXTURE_CUBE_MAP) {
@@ -469,7 +475,7 @@ define(function(require) {
 
         // Only phong material is support yet
         // TODO support custom material
-        _parseMaterials: function(json, lib) {
+        _parseMaterials: function (json, lib) {
             var techniques = {};
             // Parse techniques
             for (var name in json.techniques) {
@@ -598,7 +604,7 @@ define(function(require) {
             }
         },
 
-        _parseMeshes: function(json, lib) {
+        _parseMeshes: function (json, lib) {
             var self = this;
 
             var meshKeys = Object.keys(json.meshes);
@@ -750,7 +756,7 @@ define(function(require) {
             }
         },
 
-        _parseNodes: function(json, lib) {
+        _parseNodes: function (json, lib) {
 
             for (var name in json.nodes) {
                 var nodeInfo = json.nodes[name];
@@ -867,7 +873,7 @@ define(function(require) {
             }
          },
 
-        _parseLight: function(lightInfo) {
+        _parseLight: function (lightInfo) {
             // TODO Light parameters
             switch(lightInfo.type) {
                 case 'point':
@@ -895,7 +901,7 @@ define(function(require) {
             return light;
         },
 
-        _parseAnimations: function(json, lib) {
+        _parseAnimations: function (json, lib) {
             // TODO Only support nodes animation now
 
             var nodeAnimationClips = lib.clips = {};
