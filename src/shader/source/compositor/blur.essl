@@ -68,38 +68,3 @@ void main (void)
 }
 
 @end
-
-@export qtek.compositor.box_blur
-
-uniform sampler2D texture;
-varying vec2 v_Texcoord;
-
-uniform float blurSize : 3.0;
-uniform vec2 textureSize : [512.0, 512.0];
-
-@import qtek.util.rgbm
-@import qtek.util.clamp_sample
-
-void main(void)
-{
-
-    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
-    vec2 offset = blurSize / textureSize;
-
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(offset.x, 0.0) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(offset.x, offset.y) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(-offset.x, offset.y) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(0.0, offset.y) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(-offset.x, 0.0) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(-offset.x, -offset.y) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(offset.x, -offset.y) ));
-    tex += decodeHDR(clampSample(texture, v_Texcoord + vec2(0.0, -offset.y) ));
-
-    tex /= 9.0;
-
-    // tex.rgb /= tex.a + 0.0000001;
-
-    gl_FragColor = encodeHDR(tex);
-}
-
-@end

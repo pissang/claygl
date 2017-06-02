@@ -61,6 +61,7 @@ define(function (require) {
          * Set camera view matrix
          */
         setViewMatrix: function (viewMatrix) {
+            Matrix4.copy(this.viewMatrix, viewMatrix);
             Matrix4.invert(this.worldTransform, viewMatrix);
             this.decomposeWorldTransform();
         },

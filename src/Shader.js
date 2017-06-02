@@ -514,7 +514,7 @@ define(function (require) {
          */
         isTextureEnabled: function (symbol) {
             var textureStatus = this._textureStatus;
-            return textureStatus[symbol]
+            return !!textureStatus[symbol]
                 && textureStatus[symbol].enabled;
         },
 

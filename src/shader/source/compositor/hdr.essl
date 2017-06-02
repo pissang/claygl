@@ -121,7 +121,7 @@ void main()
     texel.rgb += bloomTexel.rgb * bloomIntensity;
     // TODO If consider bloomInstensity.
     // There are shadow like blurred edge if not consider bloomIntensity. Which is not bad
-    texel.a += bloomTexel.a;
+    texel.a += bloomTexel.a * bloomIntensity;
 #endif
 
 #ifdef LENSFLARE_ENABLED
