@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -14,7 +14,7 @@ define(function(require) {
      * @param {qtek.math.Vector3} [origin]
      * @param {qtek.math.Vector3} [direction]
      */
-    var Ray = function(origin, direction) {
+    var Ray = function (origin, direction) {
         /**
          * @type {qtek.math.Vector3}
          */
@@ -36,7 +36,7 @@ define(function(require) {
          * @param  {qtek.math.Vector3} [out]
          * @return {qtek.math.Vector3}
          */
-        intersectPlane: function(plane, out) {
+        intersectPlane: function (plane, out) {
             var pn = plane.normal._array;
             var d = plane.distance;
             var ro = this.origin._array;
@@ -60,7 +60,7 @@ define(function(require) {
          * Mirror the ray against plane
          * @param  {qtek.math.Plane} plane
          */
-        mirrorAgainstPlane: function(plane) {
+        mirrorAgainstPlane: function (plane) {
             // Distance to plane
             var d = vec3.dot(plane.normal._array, this.direction._array);
             vec3.scaleAndAdd(this.direction._array, this.direction._array, plane.normal._array, -d * 2);
@@ -142,7 +142,7 @@ define(function(require) {
          * @param {qtek.math.Vector3}
          * @return {qtek.math.Vector3}
          */
-        intersectBoundingBox: function(bbox, out) {
+        intersectBoundingBox: function (bbox, out) {
             var dir = this.direction._array;
             var origin = this.origin._array;
             var min = bbox.min._array;
@@ -224,7 +224,7 @@ define(function(require) {
          * @param {qtek.math.Vector3} [barycenteric] barycentric coords
          * @return {qtek.math.Vector3}
          */
-        intersectTriangle: (function() {
+        intersectTriangle: (function () {
 
             var eBA = vec3.create();
             var eCA = vec3.create();
@@ -292,7 +292,7 @@ define(function(require) {
          * Apply an affine transform matrix to the ray
          * @return {qtek.math.Matrix4} matrix
          */
-        applyTransform: function(matrix) {
+        applyTransform: function (matrix) {
             Vector3.add(this.direction, this.direction, this.origin);
             Vector3.transformMat4(this.origin, this.origin, matrix);
             Vector3.transformMat4(this.direction, this.direction, matrix);
@@ -305,7 +305,7 @@ define(function(require) {
          * Copy values from another ray
          * @param {qtek.math.Ray} ray
          */
-        copy: function(ray) {
+        copy: function (ray) {
             Vector3.copy(this.origin, ray.origin);
             Vector3.copy(this.direction, ray.direction);
         },
@@ -314,7 +314,7 @@ define(function(require) {
          * Clone a new ray
          * @return {qtek.math.Ray}
          */
-        clone: function() {
+        clone: function () {
             var ray = new Ray();
             ray.copy(this);
             return ray;
