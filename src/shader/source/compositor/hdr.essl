@@ -108,16 +108,14 @@ void main()
 {
     // TODO alpha blend
     vec4 texel = vec4(0.0);
+    vec4 originalTexel = vec4(0.0);
 #ifdef TEXTURE_ENABLED
-    texel += decodeHDR(texture2D(texture, v_Texcoord));
+    texel = decodeHDR(texture2D(texture, v_Texcoord));
+    originalTexel = texel;
 #endif
 
 #ifdef BLOOM_ENABLED
     vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));
-    if (texel.a > 0.0) {
-        // pending
-        bloomTexel.rgb *= bloomTexel.a;
-    }
     texel.rgb += bloomTexel.rgb * bloomIntensity;
     // TODO If consider bloomInstensity.
     // There are shadow like blurred edge if not consider bloomIntensity. Which is not bad
@@ -181,6 +179,12 @@ void main()
     gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));
     #endif
 #endif
+
+    if (originalTexel.a <= 0.01) {
+        // bloom and lensflare out of main scene should be additive blending with the background dom.
+        // So do unpremultiply alpha first.
+        gl_FragColor.rgb /= gl_FragColor.a;
+    }
     // Premultiply alpha if there is no blending.
     // webgl will divide alpha.
 #ifdef PREMULTIPLY_ALPHA
