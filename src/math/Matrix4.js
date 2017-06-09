@@ -349,11 +349,15 @@ define(function(require) {
                 var sx = vec3.length(x);
                 var sy = vec3.length(y);
                 var sz = vec3.length(z);
+
+                // if determine is negative, we need to invert one scale
+                var det = this.determinant();
+                if (det < 0) {
+                    sx = -sx;
+                }
+
                 if (scale) {
-                    scale.x = sx;
-                    scale.y = sy;
-                    scale.z = sz;
-                    scale._dirty = true;
+                    scale.set(sx, sy, sz);
                 }
 
                 position.set(el[12], el[13], el[14]);
