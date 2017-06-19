@@ -470,7 +470,7 @@ define(function (require) {
         /**
          * Update world transform, assume its parent world transform have been updated
          */
-        updateWorldTransform: function () {
+        _updateWorldTransformTopDown: function () {
             var localTransform = this.localTransform._array;
             var worldTransform = this.worldTransform._array;
             if (this._parent) {
@@ -482,6 +482,20 @@ define(function (require) {
             }
             else {
                 mat4.copy(worldTransform, localTransform);
+            }
+        },
+
+        // Update world transform before whole scene is updated.
+        updateWorldTransform: function () {
+            if (this.transformNeedsUpdate()) {
+                // Find the root node which transform needs update;
+                var rootNodeDirty = this;
+                while (rootNodeDirty && rootNodeDirty.getParent()
+                    && rootNodeDirty.getParent().transformNeedsUpdate()
+                ) {
+                    rootNodeDirty = rootNodeDirty.getParent();
+                }
+                rootNodeDirty.update();
             }
         },
 
@@ -499,7 +513,7 @@ define(function (require) {
             }
 
             if (forceUpdateWorld || this._needsUpdateWorldTransform) {
-                this.updateWorldTransform();
+                this._updateWorldTransformTopDown();
                 forceUpdateWorld = true;
                 this._needsUpdateWorldTransform = false;
             }
@@ -561,17 +575,7 @@ define(function (require) {
          * @return {qtek.math.Vector3}
          */
         getWorldPosition: function (out) {
-            // TODO If update when get worldTransform
-            if (this.transformNeedsUpdate()) {
-                // Find the root node which transform needs update;
-                var rootNodeDirty = this;
-                while (rootNodeDirty && rootNodeDirty.getParent()
-                    && rootNodeDirty.getParent().transformNeedsUpdate()
-                ) {
-                    rootNodeDirty = rootNodeDirty.getParent();
-                }
-                rootNodeDirty.update();
-            }
+            this.updateWorldTransform();
             var m = this.worldTransform._array;
             if (out) {
                 var arr = out._array;
