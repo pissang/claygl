@@ -751,7 +751,6 @@ define(function (require) {
                     .transformMat4(sceneCamera.worldTransform);
                 camera.rotation.copy(light.rotation);
                 camera.scale.copy(light.scale);
-                camera.updateLocalTransform();
                 camera.updateWorldTransform();
 
                 // Transform to light view space

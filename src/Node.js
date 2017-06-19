@@ -487,16 +487,14 @@ define(function (require) {
 
         // Update world transform before whole scene is updated.
         updateWorldTransform: function () {
-            if (this.transformNeedsUpdate()) {
-                // Find the root node which transform needs update;
-                var rootNodeDirty = this;
-                while (rootNodeDirty && rootNodeDirty.getParent()
-                    && rootNodeDirty.getParent().transformNeedsUpdate()
-                ) {
-                    rootNodeDirty = rootNodeDirty.getParent();
-                }
-                rootNodeDirty.update();
+            // Find the root node which transform needs update;
+            var rootNodeIsDirty = this;
+            while (rootNodeIsDirty && rootNodeIsDirty.getParent()
+                && rootNodeIsDirty.getParent().transformNeedsUpdate()
+            ) {
+                rootNodeIsDirty = rootNodeIsDirty.getParent();
             }
+            rootNodeIsDirty.update();
         },
 
         /**
