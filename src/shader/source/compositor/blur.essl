@@ -60,11 +60,13 @@ void main (void)
     // blur in y (horizontal)
     for (int i = 0; i < 9; i++) {
         float w = gaussianKernel[i];
+        // Premultiplied Alpha
+        vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));
         // TODO alpha blend?
-        sum += decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off)) * w;
+        sum += texel * w;
         weightAll += w;
     }
-    gl_FragColor = encodeHDR(sum / weightAll);
+    gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));
 }
 
 @end

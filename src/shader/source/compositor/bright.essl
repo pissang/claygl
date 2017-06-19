@@ -38,15 +38,16 @@ void main()
 
 #endif
 
-    float lum = dot(texel.rgb, lumWeight);
+    // Premultiplied Alpha
+    float lum = dot(texel.rgb , lumWeight);
     vec4 color;
     if (lum > threshold)
     {
-        color = vec4(texel.rgb * scale, texel.a);
+        color = vec4(texel.rgb * scale, texel.a * scale);
     }
     else
     {
-        color = vec4(vec3(0.0), texel.a);
+        color = vec4(0.0);
     }
 
     gl_FragColor = encodeHDR(color);
