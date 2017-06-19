@@ -44,7 +44,7 @@ define(function (require) {
             spotLightPosition: {
                 type: '3f',
                 value: function (instance) {
-                    return instance.getWorldPosition().normalize()._array;
+                    return instance.getWorldPosition()._array;
                 }
             },
             spotLightRange: {

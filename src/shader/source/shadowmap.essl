@@ -186,7 +186,8 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
     }}
 
     return shadowContrib / float(PCF_KERNEL_SIZE + 1);
-#endif
+#else
+    // TODO Removed in deferred pipeline
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);
     shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);
@@ -196,7 +197,8 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
     shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);
     shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);
 
-    return shadowContrib;
+    return shadowContrib / 9.0;
+#endif
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
