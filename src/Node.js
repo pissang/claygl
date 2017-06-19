@@ -573,7 +573,10 @@ define(function (require) {
          * @return {qtek.math.Vector3}
          */
         getWorldPosition: function (out) {
-            this.updateWorldTransform();
+            // PENDING
+            if (this.transformNeedsUpdate()) {
+                this.updateWorldTransform();
+            }
             var m = this.worldTransform._array;
             if (out) {
                 var arr = out._array;
