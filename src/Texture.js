@@ -9,6 +9,7 @@ define(function (require) {
     var Base = require('./core/Base');
     var glenum = require('./core/glenum');
     var Cache = require('./core/Cache');
+    var glinfo = require('./core/glinfo');
 
     /**
      * @constructor qtek.Texture
@@ -126,15 +127,15 @@ define(function (require) {
         update: function (_gl) {},
 
         // Update the common parameters of texture
-        beforeUpdate: function (_gl) {
+        updateCommon: function (_gl) {
             _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
             _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
             _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
 
-            this.fallBack();
+            this._fallBack(_gl);
         },
 
-        fallBack: function () {
+        _fallBack: function (_gl) {
             // Use of none-power of two texture
             // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
 
@@ -142,6 +143,15 @@ define(function (require) {
 
             if (this.format === glenum.DEPTH_COMPONENT) {
                 this.useMipmap = false;
+            }
+
+            var sRGBExt = glinfo.getExtension(_gl, 'EXT_sRGB');
+            // Fallback
+            if (this.format === Texture.SRGB && !sRGBExt) {
+                this.format = Texture.RGB;
+            }
+            if (this.format === Texture.SRGB_ALPHA && !sRGBExt) {
+                this.format = Texture.RGBA;
             }
 
             if (!isPowerOfTwo || !this.useMipmap) {
@@ -254,6 +264,10 @@ define(function (require) {
     Texture.RGBA = glenum.RGBA;
     Texture.LUMINANCE = glenum.LUMINANCE;
     Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
+
+    // https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+    Texture.SRGB = 0x8C40;
+    Texture.SRGB_ALPHA = 0x8C42;
 
     /* Compressed Texture */
     Texture.COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;

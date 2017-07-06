@@ -54,7 +54,7 @@ define(function(require) {
 
             _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
 
-            this.beforeUpdate( _gl);
+            this.updateCommon( _gl);
 
             var glFormat = this.format;
             var glType = this.type;

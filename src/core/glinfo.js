@@ -19,7 +19,8 @@ define(function () {
         'EXT_texture_filter_anisotropic',
         'EXT_shader_texture_lod',
         'WEBGL_draw_buffers',
-        'EXT_frag_depth'
+        'EXT_frag_depth',
+        'EXT_sRGB'
     ];
 
     var PARAMETER_NAMES = [
