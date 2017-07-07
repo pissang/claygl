@@ -14064,7 +14064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DEPTH_BUFFER_BIT               : 0x00000100,
 	    STENCIL_BUFFER_BIT             : 0x00000400,
 	    COLOR_BUFFER_BIT               : 0x00004000,
-	    
+
 	    /* BeginMode */
 	    POINTS                         : 0x0000,
 	    LINES                          : 0x0001,
@@ -14073,7 +14073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    TRIANGLES                      : 0x0004,
 	    TRIANGLE_STRIP                 : 0x0005,
 	    TRIANGLE_FAN                   : 0x0006,
-	    
+
 	    /* AlphaFunction (not supported in ES20) */
 	    /*      NEVER */
 	    /*      LESS */
@@ -14083,7 +14083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /*      NOTEQUAL */
 	    /*      GEQUAL */
 	    /*      ALWAYS */
-	    
+
 	    /* BlendingFactorDest */
 	    ZERO                           : 0,
 	    ONE                            : 1,
@@ -14093,7 +14093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ONE_MINUS_SRC_ALPHA            : 0x0303,
 	    DST_ALPHA                      : 0x0304,
 	    ONE_MINUS_DST_ALPHA            : 0x0305,
-	    
+
 	    /* BlendingFactorSrc */
 	    /*      ZERO */
 	    /*      ONE */
@@ -14104,17 +14104,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /*      ONE_MINUS_SRC_ALPHA */
 	    /*      DST_ALPHA */
 	    /*      ONE_MINUS_DST_ALPHA */
-	    
+
 	    /* BlendEquationSeparate */
 	    FUNC_ADD                       : 0x8006,
 	    BLEND_EQUATION                 : 0x8009,
 	    BLEND_EQUATION_RGB             : 0x8009, /* same as BLEND_EQUATION */
 	    BLEND_EQUATION_ALPHA           : 0x883D,
-	    
+
 	    /* BlendSubtract */
 	    FUNC_SUBTRACT                  : 0x800A,
 	    FUNC_REVERSE_SUBTRACT          : 0x800B,
-	    
+
 	    /* Separate Blend Functions */
 	    BLEND_DST_RGB                  : 0x80C8,
 	    BLEND_SRC_RGB                  : 0x80C9,
@@ -14125,27 +14125,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    CONSTANT_ALPHA                 : 0x8003,
 	    ONE_MINUS_CONSTANT_ALPHA       : 0x8004,
 	    BLEND_COLOR                    : 0x8005,
-	    
+
 	    /* Buffer Objects */
 	    ARRAY_BUFFER                   : 0x8892,
 	    ELEMENT_ARRAY_BUFFER           : 0x8893,
 	    ARRAY_BUFFER_BINDING           : 0x8894,
 	    ELEMENT_ARRAY_BUFFER_BINDING   : 0x8895,
-	    
+
 	    STREAM_DRAW                    : 0x88E0,
 	    STATIC_DRAW                    : 0x88E4,
 	    DYNAMIC_DRAW                   : 0x88E8,
-	    
+
 	    BUFFER_SIZE                    : 0x8764,
 	    BUFFER_USAGE                   : 0x8765,
-	    
+
 	    CURRENT_VERTEX_ATTRIB          : 0x8626,
-	    
+
 	    /* CullFaceMode */
 	    FRONT                          : 0x0404,
 	    BACK                           : 0x0405,
 	    FRONT_AND_BACK                 : 0x0408,
-	    
+
 	    /* DepthFunction */
 	    /*      NEVER */
 	    /*      LESS */
@@ -14155,7 +14155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /*      NOTEQUAL */
 	    /*      GEQUAL */
 	    /*      ALWAYS */
-	    
+
 	    /* EnableCap */
 	    /* TEXTURE_2D */
 	    CULL_FACE                      : 0x0B44,
@@ -14167,18 +14167,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    POLYGON_OFFSET_FILL            : 0x8037,
 	    SAMPLE_ALPHA_TO_COVERAGE       : 0x809E,
 	    SAMPLE_COVERAGE                : 0x80A0,
-	    
+
 	    /* ErrorCode */
 	    NO_ERROR                       : 0,
 	    INVALID_ENUM                   : 0x0500,
 	    INVALID_VALUE                  : 0x0501,
 	    INVALID_OPERATION              : 0x0502,
 	    OUT_OF_MEMORY                  : 0x0505,
-	    
+
 	    /* FrontFaceDirection */
 	    CW                             : 0x0900,
 	    CCW                            : 0x0901,
-	    
+
 	    /* GetPName */
 	    LINE_WIDTH                     : 0x0B21,
 	    ALIASED_POINT_SIZE_RANGE       : 0x846D,
@@ -14228,23 +14228,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    SAMPLES                        : 0x80A9,
 	    SAMPLE_COVERAGE_VALUE          : 0x80AA,
 	    SAMPLE_COVERAGE_INVERT         : 0x80AB,
-	    
+
 	    /* GetTextureParameter */
 	    /*      TEXTURE_MAG_FILTER */
 	    /*      TEXTURE_MIN_FILTER */
 	    /*      TEXTURE_WRAP_S */
 	    /*      TEXTURE_WRAP_T */
-	    
+
 	    COMPRESSED_TEXTURE_FORMATS     : 0x86A3,
-	    
+
 	    /* HintMode */
 	    DONT_CARE                      : 0x1100,
 	    FASTEST                        : 0x1101,
 	    NICEST                         : 0x1102,
-	    
+
 	    /* HintTarget */
 	    GENERATE_MIPMAP_HINT            : 0x8192,
-	    
+
 	    /* DataType */
 	    BYTE                           : 0x1400,
 	    UNSIGNED_BYTE                  : 0x1401,
@@ -14253,7 +14253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    INT                            : 0x1404,
 	    UNSIGNED_INT                   : 0x1405,
 	    FLOAT                          : 0x1406,
-	    
+
 	    /* PixelFormat */
 	    DEPTH_COMPONENT                : 0x1902,
 	    ALPHA                          : 0x1906,
@@ -14261,13 +14261,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    RGBA                           : 0x1908,
 	    LUMINANCE                      : 0x1909,
 	    LUMINANCE_ALPHA                : 0x190A,
-	    
+
 	    /* PixelType */
 	    /*      UNSIGNED_BYTE */
 	    UNSIGNED_SHORT_4_4_4_4         : 0x8033,
 	    UNSIGNED_SHORT_5_5_5_1         : 0x8034,
 	    UNSIGNED_SHORT_5_6_5           : 0x8363,
-	    
+
 	    /* Shaders */
 	    FRAGMENT_SHADER                  : 0x8B30,
 	    VERTEX_SHADER                    : 0x8B31,
@@ -14287,7 +14287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ACTIVE_ATTRIBUTES                : 0x8B89,
 	    SHADING_LANGUAGE_VERSION         : 0x8B8C,
 	    CURRENT_PROGRAM                  : 0x8B8D,
-	    
+
 	    /* StencilFunction */
 	    NEVER                          : 0x0200,
 	    LESS                           : 0x0201,
@@ -14297,7 +14297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    NOTEQUAL                       : 0x0205,
 	    GEQUAL                         : 0x0206,
 	    ALWAYS                         : 0x0207,
-	    
+
 	    /* StencilOp */
 	    /*      ZERO */
 	    KEEP                           : 0x1E00,
@@ -14307,16 +14307,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    INVERT                         : 0x150A,
 	    INCR_WRAP                      : 0x8507,
 	    DECR_WRAP                      : 0x8508,
-	    
+
 	    /* StringName */
 	    VENDOR                         : 0x1F00,
 	    RENDERER                       : 0x1F01,
 	    VERSION                        : 0x1F02,
-	    
+
 	    /* TextureMagFilter */
 	    NEAREST                        : 0x2600,
 	    LINEAR                         : 0x2601,
-	    
+
 	    /* TextureMinFilter */
 	    /*      NEAREST */
 	    /*      LINEAR */
@@ -14324,17 +14324,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    LINEAR_MIPMAP_NEAREST          : 0x2701,
 	    NEAREST_MIPMAP_LINEAR          : 0x2702,
 	    LINEAR_MIPMAP_LINEAR           : 0x2703,
-	    
+
 	    /* TextureParameterName */
 	    TEXTURE_MAG_FILTER             : 0x2800,
 	    TEXTURE_MIN_FILTER             : 0x2801,
 	    TEXTURE_WRAP_S                 : 0x2802,
 	    TEXTURE_WRAP_T                 : 0x2803,
-	    
+
 	    /* TextureTarget */
 	    TEXTURE_2D                     : 0x0DE1,
 	    TEXTURE                        : 0x1702,
-	    
+
 	    TEXTURE_CUBE_MAP               : 0x8513,
 	    TEXTURE_BINDING_CUBE_MAP       : 0x8514,
 	    TEXTURE_CUBE_MAP_POSITIVE_X    : 0x8515,
@@ -14344,7 +14344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    TEXTURE_CUBE_MAP_POSITIVE_Z    : 0x8519,
 	    TEXTURE_CUBE_MAP_NEGATIVE_Z    : 0x851A,
 	    MAX_CUBE_MAP_TEXTURE_SIZE      : 0x851C,
-	    
+
 	    /* TextureUnit */
 	    TEXTURE0                       : 0x84C0,
 	    TEXTURE1                       : 0x84C1,
@@ -14379,12 +14379,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    TEXTURE30                      : 0x84DE,
 	    TEXTURE31                      : 0x84DF,
 	    ACTIVE_TEXTURE                 : 0x84E0,
-	    
+
 	    /* TextureWrapMode */
 	    REPEAT                         : 0x2901,
 	    CLAMP_TO_EDGE                  : 0x812F,
 	    MIRRORED_REPEAT                : 0x8370,
-	    
+
 	    /* Uniform Types */
 	    FLOAT_VEC2                     : 0x8B50,
 	    FLOAT_VEC3                     : 0x8B51,
@@ -14401,7 +14401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    FLOAT_MAT4                     : 0x8B5C,
 	    SAMPLER_2D                     : 0x8B5E,
 	    SAMPLER_CUBE                   : 0x8B60,
-	    
+
 	    /* Vertex Arrays */
 	    VERTEX_ATTRIB_ARRAY_ENABLED        : 0x8622,
 	    VERTEX_ATTRIB_ARRAY_SIZE           : 0x8623,
@@ -14410,10 +14410,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    VERTEX_ATTRIB_ARRAY_NORMALIZED     : 0x886A,
 	    VERTEX_ATTRIB_ARRAY_POINTER        : 0x8645,
 	    VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : 0x889F,
-	    
+
 	    /* Shader Source */
 	    COMPILE_STATUS                 : 0x8B81,
-	    
+
 	    /* Shader Precision-Specified Types */
 	    LOW_FLOAT                      : 0x8DF0,
 	    MEDIUM_FLOAT                   : 0x8DF1,
@@ -14421,11 +14421,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    LOW_INT                        : 0x8DF3,
 	    MEDIUM_INT                     : 0x8DF4,
 	    HIGH_INT                       : 0x8DF5,
-	    
+
 	    /* Framebuffer Object. */
 	    FRAMEBUFFER                    : 0x8D40,
 	    RENDERBUFFER                   : 0x8D41,
-	    
+
 	    RGBA4                          : 0x8056,
 	    RGB5_A1                        : 0x8057,
 	    RGB565                         : 0x8D62,
@@ -14433,7 +14433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    STENCIL_INDEX                  : 0x1901,
 	    STENCIL_INDEX8                 : 0x8D48,
 	    DEPTH_STENCIL                  : 0x84F9,
-	    
+
 	    RENDERBUFFER_WIDTH             : 0x8D42,
 	    RENDERBUFFER_HEIGHT            : 0x8D43,
 	    RENDERBUFFER_INTERNAL_FORMAT   : 0x8D44,
@@ -14443,31 +14443,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    RENDERBUFFER_ALPHA_SIZE        : 0x8D53,
 	    RENDERBUFFER_DEPTH_SIZE        : 0x8D54,
 	    RENDERBUFFER_STENCIL_SIZE      : 0x8D55,
-	    
+
 	    FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           : 0x8CD0,
 	    FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           : 0x8CD1,
 	    FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         : 0x8CD2,
 	    FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : 0x8CD3,
-	    
+
 	    COLOR_ATTACHMENT0              : 0x8CE0,
 	    DEPTH_ATTACHMENT               : 0x8D00,
 	    STENCIL_ATTACHMENT             : 0x8D20,
 	    DEPTH_STENCIL_ATTACHMENT       : 0x821A,
-	    
+
 	    NONE                           : 0,
-	    
+
 	    FRAMEBUFFER_COMPLETE                      : 0x8CD5,
 	    FRAMEBUFFER_INCOMPLETE_ATTACHMENT         : 0x8CD6,
 	    FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : 0x8CD7,
 	    FRAMEBUFFER_INCOMPLETE_DIMENSIONS         : 0x8CD9,
 	    FRAMEBUFFER_UNSUPPORTED                   : 0x8CDD,
-	    
+
 	    FRAMEBUFFER_BINDING            : 0x8CA6,
 	    RENDERBUFFER_BINDING           : 0x8CA7,
 	    MAX_RENDERBUFFER_SIZE          : 0x84E8,
-	    
+
 	    INVALID_FRAMEBUFFER_OPERATION  : 0x0506,
-	    
+
 	    /* WebGL-specific enums */
 	    UNPACK_FLIP_Y_WEBGL            : 0x9240,
 	    UNPACK_PREMULTIPLY_ALPHA_WEBGL : 0x9241,
@@ -15154,7 +15154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
 
-	            this.beforeUpdate( _gl);
+	            this.updateCommon( _gl);
 
 	            var glFormat = this.format;
 	            var glType = this.type;
@@ -15338,6 +15338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var Base = __webpack_require__(3);
 	    var glenum = __webpack_require__(34);
 	    var Cache = __webpack_require__(41);
+	    var glinfo = __webpack_require__(42);
 
 	    /**
 	     * @constructor qtek.Texture
@@ -15455,15 +15456,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        update: function (_gl) {},
 
 	        // Update the common parameters of texture
-	        beforeUpdate: function (_gl) {
+	        updateCommon: function (_gl) {
 	            _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
 	            _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
 	            _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
 
-	            this.fallBack();
+	            this._fallBack(_gl);
 	        },
 
-	        fallBack: function () {
+	        _fallBack: function (_gl) {
 	            // Use of none-power of two texture
 	            // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
 
@@ -15471,6 +15472,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            if (this.format === glenum.DEPTH_COMPONENT) {
 	                this.useMipmap = false;
+	            }
+
+	            var sRGBExt = glinfo.getExtension(_gl, 'EXT_sRGB');
+	            // Fallback
+	            if (this.format === Texture.SRGB && !sRGBExt) {
+	                this.format = Texture.RGB;
+	            }
+	            if (this.format === Texture.SRGB_ALPHA && !sRGBExt) {
+	                this.format = Texture.RGBA;
 	            }
 
 	            if (!isPowerOfTwo || !this.useMipmap) {
@@ -15583,6 +15593,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Texture.RGBA = glenum.RGBA;
 	    Texture.LUMINANCE = glenum.LUMINANCE;
 	    Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
+
+	    // https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+	    Texture.SRGB = 0x8C40;
+	    Texture.SRGB_ALPHA = 0x8C42;
 
 	    /* Compressed Texture */
 	    Texture.COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
@@ -15758,7 +15772,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'EXT_texture_filter_anisotropic',
 	        'EXT_shader_texture_lod',
 	        'WEBGL_draw_buffers',
-	        'EXT_frag_depth'
+	        'EXT_frag_depth',
+	        'EXT_sRGB'
 	    ];
 
 	    var PARAMETER_NAMES = [
@@ -16373,7 +16388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
-	            this.beforeUpdate(_gl);
+	            this.updateCommon(_gl);
 
 	            var glFormat = this.format;
 	            var glType = this.type;
@@ -34220,7 +34235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	    module.exports = '0.3.9';
+	    module.exports = '0.4.0';
 
 
 /***/ },
