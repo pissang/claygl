@@ -512,8 +512,7 @@ define(function (require) {
                 mat4.multiply(lvpMat4Arr, lightProjMatrix._array, lightViewMatrix._array);
 
                 var clipPlanes = [];
-                var rad = sceneCamera.fov / 180 * Math.PI;
-                var aspect = sceneCamera.aspect;
+                var isPerspective = sceneCamera instanceof PerspectiveCamera;
 
                 var scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
                 var offsetZ = 2 * sceneCamera.near * sceneCamera.far / (sceneCamera.near - sceneCamera.far);
@@ -538,7 +537,16 @@ define(function (require) {
                     // Get the splitted frustum
                     var nearPlane = clipPlanes[i];
                     var farPlane = clipPlanes[i+1];
-                    mat4.perspective(splitProjMatrix._array, rad, aspect, nearPlane, farPlane);
+                    if (isPerspective) {
+                        mat4.perspective(splitProjMatrix._array, sceneCamera.fov / 180 * Math.PI, sceneCamera.aspect, nearPlane, farPlane);
+                    }
+                    else {
+                        mat4.ortho(
+                            splitProjMatrix._array,
+                            sceneCamera.left, sceneCamera.right, sceneCamera.bottom, sceneCamera.top,
+                            nearPlane, farPlane
+                        );
+                    }
                     splitFrustum.setFromProjection(splitProjMatrix);
                     splitFrustum.getTransformedBoundingBox(cropBBox, lightViewMatrix);
                     cropBBox.applyProjection(lightProjMatrix);
