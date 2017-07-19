@@ -253,27 +253,33 @@ define(function(require) {
          * @param {number} clipIndex
          */
         setPose: function(clipIndex) {
-            if (!this._clips[clipIndex]) {
-                return;
-            }
+            if (this._clips[clipIndex]) {
+                var clip = this._clips[clipIndex].clip;
+                var maps = this._clips[clipIndex].maps;
 
-            var clip = this._clips[clipIndex].clip;
-            var maps = this._clips[clipIndex].maps;
+                for (var i = 0; i < this.joints.length; i++) {
+                    var joint = this.joints[i];
+                    if (maps[i] === -1) {
+                        continue;
+                    }
+                    var pose = clip.jointClips[maps[i]];
 
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                if (maps[i] === -1) {
-                    continue;
+                    // Not update if there is no data.
+                    // PENDING If sync pose.position, pose.rotation, pose.scale
+                    if (pose.channels.position) {
+                        vec3.copy(joint.node.position._array, pose.position);
+                    }
+                    if (pose.channels.rotation) {
+                        quat.copy(joint.node.rotation._array, pose.rotation);
+                    }
+                    if (pose.channels.scale) {
+                        vec3.copy(joint.node.scale._array, pose.scale);
+                    }
+
+                    joint.node.position._dirty = true;
+                    joint.node.rotation._dirty = true;
+                    joint.node.scale._dirty = true;
                 }
-                var pose = clip.jointClips[maps[i]];
-
-                vec3.copy(joint.node.position._array, pose.position);
-                quat.copy(joint.node.rotation._array, pose.rotation);
-                vec3.copy(joint.node.scale._array, pose.scale);
-
-                joint.node.position._dirty = true;
-                joint.node.rotation._dirty = true;
-                joint.node.scale._dirty = true;
             }
             this.update();
         },
