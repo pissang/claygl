@@ -367,7 +367,7 @@ def CreateTexture(pProperty):
         return None
 
 _materialHashMap = {}
-_repeatedMaterialCount = {}
+_duplicateMaterialCount = {}
 def ConvertMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
 
@@ -436,11 +436,11 @@ def ConvertMaterial(pMaterial):
         return _materialHashMap[lHashKey];
 
     while lMaterialName in lib_materials:
-        if not lMaterialName in _repeatedMaterialCount:
-            _repeatedMaterialCount[lMaterialName] = 0
+        if not lMaterialName in _duplicateMaterialCount:
+            _duplicateMaterialCount[lMaterialName] = 0
         else:
-            _repeatedMaterialCount[lMaterialName] += 1
-        lMaterialName = lMaterialName + '_' + str(_repeatedMaterialCount[lMaterialName])
+            _duplicateMaterialCount[lMaterialName] += 1
+        lMaterialName = lMaterialName + '_' + str(_duplicateMaterialCount[lMaterialName])
     _materialHashMap[lHashKey] =  lMaterialName
 
     lGLTFMaterial['name'] = lMaterialName
@@ -525,7 +525,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         lLayerMaterial = lLayer.GetMaterials()
         lMaterial = None;
         if not lLayerMaterial:
-            print("Mesh " + pNode.GetName() + " doesn't have material")
+            print("Mesh " + GetNodeNameWithoutDuplication(pNode) + " doesn't have material")
             lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
             _defaultMaterialIndex += 1;
         else:
@@ -576,13 +576,14 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                     lCluster = lDeformer.GetCluster(i2)
                     lNode = lCluster.GetLink()
                     lJointIndex = -1
-                    if not lNode.GetName() in pSkin['joints']:
+                    lNodeName = GetNodeNameWithoutDuplication(lNode)
+                    if not lNodeName in pSkin['joints']:
                         lJointIndex = len(pSkin['joints'])
-                        pSkin['joints'].append(lNode.GetName())
+                        pSkin['joints'].append(lNodeName)
 
-                        pClusters[lNode.GetName()] = lCluster
+                        pClusters[lNodeName] = lCluster
                     else:
-                        lJointIndex = pSkin['joints'].index(lNode.GetName())
+                        lJointIndex = pSkin['joints'].index(lNodeName)
 
                     lControlPointIndices = lCluster.GetControlPointIndices()
                     lControlPointWeights = lCluster.GetControlPointWeights()
@@ -606,7 +607,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                         lJointCounts[lControlPointIndex] += 1
 
         if moreThanFourJoints:
-            print('More than 4 joints (%d joints) bound to per vertex. ' % lMaxJointCount)
+            print('More than 4 joints (%d joints) bound to per vertex in %s. ' %(lMaxJointCount, GetNodeNameWithoutDuplication(pNode)))
 
         # Weight is FLOAT_3 because it is normalized
         for i in range(len(lWeights)):
@@ -712,10 +713,10 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 def ConvertLight(pLight):
     lGLTFLight = {}
     # In fbx light's name is empty ?
-    if pLight.GetName() == "":
+    if GetNodeNameWithoutDuplication(pLight) == "":
         lLightName = "light_" + str(len(lib_lights.keys()))
     else:
-        lLightName = pLight.GetName() + '-light'
+        lLightName = GetNodeNameWithoutDuplication(pLight) + '-light'
 
     lGLTFLight['id'] = lLightName
 
@@ -771,17 +772,37 @@ def ConvertCamera(pCamera):
     lGLTFCamera['zfar'] = pCamera.FarPlane.Get()
 
     # In fbx camera's name is empty ?
-    if pCamera.GetName() == '':
+    if GetNodeNameWithoutDuplication(pCamera) == '':
         lCameraName = 'camera_' + str(len(lib_cameras.keys()))
     else:
-        lCameraName = pCamera.GetName() + '-camera'
+        lCameraName = GetNodeNameWithoutDuplication(pCamera) + '-camera'
     lib_cameras[lCameraName] = lGLTFCamera
     return lCameraName
 
+_duplicateNodeCount = {}
+_nodeNameMap = {}
+_exitNodes = {}
+
+def GetNodeNameWithoutDuplication(pNode):
+    lNodeName = pNode.GetName()
+    if not pNode.GetUniqueID() in _nodeNameMap:
+        while lNodeName in _exitNodes:
+            if not lNodeName in _duplicateNodeCount:
+                _duplicateNodeCount[lNodeName] = 0
+            else:
+                _duplicateNodeCount[lNodeName] += 1
+            lNodeName = lNodeName + '_' + str(_duplicateNodeCount[lNodeName])
+
+        _nodeNameMap[pNode.GetUniqueID()] = lNodeName
+        _exitNodes[lNodeName] = True
+
+    return _nodeNameMap[pNode.GetUniqueID()]
+
 def ConvertSceneNode(pScene, pNode, fbxConverter):
     lGLTFNode = {}
-    lNodeName = pNode.GetName()
+    lNodeName = GetNodeNameWithoutDuplication(pNode)
     lGLTFNode['name'] = lNodeName
+
     lib_nodes[lNodeName] = lGLTFNode
 
     # Transform matrix
@@ -847,6 +868,7 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
                 lLink = lCluster.GetLink()
                 lParent = lLink
                 lRootFound = False
+                lParentName = GetNodeNameWithoutDuplication(lParent)
                 # if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
                 #     if not lParent.GetName() in roots:
                 #         roots.append(lLink.GetName())
@@ -854,34 +876,41 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
                     lSkeleton = lParent.GetSkeleton()
                     if lSkeleton == None:
                         break;
+
                     # In case some skeleton is not a attached to any vertices(not a cluster)
                     # PENDING
-                    if not lParent.GetName() in lGLTFSkin['joints'] and not lParent.GetName() in lExtraJoints:
-                        lExtraJoints.append(lParent.GetName())
+                    if not lParentName in lGLTFSkin['joints'] and not lParentName in lExtraJoints:
+                        lExtraJoints.append(lParentName)
 
                     if lSkeleton.IsSkeletonRoot():
                         lRootFound = True
                         break;
                     lParent = lParent.GetParent()
+                    lParentName = GetNodeNameWithoutDuplication(lParent)
+
+                # lSkeletonTypes = ["Root", "Limb", "Limb Node", "Effector"]
+                # print(lSkeletonTypes[lSkeleton.GetSkeletonType()])
 
                 if lRootFound:
-                    if not lParent.GetName() in roots:
-                        roots.append(lParent.GetName())
+                    if not lParentName in roots:
+                        roots.append(lParentName)
                 else:
                     # TODO IsSkeletonRoot not works well, try another way
                     # which do not have a parent or its parent is not in skin
                     lParent = lLink.GetParent()
-                    if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
-                        if not lLink.GetName() in roots:
-                            roots.append(lLink.GetName())
+                    if lParent == None or not GetNodeNameWithoutDuplication(lParent) in lGLTFSkin['joints']:
+                        if not GetNodeNameWithoutDuplication(lLink) in roots:
+                            roots.append(GetNodeNameWithoutDuplication(lLink))
 
-            # TODO
-            lRootNode = fbxNodes[roots[0]]
-            lRootNodeTransform = lRootNode.GetParent().EvaluateGlobalTransform()
+            # lRootNode = fbxNodes[roots[0]]
+            # lRootNodeTransform = lRootNode.GetParent().EvaluateGlobalTransform()
 
             lClusterGlobalInitMatrix = FbxAMatrix()
             lReferenceGlobalInitMatrix = FbxAMatrix()
 
+            lT = pNode.GetGeometricTranslation(FbxNode.eSourcePivot)
+            lR = pNode.GetGeometricRotation(FbxNode.eSourcePivot)
+            lS = pNode.GetGeometricScaling(FbxNode.eSourcePivot)
             for i in range(len(lGLTFSkin['joints'])):
                 lJointName = lGLTFSkin['joints'][i]
                 lCluster = lClusters[lJointName]
@@ -894,7 +923,7 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
                 # Matrix in fbx is column major
                 # 1/(1/root * 1/reference * cluster) = 1/cluster * reference * root
                 # http://blog.csdn.net/bugrunner/article/details/7232291
-                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * lRootNodeTransform
+                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * FbxAMatrix(lT, lR, lS)
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
 
@@ -976,7 +1005,7 @@ def GetPropertyAnimationCurveTime(pAnimCurve):
     return lStartTimeDouble, lEndTimeDouble, lDuration
 
 def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
-    lNodeName = pNode.GetName()
+    lNodeName = GetNodeNameWithoutDuplication(pNode)
 
     # PENDING
     lTranslationCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
@@ -1135,7 +1164,7 @@ def CreateBufferViews(pBufferName):
     lByteOffset += lBufferView['byteLength']
 
 def ListNodes(pNode):
-    fbxNodes[pNode.GetName()] = pNode
+    fbxNodes[GetNodeNameWithoutDuplication(pNode)] = pNode
     for k in range(pNode.GetChildCount()):
         ListNodes(pNode.GetChild(k))
 

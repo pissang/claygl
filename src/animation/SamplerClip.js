@@ -1,5 +1,7 @@
 // Sampler clip is especially for the animation sampler in glTF
 // Use Typed Array can reduce a lot of heap memory
+//
+// TODO Sync target transform
 define(function(require) {
 
     'use strict';

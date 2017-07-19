@@ -167,20 +167,8 @@ define(function(require) {
 
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
-                    // Joint space is relative to root joint's parent, if have
-                    // !!Parent node and joint node must all be updated
-                    if (joint.rootNode && joint.rootNode.getParent()) {
-                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
-                        mat4.multiply(
-                            m4,
-                            m4,
-                            joint.node.worldTransform._array
-                        );
-                        mat4.invert(m4, m4);
-                    } else {
-                        mat4.copy(m4, joint.node.worldTransform._array);
-                        mat4.invert(m4, m4);
-                    }
+                    mat4.copy(m4, joint.node.worldTransform._array);
+                    mat4.invert(m4, m4);
 
                     var offset = i * 16;
                     for (var j = 0; j < 16; j++) {
@@ -202,34 +190,20 @@ define(function(require) {
         /**
          * Update skinning matrices
          */
-        update: (function() {
-            var m4 = mat4.create();
-            return function() {
-                for (var i = 0; i < this.roots.length; i++) {
-                    this.roots[i].node.update(true);
-                }
+        update: function () {
+            for (var i = 0; i < this.roots.length; i++) {
+                this.roots[i].node.update(true);
+            }
 
-                for (var i = 0; i < this.joints.length; i++) {
-                    var joint = this.joints[i];
-                    mat4.multiply(
-                        this._skinMatricesSubArrays[i],
-                        joint.node.worldTransform._array,
-                        this._jointMatricesSubArrays[i]
-                    );
-
-                    // Joint space is relative to root joint's parent, if have
-                    // PENDING
-                    if (joint.rootNode && joint.rootNode.getParent()) {
-                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
-                        mat4.multiply(
-                            this._skinMatricesSubArrays[i],
-                            m4,
-                            this._skinMatricesSubArrays[i]
-                        );
-                    }
-                }
-            };
-        })(),
+            for (var i = 0; i < this.joints.length; i++) {
+                var joint = this.joints[i];
+                mat4.multiply(
+                    this._skinMatricesSubArrays[i],
+                    joint.node.worldTransform._array,
+                    this._jointMatricesSubArrays[i]
+                );
+            }
+        },
 
         getSubSkinMatrices: function(meshId, joints) {
             var subArray = this._subSkinMatricesArray[meshId];

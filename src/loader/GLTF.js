@@ -250,6 +250,8 @@ define(function (require) {
                     meshes: lib.meshes,
                     clips: lib.clips,
                     // Main skinning clip
+                    // TODO Skinning clip used for multiple skeleton ?
+                    // TODO Some clip for individual node animations.
                     clip: skinningClip
                 });
             }
@@ -772,7 +774,8 @@ define(function (require) {
                             far: cameraInfo.zfar,
                             near: cameraInfo.znear
                         });
-                    } else {
+                    }
+                    else {
                         // TODO
                         node = new OrthographicCamera();
                         console.warn('TODO:Orthographic camera');
@@ -793,7 +796,8 @@ define(function (require) {
                         // Replace the node with light
                         node = lights[0];
                         node.setName(nodeInfo.name);
-                    } else {
+                    }
+                    else {
                         node = new Node();
                         node.setName(nodeInfo.name);
                         for (var i = 0; i < lights.length; i++) {
@@ -806,7 +810,8 @@ define(function (require) {
                     var meshKey;
                     if (nodeInfo.meshes) {
                         meshKey = nodeInfo.meshes[0];
-                    } else {
+                    }
+                    else {
                         meshKey = nodeInfo.instanceSkin.sources[0];
                     }
                     if (meshKey) {
@@ -816,7 +821,8 @@ define(function (require) {
                                 // Replace the node with mesh directly
                                 node = primitives[0];
                                 node.setName(nodeInfo.name);
-                            } else {
+                            }
+                            else {
                                 node = new Node();
                                 node.setName(nodeInfo.name);
                                 for (var j = 0; j < primitives.length; j++) {
@@ -828,16 +834,16 @@ define(function (require) {
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     node = new Node();
                     node.setName(nodeInfo.name);
                 }
                 if (nodeInfo.matrix) {
-                    for (var i = 0; i < 16; i++) {
-                        node.localTransform._array[i] = nodeInfo.matrix[i];
-                    }
+                    node.localTransform.setArray(nodeInfo.matrix);
                     node.decomposeLocalTransform();
-                } else {
+                }
+                else {
                     if (nodeInfo.translation) {
                         node.position.setArray(nodeInfo.translation);
                     }
