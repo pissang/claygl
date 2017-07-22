@@ -236,6 +236,7 @@ define(function (require) {
 
                         for (var name in lib.skeletons) {
                             lib.skeletons[name].addClip(skinningClip);
+                            lib.skeletons[name].relativeRootNode = rootNode;
                         }
                     }
                 }

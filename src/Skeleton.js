@@ -15,6 +15,12 @@ define(function(require) {
      */
     var Skeleton = Base.extend(function() {
         return /** @lends qtek.Skeleton# */{
+
+            /**
+             * Relative root node that not affect transform of joint.
+             * @type {qtek.Node}
+             */
+            relativeRootNode: null,
             /**
              * @type {string}
              */
@@ -64,7 +70,8 @@ define(function(require) {
                 if (joint.parentIndex >= 0) {
                     var parent = joints[joint.parentIndex].node;
                     parent.add(joint.node);
-                }else{
+                }
+                else {
                     this.roots.push(joint);
                 }
             }
@@ -167,8 +174,21 @@ define(function(require) {
 
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
-                    mat4.copy(m4, joint.node.worldTransform._array);
-                    mat4.invert(m4, m4);
+                    // Joint space is relative to root, if have
+                    // !!Parent node and joint node must all be updated
+                    if (this.relativeRootNode) {
+                        mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                        mat4.multiply(
+                            m4,
+                            m4,
+                            joint.node.worldTransform._array
+                        );
+                        mat4.invert(m4, m4);
+                    }
+                    else {
+                        mat4.copy(m4, joint.node.worldTransform._array);
+                        mat4.invert(m4, m4);
+                    }
 
                     var offset = i * 16;
                     for (var j = 0; j < 16; j++) {
@@ -190,20 +210,33 @@ define(function(require) {
         /**
          * Update skinning matrices
          */
-        update: function () {
-            for (var i = 0; i < this.roots.length; i++) {
-                this.roots[i].node.update(true);
-            }
+        update: (function() {
+            var m4 = mat4.create();
+            return function() {
+                for (var i = 0; i < this.roots.length; i++) {
+                    this.roots[i].node.update(true);
+                }
 
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                mat4.multiply(
-                    this._skinMatricesSubArrays[i],
-                    joint.node.worldTransform._array,
-                    this._jointMatricesSubArrays[i]
-                );
-            }
-        },
+                for (var i = 0; i < this.joints.length; i++) {
+                    var joint = this.joints[i];
+                    mat4.multiply(
+                        this._skinMatricesSubArrays[i],
+                        joint.node.worldTransform._array,
+                        this._jointMatricesSubArrays[i]
+                    );
+
+                    // Joint space is relative to root, if have
+                    if (this.relativeRootNode) {
+                        mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                        mat4.multiply(
+                            this._skinMatricesSubArrays[i],
+                            m4,
+                            this._skinMatricesSubArrays[i]
+                        );
+                    }
+                }
+            };
+        })(),
 
         getSubSkinMatrices: function(meshId, joints) {
             var subArray = this._subSkinMatricesArray[meshId];
@@ -274,7 +307,8 @@ define(function(require) {
                 if (path != null && rootNodePath != null) {
                     newJoint.node = newRootNode.queryNode(path);
                     newJoint.rootNode = newRootNode.queryNode(rootNodePath);
-                } else {
+                }
+                else {
                     // PENDING
                     console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.')
                 }

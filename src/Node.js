@@ -560,7 +560,6 @@ define(function (require) {
                     else {
                         out.union(tmpBBox);
                     }
-
                 }
 
                 return out;
