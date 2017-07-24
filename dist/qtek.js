@@ -7908,6 +7908,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	// Sampler clip is especially for the animation sampler in glTF
 	// Use Typed Array can reduce a lot of heap memory
+	//
+	// TODO Sync target transform
 
 
 	    var Clip = __webpack_require__(8);
@@ -9814,7 +9816,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    else {
 	                        out.union(tmpBBox);
 	                    }
-
 	                }
 
 	                return out;
@@ -27007,6 +27008,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                        for (var name in lib.skeletons) {
 	                            lib.skeletons[name].addClip(skinningClip);
+	                            lib.skeletons[name].relativeRootNode = rootNode;
 	                        }
 	                    }
 	                }
@@ -27021,6 +27023,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    meshes: lib.meshes,
 	                    clips: lib.clips,
 	                    // Main skinning clip
+	                    // TODO Skinning clip used for multiple skeleton ?
+	                    // TODO Some clip for individual node animations.
 	                    clip: skinningClip
 	                });
 	            }
@@ -27543,7 +27547,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            far: cameraInfo.zfar,
 	                            near: cameraInfo.znear
 	                        });
-	                    } else {
+	                    }
+	                    else {
 	                        // TODO
 	                        node = new OrthographicCamera();
 	                        console.warn('TODO:Orthographic camera');
@@ -27564,7 +27569,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        // Replace the node with light
 	                        node = lights[0];
 	                        node.setName(nodeInfo.name);
-	                    } else {
+	                    }
+	                    else {
 	                        node = new Node();
 	                        node.setName(nodeInfo.name);
 	                        for (var i = 0; i < lights.length; i++) {
@@ -27577,7 +27583,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var meshKey;
 	                    if (nodeInfo.meshes) {
 	                        meshKey = nodeInfo.meshes[0];
-	                    } else {
+	                    }
+	                    else {
 	                        meshKey = nodeInfo.instanceSkin.sources[0];
 	                    }
 	                    if (meshKey) {
@@ -27587,7 +27594,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                // Replace the node with mesh directly
 	                                node = primitives[0];
 	                                node.setName(nodeInfo.name);
-	                            } else {
+	                            }
+	                            else {
 	                                node = new Node();
 	                                node.setName(nodeInfo.name);
 	                                for (var j = 0; j < primitives.length; j++) {
@@ -27599,16 +27607,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            }
 	                        }
 	                    }
-	                } else {
+	                }
+	                else {
 	                    node = new Node();
 	                    node.setName(nodeInfo.name);
 	                }
 	                if (nodeInfo.matrix) {
-	                    for (var i = 0; i < 16; i++) {
-	                        node.localTransform._array[i] = nodeInfo.matrix[i];
-	                    }
+	                    node.localTransform.setArray(nodeInfo.matrix);
 	                    node.decomposeLocalTransform();
-	                } else {
+	                }
+	                else {
 	                    if (nodeInfo.translation) {
 	                        node.position.setArray(nodeInfo.translation);
 	                    }
@@ -28222,6 +28230,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    var Skeleton = Base.extend(function() {
 	        return /** @lends qtek.Skeleton# */{
+
+	            /**
+	             * Relative root node that not affect transform of joint.
+	             * @type {qtek.Node}
+	             */
+	            relativeRootNode: null,
 	            /**
 	             * @type {string}
 	             */
@@ -28271,7 +28285,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (joint.parentIndex >= 0) {
 	                    var parent = joints[joint.parentIndex].node;
 	                    parent.add(joint.node);
-	                }else{
+	                }
+	                else {
 	                    this.roots.push(joint);
 	                }
 	            }
@@ -28374,17 +28389,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                for (var i = 0; i < this.joints.length; i++) {
 	                    var joint = this.joints[i];
-	                    // Joint space is relative to root joint's parent, if have
+	                    // Joint space is relative to root, if have
 	                    // !!Parent node and joint node must all be updated
-	                    if (joint.rootNode && joint.rootNode.getParent()) {
-	                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
+	                    if (this.relativeRootNode) {
+	                        mat4.invert(m4, this.relativeRootNode.worldTransform._array);
 	                        mat4.multiply(
 	                            m4,
 	                            m4,
 	                            joint.node.worldTransform._array
 	                        );
 	                        mat4.invert(m4, m4);
-	                    } else {
+	                    }
+	                    else {
 	                        mat4.copy(m4, joint.node.worldTransform._array);
 	                        mat4.invert(m4, m4);
 	                    }
@@ -28424,10 +28440,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        this._jointMatricesSubArrays[i]
 	                    );
 
-	                    // Joint space is relative to root joint's parent, if have
-	                    // PENDING
-	                    if (joint.rootNode && joint.rootNode.getParent()) {
-	                        mat4.invert(m4, joint.rootNode.getParent().worldTransform._array);
+	                    // Joint space is relative to root, if have
+	                    if (this.relativeRootNode) {
+	                        mat4.invert(m4, this.relativeRootNode.worldTransform._array);
 	                        mat4.multiply(
 	                            this._skinMatricesSubArrays[i],
 	                            m4,
@@ -28460,27 +28475,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} clipIndex
 	         */
 	        setPose: function(clipIndex) {
-	            if (!this._clips[clipIndex]) {
-	                return;
-	            }
+	            if (this._clips[clipIndex]) {
+	                var clip = this._clips[clipIndex].clip;
+	                var maps = this._clips[clipIndex].maps;
 
-	            var clip = this._clips[clipIndex].clip;
-	            var maps = this._clips[clipIndex].maps;
+	                for (var i = 0; i < this.joints.length; i++) {
+	                    var joint = this.joints[i];
+	                    if (maps[i] === -1) {
+	                        continue;
+	                    }
+	                    var pose = clip.jointClips[maps[i]];
 
-	            for (var i = 0; i < this.joints.length; i++) {
-	                var joint = this.joints[i];
-	                if (maps[i] === -1) {
-	                    continue;
+	                    // Not update if there is no data.
+	                    // PENDING If sync pose.position, pose.rotation, pose.scale
+	                    if (pose.channels.position) {
+	                        vec3.copy(joint.node.position._array, pose.position);
+	                    }
+	                    if (pose.channels.rotation) {
+	                        quat.copy(joint.node.rotation._array, pose.rotation);
+	                    }
+	                    if (pose.channels.scale) {
+	                        vec3.copy(joint.node.scale._array, pose.scale);
+	                    }
+
+	                    joint.node.position._dirty = true;
+	                    joint.node.rotation._dirty = true;
+	                    joint.node.scale._dirty = true;
 	                }
-	                var pose = clip.jointClips[maps[i]];
-
-	                vec3.copy(joint.node.position._array, pose.position);
-	                quat.copy(joint.node.rotation._array, pose.rotation);
-	                vec3.copy(joint.node.scale._array, pose.scale);
-
-	                joint.node.position._dirty = true;
-	                joint.node.rotation._dirty = true;
-	                joint.node.scale._dirty = true;
 	            }
 	            this.update();
 	        },
@@ -28501,7 +28522,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (path != null && rootNodePath != null) {
 	                    newJoint.node = newRootNode.queryNode(path);
 	                    newJoint.rootNode = newRootNode.queryNode(rootNodePath);
-	                } else {
+	                }
+	                else {
 	                    // PENDING
 	                    console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.')
 	                }
@@ -32860,8 +32882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                mat4.multiply(lvpMat4Arr, lightProjMatrix._array, lightViewMatrix._array);
 
 	                var clipPlanes = [];
-	                var rad = sceneCamera.fov / 180 * Math.PI;
-	                var aspect = sceneCamera.aspect;
+	                var isPerspective = sceneCamera instanceof PerspectiveCamera;
 
 	                var scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
 	                var offsetZ = 2 * sceneCamera.near * sceneCamera.far / (sceneCamera.near - sceneCamera.far);
@@ -32886,7 +32907,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Get the splitted frustum
 	                    var nearPlane = clipPlanes[i];
 	                    var farPlane = clipPlanes[i+1];
-	                    mat4.perspective(splitProjMatrix._array, rad, aspect, nearPlane, farPlane);
+	                    if (isPerspective) {
+	                        mat4.perspective(splitProjMatrix._array, sceneCamera.fov / 180 * Math.PI, sceneCamera.aspect, nearPlane, farPlane);
+	                    }
+	                    else {
+	                        mat4.ortho(
+	                            splitProjMatrix._array,
+	                            sceneCamera.left, sceneCamera.right, sceneCamera.bottom, sceneCamera.top,
+	                            nearPlane, farPlane
+	                        );
+	                    }
 	                    splitFrustum.setFromProjection(splitProjMatrix);
 	                    splitFrustum.getTransformedBoundingBox(cropBBox, lightViewMatrix);
 	                    cropBBox.applyProjection(lightProjMatrix);
@@ -34235,7 +34265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	
-	    module.exports = '0.4.0';
+	    module.exports = '0.4.1';
 
 
 /***/ },
