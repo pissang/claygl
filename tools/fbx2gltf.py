@@ -830,7 +830,8 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
         # TODO SplitMeshPerMaterial may loss deformer in mesh
         # TODO It will be crashed in some fbx files
         # FBX version 2014.2 seems have fixed it
-        # fbxConverter.SplitMeshPerMaterial(lGeometry, True)
+        if not pNode.GetMesh() == None:
+            fbxConverter.SplitMeshPerMaterial(pNode.GetMesh(), True)
 
         lHasSkin = False
         lGLTFSkin = None
@@ -1238,9 +1239,9 @@ if __name__ == "__main__":
         if platform.system() == 'Windows' or platform.system() == 'Microsoft':
             msg += '"Python26/Lib/site-packages"'
         elif platform.system() == 'Linux':
-            msg += '"/usr/local/lib/python2.6/site-packages"'
+            msg += '"/usr/local/lib/python3.3/site-packages"'
         elif platform.system() == 'Darwin':
-            msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'
+            msg += '"/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages"'
         msg += ' folder.'
         print(msg)
         sys.exit(1)
