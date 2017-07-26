@@ -375,7 +375,9 @@ define(function (require) {
                     if (node instanceof Mesh) {
                         node.skeleton = skeleton;
                         node.joints = jointIndices;
-                        var material = node.material;
+                        // Make sure nodes with different joints not have same material.
+                        var material = node.material.clone();
+                        node.material = material;
                         if (material instanceof StandardMaterial) {
                             material.jointCount = jointIndices.length;
                         }
