@@ -592,6 +592,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                         lControlPointIndex = lControlPointIndices[i3]
                         lControlPointWeight = lControlPointWeights[i3]
                         lJointCount = lJointCounts[lControlPointIndex]
+
                         # At most binding four joint per vertex
                         if lJointCount <= 3:
                             # Joint index
@@ -920,15 +921,15 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
                 lCluster.GetTransformMatrix(lReferenceGlobalInitMatrix)
                 # Matrix of Joint
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
-                # Matrix in fbx is column major
-                # 1/(1/root * 1/reference * cluster) = 1/cluster * reference * root
                 # http://blog.csdn.net/bugrunner/article/details/7232291
+                # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref__view_scene_2_draw_scene_8cxx_example_html
                 m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * FbxAMatrix(lT, lR, lS)
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
 
             for i in range(len(lExtraJoints)):
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1))
+                lGLTFSkin['inverseBindMatrices']['count'] += 1
 
             lGLTFSkin['joints'] += lExtraJoints
 
