@@ -5,12 +5,7 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
-#ifdef SKINNING
-attribute vec3 weight : WEIGHT;
-attribute vec4 joint : JOINT;
-
-uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
-#endif
+@import qtek.chunk.skinning_header
 
 void main()
 {

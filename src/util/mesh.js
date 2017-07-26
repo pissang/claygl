@@ -138,6 +138,8 @@ define(function(require) {
          *
          * @memberOf qtek.util.mesh
          */
+
+        // FIXME, Have issues on some models
         splitByJoints: function(mesh, maxJointNumber, inPlace) {
             var geometry = mesh.geometry;
             var skeleton = mesh.skeleton;

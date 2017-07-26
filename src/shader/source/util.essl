@@ -149,25 +149,57 @@ vec4 linearTosRGB(in vec4 value) {
 @end
 
 
+@export qtek.chunk.skinning_header
+#ifdef SKINNING
+attribute vec3 weight : WEIGHT;
+attribute vec4 joint : JOINT;
+
+#ifdef USE_SKIN_MATRICES_TEXTURE
+uniform sampler2D skinMatricesTexture;
+uniform float skinMatricesTextureSize: unconfigurable;
+mat4 getSkinMatrix(float idx) {
+    float j = idx * 4.0;
+    float x = mod(j, skinMatricesTextureSize);
+    float y = floor(j / skinMatricesTextureSize) + 0.5;
+    vec2 scale = vec2(skinMatricesTextureSize);
+
+    return mat4(
+        texture2D(skinMatricesTexture, vec2(x + 0.5, y) / scale),
+        texture2D(skinMatricesTexture, vec2(x + 1.5, y) / scale),
+        texture2D(skinMatricesTexture, vec2(x + 2.5, y) / scale),
+        texture2D(skinMatricesTexture, vec2(x + 3.5, y) / scale)
+    );
+}
+#else
+uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
+mat4 getSkinMatrix(float idx) {
+    return skinMatrix[int(idx)];
+}
+#endif
+
+#endif
+
+@end
+
 @export qtek.chunk.skin_matrix
 
 // Weighted Sum Skinning Matrix
 mat4 skinMatrixWS;
 if (joint.x >= 0.0)
 {
-    skinMatrixWS = skinMatrix[int(joint.x)] * weight.x;
+    skinMatrixWS = getSkinMatrix(joint.x) * weight.x;
 }
 if (joint.y >= 0.0)
 {
-    skinMatrixWS += skinMatrix[int(joint.y)] * weight.y;
+    skinMatrixWS += getSkinMatrix(joint.y) * weight.y;
 }
 if (joint.z >= 0.0)
 {
-    skinMatrixWS += skinMatrix[int(joint.z)] * weight.z;
+    skinMatrixWS += getSkinMatrix(joint.z) * weight.z;
 }
 if (joint.w >= 0.0)
 {
-    skinMatrixWS += skinMatrix[int(joint.w)] * (1.0-weight.x-weight.y-weight.z);
+    skinMatrixWS += getSkinMatrix(joint.w) * (1.0-weight.x-weight.y-weight.z);
 }
 @end
 

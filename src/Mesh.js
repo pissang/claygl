@@ -4,6 +4,7 @@ define(function(require) {
 
     var Renderable = require('./Renderable');
     var glenum = require('./core/glenum');
+    var Texture2D = require('./Texture2D');
 
     /**
      * @constructor qtek.Mesh
@@ -21,22 +22,70 @@ define(function(require) {
          * Joints indices Meshes can share the one skeleton instance and each mesh can use one part of joints. Joints indices indicate the index of joint in the skeleton instance
          * @type {number[]}
          */
-        joints: null
+        joints: null,
+
+        /**
+         * If store the skin matrices in vertex texture
+         */
+        useSkinMatricesTexture: false
 
     }, function () {
         if (!this.joints) {
             this.joints = [];
         }
     }, {
-        render: function(_gl, shader) {
+        render: function (_gl, shader) {
             shader = shader || this.material.shader;
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
                 var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
-                shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+
+                if (this.useSkinMatricesTexture) {
+                    var size;
+                    var numJoints = this.joints.length;
+                    if (numJoints > 256) {
+                        size = 64;
+                    }
+                    else if (numJoints > 64) {
+                        size = 32;
+                    }
+                    else if (numJoints > 16) {
+                        size = 16;
+                    }
+                    else {
+                        size = 8;
+                    }
+
+                    var texture = this.getSkinMatricesTexture();
+                    texture.width = size;
+                    texture.height = size;
+
+                    if (!texture.pixels || texture.pixels.length !== size * size * 4) {
+                        texture.pixels = new Float32Array(size * size * 4);
+                    }
+                    texture.pixels.set(skinMatricesArray);
+                    texture.dirty();
+
+                    shader.setUniform(_gl, '1f', 'skinMatricesTextureSize', size);
+                }
+                else {
+                    shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+                }
             }
 
             return Renderable.prototype.render.call(this, _gl, shader);
+        },
+
+        getSkinMatricesTexture: function () {
+            this._skinMatricesTexture = this._skinMatricesTexture || new Texture2D({
+                type: glenum.FLOAT,
+                minFilter: glenum.NEAREST,
+                magFilter: glenum.NEAREST,
+                useMipmap: false,
+                flipY: false
+            });
+
+            return this._skinMatricesTexture;
         }
     });
 

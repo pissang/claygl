@@ -8,12 +8,7 @@ attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
 #endif
 
-#ifdef SKINNING
-attribute vec3 weight : WEIGHT;
-attribute vec4 joint : JOINT;
-
-uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
-#endif
+@import qtek.chunk.skinning_header
 
 varying vec4 v_ViewPosition;
 
@@ -121,12 +116,7 @@ uniform mat4 world : WORLD;
 
 attribute vec3 position : POSITION;
 
-#ifdef SKINNING
-attribute vec3 boneWeight;
-attribute vec4 boneIndex;
-
-uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
-#endif
+@import qtek.chunk.skinning_header
 
 varying vec3 v_WorldPosition;
 

@@ -6,12 +6,7 @@ uniform mat4 world : WORLD;
 attribute vec3 position : POSITION;
 attribute vec3 barycentric;
 
-#ifdef SKINNING
-attribute vec3 weight : WEIGHT;
-attribute vec4 joint : JOINT;
-
-uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
-#endif
+@import qtek.chunk.skinning_header
 
 varying vec3 v_Barycentric;
 

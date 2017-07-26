@@ -168,11 +168,15 @@ define(function (require) {
                 var shaderHashKey;
                 if (isShadowTransparent) {
                     matHashKey = nJoints + '-' + transparentMap.__GUID__;
-                    shaderHashKey = nJoints + 's';
+                    shaderHashKey = nJoints + '-t';
                 }
                 else {
                     matHashKey = nJoints;
                     shaderHashKey = nJoints;
+                }
+                if (mesh.useSkinMatricesTexture) {
+                    matHashKey += '-s';
+                    shaderHashKey += '-s';
                 }
                 // Use custom shadow depth material
                 var depthMaterial = mesh.shadowDepthMaterial || this._depthMaterials[matHashKey];
@@ -190,6 +194,9 @@ define(function (require) {
                         }
                         if (isShadowTransparent) {
                             depthShader.define('both', 'SHADOW_TRANSPARENT');
+                        }
+                        if (mesh.useSkinMatricesTexture) {
+                            depthShader.define('vertex', 'USE_SKIN_MATRICES_TEXTURE');
                         }
                         this._depthShaders[shaderHashKey] = depthShader;
                     }
