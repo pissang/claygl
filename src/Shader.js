@@ -238,11 +238,8 @@ define(function (require) {
                 return false;
             }
             if (this === otherShader) {
-                if (this._codeDirty) {
-                    // Still needs update and rebind.
-                    return false;
-                }
-                return true;
+                // Still needs update and rebind if dirty.
+                return !this._codeDirty;
             }
             if (otherShader._codeDirty) {
                 otherShader._updateShaderString();

@@ -129,7 +129,9 @@ define(function (require) {
          */
         includeTexture: true
     },
-
+    function () {
+        this._shaderLib = shaderLibrary.createLibrary();
+    },
     /** @lends qtek.loader.GLTF.prototype */
     {
         /**
@@ -361,6 +363,31 @@ define(function (require) {
 
             var instanceSkins = {};
 
+            var shaderLib = this._shaderLib;
+            var shaderName = this.shaderName;
+            function enableSkinningForMesh(mesh, jointIndices) {
+                mesh.skeleton = skeleton;
+                mesh.joints = jointIndices;
+                // Make sure meshs with different joints not have same material.
+                var originalShader = mesh.material.shader;
+                var material = mesh.material.clone();
+                mesh.material = material;
+                if (material instanceof StandardMaterial) {
+                    material.jointCount = jointIndices.length;
+                }
+                else {
+                    material.shader = shaderLib.get(
+                        shaderName, {
+                            textures: originalShader.getEnabledTextures(),
+                            vertexDefines: {
+                                SKINNING: null,
+                                JOINT_COUNT: jointIndices.length
+                            }
+                        }
+                    );
+                }
+            }
+
             for (var name in json.nodes) {
 
                 var nodeInfo = json.nodes[name];
@@ -373,37 +400,12 @@ define(function (require) {
                     var node = lib.nodes[name];
                     var jointIndices = skeleton.joints.map(getJointIndex);
                     if (node instanceof Mesh) {
-                        node.skeleton = skeleton;
-                        node.joints = jointIndices;
-                        // Make sure nodes with different joints not have same material.
-                        var material = node.material.clone();
-                        node.material = material;
-                        if (material instanceof StandardMaterial) {
-                            material.jointCount = jointIndices.length;
-                        }
-                        else {
-                            material.shader = material.shader.clone();
-                            material.shader.define('vertex', 'SKINNING');
-                            material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
-                        }
+                        enableSkinningForMesh(node, jointIndices);
                     }
                     else {
                         // Mesh have multiple primitives
                         for (var i = 0; i < node._children.length; i++) {
-                            var child = node._children[i];
-                            if (child.skeleton) {
-                                child.skeleton = skeleton;
-                                child.joints = jointIndices;
-                                var material = child.material;
-                                if (material instanceof StandardMaterial) {
-                                    material.jointCount = jointIndices.length;
-                                }
-                                else {
-                                    material.shader = material.shader.clone();
-                                    material.shader.define('vertex', 'SKINNING');
-                                    material.shader.define('vertex', 'JOINT_COUNT', jointIndices.length);
-                                }
-                            }
+                            enableSkinningForMesh(node._children[i], jointIndices);
                         }
                     }
 
@@ -541,7 +543,7 @@ define(function (require) {
                 else {
                     material = new Material({
                         name: materialInfo.name,
-                        shader: shaderLibrary.get(this.shaderName, enabledTextures)
+                        shader: this._shaderLib.get(this.shaderName, enabledTextures)
                     });
                 }
                 if (technique.states.depthMask != null) {
@@ -733,7 +735,7 @@ define(function (require) {
                     //Collada export from blender may not have default material
                     if (!material) {
                         material = new Material({
-                            shader: shaderLibrary.get(self.shaderName)
+                            shader: this._shaderLib.get(self.shaderName)
                         });
                     }
                     var mesh = new Mesh({

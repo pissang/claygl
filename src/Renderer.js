@@ -498,6 +498,7 @@ define(function(require) {
             var scene = this._sceneRendering;
 
             var prevMaterial;
+            var prevShader;
 
             // Status
             var depthTest, depthMask;
@@ -623,7 +624,7 @@ define(function(require) {
 
                 // FIXME Optimize for compositing.
                 // var prevShader = this._sceneRendering ? null : this._currentShader;
-                var prevShader = null;
+                // var prevShader = null;
 
                 // Before render hook
                 renderable.beforeRender(_gl);
@@ -739,6 +740,8 @@ define(function(require) {
                 // After render hook
                 this.afterRenderObject(renderable, objectRenderInfo);
                 renderable.afterRender(_gl, objectRenderInfo);
+
+                prevShader = shader;
             }
 
             return renderInfo;
