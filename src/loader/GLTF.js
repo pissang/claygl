@@ -365,7 +365,7 @@ define(function (require) {
 
             var shaderLib = this._shaderLib;
             var shaderName = this.shaderName;
-            function enableSkinningForMesh(mesh, jointIndices) {
+            function enableSkinningForMesh(mesh, skeleton, jointIndices) {
                 mesh.skeleton = skeleton;
                 mesh.joints = jointIndices;
                 // Make sure meshs with different joints not have same material.
@@ -400,12 +400,12 @@ define(function (require) {
                     var node = lib.nodes[name];
                     var jointIndices = skeleton.joints.map(getJointIndex);
                     if (node instanceof Mesh) {
-                        enableSkinningForMesh(node, jointIndices);
+                        enableSkinningForMesh(node, skeleton, jointIndices);
                     }
                     else {
                         // Mesh have multiple primitives
                         for (var i = 0; i < node._children.length; i++) {
-                            enableSkinningForMesh(node._children[i], jointIndices);
+                            enableSkinningForMesh(node._children[i], skeleton, jointIndices);
                         }
                     }
 
