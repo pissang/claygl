@@ -186,7 +186,8 @@ define(function (require) {
                     if (!depthShader) {
                         depthShader = new Shader({
                             vertex: Shader.source('qtek.sm.depth.vertex'),
-                            fragment: Shader.source('qtek.sm.depth.fragment')
+                            fragment: Shader.source('qtek.sm.depth.fragment'),
+                            precision: 'mediump'
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
@@ -238,7 +239,8 @@ define(function (require) {
                         distanceMaterial = new Material({
                             shader: new Shader({
                                 vertex: Shader.source('qtek.sm.distance.vertex'),
-                                fragment: Shader.source('qtek.sm.distance.fragment')
+                                fragment: Shader.source('qtek.sm.distance.fragment'),
+                                precision: 'mediump'
                             })
                         });
                         if (nJoints > 0) {
