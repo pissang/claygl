@@ -1006,7 +1006,7 @@ def GetPropertyAnimationCurveTime(pAnimCurve):
 
     return lStartTimeDouble, lEndTimeDouble, lDuration
 
-def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
+def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     lNodeName = GetNodeNameWithoutDuplication(pNode)
 
     # PENDING
@@ -1030,6 +1030,9 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
 
     if lDuration < 1e-5 and lHaveScaling:
         lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lScalingCurve)
+
+    lDuration = min(lDuration, pDuration)
+    lStartTimeDouble = max(lStartTimeDouble, pStartTime)
 
     if lDuration > 1e-5:
         lAnimName, lGLTFAnimation = CreateAnimation()
@@ -1093,16 +1096,16 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate):
             lib_animations[lAnimName] = lGLTFAnimation
 
     for i in range(pNode.GetChildCount()):
-        ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate)
+        ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate, pStartTime, pDuration)
 
-def ConvertAnimation(pScene, pSampleRate):
+def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
     lRoot = pScene.GetRootNode()
     for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
         for j in range(lAnimStack.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimLayer.ClassId))):
             lAnimLayer = lAnimStack.GetSrcObject(FbxCriteria.ObjectType(FbxAnimLayer.ClassId), j)
             for k in range(lRoot.GetChildCount()):
-                ConvertNodeAnimation(lAnimLayer, lRoot.GetChild(k), pSampleRate)
+                ConvertNodeAnimation(lAnimLayer, lRoot.GetChild(k), pSampleRate, pStartTime, pDuration)
 
 
 def CreateBufferViews(pBufferName):
@@ -1170,7 +1173,7 @@ def ListNodes(pNode):
     for k in range(pNode.GetChildCount()):
         ListNodes(pNode.GetChild(k))
 
-def Convert(path, animFrameRate = 1 / 30):
+def Convert(path, animFrameRate = 1 / 20, startTime = 0, duration = 1000):
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
@@ -1185,7 +1188,7 @@ def Convert(path, animFrameRate = 1 / 30):
 
         ListNodes(lScene.GetRootNode())
         lSceneName = ConvertScene(lScene, fbxConverter)
-        ConvertAnimation(lScene, animFrameRate)
+        ConvertAnimation(lScene, animFrameRate, startTime, duration)
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
