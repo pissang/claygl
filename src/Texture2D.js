@@ -162,8 +162,11 @@ define(function(require) {
             _gl.bindTexture(_gl.TEXTURE_2D, null);
         },
 
-        load: function (src) {
+        load: function (src, crossOrigin) {
             var image = new Image();
+            if (crossOrigin) {
+                image.crossOrigin = crossOrigin;
+            }
             var self = this;
             image.onload = function() {
                 self.dirty();

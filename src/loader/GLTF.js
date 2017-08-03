@@ -102,6 +102,10 @@ define(function (require) {
         shaderName: 'qtek.standard',
 
         /**
+         * Cross origin setting
+         */
+
+        /**
          * @type {string}
          */
         useStandardMaterial: false,
@@ -127,7 +131,12 @@ define(function (require) {
         /**
          * @type {boolean}
          */
-        includeTexture: true
+        includeTexture: true,
+
+        /**
+         * @type {string}
+         */
+        crossOrigin: ''
     },
     function () {
         this._shaderLib = shaderLibrary.createLibrary();
@@ -471,7 +480,7 @@ define(function (require) {
                 if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
                     var imageInfo = json.images[textureInfo.source];
-                    texture.load(util.relative2absolute(imageInfo.path, rootPath));
+                    texture.load(util.relative2absolute(imageInfo.path, rootPath), this.crossOrigin);
                     lib.textures[name] = texture;
                 }
                 else if(target === glenum.TEXTURE_CUBE_MAP) {

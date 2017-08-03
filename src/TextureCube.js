@@ -187,11 +187,14 @@ define(function (require) {
             }
         },
 
-        load: function (imageList) {
+        load: function (imageList, crossOrigin) {
             var loading = 0;
             var self = this;
             util.each(imageList, function (src, target){
                 var image = new Image();
+                if (crossOrigin) {
+                    image.crossOrigin = crossOrigin;
+                }
                 image.onload = function () {
                     loading --;
                     if (loading === 0){
