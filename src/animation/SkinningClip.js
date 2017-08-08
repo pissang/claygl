@@ -55,12 +55,12 @@ define(function(require) {
 
     SkinningClip.prototype.constructor = SkinningClip;
 
-    SkinningClip.prototype.step = function(time) {
+    SkinningClip.prototype.step = function(time, dTime) {
 
-        var ret = Clip.prototype.step.call(this, time);
+        var ret = Clip.prototype.step.call(this, time, dTime);
 
         if (ret !== 'finish') {
-            this.setTime(this._elapsedTime);
+            this.setTime(this.getElapsedTime());
         }
 
         return ret;

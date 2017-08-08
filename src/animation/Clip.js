@@ -81,6 +81,7 @@ define(function (require) {
          */
         this.onrestart = opts.onrestart || noop;
 
+        this._paused = false;
     };
 
     Clip.prototype = {
@@ -120,27 +121,31 @@ define(function (require) {
          * @param  {number} time
          * @return {string}
          */
-        step: function (time) {
+        step: function (time, deltaTime) {
             if (!this._initialized) {
-                this._currentTime = time;
-                this._startTime = this._currentTime + this.delay;
+                this._startTime = time + this.delay;
                 this._initialized = true;
+            }
+            if (this._currentTime != null) {
+                deltaTime = time - this._currentTime;
+            }
+            this._currentTime = time;
+
+            if (this._paused) {
+                return;
             }
 
             if (time < this._startTime) {
-                this._currentTime = time;
                 return;
             }
 
-            this._elapse(time);
+            // PENDIGN Sync ?
+            this._elapse(time, deltaTime);
 
-            var percent = this._elapsedTime / this.life;
+            var percent = Math.min(this._elapsedTime / this.life, 1);
 
             if (percent < 0) {
                 return;
-            }
-            if (percent > 1) {
-                percent = 1;
             }
 
             var schedule;
@@ -185,8 +190,6 @@ define(function (require) {
             // It is clearly wrong, so we use remainder to add a offset
 
             var remainder = 0;
-
-            time = time;
             // Remainder ignored if restart is invoked manually
             if (time) {
                 this._elapse(time);
@@ -196,20 +199,22 @@ define(function (require) {
 
             this._startTime = time - remainder + this.delay;
             this._elapsedTime = 0;
-            this._currentTime = time - remainder;
 
             this._needsRemove = false;
+            this._paused = false;
+        },
+
+        getElapsedTime: function () {
+            return this._elapsedTime;
         },
 
         _restartInLoop: function (time) {
             this._startTime = time + this.gap;
-            this._currentTime = time;
             this._elapsedTime = 0;
         },
 
-        _elapse: function (time) {
-            this._elapsedTime += (time - this._currentTime) * this.playbackRate;
-            this._currentTime = time;
+        _elapse: function (time, deltaTime) {
+            this._elapsedTime += deltaTime * this.playbackRate;
         },
 
         fire: function (eventType, arg) {
@@ -230,6 +235,14 @@ define(function (require) {
             clip.delay = this.delay;
 
             return clip;
+        },
+
+        pause: function () {
+            this._paused = true;
+        },
+
+        resume: function () {
+            this._paused = false;
         }
     };
     Clip.prototype.constructor = Clip;

@@ -109,7 +109,7 @@ define(function (require) {
             var deferredClips = [];
             for (var i = 0; i < len; i++) {
                 var clip = clips[i];
-                var e = clip.step(time);
+                var e = clip.step(time, delta);
                 // Throw out the events need to be called after
                 // stage.render, like finish
                 if (e) {
@@ -158,7 +158,9 @@ define(function (require) {
 
                     requestAnimationFrame(step);
 
-                    self._update();
+                    if (!self._paused) {
+                        self._update();
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -31,7 +31,7 @@ define(function(require) {
      * @param {Function} [opts.onrestart]
      * @param {object[]} [opts.keyFrames]
      */
-    var TransformClip = function(opts) {
+    var TransformClip = function (opts) {
 
         opts = opts || {};
 
@@ -70,18 +70,18 @@ define(function(require) {
 
     TransformClip.prototype.constructor = TransformClip;
 
-    TransformClip.prototype.step = function(time) {
+    TransformClip.prototype.step = function (time, dTime) {
 
-        var ret = Clip.prototype.step.call(this, time);
+        var ret = Clip.prototype.step.call(this, time, dTime);
 
         if (ret !== 'finish') {
-            this.setTime(this._elapsedTime);
+            this.setTime(this.getElapsedTime());
         }
 
         return ret;
     };
 
-    TransformClip.prototype.setTime = function(time) {
+    TransformClip.prototype.setTime = function (time) {
         this._interpolateField(time, 'position');
         this._interpolateField(time, 'rotation');
         this._interpolateField(time, 'scale');
@@ -90,7 +90,7 @@ define(function(require) {
      * Add a key frame
      * @param {Object} kf
      */
-    TransformClip.prototype.addKeyFrame = function(kf) {
+    TransformClip.prototype.addKeyFrame = function (kf) {
         for (var i = 0; i < this.keyFrames.length - 1; i++) {
             var prevFrame = this.keyFrames[i];
             var nextFrame = this.keyFrames[i+1];
@@ -108,7 +108,7 @@ define(function(require) {
      * Add keyframes
      * @param {object[]} kfs
      */
-    TransformClip.prototype.addKeyFrames = function(kfs) {
+    TransformClip.prototype.addKeyFrames = function (kfs) {
         for (var i = 0; i < kfs.length; i++) {
             this.keyFrames.push(kfs[i]);
         }
@@ -118,7 +118,7 @@ define(function(require) {
         this.life = this.keyFrames[this.keyFrames.length - 1].time;
     };
 
-    TransformClip.prototype._interpolateField = function(time, fieldName) {
+    TransformClip.prototype._interpolateField = function (time, fieldName) {
         var kfs = this.keyFrames;
         var len = kfs.length;
         var start;
@@ -174,7 +174,7 @@ define(function(require) {
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
      * @param  {number} w
      */
-    TransformClip.prototype.blend1D = function(c1, c2, w) {
+    TransformClip.prototype.blend1D = function (c1, c2, w) {
         vec3.lerp(this.position, c1.position, c2.position, w);
         vec3.lerp(this.scale, c1.scale, c2.scale, w);
         quat.slerp(this.rotation, c1.rotation, c2.rotation, w);
@@ -189,10 +189,10 @@ define(function(require) {
      * @param  {number} f
      * @param  {number} g
      */
-    TransformClip.prototype.blend2D = (function() {
+    TransformClip.prototype.blend2D = (function () {
         var q1 = quat.create();
         var q2 = quat.create();
-        return function(c1, c2, c3, f, g) {
+        return function (c1, c2, c3, f, g) {
             var a = 1 - f - g;
 
             this.position[0] = c1.position[0] * a + c2.position[0] * f + c3.position[0] * g;
@@ -221,7 +221,7 @@ define(function(require) {
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
      */
-    TransformClip.prototype.additiveBlend = function(c1, c2) {
+    TransformClip.prototype.additiveBlend = function (c1, c2) {
         vec3.add(this.position, c1.position, c2.position);
         vec3.add(this.scale, c1.scale, c2.scale);
         quat.multiply(this.rotation, c2.rotation, c1.rotation);
@@ -232,7 +232,7 @@ define(function(require) {
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
      * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
      */
-    TransformClip.prototype.subtractiveBlend = function(c1, c2) {
+    TransformClip.prototype.subtractiveBlend = function (c1, c2) {
         vec3.sub(this.position, c1.position, c2.position);
         vec3.sub(this.scale, c1.scale, c2.scale);
         quat.invert(this.rotation, c2.rotation);
@@ -244,7 +244,7 @@ define(function(require) {
      * @param {number} endTime
      * @param {boolean} isLoop
      */
-    TransformClip.prototype.getSubClip = function(startTime, endTime) {
+    TransformClip.prototype.getSubClip = function (startTime, endTime) {
         // TODO
         console.warn('TODO');
     };
