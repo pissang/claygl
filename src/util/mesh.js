@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -25,7 +25,7 @@ define(function(require) {
          * @return qtek.Mesh
          * @memberOf qtek.util.mesh
          */
-        merge: function(meshes, applyWorldTransform) {
+        merge: function (meshes, applyWorldTransform) {
 
             if (! meshes.length) {
                 return;
@@ -131,16 +131,18 @@ define(function(require) {
 
         /**
          * Split mesh into sub meshes, each mesh will have maxJointNumber joints.
-         * @param  {qtek.Mesh} mesh
-         * @param  {number} maxJointNumber
-         * @param  {boolean} inPlace
+         * @param {qtek.Mesh} mesh
+         * @param {number} maxJointNumber
+         * @param {boolean} inPlace
+         * @param {qtek.shader.library} [shaderLib]
+         * @param {string} [shaderType]
          * @return {qtek.Node}
          *
          * @memberOf qtek.util.mesh
          */
 
         // FIXME, Have issues on some models
-        splitByJoints: function(mesh, maxJointNumber, inPlace) {
+        splitByJoints: function (mesh, maxJointNumber, inPlace, shaderLib, shaderType) {
             var geometry = mesh.geometry;
             var skeleton = mesh.skeleton;
             var material = mesh.material;
@@ -168,7 +170,7 @@ define(function(require) {
 
             var buckets = [];
 
-            var getJointByIndex = function(idx) {
+            var getJointByIndex = function (idx) {
                 return joints[idx];
             };
             while (rest > 0) {
@@ -229,7 +231,7 @@ define(function(require) {
             }
 
             var root = new Node({
-                name : mesh.name
+                name: mesh.name
             });
             var attribNames = geometry.getEnabledAttributes();
 
@@ -246,11 +248,21 @@ define(function(require) {
                     subMat.jointCount = subJointNumber;
                 }
                 else {
-                    var subShader = shaders[subJointNumber];
-                    if (!subShader) {
-                        subShader = shader.clone();
-                        subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
-                        shaders[subJointNumber] = subShader;
+                    var subShader;
+                    if (shaderLib && shaderType) {
+                        subShader = shaderLib.get(shaderType, {
+                            textures: shader.getEnabledTextures(),
+                            vertexDefines: shader.vertexDefines,
+                            fragmentDefines: shader.fragmentDefines
+                        });
+                    }
+                    else {
+                        subShader = shaders[subJointNumber];
+                        if (!subShader) {
+                            subShader = shader.clone();
+                            subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
+                            shaders[subJointNumber] = subShader;
+                        }
                     }
                     subMat.attachShader(subShader, true);
                 }
