@@ -253,9 +253,12 @@ define(function (require) {
 
                         for (var name in lib.skeletons) {
                             lib.skeletons[name].addClip(skinningClip);
-                            lib.skeletons[name].relativeRootNode = rootNode;
                         }
                     }
+                }
+
+                for (var name in lib.skeletons) {
+                    lib.skeletons[name].relativeRootNode = rootNode;
                 }
 
                 self.trigger('success', {
@@ -989,7 +992,6 @@ define(function (require) {
                         }
                     }
                 }
-
                 // TODO
                 // if (nodeAnimationClips[targetId]) {
                 //     continue;

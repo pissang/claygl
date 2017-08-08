@@ -138,23 +138,34 @@ define(function(require) {
         var channels = this.channels;
         var len = channels.time.length;
         var key = -1;
-        if (time < this._cacheTime) {
-            var s = Math.min(len - 2, this._cacheKey);
-            for (var i = s; i >= 0; i--) {
-                if (channels.time[i - 1] <= time && channels.time[i] > time) {
-                    key = i - 1;
-                    break;
+        // Clamp
+        if (time <= channels.time[0]) {
+            time = channels.time[0];
+            key = 0;
+        }
+        else if (time >= channels.time[len - 1]) {
+            time = channels.time[len - 1];
+            key = len - 2;
+        }
+        else {
+            if (time < this._cacheTime) {
+                var s = Math.min(len - 2, this._cacheKey);
+                for (var i = s; i >= 0; i--) {
+                    if (channels.time[i - 1] <= time && channels.time[i] > time) {
+                        key = i - 1;
+                        break;
+                    }
                 }
             }
-        } else {
-            for (var i = this._cacheKey; i < len-1; i++) {
-                if (channels.time[i] <= time && channels.time[i + 1] > time) {
-                    key = i;
-                    break;
+            else {
+                for (var i = this._cacheKey; i < len-1; i++) {
+                    if (channels.time[i] <= time && channels.time[i + 1] > time) {
+                        key = i;
+                        break;
+                    }
                 }
             }
         }
-
         if (key > -1) {
             this._cacheKey = key;
             this._cacheTime = time;
