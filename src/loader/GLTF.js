@@ -136,10 +136,14 @@ define(function (require) {
         /**
          * @type {string}
          */
-        crossOrigin: ''
+        crossOrigin: '',
+
+        shaderLibrary: null
     },
     function () {
-        this._shaderLib = shaderLibrary.createLibrary();
+        if (!this.shaderLibrary) {
+            this.shaderLibrary = shaderLibrary.createLibrary();
+        }
     },
     /** @lends qtek.loader.GLTF.prototype */
     {
@@ -223,10 +227,12 @@ define(function (require) {
                 self._parseNodes(json, lib);
 
                 var sceneInfo = json.scenes[json.scene];
-                for (var i = 0; i < sceneInfo.nodes.length; i++) {
-                    var node = lib.nodes[sceneInfo.nodes[i]];
-                    node.update();
-                    rootNode.add(node);
+                if (sceneInfo) {
+                    for (var i = 0; i < sceneInfo.nodes.length; i++) {
+                        var node = lib.nodes[sceneInfo.nodes[i]];
+                        node.update();
+                        rootNode.add(node);
+                    }
                 }
 
                 if (self.includeMesh) {
@@ -372,7 +378,7 @@ define(function (require) {
 
             var instanceSkins = {};
 
-            var shaderLib = this._shaderLib;
+            var shaderLib = this.shaderLibrary;
             var shaderName = this.shaderName;
             function enableSkinningForMesh(mesh, skeleton, jointIndices) {
                 mesh.skeleton = skeleton;
@@ -552,7 +558,7 @@ define(function (require) {
                 else {
                     material = new Material({
                         name: materialInfo.name,
-                        shader: this._shaderLib.get(this.shaderName, enabledTextures)
+                        shader: this.shaderLibrary.get(this.shaderName, enabledTextures)
                     });
                 }
                 if (technique.states.depthMask != null) {
@@ -744,7 +750,7 @@ define(function (require) {
                     //Collada export from blender may not have default material
                     if (!material) {
                         material = new Material({
-                            shader: this._shaderLib.get(self.shaderName)
+                            shader: this.shaderLibrary.get(self.shaderName)
                         });
                     }
                     var mesh = new Mesh({
@@ -989,7 +995,8 @@ define(function (require) {
                 //     continue;
                 // }
                 nodeAnimationClips[targetId] = new SamplerClip({
-                    name: targetNode.name,
+                    // PENDING
+                    name: targetId,
                     target: targetNode
                 });
                 var nodeAnimationClip = nodeAnimationClips[targetId];

@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
 
     'use strict';
 
@@ -13,7 +13,7 @@ define(function(require) {
     /**
      * @constructor qtek.Skeleton
      */
-    var Skeleton = Base.extend(function() {
+    var Skeleton = Base.extend(function () {
         return /** @lends qtek.Skeleton# */{
 
             /**
@@ -62,7 +62,7 @@ define(function(require) {
         /**
          * Update joints hierarchy
          */
-        updateHierarchy: function() {
+        updateHierarchy: function () {
             this.roots = [];
             var joints = this.joints;
             for (var i = 0; i < joints.length; i++) {
@@ -82,7 +82,7 @@ define(function(require) {
          * @param {qtek.animation.SkinningClip} clip
          * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
          */
-        addClip: function(clip, mapRule) {
+        addClip: function (clip, mapRule) {
             // Clip have been exists in
             for (var i = 0; i < this._clips.length; i++) {
                 if (this._clips[i].clip === clip) {
@@ -121,7 +121,7 @@ define(function(require) {
         /**
          * @param {qtek.animation.SkinningClip} clip
          */
-        removeClip: function(clip) {
+        removeClip: function (clip) {
             var idx = -1;
             for (var i = 0; i < this._clips.length; i++) {
                 if (this._clips[i].clip === clip) {
@@ -136,7 +136,7 @@ define(function(require) {
         /**
          * Remove all clips
          */
-        removeClipsAll: function() {
+        removeClipsAll: function () {
             this._clips = [];
         },
 
@@ -144,7 +144,7 @@ define(function(require) {
          * Get clip by index
          * @param  {number} index
          */
-        getClip: function(index) {
+        getClip: function (index) {
             if (this._clips[index]) {
                 return this._clips[index].clip;
             }
@@ -153,7 +153,7 @@ define(function(require) {
         /**
          * @return {number}
          */
-        getClipNumber: function() {
+        getClipNumber: function () {
             return this._clips.length;
         },
 
@@ -161,11 +161,11 @@ define(function(require) {
          * Calculate joint matrices from node transform
          * @method
          */
-        updateJointMatrices: (function() {
+        updateJointMatrices: (function () {
 
             var m4 = mat4.create();
 
-            return function() {
+            return function () {
                 for (var i = 0; i < this.roots.length; i++) {
                     this.roots[i].node.update(true);
                 }
@@ -200,7 +200,7 @@ define(function(require) {
             };
         })(),
 
-        updateMatricesSubArrays: function() {
+        updateMatricesSubArrays: function () {
             for (var i = 0; i < this.joints.length; i++) {
                 this._jointMatricesSubArrays[i] = this._invBindPoseMatricesArray.subarray(i * 16, (i+1) * 16);
                 this._skinMatricesSubArrays[i] = this._skinMatricesArray.subarray(i * 16, (i+1) * 16);
@@ -210,9 +210,9 @@ define(function(require) {
         /**
          * Update skinning matrices
          */
-        update: (function() {
+        update: (function () {
             var m4 = mat4.create();
-            return function() {
+            return function () {
                 for (var i = 0; i < this.roots.length; i++) {
                     this.roots[i].node.update(true);
                 }
@@ -238,7 +238,7 @@ define(function(require) {
             };
         })(),
 
-        getSubSkinMatrices: function(meshId, joints) {
+        getSubSkinMatrices: function (meshId, joints) {
             var subArray = this._subSkinMatricesArray[meshId];
             if (!subArray) {
                 subArray
@@ -259,7 +259,7 @@ define(function(require) {
          * Set pose and update skinning matrices
          * @param {number} clipIndex
          */
-        setPose: function(clipIndex) {
+        setPose: function (clipIndex) {
             if (this._clips[clipIndex]) {
                 var clip = this._clips[clipIndex].clip;
                 var maps = this._clips[clipIndex].maps;
