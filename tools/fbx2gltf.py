@@ -1265,10 +1265,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FBX to glTF converter', add_help=True)
     parser.add_argument('-e', '--exclude', type=str, default='', help="Data excluded. Can be: scene,animation")
     parser.add_argument('-t', '--timerange', default='0,1000', type=str, help="Export animation time, in format 'startSecond,endSecond'")
-    parser.add_argument('-i', '--input', default='', type=str, help="FBX file path")
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
     parser.add_argument('-p', '--pose', default=-1, type=float, help="Pose time")
+    parser.add_argument('file')
     
     args = parser.parse_args()
 
@@ -1281,11 +1281,9 @@ if __name__ == "__main__":
     if lTimeRange[1]:
         lDuration = float(lTimeRange[1])
 
-    if not args.input:
-        lPath = sys.argv[len(sys.argv) - 1]
     if not args.output:
-        lBasename, lExt = os.path.splitext(lPath)
-        lOutput = lBasename + '.gltf'
+        lBasename, lExt = os.path.splitext(args.file)
+        args.output = lBasename + '.gltf'
 
     if (args.pose >= 0):
         lPoseTime = FbxTime()
@@ -1293,4 +1291,4 @@ if __name__ == "__main__":
 
     excluded = args.exclude.split(',')
 
-    Convert(args.input, args.output, excluded, args.framerate, lStartTime, lDuration, lPoseTime)
+    Convert(args.file, args.output, excluded, args.framerate, lStartTime, lDuration, lPoseTime)
