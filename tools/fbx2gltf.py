@@ -1191,13 +1191,14 @@ TIME_INFINITY = FbxTime(0x7fffffffffffffff)
 def Convert(
     filePath,
     ouptutFile = '',
-    ignoreScene = False,
-    ignoreAnimation = False,
+    excluded = [],
     animFrameRate = 1 / 20,
     startTime = 0,
     duration = 1000,
     poseTime = TIME_INFINITY):
 
+    ignoreScene = 'scene' in excluded
+    ignoreAnimation = 'animation' in excluded
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
@@ -1262,8 +1263,7 @@ def Convert(
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='FBX to glTF converter', add_help=True)
-    parser.add_argument('-s', '--scene', action='store_true', help="If ignore scene")
-    parser.add_argument('-a', '--animation', action='store_true', help="If ignore animation")
+    parser.add_argument('-e', '--exclude', type=str, default='', help="Data excluded. Can be: scene,animation")
     parser.add_argument('-t', '--timerange', default='0,1000', type=str, help="Export animation time, in format 'startSecond,endSecond'")
     parser.add_argument('-i', '--input', default='', type=str, help="FBX file path")
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
@@ -1291,4 +1291,6 @@ if __name__ == "__main__":
         lPoseTime = FbxTime()
         lPoseTime.SetSecondDouble(float(args.pose))
 
-    Convert(args.input, args.output, args.scene, args.animation, args.framerate, lStartTime, lDuration, lPoseTime)
+    excluded = args.exclude.split(',')
+
+    Convert(args.input, args.output, excluded, args.framerate, lStartTime, lDuration, lPoseTime)
