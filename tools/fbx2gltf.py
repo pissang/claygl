@@ -1269,7 +1269,7 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
     parser.add_argument('-p', '--pose', default=-1, type=float, help="Pose time")
     parser.add_argument('file')
-    
+
     args = parser.parse_args()
 
     lPoseTime = TIME_INFINITY
@@ -1291,4 +1291,4 @@ if __name__ == "__main__":
 
     excluded = args.exclude.split(',')
 
-    Convert(args.file, args.output, excluded, args.framerate, lStartTime, lDuration, lPoseTime)
+    Convert(args.file, args.output, excluded, 1 / args.framerate, lStartTime, lDuration, lPoseTime)
