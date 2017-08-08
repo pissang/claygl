@@ -250,9 +250,14 @@ define(function (require) {
                 else {
                     var subShader;
                     if (shaderLib && shaderType) {
+                        var vertexDefines = {};
+                        for (var name in shader.vertexDefines) {
+                            vertexDefines[name] = shader.vertexDefines[name];
+                        }
+                        vertexDefines.JOINT_COUNT = subJointNumber;
                         subShader = shaderLib.get(shaderType, {
                             textures: shader.getEnabledTextures(),
-                            vertexDefines: shader.vertexDefines,
+                            vertexDefines: vertexDefines,
                             fragmentDefines: shader.fragmentDefines
                         });
                     }
