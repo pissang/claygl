@@ -8,6 +8,21 @@
 # ############################################
 import sys, struct, json, os.path, math, getopt
 
+try:
+    from FbxCommon import *
+except ImportError:
+    import platform
+    msg = 'You need to copy the content in compatible subfolder under /lib/python<version> into your python install folder such as '
+    if platform.system() == 'Windows' or platform.system() == 'Microsoft':
+        msg += '"Python26/Lib/site-packages"'
+    elif platform.system() == 'Linux':
+        msg += '"/usr/local/lib/python3.3/site-packages"'
+    elif platform.system() == 'Darwin':
+        msg += '"/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages"'
+    msg += ' folder.'
+    print(msg)
+    sys.exit(1)
+
 lib_materials = {}
 lib_techniques = {}
 
@@ -793,7 +808,7 @@ def GetNodeNameWithoutDuplication(pNode):
 
     return _nodeNameMap[pNode.GetUniqueID()]
 
-def ConvertSceneNode(pScene, pNode, fbxConverter):
+def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
     lGLTFNode = {}
     lNodeName = GetNodeNameWithoutDuplication(pNode)
     lGLTFNode['name'] = lNodeName
@@ -801,7 +816,7 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
     lib_nodes[lNodeName] = lGLTFNode
 
     # Transform matrix
-    m = pNode.EvaluateLocalTransform()
+    m = pNode.EvaluateLocalTransform(pPoseTime)
     lGLTFNode['matrix'] = [
         m[0][0], m[0][1], m[0][2], m[0][3],
         m[1][0], m[1][1], m[1][2], m[1][3],
@@ -930,9 +945,10 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
 
             # Mesh with skin should have identity global transform.
             # Since vertices have all been transformed to skeleton spaces.
+            # PENDING
             m = FbxAMatrix()
             if not pNode.GetParent() == None:
-                m = pNode.GetParent().EvaluateGlobalTransform()
+                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime)
             m = m.Inverse()
             lGLTFNode['matrix'] = [
                 m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]
@@ -958,12 +974,12 @@ def ConvertSceneNode(pScene, pNode, fbxConverter):
 
     lGLTFNode['children'] = []
     for i in range(pNode.GetChildCount()):
-        lChildNodeName = ConvertSceneNode(pScene, pNode.GetChild(i), fbxConverter)
+        lChildNodeName = ConvertSceneNode(pScene, pNode.GetChild(i), pPoseTime, fbxConverter)
         lGLTFNode['children'].append(lChildNodeName)
 
     return lNodeName
 
-def ConvertScene(pScene, fbxConverter):
+def ConvertScene(pScene, pPoseTime, fbxConverter):
     lRoot = pScene.GetRootNode()
 
     lSceneName = pScene.GetName()
@@ -973,7 +989,7 @@ def ConvertScene(pScene, fbxConverter):
     lGLTFScene = lib_scenes[lSceneName] = {"nodes" : []}
 
     for i in range(lRoot.GetChildCount()):
-        lNodeName = ConvertSceneNode(pScene, lRoot.GetChild(i), fbxConverter)
+        lNodeName = ConvertSceneNode(pScene, lRoot.GetChild(i), pPoseTime, fbxConverter)
         lGLTFScene['nodes'].append(lNodeName)
 
     return lSceneName
@@ -1016,7 +1032,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     # It can reduce a lot of space
     # PENDING
     lStartTimeDouble = lEndTimeDouble = lDuration = 0
-    if lTranslationCurve:
+    if lHaveTranslation:
         lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lTranslationCurve)
 
     if lDuration < 1e-5 and lHaveRotation:
@@ -1098,9 +1114,8 @@ def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
         for j in range(lAnimStack.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimLayer.ClassId))):
             lAnimLayer = lAnimStack.GetSrcObject(FbxCriteria.ObjectType(FbxAnimLayer.ClassId), j)
-            for k in range(lRoot.GetChildCount()):
-                ConvertNodeAnimation(lAnimLayer, lRoot.GetChild(k), pSampleRate, pStartTime, pDuration)
-
+            # for k in range(lRoot.GetChildCount()):
+            ConvertNodeAnimation(lAnimLayer, lRoot, pSampleRate, pStartTime, pDuration)
 
 def CreateBufferViews(pBufferName):
     lByteOffset = 0
@@ -1169,6 +1184,10 @@ def ListNodes(pNode):
     for k in range(pNode.GetChildCount()):
         ListNodes(pNode.GetChild(k))
 
+# FIXME
+# http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_fbxtime_8h_html
+TIME_INFINITY = FbxTime(0x7fffffffffffffff)
+
 def Convert(
     filePath,
     ouptutFile = '',
@@ -1177,7 +1196,7 @@ def Convert(
     animFrameRate = 1 / 20,
     startTime = 0,
     duration = 1000,
-    poseTime = -1):
+    poseTime = TIME_INFINITY):
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
@@ -1191,7 +1210,7 @@ def Convert(
 
         ListNodes(lScene.GetRootNode())
         if not ignoreScene:
-            lSceneName = ConvertScene(lScene, fbxConverter)
+            lSceneName = ConvertScene(lScene, poseTime, fbxConverter)
         if not ignoreAnimation:
             ConvertAnimation(lScene, animFrameRate, startTime, duration)
 
@@ -1207,7 +1226,7 @@ def Convert(
         out.close()
 
         lBufferName = lBasename + '.bin'
-        lib_buffers[lBufferName] = {'byteLength' : len(lBin), 'path' : lBufferName}
+        lib_buffers[lBufferName] = {'byteLength' : len(lBin), 'path' : os.path.basename(lBufferName)}
 
         CreateBufferViews(lBufferName)
 
@@ -1241,21 +1260,6 @@ def Convert(
 
 if __name__ == "__main__":
     try:
-        from FbxCommon import *
-    except ImportError:
-        import platform
-        msg = 'You need to copy the content in compatible subfolder under /lib/python<version> into your python install folder such as '
-        if platform.system() == 'Windows' or platform.system() == 'Microsoft':
-            msg += '"Python26/Lib/site-packages"'
-        elif platform.system() == 'Linux':
-            msg += '"/usr/local/lib/python3.3/site-packages"'
-        elif platform.system() == 'Darwin':
-            msg += '"/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages"'
-        msg += ' folder.'
-        print(msg)
-        sys.exit(1)
-
-    try:
         lPath = ''
         lIgnoreScene = False
         lIgnoreAnimation = False
@@ -1263,8 +1267,9 @@ if __name__ == "__main__":
         lStartTime = 0
         lDuration = 1000
         lOutput = ''
+        lPoseTime = TIME_INFINITY
 
-        opts, args = getopt.getopt(sys.argv[1:], "sat:f:i:o:", ["scene", "animation", 'timerange=', 'framerate=', 'input=', 'output=']);
+        opts, args = getopt.getopt(sys.argv[1:], "sat:f:i:o:p:", ["scene", "animation", 'timerange=', 'framerate=', 'input=', 'output=', 'pose=']);
 
         for opt,arg in opts:
             if opt in ('-s', '--scene'):
@@ -1283,6 +1288,9 @@ if __name__ == "__main__":
                 lPath = arg
             if opt in ('-o', '--output'):
                 lOutput = arg
+            if opt in ('-p', '--pose'):
+                lPoseTime = FbxTime()
+                lPoseTime.SetSecondDouble(float(arg))
 
         if not lPath:
             lPath = sys.argv[len(sys.argv) - 1]
@@ -1290,7 +1298,7 @@ if __name__ == "__main__":
             lBasename, lExt = os.path.splitext(lPath)
             lOutput = lBasename + '.gltf'
 
-        Convert(lPath, lOutput, lIgnoreScene, lIgnoreAnimation, lAnimFrameRate, lStartTime, lDuration)
+        Convert(lPath, lOutput, lIgnoreScene, lIgnoreAnimation, lAnimFrameRate, lStartTime, lDuration, lPoseTime)
 
     except getopt.GetoptError:
         print("\n\nUsage: fbx2gltf [-s -a -t 0,100 -f 20] <FBX file name>\n")
