@@ -6,11 +6,7 @@
 # TODO: exportAnimation, exportMesh, exportCamera, exportLight configuration
 # http://github.com/pissang/
 # ############################################
-import sys
-import struct
-import json
-import os.path
-import math
+import sys, struct, json, os.path, math, getopt
 
 lib_materials = {}
 lib_techniques = {}
@@ -170,7 +166,7 @@ def CreateAnimationBuffer(pList, pType, pStride):
     lData, lGLTFParameter = CreateAccessorBuffer(pList, pType, pStride, False)
     lGLTFParameter['byteOffset'] = len(animationBuffer)
     animationBuffer.extend(lData)
-    lKey = 'accessor_' + str(GetId())
+    lKey = 'acc_' + str(GetId())
     lib_parameters[lKey] = lGLTFParameter
     lGLTFParameter.pop('byteStride')
     return lKey
@@ -482,8 +478,6 @@ def CreateSkin():
     lSkinName = "skin_" + str(len(lib_skins.keys()))
     # https://github.com/KhronosGroup/glTF/issues/100
     lib_skins[lSkinName] = {
-        # TODO
-        'bindShapeMatrix' : [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
         # 'bindShapeMatrix' : [],
         'inverseBindMatrices' : {
             "count" : 0,
@@ -985,7 +979,7 @@ def ConvertScene(pScene, fbxConverter):
     return lSceneName
 
 def CreateAnimation():
-    lAnimName = 'animation_' + str(len(lib_animations.keys()))
+    lAnimName = 'ani_' + str(len(lib_animations.keys()))
     lGLTFAnimation = {
         'channels' : [],
         'count' : 0,
@@ -1078,7 +1072,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
         #TODO Other interpolation methods
         for path in _samplerChannels:
             if path in lGLTFAnimation['parameters']:
-                lSamplerName = lAnimName + '_' + path + '_sampler'
+                lSamplerName = lAnimName + '_' + path[0:3]
                 lGLTFAnimation['samplers'][lSamplerName] = {
                     "input": "TIME",
                     "interpolation": "LINEAR",
@@ -1111,8 +1105,10 @@ def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
 def CreateBufferViews(pBufferName):
     lByteOffset = 0
 
+    lBufferViewNamePrefix = 'bv_'
+
     #Attribute buffer view
-    lBufferViewName = 'bufferView_' + str(GetId())
+    lBufferViewName = lBufferViewNamePrefix + str(GetId())
     lBufferView = lib_buffer_views[lBufferViewName] = {}
     lBufferView['buffer'] = pBufferName
     lBufferView['byteLength'] = len(attributeBuffer)
@@ -1127,7 +1123,7 @@ def CreateBufferViews(pBufferName):
 
     #Inverse Bind Pose Matrices
     if len(invBindMatricesBuffer) > 0:
-        lBufferViewName = 'bufferView_' + str(GetId())
+        lBufferViewName = lBufferViewNamePrefix + str(GetId())
         lBufferView = lib_buffer_views[lBufferViewName] = {}
         lBufferView['buffer'] = pBufferName
         lBufferView['byteLength'] = len(invBindMatricesBuffer)
@@ -1140,7 +1136,7 @@ def CreateBufferViews(pBufferName):
 
     #Animations
     if len(animationBuffer) > 0:
-        lBufferViewName = 'bufferView_' + str(GetId())
+        lBufferViewName = lBufferViewNamePrefix + str(GetId())
         lBufferView = lib_buffer_views[lBufferViewName] = {}
         lBufferView['buffer'] = pBufferName
         lBufferView['byteLength'] = len(animationBuffer)
@@ -1155,7 +1151,7 @@ def CreateBufferViews(pBufferName):
     #Indices buffer view
     #Put the indices buffer at last or there may be a error
     #When creating a Float32Array, which the offset must be multiple of 4
-    lBufferViewName = 'bufferView_' + str(GetId())
+    lBufferViewName = lBufferViewNamePrefix + str(GetId())
     lBufferView = lib_buffer_views[lBufferViewName] = {}
     lBufferView['buffer'] = pBufferName
     lBufferView['byteLength'] = len(indicesBuffer)
@@ -1173,22 +1169,31 @@ def ListNodes(pNode):
     for k in range(pNode.GetChildCount()):
         ListNodes(pNode.GetChild(k))
 
-def Convert(path, animFrameRate = 1 / 20, startTime = 0, duration = 1000):
+def Convert(
+    filePath,
+    ouptutFile = '',
+    ignoreScene = False,
+    ignoreAnimation = False,
+    animFrameRate = 1 / 20,
+    startTime = 0,
+    duration = 1000,
+    poseTime = -1):
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
     # Load the scene.
-    lResult = LoadScene(lSdkManager, lScene, path)
+    lResult = LoadScene(lSdkManager, lScene, filePath)
 
     if not lResult:
         print("\n\nAn error occurred while loading the scene...")
     else:
-        lBaseName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
-        lRoot, lExt = os.path.splitext(sys.argv[1])
+        lBasename, lExt = os.path.splitext(ouptutFile)
 
         ListNodes(lScene.GetRootNode())
-        lSceneName = ConvertScene(lScene, fbxConverter)
-        ConvertAnimation(lScene, animFrameRate, startTime, duration)
+        if not ignoreScene:
+            lSceneName = ConvertScene(lScene, fbxConverter)
+        if not ignoreAnimation:
+            ConvertAnimation(lScene, animFrameRate, startTime, duration)
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
@@ -1197,11 +1202,11 @@ def Convert(path, animFrameRate = 1 / 20, startTime = 0, duration = 1000):
         lBin.extend(animationBuffer)
         lBin.extend(indicesBuffer)
 
-        out = open(lRoot + ".bin", 'wb')
+        out = open(lBasename + ".bin", 'wb')
         out.write(lBin)
         out.close()
 
-        lBufferName = lBaseName + '.bin'
+        lBufferName = lBasename + '.bin'
         lib_buffers[lBufferName] = {'byteLength' : len(lBin), 'path' : lBufferName}
 
         CreateBufferViews(lBufferName)
@@ -1225,12 +1230,13 @@ def Convert(path, animFrameRate = 1 / 20, startTime = 0, duration = 1000):
             'scenes' : lib_scenes,
             'meshes' : lib_meshes,
             'skins' : lib_skins,
-            #Default scene
-            'scene' : lSceneName
         }
+        #Default scene
+        if not ignoreScene:
+            lOutput['scene'] = lSceneName
 
-        out = open(lRoot + ".gltf", 'w')
-        out.write(json.dumps(lOutput, indent = 4, sort_keys = True, separators=(',', ': ')))
+        out = open(ouptutFile, 'w')
+        out.write(json.dumps(lOutput, indent = 2, sort_keys = True, separators=(',', ': ')))
         out.close()
 
 if __name__ == "__main__":
@@ -1249,7 +1255,42 @@ if __name__ == "__main__":
         print(msg)
         sys.exit(1)
 
-    if len(sys.argv) > 1:
-        Convert(sys.argv[1]);
-    else:
-        print("\n\nUsage: fbx2gltf <FBX file name>\n")
+    try:
+        lPath = ''
+        lIgnoreScene = False
+        lIgnoreAnimation = False
+        lAnimFrameRate = 1 / 20
+        lStartTime = 0
+        lDuration = 1000
+        lOutput = ''
+
+        opts, args = getopt.getopt(sys.argv[1:], "sat:f:i:o:", ["scene", "animation", 'timerange=', 'framerate=', 'input=', 'output=']);
+
+        for opt,arg in opts:
+            if opt in ('-s', '--scene'):
+                lIgnoreScene = True
+            if opt in ('-a', '--animation'):
+                lIgnoreAnimation = True
+            if opt in ('-t', '--timerange'):
+                lTimeRange = arg.split(',')
+                if lTimeRange[0]:
+                    lStartTime = float(lTimeRange[0])
+                if lTimeRange[1]:
+                    lDuration = float(lTimeRange[1])
+            if opt in ('-f', '--framerate'):
+                lAnimFrameRate = 1 / float(arg)
+            if opt in ('-i', '--input'):
+                lPath = arg
+            if opt in ('-o', '--output'):
+                lOutput = arg
+
+        if not lPath:
+            lPath = sys.argv[len(sys.argv) - 1]
+        if not lOutput:
+            lBasename, lExt = os.path.splitext(lPath)
+            lOutput = lBasename + '.gltf'
+
+        Convert(lPath, lOutput, lIgnoreScene, lIgnoreAnimation, lAnimFrameRate, lStartTime, lDuration)
+
+    except getopt.GetoptError:
+        print("\n\nUsage: fbx2gltf [-s -a -t 0,100 -f 20] <FBX file name>\n")
