@@ -6,7 +6,7 @@
 # TODO: exportAnimation, exportMesh, exportCamera, exportLight configuration
 # http://github.com/pissang/
 # ############################################
-import sys, struct, json, os.path, math, getopt
+import sys, struct, json, os.path, math, argparse
 
 try:
     from FbxCommon import *
@@ -1197,6 +1197,7 @@ def Convert(
     startTime = 0,
     duration = 1000,
     poseTime = TIME_INFINITY):
+
     # Prepare the FBX SDK.
     lSdkManager, lScene = InitializeSdkObjects()
     fbxConverter = FbxGeometryConverter(lSdkManager)
@@ -1259,46 +1260,35 @@ def Convert(
         out.close()
 
 if __name__ == "__main__":
-    try:
-        lPath = ''
-        lIgnoreScene = False
-        lIgnoreAnimation = False
-        lAnimFrameRate = 1 / 20
-        lStartTime = 0
-        lDuration = 1000
-        lOutput = ''
-        lPoseTime = TIME_INFINITY
 
-        opts, args = getopt.getopt(sys.argv[1:], "sat:f:i:o:p:", ["scene", "animation", 'timerange=', 'framerate=', 'input=', 'output=', 'pose=']);
+    parser = argparse.ArgumentParser(description='FBX to glTF converter', add_help=True)
+    parser.add_argument('-s', '--scene', action='store_true', help="If ignore scene")
+    parser.add_argument('-a', '--animation', action='store_true', help="If ignore animation")
+    parser.add_argument('-t', '--timerange', default='0,1000', type=str, help="Export animation time, in format 'startSecond,endSecond'")
+    parser.add_argument('-i', '--input', default='', type=str, help="FBX file path")
+    parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
+    parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
+    parser.add_argument('-p', '--pose', default=-1, type=float, help="Pose time")
+    
+    args = parser.parse_args()
 
-        for opt,arg in opts:
-            if opt in ('-s', '--scene'):
-                lIgnoreScene = True
-            if opt in ('-a', '--animation'):
-                lIgnoreAnimation = True
-            if opt in ('-t', '--timerange'):
-                lTimeRange = arg.split(',')
-                if lTimeRange[0]:
-                    lStartTime = float(lTimeRange[0])
-                if lTimeRange[1]:
-                    lDuration = float(lTimeRange[1])
-            if opt in ('-f', '--framerate'):
-                lAnimFrameRate = 1 / float(arg)
-            if opt in ('-i', '--input'):
-                lPath = arg
-            if opt in ('-o', '--output'):
-                lOutput = arg
-            if opt in ('-p', '--pose'):
-                lPoseTime = FbxTime()
-                lPoseTime.SetSecondDouble(float(arg))
+    lPoseTime = TIME_INFINITY
+    lStartTime = 0
+    lDuration = 1000
+    lTimeRange = args.timerange.split(',')
+    if lTimeRange[0]:
+        lStartTime = float(lTimeRange[0])
+    if lTimeRange[1]:
+        lDuration = float(lTimeRange[1])
 
-        if not lPath:
-            lPath = sys.argv[len(sys.argv) - 1]
-        if not lOutput:
-            lBasename, lExt = os.path.splitext(lPath)
-            lOutput = lBasename + '.gltf'
+    if not args.input:
+        lPath = sys.argv[len(sys.argv) - 1]
+    if not args.output:
+        lBasename, lExt = os.path.splitext(lPath)
+        lOutput = lBasename + '.gltf'
 
-        Convert(lPath, lOutput, lIgnoreScene, lIgnoreAnimation, lAnimFrameRate, lStartTime, lDuration, lPoseTime)
+    if (args.pose >= 0):
+        lPoseTime = FbxTime()
+        lPoseTime.SetSecondDouble(float(args.pose))
 
-    except getopt.GetoptError:
-        print("\n\nUsage: fbx2gltf [-s -a -t 0,100 -f 20] <FBX file name>\n")
+    Convert(args.input, args.output, args.scene, args.animation, args.framerate, lStartTime, lDuration, lPoseTime)
