@@ -12,26 +12,33 @@ define(function (require) {
     var shaderUsedCount = {};
 
     var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
-    var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity'];
-    var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM'];
+    var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff'];
+    var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel'];
 
     var OTHER_SHADER_KEYS = [
         'environmentMapPrefiltered',
         'linear',
         'encodeRGBM',
         'decodeRGBM',
+        'doubleSided',
+        'alphaTest',
         'parallaxCorrected'
     ];
     var SHADER_KEYS = TEXTURE_PROPERTIES.concat(OTHER_SHADER_KEYS);
 
     var KEY_OFFSETS = SHADER_KEYS.reduce(function (obj, name, idx) {
-        obj[name] = 256 << idx;
+        obj[name] = 4096 << idx;
         return obj;
     }, {});
 
-    function makeKey (enabledMaps, jointCount, shaderDefines) {
+    function makeKey(enabledMaps, jointCount, shaderDefines) {
         // jointCount from 0 to 255
         var key = jointCount;
+        // roughnessChannel from 256 to 1024
+        // metalnessChannel from 1024 to 4096
+        key += 256 * shaderDefines.roughnessChannel;
+        key += 1024 * shaderDefines.metalnessChannel;
+
         for (var i = 0; i < enabledMaps.length; i++) {
             key += KEY_OFFSETS[enabledMaps[i]];
         }
@@ -45,7 +52,7 @@ define(function (require) {
         return key;
     }
 
-    function allocateShader (enabledMaps, jointCount, shaderDefines) {
+    function allocateShader(gl, enabledMaps, jointCount, shaderDefines) {
         var key = makeKey(enabledMaps, jointCount, shaderDefines);
         var shader = shaderLibrary[key];
 
@@ -57,6 +64,8 @@ define(function (require) {
             shader.enableTexture(enabledMaps);
             shader.define('fragment', 'USE_METALNESS');
             shader.define('fragment', 'USE_ROUGHNESS');
+            shader.define('ROUGHNESS_CHANNEL', shaderDefines.roughnessChannel);
+            shader.define('METALNESS_CHANNEL', shaderDefines.metalnessChannel);
             if (jointCount) {
                 shader.define('vertex', 'SKINNING');
                 shader.define('vertex', 'JOINT_COUNT', jointCount);
@@ -76,9 +85,17 @@ define(function (require) {
             if (shaderDefines.parallaxCorrected) {
                 shader.define('fragment', 'PARALLAX_CORRECTED');
             }
+            if (shaderDefines.doubleSided) {
+                shader.define('fragment', 'DOUBLE_SIDED');
+            }
+            if (shaderDefines.alphaTest) {
+                shader.define('fragment', 'ALPHA_TEST');
+            }
 
             shaderLibrary[key] = shader;
-            shaderUsedCount[key] = 0;
+
+            shaderUsedCount[gl.__GLID__] = shaderUsedCount[gl.__GLID__] || {};
+            shaderUsedCount[gl.__GLID__][key] = 0;
         }
         shaderUsedCount[key]++;
 
@@ -86,17 +103,14 @@ define(function (require) {
 
         return shader;
     }
-    function releaseShader (shader, _gl) {
+    function releaseShader (shader, gl) {
         var key = shader.__key__;
         if (shaderLibrary[key]) {
-            shaderUsedCount[key]--;
-            if (!shaderUsedCount[key]) {
-                delete shaderLibrary[key];
-                delete shaderUsedCount[key];
-
-                if (_gl) {
+            shaderUsedCount[gl.__GLID__][key]--;
+            if (!shaderUsedCount[gl.__GLID__][key]) {
+                if (gl) {
                     // Since shader may not be used on any material. We need to dispose it
-                    shader.dispose(_gl);
+                    shader.dispose(gl);
                 }
             }
         }
@@ -148,6 +162,25 @@ define(function (require) {
              */
             alpha: 1,
 
+            /**
+             * @type {boolean}
+             * @name alphaTest
+             */
+            alphaTest: false,
+
+            /**
+             * Cutoff threshold for alpha test
+             * @type {number}
+             * @name  alphaCutoff
+             */
+            alphaCutoff: 0.9,
+
+            /**
+             * @type {boolean}
+             * @name doubleSided
+             */
+            // TODO Must disable culling.
+            doubleSided: false,
 
             /**
              * @type {qtek.Texture2D}
@@ -249,7 +282,18 @@ define(function (require) {
              * @type {boolean}
              * @name decodeRGBM
              */
-            decodeRGBM: false
+            decodeRGBM: false,
+
+            /**
+             * @type {Number}
+             * @name {roughnessChannel}
+             */
+            roughnessChannel: 0,
+            /**
+             * @type {Number}
+             * @name {metalnessChannel}
+             */
+            metalnessChannel: 1
         };
     }, {
 
@@ -263,12 +307,16 @@ define(function (require) {
             }
 
             var shader = allocateShader(
-                enabledTextures, this.jointCount || 0, {
+                gl, enabledTextures, this.jointCount || 0, {
                     environmentMapPrefiltered: this.environmentMapPrefiltered,
                     linear: this.linear,
                     encodeRGBM: this.encodeRGBM,
                     decodeRGBM: this.decodeRGBM,
-                    parallaxCorrected: !!this._environmentBox
+                    parallaxCorrected: !!this._environmentBox,
+                    alphaTest: this.alphaTest,
+                    doubleSided: this.doubleSided,
+                    metalnessChannel: this.metalnessChannel,
+                    roughnessChannel: this.roughnessChannel
                 }
             );
             var originalUniforms = this.uniforms;
@@ -416,10 +464,10 @@ define(function (require) {
 
     Object.defineProperty(StandardMaterial.prototype, 'shader', {
         get: function () {
-            // PENDING
+            // FIXME updateShader needs gl context.
             if (!this._shader) {
-                this._shaderDirty = true;
-                this.updateShader();
+                // this._shaderDirty = true;
+                // this.updateShader();
             }
             return this._shader;
         },

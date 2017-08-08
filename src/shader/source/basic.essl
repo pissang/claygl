@@ -38,13 +38,16 @@ void main()
 
 @export qtek.basic.fragment
 
-#define ALPHA_TEST_THRESHOLD 0.5
 
 varying vec2 v_Texcoord;
 uniform sampler2D diffuseMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform vec3 emission : [0.0, 0.0, 0.0];
 uniform float alpha : 1.0;
+
+#ifdef ALPHA_TEST
+uniform float alphaCutoff: 0.9;
+#endif
 
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
@@ -93,7 +96,7 @@ void main()
 #endif
 
 #ifdef ALPHA_TEST
-    if (gl_FragColor.a < ALPHA_TEST_THRESHOLD) {
+    if (gl_FragColor.a < alphaCutoff) {
         discard;
     }
 #endif

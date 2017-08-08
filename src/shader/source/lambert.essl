@@ -53,8 +53,6 @@ void main()
 
 @export qtek.lambert.fragment
 
-#define ALPHA_TEST_THRESHOLD 0.5
-
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
@@ -65,6 +63,10 @@ uniform sampler2D alphaMap;
 uniform vec3 color : [1.0, 1.0, 1.0];
 uniform vec3 emission : [0.0, 0.0, 0.0];
 uniform float alpha : 1.0;
+
+#ifdef ALPHA_TEST
+uniform float alphaCutoff: 0.9;
+#endif
 
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
@@ -253,7 +255,7 @@ void main()
     }
 
 #ifdef ALPHA_TEST
-    if (gl_FragColor.a < ALPHA_TEST_THRESHOLD) {
+    if (gl_FragColor.a < alphaCutoff) {
         discard;
     }
 #endif

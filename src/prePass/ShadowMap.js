@@ -76,6 +76,8 @@ define(function (require) {
                 0, -1
             ]),
 
+            precision: 'mediump',
+
             _frameBuffer: new FrameBuffer(),
 
             _textures: {},
@@ -187,7 +189,7 @@ define(function (require) {
                         depthShader = new Shader({
                             vertex: Shader.source('qtek.sm.depth.vertex'),
                             fragment: Shader.source('qtek.sm.depth.fragment'),
-                            precision: 'mediump'
+                            precision: this.precision
                         });
                         if (nJoints > 0) {
                             depthShader.define('vertex', 'SKINNING');
@@ -240,7 +242,7 @@ define(function (require) {
                             shader: new Shader({
                                 vertex: Shader.source('qtek.sm.distance.vertex'),
                                 fragment: Shader.source('qtek.sm.distance.fragment'),
-                                precision: 'mediump'
+                                precision: this.precision
                             })
                         });
                         if (nJoints > 0) {
