@@ -48,6 +48,22 @@ define(function (require) {
         'COLOR': 'color'
     };
 
+    var ARRAY_CTOR_MAP = {
+        5120: vendor.Int8Array,
+        5121: vendor.Uint8Array,
+        5122: vendor.Int16Array,
+        5123: vendor.Uint16Array,
+        5126: vendor.Float32Array
+    };
+    var SIZE_MAP = {
+        SCALAR: 1,
+        VEC2: 2,
+        VEC3: 3,
+        VEC4: 4,
+        MAT2: 4,
+        MAT3: 9,
+        MAT4: 16
+    };
 
     /**
      * @typedef {Object} qtek.loader.GLTF.IResult
@@ -232,6 +248,9 @@ define(function (require) {
                     self._parseSkins(json, lib);
                 }
                 
+                if (self.includeAnimation) {
+                    self._parseAnimations(json, lib);
+                }
                 self.trigger('success', getResult());
             }
 
@@ -615,23 +634,9 @@ define(function (require) {
                         }
                         var componentType = attributeInfo.componentType;
                         var attributeType = attributeInfo.type;
-                        ArrayCtor = ({
-                            5120: vendor.Int8Array,
-                            5121: vendor.Uint8Array,
-                            5122: vendor.Int16Array,
-                            5123: vendor.Uint16Array,
-                            5126: vendor.Float32Array
-                        })[componentType] || vendor.Float32Array;
+                        ArrayCtor = ARRAY_CTOR_MAP[componentType] || vendor.Float32Array;
 
-                        size = ({
-                            SCALAR: 1,
-                            VEC2: 2,
-                            VEC3: 3,
-                            VEC4: 4,
-                            MAT2: 4,
-                            MAT3: 9,
-                            MAT4: 16
-                        })[attributeType];
+                        size = SIZE_MAP[attributeType];
 
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
                         var buffer = lib.buffers[bufferViewInfo.buffer];
@@ -813,21 +818,10 @@ define(function (require) {
                 var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
                 var buffer = lib.buffers[bufferViewInfo.buffer];
                 var byteOffset = (bufferViewInfo.byteOffset || 0) + (accessorInfo.byteOffset || 0);
-                switch(accessorInfo.type) {
-                    case 0x8B50:     // FLOAT_VEC2
-                        var size = 2;
-                        break;
-                    case 0x8B51:     // FLOAT_VEC3
-                        var size = 3;
-                        break;
-                    case 0x8B52:     // FLOAT_VEC4
-                        var size = 4;
-                        break;
-                    case 0x1406:     // FLOAT
-                        var size = 1;
-                        break;
-                }
-                return new vendor.Float32Array(buffer, byteOffset, size * accessorInfo.count);
+                var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
+
+                var size = SIZE_MAP[accessorInfo.type];
+                return new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
             }
 
             function checkChannelPath(channelInfo) {
@@ -840,6 +834,22 @@ define(function (require) {
 
             function getChannelHash(channelInfo, animationInfo) {
                 return channelInfo.target.node + '_' + animationInfo.samplers[channelInfo.sampler].input;
+            }
+
+            function clipOnframe() {
+                var targetNode = this.target;
+                if (targetNode) {
+                    var channels = this.channels;
+                    if (channels.position) {
+                        targetNode.position.setArray(this.position);
+                    }
+                    if (channels.rotation) {
+                        targetNode.rotation.setArray(this.rotation);
+                    }
+                    if (channels.scale) {
+                        targetNode.scale.setArray(this.scale);
+                    }
+                }
             }
 
 
@@ -857,27 +867,31 @@ define(function (require) {
 
                     var targetNode = lib.nodes[channelInfo.target.node];
                     var clip = clips[channelHash];
+                    var samplerInfo = animationInfo.samplers[channelInfo.sampler];
+                    
                     if (!clip) {
                         clip = clips[channelHash] = new SamplerClip({
                             target: targetNode,
                             name: targetNode ? targetNode.name : '',
-                            targetNodeIndex: channelInfo.target.node
+                            targetNodeIndex: channelInfo.target.node,
+
+                            // PENDING, If write here
+                            loop: true,
+                            onframe: clipOnframe
                         });
-                        clip.channels.time = getAccessorData(channelInfo.input);
+                        clip.channels.time = getAccessorData(samplerInfo.input);
                         // TODO May have same buffer data ?
                         for (var i = 0; i < clip.channels.time.length; i++) {
                             clip.channels.time[i] *= 1000;
                         }
                     }
 
-                    var samplerInfo = animationInfo.samplers[channelInfo.sampler];
-                    
                     var interpolation = samplerInfo.interpolation || 'LINEAR';
                     if (interpolation !== 'LINEAR') {
                         console.warn('GLTFLoader only support LINEAR interpolation.');
                     }
 
-                    clip.channels[channelInfo.path] = getAccessorData(samplerInfo.output);
+                    clip.channels[channelInfo.target.path] = getAccessorData(samplerInfo.output);
                 }
 
                 for (var key in clips) {
