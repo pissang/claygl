@@ -548,13 +548,10 @@ define(function (require) {
                 emission: materialInfo.emissiveFactor || [0, 0, 0]
             }
             if (commonProperties.roughnessMap) {
-                // PENDING
-                if (metallicRoughnessMatInfo.metallicFactor == null) {
-                    commonProperties.metalness = 0.5;
-                }
-                if (metallicRoughnessMatInfo.roughnessFactor == null) {
-                    commonProperties.roughness = 0.5;
-                }
+                // In glTF metallicFactor will do multiply, which is different from StandardMaterial.
+                // So simply ignore it
+                commonProperties.metalness = 0.5;
+                commonProperties.roughness = 0.5;
             }
             if (isStandardMaterial) {
                 material = new StandardMaterial(util.extend({
@@ -620,6 +617,8 @@ define(function (require) {
                 for (var pp = 0; pp < meshInfo.primitives.length; pp++) {
                     var primitiveInfo = meshInfo.primitives[pp];
                     var geometry = new StaticGeometry({
+                        // PENDIGN
+                        name: meshInfo.name,
                         boundingBox: new BoundingBox()
                     });
                     // Parse attributes
@@ -880,10 +879,13 @@ define(function (require) {
                             onframe: clipOnframe
                         });
                         clip.channels.time = getAccessorData(samplerInfo.input);
-                        // TODO May have same buffer data ?
-                        for (var k = 0; k < clip.channels.time.length; k++) {
+                        var frameLen = clip.channels.time.length;
+                        // TODO May share same buffer data ?
+                        for (var k = 0; k < frameLen; k++) {
                             clip.channels.time[k] *= 1000;
                         }
+
+                        clip.life = clip.channels.time[frameLen - 1];
                     }
 
                     var interpolation = samplerInfo.interpolation || 'LINEAR';
@@ -891,7 +893,12 @@ define(function (require) {
                         console.warn('GLTFLoader only support LINEAR interpolation.');
                     }
 
-                    clip.channels[channelInfo.target.path] = getAccessorData(samplerInfo.output);
+                    var path = channelInfo.target.path;
+                    if (path === 'translation') {
+                        path = 'position';
+                    }
+
+                    clip.channels[path] = getAccessorData(samplerInfo.output);
                 }
 
                 for (var key in clips) {
