@@ -799,8 +799,8 @@ define(function (require) {
             }, this);
 
             // Build hierarchy
-            util.each(json.nodes, function (nodeInfo) {
-                var node = lib.nodes[name];
+            util.each(json.nodes, function (nodeInfo, idx) {
+                var node = lib.nodes[idx];
                 if (nodeInfo.children) {
                     for (var i = 0; i < nodeInfo.children.length; i++) {
                         var childIdx = nodeInfo.children[i];
@@ -881,8 +881,8 @@ define(function (require) {
                         });
                         clip.channels.time = getAccessorData(samplerInfo.input);
                         // TODO May have same buffer data ?
-                        for (var i = 0; i < clip.channels.time.length; i++) {
-                            clip.channels.time[i] *= 1000;
+                        for (var k = 0; k < clip.channels.time.length; k++) {
+                            clip.channels.time[k] *= 1000;
                         }
                     }
 
