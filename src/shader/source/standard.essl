@@ -116,7 +116,6 @@ uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 #endif
 
-// I don't know why rougnessMap must be put before environmentMap. Or it will be wrong.
 #ifdef USE_ROUGHNESS
 uniform float roughness : 0.5;
     #ifdef ROUGHNESSMAP_ENABLED

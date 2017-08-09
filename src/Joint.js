@@ -22,11 +22,6 @@ define(function(require) {
          * @type {number}
          */
         index: -1,
-        /**
-         * Index of parent joint index, -1 if it is a root joint
-         * @type {number}
-         */
-        parentIndex: -1,
 
         /**
          * Scene node attached to

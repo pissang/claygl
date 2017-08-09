@@ -1267,7 +1267,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--timerange', default='0,1000', type=str, help="Export animation time, in format 'startSecond,endSecond'")
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
-    parser.add_argument('-p', '--pose', default=-1, type=float, help="Pose time")
+    parser.add_argument('-p', '--pose', default=-1, type=float, help="Static pose time")
     parser.add_argument('file')
 
     args = parser.parse_args()

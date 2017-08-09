@@ -59,23 +59,6 @@ define(function (require) {
     },
     /** @lends qtek.Skeleton.prototype */
     {
-        /**
-         * Update joints hierarchy
-         */
-        updateHierarchy: function () {
-            this.roots = [];
-            var joints = this.joints;
-            for (var i = 0; i < joints.length; i++) {
-                var joint = joints[i];
-                if (joint.parentIndex >= 0) {
-                    var parent = joints[joint.parentIndex].node;
-                    parent.add(joint.node);
-                }
-                else {
-                    this.roots.push(joint);
-                }
-            }
-        },
 
         /**
          * Add a skinning clip and create a map between clip and skeleton
@@ -200,6 +183,12 @@ define(function (require) {
             };
         })(),
 
+        setJointMatricesArray: function (array) {
+            this._invBindPoseMatricesArray = array;
+            this._skinMatricesArray = new Float32Array(array.length);
+            this.updateMatricesSubArrays();
+        },
+
         updateMatricesSubArrays: function () {
             for (var i = 0; i < this.joints.length; i++) {
                 this._jointMatricesSubArrays[i] = this._invBindPoseMatricesArray.subarray(i * 16, (i+1) * 16);
@@ -299,14 +288,12 @@ define(function (require) {
                 var newJoint = new Joint();
                 newJoint.name = this.joints[i].name;
                 newJoint.index = this.joints[i].index;
-                newJoint.parentIndex = this.joints[i].parentIndex;
 
                 var path = this.joints[i].node.getPath(rootNode);
                 var rootNodePath = this.joints[i].rootNode.getPath(rootNode);
 
                 if (path != null && rootNodePath != null) {
                     newJoint.node = newRootNode.queryNode(path);
-                    newJoint.rootNode = newRootNode.queryNode(rootNodePath);
                 }
                 else {
                     // PENDING

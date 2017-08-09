@@ -98,7 +98,9 @@ define(function(require) {
 	},
 	"loader": {
 		"FX": require('./loader/FX'),
-		"GLTF": require('./loader/GLTF')
+		"GLB": require('./loader/GLB'),
+		"GLTF": require('./loader/GLTF'),
+		"GLTF2": require('./loader/GLTF2')
 	},
 	"Material": require('./Material'),
 	"math": {
