@@ -890,6 +890,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
                 lScaleChannel.append(list(lScale))
 
         lSamplerAccessors = {
+            # TODO Share time
             "time": CreateAnimationBuffer(lTimeChannel, 'f', 1)
         };
         if lHaveTranslation:
@@ -1033,9 +1034,12 @@ def Convert(
 
         #Output json
         lOutput = {
+            'asset': {
+                'generator': 'qtek fbx2gltf',
+                'version': '2.0'
+            },
+            'extensionsUsed': ['KHR_materials_common'],
             'animations' : lib_animations,
-            'asset' : {},
-            'shaders' : {},
             'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,
