@@ -30,6 +30,7 @@ define(function (require) {
              * root joints
              * @type {Array.<qtek.Joint>}
              */
+            // PENDING If needs this?
             roots: [],
 
             /**

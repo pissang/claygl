@@ -109,10 +109,6 @@ define(function (require) {
         shaderName: 'qtek.standard',
 
         /**
-         * Cross origin setting
-         */
-
-        /**
          * @type {string}
          */
         useStandardMaterial: false,
@@ -297,10 +293,10 @@ define(function (require) {
                     });
                     skeleton.joints.push(joint);
                 }
-                lib.skeletons[name].relativeRootNode = lib.nodes[skinInfo.skeleton] || this.rootNode;
+                skeleton.relativeRootNode = lib.nodes[skinInfo.skeleton] || this.rootNode;
                 if (skinInfo.inverseBindMatrices) {
                     haveInvBindMatrices = true;
-                    var IBMInfo = skinInfo.inverseBindMatrices;
+                    var IBMInfo = json.accessors[skinInfo.inverseBindMatrices];
                     var bufferViewName = IBMInfo.bufferView;
                     var bufferViewInfo = json.bufferViews[bufferViewName];
                     var buffer = lib.buffers[bufferViewInfo.buffer];
@@ -347,12 +343,12 @@ define(function (require) {
                 return joint.index;
             }
 
-            util.each(json.nodes, function (nodeInfo) {
+            util.each(json.nodes, function (nodeInfo, nodeIdx) {
                 if (nodeInfo.skin != null) {
                     var skinIdx = nodeInfo.skin;
                     var skeleton = lib.skeletons[skinIdx];
 
-                    var node = lib.nodes[name];
+                    var node = lib.nodes[nodeIdx];
                     var jointIndices = skeleton.joints.map(getJointIndex);
                     if (node instanceof Mesh) {
                         enableSkinningForMesh(node, skeleton, jointIndices);
@@ -392,10 +388,10 @@ define(function (require) {
                 });
 
                 var target = textureInfo.target || glenum.TEXTURE_2D;
-                // var format = textureInfo.format;
-                // if (format != null) {
-                //     parameters.format = format;
-                // }
+                var format = textureInfo.format;
+                if (format != null) {
+                    parameters.format = format;
+                }
 
                 if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
@@ -410,12 +406,14 @@ define(function (require) {
             var uniforms = {};
             var commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
             uniforms = commonMaterialInfo.values;
-            for (var symbol in uniforms) {
-                var value = uniforms[symbol];
-                if (typeof(value) === 'string') {
-                    uniforms[symbol] = lib.textures[value] || null;
-                }
+            
+            if (typeof uniforms.diffuse === 'number') {
+                uniforms.diffuse = lib.textures[uniforms.diffuse]
             }
+            if (typeof uniforms.emission === 'number') {
+                uniforms.emission = lib.textures[uniforms.emission]
+            }
+
             var enabledTextures = [];
             if (uniforms['diffuse'] instanceof Texture2D) {
                 enabledTextures.push('diffuseMap');
@@ -776,6 +774,7 @@ define(function (require) {
                 }
                 else {
                     node = new Node();
+                    // PENDING Dulplicate name.
                     node.setName(nodeInfo.name);
                 }
                 if (nodeInfo.matrix) {
