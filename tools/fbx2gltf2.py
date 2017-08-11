@@ -96,15 +96,15 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
     if minMax:
         if len(pList) > 0:
             if pStride == 1:
-                lMin = pList[0]
-                lMax = pList[0]
+                lMin = [pList[0]]
+                lMax = [pList[0]]
             else:
-                lMin = list(pList[0])
-                lMax = list(pList[0])
+                lMin = list(pList[0])[:pStride]
+                lMax = list(pList[0])[:pStride]
         else:
             lMax = [0] * pStride
             lMin = [0] * pStride
-        lRange = range(pStride)
+        lRange = range(pStride - 1)
     #TODO: Other method to write binary buffer ?
     for item in pList:
         if pStride == 1:
@@ -119,13 +119,9 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
             m = item
             lData.append(struct.pack(lType, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
         if minMax:
-            if pStride == 1:
-                lMin = min(lMin, item)
-                lMax = max(lMin, item)
-            else:
-                for i in lRange:
-                    lMin[i] = min(lMin[i], item[i])
-                    lMax[i] = max(lMax[i], item[i])
+            for i in lRange:
+                lMin[i] = min(lMin[i], item[i])
+                lMax[i] = max(lMax[i], item[i])
 
     if pType == 'f':
         lGLTFAcessor['componentType'] = GL_FLOAT
@@ -163,6 +159,7 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
 def CreateAttributeBuffer(pList, pType, pStride):
     lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True)
     lGLTFAttribute['byteOffset'] = len(attributeBuffer)
+    # pType is float
     attributeBuffer.extend(lData)
     idx = len(lib_accessors)
     lib_attributes_accessors.append(lGLTFAttribute)
@@ -180,7 +177,7 @@ def CreateIndicesBuffer(pList, pType):
     return idx
 
 def CreateAnimationBuffer(pList, pType, pStride):
-    lData, lGLTFAnimSampler = CreateAccessorBuffer(pList, pType, pStride, False)
+    lData, lGLTFAnimSampler = CreateAccessorBuffer(pList, pType, pStride, True)
     lGLTFAnimSampler['byteOffset'] = len(animationBuffer)
     animationBuffer.extend(lData)
     idx = len(lib_accessors)
@@ -1043,16 +1040,22 @@ def Convert(
             'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,
-            'textures' : lib_textures,
-            'samplers' : lib_samplers,
-            'images' : lib_images,
-            'materials' : lib_materials,
             'nodes' : lib_nodes,
-            'cameras' : lib_cameras,
             'scenes' : lib_scenes,
             'meshes' : lib_meshes,
-            'skins' : lib_skins,
         }
+        if len(lib_cameras) > 0:
+            lOutput['cameras'] = lib_cameras
+        if len(lib_skins) > 0:
+            lOutput['skins'] = lib_skins
+        if len(lib_materials) > 0:
+            lOutput['materials'] = lib_materials
+        if len(lib_images) > 0:
+            lOutput['images'] = lib_images
+        if len(lib_samplers) > 0:
+            lOutput['samplers'] = lib_samplers
+        if len(lib_textures) > 0:
+            lOutput['textures'] = lib_textures
         #Default scene
         if not ignoreScene:
             lOutput['scene'] = lSceneIdx
