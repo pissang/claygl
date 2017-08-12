@@ -87,6 +87,9 @@ def GetId():
     _id = _id + 1
     return _id
 
+def ListFromM4(m):
+    return [m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]]
+
 def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
     lGLTFAcessor = {}
 
@@ -98,13 +101,17 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
             if pStride == 1:
                 lMin = [pList[0]]
                 lMax = [pList[0]]
+            elif pStride == 16:
+                lMin = ListFromM4(pList[0])
+                lMax = ListFromM4(pList[0])
             else:
                 lMin = list(pList[0])[:pStride]
                 lMax = list(pList[0])[:pStride]
         else:
             lMax = [0] * pStride
             lMin = [0] * pStride
-        lRange = range(pStride - 1)
+        lRange = range(pStride)
+
     #TODO: Other method to write binary buffer ?
     for item in pList:
         if pStride == 1:
@@ -119,9 +126,16 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
             m = item
             lData.append(struct.pack(lType, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
         if minMax:
-            for i in lRange:
-                lMin[i] = min(lMin[i], item[i])
-                lMax[i] = max(lMax[i], item[i])
+            if pStride == 1:
+                for i in lRange:
+                    lMin[i] = min(lMin[i], item)
+                    lMax[i] = max(lMax[i], item)
+            else:
+                if pStride == 16:
+                    item = ListFromM4(item)
+                for i in lRange:
+                    lMin[i] = min(lMin[i], item[i])
+                    lMax[i] = max(lMax[i], item[i])
 
     if pType == 'f':
         lGLTFAcessor['componentType'] = GL_FLOAT
@@ -168,7 +182,8 @@ def CreateAttributeBuffer(pList, pType, pStride):
 
 
 def CreateIndicesBuffer(pList, pType):
-    lData, lGLTFIndices = CreateAccessorBuffer(pList, pType, 1, False)
+    # Sketchfab needs all accessor have min, max?
+    lData, lGLTFIndices = CreateAccessorBuffer(pList, pType, 1, True)
     lGLTFIndices['byteOffset'] = len(indicesBuffer)
     indicesBuffer.extend(lData)
     idx = len(lib_accessors)
@@ -186,7 +201,7 @@ def CreateAnimationBuffer(pList, pType, pStride):
     return idx
 
 def CreateIBMBuffer(pList):
-    lData, lGLTFIBM = CreateAccessorBuffer(pList, 'f', 16)
+    lData, lGLTFIBM = CreateAccessorBuffer(pList, 'f', 16, True)
     lGLTFIBM['byteOffset'] = len(invBindMatricesBuffer)
     invBindMatricesBuffer.extend(lData)
     idx = len(lib_accessors)
@@ -460,6 +475,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             lControlPointsCount = pMesh.GetControlPointsCount()
             for i in range(lControlPointsCount):
                 lWeights.append([0, 0, 0, 0])
+                # -1 can't used in UNSIGNED_SHORT
                 lJoints.append([-1, -1, -1, -1])
                 lJointCounts.append(0)
 
@@ -590,7 +606,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if lLayer2Uv:
             lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lTexcoords2, 'f', 2)
         if hasSkin:
-            # PENDING Joint indices use other data type ?
+            # PENDING UNSIGNED_SHORT will have bug.
             lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'f', 4)
             lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 3)
 
@@ -637,13 +653,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
     lib_nodes.append(lGLTFNode)
 
     # Transform matrix
-    m = pNode.EvaluateLocalTransform(pPoseTime)
-    lGLTFNode['matrix'] = [
-        m[0][0], m[0][1], m[0][2], m[0][3],
-        m[1][0], m[1][1], m[1][2], m[1][3],
-        m[2][0], m[2][1], m[2][2], m[2][3],
-        m[3][0], m[3][1], m[3][2], m[3][3],
-    ]
+    lGLTFNode['matrix'] = ListFromM4(pNode.EvaluateLocalTransform(pPoseTime))
 
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
@@ -771,9 +781,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
             if not pNode.GetParent() == None:
                 m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime)
             m = m.Inverse()
-            lGLTFNode['matrix'] = [
-                m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]
-            ]
+            lGLTFNode['matrix'] = ListFromM4(m)
 
     else:
         # Camera and light node attribute
@@ -936,6 +944,8 @@ def CreateBufferView(pBufferIdx, appendBufferData, lib, lByteOffset, target=GL_A
         "buffer": pBufferIdx,
         "byteLength": len(appendBufferData),
         "byteOffset": lByteOffset,
+        # PENDING
+        "byteStride": 0,
         "target": target
     }
     lib_buffer_views.append(lBufferView)
@@ -1036,7 +1046,6 @@ def Convert(
                 'version': '2.0'
             },
             'extensionsUsed': ['KHR_materials_common'],
-            'animations' : lib_animations,
             'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,
@@ -1056,6 +1065,8 @@ def Convert(
             lOutput['samplers'] = lib_samplers
         if len(lib_textures) > 0:
             lOutput['textures'] = lib_textures
+        if len(lib_animations) > 0:
+            lOutput['animations'] = lib_animations
         #Default scene
         if not ignoreScene:
             lOutput['scene'] = lSceneIdx

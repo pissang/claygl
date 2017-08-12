@@ -185,21 +185,22 @@ mat4 getSkinMatrix(float idx) {
 
 // Weighted Sum Skinning Matrix
 mat4 skinMatrixWS;
-if (joint.x >= 0.0)
+if (weight.x > 0.0)
 {
     skinMatrixWS = getSkinMatrix(joint.x) * weight.x;
 }
-if (joint.y >= 0.0)
+if (weight.y > 0.0)
 {
     skinMatrixWS += getSkinMatrix(joint.y) * weight.y;
 }
-if (joint.z >= 0.0)
+if (weight.z > 0.0)
 {
     skinMatrixWS += getSkinMatrix(joint.z) * weight.z;
 }
-if (joint.w >= 0.0)
+float weightW = 1.0-weight.x-weight.y-weight.z;
+if (weightW > 0.0)
 {
-    skinMatrixWS += getSkinMatrix(joint.w) * (1.0-weight.x-weight.y-weight.z);
+    skinMatrixWS += getSkinMatrix(joint.w) * weightW;
 }
 @end
 
