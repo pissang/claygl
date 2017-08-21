@@ -1,291 +1,681 @@
-define(function(require) {
-
+define(function (require) {
     var Base = require('../core/Base');
+    var Vector2 = require('../math/Vector2');
     var Vector3 = require('../math/Vector3');
-    var Matrix4 = require('../math/Matrix4');
+    var GestureMgr = require('./GestureMgr');
 
-    function addEvent(dom, eveType, handler) {
-        dom.addEventListener(eveType, handler);
-    }
-    function removeEvent(dom, eveType, handler) {
-        dom.removeEventListener(eveType, handler);
+    function firstNotNull() {
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] != null) {
+                return arguments[i];
+            }
+        }
     }
 
     /**
-     * @constructor qtek.plugin.OrbitControl
-     *
-     * @example
-     *
-     *     var control = new qtek.plugin.OrbitControl({
-     *         target: camera,
-     *         domElement: renderer.canvas
-     *     });
-     *     // Rotate around car
-     *     control.origin.copy(car.position);
-     *     ...
-     *     animation.on('frame', function(frameTime) {
-     *         control.update(frameTime);
-     *         renderer.render(scene, camera);
-     *     });
+     * @alias module:echarts-x/util/OrbitControl
      */
-    var OrbitControl = Base.extend(function() {
-        return /** @lends qtek.plugin.OrbitControl# */ {
-            /**
-             * Scene node to control, mostly it is a camera
-             * @type {qtek.Node}
-             */
-            target: null,
+    var OrbitControl = Base.extend(function () {
+
+        return {
+            renderer: null,
+
+            animation: null,
 
             /**
-             * Target dom to bind with mouse events
-             * @type {HTMLElement}
+             * @type {HTMLDomElement}
              */
             domElement: null,
 
             /**
-             * Mouse move sensitivity
-             * @type {number}
+             * @type {qtek.Node}
              */
-            sensitivity: 1,
-
+            target: null,
             /**
-             * Origin to rotate around
              * @type {qtek.math.Vector3}
              */
-            origin: new Vector3(),
+            _center: new Vector3(),
 
             /**
-             * Up axis
-             * @type {qtek.math.Vector3}
-             */
-            up: new Vector3(0, 1, 0),
-
-            /**
-             * Minimum distance from origin to target when zooming in
+             * Minimum distance to the center
              * @type {number}
+             * @default 0.5
              */
-            minDistance: 0,
-            /**
-             * Maximum distance from origin to target when zooming out
-             * @type {number}
-             */
-            maxDistance: Infinity,
+            minDistance: 2,
 
             /**
-             * Minimum polar angle when rotate up, it is 0 when the direction origin point to target is same with up axis
+             * Maximum distance to the center
              * @type {number}
+             * @default 2
              */
-            minPolarAngle: 0, // [0, Math.PI/2]
+            maxDistance: 100,
 
             /**
-             * Maximum polar angle when rotate down. It is PI when the direction origin point to target is opposite to up axis
-             * @type {number}
+             * Minimum alpha rotation
              */
-            maxPolarAngle: Math.PI, // [Math.PI/2, Math.PI]
+            minAlpha: -90,
 
-            // Rotate around origin
-            _offsetPitch: 0,
-            _offsetRoll: 0,
+            /**
+             * Maximum alpha rotation
+             */
+            maxAlpha: 90,
 
-            // Pan the origin
-            _panX: 0,
-            _panY: 0,
+            /**
+             * Minimum beta rotation
+             */
+            minBeta: -Infinity,
+            /**
+             * Maximum beta rotation
+             */
+            maxBeta: Infinity,
 
-            // Offset of mouse move
-            _offsetX: 0,
-            _offsetY: 0,
+            /**
+             * Start auto rotating after still for the given time
+             */
+            autoRotateAfterStill: 0,
 
-            // Zoom with mouse wheel
-            _forward: 0,
+            /**
+             * Direction of autoRotate. cw or ccw when looking top down.
+             */
+            autoRotateDirection: 'cw',
 
-            _op: -1  //0: ROTATE, 1: PAN
+            /**
+             * Degree per second
+             */
+            autoRotateSpeed: 60,
+
+            /**
+             * Pan or rotate
+             * @type {String}
+             */
+            _mode: 'rotate',
+
+            /**
+             * @param {number}
+             */
+            damping: 0.8,
+
+            /**
+             * @param {number}
+             */
+            rotateSensitivity: 1,
+
+            /**
+             * @param {number}
+             */
+            zoomSensitivity: 1,
+
+            /**
+             * @param {number}
+             */
+            panSensitivity: 1,
+
+            _needsUpdate: false,
+
+            _rotating: false,
+
+            // Rotation around yAxis
+            _phi: 0,
+            // Rotation around xAxis
+            _theta: 0,
+
+            _mouseX: 0,
+            _mouseY: 0,
+
+            _rotateVelocity: new Vector2(),
+
+            _panVelocity: new Vector2(),
+
+            _distance: 20,
+
+            _zoomSpeed: 0,
+
+            _stillTimeout: 0,
+
+            _animators: [],
+
+            _gestureMgr: new GestureMgr()
         };
-    }, function() {
-        this._mouseDown = this._mouseDown.bind(this);
-        this._mouseUp = this._mouseUp.bind(this);
-        this._mouseMove = this._mouseMove.bind(this);
-        this._mouseOut = this._mouseOut.bind(this);
-        this._mouseWheel = this._mouseWheel.bind(this);
+    }, function () {
+        // Each OrbitControl has it's own handler
+        this._mouseDownHandler = this._mouseDownHandler.bind(this);
+        this._mouseWheelHandler = this._mouseWheelHandler.bind(this);
+        this._mouseMoveHandler = this._mouseMoveHandler.bind(this);
+        this._mouseUpHandler = this._mouseUpHandler.bind(this);
+        this._pinchHandler = this._pinchHandler.bind(this);
 
-        if (this.domElement) {
-            this.enable();
-        }
-    },
-    /** @lends qtek.plugin.OrbitControl.prototype */
-    {
+        this.update = this.update.bind(this);
+
+        this.init();
+
+        this._decomposeTransform();
+    }, {
         /**
-         * Enable control
+         * Initialize.
+         * Mouse event binding
          */
-        enable: function() {
-            var domElement = this.domElement;
-            addEvent(domElement, 'mousedown', this._mouseDown);
-            addEvent(domElement, 'touchstart', this._mouseDown);
+        init: function () {
+            var dom = this.domElement;
 
-            addEvent(domElement, 'mousewheel', this._mouseWheel);
-            addEvent(domElement, 'DOMMouseScroll', this._mouseWheel);
+            dom.addEventListener('touchstart', this._mouseDownHandler);
+
+            dom.addEventListener('mousedown', this._mouseDownHandler);
+            dom.addEventListener('mousewheel', this._mouseWheelHandler);
+
+            if (this.animation) {
+                this.animation.on('frame', this.update);
+            }
         },
 
         /**
-         * Disable control
+         * Dispose.
+         * Mouse event unbinding
          */
-        disable: function() {
-            var domElement = this.domElement;
-            removeEvent(domElement, 'mousedown', this._mouseDown);
-            removeEvent(domElement, 'mousemove', this._mouseMove);
-            removeEvent(domElement, 'mouseup', this._mouseUp);
+        dispose: function () {
+            var dom = this.domElement;
 
-            removeEvent(domElement, 'touchstart', this._mouseDown);
-            removeEvent(domElement, 'touchmove', this._mouseMove);
-            removeEvent(domElement, 'touchend', this._mouseUp);
+            dom.removeEventListener('touchstart', this._mouseDownHandler);
+            dom.removeEventListener('touchmove', this._mouseMoveHandler);
+            dom.removeEventListener('touchend', this._mouseUpHandler);
 
-            removeEvent(domElement, 'mousewheel', this._mouseWheel);
-            removeEvent(domElement, 'DOMMouseScroll', this._mouseWheel);
+            dom.removeEventListener('mousedown', this._mouseDownHandler);
+            dom.removeEventListener('mousemove', this._mouseMoveHandler);
+            dom.removeEventListener('mouseup', this._mouseUpHandler);
+            dom.removeEventListener('mousewheel', this._mouseWheelHandler);
 
-            this._mouseUp();
+            if (this.animation) {
+                this.animation.removeEventListener('frame', this.update);
+            }
+            this.stopAllAnimation();
         },
 
-        _mouseWheel: function(e) {
-            e.preventDefault();
-            var delta = e.wheelDelta // Webkit
-                        || -e.detail; // Firefox
-
-            this._forward += delta * this.sensitivity;
-
-            // Trigger change event to remind renderer do render
-            this.trigger('change');
+        /**
+         * Get distance
+         * @return {number}
+         */
+        getDistance: function () {
+            return this._distance;
         },
 
-        _mouseDown: function(e) {
-            var domElement = this.domElement;
-            addEvent(domElement, 'mousemove', this._mouseMove);
-            addEvent(domElement, 'mouseup', this._mouseUp);
-            addEvent(domElement, 'mouseout', this._mouseOut);
-
-            addEvent(domElement, 'touchend', this._mouseUp);
-            addEvent(domElement, 'touchmove', this._mouseMove);
-
-            var x = e.pageX;
-            var y = e.pageY;
-            // Touch
-            if (e.targetTouches) {
-                var touch = e.targetTouches[0];
-                x = touch.clientX;
-                y = touch.clientY;
-
-                this._op = 0;
-            }
-
-            this._offsetX = x;
-            this._offsetY = y;
-
-            // Rotate
-            if (e.button === 0) {
-                this._op = 0;
-            } else if (e.button === 1) {
-                this._op = 1;
-            }
+        /**
+         * Set distance
+         * @param {number} distance
+         */
+        setDistance: function (distance) {
+            this._distance = distance;
+            this._needsUpdate = true;
         },
 
-        _mouseMove: function(e) {
-            var x = e.pageX;
-            var y = e.pageY;
-            // Touch
-            if (e.targetTouches) {
-                var touch = e.targetTouches[0];
-                x = touch.clientX;
-                y = touch.clientY;
-                // PENDING
-                e.preventDefault();
-            }
+        /**
+         * Get alpha rotation
+         * Alpha angle for top-down rotation. Positive to rotate to top.
+         *
+         * Which means camera rotation around x axis.
+         */
+        getAlpha: function () {
+            return this._theta / Math.PI * 180;
+        },
 
-            var dx = x - this._offsetX;
-            var dy = y - this._offsetY;
+        /**
+         * Get beta rotation
+         * Beta angle for left-right rotation. Positive to rotate to right.
+         *
+         * Which means camera rotation around y axis.
+         */
+        getBeta: function () {
+            return -this._phi / Math.PI * 180;
+        },
 
-            if (this._op === 0) {
-                this._offsetPitch += dx * this.sensitivity / 100;
-                this._offsetRoll += dy * this.sensitivity / 100;
-            }
-            else if (this._op === 1) {
-                var len = this.origin.distance(this.target.position);
-                var divider;
-                if (this.target.fov) {
-                    divider = Math.sin(this.target.fov * Math.PI / 360) / 200;
-                } else {
-                    divider = 1 / 200;
+        /**
+         * Get control center
+         * @return {Array.<number>}
+         */
+        getCenter: function () {
+            return this._center.toArray();
+        },
+
+        /**
+         * Set alpha rotation angle
+         * @param {number} alpha
+         */
+        setAlpha: function (alpha) {
+            alpha = Math.max(Math.min(this.maxAlpha, alpha), this.minAlpha);
+
+            this._theta = alpha / 180 * Math.PI;
+            this._needsUpdate = true;
+        },
+
+        /**
+         * Set beta rotation angle
+         * @param {number} beta
+         */
+        setBeta: function (beta) {
+            beta = Math.max(Math.min(this.maxBeta, beta), this.minBeta);
+
+            this._phi = -beta / 180 * Math.PI;
+            this._needsUpdate = true;
+        },
+
+        /**
+         * Set control center
+         * @param {Array.<number>} center
+         */
+        setCenter: function (centerArr) {
+            this._center.setArray(centerArr);
+        },
+
+        setOption: function (opts) {
+            opts = opts || {};
+
+            ['autoRotate', 'autoRotateAfterStill',
+                'autoRotateDirection', 'autoRotateSpeed',
+                'damping',
+                'minDistance', 'maxDistance',
+                'minAlpha', 'maxAlpha', 'minBeta', 'maxBeta',
+                'rotateSensitivity', 'zoomSensitivity', 'panSensitivity'
+            ].forEach(function (key) {
+                if (opts[key] != null) {
+                    this[key] = opts[key];
                 }
-                this._panX += dx * this.sensitivity * len * divider;
-                this._panY += dy * this.sensitivity * len * divider;
+            }, this);
+
+            if (opts.distance != null) {
+                this.setDistance(opts.distance);
             }
 
-            this._offsetX = x;
-            this._offsetY = y;
+            if (opts.alpha != null) {
+                this.setAlpha(opts.alpha);
+            }
+            if (opts.beta != null) {
+                this.setBeta(opts.beta);
+            }
 
-            // Trigger change event to remind renderer do render
-            this.trigger('change');
-        },
-
-        _mouseUp: function() {
-            var domElement = this.domElement;
-            removeEvent(domElement, 'mousemove', this._mouseMove);
-            removeEvent(domElement, 'mouseup', this._mouseUp);
-            removeEvent(domElement, 'mouseout', this._mouseOut);
-
-            removeEvent(domElement, 'touchend', this._mouseUp);
-            removeEvent(domElement, 'touchmove', this._mouseMove);
-
-            this._op = -1;
-        },
-
-        _mouseOut: function() {
-            this._mouseUp();
+            if (opts.center) {
+                this.setCenter(opts.center);
+            }
         },
 
         /**
-         * Control update. Should be invoked every frame
-         * @param {number} frameTime Frame time
+         * @param {Object} opts
+         * @param {number} opts.distance
+         * @param {number} opts.alpha
+         * @param {number} opts.beta
+         * @param {number} [opts.duration=1000]
+         * @param {number} [opts.easing='linear']
          */
-        update: function(frameTime) {
+        animateTo: function (opts) {
+            var self = this;
+
+            var obj = {};
+            var target = {};
+            var animation = this.animation;
+            if (!animation) {
+                return;
+            }
+            if (opts.distance != null) {
+                obj.distance = this.getDistance();
+                target.distance = opts.distance;
+            }
+            if (opts.alpha != null) {
+                obj.alpha = this.getAlpha();
+                target.alpha = opts.alpha;
+            }
+            if (opts.beta != null) {
+                obj.beta = this.getBeta();
+                target.beta = opts.beta;
+            }
+            if (opts.center != null) {
+                obj.center = this.getCenter();
+                target.center = opts.center;
+            }
+
+            return this._addAnimator(
+                animation.animate(obj)
+                    .when(opts.duration || 1000, target)
+                    .during(function () {
+                        if (obj.alpha != null) {
+                            self.setAlpha(obj.alpha);
+                        }
+                        if (obj.beta != null) {
+                            self.setBeta(obj.beta);
+                        }
+                        if (obj.distance != null) {
+                            self.setDistance(obj.distance);
+                        }
+                        if (obj.center != null) {
+                            self.setCenter(obj.center);
+                        }
+                        self._needsUpdate = true;
+                    })
+            ).start(opts.easing || 'linear');
+        },
+
+        /**
+         * Stop all animation
+         */
+        stopAllAnimation: function () {
+            for (var i = 0; i < this._animators.length; i++) {
+                this._animators[i].stop();
+            }
+            this._animators.length = 0;
+        },
+
+        _isAnimating: function () {
+            return this._animators.length > 0;
+        },
+        /**
+         * Call update each frame
+         * @param  {number} deltaTime Frame time
+         */
+        update: function (deltaTime) {
+
+            if (this._rotating) {
+                var radian = (this.autoRotateDirection === 'cw' ? 1 : -1)
+                    * this.autoRotateSpeed / 180 * Math.PI;
+                this._phi -= radian * deltaTime / 1000;
+                this._needsUpdate = true;
+            }
+            else if (this._rotateVelocity.len() > 0) {
+                this._needsUpdate = true;
+            }
+
+            if (Math.abs(this._zoomSpeed) > 0.01 || this._panVelocity.len() > 0) {
+                this._needsUpdate = true;
+            }
+
+            if (!this._needsUpdate) {
+                return;
+            }
+
+            // Fixed deltaTime
+            this._updateDistance(Math.min(deltaTime, 50));
+            this._updatePan(Math.min(deltaTime, 50));
+
+            this._updateRotate(Math.min(deltaTime, 50));
+
+            this._updateTransform();
+
+            this.target.update();
+
+            this.trigger('update');
+
+            this._needsUpdate = false;
+        },
+
+        _updateRotate: function (deltaTime) {
+            var velocity = this._rotateVelocity;
+            this._phi = velocity.y * deltaTime / 20 + this._phi;
+            this._theta = velocity.x * deltaTime / 20 + this._theta;
+
+            this.setAlpha(this.getAlpha());
+            this.setBeta(this.getBeta());
+
+            this._vectorDamping(velocity, this.damping);
+        },
+
+        _updateDistance: function (deltaTime) {
+            this._setDistance(this._distance + this._zoomSpeed * deltaTime / 20);
+            this._zoomSpeed *= this.damping;
+        },
+
+        _setDistance: function (distance) {
+            this._distance = Math.max(Math.min(distance, this.maxDistance), this.minDistance);
+        },
+
+        _updatePan: function (deltaTime) {
+            var velocity = this._panVelocity;
+            var len = this._distance;
+    
             var target = this.target;
-            var zAxis = target.localTransform.z.normalize();
-            var yAxis = target.localTransform.y.normalize();
+            var yAxis = target.worldTransform.y;
+            var xAxis = target.worldTransform.x;
+    
+            // PENDING
+            this._center
+                .scaleAndAdd(xAxis, -velocity.x * len / 200)
+                .scaleAndAdd(yAxis, -velocity.y * len / 200);
+    
+            this._vectorDamping(velocity, 0);
+        },
 
-            if (this._op === 0 && (this._offsetPitch !== 0 || this._offsetRoll !== 0)) {
-                // Rotate
-                target.rotateAround(this.origin, this.up, -this._offsetPitch);
-                var xAxis = target.localTransform.x;
-                target.rotateAround(this.origin, xAxis, -this._offsetRoll);
+        _updateTransform: function () {
+            var camera = this.target;
 
-                var zAxis = target.worldTransform.z.normalize();
-                var phi = Math.acos(this.up.dot(zAxis));
-                // Rotate back a bit
-                if (this._offsetRoll > 0 && phi <= this.minPolarAngle) {
-                    target.rotateAround(this.origin, xAxis, -phi + this.minPolarAngle);
-                }
-                else if (this._offsetRoll < 0 && phi >= this.maxPolarAngle) {
-                    target.rotateAround(this.origin, xAxis, -phi + this.maxPolarAngle);
-                }
-                this._offsetRoll = this._offsetPitch = 0;
+            var dir = new Vector3();
+            var theta = this._theta + Math.PI / 2;
+            var phi = this._phi + Math.PI / 2;
+            var r = Math.sin(theta);
+
+            dir.x = r * Math.cos(phi);
+            dir.y = -Math.cos(theta);
+            dir.z = r * Math.sin(phi);
+
+            camera.position.copy(this._center).scaleAndAdd(dir, this._distance);
+            camera.rotation.identity()
+                // First around y, then around x
+                .rotateY(-this._phi)
+                .rotateX(-this._theta);
+        },
+
+        _startCountingStill: function () {
+            clearTimeout(this._stillTimeout);
+
+            var time = this.autoRotateAfterStill;
+            var self = this;
+            if (!isNaN(time) && time > 0) {
+                this._stillTimeout = setTimeout(function () {
+                    self._rotating = true;
+                }, time * 1000);
             }
-            else if (this._op === 1) {
-                // Pan
-                var xAxis = target.localTransform.x.normalize().scale(-this._panX);
-                var yAxis = target.localTransform.y.normalize().scale(this._panY);
-                target.position.add(xAxis).add(yAxis);
-                this.origin.add(xAxis).add(yAxis);
-                this._panX = this._panY = 0;
+        },
+
+        _vectorDamping: function (v, damping) {
+            var speed = v.len();
+            speed = speed * damping;
+            if (speed < 1e-4) {
+                speed = 0;
             }
-            if (this._forward !== 0) {
-                // Zoom
-                var distance = target.position.distance(this.origin);
-                var nextDistance = distance + this._forward * distance / 5000;
-                if (nextDistance < this.maxDistance && nextDistance > this.minDistance) {
-                    target.position.scaleAndAdd(zAxis, this._forward * distance / 5000);
-                }
-                this._forward = 0;
+            v.normalize().scale(speed);
+        },
+
+        _decomposeTransform: function () {
+            if (!this.target) {
+                return;
             }
 
+            // FIXME euler order......
+            // FIXME alpha is not certain when beta is 90 or -90
+            var euler = new Vector3();
+            euler.eulerFromQuat(
+                this.target.rotation.normalize(), 'ZYX'
+            );
+
+            this._theta = -euler.x;
+            this._phi = -euler.y;
+
+            this.setBeta(this.getBeta());
+            this.setAlpha(this.getAlpha());
+
+            this._setDistance(this.target.position.dist(this._center));
+        },
+
+        _mouseDownHandler: function (e) {
+            if (this._isAnimating()) {
+                return;
+            }
+            var x = e.clientX;
+            var y = e.clientY;
+            // Touch
+            if (e.targetTouches) {
+                var touch = e.targetTouches[0];
+                x = touch.clientX;
+                y = touch.clientY;
+
+                this._mode = 'rotate';
+
+                this._processGesture(e, 'start');
+            }
+
+            var dom = this.domElement;
+            dom.addEventListener('touchmove', this._mouseMoveHandler);
+            dom.addEventListener('touchend', this._mouseUpHandler);
+
+            dom.addEventListener('mousemove', this._mouseMoveHandler);
+            dom.addEventListener('mouseup', this._mouseUpHandler);
+
+            if (e.button === 0) {
+                this._mode = 'rotate';
+            }
+            else if (e.button === 1) {
+                this._mode = 'pan';
+            }
+
+            // Reset rotate velocity
+            this._rotateVelocity.set(0, 0);
+            this._rotating = false;
+            if (this.autoRotate) {
+                this._startCountingStill();
+            }
+
+            this._mouseX = x;
+            this._mouseY = y;
+        },
+
+        _mouseMoveHandler: function (e) {
+            if (this._isAnimating()) {
+                return;
+            }
+            var x = e.clientX;
+            var y = e.clientY;
+
+            var haveGesture;
+            // Touch
+            if (e.targetTouches) {
+                var touch = e.targetTouches[0];
+                x = touch.clientX;
+                y = touch.clientY;
+
+                haveGesture = this._processGesture(e, 'change');
+            }
+
+            if (!haveGesture) {
+                if (this._mode === 'rotate') {
+                    this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * this.rotateSensitivity;
+                    this._rotateVelocity.x = (y - this._mouseY) / this.domElement.clientWidth * 2 * this.rotateSensitivity;
+                }
+                else if (this._mode === 'pan') {
+                    this._panVelocity.x = (x - this._mouseX) / this.domElement.clientWidth * this.panSensitivity * 400;
+                    this._panVelocity.y = (-y + this._mouseY) / this.domElement.clientHeight * this.panSensitivity * 400;
+                }
+            }
+
+            this._mouseX = x;
+            this._mouseY = y;
+
+            e.preventDefault();
+        },
+
+        _mouseWheelHandler: function (e) {
+            if (this._isAnimating()) {
+                return;
+            }
+            var delta = e.wheelDelta // Webkit
+                    || -e.detail; // Firefox
+            if (delta === 0) {
+                return;
+            }
+            this._zoomHandler(e, delta > 0 ? -1 : 1);
+        },
+
+        _pinchHandler: function (e) {
+            if (this._isAnimating()) {
+                return;
+            }
+            this._zoomHandler(e, e.pinchScale > 1 ? -0.4 : 0.4);
+        },
+
+        _zoomHandler: function (e, delta) {
+
+            var x = e.clientX;
+            var y = e.clientY;
+            var distance = Math.max(Math.min(
+                this._distance - this.minDistance,
+                this.maxDistance - this._distance
+            ));
+            this._zoomSpeed = delta * Math.max(distance / 40 * this.zoomSensitivity, 0.2);
+
+            this._rotating = false;
+
+            if (this.autoRotate && this._mode === 'rotate') {
+                this._startCountingStill();
+            }
+
+            e.preventDefault();
+        },
+
+        _mouseUpHandler: function (event) {
+            var dom = this.domElement;
+            dom.removeEventListener('touchmove', this._mouseMoveHandler);
+            dom.removeEventListener('touchend', this._mouseUpHandler);
+            dom.removeEventListener('mousemove', this._mouseMoveHandler);
+            dom.removeEventListener('mouseup', this._mouseUpHandler);
+
+            this._processGesture(event, 'end');
+        },
+
+        _addAnimator: function (animator) {
+            var animators = this._animators;
+            animators.push(animator);
+            animator.done(function () {
+                var idx = animators.indexOf(animator);
+                if (idx >= 0) {
+                    animators.splice(idx, 1);
+                }
+            });
+            return animator;
+        },
+
+
+        _processGesture: function (event, stage) {
+            var gestureMgr = this._gestureMgr;
+
+            stage === 'start' && gestureMgr.clear();
+
+            var gestureInfo = gestureMgr.recognize(
+                event,
+                null,
+                this.domElement
+            );
+
+            stage === 'end' && gestureMgr.clear();
+
+            // Do not do any preventDefault here. Upper application do that if necessary.
+            if (gestureInfo) {
+                var type = gestureInfo.type;
+                event.gestureEvent = type;
+
+                this._pinchHandler(gestureInfo.event);
+            }
+
+            return gestureInfo;
         }
     });
+
+    /**
+     * If auto rotate the target
+     * @type {boolean}
+     * @default false
+     */
+    Object.defineProperty(OrbitControl.prototype, 'autoRotate', {
+        get: function (val) {
+            return this._autoRotate;
+        },
+        set: function (val) {
+            this._autoRotate = val;
+            this._rotating = val;
+        }
+    });
+
 
     return OrbitControl;
 });
