@@ -284,7 +284,7 @@ define(function (require) {
             }
         },
 
-        _updateCasterAndReceiver: function (mesh) {
+        _updateCasterAndReceiver: function (renderer, mesh) {
             if (mesh.castShadow) {
                 this._opaqueCasters.push(mesh);
             }
@@ -298,6 +298,9 @@ define(function (require) {
                 mesh.material.set('shadowEnabled', 0);
             }
 
+            if (!mesh.material.shader && mesh.material.updateShader) {
+                mesh.material.updateShader(renderer.gl);
+            }
             var shader = mesh.material.shader;
             if (this.softShadow === ShadowMapPass.VSM) {
                 shader.define('fragment', 'USE_VSM');
@@ -315,14 +318,14 @@ define(function (require) {
             }
         },
 
-        _update: function (scene) {
+        _update: function (renderer, scene) {
             for (var i = 0; i < scene.opaqueQueue.length; i++) {
-                this._updateCasterAndReceiver(scene.opaqueQueue[i]);
+                this._updateCasterAndReceiver(renderer, scene.opaqueQueue[i]);
             }
             for (var i = 0; i < scene.transparentQueue.length; i++) {
                 // TODO Transparent object receive shadow will be very slow
                 // in stealth demo, still not find the reason
-                this._updateCasterAndReceiver(scene.transparentQueue[i]);
+                this._updateCasterAndReceiver(renderer, scene.transparentQueue[i]);
             }
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -347,7 +350,7 @@ define(function (require) {
                 scene.update();
             }
 
-            this._update(scene);
+            this._update(renderer, scene);
 
             if (!this._lightsCastShadow.length) {
                 return;
