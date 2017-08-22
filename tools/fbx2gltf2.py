@@ -340,7 +340,7 @@ def ConvertMaterial(pMaterial):
     if pMaterial.Bump.GetSrcObjectCount() > 0:
         # TODO 3dsmax use the normal map as bump map ?
         lTextureIdx = CreateTexture(pMaterial.Bump)
-        if not lTextureName == None:
+        if not lTextureIdx == None:
             lGLTFMaterial['normalTexture'] = {
                 "index": lTextureIdx
             }

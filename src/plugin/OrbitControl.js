@@ -698,7 +698,7 @@ define(function (require) {
             this._target = val;
             this.decomposeTransform();
         }
-    })
+    });
 
 
     return OrbitControl;

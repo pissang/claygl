@@ -218,7 +218,8 @@ define(function (require) {
                     materials: lib.materials,
                     skeletons: lib.skeletons,
                     meshes: lib.meshes,
-                    clips: lib.clips
+                    clips: lib.clips,
+                    nodes: lib.nodes
                 };
             }
 
@@ -233,11 +234,15 @@ define(function (require) {
                 self._parseNodes(json, lib);
 
                 // Only support one scene.
-                var sceneInfo = json.scenes[json.scene];
-                for (var i = 0; i < sceneInfo.nodes.length; i++) {
-                    var node = lib.nodes[sceneInfo.nodes[i]];
-                    node.update();
-                    rootNode.add(node);
+                if (json.scenes) {
+                    var sceneInfo = json.scenes[json.scene];
+                    if (sceneInfo) {
+                        for (var i = 0; i < sceneInfo.nodes.length; i++) {
+                            var node = lib.nodes[sceneInfo.nodes[i]];
+                            node.update();
+                            rootNode.add(node);
+                        }
+                    }
                 }
 
                 if (self.includeMesh) {
@@ -870,12 +875,11 @@ define(function (require) {
                         clip = clips[channelHash] = new SamplerClip({
                             target: targetNode,
                             name: targetNode ? targetNode.name : '',
-                            targetNodeIndex: channelInfo.target.node,
-
                             // PENDING, If write here
                             loop: true,
                             onframe: clipOnframe
                         });
+                        clip.targetNodeIndex = channelInfo.target.node;
                         clip.channels.time = getAccessorData(samplerInfo.input);
                         var frameLen = clip.channels.time.length;
                         // TODO May share same buffer data ?
