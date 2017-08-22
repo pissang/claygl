@@ -134,6 +134,7 @@ define(function(require) {
 	},
 	"plugin": {
 		"FirstPersonControl": require('./plugin/FirstPersonControl'),
+		"GestureMgr": require('./plugin/GestureMgr'),
 		"InfinitePlane": require('./plugin/InfinitePlane'),
 		"OrbitControl": require('./plugin/OrbitControl'),
 		"Skybox": require('./plugin/Skybox'),

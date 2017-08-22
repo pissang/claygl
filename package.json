@@ -1,15 +1,15 @@
 {
   "name" : "qtek",
-  "version" : "0.4.1",
+  "version" : "0.4.2",
   "description": "WebGL graphic library",
   "keywords": [
     "graphic",
     "webgl"
   ],
-  "author": [{
+  "author": {
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
-  }],
+  },
   "watch": {
     "essl2js": {
       "patterns": ["src"],

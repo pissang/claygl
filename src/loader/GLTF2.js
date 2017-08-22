@@ -384,7 +384,7 @@ define(function (require) {
                     wrapT: Texture.REPEAT,
                     // PENDING
                     // https://github.com/KhronosGroup/glTF/issues/674
-                    flipY: false
+                    // flipY: false
                 });
 
                 var target = textureInfo.target || glenum.TEXTURE_2D;
@@ -632,7 +632,6 @@ define(function (require) {
                         var componentType = attributeInfo.componentType;
                         var attributeType = attributeInfo.type;
                         ArrayCtor = ARRAY_CTOR_MAP[componentType] || vendor.Float32Array;
-
                         size = SIZE_MAP[attributeType];
 
                         var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];

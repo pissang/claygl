@@ -12,13 +12,19 @@ define(function (require) {
         }
     }
 
+    function convertToArray(val) {
+        if (!(val instanceof Array)) {
+            val = [val, val];
+        }
+        return val;
+    }
+
     /**
      * @alias module:echarts-x/util/OrbitControl
      */
     var OrbitControl = Base.extend(function () {
 
         return {
-            renderer: null,
 
             animation: null,
 
@@ -147,8 +153,6 @@ define(function (require) {
         this.update = this.update.bind(this);
 
         this.init();
-
-        this._decomposeTransform();
     }, {
         /**
          * Initialize.
@@ -302,6 +306,7 @@ define(function (require) {
          * @param {number} opts.beta
          * @param {number} [opts.duration=1000]
          * @param {number} [opts.easing='linear']
+         * @param {number} [opts.done]
          */
         animateTo: function (opts) {
             var self = this;
@@ -347,6 +352,7 @@ define(function (require) {
                         }
                         self._needsUpdate = true;
                     })
+                    .done(opts.done)
             ).start(opts.easing || 'linear');
         },
 
@@ -478,7 +484,7 @@ define(function (require) {
             v.normalize().scale(speed);
         },
 
-        _decomposeTransform: function () {
+        decomposeTransform: function () {
             if (!this.target) {
                 return;
             }
@@ -558,14 +564,17 @@ define(function (require) {
                 haveGesture = this._processGesture(e, 'change');
             }
 
+            var panSensitivity = convertToArray(this.panSensitivity);
+            var rotateSensitivity = convertToArray(this.rotateSensitivity);
+            
             if (!haveGesture) {
                 if (this._mode === 'rotate') {
-                    this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * this.rotateSensitivity;
-                    this._rotateVelocity.x = (y - this._mouseY) / this.domElement.clientWidth * 2 * this.rotateSensitivity;
+                    this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * rotateSensitivity[0];
+                    this._rotateVelocity.x = (y - this._mouseY) / this.domElement.clientWidth * 2 * rotateSensitivity[1];
                 }
                 else if (this._mode === 'pan') {
-                    this._panVelocity.x = (x - this._mouseX) / this.domElement.clientWidth * this.panSensitivity * 400;
-                    this._panVelocity.y = (-y + this._mouseY) / this.domElement.clientHeight * this.panSensitivity * 400;
+                    this._panVelocity.x = (x - this._mouseX) / this.domElement.clientWidth * panSensitivity[0] * 400;
+                    this._panVelocity.y = (-y + this._mouseY) / this.domElement.clientHeight * panSensitivity[1] * 400;
                 }
             }
 
@@ -667,7 +676,7 @@ define(function (require) {
      * @default false
      */
     Object.defineProperty(OrbitControl.prototype, 'autoRotate', {
-        get: function (val) {
+        get: function () {
             return this._autoRotate;
         },
         set: function (val) {
@@ -675,6 +684,16 @@ define(function (require) {
             this._rotating = val;
         }
     });
+
+    Object.defineProperty(OrbitControl.prototype, 'target', {
+        get: function () {
+            return this._target;
+        },
+        set: function (val) {
+            this._target = val;
+            this.decomposeTransform();
+        }
+    })
 
 
     return OrbitControl;
