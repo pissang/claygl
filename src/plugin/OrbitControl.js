@@ -692,6 +692,9 @@ define(function (require) {
             return this._target;
         },
         set: function (val) {
+            if (val && val.target) {
+                this.setCenter(val.target.toArray());
+            }
             this._target = val;
             this.decomposeTransform();
         }

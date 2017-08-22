@@ -108,6 +108,12 @@ define(function (require) {
     {
 
         /**
+         * @memberOf qtek.Node
+         * @type {qtek.math.Vector3}
+         * @instance
+         */
+        target: null,
+        /**
          * If node and its chilren invisible
          * @type {boolean}
          * @memberOf qtek.Node
@@ -654,6 +660,8 @@ define(function (require) {
             return function (target, up) {
                 m.lookAt(this.position, target, up || this.localTransform.y).invert();
                 this.setLocalTransform(m);
+
+                this.target = target;
             };
         })()
     });
