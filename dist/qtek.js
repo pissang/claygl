@@ -9393,6 +9393,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    {
 
 	        /**
+	         * @memberOf qtek.Node
+	         * @type {qtek.math.Vector3}
+	         * @instance
+	         */
+	        target: null,
+	        /**
 	         * If node and its chilren invisible
 	         * @type {boolean}
 	         * @memberOf qtek.Node
@@ -9939,6 +9945,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return function (target, up) {
 	                m.lookAt(this.position, target, up || this.localTransform.y).invert();
 	                this.setLocalTransform(m);
+
+	                this.target = target;
 	            };
 	        })()
 	    });
@@ -33282,14 +33290,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	             * @type {number}
 	             * @default 0.5
 	             */
-	            minDistance: 2,
+	            minDistance: 0.1,
 
 	            /**
 	             * Maximum distance to the center
 	             * @type {number}
 	             * @default 2
 	             */
-	            maxDistance: 100,
+	            maxDistance: 1000,
 
 	            /**
 	             * Minimum alpha rotation
@@ -33610,6 +33618,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        update: function (deltaTime) {
 
+	            deltaTime = deltaTime || 16;
+
 	            if (this._rotating) {
 	                var radian = (this.autoRotateDirection === 'cw' ? 1 : -1)
 	                    * this.autoRotateSpeed / 180 * Math.PI;
@@ -33666,16 +33676,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _updatePan: function (deltaTime) {
 	            var velocity = this._panVelocity;
 	            var len = this._distance;
-	    
+
 	            var target = this.target;
 	            var yAxis = target.worldTransform.y;
 	            var xAxis = target.worldTransform.x;
-	    
+
 	            // PENDING
 	            this._center
 	                .scaleAndAdd(xAxis, -velocity.x * len / 200)
 	                .scaleAndAdd(yAxis, -velocity.y * len / 200);
-	    
+
 	            this._vectorDamping(velocity, 0);
 	        },
 
@@ -33801,7 +33811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var panSensitivity = convertToArray(this.panSensitivity);
 	            var rotateSensitivity = convertToArray(this.rotateSensitivity);
-	            
+
 	            if (!haveGesture) {
 	                if (this._mode === 'rotate') {
 	                    this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * rotateSensitivity[0];
@@ -33925,6 +33935,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this._target;
 	        },
 	        set: function (val) {
+	            if (val && val.target) {
+	                this.setCenter(val.target.toArray());
+	            }
 	            this._target = val;
 	            this.decomposeTransform();
 	        }
