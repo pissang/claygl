@@ -47,14 +47,14 @@ define(function (require) {
              * @type {number}
              * @default 0.5
              */
-            minDistance: 2,
+            minDistance: 0.1,
 
             /**
              * Maximum distance to the center
              * @type {number}
              * @default 2
              */
-            maxDistance: 100,
+            maxDistance: 1000,
 
             /**
              * Minimum alpha rotation
@@ -375,6 +375,8 @@ define(function (require) {
          */
         update: function (deltaTime) {
 
+            deltaTime = deltaTime || 16;
+
             if (this._rotating) {
                 var radian = (this.autoRotateDirection === 'cw' ? 1 : -1)
                     * this.autoRotateSpeed / 180 * Math.PI;
@@ -431,16 +433,16 @@ define(function (require) {
         _updatePan: function (deltaTime) {
             var velocity = this._panVelocity;
             var len = this._distance;
-    
+
             var target = this.target;
             var yAxis = target.worldTransform.y;
             var xAxis = target.worldTransform.x;
-    
+
             // PENDING
             this._center
                 .scaleAndAdd(xAxis, -velocity.x * len / 200)
                 .scaleAndAdd(yAxis, -velocity.y * len / 200);
-    
+
             this._vectorDamping(velocity, 0);
         },
 
@@ -566,7 +568,7 @@ define(function (require) {
 
             var panSensitivity = convertToArray(this.panSensitivity);
             var rotateSensitivity = convertToArray(this.rotateSensitivity);
-            
+
             if (!haveGesture) {
                 if (this._mode === 'rotate') {
                     this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * rotateSensitivity[0];
