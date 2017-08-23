@@ -53,7 +53,14 @@ define(function (require) {
         5121: vendor.Uint8Array,
         5122: vendor.Int16Array,
         5123: vendor.Uint16Array,
+        5125: vendor.Uint32Array,
         5126: vendor.Float32Array
+    };
+    var ATTR_TYPE_MAP = {
+        5120: 'byte',
+        5121: 'ubyte',
+        5122: 'short',
+        5123: 'ushort'
     };
     var SIZE_MAP = {
         SCALAR: 1,
@@ -647,6 +654,11 @@ define(function (require) {
                         var size;
                         var ArrayCtor;
                         var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
+                        // WebGL attribute buffer not support uint32.
+                        // Direct use Float32Array may also have issue.
+                        if (attributeArray instanceof vendor.Uint32Array) {
+                            attributeArray = new Float32Array(attributeArray);
+                        }
                         if (semantic === 'WEIGHTS_0' && size === 4) {
                             // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
                             var weightArray = new ArrayCtor(attributeInfo.count * 3);
@@ -660,6 +672,9 @@ define(function (require) {
                         else {
                             geometry.attributes[attributeName].value = attributeArray;
                         }
+                        geometry.attributes[attributeName].type = ATTR_TYPE_MAP[componentType] || 'float';
+                        
+
                         if (semantic === 'POSITION') {
                             // Bounding Box
                             var min = attributeInfo.min;

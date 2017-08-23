@@ -2,6 +2,8 @@ define(function (require) {
 
     'use strict';
 
+
+    // TODO Shader library
     var Pass = require('./Pass');
     var Node = require('./Node');
 
