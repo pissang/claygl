@@ -978,7 +978,6 @@ define(function (require) {
                 var rotationArr = parameters.rotation;
                 if (rotationArr) {
                     for (var i = 0; i < parameters.TIME.length; i++) {
-                        parameters.TIME[i] *= 1000;
                         var offset = i * 4;
                         if (rotationArr) {
                             quatTmp[0] = rotationArr[offset];
@@ -991,6 +990,9 @@ define(function (require) {
                             parameters.rotation[offset + 3] = quatTmp[3];
                         }
                     }
+                }
+                for (var i = 0; i < parameters.TIME.length; i++) {
+                    parameters.TIME[i] *= 1000;
                 }
                 // TODO
                 // if (nodeAnimationClips[targetId]) {
