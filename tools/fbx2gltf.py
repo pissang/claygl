@@ -1018,27 +1018,36 @@ def GetPropertyAnimationCurveTime(pAnimCurve):
 def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     lNodeName = GetNodeNameWithoutDuplication(pNode)
 
-    # PENDING
-    lTranslationCurve = pNode.LclTranslation.GetCurve(pAnimLayer, 'X')
-    lRotationCurve = pNode.LclRotation.GetCurve(pAnimLayer, 'X')
-    lScalingCurve = pNode.LclScaling.GetCurve(pAnimLayer, 'X')
+    curves = [
+        pNode.LclTranslation.GetCurve(pAnimLayer, 'X'),
+        pNode.LclTranslation.GetCurve(pAnimLayer, 'Y'),
+        pNode.LclTranslation.GetCurve(pAnimLayer, 'Z'),
 
-    lHaveTranslation = not lTranslationCurve == None
-    lHaveRotation = not lRotationCurve == None
-    lHaveScaling = not lScalingCurve == None
+        pNode.LclRotation.GetCurve(pAnimLayer, 'X'),
+        pNode.LclRotation.GetCurve(pAnimLayer, 'Y'),
+        pNode.LclRotation.GetCurve(pAnimLayer, 'Z'),
+
+        pNode.LclScaling.GetCurve(pAnimLayer, 'X'),
+        pNode.LclScaling.GetCurve(pAnimLayer, 'Y'),
+        pNode.LclScaling.GetCurve(pAnimLayer, 'Z'),
+    ];
+    
+    lHaveTranslation = any(curves[0:3])
+    lHaveRotation = any(curves[3:6])
+    lHaveScaling = any(curves[6:9])
 
     # Curve time span may much smaller than stack local time span
     # It can reduce a lot of space
     # PENDING
-    lStartTimeDouble = lEndTimeDouble = lDuration = 0
-    if lHaveTranslation:
-        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lTranslationCurve)
-
-    if lDuration < 1e-5 and lHaveRotation:
-        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lRotationCurve)
-
-    if lDuration < 1e-5 and lHaveScaling:
-        lStartTimeDouble, lEndTimeDouble, lDuration = GetPropertyAnimationCurveTime(lScalingCurve)
+    lStartTimeDouble = 1000000
+    lDuration = 0
+    lEndTimeDouble = 0
+    for curve in curves:
+        if not curve == None:
+            lCurveStart, lCurveEnd, lCurveDuration = GetPropertyAnimationCurveTime(curve)
+            lStartTimeDouble = min(lCurveStart, lStartTimeDouble)
+            lEndTimeDouble = max(lCurveEnd, lEndTimeDouble)
+            lDuration = max(lCurveDuration, lDuration)
 
     lDuration = min(lDuration, pDuration)
     lStartTimeDouble = max(lStartTimeDouble, pStartTime)
