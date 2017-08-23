@@ -8,27 +8,13 @@ define(function(require) {
     var vendor = require('./core/vendor');
 
     function getArrayCtorByType (type) {
-        var ArrayConstructor;
-        switch(type) {
-            case 'byte':
-                ArrayConstructor = vendor.Int8Array;
-                break;
-            case 'ubyte':
-                ArrayConstructor = vendor.Uint8Array;
-                break;
-            case 'short':
-                ArrayConstructor = vendor.Int16Array;
-                break;
-            case 'ushort':
-                ArrayConstructor = vendor.Uint16Array;
-                break;
-            default:
-                ArrayConstructor = vendor.Float32Array;
-                break;
-        }
-        return ArrayConstructor;
+        return ({
+            'byte': vendor.Int8Array,
+            'ubyte': vendor.Uint8Array,
+            'short': vendor.Int16Array,
+            'ushort': vendor.Uint16Array
+        })[type] || vendor.Float32Array;
     }
-
 
     function Attribute(name, type, size, semantic) {
         this.name = name;

@@ -4,6 +4,7 @@ define(function (require) {
     var Shader = require('../Shader');
 
 
+    Shader['import'](require('./source/header/light'));
     Shader['import'](require('./source/util.essl'));
 
     // Some build in shaders
