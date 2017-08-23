@@ -476,7 +476,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             for i in range(lControlPointsCount):
                 lWeights.append([0, 0, 0, 0])
                 # -1 can't used in UNSIGNED_SHORT
-                lJoints.append([-1, -1, -1, -1])
+                lJoints.append([0, 0, 0, 0])
                 lJointCounts.append(0)
 
             for i in range(pMesh.GetDeformerCount(FbxDeformer.eSkin)):
@@ -516,7 +516,6 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                             lWeights[lControlPointIndex][lMinIdx] = lControlPointWeight
                             lMaxJointCount = max(lMaxJointCount, lJointIndex)
                         lJointCounts[lControlPointIndex] += 1
-
         if moreThanFourJoints:
             print('More than 4 joints (%d joints) bound to per vertex in %s. ' %(lMaxJointCount, pNode.GetName()))
 
@@ -607,7 +606,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lTexcoords2, 'f', 2)
         if hasSkin:
             # PENDING UNSIGNED_SHORT will have bug.
-            lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'f', 4)
+            lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'H', 4)
             lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 3)
 
         if len(lPositions) >= 0xffff:
