@@ -81,6 +81,9 @@ GL_LINEAR_MIPMAP_LINEAR = 0x2703
 GL_ARRAY_BUFFER = 0x8892
 GL_ELEMENT_ARRAY_BUFFER = 0x8893
 
+
+ENV_QUANTIZE = False
+
 _id = 0
 def GetId():
     global _id
@@ -90,11 +93,62 @@ def GetId():
 def ListFromM4(m):
     return [m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]]
 
+
+def quantize(pList, pStride, pMin, pMax):
+    lRange = range(pStride)
+    lMultiplier = []
+    lDivider = []
+    for i in lRange:
+        if (pMax[i] == pMin[i]):
+            lMultiplier.append(0)
+            lDivider.append(0)
+        else:
+            lMultiplier.append(65535 / (pMax[i] - pMin[i]))
+            lDivider.append((pMax[i] - pMin[i]) / 65535)
+
+    lNewList = []
+    for item in pList:
+        if pStride == 1:
+            lNewList.append(int((item - pMin[0]) * lMultiplier[0]))
+        else:
+            lNewItem = []
+            for i in lRange:
+                lNewItem.append(int((item[i] - pMin[i]) * lMultiplier[i]))
+            lNewList.append(lNewItem)
+    
+    # TODO
+    if pStride == 1:
+        lDecodeMatrix = [
+            lDivider[0], 0,
+            pMin[0], 1
+        ]
+    elif pStride == 2:
+        lDecodeMatrix = [
+            lDivider[0], 0, 0,
+            0, lDivider[1], 0,
+            pMin[0], pMin[1], 1
+        ]
+    elif pStride == 3:
+        lDecodeMatrix = [
+            lDivider[0], 0, 0, 0,
+            0, lDivider[1], 0, 0,
+            0, 0, lDivider[2], 0,
+            pMin[0], pMin[1], pMin[2], 1
+        ]
+    elif pStride == 4:
+        lDecodeMatrix = [
+            lDivider[0], 0, 0, 0, 0,
+            0, lDivider[1], 0, 0, 0,
+            0, 0, lDivider[2], 0, 0,
+            0, 0, 0, lDivider[3], 0,
+            pMin[0], pMin[1], pMin[2], pMin[3], 1
+        ]
+
+    return lNewList, lDecodeMatrix
+        
+
 def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
     lGLTFAcessor = {}
-
-    lType = '<' + pType * pStride
-    lData = []
 
     if minMax:
         if len(pList) > 0:
@@ -111,21 +165,7 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
             lMax = [0] * pStride
             lMin = [0] * pStride
         lRange = range(pStride)
-
-    #TODO: Other method to write binary buffer ?
-    for item in pList:
-        if pStride == 1:
-            lData.append(struct.pack(lType, item))
-        elif pStride == 2:
-            lData.append(struct.pack(lType, item[0], item[1]))
-        elif pStride == 3:
-            lData.append(struct.pack(lType, item[0], item[1], item[2]))
-        elif pStride == 4:
-            lData.append(struct.pack(lType, item[0], item[1], item[2], item[3]))
-        elif pStride == 16:
-            m = item
-            lData.append(struct.pack(lType, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
-        if minMax:
+        for item in pList:
             if pStride == 1:
                 for i in lRange:
                     lMin[i] = min(lMin[i], item)
@@ -136,6 +176,34 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
                 for i in lRange:
                     lMin[i] = min(lMin[i], item[i])
                     lMax[i] = max(lMax[i], item[i])
+
+    if ENV_QUANTIZE and pType == 'f' and pStride <= 4:
+        pList, lDecodeMatrix = quantize(pList, pStride, lMin, lMax)
+        pType = 'H'
+        # https://github.com/KhronosGroup/glTF/blob/master/extensions/Vendor/WEB3D_quantized_attributes
+        lGLTFAcessor['extension'] = {
+            'WEB3D_quantized_attributes': {
+                'decodedMin': lMin,
+                'decodedMax': lMax,
+                'decodeMatrix': lDecodeMatrix
+            }
+        }
+
+    lPackType = '<' + pType * pStride
+    lData = []
+    #TODO: Other method to write binary buffer ?
+    for item in pList:
+        if pStride == 1:
+            lData.append(struct.pack(lPackType, item))
+        elif pStride == 2:
+            lData.append(struct.pack(lPackType, item[0], item[1]))
+        elif pStride == 3:
+            lData.append(struct.pack(lPackType, item[0], item[1], item[2]))
+        elif pStride == 4:
+            lData.append(struct.pack(lPackType, item[0], item[1], item[2], item[3]))
+        elif pStride == 16:
+            m = item
+            lData.append(struct.pack(lPackType, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
 
     if pType == 'f':
         lGLTFAcessor['componentType'] = GL_FLOAT
@@ -193,6 +261,16 @@ def CreateIndicesBuffer(pList, pType):
 
 def CreateAnimationBuffer(pList, pType, pStride):
     lData, lGLTFAnimSampler = CreateAccessorBuffer(pList, pType, pStride, True)
+
+    # PENDING
+    # lAllSame = True
+    # for i in range(pStride):
+    #     if lGLTFAnimSampler['min'][i] != lGLTFAnimSampler['max'][i]:
+    #         lAllSame = False
+    # # Just ignore it.
+    # if lAllSame:
+    #     return -1
+
     lGLTFAnimSampler['byteOffset'] = len(animationBuffer)
     animationBuffer.extend(lData)
     idx = len(lib_accessors)
@@ -644,7 +722,7 @@ def ConvertCamera(pCamera):
     lib_cameras.append(lGLTFCamera)
     return lCameraIdx
 
-def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
+def ConvertSceneNode(pScene, pNode, pPoseTime):
     lGLTFNode = {}
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = pNode.GetName()
@@ -664,8 +742,6 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
             lMeshName = lMeshKey
 
         lGLTFMesh = {'name' : lMeshName}
-
-        fbxConverter.Triangulate(lGeometry, True)
 
         lHasSkin = False
         lGLTFSkin = None
@@ -794,12 +870,12 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
     if pNode.GetChildCount() > 0:
         lGLTFNode['children'] = []
         for i in range(pNode.GetChildCount()):
-            lChildNodeIdx = ConvertSceneNode(pScene, pNode.GetChild(i), pPoseTime, fbxConverter)
+            lChildNodeIdx = ConvertSceneNode(pScene, pNode.GetChild(i), pPoseTime)
             lGLTFNode['children'].append(lChildNodeIdx)
 
     return GetNodeIdx(pNode)
 
-def ConvertScene(pScene, pPoseTime, fbxConverter):
+def ConvertScene(pScene, pPoseTime):
     lRoot = pScene.GetRootNode()
 
     lGLTFScene = {'nodes' : []}
@@ -808,7 +884,7 @@ def ConvertScene(pScene, pPoseTime, fbxConverter):
     lib_scenes.append(lGLTFScene)
 
     for i in range(lRoot.GetChildCount()):
-        lNodeIdx = ConvertSceneNode(pScene, lRoot.GetChild(i), pPoseTime, fbxConverter)
+        lNodeIdx = ConvertSceneNode(pScene, lRoot.GetChild(i), pPoseTime)
         lGLTFScene['nodes'].append(lNodeIdx)
 
     return lSceneIdx
@@ -907,11 +983,17 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
             "time": CreateAnimationBuffer(lTimeChannel, 'f', 1)
         };
         if lHaveTranslation:
-            lSamplerAccessors['translation'] = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
+            lAccessorIdx = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
+            if lAccessorIdx >= 0:
+                lSamplerAccessors['translation'] = lAccessorIdx
         if lHaveRotation:
-            lSamplerAccessors['rotation'] = CreateAnimationBuffer(lRotationChannel, 'f', 4)
+            lAccessorIdx = CreateAnimationBuffer(lRotationChannel, 'f', 4)
+            if lAccessorIdx >= 0:
+                lSamplerAccessors['rotation'] = lAccessorIdx
         if lHaveScaling:
-            lSamplerAccessors['scale'] = CreateAnimationBuffer(lScaleChannel, 'f', 3)
+            lAccessorIdx = CreateAnimationBuffer(lScaleChannel, 'f', 3)
+            if lAccessorIdx >= 0:
+                lSamplerAccessors['scale'] = lAccessorIdx
 
         #TODO Other interpolation methods
         for path in _samplerChannels:
@@ -982,7 +1064,7 @@ def CreateBufferViews(pBufferIdx):
 # Start from -1 and ignore the root node
 _nodeCount = -1
 _nodeIdxMap = {}
-def ListNodes(pNode, fbxConverter):
+def PrepareScene(pNode, fbxConverter):
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
@@ -992,9 +1074,12 @@ def ListNodes(pNode, fbxConverter):
     # FBX version 2014.2 seems have fixed it
     if not pNode.GetMesh() == None:
         fbxConverter.SplitMeshPerMaterial(pNode.GetMesh(), True)
+    
+    if not pNode.GetGeometry() == None:
+        fbxConverter.Triangulate(pNode.GetGeometry(), True)
 
     for k in range(pNode.GetChildCount()):
-        ListNodes(pNode.GetChild(k), fbxConverter)
+        PrepareScene(pNode.GetChild(k), fbxConverter)
 
 def GetNodeIdx(pNode):
     return _nodeIdxMap[pNode.GetUniqueID()]
@@ -1010,7 +1095,12 @@ def Convert(
     animFrameRate = 1 / 20,
     startTime = 0,
     duration = 1000,
-    poseTime = TIME_INFINITY):
+    poseTime = TIME_INFINITY,
+    quantize = False,
+    beautify = False
+):
+    global ENV_QUANTIZE;
+    ENV_QUANTIZE = quantize;
 
     ignoreScene = 'scene' in excluded
     ignoreAnimation = 'animation' in excluded
@@ -1025,9 +1115,9 @@ def Convert(
     else:
         lBasename, lExt = os.path.splitext(ouptutFile)
 
-        ListNodes(lScene.GetRootNode(), fbxConverter)
+        PrepareScene(lScene.GetRootNode(), fbxConverter)
         if not ignoreScene:
-            lSceneIdx = ConvertScene(lScene, poseTime, fbxConverter)
+            lSceneIdx = ConvertScene(lScene, poseTime)
         if not ignoreAnimation:
             ConvertAnimation(lScene, animFrameRate, startTime, duration)
 
@@ -1080,7 +1170,12 @@ def Convert(
             lOutput['scene'] = lSceneIdx
 
         out = open(ouptutFile, 'w')
-        out.write(json.dumps(lOutput, indent = 2, sort_keys = True, separators=(',', ': ')))
+        indent = None
+        seperator = ':'
+        if beautify:
+            indent = 2
+            seperator = ': '
+        out.write(json.dumps(lOutput, indent = indent, sort_keys = True, separators=(',', seperator)))
         out.close()
 
 if __name__ == "__main__":
@@ -1091,6 +1186,8 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
     parser.add_argument('-p', '--pose', default=-1, type=float, help="Static pose time")
+    parser.add_argument('-q', '--quantize', action='store_true', help="Quantize accessors with WEB3D_quantized_attributes extension")
+    parser.add_argument('-b', '--beautify', action="store_true", help="Beautify json output.")
     parser.add_argument('file')
 
     args = parser.parse_args()
@@ -1114,4 +1211,14 @@ if __name__ == "__main__":
 
     excluded = args.exclude.split(',')
 
-    Convert(args.file, args.output, excluded, 1 / args.framerate, lStartTime, lDuration, lPoseTime)
+    Convert(
+        args.file,
+        args.output,
+        excluded,
+        1 / args.framerate,
+        lStartTime,
+        lDuration,
+        lPoseTime,
+        args.quantize,
+        args.beautify
+    )
