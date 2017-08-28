@@ -188,7 +188,7 @@ define(function (require) {
             dom.removeEventListener('mousewheel', this._mouseWheelHandler);
 
             if (this.animation) {
-                this.animation.removeEventListener('frame', this.update);
+                this.animation.off('frame', this.update);
             }
             this.stopAllAnimation();
         },

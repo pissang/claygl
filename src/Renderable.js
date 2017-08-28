@@ -108,6 +108,7 @@ define(function(require) {
          * @return {boolean}
          */
         isRenderable: function() {
+            // TODO Shader ?
             return this.geometry && this.material && !this.invisible
                 && this.geometry.vertexCount > 0;
         },
