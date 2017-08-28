@@ -869,7 +869,7 @@ define(function (require) {
                 }
             }
 
-
+            var timeAccessorMultiplied = {}
             util.each(json.animations, function (animationInfo, idx) {
                 var channels = animationInfo.channels.filter(checkChannelPath);
 
@@ -897,9 +897,11 @@ define(function (require) {
                         clip.targetNodeIndex = channelInfo.target.node;
                         clip.channels.time = getAccessorData(samplerInfo.input);
                         var frameLen = clip.channels.time.length;
-                        // TODO May share same buffer data ?
-                        for (var k = 0; k < frameLen; k++) {
-                            clip.channels.time[k] *= 1000;
+                        if (!timeAccessorMultiplied[samplerInfo.input]) {
+                            for (var k = 0; k < frameLen; k++) {
+                                clip.channels.time[k] *= 1000;
+                            }
+                            timeAccessorMultiplied[samplerInfo.input] = true;
                         }
 
                         clip.life = clip.channels.time[frameLen - 1];

@@ -390,7 +390,7 @@ def ConvertMaterial(pMaterial):
     lValues = lGLTFMaterial['extensions']['KHR_materials_common']['values']
     lShading = pMaterial.ShadingModel.Get()
 
-    lMaterialIdx = len(lib_materials);
+    lMaterialIdx = len(lib_materials)
     if (lShading == 'unknown'):
         lib_materials.append(lGLTFMaterial)
         return lMaterialIdx
@@ -431,7 +431,7 @@ def ConvertMaterial(pMaterial):
             }
 
     if lShading == 'phong':
-        lValues['shininess'] = pMaterial.Shininess.Get();
+        lValues['shininess'] = pMaterial.Shininess.Get()
         # Use specular map
         # TODO Specular Factor ?
         if pMaterial.Specular.GetSrcObjectCount() > 0:
@@ -487,7 +487,7 @@ _defaultMaterialIndex = 0
 
 def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
-    global _defaultMaterialIndex;
+    global _defaultMaterialIndex
 
     lGLTFPrimitive = {}
     lPositions = []
@@ -510,15 +510,15 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
-        lMaterial = None;
+        lMaterial = None
         if not lLayerMaterial:
             print("Mesh " + pNode.GetName() + " doesn't have material")
             lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
-            _defaultMaterialIndex += 1;
+            _defaultMaterialIndex += 1
         else:
             # Mapping Mode of material must be eAllSame
             # Because the mesh has been splitted by material
-            idx = lLayerMaterial.GetIndexArray()[0];
+            idx = lLayerMaterial.GetIndexArray()[0]
             lMaterial = pNode.GetMaterial(idx)
         lMaterialKey = ConvertMaterial(lMaterial)
         lGLTFPrimitive["material"] = lMaterialKey
@@ -790,7 +790,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
                 while not lParent == None:
                     lSkeleton = lParent.GetSkeleton()
                     if lSkeleton == None:
-                        break;
+                        break
 
                     # In case some skeleton is not a attached to any vertices(not a cluster)
                     # PENDING
@@ -799,7 +799,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
 
                     if lSkeleton.IsSkeletonRoot():
                         lRootFound = True
-                        break;
+                        break
                     lParent = lParent.GetParent()
                     lParentIdx = GetNodeIdx(lParent)
 
@@ -899,6 +899,7 @@ def CreateAnimation():
     return lAnimIdx, lGLTFAnimation
 
 _samplerChannels = ['rotation', 'scale', 'translation']
+_timeSamplerHashMap = {}
 
 def GetPropertyAnimationCurveTime(pAnimCurve):
     lTimeSpan = FbxTimeSpan()
@@ -924,7 +925,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
         pNode.LclScaling.GetCurve(pAnimLayer, 'X'),
         pNode.LclScaling.GetCurve(pAnimLayer, 'Y'),
         pNode.LclScaling.GetCurve(pAnimLayer, 'Z'),
-    ];
+    ]
     
     lHaveTranslation = any(curves[0:3])
     lHaveRotation = any(curves[3:6])
@@ -978,10 +979,14 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
             if lHaveScaling:
                 lScaleChannel.append(list(lScale))
 
+        lTimeAccessorKey = (lStartTimeDouble, lDuration)
+        if not lTimeAccessorKey in _timeSamplerHashMap:
+            _timeSamplerHashMap[lTimeAccessorKey] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
+        
         lSamplerAccessors = {
             # TODO Share time
-            "time": CreateAnimationBuffer(lTimeChannel, 'f', 1)
-        };
+            "time": _timeSamplerHashMap[lTimeAccessorKey]
+        }
         if lHaveTranslation:
             lAccessorIdx = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
             if lAccessorIdx >= 0:
@@ -1099,8 +1104,8 @@ def Convert(
     quantize = False,
     beautify = False
 ):
-    global ENV_QUANTIZE;
-    ENV_QUANTIZE = quantize;
+    global ENV_QUANTIZE
+    ENV_QUANTIZE = quantize
 
     ignoreScene = 'scene' in excluded
     ignoreAnimation = 'animation' in excluded
@@ -1210,7 +1215,6 @@ if __name__ == "__main__":
         lPoseTime.SetSecondDouble(float(args.pose))
 
     excluded = args.exclude.split(',')
-
     Convert(
         args.file,
         args.output,
