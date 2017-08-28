@@ -82,13 +82,48 @@ QTEK is a WebGL graphic library.
 + Physically based rendering, Full HDR pipeline.
 + Stereo rendering, VR prepared.
 
-### FBX2GLTF Converter
 
-Have been updated to the latest glTF specification
+### FBX to glTF2.0 Converter
+
+[Get it](https://github.com/pissang/qtek/blob/master/tools/fbx2gltf2.py)
+
+Needs [python3.3](https://www.python.org/download/releases/3.3.0/) and [FBX SDK 2018.1.1](http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26416130)
+
+Usage:
+
+```
+usage: fbx2gltf2.py [-h] [-e EXCLUDE] [-t TIMERANGE] [-o OUTPUT]
+                    [-f FRAMERATE] [-p POSE] [-q] [-b]
+                    file
+
+FBX to glTF converter
+
+positional arguments:
+  file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -e EXCLUDE, --exclude EXCLUDE
+                        Data excluded. Can be: scene,animation
+  -t TIMERANGE, --timerange TIMERANGE
+                        Export animation time, in format
+                        'startSecond,endSecond'
+  -o OUTPUT, --output OUTPUT
+                        Ouput glTF file path
+  -f FRAMERATE, --framerate FRAMERATE
+                        Animation frame per sencond
+  -p POSE, --pose POSE  Static pose time
+  -q, --quantize        Quantize accessors with WEB3D_quantized_attributes
+                        extension
+  -b, --beautify        Beautify json output.
+```
+
+Support:
 
 + Scene hierarchy
-+ Mesh, light, camera
-+ Material, texture
++ Mesh, camera
++ Blinn material
++ Texture
 + Skinning
 + Animation
 
