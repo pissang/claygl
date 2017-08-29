@@ -694,7 +694,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         else:
             lIndices = pMesh.GetPolygonVertices()
             lPositions = pMesh.GetControlPoints()
-
+                
         lGLTFPrimitive['attributes'] = {}
         lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
         if not lLayerNormal == None:
@@ -815,7 +815,8 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
     lib_nodes[lNodeName] = lGLTFNode
 
     # Transform matrix
-    m = pNode.EvaluateLocalTransform(pPoseTime)
+    m = pNode.EvaluateLocalTransform(pPoseTime, FbxNode.eDestinationPivot)
+
     lGLTFNode['matrix'] = [
         m[0][0], m[0][1], m[0][2], m[0][3],
         m[1][0], m[1][1], m[1][2], m[1][3],
@@ -823,6 +824,12 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
         m[3][0], m[3][1], m[3][2], m[3][3],
     ]
 
+    lT = pNode.GetGeometricTranslation(FbxNode.eDestinationPivot)
+    lR = pNode.GetGeometricRotation(FbxNode.eDestinationPivot)
+    lS = pNode.GetGeometricScaling(FbxNode.eDestinationPivot)
+    lGeometricM = FbxAMatrix(lT, lR, lS)
+    if not lGeometricM.IsIdentity():
+        print(lGeometricM)
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
     lGeometry = pNode.GetGeometry()
@@ -918,9 +925,6 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
             lClusterGlobalInitMatrix = FbxAMatrix()
             lReferenceGlobalInitMatrix = FbxAMatrix()
 
-            lT = pNode.GetGeometricTranslation(FbxNode.eSourcePivot)
-            lR = pNode.GetGeometricRotation(FbxNode.eSourcePivot)
-            lS = pNode.GetGeometricScaling(FbxNode.eSourcePivot)
             for i in range(len(lGLTFSkin['joints'])):
                 lJointName = lGLTFSkin['joints'][i]
                 lCluster = lClusters[lJointName]
@@ -932,7 +936,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
                 # http://blog.csdn.net/bugrunner/article/details/7232291
                 # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref__view_scene_2_draw_scene_8cxx_example_html
-                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * FbxAMatrix(lT, lR, lS)
+                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix
                 invBindMatricesBuffer.extend(struct.pack('<'+'f' * 16,  m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
                 lGLTFSkin['inverseBindMatrices']['count'] += 1
 
@@ -947,14 +951,13 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
             # PENDING
             m = FbxAMatrix()
             if not pNode.GetParent() == None:
-                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime)
+                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
             m = m.Inverse()
             lGLTFNode['matrix'] = [
                 m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]
             ]
         else:
             lGLTFNode['meshes'] = [lMeshKey]
-
     else:
         # Camera and light node attribute
         lNodeAttribute = pNode.GetNodeAttribute()
@@ -1069,7 +1072,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
             lSecondDouble = min(lStartTimeDouble + pSampleRate * i, lEndTimeDouble)
             lTime.SetSecondDouble(lSecondDouble)
 
-            lTransform = pNode.EvaluateLocalTransform(lTime)
+            lTransform = pNode.EvaluateLocalTransform(lTime, FbxNode.eDestinationPivot)
             lTranslation = lTransform.GetT()
             lQuaternion = lTransform.GetQ()
             lScale = lTransform.GetS()
@@ -1118,8 +1121,10 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
 
 def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
     lRoot = pScene.GetRootNode()
+
     for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
+
         for j in range(lAnimStack.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimLayer.ClassId))):
             lAnimLayer = lAnimStack.GetSrcObject(FbxCriteria.ObjectType(FbxAnimLayer.ClassId), j)
             # for k in range(lRoot.GetChildCount()):
@@ -1187,10 +1192,34 @@ def CreateBufferViews(pBufferName):
 
     lByteOffset += lBufferView['byteLength']
 
-def ListNodes(pNode):
+# Each node can have two pivot context. The node's animation data can be converted from one pivot context to the other
+# Convert source pivot to destination with all zero pivot.
+# http://docs.autodesk.com/FBX/2013/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_node.html,topicNumber=cpp_ref_class_fbx_node_html
+def PrepareBakeTransform(pNode):
+    # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
+    pNode.SetPivotState(FbxNode.eSourcePivot, FbxNode.ePivotActive)
+    pNode.SetPivotState(FbxNode.eDestinationPivot, FbxNode.ePivotActive)
+
+    lZero = FbxVector4(0, 0, 0)
+    pNode.SetPostRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetPreRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetRotationOffset(FbxNode.eDestinationPivot, lZero);
+    pNode.SetScalingOffset(FbxNode.eDestinationPivot, lZero);
+    pNode.SetRotationPivot(FbxNode.eDestinationPivot, lZero);
+    pNode.SetScalingPivot(FbxNode.eDestinationPivot, lZero); 
+
+    pNode.SetGeometricTranslation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetGeometricRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetGeometricScaling(FbxNode.eDestinationPivot, FbxVector4(1, 1, 1));
+    # pNode.SetUseQuaternionForInterpolation(FbxNode.eDestinationPivot, pNode.GetUseQuaternionForInterpolation(FbxNode.eSourcePivot));
+
+
+def PrepareSceneNode(pNode):
+    PrepareBakeTransform(pNode)
+
     fbxNodes[GetNodeNameWithoutDuplication(pNode)] = pNode
     for k in range(pNode.GetChildCount()):
-        ListNodes(pNode.GetChild(k))
+        PrepareSceneNode(pNode.GetChild(k))
 
 # FIXME
 # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_fbxtime_8h_html
@@ -1218,7 +1247,10 @@ def Convert(
     else:
         lBasename, lExt = os.path.splitext(ouptutFile)
 
-        ListNodes(lScene.GetRootNode())
+        PrepareSceneNode(lScene.GetRootNode())
+
+        lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 30)
+
         if not ignoreScene:
             lSceneName = ConvertScene(lScene, poseTime, fbxConverter)
         if not ignoreAnimation:
