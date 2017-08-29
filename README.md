@@ -89,8 +89,6 @@ QTEK is a WebGL graphic library.
 
 Needs [python3.3](https://www.python.org/download/releases/3.3.0/) and [FBX SDK 2018.1.1](http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26416130)
 
-Usage:
-
 ```
 usage: fbx2gltf2.py [-h] [-e EXCLUDE] [-t TIMERANGE] [-o OUTPUT]
                     [-f FRAMERATE] [-p POSE] [-q] [-b]
