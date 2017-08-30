@@ -98,13 +98,19 @@ def quantize(pList, pStride, pMin, pMax):
     lRange = range(pStride)
     lMultiplier = []
     lDivider = []
+    # TODO dynamic precision? may lose info?
+    lPrecision = 1e6
     for i in lRange:
+        pMax[i] = math.ceil(pMax[i] * lPrecision) / lPrecision;
+        pMin[i] = math.floor(pMin[i] * lPrecision) / lPrecision;
         if pMax[i] == pMin[i]:
             lMultiplier.append(0)
             lDivider.append(0)
         else:
-            lMultiplier.append(65535 / (pMax[i] - pMin[i]))
-            lDivider.append((pMax[i] - pMin[i]) / 65535)
+            lDividerTmp = (pMax[i] - pMin[i]) / 65535;
+            lDividerTmp = math.ceil(lDividerTmp * lPrecision) / lPrecision
+            lDivider.append(lDividerTmp)
+            lMultiplier.append(1 / lDividerTmp)
 
     lNewList = []
     for item in pList:
@@ -144,7 +150,7 @@ def quantize(pList, pStride, pMin, pMax):
             pMin[0], pMin[1], pMin[2], pMin[3], 1
         ]
 
-    return lNewList, lDecodeMatrix
+    return lNewList, lDecodeMatrix, pMin, pMax
         
 
 def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
@@ -178,13 +184,13 @@ def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
                     lMax[i] = max(lMax[i], item[i])
 
     if pQuantize and pType == 'f' and pStride <= 4:
-        pList, lDecodeMatrix = quantize(pList, pStride, lMin, lMax)
+        pList, lDecodeMatrix, lDecodedMin, lDecodedMax = quantize(pList, pStride, lMin[0:], lMax[0:])
         pType = 'H'
         # https://github.com/KhronosGroup/glTF/blob/master/extensions/Vendor/WEB3D_quantized_attributes
         lGLTFAcessor['extensions'] = {
             'WEB3D_quantized_attributes': {
-                'decodedMin': lMin,
-                'decodedMax': lMax,
+                'decodedMin': lDecodedMin,
+                'decodedMax': lDecodedMax,
                 'decodeMatrix': lDecodeMatrix
             }
         }
@@ -1255,6 +1261,7 @@ def Convert(
         out = open(ouptutFile, 'w')
         indent = None
         seperator = ':'
+
         if beautify:
             indent = 2
             seperator = ': '
