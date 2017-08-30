@@ -27,13 +27,6 @@ define(function (require) {
             name: '',
 
             /**
-             * root joints
-             * @type {Array.<qtek.Joint>}
-             */
-            // PENDING If needs this?
-            roots: [],
-
-            /**
              * joints
              * @type {Array.<qtek.Joint>}
              */
@@ -150,9 +143,6 @@ define(function (require) {
             var m4 = mat4.create();
 
             return function () {
-                for (var i = 0; i < this.roots.length; i++) {
-                    this.roots[i].node.update(true);
-                }
                 this._invBindPoseMatricesArray = new Float32Array(this.joints.length * 16);
                 this._skinMatricesArray = new Float32Array(this.joints.length * 16);
 
@@ -203,10 +193,6 @@ define(function (require) {
         update: (function () {
             var m4 = mat4.create();
             return function () {
-                for (var i = 0; i < this.roots.length; i++) {
-                    this.roots[i].node.update(true);
-                }
-
                 for (var i = 0; i < this.joints.length; i++) {
                     var joint = this.joints[i];
                     mat4.multiply(
@@ -301,9 +287,6 @@ define(function (require) {
                     console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.')
                 }
                 skeleton.joints.push(newJoint);
-            }
-            for (var i = 0; i < this.roots.length; i++) {
-                skeleton.roots.push(skeleton.joints[this.roots[i].index]);
             }
 
             if (this._invBindPoseMatricesArray) {
