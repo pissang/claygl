@@ -121,7 +121,7 @@ define(function (require) {
          * @param  {number} time
          * @return {string}
          */
-        step: function (time, deltaTime) {
+        step: function (time, deltaTime, silent) {
             if (!this._initialized) {
                 this._startTime = time + this.delay;
                 this._initialized = true;
@@ -155,7 +155,10 @@ define(function (require) {
             else {
                 schedule = percent;
             }
-            this.fire('frame', schedule);
+
+            if (!silent) {
+                this.fire('frame', schedule);
+            }
 
             if (percent === 1) {
                 if (this._loop && this._loopRemained > 0) {

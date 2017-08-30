@@ -70,14 +70,19 @@ define(function (require) {
 
     TransformClip.prototype.constructor = TransformClip;
 
-    TransformClip.prototype.step = function (time, dTime) {
+    TransformClip.prototype.step = function (time, dTime, silent) {
 
-        var ret = Clip.prototype.step.call(this, time, dTime);
+        var ret = Clip.prototype.step.call(this, time, dTime, true);
 
         if (ret !== 'finish') {
             this.setTime(this.getElapsedTime());
         }
 
+        // PENDING Schedule
+        if (!silent) {
+            this.fire('frame');
+        }
+        
         return ret;
     };
 
