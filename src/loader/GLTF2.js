@@ -447,10 +447,10 @@ define(function (require) {
             uniforms = commonMaterialInfo.values;
             
             if (typeof uniforms.diffuse === 'number') {
-                uniforms.diffuse = lib.textures[uniforms.diffuse]
+                uniforms.diffuse = lib.textures[uniforms.diffuse];
             }
             if (typeof uniforms.emission === 'number') {
-                uniforms.emission = lib.textures[uniforms.emission]
+                uniforms.emission = lib.textures[uniforms.emission];
             }
 
             var enabledTextures = [];

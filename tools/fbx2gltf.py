@@ -1234,7 +1234,9 @@ def Convert(
     animFrameRate = 1 / 20,
     startTime = 0,
     duration = 1000,
-    poseTime = TIME_INFINITY):
+    poseTime = TIME_INFINITY,
+    beautify = False
+):
 
     ignoreScene = 'scene' in excluded
     ignoreAnimation = 'animation' in excluded
@@ -1299,7 +1301,13 @@ def Convert(
             lOutput['scene'] = lSceneName
 
         out = open(ouptutFile, 'w')
-        out.write(json.dumps(lOutput, indent = 2, sort_keys = True, separators=(',', ': ')))
+        indent = None
+        seperator = ':'
+
+        if beautify:
+            indent = 2
+            seperator = ': '
+        out.write(json.dumps(lOutput, indent = indent, sort_keys = True, separators=(',', seperator)))
         out.close()
 
 if __name__ == "__main__":
@@ -1310,6 +1318,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
     parser.add_argument('-p', '--pose', default=-1, type=float, help="Static pose time")
+    parser.add_argument('-b', '--beautify', action="store_true", help="Beautify json output.")
     parser.add_argument('file')
 
     args = parser.parse_args()
@@ -1333,4 +1342,4 @@ if __name__ == "__main__":
 
     excluded = args.exclude.split(',')
 
-    Convert(args.file, args.output, excluded, 1 / args.framerate, lStartTime, lDuration, lPoseTime)
+    Convert(args.file, args.output, excluded, 1 / args.framerate, lStartTime, lDuration, lPoseTime, args.beautify)
