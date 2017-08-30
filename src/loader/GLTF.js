@@ -439,6 +439,7 @@ define(function (require) {
                         var rootJoint = bindNodeToJoint(jointsMap, rootNodes[i], -1, rootNode);
                         // Root joint may not in the skeleton
                         if (rootJoint) {
+                            skeleton.roots = skeleton.roots || [];
                             skeleton.roots.push(rootJoint);
                         }
                     }
