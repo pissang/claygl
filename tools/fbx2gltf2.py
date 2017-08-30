@@ -2,7 +2,7 @@
 # fbx to glTF2.0 converter
 # glTF spec : https://github.com/KhronosGroup/glTF/blob/master/specification/2.0
 # fbx version 2018.1.1
-# TODO: support python2.7
+# TODO: texture flipY?
 # http://github.com/pissang/
 # ############################################
 import sys, struct, json, os.path, math, argparse
@@ -147,10 +147,10 @@ def quantize(pList, pStride, pMin, pMax):
     return lNewList, lDecodeMatrix
         
 
-def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
+def CreateAccessorBuffer(pList, pType, pStride, pMinMax = False, pQuantize=False):
     lGLTFAcessor = {}
 
-    if minMax:
+    if pMinMax:
         if len(pList) > 0:
             if pStride == 1:
                 lMin = [pList[0]]
@@ -177,7 +177,7 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
                     lMin[i] = min(lMin[i], item[i])
                     lMax[i] = max(lMax[i], item[i])
 
-    if ENV_QUANTIZE and pType == 'f' and pStride <= 4:
+    if pQuantize and pType == 'f' and pStride <= 4:
         pList, lDecodeMatrix = quantize(pList, pStride, lMin, lMax)
         pType = 'H'
         # https://github.com/KhronosGroup/glTF/blob/master/extensions/Vendor/WEB3D_quantized_attributes
@@ -231,7 +231,7 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
     lGLTFAcessor['byteOffset'] = 0
     lGLTFAcessor['count'] = len(pList)
 
-    if minMax:
+    if pMinMax:
         lGLTFAcessor['max'] = lMax
         lGLTFAcessor['min'] = lMin
 
@@ -239,7 +239,7 @@ def CreateAccessorBuffer(pList, pType, pStride, minMax = False):
 
 
 def CreateAttributeBuffer(pList, pType, pStride):
-    lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True)
+    lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True, ENV_QUANTIZE)
     lGLTFAttribute['byteOffset'] = len(attributeBuffer)
     # pType is float
     attributeBuffer.extend(lData)
@@ -383,6 +383,8 @@ def ConvertMaterial(pMaterial):
         "extensions": {
             "KHR_materials_common": {
                 "technique": "BLINN",
+                # Compatible with three.js loaders 
+                "type": "commonBlinn",
                 "values": {}
             }
         }
@@ -597,9 +599,10 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if moreThanFourJoints:
             print('More than 4 joints (%d joints) bound to per vertex in %s. ' %(lMaxJointCount, pNode.GetName()))
 
-        # Weight is FLOAT_3 because it is normalized
-        for i in range(len(lWeights)):
-            lWeights[i] = lWeights[i][:3]
+        # Weight is VEC3 because it is normalized
+        # TODO Seems most engines needs VEC4 weights.
+        # for i in range(len(lWeights)):
+        #     lWeights[i] = lWeights[i][:3]
 
         if lNormalSplitted or lUvSplitted or lUv2Splitted:
             lCount = 0
@@ -685,7 +688,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if hasSkin:
             # PENDING UNSIGNED_SHORT will have bug.
             lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'H', 4)
-            lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 3)
+            # TODO Seems most engines needs VEC4 weights.
+            lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 4)
 
         if len(lPositions) >= 0xffff:
             #Use unsigned int in element indices
@@ -730,7 +734,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
     lib_nodes.append(lGLTFNode)
 
     # Transform matrix
-    lGLTFNode['matrix'] = ListFromM4(pNode.EvaluateLocalTransform(pPoseTime))
+    lGLTFNode['matrix'] = ListFromM4(pNode.EvaluateLocalTransform(pPoseTime, FbxNode.eDestinationPivot))
 
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
@@ -774,58 +778,8 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
             lGLTFNode['mesh'] = lMeshIdx
 
         if lHasSkin:
-            roots = []
-            lExtraJoints = []
-            # Find Root
-            for lNodeIdx in lGLTFSkin['joints']:
-                lCluster = lClusters[lNodeIdx]
-                lLink = lCluster.GetLink()
-                lParent = lLink
-                lRootFound = False
-                # Parent already have index
-                lParentIdx = GetNodeIdx(lParent)
-                # if lParent == None or not lParent.GetName() in lGLTFSkin['joints']:
-                #     if not lParent.GetName() in roots:
-                #         roots.append(lLink.GetName())
-                while not lParent == None:
-                    lSkeleton = lParent.GetSkeleton()
-                    if lSkeleton == None:
-                        break
-
-                    # In case some skeleton is not a attached to any vertices(not a cluster)
-                    # PENDING
-                    if not lParentIdx in lGLTFSkin['joints'] and not lParentIdx in lExtraJoints:
-                        lExtraJoints.append(lParentIdx)
-
-                    if lSkeleton.IsSkeletonRoot():
-                        lRootFound = True
-                        break
-                    lParent = lParent.GetParent()
-                    lParentIdx = GetNodeIdx(lParent)
-
-                # lSkeletonTypes = ["Root", "Limb", "Limb Node", "Effector"]
-                # print(lSkeletonTypes[lSkeleton.GetSkeletonType()])
-
-                if lRootFound:
-                    if not lParentIdx in roots:
-                        roots.append(lParentIdx)
-                else:
-                    # TODO IsSkeletonRoot not works well, try another way
-                    # which do not have a parent or its parent is not in skin
-                    lParent = lLink.GetParent()
-                    if lParent == None or not GetNodeIdx(lParent) in lGLTFSkin['joints']:
-                        if not GetNodeIdx(lLink) in roots:
-                            roots.append(GetNodeIdx(lLink))
-
-            # lRootNode = fbxNodes[roots[0]]
-            # lRootNodeTransform = lRootNode.GetParent().EvaluateGlobalTransform()
-
             lClusterGlobalInitMatrix = FbxAMatrix()
             lReferenceGlobalInitMatrix = FbxAMatrix()
-
-            lT = pNode.GetGeometricTranslation(FbxNode.eSourcePivot)
-            lR = pNode.GetGeometricRotation(FbxNode.eSourcePivot)
-            lS = pNode.GetGeometricScaling(FbxNode.eSourcePivot)
 
             lIBM = []
             for i in range(len(lGLTFSkin['joints'])):
@@ -839,22 +793,20 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
                 lCluster.GetTransformLinkMatrix(lClusterGlobalInitMatrix)
                 # http://blog.csdn.net/bugrunner/article/details/7232291
                 # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref__view_scene_2_draw_scene_8cxx_example_html
-                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix * FbxAMatrix(lT, lR, lS)
+                m = lClusterGlobalInitMatrix.Inverse() * lReferenceGlobalInitMatrix
                 lIBM.append(m)
 
-            for i in range(len(lExtraJoints)):
-                lIBM.append(FbxMatrix())
-
             lGLTFSkin['inverseBindMatrices'] = CreateIBMBuffer(lIBM)
-
-            lGLTFSkin['joints'] += lExtraJoints
 
             # Mesh with skin should have identity global transform.
             # Since vertices have all been transformed to skeleton spaces.
             # PENDING
             m = FbxAMatrix()
             if not pNode.GetParent() == None:
-                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime)
+                lParentIdx = GetNodeIdx(pNode.GetParent())
+                # Parent node will have identity world matrix if it has skin
+                if lParentIdx < 0 or (not 'skin' in lib_nodes[lParentIdx]):
+                    m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
             m = m.Inverse()
             lGLTFNode['matrix'] = ListFromM4(m)
 
@@ -910,6 +862,61 @@ def GetPropertyAnimationCurveTime(pAnimCurve):
 
     return lStartTimeDouble, lEndTimeDouble, lDuration
 
+def V3Same(pV1, pV2):
+    return abs(pV1[0] - pV2[0]) < 1e-5 and abs(pV1[1] - pV2[1]) < 1e-5 and abs(pV1[2] - pV2[2]) < 1e-5
+def V3Middle(pV1, pV2):
+    return [(pV1[0] + pV2[0]) / 2, (pV1[1] + pV2[1]) / 2, (pV1[2] + pV2[2]) / 2]
+def QuatFromList(item):
+    return FbxQuaternion(item[0], item[1], item[2], item[3])
+
+def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleChannel):
+    lTranslationChannel = []
+    lRotationChannel = []
+    lScaleChannel = []
+    lTime = []
+    lHaveRotation = len(pRotationChannel) > 0
+    lHaveScale = len(pScaleChannel) > 0
+    lHaveTranslation = len(pTranslationChannel) > 0
+    if lHaveRotation:
+        lRotationChannel.append(pRotationChannel[0])
+    if lHaveScale:
+        lScaleChannel.append(pScaleChannel[0])
+    if lHaveTranslation:
+        lTranslationChannel.append(pTranslationChannel[0])
+    for i in range(len(pTime)):
+        lLinearInterpolated = True
+        if i > 1:
+            if lHaveTranslation:
+                if not V3Same(V3Middle(pTranslationChannel[i - 2], pTranslationChannel[i]), pTranslationChannel[i - 1]):
+                    lLinearInterpolated = False
+            if lHaveScale and lLinearInterpolated:
+                if not V3Same(V3Middle(pScaleChannel[i - 2], pScaleChannel[i]), pScaleChannel[i - 1]):
+                    lLinearInterpolated = False
+            # if lHaveRotation:
+            #     lMiddle = QuatFromList(pRotationChannel[i - 2]).Slerp(QuatFromList(pRotationChannel[i]))
+            #     if not lMiddle == QuatFromList(pRotationChannel[i - 1]):
+            #         lLinearInterpolated = False
+
+        if not lLinearInterpolated:
+            if lHaveTranslation:
+                lTranslationChannel.append(pTranslationChannel[i - 1])
+            if lHaveRotation:
+                lRotationChannel.append(pRotationChannel[i - 1])
+            if lHaveScale:
+                lScaleChannel.append(pScaleChannel[i - 1])
+            lTime.append(pTime[i - 1])
+
+    if lHaveRotation:
+        lRotationChannel.append(pRotationChannel[len(pRotationChannel) - 1])
+    if lHaveScale:
+        lScaleChannel.append(pScaleChannel[len(pScaleChannel) - 1])
+    if lHaveTranslation:
+        lTranslationChannel.append(pTranslationChannel[len(pTranslationChannel) - 1])
+            
+
+    return lTime, lTranslationChannel, lRotationChannel, lScaleChannel
+
+
 def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     lNodeIdx = GetNodeIdx(pNode)
 
@@ -964,7 +971,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
             lSecondDouble = min(lStartTimeDouble + pSampleRate * i, lEndTimeDouble)
             lTime.SetSecondDouble(lSecondDouble)
 
-            lTransform = pNode.EvaluateLocalTransform(lTime)
+            lTransform = pNode.EvaluateLocalTransform(lTime, FbxNode.eDestinationPivot)
             lTranslation = lTransform.GetT()
             lQuaternion = lTransform.GetQ()
             lScale = lTransform.GetS()
@@ -978,9 +985,14 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
                 lTranslationChannel.append(list(lTranslation))
             if lHaveScaling:
                 lScaleChannel.append(list(lScale))
+    
+        # lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel = FitLinearInterpolation(
+        #     lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel
+        # )
 
         lTimeAccessorKey = (lStartTimeDouble, lDuration)
         if not lTimeAccessorKey in _timeSamplerHashMap:
+            # TODO use ubyte.
             _timeSamplerHashMap[lTimeAccessorKey] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
         
         lSamplerAccessors = {
@@ -1066,10 +1078,11 @@ def CreateBufferViews(pBufferIdx):
     CreateBufferView(pBufferIdx, indicesBuffer, lib_indices_accessors, lByteOffset, GL_ELEMENT_ARRAY_BUFFER)
 
 
+
 # Start from -1 and ignore the root node
 _nodeCount = -1
 _nodeIdxMap = {}
-def PrepareScene(pNode, fbxConverter):
+def PrepareSceneNode(pNode, fbxConverter):
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
@@ -1084,10 +1097,38 @@ def PrepareScene(pNode, fbxConverter):
         fbxConverter.Triangulate(pNode.GetGeometry(), True)
 
     for k in range(pNode.GetChildCount()):
-        PrepareScene(pNode.GetChild(k), fbxConverter)
+        PrepareSceneNode(pNode.GetChild(k), fbxConverter)
+
+# Each node can have two pivot context. The node's animation data can be converted from one pivot context to the other
+# Convert source pivot to destination with all zero pivot.
+# http://docs.autodesk.com/FBX/2013/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_node.html,topicNumber=cpp_ref_class_fbx_node_html
+def PrepareBakeTransform(pNode):
+    # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
+    pNode.SetPivotState(FbxNode.eSourcePivot, FbxNode.ePivotActive)
+    pNode.SetPivotState(FbxNode.eDestinationPivot, FbxNode.ePivotActive)
+
+    lZero = FbxVector4(0, 0, 0)
+    pNode.SetPostRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetPreRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetRotationOffset(FbxNode.eDestinationPivot, lZero);
+    pNode.SetScalingOffset(FbxNode.eDestinationPivot, lZero);
+    pNode.SetRotationPivot(FbxNode.eDestinationPivot, lZero);
+    pNode.SetScalingPivot(FbxNode.eDestinationPivot, lZero); 
+
+    pNode.SetGeometricTranslation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetGeometricRotation(FbxNode.eDestinationPivot, lZero);
+    pNode.SetGeometricScaling(FbxNode.eDestinationPivot, FbxVector4(1, 1, 1));
+    # pNode.SetUseQuaternionForInterpolation(FbxNode.eDestinationPivot, pNode.GetUseQuaternionForInterpolation(FbxNode.eSourcePivot));
+
+    for k in range(pNode.GetChildCount()):
+        PrepareBakeTransform(pNode.GetChild(k))
+    
 
 def GetNodeIdx(pNode):
-    return _nodeIdxMap[pNode.GetUniqueID()]
+    lId = pNode.GetUniqueID()
+    if not lId in _nodeIdxMap:
+        return -1
+    return _nodeIdxMap[lId]
 
 # FIXME
 # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_fbxtime_8h_html
@@ -1120,7 +1161,12 @@ def Convert(
     else:
         lBasename, lExt = os.path.splitext(ouptutFile)
 
-        PrepareScene(lScene.GetRootNode(), fbxConverter)
+        PrepareSceneNode(lScene.GetRootNode(), fbxConverter)
+
+        PrepareBakeTransform(lScene.GetRootNode())
+
+        lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 60)
+
         if not ignoreScene:
             lSceneIdx = ConvertScene(lScene, poseTime)
         if not ignoreAnimation:

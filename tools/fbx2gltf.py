@@ -945,9 +945,9 @@ def ConvertSceneNode(pScene, pNode, pPoseTime, fbxConverter):
             # PENDING
             m = FbxAMatrix()
             if not pNode.GetParent() == None:
-                lGLTFParentNodeName = GetNodeNameWithoutDuplication(pNode.GetParent())
+                lParentName = GetNodeNameWithoutDuplication(pNode.GetParent())
                 # Parent node will have identity world matrix if it has skin
-                if not 'instanceSkin' in lib_nodes[lGLTFParentNodeName]:
+                if (not lParentName in lib_nodes) or (not 'instanceSkin' in lib_nodes[lParentName]):
                     m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
             m = m.Inverse()
             lGLTFNode['matrix'] = [
@@ -1247,7 +1247,7 @@ def Convert(
 
         PrepareSceneNode(lScene.GetRootNode())
 
-        lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 30)
+        lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 60)
 
         if not ignoreScene:
             lSceneName = ConvertScene(lScene, poseTime, fbxConverter)
