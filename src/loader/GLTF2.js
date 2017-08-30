@@ -878,7 +878,7 @@ define(function (require) {
                 }
             }
 
-            var timeAccessorMultiplied = {}
+            var timeAccessorMultiplied = {};
             util.each(json.animations, function (animationInfo, idx) {
                 var channels = animationInfo.channels.filter(checkChannelPath);
 
@@ -933,6 +933,15 @@ define(function (require) {
                     lib.clips.push(clips[key]);
                 }
             }, this);
+
+
+            // PENDING
+            var maxLife = lib.clips.reduce(function (maxTime, clip) {
+                return Math.max(maxTime, clip.life);
+            }, 0);
+            lib.clips.forEach(function (clip) {
+                clip.life = maxLife;
+            });
 
             return lib.clips;
         }
