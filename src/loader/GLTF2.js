@@ -56,12 +56,6 @@ define(function (require) {
         5125: vendor.Uint32Array,
         5126: vendor.Float32Array
     };
-    var ATTR_TYPE_MAP = {
-        5120: 'byte',
-        5121: 'ubyte',
-        5122: 'short',
-        5123: 'ushort'
-    };
     var SIZE_MAP = {
         SCALAR: 1,
         VEC2: 2,
@@ -71,6 +65,39 @@ define(function (require) {
         MAT3: 9,
         MAT4: 16
     };
+
+    function getAccessorData(json, lib, accessorIdx, isIndices) {
+        var accessorInfo = json.accessors[accessorIdx];
+
+        var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+        var buffer = lib.buffers[bufferViewInfo.buffer];
+        var byteOffset = (bufferViewInfo.byteOffset || 0) + (accessorInfo.byteOffset || 0);
+        var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
+
+        var size = isIndices ? 1 : SIZE_MAP[accessorInfo.type];
+        var arr = new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
+
+        var quantizeExtension = accessorInfo.extensions && accessorInfo.extensions['WEB3D_quantized_attributes'];
+        if (quantizeExtension) {
+            var decodedArr = new vendor.Float32Array(size * accessorInfo.count);
+            var decodeMatrix = quantizeExtension.decodeMatrix;
+            var decodeOffset, decodeScale;
+            var decodeOffset = new Array(size);
+            var decodeScale = new Array(size);
+            for (var k = 0; k < size; k++) {
+                decodeOffset[k] = decodeMatrix[size * (size + 1) + k];
+                decodeScale[k] = decodeMatrix[k * (size + 1) + k];
+            }
+            for (var i = 0; i < accessorInfo.count; i++) {
+                for (var k = 0; k < size; k++) {
+                    decodedArr[i * size + k] = arr[i * size + k] * decodeScale[k] + decodeOffset[k];
+                }
+            }
+
+            arr = decodedArr;
+        }
+        return arr;
+    }
 
     /**
      * @typedef {Object} qtek.loader.GLTF.IResult
@@ -641,19 +668,8 @@ define(function (require) {
                         if (!attributeName) {
                             continue;
                         }
-                        var componentType = attributeInfo.componentType;
-                        var attributeType = attributeInfo.type;
-                        ArrayCtor = ARRAY_CTOR_MAP[componentType] || vendor.Float32Array;
-                        size = SIZE_MAP[attributeType];
-
-                        var bufferViewInfo = json.bufferViews[attributeInfo.bufferView];
-                        var buffer = lib.buffers[bufferViewInfo.buffer];
-                        // byteoffset is optional
-                        var byteOffset = (bufferViewInfo.byteOffset || 0) + (attributeInfo.byteOffset || 0);
-
-                        var size;
-                        var ArrayCtor;
-                        var attributeArray = new ArrayCtor(buffer, byteOffset, attributeInfo.count * size);
+                        var size = SIZE_MAP[attributeInfo.type];
+                        var attributeArray = getAccessorData(json, lib, accessorIdx);
                         // WebGL attribute buffer not support uint32.
                         // Direct use Float32Array may also have issue.
                         if (attributeArray instanceof vendor.Uint32Array) {
@@ -661,7 +677,7 @@ define(function (require) {
                         }
                         if (semantic === 'WEIGHTS_0' && size === 4) {
                             // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
-                            var weightArray = new ArrayCtor(attributeInfo.count * 3);
+                            var weightArray = new attributeArray.constructor(attributeInfo.count * 3);
                             for (var i = 0; i < attributeInfo.count; i++) {
                                 weightArray[i * 3] = attributeArray[i * 4];
                                 weightArray[i * 3 + 1] = attributeArray[i * 4 + 1];
@@ -672,8 +688,20 @@ define(function (require) {
                         else {
                             geometry.attributes[attributeName].value = attributeArray;
                         }
-                        geometry.attributes[attributeName].type = ATTR_TYPE_MAP[componentType] || 'float';
-                        
+                        var attributeType = 'float';
+                        if (attributeArray instanceof vendor.Uint16Array) {
+                            attributeType = 'ushort';
+                        }
+                        else if (attributeArray instanceof vendor.Int16Array) {
+                            attributeType = 'short';
+                        }
+                        else if (attributeArray instanceof vendor.Uint8Array) {
+                            attributeType = 'ubyte';
+                        }
+                        else if (attributeArray instanceof vendor.Int8Array) {
+                            attributeType = 'byte';
+                        }
+                        geometry.attributes[attributeName].type = attributeType;
 
                         if (semantic === 'POSITION') {
                             // Bounding Box
@@ -689,14 +717,7 @@ define(function (require) {
                     }
 
                     // Parse indices
-                    var indicesInfo = json.accessors[primitiveInfo.indices];
-
-                    var bufferViewInfo = json.bufferViews[indicesInfo.bufferView];
-                    var buffer = lib.buffers[bufferViewInfo.buffer];
-                    var byteOffset = (bufferViewInfo.byteOffset || 0) + (indicesInfo.byteOffset || 0);
-
-                    var IndicesCtor = indicesInfo.componentType === 0x1405 ? vendor.Uint32Array : vendor.Uint16Array;
-                    geometry.indices = new IndicesCtor(buffer, byteOffset, indicesInfo.count);
+                    geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
 
                     var material = lib.materials[primitiveInfo.material];
                     // Use default material
@@ -829,18 +850,6 @@ define(function (require) {
          },
 
         _parseAnimations: function (json, lib) {
-            function getAccessorData(accessorIdx) {
-                var accessorInfo = json.accessors[accessorIdx];
-
-                var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
-                var buffer = lib.buffers[bufferViewInfo.buffer];
-                var byteOffset = (bufferViewInfo.byteOffset || 0) + (accessorInfo.byteOffset || 0);
-                var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
-
-                var size = SIZE_MAP[accessorInfo.type];
-                return new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
-            }
-
             function checkChannelPath(channelInfo) {
                 if (channelInfo.path === 'weights') {
                     console.warn('GLTFLoader not support morph targets yet.');
@@ -895,7 +904,7 @@ define(function (require) {
                             onframe: clipOnframe
                         });
                         clip.targetNodeIndex = channelInfo.target.node;
-                        clip.channels.time = getAccessorData(samplerInfo.input);
+                        clip.channels.time = getAccessorData(json, lib, samplerInfo.input);
                         var frameLen = clip.channels.time.length;
                         if (!timeAccessorMultiplied[samplerInfo.input]) {
                             for (var k = 0; k < frameLen; k++) {
@@ -917,7 +926,7 @@ define(function (require) {
                         path = 'position';
                     }
 
-                    clip.channels[path] = getAccessorData(samplerInfo.output);
+                    clip.channels[path] = getAccessorData(json, lib, samplerInfo.output);
                 }
 
                 for (var key in clips) {
