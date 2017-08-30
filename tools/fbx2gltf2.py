@@ -99,7 +99,7 @@ def quantize(pList, pStride, pMin, pMax):
     lMultiplier = []
     lDivider = []
     for i in lRange:
-        if (pMax[i] == pMin[i]):
+        if pMax[i] == pMin[i]:
             lMultiplier.append(0)
             lDivider.append(0)
         else:
@@ -147,7 +147,7 @@ def quantize(pList, pStride, pMin, pMax):
     return lNewList, lDecodeMatrix
         
 
-def CreateAccessorBuffer(pList, pType, pStride, pMinMax = False, pQuantize=False):
+def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
     lGLTFAcessor = {}
 
     if pMinMax:
@@ -181,7 +181,7 @@ def CreateAccessorBuffer(pList, pType, pStride, pMinMax = False, pQuantize=False
         pList, lDecodeMatrix = quantize(pList, pStride, lMin, lMax)
         pType = 'H'
         # https://github.com/KhronosGroup/glTF/blob/master/extensions/Vendor/WEB3D_quantized_attributes
-        lGLTFAcessor['extension'] = {
+        lGLTFAcessor['extensions'] = {
             'WEB3D_quantized_attributes': {
                 'decodedMin': lMin,
                 'decodedMax': lMax,
@@ -803,10 +803,12 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
             # PENDING
             m = FbxAMatrix()
             if not pNode.GetParent() == None:
+                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
                 lParentIdx = GetNodeIdx(pNode.GetParent())
                 # Parent node will have identity world matrix if it has skin
-                if lParentIdx < 0 or (not 'skin' in lib_nodes[lParentIdx]):
-                    m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
+                if lParentIdx >= 0:
+                    if 'skin' in lib_nodes[lParentIdx]:
+                        m = FbxAMatrix()
             m = m.Inverse()
             lGLTFNode['matrix'] = ListFromM4(m)
 
@@ -862,12 +864,40 @@ def GetPropertyAnimationCurveTime(pAnimCurve):
 
     return lStartTimeDouble, lEndTimeDouble, lDuration
 
-def V3Same(pV1, pV2):
-    return abs(pV1[0] - pV2[0]) < 1e-5 and abs(pV1[1] - pV2[1]) < 1e-5 and abs(pV1[2] - pV2[2]) < 1e-5
-def V3Middle(pV1, pV2):
-    return [(pV1[0] + pV2[0]) / 2, (pV1[1] + pV2[1]) / 2, (pV1[2] + pV2[2]) / 2]
-def QuatFromList(item):
-    return FbxQuaternion(item[0], item[1], item[2], item[3])
+EPSILON = 1e-6
+def V3Same(a, b):
+    return abs(a[0] - b[0]) < EPSILON and abs(a[1] - b[1]) < EPSILON and abs(a[2] - b[2]) < EPSILON
+def V4Same(a, b):
+    return abs(a[0] - b[0]) < EPSILON and abs(a[1] - b[1]) < EPSILON and abs(a[2] - b[2]) < EPSILON and abs(a[3] - b[3]) < EPSILON
+def V3Middle(a, b):
+    return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]
+def QuatSlerp(a, b, t):
+    [ax, ay, az, aw] = a
+    [bx, by, bz, bw] = b
+    ## calc cosine
+    cosom = ax * bx + ay * by + az * bz + aw * bw
+    ## adjust signs (if necessary)
+    if cosom < 0.0:
+        cosom = -cosom
+        bx = -bx
+        by = -by
+        bz = -bz
+        bw = -bw
+
+    ## calculate coefficients
+    if 1.0 - cosom > 0.000001:
+        ## standard case (slerp)
+        omega = math.acos(cosom)
+        sinom = math.sin(omega)
+        scale0 = math.sin((1.0 - t) * omega) / sinom
+        scale1 = math.sin(t * omega) / sinom
+    else:
+        ## "from" and "to" quaternions are very close
+        ##  ... so we can do a linear interpolation
+        scale0 = 1.0 - t
+        scale1 = t
+    ## calculate final values
+    return [scale0 * ax + scale1 * bx, scale0 * ay + scale1 * by, scale0 * az + scale1 * bz, scale0 * aw + scale1 * bw]
 
 def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleChannel):
     lTranslationChannel = []
@@ -883,6 +913,7 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
         lScaleChannel.append(pScaleChannel[0])
     if lHaveTranslation:
         lTranslationChannel.append(pTranslationChannel[0])
+    lTime.append(pTime[0])
     for i in range(len(pTime)):
         lLinearInterpolated = True
         if i > 1:
@@ -892,10 +923,9 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
             if lHaveScale and lLinearInterpolated:
                 if not V3Same(V3Middle(pScaleChannel[i - 2], pScaleChannel[i]), pScaleChannel[i - 1]):
                     lLinearInterpolated = False
-            # if lHaveRotation:
-            #     lMiddle = QuatFromList(pRotationChannel[i - 2]).Slerp(QuatFromList(pRotationChannel[i]))
-            #     if not lMiddle == QuatFromList(pRotationChannel[i - 1]):
-            #         lLinearInterpolated = False
+            if lHaveRotation:
+                if not V4Same(QuatSlerp(pRotationChannel[i - 2], pRotationChannel[i], 0.5), pRotationChannel[i - 1]):
+                    lLinearInterpolated = False
 
         if not lLinearInterpolated:
             if lHaveTranslation:
@@ -912,8 +942,9 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
         lScaleChannel.append(pScaleChannel[len(pScaleChannel) - 1])
     if lHaveTranslation:
         lTranslationChannel.append(pTranslationChannel[len(pTranslationChannel) - 1])
-            
 
+    lTime.append(pTime[len(pTime) - 1])
+            
     return lTime, lTranslationChannel, lRotationChannel, lScaleChannel
 
 
@@ -986,18 +1017,19 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
             if lHaveScaling:
                 lScaleChannel.append(list(lScale))
     
-        # lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel = FitLinearInterpolation(
-        #     lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel
-        # )
+        lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel = FitLinearInterpolation(
+            lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel
+        )
 
-        lTimeAccessorKey = (lStartTimeDouble, lDuration)
+        # TODO Performance?
+        lTimeAccessorKey = tuple(lTimeChannel)
         if not lTimeAccessorKey in _timeSamplerHashMap:
             # TODO use ubyte.
             _timeSamplerHashMap[lTimeAccessorKey] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
         
         lSamplerAccessors = {
-            # TODO Share time
             "time": _timeSamplerHashMap[lTimeAccessorKey]
+            # "time": CreateAnimationBuffer(lTimeChannel, 'f', 1)
         }
         if lHaveTranslation:
             lAccessorIdx = CreateAnimationBuffer(lTranslationChannel, 'f', 3)
