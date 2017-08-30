@@ -38,6 +38,9 @@ define(function(require) {
             shader = shader || this.material.shader;
             // Set pose matrices of skinned mesh
             if (this.skeleton) {
+                // TODO Multiple mesh share same skeleton
+                this.skeleton.update();
+
                 var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
 
                 if (this.useSkinMatricesTexture) {
