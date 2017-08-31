@@ -198,6 +198,12 @@ def QuaternionToAxisAngle(pQuat):
 
     return [x, y, z, angle]
 
+def MatGetOpacity(pMaterial):
+    lFactor = pMaterial.TransparencyFactor.Get()
+    lColor = pMaterial.TransparentColor.Get()
+
+    return 1.0 - lFactor * (lColor[0] + lColor[1] + lColor[2]) / 3;
+
 # PENDING : Hash mechanism may be different from COLLADA2GLTF
 # TODO Cull face
 # TODO Blending equation and function
@@ -207,7 +213,7 @@ def HashTechnique(pMaterial):
 
     lHashStr = []
     # Is Transparent
-    lHashStr.append(str(pMaterial.TransparencyFactor.Get() > 0))
+    lHashStr.append(str(MatGetOpacity(pMaterial) > 0))
     # Lambert or Phong
     lHashStr.append(str(pMaterial.ShadingModel.Get()))
     # If enable diffuse map
@@ -216,7 +222,7 @@ def HashTechnique(pMaterial):
     lHashStr.append(str(pMaterial.NormalMap.GetSrcObjectCount() > 0))
     lHashStr.append(str(pMaterial.Bump.GetSrcObjectCount() > 0))
     # If enable alpha map
-    lHashStr.append(str(pMaterial.TransparentColor.GetSrcObjectCount() > 0))
+    # lHashStr.append(str(pMaterial.TransparentColor.GetSrcObjectCount() > 0))
 
     if pMaterial.ShadingModel.Get() == 'Phong':
         # If enable specular map
@@ -263,7 +269,7 @@ def CreateTechnique(pMaterial):
     # Enable blend
     try :
         # Old fbx version transparency is 0 if object is opaque
-        if pMaterial.TransparencyFactor.Get() < 1 and pMaterial.TransparencyFactor.Get() > 0:
+        if MatGetOpacity(pMaterial) < 0.999:
             lStates = lGLTFTechnique['passes']['defaultPass']['states']
             lStates['blendEnable'] = True
             lStates['blendEquation'] = 'FUNC_ADD'
@@ -400,11 +406,9 @@ def ConvertMaterial(pMaterial):
     lValues['ambient'] = list(pMaterial.Ambient.Get())
     lValues['emission'] = list(pMaterial.Emissive.Get())
 
-    if pMaterial.TransparencyFactor.Get() < 1:
-        lValues['transparency'] = pMaterial.TransparencyFactor.Get()
-        # Old fbx version transparency is 0 if object is opaque
-        if (lValues['transparency'] == 0):
-            lValues['transparency'] = 1
+    lOpacity = MatGetOpacity(pMaterial)
+    if lOpacity < 0.999:
+        lValues['transparency'] = lOpacity
 
     # Use diffuse map
     # TODO Diffuse Factor ?

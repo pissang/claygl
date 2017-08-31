@@ -80,8 +80,8 @@ void main()
 // First pass
 // - R: normal.x
 // - G: normal.y
-// - B: glossiness
-// - A: metalness + sign(normal.z)
+// - B: normal.z
+// - A: metalness
 uniform float glossiness;
 
 varying vec2 v_Texcoord;
@@ -141,6 +141,7 @@ void main()
 // - R: albedo.r
 // - G: albedo.g
 // - B: albedo.b
+// - A: metalness
 uniform sampler2D diffuseMap;
 uniform sampler2D metalnessMap;
 
