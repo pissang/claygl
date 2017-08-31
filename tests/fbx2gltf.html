@@ -6,19 +6,19 @@
     <script type="text/javascript" src="js/config.js"></script>
 </head>
 <body style="margin:0px">
-    <canvas id="Main"></canvas>
+    <canvas id="main"></canvas>
 
     <script type="text/javascript">
         require(['qtek'], function(qtek) {
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById("Main")
+                canvas : document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
             var GLTFLoader = new qtek.loader.GLTF();
 
-            GLTFLoader.load("assets/scenes/fbx/Robot Kyle.json");
+            GLTFLoader.load('assets/models/robot/Robot Kyle.json');
 
             GLTFLoader.on('success', function(res) {
                 var scene = res.scene;
@@ -33,25 +33,25 @@
                 camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
                 var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas,
-                    sensitivity : 0.4
+                    target: camera,
+                    domElement: renderer.canvas,
+                    sensitivity: 0.4
                 });
-                control.enable();
 
-                light = new qtek.light.Directional({})
-                light.position.set(1, 1, 1)
+                var light = new qtek.light.Directional({});
+                light.position.set(1, 1, 1);
                 light.lookAt(scene.position);
-                scene.add(light)
+                scene.add(light);
 
                 scene.add(new qtek.light.Ambient({
                     intensity : 0.4
                 }));
-                
+
                 setInterval(function() {
+                    control.update(50);
                     skeleton.update();
                     renderer.render(scene, camera);
-                }, 50)
+                }, 50);
             });
         });
     </script>

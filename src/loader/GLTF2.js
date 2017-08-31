@@ -169,6 +169,12 @@ define(function (require) {
          * @type {string}
          */
         crossOrigin: '',
+        /**
+         * @type {boolean}
+         */
+        // PENDING
+        // https://github.com/KhronosGroup/glTF/issues/674
+        textureFlipY: false,
 
         shaderLibrary: null
     },
@@ -421,9 +427,7 @@ define(function (require) {
                 util.defaults(parameters, {
                     wrapS: Texture.REPEAT,
                     wrapT: Texture.REPEAT,
-                    // PENDING
-                    // https://github.com/KhronosGroup/glTF/issues/674
-                    // flipY: false
+                    flipY: this.textureFlipY
                 });
 
                 var target = textureInfo.target || glenum.TEXTURE_2D;
@@ -731,7 +735,9 @@ define(function (require) {
                         material: material,
                         mode: [Mesh.POINTS, Mesh.LINES, Mesh.LINE_LOOP, Mesh.LINE_STRIP, Mesh.TRIANGLES, Mesh.TRIANGLE_STRIP, Mesh.TRIANGLE_FAN][primitiveInfo.mode] || Mesh.TRIANGLES
                     });
-                    if (material.shader.isTextureEnabled('normalMap')) {
+                    if (((material instanceof StandardMaterial) && material.normalMap)
+                        || (material.shader && material.shader.isTextureEnabled('normalMap'))
+                    ) {
                         if (!mesh.geometry.attributes.tangent.value) {
                             mesh.geometry.generateTangents();
                         }

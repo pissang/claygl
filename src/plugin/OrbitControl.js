@@ -486,6 +486,11 @@ define(function (require) {
             v.normalize().scale(speed);
         },
 
+        // TODO Following code will cause decompose problem.
+        // camera.position.y = 2;
+        // camera.position.z = -4;
+        // camera.lookAt(scene.position);
+        // 
         decomposeTransform: function () {
             if (!this.target) {
                 return;

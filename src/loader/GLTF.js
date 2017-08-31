@@ -138,6 +138,7 @@ define(function (require) {
          */
         crossOrigin: '',
 
+
         shaderLibrary: null
     },
     function () {
@@ -761,7 +762,9 @@ define(function (require) {
                         geometry: geometry,
                         material: material
                     });
-                    if (material.shader.isTextureEnabled('normalMap')) {
+                    if (((material instanceof StandardMaterial) && material.normalMap)
+                        || (material.shader && material.shader.isTextureEnabled('normalMap'))
+                    ) {
                         if (!mesh.geometry.attributes.tangent.value) {
                             mesh.geometry.generateTangents();
                         }

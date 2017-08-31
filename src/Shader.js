@@ -539,7 +539,7 @@ define(function (require) {
             this._textureSlot = slot || 0;
         },
 
-        useCurrentTextureSlot: function (_gl, texture) {
+        takeCurrentTextureSlot: function (_gl, texture) {
             var textureSlot = this._textureSlot;
 
             this.useTextureSlot(_gl, texture, textureSlot);

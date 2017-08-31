@@ -82,32 +82,47 @@ define(function(require) {
          * @return {Object}
          */
         bind: function(_gl, shader, prevMaterial, prevShader) {
+            // PENDING Same texture in different material take different slot?
 
             // May use shader of other material if shader code are same
             var shader = shader || this.shader;
 
-            var sameShader = prevShader === shader;
+            // var sameShader = prevShader === shader;
 
             var currentTextureSlot = shader.currentTextureSlot();
+
+            for (var u = 0; u < this._enabledUniforms.length; u++) {
+                var symbol = this._enabledUniforms[u];
+                var uniformValue = this.uniforms[symbol].value;
+                if (uniformValue instanceof Texture) {
+                    // Reset slot
+                    uniformValue.__slot = -1;
+                }
+                else if (uniformValue instanceof Array) {
+                    for (var i = 0; i < uniformValue.length; i++) {
+                        if (uniformValue[i] instanceof Texture) {
+                            uniformValue[i].__slot = -1;
+                        }
+                    }
+                }
+            }
             // Set uniforms
             for (var u = 0; u < this._enabledUniforms.length; u++) {
                 var symbol = this._enabledUniforms[u];
                 var uniform = this.uniforms[symbol];
                 var uniformValue = uniform.value;
+
+                // PENDING
                 // When binding two materials with the same shader
                 // Many uniforms will be be set twice even if they have the same value
                 // So add a evaluation to see if the uniform is really needed to be set
-                if (prevMaterial && sameShader) {
-                    if (prevMaterial.uniforms[symbol].value === uniformValue) {
-                        continue;
-                    }
-                }
-
-                if (uniformValue === undefined) {
-                    console.warn('Uniform value "' + symbol + '" is undefined');
-                    continue;
-                }
-                else if (uniformValue === null) {
+                // if (prevMaterial && sameShader) {
+                //     if (prevMaterial.uniforms[symbol].value === uniformValue) {
+                //         continue;
+                //     }
+                // }
+                
+                if (uniformValue === null) {
                     // FIXME Assume material with same shader have same order uniforms
                     // Or if different material use same textures,
                     // the slot will be different and still skipped because optimization
@@ -116,22 +131,25 @@ define(function(require) {
                         var res = shader.setUniform(_gl, '1i', symbol, slot);
                         if (res) { // Texture is enabled
                             // Still occupy the slot to make sure same texture in different materials have same slot.
-                            shader.useCurrentTextureSlot(_gl, null);
+                            shader.takeCurrentTextureSlot(_gl, null);
                         }
                     }
                     continue;
                 }
-                else if (uniformValue instanceof Array
-                    && !uniformValue.length) {
-                    continue;
-                }
                 else if (uniformValue instanceof Texture) {
-                    var slot = shader.currentTextureSlot();
-                    var res = shader.setUniform(_gl, '1i', symbol, slot);
-                    if (!res) { // Texture is not enabled
-                        continue;
+                    if (uniformValue.__slot < 0) {
+                        var slot = shader.currentTextureSlot();
+                        var res = shader.setUniform(_gl, '1i', symbol, slot);
+                        if (!res) { // Texture uniform is not enabled
+                            continue;
+                        }
+                        shader.takeCurrentTextureSlot(_gl, uniformValue);
+                        uniformValue.__slot = slot;
                     }
-                    shader.useCurrentTextureSlot(_gl, uniformValue);
+                    // Multiple uniform use same texture..
+                    else {
+                        shader.setUniform(_gl, '1i', symbol, uniformValue.__slot);
+                    }
                 }
                 else if (uniformValue instanceof Array) {
                     if (uniformValue.length === 0) {
@@ -149,10 +167,15 @@ define(function(require) {
                         for (var i = 0; i < uniformValue.length; i++) {
                             var texture = uniformValue[i];
 
-                            var slot = shader.currentTextureSlot();
-                            arr.push(slot);
-
-                            shader.useCurrentTextureSlot(_gl, texture);
+                            if (texture.__slot < 0) {
+                                var slot = shader.currentTextureSlot();
+                                arr.push(slot);
+                                shader.takeCurrentTextureSlot(_gl, texture);
+                                texture.__slot = slot;
+                            }
+                            else {
+                                arr.push(texture.__slot);
+                            }
                         }
 
                         shader.setUniform(_gl, '1iv', symbol, arr);
@@ -239,6 +262,10 @@ define(function(require) {
             else {
                 var uniform = this.uniforms[symbol];
                 if (uniform) {
+                    if (typeof value === 'undefined') {
+                        console.warn('Uniform value "' + symbol + '" is undefined');
+                        value = null;
+                    }
                     uniform.value = value;
                 }
             }

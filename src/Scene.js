@@ -310,7 +310,7 @@ define(function (require) {
                         var slot = shader.currentTextureSlot();
                         var result = shader.setUniform(_gl, '1i', symbol, slot);
                         if (result) {
-                            shader.useCurrentTextureSlot(_gl, texture);
+                            shader.takeCurrentTextureSlot(_gl, texture);
                         }
                     }
                 }

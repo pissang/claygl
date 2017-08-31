@@ -396,6 +396,16 @@ define(function(require) {
             var transparentQueue = scene.transparentQueue;
             var sceneMaterial = scene.material;
 
+            // StandardMaterial needs updateShader method so shader can be created on demand.
+            for (var i = 0; i < opaqueQueue.length; i++) {
+                var material = opaqueQueue[i].material;
+                material.updateShader && material.updateShader(_gl);
+            }
+            // StandardMaterial needs updateShader method so shader can be created on demand.
+            for (var i = 0; i < transparentQueue.length; i++) {
+                var material = transparentQueue[i].material;
+                material.updateShader && material.updateShader(_gl);
+            }
             scene.trigger('beforerender', this, scene, camera);
             // Sort render queue
             // Calculate the object depth
@@ -600,10 +610,6 @@ define(function(require) {
                 }
 
                 var material = globalMaterial || renderable.material;
-                // StandardMaterial needs updateShader method so shader can be created on demand.
-                if (material !== prevMaterial) {
-                    material.updateShader && material.updateShader(_gl);
-                }
 
                 var shader = material.shader;
 

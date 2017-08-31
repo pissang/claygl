@@ -41,8 +41,8 @@
                 });
                 loader.load('assets/scenes/gltf/scene.json');
                 var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas
+                    target: camera,
+                    domElement: renderer.canvas
                 });
 
                 var shader = qtek.shader.library.get(
@@ -124,8 +124,8 @@
 
                     var animation = new qtek.animation.Animation();
                     animation.start();
-                    animation.on('frame', function() {
-                        control.update();
+                    animation.on('frame', function(deltaTime) {
+                        control.update(deltaTime);
 
                         compositor.render(renderer);
                         // renderer.render(scene, camera);
