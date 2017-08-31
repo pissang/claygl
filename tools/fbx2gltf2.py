@@ -93,6 +93,12 @@ def GetId():
 def ListFromM4(m):
     return [m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]]
 
+def MatGetOpacity(pMaterial):
+    lFactor = pMaterial.TransparencyFactor.Get()
+    lColor = pMaterial.TransparentColor.Get()
+
+    return 1.0 - lFactor * (lColor[0] + lColor[1] + lColor[2]) / 3;
+
 
 def quantize(pList, pStride, pMin, pMax):
     lRange = range(pStride)
@@ -406,12 +412,9 @@ def ConvertMaterial(pMaterial):
     lValues['ambient'] = list(pMaterial.Ambient.Get())
     lValues['emission'] = list(pMaterial.Emissive.Get())
 
-    if pMaterial.TransparencyFactor.Get() < 1:
-        lValues['transparency'] = pMaterial.TransparencyFactor.Get()
-        # Old fbx version transparency is 0 if object is opaque
-        if (lValues['transparency'] == 0):
-            lValues['transparency'] = 1
-        
+    lTransparency = MatGetOpacity(pMaterial)
+    if lTransparency < 1:
+        lValues['transparency'] = lTransparency
         lValues['transparent'] = True
 
     # Use diffuse map

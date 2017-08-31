@@ -448,7 +448,7 @@ define(function (require) {
         _KHRCommonMaterialToStandard: function (materialInfo, lib) {
             var uniforms = {};
             var commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
-            uniforms = commonMaterialInfo.values;
+            uniforms = commonMaterialInfo.values || {};
             
             if (typeof uniforms.diffuse === 'number') {
                 uniforms.diffuse = lib.textures[uniforms.diffuse];
@@ -489,7 +489,7 @@ define(function (require) {
                 });
             }
 
-            if (materialInfo.transparent) {
+            if (uniforms.transparent) {
                 material.depthMask = false;
                 material.depthTest = true;
                 material.transparent = true;
