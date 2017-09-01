@@ -132,7 +132,7 @@ define(function (require) {
             this._currentTime = time;
 
             if (this._paused) {
-                return;
+                return 'paused';
             }
 
             if (time < this._startTime) {

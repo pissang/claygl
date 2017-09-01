@@ -79,7 +79,7 @@ define(function (require) {
         }
 
         // PENDING Schedule
-        if (!silent) {
+        if (!silent && ret !== 'paused') {
             this.fire('frame');
         }
         

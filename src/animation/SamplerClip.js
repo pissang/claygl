@@ -128,8 +128,8 @@ define(function(require) {
             this.setTime(this.getElapsedTime());
         }
 
-        // PENDING Schedule
-        if (!silent) {
+        // PENDING Schedule, puased ?
+        if (!silent && ret !== 'paused') {
             this.fire('frame');
         }
 

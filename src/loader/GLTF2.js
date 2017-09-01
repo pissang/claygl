@@ -451,10 +451,10 @@ define(function (require) {
             uniforms = commonMaterialInfo.values || {};
             
             if (typeof uniforms.diffuse === 'number') {
-                uniforms.diffuse = lib.textures[uniforms.diffuse];
+                uniforms.diffuse = lib.textures[uniforms.diffuse] || null;
             }
             if (typeof uniforms.emission === 'number') {
-                uniforms.emission = lib.textures[uniforms.emission];
+                uniforms.emission = lib.textures[uniforms.emission] || null;
             }
 
             var enabledTextures = [];
@@ -525,10 +525,10 @@ define(function (require) {
                 // TODO texCoord
                 var normalTextureIndex = materialInfo.normalTexture.index;
                 if (isStandardMaterial) {
-                    material.normalMap = lib.textures[normalTextureIndex];
+                    material.normalMap = lib.textures[normalTextureIndex] || null;
                 }
                 else {
-                    material.set('normalMap', lib.textures[normalTextureIndex]);
+                    material.set('normalMap', lib.textures[normalTextureIndex] || null);
                 }
             }
             if (uniforms['shininess'] != null) {
@@ -561,19 +561,19 @@ define(function (require) {
             var enabledTextures = [];
                 // TODO texCoord
             if (metallicRoughnessMatInfo.baseColorTexture) {
-                diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index];
+                diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index] || null;
                 enabledTextures.push('diffuseMap');
             }
             if (metallicRoughnessMatInfo.metallicRoughnessTexture) {
-                roughnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index];
+                roughnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index] || null;
                 enabledTextures.push('metalnessMap', 'roughnessMap');
             }
             if (materialInfo.normalTexture) {
-                normalMap = lib.textures[materialInfo.normalTexture.index];
+                normalMap = lib.textures[materialInfo.normalTexture.index] || null;
                 enabledTextures.push('normalMap');
             }
             if (materialInfo.emissiveTexture) {
-                emissiveMap = lib.textures[materialInfo.emissiveTexture.index];
+                emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
                 enabledTextures.push('emissiveMap');
             }
 
