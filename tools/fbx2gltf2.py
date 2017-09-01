@@ -1127,16 +1127,17 @@ def PrepareSceneNode(pNode, fbxConverter):
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
-    
+
+    # Triangulate before SplitPerMaterial
+    if not pNode.GetGeometry() == None:
+        fbxConverter.Triangulate(pNode.GetGeometry(), True)
+
     # TODO SplitMeshPerMaterial may loss deformer in mesh
     # TODO It will be crashed in some fbx files
     # FBX version 2014.2 seems have fixed it
     if not pNode.GetMesh() == None:
         fbxConverter.SplitMeshPerMaterial(pNode.GetMesh(), True)
     
-    if not pNode.GetGeometry() == None:
-        fbxConverter.Triangulate(pNode.GetGeometry(), True)
-
     for k in range(pNode.GetChildCount()):
         PrepareSceneNode(pNode.GetChild(k), fbxConverter)
 
