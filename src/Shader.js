@@ -1077,7 +1077,10 @@ define(function (require) {
                         defines[symbol] = true;
                     }
                     else {
-                        defines[symbol] = value ? parseFloat(value) : null;
+                        defines[symbol] = value 
+                            // If can parse to float
+                            ? (isNaN(parseFloat(value)) ? value : parseFloat(value))
+                            : null;
                     }
                 }
                 return '';

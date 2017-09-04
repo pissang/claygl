@@ -36,6 +36,8 @@ gaussianKernel[12] = 0.02;
 
 @export qtek.compositor.gaussian_blur
 
+#define SHADER_NAME gaussian_blur
+
 uniform sampler2D texture; // the texture with the scene you want to blur
 varying vec2 v_Texcoord;
 

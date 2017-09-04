@@ -3,6 +3,8 @@
 
 @export qtek.standard.vertex
 
+#define SHADER_NAME standard
+
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
 uniform mat4 world : WORLD;

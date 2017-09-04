@@ -476,7 +476,10 @@ define(function (require) {
                 });
             }
             else {
-                var fragmentDefines = {};
+                var fragmentDefines = {
+                    USE_ROUGHNESS: null,
+                    USE_METALNESS: null
+                };
                 if (materialInfo.doubleSided) {
                     fragmentDefines.DOUBLE_SIDED = null;
                 }
