@@ -510,85 +510,18 @@ define(function(require) {
             var prevMaterial;
             var prevShader;
 
-            // Status
-            var depthTest, depthMask;
-            var culling, cullFace, frontFace;
-
             var culledRenderQueue;
             if (preZ) {
-                var preZPassMaterial = this._prezMaterial || new Material({
-                    shader: new Shader({
-                        vertex: Shader.source('qtek.prez.vertex'),
-                        fragment: Shader.source('qtek.prez.fragment')
-                    })
-                });
-                this._prezMaterial = preZPassMaterial;
-                var preZPassShader = preZPassMaterial.shader;
-
-                culledRenderQueue = [];
-                preZPassShader.bind(_gl);
-                _gl.colorMask(false, false, false, false);
-                _gl.depthMask(true);
-                _gl.enable(_gl.DEPTH_TEST);
-                for (var i = 0; i < queue.length; i++) {
-                    var renderable = queue[i];
-                    if (!this.ifRenderObject(renderable)) {
-                        continue;
-                    }
-
-                    var worldM = renderable.worldTransform._array;
-                    var geometry = renderable.geometry;
-
-                    mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
-
-                    if (geometry.boundingBox) {
-                        if (this.isFrustumCulled(
-                            renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
-                        )) {
-                            continue;
-                        }
-                    }
-                    if (renderable.skeleton) {  // FIXME  skinned mesh
-                        continue;
-                    }
-
-                    mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
-
-                    if (renderable.cullFace !== cullFace) {
-                        cullFace = renderable.cullFace;
-                        _gl.cullFace(cullFace);
-                    }
-                    if (renderable.frontFace !== frontFace) {
-                        frontFace = renderable.frontFace;
-                        _gl.frontFace(frontFace);
-                    }
-                    if (renderable.culling !== culling) {
-                        culling = renderable.culling;
-                        culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
-                    }
-
-                    var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
-                    preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
-
-                    // PENDING If invoke beforeRender hook
-                    renderable.render(_gl, preZPassMaterial.shader);
-                    culledRenderQueue.push(renderable);
-                }
-                _gl.depthFunc(_gl.LEQUAL);
-                _gl.colorMask(true, true, true, true);
-                _gl.depthMask(false);
-
-                // Reset current shader.
-                this._currentShader = null;
+                culledRenderQueue = this._renderPreZ(queue, scene, camera);
             }
             else {
                 culledRenderQueue = queue;
                 _gl.depthFunc(_gl.LESS);
             }
 
-            culling = null;
-            cullFace = null;
-            frontFace = null;
+            // Status
+            var depthTest, depthMask;
+            var culling, cullFace, frontFace;
 
             for (var i = 0; i < culledRenderQueue.length; i++) {
                 var renderable = culledRenderQueue[i];
@@ -751,6 +684,76 @@ define(function(require) {
             }
 
             return renderInfo;
+        },
+
+        _renderPreZ: function (queue, scene, camera) {
+            var _gl = this.gl;
+            var preZPassMaterial = this._prezMaterial || new Material({
+                shader: new Shader({
+                    vertex: Shader.source('qtek.prez.vertex'),
+                    fragment: Shader.source('qtek.prez.fragment')
+                })
+            });
+            this._prezMaterial = preZPassMaterial;
+            var preZPassShader = preZPassMaterial.shader;
+
+            var culledRenderQueue = [];
+            // Status
+            var culling, cullFace, frontFace;
+
+            preZPassShader.bind(_gl);
+            _gl.colorMask(false, false, false, false);
+            _gl.depthMask(true);
+            _gl.enable(_gl.DEPTH_TEST);
+            for (var i = 0; i < queue.length; i++) {
+                var renderable = queue[i];
+                if (!this.ifRenderObject(renderable)) {
+                    continue;
+                }
+
+                var worldM = renderable.worldTransform._array;
+                var geometry = renderable.geometry;
+
+                mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
+
+                if (geometry.boundingBox) {
+                    if (this.isFrustumCulled(
+                        renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
+                    )) {
+                        continue;
+                    }
+                }
+                if (renderable.skeleton) {  // FIXME  skinned mesh
+                    continue;
+                }
+
+                mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+
+                if (renderable.cullFace !== cullFace) {
+                    cullFace = renderable.cullFace;
+                    _gl.cullFace(cullFace);
+                }
+                if (renderable.frontFace !== frontFace) {
+                    frontFace = renderable.frontFace;
+                    _gl.frontFace(frontFace);
+                }
+                if (renderable.culling !== culling) {
+                    culling = renderable.culling;
+                    culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
+                }
+
+                var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
+                preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
+
+                // PENDING If invoke beforeRender hook
+                renderable.render(_gl, preZPassMaterial.shader);
+                culledRenderQueue.push(renderable);
+            }
+            _gl.depthFunc(_gl.LEQUAL);
+            _gl.colorMask(true, true, true, true);
+            _gl.depthMask(false);
+
+            return culledRenderQueue;
         },
 
         /**

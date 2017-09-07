@@ -121,8 +121,9 @@ define(function(require) {
                 var near = (-1 - m14) / m10;
                 var far = (1 - m14) / m10;
 
-                boundingBox.min.set(left, bottom, far);
-                boundingBox.max.set(right, top, near);
+
+                boundingBox.min.set(Math.min(left, right), Math.min(bottom, top), Math.min(far, near));
+                boundingBox.max.set(Math.max(right, left), Math.max(top, bottom), Math.max(near, far));
 
                 var min = boundingBox.min._array;
                 var max = boundingBox.max._array;
