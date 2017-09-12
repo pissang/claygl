@@ -103,6 +103,10 @@ define(function(require) {
          * @type {boolean}
          */
         ignorePicking: false,
+        /**
+         * @type {boolean}
+         */
+        ignorePreZ: false,
 
         /**
          * @return {boolean}

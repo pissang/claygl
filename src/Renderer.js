@@ -707,6 +707,7 @@ define(function(require) {
             _gl.enable(_gl.DEPTH_TEST);
             for (var i = 0; i < queue.length; i++) {
                 var renderable = queue[i];
+                // PENDING
                 if (!this.ifRenderObject(renderable)) {
                     continue;
                 }
@@ -723,7 +724,8 @@ define(function(require) {
                         continue;
                     }
                 }
-                if (renderable.skeleton) {  // FIXME  skinned mesh
+                culledRenderQueue.push(renderable);
+                if (renderable.skeleton || renderable.ignorePreZ) {  // FIXME  skinned mesh and custom vertex shader material.
                     continue;
                 }
 
@@ -747,11 +749,10 @@ define(function(require) {
 
                 // PENDING If invoke beforeRender hook
                 renderable.render(_gl, preZPassMaterial.shader);
-                culledRenderQueue.push(renderable);
             }
             _gl.depthFunc(_gl.LEQUAL);
             _gl.colorMask(true, true, true, true);
-            _gl.depthMask(false);
+            _gl.depthMask(true);
 
             return culledRenderQueue;
         },
