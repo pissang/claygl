@@ -1,9 +1,3 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.qtek = {})));
-}(this, (function (exports) { 'use strict';
-
 /**
  * Extend a sub class from base class
  * @param {object|Function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
@@ -34261,45 +34255,4 @@ var vr = {
     StereoCamera : StereoCamera
 };
 
-exports.animation = animation;
-exports.async = async;
-exports.Camera = Camera;
-exports.camera = camera;
-exports.canvas = canvas;
-exports.compositor = compositor;
-exports.core = core;
-exports.deferred = deferred;
-exports.dep = dep;
-exports.FrameBuffer = FrameBuffer;
-exports.Geometry = Geometry;
-exports.geometry = geometry;
-exports.Joint = Joint;
-exports.Light = Light;
-exports.light = light;
-exports.loader = loader;
-exports.Material = Material;
-exports.math = math;
-exports.Mesh = Mesh;
-exports.Node = Node;
-exports.particle = particle;
-exports.picking = picking;
-exports.plugin = plugin;
-exports.prePass = prePass;
-exports.Renderable = Renderable;
-exports.Renderer = Renderer;
-exports.Scene = Scene;
-exports.Shader = Shader;
-exports.shader = shader;
-exports.Skeleton = Skeleton;
-exports.StandardMaterial = StandardMaterial;
-exports.StaticGeometry = StaticGeometry;
-exports.Texture = Texture;
-exports.Texture2D = Texture2D;
-exports.TextureCube = TextureCube;
-exports.util = util;
-exports.version = version;
-exports.vr = vr;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+export { animation, async, Camera, camera, canvas, compositor, core, deferred, dep, FrameBuffer, Geometry, geometry, Joint, Light, light, loader, Material, math, Mesh, Node, particle, picking, plugin, prePass, Renderable, Renderer, Scene, Shader, shader, Skeleton, StandardMaterial, StaticGeometry, Texture, Texture2D, TextureCube, util, version, vr };

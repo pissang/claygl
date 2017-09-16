@@ -10,6 +10,9 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
+  "jsnext:main" : "dist/qtek.es.js",
+  "module" : "dist/qtek.es.js",
+  "main" : "dist/qtek.js",
   "scripts": {
     "build": "rollup -c",
     "genentry": "node build/genentry.js",
