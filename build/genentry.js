@@ -51,7 +51,8 @@ glob('**/*.js', {
         }
     });
 
-    var output = exportPkg(namespace);
+    var exportCode = exportPkg(namespace);
+    var output = template.replace(/\{\{\$exportsObject\}\}/, exportCode);
 
     fs.writeFileSync(ROOT + OUTPUT_PORTAL, output, 'utf-8');
 

@@ -14,7 +14,7 @@
   "module" : "dist/qtek.es.js",
   "main" : "dist/qtek.js",
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run genentry && rollup -c",
     "genentry": "node build/genentry.js",
     "prepublish": "npm run genentry"
   },

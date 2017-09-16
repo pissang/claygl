@@ -41,11 +41,6 @@ function essl() {
                 file: 'dist/qtek.js'
             },
             {
-                format: 'umd',
-                name: 'qtek',
-                file: 'dist/qtek.min.js'
-            },
-            {
                 format: 'es',
                 file: 'dist/qtek.es.js'
             }

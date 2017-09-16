@@ -1,3 +1,21 @@
+/** @namespace qtek */
+/** @namespace qtek.math */
+/** @namespace qtek.animation */
+/** @namespace qtek.async */
+/** @namespace qtek.camera */
+/** @namespace qtek.compositor */
+/** @namespace qtek.core */
+/** @namespace qtek.geometry */
+/** @namespace qtek.helper */
+/** @namespace qtek.light */
+/** @namespace qtek.loader */
+/** @namespace qtek.particleSystem */
+/** @namespace qtek.plugin */
+/** @namespace qtek.prePass */
+/** @namespace qtek.shader */
+/** @namespace qtek.texture */
+/** @namespace qtek.util */
+
 import Animation$0 from './animation/Animation';
 import Animator$1 from './animation/Animator';
 import Blend1DClip$2 from './animation/Blend1DClip';
@@ -331,3 +349,4 @@ var vr = {
     StereoCamera : StereoCamera$115
 };
 export { vr };
+;
