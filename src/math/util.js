@@ -1,26 +1,23 @@
-define(function (require) {
+var mathUtil = {};
 
-    var mathUtil = {};
+mathUtil.isPowerOfTwo = function (value) {
+    return (value & (value - 1)) === 0;
+};
 
-    mathUtil.isPowerOfTwo = function (value) {
-        return (value & (value - 1)) === 0;
-    };
+mathUtil.nextPowerOfTwo = function (value) {
+    value --;
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    value ++;
 
-    mathUtil.nextPowerOfTwo = function (value) {
-        value --;
-        value |= value >> 1;
-        value |= value >> 2;
-        value |= value >> 4;
-        value |= value >> 8;
-        value |= value >> 16;
-        value ++;
+    return value;
+};
 
-        return value;
-    };
+mathUtil.nearestPowerOfTwo = function (value) {
+    return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
+};
 
-    mathUtil.nearestPowerOfTwo = function (value) {
-        return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
-    };
-
-    return mathUtil;
-});
+export default mathUtil;

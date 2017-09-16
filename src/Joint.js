@@ -1,40 +1,35 @@
-define(function(require) {
+import Base from './core/Base';
 
-    'use strict';
-
-    var Base = require('./core/Base');
+/**
+ * @constructor qtek.Joint
+ * @extends qtek.core.Base
+ */
+var Joint = Base.extend(
+/** @lends qtek.Joint# */
+{
+    // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576
+    /**
+     * Joint name
+     * @type {string}
+     */
+    name: '',
+    /**
+     * Index of joint in the skeleton
+     * @type {number}
+     */
+    index: -1,
 
     /**
-     * @constructor qtek.Joint
-     * @extends qtek.core.Base
+     * Scene node attached to
+     * @type {qtek.Node}
      */
-    var Joint = Base.extend(
-    /** @lends qtek.Joint# */
-    {
-        // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576
-        /**
-         * Joint name
-         * @type {string}
-         */
-        name: '',
-        /**
-         * Index of joint in the skeleton
-         * @type {number}
-         */
-        index: -1,
+    node: null,
 
-        /**
-         * Scene node attached to
-         * @type {qtek.Node}
-         */
-        node: null,
-
-        /**
-         * Root scene node of the skeleton, which parent node is null or don't have a joint
-         * @type {qtek.Node}
-         */
-        rootNode: null
-    });
-
-    return Joint;
+    /**
+     * Root scene node of the skeleton, which parent node is null or don't have a joint
+     * @type {qtek.Node}
+     */
+    rootNode: null
 });
+
+export default Joint;

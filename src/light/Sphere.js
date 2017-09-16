@@ -1,58 +1,53 @@
-define(function (require) {
+import Light from '../Light';
 
-    'use strict';
-
-    var Light = require('../Light');
+/**
+ * @constructor qtek.light.Sphere
+ * @extends {qtek.Light}
+ */
+var SphereLight = Light.extend(
+/** @lends qtek.light.Sphere# */
+{
+    /**
+     * @type {number}
+     */
+    range: 100,
 
     /**
-     * @constructor qtek.light.Sphere
-     * @extends {qtek.Light}
+     * @type {number}
      */
-    var SphereLight = Light.extend(
-    /** @lends qtek.light.Sphere# */
-    {
-        /**
-         * @type {number}
-         */
-        range: 100,
+    radius: 5
+}, {
 
-        /**
-         * @type {number}
-         */
-        radius: 5
-    }, {
+    type: 'SPHERE_LIGHT',
 
-        type: 'SPHERE_LIGHT',
-
-        uniformTemplates: {
-            sphereLightPosition: {
-                type: '3f',
-                value: function(instance) {
-                    return instance.getWorldPosition()._array;
-                }
-            },
-            sphereLightRange: {
-                type: '1f',
-                value: function(instance) {
-                    return instance.range;
-                }
-            },
-            sphereLightRadius: {
-                type: '1f',
-                value: function(instance) {
-                    return instance.radius;
-                }
-            },
-            sphereLightColor: {
-                type: '3f',
-                value: function(instance) {
-                    var color = instance.color;
-                    var intensity = instance.intensity;
-                    return [color[0]*intensity, color[1]*intensity, color[2]*intensity];
-                }
+    uniformTemplates: {
+        sphereLightPosition: {
+            type: '3f',
+            value: function(instance) {
+                return instance.getWorldPosition()._array;
+            }
+        },
+        sphereLightRange: {
+            type: '1f',
+            value: function(instance) {
+                return instance.range;
+            }
+        },
+        sphereLightRadius: {
+            type: '1f',
+            value: function(instance) {
+                return instance.radius;
+            }
+        },
+        sphereLightColor: {
+            type: '3f',
+            value: function(instance) {
+                var color = instance.color;
+                var intensity = instance.intensity;
+                return [color[0]*intensity, color[1]*intensity, color[2]*intensity];
             }
         }
-    });
-
-    return SphereLight;
+    }
 });
+
+export default SphereLight;

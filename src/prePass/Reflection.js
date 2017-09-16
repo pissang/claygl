@@ -1,15 +1,12 @@
-define(function(require) {
+import Base from '../core/Base';
+import Vector4 from '../math/Vector4';
 
-    var Base = require('../core/Base');
-    var Vector4 = require('../math/Vector4');
+var ReflectionPass = Base.extend(function() {
+    console.warn('TODO');
+}, {
+    render : function(renderer, scene, camera) {
 
-    var ReflectionPass = Base.extend(function() {
-        console.warn('TODO');
-    }, {
-        render : function(renderer, scene, camera) {
-
-        }
-    });
-
-    return ReflectionPass;
+    }
 });
+
+export default ReflectionPass;
