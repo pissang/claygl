@@ -63,7 +63,7 @@ define(function (require) {
              */
             shadowBlur: 1.0,
 
-            lightFrustumBias: 2,
+            lightFrustumBias: 'auto',
 
             kernelPCF: new Float32Array([
                 1, 0,
@@ -550,7 +550,7 @@ define(function (require) {
                 for (var i = 0; i < light.shadowCascade; i++) {
                     // Get the splitted frustum
                     var nearPlane = clipPlanes[i];
-                    var farPlane = clipPlanes[i+1];
+                    var farPlane = clipPlanes[i + 1];
                     if (isPerspective) {
                         mat4.perspective(splitProjMatrix._array, sceneCamera.fov / 180 * Math.PI, sceneCamera.aspect, nearPlane, farPlane);
                     }
@@ -566,6 +566,10 @@ define(function (require) {
                     cropBBox.applyProjection(lightProjMatrix);
                     var _min = cropBBox.min._array;
                     var _max = cropBBox.max._array;
+                    _min[0] = Math.max(_min[0], -1);
+                    _min[1] = Math.max(_min[1], -1);
+                    _max[0] = Math.min(_max[0], 1);
+                    _max[1] = Math.min(_max[1], 1);
                     cropMatrix.ortho(_min[0], _max[0], _min[1], _max[1], 1, -1);
                     lightCamera.projectionMatrix.multiplyLeft(cropMatrix);
 
@@ -588,8 +592,7 @@ define(function (require) {
                     }
 
                     var matrix = new Matrix4();
-                    matrix.copy(lightCamera.worldTransform)
-                        .invert()
+                    matrix.copy(lightCamera.viewMatrix)
                         .multiplyLeft(lightCamera.projectionMatrix);
 
                     directionalLightMatrices.push(matrix._array);
@@ -776,26 +779,30 @@ define(function (require) {
                 camera.updateWorldTransform();
 
                 // Transform to light view space
-                lightViewMatrix
-                    .copy(camera.worldTransform)
-                    .invert()
-                    .multiply(sceneCamera.worldTransform);
+                Matrix4.invert(lightViewMatrix, camera.worldTransform);
+                Matrix4.multiply(lightViewMatrix, lightViewMatrix, sceneCamera.worldTransform);
 
-                // FIXME boundingBox becomes much larger after transformd.
                 lightViewBBox.copy(sceneViewBoundingBox).applyTransform(lightViewMatrix);
+
                 var min = lightViewBBox.min._array;
                 var max = lightViewBBox.max._array;
 
                 // Move camera to adjust the near to 0
-                // TODO: some scene object cast shadow in view will also be culled
-                // add a bias?
-                camera.position.scaleAndAdd(camera.worldTransform.z, max[2] + this.lightFrustumBias);
+                camera.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, max[2])
+                    .transformMat4(camera.worldTransform);
                 camera.near = 0;
-                camera.far = -min[2] + max[2] + this.lightFrustumBias;
-                camera.left = min[0] - this.lightFrustumBias;
-                camera.right = max[0] + this.lightFrustumBias;
-                camera.top = max[1] + this.lightFrustumBias;
-                camera.bottom = min[1] - this.lightFrustumBias;
+                camera.far = -min[2] + max[2];
+                // Make sure receivers not in the frustum will stil receive the shadow.
+                if (isNaN(this.lightFrustumBias)) {
+                    camera.far *= 4;
+                }
+                else {
+                    camera.far += this.lightFrustumBias;
+                }
+                camera.left = min[0];
+                camera.right = max[0];
+                camera.top = max[1];
+                camera.bottom = min[1];
                 camera.update(true);
 
                 return camera;
