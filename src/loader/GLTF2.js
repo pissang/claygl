@@ -298,6 +298,10 @@ define(function (require) {
             return getResult();
         },
 
+        /**
+         * Binary file path resolver. User can override it
+         * @param {string} path
+         */
         resolveBinaryPath: function (path) {
             var rootPath = this.bufferRootPath;
             if (rootPath == null) {
@@ -306,6 +310,10 @@ define(function (require) {
             return util.relative2absolute(path, rootPath);
         },
 
+        /**
+         * Texture file path resolver. User can override it
+         * @param {string} path
+         */
         resolveTexturePath: function (path) {
             var rootPath = this.textureRootPath;
             if (rootPath == null) {
