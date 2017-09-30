@@ -249,12 +249,20 @@ def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
 
     return b''.join(lData), lGLTFAcessor
 
+def appendToBuffer(pType, pBuffer, pData, pObj):
+    lByteOffset = len(pBuffer)
+    if pType == 'f' or pType == 'I':
+        # should be a multiple of 4 for alignment
+        if lByteOffset % 4 == 2:
+            pBuffer.extend(b'\x00\x00')
+            lByteOffset += 2
+            
+    pObj['byteOffset'] = lByteOffset
+    pBuffer.extend(pData)
 
 def CreateAttributeBuffer(pList, pType, pStride):
     lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True, ENV_QUANTIZE)
-    lGLTFAttribute['byteOffset'] = len(attributeBuffer)
-    # pType is float
-    attributeBuffer.extend(lData)
+    appendToBuffer(pType, attributeBuffer, lData, lGLTFAttribute)
     idx = len(lib_accessors)
     lib_attributes_accessors.append(lGLTFAttribute)
     lib_accessors.append(lGLTFAttribute)
@@ -264,8 +272,7 @@ def CreateAttributeBuffer(pList, pType, pStride):
 def CreateIndicesBuffer(pList, pType):
     # Sketchfab needs all accessor have min, max?
     lData, lGLTFIndices = CreateAccessorBuffer(pList, pType, 1, True)
-    lGLTFIndices['byteOffset'] = len(indicesBuffer)
-    indicesBuffer.extend(lData)
+    appendToBuffer(pType, indicesBuffer, lData, lGLTFIndices)
     idx = len(lib_accessors)
     lib_indices_accessors.append(lGLTFIndices)
     lib_accessors.append(lGLTFIndices)
@@ -283,8 +290,8 @@ def CreateAnimationBuffer(pList, pType, pStride):
     # if lAllSame:
     #     return -1
 
-    lGLTFAnimSampler['byteOffset'] = len(animationBuffer)
-    animationBuffer.extend(lData)
+    appendToBuffer(pType, animationBuffer, lData, lGLTFAnimSampler)
+    
     idx = len(lib_accessors)
     lib_animation_accessors.append(lGLTFAnimSampler)
     lib_accessors.append(lGLTFAnimSampler)
@@ -292,8 +299,7 @@ def CreateAnimationBuffer(pList, pType, pStride):
 
 def CreateIBMBuffer(pList):
     lData, lGLTFIBM = CreateAccessorBuffer(pList, 'f', 16, True)
-    lGLTFIBM['byteOffset'] = len(invBindMatricesBuffer)
-    invBindMatricesBuffer.extend(lData)
+    appendToBuffer(pType, invBindMatricesBuffer, lData, lGLTFIBM)
     idx = len(lib_accessors)
     lib_ibm_accessors.append(lGLTFIBM)
     lib_accessors.append(lGLTFIBM)
@@ -440,8 +446,8 @@ def ConvertMaterial(pMaterial):
             lGLTFMaterial['normalTexture'] = {
                 "index": lTextureIdx
             }
-
-    if lShading == 'phong':
+    # PENDING
+    if lShading == 'phong' or lShading == 'Phong':
         lValues['shininess'] = pMaterial.Shininess.Get()
         # Use specular map
         # TODO Specular Factor ?
@@ -1086,12 +1092,17 @@ def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
             ConvertNodeAnimation(lAnimLayer, lRoot, pSampleRate, pStartTime, pDuration)
 
 
-def CreateBufferView(pBufferIdx, appendBufferData, lib, lByteOffset, target=GL_ARRAY_BUFFER):
+def CreateBufferView(pBufferIdx, pBuffer, appendBufferData, lib, pByteOffset, target=GL_ARRAY_BUFFER):
+    if pByteOffset % 4 == 2:
+        pBuffer.extend(b'\x00\x00')
+        pByteOffset += 2
+
+    pBuffer.extend(appendBufferData)
     lBufferViewIdx = len(lib_buffer_views)
     lBufferView = {
         "buffer": pBufferIdx,
         "byteLength": len(appendBufferData),
-        "byteOffset": lByteOffset,
+        "byteOffset": pByteOffset,
         # PENDING
         "byteStride": 0,
         "target": target
@@ -1103,21 +1114,18 @@ def CreateBufferView(pBufferIdx, appendBufferData, lib, lByteOffset, target=GL_A
     return lBufferView
 
 
-def CreateBufferViews(pBufferIdx):
+def CreateBufferViews(pBufferIdx, pBin):
 
-    lByteOffset = CreateBufferView(pBufferIdx, attributeBuffer, lib_attributes_accessors, 0)['byteLength']
+    lByteOffset = CreateBufferView(pBufferIdx, pBin, attributeBuffer, lib_attributes_accessors, 0)['byteLength']
 
     if len(lib_ibm_accessors) > 0:
-        lByteOffset += CreateBufferView(pBufferIdx, invBindMatricesBuffer, lib_ibm_accessors, lByteOffset)['byteLength']
+        lByteOffset += CreateBufferView(pBufferIdx, pBin, invBindMatricesBuffer, lib_ibm_accessors, lByteOffset)['byteLength']
 
     if len(lib_animation_accessors) > 0:
-        lByteOffset += CreateBufferView(pBufferIdx, animationBuffer, lib_animation_accessors, lByteOffset)['byteLength']
+        lByteOffset += CreateBufferView(pBufferIdx, pBin, animationBuffer, lib_animation_accessors, lByteOffset)['byteLength']
 
-    #Indices buffer view
-    #Put the indices buffer at last or there may be a error
     #When creating a Float32Array, which the offset must be multiple of 4
-    CreateBufferView(pBufferIdx, indicesBuffer, lib_indices_accessors, lByteOffset, GL_ELEMENT_ARRAY_BUFFER)
-
+    CreateBufferView(pBufferIdx, pBin, indicesBuffer, lib_indices_accessors, lByteOffset, GL_ELEMENT_ARRAY_BUFFER)
 
 
 # Start from -1 and ignore the root node
@@ -1216,19 +1224,15 @@ def Convert(
 
         #Merge binary data and write to a binary file
         lBin = bytearray()
-        lBin.extend(attributeBuffer)
-        lBin.extend(invBindMatricesBuffer)
-        lBin.extend(animationBuffer)
-        lBin.extend(indicesBuffer)
 
-        out = open(lBasename + ".bin", 'wb')
-        out.write(lBin)
-        out.close()
+        CreateBufferViews(0, lBin)
 
         lBufferName = lBasename + '.bin'
         lib_buffers.append({'byteLength' : len(lBin), 'uri' : os.path.basename(lBufferName)})
 
-        CreateBufferViews(0)
+        out = open(lBasename + ".bin", 'wb')
+        out.write(lBin)
+        out.close()
 
         #Output json
         lOutput = {
