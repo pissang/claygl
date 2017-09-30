@@ -298,16 +298,25 @@ define(function (require) {
             return getResult();
         },
 
-        _loadBuffer: function (path, onsuccess, onerror) {
+        resolveBinaryPath: function (path) {
             var rootPath = this.bufferRootPath;
             if (rootPath == null) {
                 rootPath = this.rootPath;
             }
-            if (rootPath) {
-                path = rootPath + '/' + path;
+            return util.relative2absolute(path, rootPath);
+        },
+
+        resolveTexturePath: function (path) {
+            var rootPath = this.textureRootPath;
+            if (rootPath == null) {
+                rootPath = this.rootPath;
             }
+            return util.relative2absolute(path, rootPath);
+        },
+
+        _loadBuffer: function (path, onsuccess, onerror) {
             request.get({
-                url: path,
+                url: this.resolveBinaryPath(path),
                 responseType: 'arraybuffer',
                 onload: function (buffer) {
                     onsuccess && onsuccess(buffer);
@@ -410,10 +419,6 @@ define(function (require) {
         },
 
         _parseTextures: function (json, lib) {
-            var rootPath = this.textureRootPath;
-            if (rootPath == null) {
-                rootPath = this.rootPath;
-            }
             util.each(json.textures, function (textureInfo, idx){
                 // samplers is optional
                 var samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
@@ -439,7 +444,7 @@ define(function (require) {
                 if (target === glenum.TEXTURE_2D) {
                     var texture = new Texture2D(parameters);
                     var imageInfo = json.images[textureInfo.source];
-                    texture.load(util.relative2absolute(imageInfo.uri, rootPath), this.crossOrigin);
+                    texture.load(this.resolveTexturePath(imageInfo.uri), this.crossOrigin);
                     lib.textures[idx] = texture;
                 }
             }, this);
