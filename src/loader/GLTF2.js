@@ -581,7 +581,7 @@ define(function (require) {
                 enabledTextures.push('diffuseMap');
             }
             if (metallicRoughnessMatInfo.metallicRoughnessTexture) {
-                roughnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index] || null;
+                roughnessMap = metalnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index] || null;
                 enabledTextures.push('metalnessMap', 'roughnessMap');
             }
             if (materialInfo.normalTexture) {
@@ -814,7 +814,7 @@ define(function (require) {
             util.each(json.nodes, function (nodeInfo, idx) {
                 var node;
                 if (nodeInfo.camera != null && this.includeCamera) {
-                    this._instanceCamera(nodeInfo.camera);
+                    node = this._instanceCamera(json, nodeInfo);
                     lib.cameras.push(node);
                 }
                 else if (nodeInfo.mesh != null && this.includeMesh) {
