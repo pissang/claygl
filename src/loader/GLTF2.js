@@ -69,9 +69,8 @@ define(function (require) {
     function getAccessorData(json, lib, accessorIdx, isIndices) {
         var accessorInfo = json.accessors[accessorIdx];
 
-        var bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
-        var buffer = lib.buffers[bufferViewInfo.buffer];
-        var byteOffset = (bufferViewInfo.byteOffset || 0) + (accessorInfo.byteOffset || 0);
+        var buffer = lib.bufferViews[accessorInfo.bufferView];
+        var byteOffset = accessorInfo.byteOffset || 0;
         var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
 
         var size = SIZE_MAP[accessorInfo.type];
@@ -222,6 +221,7 @@ define(function (require) {
 
             var lib = {
                 buffers: [],
+                bufferViews: [],
                 materials: [],
                 textures: [],
                 meshes: [],
@@ -267,6 +267,11 @@ define(function (require) {
             }
 
             function afterLoadBuffer() {
+                json.bufferViews.forEach(function (bufferViewInfo, idx) {
+                    lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer]
+                        .slice(bufferViewInfo.byteOffset || 0, (bufferViewInfo.byteOffset || 0) + (bufferViewInfo.byteLength || 0));
+                });
+                lib.buffers = null;
                 if (self.includeMesh) {
                     if (self.includeTexture) {
                         self._parseTextures(json, lib);
@@ -362,11 +367,9 @@ define(function (require) {
                 if (skinInfo.inverseBindMatrices) {
                     haveInvBindMatrices = true;
                     var IBMInfo = json.accessors[skinInfo.inverseBindMatrices];
-                    var bufferViewName = IBMInfo.bufferView;
-                    var bufferViewInfo = json.bufferViews[bufferViewName];
-                    var buffer = lib.buffers[bufferViewInfo.buffer];
+                    var buffer = lib.bufferViews[IBMInfo.bufferView];
 
-                    var offset = (IBMInfo.byteOffset || 0) + (bufferViewInfo.byteOffset || 0);
+                    var offset = IBMInfo.byteOffset || 0;
                     var size = IBMInfo.count * 16;
 
                     var array = new vendor.Float32Array(buffer, offset, size);
@@ -570,9 +573,8 @@ define(function (require) {
             return material;
         },
 
-        _pbrToStandard: function (materialInfo, lib) {
+        _pbrToStandard: function (materialInfo, metallicRoughnessMatInfo, lib) {
             var alphaTest = materialInfo.alphaMode === 'MASK';
-            var metallicRoughnessMatInfo = materialInfo.pbrMetallicRoughness;
 
             var isStandardMaterial = this.useStandardMaterial;
             var material;
@@ -656,15 +658,29 @@ define(function (require) {
             return material;
         },
 
+        _getMetallicRoughnessFromSpecularGlossiness: function (specularGlossinessMatInfo) {
+            return {
+                baseColorFactor: specularGlossinessMatInfo.diffuseFactor,
+                baseColorTexture: specularGlossinessMatInfo.diffuseTexture,
+                roughnessFactor: 1.0 - specularGlossinessMatInfo.roughnessFactor
+            };
+        },
+
         _parseMaterials: function (json, lib) {
             util.each(json.materials, function (materialInfo, idx) {
                 if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
                     lib.materials[idx] = this._KHRCommonMaterialToStandard(materialInfo, lib);
                 }
                 else if (materialInfo.pbrMetallicRoughness) {
-                    lib.materials[idx] = this._pbrToStandard(materialInfo, lib);
+                    lib.materials[idx] = this._pbrToStandard(materialInfo, materialInfo.pbrMetallicRoughness, lib);
                 }
-                // TODO
+                else if (materialInfo.extensions && materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']) {
+                    lib.materials[idx] = this._pbrToStandard(
+                        materialInfo,
+                        this._getMetallicRoughnessFromSpecularGlossiness(materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']),
+                        lib
+                    );
+                }
             }, this);
         },
 
