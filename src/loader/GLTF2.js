@@ -74,7 +74,10 @@ define(function (require) {
         var byteOffset = (bufferViewInfo.byteOffset || 0) + (accessorInfo.byteOffset || 0);
         var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
 
-        var size = isIndices ? 1 : SIZE_MAP[accessorInfo.type];
+        var size = SIZE_MAP[accessorInfo.type];
+        if (size == null && isIndices) {
+            size = 1;
+        }
         var arr = new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
 
         var quantizeExtension = accessorInfo.extensions && accessorInfo.extensions['WEB3D_quantized_attributes'];
@@ -738,6 +741,9 @@ define(function (require) {
 
                     // Parse indices
                     geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
+                    if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
+                        geometry.indices = new vendor.Uint16Array(geometry.indices);
+                    }
 
                     var material = lib.materials[primitiveInfo.material];
                     // Use default material
