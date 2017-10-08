@@ -27,8 +27,6 @@ define(function (require) {
     var OrthographicCamera = require('../camera/Orthographic');
     var glenum = require('../core/glenum');
 
-    var Vector3 = require('../math/Vector3');
-    var Quaternion = require('../math/Quaternion');
     var BoundingBox = require('../math/BoundingBox');
 
     var SamplerClip = require('../animation/SamplerClip');
@@ -268,6 +266,7 @@ define(function (require) {
 
             function afterLoadBuffer() {
                 json.bufferViews.forEach(function (bufferViewInfo, idx) {
+                    // PENDING Performance
                     lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer]
                         .slice(bufferViewInfo.byteOffset || 0, (bufferViewInfo.byteOffset || 0) + (bufferViewInfo.byteLength || 0));
                 });
@@ -573,7 +572,7 @@ define(function (require) {
             return material;
         },
 
-        _pbrToStandard: function (materialInfo, metallicRoughnessMatInfo, lib) {
+        _pbrMetallicRoughnessToStandard: function (materialInfo, metallicRoughnessMatInfo, lib) {
             var alphaTest = materialInfo.alphaMode === 'MASK';
 
             var isStandardMaterial = this.useStandardMaterial;
@@ -608,7 +607,7 @@ define(function (require) {
                 metalness: metallicRoughnessMatInfo.metallicFactor || 0,
                 roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
                 emission: materialInfo.emissiveFactor || [0, 0, 0]
-            }
+            };
             if (commonProperties.roughnessMap) {
                 // In glTF metallicFactor will do multiply, which is different from StandardMaterial.
                 // So simply ignore it
@@ -658,12 +657,79 @@ define(function (require) {
             return material;
         },
 
-        _getMetallicRoughnessFromSpecularGlossiness: function (specularGlossinessMatInfo) {
-            return {
-                baseColorFactor: specularGlossinessMatInfo.diffuseFactor,
-                baseColorTexture: specularGlossinessMatInfo.diffuseTexture,
-                roughnessFactor: 1.0 - specularGlossinessMatInfo.roughnessFactor
+        _pbrSpecularGlossinessToStandard: function (materialInfo, specularGlossinessMatInfo, lib) {
+            var alphaTest = materialInfo.alphaMode === 'MASK';
+            
+            if (this.useStandardMaterial) {
+                console.error('StandardMaterial doesn\'t support specular glossiness workflow yet');
+            }
+
+            var material;
+            var diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap;
+            var enabledTextures = [];
+                // TODO texCoord
+            if (specularGlossinessMatInfo.diffuseTexture) {
+                diffuseMap = lib.textures[specularGlossinessMatInfo.diffuseTexture.index] || null;
+                enabledTextures.push('diffuseMap');
+            }
+            if (specularGlossinessMatInfo.specularGlossinessTexture) {
+                glossinessMap = specularMap = lib.textures[specularGlossinessMatInfo.specularGlossinessTexture.index] || null;
+                enabledTextures.push('specularMap', 'glossinessMap');
+            }
+            if (materialInfo.normalTexture) {
+                normalMap = lib.textures[materialInfo.normalTexture.index] || null;
+                enabledTextures.push('normalMap');
+            }
+            if (materialInfo.emissiveTexture) {
+                emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
+                enabledTextures.push('emissiveMap');
+            }
+
+            var commonProperties = {
+                diffuseMap: diffuseMap || null,
+                glossinessMap: glossinessMap || null,
+                specularMap: specularMap || null,
+                normalMap: normalMap || null,
+                emissiveMap: emissiveMap || null,
+                color: specularGlossinessMatInfo.diffuseFactor || [1, 1, 1],
+                specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],
+                glossiness: specularGlossinessMatInfo.glossinessFactor || 0,
+                emission: materialInfo.emissiveFactor || [0, 0, 0]
             };
+            if (commonProperties.glossinessMap) {
+                // Ignore specularFactor
+                commonProperties.glossiness = 0.5;
+            }
+            if (commonProperties.specularMap) {
+                // Ignore specularFactor
+                commonProperties.specularColor = [1, 1, 1];
+            }
+
+            var fragmentDefines = {
+                GLOSSINESS_CHANNEL: 3
+            };
+            if (alphaTest) {
+                fragmentDefines.ALPHA_TEST = null;
+            }
+            if (materialInfo.doubleSided) {
+                fragmentDefines.DOUBLE_SIDED = null;
+            }
+            material = new Material({
+                name: materialInfo.name,
+                shader: this.shaderLibrary.get(this.shaderName, {
+                    fragmentDefines: fragmentDefines,
+                    textures: enabledTextures
+                })
+            });
+            material.set(commonProperties);
+
+            if (materialInfo.alphaMode === 'BLEND') {
+                material.depthMask = false;
+                material.depthTest = true;
+                material.transparent = true;
+            }
+
+            return material;
         },
 
         _parseMaterials: function (json, lib) {
@@ -672,14 +738,10 @@ define(function (require) {
                     lib.materials[idx] = this._KHRCommonMaterialToStandard(materialInfo, lib);
                 }
                 else if (materialInfo.pbrMetallicRoughness) {
-                    lib.materials[idx] = this._pbrToStandard(materialInfo, materialInfo.pbrMetallicRoughness, lib);
+                    lib.materials[idx] = this._pbrMetallicRoughnessToStandard(materialInfo, materialInfo.pbrMetallicRoughness, lib);
                 }
                 else if (materialInfo.extensions && materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']) {
-                    lib.materials[idx] = this._pbrToStandard(
-                        materialInfo,
-                        this._getMetallicRoughnessFromSpecularGlossiness(materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']),
-                        lib
-                    );
+                    lib.materials[idx] = this._pbrSpecularGlossinessToStandard(materialInfo, materialInfo.extensions['KHR_materials_pbrSpecularGlossiness'], lib);
                 }
             }, this);
         },
