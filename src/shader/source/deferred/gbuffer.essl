@@ -91,11 +91,21 @@ uniform sampler2D normalMap;
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 
-uniform sampler2D roughnessMap;
+uniform sampler2D roughGlossMap;
 
-uniform bool useRoughnessMap;
+uniform bool useRoughGlossMap;
+uniform bool useRoughness;
+
+uniform int roughGlossChannel: 0;
 
 varying vec4 v_ProjPos;
+
+float indexingTexel(in vec4 texel, in int idx) {
+    if (idx == 3) return texel.a;
+    else if (idx == 1) return texel.g;
+    else if (idx == 2) return texel.b;
+    else return texel.r;
+}
 
 void main()
 {
@@ -119,13 +129,13 @@ void main()
 
     float g = glossiness;
 
-    if (useRoughnessMap) {
-        vec4 glossTexel = texture2D(roughnessMap, v_Texcoord);
-        // TODO custom chanel
-        // g = clamp(1.0 - glossTexel.r + (g * 2.0 - 1.0), 0.0, 1.0);
-        g = clamp(-glossTexel.r + g * 2.0, 0.0, 1.0);
+    if (useRoughGlossMap) {
+        float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);
+        if (useRoughness) {
+            g2 = 1.0 - g2;
+        }
+        g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     }
-
 
     gl_FragColor.a = g;
 

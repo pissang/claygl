@@ -41,7 +41,7 @@ define(function (require) {
     function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
 
         var previousNormalMap;
-        var previousRougnessMap;
+        var previousRougGlossMap;
         var previousRenderable;
 
         return function (renderable, prevMaterial, prevShader) {
@@ -53,36 +53,52 @@ define(function (require) {
             var standardMaterial = renderable.__standardMat;
             var gBufferMat = renderable.material;
 
-            var roughness = standardMaterial.get('roughness');
+            var glossiness;
+            var roughGlossMap;
+            var useRoughnessWorkflow = standardMaterial.shader.isDefined('fragment', 'USE_ROUGHNESS');
+            var roughGlossChannel;
+            if (useRoughnessWorkflow) {
+                glossiness = 1.0 - standardMaterial.get('roughness');
+                roughGlossMap = standardMaterial.get('roughnessMap');
+                roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'ROUGHNESS_CHANNEL');
+            }
+            else {
+                glossiness = standardMaterial.get('glossiness');
+                roughGlossMap = standardMaterial.get('glossinessMap');
+                roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'GLOSSINESS_CHANNEL');
+            }
+            var useRoughGlossMap = !!roughGlossMap;
 
             var normalMap = standardMaterial.get('normalMap') || defaultNormalMap;
-            var roughnessMap = standardMaterial.get('roughnessMap');
             var uvRepeat = standardMaterial.get('uvRepeat');
             var uvOffset = standardMaterial.get('uvOffset');
-            var useRoughnessMap = !!roughnessMap;
 
-            roughnessMap = roughnessMap || defaultRoughnessMap;
+            roughGlossMap = roughGlossMap || defaultRoughnessMap;
 
             if (prevMaterial !== gBufferMat) {
-                gBufferMat.set('glossiness', 1.0 - roughness);
+                gBufferMat.set('glossiness', glossiness);
                 gBufferMat.set('normalMap', normalMap);
-                gBufferMat.set('roughnessMap', roughnessMap);
-                gBufferMat.set('useRoughnessMap', +useRoughnessMap);
+                gBufferMat.set('roughGlossMap', roughGlossMap);
+                gBufferMat.set('useRoughGlossMap', +useRoughGlossMap);
+                gBufferMat.set('useRoughness', +useRoughnessWorkflow);
+                gBufferMat.set('roughGlossChannel', +roughGlossChannel || 0);
                 gBufferMat.set('uvRepeat', uvRepeat);
                 gBufferMat.set('uvOffset', uvOffset);
             }
             else {
                 gBufferMat.shader.setUniform(
-                    gl, '1f', 'glossiness', 1.0 - roughness
+                    gl, '1f', 'glossiness', glossiness
                 );
 
                 if (previousNormalMap !== normalMap) {
                     attachTextureToSlot(gl, gBufferMat.shader, 'normalMap', normalMap, 0);
                 }
-                if (previousRougnessMap !== roughnessMap) {
-                    attachTextureToSlot(gl, gBufferMat.shader, 'roughnessMap', roughnessMap, 1);
+                if (previousRougGlossMap !== roughGlossMap) {
+                    attachTextureToSlot(gl, gBufferMat.shader, 'roughGlossMap', roughGlossMap, 1);
                 }
-                gBufferMat.shader.setUniform(gl, '1i', 'useRoughnessMap', +useRoughnessMap);
+                gBufferMat.shader.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
+                gBufferMat.shader.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
+                gBufferMat.shader.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
                 if (uvRepeat != null) {
                     gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
                 }
@@ -92,7 +108,7 @@ define(function (require) {
             }
 
             previousNormalMap = normalMap;
-            previousRougnessMap = roughnessMap;
+            previousRougGlossMap = roughGlossMap;
 
             previousRenderable = renderable;
         };
@@ -285,6 +301,12 @@ define(function (require) {
             var opaqueQueue = scene.opaqueQueue;
             var oldBeforeRender = renderer.beforeRenderObject;
 
+            // StandardMaterial needs updateShader method so shader can be created on demand.
+            for (var i = 0; i < opaqueQueue.length; i++) {
+                var material = opaqueQueue[i].material;
+                material.updateShader && material.updateShader(renderer.gl);
+            }
+
             gl.clearColor(0, 0, 0, 0);
             gl.depthMask(true);
             gl.colorMask(true, true, true, true);
@@ -324,7 +346,6 @@ define(function (require) {
 
                 this._replaceGBufferMat(opaqueQueue, 1);
                 opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
-
 
                 // FIXME Use MRT if possible
                 // Pass 1
