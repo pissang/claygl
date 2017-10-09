@@ -596,6 +596,7 @@ define(function (require) {
                 emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
                 enabledTextures.push('emissiveMap');
             }
+            var baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
             var commonProperties = {
                 diffuseMap: diffuseMap || null,
@@ -603,10 +604,12 @@ define(function (require) {
                 metalnessMap: metalnessMap || null,
                 normalMap: normalMap || null,
                 emissiveMap: emissiveMap || null,
-                color: metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1],
+                color: baseColor.slice(0, 3),
+                alpha: baseColor[3],
                 metalness: metallicRoughnessMatInfo.metallicFactor || 0,
                 roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
-                emission: materialInfo.emissiveFactor || [0, 0, 0]
+                emission: materialInfo.emissiveFactor || [0, 0, 0],
+                alphaCutoff: materialInfo.alphaCutoff == null ? 0.9 : materialInfo.alphaCutoff
             };
             if (commonProperties.roughnessMap) {
                 // In glTF metallicFactor will do multiply, which is different from StandardMaterial.
@@ -684,6 +687,7 @@ define(function (require) {
                 emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
                 enabledTextures.push('emissiveMap');
             }
+            var baseColor = specularGlossinessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
             var commonProperties = {
                 diffuseMap: diffuseMap || null,
@@ -691,10 +695,12 @@ define(function (require) {
                 specularMap: specularMap || null,
                 normalMap: normalMap || null,
                 emissiveMap: emissiveMap || null,
-                color: specularGlossinessMatInfo.diffuseFactor || [1, 1, 1],
+                color: baseColor.slice(0, 3),
+                alpha: baseColor[3],
                 specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],
                 glossiness: specularGlossinessMatInfo.glossinessFactor || 0,
-                emission: materialInfo.emissiveFactor || [0, 0, 0]
+                emission: materialInfo.emissiveFactor || [0, 0, 0],
+                alphaCutoff: materialInfo.alphaCutoff == null ? 0.9 : materialInfo.alphaCutoff
             };
             if (commonProperties.glossinessMap) {
                 // Ignore specularFactor
