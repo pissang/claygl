@@ -299,7 +299,7 @@ def CreateAnimationBuffer(pList, pType, pStride):
 
 def CreateIBMBuffer(pList):
     lData, lGLTFIBM = CreateAccessorBuffer(pList, 'f', 16, True)
-    appendToBuffer(pType, invBindMatricesBuffer, lData, lGLTFIBM)
+    appendToBuffer('f', invBindMatricesBuffer, lData, lGLTFIBM)
     idx = len(lib_accessors)
     lib_ibm_accessors.append(lGLTFIBM)
     lib_accessors.append(lGLTFIBM)
