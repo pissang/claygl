@@ -24,6 +24,7 @@ glob('**/*.js', {
         if (
             file.match(/qtek.*?\.js/)
             || file.indexOf('_') >= 0
+            || file.endsWith('.essl.js')
         ) {
             return;
         }
