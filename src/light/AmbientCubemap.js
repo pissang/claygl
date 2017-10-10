@@ -45,7 +45,7 @@ var AmbientCubemapLight = Light.extend({
         this.cubemap = result.environmentMap;
         this.cubemap.__prefiltered = true;
 
-        cubemap.dispose(renderer.gl);
+        cubemap.dispose(renderer);
     },
 
     uniformTemplates: {

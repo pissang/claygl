@@ -36,9 +36,9 @@ TexturePool.prototype = {
         list.push(texture);
     },
 
-    clear: function (gl) {
+    clear: function (renderer) {
         for (var i = 0; i < this._allocatedTextures.length; i++) {
-            this._allocatedTextures[i].dispose(gl);
+            this._allocatedTextures[i].dispose(renderer);
         }
         this._pool = {};
         this._allocatedTextures = [];

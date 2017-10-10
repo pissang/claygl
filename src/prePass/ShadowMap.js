@@ -298,7 +298,7 @@ var ShadowMapPass = Base.extend(function () {
         }
 
         if (!mesh.material.shader && mesh.material.updateShader) {
-            mesh.material.updateShader(renderer.gl);
+            mesh.material.updateShader(renderer);
         }
         var shader = mesh.material.shader;
         if (this.softShadow === ShadowMapPass.VSM) {

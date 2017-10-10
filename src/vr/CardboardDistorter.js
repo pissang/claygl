@@ -58,8 +58,8 @@ var CardboardDistorter = Base.extend(function () {
         renderer.setViewport(0, 0, renderer.getWidth(), renderer.getHeight());
         renderer.renderQueue([this._mesh], this._fakeCamera);
         renderer.restoreViewport();
-        // this._mesh.material.shader.bind(renderer.gl);
-        // this._mesh.material.bind(renderer.gl);
+        // this._mesh.material.shader.bind(renderer);
+        // this._mesh.material.bind(renderer);
         // this._mesh.render(renderer.gl);
     },
 

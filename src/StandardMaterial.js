@@ -49,7 +49,7 @@ function makeKey(enabledMaps, jointCount, shaderDefines) {
     return key;
 }
 
-function allocateShader(gl, enabledMaps, jointCount, shaderDefines) {
+function allocateShader(renderer, enabledMaps, jointCount, shaderDefines) {
     var key = makeKey(enabledMaps, jointCount, shaderDefines);
     var shader = shaderLibrary[key];
 
@@ -91,8 +91,8 @@ function allocateShader(gl, enabledMaps, jointCount, shaderDefines) {
 
         shaderLibrary[key] = shader;
 
-        shaderUsedCount[gl.__GLID__] = shaderUsedCount[gl.__GLID__] || {};
-        shaderUsedCount[gl.__GLID__][key] = 0;
+        shaderUsedCount[renderer.__GUID__] = shaderUsedCount[renderer.__GUID__] || {};
+        shaderUsedCount[renderer.__GUID__][key] = 0;
     }
     shaderUsedCount[key]++;
 
@@ -100,14 +100,14 @@ function allocateShader(gl, enabledMaps, jointCount, shaderDefines) {
 
     return shader;
 }
-function releaseShader (shader, gl) {
+function releaseShader(shader, renderer) {
     var key = shader.__key__;
     if (shaderLibrary[key]) {
-        shaderUsedCount[gl.__GLID__][key]--;
-        if (!shaderUsedCount[gl.__GLID__][key]) {
-            if (gl) {
+        shaderUsedCount[renderer.__GUID__][key]--;
+        if (!shaderUsedCount[renderer.__GUID__][key]) {
+            if (renderer) {
                 // Since shader may not be used on any material. We need to dispose it
-                shader.dispose(gl);
+                shader.dispose(renderer);
             }
         }
     }
@@ -294,17 +294,17 @@ var StandardMaterial = Material.extend(function () {
     };
 }, {
 
-    _doUpdateShader: function (gl) {
+    _doUpdateShader: function (renderer) {
         var enabledTextures = TEXTURE_PROPERTIES.filter(function (name) {
             return !!this[name];
         }, this);
         if (this._shader) {
-            releaseShader(this._shader, gl);
+            releaseShader(this._shader, renderer);
             this._shader.detached();
         }
 
         var shader = allocateShader(
-            gl, enabledTextures, this.jointCount || 0, {
+            renderer, enabledTextures, this.jointCount || 0, {
                 environmentMapPrefiltered: this.environmentMapPrefiltered,
                 linear: this.linear,
                 encodeRGBM: this.encodeRGBM,
@@ -337,9 +337,9 @@ var StandardMaterial = Material.extend(function () {
         this._shaderDirty = false;
     },
 
-    updateShader: function (gl) {
+    updateShader: function (renderer) {
         if (this._shaderDirty) {
-            this._doUpdateShader(gl);
+            this._doUpdateShader(renderer);
             this._shaderDirty = false;
         }
     },

@@ -7,7 +7,6 @@ import Shader from '../Shader';
 import ForwardRenderer from '../Renderer';
 import Pass from '../compositor/Pass';
 import Matrix4 from '../math/Matrix4';
-import glinfo from '../core/glinfo';
 
 function createFillCanvas(color) {
     var canvas = document.createElement('canvas');
@@ -19,17 +18,18 @@ function createFillCanvas(color) {
     return canvas;
 }
 
-function attachTextureToSlot(gl, shader, symbol, texture, slot) {
+function attachTextureToSlot(renderer, shader, symbol, texture, slot) {
+    var gl = renderer.gl;
     shader.setUniform(gl, '1i', symbol, slot);
 
     gl.activeTexture(gl.TEXTURE0 + slot);
     // Maybe texture is not loaded yet;
     if (texture.isRenderable()) {
-        texture.bind(gl);
+        texture.bind(renderer);
     }
     else {
         // Bind texture to null
-        texture.unbind(gl);
+        texture.unbind(renderer);
     }
 }
 
@@ -87,10 +87,10 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
             );
 
             if (previousNormalMap !== normalMap) {
-                attachTextureToSlot(gl, gBufferMat.shader, 'normalMap', normalMap, 0);
+                attachTextureToSlot(this, gBufferMat.shader, 'normalMap', normalMap, 0);
             }
             if (previousRougGlossMap !== roughGlossMap) {
-                attachTextureToSlot(gl, gBufferMat.shader, 'roughGlossMap', roughGlossMap, 1);
+                attachTextureToSlot(this, gBufferMat.shader, 'roughGlossMap', roughGlossMap, 1);
             }
             gBufferMat.shader.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
             gBufferMat.shader.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
@@ -156,10 +156,10 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
 
             gBufferMat.shader.setUniform(gl, '3f', 'color', color);
             if (previousDiffuseMap !== diffuseMap) {
-                attachTextureToSlot(gl, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
+                attachTextureToSlot(this, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
             }
             if (previousMetalnessMap !== metalnessMap) {
-                attachTextureToSlot(gl, gBufferMat.shader, 'metalnessMap', metalnessMap, 1);
+                attachTextureToSlot(this, gBufferMat.shader, 'metalnessMap', metalnessMap, 1);
             }
             gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
             gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
@@ -303,7 +303,7 @@ var GBuffer = Base.extend(function () {
         // StandardMaterial needs updateShader method so shader can be created on demand.
         for (var i = 0; i < opaqueQueue.length; i++) {
             var material = opaqueQueue[i].material;
-            material.updateShader && material.updateShader(renderer.gl);
+            material.updateShader && material.updateShader(renderer);
         }
 
         gl.clearColor(0, 0, 0, 0);
@@ -386,7 +386,7 @@ var GBuffer = Base.extend(function () {
         renderer.bindSceneRendering(null);
 
         renderer.beforeRenderObject = oldBeforeRender;
-        this._cleanGBufferMaterials(renderer.gl);
+        this._cleanGBufferMaterials(renderer);
         this._restoreMaterial(opaqueQueue);
 
         frameBuffer.unbind(renderer);
@@ -485,12 +485,12 @@ var GBuffer = Base.extend(function () {
         }
     },
 
-    _cleanGBufferMaterials: function (gl) {
+    _cleanGBufferMaterials: function (renderer) {
         for (var key in this._gBufferMaterials) {
             var obj = this._gBufferMaterials[key];
             if (!obj.used) {
-                obj.material1.dispose(gl);
-                obj.material2.dispose(gl);
+                obj.material1.dispose(renderer);
+                obj.material2.dispose(renderer);
             }
         }
     },
@@ -521,11 +521,11 @@ var GBuffer = Base.extend(function () {
         }
     },
 
-    dispose: function (gl) {
+    dispose: function (renderer) {
         for (var name in this._gBufferMaterials) {
             var matObj = this._gBufferMaterials[name];
-            matObj.material1.dispose(gl);
-            matObj.material2.dispose(gl);
+            matObj.material1.dispose(renderer);
+            matObj.material2.dispose(renderer);
         }
     }
 });

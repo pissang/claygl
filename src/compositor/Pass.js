@@ -4,7 +4,6 @@ import Plane from '../geometry/Plane';
 import Shader from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
-import glinfo from '../core/glinfo';
 import glenum from '../core/glenum';
 import vertexEssl from '../shader/source/compositor/vertex.glsl.js';
 
@@ -144,7 +143,7 @@ var Pass = Base.extend(function () {
             this.bind(renderer, frameBuffer);
             // MRT Support in chrome
             // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-            var ext = glinfo.getExtension(_gl, 'EXT_draw_buffers');
+            var ext = renderer.getGLExtension('EXT_draw_buffers');
             if (ext && this.outputs) {
                 var bufs = [];
                 for (var attachment in this.outputs) {
@@ -203,10 +202,10 @@ var Pass = Base.extend(function () {
     },
 
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      */
-    dispose: function (gl) {
-        this.material.dispose(gl);
+    dispose: function (renderer) {
+        this.material.dispose(renderer);
     }
 });
 

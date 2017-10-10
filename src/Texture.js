@@ -5,7 +5,6 @@
 import Base from './core/Base';
 import glenum from './core/glenum';
 import Cache from './core/Cache';
-import glinfo from './core/glinfo';
 
 /**
  * @constructor qtek.Texture
@@ -89,19 +88,20 @@ var Texture = Base.extend(
 /** @lends qtek.Texture.prototype */
 {
 
-    getWebGLTexture: function (_gl) {
+    getWebGLTexture: function (renderer) {
+        var _gl = renderer.gl;
         var cache = this._cache;
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
 
         if (cache.miss('webgl_texture')) {
             // In a new gl context, create new texture and set dirty true
             cache.put('webgl_texture', _gl.createTexture());
         }
         if (this.dynamic) {
-            this.update(_gl);
+            this.update(renderer);
         }
         else if (cache.isDirty()) {
-            this.update(_gl);
+            this.update(renderer);
             cache.fresh();
         }
 
@@ -120,18 +120,19 @@ var Texture = Base.extend(
         }
     },
 
-    update: function (_gl) {},
+    update: function (renderer) {},
 
     // Update the common parameters of texture
-    updateCommon: function (_gl) {
+    updateCommon: function (renderer) {
+        var _gl = renderer.gl;
         _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
         _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
         _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
 
-        this._fallBack(_gl);
+        this._fallBack(renderer);
     },
 
-    _fallBack: function (_gl) {
+    _fallBack: function (renderer) {
         // Use of none-power of two texture
         // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
 
@@ -141,7 +142,7 @@ var Texture = Base.extend(
             this.useMipmap = false;
         }
 
-        var sRGBExt = glinfo.getExtension(_gl, 'EXT_sRGB');
+        var sRGBExt = renderer.getGLExtension( 'EXT_sRGB');
         // Fallback
         if (this.format === Texture.SRGB && !sRGBExt) {
             this.format = Texture.RGB;
@@ -198,19 +199,19 @@ var Texture = Base.extend(
         return x + 1;
     },
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      */
-    dispose: function (_gl) {
+    dispose: function (renderer) {
 
         var cache = this._cache;
 
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
 
         var webglTexture = cache.get('webgl_texture');
         if (webglTexture){
-            _gl.deleteTexture(webglTexture);
+            renderer.gl.deleteTexture(webglTexture);
         }
-        cache.deleteContext(_gl.__GLID__);
+        cache.deleteContext(renderer.__GUID__);
 
     },
     /**

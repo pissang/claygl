@@ -137,8 +137,8 @@ var EnvironmentMapPass = Base.extend(function() {
     /**
      * @param  {qtek.Renderer} renderer
      */
-    dispose: function(gl) {
-        this._frameBuffer.dispose(gl);
+    dispose: function (renderer) {
+        this._frameBuffer.dispose(renderer);
     }
 });
 

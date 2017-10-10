@@ -202,13 +202,13 @@ var StaticGeometry = Geometry.extend(function () {
         return result;
     },
 
-    getBufferChunks: function (_gl) {
+    getBufferChunks: function (renderer) {
         var cache = this._cache;
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
         var isAttributesDirty = cache.isDirty('attributes');
         var isIndicesDirty = cache.isDirty('indices');
         if (isAttributesDirty || isIndicesDirty) {
-            this._updateBuffer(_gl, isAttributesDirty, isIndicesDirty);
+            this._updateBuffer(renderer.gl, isAttributesDirty, isIndicesDirty);
             var enabledAttributes = this.getEnabledAttributes();
             for (var i = 0; i < enabledAttributes.length; i++) {
                 cache.fresh(makeAttrKey(enabledAttributes[i]));
@@ -603,11 +603,11 @@ var StaticGeometry = Geometry.extend(function () {
         }
     },
 
-    dispose: function (_gl) {
+    dispose: function (renderer) {
 
         var cache = this._cache;
 
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
         var chunks = cache.get('chunks');
         if (chunks) {
             for (var c = 0; c < chunks.length; c++) {
@@ -615,11 +615,11 @@ var StaticGeometry = Geometry.extend(function () {
 
                 for (var k = 0; k < chunk.attributeBuffers.length; k++) {
                     var attribs = chunk.attributeBuffers[k];
-                    _gl.deleteBuffer(attribs.buffer);
+                    renderer.gl.deleteBuffer(attribs.buffer);
                 }
             }
         }
-        cache.deleteContext(_gl.__GLID__);
+        cache.deleteContext(renderer.__GUID__);
     }
 });
 

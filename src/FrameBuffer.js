@@ -1,7 +1,6 @@
 import Base from './core/Base';
 import Texture from './Texture';
 import TextureCube from './TextureCube';
-import glinfo from './core/glinfo';
 import glenum from './core/glenum';
 import Cache from './core/Cache';
 
@@ -84,7 +83,7 @@ var FrameBuffer = Base.extend(
 
         var _gl = renderer.gl;
 
-        _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(_gl));
+        _gl.bindFramebuffer(GL_FRAMEBUFFER, this._getFrameBufferGL(renderer));
         this._boundRenderer = renderer;
         var cache = this._cache;
 
@@ -101,7 +100,7 @@ var FrameBuffer = Base.extend(
                 width = obj.texture.width;
                 height = obj.texture.height;
                 // Attach textures
-                this._doAttach(_gl, obj.texture, attachment, obj.target);
+                this._doAttach(renderer, obj.texture, attachment, obj.target);
             }
         }
 
@@ -163,19 +162,20 @@ var FrameBuffer = Base.extend(
         _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
         this._boundRenderer = null;
 
-        this._cache.use(_gl.__GLID__);
+        this._cache.use(renderer.__GUID__);
         var viewport = this._cache.get('viewport');
         // Reset viewport;
         if (viewport) {
             renderer.setViewport(viewport);
         }
 
-        this.updateMipmap(_gl);
+        this.updateMipmap(renderer);
     },
 
     // Because the data of texture is changed over time,
     // Here update the mipmaps of texture each time after rendered;
-    updateMipmap: function (_gl) {
+    updateMipmap: function (renderer) {
+        var _gl = renderer.gl;
         for (var attachment in this._textures) {
             var obj = this._textures[attachment];
             if (obj) {
@@ -184,7 +184,7 @@ var FrameBuffer = Base.extend(
                 if (!texture.NPOT && texture.useMipmap
                     && texture.minFilter === Texture.LINEAR_MIPMAP_LINEAR) {
                     var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
-                    _gl.bindTexture(target, texture.getWebGLTexture(_gl));
+                    _gl.bindTexture(target, texture.getWebGLTexture(renderer));
                     _gl.generateMipmap(target);
                     _gl.bindTexture(target, null);
                 }
@@ -203,12 +203,12 @@ var FrameBuffer = Base.extend(
         return _gl.checkFramebufferStatus(GL_FRAMEBUFFER);
     },
 
-    _getFrameBufferGL: function (_gl) {
+    _getFrameBufferGL: function (renderer) {
         var cache = this._cache;
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
 
         if (cache.miss(KEY_FRAMEBUFFER)) {
-            cache.put(KEY_FRAMEBUFFER, _gl.createFramebuffer());
+            cache.put(KEY_FRAMEBUFFER, renderer.gl.createFramebuffer());
         }
 
         return cache.get(KEY_FRAMEBUFFER);
@@ -239,7 +239,7 @@ var FrameBuffer = Base.extend(
 
         if (_gl) {
             var cache = this._cache;
-            cache.use(_gl.__GLID__);
+            cache.use(boundRenderer.__GUID__);
             attachedTextures = cache.get('attached_textures');
         }
 
@@ -253,8 +253,8 @@ var FrameBuffer = Base.extend(
         }
 
         var canAttach = true;
-        if (_gl) {
-            canAttach = this._doAttach(_gl, texture, attachment, target);
+        if (boundRenderer) {
+            canAttach = this._doAttach(boundRenderer, texture, attachment, target);
             // Set viewport again incase attached to different size textures.
             if (!this.viewport) {
                 boundRenderer.setViewport(0, 0, texture.width, texture.height, 1);
@@ -268,12 +268,12 @@ var FrameBuffer = Base.extend(
         }
     },
 
-    _doAttach: function (_gl, texture, attachment, target) {
-
+    _doAttach: function (renderer, texture, attachment, target) {
+        var _gl = renderer.gl;
         // Make sure texture is always updated
         // Because texture width or height may be changed and in this we can't be notified
         // FIXME awkward;
-        var webglTexture = texture.getWebGLTexture(_gl);
+        var webglTexture = texture.getWebGLTexture(renderer);
         // Assume cache has been used.
         var attachedTextures = this._cache.get('attached_textures');
         if (attachedTextures && attachedTextures[attachment]) {
@@ -287,7 +287,7 @@ var FrameBuffer = Base.extend(
 
         var canAttach = true;
         if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
-            var extension = glinfo.getExtension(_gl, 'WEBGL_depth_texture');
+            var extension = renderer.getGLExtension('WEBGL_depth_texture');
 
             if (!extension) {
                 console.error('Depth texture is not supported by the browser');
@@ -353,21 +353,21 @@ var FrameBuffer = Base.extend(
         // TODO depth extension check ?
         this._textures[attachment] = null;
         if (this._boundRenderer) {
-            var gl = this._boundRenderer.gl;
             var cache = this._cache;
-            cache.use(gl.__GLID__);
-            this._doDetach(gl, attachment, target);
+            cache.use(this._boundRenderer.__GUID__);
+            this._doDetach(this._boundRenderer.gl, attachment, target);
         }
     },
     /**
      * Dispose
      * @param  {WebGLRenderingContext} _gl
      */
-    dispose: function (_gl) {
+    dispose: function (renderer) {
 
+        var _gl = renderer.gl;
         var cache = this._cache;
 
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
 
         var renderBuffer = cache.get(KEY_RENDERBUFFER);
         if (renderBuffer) {
@@ -377,7 +377,7 @@ var FrameBuffer = Base.extend(
         if (frameBuffer) {
             _gl.deleteFramebuffer(frameBuffer);
         }
-        cache.deleteContext(_gl.__GLID__);
+        cache.deleteContext(renderer.__GUID__);
 
         // Clear cache for reusing
         this._textures = {};

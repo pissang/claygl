@@ -84,12 +84,12 @@ var Skybox = Mesh.extend(function () {
 
     /**
      * Dispose skybox
-     * @param  {WebGLRenderingContext} gl
+     * @param  {qtek.Renderer} renderer
      */
-    dispose: function (gl) {
+    dispose: function (renderer) {
         this.detachScene();
-        this.geometry.dispose(gl);
-        this.material.dispose(gl);
+        this.geometry.dispose(renderer);
+        this.material.dispose(renderer);
     },
 
     setEnvironmentMap: function (envMap) {

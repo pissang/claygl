@@ -1,5 +1,4 @@
 import Node from './Node';
-import glinfo from '../core/glinfo';
 import glenum from '../core/glenum';
 import FrameBuffer from '../FrameBuffer';
 
@@ -64,7 +63,7 @@ var SceneNode = Node.extend(
 
             // MRT Support in chrome
             // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-            var ext = glinfo.getExtension(_gl, 'EXT_draw_buffers');
+            var ext = renderer.getGLExtension('EXT_draw_buffers');
             if (ext) {
                 var bufs = [];
                 for (var attachment in this.outputs) {

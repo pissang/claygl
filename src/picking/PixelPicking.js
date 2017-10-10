@@ -161,9 +161,9 @@ var PixelPicking = Base.extend(function() {
         }
     },
 
-    dispose: function(_gl) {
-        this._frameBuffer.dispose(_gl);
-        this._shader.dispose(_gl);
+    dispose: function(renderer) {
+        this._frameBuffer.dispose(renderer);
+        this._shader.dispose(renderer);
     }
 });
 

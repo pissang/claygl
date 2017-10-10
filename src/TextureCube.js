@@ -1,5 +1,4 @@
 import Texture from './Texture';
-import glinfo from './core/glinfo';
 import glenum from './core/glenum';
 import util from './core/util';
 import mathUtil from './math/util';
@@ -77,11 +76,11 @@ var TextureCube = Texture.extend(function () {
         mipmaps: []
     };
 }, {
-    update: function (_gl) {
-
+    update: function (renderer) {
+        var _gl = renderer.gl;
         _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
-        this.updateCommon(_gl);
+        this.updateCommon(renderer);
 
         var glFormat = this.format;
         var glType = this.type;
@@ -92,14 +91,14 @@ var TextureCube = Texture.extend(function () {
         _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.magFilter);
         _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.minFilter);
 
-        var anisotropicExt = glinfo.getExtension(_gl, 'EXT_texture_filter_anisotropic');
+        var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
         if (anisotropicExt && this.anisotropic > 1) {
             _gl.texParameterf(_gl.TEXTURE_CUBE_MAP, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
         }
 
         // Fallback to float type if browser don't have half float extension
         if (glType === 36193) {
-            var halfFloatExt = glinfo.getExtension(_gl, 'OES_texture_half_float');
+            var halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
             if (!halfFloatExt) {
                 glType = glenum.FLOAT;
             }
@@ -140,23 +139,23 @@ var TextureCube = Texture.extend(function () {
     },
 
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      * @memberOf qtek.TextureCube.prototype
      */
-    generateMipmap: function (_gl) {
+    generateMipmap: function (renderer) {
+        var _gl = renderer.gl;
         if (this.useMipmap && !this.NPOT) {
             _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
             _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
         }
     },
 
-    bind: function (_gl) {
-
-        _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(_gl));
+    bind: function (renderer) {
+        renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(renderer));
     },
 
-    unbind: function (_gl) {
-        _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+    unbind: function (renderer) {
+        renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, null);
     },
 
     // Overwrite the isPowerOfTwo method

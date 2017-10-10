@@ -95,10 +95,10 @@ var Skydome = Mesh.extend(function () {
         return this.material.get('diffuseMap');
     },
 
-    dispose: function (gl) {
+    dispose: function (renderer) {
         this.detachScene();
-        this.geometry.dispose(gl);
-        this.material.dispose(gl);
+        this.geometry.dispose(renderer);
+        this.material.dispose(renderer);
     }
 });
 

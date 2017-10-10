@@ -71,13 +71,14 @@ var Material = Base.extend(
 {
 
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {WebGLRenderingContext} renderer
      * @param  {qtek.Shader} [shader]
      * @param  {qtek.Material} [prevMaterial]
      * @param  {qtek.Shader} [prevShader]
      * @return {Object}
      */
-    bind: function(_gl, shader, prevMaterial, prevShader) {
+    bind: function(renderer, shader, prevMaterial, prevShader) {
+        var _gl = renderer.gl;
         // PENDING Same texture in different material take different slot?
 
         // May use shader of other material if shader code are same
@@ -127,7 +128,7 @@ var Material = Base.extend(
                     var res = shader.setUniform(_gl, '1i', symbol, slot);
                     if (res) { // Texture is enabled
                         // Still occupy the slot to make sure same texture in different materials have same slot.
-                        shader.takeCurrentTextureSlot(_gl, null);
+                        shader.takeCurrentTextureSlot(renderer, null);
                     }
                 }
                 continue;
@@ -139,7 +140,7 @@ var Material = Base.extend(
                     if (!res) { // Texture uniform is not enabled
                         continue;
                     }
-                    shader.takeCurrentTextureSlot(_gl, uniformValue);
+                    shader.takeCurrentTextureSlot(renderer, uniformValue);
                     uniformValue.__slot = slot;
                 }
                 // Multiple uniform use same texture..
@@ -166,7 +167,7 @@ var Material = Base.extend(
                         if (texture.__slot < 0) {
                             var slot = shader.currentTextureSlot();
                             arr.push(slot);
-                            shader.takeCurrentTextureSlot(_gl, texture);
+                            shader.takeCurrentTextureSlot(renderer, texture);
                             texture.__slot = slot;
                         }
                         else {
@@ -344,7 +345,7 @@ var Material = Base.extend(
      * @param {WebGLRenderingContext} gl
      * @param {boolean} [disposeTexture=false] If dispose the textures used in the material
      */
-    dispose: function(_gl, disposeTexture) {
+    dispose: function(renderer, disposeTexture) {
         if (disposeTexture) {
             for (var name in this.uniforms) {
                 var val = this.uniforms[name].value;
@@ -352,12 +353,12 @@ var Material = Base.extend(
                     continue;
                 }
                 if (val instanceof Texture) {
-                    val.dispose(_gl);
+                    val.dispose(renderer);
                 }
                 else if (val instanceof Array) {
                     for (var i = 0; i < val.length; i++) {
                         if (val[i] instanceof Texture) {
-                            val[i].dispose(_gl);
+                            val[i].dispose(renderer);
                         }
                     }
                 }
@@ -367,7 +368,7 @@ var Material = Base.extend(
         if (shader) {
             this.detachShader();
             if (!shader.isAttachedToAny()) {
-                shader.dispose(_gl);
+                shader.dispose(renderer);
             }
         }
     }

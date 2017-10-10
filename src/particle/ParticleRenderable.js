@@ -268,15 +268,15 @@ var ParticleRenderable = Renderable.extend(
     },
 
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      */
-    dispose: function(_gl) {
+    dispose: function(renderer) {
         // Put all the particles back
         for (var i = 0; i < this._particles.length; i++) {
             var p = this._particles[i];
             p.emitter.kill(p);
         }
-        this.geometry.dispose(_gl);
+        this.geometry.dispose(renderer);
         // TODO Dispose texture, shader ?
     },
 

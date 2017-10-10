@@ -108,7 +108,7 @@ var textureUtil = {
             // PENDING
             texture.flipY = option.flipY || false;
             self.panoramaToCubeMap(renderer, texture, cubeMap, option);
-            texture.dispose(renderer.gl);
+            texture.dispose(renderer);
             onsuccess && onsuccess(cubeMap);
         }, onerror);
     },

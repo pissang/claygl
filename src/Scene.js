@@ -296,7 +296,7 @@ var Scene = Node.extend(function () {
         shader.dirty();
     },
 
-    setLightUniforms: function (shader, _gl) {
+    setLightUniforms: function (shader, renderer) {
         var group = shader.lightGroup;
         for (var symbol in this._lightUniforms[group]) {
             var lu = this._lightUniforms[group][symbol];
@@ -304,14 +304,14 @@ var Scene = Node.extend(function () {
                 for (var i = 0; i < lu.value.length; i++) {
                     var texture = lu.value[i];
                     var slot = shader.currentTextureSlot();
-                    var result = shader.setUniform(_gl, '1i', symbol, slot);
+                    var result = shader.setUniform(renderer.gl, '1i', symbol, slot);
                     if (result) {
-                        shader.takeCurrentTextureSlot(_gl, texture);
+                        shader.takeCurrentTextureSlot(renderer, texture);
                     }
                 }
             }
             else {
-                shader.setUniform(_gl, lu.type, symbol, lu.value);
+                shader.setUniform(renderer.gl, lu.type, symbol, lu.value);
             }
         }
     },

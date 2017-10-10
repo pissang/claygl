@@ -12,7 +12,6 @@ import util from './core/util';
 import Cache from './core/Cache';
 import vendor from './core/vendor';
 import glMatrix from './dep/glmatrix';
-import glInfo from './core/glinfo';
 var mat2 = glMatrix.mat2;
 var mat3 = glMatrix.mat3;
 var mat4 = glMatrix.mat4;
@@ -271,9 +270,10 @@ var Shader = Base.extend(function () {
      * Return true or error msg if error happened
      * @param {WebGLRenderingContext} _gl
      */
-    bind: function (_gl) {
+    bind: function (renderer) {
         var cache = this._cache;
-        cache.use(_gl.__GLID__, getCacheSchema);
+        var _gl = renderer.gl;
+        cache.use(renderer.__GUID__, getCacheSchema);
 
         this._currentLocationsMap = cache.get('locations');
 
@@ -320,7 +320,7 @@ var Shader = Base.extend(function () {
         }
     },
 
-    _updateShaderString: function (extensions) {
+    _updateShaderString: function (exts) {
 
         if (this.vertex !== this._vertexPrev ||
             this.fragment !== this._fragmentPrev
@@ -340,7 +340,7 @@ var Shader = Base.extend(function () {
             this._fragmentPrev = this.fragment;
         }
 
-        this._addDefineExtensionAndPrecision(extensions);
+        this._addDefineExtensionAndPrecision(exts);
 
         this._vertexProcessed = this._unrollLoop(this._vertexProcessed, this.vertexDefines);
         this._fragmentProcessed = this._unrollLoop(this._fragmentProcessed, this.fragmentDefines);
@@ -545,16 +545,16 @@ var Shader = Base.extend(function () {
         return textureSlot;
     },
 
-    useTextureSlot: function (_gl, texture, slot) {
+    useTextureSlot: function (renderer, texture, slot) {
         if (texture) {
-            _gl.activeTexture(_gl.TEXTURE0 + slot);
+            renderer.gl.activeTexture(renderer.gl.TEXTURE0 + slot);
             // Maybe texture is not loaded yet;
             if (texture.isRenderable()) {
-                texture.bind(_gl);
+                texture.bind(renderer);
             }
             else {
                 // Bind texture to null
-                texture.unbind(_gl);
+                texture.unbind(renderer);
             }
         }
     },
@@ -659,8 +659,8 @@ var Shader = Base.extend(function () {
     // Enable the attributes passed in and disable the rest
     // Example Usage:
     // enableAttributes(_gl, ["position", "texcoords"])
-    enableAttributes: function (_gl, attribList, vao) {
-
+    enableAttributes: function (renderer, attribList, vao) {
+        var _gl = renderer.gl;
         var program = this._cache.get('program');
 
         var locationMap = this._cache.get('attriblocations');
@@ -670,7 +670,7 @@ var Shader = Base.extend(function () {
             enabledAttributeListInContext = vao.__enabledAttributeList;
         }
         else {
-            enabledAttributeListInContext = enabledAttributeList[_gl.__GLID__];
+            enabledAttributeListInContext = enabledAttributeList[renderer.__GUID__];
         }
         if (! enabledAttributeListInContext) {
             // In vertex array object context
@@ -682,7 +682,7 @@ var Shader = Base.extend(function () {
             }
             else {
                 enabledAttributeListInContext
-                    = enabledAttributeList[_gl.__GLID__]
+                    = enabledAttributeList[renderer.__GUID__]
                     = [];
             }
         }
@@ -740,14 +740,14 @@ var Shader = Base.extend(function () {
 
     },
 
-    _addDefineExtensionAndPrecision: function (extensions) {
+    _addDefineExtensionAndPrecision: function (exts) {
 
-        extensions = extensions || this.extensions;
+        exts = exts || this.extensions;
         // Extension declaration must before all non-preprocessor codes
         // TODO vertex ? extension enum ?
         var extensionStr = [];
-        for (var i = 0; i < extensions.length; i++) {
-            extensionStr.push('#extension GL_' + extensions[i] + ' : enable');
+        for (var i = 0; i < exts.length; i++) {
+            extensionStr.push('#extension GL_' + exts[i] + ' : enable');
         }
 
         // Add defines
@@ -1157,17 +1157,17 @@ var Shader = Base.extend(function () {
     },
     /**
      * Dispose given context
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      */
-    dispose: function (_gl) {
+    dispose: function (renderer) {
         var cache = this._cache;
 
-        cache.use(_gl.__GLID__);
+        cache.use(renderer.__GUID__);
         var program = cache.get('program');
         if (program) {
-            _gl.deleteProgram(program);
+            renderer.gl.deleteProgram(program);
         }
-        cache.deleteContext(_gl.__GLID__);
+        cache.deleteContext(renderer.__GUID__);
 
         this._locations = {};
     }

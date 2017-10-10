@@ -649,7 +649,7 @@ var DeferredRenderer = Base.extend(function () {
 
                 var semanticInfo = prezShader.matrixSemantics.WORLDVIEWPROJECTION;
                 prezShader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
-                volumeMesh.render(gl, prezShader);
+                volumeMesh.render(renderer, prezShader);
 
                 // Render light
                 gl.colorMask(true, true, true, true);
@@ -663,8 +663,8 @@ var DeferredRenderer = Base.extend(function () {
                 shader.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
                 shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
-                volumeMesh.material.bind(gl);
-                volumeMesh.render(gl, shader);
+                volumeMesh.material.bind(renderer);
+                volumeMesh.render(renderer, shader);
             }
 
             gl.depthFunc(gl.LESS);
@@ -674,7 +674,7 @@ var DeferredRenderer = Base.extend(function () {
     })(),
 
     _bindShader: function (renderer, shader) {
-        var errMsg = shader.bind(renderer.gl);
+        var errMsg = shader.bind(renderer);
         if (errMsg) {
 
             if (errorShader[shader.__GUID__]) {
@@ -693,39 +693,33 @@ var DeferredRenderer = Base.extend(function () {
 
 
     /**
-     * @param  {qtek.Renderer|WebGLRenderingContext} [renderer]
+     * @param  {qtek.Renderer} [renderer]
      */
     dispose: function (renderer) {
-        var gl = renderer.gl || renderer;
+        this._gBuffer.dispose(renderer);
 
-        this._gBuffer.dispose(gl);
+        this._lightAccumFrameBuffer.dispose(renderer);
+        this._lightAccumTex.dispose(renderer);
 
-        this._lightAccumFrameBuffer.dispose(gl);
-        this._lightAccumTex.dispose(gl);
+        this._pointLightShader.dispose(renderer);
+        this._pointLightShaderWithShadow.dispose(renderer);
+        this._spotLightShader.dispose(renderer);
+        this._spotLightShaderWithShadow.dispose(renderer);
+        this._sphereLightShader.dispose(renderer);
+        this._tubeLightShader.dispose(renderer);
 
-        this._pointLightShader.dispose(gl);
-        this._pointLightShaderWithShadow.dispose(gl);
-        this._spotLightShader.dispose(gl);
-        this._spotLightShaderWithShadow.dispose(gl);
-        this._sphereLightShader.dispose(gl);
-        this._tubeLightShader.dispose(gl);
+        this._lightConeGeo.dispose(renderer);
+        this._lightCylinderGeo.dispose(renderer);
+        this._lightSphereGeo.dispose(renderer);
 
-        this._lightConeGeo.dispose(gl);
-        this._lightCylinderGeo.dispose(gl);
-        this._lightSphereGeo.dispose(gl);
+        this._fullQuadPass.dispose(renderer);
+        this._outputPass.dispose(renderer);
 
-        this._fullQuadPass.dispose(gl);
-        this._outputPass.dispose(gl);
+        this._directionalLightMat.dispose(renderer);
+        this._directionalLightMatWithShadow.dispose(renderer);
 
-        this._directionalLightMat.dispose(gl);
-        this._directionalLightMatWithShadow.dispose(gl);
-
-        this.shadowMapPass.dispose(gl);
+        this.shadowMapPass.dispose(renderer);
     }
 });
-
-// DeferredRenderer.registerLight = function () {
-
-// };
 
 export default DeferredRenderer;

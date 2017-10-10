@@ -48,8 +48,8 @@ function projectEnvironmentMapGPU(renderer, envMap) {
     }
     framebuffer.unbind(renderer);
 
-    framebuffer.dispose(renderer.gl);
-    pass.dispose(renderer.gl);
+    framebuffer.dispose(renderer);
+    pass.dispose(renderer);
     return coeff;
 }
 
@@ -209,9 +209,9 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
         framebuffer.unbind(renderer);
     }
 
-    skybox.dispose(renderer.gl);
-    framebuffer.dispose(renderer.gl);
-    rgbmTexture.dispose(renderer.gl);
+    skybox.dispose(renderer);
+    framebuffer.dispose(renderer);
+    rgbmTexture.dispose(renderer);
 
     return projectEnvironmentMapCPU(renderer, cubePixels, width, height);
 };

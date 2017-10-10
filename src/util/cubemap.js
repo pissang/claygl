@@ -162,11 +162,11 @@ cubemapUtil.prefilterEnvironmentMap = function (
         renderTargetTmp.dirty();
     }
 
-    frameBuffer.dispose(renderer.gl);
-    renderTargetTmp.dispose(renderer.gl);
-    skyEnv.dispose(renderer.gl);
+    frameBuffer.dispose(renderer);
+    renderTargetTmp.dispose(renderer);
+    skyEnv.dispose(renderer);
     // Remove gpu resource allucated in renderer
-    normalDistribution.dispose(renderer.gl);
+    normalDistribution.dispose(renderer);
 
     // renderer.dispose();
 
@@ -212,7 +212,7 @@ cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
     // texture.dirty();
     // framebuffer.unbind(renderer);
 
-    framebuffer.dispose(renderer.gl);
+    framebuffer.dispose(renderer);
 
     return texture;
 };

@@ -214,7 +214,7 @@ var FilterNode = Node.extend(function () {
             || parametersCopy.height !== height
         ) {
             if (this._outputTextures[outputName]) {
-                this._outputTextures[outputName].dispose(renderer.gl);
+                this._outputTextures[outputName].dispose(renderer);
             }
         }
         parametersCopy.width = width;

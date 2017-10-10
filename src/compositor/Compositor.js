@@ -76,10 +76,10 @@ var Compositor = Graph.extend(function() {
 
     /**
      * Dispose compositor
-     * @param {WebGLRenderingContext|qtek.Renderer} renderer
+     * @param {qtek.Renderer} renderer
      */
     dispose: function (renderer) {
-        this._texturePool.clear(renderer.gl || renderer);
+        this._texturePool.clear(renderer);
     }
 });
 

@@ -44,7 +44,7 @@ import Base$24 from './core/Base';
 import Cache$25 from './core/Cache';
 import Event$26 from './core/Event';
 import glenum$27 from './core/glenum';
-import glinfo$28 from './core/glinfo';
+import GLInfo$28 from './core/GLInfo';
 import LinkedList$29 from './core/LinkedList';
 import LRU$30 from './core/LRU';
 import extend$31 from './core/mixin/extend';
@@ -188,7 +188,7 @@ var core = {
     Cache : Cache$25,
     Event : Event$26,
     glenum : glenum$27,
-    glinfo : glinfo$28,
+    GLInfo : GLInfo$28,
     LinkedList : LinkedList$29,
     LRU : LRU$30,
     mixin : {

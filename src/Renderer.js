@@ -3,7 +3,7 @@
 //
 // TODO prez skinning
 import Base from './core/Base';
-import glinfo from './core/glinfo';
+import GLInfo from './core/GLInfo';
 import glenum from './core/glenum';
 import vendor from './core/vendor';
 import BoundingBox from './math/BoundingBox';
@@ -158,17 +158,16 @@ var Renderer = Base.extend(function () {
             throw new Error();
         }
 
-        if (this.gl.__GLID__ == null) {
-            // gl context is not created
-            // Otherwise is the case mutiple renderer share the same gl context
-            this.gl.__GLID__ = glid++;
+        this._glinfo = new GLInfo(this.gl);
 
-            glinfo.initialize(this.gl);
+        if (this.gl.targetRenderer) {
+            console.error('Already created a renderer');
         }
+        this.gl.targetRenderer = this;
 
         this.resize();
     }
-    catch(e) {
+    catch (e) {
         throw 'Error creating WebGL Context ' + e;
     }
 },
@@ -244,11 +243,21 @@ var Renderer = Base.extend(function () {
     },
 
     /**
-     * Get WebGL extionsion
+     * Get WebGL extension
+     * @param {string} name
      * @return {object}
      */
-    getExtension: function (name) {
-        return glinfo.getExtension(this.gl, name);
+    getGLExtension: function (name) {
+        return this._glinfo.getExtension(name);
+    },
+
+    /**
+     * Get WebGL parameter
+     * @param {string} name
+     * @return {*}
+     */
+    getGLParameter: function (name) {
+        return this._glinfo.getExtension(name);
     },
 
     /**
@@ -398,12 +407,12 @@ var Renderer = Base.extend(function () {
         // StandardMaterial needs updateShader method so shader can be created on demand.
         for (var i = 0; i < opaqueQueue.length; i++) {
             var material = opaqueQueue[i].material;
-            material.updateShader && material.updateShader(_gl);
+            material.updateShader && material.updateShader(this);
         }
         // StandardMaterial needs updateShader method so shader can be created on demand.
         for (var i = 0; i < transparentQueue.length; i++) {
             var material = transparentQueue[i].material;
-            material.updateShader && material.updateShader(_gl);
+            material.updateShader && material.updateShader(this);
         }
         scene.trigger('beforerender', this, scene, camera);
         // Sort render queue
@@ -565,7 +574,7 @@ var Renderer = Base.extend(function () {
             // var prevShader = null;
 
             // Before render hook
-            renderable.beforeRender(_gl);
+            renderable.beforeRender(this);
             this.beforeRenderObject(renderable, prevMaterial, prevShader);
 
             var shaderChanged = !shader.isEqual(prevShader);
@@ -574,7 +583,7 @@ var Renderer = Base.extend(function () {
                 if (scene && scene.isShaderLightNumberChanged(shader)) {
                     scene.setShaderLightNumber(shader);
                 }
-                var errMsg = shader.bind(_gl);
+                var errMsg = shader.bind(this);
                 if (errMsg) {
 
                     if (errorShader[shader.__GUID__]) {
@@ -602,7 +611,7 @@ var Renderer = Base.extend(function () {
                 // Set lights uniforms
                 // TODO needs optimized
                 if (scene) {
-                    scene.setLightUniforms(shader, _gl);
+                    scene.setLightUniforms(shader, this);
                 }
 
                 // Save current used shader in the renderer
@@ -626,7 +635,7 @@ var Renderer = Base.extend(function () {
                         depthMask = material.depthMask;
                     }
                 }
-                material.bind(_gl, shader, prevMaterial, prevShader);
+                material.bind(this, shader, prevMaterial, prevShader);
                 prevMaterial = material;
 
                 // TODO cache blending
@@ -666,7 +675,7 @@ var Renderer = Base.extend(function () {
                 culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
             }
 
-            var objectRenderInfo = renderable.render(_gl, shader);
+            var objectRenderInfo = renderable.render(this, shader);
 
             if (objectRenderInfo) {
                 renderInfo.triangleCount += objectRenderInfo.triangleCount;
@@ -677,7 +686,7 @@ var Renderer = Base.extend(function () {
 
             // After render hook
             this.afterRenderObject(renderable, objectRenderInfo);
-            renderable.afterRender(_gl, objectRenderInfo);
+            renderable.afterRender(this, objectRenderInfo);
 
             prevShader = shader;
         }
@@ -700,7 +709,7 @@ var Renderer = Base.extend(function () {
         // Status
         var culling, cullFace, frontFace;
 
-        preZPassShader.bind(_gl);
+        preZPassShader.bind(this);
         _gl.colorMask(false, false, false, false);
         _gl.depthMask(true);
         _gl.enable(_gl.DEPTH_TEST);
@@ -747,7 +756,7 @@ var Renderer = Base.extend(function () {
             preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
 
             // PENDING If invoke beforeRender hook
-            renderable.render(_gl, preZPassMaterial.shader);
+            renderable.render(this, preZPassMaterial.shader);
         }
         _gl.depthFunc(_gl.LEQUAL);
         _gl.colorMask(true, true, true, true);
@@ -836,26 +845,25 @@ var Renderer = Base.extend(function () {
      */
     disposeNode: function(root, disposeGeometry, disposeTexture) {
         var materials = {};
-        var _gl = this.gl;
         // Dettached from parent
         if (root.getParent()) {
             root.getParent().remove(root);
         }
         root.traverse(function(node) {
             if (node.geometry && disposeGeometry) {
-                node.geometry.dispose(_gl);
+                node.geometry.dispose(this);
             }
             if (node.material) {
                 materials[node.material.__GUID__] = node.material;
             }
             // Particle system and AmbientCubemap light need to dispose
             if (node.dispose) {
-                node.dispose(_gl);
+                node.dispose(this);
             }
         });
         for (var guid in materials) {
             var mat = materials[guid];
-            mat.dispose(_gl, disposeTexture);
+            mat.dispose(this, disposeTexture);
         }
     },
 
@@ -864,7 +872,7 @@ var Renderer = Base.extend(function () {
      * @param {qtek.Shader} shader
      */
     disposeShader: function(shader) {
-        shader.dispose(this.gl);
+        shader.dispose(this);
     },
 
     /**
@@ -872,7 +880,7 @@ var Renderer = Base.extend(function () {
      * @param {qtek.Geometry} geometry
      */
     disposeGeometry: function(geometry) {
-        geometry.dispose(this.gl);
+        geometry.dispose(this);
     },
 
     /**
@@ -880,7 +888,7 @@ var Renderer = Base.extend(function () {
      * @param {qtek.Texture} texture
      */
     disposeTexture: function(texture) {
-        texture.dispose(this.gl);
+        texture.dispose(this);
     },
 
     /**
@@ -888,14 +896,13 @@ var Renderer = Base.extend(function () {
      * @param {qtek.FrameBuffer} frameBuffer
      */
     disposeFrameBuffer: function(frameBuffer) {
-        frameBuffer.dispose(this.gl);
+        frameBuffer.dispose(this);
     },
 
     /**
      * Dispose renderer
      */
     dispose: function () {
-        glinfo.dispose(this.gl);
     },
 
     /**

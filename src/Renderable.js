@@ -1,6 +1,5 @@
 import Node from './Node';
 import glenum from './core/glenum';
-import glinfo from './core/glinfo';
 
 // Cache
 var prevDrawID = 0;
@@ -137,11 +136,12 @@ var Renderable = Node.extend(
     },
 
     /**
-     * @param  {WebGLRenderingContext} _gl
+     * @param  {qtek.Renderer} renderer
      * @param  {qtek.Shader} [shader] May use shader of other material if shader code are same
      * @return {Object}
      */
-    render: function (_gl, shader) {
+    render: function (renderer, shader) {
+        var _gl = renderer.gl;
         // May use shader of other material if shader code are same
         var shader = shader || this.material.shader;
         var geometry = this.geometry;
@@ -151,11 +151,11 @@ var Renderable = Node.extend(
         var nVertex = geometry.vertexCount;
         var isUseIndices = geometry.isUseIndices();
 
-        var uintExt = glinfo.getExtension(_gl, 'OES_element_index_uint');
+        var uintExt = renderer.getGLExtension('OES_element_index_uint');
         var useUintExt = uintExt && nVertex > 0xffff;
         var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
-        var vaoExt = glinfo.getExtension(_gl, 'OES_vertex_array_object');
+        var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
         // var vaoExt = null;
 
         var isStatic = !geometry.dynamic;
@@ -167,7 +167,7 @@ var Renderable = Node.extend(
         // Draw each chunk
         var drawHashChanged = false;
         // Hash with shader id in case previous material has less attributes than next material
-        currentDrawID = _gl.__GLID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
+        currentDrawID = renderer.__GUID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
 
         if (currentDrawID !== prevDrawID) {
             drawHashChanged = true;
@@ -204,7 +204,7 @@ var Renderable = Node.extend(
             // Use the cache of static geometry
             var vaoList = this._drawCache[currentDrawID];
             if (!vaoList) {
-                var chunks = geometry.getBufferChunks(_gl);
+                var chunks = geometry.getBufferChunks(renderer);
                 if (!chunks) {  // Empty mesh
                     return;
                 }
@@ -268,7 +268,7 @@ var Renderable = Node.extend(
                 var indicesBuffer = vao.indicesBuffer;
 
                 if (needsBindAttributes) {
-                    var locationList = shader.enableAttributes(_gl, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
+                    var locationList = shader.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
                     // Setting attributes;
                     for (var a = 0; a < availableAttributes.length; a++) {
                         var location = locationList[a];
