@@ -175,8 +175,8 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
     };
 }
 
-import gbufferEssl from '../shader/source/deferred/gbuffer.essl';
-import chunkEssl from '../shader/source/deferred/gbuffer.essl';
+import gbufferEssl from '../shader/source/deferred/gbuffer.essl.js';
+import chunkEssl from '../shader/source/deferred/gbuffer.essl.js';
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);

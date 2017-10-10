@@ -14,7 +14,7 @@ import glmatrix from '../dep/glmatrix';
 var vec3 = glmatrix.vec3;
 var sh = {};
 
-import projectEnvMapShaderCode from './shader/projectEnvMap.essl';
+import projectEnvMapShaderCode from './shader/projectEnvMap.essl.js';
 
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 

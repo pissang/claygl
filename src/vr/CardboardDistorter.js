@@ -13,7 +13,7 @@ import Shader from '../Shader';
 import Base from '../core/Base';
 import PerspectiveCamera from '../camera/Perspective';
 
-import outputEssl from './output.essl';
+import outputEssl from './output.essl.js';
 
 Shader.import(outputEssl);
 

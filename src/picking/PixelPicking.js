@@ -4,7 +4,7 @@ import Texture2D from '../Texture2D';
 import Shader from '../Shader';
 import Material from '../Material';
 
-import colorEssl from './color.essl';
+import colorEssl from './color.essl.js';
 Shader.import(colorEssl);
 
 /**

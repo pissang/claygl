@@ -16,7 +16,7 @@ import Vector2 from './math/Vector2';
 import Shader from './Shader';
 
 import lightShader from './shader/source/header/light';
-import prezEssl from './shader/source/prez.essl';
+import prezEssl from './shader/source/prez.essl.js';
 Shader['import'](lightShader);
 Shader['import'](prezEssl);
 

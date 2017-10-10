@@ -29,7 +29,7 @@ var vec3 = glMatrix.vec3;
 
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
-import shadowmapEssl from '../shader/source/shadowmap.essl';
+import shadowmapEssl from '../shader/source/shadowmap.essl.js';
 Shader['import'](shadowmapEssl);
 
 /**

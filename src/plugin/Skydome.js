@@ -3,7 +3,7 @@ import SphereGeometry from '../geometry/Sphere';
 import Shader from '../Shader';
 import Material from '../Material';
 
-import basicEssl from '../shader/source/basic.essl';
+import basicEssl from '../shader/source/basic.essl.js';
 Shader.import(basicEssl);
 /**
  * @constructor qtek.plugin.Skydome

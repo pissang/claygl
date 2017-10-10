@@ -1,7 +1,7 @@
 import Material from './Material';
 
 import Shader from './Shader';
-import standardEssl from './shader/source/standard.essl';
+import standardEssl from './shader/source/standard.essl.js';
 // Import standard shader
 Shader['import'](standardEssl);
 

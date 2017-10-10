@@ -14,9 +14,10 @@
   "module" : "dist/qtek.es.js",
   "main" : "dist/qtek.js",
   "scripts": {
-    "build": "npm run genentry && rollup -c",
+    "build": "npm run essl2js && npm run genentry && rollup -c",
     "genentry": "node build/genentry.js",
-    "prepublish": "npm run genentry"
+    "essl2js": "node build/essl2js.js",
+    "prepublish": "npm run essl2js && npm run genentry"
   },
   "repository": {
     "type": "git",
