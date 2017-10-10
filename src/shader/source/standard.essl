@@ -94,7 +94,7 @@ void main()
 
 #define PI 3.14159265358979
 
-#define GLOSS_CHANEL 0
+#define GLOSSINESS_CHANNEL 0
 #define ROUGHNESS_CHANNEL 0
 #define METALNESS_CHANNEL 1
 
@@ -125,8 +125,8 @@ uniform sampler2D roughnessMap;
     #endif
 #else
 uniform float glossiness: 0.5;
-    #ifdef GLOSSMAP_ENABLED
-uniform sampler2D glossMap;
+    #ifdef GLOSSINESSMAP_ENABLED
+uniform sampler2D glossinessMap;
     #endif
 #endif
 
@@ -303,15 +303,16 @@ void main()
     #endif
 #else
     float g = glossiness;
-    #ifdef GLOSSMAP_ENABLED
-    float g2 = texture2D(glossMap, v_Texcoord)[GLOSS_CHANEL];
+    #ifdef GLOSSINESSMAP_ENABLED
+    float g2 = texture2D(glossinessMap, v_Texcoord)[GLOSSINESS_CHANNEL];
     // Adjust the brightness
     g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     #endif
 #endif
 
 #ifdef SPECULARMAP_ENABLED
-    spec *= texture2D(specularMap, v_Texcoord).rgb;
+    // Convert to linear space.
+    spec *= sRGBToLinear(texture2D(specularMap, v_Texcoord)).rgb;
 #endif
 
     vec3 N = v_Normal;
