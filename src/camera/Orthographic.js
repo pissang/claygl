@@ -1,71 +1,66 @@
-define(function(require) {
-
-    'use strict';
-
-    var Camera = require('../Camera');
+import Camera from '../Camera';
+/**
+ * @constructor qtek.camera.Orthographic
+ * @extends qtek.Camera
+ */
+var Orthographic = Camera.extend(
+/** @lends qtek.camera.Orthographic# */
+{
     /**
-     * @constructor qtek.camera.Orthographic
-     * @extends qtek.Camera
+     * @type {number}
      */
-    var Orthographic = Camera.extend(
-    /** @lends qtek.camera.Orthographic# */
-    {
-        /**
-         * @type {number}
-         */
-        left: -1,
-        /**
-         * @type {number}
-         */
-        right: 1,
-        /**
-         * @type {number}
-         */
-        near: -1,
-        /**
-         * @type {number}
-         */
-        far: 1,
-        /**
-         * @type {number}
-         */
-        top: 1,
-        /**
-         * @type {number}
-         */
-        bottom: -1
+    left: -1,
+    /**
+     * @type {number}
+     */
+    right: 1,
+    /**
+     * @type {number}
+     */
+    near: -1,
+    /**
+     * @type {number}
+     */
+    far: 1,
+    /**
+     * @type {number}
+     */
+    top: 1,
+    /**
+     * @type {number}
+     */
+    bottom: -1
+},
+/** @lends qtek.camera.Orthographic.prototype */
+{
+
+    updateProjectionMatrix: function() {
+        this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
     },
-    /** @lends qtek.camera.Orthographic.prototype */
-    {
 
-        updateProjectionMatrix: function() {
-            this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
-        },
+    decomposeProjectionMatrix: function () {
+        var m = this.projectionMatrix._array;
+        this.left = (-1 - m[12]) / m[0];
+        this.right = (1 - m[12]) / m[0];
+        this.top = (1 - m[13]) / m[5];
+        this.bottom = (-1 - m[13]) / m[5];
+        this.near = -(-1 - m[14]) / m[10];
+        this.far = -(1 - m[14]) / m[10];
+    },
+    /**
+     * @return {qtek.camera.Orthographic}
+     */
+    clone: function() {
+        var camera = Camera.prototype.clone.call(this);
+        camera.left = this.left;
+        camera.right = this.right;
+        camera.near = this.near;
+        camera.far = this.far;
+        camera.top = this.top;
+        camera.bottom = this.bottom;
 
-        decomposeProjectionMatrix: function () {
-            var m = this.projectionMatrix._array;
-            this.left = (-1 - m[12]) / m[0];
-            this.right = (1 - m[12]) / m[0];
-            this.top = (1 - m[13]) / m[5];
-            this.bottom = (-1 - m[13]) / m[5];
-            this.near = -(-1 - m[14]) / m[10];
-            this.far = -(1 - m[14]) / m[10];
-        },
-        /**
-         * @return {qtek.camera.Orthographic}
-         */
-        clone: function() {
-            var camera = Camera.prototype.clone.call(this);
-            camera.left = this.left;
-            camera.right = this.right;
-            camera.near = this.near;
-            camera.far = this.far;
-            camera.top = this.top;
-            camera.bottom = this.bottom;
-
-            return camera;
-        }
-    });
-
-    return Orthographic;
+        return camera;
+    }
 });
+
+export default Orthographic;

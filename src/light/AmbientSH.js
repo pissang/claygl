@@ -1,60 +1,55 @@
-define(function(require) {
+import Light from '../Light';
+import vendor from '../core/vendor';
 
-    'use strict';
+/**
+ * Spherical Harmonic Ambient Light
+ * @constructor qtek.light.AmbientSH
+ * @extends qtek.Light
+ */
+var AmbientSHLight = Light.extend({
 
-    var Light = require('../Light');
-    var vendor = require('../core/vendor');
+    castShadow: false,
+
 
     /**
-     * Spherical Harmonic Ambient Light
-     * @constructor qtek.light.AmbientSH
-     * @extends qtek.Light
+     * Spherical Harmonic Coefficients
+     * @type {Array.<number>}
      */
-    var AmbientSHLight = Light.extend({
+    coefficients: [],
 
-        castShadow: false,
+}, function () {
+    this._coefficientsTmpArr = new vendor.Float32Array(9 * 3);
+}, {
 
+    type: 'AMBIENT_SH_LIGHT',
 
-        /**
-         * Spherical Harmonic Coefficients
-         * @type {Array.<number>}
-         */
-        coefficients: [],
+    uniformTemplates: {
+        ambientSHLightColor: {
+            type: '3f',
+            value: function (instance) {
+                var color = instance.color;
+                var intensity = instance.intensity;
+                return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
+            }
+        },
 
-    }, function () {
-        this._coefficientsTmpArr = new vendor.Float32Array(9 * 3);
-    }, {
-
-        type: 'AMBIENT_SH_LIGHT',
-
-        uniformTemplates: {
-            ambientSHLightColor: {
-                type: '3f',
-                value: function (instance) {
-                    var color = instance.color;
-                    var intensity = instance.intensity;
-                    return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
+        ambientSHLightCoefficients: {
+            type: '3f',
+            value: function (instance) {
+                var coefficientsTmpArr = instance._coefficientsTmpArr;
+                for (var i = 0; i < instance.coefficients.length; i++) {
+                    coefficientsTmpArr[i] = instance.coefficients[i];
                 }
-            },
-
-            ambientSHLightCoefficients: {
-                type: '3f',
-                value: function (instance) {
-                    var coefficientsTmpArr = instance._coefficientsTmpArr;
-                    for (var i = 0; i < instance.coefficients.length; i++) {
-                        coefficientsTmpArr[i] = instance.coefficients[i];
-                    }
-                    return coefficientsTmpArr;
-                }
+                return coefficientsTmpArr;
             }
         }
-        /**
-         * @method
-         * @name clone
-         * @return {qtek.light.Ambient}
-         * @memberOf qtek.light.Ambient.prototype
-         */
-    });
-
-    return AmbientSHLight;
+    }
+    /**
+     * @method
+     * @name clone
+     * @return {qtek.light.Ambient}
+     * @memberOf qtek.light.Ambient.prototype
+     */
 });
+
+export default AmbientSHLight;

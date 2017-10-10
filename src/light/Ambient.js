@@ -1,38 +1,33 @@
-define(function(require) {
+import Light from '../Light';
 
-    'use strict';
+/**
+ * @constructor qtek.light.Ambient
+ * @extends qtek.Light
+ */
+var AmbientLight = Light.extend({
 
-    var Light = require('../Light');
+    castShadow: false
 
-    /**
-     * @constructor qtek.light.Ambient
-     * @extends qtek.Light
-     */
-    var AmbientLight = Light.extend({
+}, {
 
-        castShadow: false
+    type: 'AMBIENT_LIGHT',
 
-    }, {
-
-        type: 'AMBIENT_LIGHT',
-
-        uniformTemplates: {
-            ambientLightColor: {
-                type: '3f',
-                value: function(instance) {
-                    var color = instance.color;
-                    var intensity = instance.intensity;
-                    return [color[0]*intensity, color[1]*intensity, color[2]*intensity];
-                }
+    uniformTemplates: {
+        ambientLightColor: {
+            type: '3f',
+            value: function(instance) {
+                var color = instance.color;
+                var intensity = instance.intensity;
+                return [color[0]*intensity, color[1]*intensity, color[2]*intensity];
             }
         }
-        /**
-         * @method
-         * @name clone
-         * @return {qtek.light.Ambient}
-         * @memberOf qtek.light.Ambient.prototype
-         */
-    });
-
-    return AmbientLight;
+    }
+    /**
+     * @method
+     * @name clone
+     * @return {qtek.light.Ambient}
+     * @memberOf qtek.light.Ambient.prototype
+     */
 });
+
+export default AmbientLight;

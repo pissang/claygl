@@ -1,6 +1,6 @@
 {
-  "name" : "qtek",
-  "version" : "0.4.3",
+  "name": "qtek",
+  "version": "0.4.3",
   "description": "WebGL graphic library",
   "keywords": [
     "graphic",
@@ -14,27 +14,24 @@
     "essl2js": {
       "patterns": ["src"],
       "extensions": "essl"
-    },
-    "amd2common": {
-      "patterns": ["src"],
-      "extensions": "js"
     }
   },
+  "jsnext:main" : "dist/qtek.es.js",
+  "module" : "dist/qtek.es.js",
+  "main" : "dist/qtek.js",
   "scripts": {
+    "build": "npm run essl2js && npm run genentry && rollup -c",
     "genentry": "node build/genentry.js",
     "essl2js": "node build/essl2js.js",
-    "amd2common": "node build/amd2common.js",
-    "prepublish": "npm run essl2js && npm run genentry && npm run amd2common"
+    "prepublish": "npm run essl2js && npm run genentry"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/pissang/qtek.git"
   },
-  "devDependencies" : {
-    "webpack": "^1.12.13",
-    "esprima": "^2.7.2",
-    "estraverse": "^4.1.1",
-    "fs-extra": "^0.26.5",
-    "glob": "^7.0.0"
+  "devDependencies": {
+    "glob": "^7.0.0",
+    "rollup": "^0.49.3",
+    "rollup-plugin-commonjs": "^8.2.1"
   }
 }

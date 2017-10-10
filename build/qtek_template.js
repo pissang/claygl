@@ -15,9 +15,5 @@
 /** @namespace qtek.shader */
 /** @namespace qtek.texture */
 /** @namespace qtek.util */
-define(function(require) {
 
-	var exportsObject = {{$exportsObject}};
-
-    return exportsObject;
-});
+{{$exportsObject}};

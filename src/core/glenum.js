@@ -2,9 +2,7 @@
  * @namespace qtek.core.glenum
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
  */
-define(function() {
-
-return {
+export default {
     /* ClearBufferMask */
     DEPTH_BUFFER_BIT               : 0x00000100,
     STENCIL_BUFFER_BIT             : 0x00000400,
@@ -420,4 +418,3 @@ return {
     UNPACK_COLORSPACE_CONVERSION_WEBGL : 0x9243,
     BROWSER_DEFAULT_WEBGL          : 0x9244,
 };
-});

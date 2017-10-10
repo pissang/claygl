@@ -1,36 +1,31 @@
-define(function(require) {
+import Node from './Node';
 
-    'use strict';
+/**
+ * @constructor qtek.compositor.TextureNode
+ * @extends qtek.compositor.Node
+ */
+var TextureNode = Node.extend(function() {
+    return /** @lends qtek.compositor.TextureNode# */ {
+        /**
+         * @type {qtek.Texture2D}
+         */
+        texture: null,
 
-    var Node = require('./Node');
+        // Texture node must have output without parameters
+        outputs: {
+            color: {}
+        }
+    };
+}, function () {
+}, {
 
-    /**
-     * @constructor qtek.compositor.TextureNode
-     * @extends qtek.compositor.Node
-     */
-    var TextureNode = Node.extend(function() {
-        return /** @lends qtek.compositor.TextureNode# */ {
-            /**
-             * @type {qtek.Texture2D}
-             */
-            texture: null,
+    getOutput: function (renderer, name) {
+        return this.texture;
+    },
 
-            // Texture node must have output without parameters
-            outputs: {
-                color: {}
-            }
-        };
-    }, function () {
-    }, {
-
-        getOutput: function (renderer, name) {
-            return this.texture;
-        },
-
-        // Do nothing
-        beforeFrame: function () {},
-        afterFrame: function () {}
-    });
-
-    return TextureNode;
+    // Do nothing
+    beforeFrame: function () {},
+    afterFrame: function () {}
 });
+
+export default TextureNode;
