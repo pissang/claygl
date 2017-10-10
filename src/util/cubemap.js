@@ -14,8 +14,8 @@ import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import vendor from '../core/vendor';
 import textureUtil from './texture';
 
-import integrateBRDFShaderCode from './shader/integrateBRDF.essl.js';
-import prefilterFragCode from './shader/prefilter.essl.js';
+import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
+import prefilterFragCode from './shader/prefilter.glsl.js';
 
 var cubemapUtil = {};
 

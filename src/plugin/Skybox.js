@@ -4,7 +4,7 @@ import CubeGeometry from '../geometry/Cube';
 import Shader from '../Shader';
 import Material from '../Material';
 
-import skyboxEssl from '../shader/source/skybox.essl.js';
+import skyboxEssl from '../shader/source/skybox.glsl.js';
 Shader.import(skyboxEssl);
 /**
  * @constructor qtek.plugin.Skybox

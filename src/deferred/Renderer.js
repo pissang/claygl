@@ -15,20 +15,20 @@ import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
 import GBuffer from './GBuffer';
 
-import prezEssl from '../shader/source/prez.essl.js';
-import utilEssl from '../shader/source/util.essl.js';
+import prezEssl from '../shader/source/prez.glsl.js';
+import utilEssl from '../shader/source/util.glsl.js';
 
-import chunkEssl from '../shader/source/deferred/chunk.essl.js';
-import lightvolumeEssl from '../shader/source/deferred/lightvolume.essl.js';
+import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
+import lightvolumeEssl from '../shader/source/deferred/lightvolume.glsl.js';
 // Light shaders
-import spotEssl from '../shader/source/deferred/spot.essl.js';
-import directionalEssl from '../shader/source/deferred/directional.essl.js';
-import ambientEssl from '../shader/source/deferred/ambient.essl.js';
-import ambientshEssl from '../shader/source/deferred/ambientsh.essl.js';
-import ambientcubemapEssl from '../shader/source/deferred/ambientcubemap.essl.js';
-import pointEssl from '../shader/source/deferred/point.essl.js';
-import sphereEssl from '../shader/source/deferred/sphere.essl.js';
-import tubeEssl from '../shader/source/deferred/tube.essl.js';
+import spotEssl from '../shader/source/deferred/spot.glsl.js';
+import directionalEssl from '../shader/source/deferred/directional.glsl.js';
+import ambientEssl from '../shader/source/deferred/ambient.glsl.js';
+import ambientshEssl from '../shader/source/deferred/ambientsh.glsl.js';
+import ambientcubemapEssl from '../shader/source/deferred/ambientcubemap.glsl.js';
+import pointEssl from '../shader/source/deferred/point.glsl.js';
+import sphereEssl from '../shader/source/deferred/sphere.glsl.js';
+import tubeEssl from '../shader/source/deferred/tube.glsl.js';
 
 Shader.import(prezEssl);
 Shader.import(utilEssl);

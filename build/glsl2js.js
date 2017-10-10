@@ -3,15 +3,12 @@ var fs = require('fs');
 
 var ROOT = __dirname + '/../src/';
 
-glob(ROOT + '**/*.essl', function (err, files) {
+glob(ROOT + '**/*.glsl', function (err, files) {
     files.forEach(function (filePath) {
-        var esslCode = fs.readFileSync(filePath, 'utf-8');
-        // TODO Remove comment
-        // esslCode = esslCode.replace(/\/\/.*\n/g, '');
-        // esslCode = esslCode.replace(/ +/g, ' ');
+        var glslCode = fs.readFileSync(filePath, 'utf-8');
         
         //From THREE.js's rollup.config.js
-        esslCode = esslCode
+        glslCode = glslCode
             .replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
             .replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
             .replace( /\n{2,}/g, '\n' ) // # \n+ to \n
@@ -21,7 +18,7 @@ glob(ROOT + '**/*.essl', function (err, files) {
         fs.writeFileSync(
             filePath + '.js',
             'export default ' +
-               JSON.stringify(esslCode) + ';\n',
+               JSON.stringify(glslCode) + ';\n',
             'utf-8'
         );
     });

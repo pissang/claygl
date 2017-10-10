@@ -1,0 +1,1 @@
+export default "@export qtek.deferred.light_volume.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_Position;\nvoid main()\n{\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n    v_Position = position;\n}\n@end";

@@ -1,12 +1,12 @@
 import lightEssl from './source/header/light';
-import utilEssl from './source/util.essl.js';
+import utilEssl from './source/util.glsl.js';
 
-import basicEssl from './source/basic.essl.js';
-import lambertEssl from './source/lambert.essl.js';
-import standardEssl from './source/standard.essl.js';
-import wireframeEssl from './source/wireframe.essl.js';
-import skyboxEssl from './source/skybox.essl.js';
-import prezEssl from './source/prez.essl.js';
+import basicEssl from './source/basic.glsl.js';
+import lambertEssl from './source/lambert.glsl.js';
+import standardEssl from './source/standard.glsl.js';
+import wireframeEssl from './source/wireframe.glsl.js';
+import skyboxEssl from './source/skybox.glsl.js';
+import prezEssl from './source/prez.glsl.js';
 
 import library from './library';
 import Shader from '../Shader';
@@ -31,22 +31,22 @@ library.template('qtek.prez', Shader.source('qtek.prez.vertex'), Shader.source('
 library.template('qtek.standard', Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'));
 
 
-import coloradjustEssl from './source/compositor/coloradjust.essl.js';
-import blurEssl from './source/compositor/blur.essl.js';
-import lumEssl from './source/compositor/lum.essl.js';
-import lutEssl from './source/compositor/lut.essl.js';
-import vigentteEssl from './source/compositor/vignette.essl.js';
-import outputEssl from './source/compositor/output.essl.js';
-import brightEssl from './source/compositor/bright.essl.js';
-import downsampleEssl from './source/compositor/downsample.essl.js';
-import upsampleEssl from './source/compositor/upsample.essl.js';
-import hdrEssl from './source/compositor/hdr.essl.js';
-import dofEssl from './source/compositor/dof.essl.js';
-import lensflareEssl from './source/compositor/lensflare.essl.js';
-import blendEssl from './source/compositor/blend.essl.js';
+import coloradjustEssl from './source/compositor/coloradjust.glsl.js';
+import blurEssl from './source/compositor/blur.glsl.js';
+import lumEssl from './source/compositor/lum.glsl.js';
+import lutEssl from './source/compositor/lut.glsl.js';
+import vigentteEssl from './source/compositor/vignette.glsl.js';
+import outputEssl from './source/compositor/output.glsl.js';
+import brightEssl from './source/compositor/bright.glsl.js';
+import downsampleEssl from './source/compositor/downsample.glsl.js';
+import upsampleEssl from './source/compositor/upsample.glsl.js';
+import hdrEssl from './source/compositor/hdr.glsl.js';
+import dofEssl from './source/compositor/dof.glsl.js';
+import lensflareEssl from './source/compositor/lensflare.glsl.js';
+import blendEssl from './source/compositor/blend.glsl.js';
 
-import fxaaEssl from './source/compositor/fxaa.essl.js';
-import fxaa3Essl from './source/compositor/fxaa3.essl.js';
+import fxaaEssl from './source/compositor/fxaa.glsl.js';
+import fxaa3Essl from './source/compositor/fxaa3.glsl.js';
 
 // Some build in shaders
 Shader['import'](coloradjustEssl);

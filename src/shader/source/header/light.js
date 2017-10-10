@@ -1,4 +1,4 @@
-import calcAmbientSHLightEssl from './calcAmbientSHLight.essl.js';
+import calcAmbientSHLightEssl from './calcAmbientSHLight.glsl.js';
 
 var uniformVec3Prefix = 'uniform vec3 ';
 var uniformFloatPrefix = 'uniform float ';

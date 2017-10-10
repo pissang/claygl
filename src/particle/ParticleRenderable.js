@@ -4,7 +4,7 @@ import StaticGeometry from '../StaticGeometry';
 import Material from '../Material';
 import Shader from '../Shader';
 
-import particleEssl from './particle.essl.js';
+import particleEssl from './particle.glsl.js';
 Shader['import'](particleEssl);
 
 var particleShader = new Shader({

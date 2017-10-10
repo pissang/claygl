@@ -6,7 +6,7 @@ import Material from '../Material';
 import Mesh from '../Mesh';
 import glinfo from '../core/glinfo';
 import glenum from '../core/glenum';
-import vertexEssl from '../shader/source/compositor/vertex.essl.js';
+import vertexEssl from '../shader/source/compositor/vertex.glsl.js';
 
 Shader['import'](vertexEssl);
 
