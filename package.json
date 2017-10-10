@@ -10,6 +10,12 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
+  "watch": {
+    "essl2js": {
+      "patterns": ["src"],
+      "extensions": "essl"
+    }
+  },
   "jsnext:main" : "dist/qtek.es.js",
   "module" : "dist/qtek.es.js",
   "main" : "dist/qtek.js",
