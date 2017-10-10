@@ -1,4 +1,4 @@
-// https://docs.unrealengine.com/latest/INT/Engine/Rendering/LightingAndShadows/AmbientCubemap/define(function(require) {
+// https://docs.unrealengine.com/latest/INT/Engine/Rendering/LightingAndShadows/AmbientCubemap/
 import Light from '../Light';
 import cubemapUtil from '../util/cubemap';
 
