@@ -30,7 +30,8 @@ var Mesh = Renderable.extend(
         this.joints = [];
     }
 }, {
-    render: function (_gl, shader) {
+    render: function (renderer, shader) {
+        var _gl = renderer.gl;
         shader = shader || this.material.shader;
         // Set pose matrices of skinned mesh
         if (this.skeleton) {
@@ -72,7 +73,7 @@ var Mesh = Renderable.extend(
             }
         }
 
-        return Renderable.prototype.render.call(this, _gl, shader);
+        return Renderable.prototype.render.call(this, renderer, shader);
     },
 
     getSkinMatricesTexture: function () {

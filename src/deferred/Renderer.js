@@ -18,7 +18,6 @@ import GBuffer from './GBuffer';
 import prezEssl from '../shader/source/prez.glsl.js';
 import utilEssl from '../shader/source/util.glsl.js';
 
-import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
 import lightvolumeEssl from '../shader/source/deferred/lightvolume.glsl.js';
 // Light shaders
 import spotEssl from '../shader/source/deferred/spot.glsl.js';
@@ -34,7 +33,6 @@ Shader.import(prezEssl);
 Shader.import(utilEssl);
 Shader.import(lightvolumeEssl);
 
-Shader.import(chunkEssl);
 // Light shaders
 Shader.import(spotEssl);
 Shader.import(directionalEssl);

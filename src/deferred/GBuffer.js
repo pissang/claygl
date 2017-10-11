@@ -8,6 +8,12 @@ import ForwardRenderer from '../Renderer';
 import Pass from '../compositor/Pass';
 import Matrix4 from '../math/Matrix4';
 
+import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
+import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
+
+Shader.import(gbufferEssl);
+Shader.import(chunkEssl);
+
 function createFillCanvas(color) {
     var canvas = document.createElement('canvas');
     canvas.width = canvas.height = 1;
@@ -174,12 +180,6 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
         previousRenderable = renderable;
     };
 }
-
-import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
-import chunkEssl from '../shader/source/deferred/gbuffer.glsl.js';
-
-Shader.import(gbufferEssl);
-Shader.import(chunkEssl);
 
 var GBuffer = Base.extend(function () {
 
