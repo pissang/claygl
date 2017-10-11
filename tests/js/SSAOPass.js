@@ -1,9 +1,9 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
     var Matrix4 = qtek.math.Matrix4;
     var Vector3 = qtek.math.Vector3;
 
-    qtek.Shader.import(require('text!../shader/ssao.essl'));
+    qtek.Shader.import(require('text!../shader/ssao.glsl'));
 
     function generateNoiseData(size) {
         var data = new Uint8Array(size * size * 4);

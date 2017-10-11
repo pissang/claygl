@@ -1,82 +1,79 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            require(['qtek'], function(qtek) {
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek.camera.Perspective();
-                camera.aspect = renderer.getViewportAspect();
-                camera.position.z = 3;
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var camera = new qtek.camera.Perspective();
+            camera.aspect = renderer.getViewportAspect();
+            camera.position.z = 3;
 
-                var control = new qtek.plugin.OrbitControl({
-                    domElement: renderer.canvas,
-                    target: camera
-                });
+            var control = new qtek.plugin.OrbitControl({
+                domElement: renderer.canvas,
+                target: camera
+            });
 
-                var scene = new qtek.Scene();
+            var scene = new qtek.Scene();
 
-                var loader = new qtek.loader.GLTF();
-                loader.load('assets/models/suzanne.json');
-                loader.success(function(res) {
-                    var geo = res.scene.getNode('Suzanne').geometry;
-                    var mesh = new qtek.Mesh({
-                        material: new qtek.Material({
-                            shader: qtek.shader.library.get('qtek.standard')
-                        }),
-                        geometry: geo
-                    });
-
-                    scene.add(mesh);
-                })
-
-                var light = new qtek.light.Directional();
-                light.position.set(1, 1, 1);
-                light.lookAt(qtek.math.Vector3.ZERO);
-                scene.add(light);
-                scene.add(new qtek.light.Ambient({
-                    intensity : 0.5
-                }));
-
-                var picking = new qtek.picking.RayPicking({
-                    renderer : renderer,
-                    scene: scene,
-                    camera: camera
-                });
-
-                var animation = new qtek.animation.Animation();
-                animation.start();
-                animation.on('frame', function(dTime) {
-                    control.update(dTime);
-                    renderer.render(scene, camera);
-                });
-
-                var sphere = new qtek.Mesh({
+            var loader = new qtek.loader.GLTF();
+            loader.load('assets/models/suzanne.json');
+            loader.success(function(res) {
+                var geo = res.scene.getNode('Suzanne').geometry;
+                var mesh = new qtek.Mesh({
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.basic')
+                        shader: qtek.shader.library.get('qtek.standard')
                     }),
-                    geometry: new qtek.geometry.Sphere()
+                    geometry: geo
                 });
-                sphere.scale.set(0.02, 0.02, 0.02);
-                sphere.material.set('color', [1, 0, 0]);
-                scene.add(sphere);
 
-                renderer.canvas.addEventListener('mousemove', function(e) {
-                    var res = picking.pick(e.offsetX, e.offsetY);
-                    if (res) {
-                        sphere.position.copy(res.pointWorld);
-                    } else {
-                        sphere.position.set(1000, 1000, 1000);
-                    }
-                });
+                scene.add(mesh);
+            })
+
+            var light = new qtek.light.Directional();
+            light.position.set(1, 1, 1);
+            light.lookAt(qtek.math.Vector3.ZERO);
+            scene.add(light);
+            scene.add(new qtek.light.Ambient({
+                intensity : 0.5
+            }));
+
+            var picking = new qtek.picking.RayPicking({
+                renderer : renderer,
+                scene: scene,
+                camera: camera
+            });
+
+            var animation = new qtek.animation.Animation();
+            animation.start();
+            animation.on('frame', function(dTime) {
+                control.update(dTime);
+                renderer.render(scene, camera);
+            });
+
+            var sphere = new qtek.Mesh({
+                material: new qtek.Material({
+                    shader: qtek.shader.library.get('qtek.basic')
+                }),
+                geometry: new qtek.geometry.Sphere()
+            });
+            sphere.scale.set(0.02, 0.02, 0.02);
+            sphere.material.set('color', [1, 0, 0]);
+            scene.add(sphere);
+
+            renderer.canvas.addEventListener('mousemove', function(e) {
+                var res = picking.pick(e.offsetX, e.offsetY);
+                if (res) {
+                    sphere.position.copy(res.pointWorld);
+                } else {
+                    sphere.position.set(1000, 1000, 1000);
+                }
             });
         </script>
     </body>

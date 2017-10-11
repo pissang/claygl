@@ -1,5 +1,5 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
     var json = JSON.parse(require('text!../assets/fx/composite.json'));
 
     var parameterNodeMap = {

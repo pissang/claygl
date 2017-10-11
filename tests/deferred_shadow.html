@@ -3,130 +3,127 @@
         <title>Deferred Pointlight Shadow</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
 
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            require(['qtek'], function(qtek) {
-                var animation = new qtek.animation.Animation();
+            var animation = new qtek.animation.Animation();
 
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                var shadowMapPass = new qtek.prePass.ShadowMap();
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
+            });
+            var shadowMapPass = new qtek.prePass.ShadowMap();
 
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var deferredRenderer = new qtek.deferred.Renderer({
-                    shadowMapPass: shadowMapPass
-                });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var deferredRenderer = new qtek.deferred.Renderer({
+                shadowMapPass: shadowMapPass
+            });
 
-                var camera = new qtek.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
+            var camera = new qtek.camera.Perspective({
+                aspect: renderer.getViewportAspect()
+            });
 
-                var scene = new qtek.Scene();
+            var scene = new qtek.Scene();
 
-                var cube = new qtek.Mesh({
+            var cube = new qtek.Mesh({
+                material: new qtek.StandardMaterial({
+                    roughness: 0.9
+                }),
+                culling: false,
+                geometry: new qtek.geometry.Cube({
+                    inside: true
+                })
+            });
+            cube.scale.set(10, 10, 10);
+            scene.add(cube);
+
+            function randomInSquare(size) {
+                return (Math.random() - 0.5) * size * 2
+            }
+            var sphereGeo = new qtek.geometry.Sphere();
+            for (var i = 0; i < 20; i++) {
+                var sphere = new qtek.Mesh({
                     material: new qtek.StandardMaterial({
                         roughness: 0.9
                     }),
-                    culling: false,
-                    geometry: new qtek.geometry.Cube({
-                        inside: true
-                    })
+                    geometry: sphereGeo
                 });
-                cube.scale.set(10, 10, 10);
-                scene.add(cube);
+                sphere.scale.set(0.5, 0.5, 0.5);
+                sphere.position.set(
+                    randomInSquare(8), randomInSquare(8), randomInSquare(8)
+                );
+                scene.add(sphere);
+            }
 
-                function randomInSquare(size) {
-                    return (Math.random() - 0.5) * size * 2
-                }
-                var sphereGeo = new qtek.geometry.Sphere();
-                for (var i = 0; i < 20; i++) {
-                    var sphere = new qtek.Mesh({
-                        material: new qtek.StandardMaterial({
-                            roughness: 0.9
-                        }),
-                        geometry: sphereGeo
-                    });
-                    sphere.scale.set(0.5, 0.5, 0.5);
-                    sphere.position.set(
-                        randomInSquare(8), randomInSquare(8), randomInSquare(8)
-                    );
-                    scene.add(sphere);
-                }
+            // var spotLight = new qtek.light.Spot({
+            //     color: [1, 0, 0],
+            //     range: 500,
+            //     intensity: 10
+            // });
+            // spotLight.position.set(0, 50, 0);
+            // spotLight.rotation.rotateX(-Math.PI / 4);
+            // scene.add(spotLight);
 
-                // var spotLight = new qtek.light.Spot({
-                //     color: [1, 0, 0],
-                //     range: 500,
-                //     intensity: 10
-                // });
-                // spotLight.position.set(0, 50, 0);
-                // spotLight.rotation.rotateX(-Math.PI / 4);
-                // scene.add(spotLight);
-
-                for (var i = 0; i < 10; i ++) {
-                    var pointLight = new qtek.light.Point({
-                        color: [Math.random(), Math.random(), Math.random()],
-                        range: 40,
-                        intensity: 0.15,
-                        castShadow: true,
-                        shadowResolution: 512
-                    });
-                    pointLight.position.set(
-                        randomInSquare(5), randomInSquare(5), randomInSquare(5)
-                    );
-                    var debugMesh = new qtek.Mesh({
-                        material: new qtek.StandardMaterial({
-                            color: [0, 0, 0],
-                            rougness: 1,
-                            emission: pointLight.color
-                        }),
-                        geometry: sphereGeo
-                    });
-                    debugMesh.scale.set(0.1, 0.1, 0.1);
-                    pointLight.add(debugMesh);
-
-                    var animator = animation.animate(pointLight.position, { loop: true });
-                    for (var k = 0; k < 10; k++) {
-                        animator.when(k * 4000 + i * 1000, {
-                            x: randomInSquare(5),
-                            y: randomInSquare(5),
-                            z: randomInSquare(5)
-                        });
-                    }
-                    animator.start('spline');
-                    scene.add(pointLight);
-                }
-
-                camera.position.set(0, 0, 3);
-                camera.lookAt(scene.position);
-
-                var control = new qtek.plugin.OrbitControl({
-                    domElement: renderer.canvas,
-                    target: camera
+            for (var i = 0; i < 10; i ++) {
+                var pointLight = new qtek.light.Point({
+                    color: [Math.random(), Math.random(), Math.random()],
+                    range: 40,
+                    intensity: 0.15,
+                    castShadow: true,
+                    shadowResolution: 512
                 });
-
-                animation.on('frame', function (deltaTime) {
-                    control.update(deltaTime);
-                    // renderer.render(scene, camera);
-                    deferredRenderer.render(renderer, scene, camera);
-
-                    stats.update();
+                pointLight.position.set(
+                    randomInSquare(5), randomInSquare(5), randomInSquare(5)
+                );
+                var debugMesh = new qtek.Mesh({
+                    material: new qtek.StandardMaterial({
+                        color: [0, 0, 0],
+                        rougness: 1,
+                        emission: pointLight.color
+                    }),
+                    geometry: sphereGeo
                 });
-                animation.start();
+                debugMesh.scale.set(0.1, 0.1, 0.1);
+                pointLight.add(debugMesh);
 
-                var stats = new Stats();
-                stats.domElement.style.position = 'absolute';
-                stats.domElement.style.top = '0px';
-                stats.domElement.style.right = '0px';
-                document.body.appendChild(stats.domElement);
+                var animator = animation.animate(pointLight.position, { loop: true });
+                for (var k = 0; k < 10; k++) {
+                    animator.when(k * 4000 + i * 1000, {
+                        x: randomInSquare(5),
+                        y: randomInSquare(5),
+                        z: randomInSquare(5)
+                    });
+                }
+                animator.start('spline');
+                scene.add(pointLight);
+            }
+
+            camera.position.set(0, 0, 3);
+            camera.lookAt(scene.position);
+
+            var control = new qtek.plugin.OrbitControl({
+                domElement: renderer.canvas,
+                target: camera
             });
+
+            animation.on('frame', function (deltaTime) {
+                control.update(deltaTime);
+                // renderer.render(scene, camera);
+                deferredRenderer.render(renderer, scene, camera);
+
+                stats.update();
+            });
+            animation.start();
+
+            var stats = new Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '0px';
+            stats.domElement.style.right = '0px';
+            document.body.appendChild(stats.domElement);
         </script>
     </body>
 </html>

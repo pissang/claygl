@@ -1,119 +1,115 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;background-color:#20242B;">
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
-            require(['qtek'], function(qtek){
-                var Shader = qtek.Shader;
-                var Material = qtek.Material;
-                var Mesh = qtek.Mesh;
-                var Cube = qtek.geometry.Cube;
-                var meshUtil = qtek.util.mesh;
-                var shaderLibrary = qtek.shader.library;
-                var animation = new qtek.animation.Animation;
-                animation.start();
+            var Shader = qtek.Shader;
+            var Material = qtek.Material;
+            var Mesh = qtek.Mesh;
+            var Cube = qtek.geometry.Cube;
+            var meshUtil = qtek.util.mesh;
+            var shaderLibrary = qtek.shader.library;
+            var animation = new qtek.animation.Animation;
+            animation.start();
 
-                var renderer = new qtek.Renderer({
-                    canvas : document.getElementById("Main"),
-                    devicePixelRatio : 1.0
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek.Scene;
-                var camera = new qtek.camera.Perspective({
-                    aspect : renderer.getViewportAspect(),
-                    far : 500
-                });
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById("main"),
+                devicePixelRatio : 1.0
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var scene = new qtek.Scene;
+            var camera = new qtek.camera.Perspective({
+                aspect : renderer.getViewportAspect(),
+                far : 500
+            });
 
-                var cube = new Cube();
-                cube.generateTangents();
+            var cube = new Cube();
+            cube.generateTangents();
 
-                var diffuse = new qtek.Texture2D;
-                diffuse.load("assets/textures/crate.gif");
-                var normal = new qtek.Texture2D;
-                normal.load("assets/textures/normal_map.jpg");
+            var diffuse = new qtek.Texture2D;
+            diffuse.load("assets/textures/crate.gif");
+            var normal = new qtek.Texture2D;
+            normal.load("assets/textures/normal_map.jpg");
 
-                var material1 = new Material({
-                    shader: new Shader({
-                        vertex: Shader.source('qtek.standard.vertex'),
-                        fragment: Shader.source('qtek.standard.fragment')
-                    })
-                });
-                material1.set('diffuseMap', diffuse);
-                material1.set('normalMap', normal);
-                var material2 = new Material({
-                    shader: new Shader({
-                        vertex: Shader.source('qtek.standard.vertex'),
-                        fragment: Shader.source('qtek.standard.fragment')
-                    })
-                });
-                material2.set('diffuseMap', diffuse);
-                material2.set('normalMap', normal);
-                material1.shader.enableTexture(['diffuseMap', 'normalMap']);
-                material2.shader.enableTexture(['diffuseMap', 'normalMap']);
+            var material1 = new Material({
+                shader: new Shader({
+                    vertex: Shader.source('qtek.standard.vertex'),
+                    fragment: Shader.source('qtek.standard.fragment')
+                })
+            });
+            material1.set('diffuseMap', diffuse);
+            material1.set('normalMap', normal);
+            var material2 = new Material({
+                shader: new Shader({
+                    vertex: Shader.source('qtek.standard.vertex'),
+                    fragment: Shader.source('qtek.standard.fragment')
+                })
+            });
+            material2.set('diffuseMap', diffuse);
+            material2.set('normalMap', normal);
+            material1.shader.enableTexture(['diffuseMap', 'normalMap']);
+            material2.shader.enableTexture(['diffuseMap', 'normalMap']);
 
-                material1.shader.lightGroup = 0;
-                material2.shader.lightGroup = 1;
+            material1.shader.lightGroup = 0;
+            material2.shader.lightGroup = 1;
 
-                var root = new qtek.Node({
-                    name : 'ROOT'
-                });
-                scene.add(root);
-                for (var i = 0; i < 20; i++) {
-                    for (var j = 0; j < 10; j++) {
-                        for ( var k = 0; k < 50; k++) {
-                            var mesh = new qtek.Mesh({
-                                geometry: cube,
-                                material: i % 2 ? material1 : material2
-                            });
-                            mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
-                            root.add(mesh);
-                        }
+            var root = new qtek.Node({
+                name : 'ROOT'
+            });
+            scene.add(root);
+            for (var i = 0; i < 20; i++) {
+                for (var j = 0; j < 10; j++) {
+                    for ( var k = 0; k < 50; k++) {
+                        var mesh = new qtek.Mesh({
+                            geometry: cube,
+                            material: i % 2 ? material1 : material2
+                        });
+                        mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
+                        root.add(mesh);
                     }
                 }
-                var light1 = new qtek.light.Point({
-                    range: 200,
-                    group: 0,
-                    color: [1, 0.5, 0]
-                });
-                var light2 = new qtek.light.Point({
-                    range: 200,
-                    group: 1,
-                    color: [0, 0.5, 1]
-                });
-                scene.add(light1);
-                scene.add(light2);
-                scene.add(new qtek.light.Ambient({
-                    intensity: 0.3
-                }))
+            }
+            var light1 = new qtek.light.Point({
+                range: 200,
+                group: 0,
+                color: [1, 0.5, 0]
+            });
+            var light2 = new qtek.light.Point({
+                range: 200,
+                group: 1,
+                color: [0, 0.5, 1]
+            });
+            scene.add(light1);
+            scene.add(light2);
+            scene.add(new qtek.light.Ambient({
+                intensity: 0.3
+            }))
 
-                camera.position.set(0, 0, 10);
+            camera.position.set(0, 0, 10);
 
-                animation.on('frame', function(deltaTime) {
-                    var start = new Date().getTime();
-                    var drawInfo = renderer.render(scene, camera);
-                    var renderTime = new Date().getTime() - start;
-                    document.getElementById('time').innerHTML =
-                            Math.round(1000 / deltaTime) + '<br />'
-                            + renderTime + '<br />'
-                            + drawInfo.renderedMeshCount + '(' + drawInfo.meshCount + ')';
-                    root.rotation.rotateY(Math.PI/500);
+            animation.on('frame', function(deltaTime) {
+                var start = new Date().getTime();
+                var drawInfo = renderer.render(scene, camera);
+                var renderTime = new Date().getTime() - start;
+                document.getElementById('time').innerHTML =
+                        Math.round(1000 / deltaTime) + '<br />'
+                        + renderTime + '<br />'
+                        + drawInfo.renderedMeshCount + '(' + drawInfo.meshCount + ')';
+                root.rotation.rotateY(Math.PI/500);
 
-                    stats.update();
-                });
+                stats.update();
+            });
 
-                var stats = new Stats();
-                stats.domElement.style.position = 'absolute';
-                stats.domElement.style.top = '0px';
-                stats.domElement.style.right = '0px';
-                document.body.appendChild( stats.domElement );
-
-            })
+            var stats = new Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '0px';
+            stats.domElement.style.right = '0px';
+            document.body.appendChild( stats.domElement );
 
         </script>
     </body>

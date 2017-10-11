@@ -2,94 +2,90 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek) {
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById('main'),
-                    // devicePixelRatio: 1.0
-                });
-                var gbuffer = new qtek.deferred.GBuffer();
-                var camera = new qtek.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 0, 6);
-
-                var scene = new qtek.Scene();
-
-                var loader = new qtek.loader.GLTF();
-                loader.load('assets/models/suzanne_full.gltf');
-                var suzanneGeometry;
-                loader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-
-                    var material = new qtek.StandardMaterial({
-                        metalness: 0.5,
-                        uvRepeat: [3, 3],
-                        roughness: 0.5
-                    });
-                    var mesh = new qtek.Mesh({
-                        geometry: suzanneGeometry,
-                        material: material
-                    });
-                    mesh.geometry.generateTangents();
-
-                    [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                        var tex = new qtek.Texture2D({
-                            wrapS: qtek.Texture.REPEAT,
-                            wratT: qtek.Texture.REPEAT
-                        });
-                        tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-                            .success(function () {
-                                // FIXME
-                                tex.wrapS = qtek.Texture.REPEAT;
-                                tex.wrapT = qtek.Texture.REPEAT;
-                            });
-                        material[mapInfo[0]] = tex;
-                    });
-
-                    mesh.scale.set(1.4, 1.4, 1.4);
-                    scene.add(mesh);
-                });
-
-                var control = new qtek.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
-                });
-
-                var animation = new qtek.animation.Animation();
-                animation.start();
-                animation.on('frame', function(deltaTime) {
-                    control.update(deltaTime);
-                    scene.update();
-                    camera.update();
-                    gbuffer.update(renderer, scene, camera);
-                    gbuffer.renderDebug(renderer, camera, config.debugType);
-                });
-
-                window.onresize = function() {
-                    renderer.resize(window.innerWidth, window.innerHeight);
-                    gbuffer.resize(
-                        renderer.getWidth() * renderer.getDevicePixelRatio(),
-                        renderer.getHeight() * renderer.getDevicePixelRatio()
-                    );
-                    camera.aspect = renderer.getViewportAspect();
-                };
-                window.onresize();
-
-                var config = {
-                    debugType: 'normal'
-                }
-                var gui = new dat.GUI();
-
-                gui.add(config, 'debugType', [
-                    'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo'
-                ]);
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main')
             });
+            var gbuffer = new qtek.deferred.GBuffer();
+            var camera = new qtek.camera.Perspective({
+                aspect: renderer.getViewportAspect()
+            });
+            camera.position.set(0, 0, 6);
+
+            var scene = new qtek.Scene();
+
+            var loader = new qtek.loader.GLTF();
+            loader.load('assets/models/suzanne_full.gltf');
+            var suzanneGeometry;
+            loader.on('success', function(res) {
+                suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+                var material = new qtek.StandardMaterial({
+                    metalness: 0.5,
+                    uvRepeat: [3, 3],
+                    roughness: 0.5
+                });
+                var mesh = new qtek.Mesh({
+                    geometry: suzanneGeometry,
+                    material: material
+                });
+                mesh.geometry.generateTangents();
+
+                [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
+                    var tex = new qtek.Texture2D({
+                        wrapS: qtek.Texture.REPEAT,
+                        wratT: qtek.Texture.REPEAT
+                    });
+                    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+                        .success(function () {
+                            // FIXME
+                            tex.wrapS = qtek.Texture.REPEAT;
+                            tex.wrapT = qtek.Texture.REPEAT;
+                        });
+                    material[mapInfo[0]] = tex;
+                });
+
+                mesh.scale.set(1.4, 1.4, 1.4);
+                scene.add(mesh);
+            });
+
+            var control = new qtek.plugin.OrbitControl({
+                target: camera,
+                domElement: renderer.canvas
+            });
+
+            var animation = new qtek.animation.Animation();
+            animation.start();
+            animation.on('frame', function(deltaTime) {
+                control.update(deltaTime);
+                scene.update();
+                camera.update();
+                gbuffer.update(renderer, scene, camera);
+                gbuffer.renderDebug(renderer, camera, config.debugType);
+            });
+
+            window.onresize = function() {
+                renderer.resize(window.innerWidth, window.innerHeight);
+                gbuffer.resize(
+                    renderer.getWidth() * renderer.getDevicePixelRatio(),
+                    renderer.getHeight() * renderer.getDevicePixelRatio()
+                );
+                camera.aspect = renderer.getViewportAspect();
+            };
+            window.onresize();
+
+            var config = {
+                debugType: 'normal'
+            }
+            var gui = new dat.GUI();
+
+            gui.add(config, 'debugType', [
+                'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo'
+            ]);
         </script>
 </html>

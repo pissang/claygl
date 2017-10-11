@@ -1,5 +1,5 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
 
     var DOWNSAMPLE_REPEAT = 1;
 

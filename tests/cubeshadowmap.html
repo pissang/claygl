@@ -1,104 +1,100 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body style="margin:0px">
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek){
-                var Shader = qtek.Shader;
-                var Material = qtek.Material;
-                var Mesh = qtek.Mesh;
-                var Cube = qtek.geometry.Cube;
-                var meshUtil = qtek.util.mesh;
-                var shaderLibrary = qtek.shader.library;
+            var Shader = qtek.Shader;
+            var Material = qtek.Material;
+            var Mesh = qtek.Mesh;
+            var Cube = qtek.geometry.Cube;
+            var meshUtil = qtek.util.mesh;
+            var shaderLibrary = qtek.shader.library;
 
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById("Main")
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var animation = new qtek.animation.Animation();
-                animation.start();
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main')
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var animation = new qtek.animation.Animation();
+            animation.start();
 
-                var shadowMapPass = new qtek.prePass.ShadowMap();
+            var shadowMapPass = new qtek.prePass.ShadowMap();
 
-                var scene = new qtek.Scene;
-                var camera = new qtek.camera.Perspective({
-                        aspect: renderer.getViewportAspect(),
-                        far: 500
-                    });
-
-                var cube = new Cube();
-                var shader = shaderLibrary.get('qtek.lambert');
-                var material = new Material({
-                    shader: shader
+            var scene = new qtek.Scene;
+            var camera = new qtek.camera.Perspective({
+                    aspect: renderer.getViewportAspect(),
+                    far: 500
                 });
 
-                var root = new qtek.Node();
-                for(var i = 0; i < 2; i++){
-                    for(var j = 0; j < 2; j++){
-                        for(var k = 0; k < 2; k++){
-                            var mesh = new Mesh({
-                                geometry: cube,
-                                material: material
-                            });
-                            mesh.scale.set(0.5, 0.5, 0.5);
-                            mesh.position.set((i-0.5) * 5, (j-0.5) * 5, (k-0.5)*5);
-                            root.add(mesh)
-                        }
+            var cube = new Cube();
+            var shader = shaderLibrary.get('qtek.lambert');
+            var material = new Material({
+                shader: shader
+            });
+
+            var root = new qtek.Node();
+            for(var i = 0; i < 2; i++){
+                for(var j = 0; j < 2; j++){
+                    for(var k = 0; k < 2; k++){
+                        var mesh = new Mesh({
+                            geometry: cube,
+                            material: material
+                        });
+                        mesh.scale.set(0.5, 0.5, 0.5);
+                        mesh.position.set((i-0.5) * 5, (j-0.5) * 5, (k-0.5)*5);
+                        root.add(mesh)
                     }
                 }
-                scene.add(root);
+            }
+            scene.add(root);
 
-                var bigCube = new qtek.Mesh({
-                    geometry: new qtek.geometry.Cube({
-                        inside: true
-                    }),
-                    material: new qtek.Material({
-                        shader: qtek.shader.library.get("qtek.lambert")
-                    }),
-                    culling: false,
-                    scale: new qtek.math.Vector3(10, 10, 10)
-                });
-                root.add(bigCube);
+            var bigCube = new qtek.Mesh({
+                geometry: new qtek.geometry.Cube({
+                    inside: true
+                }),
+                material: new qtek.Material({
+                    shader: qtek.shader.library.get("qtek.lambert")
+                }),
+                culling: false,
+                scale: new qtek.math.Vector3(10, 10, 10)
+            });
+            root.add(bigCube);
 
-                camera.position.set(0, 2, 10);
-                camera.lookAt(new qtek.math.Vector3(0, 0, 0));
+            camera.position.set(0, 2, 10);
+            camera.lookAt(new qtek.math.Vector3(0, 0, 0));
 
-                var light = new qtek.light.Point({
-                    color: [1.5, 1.5, 1.5],
-                    shadowResolution: 512,
-                    intensity: 0.5,
-                    range: 40,
-                    castShadow: true
-                })
-                light.position.set(0.2, 0.2, 0.2);
-                scene.add(light);
-
-                var light2 = new qtek.light.Point({
-                    color: [1.5, 1.5, 1.5],
-                    shadowResolution: 512,
-                    range: 40,
-                    intensity: 0.5,
-                    castShadow: true
-                })
-                light2.position.set(-0.2, -0.2, -0.2);
-                scene.add(light2);
-
-                var elapsedTime = 0;
-                animation.on('frame', function(deltaTime){
-                    shadowMapPass.render(renderer, scene);
-                    renderer.render(scene, camera);
-                    elapsedTime += deltaTime / 1000;
-                    root.rotation.rotateY(deltaTime / 4000);
-                    // light.position.x = 0.2 + 7 * Math.sin(elapsedTime + 0.2);
-                    // light.position.y = 0.2 + 7 * Math.sin(elapsedTime + 0.4);
-                    // light.position.z = 0.2 + 7 * Math.sin(elapsedTime + 0.3);
-                });
+            var light = new qtek.light.Point({
+                color: [1.5, 1.5, 1.5],
+                shadowResolution: 512,
+                intensity: 0.5,
+                range: 40,
+                castShadow: true
             })
+            light.position.set(0.2, 0.2, 0.2);
+            scene.add(light);
 
+            var light2 = new qtek.light.Point({
+                color: [1.5, 1.5, 1.5],
+                shadowResolution: 512,
+                range: 40,
+                intensity: 0.5,
+                castShadow: true
+            })
+            light2.position.set(-0.2, -0.2, -0.2);
+            scene.add(light2);
+
+            var elapsedTime = 0;
+            animation.on('frame', function(deltaTime){
+                shadowMapPass.render(renderer, scene);
+                renderer.render(scene, camera);
+                elapsedTime += deltaTime / 1000;
+                root.rotation.rotateY(deltaTime / 4000);
+                // light.position.x = 0.2 + 7 * Math.sin(elapsedTime + 0.2);
+                // light.position.y = 0.2 + 7 * Math.sin(elapsedTime + 0.4);
+                // light.position.z = 0.2 + 7 * Math.sin(elapsedTime + 0.3);
+            });
         </script>
     </body>
 </html>

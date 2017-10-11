@@ -126,10 +126,10 @@
     "cameras": {},
     "images": {
         "image_0": {
-            "path": "Robot_Color.png"
+            "path": "Robot_Color.jpg"
         },
         "image_1": {
-            "path": "Robot_Normal.png"
+            "path": "Robot_Normal.jpg"
         }
     },
     "lights": {},

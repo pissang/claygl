@@ -2,13 +2,12 @@
 <head>
     <title></title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="../thirdparty/require.js"></script>
-    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript" src="lib/require.js"></script>
 </head>
 <body style="margin:0px">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['qtek', 'js/createCompositor'], function(qtek, createCompositor) {
+        require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
             var renderer = new qtek.Renderer({
                 canvas : document.getElementById('main'),
                 devicePixelRatio : 1.0

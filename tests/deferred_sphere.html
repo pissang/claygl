@@ -2,158 +2,155 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../thirdparty/require.js"></script>
-        <script src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
         <script src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main" style="background: black;"></canvas>
         <script>
-            require(['qtek'], function(qtek) {
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var deferredRenderer = new qtek.deferred.Renderer();
-
-                var camera = new qtek.camera.Perspective({
-                    far: 5000,
-                    aspect: renderer.getViewportAspect()
-                });
-
-                var texture = new qtek.Texture2D({
-                    wrapS: qtek.Texture.REPEAT,
-                    wrapT: qtek.Texture.REPEAT,
-                    anisotropic: 32
-                });
-                texture.load('assets/textures/rockwall_n.jpg');
-
-                var scene = new qtek.Scene();
-
-                var plane = new qtek.Mesh({
-                    material: new qtek.StandardMaterial({
-                        glossiness: 0.5,
-                        specularColor: [0.5, 0.5, 0.5],
-                        uvRepeat: [100, 100],
-                        normalMap: texture
-                    }),
-                    geometry: new qtek.geometry.Plane()
-                });
-                plane.scale.set(10000, 10000, 1);
-                plane.rotation.rotateX(-Math.PI / 2);
-                plane.geometry.generateTangents();
-
-                scene.add(plane);
-
-                function randomInSquare(size) {
-                    return (Math.random() - 0.5) * size * 2;
-                }
-
-                var sphereGeo = new qtek.geometry.Sphere();
-
-                var sphereLights = [];
-                var HEIGHT = 150;
-                for (var i = 0; i < 10; i ++) {
-                    for (var j = 0; j < 10; j ++) {
-                        var sphereLight = new qtek.light.Sphere({
-                            color: [Math.random(), Math.random(), Math.random()],
-                            range: 600,
-                            intensity: 2.0,
-                            radius: 60
-                        });
-                        var x = (i - 5) * 400;
-                        var z = (j - 5) * 400;
-                        // var z =  0;
-                        var y = HEIGHT;
-                        sphereLight.position.set(x, y, z);
-                        scene.add(sphereLight);
-
-                        var lightMesh = new qtek.Mesh({
-                            material: new qtek.StandardMaterial({
-                                color: [0, 0, 0],
-                                rougness: 1,
-                                emission: sphereLight.color
-                            }),
-                            geometry: sphereGeo
-                        });
-                        var r = sphereLight.radius;
-                        lightMesh.scale.set(r, r, r);
-
-                        sphereLight.add(lightMesh);
-
-                        sphereLights.push(sphereLight);
-                    }
-                }
-
-                var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load('assets/models/suzanne.json');
-                GLTFLoader.on('success', function(res) {
-                    var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-                    var material = new qtek.StandardMaterial({
-                        specularColor: [0.95, 0.64, 0.54],
-                        // metalness: 1,
-                        roughness: 0.5
-                    });
-
-                    for (var i = 0; i < 5; i++) {
-                        for (var j = 0; j < 5; j++) {
-                            var mesh = new qtek.Mesh({
-                                material: material,
-                                geometry: suzanneGeometry
-                            });
-                            mesh.position.set(
-                                (i - 2.5) * 500,
-                                150,
-                                (j - 2.5) * 500
-                            );
-                            mesh.scale.set(100, 100, 100);
-                            scene.add(mesh);
-                        }
-                    }
-                });
-
-
-                camera.position.set(0, 1000, 100);
-                camera.lookAt(scene.position);
-
-                var control = new qtek.plugin.OrbitControl({
-                    domElement: renderer.canvas,
-                    target: camera
-                });
-
-                var animation = new qtek.animation.Animation();
-
-                var debugPass = new qtek.compositor.Pass({
-                    fragment: qtek.Shader.source('qtek.compositor.output')
-                });
-                var elpasedTime = 0;
-                // debugPass.material.shader.undefine('fragment', 'OUTPUT_ALPHA');
-                animation.on('frame', function (deltaTime) {
-                    control.update(deltaTime);
-
-                    elpasedTime += deltaTime;
-
-                    sphereLights.forEach(function (sphereLight, idx) {
-                        sphereLight.position.y = HEIGHT + 200 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
-                    });
-
-                    deferredRenderer.render(renderer, scene, camera);
-
-                    // renderer.gl.clear(renderer.gl.COLOR_BUFFER_BIT);
-                    // debugPass.setUniform('texture', deferredRenderer._depthTex);
-                    // debugPass.render(renderer);
-
-                    stats.update();
-                });
-                animation.start();
-
-                var stats = new Stats();
-                stats.domElement.style.position = 'absolute';
-                stats.domElement.style.top = '0px';
-                stats.domElement.style.right = '0px';
-                document.body.appendChild(stats.domElement);
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
             });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var deferredRenderer = new qtek.deferred.Renderer();
+
+            var camera = new qtek.camera.Perspective({
+                far: 5000,
+                aspect: renderer.getViewportAspect()
+            });
+
+            var texture = new qtek.Texture2D({
+                wrapS: qtek.Texture.REPEAT,
+                wrapT: qtek.Texture.REPEAT,
+                anisotropic: 32
+            });
+            texture.load('assets/textures/rockwall_n.jpg');
+
+            var scene = new qtek.Scene();
+
+            var plane = new qtek.Mesh({
+                material: new qtek.StandardMaterial({
+                    glossiness: 0.5,
+                    specularColor: [0.5, 0.5, 0.5],
+                    uvRepeat: [100, 100],
+                    normalMap: texture
+                }),
+                geometry: new qtek.geometry.Plane()
+            });
+            plane.scale.set(10000, 10000, 1);
+            plane.rotation.rotateX(-Math.PI / 2);
+            plane.geometry.generateTangents();
+
+            scene.add(plane);
+
+            function randomInSquare(size) {
+                return (Math.random() - 0.5) * size * 2;
+            }
+
+            var sphereGeo = new qtek.geometry.Sphere();
+
+            var sphereLights = [];
+            var HEIGHT = 150;
+            for (var i = 0; i < 10; i ++) {
+                for (var j = 0; j < 10; j ++) {
+                    var sphereLight = new qtek.light.Sphere({
+                        color: [Math.random(), Math.random(), Math.random()],
+                        range: 600,
+                        intensity: 2.0,
+                        radius: 60
+                    });
+                    var x = (i - 5) * 400;
+                    var z = (j - 5) * 400;
+                    // var z =  0;
+                    var y = HEIGHT;
+                    sphereLight.position.set(x, y, z);
+                    scene.add(sphereLight);
+
+                    var lightMesh = new qtek.Mesh({
+                        material: new qtek.StandardMaterial({
+                            color: [0, 0, 0],
+                            rougness: 1,
+                            emission: sphereLight.color
+                        }),
+                        geometry: sphereGeo
+                    });
+                    var r = sphereLight.radius;
+                    lightMesh.scale.set(r, r, r);
+
+                    sphereLight.add(lightMesh);
+
+                    sphereLights.push(sphereLight);
+                }
+            }
+
+            var GLTFLoader = new qtek.loader.GLTF();
+            GLTFLoader.load('assets/models/suzanne.json');
+            GLTFLoader.on('success', function(res) {
+                var suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                var material = new qtek.StandardMaterial({
+                    specularColor: [0.95, 0.64, 0.54],
+                    // metalness: 1,
+                    roughness: 0.5
+                });
+
+                for (var i = 0; i < 5; i++) {
+                    for (var j = 0; j < 5; j++) {
+                        var mesh = new qtek.Mesh({
+                            material: material,
+                            geometry: suzanneGeometry
+                        });
+                        mesh.position.set(
+                            (i - 2.5) * 500,
+                            150,
+                            (j - 2.5) * 500
+                        );
+                        mesh.scale.set(100, 100, 100);
+                        scene.add(mesh);
+                    }
+                }
+            });
+
+
+            camera.position.set(0, 1000, 100);
+            camera.lookAt(scene.position);
+
+            var control = new qtek.plugin.OrbitControl({
+                domElement: renderer.canvas,
+                target: camera
+            });
+
+            var animation = new qtek.animation.Animation();
+
+            var debugPass = new qtek.compositor.Pass({
+                fragment: qtek.Shader.source('qtek.compositor.output')
+            });
+            var elpasedTime = 0;
+            // debugPass.material.shader.undefine('fragment', 'OUTPUT_ALPHA');
+            animation.on('frame', function (deltaTime) {
+                control.update(deltaTime);
+
+                elpasedTime += deltaTime;
+
+                sphereLights.forEach(function (sphereLight, idx) {
+                    sphereLight.position.y = HEIGHT + 200 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
+                });
+
+                deferredRenderer.render(renderer, scene, camera);
+
+                // renderer.gl.clear(renderer.gl.COLOR_BUFFER_BIT);
+                // debugPass.setUniform('texture', deferredRenderer._depthTex);
+                // debugPass.render(renderer);
+
+                stats.update();
+            });
+            animation.start();
+
+            var stats = new Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '0px';
+            stats.domElement.style.right = '0px';
+            document.body.appendChild(stats.domElement);
         </script>
     </body>
 </html>

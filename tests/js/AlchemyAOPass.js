@@ -1,10 +1,10 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
     var Matrix4 = qtek.math.Matrix4;
     var Vector2 = qtek.math.Vector2;
     var PostProcessPass = require('./PostProcessPass');
 
-    qtek.Shader.import(require('text!../shader/alchemy.essl'));
+    qtek.Shader.import(require('text!../shader/alchemy.glsl'));
 
     function generateKernel(size) {
         var kernel = new Float32Array(size * 2);

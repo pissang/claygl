@@ -1,70 +1,67 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body style="margin:0px;">
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <script>
-            require(['qtek'], function(qtek){
-                var Shader = qtek.Shader
+            var Shader = qtek.Shader;
 
-                var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main"),
-                    devicePixelRatio : 1.0
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById('main'),
+                devicePixelRatio : 1.0
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
 
-                var scene = new qtek.Scene;
-                var camera = new qtek.camera.Perspective({
-                    aspect : renderer.getViewportAspect(),
-                    far : 500
-                });
+            var scene = new qtek.Scene;
+            var camera = new qtek.camera.Perspective({
+                aspect : renderer.getViewportAspect(),
+                far : 500
+            });
 
-                var shader = qtek.shader.library.get("qtek.basic", "diffuseMap");
+            var shader = qtek.shader.library.get("qtek.basic", "diffuseMap");
 
-                var material = new qtek.Material({
-                    shader : shader
-                });
-                var image = new Image;
-                image.src = "assets/textures/ground_tile.jpg";
-                var texture = new qtek.Texture2D({
-                    image : image,
-                    wrapS : qtek.Texture.REPEAT,
-                    wrapT : qtek.Texture.REPEAT,
-                    anisotropic : 16
-                });
-                image.onload = function(){
-                    texture.dirty();
-                };
-                material.set("diffuseMap", texture);
-                material.set("uvRepeat", [10, 10])
+            var material = new qtek.Material({
+                shader : shader
+            });
+            var image = new Image;
+            image.src = "assets/textures/ground_tile.jpg";
+            var texture = new qtek.Texture2D({
+                image : image,
+                wrapS : qtek.Texture.REPEAT,
+                wrapT : qtek.Texture.REPEAT,
+                anisotropic : 16
+            });
+            image.onload = function(){
+                texture.dirty();
+            };
+            material.set("diffuseMap", texture);
+            material.set("uvRepeat", [10, 10])
 
-                var root = new qtek.Node();
+            var root = new qtek.Node();
 
-                camera.position.set(0, 4, 14);
-                camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
+            camera.position.set(0, 4, 14);
+            camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
 
-                scene.add( root );
-                // Add Plane
-                var plane = new qtek.geometry.Plane({
-                    widthSegments : 1,
-                    heightSegments : 1
-                });
-                var planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material,
-                    scale : new qtek.math.Vector3(60, 60, 60)
-                });
-                planeMesh.position.y = -0.8;
-                planeMesh.rotation.rotateX(-Math.PI/2);
-                root.add(planeMesh);
+            scene.add( root );
+            // Add Plane
+            var plane = new qtek.geometry.Plane({
+                widthSegments : 1,
+                heightSegments : 1
+            });
+            var planeMesh = new qtek.Mesh({
+                geometry : plane,
+                material : material,
+                scale : new qtek.math.Vector3(60, 60, 60)
+            });
+            planeMesh.position.y = -0.8;
+            planeMesh.rotation.rotateX(-Math.PI/2);
+            root.add(planeMesh);
 
-                setInterval(function(){
-                    renderer.render( scene, camera );
-                }, 20);
-            })
+            setInterval(function(){
+                renderer.render( scene, camera );
+            }, 20);
 
         </script>
     </body>

@@ -3,8 +3,7 @@
         <title>Tron Effect</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/require.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body>
@@ -18,7 +17,7 @@
         </style>
         <canvas id='main'></canvas>
         <script type="text/javascript">
-            require(['qtek', 'text!./shader/tron.essl', 'js/createCompositor'], function (qtek, tronShader, createCompositor) {
+            require(['../dist/qtek', 'text!./shader/tron.glsl', 'js/createCompositor'], function (qtek, tronShader, createCompositor) {
                 var Shader = qtek.Shader;
                 Shader.import(tronShader);
 
@@ -53,8 +52,8 @@
                     geometry: cube,
                     material: tronMaterial,
                     culling: false,
-                    beforeRender: function (_gl) {
-                        _gl.clear(_gl.DEPTH_BUFFER_BIT);
+                    beforeRender: function (renderer) {
+                        renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
                     }
                 });
                 var cubeMesh = new qtek.Mesh({

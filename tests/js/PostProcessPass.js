@@ -1,5 +1,5 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
 
     function PostProcessPass(shader, renderToTarget, clearColor) {
         this._pass = new qtek.compositor.Pass({

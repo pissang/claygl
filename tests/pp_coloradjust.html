@@ -1,94 +1,91 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
 
         <script type="text/javascript">
-            require(['qtek'], function(qtek){
-                var Shader = qtek.Shader;
-                var pp_FilterNode = qtek.compositor.FilterNode;
-                var pp_SceneNode = qtek.compositor.SceneNode;
-                var compositor = new qtek.compositor.Compositor();
+            var Shader = qtek.Shader;
+            var pp_FilterNode = qtek.compositor.FilterNode;
+            var pp_SceneNode = qtek.compositor.SceneNode;
+            var compositor = new qtek.compositor.Compositor();
 
-                var renderer = new qtek.Renderer({
-                    canvas : document.getElementById( "Main"),
-                    devicePixelRatio : 1.0
-                });
-                //Create scene
-                var scene = new qtek.Scene(),
-                    camera = new qtek.camera.Perspective({
-                        aspect : renderer.canvas.width/renderer.canvas.height,
-                        far : 500
-                    }),
-                    cube = new qtek.geometry.Cube();
-                var shader = new Shader({
-                    vertex : Shader.source("qtek.lambert.vertex"),
-                    fragment : Shader.source("qtek.lambert.fragment")
-                })
-                shader.enableTexture("diffuseMap");
-                var material = new qtek.Material({
-                    shader : shader
-                });
-                var texture = new qtek.Texture2D();
-                texture.image = new Image();
-                texture.image.onload = function(){
-                    texture.dirty();
-                }
-                texture.image.src = "assets/textures/crate.gif";
-                material.set("diffuseMap", texture );
-                var mesh = new qtek.Mesh({
-                    material : material,
-                    geometry : cube
-                })
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById('main'),
+                devicePixelRatio : 1.0
+            });
+            //Create scene
+            var scene = new qtek.Scene(),
+                camera = new qtek.camera.Perspective({
+                    aspect : renderer.canvas.width/renderer.canvas.height,
+                    far : 500
+                }),
+                cube = new qtek.geometry.Cube();
+            var shader = new Shader({
+                vertex : Shader.source('qtek.lambert.vertex'),
+                fragment : Shader.source('qtek.lambert.fragment')
+            })
+            shader.enableTexture('diffuseMap');
+            var material = new qtek.Material({
+                shader : shader
+            });
+            var texture = new qtek.Texture2D();
+            texture.image = new Image();
+            texture.image.onload = function(){
+                texture.dirty();
+            }
+            texture.image.src = 'assets/textures/crate.gif';
+            material.set('diffuseMap', texture );
+            var mesh = new qtek.Mesh({
+                material : material,
+                geometry : cube
+            })
 
-                scene.add( mesh );
+            scene.add( mesh );
 
-                camera.position.set(0, 2, 2);
-                camera.lookAt( new qtek.math.Vector3() );
+            camera.position.set(0, 2, 2);
+            camera.lookAt( new qtek.math.Vector3() );
 
-                var light = new qtek.light.Directional({
-                    color : [1.5, 1.5, 1.5]
-                })
-                light.position.set(50, 50, 50);
-                light.lookAt(new qtek.math.Vector3());
-                scene.add( light );
+            var light = new qtek.light.Directional({
+                color : [1.5, 1.5, 1.5]
+            })
+            light.position.set(50, 50, 50);
+            light.lookAt(new qtek.math.Vector3());
+            scene.add( light );
 
-                compositor.addNode(new pp_SceneNode({
-                    name : "scene",
-                    scene : scene,
-                    camera : camera,
-                    outputs : {
-                        "color" : {
-                            parameters : {
-                                width : 1024,
-                                height : 1024
-                            }
+            compositor.addNode(new pp_SceneNode({
+                name : 'scene',
+                scene : scene,
+                camera : camera,
+                outputs : {
+                    'color' : {
+                        parameters : {
+                            width : 1024,
+                            height : 1024
                         }
                     }
-                }) );
-                var colorAdjustNode = new pp_FilterNode({
-                    name : "coloradjust",
-                    shader : Shader.source("qtek.compositor.coloradjust"),
-                    inputs : {
-                        "texture" : {
-                            node : "scene",
-                            pin : "color"
-                        }
-                    },
-                    outputs : null
-                })
-                colorAdjustNode.setParameter("gamma", 1.3);
-                compositor.addNode( colorAdjustNode );
-
-                setInterval(function(){
-                    compositor.render(renderer);
-                    mesh.rotation.rotateY(Math.PI/500);
-                }, 20);
+                }
+            }) );
+            var colorAdjustNode = new pp_FilterNode({
+                name : 'coloradjust',
+                shader : Shader.source('qtek.compositor.coloradjust'),
+                inputs : {
+                    'texture' : {
+                        node : 'scene',
+                        pin : 'color'
+                    }
+                },
+                outputs : null
             })
+            colorAdjustNode.setParameter('gamma', 1.3);
+            compositor.addNode( colorAdjustNode );
+
+            setInterval(function(){
+                compositor.render(renderer);
+                mesh.rotation.rotateY(Math.PI/500);
+            }, 20);
 
         </script>
     </body>

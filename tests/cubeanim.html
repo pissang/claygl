@@ -1,8 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
 
         <style>
             body{
@@ -27,207 +26,204 @@
         <div id="cubeColor" style="background-color: rgb(245, 50, 50);"></div>
         <div id="fps" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script>
-            require(['qtek'], function(qtek){
+            //----------------------------------
+            // Prepare animation shape data
+            //----------------------------------
+            var canvas = document.createElement('canvas');
+            canvas.id = 'shape';
+            var SIZE = 50;
+            canvas.width = SIZE;
+            canvas.height = SIZE;
+            var ctx = canvas.getContext('2d');
+            function drawCross() {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, SIZE, SIZE);
+                ctx.save()
+                ctx.scale(0.6, 0.6);
+                ctx.translate(10, 10);
+                ctx.strokeStyle = 'white';
+                ctx.beginPath();
+                ctx.lineWidth = SIZE / 3.5;
+                ctx.moveTo(0, 0);
+                ctx.lineTo(SIZE, SIZE);
+                ctx.stroke();
 
-                //----------------------------------
-                // Prepare animation shape data
-                //----------------------------------
-                var canvas = document.createElement('canvas');
-                canvas.id = 'shape';
-                var SIZE = 50;
-                canvas.width = SIZE;
-                canvas.height = SIZE;
-                var ctx = canvas.getContext('2d');
-                function drawCross() {
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(0, 0, SIZE, SIZE);
-                    ctx.save()
-                    ctx.scale(0.6, 0.6);
-                    ctx.translate(10, 10);
-                    ctx.strokeStyle = 'white';
-                    ctx.beginPath();
-                    ctx.lineWidth = SIZE / 3.5;
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(SIZE, SIZE);
-                    ctx.stroke();
+                ctx.moveTo(SIZE, 0);
+                ctx.lineTo(0, SIZE);
+                ctx.stroke();
+                ctx.restore();
+                return ctx.getImageData(0, 0, SIZE, SIZE).data;
+            }
 
-                    ctx.moveTo(SIZE, 0);
-                    ctx.lineTo(0, SIZE);
-                    ctx.stroke();
-                    ctx.restore();
-                    return ctx.getImageData(0, 0, SIZE, SIZE).data;
-                }
+            function drawCheck() {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, SIZE, SIZE);
 
-                function drawCheck() {
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(0, 0, SIZE, SIZE);
+                ctx.scale(0.7, 0.7);
+                ctx.translate(10, 10);
+                ctx.strokeStyle = 'white';
+                ctx.beginPath();
+                ctx.lineWidth = SIZE / 3.5;
+                ctx.moveTo(0, SIZE / 2);
+                ctx.lineTo(SIZE / 2, SIZE / 1.2);
 
-                    ctx.scale(0.7, 0.7);
-                    ctx.translate(10, 10);
-                    ctx.strokeStyle = 'white';
-                    ctx.beginPath();
-                    ctx.lineWidth = SIZE / 3.5;
-                    ctx.moveTo(0, SIZE / 2);
-                    ctx.lineTo(SIZE / 2, SIZE / 1.2);
+                ctx.lineTo(SIZE, SIZE / 10);
+                ctx.stroke();
 
-                    ctx.lineTo(SIZE, SIZE / 10);
-                    ctx.stroke();
+                return ctx.getImageData(0, 0, SIZE, SIZE).data;
+            }
 
-                    return ctx.getImageData(0, 0, SIZE, SIZE).data;
-                }
+            document.body.appendChild(canvas);
 
-                document.body.appendChild(canvas);
-
-                function pixelToPositionArray(pixels) {
-                    var position = [];
-                    for (var i = 0; i < pixels.length; i+=4) {
-                        var r = pixels[i];
-                        if (r < 128) {
-                            continue;
-                        }
-                        var idx = i / 4;
-                        var x = (idx % SIZE) / SIZE * 40 - 20;
-                        var y = 20 - (idx / SIZE) / SIZE * 40;
-                        var z = Math.random() * 6;
-
-                        position.push([x, y, z]);
+            function pixelToPositionArray(pixels) {
+                var position = [];
+                for (var i = 0; i < pixels.length; i+=4) {
+                    var r = pixels[i];
+                    if (r < 128) {
+                        continue;
                     }
-                    return position;
+                    var idx = i / 4;
+                    var x = (idx % SIZE) / SIZE * 40 - 20;
+                    var y = 20 - (idx / SIZE) / SIZE * 40;
+                    var z = Math.random() * 6;
+
+                    position.push([x, y, z]);
                 }
-                var crossPixels = drawCross();
-                var checkPixels = drawCheck();
+                return position;
+            }
+            var crossPixels = drawCross();
+            var checkPixels = drawCheck();
 
-                var crossPosArr = pixelToPositionArray(crossPixels);
-                var checkPosArr = pixelToPositionArray(checkPixels);
+            var crossPosArr = pixelToPositionArray(crossPixels);
+            var checkPosArr = pixelToPositionArray(checkPixels);
 
-                var larger = checkPosArr.length < crossPosArr.length ? crossPosArr : checkPosArr;
-                var smaller = larger == crossPosArr ? checkPosArr : crossPosArr;
+            var larger = checkPosArr.length < crossPosArr.length ? crossPosArr : checkPosArr;
+            var smaller = larger == crossPosArr ? checkPosArr : crossPosArr;
 
-                for (var i = smaller.length; i < larger.length; i++) {
-                    var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
-                    random = random.slice();
-                    random[2] += Math.random() * 3;
-                    smaller[i] = random;
-                }
+            for (var i = smaller.length; i < larger.length; i++) {
+                var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
+                random = random.slice();
+                random[2] += Math.random() * 3;
+                smaller[i] = random;
+            }
 
-                var positionArr = [];
+            var positionArr = [];
 
-                for (var i = 0; i < crossPosArr.length; i++) {
-                    positionArr[i] = crossPosArr[i].slice();
-                }
+            for (var i = 0; i < crossPosArr.length; i++) {
+                positionArr[i] = crossPosArr[i].slice();
+            }
 
-                //----------------------------------
-                // Prepare scene
-                //----------------------------------
-                var Shader = qtek.Shader;
+            //----------------------------------
+            // Prepare scene
+            //----------------------------------
+            var Shader = qtek.Shader;
 
-                var renderer = new qtek.Renderer({
-                    canvas : document.getElementById('main')
-                });
-                var shadowMapPass = new qtek.prePass.ShadowMap({
-                    // softShadow : qtek.prePass.VSM
-                });
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById('main')
+            });
+            var shadowMapPass = new qtek.prePass.ShadowMap({
+                // softShadow : qtek.prePass.VSM
+            });
 
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek.Scene();
-                var camera = new qtek.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 0, 40);
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var scene = new qtek.Scene();
+            var camera = new qtek.camera.Perspective({
+                aspect: renderer.getViewportAspect()
+            });
+            camera.position.set(0, 0, 40);
 
-                var shader = qtek.shader.library.get('qtek.standard');
+            var shader = qtek.shader.library.get('qtek.standard');
 
-                var cubeMat = new qtek.Material({
-                    shader : shader
-                });
+            var cubeMat = new qtek.Material({
+                shader : shader
+            });
 
-                var root = new qtek.Node();
-                scene.add(root);
+            var root = new qtek.Node();
+            scene.add(root);
 
-                var cubeList = [];
+            var cubeList = [];
 
-                var gltfLoader = new qtek.loader.GLTF();
-                gltfLoader.load('assets/models/cube/cube.json');
-                gltfLoader.success(function(res) {
-                    var cubeGeo = res.scene.getNode('Cube').geometry;
+            var gltfLoader = new qtek.loader.GLTF();
+            gltfLoader.load('assets/models/cube/cube.json');
+            gltfLoader.success(function(res) {
+                var cubeGeo = res.scene.getNode('Cube').geometry;
 
-                    for (var i = 0; i < positionArr.length; i++) {
-                        var position = positionArr[i];
-                        var mesh = new qtek.Mesh({
-                            material: cubeMat,
-                            geometry: cubeGeo
-                        });
-                        mesh.position.set(position[0], position[1], position[2]);
-
-                        mesh.rotation.rotateX(Math.random() * Math.PI * 2);
-                        mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
-
-                        mesh.scale.set(0.5, 0.5, 0.5);
-                        root.add(mesh);
-
-                        cubeList.push(mesh);
-                    }
-
-                    var light = new qtek.light.Directional({
-                        shadowResolution : 1024,
-                        shadowBias: 0.005,
-                        intensity: 0.7
+                for (var i = 0; i < positionArr.length; i++) {
+                    var position = positionArr[i];
+                    var mesh = new qtek.Mesh({
+                        material: cubeMat,
+                        geometry: cubeGeo
                     });
-                    light.position.set(0, 30, 30);
-                    light.lookAt(scene.position);
-                    scene.add(light);
+                    mesh.position.set(position[0], position[1], position[2]);
 
-                    scene.add(new qtek.light.Ambient({
-                        intensity: 0.3
-                    }));
+                    mesh.rotation.rotateX(Math.random() * Math.PI * 2);
+                    mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
 
-                    var animation = new qtek.animation.Animation();
-                    animation.start();
+                    mesh.scale.set(0.5, 0.5, 0.5);
+                    root.add(mesh);
 
-                    animation.on('frame', function(deltaTime) {
+                    cubeList.push(mesh);
+                }
 
-                        var start = new Date().getTime();
-                        shadowMapPass.render(renderer, scene, camera);
-                        var drawInfo = renderer.render(scene, camera);
-                        var renderTime = new Date().getTime() - start;
+                var light = new qtek.light.Directional({
+                    shadowResolution : 1024,
+                    shadowBias: 0.005,
+                    intensity: 0.7
+                });
+                light.position.set(0, 30, 30);
+                light.lookAt(scene.position);
+                scene.add(light);
 
-                        document.getElementById('fps').innerHTML =
-                                Math.round(1000 / deltaTime) + '<br />'
-                                + renderTime + '<br />';
+                scene.add(new qtek.light.Ambient({
+                    intensity: 0.3
+                }));
 
-                        var color = document.getElementById('cubeColor').style.backgroundColor;
-                        color = color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
-                            return parseInt(item) / 255;
-                        });
+                var animation = new qtek.animation.Animation();
+                animation.start();
 
-                        for (var i = 0; i < cubeList.length; i++) {
-                            cubeList[i].material.set('color', color);
-                            var pos = positionArr[i];
-                            qtek.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
-                            qtek.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
-                        }
+                animation.on('frame', function(deltaTime) {
+
+                    var start = new Date().getTime();
+                    shadowMapPass.render(renderer, scene, camera);
+                    var drawInfo = renderer.render(scene, camera);
+                    var renderTime = new Date().getTime() - start;
+
+                    document.getElementById('fps').innerHTML =
+                            Math.round(1000 / deltaTime) + '<br />'
+                            + renderTime + '<br />';
+
+                    var color = document.getElementById('cubeColor').style.backgroundColor;
+                    color = color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
+                        return parseInt(item) / 255;
                     });
 
-                    document.body.addEventListener('mousemove', function(e) {
-                        var dx = e.pageX - window.innerWidth / 2;
-
-                        root.rotation.identity().rotateY(dx / 1000);
-                    });
-
-                    var obj = {
-                        position : positionArr
+                    for (var i = 0; i < cubeList.length; i++) {
+                        cubeList[i].material.set('color', color);
+                        var pos = positionArr[i];
+                        qtek.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
+                        qtek.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
                     }
-
-                    var current = crossPosArr;
-                    setInterval(function() {
-                        var another = current == crossPosArr ? checkPosArr : crossPosArr;
-                        animation.animate(obj)
-                        .when(1000, {
-                            position : another
-                        }).start("CubicInOut");
-                        current = another;
-                    }, 4000);
                 });
+
+                document.body.addEventListener('mousemove', function(e) {
+                    var dx = e.pageX - window.innerWidth / 2;
+
+                    root.rotation.identity().rotateY(dx / 1000);
+                });
+
+                var obj = {
+                    position : positionArr
+                }
+
+                var current = crossPosArr;
+                setInterval(function() {
+                    var another = current == crossPosArr ? checkPosArr : crossPosArr;
+                    animation.animate(obj)
+                    .when(1000, {
+                        position : another
+                    }).start("CubicInOut");
+                    current = another;
+                }, 4000);
             });
         </script>
     </body>

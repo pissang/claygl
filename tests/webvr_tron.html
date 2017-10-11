@@ -3,8 +3,7 @@
         <title>Tron Effect</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/require.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body>
@@ -28,7 +27,7 @@
         <canvas id='main'></canvas>
         <!--<div id="split-line"></div>-->
         <script type="text/javascript">
-            require(['qtek', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (qtek, tronShader, createCompositor) {
+            require(['../dist/qtek', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (qtek, tronShader, createCompositor) {
                 var Shader = qtek.Shader;
                 Shader.import(tronShader);
 

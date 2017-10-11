@@ -1,85 +1,82 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body>
-        <canvas width="1200" height="640" id="Main"></canvas>
+        <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            require(['qtek'], function(qtek){
-                var Shader = qtek.Shader;
+            var Shader = qtek.Shader;
 
-                var renderer = new qtek.Renderer({
-                    canvas: document.getElementById( "Main"),
-                    devicePixelRatio: 1.0
-                });
-                //Create scene
-                var scene = new qtek.Scene();
-                var camera = new qtek.camera.Perspective({
-                    aspect: renderer.getViewportAspect(),
-                    far: 500
-                });
-                var cube = new qtek.geometry.Cube();
-                var shader = new Shader({
-                    vertex: Shader.source("qtek.standard.vertex"),
-                    fragment: Shader.source("qtek.standard.fragment")
-                })
-                shader.enableTexture("diffuseMap");
-                var material = new qtek.Material({
-                    shader: shader
-                });
-                var texture = new qtek.Texture2D;
-                texture.load('assets/textures/crate.gif');
-                material.set("diffuseMap", texture );
-                var mesh = new qtek.Mesh({
-                    material: material,
-                    geometry: cube
-                })
-
-                scene.add( mesh );
-
-                camera.position.set(0, 1.5, 3);
-                camera.lookAt( new qtek.math.Vector3(0, 0, 0) );
-
-                var light = new qtek.light.Point({
-                    color: [1.5, 1.5, 1.5]
-                })
-                light.position.set(0, 0, 3);
-                scene.add( light );
-
-                var frameBuffer = new qtek.FrameBuffer();
-                var rtt = new qtek.Texture2D({
-                    width: 1024,
-                    height: 1024,
-                });
-                frameBuffer.attach( rtt );
-                var rttShader = qtek.shader.library.get("qtek.basic", "diffuseMap");
-                rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
-                var rttMesh = new qtek.Mesh({
-                    geometry: new qtek.geometry.Plane(),
-                    material: new qtek.Material({
-                        shader: rttShader
-                    })
-                });
-                rttMesh.material.set("diffuseMap", rtt);
-                var rttScene = new qtek.Scene();
-                rttScene.add(rttMesh);
-
-                var orthCamera = new qtek.camera.Orthographic();
-
-                var animation = new qtek.animation.Animation();
-                animation.start();
-                animation.on('frame', function() {
-                    frameBuffer.bind( renderer );
-                    renderer.render( scene, camera );
-                    frameBuffer.unbind( renderer );
-
-                    renderer.render( rttScene, orthCamera );
-
-                    mesh.rotation.rotateY(Math.PI/500);
-                });
+            var renderer = new qtek.Renderer({
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
+            });
+            //Create scene
+            var scene = new qtek.Scene();
+            var camera = new qtek.camera.Perspective({
+                aspect: renderer.getViewportAspect(),
+                far: 500
+            });
+            var cube = new qtek.geometry.Cube();
+            var shader = new Shader({
+                vertex: Shader.source("qtek.standard.vertex"),
+                fragment: Shader.source("qtek.standard.fragment")
             })
+            shader.enableTexture("diffuseMap");
+            var material = new qtek.Material({
+                shader: shader
+            });
+            var texture = new qtek.Texture2D;
+            texture.load('assets/textures/crate.gif');
+            material.set("diffuseMap", texture);
+            var mesh = new qtek.Mesh({
+                material: material,
+                geometry: cube
+            })
+
+            scene.add(mesh);
+
+            camera.position.set(0, 1.5, 3);
+            camera.lookAt(new qtek.math.Vector3(0, 0, 0));
+
+            var light = new qtek.light.Point({
+                color: [1.5, 1.5, 1.5]
+            })
+            light.position.set(0, 0, 3);
+            scene.add(light);
+
+            var frameBuffer = new qtek.FrameBuffer();
+            var rtt = new qtek.Texture2D({
+                width: 1024,
+                height: 1024,
+            });
+            frameBuffer.attach(rtt);
+            var rttShader = qtek.shader.library.get("qtek.basic", "diffuseMap");
+            rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
+            var rttMesh = new qtek.Mesh({
+                geometry: new qtek.geometry.Plane(),
+                material: new qtek.Material({
+                    shader: rttShader
+                })
+            });
+            rttMesh.material.set('diffuseMap', rtt);
+            var rttScene = new qtek.Scene();
+            rttScene.add(rttMesh);
+
+            var orthCamera = new qtek.camera.Orthographic();
+
+            var animation = new qtek.animation.Animation();
+            animation.start();
+            animation.on('frame', function() {
+                frameBuffer.bind(renderer);
+                renderer.render(scene, camera);
+                frameBuffer.unbind(renderer);
+
+                renderer.render(rttScene, orthCamera);
+
+                mesh.rotation.rotateY(Math.PI / 500);
+            });
 
         </script>
     </body>

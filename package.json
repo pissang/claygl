@@ -23,6 +23,7 @@
   "main": "dist/qtek.js",
   "scripts": {
     "build": "npm run glsl2js && npm run genentry && rollup -c",
+    "dev": "rollup -c -w",
     "genentry": "node build/genentry.js",
     "glsl2js": "node build/glsl2js.js",
     "prepublish": "npm run glsl2js && npm run genentry"

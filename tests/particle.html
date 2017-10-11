@@ -1,97 +1,94 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <script type="text/javascript" src="../thirdparty/require.js"></script>
-    <script type="text/javascript" src="js/config.js"></script>
+    <script src="../dist/qtek.js"></script>
 </head>
 <body style="margin:0px;">
     <canvas id="Main"></canvas>
 
     <script type="text/javascript">
-        require(['qtek'], function(qtek){
-            var Shader = qtek.Shader;
+        var Shader = qtek.Shader;
 
-            var renderer = new qtek.Renderer({
-                canvas : document.getElementById("Main")
-            });
-            var animation = new qtek.animation.Animation();
-            animation.start();
-
-            renderer.resize(window.innerWidth, window.innerHeight);
-
-            var Value = qtek.math.Value;
-            var Vector3 = qtek.math.Vector3;
-            var particleRenderable = new qtek.particle.ParticleRenderable();
-            var emitter = new qtek.particle.Emitter({
-                max : 5000,
-                amount : 7,
-                life : Value.constant(2),
-                spriteSize : Value.constant(400),
-                position : Value.random3D(new Vector3(-100, -30, 50), new Vector3(100, -40, 90)),
-                velocity : Value.random3D(new Vector3(-20, 0, -10), new Vector3(20, 20, 10))
-            });
-            particleRenderable.addEmitter(emitter);
-            particleRenderable.material.set('color', [1, 1, 1]);
-            particleRenderable.material.shader.enableTexture('sprite');
-            particleRenderable.material.set('sprite', new qtek.Texture2D({
-                image : generateSprite()
-            }));
-
-            var scene = new qtek.Scene();
-            var camera = new qtek.camera.Perspective({
-                aspect : renderer.getViewportAspect(),
-                far : 1000,
-                near : 1
-            });
-            camera.position.set(0, 0, 120);
-            scene.add(particleRenderable);
-
-            var planeMesh = new qtek.Mesh({
-                geometry : new qtek.geometry.Plane(),
-                material : new qtek.Material({
-                    shader : qtek.shader.library.get('qtek.lambert')
-                })
-            });
-            planeMesh.material.set('color', [0.3, 0, 0]);
-            planeMesh.scale.set(10000, 10000, 1);
-            scene.add(planeMesh);
-
-            var light = new qtek.light.Point({
-                range : 300
-            });
-            light.position.z = 50;
-            light.position.y = -40;
-            scene.add(light);
-            animation.on('frame', function(deltaTime) {
-                particleRenderable.updateParticles(deltaTime);
-                renderer.render(scene, camera);
-            });
-
-            function generateSprite(){
-                var size = 128;
-
-                var canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-
-                var ctx = canvas.getContext('2d');
-                ctx.beginPath();
-                ctx.arc(size/2, size/2, 60, 0, Math.PI * 2, false) ;
-                ctx.closePath();
-
-                var gradient = ctx.createRadialGradient(
-                    size/2, size/2, 0, size/2, size/2, size/2
-                );
-                gradient.addColorStop(0, 'rgba(255,239,179,1)');
-                gradient.addColorStop(0.34, 'rgba(255,212,157,1)');
-                gradient.addColorStop(0.7, 'rgba(130,55,55,0.51)');
-                gradient.addColorStop(1.0, 'rgba(130,55,55,0.0)');
-                ctx.fillStyle = gradient;
-                ctx.fill();
-
-                return canvas;
-            }
+        var renderer = new qtek.Renderer({
+            canvas : document.getElementById("Main")
         });
+        var animation = new qtek.animation.Animation();
+        animation.start();
+
+        renderer.resize(window.innerWidth, window.innerHeight);
+
+        var Value = qtek.math.Value;
+        var Vector3 = qtek.math.Vector3;
+        var particleRenderable = new qtek.particle.ParticleRenderable();
+        var emitter = new qtek.particle.Emitter({
+            max : 5000,
+            amount : 7,
+            life : Value.constant(2),
+            spriteSize : Value.constant(400),
+            position : Value.random3D(new Vector3(-100, -30, 50), new Vector3(100, -40, 90)),
+            velocity : Value.random3D(new Vector3(-20, 0, -10), new Vector3(20, 20, 10))
+        });
+        particleRenderable.addEmitter(emitter);
+        particleRenderable.material.set('color', [1, 1, 1]);
+        particleRenderable.material.shader.enableTexture('sprite');
+        particleRenderable.material.set('sprite', new qtek.Texture2D({
+            image : generateSprite()
+        }));
+
+        var scene = new qtek.Scene();
+        var camera = new qtek.camera.Perspective({
+            aspect : renderer.getViewportAspect(),
+            far : 1000,
+            near : 1
+        });
+        camera.position.set(0, 0, 120);
+        scene.add(particleRenderable);
+
+        var planeMesh = new qtek.Mesh({
+            geometry : new qtek.geometry.Plane(),
+            material : new qtek.Material({
+                shader : qtek.shader.library.get('qtek.lambert')
+            })
+        });
+        planeMesh.material.set('color', [0.3, 0, 0]);
+        planeMesh.scale.set(10000, 10000, 1);
+        scene.add(planeMesh);
+
+        var light = new qtek.light.Point({
+            range : 300
+        });
+        light.position.z = 50;
+        light.position.y = -40;
+        scene.add(light);
+        animation.on('frame', function(deltaTime) {
+            particleRenderable.updateParticles(deltaTime);
+            renderer.render(scene, camera);
+        });
+
+        function generateSprite() {
+            var size = 128;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+
+            var ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, 60, 0, Math.PI * 2, false) ;
+            ctx.closePath();
+
+            var gradient = ctx.createRadialGradient(
+                size/2, size/2, 0, size/2, size/2, size/2
+            );
+            gradient.addColorStop(0, 'rgba(255,239,179,1)');
+            gradient.addColorStop(0.34, 'rgba(255,212,157,1)');
+            gradient.addColorStop(0.7, 'rgba(130,55,55,0.51)');
+            gradient.addColorStop(1.0, 'rgba(130,55,55,0.0)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            return canvas;
+        }
     </script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 define(function (require) {
-    var qtek = require('qtek');
+    var qtek = require('../../dist/qtek');
     var PostProcessPass = require('./PostProcessPass');
 
-    qtek.Shader.import(require('text!../shader/ssr.essl'));
+    qtek.Shader.import(require('text!../shader/ssr.glsl'));
 
 
     function SSRPass(opt) {

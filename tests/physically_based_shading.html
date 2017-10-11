@@ -1,60 +1,57 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script src="../dist/qtek.js"></script>
     </head>
     <body style="margin:0px;">
-        <canvas id="Main"></canvas>
+        <canvas id="main"></canvas>
         <script>
-            require(['qtek'], function(qtek) {
-                var renderer = new qtek.Renderer({
-                    canvas : document.getElementById('Main')
-                });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek.camera.Perspective({
-                    aspect : renderer.getViewportAspect()
-                });
-                camera.position.set(0, 0, 10);
+            var renderer = new qtek.Renderer({
+                canvas : document.getElementById('main')
+            });
+            renderer.resize(window.innerWidth, window.innerHeight);
+            var camera = new qtek.camera.Perspective({
+                aspect : renderer.getViewportAspect()
+            });
+            camera.position.set(0, 0, 10);
 
-                var scene = new qtek.Scene();
-                scene.add(camera);
+            var scene = new qtek.Scene();
+            scene.add(camera);
 
-                var GLTFLoader = new qtek.loader.GLTF();
-                GLTFLoader.load("assets/models/suzanne.json");
-                var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas
-                });
+            var GLTFLoader = new qtek.loader.GLTF();
+            GLTFLoader.load("assets/models/suzanne.json");
+            var control = new qtek.plugin.OrbitControl({
+                target : camera,
+                domElement : renderer.canvas
+            });
 
-                GLTFLoader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-                    for (var i = 0; i < 10; i++) {
-                        var material = new qtek.Material({
-                            shader : qtek.shader.library.get('qtek.standard')
-                        });
-                        material.set('color', [0.7, 0.0, 0.0]);
-                        material.set('specularColor', [0.1, 0.1, 0.1]);
-                        material.set('glossiness', (i+1) / 12);
-                        var mesh = new qtek.Mesh({
-                            material : material,
-                            geometry :suzanneGeometry
-                        });
-                        mesh.position.set((i - 5) * 2.1, 0, 0);
-                        scene.add(mesh);
-                    }
-
-                    var light = new qtek.light.Directional();
-                    light.position.set(1, 4, 4);
-                    light.lookAt(qtek.math.Vector3.ZERO);
-                    scene.add(light);
-
-                    var animation = new qtek.animation.Animation();
-                    animation.start();
-                    animation.on('frame', function() {
-                        control.update();
-                        renderer.render(scene, camera);
+            GLTFLoader.on('success', function(res) {
+                suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+                for (var i = 0; i < 10; i++) {
+                    var material = new qtek.Material({
+                        shader : qtek.shader.library.get('qtek.standard')
                     });
+                    material.set('color', [0.7, 0.0, 0.0]);
+                    material.set('specularColor', [0.1, 0.1, 0.1]);
+                    material.set('glossiness', (i+1) / 12);
+                    var mesh = new qtek.Mesh({
+                        material : material,
+                        geometry :suzanneGeometry
+                    });
+                    mesh.position.set((i - 5) * 2.1, 0, 0);
+                    scene.add(mesh);
+                }
+
+                var light = new qtek.light.Directional();
+                light.position.set(1, 4, 4);
+                light.lookAt(qtek.math.Vector3.ZERO);
+                scene.add(light);
+
+                var animation = new qtek.animation.Animation();
+                animation.start();
+                animation.on('frame', function() {
+                    control.update();
+                    renderer.render(scene, camera);
                 });
             });
         </script>

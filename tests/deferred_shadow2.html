@@ -3,96 +3,93 @@
     <title>Deferred Spotlight Shadow</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="text/javascript" src="../thirdparty/require.js"></script>
-    <script type="text/javascript" src="js/config.js"></script>
+    <script src="../dist/qtek.js"></script>
 </head>
 <body style="margin:0px; background-color: black">
-    <canvas id="Main"></canvas>
+    <canvas id="main"></canvas>
 
     <script type="text/javascript">
-        require(['qtek'], function(qtek) {
-            var renderer = new qtek.Renderer({
-                canvas: document.getElementById("Main")
+        var renderer = new qtek.Renderer({
+            canvas: document.getElementById('main')
+        });
+        renderer.resize(window.innerWidth, window.innerHeight);
+        var shadowMapPass = new qtek.prePass.ShadowMap();
+        var deferredRenderer = new qtek.deferred.Renderer({
+            shadowMapPass: shadowMapPass
+        });
+
+        var animation = new qtek.animation.Animation();
+        animation.start();
+
+        var GLTFLoader = new qtek.loader.GLTF({
+            includeLight: false
+        });
+
+        GLTFLoader.load("assets/scenes/gltf/scene.json");
+
+        GLTFLoader.on('success', function(res) {
+            var scene = res.scene;
+            scene.rotation.rotateX(-Math.PI / 2);
+            var camera = new qtek.camera.Perspective({
+                aspect: renderer.getViewportAspect(),
+                far: 500
             });
-            renderer.resize(window.innerWidth, window.innerHeight);
-            var shadowMapPass = new qtek.prePass.ShadowMap();
-            var deferredRenderer = new qtek.deferred.Renderer({
-                shadowMapPass: shadowMapPass
+
+            camera.position.set(2, 2, 2);
+            camera.lookAt(scene.position);
+            camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+            var control = new qtek.plugin.OrbitControl({
+                target: camera,
+                domElement: renderer.canvas,
+                sensitivity: 0.4
             });
 
-            var animation = new qtek.animation.Animation();
-            animation.start();
-
-            var GLTFLoader = new qtek.loader.GLTF({
-                includeLight: false
+            var light = new qtek.light.Spot({
+                color: [1, 0.3, 0.3],
+                range: 30,
+                umbraAngle: 10,
+                penumbraAngle: 25,
+                intensity: 1,
+                shadowResolution: 512,
+                shadowBias: 0.001,
+                castShadow: true
             });
+            light.position.set(-3, -4, 2);
+            light.lookAt(scene.position);
+            scene.add(light);
 
-            GLTFLoader.load("assets/scenes/gltf/scene.json");
+            var light2 = new qtek.light.Spot({
+                color: [0.3, 1, 0.3],
+                range: 50,
+                umbraAngle: 10,
+                penumbraAngle: 25,
+                shadowResolution: 512,
+                intensity: 1,
+                shadowBias: 0.001,
+                castShadow: true
+            });
+            light2.position.set(3, -4, 2);
+            light2.lookAt(scene.position);
+            scene.add(light2);
 
-            GLTFLoader.on('success', function(res) {
-                var scene = res.scene;
-                scene.rotation.rotateX(-Math.PI / 2);
-                var camera = new qtek.camera.Perspective({
-                    aspect: renderer.getViewportAspect(),
-                    far: 500
-                });
-
-                camera.position.set(2, 2, 2);
-                camera.lookAt(scene.position);
-                camera.aspect = renderer.canvas.width / renderer.canvas.height;
-
-                var control = new qtek.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas,
-                    sensitivity: 0.4
-                });
-
-                var light = new qtek.light.Spot({
-                    color: [1, 0.3, 0.3],
-                    range: 30,
-                    umbraAngle: 10,
-                    penumbraAngle: 25,
-                    intensity: 1,
-                    shadowResolution: 512,
-                    shadowBias: 0.001,
-                    castShadow: true
-                });
-                light.position.set(-3, -4, 2);
-                light.lookAt(scene.position);
-                scene.add(light);
-
-                var light2 = new qtek.light.Spot({
-                    color: [0.3, 1, 0.3],
-                    range: 50,
-                    umbraAngle: 10,
-                    penumbraAngle: 25,
-                    shadowResolution: 512,
-                    intensity: 1,
-                    shadowBias: 0.001,
-                    castShadow: true
-                });
-                light2.position.set(3, -4, 2);
-                light2.lookAt(scene.position);
-                scene.add(light2);
-
-                var light3 = new qtek.light.Point({
-                    color: [0.3, 0.3, 1],
-                    range: 50,
-                    shadowResolution: 512,
-                    shadowBias: 0.001,
-                    castShadow: true
-                });
-                light3.position.set(0, -4, 5);
-                light3.lookAt(scene.position);
-                scene.add(light3);
+            var light3 = new qtek.light.Point({
+                color: [0.3, 0.3, 1],
+                range: 50,
+                shadowResolution: 512,
+                shadowBias: 0.001,
+                castShadow: true
+            });
+            light3.position.set(0, -4, 5);
+            light3.lookAt(scene.position);
+            scene.add(light3);
 
 
-                animation.on('frame', function(deltaTime) {
-                    control.update(deltaTime);
-                    // shadowMapPass.render(renderer, scene, camera);
-                    // renderer.render(scene, camera);
-                    deferredRenderer.render(renderer, scene, camera);
-                });
+            animation.on('frame', function(deltaTime) {
+                control.update(deltaTime);
+                // shadowMapPass.render(renderer, scene, camera);
+                // renderer.render(scene, camera);
+                deferredRenderer.render(renderer, scene, camera);
             });
         });
     </script>

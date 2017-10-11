@@ -2,8 +2,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="../thirdparty/require.js"></script>
-        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="lib/require.js"></script>
 
         <script type="text/javascript" src="lib/stats.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
@@ -11,7 +10,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            require(['qtek', 'js/AlchemyAOPass'], function(qtek, AlchemyAOPass) {
+            require(['../dist/qtek', 'js/AlchemyAOPass'], function(qtek, AlchemyAOPass) {
 
                 var config = {
                     kernelSize: 12,
