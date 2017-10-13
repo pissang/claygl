@@ -104,6 +104,11 @@ var Renderable = Node.extend(
     ignorePreZ: false,
 
     /**
+     * @type {boolean}
+     */
+    ignoreGBuffer: false,
+
+    /**
      * @return {boolean}
      */
     isRenderable: function() {

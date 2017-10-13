@@ -191,6 +191,7 @@ var GBuffer = Base.extend(function () {
 
         enableTargetTexture3: true,
 
+        _renderQueue: [],
         // - R: normal.x
         // - G: normal.y
         // - B: normal.z
@@ -298,11 +299,28 @@ var GBuffer = Base.extend(function () {
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
         var opaqueQueue = scene.opaqueQueue;
+        var transparentQueue = scene.transparentQueue;
         var oldBeforeRender = renderer.beforeRenderObject;
 
-        // StandardMaterial needs updateShader method so shader can be created on demand.
+        opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
+
+        var offset = 0;
+        var renderQueue = this._renderQueue;
         for (var i = 0; i < opaqueQueue.length; i++) {
-            var material = opaqueQueue[i].material;
+            if (!opaqueQueue[i].ignoreGBuffer) {
+                renderQueue[offset++] = opaqueQueue[i];
+            }
+        }
+        for (var i = 0; i < transparentQueue.length; i++) {
+            if (!transparentQueue[i].ignoreGBuffer) {
+                renderQueue[offset++] = transparentQueue[i];
+            }
+        }
+        renderQueue.length = offset;
+
+        // StandardMaterial needs updateShader method so shader can be created on demand.
+        for (var i = 0; i < renderQueue.length; i++) {
+            var material = renderQueue[i].material;
             material.updateShader && material.updateShader(renderer);
         }
 
@@ -343,8 +361,7 @@ var GBuffer = Base.extend(function () {
 
             this._resetGBufferMaterials();
 
-            this._replaceGBufferMat(opaqueQueue, 1);
-            opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
+            this._replaceGBufferMat(renderQueue, 1);
 
             // FIXME Use MRT if possible
             // Pass 1
@@ -353,7 +370,7 @@ var GBuffer = Base.extend(function () {
                 this._defaultNormalMap,
                 this._defaultRoughnessMap
             );
-            renderer.renderQueue(opaqueQueue, camera);
+            renderer.renderQueue(renderQueue, camera);
 
         }
         if (enableTargetTexture3) {
@@ -373,13 +390,13 @@ var GBuffer = Base.extend(function () {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
-            this._replaceGBufferMat(opaqueQueue, 2);
+            this._replaceGBufferMat(renderQueue, 2);
             renderer.beforeRenderObject = getBeforeRenderHook2(
                 gl,
                 this._defaultDiffuseMap,
                 this._defaultMetalnessMap
             );
-            renderer.renderQueue(opaqueQueue, camera);
+            renderer.renderQueue(renderQueue, camera);
 
         }
 
@@ -387,7 +404,7 @@ var GBuffer = Base.extend(function () {
 
         renderer.beforeRenderObject = oldBeforeRender;
         this._cleanGBufferMaterials(renderer);
-        this._restoreMaterial(opaqueQueue);
+        this._restoreMaterial(renderQueue);
 
         frameBuffer.unbind(renderer);
     },

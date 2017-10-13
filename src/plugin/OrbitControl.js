@@ -611,8 +611,6 @@ var OrbitControl = Base.extend(function () {
 
     _zoomHandler: function (e, delta) {
 
-        var x = e.clientX;
-        var y = e.clientY;
         var distance = Math.max(Math.min(
             this._distance - this.minDistance,
             this.maxDistance - this._distance

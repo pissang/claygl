@@ -756,7 +756,8 @@ function () {
                 }
                 var mesh = new Mesh({
                     geometry: geometry,
-                    material: material
+                    material: material,
+                    ignoreGBuffer: material.transparent
                 });
                 if (((material instanceof StandardMaterial) && material.normalMap)
                     || (material.shader && material.shader.isTextureEnabled('normalMap'))
