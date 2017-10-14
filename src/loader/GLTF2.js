@@ -683,7 +683,7 @@ function () {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
             enabledTextures.push('emissiveMap');
         }
-        var baseColor = specularGlossinessMatInfo.baseColorFactor || [1, 1, 1, 1];
+        var diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
         var commonProperties = {
             diffuseMap: diffuseMap || null,
@@ -691,8 +691,8 @@ function () {
             specularMap: specularMap || null,
             normalMap: normalMap || null,
             emissiveMap: emissiveMap || null,
-            color: baseColor.slice(0, 3),
-            alpha: baseColor[3],
+            color: diffuseColor.slice(0, 3),
+            alpha: diffuseColor[3],
             specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],
             glossiness: specularGlossinessMatInfo.glossinessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
