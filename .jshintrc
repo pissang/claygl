@@ -2,7 +2,7 @@
     "bitwise": false,
     "camelcase": true,
     "curly": true,
-    "es3": false,
+    "esversion": 6,
     "eqeqeq": false,
     "forin": false,
     "immed": true,
