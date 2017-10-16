@@ -860,7 +860,7 @@ var Renderer = Base.extend(function () {
             if (node.dispose) {
                 node.dispose(this);
             }
-        });
+        }, this);
         for (var guid in materials) {
             var mat = materials[guid];
             mat.dispose(this, disposeTexture);
