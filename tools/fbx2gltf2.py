@@ -951,14 +951,15 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
                 lScaleChannel.append(pScaleChannel[i - 1])
             lTime.append(pTime[i - 1])
 
-    if lHaveRotation:
-        lRotationChannel.append(pRotationChannel[len(pRotationChannel) - 1])
-    if lHaveScale:
-        lScaleChannel.append(pScaleChannel[len(pScaleChannel) - 1])
-    if lHaveTranslation:
-        lTranslationChannel.append(pTranslationChannel[len(pTranslationChannel) - 1])
+    if len(pTime) > 1:
+        if lHaveRotation:
+            lRotationChannel.append(pRotationChannel[len(pRotationChannel) - 1])
+        if lHaveScale:
+            lScaleChannel.append(pScaleChannel[len(pScaleChannel) - 1])
+        if lHaveTranslation:
+            lTranslationChannel.append(pTranslationChannel[len(pTranslationChannel) - 1])
 
-    lTime.append(pTime[len(pTime) - 1])
+        lTime.append(pTime[len(pTime) - 1])
             
     return lTime, lTranslationChannel, lRotationChannel, lScaleChannel
 
