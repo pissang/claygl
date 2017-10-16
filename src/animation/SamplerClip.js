@@ -188,7 +188,8 @@ SamplerClip.prototype.setTime = function (time) {
         var end = key + 1;
         var startTime = channels.time[start];
         var endTime = channels.time[end];
-        var percent = (time - startTime) / (endTime - startTime);
+        var range = endTime - startTime;
+        var percent = range === 0 ? 0 : (time - startTime) / range;
 
         if (channels.rotation) {
             quatSlerp(this.rotation, channels.rotation, channels.rotation, percent, start * 4, end * 4);

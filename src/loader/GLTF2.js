@@ -104,7 +104,6 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
  * @property {Object.<string, qtek.Material>} materials
  * @property {Object.<string, qtek.Skeleton>} skeletons
  * @property {Object.<string, qtek.Mesh>} meshes
- * @property {qtek.animation.SkinningClip} clip
  */
 
 /**

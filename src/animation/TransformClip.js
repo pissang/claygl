@@ -157,7 +157,7 @@ TransformClip.prototype._interpolateField = function (time, fieldName) {
     }
 
     if (start && end) {
-        var percent = (time-start.time) / (end.time-start.time);
+        var percent = (time - start.time) / (end.time - start.time);
         percent = Math.max(Math.min(percent, 1), 0);
         if (fieldName === 'rotation') {
             quat.slerp(this[fieldName], start[fieldName], end[fieldName], percent);
