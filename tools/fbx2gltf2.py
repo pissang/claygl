@@ -1283,7 +1283,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--exclude', type=str, default='', help="Data excluded. Can be: scene,animation")
     parser.add_argument('-t', '--timerange', default='0,1000', type=str, help="Export animation time, in format 'startSecond,endSecond'")
     parser.add_argument('-o', '--output', default='', type=str, help="Ouput glTF file path")
-    parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per sencond")
+    parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per second")
     parser.add_argument('-p', '--pose', default=-1, type=float, help="Static pose time")
     parser.add_argument('-q', '--quantize', action='store_true', help="Quantize accessors with WEB3D_quantized_attributes extension")
     parser.add_argument('-b', '--beautify', action="store_true", help="Beautify json output.")

@@ -109,7 +109,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         Ouput glTF file path
   -f FRAMERATE, --framerate FRAMERATE
-                        Animation frame per sencond
+                        Animation frame per second
   -p POSE, --pose POSE  Static pose time
   -q, --quantize        Quantize accessors with WEB3D_quantized_attributes
                         extension
