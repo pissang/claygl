@@ -24,21 +24,21 @@ function makeAttrKey(attrName) {
 var StaticGeometry = Geometry.extend(function () {
     return /** @lends qtek.StaticGeometry# */ {
         attributes: {
-                position: new StaticAttribute('position', 'float', 3, 'POSITION'),
-                texcoord0: new StaticAttribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
-                texcoord1: new StaticAttribute('texcoord1', 'float', 2, 'TEXCOORD_1'),
-                normal: new StaticAttribute('normal', 'float', 3, 'NORMAL'),
-                tangent: new StaticAttribute('tangent', 'float', 4, 'TANGENT'),
-                color: new StaticAttribute('color', 'float', 4, 'COLOR'),
-                // Skinning attributes
-                // Each vertex can be bind to 4 bones, because the
-                // sum of weights is 1, so the weights is stored in vec3 and the last
-                // can be calculated by 1-w.x-w.y-w.z
-                weight: new StaticAttribute('weight', 'float', 3, 'WEIGHT'),
-                joint: new StaticAttribute('joint', 'float', 4, 'JOINT'),
-                // For wireframe display
-                // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-                barycentric: new StaticAttribute('barycentric', 'float', 3, null),
+            position: new StaticAttribute('position', 'float', 3, 'POSITION'),
+            texcoord0: new StaticAttribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
+            texcoord1: new StaticAttribute('texcoord1', 'float', 2, 'TEXCOORD_1'),
+            normal: new StaticAttribute('normal', 'float', 3, 'NORMAL'),
+            tangent: new StaticAttribute('tangent', 'float', 4, 'TANGENT'),
+            color: new StaticAttribute('color', 'float', 4, 'COLOR'),
+            // Skinning attributes
+            // Each vertex can be bind to 4 bones, because the
+            // sum of weights is 1, so the weights is stored in vec3 and the last
+            // can be calculated by 1-w.x-w.y-w.z
+            weight: new StaticAttribute('weight', 'float', 3, 'WEIGHT'),
+            joint: new StaticAttribute('joint', 'float', 4, 'JOINT'),
+            // For wireframe display
+            // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
+            barycentric: new StaticAttribute('barycentric', 'float', 3, null),
         },
 
         hint: glenum.STATIC_DRAW,
@@ -416,6 +416,11 @@ var StaticGeometry = Geometry.extend(function () {
         var positions = attributes.position.value;
         var tangents = attributes.tangent.value;
         var normals = attributes.normal.value;
+
+        if (!texcoords) {
+            console.warn('Geometry without texcoords can\'t generate tangents.');
+            return;
+        }
 
         var tan1 = [];
         var tan2 = [];

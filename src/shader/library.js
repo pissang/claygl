@@ -18,7 +18,6 @@ function ShaderLibrary () {
  * + qtek.standard
  * + qtek.basic
  * + qtek.lambert
- * + qtek.phong
  * + qtek.wireframe
  *
  * @namespace qtek.shader.library
@@ -38,12 +37,14 @@ function ShaderLibrary () {
  *         textures: ['diffuseMap'],
  *         vertexDefines: {},
  *         fragmentDefines: {}
+ *         precision: 'mediump'
  *     })
  */
 ShaderLibrary.prototype.get = function(name, option) {
     var enabledTextures = [];
     var vertexDefines = {};
     var fragmentDefines = {};
+    var precision;
     if (typeof(option) === 'string') {
         enabledTextures = Array.prototype.slice.call(arguments, 1);
     }
@@ -51,6 +52,7 @@ ShaderLibrary.prototype.get = function(name, option) {
         enabledTextures = option.textures || [];
         vertexDefines = option.vertexDefines || {};
         fragmentDefines = option.fragmentDefines || {};
+        precision = option.precision;
     }
     else if (option instanceof Array) {
         enabledTextures = option;
@@ -74,6 +76,9 @@ ShaderLibrary.prototype.get = function(name, option) {
             fragmentDefineKeys[i],
             fragmentDefines[fragmentDefineKeys[i]]
         );
+    }
+    if (precision) {
+        keyArr.push(precision);
     }
     var key = keyArr.join('_');
 

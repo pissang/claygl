@@ -13,7 +13,7 @@ except ImportError:
     import platform
     msg = 'You need to copy the content in compatible subfolder under /lib/python<version> into your python install folder such as '
     if platform.system() == 'Windows' or platform.system() == 'Microsoft':
-        msg += '"Python26/Lib/site-packages"'
+        msg += '"Python33/Lib/site-packages"'
     elif platform.system() == 'Linux':
         msg += '"/usr/local/lib/python3.3/site-packages"'
     elif platform.system() == 'Darwin':
@@ -127,7 +127,7 @@ def quantize(pList, pStride, pMin, pMax):
             for i in lRange:
                 lNewItem.append(int((item[i] - pMin[i]) * lMultiplier[i]))
             lNewList.append(lNewItem)
-    
+
     # TODO
     if pStride == 1:
         lDecodeMatrix = [
@@ -157,7 +157,7 @@ def quantize(pList, pStride, pMin, pMax):
         ]
 
     return lNewList, lDecodeMatrix, pMin, pMax
-        
+
 
 def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
     lGLTFAcessor = {}
@@ -256,7 +256,7 @@ def appendToBuffer(pType, pBuffer, pData, pObj):
         if lByteOffset % 4 == 2:
             pBuffer.extend(b'\x00\x00')
             lByteOffset += 2
-            
+
     pObj['byteOffset'] = lByteOffset
     pBuffer.extend(pData)
 
@@ -291,7 +291,7 @@ def CreateAnimationBuffer(pList, pType, pStride):
     #     return -1
 
     appendToBuffer(pType, animationBuffer, lData, lGLTFAnimSampler)
-    
+
     idx = len(lib_accessors)
     lib_animation_accessors.append(lGLTFAnimSampler)
     lib_accessors.append(lGLTFAnimSampler)
@@ -401,12 +401,12 @@ def ConvertMaterial(pMaterial):
         "extensions": {
             "KHR_materials_common": {
                 "technique": "BLINN",
-                # Compatible with three.js loaders 
+                # Compatible with three.js loaders
                 "type": "commonBlinn",
                 "values": {}
             }
         }
-    } 
+    }
     lValues = lGLTFMaterial['extensions']['KHR_materials_common']['values']
     lShading = pMaterial.ShadingModel.Get()
 
@@ -960,7 +960,7 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
             lTranslationChannel.append(pTranslationChannel[len(pTranslationChannel) - 1])
 
         lTime.append(pTime[len(pTime) - 1])
-            
+
     return lTime, lTranslationChannel, lRotationChannel, lScaleChannel
 
 
@@ -980,7 +980,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
         pNode.LclScaling.GetCurve(pAnimLayer, 'Y'),
         pNode.LclScaling.GetCurve(pAnimLayer, 'Z'),
     ]
-    
+
     lHaveTranslation = any(curves[0:3])
     lHaveRotation = any(curves[3:6])
     lHaveScaling = any(curves[6:9])
@@ -1032,7 +1032,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
                 lTranslationChannel.append(list(lTranslation))
             if lHaveScaling:
                 lScaleChannel.append(list(lScale))
-    
+
         lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel = FitLinearInterpolation(
             lTimeChannel, lTranslationChannel, lRotationChannel, lScaleChannel
         )
@@ -1042,7 +1042,7 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
         if not lTimeAccessorKey in _timeSamplerHashMap:
             # TODO use ubyte.
             _timeSamplerHashMap[lTimeAccessorKey] = CreateAnimationBuffer(lTimeChannel, 'f', 1)
-        
+
         lSamplerAccessors = {
             "time": _timeSamplerHashMap[lTimeAccessorKey]
             # "time": CreateAnimationBuffer(lTimeChannel, 'f', 1)
@@ -1146,7 +1146,7 @@ def PrepareSceneNode(pNode, fbxConverter):
     # FBX version 2014.2 seems have fixed it
     if not pNode.GetMesh() == None:
         fbxConverter.SplitMeshPerMaterial(pNode.GetMesh(), True)
-    
+
     for k in range(pNode.GetChildCount()):
         PrepareSceneNode(pNode.GetChild(k), fbxConverter)
 
@@ -1164,7 +1164,7 @@ def PrepareBakeTransform(pNode):
     pNode.SetRotationOffset(FbxNode.eDestinationPivot, lZero);
     pNode.SetScalingOffset(FbxNode.eDestinationPivot, lZero);
     pNode.SetRotationPivot(FbxNode.eDestinationPivot, lZero);
-    pNode.SetScalingPivot(FbxNode.eDestinationPivot, lZero); 
+    pNode.SetScalingPivot(FbxNode.eDestinationPivot, lZero);
 
     pNode.SetGeometricTranslation(FbxNode.eDestinationPivot, lZero);
     pNode.SetGeometricRotation(FbxNode.eDestinationPivot, lZero);
@@ -1173,7 +1173,7 @@ def PrepareBakeTransform(pNode):
 
     for k in range(pNode.GetChildCount()):
         PrepareBakeTransform(pNode.GetChild(k))
-    
+
 
 def GetNodeIdx(pNode):
     lId = pNode.GetUniqueID()

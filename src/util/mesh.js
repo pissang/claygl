@@ -254,7 +254,8 @@ var meshUtil = {
                     subShader = shaderLib.get(shaderType, {
                         textures: shader.getEnabledTextures(),
                         vertexDefines: vertexDefines,
-                        fragmentDefines: shader.fragmentDefines
+                        fragmentDefines: shader.fragmentDefines,
+                        precision: shader.precision
                     });
                 }
                 else {
