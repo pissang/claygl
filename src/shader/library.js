@@ -95,6 +95,9 @@ ShaderLibrary.prototype.get = function(name, option) {
             'vertex': source.vertex,
             'fragment': source.fragment
         });
+        if (precision) {
+            shader.precision = precision;
+        }
         for (var i = 0; i < enabledTextures.length; i++) {
             shader.enableTexture(enabledTextures[i]);
         }
