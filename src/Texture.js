@@ -36,11 +36,11 @@ var Texture = Base.extend(
     /**
      * @type {number}
      */
-    wrapS: glenum.CLAMP_TO_EDGE,
+    wrapS: glenum.REPEAT,
     /**
      * @type {number}
      */
-    wrapT: glenum.CLAMP_TO_EDGE,
+    wrapT: glenum.REPEAT,
     /**
      * @type {number}
      */
