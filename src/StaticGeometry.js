@@ -500,7 +500,8 @@ var StaticGeometry = Geometry.extend(function () {
             tangents[i * 4] = tmp[0];
             tangents[i * 4 + 1] = tmp[1];
             tangents[i * 4 + 2] = tmp[2];
-            tangents[i * 4 + 3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? -1.0 : 1.0;
+            // PENDING can config ?
+            tangents[i * 4 + 3] = vec3.dot(nCrossT, tan2[i]) < 0.0 ? 1.0 : -1.0;
         }
         this.dirty();
     },
