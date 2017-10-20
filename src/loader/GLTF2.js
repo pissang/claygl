@@ -845,14 +845,7 @@ function () {
                     }
                 }
 
-                if (meshInfo.name) {
-                    if (meshInfo.primitives.length > 1) {
-                        mesh.name = [meshInfo.name, pp].join('-');
-                    }
-                    else {
-                        mesh.name = meshInfo.name;
-                    }
-                }
+                mesh.name = GLTFLoader.generateMeshName(meshInfo.name, pp);
 
                 lib.meshes[idx].push(mesh);
             }
@@ -1054,5 +1047,9 @@ function () {
         return lib.clips;
     }
 });
+
+GLTFLoader.generateMeshName = function (meshName, primitiveIdx) {
+    return primitiveIdx === 0 ? meshName : (meshName + '$' + primitiveIdx);
+};
 
 export default GLTFLoader;
