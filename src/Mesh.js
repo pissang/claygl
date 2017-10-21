@@ -30,6 +30,11 @@ var Mesh = Renderable.extend(
         this.joints = [];
     }
 }, {
+
+    isSkinnedMesh: function () {
+        return this.skeleton && this.material.shader.isDefined('vertex', 'SKINNING');
+    },
+
     render: function (renderer, shader) {
         var _gl = renderer.gl;
         shader = shader || this.material.shader;

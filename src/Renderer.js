@@ -539,7 +539,8 @@ var Renderer = Base.extend(function () {
 
             var geometry = renderable.geometry;
 
-            var worldM = renderable.worldTransform._array;
+            // Skinned mesh will transformed to joint space. Ignore the mesh transform
+            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
             // All matrices ralated to world matrix will be updated on demand;
             mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
             if (geometry.boundingBox && !preZ) {
@@ -720,7 +721,7 @@ var Renderer = Base.extend(function () {
                 continue;
             }
 
-            var worldM = renderable.worldTransform._array;
+            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
             var geometry = renderable.geometry;
 
             mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
@@ -983,6 +984,8 @@ Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function
 
 // Temporary variables
 var matrices = {
+    IDENTITY: mat4Create(),
+    
     WORLD: mat4Create(),
     VIEW: mat4Create(),
     PROJECTION: mat4Create(),

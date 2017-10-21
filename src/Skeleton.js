@@ -144,21 +144,19 @@ var Skeleton = Base.extend(function () {
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
-                // Joint space is relative to root, if have
-                // !!Parent node and joint node must all be updated
-                if (this.relativeRootNode) {
-                    mat4.invert(m4, this.relativeRootNode.worldTransform._array);
-                    mat4.multiply(
-                        m4,
-                        m4,
-                        joint.node.worldTransform._array
-                    );
-                    mat4.invert(m4, m4);
-                }
-                else {
+                // if (this.relativeRootNode) {
+                //     mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                //     mat4.multiply(
+                //         m4,
+                //         m4,
+                //         joint.node.worldTransform._array
+                //     );
+                //     mat4.invert(m4, m4);
+                // }
+                // else {
                     mat4.copy(m4, joint.node.worldTransform._array);
                     mat4.invert(m4, m4);
-                }
+                // }
 
                 var offset = i * 16;
                 for (var j = 0; j < 16; j++) {
@@ -170,9 +168,9 @@ var Skeleton = Base.extend(function () {
         };
     })(),
 
-    setJointMatricesArray: function (array) {
-        this._invBindPoseMatricesArray = array;
-        this._skinMatricesArray = new Float32Array(array.length);
+    setJointMatricesArray: function (arr) {
+        this._invBindPoseMatricesArray = arr;
+        this._skinMatricesArray = new Float32Array(arr.length);
         this.updateMatricesSubArrays();
     },
 
@@ -187,7 +185,7 @@ var Skeleton = Base.extend(function () {
      * Update skinning matrices
      */
     update: (function () {
-        var m4 = mat4.create();
+        // var m4 = mat4.create();
         return function () {
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
@@ -198,14 +196,14 @@ var Skeleton = Base.extend(function () {
                 );
 
                 // Joint space is relative to root, if have
-                if (this.relativeRootNode) {
-                    mat4.invert(m4, this.relativeRootNode.worldTransform._array);
-                    mat4.multiply(
-                        this._skinMatricesSubArrays[i],
-                        m4,
-                        this._skinMatricesSubArrays[i]
-                    );
-                }
+                // if (this.relativeRootNode) {
+                //     mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                //     mat4.multiply(
+                //         this._skinMatricesSubArrays[i],
+                //         m4,
+                //         this._skinMatricesSubArrays[i]
+                //     );
+                // }
             }
         };
     })(),

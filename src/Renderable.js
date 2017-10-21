@@ -108,6 +108,9 @@ var Renderable = Node.extend(
      */
     ignoreGBuffer: false,
 
+    isSkinnedMesh: function () {
+        return false;
+    },
     /**
      * @return {boolean}
      */
