@@ -118,6 +118,12 @@ var Node = Base.extend(
     invisible: false,
 
     /**
+     * Return if Node is a skinned mesh
+     */
+    isSkinnedMesh: function () {
+        return false;
+    },
+    /**
      * Return true if it is a renderable scene node, like Mesh and ParticleSystem
      * @return {boolean}
      */

@@ -781,7 +781,7 @@ var Renderer = Base.extend(function () {
         // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
         var cullingBoundingBox = new BoundingBox();
         var cullingMatrix = new Matrix4();
-        return function(object, scene, camera, worldViewMat, projectionMat) {
+        return function (object, scene, camera, worldViewMat, projectionMat) {
             // Bounding box can be a property of object(like light) or renderable.geometry
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
             cullingMatrix._array = worldViewMat;
