@@ -813,19 +813,19 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
 
             lGLTFSkin['inverseBindMatrices'] = CreateIBMBuffer(lIBM)
 
-            # Mesh with skin should have identity global transform.
-            # Since vertices have all been transformed to skeleton spaces.
-            # PENDING
-            m = FbxAMatrix()
-            if not pNode.GetParent() == None:
-                m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
-                lParentIdx = GetNodeIdx(pNode.GetParent())
-                # Parent node will have identity world matrix if it has skin
-                if lParentIdx >= 0:
-                    if 'skin' in lib_nodes[lParentIdx]:
-                        m = FbxAMatrix()
-            m = m.Inverse()
-            lGLTFNode['matrix'] = ListFromM4(m)
+            # # Mesh with skin should have identity global transform.
+            # # Since vertices have all been transformed to skeleton spaces.
+            # # PENDING
+            # m = FbxAMatrix()
+            # if not pNode.GetParent() == None:
+            #     m = pNode.GetParent().EvaluateGlobalTransform(pPoseTime, FbxNode.eDestinationPivot)
+            #     lParentIdx = GetNodeIdx(pNode.GetParent())
+            #     # Parent node will have identity world matrix if it has skin
+            #     if lParentIdx >= 0:
+            #         if 'skin' in lib_nodes[lParentIdx]:
+            #             m = FbxAMatrix()
+            # m = m.Inverse()
+            # lGLTFNode['matrix'] = ListFromM4(m)
 
     else:
         # Camera and light node attribute
