@@ -18,13 +18,13 @@ var BoundingBox = function (min, max) {
      * Minimum coords of bounding box
      * @type {qtek.math.Vector3}
      */
-    this.min = min || new Vector3(Infinity, Infinity, Infinity);
+    this.min = min || new Vector3(-Infinity, -Infinity, -Infinity);
 
     /**
      * Maximum coords of bounding box
      * @type {qtek.math.Vector3}
      */
-    this.max = max || new Vector3(-Infinity, -Infinity, -Infinity);
+    this.max = max || new Vector3(Infinity, Infinity, Infinity);
 };
 
 BoundingBox.prototype = {
