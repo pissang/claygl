@@ -26,14 +26,19 @@
     "dev": "rollup -c -w",
     "genentry": "node build/genentry.js",
     "glsl2js": "node build/glsl2js.js",
-    "prepublish": "npm run glsl2js && npm run genentry"
+    "prepublish": "npm run glsl2js && npm run genentry",
+    "pretest" : "npm run genentry && rollup -c",
+    "test": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/pissang/qtek.git"
   },
   "devDependencies": {
+    "canvas": "^2.0.0-alpha.5",
+    "gl": "^4.0.4",
     "glob": "^7.0.0",
+    "mocha": "^4.0.1",
     "rollup": "^0.49.3",
     "rollup-plugin-commonjs": "^8.2.1",
     "rollup-watch": "^4.3.1"
