@@ -28,7 +28,8 @@
     "glsl2js": "node build/glsl2js.js",
     "prepublish": "npm run glsl2js && npm run genentry",
     "pretest" : "npm run genentry && rollup -c",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha",
+    "tdd": "./node_modules/.bin/mocha -w"
   },
   "repository": {
     "type": "git",
