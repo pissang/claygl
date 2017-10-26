@@ -271,7 +271,13 @@ var Scene = Node.extend(function () {
             }
         }
     },
-
+    
+    /**
+     * Determine if light group of the shader is different from scene's
+     * Used to determine whether to update shader and scene's uniforms in Renderer.render
+     * @param {Shader} shader
+     * @returns {Boolean}
+     */
     isShaderLightNumberChanged: function (shader) {
         var group = shader.lightGroup;
         // PENDING Performance
@@ -288,12 +294,17 @@ var Scene = Node.extend(function () {
         return false;
     },
 
+    /**
+     * Set shader's light group with scene's
+     * @param {Shader} shader
+     */
     setShaderLightNumber: function (shader) {
         var group = shader.lightGroup;
         for (var type in this._lightNumber[group]) {
             shader.lightNumber[type] = this._lightNumber[group][type];
         }
         shader.dirty();
+        return this;
     },
 
     setLightUniforms: function (shader, renderer) {
