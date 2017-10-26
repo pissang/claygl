@@ -9,6 +9,7 @@ glob(ROOT + '**/*.glsl', function (err, files) {
         
         //From THREE.js's rollup.config.js
         glslCode = glslCode
+            .replace( /\r/g, '' ) // remove \r
             .replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
             .replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
             .replace( /\n{2,}/g, '\n' ) // # \n+ to \n
