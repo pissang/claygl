@@ -154,28 +154,16 @@ describe('Scene.Spec', function () {
         };
 
         renderer.render(scene, camera);
-        
-        const lightUniforms = [
-            'pointLightPosition',
-            'pointLightRange',
-            'pointLightColor',
-            'ambientLightColor'
-        ];
+        const lightGroup0 = scene._lightUniforms[0];
+        const lightGroup1 = scene._lightUniforms[1];
 
-        const enUniforms1 = {};
-        const enUniforms2 = {};
-        for (const p of lightUniforms) {            
-            enUniforms1[p] = material1.get(p);
-            enUniforms2[p] = material2.get(p);
-        }
-
-        console.log(JSON.stringify(enUniforms1));
-        console.log(JSON.stringify(enUniforms2));
+        const expected0 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[1,0.5,0]},"ambientLightColor":{"type":"3fv","value":[0.3,0.3,0.3]}};
+        const expected1 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[0,0.5,1]}};
 
         assert(called1 && called2);
 
-        // assert.deepEqual(enUniforms1, expected1);
-        // assert.deepEqual(enUniforms2, expected2);
+        assert.deepEqual(lightGroup0, expected0);
+        assert.deepEqual(lightGroup1, expected1);
     });
 
 });
