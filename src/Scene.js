@@ -304,7 +304,6 @@ var Scene = Node.extend(function () {
             shader.lightNumber[type] = this._lightNumber[group][type];
         }
         shader.dirty();
-        return this;
     },
 
     setLightUniforms: function (shader, renderer) {
