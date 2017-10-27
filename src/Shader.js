@@ -656,9 +656,10 @@ var Shader = Base.extend(function () {
         return false;
     },
 
+    // Used for creating VAO
     // Enable the attributes passed in and disable the rest
     // Example Usage:
-    // enableAttributes(_gl, ["position", "texcoords"])
+    // enableAttributes(renderer, ["position", "texcoords"])
     enableAttributes: function (renderer, attribList, vao) {
         var _gl = renderer.gl;
         var program = this._cache.get('program');
