@@ -50,7 +50,7 @@ describe('Scene.Spec', function () {
         assert(cloned.geometry === mesh.geometry);
     });
 
-    it('#update', function () {
+    it('invoking update shouldn\'t throw any error', function () {
         const { renderer, scene, camera } = helper.createQtekScene();
         //scene.update is called in render.render
         const originUpdate = scene.update;
@@ -63,8 +63,9 @@ describe('Scene.Spec', function () {
         assert(called);
     });
 
-    it('#setShaderLightNumber and #setLightUniforms', function () {
-        //from lightgroup.html
+    it('invoking setShaderLightNumber and setLightUniforms shouldn\'t throw any error', function () {
+        //a little bit complicated case lended from lightgroup.html
+        //ensure setShaderLightNumber and setLightUniforms are invoked
         //-------------------------------------------
         const Shader = qtek.Shader,
             Material = qtek.Material;
@@ -162,6 +163,7 @@ describe('Scene.Spec', function () {
 
         assert(called1 && called2);
 
+        //check light uniforms
         assert.deepEqual(lightGroup0, expected0);
         assert.deepEqual(lightGroup1, expected1);
     });
