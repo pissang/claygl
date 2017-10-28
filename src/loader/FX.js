@@ -318,7 +318,7 @@ var FXLoader = Base.extend(
             var texture;
             var path = textureInfo.path;
             var parameters = this._convertParameter(textureInfo.parameters);
-            if (path instanceof Array && path.length === 6) {
+            if (Array.isArray(path) && path.length === 6) {
                 path = path.map(function(item) {
                     return util.relative2absolute(item, textureRootPath);
                 });

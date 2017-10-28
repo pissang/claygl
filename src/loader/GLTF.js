@@ -577,7 +577,7 @@ function () {
             var diffuseProp = uniforms['diffuse'];
             if (diffuseProp) {
                 // Color
-                if (diffuseProp instanceof Array) {
+                if (Array.isArray(diffuseProp)) {
                     if (isStandardMaterial) {
                         material.color = diffuseProp.slice(0, 3);
                     }

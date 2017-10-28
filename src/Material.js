@@ -95,7 +95,7 @@ var Material = Base.extend(
                 // Reset slot
                 uniformValue.__slot = -1;
             }
-            else if (uniformValue instanceof Array) {
+            else if (Array.isArray(uniformValue)) {
                 for (var i = 0; i < uniformValue.length; i++) {
                     if (uniformValue[i] instanceof Texture) {
                         uniformValue[i].__slot = -1;
@@ -148,7 +148,7 @@ var Material = Base.extend(
                     shader.setUniform(_gl, '1i', symbol, uniformValue.__slot);
                 }
             }
-            else if (uniformValue instanceof Array) {
+            else if (Array.isArray(uniformValue)) {
                 if (uniformValue.length === 0) {
                     continue;
                 }
@@ -355,7 +355,7 @@ var Material = Base.extend(
                 if (val instanceof Texture) {
                     val.dispose(renderer);
                 }
-                else if (val instanceof Array) {
+                else if (Array.isArray(val)) {
                     for (var i = 0; i < val.length; i++) {
                         if (val[i] instanceof Texture) {
                             val[i].dispose(renderer);

@@ -54,7 +54,7 @@ ShaderLibrary.prototype.get = function(name, option) {
         fragmentDefines = option.fragmentDefines || {};
         precision = option.precision;
     }
-    else if (option instanceof Array) {
+    else if (Array.isArray(option)) {
         enabledTextures = option;
     }
     var vertexDefineKeys = Object.keys(vertexDefines);
