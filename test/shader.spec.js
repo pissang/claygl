@@ -85,10 +85,14 @@ describe('Shader.Spec', function () {
     });
 
     it('#dirty', function () {        
+        const { renderer } = helper.createQtekScene();
         const shader = new qtek.Shader({
             vertex : vertexCode,
             fragment : fragmentCode
         });
+        shader.bind(renderer);
+        assert(!shader._codeDirty);
+        
         shader.dirty();
 
         assert(shader._codeDirty);
