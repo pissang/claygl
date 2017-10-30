@@ -12,7 +12,7 @@ function firstNotNull() {
 }
 
 function convertToArray(val) {
-    if (!(val instanceof Array)) {
+    if (!Array.isArray(val)) {
         val = [val, val];
     }
     return val;

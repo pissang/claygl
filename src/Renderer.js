@@ -257,7 +257,7 @@ var Renderer = Base.extend(function () {
      * @return {*}
      */
     getGLParameter: function (name) {
-        return this._glinfo.getExtension(name);
+        return this._glinfo.getParameter(name);
     },
 
     /**

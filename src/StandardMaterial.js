@@ -94,7 +94,7 @@ function allocateShader(renderer, enabledMaps, jointCount, shaderDefines) {
         shaderUsedCount[renderer.__GUID__] = shaderUsedCount[renderer.__GUID__] || {};
         shaderUsedCount[renderer.__GUID__][key] = 0;
     }
-    shaderUsedCount[key]++;
+    shaderUsedCount[renderer.__GUID__][key]++;
 
     shader.__key__ = key;
 

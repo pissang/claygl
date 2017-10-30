@@ -155,7 +155,7 @@ var util = {
      * @memberOf qtek.core.util
      */
     isArray: function(obj) {
-        return obj instanceof Array;
+        return Array.isArray(obj);
     },
 
     /**

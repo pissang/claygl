@@ -442,7 +442,7 @@ var Shader = Base.extend(function () {
      * @param  {string} symbol
      */
     enableTexture: function (symbol) {
-        if (symbol instanceof Array) {
+        if (Array.isArray(symbol)) {
             for (var i = 0; i < symbol.length; i++) {
                 this.enableTexture(symbol[i]);
             }
@@ -474,7 +474,7 @@ var Shader = Base.extend(function () {
      * @param  {string} symbol
      */
     disableTexture: function (symbol) {
-        if (symbol instanceof Array) {
+        if (Array.isArray(symbol)) {
             for (var i = 0; i < symbol.length; i++) {
                 this.disableTexture(symbol[i]);
             }
@@ -629,7 +629,7 @@ var Shader = Base.extend(function () {
                 break;
             case 'm4v':
                 // Raw value
-                if (value instanceof Array) {
+                if (Array.isArray(value)) {
                     var array = new vendor.Float32Array(value.length * 16);
                     var cursor = 0;
                     for (var i = 0; i < value.length; i++) {
@@ -656,9 +656,10 @@ var Shader = Base.extend(function () {
         return false;
     },
 
+    // Used for creating VAO
     // Enable the attributes passed in and disable the rest
     // Example Usage:
-    // enableAttributes(_gl, ["position", "texcoords"])
+    // enableAttributes(renderer, ["position", "texcoords"])
     enableAttributes: function (renderer, attribList, vao) {
         var _gl = renderer.gl;
         var program = this._cache.get('program');
@@ -756,7 +757,7 @@ var Shader = Base.extend(function () {
         this._vertexProcessed = defineStr + '\n' + this._vertexProcessedWithoutDefine;
 
         // FRAGMENT
-        var defineStr = this._getDefineStr(this.fragmentDefines);
+        defineStr = this._getDefineStr(this.fragmentDefines);
         var code = defineStr + '\n' + this._fragmentProcessedWithoutDefine;
 
         // Add precision

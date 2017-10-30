@@ -166,7 +166,7 @@ var Pass = Base.extend(function () {
             clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
             _gl.colorMask(true, true, true, true);
             var cc = this.clearColor;
-            if (cc instanceof Array) {
+            if (Array.isArray(cc)) {
                 _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
             }
         }

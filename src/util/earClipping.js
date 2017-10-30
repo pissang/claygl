@@ -383,7 +383,7 @@ var earClipping = {
         }
 
         var triangulationCtx = new TriangulationContext();
-        if (points[0] instanceof Array) {
+        if (Array.isArray(points[0])) {
             // Assume each pt is an x,y array
             return triangulationCtx.triangulate(earClipping.flatPoints(points));
         }

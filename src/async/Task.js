@@ -90,7 +90,7 @@ Task.makeRequestTask = function(url, responseType) {
     } else if (url.url) {   //  Configure object
         var obj = url;
         return makeRequestTask(obj.url, obj.responseType);
-    } else if (url instanceof Array) {  // Url list
+    } else if (Array.isArray(url)) {  // Url list
         var urlList = url;
         var tasks = [];
         urlList.forEach(function(obj) {

@@ -514,7 +514,7 @@ function () {
         var diffuseProp = uniforms['diffuse'];
         if (diffuseProp) {
             // Color
-            if (diffuseProp instanceof Array) {
+            if (Array.isArray(diffuseProp)) {
                 diffuseProp = diffuseProp.slice(0, 3);
                 isStandardMaterial ? (material.color = diffuseProp)
                     : material.set('color', diffuseProp);
@@ -527,7 +527,7 @@ function () {
         var emissionProp = uniforms['emission'];
         if (emissionProp != null) {
             // Color
-            if (emissionProp instanceof Array) {
+            if (Array.isArray(emissionProp)) {
                 emissionProp = emissionProp.slice(0, 3);
                 isStandardMaterial ? (material.emission = emissionProp)
                     : material.set('emission', emissionProp);
