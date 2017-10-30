@@ -6,3 +6,4 @@ gh-pages
 cloc_definitions.txt
 tests/unit
 lib
+coverage/
