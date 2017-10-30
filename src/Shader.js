@@ -757,7 +757,7 @@ var Shader = Base.extend(function () {
         this._vertexProcessed = defineStr + '\n' + this._vertexProcessedWithoutDefine;
 
         // FRAGMENT
-        var defineStr = this._getDefineStr(this.fragmentDefines);
+        defineStr = this._getDefineStr(this.fragmentDefines);
         var code = defineStr + '\n' + this._fragmentProcessedWithoutDefine;
 
         // Add precision
