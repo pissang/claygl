@@ -923,9 +923,10 @@ def ConvertScene(pScene, pPoseTime):
 
     return lSceneIdx
 
-def CreateAnimation():
+def CreateAnimation(pName):
     lAnimIdx = len(lib_animations)
     lGLTFAnimation = {
+        'name': pName,
         'channels' : [],
         'samplers' : []
     }
@@ -1067,8 +1068,6 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     lStartTimeDouble = max(lStartTimeDouble, pStartTime)
 
     if lDuration > 1e-5:
-        lAnimIdx, lGLTFAnimation = CreateAnimation()
-
         lNumFrames = math.ceil(lDuration / pSampleRate)
 
         lTime = FbxTime()
@@ -1128,6 +1127,12 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
         #TODO Other interpolation methods
         for path in _samplerChannels:
             if path in lSamplerAccessors:
+                # PENDING The whole fbx only have one animation.
+                # TODO Clips.
+                if len(lib_animations) == 0:
+                    lAnimIdx, lGLTFAnimation = CreateAnimation('Default')
+                    lib_animations.append(lGLTFAnimation)
+                lGLTFAnimation = lib_animations[0]
                 lSamplerIdx = len(lGLTFAnimation['samplers'])
                 lGLTFAnimation['samplers'].append({
                     "input": lSamplerAccessors['time'],
@@ -1141,9 +1146,6 @@ def ConvertNodeAnimation(pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
                         "path" : path
                     }
                 })
-
-        if len(lGLTFAnimation['channels']) > 0:
-            lib_animations.append(lGLTFAnimation)
 
     for i in range(pNode.GetChildCount()):
         ConvertNodeAnimation(pAnimLayer, pNode.GetChild(i), pSampleRate, pStartTime, pDuration)
