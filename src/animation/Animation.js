@@ -96,7 +96,7 @@ var Animation = Base.extend(function () {
 
     _update: function () {
 
-        var time = new Date().getTime() - this._pausedTime;
+        var time = Date.now() - this._pausedTime;
         var delta = time - this._time;
         var clips = this._clips;
         var len = clips.length;
@@ -145,7 +145,7 @@ var Animation = Base.extend(function () {
         var self = this;
 
         this._running = true;
-        this._time = new Date().getTime();
+        this._time = Date.now();
 
         this._pausedTime = 0;
 
@@ -175,7 +175,7 @@ var Animation = Base.extend(function () {
      */
     pause: function () {
         if (!this._paused) {
-            this._pauseStart = new Date().getTime();
+            this._pauseStart = Date.now();
             this._paused = true;
         }
     },
@@ -185,7 +185,7 @@ var Animation = Base.extend(function () {
      */
     resume: function () {
         if (this._paused) {
-            this._pausedTime += (new Date().getTime()) - this._pauseStart;
+            this._pausedTime += Date.now() - this._pauseStart;
             this._paused = false;
         }
     },
