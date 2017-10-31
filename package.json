@@ -1,6 +1,6 @@
 {
   "name": "qtek",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "WebGL graphic library",
   "keywords": [
     "graphic",
@@ -22,7 +22,7 @@
   "module": "dist/qtek.es.js",
   "main": "dist/qtek.js",
   "scripts": {
-    "build": "npm run glsl2js && npm run genentry && rollup -c",
+    "build": "npm run glsl2js && npm run genentry && rollup -c && uglifyjs dist/qtek.js -c -m > dist/qtek.min.js",
     "dev": "rollup -c -w",
     "genentry": "node build/genentry.js",
     "glsl2js": "node build/glsl2js.js",

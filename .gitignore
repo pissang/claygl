@@ -4,6 +4,6 @@ gh-pages
 .DS_Store
 .idea
 cloc_definitions.txt
-tests/unit
+example/unit
 lib
 coverage/

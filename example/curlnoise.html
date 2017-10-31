@@ -2,20 +2,19 @@
 <head>
     <title></title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="../thirdparty/require.js"></script>
-    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript" src="lib/require.js"></script>
 </head>
 <body style="margin:0px;">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['qtek'], function(qtek){
+        require(['../dist/qtek'], function(qtek){
 
             var Shader = qtek.Shader;
 
             var SIZE = 1024;
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById("main"),
+                canvas: document.getElementById("main"),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
@@ -32,33 +31,35 @@
                 var particleNode = compositor.getNodeByName('particle');
 
                 // Scene
-                var geo = new qtek.DynamicGeometry();
+                var geo = new qtek.StaticGeometry();
+                var offset = 0;
+                geo.attributes.position.init(SIZE * SIZE);
                 for (var i = 0; i < SIZE; i++) {
                     for (var j = 0; j < SIZE; j++) {
-                        geo.attributes.position.value.push([i / SIZE, j / SIZE, 0]);
+                        geo.attributes.position.set(offset++, [i / SIZE, j / SIZE, 0]);
                     }
                 }
                 var mat = new qtek.Material({
-                    shader : new qtek.Shader({
-                        vertex : Shader.source('curlnoise.vertex'),
-                        fragment : Shader.source('curlnoise.fragment')
+                    shader: new qtek.Shader({
+                        vertex: Shader.source('curlnoise.vertex'),
+                        fragment: Shader.source('curlnoise.fragment')
                     }),
-                    transparent : true,
-                    depthTest : false,
-                    blend : function(_gl){
+                    transparent: true,
+                    depthTest: false,
+                    blend: function(_gl){
                         _gl.blendEquation(_gl.FUNC_ADD);
                         _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
                     }
                 });
                 var particleSystem = new qtek.Mesh({
-                    geometry : geo,
-                    material : mat,
-                    mode : qtek.Mesh.POINTS
+                    geometry: geo,
+                    material: mat,
+                    mode: qtek.Mesh.POINTS
                 });
                 var scene = new qtek.Scene();
                 scene.add(particleSystem);
                 var camera = new qtek.camera.Perspective({
-                    aspect : renderer.getViewportAspect()
+                    aspect: renderer.getViewportAspect()
                 });
                 camera.position.z = 0.3;
                 camera.position.y = 0.3;
@@ -70,9 +71,9 @@
                 mat.set("color", [0.0, 0.0, 0.0]);
 
                 var control = new qtek.plugin.OrbitControl({
-                    target : camera,
-                    domElement : renderer.canvas,
-                    sensitivity : 0.4
+                    target: camera,
+                    domElement: renderer.canvas,
+                    sensitivity: 0.4
                 });
 
                 animation.on('frame', function () {
