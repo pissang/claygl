@@ -459,6 +459,65 @@ def ConvertMaterial(pMaterial):
     lib_materials.append(lGLTFMaterial)
     return lMaterialIdx
 
+def ConvertToPBRMaterial(pMaterial):
+    lMaterialName = pMaterial.GetName()
+
+    lGLTFMaterial = {
+        "name" : lMaterialName,
+        "pbrMetallicRoughness": {
+            "baseColorFactor": [1, 1, 1, 1],
+            "metallicFactor": 0,
+            "roughnessFactor": 1
+        }
+    }
+    lValues = lGLTFMaterial["pbrMetallicRoughness"];
+
+    lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
+
+    lTransparency = MatGetOpacity(pMaterial)
+    if lTransparency < 1:
+        lGLTFMaterial['alphaMode'] = 'BLEND'
+        lValues['baseColorFactor'][3] = lTransparency
+
+    # Use diffuse map
+    # TODO Diffuse Factor ?
+    if pMaterial.Diffuse.GetSrcObjectCount() > 0:
+        lTextureIdx = CreateTexture(pMaterial.Diffuse)
+        if not lTextureIdx == None:
+            lValues['baseColorTexture'] = {
+                "index": lTextureIdx,
+                "texCoord": 0
+            }
+    else:
+        lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
+
+    if pMaterial.Bump.GetSrcObjectCount() > 0:
+        # TODO 3dsmax use the normal map as bump map ?
+        lTextureIdx = CreateTexture(pMaterial.Bump)
+        if not lTextureIdx == None:
+            lGLTFMaterial['normalTexture'] = {
+                "index": lTextureIdx,
+                "texCoord": 0
+            }
+
+    if pMaterial.NormalMap.GetSrcObjectCount() > 0:
+        lTextureIdx = CreateTexture(pMaterial.NormalMap)
+        if not lTextureIdx == None:
+            lGLTFMaterial['normalTexture'] = {
+                "index": lTextureIdx,
+                "texCoord": 0
+            }
+    # PENDING
+
+    if str(pMaterial.ShadingModel.Get()).lower() == 'phong':
+        lGLossiness = math.log(pMaterial.Shininess.Get()) / math.log(8192)
+        lValues['roughnessFactor'] = min(max(1 - lGLossiness, 0), 1)
+
+    lMaterialIdx = len(lib_materials)
+    lib_materials.append(lGLTFMaterial)
+    return lMaterialIdx
+
+
 def ConvertVertexLayer(pMesh, pLayer, pOutput):
     lMappingMode = pLayer.GetMappingMode()
     lReferenceMode = pLayer.GetReferenceMode()
@@ -537,7 +596,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             # Because the mesh has been splitted by material
             idx = lLayerMaterial.GetIndexArray()[0]
             lMaterial = pNode.GetMaterial(idx)
-        lMaterialKey = ConvertMaterial(lMaterial)
+        lMaterialKey = ConvertToPBRMaterial(lMaterial)
         lGLTFPrimitive["material"] = lMaterialKey
 
         lNormalSplitted = False
@@ -555,11 +614,17 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
         if lLayerUV:
             lUvSplitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
+            for i in range(len(lTexcoords)):
+                # glTF2.0 don't flipY. So flip the uv.
+                lTexcoords[i] = [lTexcoords[i][0], 1.0 - lTexcoords[i][1]]
 
         if lLayer2:
             lLayer2Uv = lLayer2.GetUVs()
             if lLayer2Uv:
                 lUv2Splitted = ConvertVertexLayer(pMesh, lLayer2Uv, lTexcoords2)
+                for i in range(len(lTexcoords2)):
+                    # glTF2.0 don't flipY. So flip the uv.
+                    lTexcoords2[i] = [lTexcoords2[i][0], 1.0 - lTexcoords2[i][1]]
 
         hasSkin = False
         moreThanFourJoints = False
