@@ -73,33 +73,19 @@ describe('Scene.Spec', function () {
         const { renderer, scene, camera } = helper.createQtekScene();
 
         const cube = new qtek.geometry.Cube();
-        cube.generateTangents();
 
-        const diffuse = new qtek.Texture2D;
-        diffuse.load("../assets/textures/crate.gif");
-        const normal = new qtek.Texture2D;
-        normal.load("../assets/textures/normal_map.jpg");
-        
-        const shader1 = new Shader({
-            vertex: Shader.source('qtek.standard.vertex'),
-            fragment: Shader.source('qtek.standard.fragment')
-        });
         const material1 = new Material({
-            shader: shader1
-        });
-        material1.set('diffuseMap', diffuse);
-        material1.set('normalMap', normal);
-        const shader2 = new Shader({
-            vertex: Shader.source('qtek.standard.vertex'),
-            fragment: Shader.source('qtek.standard.fragment')
+            shader: new Shader({
+                vertex: Shader.source('qtek.standard.vertex'),
+                fragment: Shader.source('qtek.standard.fragment')
+            })
         });
         const material2 = new Material({
-            shader: shader2
+            shader: new Shader({
+                vertex: Shader.source('qtek.standard.vertex'),
+                fragment: Shader.source('qtek.standard.fragment')
+            })
         });
-        material2.set('diffuseMap', diffuse);
-        material2.set('normalMap', normal);
-        material1.shader.enableTexture(['diffuseMap', 'normalMap']);
-        material2.shader.enableTexture(['diffuseMap', 'normalMap']);
 
         material1.shader.lightGroup = 0;
         material2.shader.lightGroup = 1;
@@ -109,17 +95,12 @@ describe('Scene.Spec', function () {
         });
         scene.add(root);
         
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 5; j++) {
-                for ( let k = 0; k < 5; k++) {
-                    const mesh = new qtek.Mesh({
-                        geometry: cube,
-                        material: i % 2 ? material1 : material2
-                    });
-                    mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
-                    root.add(mesh);
-                }
-            }
+        for (let i = 0; i < 2; i++) {
+            const mesh = new qtek.Mesh({
+                geometry: cube,
+                material: i % 2 ? material1 : material2
+            });
+            root.add(mesh);
         }
         //-------------------------------------------
 
@@ -135,9 +116,6 @@ describe('Scene.Spec', function () {
         });
         scene.add(light1);
         scene.add(light2);
-        scene.add(new qtek.light.Ambient({
-            intensity: 0.3
-        }));
 
         let called1 = false, called2 = false;
 
@@ -158,7 +136,7 @@ describe('Scene.Spec', function () {
         const lightGroup0 = scene._lightUniforms[0];
         const lightGroup1 = scene._lightUniforms[1];
 
-        const expected0 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[1,0.5,0]},"ambientLightColor":{"type":"3fv","value":[0.3,0.3,0.3]}};
+        const expected0 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[1,0.5,0]}};
         const expected1 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[0,0.5,1]}};
 
         assert(called1 && called2);
