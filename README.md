@@ -2,7 +2,7 @@
 
 QTEK is a WebGL graphic library.
 
-### [Download v0.3.0](https://github.com/pissang/qtek/archive/0.3.0.zip)
+### [Download](https://github.com/pissang/qtek/releases)
 
 ### [API](http://pissang.github.io/qtek/doc/api)
 
