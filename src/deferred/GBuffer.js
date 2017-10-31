@@ -302,7 +302,18 @@ var GBuffer = Base.extend(function () {
         var transparentQueue = scene.transparentQueue;
         var oldBeforeRender = renderer.beforeRenderObject;
 
+        // StandardMaterial needs updateShader method so shader can be created on demand.
+        for (var i = 0; i < opaqueQueue.length; i++) {
+            var material = opaqueQueue[i].material;
+            material.updateShader && material.updateShader(renderer);
+        }
+        for (var i = 0; i < transparentQueue.length; i++) {
+            var material = transparentQueue[i].material;
+            material.updateShader && material.updateShader(renderer);
+        }
+
         opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
+        transparentQueue.sort(ForwardRenderer.transparentSortFunc);
 
         var offset = 0;
         var renderQueue = this._renderQueue;
@@ -318,11 +329,6 @@ var GBuffer = Base.extend(function () {
         }
         renderQueue.length = offset;
 
-        // StandardMaterial needs updateShader method so shader can be created on demand.
-        for (var i = 0; i < renderQueue.length; i++) {
-            var material = renderQueue[i].material;
-            material.updateShader && material.updateShader(renderer);
-        }
 
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
