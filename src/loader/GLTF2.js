@@ -554,8 +554,8 @@ function () {
             material.set('roughness', 1 - glossiness);
         }
         else {
-            material.set('glossiness', 0.5);
-            material.set('roughness', 0.5);
+            material.set('glossiness', 0.3);
+            material.set('roughness', 0.3);
         }
         if (uniforms['specular'] != null) {
             material.set('specularColor', uniforms['specular'].slice(0, 3));

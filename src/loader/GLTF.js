@@ -613,8 +613,8 @@ function () {
                 material.set('shininess', uniforms['shininess']);
             }
             else {
-                material.set('glossiness', 0.5);
-                material.set('shininess', 0.5);
+                material.set('glossiness', 0.2);
+                material.set('shininess', 0.2);
             }
             if (uniforms['specular'] != null) {
                 material.set('specularColor', uniforms['specular'].slice(0, 3));
