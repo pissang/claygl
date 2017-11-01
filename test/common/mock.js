@@ -1,16 +1,16 @@
 const { createHeadlessCanvas } = require('./util');
 const { Image } = require('canvas');
 
+
 /**
 * reference:
 * https://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
 */
-const requestAnimationFrame = function (callback, element) {
-    var currTime = Date.now();
-    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var id = window.setTimeout(function () { callback(currTime + timeToCall); },
+const requestAnimationFrame = function (callback, element) {    
+    const currTime = Date.now();
+    const timeToCall = Math.max(0, 16);
+    const id = setTimeout(function () { callback(currTime + timeToCall); },
         timeToCall);
-    lastTime = currTime + timeToCall;
     return id;
 };
 /**

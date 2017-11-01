@@ -194,7 +194,7 @@ Clip.prototype = {
             this._elapse(time);
             remainder = this._elapsedTime % this.life;
         }
-        time = time || new Date().getTime();
+        time = time || Date.now();
 
         this._startTime = time - remainder + this.delay;
         this._elapsedTime = 0;

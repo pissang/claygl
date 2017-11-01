@@ -1,10 +1,10 @@
-require('./common/');
+require('../common/');
 const assert = require('assert');
-const qtek = require('../dist/qtek');
+const qtek = require('../../dist/qtek');
 
-describe('Cube.Spec', function () {
+describe('Plane.Spec', function () {
     it('constructor', function () {
-        const geometry = new qtek.geometry.Cube({
+        const geometry = new qtek.geometry.Plane({
             widthSegments : 1,
             heightSegments : 2,
             depthSegments : 3
@@ -19,34 +19,40 @@ describe('Cube.Spec', function () {
     });
 
     it('#generateFaceNormals', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new qtek.geometry.Plane();
         const normal = geometry.attributes.normal.value;
         geometry.generateFaceNormals();
         assert.notDeepEqual(geometry.attributes.normal.value, normal);
     });
     
     it('#generateTangents', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new qtek.geometry.Plane();
         const tangent = geometry.attributes.tangent.value;
         geometry.generateTangents();
         assert.notDeepEqual(geometry.attributes.tangent.value, tangent);
-        assert(geometry.attributes.tangent.value.length === 96);
+        const len = geometry.attributes.tangent.value.length;
+        assert(len === 16, 'Plane.tangent : ' + len);
     });
 
     it('#generateUniqueVertex', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new qtek.geometry.Plane();
         assert(!geometry.isUniqueVertex());
-        assert(geometry.attributes.normal.value.length === 72);
-        assert(geometry.attributes.texcoord0.value.length === 48);
+        let normals = geometry.attributes.normal.value,
+            texCoords = geometry.attributes.texcoord0.value;
+        assert(normals.length === 12, 'Plane.normal.count : ' + normals.length);
+        assert(texCoords.length === 8, 'Plane.textcoord.count : ' + texCoords.length);
         geometry.generateUniqueVertex();
-        assert(geometry.attributes.normal.value.length  === 108);
-        assert(geometry.attributes.texcoord0.value.length === 72);
+        normals = geometry.attributes.normal.value;
+        texCoords = geometry.attributes.texcoord0.value;
+        assert(normals.length  === 18, 'Plane.normal.count : ' + normals.length);
+        assert(texCoords.length === 12, 'Plane.textcoord.count : ' + texCoords.length);
     });
 
     it('#generateBarycentric', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new qtek.geometry.Plane();
         assert(!geometry.attributes.barycentric.value);
         geometry.generateBarycentric();
-        assert(geometry.attributes.barycentric.value.length === 108);
+        const attrCount = geometry.attributes.barycentric.value.length;
+        assert(attrCount === 18, attrCount);
     });
 });

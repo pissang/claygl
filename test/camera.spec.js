@@ -100,4 +100,96 @@ describe('Camera.Spec', function () {
         assert.deepEqual(ray.direction.toArray(), [ 0.7999337911605835, 0.59995037317276, -0.012865976430475712 ]);
         assert.deepEqual(ray.origin.toArray(), [ 6.217435359954834, 4.663076877593994, -0.10000000149011612 ]);
     });
+
+    it('Orthographic Camera', function () {
+        const camera = new qtek.camera.Orthographic({
+            left : -2,
+            right : 3,
+            top : 4,
+            bottom : -5,
+            near : -2,
+            far : 2
+        });
+
+        camera.position.set(0, 0, 20);
+        camera.updateProjectionMatrix();
+        assert.deepEqual(camera.projectionMatrix.toArray(), [ 0.4000000059604645,
+            0,
+            0,
+            0,
+            0,
+            0.2222222238779068,
+            0,
+            0,
+            0,
+            0,
+            -0.5,
+            0,
+            -0.20000000298023224,
+            0.1111111119389534,
+            -0,
+            1 ]);
+
+        const c2 = camera.clone();
+        assert(c2.left === -2);
+        assert(c2.right === 3);
+        assert(c2.top === 4);
+        assert(c2.bottom === -5);
+        assert(c2.near === -2);
+        assert(c2.far === 2);
+
+        camera.decomposeProjectionMatrix();
+        assert(closeTo(camera.left, -2));
+        assert(closeTo(camera.right, 3));
+        assert(closeTo(camera.top, 4));
+        assert(closeTo(camera.bottom, -5));
+        assert(closeTo(camera.near, -2));
+        assert(closeTo(camera.far, 2));
+    });
+
+    it('Perspective Camera', function () {
+        const camera = new qtek.camera.Perspective({
+            fov : 60,
+            aspect : 1,
+            near : 1,
+            far : 8000
+        });
+
+        camera.position.set(0, 0, 20);
+        camera.updateProjectionMatrix();
+        assert.deepEqual(camera.projectionMatrix.toArray(), [ 1.7320507764816284,
+            0,
+            0,
+            0,
+            0,
+            1.7320507764816284,
+            0,
+            0,
+            0,
+            0,
+            -1.000249981880188,
+            -1,
+            0,
+            0,
+            -2.0002501010894775,
+            0 ]);
+
+        const c2 = camera.clone();
+        assert(c2.fov === 60);
+        assert(c2.aspect === 1);
+        assert(c2.near === 1);
+        assert(c2.far === 8000);        
+
+        camera.decomposeProjectionMatrix();
+        assert(closeTo(camera.fov, 60));
+        assert(closeTo(camera.aspect, 1));
+        assert(closeTo(camera.near, 1));
+        assert(Math.round(camera.far) === 8002, camera.far);
+    });
 });
+
+function closeTo(d1, d2, delta) {
+    delta = delta || 1E-6;
+    const d = d1 - d2;
+    return d >= -delta && d <= delta;
+}
