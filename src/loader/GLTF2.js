@@ -226,7 +226,7 @@ function () {
         };
         // Mount on the root node if given
         var rootNode = this.rootNode || new Scene();
-        
+
         var loading = 0;
         function checkLoad() {
             loading--;
@@ -290,7 +290,7 @@ function () {
             if (self.includeMesh) {
                 self._parseSkins(json, lib);
             }
-            
+
             if (self.includeAnimation) {
                 self._parseAnimations(json, lib);
             }
@@ -462,7 +462,7 @@ function () {
         var uniforms = {};
         var commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
         uniforms = commonMaterialInfo.values || {};
-        
+
         if (typeof uniforms.diffuse === 'number') {
             uniforms.diffuse = lib.textures[uniforms.diffuse] || null;
         }
@@ -657,7 +657,7 @@ function () {
 
     _pbrSpecularGlossinessToStandard: function (materialInfo, specularGlossinessMatInfo, lib) {
         var alphaTest = materialInfo.alphaMode === 'MASK';
-        
+
         if (this.useStandardMaterial) {
             console.error('StandardMaterial doesn\'t support specular glossiness workflow yet');
         }
@@ -845,7 +845,7 @@ function () {
                     }
                 }
 
-                mesh.name = GLTFLoader.generateMeshName(meshInfo.name, pp);
+                mesh.name = GLTFLoader.generateMeshName(json.meshes, idx, pp);
 
                 lib.meshes[idx].push(mesh);
             }
@@ -995,7 +995,7 @@ function () {
                 var targetNode = lib.nodes[channelInfo.target.node];
                 var clip = clips[channelHash];
                 var samplerInfo = animationInfo.samplers[channelInfo.sampler];
-                
+
                 if (!clip) {
                     clip = clips[channelHash] = new SamplerClip({
                         target: targetNode,
@@ -1048,7 +1048,9 @@ function () {
     }
 });
 
-GLTFLoader.generateMeshName = function (meshName, primitiveIdx) {
+GLTFLoader.generateMeshName = function (meshes, idx, primitiveIdx) {
+    var meshInfo = meshes[idx];
+    var meshName = meshInfo.name || ('mesh_' + idx);
     return primitiveIdx === 0 ? meshName : (meshName + '$' + primitiveIdx);
 };
 
