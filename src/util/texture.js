@@ -142,6 +142,104 @@ var textureUtil = {
         return cubeMap;
     },
 
+    /**
+     * Convert height map to normal map
+     * @param {HTMLImageElement|HTMLCanvasElement} image
+     * @param {boolean} [checkBump=false]
+     * @return {HTMLCanvasElement}
+     */
+    heightToNormal: function (image, checkBump) {
+        var canvas = document.createElement('canvas');
+        var width = canvas.width = image.width;
+        var height = canvas.height = image.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, width, height);
+        checkBump = checkBump || false;
+        var srcData = ctx.getImageData(0, 0, width, height);
+        var dstData = ctx.createImageData(width, height);
+        for (var i = 0; i < srcData.data.length; i += 4) {
+            if (checkBump) {
+                var r = srcData.data[i];
+                var g = srcData.data[i + 1];
+                var b = srcData.data[i + 2];
+                var diff = Math.abs(r - g) + Math.abs(g - b);
+                if (diff > 20) {
+                    console.warn('Given image is not a height map');
+                    return image;
+                }
+            }
+            // Modified from http://mrdoob.com/lab/javascript/height2normal/
+            var x1, y1, x2, y2;
+            if (i % (width * 4) === 0) {
+                // left edge
+                x1 = srcData.data[i];
+                x2 = srcData.data[i + 4];
+            }
+            else if (i % (width * 4) === (width - 1) * 4) {
+                // right edge
+                x1 = srcData.data[i - 4];
+                x2 = srcData.data[i];
+            }
+            else {
+                x1 = srcData.data[i - 4];
+                x2 = srcData.data[i + 4];
+            }
+
+            if (i < width * 4) {
+                // top edge
+                y1 = srcData.data[i];
+                y2 = srcData.data[i + width * 4];
+            }
+            else if (i > width * (height - 1) * 4) {
+                // bottom edge
+                y1 = srcData.data[i - width * 4];
+                y2 = srcData.data[i];
+            }
+            else {
+                y1 = srcData.data[i - width * 4];
+                y2 = srcData.data[i + width * 4];
+            }
+
+            dstData.data[i] = (x1 - x2) + 127;
+            dstData.data[i + 1] = (y1 - y2) + 127;
+            dstData.data[i + 2] = 255;
+            dstData.data[i + 3] = 255;
+        }
+        ctx.putImageData(dstData, 0, 0);
+        return canvas;
+    },
+
+    /**
+     * Convert height map to normal map
+     * @param {HTMLImageElement|HTMLCanvasElement} image
+     * @param {boolean} [checkBump=false]
+     * @param {number} [threshold=20]
+     * @return {HTMLCanvasElement}
+     */
+    isHeightImage: function (img, downScaleSize, threshold) {
+        if (!img || !img.width || !img.height) {
+            return false;
+        }
+
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var size = downScaleSize || 32;
+        threshold = threshold || 20;
+        canvas.width = canvas.height = size;
+        ctx.drawImage(img, 0, 0, size, size);
+        var srcData = ctx.getImageData(0, 0, size, size);
+        for (var i = 0; i < srcData.data.length; i += 4) {
+            var r = srcData.data[i];
+            var g = srcData.data[i + 1];
+            var b = srcData.data[i + 2];
+            var diff = Math.abs(r - g) + Math.abs(g - b);
+            if (diff > threshold) {
+                return false;
+            }
+        }
+        return true;
+    },
+
     _fetchTexture: function (path, onsuccess, onerror) {
         request.get({
             url: path,
