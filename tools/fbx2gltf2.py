@@ -1172,7 +1172,7 @@ def CreateBufferView(pBufferIdx, pBuffer, appendBufferData, lib, pByteOffset, ta
         "byteLength": len(appendBufferData),
         "byteOffset": pByteOffset,
         # PENDING
-        "byteStride": 0,
+        # "byteStride": 0,
         "target": target
     }
     lib_buffer_views.append(lBufferView)
@@ -1207,12 +1207,6 @@ def PrepareSceneNode(pNode, fbxConverter):
     # Triangulate before SplitPerMaterial
     if not pNode.GetGeometry() == None:
         fbxConverter.Triangulate(pNode.GetGeometry(), True)
-
-    # TODO SplitMeshPerMaterial may loss deformer in mesh
-    # TODO It will be crashed in some fbx files
-    # FBX version 2014.2 seems have fixed it
-    if not pNode.GetMesh() == None:
-        fbxConverter.SplitMeshPerMaterial(pNode.GetMesh(), True)
 
     for k in range(pNode.GetChildCount()):
         PrepareSceneNode(pNode.GetChild(k), fbxConverter)
@@ -1279,11 +1273,16 @@ def Convert(
     else:
         lBasename, lExt = os.path.splitext(ouptutFile)
 
-        PrepareSceneNode(lScene.GetRootNode(), fbxConverter)
-
+        # Do it before SplitMeshesPerMaterial or the vertices of split mesh will be wrong.
         PrepareBakeTransform(lScene.GetRootNode())
-
         lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 60)
+
+        # TODO SplitMeshPerMaterial may loss deformer in mesh
+        # TODO It will be crashed in some fbx files
+        # FBX version 2014.2 seems have fixed it
+        fbxConverter.SplitMeshesPerMaterial(lScene, True)
+
+        PrepareSceneNode(lScene.GetRootNode(), fbxConverter)
 
         if not ignoreScene:
             lSceneIdx = ConvertScene(lScene, poseTime)
