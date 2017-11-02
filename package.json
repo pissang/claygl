@@ -23,30 +23,34 @@
   "main": "dist/qtek.js",
   "scripts": {
     "build": "npm run glsl2js && npm run genentry && rollup -c && uglifyjs dist/qtek.js -c -m > dist/qtek.min.js",
-    "build:sourcemap": "npm run genentry && rollup -c --sourcemap inline",
+    "build:sourcemap": "npm run genentry && rollup --sourcemap inline -c",
     "dev": "rollup -c -w",
     "genentry": "node build/genentry.js",
     "glsl2js": "node build/glsl2js.js",
+    "genfixture": "npm run pretest && electron-mocha --require-main ./test/genfixture-env.js --renderer \"./test/integration/**/*.spec.js\"",
     "prepublish": "npm run glsl2js && npm run genentry",
-    "pretest": "npm run glsl2js && npm run build:sourcemap",
-    "test": "./node_modules/.bin/mocha ./test/**/*.spec.js",
-    "test:cover": "npm run test && npm run coverage",
-    "tdd": "npm run build:sourcemap && mocha -w ./test/**/*.spec.js",
-    "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- ./test/**/*.spec.js && remap-istanbul -i coverage/coverage.json -o coverage/html-report -t html"
+    "debug": "npm run pretest && electron-mocha --debug-brk --renderer \"./test/**/*.spec.js\"",
+    "instrument": "istanbul instrument ./dist/qtek.src.js --output ./dist/qtek.js --no-compact --complete-copy --es-modules",
+    "pretest": "npm run build:sourcemap",
+    "tdd": "npm run pretest && electron-mocha --interactive --renderer \"./test/**/*.spec.js\"",
+    "test:cov" : "npm run pretest -- test/rollup.config.js && npm run instrument && npm run test:main -- -R test/istanbul-reporter && remap-istanbul -i coverage/coverage-final.json -o coverage/html-report -t html && node -e \"require('fs').unlinkSync('./dist/qtek.src.js')\"",
+    "test:main": "electron-mocha --require-main ./test/ci-env.js --renderer \"./test/**/*.spec.js\" -R spec",
+    "test" : "npm run test:main"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/pissang/qtek.git"
   },
   "devDependencies": {
-    "canvas": "^2.0.0-alpha.5",
-    "gl": "^4.0.4",
+    "electron": "1.7.9",
+    "electron-mocha": "^4.0.3",
     "glob": "^7.0.0",
-    "istanbul": "^0.4.5",
+    "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "remap-istanbul": "^0.9.5",
     "rollup": "^0.49.3",
-    "rollup-plugin-commonjs": "^8.2.1",
+    "rollup-plugin-commonjs": "^8.2.6",
     "rollup-watch": "^4.3.1"
-  }
+  },
+  "dependencies": {}
 }
