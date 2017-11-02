@@ -45,7 +45,7 @@ TrackClip.prototype.step = function (time, dTime, silent) {
         if (this._range) {
             time = this._range[0] + time;
         }
-        this.setTime();
+        this.setTime(time);
     }
 
     // PENDING Schedule
