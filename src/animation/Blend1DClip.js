@@ -3,7 +3,7 @@
 
 import Clip from './Clip';
 
-var clipSortFunc = function(a, b) {
+var clipSortFunc = function (a, b) {
     return a.position < b.position;
 };
 
@@ -37,7 +37,7 @@ var clipSortFunc = function(a, b) {
  * @param {number} [opts.position]
  * @param {qtek.animation.Clip} [opts.output]
  */
-var Blend1DClip = function(opts) {
+var Blend1DClip = function (opts) {
 
     opts = opts || {};
 
@@ -71,7 +71,7 @@ Blend1DClip.prototype.constructor = Blend1DClip;
  * @param {number} [offset]
  * @return {qtek.animation.Blend1DClip.IClipInput}
  */
-Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
+Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
         position: position,
         clip: inputClip,
@@ -96,18 +96,22 @@ Blend1DClip.prototype.addInput = function(position, inputClip, offset) {
     return obj;
 };
 
-Blend1DClip.prototype.step = function(time) {
+Blend1DClip.prototype.step = function (time, dTime, silent) {
 
     var ret = Clip.prototype.step.call(this, time);
 
     if (ret !== 'finish') {
-        this.setTime(this._elapsedTime);
+        this.setTime(this.getElapsedTime());
     }
 
+    // PENDING Schedule
+    if (!silent && ret !== 'paused') {
+        this.fire('frame');
+    }
     return ret;
 };
 
-Blend1DClip.prototype.setTime = function(time) {
+Blend1DClip.prototype.setTime = function (time) {
     var position = this.position;
     var inputs = this.inputs;
     var len = inputs.length;
@@ -160,7 +164,7 @@ Blend1DClip.prototype.clone = function (cloneInputs) {
 };
 
 // Find the key where position in range [inputs[key].position, inputs[key+1].position)
-Blend1DClip.prototype._findKey = function(position) {
+Blend1DClip.prototype._findKey = function (position) {
     var key = -1;
     var inputs = this.inputs;
     var len = inputs.length;

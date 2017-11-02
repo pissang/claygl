@@ -144,87 +144,84 @@
             var cubeList = [];
 
             var gltfLoader = new qtek.loader.GLTF();
-            gltfLoader.load('assets/models/cube/cube.json');
-            gltfLoader.success(function(res) {
-                var cubeGeo = res.scene.getNode('Cube').geometry;
+            var cubeGeo = new qtek.geometry.Cube();
 
-                for (var i = 0; i < positionArr.length; i++) {
-                    var position = positionArr[i];
-                    var mesh = new qtek.Mesh({
-                        material: cubeMat,
-                        geometry: cubeGeo
-                    });
-                    mesh.position.set(position[0], position[1], position[2]);
-
-                    mesh.rotation.rotateX(Math.random() * Math.PI * 2);
-                    mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
-
-                    mesh.scale.set(0.5, 0.5, 0.5);
-                    root.add(mesh);
-
-                    cubeList.push(mesh);
-                }
-
-                var light = new qtek.light.Directional({
-                    shadowResolution : 1024,
-                    shadowBias: 0.005,
-                    intensity: 0.7
+            for (var i = 0; i < positionArr.length; i++) {
+                var position = positionArr[i];
+                var mesh = new qtek.Mesh({
+                    material: cubeMat,
+                    geometry: cubeGeo
                 });
-                light.position.set(0, 30, 30);
-                light.lookAt(scene.position);
-                scene.add(light);
+                mesh.position.set(position[0], position[1], position[2]);
 
-                scene.add(new qtek.light.Ambient({
-                    intensity: 0.3
-                }));
+                mesh.rotation.rotateX(Math.random() * Math.PI * 2);
+                mesh.rotation.rotateZ(Math.random() * Math.PI * 2);
 
-                var animation = new qtek.animation.Animation();
-                animation.start();
+                mesh.scale.set(0.5, 0.5, 0.5);
+                root.add(mesh);
 
-                animation.on('frame', function(deltaTime) {
+                cubeList.push(mesh);
+            }
 
-                    var start = new Date().getTime();
-                    shadowMapPass.render(renderer, scene, camera);
-                    var drawInfo = renderer.render(scene, camera);
-                    var renderTime = new Date().getTime() - start;
-
-                    document.getElementById('fps').innerHTML =
-                            Math.round(1000 / deltaTime) + '<br />'
-                            + renderTime + '<br />';
-
-                    var color = document.getElementById('cubeColor').style.backgroundColor;
-                    color = color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
-                        return parseInt(item) / 255;
-                    });
-
-                    for (var i = 0; i < cubeList.length; i++) {
-                        cubeList[i].material.set('color', color);
-                        var pos = positionArr[i];
-                        qtek.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
-                        qtek.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
-                    }
-                });
-
-                document.body.addEventListener('mousemove', function(e) {
-                    var dx = e.pageX - window.innerWidth / 2;
-
-                    root.rotation.identity().rotateY(dx / 1000);
-                });
-
-                var obj = {
-                    position : positionArr
-                }
-
-                var current = crossPosArr;
-                setInterval(function() {
-                    var another = current == crossPosArr ? checkPosArr : crossPosArr;
-                    animation.animate(obj)
-                    .when(1000, {
-                        position : another
-                    }).start("CubicInOut");
-                    current = another;
-                }, 4000);
+            var light = new qtek.light.Directional({
+                shadowResolution : 1024,
+                shadowBias: 0.005,
+                intensity: 0.7
             });
+            light.position.set(0, 30, 30);
+            light.lookAt(scene.position);
+            scene.add(light);
+
+            scene.add(new qtek.light.Ambient({
+                intensity: 0.3
+            }));
+
+            var animation = new qtek.animation.Animation();
+            animation.start();
+
+            animation.on('frame', function(deltaTime) {
+
+                var start = new Date().getTime();
+                shadowMapPass.render(renderer, scene, camera);
+                var drawInfo = renderer.render(scene, camera);
+                var renderTime = new Date().getTime() - start;
+
+                document.getElementById('fps').innerHTML =
+                        Math.round(1000 / deltaTime) + '<br />'
+                        + renderTime + '<br />';
+
+                var color = document.getElementById('cubeColor').style.backgroundColor;
+                color = color.match(/rgb\((.*?)\)/)[1].split(/\s*,\s*/).map(function(item) {
+                    return parseInt(item) / 255;
+                });
+
+                for (var i = 0; i < cubeList.length; i++) {
+                    cubeList[i].material.set('color', color);
+                    var pos = positionArr[i];
+                    qtek.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
+                    qtek.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
+                }
+            });
+
+            document.body.addEventListener('mousemove', function(e) {
+                var dx = e.pageX - window.innerWidth / 2;
+
+                root.rotation.identity().rotateY(dx / 1000);
+            });
+
+            var obj = {
+                position : positionArr
+            }
+
+            var current = crossPosArr;
+            setInterval(function() {
+                var another = current == crossPosArr ? checkPosArr : crossPosArr;
+                animation.animate(obj)
+                .when(1000, {
+                    position : another
+                }).start("CubicInOut");
+                current = another;
+            }, 4000);
         </script>
     </body>
 </html>

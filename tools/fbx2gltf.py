@@ -1135,12 +1135,12 @@ def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
     for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
         lAnimIdx, lGLTFAnimation = CreateAnimation(lAnimStack.GetName())
-        lib_animations.append(lGLTFAnimation)
         for j in range(lAnimStack.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimLayer.ClassId))):
             lAnimLayer = lAnimStack.GetSrcObject(FbxCriteria.ObjectType(FbxAnimLayer.ClassId), j)
             # for k in range(lRoot.GetChildCount()):
             ConvertNodeAnimation(lGLTFAnimation, lAnimLayer, lRoot, pSampleRate, pStartTime, pDuration)
-
+        if len(lGLTFAnimation['samplers']) > 0:
+            lib_animations.append(lGLTFAnimation)
 # def ConvertAnimation2(pScene, pStartTime, pDuration):
 #     for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
 #         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
@@ -1358,7 +1358,7 @@ if __name__ == "__main__":
         lBasename, lExt = os.path.splitext(args.file)
         args.output = lBasename + '.gltf'
 
-    # Not use INFINITY poseTime or some joint transform without animation maybe not right.
+    # PENDING Not use INFINITY poseTime or some joint transform without animation maybe not right.
     lPoseTime = FbxTime()
     lPoseTime.SetSecondDouble(float(args.pose))
 

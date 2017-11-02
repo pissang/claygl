@@ -23,7 +23,7 @@
             var scene = new qtek.Scene();
 
             var loader = new qtek.loader.GLTF();
-            loader.load('assets/models/suzanne.json');
+            loader.load('assets/models/suzanne/suzanne.gltf');
             loader.success(function(res) {
                 var geo = res.scene.getNode('Suzanne').geometry;
                 var mesh = new qtek.Mesh({

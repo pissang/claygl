@@ -34,7 +34,7 @@ import Vector2 from '../math/Vector2';
  * @param {qtek.math.Vector2} [opts.position]
  * @param {qtek.animation.Clip} [opts.output]
  */
-var Blend2DClip = function(opts) {
+var Blend2DClip = function (opts) {
 
     opts = opts || {};
 
@@ -68,7 +68,7 @@ Blend2DClip.prototype.constructor = Blend2DClip;
  * @param {number} [offset]
  * @return {qtek.animation.Blend2DClip.IClipInput}
  */
-Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
+Blend2DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
         position : position,
         clip : inputClip,
@@ -83,25 +83,29 @@ Blend2DClip.prototype.addInput = function(position, inputClip, offset) {
 };
 
 // Delaunay triangulate
-Blend2DClip.prototype._updateTriangles = function() {
-    var inputs = this.inputs.map(function(a) {
+Blend2DClip.prototype._updateTriangles = function () {
+    var inputs = this.inputs.map(function (a) {
         return a.position;
     });
     this._triangles = delaunay.triangulate(inputs, '_array');
 };
 
-Blend2DClip.prototype.step = function(time) {
-
+Blend2DClip.prototype.step = function (time, dTime, silent) {
+    
     var ret = Clip.prototype.step.call(this, time);
 
     if (ret !== 'finish') {
-        this.setTime(this._elapsedTime);
+        this.setTime(this.getElapsedTime());
     }
 
+    // PENDING Schedule
+    if (!silent && ret !== 'paused') {
+        this.fire('frame');
+    }
     return ret;
 };
 
-Blend2DClip.prototype.setTime = function(time) {
+Blend2DClip.prototype.setTime = function (time) {
     var res = this._findTriangle(this.position);
     if (!res) {
         return;
@@ -145,7 +149,7 @@ Blend2DClip.prototype.clone = function (cloneInputs) {
     return clip;
 };
 
-Blend2DClip.prototype._findTriangle = function(position) {
+Blend2DClip.prototype._findTriangle = function (position) {
     if (this._cacheTriangle) {
         var res = delaunay.contains(this._cacheTriangle.vertices, position._array);
         if (res) {

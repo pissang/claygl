@@ -3,8 +3,7 @@
 //
 // TODO Sync target transform
 
-import Clip from './Clip';
-import TransformClip from './TransformClip';
+import TransformTrack from './TransformTrack';
 
 import glMatrix from '../dep/glmatrix';
 var quat = glMatrix.quat;
@@ -64,30 +63,14 @@ function quatSlerp(out, a, b, t, oa, ob) {
     return out;
 }
 
-/**
- * @constructor
- * @alias qtek.animation.SamplerClip
- * @extends qtek.animation.Clip
- *
- * @param {Object} [opts]
- * @param {string} [opts.name]
- * @param {Object} [opts.target]
- * @param {number} [opts.life]
- * @param {number} [opts.delay]
- * @param {number} [opts.gap]
- * @param {number} [opts.playbackRatio]
- * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
- * @param {string|Function} [opts.easing]
- * @param {Function} [opts.onframe]
- * @param {Function} [opts.onfinish]
- * @param {Function} [opts.onrestart]
- */
-var SamplerClip = function(opts) {
-
+var SamplerTrack = function (opts) {
     opts = opts || {};
 
-    Clip.call(this, opts);
-
+    this.name = opts.name || '';
+    /**
+     * @param {qtek.Node}
+     */
+    this.target = opts.target || null;
     /**
      * @type {Float32Array}
      */
@@ -113,27 +96,7 @@ var SamplerClip = function(opts) {
     this._cacheTime = 0;
 };
 
-SamplerClip.prototype = Object.create(Clip.prototype);
-
-SamplerClip.prototype.constructor = SamplerClip;
-
-SamplerClip.prototype.step = function (time, dTime, silent) {
-
-    var ret = Clip.prototype.step.call(this, time, dTime, true);
-
-    if (ret !== 'finish') {
-        this.setTime(this.getElapsedTime());
-    }
-
-    // PENDING Schedule, puased ?
-    if (!silent && ret !== 'paused') {
-        this.fire('frame');
-    }
-
-    return ret;
-};
-
-SamplerClip.prototype.setTime = function (time) {
+SamplerTrack.prototype.setTime = function (time) {
     if (!this.channels.time) {
         return;
     }
@@ -206,16 +169,41 @@ SamplerClip.prototype.setTime = function (time) {
         this._cacheKey = 0;
         this._cacheTime = 0;
     }
+
+    this.updateTarget();
+};
+
+SamplerTrack.prototype.updateTarget = function () {
+    var channels = this.channels;
+    if (this.target) {
+        // Only update target prop if have data.
+        if (channels.position) {
+            this.target.position.setArray(this.position);
+        }
+        if (channels.rotation) {
+            this.target.rotation.setArray(this.rotation);
+        }
+        if (channels.scale) {
+            this.target.scale.setArray(this.scale);
+        }
+    }
+};
+
+/**
+ * @return {number}
+ */
+SamplerTrack.prototype.getMaxTime = function () {
+    return this.channels.time[this.channels.time.length - 1];
 };
 
 /**
  * @param {number} startTime
  * @param {number} endTime
- * @return {qtek.animation.SamplerClip}
+ * @return {qtek.animation.SamplerTrack}
  */
-SamplerClip.prototype.getSubClip = function(startTime, endTime) {
+SamplerTrack.prototype.getSubTrack = function (startTime, endTime) {
 
-    var subClip = new SamplerClip({
+    var subClip = new SamplerTrack({
         name: this.name
     });
     var minTime = this.channels.time[0];
@@ -277,7 +265,7 @@ SamplerClip.prototype.getSubClip = function(startTime, endTime) {
     return subClip;
 };
 
-SamplerClip.prototype._findRange = function(time) {
+SamplerTrack.prototype._findRange = function (time) {
     var channels = this.channels;
     var len = channels.time.length;
     var start = -1;
@@ -299,54 +287,57 @@ SamplerClip.prototype._findRange = function(time) {
 /**
  * 1D blending between two clips
  * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
  * @param  {number} w
  */
-SamplerClip.prototype.blend1D = TransformClip.prototype.blend1D;
+SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
 /**
  * 2D blending between three clips
  * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c3
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c3
  * @param  {number} f
  * @param  {number} g
  */
-SamplerClip.prototype.blend2D = TransformClip.prototype.blend2D;
+SamplerTrack.prototype.blend2D = TransformTrack.prototype.blend2D;
 /**
  * Additive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
  */
-SamplerClip.prototype.additiveBlend = TransformClip.prototype.additiveBlend;
+SamplerTrack.prototype.additiveBlend = TransformTrack.prototype.additiveBlend;
 /**
  * Subtractive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformClip} c2
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
+ * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
  */
-SamplerClip.prototype.subtractiveBlend = TransformClip.prototype.subtractiveBlend;
+SamplerTrack.prototype.subtractiveBlend = TransformTrack.prototype.subtractiveBlend;
 
 /**
- * Clone a new SamplerClip
- * @return {qtek.animation.SamplerClip}
+ * Clone a new SamplerTrack
+ * @return {qtek.animation.SamplerTrack}
  */
-SamplerClip.prototype.clone = function () {
-    var clip = Clip.prototype.clone.call(this);
-    clip.channels = {
+SamplerTrack.prototype.clone = function () {
+    var track = SamplerTrack.prototype.clone.call(this);
+    track.channels = {
         time: this.channels.time || null,
         position: this.channels.position || null,
         rotation: this.channels.rotation || null,
         scale: this.channels.scale || null
     };
-    vec3.copy(clip.position, this.position);
-    quat.copy(clip.rotation, this.rotation);
-    vec3.copy(clip.scale, this.scale);
+    vec3.copy(track.position, this.position);
+    quat.copy(track.rotation, this.rotation);
+    vec3.copy(track.scale, this.scale);
 
-    return clip;
+    track.target = this.target;
+    track.updateTarget();
+
+    return track;
 
 };
 
-export default SamplerClip;
+export default SamplerTrack;

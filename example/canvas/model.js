@@ -24,7 +24,7 @@ define(function (require) {
     camera.position.z = 4;
 
     var loader = new GLTFLoader();
-    loader.load('../assets/models/suzanne_low.json');
+    loader.load('../assets/models/suzanne/suzanne_low.gltf');
     loader.success(function (res) {
 
         var mesh = res.meshes['Suzanne-mesh'][0];

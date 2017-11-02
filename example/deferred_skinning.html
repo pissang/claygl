@@ -80,7 +80,8 @@
 
         GLTFLoader.on('success', function(res) {
             var scene = res.scene;
-            var skeleton = res.skeletons['skin_0'];
+            var skeleton = res.skeletons[0];
+            var clip = res.clips[0];
             var camera = new qtek.camera.Perspective({
                 aspect : renderer.getViewportAspect()
             });
@@ -117,15 +118,13 @@
 
             var animation = new qtek.animation.Animation();
             animation.start();
-            animation.addClip(skeleton.getClip(0));
-            skeleton.getClip(0).setLoop(true);
+            animation.addClip(clip);
 
             var skeletonDebugScene = createSkeletonDebugScene(skeleton, qtek);
             skeletonDebugScene.position.x = -10;
             animation.on('frame', function() {
                 control.update(50);
-                skeleton.setPose(0);
-                // renderer.render(scene, camera);
+                skeleton.update();
                 deferredRenderer.render(renderer, scene, camera);
 
                 renderer.saveClear();

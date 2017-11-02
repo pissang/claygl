@@ -68,15 +68,15 @@ var Skeleton = Base.extend(function () {
             maps[i] = -1;
         }
         // Create avatar
-        for (var i = 0; i < clip.jointClips.length; i++) {
+        for (var i = 0; i < clip.tracks.length; i++) {
             for (var j = 0; j < this.joints.length; j++) {
                 var joint = this.joints[j];
-                var jointPose = clip.jointClips[i];
+                var track = clip.tracks[i];
                 var jointName = joint.name;
                 if (mapRule) {
                     jointName = mapRule[jointName];
                 }
-                if (jointPose.name === jointName) {
+                if (track.name === jointName) {
                     maps[j] = i;
                     break;
                 }
@@ -239,7 +239,7 @@ var Skeleton = Base.extend(function () {
                 if (maps[i] === -1) {
                     continue;
                 }
-                var pose = clip.jointClips[maps[i]];
+                var pose = clip.tracks[maps[i]];
 
                 // Not update if there is no data.
                 // PENDING If sync pose.position, pose.rotation, pose.scale

@@ -24,7 +24,7 @@
             });
 
             var GLTFLoader = new qtek.loader.GLTF();
-            GLTFLoader.load('assets/models/suzanne.json');
+            GLTFLoader.load('assets/models/suzanne/suzanne.gltf');
             var suzanneGeometry;
             GLTFLoader.on('success', function (res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;

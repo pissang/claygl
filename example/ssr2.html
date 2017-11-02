@@ -88,7 +88,7 @@
                 scene.add(mainLight);
 
                 var loader = new qtek.loader.GLTF();
-                loader.load('assets/models/suzanne_full.gltf');
+                loader.load('assets/models/suzanne/suzanne_high.gltf');
                 var suzanneGeometry;
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;

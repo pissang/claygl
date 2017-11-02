@@ -23,11 +23,11 @@
         var animation = new qtek.animation.Animation();
         animation.start();
 
-        var GLTFLoader = new qtek.loader.GLTF();
+        var loader = new qtek.loader.GLTF();
 
-        GLTFLoader.load("assets/scenes/gltf/scene.json");
+        loader.load("assets/models/basic_scene/scene.gltf");
 
-        GLTFLoader.on('success', function(res) {
+        loader.on('success', function(res) {
             var scene = res.scene;
             scene.rotation.rotateX(-Math.PI / 2);
             var camera = new qtek.camera.Perspective({
@@ -45,16 +45,18 @@
                 sensitivity: 0.4
             });
 
-            var light = scene.getNode('Spot');
+            var light = new qtek.light.Spot();
             light.range = 30;
             light.umbraAngle = 10;
             light.penumbraAngle = 25;
             light.shadowResolution = 2048;
-
+            light.shadowBias = 0.0002;
+            light.position.set(-5, -5, 5);
             light.lookAt(scene.position);
+            scene.add(light);
 
             scene.add(new qtek.light.Ambient({
-                intensity: 0.1
+                intensity: 0.3
             }));
 
             var suzanne = scene.getNode('Suzanne');
