@@ -1,6 +1,6 @@
-require('../common/');
+require('../../common/');
 const assert = require('assert');
-const qtek = require('../../dist/qtek');
+const qtek = require('../../../dist/qtek');
 
 describe('Sphere.Spec', function () {
     it('constructor', function () {
