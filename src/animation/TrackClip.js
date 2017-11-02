@@ -40,7 +40,12 @@ TrackClip.prototype.step = function (time, dTime, silent) {
     var ret = Clip.prototype.step.call(this, time, dTime, true);
 
     if (ret !== 'finish') {
-        this.setTime(this.getElapsedTime());
+        var time = this.getElapsedTime();
+        // TODO life may be changed.
+        if (this._range) {
+            time = this._range[0] + time;
+        }
+        this.setTime();
     }
 
     // PENDING Schedule
@@ -49,6 +54,19 @@ TrackClip.prototype.step = function (time, dTime, silent) {
     }
     
     return ret;
+};
+
+/**
+ * @param {Array.<number>} range
+ */
+TrackClip.prototype.setRange = function (range) {
+    this.calcLifeFromTracks();
+    this._range = range;
+    if (range) {
+        range[1] = Math.min(range[1], this.life);
+        range[0] = Math.min(range[0], this.life);
+        this.life = (range[1] - range[0]);
+    }
 };
 
 TrackClip.prototype.setTime = function (time) {

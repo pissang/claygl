@@ -1009,6 +1009,7 @@ function () {
                 track.channels[path] = getAccessorData(json, lib, samplerInfo.output);
             }
             var clip = new TrackClip({
+                name: animationInfo.name,
                 loop: true
             });
             for (var hash in tracks) {
