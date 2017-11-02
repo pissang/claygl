@@ -83,6 +83,7 @@ GL_ELEMENT_ARRAY_BUFFER = 0x8893
 
 
 ENV_QUANTIZE = False
+ENV_FLIP_V = True
 
 _id = 0
 def GetId():
@@ -614,17 +615,18 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
         if lLayerUV:
             lUvSplitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
-            for i in range(len(lTexcoords)):
-                # glTF2.0 don't flipY. So flip the uv.
-                lTexcoords[i] = [lTexcoords[i][0], 1.0 - lTexcoords[i][1]]
+            if ENV_FLIP_V:
+                for i in range(len(lTexcoords)):
+                    # glTF2.0 don't flipY. So flip the uv.
+                    lTexcoords[i] = [lTexcoords[i][0], 1.0 - lTexcoords[i][1]]
 
         if lLayer2:
             lLayer2Uv = lLayer2.GetUVs()
             if lLayer2Uv:
                 lUv2Splitted = ConvertVertexLayer(pMesh, lLayer2Uv, lTexcoords2)
-                for i in range(len(lTexcoords2)):
-                    # glTF2.0 don't flipY. So flip the uv.
-                    lTexcoords2[i] = [lTexcoords2[i][0], 1.0 - lTexcoords2[i][1]]
+                if ENV_FLIP_V:
+                    for i in range(len(lTexcoords2)):
+                        lTexcoords2[i] = [lTexcoords2[i][0], 1.0 - lTexcoords2[i][1]]
 
         hasSkin = False
         moreThanFourJoints = False
@@ -1243,12 +1245,8 @@ def Convert(
     startTime = 0,
     duration = 1000,
     poseTime = TIME_INFINITY,
-    quantize = False,
     beautify = False
 ):
-    global ENV_QUANTIZE
-    ENV_QUANTIZE = quantize
-
     ignoreScene = 'scene' in excluded
     ignoreAnimation = 'animation' in excluded
     # Prepare the FBX SDK.
@@ -1342,6 +1340,8 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--pose', default=0, type=float, help="Start pose time")
     parser.add_argument('-q', '--quantize', action='store_true', help="Quantize accessors with WEB3D_quantized_attributes extension")
     parser.add_argument('-b', '--beautify', action="store_true", help="Beautify json output.")
+
+    parser.add_argument('--noflipv', action="store_true", help="If not flip v in texcoord.")
     parser.add_argument('file')
 
     args = parser.parse_args()
@@ -1363,6 +1363,10 @@ if __name__ == "__main__":
     lPoseTime.SetSecondDouble(float(args.pose))
 
     excluded = args.exclude.split(',')
+
+    ENV_QUANTIZE = args.quantize
+    ENV_FLIP_V = not args.noflipv
+
     Convert(
         args.file,
         args.output,
@@ -1371,6 +1375,5 @@ if __name__ == "__main__":
         lStartTime,
         lDuration,
         lPoseTime,
-        args.quantize,
         args.beautify
     )
