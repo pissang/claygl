@@ -5,6 +5,9 @@ import Vector3 from '../math/Vector3';
 import Matrix4 from '../math/Matrix4';
 import Renderable from '../Renderable';
 import glenum from '../core/glenum';
+import glmatrix from '../dep/glmatrix';
+
+var vec3 = glmatrix.vec3;
 
 /**
  * @constructor qtek.picking.RayPicking
@@ -97,15 +100,22 @@ var RayPicking = Base.extend(
 
         return function (renderable, out) {
 
+            var isSkinnedMesh = renderable.isSkinnedMesh();
             ray.copy(this._ray);
             Matrix4.invert(worldInverse, renderable.worldTransform);
-
-            ray.applyTransform(worldInverse);
+            
+            // Skinned mesh will ignore the world transform.
+            if (!isSkinnedMesh) {
+                ray.applyTransform(worldInverse);
+            }
 
             var geometry = renderable.geometry;
-            if (geometry.boundingBox) {
-                if (!ray.intersectBoundingBox(geometry.boundingBox)) {
-                    return;
+            // Ignore bounding box of skinned mesh?
+            if (!isSkinnedMesh) {
+                if (geometry.boundingBox) {
+                    if (!ray.intersectBoundingBox(geometry.boundingBox)) {
+                        return;
+                    }
                 }
             }
             // Use user defined picking algorithm
@@ -129,18 +139,60 @@ var RayPicking = Base.extend(
 
             var point;
             var indices = geometry.indices;
-            var positionsAttr = geometry.attributes.position;
+            var positionAttr = geometry.attributes.position;
+            var weightAttr = geometry.attributes.weight;
+            var jointAttr = geometry.attributes.joint;
+            var skinMatricesArray;
+            var skinMatrices = [];
             // Check if valid.
-            if (!positionsAttr || !positionsAttr.value || !indices) {
+            if (!positionAttr || !positionAttr.value || !indices) {
                 return;
             }
+            if (isSkinnedMesh) {
+                skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__GUID__, renderable.joints);
+                for (var i = 0; i < renderable.joints.length; i++) {
+                    skinMatrices[i] = skinMatrices[i] || [];
+                    for (var k = 0; k < 16; k++) {
+                        skinMatrices[i][k] = skinMatricesArray[i * 16 + k];
+                    }
+                }
+                var pos = [];
+                var weight = [];
+                var joint = [];
+                var skinnedPos = [];
+                var tmp = [];
+                var skinnedPositionAttr = geometry.attributes.skinnedPosition;
+                if (!skinnedPositionAttr || !skinnedPositionAttr.value) {
+                    geometry.createAttribute('skinnedPosition', 'f', 3);
+                    skinnedPositionAttr = geometry.attributes.skinnedPosition;
+                    skinnedPositionAttr.init(geometry.vertexCount);
+                }
+                for (var i = 0; i < geometry.vertexCount; i++) {
+                    positionAttr.get(i, pos);
+                    weightAttr.get(i, weight);
+                    jointAttr.get(i, joint);
+                    weight[3] = 1 - weight[0] - weight[1] - weight[2];
+                    vec3.set(skinnedPos, 0, 0, 0);
+                    for (var k = 0; k < 4; k++) {
+                        if (joint[k] >= 0) {
+                            vec3.transformMat4(tmp, pos, skinMatrices[joint[k]]);
+                            vec3.scaleAndAdd(skinnedPos, skinnedPos, tmp, weight[k]);
+                        }   
+                    }
+                    skinnedPositionAttr.set(i, skinnedPos);
+                }
+            }
+
             for (var i = 0; i < indices.length; i += 3) {
                 var i1 = indices[i];
                 var i2 = indices[i + 1];
                 var i3 = indices[i + 2];
-                positionsAttr.get(i1, v1._array);
-                positionsAttr.get(i2, v2._array);
-                positionsAttr.get(i3, v3._array);
+                var finalPosAttr = isSkinnedMesh
+                    ? geometry.attributes.skinnedPosition
+                    : positionAttr;
+                finalPosAttr.get(i1, v1._array);
+                finalPosAttr.get(i2, v2._array);
+                finalPosAttr.get(i3, v3._array);
 
                 if (cullBack) {
                     point = ray.intersectTriangle(v1, v2, v3, renderable.culling);

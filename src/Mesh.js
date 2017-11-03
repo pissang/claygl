@@ -32,7 +32,7 @@ var Mesh = Renderable.extend(
 }, {
 
     isSkinnedMesh: function () {
-        return this.skeleton && this.material.shader.isDefined('vertex', 'SKINNING');
+        return !!(this.skeleton && this.material.shader.isDefined('vertex', 'SKINNING'));
     },
 
     render: function (renderer, shader) {
