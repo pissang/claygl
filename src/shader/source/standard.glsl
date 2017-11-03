@@ -35,7 +35,7 @@ varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
 varying vec3 v_Barycentric;
 
-#ifdef NORMALMAP_ENABLED
+#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 #endif
@@ -43,7 +43,6 @@ varying vec3 v_Bitangent;
 #ifdef VERTEX_COLOR
 varying vec4 v_Color;
 #endif
-
 
 #if defined(AOMAP_ENABLED)
 varying vec2 v_Texcoord2;
@@ -73,7 +72,7 @@ void main()
 
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
 
-#ifdef NORMALMAP_ENABLED
+#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
     v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
 #endif
@@ -104,9 +103,12 @@ varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
 
-#ifdef NORMALMAP_ENABLED
+#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
+#endif
+
+#ifdef NORMALMAP_ENABLED
 uniform sampler2D normalMap;
 #endif
 
@@ -257,6 +259,49 @@ float D_GGX(float g, float ndh) {
     return a / (PI * tmp * tmp);
 }
 
+#ifdef PARALLAXOCCLUSIONMAP_ENABLED
+uniform float parallaxOcclusionScale : 0.02;
+uniform float numLayers : 10;
+uniform sampler2D parallaxOcclusionMap;
+
+mat3 transpose(in mat3 inMat)
+{
+    vec3 i0 = inMat[0];
+    vec3 i1 = inMat[1];
+    vec3 i2 = inMat[2];
+
+    return mat3(
+        vec3(i0.x, i1.x, i2.x),
+        vec3(i0.y, i1.y, i2.y),
+        vec3(i0.z, i1.z, i2.z)
+    );
+}
+// Modified from http://apoorvaj.io/exploring-bump-mapping-with-webgl.html
+vec2 parallaxUv(vec2 uv, vec3 viewDir)
+{
+    float layerHeight = 1.0 / numLayers;
+    float curLayerHeight = 0.0;
+    vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);
+    vec2 curUv = uv;
+
+    float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
+
+    for (int i = 0; i < 32; i++) {
+        curLayerHeight += layerHeight;
+        curUv -= deltaUv;
+        height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
+        if (height < curLayerHeight) {
+            break;
+        }
+    }
+
+    // Parallax occlusion mapping
+    vec2 prevUv = curUv + deltaUv;
+    float next = height - curLayerHeight;
+    float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;
+    return mix(curUv, prevUv, next / (next - prev));
+}
+#endif
 
 void main()
 {
@@ -265,8 +310,17 @@ void main()
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
 
+    vec2 uv = v_Texcoord;
+
+#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
+    mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+#endif
+
+#ifdef PARALLAXOCCLUSIONMAP_ENABLED
+    uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));
+#endif
 #ifdef DIFFUSEMAP_ENABLED
-    vec4 texel = texture2D(diffuseMap, v_Texcoord);
+    vec4 texel = texture2D(diffuseMap, uv);
     #ifdef SRGB_DECODE
     texel = sRGBToLinear(texel);
     #endif
@@ -282,7 +336,7 @@ void main()
     float m = metalness;
 
     #ifdef METALNESSMAP_ENABLED
-    float m2 = texture2D(metalnessMap, v_Texcoord)[METALNESS_CHANNEL];
+    float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];
     // Adjust the brightness
     m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);
     #endif
@@ -297,14 +351,14 @@ void main()
 #ifdef USE_ROUGHNESS
     float g = 1.0 - roughness;
     #ifdef ROUGHNESSMAP_ENABLED
-    float g2 = 1.0 - texture2D(roughnessMap, v_Texcoord)[ROUGHNESS_CHANNEL];
+    float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];
     // Adjust the brightness
     g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     #endif
 #else
     float g = glossiness;
     #ifdef GLOSSINESSMAP_ENABLED
-    float g2 = texture2D(glossinessMap, v_Texcoord)[GLOSSINESS_CHANNEL];
+    float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];
     // Adjust the brightness
     g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     #endif
@@ -312,7 +366,7 @@ void main()
 
 #ifdef SPECULARMAP_ENABLED
     // Convert to linear space.
-    spec *= sRGBToLinear(texture2D(specularMap, v_Texcoord)).rgb;
+    spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;
 #endif
 
     vec3 N = v_Normal;
@@ -325,10 +379,9 @@ void main()
 
 #ifdef NORMALMAP_ENABLED
     if (dot(v_Tangent, v_Tangent) > 0.0) {
-        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;
+        vec3 normalTexel = texture2D(normalMap, uv).xyz;
         if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
             N = normalTexel * 2.0 - 1.0;
-            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
             // FIXME Why need to normalize again?
             N = normalize(tbn * N);
         }
@@ -545,7 +598,7 @@ void main()
 
     vec3 lEmission = emission;
 #ifdef EMISSIVEMAP_ENABLED
-    lEmission *= texture2D(emissiveMap, v_Texcoord).rgb;
+    lEmission *= texture2D(emissiveMap, uv).rgb;
 #endif
     outColor.rgb += lEmission * emissionIntensity;
 
