@@ -174,7 +174,7 @@ var RayPicking = Base.extend(
                     weight[3] = 1 - weight[0] - weight[1] - weight[2];
                     vec3.set(skinnedPos, 0, 0, 0);
                     for (var k = 0; k < 4; k++) {
-                        if (joint[k] >= 0) {
+                        if (joint[k] >= 0 && weight[k] > 1e-4) {
                             vec3.transformMat4(tmp, pos, skinMatrices[joint[k]]);
                             vec3.scaleAndAdd(skinnedPos, skinnedPos, tmp, weight[k]);
                         }   

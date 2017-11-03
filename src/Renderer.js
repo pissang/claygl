@@ -543,7 +543,8 @@ var Renderer = Base.extend(function () {
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
             // All matrices ralated to world matrix will be updated on demand;
             mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
-            if (geometry.boundingBox && !preZ) {
+            // TODO Skinned mesh may have wrong bounding box.
+            if (geometry.boundingBox && !preZ && !renderable.isSkinnedMesh()) {
                 if (this.isFrustumCulled(
                     renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
                 )) {
