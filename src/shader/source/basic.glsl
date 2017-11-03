@@ -51,7 +51,7 @@ uniform float alphaCutoff: 0.9;
 
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
-uniform vec3 lineColor : [0.0, 0.0, 0.0];
+uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
 varying vec3 v_Barycentric;
 
 @import qtek.util.edge_factor
@@ -85,9 +85,9 @@ void main()
 #endif
 
     gl_FragColor.rgb += emission;
-    if( lineWidth > 0.01)
+    if( lineWidth > 0.)
     {
-        gl_FragColor.rgb = gl_FragColor.rgb * mix(lineColor, vec3(1.0), edgeFactor(lineWidth));
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
     }
 
 #ifdef GAMMA_ENCODE

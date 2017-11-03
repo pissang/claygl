@@ -186,7 +186,7 @@ uniform float emissionIntensity: 1;
 
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
-uniform vec3 lineColor : [0.0, 0.0, 0.0];
+uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
 varying vec3 v_Barycentric;
 
 // Max mipmap level of environment map
@@ -556,7 +556,7 @@ void main()
 
     if(lineWidth > 0.)
     {
-        outColor.rgb = mix(lineColor, vec3(outColor.rgb), edgeFactor(lineWidth));
+        outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
     }
 
 #ifdef ALPHA_TEST
