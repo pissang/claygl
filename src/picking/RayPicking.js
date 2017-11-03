@@ -202,7 +202,13 @@ var RayPicking = Base.extend(
                 }
                 if (point) {
                     var pointW = new Vector3();
-                    Vector3.transformMat4(pointW, point, renderable.worldTransform);
+                    if (!isSkinnedMesh) {
+                        Vector3.transformMat4(pointW, point, renderable.worldTransform);
+                    }
+                    else {
+                        // TODO point maybe not right.
+                        Vector3.copy(pointW, point);
+                    }
                     out.push(new RayPicking.Intersection(
                         point, pointW, renderable, [i1, i2, i3], i / 3,
                         Vector3.dist(pointW, this._ray.origin)

@@ -544,7 +544,7 @@ var Renderer = Base.extend(function () {
             // All matrices ralated to world matrix will be updated on demand;
             mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
             // TODO Skinned mesh may have wrong bounding box.
-            if (geometry.boundingBox && !preZ && !renderable.isSkinnedMesh()) {
+            if (geometry.boundingBox && !preZ) {
                 if (this.isFrustumCulled(
                     renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
                 )) {
@@ -797,8 +797,8 @@ var Renderer = Base.extend(function () {
             if (scene && object.isRenderable() && object.castShadow) {
                 scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
             }
-
-            if (object.frustumCulling)  {
+            // Ignore frustum culling if object is skinned mesh.
+            if (object.frustumCulling && !object.isSkinnedMesh())  {
                 if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
                     return true;
                 }
