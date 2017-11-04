@@ -1,10 +1,11 @@
 <html>
     <head>
-        <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <meta charset='utf-8'>
+        <script src='../dist/qtek.js'></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body>
-        <canvas width="1200" height="640" id="main"></canvas>
+        <canvas width='1200' height='640' id="main"></canvas>
         <script type="text/javascript">
             var Shader = qtek.Shader;
 
@@ -23,16 +24,17 @@
             cube.generateUniqueVertex();
             cube.generateTangents();
 
-            var shader = qtek.shader.library.get("qtek.standard", ["normalMap", "diffuseMap"]);
+            var shader = qtek.shader.library.get('qtek.standard', ['parallaxOcclusionMap', 'diffuseMap', 'normalMap']);
             var material = new qtek.Material({
                 shader: shader
             });
-            material.set("normalMap", loadTexture("assets/textures/normal_map.jpg"));
-            material.set("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
-            material.set("shininess", 100);
+            material.set('parallaxOcclusionMap', loadTexture('assets/textures/depth.png'));
+            material.set('diffuseMap', loadTexture('assets/textures/diffuse2.png'));
+            material.set('normalMap', loadTexture('assets/textures/normal.png'));
+            material.set('shininess', 100);
 
-            camera.position.set(0, 0, 4);
-            // camera.lookAt( scene.position );
+            camera.position.set(0, 2, 4);
+            camera.lookAt(scene.position);
 
             var mesh = new qtek.Mesh({
                 geometry: cube,
@@ -57,6 +59,13 @@
                 return texture;
             }
 
+            var config = {
+                scale: 0.01
+            }
+            var gui = new dat.GUI();
+            gui.add(config, 'scale', 0, 0.1).onChange(function () {
+                material.set('parallaxOcclusionScale', config.scale);
+            });
         </script>
     </body>
 </html>
