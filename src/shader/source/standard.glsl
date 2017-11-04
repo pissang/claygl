@@ -261,7 +261,8 @@ float D_GGX(float g, float ndh) {
 
 #ifdef PARALLAXOCCLUSIONMAP_ENABLED
 uniform float parallaxOcclusionScale : 0.02;
-uniform float numLayers : 10;
+uniform float parallaxMaxLayers : 20;
+uniform float parallaxMinLayers : 5;
 uniform sampler2D parallaxOcclusionMap;
 
 mat3 transpose(in mat3 inMat)
@@ -279,6 +280,8 @@ mat3 transpose(in mat3 inMat)
 // Modified from http://apoorvaj.io/exploring-bump-mapping-with-webgl.html
 vec2 parallaxUv(vec2 uv, vec3 viewDir)
 {
+    // Determine number of layers from angle between V and N
+    float numLayers = mix(parallaxMaxLayers, parallaxMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
     float layerHeight = 1.0 / numLayers;
     float curLayerHeight = 0.0;
     vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);
@@ -286,7 +289,7 @@ vec2 parallaxUv(vec2 uv, vec3 viewDir)
 
     float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
 
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 30; i++) {
         curLayerHeight += layerHeight;
         curUv -= deltaUv;
         height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
