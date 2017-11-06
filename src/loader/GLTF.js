@@ -208,9 +208,10 @@ function () {
 
     /**
      * @param {Object} json
+     * @param {Array.<ArrayBuffer>} [buffer]
      * @return {qtek.loader.GLTF.IResult}
      */
-    parse: function (json) {
+    parse: function (json, buffers) {
         var self = this;
 
         var lib = {
@@ -235,16 +236,23 @@ function () {
                 afterLoadBuffer();
             }
         }
-        // Load buffers
-        util.each(json.buffers, function (bufferInfo, idx) {
-            loading++;
-            var path = bufferInfo.uri;
-
-            self._loadBuffer(path, function (buffer) {
-                lib.buffers[idx] = buffer;
-                checkLoad();
-            }, checkLoad);
-        });
+        // If already load buffers
+        if (buffers) {
+            lib.buffers = buffers.slice();
+            afterLoadBuffer(true);
+        }
+        else {
+            // Load buffers
+            util.each(json.buffers, function (bufferInfo, idx) {
+                loading++;
+                var path = bufferInfo.uri;
+    
+                self._loadBuffer(path, function (buffer) {
+                    lib.buffers[idx] = buffer;
+                    checkLoad();
+                }, checkLoad);
+            });
+        }
 
         function getResult() {
             return {
@@ -260,7 +268,7 @@ function () {
             };
         }
 
-        function afterLoadBuffer() {
+        function afterLoadBuffer(immediately) {
             json.bufferViews.forEach(function (bufferViewInfo, idx) {
                 // PENDING Performance
                 lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer]
@@ -295,7 +303,14 @@ function () {
             if (self.includeAnimation) {
                 self._parseAnimations(json, lib);
             }
-            self.trigger('success', getResult());
+            if (immediately) {
+                setTimeout(function () {
+                    self.trigger('success', getResult());
+                });
+            }
+            else {
+                self.trigger('success', getResult());
+            }
         }
 
         return getResult();
