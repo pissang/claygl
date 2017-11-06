@@ -2,6 +2,21 @@ const qtek = require('../../../dist/qtek');
 const { util, helper } = require('../../common');
 const path = require('path');
 
+function createCube() {
+    const root = new qtek.Node();
+    root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
+
+    const mesh = new qtek.Mesh({
+        material: new qtek.Material({
+            shader : qtek.shader.library.get('qtek.standard')
+        }),
+        geometry : new qtek.geometry.Cube()
+    });
+    root.add(mesh);
+
+    return root;
+}
+
 describe('Integration.lights.Spec', function () {
     it('directional light', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene(); 
@@ -14,17 +29,8 @@ describe('Integration.lights.Spec', function () {
          
         scene.add(light);
 
-        var root = new qtek.Node();
-        root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
-        scene.add(root);
-
-        const mesh = new qtek.Mesh({
-            material: new qtek.Material({
-                shader : qtek.shader.library.get('qtek.standard')
-            }),
-            geometry : new qtek.geometry.Cube()
-        });
-        root.add(mesh);
+        const cube = createCube();
+        scene.add(cube);
 
         const drawInfo = renderer.render(scene, camera);
         
@@ -38,17 +44,8 @@ describe('Integration.lights.Spec', function () {
             intensity: 0.3
         }));
 
-        var root = new qtek.Node();
-        root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
-        scene.add(root);
-
-        const mesh = new qtek.Mesh({
-            material: new qtek.Material({
-                shader : qtek.shader.library.get('qtek.standard')
-            }),
-            geometry : new qtek.geometry.Cube()
-        });
-        root.add(mesh);
+        const cube = createCube();
+        scene.add(cube);
 
         const drawInfo = renderer.render(scene, camera);
         
@@ -67,17 +64,8 @@ describe('Integration.lights.Spec', function () {
 
         scene.add(light);
 
-        var root = new qtek.Node();
-        root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
-        scene.add(root);
-
-        const mesh = new qtek.Mesh({
-            material: new qtek.Material({
-                shader : qtek.shader.library.get('qtek.standard')
-            }),
-            geometry : new qtek.geometry.Cube()
-        });
-        root.add(mesh);
+        const cube = createCube();
+        scene.add(cube);
 
         const drawInfo = renderer.render(scene, camera);
         
