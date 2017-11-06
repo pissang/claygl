@@ -339,7 +339,7 @@ var GBuffer = Base.extend(function () {
         var enableTargetTexture2 = this.enableTargetTexture2;
         var enableTargetTexture3 = this.enableTargetTexture3;
         if (!enableTargetTexture1 && !enableTargetTexture3) {
-            console.warn('Can\'t disable targetTexture1 targetTexture2 both');
+            console.warn('Can\'t disable targetTexture1 targetTexture3 both');
             enableTargetTexture1 = true;
         }
 

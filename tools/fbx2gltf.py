@@ -462,6 +462,7 @@ def ConvertMaterial(pMaterial):
 
 def ConvertToPBRMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
+    lShading = str(pMaterial.ShadingModel.Get()).lower()
 
     lGLTFMaterial = {
         "name" : lMaterialName,
@@ -472,6 +473,12 @@ def ConvertToPBRMaterial(pMaterial):
         }
     }
     lValues = lGLTFMaterial["pbrMetallicRoughness"];
+
+    lMaterialIdx = len(lib_materials)
+    
+    if (lShading == 'unknown'):
+        lib_materials.append(lGLTFMaterial)
+        return lMaterialIdx
 
     lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
 
@@ -510,11 +517,10 @@ def ConvertToPBRMaterial(pMaterial):
             }
     # PENDING
 
-    if str(pMaterial.ShadingModel.Get()).lower() == 'phong':
+    if lShading == 'phong':
         lGLossiness = math.log(pMaterial.Shininess.Get()) / math.log(8192)
         lValues['roughnessFactor'] = min(max(1 - lGLossiness, 0), 1)
 
-    lMaterialIdx = len(lib_materials)
     lib_materials.append(lGLTFMaterial)
     return lMaterialIdx
 
