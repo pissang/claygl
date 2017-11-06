@@ -78,7 +78,14 @@ module.exports = {
         webImg2.src = img2.toDataURL();
     },
 
-    compareImagePixel(fixture, actual) {
+    /**
+     * Compare image pixel difference
+     * @param {Buffer} fixture
+     * @param {Buffer} actual
+     * @param {Number} colorDelta max distance of RGB value
+     * @return {Number} -1 : different, 0: blank image, 1 : same
+     */
+    compareImagePixel(fixture, actual, colorDelta = 2) {
         if (fixture.width !== actual.width || fixture.height !== actual.height) {
             return -1;
         }
@@ -94,16 +101,24 @@ module.exports = {
         const data1 = ctx1.getImageData(0, 0, w, h).data;
         const data2 = ctx2.getImageData(0, 0, w, h).data;
         
-        let drawn = 0;
+        let drawn = 0;        
         for (let i = 0, l = data1.length; i < l; i += 4) {
             if (!drawn && data2[i + 3] > 0) {
                 drawn = 1;
             }
-            if (data1[i] !== data2[i] || data1[i + 1] !== data2[i + 1] || data1[i + 2] !== data2[i + 2] || data1[i + 3] !== data2[i + 3]) {
-                return -1;
+            if (!compare(data1[i], data2[i], colorDelta) ||
+                !compare(data1[i + 1], data2[i + 1], colorDelta) ||
+                !compare(data1[i + 2], data2[i + 2], colorDelta) ||
+                data1[i + 3] !== data2[i + 3]) {
+                return false;
             }
         }
         return drawn;
     }
 
 };
+
+function compare(c1, c2, delta) {
+    const c = c1 - c2;
+    return c <= delta && c >= -delta;
+}
