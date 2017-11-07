@@ -7,7 +7,10 @@ describe('Integration.Anistropic.Spec', function () {
         const { renderer, scene, camera, canvas } = helper.createQtekScene({
             size : [600, 600],
             cameraPosition : [0, 4, 14]
-        });        
+        });
+        if (!renderer.getGLExtension('EXT_texture_filter_anisotropic')) {
+            done();
+        }
         camera.lookAt(new qtek.math.Vector3(0, 1, 0));
         camera.far = 500;
 
