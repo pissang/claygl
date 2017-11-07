@@ -45,6 +45,10 @@ Compare spec's paiting result with pre-generated fixtures.
 ```shell
 npm run gen:fixture
 ```
+Generate fixture for specs matching the pattern:
+```shell
+npm run gen:texture -- -g "texture anistropic"
+```
 
 ## Commands
 * run, watch and debug in electron
@@ -54,6 +58,13 @@ npm run tdd
 * run test
 ```shell
 npm test
+```
+* run tests matching patterns
+```shell
+npm test -- -g "texture anistropic"
+```
+```shell
+npm run tdd -- -g "texture anistropic"
 ```
 * run test with coverage
 ```shell
