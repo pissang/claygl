@@ -53,8 +53,6 @@ describe('Integration.shadow.Spec', function () {
 
         addCubes(scene);
 
-        //TODO #12
-        renderer.render(scene, camera);
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
@@ -84,8 +82,6 @@ describe('Integration.shadow.Spec', function () {
 
         addCubes(scene);
 
-        //TODO #12
-        renderer.render(scene, camera);
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
@@ -134,8 +130,6 @@ describe('Integration.shadow.Spec', function () {
 
         addCubes(scene);
 
-        //TODO #12
-        renderer.render(scene, camera);
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
@@ -161,8 +155,6 @@ describe('Integration.shadow.Spec', function () {
 
         addCubes(scene);
 
-        //TODO #12
-        renderer.render(scene, camera);
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
