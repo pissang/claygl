@@ -32,7 +32,7 @@ describe('Scene.Spec', function () {
     it('clone a node', function () {
         const mesh = new qtek.Mesh({
             material: new qtek.Material({
-                shader : qtek.shader.library.get('qtek.standard')
+                shader : qtek.shader.library.get('qtek.standard').clone()
             }),
             geometry : new qtek.geometry.Cube()
         });
