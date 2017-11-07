@@ -1201,10 +1201,6 @@ def PrepareSceneNode(pNode, fbxConverter):
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
 
-    # Triangulate before SplitPerMaterial
-    if not pNode.GetGeometry() == None:
-        fbxConverter.Triangulate(pNode.GetGeometry(), True)
-
     for k in range(pNode.GetChildCount()):
         PrepareSceneNode(pNode.GetChild(k), fbxConverter)
 
@@ -1269,6 +1265,9 @@ def Convert(
         # Do it before SplitMeshesPerMaterial or the vertices of split mesh will be wrong.
         PrepareBakeTransform(lScene.GetRootNode())
         lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 60)
+
+        # PENDING Triangulate before SplitMeshesPerMaterial or it will not work.
+        fbxConverter.Triangulate(lScene, True)
 
         # TODO SplitMeshPerMaterial may loss deformer in mesh
         # TODO It will be crashed in some fbx files
