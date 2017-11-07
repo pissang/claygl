@@ -51,7 +51,7 @@ module.exports = {
             const fixture = fs.readFileSync(fixturePath);
             const actual = this.getGlImage(canvas);
             this._loadImage(fixture, actual, (fixture, actual) => {
-                const diff = this.compareImagePixel(fixture, actual, options.delta);
+                const diff = this.compareImagePixel(fixture, actual, options.diffOptions);
                 assert(diff === 0, (diff > 0 ? `Image is different from fixture with delta ${diff}` : 'Image is blank') + `, fixture: ${fixturePath}`);
                 cb();
             });
@@ -83,11 +83,12 @@ module.exports = {
      * @param {Number} colorDelta Max. distance colors in the 4 dimensional color-space without triggering a difference. (default: 20)
      * @return {Number} -1 : blank image, 0: same, > 0 : color delta
      */
-    compareImagePixel(fixture, actual, colorDelta) {
+    compareImagePixel(fixture, actual, options = {}) {
         if (fixture.width !== actual.width || fixture.height !== actual.height) {
             return fixture.width * fixture.height;
         }
-        colorDelta = colorDelta || 20;
+        const rgbaDelta = options.rgbaDelta || 2;
+        const diffRatio = options.diffRatio || 0.01;
         const w = fixture.width, h = fixture.height;
         const canvas1 = document.createElement('canvas');
         const canvas2 = document.createElement('canvas');
@@ -102,20 +103,24 @@ module.exports = {
         const data1 = ctx1.getImageData(0, 0, w, h).data;
         const data2 = ctx2.getImageData(0, 0, w, h).data;
         
-        let diff = -1; //blank in default
-        let delta = 0;
+        let blank = -1; //blank in default
+        let diffCount = 0;
         for (let i = 0, l = data1.length; i < l; i += 4) {
-            if (diff === -1 && data2[i + 3] > 0) {
-                diff = 0; //met 1st drawn pixel
+            if (blank === -1 && data2[i + 3] > 0) {
+                blank = 0; //met 1st drawn pixel
             }
             for (let ii = 0; ii < 4; ii++) {
-                delta += Math.abs(data1[i + ii] - data2[i + ii]);
+                const d = Math.abs(data1[i + ii] - data2[i + ii]);
+                if (d > rgbaDelta) {
+                    diffCount += d;
+                    break;
+                }                
             }
         }
-        if (delta > colorDelta) {
-            return delta;
+        if (diffCount / (w * h) > diffRatio) {
+            return diffCount;
         }
-        return diff;
+        return blank;
     }
 
 };
