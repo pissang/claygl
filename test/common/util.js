@@ -41,17 +41,18 @@ module.exports = {
         fs.writeFile(path, buf, cb);
     },
 
-    assertWith(canvas, filePath, cb) {        
+    assertWith(canvas, options, cb) {
+        const fixturePath = options.fixture;
         if (process.env.GENERATE_FIXTURE) {
-            this.writeGLImage(canvas, filePath, function () {
+            this.writeGLImage(canvas, fixturePath, function () {
                 cb();        
             });
         } else {
-            const fixture = fs.readFileSync(filePath);
+            const fixture = fs.readFileSync(fixturePath);
             const actual = this.getGlImage(canvas);
             this._loadImage(fixture, actual, (fixture, actual) => {
-                const diff = this.compareImagePixel(fixture, actual);
-                assert(diff === 0, (diff > 0 ? `Image is different from fixture with delta ${diff}` : 'Image is blank') + `, fixture: ${filePath}`);
+                const diff = this.compareImagePixel(fixture, actual, options.delta);
+                assert(diff === 0, (diff > 0 ? `Image is different from fixture with delta ${diff}` : 'Image is blank') + `, fixture: ${fixturePath}`);
                 cb();
             });
         }
@@ -82,10 +83,11 @@ module.exports = {
      * @param {Number} colorDelta Max. distance colors in the 4 dimensional color-space without triggering a difference. (default: 20)
      * @return {Number} -1 : blank image, 0: same, > 0 : color delta
      */
-    compareImagePixel(fixture, actual, colorDelta = 20) {
+    compareImagePixel(fixture, actual, colorDelta) {
         if (fixture.width !== actual.width || fixture.height !== actual.height) {
             return fixture.width * fixture.height;
         }
+        colorDelta = colorDelta || 20;
         const w = fixture.width, h = fixture.height;
         const canvas1 = document.createElement('canvas');
         const canvas2 = document.createElement('canvas');

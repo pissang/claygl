@@ -58,7 +58,7 @@ describe('Integration.shadow.Spec', function () {
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'shadow-directional-pcf.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'shadow-directional-pcf.png') }, done);
     });
 
     it('directional light shadow with VSM', function (done) {
@@ -89,7 +89,7 @@ describe('Integration.shadow.Spec', function () {
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'shadow-directional-vsm.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'shadow-directional-vsm.png') }, done);
     });
 
 
@@ -112,7 +112,7 @@ describe('Integration.shadow.Spec', function () {
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'shadow-ambient.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'shadow-ambient.png') }, done);
     }); */
 
     it('point light shadow', function (done) {
@@ -139,7 +139,7 @@ describe('Integration.shadow.Spec', function () {
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'shadow-point-pcf.png'), done);        
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'shadow-point-pcf.png') }, done);        
     });
 
     it('point light shadow with VSM', function (done) {
@@ -166,7 +166,7 @@ describe('Integration.shadow.Spec', function () {
         shadowMapPass.render(renderer, scene, camera);
         renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'shadow-point-vsm.png'), done);        
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'shadow-point-vsm.png') }, done);        
     });
 });
 

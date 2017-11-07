@@ -34,7 +34,7 @@ describe('Integration.lights.Spec', function () {
 
         const drawInfo = renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'directional-light.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'directional-light.png') }, done);
     });
 
     it('ambient light', function (done) {
@@ -49,7 +49,7 @@ describe('Integration.lights.Spec', function () {
 
         const drawInfo = renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'ambient-light.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'ambient-light.png') }, done);
     });
 
     it('point light', function (done) {
@@ -69,7 +69,7 @@ describe('Integration.lights.Spec', function () {
 
         const drawInfo = renderer.render(scene, camera);
         
-        util.assertWith(canvas, path.join(__dirname, 'point-light.png'), done);
+        util.assertWith(canvas, { fixture : path.join(__dirname, 'point-light.png') }, done);
     });
 });
 
