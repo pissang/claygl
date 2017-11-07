@@ -765,6 +765,12 @@ var ShadowMapPass = Base.extend(function () {
             }
             var camera = this._lightCameras.directional;
 
+            if (!scene.viewBoundingBoxLastFrame.isFinite()) {
+                var boundingBox = scene.getBoundingBox();
+                scene.viewBoundingBoxLastFrame
+                    .copy(boundingBox).applyTransform(camera.viewMatrix);
+            }
+
             sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
             sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
             // Move to the center of frustum(in world space)

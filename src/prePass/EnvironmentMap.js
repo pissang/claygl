@@ -117,9 +117,7 @@ var EnvironmentMapPass = Base.extend(function() {
                 camera.update();
 
                 // update boundingBoxLastFrame
-                var bbox = scene.getBoundingBox(function (el) {
-                    return !el.invisible;
-                });
+                var bbox = scene.getBoundingBox();
                 bbox.applyTransform(camera.viewMatrix);
                 scene.viewBoundingBoxLastFrame.copy(bbox);
 
