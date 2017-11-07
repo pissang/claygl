@@ -66,16 +66,16 @@
             camera.lookAt(scene.position);
             camera.scale.set(0.1, 0.1, 0.1);
 
-            // var control = new qtek.plugin.OrbitControl({
-            //     domElement: renderer.canvas,
-            //     target: camera
-            // });
+            var control = new qtek.plugin.OrbitControl({
+                domElement: renderer.canvas,
+                target: camera
+            });
 
             var animation = new qtek.animation.Animation();
 
             var elapsedTime = 0;
             animation.on('frame', function (deltaTime) {
-                // control.update(deltaTime);
+                control.update(deltaTime);
 
                 elapsedTime += deltaTime;
                 cubes.forEach(function (cube, idx) {

@@ -77,6 +77,8 @@ var ShadowMapPass = Base.extend(function () {
 
         precision: 'mediump',
 
+        _lastRenderNotCastShadow: false,
+
         _frameBuffer: new FrameBuffer(),
 
         _textures: {},
@@ -352,9 +354,12 @@ var ShadowMapPass = Base.extend(function () {
 
         this._update(renderer, scene);
 
-        if (!this._lightsCastShadow.length) {
+        // Needs to update the receivers again if shadows come from 1 to 0.
+        if (!this._lightsCastShadow.length && this._lastRenderNotCastShadow) {
             return;
         }
+
+        this._lastRenderNotCastShadow = this._lightsCastShadow === 0;
 
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthMask(true);
@@ -458,9 +463,15 @@ var ShadowMapPass = Base.extend(function () {
                     var number = this._shadowMapNumber[lightType];
                     var key = lightType + '_SHADOWMAP_COUNT';
 
-                    if (shader.fragmentDefines[key] !== number && number > 0) {
-                        shader.fragmentDefines[key] = number;
-                        shaderNeedsUpdate = true;
+                    if (shader.fragmentDefines[key] !== number) {
+                        if (number > 0) {
+                            shader.fragmentDefines[key] = number;
+                            shaderNeedsUpdate = true;
+                        }
+                        else if (shader.isDefined('fragment', key)) {
+                            shader.undefine('fragment', key);
+                            shaderNeedsUpdate = true;
+                        }
                     }
                 }
                 if (shaderNeedsUpdate) {
