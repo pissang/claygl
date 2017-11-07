@@ -348,6 +348,7 @@ var ShadowMapPass = Base.extend(function () {
         if (!notUpdateScene) {
             scene.update();
         }
+        sceneCamera.update();
 
         this._update(renderer, scene);
 
@@ -511,6 +512,12 @@ var ShadowMapPass = Base.extend(function () {
 
             casters.sort(Renderer.opaqueSortFunc);
 
+            // First frame
+            if (!scene.viewBoundingBoxLastFrame.isFinite()) {
+                var boundingBox = scene.getBoundingBox();
+                scene.viewBoundingBoxLastFrame
+                    .copy(boundingBox).applyTransform(sceneCamera.viewMatrix);
+            }
             // Considering moving speed since the bounding box is from last frame
             // TODO: add a bias
             var clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, sceneCamera.far);
@@ -764,12 +771,6 @@ var ShadowMapPass = Base.extend(function () {
                 this._lightCameras.directional = new OrthoCamera();
             }
             var camera = this._lightCameras.directional;
-
-            if (!scene.viewBoundingBoxLastFrame.isFinite()) {
-                var boundingBox = scene.getBoundingBox();
-                scene.viewBoundingBoxLastFrame
-                    .copy(boundingBox).applyTransform(camera.viewMatrix);
-            }
 
             sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
             sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
