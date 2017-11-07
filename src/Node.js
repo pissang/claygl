@@ -363,18 +363,18 @@ var Node = Base.extend(
      * Depth first traverse all its descendant scene nodes and
      * @param {Function} callback
      * @param {Node} [context]
-     * @param {Function} [ctor]
+     * @param {Function} [filter]
      */
-    traverse: function (callback, context, ctor) {
+    traverse: function (callback, context, filter) {
 
         this._inIterating = true;
 
-        if (ctor == null || this.constructor === ctor) {
+        if (!filter || filter.call(context, this)) {
             callback.call(context, this);
         }
         var _children = this._children;
         for(var i = 0, len = _children.length; i < len; i++) {
-            _children[i].traverse(callback, context, ctor);
+            _children[i].traverse(callback, context, filter);
         }
 
         this._inIterating = false;
@@ -536,40 +536,22 @@ var Node = Base.extend(
      * @param  {qtek.math.BoundingBox} [out]
      * @return {qtek.math.BoundingBox}
      */
+    // TODO Skinning
     getBoundingBox: (function () {
-
         function defaultFilter (el) {
-            return !el.invisible;
+            return !el.invisible && el.geometry;
         }
+        var tmpBBox = new BoundingBox();
         return function (filter, out) {
             out = out || new BoundingBox();
             filter = filter || defaultFilter;
-
-            var children = this._children;
-            if (children.length === 0) {
-                out.max.set(-Infinity, -Infinity, -Infinity);
-                out.min.set(Infinity, Infinity, Infinity);
-            }
-
-            var tmpBBox = new BoundingBox();
-            for (var i = 0; i < children.length; i++) {
-                var child = children[i];
-                if (!filter(child)) {
-                    continue;
-                }
-                child.getBoundingBox(filter, tmpBBox);
-                child.updateLocalTransform();
-                if (tmpBBox.isFinite()) {
-                    tmpBBox.applyTransform(child.localTransform);
-                }
-                if (i === 0) {
-                    out.copy(tmpBBox);
-                }
-                else {
-                    out.union(tmpBBox);
-                }
-            }
-
+            
+            this.traverse(function (mesh) {
+                tmpBBox.copy(mesh.geometry.boundingBox);
+                tmpBBox.applyTransform(mesh.worldTransform);
+                out.union(tmpBBox);
+            }, this, defaultFilter);
+            
             return out;
         };
     })(),
