@@ -87,8 +87,8 @@ module.exports = {
         if (fixture.width !== actual.width || fixture.height !== actual.height) {
             return fixture.width * fixture.height;
         }
-        const rgbaDelta = options.rgbaDelta || 2;
-        const diffRatio = options.diffRatio || 0.01;
+        const rgbaDelta = options.rgbaDelta || 6; // default rgba delta is 5
+        const diffRatio = options.diffRatio || 0.01; //default diff ratio is 1% 
         const w = fixture.width, h = fixture.height;
         const canvas1 = document.createElement('canvas');
         const canvas2 = document.createElement('canvas');
@@ -112,6 +112,7 @@ module.exports = {
             for (let ii = 0; ii < 4; ii++) {
                 const d = Math.abs(data1[i + ii] - data2[i + ii]);
                 if (d > rgbaDelta) {
+                    // console.log(Math.floor(i / 4), data1.slice(i, i + 4).join(' '), data2.slice(i, i + 4).join(' '));
                     diffCount += d;
                     break;
                 }                
