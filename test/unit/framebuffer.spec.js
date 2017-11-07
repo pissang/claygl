@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { util, helper } = require('./common/');
-const qtek = require('../dist/qtek');
+const { util, helper } = require('./../common/');
+const qtek = require('../../dist/qtek');
 
 describe('FrameBuffer.Spec', function () {
     it('constructor', function () {
@@ -52,9 +52,9 @@ describe('FrameBuffer.Spec', function () {
         //default attach
         frameBuffer.attach(texture);
 
-        frameBuffer.bind(renderer);        
+        frameBuffer.bind(renderer);
 
-        assert(frameBuffer.checkStatus(gl) === gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
+        assert(frameBuffer.checkStatus(gl) === gl.FRAMEBUFFER_COMPLETE, frameBuffer.checkStatus(gl));
         assert(renderer.__currentFrameBuffer === frameBuffer);
         assert(frameBuffer.getTextureWidth() === texture.width);
         assert(frameBuffer.getTextureHeight() === texture.height);

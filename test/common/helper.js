@@ -10,11 +10,15 @@ module.exports = {
      */
     createQtekScene(options = {}) {
         const size = options.size || [200, 200];
-        const canvas = util.createHeadlessCanvas(size[0], size[1]);
+        const canvas = document.createElement('canvas');
+        canvas.width = size[0];
+        canvas.height = size[1];
         const renderer = new qtek.Renderer({
-            canvas : canvas
+            canvas : canvas,
+            //disable antialias to avoid pixel shift on different OS
+            antialias : false
         });
-        
+        canvas.gl = renderer.gl;
         renderer.resize(canvas.width, canvas.height);
         const scene = new qtek.Scene();
         const camera = new qtek.camera.Perspective({

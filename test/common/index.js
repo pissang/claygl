@@ -1,4 +1,3 @@
-require('./mock');
 const util = require('./util');
 const helper = require('./helper');
 

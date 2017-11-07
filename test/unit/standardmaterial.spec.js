@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { util, helper } = require('./common/');
-const qtek = require('../dist/qtek');
+const { util, helper } = require('./../common/');
+const qtek = require('../../dist/qtek');
 
 describe('StandardMaterial.Spec', function () {
     it('constructor', function () {
