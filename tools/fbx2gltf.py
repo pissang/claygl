@@ -371,7 +371,12 @@ def CreateTexture(pProperty):
                 lFileTextures.append(lTexture)
 
     for lTexture in lFileTextures:
-        lImageIdx = CreateImage(lTexture.GetFileName())
+        try:
+            lTextureFileName = lTexture.GetFileName()
+        except UnicodeDecodeError:
+            print('Get texture file name error.')
+            continue
+        lImageIdx = CreateImage(lTextureFileName)
         lSamplerIdx = CreateSampler(lTexture)
         lHashKey = (lImageIdx, lSamplerIdx)
         if lHashKey in _textureHashMap:
