@@ -1299,7 +1299,6 @@ def Convert(
                 'generator': 'qtek fbx2gltf',
                 'version': '2.0'
             },
-            'extensionsUsed': ['KHR_materials_common'],
             'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,
