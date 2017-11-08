@@ -620,7 +620,7 @@ function () {
             metalness: metallicRoughnessMatInfo.metallicFactor || 0,
             roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
-            alphaCutoff: materialInfo.alphaCutoff == null ? 0.9 : materialInfo.alphaCutoff
+            alphaCutoff: materialInfo.alphaCutoff || 0
         };
         if (commonProperties.roughnessMap) {
             // In glTF metallicFactor will do multiply, which is different from StandardMaterial.
@@ -754,11 +754,11 @@ function () {
             if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
                 lib.materials[idx] = this._KHRCommonMaterialToStandard(materialInfo, lib);
             }
-            else if (materialInfo.pbrMetallicRoughness) {
-                lib.materials[idx] = this._pbrMetallicRoughnessToStandard(materialInfo, materialInfo.pbrMetallicRoughness, lib);
-            }
             else if (materialInfo.extensions && materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']) {
                 lib.materials[idx] = this._pbrSpecularGlossinessToStandard(materialInfo, materialInfo.extensions['KHR_materials_pbrSpecularGlossiness'], lib);
+            }
+            else {
+                lib.materials[idx] = this._pbrMetallicRoughnessToStandard(materialInfo, materialInfo.pbrMetallicRoughness || {}, lib);
             }
         }, this);
     },
