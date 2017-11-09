@@ -294,7 +294,7 @@ function () {
 
             // Only support one scene.
             if (json.scenes) {
-                var sceneInfo = json.scenes[json.scene];
+                var sceneInfo = json.scenes[json.scene || 0]; // Default use the first scene.
                 if (sceneInfo) {
                     for (var i = 0; i < sceneInfo.nodes.length; i++) {
                         var node = lib.nodes[sceneInfo.nodes[i]];
@@ -843,13 +843,15 @@ function () {
                 }
 
                 // Parse indices
-                geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
-                if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
-                    geometry.indices = new vendor.Uint16Array(geometry.indices);
+                if (primitiveInfo.indices != null) {
+                    geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
+                    if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
+                        geometry.indices = new vendor.Uint16Array(geometry.indices);
+                    }   
                 }
 
                 var material = lib.materials[primitiveInfo.material];
-                var materialInfo = json.materials[primitiveInfo.material];
+                var materialInfo = (json.materials || [])[primitiveInfo.material];
                 // Use default material
                 if (!material) {
                     material = new Material({
@@ -859,10 +861,12 @@ function () {
                 var mesh = new Mesh({
                     geometry: geometry,
                     material: material,
-                    culling: !materialInfo.doubleSided,
                     mode: [Mesh.POINTS, Mesh.LINES, Mesh.LINE_LOOP, Mesh.LINE_STRIP, Mesh.TRIANGLES, Mesh.TRIANGLE_STRIP, Mesh.TRIANGLE_FAN][primitiveInfo.mode] || Mesh.TRIANGLES,
                     ignoreGBuffer: material.transparent
                 });
+                if (materialInfo != null) {
+                    mesh.culling = !materialInfo.doubleSided;
+                }
                 if (((material instanceof StandardMaterial) && material.normalMap)
                     || (material.shader && material.shader.isTextureEnabled('normalMap'))
                 ) {
