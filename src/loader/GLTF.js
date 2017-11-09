@@ -601,19 +601,19 @@ function () {
             // TODO texCoord
         if (metallicRoughnessMatInfo.baseColorTexture) {
             diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index] || null;
-            enabledTextures.push('diffuseMap');
+            diffuseMap && enabledTextures.push('diffuseMap');
         }
         if (metallicRoughnessMatInfo.metallicRoughnessTexture) {
             roughnessMap = metalnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index] || null;
-            enabledTextures.push('metalnessMap', 'roughnessMap');
+            roughnessMap && enabledTextures.push('metalnessMap', 'roughnessMap');
         }
         if (materialInfo.normalTexture) {
             normalMap = lib.textures[materialInfo.normalTexture.index] || null;
-            enabledTextures.push('normalMap');
+            normalMap && enabledTextures.push('normalMap');
         }
         if (materialInfo.emissiveTexture) {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
-            enabledTextures.push('emissiveMap');
+            emissiveMap && enabledTextures.push('emissiveMap');
         }
         var baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
@@ -692,19 +692,19 @@ function () {
             // TODO texCoord
         if (specularGlossinessMatInfo.diffuseTexture) {
             diffuseMap = lib.textures[specularGlossinessMatInfo.diffuseTexture.index] || null;
-            enabledTextures.push('diffuseMap');
+            diffuseMap && enabledTextures.push('diffuseMap');
         }
         if (specularGlossinessMatInfo.specularGlossinessTexture) {
             glossinessMap = specularMap = lib.textures[specularGlossinessMatInfo.specularGlossinessTexture.index] || null;
-            enabledTextures.push('specularMap', 'glossinessMap');
+            glossinessMap && enabledTextures.push('specularMap', 'glossinessMap');
         }
         if (materialInfo.normalTexture) {
             normalMap = lib.textures[materialInfo.normalTexture.index] || null;
-            enabledTextures.push('normalMap');
+            normalMap && enabledTextures.push('normalMap');
         }
         if (materialInfo.emissiveTexture) {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
-            enabledTextures.push('emissiveMap');
+            emissiveMap && enabledTextures.push('emissiveMap');
         }
         var diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
