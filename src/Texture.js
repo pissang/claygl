@@ -148,20 +148,20 @@ var Texture = Base.extend(
     },
 
     getAvailableWrapS: function () {
-        if (!this.NPOT) {
+        if (this.NPOT) {
             return glenum.CLAMP_TO_EDGE;
         }
         return this.wrapS;
     },
     getAvailableWrapT: function () {
-        if (!this.NPOT) {
+        if (this.NPOT) {
             return glenum.CLAMP_TO_EDGE;
         }
         return this.wrapT;
     },
     getAvailableMinFilter: function () {
         var minFilter = this.minFilter;
-        if (!this.NPOT || !this.useMipmap) {
+        if (this.NPOT || !this.useMipmap) {
             if (minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
                 minFilter == glenum.NEAREST_MIPMAP_LINEAR
             ) {
