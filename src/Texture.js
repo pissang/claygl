@@ -144,7 +144,7 @@ var Texture = Base.extend(
             this.format = Texture.RGBA;
         }
 
-        this.NPOT = this.isPowerOfTwo();
+        this.NPOT = !this.isPowerOfTwo();
     },
 
     getAvailableWrapS: function () {
