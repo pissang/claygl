@@ -849,6 +849,7 @@ function () {
                 }
 
                 var material = lib.materials[primitiveInfo.material];
+                var materialInfo = json.materials[primitiveInfo.material];
                 // Use default material
                 if (!material) {
                     material = new Material({
@@ -858,6 +859,7 @@ function () {
                 var mesh = new Mesh({
                     geometry: geometry,
                     material: material,
+                    culling: !materialInfo.doubleSided,
                     mode: [Mesh.POINTS, Mesh.LINES, Mesh.LINE_LOOP, Mesh.LINE_STRIP, Mesh.TRIANGLES, Mesh.TRIANGLE_STRIP, Mesh.TRIANGLE_FAN][primitiveInfo.mode] || Mesh.TRIANGLES,
                     ignoreGBuffer: material.transparent
                 });
@@ -910,6 +912,7 @@ function () {
                 name: mesh.name,
                 geometry: mesh.geometry,
                 material: mesh.material,
+                culling: mesh.culling,
                 mode: mesh.mode
             });
         }
