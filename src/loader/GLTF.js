@@ -269,6 +269,14 @@ function () {
         }
 
         function afterLoadBuffer(immediately) {
+            // Buffer not load complete.
+            if (lib.buffers.length !== json.buffers.length) {
+                setTimeout(function () {
+                    self.trigger('error', 'Buffer not load complete.');
+                });
+                return;
+            }
+
             json.bufferViews.forEach(function (bufferViewInfo, idx) {
                 // PENDING Performance
                 lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer]
