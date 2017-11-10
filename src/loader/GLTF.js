@@ -22,6 +22,7 @@ import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
 import glenum from '../core/glenum';
+import glmatrix from '../dep/glmatrix';
 
 import BoundingBox from '../math/BoundingBox';
 
@@ -32,6 +33,8 @@ import StaticGeometry from '../StaticGeometry';
 
 // Import builtin shader
 import '../shader/builtin';
+
+var vec4 = glmatrix.vec4;
 
 var semanticAttributeMap = {
     'NORMAL': 'normal',
@@ -805,9 +808,12 @@ function () {
                         // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
                         var weightArray = new attributeArray.constructor(attributeInfo.count * 3);
                         for (var i = 0; i < attributeInfo.count; i++) {
-                            weightArray[i * 3] = attributeArray[i * 4];
-                            weightArray[i * 3 + 1] = attributeArray[i * 4 + 1];
-                            weightArray[i * 3 + 2] = attributeArray[i * 4 + 2];
+                            var i4 = i * 4, i3 = i * 3;
+                            var w1 = attributeArray[i4], w2 = attributeArray[i4 + 1], w3 = attributeArray[i4 + 2], w4 = attributeArray[i4 + 3];
+                            var wSum = w1 + w2 + w3 + w4;
+                            weightArray[i3] = w1 / wSum;
+                            weightArray[i3 + 1] = w2 / wSum;
+                            weightArray[i3 + 2] = w3 / wSum;
                         }
                         geometry.attributes[attributeName].value = weightArray;
                     }
