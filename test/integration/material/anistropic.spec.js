@@ -15,7 +15,7 @@ describe('Integration.Anistropic.Spec', function () {
         camera.far = 500;
 
         const texture = qtek.util.texture.loadTexture(
-            path.join(__dirname, 'textures', 'ground_tile.jpg'),
+            path.join(__dirname, 'textures', 'anistropic', 'ground_tile.jpg'),
             function () {                
                 texture.wrapS = qtek.Texture.REPEAT;
                 texture.wrapT = qtek.Texture.REPEAT;
