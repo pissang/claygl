@@ -547,9 +547,11 @@ var Node = Base.extend(
             filter = filter || defaultFilter;
             
             this.traverse(function (mesh) {
-                tmpBBox.copy(mesh.geometry.boundingBox);
-                tmpBBox.applyTransform(mesh.worldTransform);
-                out.union(tmpBBox);
+                if (mesh.geometry && mesh.geometry.boundingBox) {
+                    tmpBBox.copy(mesh.geometry.boundingBox);
+                    tmpBBox.applyTransform(mesh.worldTransform);
+                    out.union(tmpBBox);
+                }
             }, this, defaultFilter);
             
             return out;

@@ -22,6 +22,7 @@ import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
 import glenum from '../core/glenum';
+import glmatrix from '../dep/glmatrix';
 
 import BoundingBox from '../math/BoundingBox';
 
@@ -32,6 +33,8 @@ import StaticGeometry from '../StaticGeometry';
 
 // Import builtin shader
 import '../shader/builtin';
+
+var vec4 = glmatrix.vec4;
 
 var semanticAttributeMap = {
     'NORMAL': 'normal',
@@ -269,6 +272,14 @@ function () {
         }
 
         function afterLoadBuffer(immediately) {
+            // Buffer not load complete.
+            if (lib.buffers.length !== json.buffers.length) {
+                setTimeout(function () {
+                    self.trigger('error', 'Buffer not load complete.');
+                });
+                return;
+            }
+
             json.bufferViews.forEach(function (bufferViewInfo, idx) {
                 // PENDING Performance
                 lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer]
@@ -286,7 +297,7 @@ function () {
 
             // Only support one scene.
             if (json.scenes) {
-                var sceneInfo = json.scenes[json.scene];
+                var sceneInfo = json.scenes[json.scene || 0]; // Default use the first scene.
                 if (sceneInfo) {
                     for (var i = 0; i < sceneInfo.nodes.length; i++) {
                         var node = lib.nodes[sceneInfo.nodes[i]];
@@ -593,19 +604,19 @@ function () {
             // TODO texCoord
         if (metallicRoughnessMatInfo.baseColorTexture) {
             diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index] || null;
-            enabledTextures.push('diffuseMap');
+            diffuseMap && enabledTextures.push('diffuseMap');
         }
         if (metallicRoughnessMatInfo.metallicRoughnessTexture) {
             roughnessMap = metalnessMap = lib.textures[metallicRoughnessMatInfo.metallicRoughnessTexture.index] || null;
-            enabledTextures.push('metalnessMap', 'roughnessMap');
+            roughnessMap && enabledTextures.push('metalnessMap', 'roughnessMap');
         }
         if (materialInfo.normalTexture) {
             normalMap = lib.textures[materialInfo.normalTexture.index] || null;
-            enabledTextures.push('normalMap');
+            normalMap && enabledTextures.push('normalMap');
         }
         if (materialInfo.emissiveTexture) {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
-            enabledTextures.push('emissiveMap');
+            emissiveMap && enabledTextures.push('emissiveMap');
         }
         var baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
@@ -620,7 +631,7 @@ function () {
             metalness: metallicRoughnessMatInfo.metallicFactor || 0,
             roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
-            alphaCutoff: materialInfo.alphaCutoff == null ? 0.9 : materialInfo.alphaCutoff
+            alphaCutoff: materialInfo.alphaCutoff || 0
         };
         if (commonProperties.roughnessMap) {
             // In glTF metallicFactor will do multiply, which is different from StandardMaterial.
@@ -684,19 +695,19 @@ function () {
             // TODO texCoord
         if (specularGlossinessMatInfo.diffuseTexture) {
             diffuseMap = lib.textures[specularGlossinessMatInfo.diffuseTexture.index] || null;
-            enabledTextures.push('diffuseMap');
+            diffuseMap && enabledTextures.push('diffuseMap');
         }
         if (specularGlossinessMatInfo.specularGlossinessTexture) {
             glossinessMap = specularMap = lib.textures[specularGlossinessMatInfo.specularGlossinessTexture.index] || null;
-            enabledTextures.push('specularMap', 'glossinessMap');
+            glossinessMap && enabledTextures.push('specularMap', 'glossinessMap');
         }
         if (materialInfo.normalTexture) {
             normalMap = lib.textures[materialInfo.normalTexture.index] || null;
-            enabledTextures.push('normalMap');
+            normalMap && enabledTextures.push('normalMap');
         }
         if (materialInfo.emissiveTexture) {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
-            enabledTextures.push('emissiveMap');
+            emissiveMap && enabledTextures.push('emissiveMap');
         }
         var diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
@@ -754,11 +765,11 @@ function () {
             if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
                 lib.materials[idx] = this._KHRCommonMaterialToStandard(materialInfo, lib);
             }
-            else if (materialInfo.pbrMetallicRoughness) {
-                lib.materials[idx] = this._pbrMetallicRoughnessToStandard(materialInfo, materialInfo.pbrMetallicRoughness, lib);
-            }
             else if (materialInfo.extensions && materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']) {
                 lib.materials[idx] = this._pbrSpecularGlossinessToStandard(materialInfo, materialInfo.extensions['KHR_materials_pbrSpecularGlossiness'], lib);
+            }
+            else {
+                lib.materials[idx] = this._pbrMetallicRoughnessToStandard(materialInfo, materialInfo.pbrMetallicRoughness || {}, lib);
             }
         }, this);
     },
@@ -797,9 +808,12 @@ function () {
                         // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
                         var weightArray = new attributeArray.constructor(attributeInfo.count * 3);
                         for (var i = 0; i < attributeInfo.count; i++) {
-                            weightArray[i * 3] = attributeArray[i * 4];
-                            weightArray[i * 3 + 1] = attributeArray[i * 4 + 1];
-                            weightArray[i * 3 + 2] = attributeArray[i * 4 + 2];
+                            var i4 = i * 4, i3 = i * 3;
+                            var w1 = attributeArray[i4], w2 = attributeArray[i4 + 1], w3 = attributeArray[i4 + 2], w4 = attributeArray[i4 + 3];
+                            var wSum = w1 + w2 + w3 + w4;
+                            weightArray[i3] = w1 / wSum;
+                            weightArray[i3 + 1] = w2 / wSum;
+                            weightArray[i3 + 2] = w3 / wSum;
                         }
                         geometry.attributes[attributeName].value = weightArray;
                     }
@@ -835,12 +849,15 @@ function () {
                 }
 
                 // Parse indices
-                geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
-                if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
-                    geometry.indices = new vendor.Uint16Array(geometry.indices);
+                if (primitiveInfo.indices != null) {
+                    geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
+                    if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
+                        geometry.indices = new vendor.Uint16Array(geometry.indices);
+                    }   
                 }
 
                 var material = lib.materials[primitiveInfo.material];
+                var materialInfo = (json.materials || [])[primitiveInfo.material];
                 // Use default material
                 if (!material) {
                     material = new Material({
@@ -853,6 +870,9 @@ function () {
                     mode: [Mesh.POINTS, Mesh.LINES, Mesh.LINE_LOOP, Mesh.LINE_STRIP, Mesh.TRIANGLES, Mesh.TRIANGLE_STRIP, Mesh.TRIANGLE_FAN][primitiveInfo.mode] || Mesh.TRIANGLES,
                     ignoreGBuffer: material.transparent
                 });
+                if (materialInfo != null) {
+                    mesh.culling = !materialInfo.doubleSided;
+                }
                 if (((material instanceof StandardMaterial) && material.normalMap)
                     || (material.shader && material.shader.isTextureEnabled('normalMap'))
                 ) {
@@ -902,6 +922,7 @@ function () {
                 name: mesh.name,
                 geometry: mesh.geometry,
                 material: mesh.material,
+                culling: mesh.culling,
                 mode: mesh.mode
             });
         }

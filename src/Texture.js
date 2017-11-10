@@ -129,15 +129,8 @@ var Texture = Base.extend(
         _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
         _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
 
-        this._fallBack(renderer);
-    },
-
-    _fallBack: function (renderer) {
         // Use of none-power of two texture
         // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-
-        var isPowerOfTwo = this.isPowerOfTwo();
-
         if (this.format === glenum.DEPTH_COMPONENT) {
             this.useMipmap = false;
         }
@@ -151,44 +144,44 @@ var Texture = Base.extend(
             this.format = Texture.RGBA;
         }
 
-        if (!isPowerOfTwo || !this.useMipmap) {
-            // none-power of two flag
-            this.NPOT = true;
-            // Save the original value for restore
-            this._minFilterOriginal = this.minFilter;
-            this._magFilterOriginal = this.magFilter;
-            this._wrapSOriginal = this.wrapS;
-            this._wrapTOriginal = this.wrapT;
+        this.NPOT = !this.isPowerOfTwo();
+    },
 
-            if (this.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
-                this.minFilter == glenum.NEAREST_MIPMAP_LINEAR) {
-                this.minFilter = glenum.NEAREST;
-            } else if (
-                this.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
-                this.minFilter == glenum.LINEAR_MIPMAP_NEAREST
+    getAvailableWrapS: function () {
+        if (this.NPOT) {
+            return glenum.CLAMP_TO_EDGE;
+        }
+        return this.wrapS;
+    },
+    getAvailableWrapT: function () {
+        if (this.NPOT) {
+            return glenum.CLAMP_TO_EDGE;
+        }
+        return this.wrapT;
+    },
+    getAvailableMinFilter: function () {
+        var minFilter = this.minFilter;
+        if (this.NPOT || !this.useMipmap) {
+            if (minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
+                minFilter == glenum.NEAREST_MIPMAP_LINEAR
             ) {
-                this.minFilter = glenum.LINEAR;
+                return glenum.NEAREST;
             }
-
-            this.wrapS = glenum.CLAMP_TO_EDGE;
-            this.wrapT = glenum.CLAMP_TO_EDGE;
+            else if (minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
+                minFilter == glenum.LINEAR_MIPMAP_NEAREST
+            ) {
+                return glenum.LINEAR;
+            }
+            else {
+                return minFilter;
+            }
         }
         else {
-            this.NPOT = false;
-            if (this._minFilterOriginal) {
-                this.minFilter = this._minFilterOriginal;
-            }
-            if (this._magFilterOriginal) {
-                this.magFilter = this._magFilterOriginal;
-            }
-            if (this._wrapSOriginal) {
-                this.wrapS = this._wrapSOriginal;
-            }
-            if (this._wrapTOriginal) {
-                this.wrapT = this._wrapTOriginal;
-            }
+            return minFilter;
         }
-
+    },
+    getAvailableMagFilter: function () {
+        return this.magFilter;
     },
 
     nextHighestPowerOfTwo: function (x) {

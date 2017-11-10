@@ -15,13 +15,19 @@ function get(options) {
             if (e.lengthComputable) {
                 var percent = e.loaded / e.total;
                 options.onprogress(percent, e.loaded, e.total);
-            } else {
+            }
+            else {
                 options.onprogress(null);
             }
         };
     }
     xhr.onload = function(e) {
-        options.onload && options.onload(xhr.response);
+        if (xhr.status >= 400) {
+            options.onerror && options.onerror();
+        }
+        else {
+            options.onload && options.onload(xhr.response);
+        }
     };
     if (options.onerror) {
         xhr.onerror = options.onerror;

@@ -57,11 +57,11 @@ var Texture2D = Texture.extend(function () {
         var glFormat = this.format;
         var glType = this.type;
 
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, this.wrapS);
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, this.wrapT);
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
 
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.magFilter);
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.minFilter);
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
 
         var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
         if (anisotropicExt && this.anisotropic > 1) {

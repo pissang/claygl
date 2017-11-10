@@ -371,7 +371,12 @@ def CreateTexture(pProperty):
                 lFileTextures.append(lTexture)
 
     for lTexture in lFileTextures:
-        lImageIdx = CreateImage(lTexture.GetFileName())
+        try:
+            lTextureFileName = lTexture.GetFileName()
+        except UnicodeDecodeError:
+            print('Get texture file name error.')
+            continue
+        lImageIdx = CreateImage(lTextureFileName)
         lSamplerIdx = CreateSampler(lTexture)
         lHashKey = (lImageIdx, lSamplerIdx)
         if lHashKey in _textureHashMap:
@@ -1299,7 +1304,6 @@ def Convert(
                 'generator': 'qtek fbx2gltf',
                 'version': '2.0'
             },
-            'extensionsUsed': ['KHR_materials_common'],
             'accessors' : lib_accessors,
             'bufferViews' : lib_buffer_views,
             'buffers' : lib_buffers,

@@ -94,7 +94,8 @@ function fallBack(target) {
         ) {
             target.minFilter = glenum.LINEAR;
         }
-
+    }
+    if (!IPOT) {
         target.wrapS = glenum.CLAMP_TO_EDGE;
         target.wrapT = glenum.CLAMP_TO_EDGE;
     }
