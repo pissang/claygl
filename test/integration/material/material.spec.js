@@ -62,7 +62,7 @@ describe('Integration.Material.Spec', function () {
         }));
 
         
-        const promises = [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness']].map(mapInfo => {
+        const promises = [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'],  ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness']].map(mapInfo => {
             const tex = new qtek.Texture2D({
                 wrapS: qtek.Texture.REPEAT,
                 wratT: qtek.Texture.REPEAT
@@ -101,10 +101,8 @@ describe('Integration.Material.Spec', function () {
             const root = new qtek.Node();
             root.add(mesh);
             scene.add(root);
-            console.log('1');
             const drawInfo = renderer.render(scene, camera);
-            console.log('2');
-            util.assertWith(canvas, { fixture : path.join(__dirname, 'maps.png') }, done);
+            util.assertWith(canvas, { fixture : path.join(__dirname, 'maps.png'), diffOptions : { diffRatio : 0.1 } }, done);
         });
     });
 });

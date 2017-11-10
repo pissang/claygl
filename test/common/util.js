@@ -119,6 +119,7 @@ module.exports = {
             }
         }
         if (diffCount / (w * h) > diffRatio) {
+            // console.log('diff count', diffCount);
             return diffCount;
         }
         return blank;
