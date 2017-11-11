@@ -873,6 +873,9 @@ function () {
                 if (materialInfo != null) {
                     mesh.culling = !materialInfo.doubleSided;
                 }
+                if (!mesh.geometry.attributes.normal.value) {
+                    mesh.geometry.generateVertexNormals();
+                }
                 if (((material instanceof StandardMaterial) && material.normalMap)
                     || (material.shader && material.shader.isTextureEnabled('normalMap'))
                 ) {
