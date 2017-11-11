@@ -322,11 +322,19 @@ var StaticGeometry = Geometry.extend(function () {
 
         var n = vec3Create();
 
-        // TODO if no indices
-        for (var f = 0; f < indices.length;) {
-            var i1 = indices[f++];
-            var i2 = indices[f++];
-            var i3 = indices[f++];
+        var len = indices ? indices.length : this.vertexCount;
+        var i1, i2, i3;
+        for (var f = 0; f < len;) {
+            if (indices) {
+                i1 = indices[f++];
+                i2 = indices[f++];
+                i3 = indices[f++];
+            }
+            else {
+                i1 = f++;
+                i2 = f++;
+                i3 = f++;
+            }
 
             vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
             vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
@@ -378,10 +386,19 @@ var StaticGeometry = Geometry.extend(function () {
         if (!normals) {
             normals = attributes.normal.value = new Float32Array(positions.length);
         }
-        for (var f = 0; f < indices.length;) {
-            var i1 = indices[f++];
-            var i2 = indices[f++];
-            var i3 = indices[f++];
+        var len = indices ? indices.length : this.vertexCount;
+        var i1, i2, i3;
+        for (var f = 0; f < len;) {
+            if (indices) {
+                i1 = indices[f++];
+                i2 = indices[f++];
+                i3 = indices[f++];
+            }
+            else {
+                i1 = f++;
+                i2 = f++;
+                i3 = f++;
+            }
 
             vec3Set(p1, positions[i1*3], positions[i1*3+1], positions[i1*3+2]);
             vec3Set(p2, positions[i2*3], positions[i2*3+1], positions[i2*3+2]);
@@ -432,12 +449,22 @@ var StaticGeometry = Geometry.extend(function () {
         var sdir = [0.0, 0.0, 0.0];
         var tdir = [0.0, 0.0, 0.0];
         var indices = this.indices;
-        for (var i = 0; i < indices.length;) {
-            var i1 = indices[i++],
-                i2 = indices[i++],
-                i3 = indices[i++],
 
-                st1s = texcoords[i1 * 2],
+        var len = indices ? indices.length : this.vertexCount;
+        var i1, i2, i3;
+        for (var i = 0; i < len;) {
+            if (indices) {
+                i1 = indices[i++];
+                i2 = indices[i++];
+                i3 = indices[i++];
+            }
+            else {
+                i1 = i++;
+                i2 = i++;
+                i3 = i++;
+            }
+
+            var st1s = texcoords[i1 * 2],
                 st2s = texcoords[i2 * 2],
                 st3s = texcoords[i3 * 2],
                 st1t = texcoords[i1 * 2 + 1],
@@ -516,7 +543,7 @@ var StaticGeometry = Geometry.extend(function () {
     },
 
     generateUniqueVertex: function () {
-        if (!this.vertexCount) {
+        if (!this.vertexCount || !this.indices) {
             return;
         }
 
@@ -572,9 +599,10 @@ var StaticGeometry = Geometry.extend(function () {
             return;
         }
         array = attributes.barycentric.value = new Float32Array(indices.length * 3);
-        for (var i = 0; i < indices.length;) {
+        
+        for (var i = 0; i < (indices ? indices.length : this.vertexCount / 3);) {
             for (var j = 0; j < 3; j++) {
-                var ii = indices[i++];
+                var ii = indices ? indices[i++] : (i * 3 + j);
                 array[ii * 3 + j] = 1;
             }
         }
