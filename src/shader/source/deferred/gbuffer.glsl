@@ -23,11 +23,11 @@ varying vec3 v_Normal;
 attribute vec4 tangent : TANGENT;
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
+varying vec3 v_WorldPosition;
 #endif
 
 
 varying vec2 v_Texcoord;
-varying vec4 v_ProjPos;
 
 void main()
 {
@@ -66,9 +66,8 @@ void main()
         v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
         v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
     }
+    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 #endif
-
-    v_ProjPos = gl_Position;
 }
 
 
@@ -76,6 +75,8 @@ void main()
 
 
 @export qtek.deferred.gbuffer1.fragment
+
+uniform mat4 viewInverse : VIEWINVERSE;
 
 // First pass
 // - R: normal.x
@@ -86,6 +87,7 @@ uniform float glossiness;
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
 
 uniform sampler2D normalMap;
 varying vec3 v_Tangent;
@@ -95,10 +97,9 @@ uniform sampler2D roughGlossMap;
 
 uniform bool useRoughGlossMap;
 uniform bool useRoughness;
+uniform bool doubleSided;
 
 uniform int roughGlossChannel: 0;
-
-varying vec4 v_ProjPos;
 
 float indexingTexel(in vec4 texel, in int idx) {
     if (idx == 3) return texel.a;
@@ -110,6 +111,14 @@ float indexingTexel(in vec4 texel, in int idx) {
 void main()
 {
     vec3 N = v_Normal;
+
+    if (doubleSided) {
+        vec3 eyePos = viewInverse[3].xyz;
+        vec3 V = eyePos - v_WorldPosition;
+        if (dot(N, V) < 0.0) {
+            N = -N;
+        }
+    }
 
     if (dot(v_Tangent, v_Tangent) > 0.0) {
         vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;

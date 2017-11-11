@@ -58,6 +58,7 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
         var glossiness;
         var roughGlossMap;
         var useRoughnessWorkflow = standardMaterial.shader.isDefined('fragment', 'USE_ROUGHNESS');
+        var doubleSided = standardMaterial.shader.isDefined('fragment', 'DOUBLE_SIDED');
         var roughGlossChannel;
         if (useRoughnessWorkflow) {
             glossiness = 1.0 - standardMaterial.get('roughness');
@@ -83,6 +84,7 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
             gBufferMat.set('roughGlossMap', roughGlossMap);
             gBufferMat.set('useRoughGlossMap', +useRoughGlossMap);
             gBufferMat.set('useRoughness', +useRoughnessWorkflow);
+            gBufferMat.set('doubleSided', +doubleSided);
             gBufferMat.set('roughGlossChannel', +roughGlossChannel || 0);
             gBufferMat.set('uvRepeat', uvRepeat);
             gBufferMat.set('uvOffset', uvOffset);
@@ -100,6 +102,7 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
             }
             gBufferMat.shader.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
             gBufferMat.shader.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
+            gBufferMat.shader.setUniform(gl, '1i', 'doubleSided', +doubleSided);
             gBufferMat.shader.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
             if (uvRepeat != null) {
                 gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
