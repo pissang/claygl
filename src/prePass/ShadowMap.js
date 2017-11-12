@@ -350,7 +350,9 @@ var ShadowMapPass = Base.extend(function () {
         if (!notUpdateScene) {
             scene.update();
         }
-        sceneCamera.update();
+        if (sceneCamera) {
+            sceneCamera.update();   
+        }
 
         this._update(renderer, scene);
 

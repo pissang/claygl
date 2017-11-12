@@ -22,7 +22,6 @@ import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
 import glenum from '../core/glenum';
-import glmatrix from '../dep/glmatrix';
 
 import BoundingBox from '../math/BoundingBox';
 
@@ -33,8 +32,6 @@ import StaticGeometry from '../StaticGeometry';
 
 // Import builtin shader
 import '../shader/builtin';
-
-var vec4 = glmatrix.vec4;
 
 var semanticAttributeMap = {
     'NORMAL': 'normal',
@@ -189,6 +186,7 @@ function () {
      */
     load: function (url) {
         var self = this;
+        var isBinary = url.endsWith('.glb');
 
         if (this.rootPath == null) {
             this.rootPath = url.slice(0, url.lastIndexOf('/'));
@@ -202,11 +200,70 @@ function () {
             onerror: function (e) {
                 self.trigger('error', e);
             },
-            responseType: 'text',
+            responseType: isBinary ? 'arraybuffer' : 'text',
             onload: function (data) {
-                self.parse(JSON.parse(data));
+                if (isBinary) {
+                    self.parseGLB(data);
+                }
+                else {
+                    self.parse(JSON.parse(data));
+                }
             }
         });
+    },
+
+    /**
+     * Parse glTF binary
+     * @param {ArrayBuffer} buffer
+     */
+    parseGLB: function (buffer) {
+        var header = new Uint32Array(buffer, 0, 4);
+        if (header[0] !== 0x46546C67) {
+            this.trigger('error', 'Invalid glTF binary format: Invalid header');
+            return;
+        }
+        if (header[0] < 2) {
+            this.trigger('error', 'Only glTF2.0 is supported.');
+            return;
+        }
+        
+        var dataView = new DataView(buffer, 12);
+        
+        var json;
+        var buffers = [];
+        // Read chunks
+        for (var i = 0; i < dataView.byteLength;) {
+            var chunkLength = dataView.getUint32(i, true);
+            i += 4;
+            var chunkType = dataView.getUint32(i, true);
+            i += 4;
+
+            // json
+            if (chunkType === 0x4E4F534A) {
+                var arr = new Uint8Array(buffer, i + 12, chunkLength);
+                // TODO, for the browser not support TextDecoder.
+                var decoder = new TextDecoder();
+                var str = decoder.decode(arr);
+                try {
+                    json = JSON.parse(str);
+                }
+                catch (e) {
+                    this.trigger('error', 'JSON Parse error:' + e.toString());
+                    return;
+                }
+            }
+            else if (chunkType === 0x004E4942) {
+                buffers.push(buffer.slice(i + 12, i + 12 + chunkLength));
+            }
+
+            i += chunkLength;
+        }
+        if (!json) {
+            this.trigger('error', 'Invalid glTF binary format: Can\'t find JSON.');
+            return;
+        }
+
+        return this.parse(json, buffers);
     },
 
     /**
@@ -479,8 +536,19 @@ function () {
             if (target === glenum.TEXTURE_2D) {
                 var texture = new Texture2D(parameters);
                 var imageInfo = json.images[textureInfo.source];
-                texture.load(this.resolveTexturePath(imageInfo.uri), this.crossOrigin);
-                lib.textures[idx] = texture;
+                var uri;
+                if (imageInfo.uri) {
+                    uri = this.resolveTexturePath(imageInfo.uri);
+                }
+                else if (imageInfo.bufferView != null) {
+                    uri = URL.createObjectURL(new Blob([lib.bufferViews[imageInfo.bufferView]], {
+                        type: imageInfo.mimeType
+                    }));
+                }
+                if (uri) {
+                    texture.load(uri, this.crossOrigin);
+                    lib.textures[idx] = texture;
+                }
             }
         }, this);
     },

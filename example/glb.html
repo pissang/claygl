@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <title>GLTF2.0 Loader</title>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="lib/require.js"></script>
+        <link rel="stylesheet" href="./css/common.css">
+    </head>
+    <body>
+        <canvas id="main"></canvas>
+    
+        <script type="text/javascript">
+            require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
+                var renderer = new qtek.Renderer({
+                    canvas: document.getElementById('main')
+                });
+                renderer.resize(window.innerWidth, window.innerHeight);
+                var animation = new qtek.animation.Animation();
+                animation.start();
+    
+                var cubemap = new qtek.TextureCube({
+                    type: qtek.Texture.HALF_FLOAT,
+                    width: 128,
+                    height: 128
+                });
+                qtek.util.texture.loadPanorama(
+                    renderer,
+                    'assets/textures/hdr/pisa.hdr',
+                    cubemap,
+                    { exposure: 1 },
+                    function () {
+    
+                        var ambientCubemapLight = new qtek.light.AmbientCubemap({
+                            cubemap: cubemap,
+                            intensity: 1
+                        });
+                        ambientCubemapLight.prefilter(renderer);
+                        var ambientSHLight = new qtek.light.AmbientSH({
+                            coefficients: [0.8450393676757812, 0.7135089635848999, 0.6934053897857666, 0.02310405671596527, 0.17135757207870483, 0.28332242369651794, 0.343019962310791, 0.2880895435810089, 0.2998031973838806, 0.08001846075057983, 0.10719859600067139, 0.12824314832687378, 0.003927173092961311, 0.04206192493438721, 0.06470289081335068, 0.036095526069402695, 0.04928380250930786, 0.058642253279685974, -0.009344635531306267, 0.06963406503200531, 0.1312279999256134, -0.05935414880514145, -0.04865729808807373, -0.060036804527044296, 0.04625355824828148, 0.0563165508210659, 0.050963230431079865],
+                            intensity: 0.
+                        });
+    
+                        var loader = new qtek.loader.GLTF({
+                            rootNode: new qtek.Node()
+                        });
+                        loader.load("assets/models/gltf2/BoomBox/BoomBox.glb");
+    
+                        loader.on('success', function (res) {
+                            var scene = new qtek.Scene();
+                            scene.add(loader.rootNode);
+                            loader.rootNode.scale.set(100, 100, 100);
+                            var camera = new qtek.camera.Perspective({
+                                aspect: renderer.getViewportAspect()
+                            });
+                            camera.position.y = 2;
+                            camera.position.z = 4;
+                            camera.lookAt(scene.position);
+    
+                            scene.traverse(function (node) {
+                                if (node.material) {
+                                    node.material.shader.define('fragment', 'RGBM');
+                                    node.material.shader.define('fragment', 'SRGB_DECODE');
+                                }
+                            });
+    
+                            var control = new qtek.plugin.OrbitControl({
+                                target: camera,
+                                domElement: renderer.canvas,
+                                sensitivity: 0.4
+                            });
+    
+                            var light = new qtek.light.Directional({
+                                intensity: 3,
+                                shadowResolution: 1024
+                            });
+                            light.position.set(10, 10, -5);
+                            light.lookAt(scene.position);
+                            scene.add(light);
+    
+                            var compositor = createCompositor({
+                                scene: scene,
+                                camera: camera,
+                                enableBloom: true
+                            });
+    
+                            scene.add(ambientCubemapLight);
+                            scene.add(ambientSHLight);
+    
+                            animation.on('frame', function(deltaTime) {
+                                control.update(deltaTime);
+                                compositor.render(renderer);
+                            });
+                        });
+                    }
+                );
+    
+            });
+        </script>
+    </body>
+    </html>

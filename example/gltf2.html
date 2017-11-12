@@ -43,18 +43,20 @@
                         intensity: 0.
                     });
 
-                    var loader = new qtek.loader.GLTF();
+                    var loader = new qtek.loader.GLTF({
+                        rootNode: new qtek.Node()
+                    });
                     loader.load("assets/models/gltf2/BoomBox/BoomBox.gltf");
 
                     loader.on('success', function (res) {
-                        var scene = res.scene;
+                        var scene = new qtek.Scene();
+                        scene.add(loader.rootNode);
+                        loader.rootNode.scale.set(100, 100, 100);
                         var camera = new qtek.camera.Perspective({
-                            aspect: renderer.getViewportAspect(),
-                            far: 10,
-                            near: 0.001
+                            aspect: renderer.getViewportAspect()
                         });
-                        camera.position.y = 0.02;
-                        camera.position.z = 0.04;
+                        camera.position.y = 2;
+                        camera.position.z = 4;
                         camera.lookAt(scene.position);
 
                         scene.traverse(function (node) {
@@ -100,8 +102,8 @@
                                 })
                             }),
                         });
-                        plane.scale.set(0.1, 0.1, 1);
-                        plane.position.set(0, -0.01, 0);
+                        plane.scale.set(10, 10, 1);
+                        plane.position.set(0, -1, 0);
                         plane.rotation.rotateX(-Math.PI / 2);
                         var diffuseTex = new qtek.Texture2D({
                             wrapS: qtek.Texture.REPEAT, wrapT: qtek.Texture.REPEAT

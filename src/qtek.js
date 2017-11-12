@@ -73,7 +73,6 @@ import Sphere$53 from './light/Sphere';
 import Spot$54 from './light/Spot';
 import Tube$55 from './light/Tube';
 import FX$56 from './loader/FX';
-import GLB$57 from './loader/GLB';
 import GLTF$58 from './loader/GLTF';
 import Material$59 from './Material';
 import BoundingBox$60 from './math/BoundingBox';
@@ -243,7 +242,6 @@ export { light };
 
 var loader = {
     FX : FX$56,
-    GLB : GLB$57,
     GLTF : GLTF$58
 };
 export { loader };
