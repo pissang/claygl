@@ -203,7 +203,7 @@ function () {
             responseType: isBinary ? 'arraybuffer' : 'text',
             onload: function (data) {
                 if (isBinary) {
-                    self.parseGLB(data);
+                    self.parseBinary(data);
                 }
                 else {
                     self.parse(JSON.parse(data));
@@ -216,7 +216,7 @@ function () {
      * Parse glTF binary
      * @param {ArrayBuffer} buffer
      */
-    parseGLB: function (buffer) {
+    parseBinary: function (buffer) {
         var header = new Uint32Array(buffer, 0, 4);
         if (header[0] !== 0x46546C67) {
             this.trigger('error', 'Invalid glTF binary format: Invalid header');
