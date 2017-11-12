@@ -51,6 +51,10 @@ function makeKey(enabledMaps, jointCount, shaderDefines) {
 
 function allocateShader(renderer, enabledMaps, jointCount, shaderDefines) {
     var key = makeKey(enabledMaps, jointCount, shaderDefines);
+    if (!shaderUsedCount[renderer.__GUID__]) {
+        shaderUsedCount[renderer.__GUID__] = {};
+    }
+
     var shader = shaderLibrary[key];
 
     if (!shader) {
@@ -90,8 +94,8 @@ function allocateShader(renderer, enabledMaps, jointCount, shaderDefines) {
         }
 
         shaderLibrary[key] = shader;
-
-        shaderUsedCount[renderer.__GUID__] = shaderUsedCount[renderer.__GUID__] || {};
+    }
+    if (!shaderUsedCount[renderer.__GUID__][key]) {
         shaderUsedCount[renderer.__GUID__][key] = 0;
     }
     shaderUsedCount[renderer.__GUID__][key]++;

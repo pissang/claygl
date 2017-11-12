@@ -58,7 +58,7 @@ describe('Integration.lights.Spec', function () {
         const light = new qtek.light.Point({
             castShadow: false,
             range: 200
-        })
+        });
         light.position.set(30, -30, 30);
         light.lookAt(scene.position);
 
@@ -72,5 +72,3 @@ describe('Integration.lights.Spec', function () {
         util.assertWith(canvas, { fixture : path.join(__dirname, 'point-light.png') }, done);
     });
 });
-
-
