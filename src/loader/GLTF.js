@@ -275,6 +275,7 @@ function () {
         var self = this;
 
         var lib = {
+            json: json,
             buffers: [],
             bufferViews: [],
             materials: [],
@@ -316,6 +317,7 @@ function () {
 
         function getResult() {
             return {
+                json: json,
                 scene: self.rootNode ? null : rootNode,
                 rootNode: self.rootNode ? rootNode : null,
                 cameras: lib.cameras,
