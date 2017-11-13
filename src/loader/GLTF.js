@@ -391,6 +391,10 @@ function () {
      * @param {string} path
      */
     resolveBinaryPath: function (path) {
+        if (path && path.match(/^data:(.*?)base64,/)) {
+            return path;
+        }
+        
         var rootPath = this.bufferRootPath;
         if (rootPath == null) {
             rootPath = this.rootPath;
@@ -403,6 +407,10 @@ function () {
      * @param {string} path
      */
     resolveTexturePath: function (path) {
+        if (path && path.match(/^data:(.*?)base64,/)) {
+            return path;
+        }
+
         var rootPath = this.textureRootPath;
         if (rootPath == null) {
             rootPath = this.rootPath;
