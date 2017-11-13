@@ -480,7 +480,7 @@ def ConvertToPBRMaterial(pMaterial):
     lValues = lGLTFMaterial["pbrMetallicRoughness"];
 
     lMaterialIdx = len(lib_materials)
-    
+
     if (lShading == 'unknown'):
         lib_materials.append(lGLTFMaterial)
         return lMaterialIdx
@@ -618,6 +618,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         lLayerNormal = lLayer.GetNormals()
         if lLayerNormal:
             lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
+            if len(lNormals) == 0:
+                lLayerNormal = None
 
         ## Handle uvs
         lLayerUV = lLayer.GetUVs()
@@ -630,6 +632,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 for i in range(len(lTexcoords)):
                     # glTF2.0 don't flipY. So flip the uv.
                     lTexcoords[i] = [lTexcoords[i][0], 1.0 - lTexcoords[i][1]]
+            if len(lTexcoords) == 0:
+                lLayerUV = None
 
         if lLayer2:
             lLayer2Uv = lLayer2.GetUVs()
@@ -638,6 +642,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 if ENV_FLIP_V:
                     for i in range(len(lTexcoords2)):
                         lTexcoords2[i] = [lTexcoords2[i][0], 1.0 - lTexcoords2[i][1]]
+                if len(lTexcoords2) == 0:
+                    lLayer2Uv = None
 
         hasSkin = False
         moreThanFourJoints = False
