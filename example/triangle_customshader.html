@@ -38,10 +38,7 @@ void main() {
     var geometry = new qtek.StaticGeometry();
     
     // Add triangle vertices to position attribute.
-    geometry.attributes.position.init(3);
-    TRIANGLE_POSITIONS.forEach(function (pos, i) {
-        geometry.attributes.position.set(i, pos);
-    });
+    geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
     var mesh = new qtek.Mesh({
         geometry: geometry,
