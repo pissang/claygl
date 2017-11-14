@@ -135,7 +135,7 @@ var Texture = Base.extend(
             this.useMipmap = false;
         }
 
-        var sRGBExt = renderer.getGLExtension( 'EXT_sRGB');
+        var sRGBExt = renderer.getGLExtension('EXT_sRGB');
         // Fallback
         if (this.format === Texture.SRGB && !sRGBExt) {
             this.format = Texture.RGB;

@@ -32,5 +32,14 @@ module.exports = {
         return {
             canvas, renderer, scene, camera
         };
+    },
+
+    createBuiltinMaterial(shaderName) {
+        return new qtek.Material({
+            shader: new qtek.Shader({
+                vertex: qtek.Shader.source(`qtek.${shaderName}.vertex`),
+                fragment: qtek.Shader.source(`qtek.${shaderName}.fragment`)
+            })
+        });
     }
 };

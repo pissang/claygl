@@ -5,8 +5,8 @@ const path = require('path');
 describe('Integration.Anistropic.Spec', function () {
     it('texture anistropic', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene({
-            size : [600, 600],
-            cameraPosition : [0, 4, 14]
+            size: [600, 600],
+            cameraPosition: [0, 4, 14]
         });
         if (!renderer.getGLExtension('EXT_texture_filter_anisotropic')) {
             done();
@@ -21,10 +21,10 @@ describe('Integration.Anistropic.Spec', function () {
                 texture.wrapT = qtek.Texture.REPEAT;
                 texture.anisotropic = 4;
 
-                const shader = qtek.shader.library.get("qtek.basic", "diffuseMap");
+                const shader = qtek.shader.library.get('qtek.basic', 'diffuseMap');
                 
                 const material = new qtek.Material({
-                    shader : shader
+                    shader: shader
                 });
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10])
@@ -33,13 +33,13 @@ describe('Integration.Anistropic.Spec', function () {
                 scene.add(root);
 
                 const plane = new qtek.geometry.Plane({
-                    widthSegments : 1,
-                    heightSegments : 1
+                    widthSegments: 1,
+                    heightSegments: 1
                 });
                 const planeMesh = new qtek.Mesh({
-                    geometry : plane,
-                    material : material,
-                    scale : new qtek.math.Vector3(30, 30, 30)
+                    geometry: plane,
+                    material: material,
+                    scale: new qtek.math.Vector3(30, 30, 30)
                 });
                 
                 planeMesh.rotation.rotateX(-Math.PI/2);
@@ -47,7 +47,7 @@ describe('Integration.Anistropic.Spec', function () {
 
                 const drawInfo = renderer.render(scene, camera);
 
-                util.assertWith(canvas, { fixture : path.join(__dirname, 'anistropic.png') }, done);
+                util.assertWith(canvas, { fixture: path.join(__dirname, 'anistropic.png') }, done);
             });
         
     });

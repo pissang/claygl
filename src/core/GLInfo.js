@@ -47,7 +47,7 @@ function GLInfo(_gl) {
      * @memberOf qtek.core.glinfo
      */
     this.getExtension = function (name) {
-        if (typeof(extensions[name]) == 'undefined') {
+        if (!(name in extensions)) {
             createExtension(name);
         }
         return extensions[name];

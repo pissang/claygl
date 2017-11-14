@@ -70,9 +70,15 @@ var Node = Base.extend(
      * @private
      */
     _scene: null,
-
+    /**
+     * @type {boolean}
+     * @private
+     */
     _needsUpdateWorldTransform: true,
-
+    /**
+     * @type {boolean}
+     * @private
+     */
     _inIterating: false,
 
     // Depth for transparent queue sorting
@@ -253,13 +259,18 @@ var Node = Base.extend(
     },
 
     /**
-     * Get a new created array of all its children nodes
+     * Get a new created array of all children nodes
      * @return {qtek.Node[]}
      */
     children: function () {
         return this._children.slice();
     },
 
+    /**
+     * Get child scene node at given index.
+     * @param {number} idx
+     * @return {qtek.Node}
+     */
     childAt: function (idx) {
         return this._children[idx];
     },
@@ -302,6 +313,8 @@ var Node = Base.extend(
      * Query descendant node by path
      * @param {string} path
      * @return {qtek.Node}
+     * @example
+     *  node.queryNode('root/parent/child');
      */
     queryNode: function (path) {
         if (!path) {
@@ -337,6 +350,7 @@ var Node = Base.extend(
 
     /**
      * Get query path, relative to rootNode(default is scene)
+     * @param {qtek.Node} [rootNode]
      * @return {string}
      */
     getPath: function (rootNode) {
@@ -542,14 +556,24 @@ var Node = Base.extend(
             return !el.invisible && el.geometry;
         }
         var tmpBBox = new BoundingBox();
+        var tmpMat4 = new Matrix4();
+        var invWorldTransform = new Matrix4();
         return function (filter, out) {
             out = out || new BoundingBox();
             filter = filter || defaultFilter;
             
+            if (this._parent) {
+                Matrix4.invert(invWorldTransform, this._parent.worldTransform);
+            }
+            else {
+                Matrix4.identity(invWorldTransform);
+            }
+
             this.traverse(function (mesh) {
                 if (mesh.geometry && mesh.geometry.boundingBox) {
                     tmpBBox.copy(mesh.geometry.boundingBox);
-                    tmpBBox.applyTransform(mesh.worldTransform);
+                    Matrix4.multiply(tmpMat4, invWorldTransform, mesh.worldTransform);
+                    tmpBBox.applyTransform(tmpMat4);
                     out.union(tmpBBox);
                 }
             }, this, defaultFilter);
@@ -580,8 +604,6 @@ var Node = Base.extend(
             return new Vector3(m[12], m[13], m[14]);
         }
     },
-
-    // TODO Set world transform
 
     /**
      * Clone a new node
@@ -640,7 +662,6 @@ var Node = Base.extend(
      * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
      * @method
      */
-    // TODO world space ?
     lookAt: (function () {
         var m = new Matrix4();
         return function (target, up) {
