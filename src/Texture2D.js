@@ -26,11 +26,12 @@ var isPowerOfTwo = mathUtil.isPowerOfTwo;
 var Texture2D = Texture.extend(function () {
     return /** @lends qtek.Texture2D# */ {
         /**
-         * @type {HTMLImageElement|HTMLCanvasElemnet}
+         * @type {?HTMLImageElement|HTMLCanvasElemnet}
          */
         image: null,
         /**
-         * @type {Uint8Array|Float32Array}
+         * Pixels data. Will be ignored if image is set.
+         * @type {?Uint8Array|Float32Array}
          */
         pixels: null,
         /**

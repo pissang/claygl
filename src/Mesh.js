@@ -22,6 +22,7 @@ var Mesh = Renderable.extend(
 
     /**
      * If store the skin matrices in vertex texture
+     * @type {bool}
      */
     useSkinMatricesTexture: false
 

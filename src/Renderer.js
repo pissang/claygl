@@ -219,6 +219,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Get viewport aspect,
+     * @return {number}
      */
     getViewportAspect: function () {
         var viewport = this.viewport;
@@ -465,6 +466,11 @@ var Renderer = Base.extend(function () {
         this._currentShader = null;
     },
 
+    /**
+     * Callback during rendering process to determine if render given renderable.
+     * @param {qtek.Renderable} given renderable.
+     * @return {boolean}
+     */
     ifRenderObject: function (obj) {
         return true;
     },
@@ -904,8 +910,7 @@ var Renderer = Base.extend(function () {
     /**
      * Dispose renderer
      */
-    dispose: function () {
-    },
+    dispose: function () {},
 
     /**
      * Convert screen coords to normalized device coordinates(NDC)
@@ -1015,8 +1020,20 @@ var matrices = {
     WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4Create()
 };
 
+/**
+ * @name qtek.Renderer.COLOR_BUFFER_BIT
+ * @type {number}
+ */
 Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
+/**
+ * @name qtek.Renderer.DEPTH_BUFFER_BIT
+ * @type {number}
+ */
 Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
+/**
+ * @name qtek.Renderer.STENCIL_BUFFER_BIT
+ * @type {number}
+ */
 Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;
 
 export default Renderer;

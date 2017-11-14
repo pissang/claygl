@@ -98,13 +98,16 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 
 /**
  * @typedef {Object} qtek.loader.GLTF.IResult
+ * @property {Object} json
  * @property {qtek.Scene} scene
  * @property {qtek.Node} rootNode
- * @property {Object.<string, qtek.Camera>} cameras
- * @property {Object.<string, qtek.Texture>} textures
- * @property {Object.<string, qtek.Material>} materials
- * @property {Object.<string, qtek.Skeleton>} skeletons
- * @property {Object.<string, qtek.Mesh>} meshes
+ * @property {qtek.Camera[]} cameras
+ * @property {qtek.Texture[]} textures
+ * @property {qtek.Material[]} materials
+ * @property {qtek.Skeleton[]} skeletons
+ * @property {qtek.Mesh[]} meshes
+ * @property {qtek.animation.TrackClip[]} clips
+ * @property {qtek.Node[]} nodes
  */
 
 /**
@@ -115,48 +118,59 @@ var GLTFLoader = Base.extend(
 /** @lends qtek.loader.GLTF# */
 {
     /**
+     * 
      * @type {qtek.Node}
      */
     rootNode: null,
     /**
+     * Root path for uri parsing.
      * @type {string}
      */
     rootPath: null,
 
     /**
+     * Root path for texture uri parsing. Defaultly use the rootPath
      * @type {string}
      */
     textureRootPath: null,
 
     /**
+     * Root path for buffer uri parsing. Defaultly use the rootPath
      * @type {string}
      */
     bufferRootPath: null,
 
     /**
+     * Shader used when creating the materials.
      * @type {string}
+     * @default 'qtek.standard'
      */
     shaderName: 'qtek.standard',
 
     /**
+     * If use {@link qtek.StandardMaterial}
      * @type {string}
      */
     useStandardMaterial: false,
 
     /**
+     * If loading the cameras.
      * @type {boolean}
      */
     includeCamera: true,
 
     /**
+     * If loading the animations.
      * @type {boolean}
      */
     includeAnimation: true,
     /**
+     * If loading the meshes
      * @type {boolean}
      */
     includeMesh: true,
     /**
+     * If loading the textures.
      * @type {boolean}
      */
     includeTexture: true,
@@ -167,9 +181,8 @@ var GLTFLoader = Base.extend(
     crossOrigin: '',
     /**
      * @type {boolean}
+     * @see https://github.com/KhronosGroup/glTF/issues/674
      */
-    // PENDING
-    // https://github.com/KhronosGroup/glTF/issues/674
     textureFlipY: false,
 
     shaderLibrary: null
@@ -182,7 +195,7 @@ function () {
 /** @lends qtek.loader.GLTF.prototype */
 {
     /**
-     * @param  {string} url
+     * @param {string} url
      */
     load: function (url) {
         var self = this;

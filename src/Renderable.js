@@ -69,20 +69,32 @@ var Renderable = Node.extend(
     lineWidth: 1,
 
     /**
+     * If enable culling
      * @type {boolean}
      */
     culling: true,
     /**
+     * Specify which side of polygon will be culled.
+     * Possible values:
+     *  + {@link qtek.Renderable.BACK}
+     *  + {@link qtek.Renderable.FRONT}
+     *  + {@link qtek.Renderable.FRONT_AND_BACK}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
      * @type {number}
      */
     cullFace: glenum.BACK,
     /**
+     * Specify which side is front face.
+     * Possible values:
+     *  + {@link qtek.Renderable.CW}
+     *  + {@link qtek.Renderable.CCW}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
      * @type {number}
      */
     frontFace: glenum.CCW,
 
     /**
-     * Software frustum culling
+     * If enable software frustum culling 
      * @type {boolean}
      */
     frustumCulling: true,
@@ -120,14 +132,12 @@ var Renderable = Node.extend(
     /**
      * Before render hook
      * @type {Function}
-     * @memberOf qtek.Renderable
      */
     beforeRender: function (_gl) {},
 
     /**
      * Before render hook
      * @type {Function}
-     * @memberOf qtek.Renderable
      */
     afterRender: function (_gl, renderStat) {},
 
@@ -350,7 +360,9 @@ var Renderable = Node.extend(
         var properties = [
             'castShadow', 'receiveShadow',
             'mode', 'culling', 'cullFace', 'frontFace',
-            'frustumCulling'
+            'frustumCulling',
+            'renderOrder', 'lineWidth',
+            'ignorePicking', 'ignorePreZ', 'ignoreGBuffer'
         ];
         return function() {
             var renderable = Node.prototype.clone.call(this);
@@ -371,23 +383,65 @@ var Renderable = Node.extend(
     })()
 });
 
-Renderable.beforeFrame = function() {
-    prevDrawID = 0;
-};
-
-// Enums
+/**
+ * @name qtek.Renderable.POINTS
+ * @type {number}
+ */
 Renderable.POINTS = glenum.POINTS;
+/**
+ * @name qtek.Renderable.LINES
+ * @type {number}
+ */
 Renderable.LINES = glenum.LINES;
+/**
+ * @name qtek.Renderable.LINE_LOOP
+ * @type {number}
+ */
 Renderable.LINE_LOOP = glenum.LINE_LOOP;
+/**
+ * @name qtek.Renderable.LINE_STRIP
+ * @type {number}
+ */
 Renderable.LINE_STRIP = glenum.LINE_STRIP;
+/**
+ * @name qtek.Renderable.TRIANGLES
+ * @type {number}
+ */
 Renderable.TRIANGLES = glenum.TRIANGLES;
+/**
+ * @name qtek.Renderable.TRIANGLE_STRIP
+ * @type {number}
+ */
 Renderable.TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
+/**
+ * @name qtek.Renderable.TRIANGLE_FAN
+ * @type {number}
+ */
 Renderable.TRIANGLE_FAN = glenum.TRIANGLE_FAN;
-
+/**
+ * @name qtek.Renderable.BACK
+ * @type {number}
+ */
 Renderable.BACK = glenum.BACK;
+/**
+ * @name qtek.Renderable.FRONT
+ * @type {number}
+ */
 Renderable.FRONT = glenum.FRONT;
+/**
+ * @name qtek.Renderable.FRONT_AND_BACK
+ * @type {number}
+ */
 Renderable.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
+/**
+ * @name qtek.Renderable.CW
+ * @type {number}
+ */
 Renderable.CW = glenum.CW;
+/**
+ * @name qtek.Renderable.CCW
+ * @type {number}
+ */
 Renderable.CCW = glenum.CCW;
 
 Renderable.RenderInfo = RenderInfo;

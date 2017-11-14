@@ -70,13 +70,6 @@ var Material = Base.extend(
 /** @lends qtek.Material.prototype */
 {
 
-    /**
-     * @param  {WebGLRenderingContext} renderer
-     * @param  {qtek.Shader} [shader]
-     * @param  {qtek.Material} [prevMaterial]
-     * @param  {qtek.Shader} [prevShader]
-     * @return {Object}
-     */
     bind: function(renderer, shader, prevMaterial, prevShader) {
         var _gl = renderer.gl;
         // PENDING Same texture in different material take different slot?
@@ -190,6 +183,9 @@ var Material = Base.extend(
     },
 
     /**
+     * Set material uniform
+     * @example
+     *  mat.setUniform('color', [1, 1, 1, 1]);
      * @param {string} symbol
      * @param {number|array|qtek.Texture|ArrayBufferView} value
      */
@@ -213,11 +209,11 @@ var Material = Base.extend(
         }
     },
 
-    /**
-     * Enable a uniform
-     * It only have effect on the uniform exists in shader.
-     * @param  {string} symbol
-     */
+    // /**
+    //  * Enable a uniform
+    //  * It only have effect on the uniform exists in shader.
+    //  * @param  {string} symbol
+    //  */
     // enableUniform: function (symbol) {
     //     if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
     //         this._enabledUniforms.push(symbol);

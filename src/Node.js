@@ -110,21 +110,20 @@ var Node = Base.extend(
 {
 
     /**
-     * @memberOf qtek.Node
-     * @type {qtek.math.Vector3}
+     * @type {?qtek.math.Vector3}
      * @instance
      */
     target: null,
     /**
      * If node and its chilren invisible
      * @type {boolean}
-     * @memberOf qtek.Node
      * @instance
      */
     invisible: false,
 
     /**
-     * Return if Node is a skinned mesh
+     * If Node is a skinned mesh
+     * @return {boolean}
      */
     isSkinnedMesh: function () {
         return false;
@@ -491,6 +490,7 @@ var Node = Base.extend(
 
     /**
      * Update world transform, assume its parent world transform have been updated
+     * @private
      */
     _updateWorldTransformTopDown: function () {
         var localTransform = this.localTransform._array;
@@ -507,7 +507,9 @@ var Node = Base.extend(
         }
     },
 
-    // Update world transform before whole scene is updated.
+    /**
+     * Update world transform before whole scene is updated.
+     */
     updateWorldTransform: function () {
         // Find the root node which transform needs update;
         var rootNodeIsDirty = this;

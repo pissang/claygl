@@ -37,12 +37,12 @@ var TextureCube = Texture.extend(function () {
     return /** @lends qtek.TextureCube# */{
         /**
          * @type {Object}
-         * @property {HTMLImageElement|HTMLCanvasElemnet} px
-         * @property {HTMLImageElement|HTMLCanvasElemnet} nx
-         * @property {HTMLImageElement|HTMLCanvasElemnet} py
-         * @property {HTMLImageElement|HTMLCanvasElemnet} ny
-         * @property {HTMLImageElement|HTMLCanvasElemnet} pz
-         * @property {HTMLImageElement|HTMLCanvasElemnet} nz
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} px
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} nx
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} py
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} ny
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} pz
+         * @property {?HTMLImageElement|HTMLCanvasElemnet} nz
          */
         image: {
             px: null,
@@ -53,13 +53,14 @@ var TextureCube = Texture.extend(function () {
             nz: null
         },
         /**
+         * Pixels data of each side. Will be ignored if images are set.
          * @type {Object}
-         * @property {Uint8Array} px
-         * @property {Uint8Array} nx
-         * @property {Uint8Array} py
-         * @property {Uint8Array} ny
-         * @property {Uint8Array} pz
-         * @property {Uint8Array} nz
+         * @property {?Uint8Array} px
+         * @property {?Uint8Array} nx
+         * @property {?Uint8Array} py
+         * @property {?Uint8Array} ny
+         * @property {?Uint8Array} pz
+         * @property {?Uint8Array} nz
          */
         pixels: {
             px: null,

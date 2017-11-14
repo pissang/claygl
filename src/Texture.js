@@ -14,42 +14,73 @@ var Texture = Base.extend(
 /** @lends qtek.Texture# */
 {
     /**
-     * Texture width, only needed when the texture is used as a render target
+     * Texture width, readonly when the texture source is image
      * @type {number}
      */
     width: 512,
     /**
-     * Texture height, only needed when the texture is used as a render target
+     * Texture height, readonly when the texture source is image
      * @type {number}
      */
     height: 512,
     /**
-     * Texel data type
+     * Texel data type.
+     * Possible values:
+     *  + {@link qtek.Texture.UNSIGNED_BYTE}
+     *  + {@link qtek.Texture.HALF_FLOAT}
+     *  + {@link qtek.Texture.FLOAT}
+     *  + {@link qtek.Texture.UNSIGNED_INT_24_8_WEBGL}
+     *  + {@link qtek.Texture.UNSIGNED_INT}
      * @type {number}
      */
     type: glenum.UNSIGNED_BYTE,
     /**
      * Format of texel data
+     * Possible values:
+     *  + {@link qtek.Texture.RGBA}
+     *  + {@link qtek.Texture.DEPTH_COMPONENT}
+     *  + {@link qtek.Texture.DEPTH_STENCIL}
      * @type {number}
      */
     format: glenum.RGBA,
     /**
+     * Texture wrap. Default to be REPEAT.
+     * Possible values:
+     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
+     *  + {@link qtek.Texture.REPEAT}
+     *  + {@link qtek.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapS: glenum.REPEAT,
     /**
+     * Texture wrap. Default to be REPEAT.
+     * Possible values:
+     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
+     *  + {@link qtek.Texture.REPEAT}
+     *  + {@link qtek.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapT: glenum.REPEAT,
     /**
+     * Possible values:
+     *  + {@link qtek.Texture.NEAREST}
+     *  + {@link qtek.Texture.LINEAR}
+     *  + {@link qtek.Texture.NEAREST_MIPMAP_NEAREST}
+     *  + {@link qtek.Texture.LINEAR_MIPMAP_NEAREST}
+     *  + {@link qtek.Texture.NEAREST_MIPMAP_LINEAR}
+     *  + {@link qtek.Texture.LINEAR_MIPMAP_LINEAR}
      * @type {number}
      */
     minFilter: glenum.LINEAR_MIPMAP_LINEAR,
     /**
+     * Possible values:
+     *  + {@link qtek.Texture.NEAREST}
+     *  + {@link qtek.Texture.LINEAR}
      * @type {number}
      */
     magFilter: glenum.LINEAR,
     /**
+     * If enable mimap.
      * @type {boolean}
      */
     useMipmap: true,
@@ -63,15 +94,19 @@ var Texture = Base.extend(
     // pixelStorei parameters, not available when texture is used as render target
     // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
     /**
+     * If flip in y axis for given image source
      * @type {boolean}
+     * @default true
      */
     flipY: true,
     /**
      * @type {number}
+     * @default 4
      */
     unpackAlignment: 4,
     /**
      * @type {boolean}
+     * @default false
      */
     premultiplyAlpha: false,
 
@@ -213,6 +248,10 @@ var Texture = Base.extend(
      */
     isRenderable: function () {},
 
+    /**
+     * Test if texture size is power of two
+     * @return {boolean}
+     */
     isPowerOfTwo: function () {}
 });
 
@@ -234,29 +273,103 @@ Object.defineProperty(Texture.prototype, 'height', {
 });
 
 /* DataType */
+
+/**
+ * @name qtek.Texture.BYTE
+ * @type {number}
+ */
 Texture.BYTE = glenum.BYTE;
+/**
+ * @name qtek.Texture.UNSIGNED_BYTE
+ * @type {number}
+ */
 Texture.UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
+/**
+ * @name qtek.Texture.SHORT
+ * @type {number}
+ */
 Texture.SHORT = glenum.SHORT;
+/**
+ * @name qtek.Texture.UNSIGNED_SHORT
+ * @type {number}
+ */
 Texture.UNSIGNED_SHORT = glenum.UNSIGNED_SHORT;
+/**
+ * @name qtek.Texture.INT
+ * @type {number}
+ */
 Texture.INT = glenum.INT;
+/**
+ * @name qtek.Texture.UNSIGNED_INT
+ * @type {number}
+ */
 Texture.UNSIGNED_INT = glenum.UNSIGNED_INT;
+/**
+ * @name qtek.Texture.FLOAT
+ * @type {number}
+ */
 Texture.FLOAT = glenum.FLOAT;
+/**
+ * @name qtek.Texture.HALF_FLOAT
+ * @type {number}
+ */
 Texture.HALF_FLOAT = 0x8D61;
 
-// ext.UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
+/**
+ * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
+ * @name qtek.Texture.UNSIGNED_INT_24_8_WEBGL
+ * @type {number}
+ */
 Texture.UNSIGNED_INT_24_8_WEBGL = 34042;
 
 /* PixelFormat */
+/**
+ * @name qtek.Texture.DEPTH_COMPONENT
+ * @type {number}
+ */
 Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
+/**
+ * @name qtek.Texture.DEPTH_STENCIL
+ * @type {number}
+ */
 Texture.DEPTH_STENCIL = glenum.DEPTH_STENCIL;
+/**
+ * @name qtek.Texture.ALPHA
+ * @type {number}
+ */
 Texture.ALPHA = glenum.ALPHA;
+/**
+ * @name qtek.Texture.RGB
+ * @type {number}
+ */
 Texture.RGB = glenum.RGB;
+/**
+ * @name qtek.Texture.RGBA
+ * @type {number}
+ */
 Texture.RGBA = glenum.RGBA;
+/**
+ * @name qtek.Texture.LUMINANCE
+ * @type {number}
+ */
 Texture.LUMINANCE = glenum.LUMINANCE;
+/**
+ * @name qtek.Texture.LUMINANCE_ALPHA
+ * @type {number}
+ */
 Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
 
-// https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+/**
+ * @name qtek.Texture.SRGB
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ * @type {number}
+ */
 Texture.SRGB = 0x8C40;
+/**
+ * @name qtek.Texture.SRGB_ALPHA
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ * @type {number}
+ */
 Texture.SRGB_ALPHA = 0x8C42;
 
 /* Compressed Texture */
@@ -266,24 +379,54 @@ Texture.COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
 Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
 
 /* TextureMagFilter */
+/**
+ * @name qtek.Texture.NEAREST
+ * @type {number}
+ */
 Texture.NEAREST = glenum.NEAREST;
+/**
+ * @name qtek.Texture.LINEAR
+ * @type {number}
+ */
 Texture.LINEAR = glenum.LINEAR;
 
 /* TextureMinFilter */
-/*      NEAREST */
-/*      LINEAR */
+/**
+ * @name qtek.Texture.NEAREST_MIPMAP_NEAREST
+ * @type {number}
+ */
 Texture.NEAREST_MIPMAP_NEAREST = glenum.NEAREST_MIPMAP_NEAREST;
+/**
+ * @name qtek.Texture.LINEAR_MIPMAP_NEAREST
+ * @type {number}
+ */
 Texture.LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
+/**
+ * @name qtek.Texture.NEAREST_MIPMAP_LINEAR
+ * @type {number}
+ */
 Texture.NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
+/**
+ * @name qtek.Texture.LINEAR_MIPMAP_LINEAR
+ * @type {number}
+ */
 Texture.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
 
-/* TextureParameterName */
-// Texture.TEXTURE_MAG_FILTER = glenum.TEXTURE_MAG_FILTER;
-// Texture.TEXTURE_MIN_FILTER = glenum.TEXTURE_MIN_FILTER;
-
 /* TextureWrapMode */
+/**
+ * @name qtek.Texture.REPEAT
+ * @type {number}
+ */
 Texture.REPEAT = glenum.REPEAT;
+/**
+ * @name qtek.Texture.CLAMP_TO_EDGE
+ * @type {number}
+ */
 Texture.CLAMP_TO_EDGE = glenum.CLAMP_TO_EDGE;
+/**
+ * @name qtek.Texture.MIRRORED_REPEAT
+ * @type {number}
+ */
 Texture.MIRRORED_REPEAT = glenum.MIRRORED_REPEAT;
 
 
