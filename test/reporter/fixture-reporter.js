@@ -3,7 +3,7 @@ const Spec = require('mocha/lib/reporters/Base');
 const fs = require('fs');
 const path = require('path');
 
-class Istanbul extends Spec {
+class FixtureReporter extends Spec {
   constructor(runner) {
     super(runner);    
     const failedTitles = [];
@@ -42,4 +42,4 @@ function generateReport(failedTitles, errors) {
     return reportPath;
 }
 
-module.exports = Istanbul;
+module.exports = FixtureReporter;
