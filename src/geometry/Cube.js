@@ -1,4 +1,4 @@
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import Plane from './Plane';
 import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
@@ -9,16 +9,17 @@ var planeMatrix = new Matrix4();
 
 /**
  * @constructor qtek.geometry.Cube
- * @extends qtek.StaticGeometry
+ * @extends qtek.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
  * @param {number} [opt.depthSegments]
  * @param {boolean} [opt.inside]
  */
-var Cube = StaticGeometry.extend(
+var Cube = Geometry.extend(
 /**@lends qtek.geometry.Cube# */
 {
+    dynamic: false,
     /**
      * @type {number}
      */

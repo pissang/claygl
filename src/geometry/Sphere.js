@@ -1,12 +1,9 @@
-import StaticGeometry from '../StaticGeometry';
-import glMatrix from '../dep/glmatrix';
-var vec3 = glMatrix.vec3;
-var vec2 = glMatrix.vec2;
+import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 
 /**
  * @constructor qtek.geometry.Sphere
- * @extends qtek.StaticGeometry
+ * @extends qtek.Geometry
  * @param {Object} [opt]
  * @param {number} [widthSegments]
  * @param {number} [heightSegments]
@@ -16,9 +13,10 @@ import BoundingBox from '../math/BoundingBox';
  * @param {number} [thetaLength]
  * @param {number} [radius]
  */
-var Sphere = StaticGeometry.extend(
+var Sphere = Geometry.extend(
 /** @lends qtek.geometry.Sphere# */
 {
+    dynamic: false,
     /**
      * @type {number}
      */

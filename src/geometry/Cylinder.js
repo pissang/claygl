@@ -1,18 +1,19 @@
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import ConeGeometry from './Cone';
 
 /**
  * @constructor qtek.geometry.Cylinder
- * @extends qtek.StaticGeometry
+ * @extends qtek.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.radius]
  * @param {number} [opt.height]
  * @param {number} [opt.capSegments]
  * @param {number} [opt.heightSegments]
  */
-var Cylinder = StaticGeometry.extend(
+var Cylinder = Geometry.extend(
 /** @lends qtek.geometry.Cylinder# */
 {
+    dynamic: false,
     /**
      * @type {number}
      */

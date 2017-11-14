@@ -1,5 +1,5 @@
 // TODO test
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import Mesh from '../Mesh';
 import Node from '../Node';
 import StandardMaterial from '../StandardMaterial';
@@ -31,7 +31,9 @@ var meshUtil = {
         var templateGeo = templateMesh.geometry;
         var material = templateMesh.material;
 
-        var geometry = new StaticGeometry();
+        var geometry = new Geometry({
+            dynamic: false
+        });
         geometry.boundingBox = new BoundingBox();
 
         var attributeNames = templateGeo.getEnabledAttributes();
@@ -270,7 +272,7 @@ var meshUtil = {
             }
             subMat.name = [material.name, b].join('-');
 
-            var subGeo = new StaticGeometry();
+            var subGeo = new Geometry();
 
             var subMesh = new Mesh({
                 name: [mesh.name, i].join('-'),

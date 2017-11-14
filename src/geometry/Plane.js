@@ -1,16 +1,17 @@
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 
 /**
  * @constructor qtek.geometry.Plane
- * @extends qtek.StaticGeometry
+ * @extends qtek.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
  */
-var Plane = StaticGeometry.extend(
+var Plane = Geometry.extend(
 /** @lends qtek.geometry.Plane# */
 {
+    dynamic: false,
     /**
      * @type {number}
      */

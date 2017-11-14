@@ -28,7 +28,7 @@ import BoundingBox from '../math/BoundingBox';
 import TrackClip from '../animation/TrackClip';
 import SamplerTrack from '../animation/SamplerTrack';
 
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 
 // Import builtin shader
 import '../shader/builtin';
@@ -860,7 +860,8 @@ function () {
             // Geometry
             for (var pp = 0; pp < meshInfo.primitives.length; pp++) {
                 var primitiveInfo = meshInfo.primitives[pp];
-                var geometry = new StaticGeometry({
+                var geometry = new Geometry({
+                    dynamic: false,
                     // PENDIGN
                     name: meshInfo.name,
                     boundingBox: new BoundingBox()

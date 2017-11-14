@@ -8,7 +8,7 @@
 
 import Mesh from '../Mesh';
 import Material from '../Material';
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import Shader from '../Shader';
 import Base from '../core/Base';
 import PerspectiveCamera from '../camera/Perspective';
@@ -27,7 +27,9 @@ var CardboardDistorter = Base.extend(function () {
         clearColor: [0, 0, 0, 1],
 
         _mesh: new Mesh({
-            geometry: new StaticGeometry(),
+            geometry: new Geometry({
+                dynamic: true
+            }),
             culling: false,
             material: new Material({
                 // FIXME Why disable depthMask will be wrong

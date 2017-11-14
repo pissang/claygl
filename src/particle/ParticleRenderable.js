@@ -1,6 +1,6 @@
 import Renderable from '../Renderable';
 
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import Material from '../Material';
 import Shader from '../Shader';
 
@@ -86,7 +86,7 @@ var ParticleRenderable = Renderable.extend(
 
 }, function(){
 
-    this.geometry = new StaticGeometry({
+    this.geometry = new Geometry({
         dynamic: true
     });
 

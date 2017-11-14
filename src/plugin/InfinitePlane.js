@@ -1,5 +1,5 @@
 import Mesh from '../Mesh';
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import Plane from '../math/Plane';
 import Vector3 from '../math/Vector3';
 import Matrix4 from '../math/Matrix4';
@@ -25,7 +25,7 @@ var InfinitePlane = Mesh.extend({
     frustumCulling: false
 
 }, function () {
-    var geometry = this.geometry = new StaticGeometry({
+    var geometry = this.geometry = new Geometry({
         dynamic: true
     });
     geometry.attributes.position.init(6);

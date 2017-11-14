@@ -1,4 +1,4 @@
-import StaticGeometry from '../StaticGeometry';
+import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 import glMatrix from '../dep/glmatrix';
 var vec3 = glMatrix.vec3;
@@ -6,7 +6,7 @@ var vec2 = glMatrix.vec2;
 
 /**
  * @constructor qtek.geometry.Cone
- * @extends qtek.StaticGeometry
+ * @extends qtek.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.topRadius]
  * @param {number} [opt.bottomRadius]
@@ -14,9 +14,10 @@ var vec2 = glMatrix.vec2;
  * @param {number} [opt.capSegments]
  * @param {number} [opt.heightSegments]
  */
-var Cone = StaticGeometry.extend(
+var Cone = Geometry.extend(
 /** @lends qtek.geometry.Cone# */
 {
+    dynamic: false,
     /**
      * @type {number}
      */
