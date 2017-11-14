@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/qtek.js"></script>
+    <title>Triangle with Custom Shader</title>
+
+    <script type="x-shader/x-vertex" id="vs">
+attribute vec3 position: POSITION;
+void main() {
+    gl_Position = vec4(position, 1.0);
+}
+    </script>
+    <script type="x-shader/x-fragment" id="fs">
+void main() {
+    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+}
+    </script>
+</head>
+<body>
+    <canvas id="main"></canvas>
+    
+    <script>
+    var TRIANGLE_POSITIONS = [
+        [-0.5, -0.5, 0],
+        [0.5, -0.5, 0],
+        [0, 0.5, 0]
+    ];
+
+    var renderer = new qtek.Renderer({
+        canvas: document.getElementById("main")
+    });
+    renderer.resize(400, 400);
+    var scene = new qtek.Scene();
+    var dummyCamera = new qtek.camera.Perspective();
+    var geometry = new qtek.StaticGeometry();
+    
+    // Add triangle vertices to position attribute.
+    geometry.attributes.position.init(3);
+    TRIANGLE_POSITIONS.forEach(function (pos, i) {
+        geometry.attributes.position.set(i, pos);
+    });
+
+    var mesh = new qtek.Mesh({
+        geometry: geometry,
+        material: new qtek.Material({
+            shader: new qtek.Shader({
+                vertex: document.getElementById('vs').textContent,
+                fragment: document.getElementById('fs').textContent
+            })
+        })
+    });
+    scene.add(mesh);
+
+    renderer.render(scene, dummyCamera);
+    </script>
+</body>
+</html>
