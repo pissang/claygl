@@ -33,7 +33,8 @@
     "instrument": "istanbul instrument ./dist/qtek.src.js --output ./dist/qtek.js --no-compact --complete-copy --es-modules",
     "pretest": "npm run build:sourcemap",
     "tdd": "npm run pretest && electron-mocha --interactive --renderer \"./test/**/*.spec.js\"",
-    "test:cov": "npm run pretest -- test/rollup.config.js && npm run instrument && npm run test:main -- -R test/istanbul-reporter && remap-istanbul -i coverage/coverage-final.json -o coverage/html-report -t html && node -e \"require('fs').unlinkSync('./dist/qtek.src.js')\"",
+    "test:cov": "npm run pretest -- test/rollup.config.js && npm run instrument && npm run test:main -- -R test/reporter/istanbul-reporter && remap-istanbul -i coverage/coverage-final.json -o coverage/html-report -t html && node -e \"require('fs').unlinkSync('./dist/qtek.src.js')\"",
+    "test:fixture" : "npm run pretest && electron-mocha --require-main ./test/ci-env.js --renderer \"./test/integration/**/*.spec.js\" -R test/reporter/fixture-reporter",
     "test:main": "electron-mocha --require-main ./test/ci-env.js --renderer \"./test/**/*.spec.js\"",
     "test": "npm run test:main"
   },

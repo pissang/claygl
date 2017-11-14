@@ -50,6 +50,14 @@ Generate fixture for specs matching the pattern:
 npm run gen:texture -- -g "texture anistropic"
 ```
 
+### Fixture test report
+```shell
+npm run test:fixture
+```
+A html report named `fixture-report.html` will be generated in `coverage` folder.
+
+The report template is `test/reporter/fixture-tmpl.html`.
+
 ## Commands
 * run, watch and debug in electron
 ```shell
@@ -65,6 +73,10 @@ npm test -- -g "texture anistropic"
 ```
 ```shell
 npm run tdd -- -g "texture anistropic"
+```
+* run fixture tests (compare failed integration tests)
+```shell
+npm run test:fixture
 ```
 * run test with coverage
 ```shell
