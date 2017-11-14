@@ -2,7 +2,13 @@ const fs = require('fs');
 const nativeImage = require('electron').nativeImage;
 const assert = require('assert');
 
+const testErrors = [];
+
 module.exports = {
+    getTestErrors() {
+        return testErrors;
+    },
+
     /**
     * Get image content of the canvas
     * @param {Canvas} canvas
@@ -52,8 +58,22 @@ module.exports = {
             const actual = this.getGlImage(canvas);
             this._loadImage(fixture, actual, (fixture, actual) => {
                 const diff = this.compareImagePixel(fixture, actual, options.diffOptions);
-                assert(diff === 0, (diff > 0 ? `Image is different from fixture with delta ${diff}` : 'Image is blank') + `, fixture: ${fixturePath}`);
-                cb();
+                let err;
+                if (diff !== 0) {
+                    if (diff > 0) {
+                        err = {
+                            'error' : `Image is different from fixture with delta ${diff}`
+                        };
+                    } else {
+                        err = {
+                            'error' : 'Image is blank'
+                        };
+                    }
+                    err.fixture = fixture;
+                    err.actual = actual;
+                    testErrors.push(err);
+                }
+                cb(err);
             });
         }
     },
