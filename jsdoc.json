@@ -5,27 +5,13 @@
         "exclude": ["src/dep/glmatrix.js"]
     },
     "opts": {
-        "template": "jsdoc-tmpl",
+        "template": "node_modules/minami",
         "encoding": "utf8",
         "destination": "./doc/api/",
         "recurse": true
     },
     "plugins": ["plugins/markdown"],
     "templates": {
-        "applicationName": "QTEK",
-        "disqus": "",
-        "googleAnalytics": "",
-        "openGraph": {
-            "title": "",
-            "type": "website",
-            "image": "",
-            "site_name": "",
-            "url": ""
-        },
-        "meta": {
-            "title": "",
-            "description": "",
-            "keyword": ""
-        }
+        "showInheritedInNav": false
     }
 }
