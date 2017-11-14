@@ -26,7 +26,8 @@ function VertexArrayObject(
     this.vao = null;
 }
 /**
- * @constructor qtek.Renderable
+ * @constructor
+ * @alias qtek.Renderable
  * @extends qtek.Node
  */
 var Renderable = Node.extend(
@@ -384,62 +385,50 @@ var Renderable = Node.extend(
 });
 
 /**
- * @name qtek.Renderable.POINTS
  * @type {number}
  */
 Renderable.POINTS = glenum.POINTS;
 /**
- * @name qtek.Renderable.LINES
  * @type {number}
  */
 Renderable.LINES = glenum.LINES;
 /**
- * @name qtek.Renderable.LINE_LOOP
  * @type {number}
  */
 Renderable.LINE_LOOP = glenum.LINE_LOOP;
 /**
- * @name qtek.Renderable.LINE_STRIP
  * @type {number}
  */
 Renderable.LINE_STRIP = glenum.LINE_STRIP;
 /**
- * @name qtek.Renderable.TRIANGLES
  * @type {number}
  */
 Renderable.TRIANGLES = glenum.TRIANGLES;
 /**
- * @name qtek.Renderable.TRIANGLE_STRIP
  * @type {number}
  */
 Renderable.TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
 /**
- * @name qtek.Renderable.TRIANGLE_FAN
  * @type {number}
  */
 Renderable.TRIANGLE_FAN = glenum.TRIANGLE_FAN;
 /**
- * @name qtek.Renderable.BACK
  * @type {number}
  */
 Renderable.BACK = glenum.BACK;
 /**
- * @name qtek.Renderable.FRONT
  * @type {number}
  */
 Renderable.FRONT = glenum.FRONT;
 /**
- * @name qtek.Renderable.FRONT_AND_BACK
  * @type {number}
  */
 Renderable.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
 /**
- * @name qtek.Renderable.CW
  * @type {number}
  */
 Renderable.CW = glenum.CW;
 /**
- * @name qtek.Renderable.CCW
  * @type {number}
  */
 Renderable.CCW = glenum.CCW;

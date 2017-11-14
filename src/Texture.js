@@ -7,7 +7,8 @@ import glenum from './core/glenum';
 import Cache from './core/Cache';
 
 /**
- * @constructor qtek.Texture
+ * @constructor
+ * @alias qtek.Texture
  * @extends qtek.core.Base
  */
 var Texture = Base.extend(
@@ -275,98 +276,80 @@ Object.defineProperty(Texture.prototype, 'height', {
 /* DataType */
 
 /**
- * @name qtek.Texture.BYTE
  * @type {number}
  */
 Texture.BYTE = glenum.BYTE;
 /**
- * @name qtek.Texture.UNSIGNED_BYTE
  * @type {number}
  */
 Texture.UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
 /**
- * @name qtek.Texture.SHORT
  * @type {number}
  */
 Texture.SHORT = glenum.SHORT;
 /**
- * @name qtek.Texture.UNSIGNED_SHORT
  * @type {number}
  */
 Texture.UNSIGNED_SHORT = glenum.UNSIGNED_SHORT;
 /**
- * @name qtek.Texture.INT
  * @type {number}
  */
 Texture.INT = glenum.INT;
 /**
- * @name qtek.Texture.UNSIGNED_INT
  * @type {number}
  */
 Texture.UNSIGNED_INT = glenum.UNSIGNED_INT;
 /**
- * @name qtek.Texture.FLOAT
  * @type {number}
  */
 Texture.FLOAT = glenum.FLOAT;
 /**
- * @name qtek.Texture.HALF_FLOAT
  * @type {number}
  */
 Texture.HALF_FLOAT = 0x8D61;
 
 /**
  * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
- * @name qtek.Texture.UNSIGNED_INT_24_8_WEBGL
  * @type {number}
  */
 Texture.UNSIGNED_INT_24_8_WEBGL = 34042;
 
 /* PixelFormat */
 /**
- * @name qtek.Texture.DEPTH_COMPONENT
  * @type {number}
  */
 Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
 /**
- * @name qtek.Texture.DEPTH_STENCIL
  * @type {number}
  */
 Texture.DEPTH_STENCIL = glenum.DEPTH_STENCIL;
 /**
- * @name qtek.Texture.ALPHA
  * @type {number}
  */
 Texture.ALPHA = glenum.ALPHA;
 /**
- * @name qtek.Texture.RGB
  * @type {number}
  */
 Texture.RGB = glenum.RGB;
 /**
- * @name qtek.Texture.RGBA
  * @type {number}
  */
 Texture.RGBA = glenum.RGBA;
 /**
- * @name qtek.Texture.LUMINANCE
  * @type {number}
  */
 Texture.LUMINANCE = glenum.LUMINANCE;
 /**
- * @name qtek.Texture.LUMINANCE_ALPHA
  * @type {number}
  */
 Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
 
 /**
- * @name qtek.Texture.SRGB
  * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
  * @type {number}
  */
 Texture.SRGB = 0x8C40;
 /**
- * @name qtek.Texture.SRGB_ALPHA
  * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
  * @type {number}
  */
@@ -380,51 +363,42 @@ Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
 
 /* TextureMagFilter */
 /**
- * @name qtek.Texture.NEAREST
  * @type {number}
  */
 Texture.NEAREST = glenum.NEAREST;
 /**
- * @name qtek.Texture.LINEAR
  * @type {number}
  */
 Texture.LINEAR = glenum.LINEAR;
 
 /* TextureMinFilter */
 /**
- * @name qtek.Texture.NEAREST_MIPMAP_NEAREST
  * @type {number}
  */
 Texture.NEAREST_MIPMAP_NEAREST = glenum.NEAREST_MIPMAP_NEAREST;
 /**
- * @name qtek.Texture.LINEAR_MIPMAP_NEAREST
  * @type {number}
  */
 Texture.LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
 /**
- * @name qtek.Texture.NEAREST_MIPMAP_LINEAR
  * @type {number}
  */
 Texture.NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
 /**
- * @name qtek.Texture.LINEAR_MIPMAP_LINEAR
  * @type {number}
  */
 Texture.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
 
 /* TextureWrapMode */
 /**
- * @name qtek.Texture.REPEAT
  * @type {number}
  */
 Texture.REPEAT = glenum.REPEAT;
 /**
- * @name qtek.Texture.CLAMP_TO_EDGE
  * @type {number}
  */
 Texture.CLAMP_TO_EDGE = glenum.CLAMP_TO_EDGE;
 /**
- * @name qtek.Texture.MIRRORED_REPEAT
  * @type {number}
  */
 Texture.MIRRORED_REPEAT = glenum.MIRRORED_REPEAT;

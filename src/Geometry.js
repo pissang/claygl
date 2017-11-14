@@ -25,16 +25,59 @@ function makeAttrKey(attrName) {
     return 'attr_' + attrName;
 }
 /**
- * Attribute for static geometry
+ * Geometry attribute
+ * @alias qtek.Geometry.Attribute
+ * @constructor
  */
-function Attribute (name, type, size, semantic) {
+function Attribute(name, type, size, semantic) {
+    /**
+     * Attribute name
+     * @type {string}
+     */
     this.name = name;
+    /**
+     * Attribute type
+     * Possible values:
+     *  + `'byte'`
+     *  + `'ubyte'`
+     *  + `'short'`
+     *  + `'ushort'`
+     *  + `'float'` Most commonly used.
+     * @type {string}
+     */
     this.type = type;
+    /**
+     * Size of attribute component. 1 - 4.
+     * @type {number}
+     */
     this.size = size;
-    if (semantic) {
-        this.semantic = semantic;
-    }
+    /**
+     * Semantic of this attribute.
+     * Possible values:
+     *  + `'POSITION'`
+     *  + `'NORMAL'`
+     *  + `'BINORMAL'`
+     *  + `'TANGENT'`
+     *  + `'TEXCOORD'`
+     *  + `'TEXCOORD_0'`
+     *  + `'TEXCOORD_1'`
+     *  + `'COLOR'`
+     *  + `'JOINT'`
+     *  + `'WEIGHT'`
+     * 
+     * In shader, attribute with same semantic will be automatically mapped. For example:
+     * ```glsl
+     * attribute vec3 pos: POSITION
+     * ```
+     * will use the attribute value with semantic POSITION in geometry, no matter what name it used.
+     * @type {string}
+     */
+    this.semantic = semantic || '';
 
+    /**
+     * Value of the attribute.
+     * @type {TypedArray}
+     */
     this.value = null;
 
     // Init getter setter
@@ -126,7 +169,10 @@ function Attribute (name, type, size, semantic) {
             };
     }
 }
-
+/**
+ * Initialize attribute with given vertex count
+ * @param {number} nVertex 
+ */
 Attribute.prototype.init = function (nVertex) {
     if (!this.value || this.value.length != nVertex * this.size) {
         var ArrayConstructor = getArrayCtorByType(this.type);
@@ -134,6 +180,17 @@ Attribute.prototype.init = function (nVertex) {
     }
 };
 
+/**
+ * Initialize attribute with given array. Which can be 1 dimensional or 2 dimensional
+ * @param {Array} array
+ * @example
+ *  geometry.getAttribute('position').fromArray(
+ *      [-1, 0, 0, 1, 0, 0, 0, 1, 0]
+ *  );
+ *  geometry.getAttribute('position').fromArray(
+ *      [ [-1, 0, 0], [1, 0, 0], [0, 1, 0] ]
+ *  );
+ */
 Attribute.prototype.fromArray = function (array) {
     var ArrayConstructor = getArrayCtorByType(this.type);
     var value;
@@ -188,8 +245,20 @@ function IndicesBuffer(buffer) {
  * @extends qtek.core.Base
  */
 var Geometry = Base.extend(function () {
-    /** @lends qtek.Geometry# */
-    return {
+    return /** @lends qtek.Geometry# */ {
+        /**
+         * Attributes of geometry. Including:
+         *  + `position`
+         *  + `texcoord0`
+         *  + `texcoord1`
+         *  + `normal`
+         *  + `tangent`
+         *  + `color`
+         *  + `weight`
+         *  + `joint`
+         *  + `barycentric`
+         * @type {Object}
+         */
         attributes: {
             position: new Attribute('position', 'float', 3, 'POSITION'),
             texcoord0: new Attribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
@@ -208,17 +277,20 @@ var Geometry = Base.extend(function () {
             barycentric: new Attribute('barycentric', 'float', 3, null),
         },
         /**
+         * Calculated bounding box of geometry.
          * @type {qtek.math.BoundingBox}
          */
         boundingBox: null,
 
         /**
+         * Indices of geometry.
          * @type {Uint16Array|Uint32Array}
          */
         indices: null,
 
         /**
-         * Is vertices data dynamically updated
+         * Is vertices data dynamically updated.
+         * Attributes value can't be changed after first render if dyanmic is false.
          * @type {boolean}
          */
         dynamic: true,
@@ -239,23 +311,29 @@ var Geometry = Base.extend(function () {
      */
     mainAttribute: 'position',
     /**
-     * User defined ray picking algorithm instead of default
+     * User defined picking algorithm instead of default
      * triangle ray intersection
      * x, y are NDC.
+     * ```typescript
      * (x, y, renderer, camera, renderable, out) => boolean
-     * @type {Function}
+     * ```
+     * @type {?Function}
+     */
+    pick: null,
+
+    /**
+     * User defined ray picking algorithm instead of default
+     * triangle ray intersection
+     * ```typescript
+     * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
+     * ```
+     * @type {?Function}
      */
     pickByRay: null,
 
     /**
-     * User defined picking algorithm instead of default
-     * triangle ray intersection
-     * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
-     * @type {Function}
+     * Update boundingBox of Geometry
      */
-    pick: null,
-
-
     updateBoundingBox: function () {
         var bbox = this.boundingBox;
         if (!bbox) {
@@ -285,7 +363,9 @@ var Geometry = Base.extend(function () {
             max._dirty = true;
         }
     },
-
+    /**
+     * Mark attributes and indices in geometry needs to update.
+     */
     dirty: function () {
         var enabledAttributes = this.getEnabledAttributes();
         for (var i = 0; i < enabledAttributes.length; i++) {
@@ -294,16 +374,26 @@ var Geometry = Base.extend(function () {
         this.dirtyIndices();
         this._enabledAttributes = null;
     },
-
+    /**
+     * Mark the indices needs to update.
+     */
     dirtyIndices: function () {
         this._cache.dirtyAll('indices');
     },
-
+    /**
+     * Mark the attributes needs to update.
+     * @param {string} [attrName]
+     */
     dirtyAttribute: function (attrName) {
         this._cache.dirtyAll(makeAttrKey(attrName));
         this._cache.dirtyAll('attributes');
     },
-
+    /**
+     * Get indices of triangle at given index.
+     * @param {number} idx
+     * @param {Array.<number>} out
+     * @return {Array.<number>}
+     */
     getTriangleIndices: function (idx, out) {
         if (idx < this.triangleCount && idx >= 0) {
             if (!out) {
@@ -317,6 +407,11 @@ var Geometry = Base.extend(function () {
         }
     },
 
+    /**
+     * Set indices of triangle at given index.
+     * @param {number} idx
+     * @param {Array.<number>} arr
+     */
     setTriangleIndices: function (idx, arr) {
         var indices = this.indices;
         indices[idx * 3] = arr[0];
@@ -328,6 +423,9 @@ var Geometry = Base.extend(function () {
         return !!this.indices;
     },
 
+    /**
+     * Initialize 
+     */
     initIndicesFromArray: function (array) {
         var value;
         var ArrayConstructor = this.vertexCount > 0xffff
@@ -350,7 +448,13 @@ var Geometry = Base.extend(function () {
 
         this.indices = value;
     },
-
+    /**
+     * Create a new attribute
+     * @param {string} name
+     * @param {string} type
+     * @param {number} size
+     * @param {string} [semantic]
+     */
     createAttribute: function (name, type, size, semantic) {
         var attrib = new Attribute(name, type, size, semantic);
         if (this.attributes[name]) {
@@ -360,7 +464,10 @@ var Geometry = Base.extend(function () {
         this._attributeList.push(name);
         return attrib;
     },
-
+    /**
+     * Remove attribute
+     * @param {string} name
+     */
     removeAttribute: function (name) {
         var attributeList = this._attributeList;
         var idx = attributeList.indexOf(name);
@@ -370,6 +477,15 @@ var Geometry = Base.extend(function () {
             return true;
         }
         return false;
+    },
+
+    /**
+     * Get attribute
+     * @param {string} name
+     * @return {qtek.Geometry.Attribute}
+     */
+    getAttribute: function (name) {
+        return this.attribute[name];
     },
 
     /**
@@ -494,6 +610,9 @@ var Geometry = Base.extend(function () {
         }
     },
 
+    /**
+     * Generate normals per vertex.
+     */
     generateVertexNormals: function () {
         if (!this.vertexCount) {
             return;
@@ -562,6 +681,9 @@ var Geometry = Base.extend(function () {
         this.dirty();
     },
 
+    /**
+     * Generate normals per face.
+     */
     generateFaceNormals: function () {
         if (!this.vertexCount) {
             return;
@@ -620,6 +742,9 @@ var Geometry = Base.extend(function () {
         this.dirty();
     },
 
+    /**
+     * Generate tangents attributes.
+     */
     generateTangents: function () {
         if (!this.vertexCount) {
             return;
@@ -733,7 +858,10 @@ var Geometry = Base.extend(function () {
         }
         this.dirty();
     },
-
+    
+    /**
+     * If vertices are not shared by different indices.
+     */
     isUniqueVertex: function () {
         if (this.isUseIndices()) {
             return this.vertexCount === this.indices.length;
@@ -742,7 +870,9 @@ var Geometry = Base.extend(function () {
             return true;
         }
     },
-
+    /**
+     * Create a unique vertex for each index.
+     */
     generateUniqueVertex: function () {
         if (!this.vertexCount || !this.indices) {
             return;
@@ -783,6 +913,9 @@ var Geometry = Base.extend(function () {
         this.dirty();
     },
 
+    /**
+     * Generate barycentric coordinates for wireframe draw.
+     */
     generateBarycentric: function () {
         if (!this.vertexCount) {
             return;
@@ -810,6 +943,10 @@ var Geometry = Base.extend(function () {
         this.dirty();
     },
 
+    /**
+     * Apply transform to geometry attributes.
+     * @param {qtek.math.Matrix4} matrix
+     */
     applyTransform: function (matrix) {
 
         var attributes = this.attributes;
@@ -837,7 +974,10 @@ var Geometry = Base.extend(function () {
             this.updateBoundingBox();
         }
     },
-
+    /**
+     * Dispose geometry data in GL context.
+     * @param {qtek.Renderer} renderer
+     */
     dispose: function (renderer) {
 
         var cache = this._cache;
@@ -860,6 +1000,11 @@ var Geometry = Base.extend(function () {
 });
 
 if (Object.defineProperty) {
+    /**
+     * @name qtek.Geometry#vertexCount
+     * @type {number}
+     * @readOnly
+     */
     Object.defineProperty(Geometry.prototype, 'vertexCount', {
 
         enumerable: false,
@@ -872,6 +1017,11 @@ if (Object.defineProperty) {
             return mainAttribute.value.length / mainAttribute.size;
         }
     });
+    /**
+     * @name qtek.Geometry#triangleCount
+     * @type {number}
+     * @readOnly
+     */
     Object.defineProperty(Geometry.prototype, 'triangleCount', {
 
         enumerable: false,
@@ -894,7 +1044,7 @@ Geometry.STREAM_DRAW = glenum.STREAM_DRAW;
 
 Geometry.AttributeBuffer = AttributeBuffer;
 Geometry.IndicesBuffer = IndicesBuffer;
-Geometry.Attribute = Attribute;
+
 Geometry.Attribute = Attribute;
 
 export default Geometry;
