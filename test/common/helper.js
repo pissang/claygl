@@ -15,6 +15,7 @@ module.exports = {
         canvas.height = size[1];
         const renderer = new qtek.Renderer({
             canvas : canvas,
+            devicePixelRatio: 1,
             //disable antialias to avoid pixel shift on different OS
             antialias : false
         });
