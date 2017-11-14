@@ -1,8 +1,8 @@
 const istanbulAPI = require('istanbul-api');
 const libCoverage = require('istanbul-lib-coverage');
-const Spec = require('mocha/lib/reporters/Base');
+const BaseReporter = require('mocha/lib/reporters/base');
 
-class Istanbul extends Spec {
+class Istanbul extends BaseReporter {
   constructor(runner) {
     super(runner);
     runner.on('fail', (test, err) => {

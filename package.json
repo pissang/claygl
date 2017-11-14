@@ -28,7 +28,7 @@
     "glsl2js": "node build/glsl2js.js",
     "gen:entry": "node build/genentry.js",    
     "gen:fixture": "npm run pretest && electron-mocha --require-main \"./test/genfixture-env.js\" --renderer \"./test/integration/**/*.spec.js\"",
-    "prepublish": "npm test && npm run build",
+    "prepublish": "npm run build",
     "debug": "npm run pretest && electron-mocha --debug-brk --renderer \"./test/**/*.spec.js\"",
     "instrument": "istanbul instrument ./dist/qtek.src.js --output ./dist/qtek.js --no-compact --complete-copy --es-modules",
     "pretest": "npm run build:sourcemap",
