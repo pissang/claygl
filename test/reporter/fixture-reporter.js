@@ -1,9 +1,9 @@
 const { getTestErrors } = require('../common/util');
-const Spec = require('mocha/lib/reporters/Base');
+const BaseReporter = require('mocha/lib/reporters/base');
 const fs = require('fs');
 const path = require('path');
 
-class FixtureReporter extends Spec {
+class FixtureReporter extends BaseReporter {
   constructor(runner) {
     super(runner);    
     const failedTitles = [];

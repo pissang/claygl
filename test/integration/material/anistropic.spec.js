@@ -10,6 +10,7 @@ describe('Integration.Anistropic.Spec', function () {
         });
         if (!renderer.getGLExtension('EXT_texture_filter_anisotropic')) {
             done();
+            return;
         }
         camera.lookAt(new qtek.math.Vector3(0, 1, 0));
         camera.far = 500;
