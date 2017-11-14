@@ -34,10 +34,11 @@ function generateReport(failedTitles, errors) {
     });
     let tmpl = fs.readFileSync(path.join(__dirname, 'fixture-tmpl.html')).toString();
     tmpl = tmpl.replace('{{content}}', content);
+    const cwd = process.cwd();
     try {
-        fs.mkdirSync(path.join(process.cwd(), 'coverage'));
+        fs.mkdirSync(path.join(cwd, 'coverage'));
     } catch (err) {}
-    const reportPath = path.join(process.cwd(), 'coverage', 'fixture-report.html');
+    const reportPath = path.join(cwd, 'coverage', 'fixture-report.html');
     fs.writeFileSync(reportPath, tmpl);
     return reportPath;
 }
