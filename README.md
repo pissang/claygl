@@ -1,5 +1,7 @@
 # QTEK
 
+[![NPM Version](https://img.shields.io/npm/v/qtek.svg)](https://github.com/pissang/qtek) [![Circle CI](https://circleci.com/gh/pissang/qtek.svg?style=shield)](https://circleci.com/gh/pissang/qtek)
+
 QTEK is a WebGL graphic library.
 
 ### [Download](https://github.com/pissang/qtek/releases)
