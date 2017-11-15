@@ -17,6 +17,11 @@ attribute vec3 normal : NORMAL;
 
 attribute vec3 barycentric;
 
+#ifdef VERTEX_COLOR
+attribute vec4 a_Color : COLOR;
+varying vec4 v_Color;
+#endif
+
 @import qtek.chunk.skinning_header
 
 varying vec2 v_Texcoord;
@@ -46,6 +51,10 @@ void main()
     v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;
 
     v_Barycentric = barycentric;
+
+#ifdef VERTEX_COLOR
+    v_Color = a_Color;
+#endif
 }
 
 @end
@@ -72,6 +81,10 @@ uniform float alphaCutoff: 0.9;
 uniform float lineWidth : 0.0;
 uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
 varying vec3 v_Barycentric;
+
+#ifdef VERTEX_COLOR
+varying vec4 v_Color;
+#endif
 
 #ifdef AMBIENT_LIGHT_COUNT
 @import qtek.header.ambient_light
@@ -110,6 +123,10 @@ void main()
 #endif
 
     gl_FragColor = vec4(color, alpha);
+
+#ifdef VERTEX_COLOR
+    gl_FragColor *= v_Color;
+#endif
 
 #ifdef DIFFUSEMAP_ENABLED
     vec4 tex = texture2D( diffuseMap, v_Texcoord );

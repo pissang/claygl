@@ -23,7 +23,8 @@ attribute vec3 normal : NORMAL;
 attribute vec4 tangent : TANGENT;
 
 #ifdef VERTEX_COLOR
-attribute vec4 color : COLOR;
+attribute vec4 a_Color : COLOR;
+varying vec4 v_Color;
 #endif
 
 attribute vec3 barycentric;
@@ -38,10 +39,6 @@ varying vec3 v_Barycentric;
 #if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
-#endif
-
-#ifdef VERTEX_COLOR
-varying vec4 v_Color;
 #endif
 
 #if defined(AOMAP_ENABLED)
@@ -78,7 +75,7 @@ void main()
 #endif
 
 #ifdef VERTEX_COLOR
-    v_Color = color;
+    v_Color = a_Color;
 #endif
 
 #if defined(AOMAP_ENABLED)
@@ -102,6 +99,10 @@ uniform mat4 viewInverse : VIEWINVERSE;
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
+
+#ifdef VERTEX_COLOR
+varying vec4 v_Color;
+#endif
 
 #if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
 varying vec3 v_Tangent;
@@ -306,10 +307,14 @@ vec2 parallaxUv(vec2 uv, vec3 viewDir)
 }
 #endif
 
-void main()
-{
-    // TODO If sRGB decode color?
+void main() {
+    
     vec4 albedoColor = vec4(color, alpha);
+
+#ifdef VERTEX_COLOR
+    albedoColor *= v_Color;
+#endif
+
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
 

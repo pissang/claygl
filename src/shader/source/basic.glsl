@@ -15,6 +15,11 @@ attribute vec3 barycentric;
 varying vec2 v_Texcoord;
 varying vec3 v_Barycentric;
 
+#ifdef VERTEX_COLOR
+attribute vec4 a_Color : COLOR;
+varying vec4 v_Color;
+#endif
+
 void main()
 {
     vec3 skinnedPosition = position;
@@ -29,6 +34,10 @@ void main()
     v_Barycentric = barycentric;
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
+#ifdef VERTEX_COLOR
+    v_Color = a_Color;
+#endif
 }
 
 @end
@@ -47,6 +56,10 @@ uniform float alpha : 1.0;
 
 #ifdef ALPHA_TEST
 uniform float alphaCutoff: 0.9;
+#endif
+
+#ifdef VERTEX_COLOR
+varying vec4 v_Color;
 #endif
 
 // Uniforms for wireframe
@@ -69,6 +82,10 @@ void main()
 #endif
 
     gl_FragColor = vec4(color, alpha);
+
+#ifdef VERTEX_COLOR
+    gl_FragColor *= v_Color;
+#endif
 
 #ifdef DIFFUSEMAP_ENABLED
     vec4 tex = decodeHDR(texture2D(diffuseMap, v_Texcoord));

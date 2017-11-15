@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/qtek.js"></script>
+    <title>Triangle</title>
+</head>
+<body>
+    <canvas id="main"></canvas>
+    
+    <script>
+    var TRIANGLE_POSITIONS = [
+        [-0.5, -0.5, 0],
+        [0.5, -0.5, 0],
+        [0, 0.5, 0]
+    ];
+    var VERTEX_COLORS = [
+        [1, 0, 0, 1],
+        [0, 1, 0, 1],
+        [0, 0, 1, 1]
+    ];
+
+    var renderer = new qtek.Renderer({
+        canvas: document.getElementById("main")
+    });
+    renderer.resize(400, 400);
+    var scene = new qtek.Scene();
+    var camera = new qtek.camera.Orthographic();
+    var geometry = new qtek.StaticGeometry();
+    
+    // Add triangle vertices to position attribute.
+    geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
+    geometry.attributes.color.fromArray(VERTEX_COLORS);
+    
+    var mesh = new qtek.Mesh({
+        geometry: geometry,
+        material: new qtek.Material({
+            shader: qtek.shader.library.get('qtek.basic')
+        })
+    });
+    mesh.material.shader.define('both', 'VERTEX_COLOR');
+    mesh.material.set('color', [1, 1, 1]);
+    scene.add(mesh);
+
+    renderer.render(scene, camera);
+    </script>
+</body>
+</html>
