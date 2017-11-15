@@ -12,16 +12,23 @@ QTEK is a WebGL graphic library.
 
 ### Feature Projects
 
-[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
+[ECharts GL](https://github.com/ecomfe/echarts-gl)
 
-<a href="https://github.com/pissang/qtek-bootcamp" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/dota2hero-2.jpg" width="500"></img>
+<a href="https://github.com/ecomfe/echarts-gl" target="_blank">
+<img src="./screenshot/echarts-gl.jpg" width="600"></img>
 </a>
 
-[Bootcamp](https://github.com/pissang/qtek-bootcamp/)
+[QTEK Model Viewer](https://github.com/pissang/qtek-model-viewer)
 
-<a href="https://github.com/pissang/qtek-bootcamp/" target="_blank">
-<img src="http://pictures-shenyi.qiniudn.com/bootcamp-1.jpg" width="500"></img>
+<a href="https://github.com/pissang/qtek-model-viewer" target="_blank">
+<img src="./screenshot/qtek-model-viewer.jpg" width="600"></img>
+</a>
+
+
+[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
+
+<a href="https://github.com/pissang/dota2hero" target="_blank">
+<img src="./screenshot/dota2hero.jpg" width="600"></img>
 </a>
 
 [Worldcup 2014 Intro Movie](https://github.com/pissang/worldcup-intro)
@@ -31,10 +38,14 @@ QTEK is a WebGL graphic library.
 </a>
 
 
+
 ### Quick Examples
+
++ [Basic triangle](http://pissang.github.io/qtek/tests/triangle.html)
 + [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/tests/cubes.html)
 + [Cube animation](http://pissang.github.io/qtek/tests/cubeanim.html)
 + [A simple glTF scene](http://pissang.github.io/qtek/tests/gltf.html)
++ [glTF PBR Model](http://pissang.github.io/qtek/tests/gltf2.html)
 + [Skinning](http://pissang.github.io/qtek/tests/skinning.html)
 + [Particle effects](http://pissang.github.io/qtek/tests/particle.html)
 + [Shadowmap](http://pissang.github.io/qtek/tests/shadowmap.html)
@@ -48,8 +59,6 @@ QTEK is a WebGL graphic library.
 + [Standard Material](http://pissang.github.io/qtek/tests/standard_material.html)
 + [Post processing - Depth of field](http://pissang.github.io/qtek/tests/dof.html)
 + [Post processing - Bloom](http://pissang.github.io/qtek/tests/tron.html)
-+ [Post Processing - SSR](http://pissang.github.io/qtek/tests/ssr3.html)
-+ [Post Processing - Alchemy AO](http://pissang.github.io/qtek/tests/alchemyao.html)
 + [GBuffer preview](http://pissang.github.io/qtek/tests/gbuffer.html)
 + [Deferred rendering](http://pissang.github.io/qtek/tests/deferred.html)
 + [Deferred cascade light shadow](http://pissang.github.io/qtek/tests/deferred_shadow3.html)
@@ -118,7 +127,13 @@ optional arguments:
   -b, --beautify        Beautify json output.
 ```
 
-Support:
+Input:
+
++ FBX
++ COLLADA
++ OBJ
+
+Output:
 
 + Scene hierarchy
 + Mesh, camera

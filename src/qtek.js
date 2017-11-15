@@ -42,94 +42,92 @@ import TextureNode$22 from './compositor/TextureNode';
 import TexturePool$23 from './compositor/TexturePool';
 import Base$24 from './core/Base';
 import Cache$25 from './core/Cache';
-import Event$26 from './core/Event';
-import glenum$27 from './core/glenum';
-import GLInfo$28 from './core/GLInfo';
-import LinkedList$29 from './core/LinkedList';
-import LRU$30 from './core/LRU';
-import extend$31 from './core/mixin/extend';
-import notifier$32 from './core/mixin/notifier';
-import request$33 from './core/request';
-import util$34 from './core/util';
-import vendor$35 from './core/vendor';
-import GBuffer$36 from './deferred/GBuffer';
-import Renderer$37 from './deferred/Renderer';
-import glmatrix$38 from './dep/glmatrix';
-import FrameBuffer$39 from './FrameBuffer';
-import Geometry$40 from './Geometry';
-import Cone$41 from './geometry/Cone';
-import Cube$42 from './geometry/Cube';
-import Cylinder$43 from './geometry/Cylinder';
-import Plane$44 from './geometry/Plane';
-import Sphere$45 from './geometry/Sphere';
-import Joint$46 from './Joint';
-import Light$47 from './Light';
-import Ambient$48 from './light/Ambient';
-import AmbientCubemap$49 from './light/AmbientCubemap';
-import AmbientSH$50 from './light/AmbientSH';
-import Directional$51 from './light/Directional';
-import Point$52 from './light/Point';
-import Sphere$53 from './light/Sphere';
-import Spot$54 from './light/Spot';
-import Tube$55 from './light/Tube';
-import FX$56 from './loader/FX';
-import GLTF$57 from './loader/GLTF';
-import Material$58 from './Material';
-import BoundingBox$59 from './math/BoundingBox';
-import Frustum$60 from './math/Frustum';
-import Matrix2$61 from './math/Matrix2';
-import Matrix2d$62 from './math/Matrix2d';
-import Matrix3$63 from './math/Matrix3';
-import Matrix4$64 from './math/Matrix4';
-import Plane$65 from './math/Plane';
-import Quaternion$66 from './math/Quaternion';
-import Ray$67 from './math/Ray';
-import util$68 from './math/util';
-import Value$69 from './math/Value';
-import Vector2$70 from './math/Vector2';
-import Vector3$71 from './math/Vector3';
-import Vector4$72 from './math/Vector4';
-import Mesh$73 from './Mesh';
-import Node$74 from './Node';
-import Emitter$75 from './particle/Emitter';
-import Field$76 from './particle/Field';
-import ForceField$77 from './particle/ForceField';
-import Particle$78 from './particle/Particle';
-import ParticleRenderable$79 from './particle/ParticleRenderable';
-import PixelPicking$80 from './picking/PixelPicking';
-import RayPicking$81 from './picking/RayPicking';
-import FirstPersonControl$82 from './plugin/FirstPersonControl';
-import GestureMgr$83 from './plugin/GestureMgr';
-import InfinitePlane$84 from './plugin/InfinitePlane';
-import OrbitControl$85 from './plugin/OrbitControl';
-import Skybox$86 from './plugin/Skybox';
-import Skydome$87 from './plugin/Skydome';
-import EnvironmentMap$88 from './prePass/EnvironmentMap';
-import Reflection$89 from './prePass/Reflection';
-import ShadowMap$90 from './prePass/ShadowMap';
-import Renderable$91 from './Renderable';
-import Renderer$92 from './Renderer';
-import Scene$93 from './Scene';
-import Shader$94 from './Shader';
-import library$95 from './shader/library';
-import light$96 from './shader/source/header/light';
-import Skeleton$97 from './Skeleton';
-import StandardMaterial$98 from './StandardMaterial';
-import StaticGeometry$99 from './StaticGeometry';
-import Texture$100 from './Texture';
-import Texture2D$101 from './Texture2D';
-import TextureCube$102 from './TextureCube';
-import cubemap$103 from './util/cubemap';
-import dds$104 from './util/dds';
-import delaunay$105 from './util/delaunay';
-import earClipping$106 from './util/earClipping';
-import hdr$107 from './util/hdr';
-import mesh$108 from './util/mesh';
-import sh$109 from './util/sh';
-import texture$110 from './util/texture';
-import version$111 from './version';
-import CardboardDistorter$112 from './vr/CardboardDistorter';
-import StereoCamera$113 from './vr/StereoCamera';
+import glenum$26 from './core/glenum';
+import GLInfo$27 from './core/GLInfo';
+import LinkedList$28 from './core/LinkedList';
+import LRU$29 from './core/LRU';
+import extend$30 from './core/mixin/extend';
+import notifier$31 from './core/mixin/notifier';
+import request$32 from './core/request';
+import util$33 from './core/util';
+import vendor$34 from './core/vendor';
+import GBuffer$35 from './deferred/GBuffer';
+import Renderer$36 from './deferred/Renderer';
+import glmatrix$37 from './dep/glmatrix';
+import FrameBuffer$38 from './FrameBuffer';
+import Geometry$39 from './Geometry';
+import Cone$40 from './geometry/Cone';
+import Cube$41 from './geometry/Cube';
+import Cylinder$42 from './geometry/Cylinder';
+import Plane$43 from './geometry/Plane';
+import Sphere$44 from './geometry/Sphere';
+import Joint$45 from './Joint';
+import Light$46 from './Light';
+import Ambient$47 from './light/Ambient';
+import AmbientCubemap$48 from './light/AmbientCubemap';
+import AmbientSH$49 from './light/AmbientSH';
+import Directional$50 from './light/Directional';
+import Point$51 from './light/Point';
+import Sphere$52 from './light/Sphere';
+import Spot$53 from './light/Spot';
+import Tube$54 from './light/Tube';
+import FX$55 from './loader/FX';
+import GLTF$56 from './loader/GLTF';
+import Material$57 from './Material';
+import BoundingBox$58 from './math/BoundingBox';
+import Frustum$59 from './math/Frustum';
+import Matrix2$60 from './math/Matrix2';
+import Matrix2d$61 from './math/Matrix2d';
+import Matrix3$62 from './math/Matrix3';
+import Matrix4$63 from './math/Matrix4';
+import Plane$64 from './math/Plane';
+import Quaternion$65 from './math/Quaternion';
+import Ray$66 from './math/Ray';
+import util$67 from './math/util';
+import Value$68 from './math/Value';
+import Vector2$69 from './math/Vector2';
+import Vector3$70 from './math/Vector3';
+import Vector4$71 from './math/Vector4';
+import Mesh$72 from './Mesh';
+import Node$73 from './Node';
+import Emitter$74 from './particle/Emitter';
+import Field$75 from './particle/Field';
+import ForceField$76 from './particle/ForceField';
+import Particle$77 from './particle/Particle';
+import ParticleRenderable$78 from './particle/ParticleRenderable';
+import PixelPicking$79 from './picking/PixelPicking';
+import RayPicking$80 from './picking/RayPicking';
+import FirstPersonControl$81 from './plugin/FirstPersonControl';
+import GestureMgr$82 from './plugin/GestureMgr';
+import InfinitePlane$83 from './plugin/InfinitePlane';
+import OrbitControl$84 from './plugin/OrbitControl';
+import Skybox$85 from './plugin/Skybox';
+import Skydome$86 from './plugin/Skydome';
+import EnvironmentMap$87 from './prePass/EnvironmentMap';
+import Reflection$88 from './prePass/Reflection';
+import ShadowMap$89 from './prePass/ShadowMap';
+import Renderable$90 from './Renderable';
+import Renderer$91 from './Renderer';
+import Scene$92 from './Scene';
+import Shader$93 from './Shader';
+import library$94 from './shader/library';
+import light$95 from './shader/source/header/light';
+import Skeleton$96 from './Skeleton';
+import StandardMaterial$97 from './StandardMaterial';
+import StaticGeometry$98 from './StaticGeometry';
+import Texture$99 from './Texture';
+import Texture2D$100 from './Texture2D';
+import TextureCube$101 from './TextureCube';
+import cubemap$102 from './util/cubemap';
+import dds$103 from './util/dds';
+import delaunay$104 from './util/delaunay';
+import hdr$105 from './util/hdr';
+import mesh$106 from './util/mesh';
+import sh$107 from './util/sh';
+import texture$108 from './util/texture';
+import version$109 from './version';
+import CardboardDistorter$110 from './vr/CardboardDistorter';
+import StereoCamera$111 from './vr/StereoCamera';
 
 
 var animation = {
@@ -184,165 +182,163 @@ export { compositor };
 var core = {
     Base : Base$24,
     Cache : Cache$25,
-    Event : Event$26,
-    glenum : glenum$27,
-    GLInfo : GLInfo$28,
-    LinkedList : LinkedList$29,
-    LRU : LRU$30,
+    glenum : glenum$26,
+    GLInfo : GLInfo$27,
+    LinkedList : LinkedList$28,
+    LRU : LRU$29,
     mixin : {
-        extend : extend$31,
-        notifier : notifier$32
+        extend : extend$30,
+        notifier : notifier$31
     },
-    request : request$33,
-    util : util$34,
-    vendor : vendor$35
+    request : request$32,
+    util : util$33,
+    vendor : vendor$34
 };
 export { core };
 
 
 var deferred = {
-    GBuffer : GBuffer$36,
-    Renderer : Renderer$37
+    GBuffer : GBuffer$35,
+    Renderer : Renderer$36
 };
 export { deferred };
 
 
 var dep = {
-    glmatrix : glmatrix$38
+    glmatrix : glmatrix$37
 };
 export { dep };
 
-export { FrameBuffer$39 as FrameBuffer };
-export { Geometry$40 as Geometry };
+export { FrameBuffer$38 as FrameBuffer };
+export { Geometry$39 as Geometry };
 
 var geometry = {
-    Cone : Cone$41,
-    Cube : Cube$42,
-    Cylinder : Cylinder$43,
-    Plane : Plane$44,
-    Sphere : Sphere$45
+    Cone : Cone$40,
+    Cube : Cube$41,
+    Cylinder : Cylinder$42,
+    Plane : Plane$43,
+    Sphere : Sphere$44
 };
 export { geometry };
 
-export { Joint$46 as Joint };
-export { Light$47 as Light };
+export { Joint$45 as Joint };
+export { Light$46 as Light };
 
 var light = {
-    Ambient : Ambient$48,
-    AmbientCubemap : AmbientCubemap$49,
-    AmbientSH : AmbientSH$50,
-    Directional : Directional$51,
-    Point : Point$52,
-    Sphere : Sphere$53,
-    Spot : Spot$54,
-    Tube : Tube$55
+    Ambient : Ambient$47,
+    AmbientCubemap : AmbientCubemap$48,
+    AmbientSH : AmbientSH$49,
+    Directional : Directional$50,
+    Point : Point$51,
+    Sphere : Sphere$52,
+    Spot : Spot$53,
+    Tube : Tube$54
 };
 export { light };
 
 
 var loader = {
-    FX : FX$56,
-    GLTF : GLTF$57
+    FX : FX$55,
+    GLTF : GLTF$56
 };
 export { loader };
 
-export { Material$58 as Material };
+export { Material$57 as Material };
 
 var math = {
-    BoundingBox : BoundingBox$59,
-    Frustum : Frustum$60,
-    Matrix2 : Matrix2$61,
-    Matrix2d : Matrix2d$62,
-    Matrix3 : Matrix3$63,
-    Matrix4 : Matrix4$64,
-    Plane : Plane$65,
-    Quaternion : Quaternion$66,
-    Ray : Ray$67,
-    util : util$68,
-    Value : Value$69,
-    Vector2 : Vector2$70,
-    Vector3 : Vector3$71,
-    Vector4 : Vector4$72
+    BoundingBox : BoundingBox$58,
+    Frustum : Frustum$59,
+    Matrix2 : Matrix2$60,
+    Matrix2d : Matrix2d$61,
+    Matrix3 : Matrix3$62,
+    Matrix4 : Matrix4$63,
+    Plane : Plane$64,
+    Quaternion : Quaternion$65,
+    Ray : Ray$66,
+    util : util$67,
+    Value : Value$68,
+    Vector2 : Vector2$69,
+    Vector3 : Vector3$70,
+    Vector4 : Vector4$71
 };
 export { math };
 
-export { Mesh$73 as Mesh };
-export { Node$74 as Node };
+export { Mesh$72 as Mesh };
+export { Node$73 as Node };
 
 var particle = {
-    Emitter : Emitter$75,
-    Field : Field$76,
-    ForceField : ForceField$77,
-    Particle : Particle$78,
-    ParticleRenderable : ParticleRenderable$79
+    Emitter : Emitter$74,
+    Field : Field$75,
+    ForceField : ForceField$76,
+    Particle : Particle$77,
+    ParticleRenderable : ParticleRenderable$78
 };
 export { particle };
 
 
 var picking = {
-    PixelPicking : PixelPicking$80,
-    RayPicking : RayPicking$81
+    PixelPicking : PixelPicking$79,
+    RayPicking : RayPicking$80
 };
 export { picking };
 
 
 var plugin = {
-    FirstPersonControl : FirstPersonControl$82,
-    GestureMgr : GestureMgr$83,
-    InfinitePlane : InfinitePlane$84,
-    OrbitControl : OrbitControl$85,
-    Skybox : Skybox$86,
-    Skydome : Skydome$87
+    FirstPersonControl : FirstPersonControl$81,
+    GestureMgr : GestureMgr$82,
+    InfinitePlane : InfinitePlane$83,
+    OrbitControl : OrbitControl$84,
+    Skybox : Skybox$85,
+    Skydome : Skydome$86
 };
 export { plugin };
 
 
 var prePass = {
-    EnvironmentMap : EnvironmentMap$88,
-    Reflection : Reflection$89,
-    ShadowMap : ShadowMap$90
+    EnvironmentMap : EnvironmentMap$87,
+    Reflection : Reflection$88,
+    ShadowMap : ShadowMap$89
 };
 export { prePass };
 
-export { Renderable$91 as Renderable };
-export { Renderer$92 as Renderer };
-export { Scene$93 as Scene };
-export { Shader$94 as Shader };
+export { Renderable$90 as Renderable };
+export { Renderer$91 as Renderer };
+export { Scene$92 as Scene };
+export { Shader$93 as Shader };
 
 var shader = {
-    library : library$95,
+    library : library$94,
     source : {
     header : {
-        light : light$96
+        light : light$95
     }
     }
 };
 export { shader };
 
-export { Skeleton$97 as Skeleton };
-export { StandardMaterial$98 as StandardMaterial };
-export { StaticGeometry$99 as StaticGeometry };
-export { Texture$100 as Texture };
-export { Texture2D$101 as Texture2D };
-export { TextureCube$102 as TextureCube };
+export { Skeleton$96 as Skeleton };
+export { StandardMaterial$97 as StandardMaterial };
+export { StaticGeometry$98 as StaticGeometry };
+export { Texture$99 as Texture };
+export { Texture2D$100 as Texture2D };
+export { TextureCube$101 as TextureCube };
 
 var util = {
-    cubemap : cubemap$103,
-    dds : dds$104,
-    delaunay : delaunay$105,
-    earClipping : earClipping$106,
-    hdr : hdr$107,
-    mesh : mesh$108,
-    sh : sh$109,
-    texture : texture$110
+    cubemap : cubemap$102,
+    dds : dds$103,
+    delaunay : delaunay$104,
+    hdr : hdr$105,
+    mesh : mesh$106,
+    sh : sh$107,
+    texture : texture$108
 };
 export { util };
 
-export { version$111 as version };
+export { version$109 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$112,
-    StereoCamera : StereoCamera$113
+    CardboardDistorter : CardboardDistorter$110,
+    StereoCamera : StereoCamera$111
 };
 export { vr };
 ;
