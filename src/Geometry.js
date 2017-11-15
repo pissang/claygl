@@ -445,7 +445,8 @@ var Geometry = Base.extend(function () {
     },
 
     /**
-     * Initialize 
+     * Initialize indices from an array.
+     * @param {Array} array 
      */
     initIndicesFromArray: function (array) {
         var value;

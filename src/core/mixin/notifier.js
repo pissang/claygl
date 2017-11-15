@@ -151,7 +151,7 @@ var notifier = {
     },
 
     /**
-     * Alias of on('success')
+     * Remove event listener
      * @param  {Function} action
      * @param  {Object} [context]
      * @chainable
