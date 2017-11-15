@@ -63,6 +63,14 @@ function quatSlerp(out, a, b, t, oa, ob) {
     return out;
 }
 
+/**
+ * SamplerTrack manages `position`, `rotation`, `scale` tracks in animation of single scene node.
+ * @constructor
+ * @alias qtek.animation.SamplerTrack
+ * @param {Object} [opts]
+ * @param {string} [opts.name] Track name
+ * @param {qtek.Node} [opts.target] Target node's transform will updated automatically
+ */
 var SamplerTrack = function (opts) {
     opts = opts || {};
 
@@ -173,6 +181,9 @@ SamplerTrack.prototype.setTime = function (time) {
     this.updateTarget();
 };
 
+/**
+ * Update transform of target node manually
+ */
 SamplerTrack.prototype.updateTarget = function () {
     var channels = this.channels;
     if (this.target) {

@@ -3,6 +3,8 @@ import Light from '../Light';
 import cubemapUtil from '../util/cubemap';
 
 /**
+ * Ambient cubemap light provides specular parts of Image Based Lighting.
+ * Which is a basic requirement for Physically Based Rendering
  * @constructor qtek.light.AmbientCubemap
  * @extends qtek.Light
  */
@@ -25,6 +27,11 @@ var AmbientCubemapLight = Light.extend({
 
     type: 'AMBIENT_CUBEMAP_LIGHT',
 
+    /**
+     * Do prefitering the cubemap
+     * @param {qtek.Renderer} renderer
+     * @param {number} [size=32]
+     */
     prefilter: function (renderer, size) {
         if (!this._brdfLookup) {
             this._normalDistribution = cubemapUtil.generateNormalDistribution();

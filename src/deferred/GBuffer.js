@@ -184,6 +184,16 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
     };
 }
 
+/**
+ * GBuffer is provided for deferred rendering and SSAO, SSR pass.
+ * It will do two passes rendering to three target textures. See
+ * + {@link qtek.deferred.GBuffer#getTargetTexture1}
+ * + {@link qtek.deferred.GBuffer#getTargetTexture2}
+ * + {@link qtek.deferred.GBuffer#getTargetTexture3}
+ * @constructor
+ * @alias qtek.deferred.GBuffer
+ * @extends qtek.core.Base
+ */
 var GBuffer = Base.extend(function () {
 
     return {
@@ -247,8 +257,13 @@ var GBuffer = Base.extend(function () {
             fragment: Shader.source('qtek.deferred.gbuffer.debug')
         })
     };
-}, {
+}, /** @lends qtek.deferred.GBuffer# */{
 
+    /**
+     * Set G Buffer size.
+     * @param {number} width
+     * @param {number} height
+     */
     resize: function (width, height) {
         if (this._gBufferTex1.width === width
             && this._gBufferTex1.height === height
@@ -295,6 +310,12 @@ var GBuffer = Base.extend(function () {
         }
     },
 
+    /**
+     * Update G Buffer
+     * @param {qtek.Renderer} renderer
+     * @param {qtek.Scene} scene
+     * @param {qtek.camera.Perspective} camera
+     */
     update: function (renderer, scene, camera) {
 
         var gl = renderer.gl;
@@ -456,14 +477,38 @@ var GBuffer = Base.extend(function () {
         renderer.restoreClear();
     },
 
+    /**
+     * Get first target texture.
+     * Channel storage:
+     * + R: normal.x * 0.5 + 0.5
+     * + G: normal.y * 0.5 + 0.5
+     * + B: normal.z * 0.5 + 0.5
+     * + A: glossiness
+     * @return {qtek.Texture2D}
+     */
     getTargetTexture1: function () {
         return this._gBufferTex1;
     },
 
+    /**
+     * Get second target texture.
+     * Channel storage:
+     * + R: depth
+     * @return {qtek.Texture2D}
+     */
     getTargetTexture2: function () {
         return this._gBufferTex2;
     },
 
+    /**
+     * Get third target texture.
+     * Channel storage:
+     * + R: albedo.r
+     * + G: albedo.g
+     * + B: albedo.b
+     * + A: metalness
+     * @return {qtek.Texture2D}
+     */
     getTargetTexture3: function () {
         return this._gBufferTex3;
     },
@@ -547,6 +592,10 @@ var GBuffer = Base.extend(function () {
         }
     },
 
+
+    /**
+     * @param  {qtek.Renderer} renderer
+     */
     dispose: function (renderer) {
         for (var name in this._gBufferMaterials) {
             var matObj = this._gBufferMaterials[name];

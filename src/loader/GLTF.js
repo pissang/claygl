@@ -228,6 +228,7 @@ function () {
     /**
      * Parse glTF binary
      * @param {ArrayBuffer} buffer
+     * @return {qtek.loader.GLTF.IResult}
      */
     parseBinary: function (buffer) {
         var header = new Uint32Array(buffer, 0, 4);
@@ -281,7 +282,7 @@ function () {
 
     /**
      * @param {Object} json
-     * @param {Array.<ArrayBuffer>} [buffer]
+     * @param {ArrayBuffer[]} [buffer]
      * @return {qtek.loader.GLTF.IResult}
      */
     parse: function (json, buffers) {

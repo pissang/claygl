@@ -47,6 +47,12 @@ Shader.import(prezEssl);
 
 var errorShader = {};
 
+/**
+ * Deferred renderer
+ * @constructor
+ * @alias qtek.deferred.Renderer
+ * @extends qtek.core.Base
+ */
 var DeferredRenderer = Base.extend(function () {
 
     var fullQuadVertex = Shader.source('qtek.compositor.vertex');
@@ -103,10 +109,17 @@ var DeferredRenderer = Base.extend(function () {
     mat.identity().rotateZ(Math.PI / 2);
     cylinderGeo.applyTransform(mat);
 
-    return {
+    return /** @lends qtek.deferred.Renderer# */ {
 
+        /**
+         * Provide ShadowMapPass for shadow rendering.
+         * @type {qtek.prePass.ShadowMap}
+         */
         shadowMapPass: null,
-
+        /**
+         * If enable auto resizing from given defualt renderer size.
+         * @type {boolean}
+         */
         autoResize: true,
 
         _createLightPassMat: createLightPassMat,
@@ -167,13 +180,14 @@ var DeferredRenderer = Base.extend(function () {
     };
 }, {
     /**
+     * Do render
      * @param {qtek.Renderer} renderer
      * @param {qtek.Scene} scene
      * @param {qtek.Camera} camera
      * @param {Object} [opts]
-     * @param {boolean} [opts.renderToTarget = false]
-     * @param {boolean} [opts.notUpdateShadow = true]
-     * @param {boolean} [opts.notUpdateScene = true]
+     * @param {boolean} [opts.renderToTarget = false] If not ouput and render to the target texture
+     * @param {boolean} [opts.notUpdateShadow = true] If not update the shadow.
+     * @param {boolean} [opts.notUpdateScene = true] If not update the scene.
      */
     render: function (renderer, scene, camera, opts) {
 
@@ -224,6 +238,9 @@ var DeferredRenderer = Base.extend(function () {
         return this._lightAccumFrameBuffer;
     },
 
+    /**
+     * @return {qtek.deferred.GBuffer}
+     */
     getGBuffer: function () {
         return this._gBuffer;
     },
@@ -237,7 +254,12 @@ var DeferredRenderer = Base.extend(function () {
     // getFullQuadLightPass: function () {
     //     return this._fullQuadPass;
     // },
-
+    
+    /**
+     * Set renderer size.
+     * @param {number} width
+     * @param {number} height
+     */
     resize: function (width, height) {
         this._lightAccumTex.width = width;
         this._lightAccumTex.height = height;
@@ -691,7 +713,7 @@ var DeferredRenderer = Base.extend(function () {
 
 
     /**
-     * @param  {qtek.Renderer} [renderer]
+     * @param  {qtek.Renderer} renderer
      */
     dispose: function (renderer) {
         this._gBuffer.dispose(renderer);

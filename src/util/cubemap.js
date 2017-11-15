@@ -22,14 +22,15 @@ var cubemapUtil = {};
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
+ * @name qtek.util.cubemap.prefilterEnvironmentMap
  * @param  {qtek.Renderer} renderer
  * @param  {qtek.Texture} envMap
  * @param  {Object} [textureOpts]
- * @param  {number} [textureOpts.width]
- * @param  {number} [textureOpts.height]
+ * @param  {number} [textureOpts.width=64]
+ * @param  {number} [textureOpts.height=64]
  * @param  {number} [textureOpts.type]
- * @param  {boolean} [textureOpts.encodeRGBM]
- * @param  {boolean} [textureOpts.decodeRGBM]
+ * @param  {boolean} [textureOpts.encodeRGBM=false]
+ * @param  {boolean} [textureOpts.decodeRGBM=false]
  * @param  {qtek.Texture2D} [normalDistribution]
  * @param  {qtek.Texture2D} [brdfLookup]
  */

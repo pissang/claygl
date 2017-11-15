@@ -2,7 +2,6 @@
  * @export{Object} library
  */
 import Shader from '../Shader';
-import util from '../core/util';
 
 var _library = {};
 
@@ -31,9 +30,9 @@ function ShaderLibrary () {
  * @return {qtek.Shader}
  *
  * @example
- *     qtek.shader.library.get('qtek.phong', 'diffuseMap', 'normalMap');
- *     qtek.shader.library.get('qtek.phong', ['diffuseMap', 'normalMap']);
- *     qtek.shader.library.get('qtek.phong', {
+ *     qtek.shader.library.get('qtek.standard', 'diffuseMap', 'normalMap');
+ *     qtek.shader.library.get('qtek.standard', ['diffuseMap', 'normalMap']);
+ *     qtek.shader.library.get('qtek.standard', {
  *         textures: ['diffuseMap'],
  *         vertexDefines: {},
  *         fragmentDefines: {}
@@ -134,7 +133,13 @@ function template(name, vertex, fragment) {
 
 var defaultLibrary = new ShaderLibrary();
 
+/**
+ * @alias qtek.shader.library
+ */
 export default {
+    /**
+     * Create a new shader library.
+     */
     createLibrary: function () {
         return new ShaderLibrary();
     },

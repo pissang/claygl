@@ -126,19 +126,19 @@ var SHADER_STATE_KEEP_ENABLE = 2;
 var SHADER_STATE_PENDING = 3;
 
 /**
- * @constructor qtek.Shader
+ * @constructor
  * @extends qtek.core.Base
- *
+ * @alias qtek.Shader
  * @example
- *     // Create a phong shader
- *     var shader = new qtek.Shader({
- *         vertex: qtek.Shader.source('qtek.phong.vertex'),
- *         fragment: qtek.Shader.source('qtek.phong.fragment')
- *     });
- *     // Enable diffuse texture
- *     shader.enableTexture('diffuseMap');
- *     // Use alpha channel in diffuse texture
- *     shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
+ * // Create a phong shader
+ * var shader = new qtek.Shader({
+ *     vertex: qtek.Shader.source('qtek.phong.vertex'),
+ *     fragment: qtek.Shader.source('qtek.phong.fragment')
+ * });
+ * // Enable diffuse texture
+ * shader.enableTexture('diffuseMap');
+ * // Use alpha channel in diffuse texture
+ * shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
  */
 var Shader = Base.extend(function () {
     return /** @lends qtek.Shader# */ {
@@ -228,6 +228,11 @@ var Shader = Base.extend(function () {
 },
 /** @lends qtek.Shader.prototype */
 {
+    /**
+     * If code is equal with given shader.
+     * @param {qtek.Shader}
+     * @return {boolean}
+     */
     isEqual: function (otherShader) {
         if (!otherShader) {
             return false;
@@ -268,7 +273,7 @@ var Shader = Base.extend(function () {
     /**
      * Bind shader program
      * Return true or error msg if error happened
-     * @param {WebGLRenderingContext} _gl
+     * @param {qtek.Renderer} renderer
      */
     bind: function (renderer) {
         var cache = this._cache;
@@ -349,7 +354,7 @@ var Shader = Base.extend(function () {
     },
 
     /**
-     * Add a #define micro in shader code
+     * Add a #define macro in shader code
      * @param  {string} shaderType Can be vertex, fragment or both
      * @param  {string} symbol
      * @param  {number} [val]
@@ -384,6 +389,7 @@ var Shader = Base.extend(function () {
     },
 
     /**
+     * Remove a #define macro in shader code
      * @param  {string} shaderType Can be vertex, fragment or both
      * @param  {string} symbol
      */
@@ -413,6 +419,7 @@ var Shader = Base.extend(function () {
     },
 
     /**
+     * If macro is defined in shader.
      * @param  {string} shaderType Can be vertex, fragment or both
      * @param  {string} symbol
      */
@@ -425,6 +432,7 @@ var Shader = Base.extend(function () {
         }
     },
     /**
+     * Get macro value defined in shader.
      * @param  {string} shaderType Can be vertex, fragment or both
      * @param  {string} symbol
      */
@@ -437,7 +445,7 @@ var Shader = Base.extend(function () {
         }
     },
     /**
-     * Enable a texture, actually it will add a #define micro in the shader code
+     * Enable a texture, actually it will add a #define macro in the shader code
      * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
      * @param  {string} symbol
      */
@@ -470,7 +478,7 @@ var Shader = Base.extend(function () {
         this.dirty();
     },
     /**
-     * Disable a texture, it remove a #define micro in the shader
+     * Disable a texture, it remove a #define macro in the shader
      * @param  {string} symbol
      */
     disableTexture: function (symbol) {
@@ -502,6 +510,7 @@ var Shader = Base.extend(function () {
         this.dirty();
     },
     /**
+     * If texture of given type is enabled.
      * @param  {string}  symbol
      * @return {boolean}
      */
@@ -511,6 +520,10 @@ var Shader = Base.extend(function () {
             && textureStatus[symbol].enabled;
     },
 
+    /**
+     * Get all enabled textures
+     * @return {string[]}
+     */
     getEnabledTextures: function () {
         var enabledTextures = [];
         var textureStatus = this._textureStatus;
@@ -1256,7 +1269,6 @@ Shader.codes = {};
  * Get shader source
  * @param  {string} name
  * @return {string}
- * @memberOf qtek.Shader
  */
 Shader.source = function (name) {
     var parts = name.split('.');

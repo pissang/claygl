@@ -26,8 +26,6 @@ var vec3 = glMatrix.vec3;
 
 var mat4Create = mat4.create;
 
-var glid = 0;
-
 var errorShader = {};
 
 /**

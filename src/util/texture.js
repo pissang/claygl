@@ -9,7 +9,7 @@ import dds from './dds';
 import hdr from './hdr';
 
 /**
- * @namespace qtek.util.texture
+ * @alias qtek.util.texture
  */
 var textureUtil = {
     /**
@@ -18,8 +18,6 @@ var textureUtil = {
      * @param  {Function} [onsuccess]
      * @param  {Function} [onerror]
      * @return {qtek.Texture}
-     *
-     * @memberOf qtek.util.texture
      */
     loadTexture: function (path, option, onsuccess, onerror) {
         var texture;
@@ -89,8 +87,6 @@ var textureUtil = {
      * @param  {number} [option.exposure]
      * @param  {Function} [onsuccess]
      * @param  {Function} [onerror]
-     *
-     * @memberOf qtek.util.texture
      */
     loadPanorama: function (renderer, path, cubeMap, option, onsuccess, onerror) {
         var self = this;
@@ -120,8 +116,6 @@ var textureUtil = {
      * @param  {qtek.TextureCube} cubeMap
      * @param  {Object} option
      * @param  {boolean} [option.encodeRGBM]
-     *
-     * @memberOf qtek.util.texture
      */
     panoramaToCubeMap: function (renderer, panoramaMap, cubeMap, option) {
         var environmentMapPass = new EnvironmentMapPass();
@@ -256,8 +250,6 @@ var textureUtil = {
      * @param  {string} [color1]
      * @param  {string} [color2]
      * @return {qtek.Texture2D}
-     *
-     * @memberOf qtek.util.texture
      */
     createChessboard: function (size, unitSize, color1, color2) {
         size = size || 512;
@@ -296,8 +288,6 @@ var textureUtil = {
      * Create a blank pure color 1x1 texture
      * @param  {string} color
      * @return {qtek.Texture2D}
-     *
-     * @memberOf qtek.util.texture
      */
     createBlank: function (color) {
         var canvas = document.createElement('canvas');

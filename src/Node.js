@@ -517,7 +517,7 @@ var Node = Base.extend(
             && rootNodeIsDirty.getParent().transformNeedsUpdate()
         ) {
             rootNodeIsDirty = rootNodeIsDirty.getParent();
-        }
+        }2
         rootNodeIsDirty.update();
     },
 

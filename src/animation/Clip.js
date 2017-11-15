@@ -235,11 +235,16 @@ Clip.prototype = {
 
         return clip;
     },
-
+    /**
+     * Pause the clip.
+     */
     pause: function () {
         this._paused = true;
     },
 
+    /**
+     * Resume the clip.
+     */
     resume: function () {
         this._paused = false;
     }

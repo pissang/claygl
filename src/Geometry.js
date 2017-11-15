@@ -169,6 +169,27 @@ function Attribute(name, type, size, semantic) {
             };
     }
 }
+
+/**
+ * Set item value at give index. Second parameter val is number if size is 1
+ * @method
+ * @name qtek.Geometry.Attribute#set
+ * @param {number} idx
+ * @param {number[]|number} val
+ * @example
+ * geometry.getAttribute('position').set(0, [1, 1, 1]);
+ */
+
+/**
+ * Get item value at give index. Second parameter out is no need if size is 1
+ * @method
+ * @name qtek.Geometry.Attribute#set
+ * @param {number} idx
+ * @param {number[]} [out]
+ * @example
+ * geometry.getAttribute('position').get(0, out);
+ */
+
 /**
  * Initialize attribute with given vertex count
  * @param {number} nVertex 

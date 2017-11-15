@@ -69,6 +69,7 @@ var Camera = Node.extend(function () {
 
     /**
      * Set camera projection matrix
+     * @param {qtek.math.Matrix4} projectionMatrix
      */
     setProjectionMatrix: function (projectionMatrix) {
         Matrix4.copy(this.projectionMatrix, projectionMatrix);

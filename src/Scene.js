@@ -10,7 +10,7 @@ var Scene = Node.extend(function () {
     return /** @lends qtek.Scene# */ {
         /**
          * Global material of scene
-         * @type {Material}
+         * @type {qtek.Material}
          */
         material: null,
 
@@ -21,14 +21,14 @@ var Scene = Node.extend(function () {
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {Renderable[]}
+         * @type {qtek.Renderable[]}
          * @readonly
          */
         opaqueQueue: [],
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {Renderable[]}
+         * @type {qtek.Renderable[]}
          * @readonly
          */
         transparentQueue: [],

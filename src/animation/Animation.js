@@ -13,21 +13,21 @@ var requestAnimationFrame = window.requestAnimationFrame
  * @extends qtek.core.Base
  *
  * @example
- *     var animation = new qtek.animation.Animation();
- *     var node = new qtek.Node();
- *     animation.animate(node.position)
- *         .when(1000, {
- *             x: 500,
- *             y: 500
- *         })
- *         .when(2000, {
- *             x: 100,
- *             y: 100
- *         })
- *         .when(3000, {
- *             z: 10
- *         })
- *         .start('spline');
+ * var animation = new qtek.animation.Animation();
+ * var node = new qtek.Node();
+ * animation.animate(node.position)
+ *     .when(1000, {
+ *         x: 500,
+ *         y: 500
+ *     })
+ *     .when(2000, {
+ *         x: 100,
+ *         y: 100
+ *     })
+ *     .when(3000, {
+ *         z: 10
+ *     })
+ *     .start('spline');
  */
 var Animation = Base.extend(function () {
     return /** @lends qtek.animation.Animation# */{

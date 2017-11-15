@@ -8,13 +8,6 @@ function keyframeSort(a, b) {
     return a.time - b.time;
 }
 
-/**
- * @constructor
- * @alias qtek.animation.TransformTrack
- * @extends qtek.animation.Clip
- *
- * @param {object[]} [opts.keyFrames]
- */
 var TransformTrack = function (opts) {
 
     this.name = opts.name || '';
