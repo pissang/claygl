@@ -22,9 +22,9 @@ npm install
 
 #### Electron
 
-Installation of electron in China may fail as its host is blocked for well know reason.
+Installation of electron in China may fail as its host is blocked for well known reason.
 
-Yon can export an evironment param to change electron's mirror to taobao.
+Yon can export an evironment variable to change electron's mirror to taobao.
 ```
 export ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
 ```
@@ -34,12 +34,12 @@ export ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
 Compare spec's paiting result with pre-generated fixtures.
 
 ### Test Flow with Coverage
-* 用test/rollup.config.js编译, 生成dist/qtek.src.js, 写入sourcemap
-* 运行istanbul instrument, 为qtek.src.js手动装载覆盖率逻辑, 生成dist/qtek.js
-* 运行specs
-* 用自定义mocha reporter (test/istanbul-reporter) 生成coverage-final.json和lcov.info
-* 用remap-istanbul基于coverage-final.json和sourcemap生成每个文件的html格式覆盖率报告
-* 删除dist/qtek.src.js
+* build with test/rollup.config.js, generate dist/qtek.src.js, with inline sourcemap
+* run istanbul instrument, instrument qtek.src.js with code coverage wrappers and generate dist/qtek.js
+* run specs
+* generate coverage-final.json and lcov.info with a customized mocha reporter (test/reporter/istanbul-reporter)
+* generate html coverage reports with remap-istanbul based on coverage-final.json and sourcemap
+* delete dist/qtek.src.js
 
 ### Generate Fixtures
 ```shell
