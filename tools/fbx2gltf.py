@@ -843,6 +843,9 @@ def ConvertCamera(pCamera):
     return lCameraIdx
 
 def ConvertSceneNode(pScene, pNode, pPoseTime):
+    if not pNode.GetVisibility():
+        return -1
+
     lGLTFNode = {}
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = pNode.GetName()
@@ -927,7 +930,8 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
         lGLTFNode['children'] = []
         for i in range(pNode.GetChildCount()):
             lChildNodeIdx = ConvertSceneNode(pScene, pNode.GetChild(i), pPoseTime)
-            lGLTFNode['children'].append(lChildNodeIdx)
+            if lChildNodeIdx >= 0:
+                lGLTFNode['children'].append(lChildNodeIdx)
 
     return GetNodeIdx(pNode)
 
@@ -941,7 +945,8 @@ def ConvertScene(pScene, pPoseTime):
 
     for i in range(lRoot.GetChildCount()):
         lNodeIdx = ConvertSceneNode(pScene, lRoot.GetChild(i), pPoseTime)
-        lGLTFScene['nodes'].append(lNodeIdx)
+        if lNodeIdx >= 0:
+            lGLTFScene['nodes'].append(lNodeIdx)
 
     return lSceneIdx
 
@@ -1053,6 +1058,9 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
 
 
 def ConvertNodeAnimation(pGLTFAnimation, pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
+    if not pNode.GetVisibility():
+        return
+    
     lNodeIdx = GetNodeIdx(pNode)
 
     curves = [
@@ -1225,6 +1233,9 @@ def CreateBufferViews(pBufferIdx, pBin):
 _nodeCount = -1
 _nodeIdxMap = {}
 def PrepareSceneNode(pNode, fbxConverter):
+    if not pNode.GetVisibility():
+        return
+    
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
@@ -1236,6 +1247,9 @@ def PrepareSceneNode(pNode, fbxConverter):
 # Convert source pivot to destination with all zero pivot.
 # http://docs.autodesk.com/FBX/2013/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_node.html,topicNumber=cpp_ref_class_fbx_node_html
 def PrepareBakeTransform(pNode):
+    if not pNode.GetVisibility():
+        return
+    
     # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
     pNode.SetPivotState(FbxNode.eSourcePivot, FbxNode.ePivotActive)
     pNode.SetPivotState(FbxNode.eDestinationPivot, FbxNode.ePivotActive)
