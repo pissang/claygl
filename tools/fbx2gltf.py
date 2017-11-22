@@ -598,7 +598,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
-        lLayerMaterial2 = lLayer2.GetMaterials()
+        # lLayerMaterial2 = lLayer2.GetMaterials()
 
         lMaterial = None
         if not lLayerMaterial:
