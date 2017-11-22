@@ -598,16 +598,20 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     if lLayer:
         ## Handle material
         lLayerMaterial = lLayer.GetMaterials()
+        lLayerMaterial2 = lLayer2.GetMaterials()
+
         lMaterial = None
         if not lLayerMaterial:
             print("Mesh " + pNode.GetName() + " doesn't have material")
-            lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
-            _defaultMaterialIndex += 1
         else:
             # Mapping Mode of material must be eAllSame
             # Because the mesh has been splitted by material
             idx = lLayerMaterial.GetIndexArray()[0]
             lMaterial = pNode.GetMaterial(idx)
+        if lMaterial == None:
+            lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
+            _defaultMaterialIndex += 1
+
         lMaterialKey = ConvertToPBRMaterial(lMaterial)
         lGLTFPrimitive["material"] = lMaterialKey
 
@@ -616,6 +620,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         lUv2Splitted = False
         ## Handle normals
         lLayerNormal = lLayer.GetNormals()
+
         if lLayerNormal:
             lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
             if len(lNormals) == 0:
@@ -715,11 +720,12 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
             for idx in pMesh.GetPolygonVertices():
                 lPosition = pMesh.GetControlPointAt(idx)
-                if not lNormalSplitted:
-                    # Split normal data
-                    lNormal = lNormals[idx]
-                else:
-                    lNormal = lNormals[lCount]
+                if lLayerNormal:
+                    if not lNormalSplitted:
+                        # Split normal data
+                        lNormal = lNormals[idx]
+                    else:
+                        lNormal = lNormals[lCount]
 
                 if lLayerUV:
                     if not lUvSplitted:
@@ -736,21 +742,32 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 lCount += 1
 
                 #Compress vertex, hashed with position and normal
+                lKeyList = list(lPosition)
+                if lLayerNormal:
+                    lKeyList += lNormal
+                if lLayerUV:
+
+                    lKeyList += lTexcoord
                 if lLayer2Uv:
-                    if lLayer2Uv:
-                        lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1], lTexcoord2[0], lTexcoord2[1])
-                    else:
-                        lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord2[0], lTexcoord2[1])
-                elif lLayerUV:
-                    lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1])
-                else:
-                    lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
+                    lKeyList += lTexcoord2
+                lKey = tuple(lKeyList)
+                # if lLayer2Uv:
+                #     if lLayer2Uv:
+                #         lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1], lTexcoord2[0], lTexcoord2[1])
+                #     else:
+                #         lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord2[0], lTexcoord2[1])
+                # elif lLayerUV:
+                #     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1])
+                # else:
+                #     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
 
                 if lKey in lVertexMap:
                     lIndices.append(lVertexMap[lKey])
                 else:
                     lPositions.append(lPosition)
-                    lNormalsTmp.append(lNormal)
+
+                    if lLayerNormal:
+                        lNormalsTmp.append(lNormal)
 
                     if lLayerUV:
                         lTexcoordsTmp.append(lTexcoord)
