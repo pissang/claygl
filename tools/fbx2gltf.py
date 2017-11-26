@@ -534,32 +534,16 @@ def ConvertVertexLayer(pMesh, pLayer, pOutput):
     lMappingMode = pLayer.GetMappingMode()
     lReferenceMode = pLayer.GetReferenceMode()
 
-    if lMappingMode == FbxLayerElement.eByControlPoint:
-        if lReferenceMode == FbxLayerElement.eDirect:
-            for vec in pLayer.GetDirectArray():
-                pOutput.append(vec)
-        elif lReferenceMode == FbxLayerElement.eIndexToDirect:
-            lIndexArray = pLayer.GetIndexArray()
-            lDirectArray = pLayer.GetDirectArray()
-            for idx in lIndexArray:
-                pOutput.append(lDirectArray.GetAt(idx))
+    if lReferenceMode == FbxLayerElement.eDirect:
+        for vec in pLayer.GetDirectArray():
+            pOutput.append(vec)
+    elif lReferenceMode == FbxLayerElement.eIndexToDirect:
+        lIndexArray = pLayer.GetIndexArray()
+        lDirectArray = pLayer.GetDirectArray()
+        for idx in lIndexArray:
+            pOutput.append(lDirectArray.GetAt(idx))
 
-        return False
-    elif lMappingMode == FbxLayerElement.eByPolygonVertex:
-        if lReferenceMode == FbxLayerElement.eDirect:
-            for vec in pLayer.GetDirectArray():
-                pOutput.append(vec)
-        # Need to split vertex
-        # TODO: Normal per vertex will still have ByPolygonVertex in COLLADA
-        elif lReferenceMode == FbxLayerElement.eIndexToDirect:
-            lIndexArray = pLayer.GetIndexArray()
-            lDirectArray = pLayer.GetDirectArray()
-            for idx in lIndexArray:
-                pOutput.append(lDirectArray.GetAt(idx))
-        else:
-            print("Unsupported mapping mode " + lMappingMode)
-
-        return True
+    return len(pOutput) >= 0
 
 def CreateSkin():
     lSkinIdx = len(lib_skins)
@@ -571,12 +555,75 @@ def CreateSkin():
     return lSkinIdx
 
 _defaultMaterialName = 'DEFAULT_MAT_'
-_defaultMaterialIndex = 0
+
+def CreateDefaultMaterial(pScene):
+    lMat = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(len(lib_materials)))
+    return lMat
+
+def ProcessUV(uv):
+    if ENV_FLIP_V:
+        for i in range(len(uv)):
+            # glTF2.0 don't flipY. So flip the uv.
+            uv[i] = [uv[i][0], 1.0 - uv[i][1]]
+
+def GetSkinningData(pMesh, pSkin, pClusters):
+    moreThanFourJoints = False
+    lMaxJointCount = 0
+    lControlPointsCount = pMesh.GetControlPointsCount()
+
+    lWeights = []
+    lJoints = []
+    # Count joint number of each vertex
+    lJointCounts = []
+    for i in range(lControlPointsCount):
+        lWeights.append([0, 0, 0, 0])
+        # -1 can't used in UNSIGNED_SHORT
+        lJoints.append([0, 0, 0, 0])
+        lJointCounts.append(0)
+
+    for i in range(pMesh.GetDeformerCount(FbxDeformer.eSkin)):
+        lDeformer = pMesh.GetDeformer(i, FbxDeformer.eSkin)
+
+        for i2 in range(lDeformer.GetClusterCount()):
+            lCluster = lDeformer.GetCluster(i2)
+            lNode = lCluster.GetLink()
+            lJointIndex = -1
+            lNodeIdx = GetNodeIdx(lNode)
+            if not lNodeIdx in pSkin['joints']:
+                lJointIndex = len(pSkin['joints'])
+                pSkin['joints'].append(lNodeIdx)
+
+                pClusters[lNodeIdx] = lCluster
+            else:
+                lJointIndex = pSkin['joints'].index(lNodeIdx)
+
+            lControlPointIndices = lCluster.GetControlPointIndices()
+            lControlPointWeights = lCluster.GetControlPointWeights()
+
+            for i3 in range(lCluster.GetControlPointIndicesCount()):
+                lControlPointIndex = lControlPointIndices[i3]
+                lControlPointWeight = lControlPointWeights[i3]
+                lJointCount = lJointCounts[lControlPointIndex]
+
+                # At most binding four joint per vertex
+                if lJointCount <= 3:
+                    # Joint index
+                    lJoints[lControlPointIndex][lJointCount] = lJointIndex
+                    lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
+                else:
+                    moreThanFourJoints = True
+                    # More than four joints, replace joint of minimum Weight
+                    lMinW, lMinIdx = min((lWeights[lControlPointIndex][i], i) for i in range(len(lWeights[lControlPointIndex])))
+                    lJoints[lControlPointIndex][lMinIdx] = lJointIndex
+                    lWeights[lControlPointIndex][lMinIdx] = lControlPointWeight
+                    lMaxJointCount = max(lMaxJointCount, lJointIndex)
+                lJointCounts[lControlPointIndex] += 1
+    if moreThanFourJoints:
+        print('More than 4 joints (%d joints) bound to per vertex in %s. ' %(lMaxJointCount, pNode.GetName()))
+
+    return lJoints, lWeights
 
 def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
-
-    global _defaultMaterialIndex
-
     lGLTFPrimitive = {}
     lPositions = []
     lNormals = []
@@ -586,237 +633,77 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
     lWeights = []
     lJoints = []
-    # Count joint number of each vertex
-    lJointCounts = []
 
-    # Only consider layer 0
     lLayer = pMesh.GetLayer(0)
     # Uv of lightmap on layer 1
     # PENDING Uv2 always on layer 1?
     lLayer2 = pMesh.GetLayer(1)
 
-    if lLayer:
-        ## Handle material
-        lLayerMaterial = lLayer.GetMaterials()
-        # lLayerMaterial2 = lLayer2.GetMaterials()
+    lMaterial = None
+    for i in range(pMesh.GetElementMaterialCount()):
+        # Mapping Mode of material must be eAllSame
+        # Because the mesh has been splitted by material
+        lMaterialLayer = pMesh.GetElementMaterial(i)
+        lMaterial = pNode.GetMaterial(lMaterialLayer.GetIndexArray()[0])
+    if not lMaterial:
+        # Get any material in mesh
+        lMaterial = pNode.GetMaterial(0)
+    if not lMaterial:
+        print("Mesh " + pNode.GetName() + " doesn't have material")
+        lMaterial = CreateDefaultMaterial(pScene)
 
-        lMaterial = None
-        if not lLayerMaterial:
-            print("Mesh " + pNode.GetName() + " doesn't have material")
-        else:
-            # Mapping Mode of material must be eAllSame
-            # Because the mesh has been splitted by material
-            idx = lLayerMaterial.GetIndexArray()[0]
-            lMaterial = pNode.GetMaterial(idx)
-        if lMaterial == None:
-            lMaterial = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(_defaultMaterialIndex))
-            _defaultMaterialIndex += 1
+    lMaterialKey = ConvertToPBRMaterial(lMaterial)
+    lGLTFPrimitive["material"] = lMaterialKey
 
-        lMaterialKey = ConvertToPBRMaterial(lMaterial)
-        lGLTFPrimitive["material"] = lMaterialKey
+    ## Handle normals
+    lLayerNormal = False
 
-        lNormalSplitted = False
-        lUvSplitted = False
-        lUv2Splitted = False
-        ## Handle normals
-        lLayerNormal = lLayer.GetNormals()
+    if lLayer.GetNormals():
+        lLayerNormal = ConvertVertexLayer(pMesh, lLayer.GetNormals(), lNormals)
 
-        if lLayerNormal:
-            lNormalSplitted = ConvertVertexLayer(pMesh, lLayerNormal, lNormals)
-            if len(lNormals) == 0:
-                lLayerNormal = None
+    ## Handle uvs
+    lLayerUV = False
+    lLayer2Uv = False
 
-        ## Handle uvs
-        lLayerUV = lLayer.GetUVs()
+    if lLayer.GetUVs():
+        lLayerUV = ConvertVertexLayer(pMesh, lLayer.GetUVs(), lTexcoords)
+        ProcessUV(lTexcoords)
+    if lLayer2:
+        if lLayer2.GetUVs():
+            lLayer2Uv = ConvertVertexLayer(pMesh, lLayer2.GetUVs(), lTexcoords2)
+            ProcessUV(lTexcoords2)
 
-        lLayer2Uv = None
+    hasSkin = False
+    ## Handle Skinning data
+    if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
+        hasSkin = True
+        lJoints, lMesh = GetSkinningData(pMesh, pSkin, pClusters)
 
-        if lLayerUV:
-            lUvSplitted = ConvertVertexLayer(pMesh, lLayerUV, lTexcoords)
-            if ENV_FLIP_V:
-                for i in range(len(lTexcoords)):
-                    # glTF2.0 don't flipY. So flip the uv.
-                    lTexcoords[i] = [lTexcoords[i][0], 1.0 - lTexcoords[i][1]]
-            if len(lTexcoords) == 0:
-                lLayerUV = None
+    lIndices = pMesh.GetPolygonVertices()
+    lPositions = pMesh.GetControlPoints()
 
-        if lLayer2:
-            lLayer2Uv = lLayer2.GetUVs()
-            if lLayer2Uv:
-                lUv2Splitted = ConvertVertexLayer(pMesh, lLayer2Uv, lTexcoords2)
-                if ENV_FLIP_V:
-                    for i in range(len(lTexcoords2)):
-                        lTexcoords2[i] = [lTexcoords2[i][0], 1.0 - lTexcoords2[i][1]]
-                if len(lTexcoords2) == 0:
-                    lLayer2Uv = None
-
-        hasSkin = False
-        moreThanFourJoints = False
-        lMaxJointCount = 0
-        ## Handle Skinning data
-        if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
-            hasSkin = True
-            lControlPointsCount = pMesh.GetControlPointsCount()
-            for i in range(lControlPointsCount):
-                lWeights.append([0, 0, 0, 0])
-                # -1 can't used in UNSIGNED_SHORT
-                lJoints.append([0, 0, 0, 0])
-                lJointCounts.append(0)
-
-            for i in range(pMesh.GetDeformerCount(FbxDeformer.eSkin)):
-                lDeformer = pMesh.GetDeformer(i, FbxDeformer.eSkin)
-
-                for i2 in range(lDeformer.GetClusterCount()):
-                    lCluster = lDeformer.GetCluster(i2)
-                    lNode = lCluster.GetLink()
-                    lJointIndex = -1
-                    lNodeIdx = GetNodeIdx(lNode)
-                    if not lNodeIdx in pSkin['joints']:
-                        lJointIndex = len(pSkin['joints'])
-                        pSkin['joints'].append(lNodeIdx)
-
-                        pClusters[lNodeIdx] = lCluster
-                    else:
-                        lJointIndex = pSkin['joints'].index(lNodeIdx)
-
-                    lControlPointIndices = lCluster.GetControlPointIndices()
-                    lControlPointWeights = lCluster.GetControlPointWeights()
-
-                    for i3 in range(lCluster.GetControlPointIndicesCount()):
-                        lControlPointIndex = lControlPointIndices[i3]
-                        lControlPointWeight = lControlPointWeights[i3]
-                        lJointCount = lJointCounts[lControlPointIndex]
-
-                        # At most binding four joint per vertex
-                        if lJointCount <= 3:
-                            # Joint index
-                            lJoints[lControlPointIndex][lJointCount] = lJointIndex
-                            lWeights[lControlPointIndex][lJointCount] = lControlPointWeight
-                        else:
-                            moreThanFourJoints = True
-                            # More than four joints, replace joint of minimum Weight
-                            lMinW, lMinIdx = min( (lWeights[lControlPointIndex][i], i) for i in range(len(lWeights[lControlPointIndex])) )
-                            lJoints[lControlPointIndex][lMinIdx] = lJointIndex
-                            lWeights[lControlPointIndex][lMinIdx] = lControlPointWeight
-                            lMaxJointCount = max(lMaxJointCount, lJointIndex)
-                        lJointCounts[lControlPointIndex] += 1
-        if moreThanFourJoints:
-            print('More than 4 joints (%d joints) bound to per vertex in %s. ' %(lMaxJointCount, pNode.GetName()))
-
-        # Weight is VEC3 because it is normalized
+    lGLTFPrimitive['attributes'] = {}
+    lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
+    if lLayerNormal:
+        lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
+    if lLayerUV:
+        lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
+    if lLayer2Uv:
+        lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lTexcoords2, 'f', 2)
+    if hasSkin:
+        # PENDING UNSIGNED_SHORT will have bug.
+        lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'H', 4)
         # TODO Seems most engines needs VEC4 weights.
-        # for i in range(len(lWeights)):
-        #     lWeights[i] = lWeights[i][:3]
+        lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 4)
 
-        if lNormalSplitted or lUvSplitted or lUv2Splitted:
-            lCount = 0
-            lVertexCount = 0
-            lNormalsTmp = []
-            lTexcoordsTmp = []
-            lTexcoords2Tmp = []
-            lJointsTmp = []
-            lWeightsTmp = []
-            lVertexMap = {}
-
-            for idx in pMesh.GetPolygonVertices():
-                lPosition = pMesh.GetControlPointAt(idx)
-                if lLayerNormal:
-                    if not lNormalSplitted:
-                        # Split normal data
-                        lNormal = lNormals[idx]
-                    else:
-                        lNormal = lNormals[lCount]
-
-                if lLayerUV:
-                    if not lUvSplitted:
-                        lTexcoord = lTexcoords[idx]
-                    else:
-                        lTexcoord = lTexcoords[lCount]
-
-                if lLayer2Uv:
-                    if not lUv2Splitted:
-                        lTexcoord = lTexcoords2[idx]
-                    else:
-                        lTexcoord2 = lTexcoords2[lCount]
-
-                lCount += 1
-
-                #Compress vertex, hashed with position and normal
-                lKeyList = list(lPosition)
-                if lLayerNormal:
-                    lKeyList += lNormal
-                if lLayerUV:
-
-                    lKeyList += lTexcoord
-                if lLayer2Uv:
-                    lKeyList += lTexcoord2
-                lKey = tuple(lKeyList)
-                # if lLayer2Uv:
-                #     if lLayer2Uv:
-                #         lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1], lTexcoord2[0], lTexcoord2[1])
-                #     else:
-                #         lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord2[0], lTexcoord2[1])
-                # elif lLayerUV:
-                #     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2], lTexcoord[0], lTexcoord[1])
-                # else:
-                #     lKey = (lPosition[0], lPosition[1], lPosition[2], lNormal[0], lNormal[1], lNormal[2])
-
-                if lKey in lVertexMap:
-                    lIndices.append(lVertexMap[lKey])
-                else:
-                    lPositions.append(lPosition)
-
-                    if lLayerNormal:
-                        lNormalsTmp.append(lNormal)
-
-                    if lLayerUV:
-                        lTexcoordsTmp.append(lTexcoord)
-
-                    if lLayer2Uv:
-                        lTexcoords2Tmp.append(lTexcoord2)
-
-                    if hasSkin:
-                        lWeightsTmp.append(lWeights[idx])
-                        lJointsTmp.append(lJoints[idx])
-                    lIndices.append(lVertexCount)
-                    lVertexMap[lKey] = lVertexCount
-                    lVertexCount += 1
-
-            lNormals = lNormalsTmp
-            lTexcoords = lTexcoordsTmp
-            lTexcoords2 = lTexcoords2Tmp
-
-            if hasSkin:
-                lWeights = lWeightsTmp
-                lJoints = lJointsTmp
-        else:
-            lIndices = pMesh.GetPolygonVertices()
-            lPositions = pMesh.GetControlPoints()
-
-        lGLTFPrimitive['attributes'] = {}
-        lGLTFPrimitive['attributes']['POSITION'] = CreateAttributeBuffer(lPositions, 'f', 3)
-        if not lLayerNormal == None:
-            lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lNormals, 'f', 3)
-        if lLayerUV:
-            lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lTexcoords, 'f', 2)
-        if lLayer2Uv:
-            lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lTexcoords2, 'f', 2)
-        if hasSkin:
-            # PENDING UNSIGNED_SHORT will have bug.
-            lGLTFPrimitive['attributes']['JOINTS_0'] = CreateAttributeBuffer(lJoints, 'H', 4)
-            # TODO Seems most engines needs VEC4 weights.
-            lGLTFPrimitive['attributes']['WEIGHTS_0'] = CreateAttributeBuffer(lWeights, 'f', 4)
-
-        if len(lPositions) >= 0xffff:
-            #Use unsigned int in element indices
-            lIndicesType = 'I'
-        else:
-            lIndicesType = 'H'
-        lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices, lIndicesType)
-
-        return lGLTFPrimitive
+    if len(lPositions) >= 0xffff:
+        #Use unsigned int in element indices
+        lIndicesType = 'I'
     else:
-        return None
+        lIndicesType = 'H'
+    lGLTFPrimitive['indices'] = CreateIndicesBuffer(lIndices, lIndicesType)
+
+    return lGLTFPrimitive
 
 def ConvertCamera(pCamera):
     lGLTFCamera = {}
@@ -857,39 +744,31 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
 
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
-    lGeometry = pNode.GetGeometry()
-    if not lGeometry == None:
+    lMesh = pNode.GetMesh()
+    if lMesh:
         lMeshKey = lNodeName
-        lMeshName = lGeometry.GetName()
+        lMeshName = lMesh.GetName()
         if lMeshName == '':
             lMeshName = lMeshKey
 
         lGLTFMesh = {'name' : lMeshName}
 
-        lHasSkin = False
+        # If any attribute of this node have skinning data
+        # (Mesh splitted by material may have multiple MeshAttribute in one node)
+        lHasSkin = lMesh.GetDeformerCount(FbxDeformer.eSkin) > 0
         lGLTFSkin = None
         lClusters = {}
 
-        # If any attribute of this node have skinning data
-        # (Mesh splitted by material may have multiple MeshAttribute in one node)
-        for i in range(pNode.GetNodeAttributeCount()):
-            lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
-            if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
-                if (lNodeAttribute.GetDeformerCount(FbxDeformer.eSkin) > 0):
-                    lHasSkin = True
         if lHasSkin:
             lSkinIdx = CreateSkin()
             lGLTFSkin = lib_skins[lSkinIdx]
             lGLTFNode['skin'] = lSkinIdx
 
-        for i in range(pNode.GetNodeAttributeCount()):
-            lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
-            if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
-                lPrimitive = ConvertMesh(pScene, lNodeAttribute, pNode, lGLTFSkin, lClusters)
-                if not lPrimitive == None:
-                    if (not "primitives" in lGLTFMesh):
-                        lGLTFMesh["primitives"] = []
-                    lGLTFMesh["primitives"].append(lPrimitive)
+        lPrimitive = ConvertMesh(pScene, lMesh, pNode, lGLTFSkin, lClusters)
+        if not lPrimitive == None:
+            if (not "primitives" in lGLTFMesh):
+                lGLTFMesh["primitives"] = []
+            lGLTFMesh["primitives"].append(lPrimitive)
 
         if "primitives" in lGLTFMesh:
             lMeshIdx = len(lib_meshes)
@@ -917,14 +796,10 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
 
             lGLTFSkin['inverseBindMatrices'] = CreateIBMBuffer(lIBM)
 
-    else:
-        # Camera and light node attribute
-        lNodeAttribute = pNode.GetNodeAttribute()
-        if not lNodeAttribute == None:
-            lAttributeType = lNodeAttribute.GetAttributeType()
-            if lAttributeType == FbxNodeAttribute.eCamera:
-                lCameraKey = ConvertCamera(lNodeAttribute)
-                lGLTFNode['camera'] = lCameraKey
+    elif pNode.GetCamera():
+        # Camera attribute
+        lCameraKey = ConvertCamera(pNode.GetCamera())
+        lGLTFNode['camera'] = lCameraKey
 
     if pNode.GetChildCount() > 0:
         lGLTFNode['children'] = []
@@ -1060,7 +935,7 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
 def ConvertNodeAnimation(pGLTFAnimation, pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
     if not pNode.GetVisibility():
         return
-    
+
     lNodeIdx = GetNodeIdx(pNode)
 
     curves = [
@@ -1185,12 +1060,6 @@ def ConvertAnimation(pScene, pSampleRate, pStartTime, pDuration):
             ConvertNodeAnimation(lGLTFAnimation, lAnimLayer, lRoot, pSampleRate, pStartTime, pDuration)
         if len(lGLTFAnimation['samplers']) > 0:
             lib_animations.append(lGLTFAnimation)
-# def ConvertAnimation2(pScene, pStartTime, pDuration):
-#     for i in range(pScene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxAnimStack.ClassId))):
-#         lAnimStack = pScene.GetSrcObject(FbxCriteria.ObjectType(FbxAnimStack.ClassId), i)
-#         lAnimName = lAnimStack.GetName()
-
-#         lTakeInfo = pScene.GetTakeInfo(lAnimName)
 
 
 def CreateBufferView(pBufferIdx, pBuffer, appendBufferData, lib, pByteOffset, target=GL_ARRAY_BUFFER):
@@ -1232,16 +1101,60 @@ def CreateBufferViews(pBufferIdx, pBin):
 # Start from -1 and ignore the root node
 _nodeCount = -1
 _nodeIdxMap = {}
-def PrepareSceneNode(pNode, fbxConverter):
+def PrepareSceneNode(pNode):
     if not pNode.GetVisibility():
         return
-    
+
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
 
     for k in range(pNode.GetChildCount()):
-        PrepareSceneNode(pNode.GetChild(k), fbxConverter)
+        PrepareSceneNode(pNode.GetChild(k))
+
+def PrepareSplitMeshesPerMaterial(pScene, pNode):
+    pMesh = pNode.GetMesh()
+
+    lDefaultMaterial = None
+    lDefaultMaterialIdx = -1
+    if pMesh:
+        lMaterialLayers = [];
+
+        lMaterialLayerCount = pMesh.GetElementMaterialCount()
+        if lMaterialLayerCount >= 2:
+            for i in range(lMaterialLayerCount):
+                lMaterialLayers.append(pMesh.GetElementMaterial(i))
+
+            lLayerWithMaterial = None
+            lFirstLayer = pMesh.GetElementMaterial(0)
+
+            for lMaterialLayer in lMaterialLayers:
+                matIndicesArray = lMaterialLayer.GetIndexArray()
+                matIndices = list(matIndicesArray)
+                haveMaterial = False
+                for matIdx in matIndices:
+                    if matIdx >= 0:
+                        lLayerWithMaterial = lMaterialLayer
+                        break
+            # FIXME If remove the first material layer, SplitMeshPerMaterial will have segmentfault
+            if lLayerWithMaterial and not lLayerWithMaterial == lFirstLayer:
+                indexArray0 = lFirstLayer.GetIndexArray()
+                indexArray1 = lLayerWithMaterial.GetIndexArray()
+                for i in range(len(list(indexArray1))):
+                    lIdx = indexArray1.GetAt(i)
+                    if lIdx < 0:
+                        if not lDefaultMaterial:
+                            lDefaultMaterial = CreateDefaultMaterial(pScene)
+                            lDefaultMaterialIdx = pNode.AddMaterial(lDefaultMaterial)
+                        lIdx = lDefaultMaterialIdx
+                    indexArray0.SetAt(i, lIdx)
+
+            for i in reversed(range(lMaterialLayerCount)[1:]):
+                pMesh.RemoveElementMaterial(lMaterialLayers[i])
+
+            # print(list(pMesh.GetElementMaterial(0).GetIndexArray()))
+    for k in range(pNode.GetChildCount()):
+        PrepareSplitMeshesPerMaterial(pScene, pNode.GetChild(k))
 
 # Each node can have two pivot context. The node's animation data can be converted from one pivot context to the other
 # Convert source pivot to destination with all zero pivot.
@@ -1249,7 +1162,7 @@ def PrepareSceneNode(pNode, fbxConverter):
 def PrepareBakeTransform(pNode):
     if not pNode.GetVisibility():
         return
-    
+
     # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
     pNode.SetPivotState(FbxNode.eSourcePivot, FbxNode.ePivotActive)
     pNode.SetPivotState(FbxNode.eDestinationPivot, FbxNode.ePivotActive)
@@ -1311,12 +1224,12 @@ def Convert(
         # PENDING Triangulate before SplitMeshesPerMaterial or it will not work.
         fbxConverter.Triangulate(lScene, True)
 
-        # TODO SplitMeshPerMaterial may loss deformer in mesh
-        # TODO It will be crashed in some fbx files
-        # FBX version 2014.2 seems have fixed it
-        fbxConverter.SplitMeshesPerMaterial(lScene, True)
+        # SplitMeshPerMaterial will fail if the mapped material is not per face (FbxLayerElement::eByPolygon) or if a material is multi-layered.
+        # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_geometry_converter_html
+        if not fbxConverter.SplitMeshesPerMaterial(lScene, True):
+            print('SplitMeshesPerMaterial fail')
 
-        PrepareSceneNode(lScene.GetRootNode(), fbxConverter)
+        PrepareSceneNode(lScene.GetRootNode())
 
         if not ignoreScene:
             lSceneIdx = ConvertScene(lScene, poseTime)
