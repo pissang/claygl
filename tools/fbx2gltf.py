@@ -501,7 +501,7 @@ def ProcessUV(uv, scaleU, scaleV, translationU, translationV):
                 1 - (uv[i][1] * scaleV + translationV)
             ]
 
-def GetSkinningData(pMesh, pSkin, pClusters):
+def GetSkinningData(pMesh, pSkin, pClusters, pNode):
     moreThanFourJoints = False
     lMaxJointCount = 0
     lControlPointsCount = pMesh.GetControlPointsCount()
@@ -613,7 +613,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     # Handle Skinning data
     if (pMesh.GetDeformerCount(FbxDeformer.eSkin) > 0):
         hasSkin = True
-        lJoints, lWeights = GetSkinningData(pMesh, pSkin, pClusters)
+        lJoints, lWeights = GetSkinningData(pMesh, pSkin, pClusters, pNode)
     lPositions = pMesh.GetControlPoints()
     # Prepare materials
     lAllSameMaterial = True
@@ -673,6 +673,18 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
     range3 = range(3)
     lVertexCount = 0;
+
+    lNeedHash = False
+    if lNormalLayer:
+        if lNormalLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
+            lNeedHash = True
+    if lUvLayer:
+        if lUvLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
+            lNeedHash = True
+    if lUv2Layer:
+        if lUv2Layer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
+            lNeedHash = True
+            
     for i in range(pMesh.GetPolygonCount()):
         if lAllSameMaterial:
             lPrimitive = lPrimitivesList[0]
@@ -682,22 +694,30 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         # Mesh should be triangulated
         for j in range3:
             lControlPointIndex = pMesh.GetPolygonVertex(i, j)
-            vertexKeyList = []
-            vertexKeyList += lPositions[lControlPointIndex]
+            if lNeedHash:
+                vertexKeyList = []
+                vertexKeyList += lPositions[lControlPointIndex]
             if lNormalLayer:
                 lNormal = GetVertexAttribute(lNormalLayer, lControlPointIndex, lVertexCount)
-                vertexKeyList += lNormal
+                if lNeedHash:
+                    vertexKeyList += lNormal
             if lUvLayer:
                 # PENDING GetTextureUVIndex?
                 lUv = GetVertexAttribute(lUvLayer, lControlPointIndex, lVertexCount)
-                vertexKeyList += lUv
+                if lNeedHash:
+                    vertexKeyList += lUv
             if lUv2Layer:
                 lUv2 = GetVertexAttribute(lUv2Layer, lControlPointIndex, lVertexCount)
-                vertexKeyList += lUv2
+                if lNeedHash:
+                    vertexKeyList += lUv2
 
             lVertexCount += 1
 
-            vertexKey = tuple(vertexKeyList)
+            if lNeedHash:
+                vertexKey = tuple(vertexKeyList)
+            else:
+                vertexKey = lControlPointIndex
+
             if not vertexKey in lPrimitive['indicesMap']:
                 lIndex = len(lPrimitive['positions'])
                 lPrimitive['positions'].append(lPositions[lControlPointIndex])
