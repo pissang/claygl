@@ -493,13 +493,14 @@ def CreateDefaultMaterial(pScene):
     return lMat
 
 def ProcessUV(uv, scaleU, scaleV, translationU, translationV):
-    if ENV_FLIP_V:
-        for i in range(len(uv)):
-            uv[i] = [
-                uv[i][0] * scaleU + translationU,
-                # glTF2.0 don't flipY. So flip the uv.
-                1 - (uv[i][1] * scaleV + translationV)
-            ]
+    for i in range(len(uv)):
+        uv[i] = [
+            uv[i][0] * scaleU + translationU,
+            uv[i][1] * scaleV + translationV
+        ]
+        if ENV_FLIP_V:
+            # glTF2.0 don't flipY. So flip the uv.
+            uv[i][1] = 1.0 - uv[i][1]
 
 def GetSkinningData(pMesh, pSkin, pClusters, pNode):
     moreThanFourJoints = False
@@ -626,7 +627,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 if not lIndexArray.GetAt(k) == lIndexArray.GetAt(0):
                     lAllSameMaterial = False
                     break
-                
+
         if lAllSameMaterial:
             lAllSameMaterialIndex = lMaterialLayer.GetIndexArray().GetAt(0)
 
@@ -684,7 +685,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     if lUv2Layer:
         if lUv2Layer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
             lNeedHash = True
-            
+
     for i in range(pMesh.GetPolygonCount()):
         if lAllSameMaterial:
             lPrimitive = lPrimitivesList[0]
@@ -734,6 +735,10 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                         lPrimitive['texcoords0'].append(lUv)
                     if lUv2Layer:
                         lPrimitive['texcoords1'].append(lUv2)
+                if hasSkin:
+                    lPrimitive['joints'].append(lJoints[lControlPointIndex])
+                    lPrimitive['weights'].append(lWeights[lControlPointIndex])
+
                 lPrimitive['indicesMap'][vertexKey] = lIndex
             else:
                 lIndex = lPrimitive['indicesMap'][vertexKey]
