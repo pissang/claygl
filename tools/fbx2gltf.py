@@ -355,6 +355,12 @@ def CreateTexture(pProperty):
 
     lFileTextures = []
     lLayeredTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
+
+    lScaleU = 1
+    lScaleV = 1
+    lTranslationU = 0
+    lTranslationV = 0
+
     if lLayeredTextureCount > 0:
         for i in range(lLayeredTextureCount):
             lLayeredTexture = pProperty.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), i)
@@ -362,7 +368,6 @@ def CreateTexture(pProperty):
                 lTexture = lLayeredTexture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId), j)
                 if lTexture and lTexture.__class__ == FbxFileTexture:
                     lFileTextures.append(lTexture)
-        pass
     else:
         lTextureCount = pProperty.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
         for t in range(lTextureCount):
@@ -376,6 +381,12 @@ def CreateTexture(pProperty):
         except UnicodeDecodeError:
             print('Get texture file name error.')
             continue
+        # TODO rotation
+        lScaleU = lTexture.GetScaleU()
+        lScaleV = lTexture.GetScaleV()
+        lTranslationU = lTexture.GetTranslationU()
+        lTranslationV = lTexture.GetTranslationV()
+
         lImageIdx = CreateImage(lTextureFileName)
         lSamplerIdx = CreateSampler(lTexture)
         lHashKey = (lImageIdx, lSamplerIdx)
@@ -394,80 +405,18 @@ def CreateTexture(pProperty):
             lTextureList.append(lTextureIdx)
     # PENDING Return the first texture ?
     if len(lTextureList) > 0:
-        return lTextureList[0]
+        return lTextureList[0], lScaleU, lScaleV, lTranslationU, lTranslationV
     else:
-        return None
-
-def ConvertMaterial(pMaterial):
-    lMaterialName = pMaterial.GetName()
-
-    lGLTFMaterial = {
-        "name" : lMaterialName,
-        # TODO PBR
-        "extensions": {
-            "KHR_materials_common": {
-                "technique": "BLINN",
-                # Compatible with three.js loaders
-                "type": "commonBlinn",
-                "values": {}
-            }
-        }
-    }
-    lValues = lGLTFMaterial['extensions']['KHR_materials_common']['values']
-    lShading = pMaterial.ShadingModel.Get()
-
-    lMaterialIdx = len(lib_materials)
-    if (lShading == 'unknown'):
-        lib_materials.append(lGLTFMaterial)
-        return lMaterialIdx
-
-    lValues['ambient'] = list(pMaterial.Ambient.Get())
-    lValues['emission'] = list(pMaterial.Emissive.Get())
-
-    lTransparency = MatGetOpacity(pMaterial)
-    if lTransparency < 1:
-        lValues['transparency'] = lTransparency
-        lValues['transparent'] = True
-
-    # Use diffuse map
-    # TODO Diffuse Factor ?
-    if pMaterial.Diffuse.GetSrcObjectCount() > 0:
-        lTextureIdx = CreateTexture(pMaterial.Diffuse)
-        if not lTextureIdx == None:
-            lValues['diffuse'] = lTextureIdx
-    else:
-        lValues['diffuse'] = list(pMaterial.Diffuse.Get())
-
-    if pMaterial.Bump.GetSrcObjectCount() > 0:
-        # TODO 3dsmax use the normal map as bump map ?
-        lTextureIdx = CreateTexture(pMaterial.Bump)
-        if not lTextureIdx == None:
-            lGLTFMaterial['normalTexture'] = {
-                "index": lTextureIdx
-            }
-
-    if pMaterial.NormalMap.GetSrcObjectCount() > 0:
-        lTextureIdx = CreateTexture(pMaterial.NormalMap)
-        if not lTextureIdx == None:
-            lGLTFMaterial['normalTexture'] = {
-                "index": lTextureIdx
-            }
-    # PENDING
-    if lShading == 'phong' or lShading == 'Phong':
-        lValues['shininess'] = pMaterial.Shininess.Get()
-        # Use specular map
-        # TODO Specular Factor ?
-        if pMaterial.Specular.GetSrcObjectCount() > 0:
-            pass
-        else:
-            lValues['specular'] = list(pMaterial.Specular.Get())
-
-    lib_materials.append(lGLTFMaterial)
-    return lMaterialIdx
+        return None, lScaleU, lScaleV, lTranslationU, lTranslationV
 
 def ConvertToPBRMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
     lShading = str(pMaterial.ShadingModel.Get()).lower()
+
+    lScaleU = 1
+    lScaleV = 1
+    lTranslationU = 0
+    lTranslationV = 0
 
     lGLTFMaterial = {
         "name" : lMaterialName,
@@ -492,10 +441,9 @@ def ConvertToPBRMaterial(pMaterial):
         lGLTFMaterial['alphaMode'] = 'BLEND'
         lValues['baseColorFactor'][3] = lTransparency
 
-    # Use diffuse map
-    # TODO Diffuse Factor ?
     if pMaterial.Diffuse.GetSrcObjectCount() > 0:
-        lTextureIdx = CreateTexture(pMaterial.Diffuse)
+        # TODO other textures ?
+        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Diffuse)
         if not lTextureIdx == None:
             lValues['baseColorTexture'] = {
                 "index": lTextureIdx,
@@ -505,7 +453,6 @@ def ConvertToPBRMaterial(pMaterial):
         lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
 
     if pMaterial.Bump.GetSrcObjectCount() > 0:
-        # TODO 3dsmax use the normal map as bump map ?
         lTextureIdx = CreateTexture(pMaterial.Bump)
         if not lTextureIdx == None:
             lGLTFMaterial['normalTexture'] = {
@@ -527,7 +474,7 @@ def ConvertToPBRMaterial(pMaterial):
         lValues['roughnessFactor'] = min(max(1 - lGLossiness, 0), 1)
 
     lib_materials.append(lGLTFMaterial)
-    return lMaterialIdx
+    return lMaterialIdx, lScaleU, lScaleV, lTranslationU, lTranslationV
 
 
 def CreateSkin():
@@ -545,11 +492,14 @@ def CreateDefaultMaterial(pScene):
     lMat = FbxSurfacePhong.Create(pScene, _defaultMaterialName + str(len(lib_materials)))
     return lMat
 
-def ProcessUV(uv):
+def ProcessUV(uv, scaleU, scaleV, translationU, translationV):
     if ENV_FLIP_V:
         for i in range(len(uv)):
-            # glTF2.0 don't flipY. So flip the uv.
-            uv[i] = [uv[i][0], 1.0 - uv[i][1]]
+            uv[i] = [
+                uv[i][0] * scaleU + translationU,
+                # glTF2.0 don't flipY. So flip the uv.
+                1 - (uv[i][1] * scaleV + translationV)
+            ]
 
 def GetSkinningData(pMesh, pSkin, pClusters):
     moreThanFourJoints = False
@@ -608,7 +558,7 @@ def GetSkinningData(pMesh, pSkin, pClusters):
 
     return lJoints, lWeights
 
-def CreatePrimitiveRaw(matIndex, useTexcoords1=False):
+def CreatePrimitiveRaw(matIndex, useTexcoords1=False, scaleU=1, scaleV=1,translationU=0, translationV=1):
     return {
         "normals": [],
         "texcoords0": [],
@@ -621,7 +571,11 @@ def CreatePrimitiveRaw(matIndex, useTexcoords1=False):
         # Should use texcoord in layer2 if material is in layer2
         # PENDING
         "useTexcoords1": useTexcoords1,
-        "indicesMap": {}
+        "indicesMap": {},
+        "scaleU": scaleU,
+        "scaleV": scaleV,
+        "translationU": translationU,
+        "translationV": translationV
     }
 
 def GetVertexAttribute(pLayer, pControlPointIdx, pPolygonVertexIndex):
@@ -677,10 +631,12 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             lAllSameMaterialIndex = lMaterialLayer.GetIndexArray().GetAt(0)
 
     if lAllSameMaterial:
-        lTmpIndex = ConvertToPBRMaterial(pNode.GetMaterial(lAllSameMaterialIndex))
-        lPrimitivesList.append(CreatePrimitiveRaw(lTmpIndex))
-
-    if not lAllSameMaterial:
+        lTmpIndex, lScaleU, lScaleV, lTranslationU, lTranslationV = ConvertToPBRMaterial(pNode.GetMaterial(lAllSameMaterialIndex))
+        lPrimitivesList.append(CreatePrimitiveRaw(
+            lTmpIndex, False,
+            lScaleU, lScaleV, lTranslationU, lTranslationV
+        ))
+    else:
         lMaterialIndices = [-1]*pMesh.GetPolygonCount()
         lMaterialsPrimitivesMap = {}
         lIsMaterialInSecondLayer = {}
@@ -704,13 +660,15 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         for lIdx in lMaterialIndices:
             if not lIdx in lMaterialsPrimitivesMap:
                 if lIdx >= 0:
-                    lGLTFMaterialIdx = ConvertToPBRMaterial(pNode.GetMaterial(lIdx))
+                    lMaterial = pNode.GetMaterial(lIdx)
                 else:
                     lDefaultMaterial = CreateDefaultMaterial(pScene)
-                    lGLTFMaterialIdx = ConvertToPBRMaterial(lDefaultMaterial)
+                    lMaterial = lDefaultMaterial
+                lGLTFMaterialIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = ConvertToPBRMaterial(lMaterial)
                 lMaterialsPrimitivesMap[lIdx] = len(lPrimitivesList)
                 lPrimitivesList.append(CreatePrimitiveRaw(
-                    lGLTFMaterialIdx, lIsMaterialInSecondLayer[lIdx]
+                    lGLTFMaterialIdx, lIsMaterialInSecondLayer[lIdx],
+                    lScaleU, lScaleV, lTranslationU, lTranslationV
                 ))
 
     range3 = range(3)
@@ -730,6 +688,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 lNormal = GetVertexAttribute(lNormalLayer, lControlPointIndex, lVertexCount)
                 vertexKeyList += lNormal
             if lUvLayer:
+                # PENDING GetTextureUVIndex?
                 lUv = GetVertexAttribute(lUvLayer, lControlPointIndex, lVertexCount)
                 vertexKeyList += lUv
             if lUv2Layer:
@@ -774,8 +733,18 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if len(lPrimitive['normals']) > 0:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lPrimitive['normals'], 'f', 3)
         if len(lPrimitive['texcoords0']) > 0:
+            ProcessUV(
+                lPrimitive['texcoords0'],
+                lPrimitive['scaleU'], lPrimitive['scaleV'],
+                lPrimitive['translationU'], lPrimitive['translationV']
+            )
             lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lPrimitive['texcoords0'], 'f', 2)
         if len(lPrimitive['texcoords1']) > 0:
+            ProcessUV(
+                lPrimitive['texcoords1'],
+                lPrimitive['scaleU'], lPrimitive['scaleV'],
+                lPrimitive['translationU'], lPrimitive['translationV']
+            )
             lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lPrimitive['texcoords1'], 'f', 2)
         if len(lPrimitive['joints']) > 0:
             # PENDING UNSIGNED_SHORT will have bug.
