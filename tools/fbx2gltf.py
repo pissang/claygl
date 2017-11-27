@@ -608,21 +608,23 @@ def GetSkinningData(pMesh, pSkin, pClusters):
 
     return lJoints, lWeights
 
-def CreatePrimitiveRaw(matIndex):
+def CreatePrimitiveRaw(matIndex, useTexcoords1=False):
     return {
         "normals": [],
-        "texcoords": [],
+        "texcoords0": [],
         "texcoords1": [],
         "indices": [],
         "positions": [],
         "joints": [],
         "weights": [],
         "material": matIndex,
-
+        # Should use texcoord in layer2 if material is in layer2
+        # PENDING
+        "useTexcoords1": useTexcoords1,
         "indicesMap": {}
     }
 
-def GetVertexAttribute(pLayer, pControlPointIdx, pDirectIdx):
+def GetVertexAttribute(pLayer, pControlPointIdx, pPolygonVertexIndex):
     if pLayer.GetMappingMode() == FbxLayerElement.eByControlPoint:
         if pLayer.GetReferenceMode() == FbxLayerElement.eDirect:
             return pLayer.GetDirectArray().GetAt(pControlPointIdx)
@@ -630,9 +632,10 @@ def GetVertexAttribute(pLayer, pControlPointIdx, pDirectIdx):
             return pLayer.GetDirectArray().GetAt(pLayer.GetIndexArray().GetAt(pControlPointIdx))
     elif pLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
         if pLayer.GetReferenceMode() == FbxLayerElement.eDirect:
-            return pLayer.GetDirectArray().GetAt(pDirectIdx)
-        elif pLayer.GetReferenceMode() == FbxLayerElement.eIndexToDirect:
-            return pLayer.GetDirectArray().GetAt(pLayer.GetIndexArray().GetAt(pDirectIdx))
+            return pLayer.GetDirectArray().GetAt(pPolygonVertexIndex)
+        elif pLayer.GetReferenceMode() == FbxLayerElement.eDirect or\
+            pLayer.GetReferenceMode() == FbxLayerElement.eIndexToDirect:
+            return pLayer.GetDirectArray().GetAt(pLayer.GetIndexArray().GetAt(pPolygonVertexIndex))
     else:
         pass
         # Unknown
@@ -644,6 +647,9 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
 
     lLayer = pMesh.GetLayer(0)
     lLayer2 = pMesh.GetLayer(1)
+    lSecondMaterialLayer = None
+    if lLayer2:
+        lSecondMaterialLayer = lLayer2.GetMaterials()
 
     lNormalLayer = pMesh.GetElementNormal(0)
     lUvLayer = pMesh.GetElementUV(0)
@@ -657,7 +663,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     lPositions = pMesh.GetControlPoints()
     # Prepare materials
     lAllSameMaterial = True
-    lMaterialIndex = -1
+    lAllSameMaterialIndex = -1
     for i in range(pMesh.GetElementMaterialCount()):
         lMaterialLayer = pMesh.GetElementMaterial(i)
         if not lMaterialLayer.GetMappingMode() == FbxLayerElement.eAllSame:
@@ -668,43 +674,47 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                     break
                 
         if lAllSameMaterial:
-            lMaterialIndex = lMaterialLayer.GetIndexArray().GetAt(0)
+            lAllSameMaterialIndex = lMaterialLayer.GetIndexArray().GetAt(0)
 
     if lAllSameMaterial:
-        lTmpIndex = ConvertToPBRMaterial(pNode.GetMaterial(lMaterialIndex))
+        lTmpIndex = ConvertToPBRMaterial(pNode.GetMaterial(lAllSameMaterialIndex))
         lPrimitivesList.append(CreatePrimitiveRaw(lTmpIndex))
 
     if not lAllSameMaterial:
         lMaterialIndices = [-1]*pMesh.GetPolygonCount()
-        lMaxMaterialIndex = -1
         lMaterialsPrimitivesMap = {}
+        lIsMaterialInSecondLayer = {}
         for i in range(pMesh.GetElementMaterialCount()):
             lMaterialLayer = pMesh.GetElementMaterial(i)
             lIndexArray = lMaterialLayer.GetIndexArray()
+            lIsInSecondLayer = lMaterialLayer == lSecondMaterialLayer
             if lMaterialLayer.GetMappingMode() == FbxLayerElement.eByPolygon:
                 for k in range(len(lMaterialIndices)):
                     if lIndexArray.GetAt(k) >= 0:
                         # index in top material layer will overwrite the bottom material layer
                         lMaterialIndices[k] = lIndexArray.GetAt(k)
-                        lMaxMaterialIndex = max(lMaxMaterialIndex, lMaterialIndices[k])
+                    lIsMaterialInSecondLayer[lIndexArray.GetAt(k)] = lIsInSecondLayer
             elif lMaterialLayer.GetMappingMode() == FbxLayerElement.eAllSame:
                 lIdx = lIndexArray.GetAt(0)
-                lMaxMaterialIndex = max(lMaxMaterialIndex, lIdx)
                 if lIdx:
                     if lIdx >= 0:
                         for k in range(len(lMaterialIndices)):
                             lMaterialIndices[k] = lIdx
-        for idx in lMaterialIndices:
-            if not idx in lMaterialsPrimitivesMap:
-                if idx >= 0:
-                    lGLTFMaterialIdx = ConvertToPBRMaterial(pNode.GetMaterial(idx))
+                lIsMaterialInSecondLayer[lIdx] = lIsInSecondLayer
+        for lIdx in lMaterialIndices:
+            if not lIdx in lMaterialsPrimitivesMap:
+                if lIdx >= 0:
+                    lGLTFMaterialIdx = ConvertToPBRMaterial(pNode.GetMaterial(lIdx))
                 else:
                     lDefaultMaterial = CreateDefaultMaterial(pScene)
                     lGLTFMaterialIdx = ConvertToPBRMaterial(lDefaultMaterial)
-                lMaterialsPrimitivesMap[idx] = len(lPrimitivesList)
-                lPrimitivesList.append(CreatePrimitiveRaw(lGLTFMaterialIdx))
+                lMaterialsPrimitivesMap[lIdx] = len(lPrimitivesList)
+                lPrimitivesList.append(CreatePrimitiveRaw(
+                    lGLTFMaterialIdx, lIsMaterialInSecondLayer[lIdx]
+                ))
 
     range3 = range(3)
+    lVertexCount = 0;
     for i in range(pMesh.GetPolygonCount()):
         if lAllSameMaterial:
             lPrimitive = lPrimitivesList[0]
@@ -717,26 +727,34 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             vertexKeyList = []
             vertexKeyList += lPositions[lControlPointIndex]
             if lNormalLayer:
-                lNormal = GetVertexAttribute(lNormalLayer, lControlPointIndex, lIndex)
+                lNormal = GetVertexAttribute(lNormalLayer, lControlPointIndex, lVertexCount)
                 vertexKeyList += lNormal
             if lUvLayer:
-                lUv = GetVertexAttribute(lUvLayer, lControlPointIndex, pMesh.GetTextureUVIndex(i, j))
+                lUv = GetVertexAttribute(lUvLayer, lControlPointIndex, lVertexCount)
                 vertexKeyList += lUv
             if lUv2Layer:
-                lUv2 = GetVertexAttribute(lUv2Layer, lControlPointIndex, pMesh.GetTextureUVIndex(i, j))
+                lUv2 = GetVertexAttribute(lUv2Layer, lControlPointIndex, lVertexCount)
                 vertexKeyList += lUv2
 
-            vertexKey = tuple(vertexKeyList)
+            lVertexCount += 1
 
+            vertexKey = tuple(vertexKeyList)
             if not vertexKey in lPrimitive['indicesMap']:
                 lIndex = len(lPrimitive['positions'])
                 lPrimitive['positions'].append(lPositions[lControlPointIndex])
                 if lNormalLayer:
                     lPrimitive['normals'].append(lNormal)
-                if lUvLayer:
-                    lPrimitive['texcoords'].append(lUv)
-                if lUv2Layer:
-                    lPrimitive['texcoords1'].append(lUv2)
+                # PENDING
+                if lPrimitive['useTexcoords1']:
+                    if lUv2Layer:
+                        lPrimitive['texcoords0'].append(lUv2)
+                    else:
+                        lPrimitive['texcoords0'].append(lUv)
+                else:
+                    if lUvLayer:
+                        lPrimitive['texcoords0'].append(lUv)
+                    if lUv2Layer:
+                        lPrimitive['texcoords1'].append(lUv2)
                 lPrimitive['indicesMap'][vertexKey] = lIndex
             else:
                 lIndex = lPrimitive['indicesMap'][vertexKey]
@@ -750,12 +768,13 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         lGLTFPrimitive = {
             'attributes': {
                 'POSITION': CreateAttributeBuffer(lPrimitive['positions'], 'f', 3)
-            }
+            },
+            "material": lPrimitive['material']
         }
         if len(lPrimitive['normals']) > 0:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lPrimitive['normals'], 'f', 3)
-        if len(lPrimitive['texcoords']) > 0:
-            lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lPrimitive['texcoords'], 'f', 2)
+        if len(lPrimitive['texcoords0']) > 0:
+            lGLTFPrimitive['attributes']['TEXCOORD_0'] = CreateAttributeBuffer(lPrimitive['texcoords0'], 'f', 2)
         if len(lPrimitive['texcoords1']) > 0:
             lGLTFPrimitive['attributes']['TEXCOORD_1'] = CreateAttributeBuffer(lPrimitive['texcoords1'], 'f', 2)
         if len(lPrimitive['joints']) > 0:
