@@ -528,7 +528,6 @@ def GetSkinningData(pMesh, pSkin, pClusters, pNode):
             if not lNodeIdx in pSkin['joints']:
                 lJointIndex = len(pSkin['joints'])
                 pSkin['joints'].append(lNodeIdx)
-
                 pClusters[lNodeIdx] = lCluster
             else:
                 lJointIndex = pSkin['joints'].index(lNodeIdx)
@@ -632,7 +631,11 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             lAllSameMaterialIndex = lMaterialLayer.GetIndexArray().GetAt(0)
 
     if lAllSameMaterial:
-        lTmpIndex, lScaleU, lScaleV, lTranslationU, lTranslationV = ConvertToPBRMaterial(pNode.GetMaterial(lAllSameMaterialIndex))
+        lMaterial = pNode.GetMaterial(lAllSameMaterialIndex)
+        if not lMaterial:
+            lMaterial = CreateDefaultMaterial(pScene)
+
+        lTmpIndex, lScaleU, lScaleV, lTranslationU, lTranslationV = ConvertToPBRMaterial(lMaterial)
         lPrimitivesList.append(CreatePrimitiveRaw(
             lTmpIndex, False,
             lScaleU, lScaleV, lTranslationU, lTranslationV
@@ -660,11 +663,9 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 lIsMaterialInSecondLayer[lIdx] = lIsInSecondLayer
         for lIdx in lMaterialIndices:
             if not lIdx in lMaterialsPrimitivesMap:
-                if lIdx >= 0:
-                    lMaterial = pNode.GetMaterial(lIdx)
-                else:
-                    lDefaultMaterial = CreateDefaultMaterial(pScene)
-                    lMaterial = lDefaultMaterial
+                lMaterial = pNode.GetMaterial(lIdx)
+                if not lMaterial:
+                    lMaterial = CreateDefaultMaterial(pScene)
                 lGLTFMaterialIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = ConvertToPBRMaterial(lMaterial)
                 lMaterialsPrimitivesMap[lIdx] = len(lPrimitivesList)
                 lPrimitivesList.append(CreatePrimitiveRaw(
@@ -813,9 +814,6 @@ def ConvertCamera(pCamera):
     return lCameraIdx
 
 def ConvertSceneNode(pScene, pNode, pPoseTime):
-    if not pNode.GetVisibility():
-        return -1
-
     lGLTFNode = {}
     lNodeName = pNode.GetName()
     lGLTFNode['name'] = pNode.GetName()
@@ -828,7 +826,8 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
     #PENDING : Triangulate and split all geometry not only the default one ?
     #PENDING : Multiple node use the same mesh ?
     lMesh = pNode.GetMesh()
-    if lMesh:
+    # PENDING If invisible node will have all children invisible.
+    if pNode.GetVisibility() and lMesh:
         lMeshKey = lNodeName
         lMeshName = lMesh.GetName()
         if lMeshName == '':
@@ -1011,9 +1010,6 @@ def FitLinearInterpolation(pTime, pTranslationChannel, pRotationChannel, pScaleC
 
 
 def ConvertNodeAnimation(pGLTFAnimation, pAnimLayer, pNode, pSampleRate, pStartTime, pDuration):
-    if not pNode.GetVisibility():
-        return
-
     lNodeIdx = GetNodeIdx(pNode)
 
     curves = [
@@ -1180,9 +1176,6 @@ def CreateBufferViews(pBufferIdx, pBin):
 _nodeCount = -1
 _nodeIdxMap = {}
 def PrepareSceneNode(pNode):
-    if not pNode.GetVisibility():
-        return
-
     global _nodeCount
     _nodeIdxMap[pNode.GetUniqueID()] = _nodeCount
     _nodeCount = _nodeCount + 1
@@ -1190,57 +1183,10 @@ def PrepareSceneNode(pNode):
     for k in range(pNode.GetChildCount()):
         PrepareSceneNode(pNode.GetChild(k))
 
-def PrepareSplitMeshesPerMaterial(pScene, pNode):
-    pMesh = pNode.GetMesh()
-
-    lDefaultMaterial = None
-    lDefaultMaterialIdx = -1
-    if pMesh:
-        lMaterialLayers = [];
-
-        lMaterialLayerCount = pMesh.GetElementMaterialCount()
-        if lMaterialLayerCount >= 2:
-            for i in range(lMaterialLayerCount):
-                lMaterialLayers.append(pMesh.GetElementMaterial(i))
-
-            lLayerWithMaterial = None
-            lFirstLayer = pMesh.GetElementMaterial(0)
-
-            for lMaterialLayer in lMaterialLayers:
-                matIndicesArray = lMaterialLayer.GetIndexArray()
-                matIndices = list(matIndicesArray)
-                haveMaterial = False
-                for matIdx in matIndices:
-                    if matIdx >= 0:
-                        lLayerWithMaterial = lMaterialLayer
-                        break
-            # FIXME If remove the first material layer, SplitMeshPerMaterial will have segmentfault
-            if lLayerWithMaterial and not lLayerWithMaterial == lFirstLayer:
-                indexArray0 = lFirstLayer.GetIndexArray()
-                indexArray1 = lLayerWithMaterial.GetIndexArray()
-                for i in range(len(list(indexArray1))):
-                    lIdx = indexArray1.GetAt(i)
-                    if lIdx < 0:
-                        if not lDefaultMaterial:
-                            lDefaultMaterial = CreateDefaultMaterial(pScene)
-                            lDefaultMaterialIdx = pNode.AddMaterial(lDefaultMaterial)
-                        lIdx = lDefaultMaterialIdx
-                    indexArray0.SetAt(i, lIdx)
-
-            for i in reversed(range(lMaterialLayerCount)[1:]):
-                pMesh.RemoveElementMaterial(lMaterialLayers[i])
-
-            # print(list(pMesh.GetElementMaterial(0).GetIndexArray()))
-    for k in range(pNode.GetChildCount()):
-        PrepareSplitMeshesPerMaterial(pScene, pNode.GetChild(k))
-
 # Each node can have two pivot context. The node's animation data can be converted from one pivot context to the other
 # Convert source pivot to destination with all zero pivot.
 # http://docs.autodesk.com/FBX/2013/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_node.html,topicNumber=cpp_ref_class_fbx_node_html
 def PrepareBakeTransform(pNode):
-    if not pNode.GetVisibility():
-        return
-
     # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_C35D98CB_5148_4B46_82D1_51077D8970EE_htm
     pNode.SetPivotState(FbxNode.eSourcePivot, FbxNode.ePivotActive)
     pNode.SetPivotState(FbxNode.eDestinationPivot, FbxNode.ePivotActive)
