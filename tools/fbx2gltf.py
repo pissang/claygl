@@ -453,7 +453,7 @@ def ConvertToPBRMaterial(pMaterial):
         lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
 
     if pMaterial.Bump.GetSrcObjectCount() > 0:
-        lTextureIdx = CreateTexture(pMaterial.Bump)
+        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Bump)
         if not lTextureIdx == None:
             lGLTFMaterial['normalTexture'] = {
                 "index": lTextureIdx,
@@ -461,7 +461,7 @@ def ConvertToPBRMaterial(pMaterial):
             }
 
     if pMaterial.NormalMap.GetSrcObjectCount() > 0:
-        lTextureIdx = CreateTexture(pMaterial.NormalMap)
+        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.NormalMap)
         if not lTextureIdx == None:
             lGLTFMaterial['normalTexture'] = {
                 "index": lTextureIdx,
