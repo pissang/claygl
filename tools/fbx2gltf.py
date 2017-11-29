@@ -833,7 +833,7 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
         if lMeshName == '':
             lMeshName = lMeshKey
 
-        lGLTFMesh = {'name' : lMeshName}
+        lGLTFMesh = {'name' : lMeshName, "primitives": []}
 
         # If any attribute of this node have skinning data
         # (Mesh splitted by material may have multiple MeshAttribute in one node)
@@ -847,7 +847,11 @@ def ConvertSceneNode(pScene, pNode, pPoseTime):
             lGLTFNode['skin'] = lSkinIdx
 
         if lMesh.GetLayer(0):
-            lGLTFMesh["primitives"] = ConvertMesh(pScene, lMesh, pNode, lGLTFSkin, lClusters)
+            for i in range(pNode.GetNodeAttributeCount()):
+                lNodeAttribute = pNode.GetNodeAttributeByIndex(i)
+                if lNodeAttribute.GetAttributeType() == FbxNodeAttribute.eMesh:
+                    lGLTFMesh['primitives'] += ConvertMesh(pScene, lNodeAttribute, pNode, lGLTFSkin, lClusters)
+
             lMeshIdx = len(lib_meshes)
             lib_meshes.append(lGLTFMesh)
             lGLTFNode['mesh'] = lMeshIdx
