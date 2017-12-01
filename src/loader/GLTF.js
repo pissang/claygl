@@ -946,7 +946,10 @@ function () {
                     geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
                     if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
                         geometry.indices = new vendor.Uint16Array(geometry.indices);
-                    }   
+                    }
+                    if(geometry.indices instanceof vendor.Uint8Array) {
+                        geometry.indices = new vendor.Uint16Array(geometry.indices);
+                    }
                 }
 
                 var material = lib.materials[primitiveInfo.material];
