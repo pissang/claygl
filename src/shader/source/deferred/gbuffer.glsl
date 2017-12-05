@@ -190,7 +190,8 @@ void main ()
 
     gl_FragColor.rgb = texel.rgb * color;
 
-    gl_FragColor.a = m;
+    // PENDING Alpha can't be zero.
+    gl_FragColor.a = m + 0.005;
 }
 
 @end
