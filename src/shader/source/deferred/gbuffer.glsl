@@ -146,7 +146,8 @@ void main()
         g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
     }
 
-    gl_FragColor.a = g;
+    // PENDING Alpha can't be zero.
+    gl_FragColor.a = g + 0.005;
 
     // Pack sign of normal to metalness
     // Add 0.001 to avoid m is 0
