@@ -58,6 +58,12 @@ var Renderable = Node.extend(
 /** @lends qtek.Renderable.prototype */
 {
 
+    __program: null,
+
+    /**
+     * Group of received light.
+     */
+    lightGroup: 0,
     /**
      * Render order, Nodes with smaller value renders before nodes with larger values.
      * @type {Number}
@@ -95,7 +101,7 @@ var Renderable = Node.extend(
     frontFace: glenum.CCW,
 
     /**
-     * If enable software frustum culling 
+     * If enable software frustum culling
      * @type {boolean}
      */
     frustumCulling: true,
@@ -120,7 +126,7 @@ var Renderable = Node.extend(
      * @type {boolean}
      */
     ignoreGBuffer: false,
-    
+
     /**
      * @return {boolean}
      */
@@ -153,13 +159,14 @@ var Renderable = Node.extend(
 
     /**
      * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Shader} [shader] May use shader of other material if shader code are same
+     * @param  {qtek.Material} [material]
      * @return {Object}
      */
-    render: function (renderer, shader) {
+    render: function (renderer, material, program) {
         var _gl = renderer.gl;
+        material = material || this.material;
         // May use shader of other material if shader code are same
-        var shader = shader || this.material.shader;
+        var shader = material.shader;
         var geometry = this.geometry;
 
         var glDrawMode = this.mode;
@@ -183,7 +190,7 @@ var Renderable = Node.extend(
         // Draw each chunk
         var drawHashChanged = false;
         // Hash with shader id in case previous material has less attributes than next material
-        currentDrawID = renderer.__GUID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
+        currentDrawID = renderer.__GUID__ + '-' + geometry.__GUID__ + '-' + program.__GUID__;
 
         if (currentDrawID !== prevDrawID) {
             drawHashChanged = true;
@@ -238,13 +245,13 @@ var Renderable = Node.extend(
                         var semantic = attributeBufferInfo.semantic;
                         var symbol;
                         if (semantic) {
-                            var semanticInfo = shader.attribSemantics[semantic];
+                            var semanticInfo = shader.attributeSemantics[semantic];
                             symbol = semanticInfo && semanticInfo.symbol;
                         }
                         else {
                             symbol = name;
                         }
-                        if (symbol && shader.attributeTemplates[symbol]) {
+                        if (symbol && program.attributes[symbol]) {
                             availableAttributes.push(attributeBufferInfo);
                             availableAttributeSymbols.push(symbol);
                         }
@@ -284,7 +291,7 @@ var Renderable = Node.extend(
                 var indicesBuffer = vao.indicesBuffer;
 
                 if (needsBindAttributes) {
-                    var locationList = shader.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
+                    var locationList = program.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
                     // Setting attributes;
                     for (var a = 0; a < availableAttributes.length; a++) {
                         var location = locationList[a];

@@ -56,7 +56,7 @@
                         var skybox = new qtek.plugin.Skybox({
                             environmentMap: ambientCubemapLight.cubemap
                         });
-                        skybox.material.shader.define('fragment', 'RGBM_DECODE');
+                        skybox.material.define('fragment', 'RGBM_DECODE');
                         skybox.material.set('lod', 3.0);
 
                         for (var i = 0; i < 10; i++) {

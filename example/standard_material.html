@@ -48,8 +48,8 @@
                             });
                             skybox.material.set('lod', 1.0);
 
-                            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
-                            skybox.material.shader.define('fragment', 'RGBM_DECODE');
+                            skybox.material.define('fragment', 'RGBM_ENCODE');
+                            skybox.material.define('fragment', 'RGBM_DECODE');
 
                             var material = new qtek.StandardMaterial({
                                 brdfLookup: prefilterResult.brdfLookup,

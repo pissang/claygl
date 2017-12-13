@@ -194,8 +194,7 @@ var Node = Base.extend(function () {
         });
 
         // Enabled the pin texture in shader
-        var shader = this.pass.material.shader;
-        shader.enableTexture(inputPinName);
+        this.pass.material.enableTexture(inputPinName);
     },
 
     clear: function () {

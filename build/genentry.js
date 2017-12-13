@@ -25,6 +25,7 @@ glob('**/*.js', {
             file.match(/qtek.*?\.js/)
             || file.indexOf('_') >= 0
             || file.endsWith('.glsl.js')
+            || file.indexOf('gpu/') >= 0
         ) {
             return;
         }

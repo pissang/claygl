@@ -49,9 +49,7 @@
                 var plane = new qtek.Mesh({
                     geometry: planeGeo,
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard', {
-                            textures: ['diffuseMap', 'normalMap', 'roughnessMap']
-                        })
+                        shader: qtek.shader.library.get('qtek.standard')
                     }),
                     culling: false
                 });
@@ -83,9 +81,7 @@
                 var pic = new qtek.Mesh({
                     geometry: planeGeo,
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard', {
-                            textures: ['diffuseMap']
-                        })
+                        shader: qtek.shader.library.get('qtek.standard')
                     }),
                     culling: false
                 });

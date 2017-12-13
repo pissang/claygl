@@ -15,22 +15,22 @@
             var shaderLibrary = qtek.shader.library;
 
             var renderer1 = new qtek.Renderer({
-                canvas : document.getElementById( "Renderer1")
+                canvas: document.getElementById( "Renderer1")
             });
             var renderer2 = new qtek.Renderer({
-                canvas : document.getElementById( "Renderer2")
+                canvas: document.getElementById( "Renderer2")
             });
             var scene = new qtek.Scene;
             var camera = new qtek.camera.Perspective({
-                aspect : renderer1.getViewportAspect(),
-                far : 500
+                aspect: renderer1.getViewportAspect(),
+                far: 500
             });
 
             var cube = new Cube();
-            var shader = shaderLibrary.get("qtek.lambert", "diffuseMap");
+            var shader = shaderLibrary.get('qtek.lambert');
 
             var material = new Material({
-                shader : shader
+                shader: shader
             });
             var texture = new qtek.Texture2D;
             texture.image = new Image;
@@ -38,13 +38,13 @@
                 texture.dirty();
             }
             texture.image.src = "assets/textures/crate.gif";
-            var uniforms = material.uniforms;
-            uniforms.diffuseMap.value = texture;
-            uniforms.color.value = [1, 1, 1];
+
+            material.set('diffuseMap', texture);
+            material.set('color', [1, 1, 1]);
 
             var mesh = new Mesh({
-                geometry : cube,
-                material : material
+                geometry: cube,
+                material: material
             });
 
             camera.position.set(0, 4, 4);
@@ -53,7 +53,7 @@
             scene.add( mesh );
 
             var light = new qtek.light.Directional({
-                color : [1.5, 1.5, 1.5]
+                color: [1.5, 1.5, 1.5]
             })
             light.position.set(50, 50, 50);
             light.lookAt( scene.position );

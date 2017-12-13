@@ -97,7 +97,7 @@ import Particle$77 from './particle/Particle';
 import ParticleRenderable$78 from './particle/ParticleRenderable';
 import PixelPicking$79 from './picking/PixelPicking';
 import RayPicking$80 from './picking/RayPicking';
-import FirstPersonControl$81 from './plugin/FirstPersonControl';
+import FreeControl$81 from './plugin/FreeControl';
 import GestureMgr$82 from './plugin/GestureMgr';
 import InfinitePlane$83 from './plugin/InfinitePlane';
 import OrbitControl$84 from './plugin/OrbitControl';
@@ -284,7 +284,7 @@ export { picking };
 
 
 var plugin = {
-    FirstPersonControl : FirstPersonControl$81,
+    FreeControl : FreeControl$81,
     GestureMgr : GestureMgr$82,
     InfinitePlane : InfinitePlane$83,
     OrbitControl : OrbitControl$84,

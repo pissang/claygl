@@ -24,7 +24,7 @@
             cube.generateUniqueVertex();
             cube.generateTangents();
 
-            var shader = qtek.shader.library.get('qtek.standard', ['parallaxOcclusionMap', 'diffuseMap', 'normalMap']);
+            var shader = qtek.shader.library.get('qtek.standard');
             var material = new qtek.Material({
                 shader: shader
             });

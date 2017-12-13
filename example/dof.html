@@ -44,22 +44,6 @@
                     domElement: renderer.canvas
                 });
 
-                var shader = qtek.shader.library.get(
-                    'qtek.standard', {
-                        textures: ['environmentMap', 'brdfLookup'],
-                        fragmentDefines: {
-                            'ENVIRONMENTMAP_PREFILTER': null,
-                            'USE_METALNESS': null,
-                            'USE_ROUGHNESS': null,
-                            'SRGB_DECODE': null,
-                            'RGBM_ENCODE': null
-                        }
-                    }
-                );
-
-                var shaderWidthDiffuse = shader.clone();
-                shaderWidthDiffuse.enableTexture('diffuseMap');
-
                 var sphereGeo = new qtek.geometry.Sphere({
                     radius: 0.2
                 });
@@ -75,6 +59,7 @@
                     emitMesh.material.set('emissionIntensity', 5);
                     emitMesh.material.set('color', [0, 0, 0]);
                     emitMesh.material.set('specularColor', [0, 0, 0]);
+
                     scene.add(emitMesh);
                 }
                 loader.on('success', function(res) {
@@ -104,11 +89,17 @@
 
                             rootNode.traverse(function (mesh) {
                                 if (mesh.isRenderable()) {
-                                    mesh.material.attachShader(mesh.material.get('diffuseMap') ? shaderWidthDiffuse: shader, true);
                                     mesh.material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
                                     mesh.material.set('brdfLookup', prefilterResult.brdfLookup);
                                     mesh.material.set('environmentMap', prefilterResult.environmentMap);
                                     mesh.material.set('roughness', 0.2);
+
+                                    mesh.material.define('ENVIRONMENTMAP_PREFILTER');
+                                    mesh.material.define('USE_METALNESS');
+                                    mesh.material.define('USE_ROUGHNESS');
+                                    mesh.material.define('SRGB_DECODE');
+                                    mesh.material.define('RGBM_ENCODE');
+
                                 }
                             });
                         }
@@ -159,17 +150,17 @@
 
                     function updateDebugConfig() {
                         if (config.debug === 'COC' || config.debug === 'Near COC') {
-                            dofCompositeNode.shaderUndefine('RGBM');
-                            compositeNode.shaderUndefine('RGBM_DECODE');
-                            compositeNode.shaderDefine('DEBUG', 1);
+                            dofCompositeNode.pass.material.undefine('RGBM');
+                            compositeNode.pass.material.undefine('RGBM_DECODE');
+                            compositeNode.pass.material.define('DEBUG', 1);
                         }
                         else {
-                            dofCompositeNode.shaderDefine('RGBM');
-                            compositeNode.shaderDefine('RGBM_DECODE');
+                            dofCompositeNode.pass.material.define('RGBM');
+                            compositeNode.pass.material.define('RGBM_DECODE');
 
-                            compositeNode.shaderDefine('DEBUG', 0);
+                            compositeNode.pass.material.define('DEBUG', 0);
                         }
-                        dofCompositeNode.shaderDefine('DEBUG', debugConfigValueMap[config.debug]);
+                        dofCompositeNode.pass.material.define('DEBUG', debugConfigValueMap[config.debug]);
                     }
 
                     var debugConfigs = ['none', 'COC', 'Near COC', 'Blurred', 'Blurred Near'];

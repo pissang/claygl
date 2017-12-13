@@ -97,8 +97,8 @@
             var crossPosArr = pixelToPositionArray(crossPixels);
             var checkPosArr = pixelToPositionArray(checkPixels);
 
-            var larger = checkPosArr.length < crossPosArr.length ? crossPosArr : checkPosArr;
-            var smaller = larger == crossPosArr ? checkPosArr : crossPosArr;
+            var larger = checkPosArr.length < crossPosArr.length ? crossPosArr: checkPosArr;
+            var smaller = larger == crossPosArr ? checkPosArr: crossPosArr;
 
             for (var i = smaller.length; i < larger.length; i++) {
                 var random = smaller[Math.round(Math.random() * (smaller.length - 1))];
@@ -119,10 +119,10 @@
             var Shader = qtek.Shader;
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById('main')
+                canvas: document.getElementById('main')
             });
             var shadowMapPass = new qtek.prePass.ShadowMap({
-                // softShadow : qtek.prePass.VSM
+                // softShadow: qtek.prePass.VSM
             });
 
             renderer.resize(window.innerWidth, window.innerHeight);
@@ -135,7 +135,7 @@
             var shader = qtek.shader.library.get('qtek.standard');
 
             var cubeMat = new qtek.Material({
-                shader : shader
+                shader: shader
             });
 
             var root = new qtek.Node();
@@ -164,7 +164,7 @@
             }
 
             var light = new qtek.light.Directional({
-                shadowResolution : 1024,
+                shadowResolution: 1024,
                 shadowBias: 0.005,
                 intensity: 0.7
             });
@@ -210,15 +210,15 @@
             });
 
             var obj = {
-                position : positionArr
+                position: positionArr
             }
 
             var current = crossPosArr;
             setInterval(function() {
-                var another = current == crossPosArr ? checkPosArr : crossPosArr;
+                var another = current == crossPosArr ? checkPosArr: crossPosArr;
                 animation.animate(obj)
                 .when(1000, {
-                    position : another
+                    position: another
                 }).start("CubicInOut");
                 current = another;
             }, 4000);

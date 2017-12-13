@@ -56,14 +56,11 @@ var Pass = Base.extend(function () {
     };
 }, function() {
 
-    var shader = new Shader({
-        vertex : Shader.source('qtek.compositor.vertex'),
-        fragment : this.fragment
-    });
+    var shader = new Shader(Shader.source('qtek.compositor.vertex'), this.fragment);
     var material = new Material({
-        shader : shader
+        shader: shader
     });
-    shader.enableTexturesAll();
+    material.enableTexturesAll();
 
     this.material = material;
 

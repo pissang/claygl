@@ -26,7 +26,7 @@ function projectEnvironmentMapGPU(renderer, envMap) {
     var pass = new Pass({
         fragment: projectEnvMapShaderCode
     });
-    pass.material.shader.define('fragment', 'TEXTURE_SIZE', envMap.width);
+    pass.material.define('fragment', 'TEXTURE_SIZE', envMap.width);
     pass.setUniform('environmentMap', envMap);
 
     var framebuffer = new FrameBuffer();
@@ -184,9 +184,9 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
         height: height
     });
     var framebuffer = new FrameBuffer();
-    skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+    skybox.material.define('fragment', 'RGBM_ENCODE');
     if (opts.decodeRGBM) {
-        skybox.material.shader.define('fragment', 'RGBM_DECODE');
+        skybox.material.define('fragment', 'RGBM_DECODE');
     }
     skybox.material.set('lod', opts.lod);
     var envMapPass = new EnvironmentMapPass({

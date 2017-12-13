@@ -58,11 +58,10 @@ var Skybox = Mesh.extend(function () {
     if (this.environmentMap) {
         this.setEnvironmentMap(this.environmentMap);
     }
-}, {
+}, /** @lends qtek.plugin.Skybox# */ {
     /**
      * Attach the skybox to the scene
      * @param  {qtek.Scene} scene
-     * @memberOf qtek.plugin.Skybox.prototype
      */
     attachScene: function (scene) {
         if (this.scene) {
@@ -73,7 +72,6 @@ var Skybox = Mesh.extend(function () {
     },
     /**
      * Detach from scene
-     * @memberOf qtek.plugin.Skybox.prototype
      */
     detachScene: function () {
         if (this.scene) {
@@ -89,13 +87,18 @@ var Skybox = Mesh.extend(function () {
     dispose: function (renderer) {
         this.detachScene();
         this.geometry.dispose(renderer);
-        this.material.dispose(renderer);
     },
-
+    /**
+     * Set environment map
+     * @param {qtek.TextureCube} envMap
+     */
     setEnvironmentMap: function (envMap) {
         this.material.set('environmentMap', envMap);
     },
-
+    /**
+     * Get environment map
+     * @return {qtek.TextureCube}
+     */
     getEnvironmentMap: function () {
         return this.material.get('environmentMap');
     },

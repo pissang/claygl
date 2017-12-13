@@ -44,7 +44,7 @@
                 scene : scene
             });
             skybox.material.set('environmentMap', cubeMap);
-            skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+            skybox.material.define('fragment', 'RGBM_ENCODE');
 
             var animation = new qtek.animation.Animation();
             animation.start();

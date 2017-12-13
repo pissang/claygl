@@ -154,28 +154,28 @@ vec4 linearTosRGB(in vec4 value) {
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
 
-#ifdef USE_SKIN_MATRICES_TEXTURE
-uniform sampler2D skinMatricesTexture;
-uniform float skinMatricesTextureSize: unconfigurable;
-mat4 getSkinMatrix(float idx) {
-    float j = idx * 4.0;
-    float x = mod(j, skinMatricesTextureSize);
-    float y = floor(j / skinMatricesTextureSize) + 0.5;
-    vec2 scale = vec2(skinMatricesTextureSize);
+// #ifdef USE_SKIN_MATRICES_TEXTURE
+// uniform sampler2D skinMatricesTexture;
+// uniform float skinMatricesTextureSize: unconfigurable;
+// mat4 getSkinMatrix(float idx) {
+//     float j = idx * 4.0;
+//     float x = mod(j, skinMatricesTextureSize);
+//     float y = floor(j / skinMatricesTextureSize) + 0.5;
+//     vec2 scale = vec2(skinMatricesTextureSize);
 
-    return mat4(
-        texture2D(skinMatricesTexture, vec2(x + 0.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 1.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 2.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 3.5, y) / scale)
-    );
-}
-#else
+//     return mat4(
+//         texture2D(skinMatricesTexture, vec2(x + 0.5, y) / scale),
+//         texture2D(skinMatricesTexture, vec2(x + 1.5, y) / scale),
+//         texture2D(skinMatricesTexture, vec2(x + 2.5, y) / scale),
+//         texture2D(skinMatricesTexture, vec2(x + 3.5, y) / scale)
+//     );
+// }
+// #else
 uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;
 mat4 getSkinMatrix(float idx) {
     return skinMatrix[int(idx)];
 }
-#endif
+// #endif
 
 #endif
 

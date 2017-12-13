@@ -177,19 +177,19 @@ define(function (require) {
             blurNode2.setParameter('textureSize', textureSize);
             blurNode3.setParameter('textureSize', textureSize);
 
-            blurNode1.shaderDefine('KERNEL_SIZE', 10);
-            blurNode2.shaderDefine('KERNEL_SIZE', 10);
-            blurNode3.shaderDefine('KERNEL_SIZE', 10);
+            blurNode1.pass.material.define('KERNEL_SIZE', 10);
+            blurNode2.pass.material.define('KERNEL_SIZE', 10);
+            blurNode3.pass.material.define('KERNEL_SIZE', 10);
 
             if (target === 'near') {
-                blurNode1.shaderDefine('BLUR_NEARFIELD');
-                blurNode2.shaderDefine('BLUR_NEARFIELD');
-                blurNode3.shaderDefine('BLUR_NEARFIELD');
+                blurNode1.pass.material.define('BLUR_NEARFIELD');
+                blurNode2.pass.material.define('BLUR_NEARFIELD');
+                blurNode3.pass.material.define('BLUR_NEARFIELD');
             }
             else if (target === 'coc') {
-                blurNode1.shaderDefine('BLUR_COC');
-                blurNode2.shaderDefine('BLUR_COC');
-                blurNode3.shaderDefine('BLUR_COC');
+                blurNode1.pass.material.define('BLUR_COC');
+                blurNode2.pass.material.define('BLUR_COC');
+                blurNode3.pass.material.define('BLUR_COC');
             }
 
             return blurNodes;
@@ -289,17 +289,17 @@ define(function (require) {
         compositor.addNode(upSampleNearNode);
         compositor.addNode(upSampleCocNode);
 
-        premultiplyNode.shaderDefine('RGBM');
-        dofCompositeNode.shaderDefine('RGBM');
-        compositeNode.shaderDefine('RGBM_DECODE');
-        upSampleNode.shaderDefine('RGBM');
-        upSampleNearNode.shaderDefine('RGBM');
+        premultiplyNode.pass.material.define('RGBM');
+        dofCompositeNode.pass.material.define('RGBM');
+        compositeNode.pass.material.define('RGBM_DECODE');
+        upSampleNode.pass.material.define('RGBM');
+        upSampleNearNode.pass.material.define('RGBM');
         downSampleNodes.forEach(function (downSampleNode) {
-            downSampleNode.shaderDefine('RGBM');
+            downSampleNode.pass.material.define('RGBM');
         });
         blurNodes.forEach(function (blurNode) {
             compositor.addNode(blurNode);
-            blurNode.shaderDefine('RGBM');
+            blurNode.pass.material.define('RGBM');
         });
 
         // Inject method

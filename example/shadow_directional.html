@@ -33,10 +33,11 @@
                 for (var j = 0; j < CUBE_COUNT; j++) {
                     var mesh = new qtek.Mesh({
                         geometry: cubeGeo,
-                        material: new qtek.StandardMaterial({
-                            color: [i / CUBE_COUNT, j / CUBE_COUNT, 0.5]
+                        material: new qtek.Material({
+                            shader: qtek.shader.library.get('qtek.standard')
                         })
                     });
+                    mesh.material.set('color', [i / CUBE_COUNT, j / CUBE_COUNT, 0.5]);
                     mesh.position.x = i - CUBE_COUNT / 2;
                     mesh.position.z = j - CUBE_COUNT / 2;
                     mesh.scale.set(0.5, 0, 0.5);

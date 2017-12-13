@@ -308,7 +308,7 @@ vec2 parallaxUv(vec2 uv, vec3 viewDir)
 #endif
 
 void main() {
-    
+
     vec4 albedoColor = vec4(color, alpha);
 
 #ifdef VERTEX_COLOR

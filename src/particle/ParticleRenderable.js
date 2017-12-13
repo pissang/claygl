@@ -7,11 +7,7 @@ import Shader from '../Shader';
 import particleEssl from './particle.glsl.js';
 Shader['import'](particleEssl);
 
-var particleShader = new Shader({
-    vertex: Shader.source('qtek.particle.vertex'),
-    fragment: Shader.source('qtek.particle.fragment')
-});
-particleShader.enableTexture('sprite');
+var particleShader = new Shader(Shader.source('qtek.particle.vertex'), Shader.source('qtek.particle.fragment'));
 
 /**
  * @constructor qtek.particle.ParticleRenderable
@@ -25,7 +21,7 @@ particleShader.enableTexture('sprite');
  *     });
  *     scene.add(particleRenderable);
  *     // Enable uv animation in the shader
- *     particleRenderable.material.shader.define('both', 'UV_ANIMATION');
+ *     particleRenderable.material.define('both', 'UV_ANIMATION');
  *     var Emitter = qtek.particle.Emitter;
  *     var Vector3 = qtek.math.Vector3;
  *     var emitter = new Emitter({
@@ -96,6 +92,8 @@ var ParticleRenderable = Renderable.extend(
             transparent: true,
             depthMask: false
         });
+
+        this.material.enableTexture('sprite');
     }
 
     this._particles = [];

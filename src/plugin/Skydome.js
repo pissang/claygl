@@ -18,16 +18,13 @@ Shader.import(basicEssl);
  */
 var Skydome = Mesh.extend(function () {
 
-    var skydomeShader = new Shader({
-        vertex: Shader.source('qtek.basic.vertex'),
-        fragment: Shader.source('qtek.basic.fragment')
-    });
-    skydomeShader.enableTexture('diffuseMap');
+    var skydomeShader = new Shader(Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
 
     var material = new Material({
         shader: skydomeShader,
         depthMask: false
     });
+    material.enableTexture('diffuseMap');
 
     return {
         /**

@@ -221,7 +221,7 @@ var FXLoader = Base.extend(
             if (nodeInfo.defines && node.pass) {
                 for (var name in nodeInfo.defines) {
                     var val = nodeInfo.defines[name];
-                    node.pass.material.shader.define('fragment', name, val);
+                    node.pass.material.define('fragment', name, val);
                 }
             }
         }

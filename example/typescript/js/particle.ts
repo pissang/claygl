@@ -21,7 +21,6 @@ var emitter = new qtek.particle.Emitter({
 });
 particleRenderable.addEmitter(emitter);
 particleRenderable.material.set('color', [1, 1, 1]);
-particleRenderable.material.shader.enableTexture("sprite");
 particleRenderable.material.set('sprite', new qtek.texture.Texture2D({
     image: generateSprite(128)
 }));

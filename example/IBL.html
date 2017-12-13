@@ -54,13 +54,9 @@
                                 scene: scene
                             });
                             skybox.material.set('environmentMap', prefilterResult.environmentMap);
-                            skybox.material.shader.define('fragment', 'RGBM');
+                            skybox.material.define('fragment', 'RGBM');
 
-                            var shader = qtek.shader.library.get(
-                                'qtek.standard', ['environmentMap', 'brdfLookup']
-                            );
-                            shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-                            shader.define('fragment', 'RGBM');
+                            var shader = qtek.shader.library.get('qtek.standard');
                             for (var i = 0; i < 10; i++) {
                                 var material = new qtek.Material({
                                     shader: shader
@@ -168,6 +164,9 @@
                     material.set('brdfLookup', prefilterResult.brdfLookup);
                     material.set('environmentMap', prefilterResult.environmentMap);
                     material.set('glossiness', 1 - roughness);
+
+                    material.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
+                    material.define('fragment', 'RGBM');
                 }
 
                 window.onresize = function() {

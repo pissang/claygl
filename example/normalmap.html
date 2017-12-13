@@ -23,16 +23,14 @@
             cube.generateUniqueVertex();
             cube.generateTangents();
 
-            var shader = qtek.shader.library.get("qtek.standard", ["normalMap", "diffuseMap"]);
+            var shader = qtek.shader.library.get('qtek.standard');
             var material = new qtek.Material({
                 shader: shader
             });
-            material.set("normalMap", loadTexture("assets/textures/normal_map.jpg"));
-            material.set("diffuseMap", loadTexture("assets/textures/diffuse.jpg"));
-            material.set("shininess", 100);
+            material.set('normalMap', loadTexture('assets/textures/normal_map.jpg'));
+            material.set('diffuseMap', loadTexture('assets/textures/diffuse.jpg'));
 
             camera.position.set(0, 0, 4);
-            // camera.lookAt( scene.position );
 
             var mesh = new qtek.Mesh({
                 geometry: cube,

@@ -18,21 +18,21 @@
             animation.start();
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById('main'),
-                devicePixelRatio : 1.0
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
             var scene = new qtek.Scene;
             var camera = new qtek.camera.Perspective({
-                aspect : renderer.getViewportAspect(),
-                far : 500
+                aspect: renderer.getViewportAspect(),
+                far: 500
             });
 
             var cube = new Cube();
             cube.generateTangents();
-            var shader = shaderLibrary.get('qtek.standard', 'diffuseMap', 'normalMap');
+            var shader = shaderLibrary.get('qtek.standard');
             var material = new Material({
-                shader : shader
+                shader: shader
             });
             material.set('glossiness', 0.4);
             var diffuse = new qtek.Texture2D;
@@ -41,6 +41,8 @@
             normal.load("assets/textures/normal_map.jpg");
             material.set('diffuseMap', diffuse);
             material.set('normalMap', normal);
+            material.enableTexture('diffuseMap');
+            material.enableTexture('normalMap');
 
             var root = new qtek.Node({
                 name: 'ROOT'

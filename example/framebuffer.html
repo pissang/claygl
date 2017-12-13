@@ -23,7 +23,6 @@
                 vertex: Shader.source("qtek.standard.vertex"),
                 fragment: Shader.source("qtek.standard.fragment")
             })
-            shader.enableTexture("diffuseMap");
             var material = new qtek.Material({
                 shader: shader
             });
@@ -52,8 +51,7 @@
                 height: 1024,
             });
             frameBuffer.attach(rtt);
-            var rttShader = qtek.shader.library.get("qtek.basic", "diffuseMap");
-            rttShader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
+            var rttShader = qtek.shader.library.get("qtek.basic");
             var rttMesh = new qtek.Mesh({
                 geometry: new qtek.geometry.Plane(),
                 material: new qtek.Material({

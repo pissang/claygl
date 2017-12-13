@@ -126,7 +126,7 @@ var textureUtil = {
 
         option = option || {};
         if (option.encodeRGBM) {
-            skydome.material.shader.define('fragment', 'RGBM_ENCODE');
+            skydome.material.define('fragment', 'RGBM_ENCODE');
         }
 
         environmentMapPass.texture = cubeMap;

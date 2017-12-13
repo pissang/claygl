@@ -126,7 +126,7 @@
                 fragment: qtek.Shader.source('qtek.compositor.output')
             });
             var elpasedTime = 0;
-            // debugPass.material.shader.undefine('fragment', 'OUTPUT_ALPHA');
+            // debugPass.material.undefine('fragment', 'OUTPUT_ALPHA');
             animation.on('frame', function (deltaTime) {
                 control.update(deltaTime);
 

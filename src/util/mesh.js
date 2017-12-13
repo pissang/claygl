@@ -132,19 +132,16 @@ var meshUtil = {
      * @param {qtek.Mesh} mesh
      * @param {number} maxJointNumber
      * @param {boolean} inPlace
-     * @param {qtek.shader.library} [shaderLib]
-     * @param {string} [shaderType]
      * @return {qtek.Node}
      *
      * @memberOf qtek.util.mesh
      */
 
     // FIXME, Have issues on some models
-    splitByJoints: function (mesh, maxJointNumber, inPlace, shaderLib, shaderType) {
+    splitByJoints: function (mesh, maxJointNumber, inPlace) {
         var geometry = mesh.geometry;
         var skeleton = mesh.skeleton;
         var material = mesh.material;
-        var shader = material.shader;
         var joints = mesh.joints;
         if (!geometry || !skeleton || !joints.length) {
             return;
@@ -153,7 +150,6 @@ var meshUtil = {
             return mesh;
         }
 
-        var shaders = {};
 
         var indices = geometry.indices;
 
@@ -242,34 +238,6 @@ var meshUtil = {
             var subJointNumber = bucket.joints.length;
 
             var subMat = material.clone();
-            if (material instanceof StandardMaterial) {
-                subMat.jointCount = subJointNumber;
-            }
-            else {
-                var subShader;
-                if (shaderLib && shaderType) {
-                    var vertexDefines = {};
-                    for (var name in shader.vertexDefines) {
-                        vertexDefines[name] = shader.vertexDefines[name];
-                    }
-                    vertexDefines.JOINT_COUNT = subJointNumber;
-                    subShader = shaderLib.get(shaderType, {
-                        textures: shader.getEnabledTextures(),
-                        vertexDefines: vertexDefines,
-                        fragmentDefines: shader.fragmentDefines,
-                        precision: shader.precision
-                    });
-                }
-                else {
-                    subShader = shaders[subJointNumber];
-                    if (!subShader) {
-                        subShader = shader.clone();
-                        subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
-                        shaders[subJointNumber] = subShader;
-                    }
-                }
-                subMat.attachShader(subShader, true);
-            }
             subMat.name = [material.name, b].join('-');
 
             var subGeo = new Geometry();

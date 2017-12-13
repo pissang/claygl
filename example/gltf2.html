@@ -61,8 +61,8 @@
 
                         scene.traverse(function (node) {
                             if (node.material) {
-                                node.material.shader.define('fragment', 'RGBM');
-                                node.material.shader.define('fragment', 'SRGB_DECODE');
+                                node.material.define('fragment', 'RGBM');
+                                node.material.define('fragment', 'SRGB_DECODE');
                             }
                         });
 
@@ -93,15 +93,11 @@
                         var plane = new qtek.Mesh({
                             geometry: planeGeo,
                             material: new qtek.Material({
-                                shader: qtek.shader.library.get('qtek.standard', {
-                                    textures: ['diffuseMap', 'normalMap'],
-                                    fragmentDefines: {
-                                        RGBM: null,
-                                        SRGB_DECODE: null
-                                    }
-                                })
+                                shader: qtek.shader.library.get('qtek.standard')
                             }),
                         });
+                        plane.material.define('fragment', 'RGBM');
+                        plane.material.define('fragment', 'SRGB_DECODE');
                         plane.scale.set(10, 10, 1);
                         plane.position.set(0, -1, 0);
                         plane.rotation.rotateX(-Math.PI / 2);

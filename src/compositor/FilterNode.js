@@ -248,31 +248,31 @@ var FilterNode = Node.extend(function () {
             this.setParameter(name, obj[name]);
         }
     },
-    /**
-     * Set shader code
-     * @param {string} shaderStr
-     */
-    setShader: function (shaderStr) {
-        var material = this.pass.material;
-        material.shader.setFragment(shaderStr);
-        material.attachShader(material.shader, true);
-    },
-    /**
-     * Proxy of pass.material.shader.define('fragment', xxx);
-     * @param  {string} symbol
-     * @param  {number} [val]
-     */
-    shaderDefine: function (symbol, val) {
-        this.pass.material.shader.define('fragment', symbol, val);
-    },
+    // /**
+    //  * Set shader code
+    //  * @param {string} shaderStr
+    //  */
+    // setShader: function (shaderStr) {
+    //     var material = this.pass.material;
+    //     material.shader.setFragment(shaderStr);
+    //     material.attachShader(material.shader, true);
+    // },
+    // /**
+    //  * Proxy of pass.material.define('fragment', xxx);
+    //  * @param  {string} symbol
+    //  * @param  {number} [val]
+    //  */
+    // shaderDefine: function (symbol, val) {
+    //     this.pass.material.define('fragment', symbol, val);
+    // },
 
-    /**
-     * Proxy of pass.material.shader.undefine('fragment', xxx)
-     * @param  {string} symbol
-     */
-    shaderUndefine: function (symbol) {
-        this.pass.material.shader.undefine('fragment', symbol);
-    },
+    // /**
+    //  * Proxy of pass.material.undefine('fragment', xxx)
+    //  * @param  {string} symbol
+    //  */
+    // shaderUndefine: function (symbol) {
+    //     this.pass.material.undefine('fragment', symbol);
+    // },
 
     removeReference: function (outputName) {
         this._outputReferences[outputName]--;
@@ -292,72 +292,11 @@ var FilterNode = Node.extend(function () {
         }
     },
 
-    link: function (inputPinName, fromNode, fromPinName) {
-
-        // The relationship from output pin to input pin is one-on-multiple
-        this.inputLinks[inputPinName] = {
-            node: fromNode,
-            pin: fromPinName
-        };
-        if (!fromNode.outputLinks[fromPinName]) {
-            fromNode.outputLinks[fromPinName] = [];
-        }
-        fromNode.outputLinks[ fromPinName ].push({
-            node: this,
-            pin: inputPinName
-        });
-
-        // Enabled the pin texture in shader
-        var shader = this.pass.material.shader;
-        shader.enableTexture(inputPinName);
-    },
-
     clear: function () {
         Node.prototype.clear.call(this);
 
-        var shader = this.pass.material.shader;
         // Default disable all texture
-        shader.disableTexturesAll();
-    },
-
-    updateReference: function (outputName) {
-        if (!this._rendering) {
-            this._rendering = true;
-            for (var inputName in this.inputLinks) {
-                var link = this.inputLinks[inputName];
-                link.node.updateReference(link.pin);
-            }
-            this._rendering = false;
-        }
-        if (outputName) {
-            this._outputReferences[outputName] ++;
-        }
-    },
-
-    beforeFrame: function () {
-        this._rendered = false;
-
-        for (var name in this.outputLinks) {
-            this._outputReferences[name] = 0;
-        }
-    },
-
-    afterFrame: function () {
-        // Put back all the textures to pool
-        for (var name in this.outputLinks) {
-            if (this._outputReferences[name] > 0) {
-                var outputInfo = this.outputs[name];
-                if (outputInfo.keepLastFrame) {
-                    if (this._prevOutputTextures[name]) {
-                        this._compositor.releaseTexture(this._prevOutputTextures[name]);
-                    }
-                    this._prevOutputTextures[name] = this._outputTextures[name];
-                }
-                else {
-                    this._compositor.releaseTexture(this._outputTextures[name]);
-                }
-            }
-        }
+        this.pass.material.disableTexturesAll();
     }
 });
 

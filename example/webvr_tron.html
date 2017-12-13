@@ -54,7 +54,7 @@
                         fragment: Shader.source('tron.fragment')
                     })
                 });
-                tronMaterial.shader.define('fragment', 'RGBM_ENCODE');
+                tronMaterial.define('fragment', 'RGBM_ENCODE');
 
                 camera.position.set(0, 0, 7);
 
@@ -69,13 +69,10 @@
                 var cubeMesh = new qtek.Mesh({
                     geometry: cube,
                     material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard', {
-                            fragmentDefines: {
-                                RGBM_ENCODE: null
-                            }
-                        })
+                        shader: qtek.shader.library.get('qtek.standard')
                     })
                 });
+                cubeMesh.material.define('fragment', 'RGBM_ENCODE');
                 cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
                 cubeMesh.scale.set(1.5, 1.5, 1.5);
 

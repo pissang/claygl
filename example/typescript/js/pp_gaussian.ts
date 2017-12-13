@@ -15,7 +15,6 @@ var cubeMat: qtek.Material = new qtek.Material({
         fragment: qtek.Shader.source("qtek.lambert.fragment")
     })
 });
-cubeMat.shader.enableTexture("diffuseMap");
 
 var diffuseTexture: qtek.texture.Texture2D = new qtek.texture.Texture2D();
 diffuseTexture.load('../assets/textures/crate.gif');

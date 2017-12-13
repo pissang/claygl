@@ -24,9 +24,9 @@ function createFillCanvas(color) {
     return canvas;
 }
 
-function attachTextureToSlot(renderer, shader, symbol, texture, slot) {
+function attachTextureToSlot(renderer, program, symbol, texture, slot) {
     var gl = renderer.gl;
-    shader.setUniform(gl, '1i', symbol, slot);
+    program.setUniform(gl, '1i', symbol, slot);
 
     gl.activeTexture(gl.TEXTURE0 + slot);
     // Maybe texture is not loaded yet;
@@ -46,29 +46,29 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
     var previousRougGlossMap;
     var previousRenderable;
 
-    return function (renderable, prevMaterial, prevShader) {
+    return function (renderable, gBufferMat, prevMaterial) {
         // Material not change
-        if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+        if (previousRenderable && previousRenderable.material === renderable.material) {
             return;
         }
 
-        var standardMaterial = renderable.__standardMat;
-        var gBufferMat = renderable.material;
+        var standardMaterial = renderable.material;
+        var program = renderable.__program;
 
         var glossiness;
         var roughGlossMap;
-        var useRoughnessWorkflow = standardMaterial.shader.isDefined('fragment', 'USE_ROUGHNESS');
-        var doubleSided = standardMaterial.shader.isDefined('fragment', 'DOUBLE_SIDED');
+        var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
+        var doubleSided = standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
         var roughGlossChannel;
         if (useRoughnessWorkflow) {
             glossiness = 1.0 - standardMaterial.get('roughness');
             roughGlossMap = standardMaterial.get('roughnessMap');
-            roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'ROUGHNESS_CHANNEL');
+            roughGlossChannel = standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL');
         }
         else {
             glossiness = standardMaterial.get('glossiness');
             roughGlossMap = standardMaterial.get('glossinessMap');
-            roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'GLOSSINESS_CHANNEL');
+            roughGlossChannel = standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
         }
         var useRoughGlossMap = !!roughGlossMap;
 
@@ -90,25 +90,25 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
             gBufferMat.set('uvOffset', uvOffset);
         }
         else {
-            gBufferMat.shader.setUniform(
+            program.setUniform(
                 gl, '1f', 'glossiness', glossiness
             );
 
             if (previousNormalMap !== normalMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'normalMap', normalMap, 0);
+                attachTextureToSlot(this, program, 'normalMap', normalMap, 0);
             }
             if (previousRougGlossMap !== roughGlossMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'roughGlossMap', roughGlossMap, 1);
+                attachTextureToSlot(this, program, 'roughGlossMap', roughGlossMap, 1);
             }
-            gBufferMat.shader.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
-            gBufferMat.shader.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
-            gBufferMat.shader.setUniform(gl, '1i', 'doubleSided', +doubleSided);
-            gBufferMat.shader.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
+            program.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
+            program.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
+            program.setUniform(gl, '1i', 'doubleSided', +doubleSided);
+            program.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
             if (uvRepeat != null) {
-                gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+                program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
             }
             if (uvOffset != null) {
-                gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+                program.setUniform(gl, '2f', 'uvOffset', uvOffset);
             }
         }
 
@@ -124,14 +124,14 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
     var previousRenderable;
     var previousMetalnessMap;
 
-    return function (renderable, prevMaterial, prevShader) {
+    return function (renderable, gBufferMat, prevMaterial) {
         // Material not change
-        if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+        if (previousRenderable && previousRenderable.material === renderable.material) {
             return;
         }
 
-        var standardMaterial = renderable.__standardMat;
-        var gBufferMat = renderable.material;
+        var program = renderable.__program;
+        var standardMaterial = renderable.material;
 
         var color = standardMaterial.get('color');
         var metalness = standardMaterial.get('metalness');
@@ -159,22 +159,20 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
             gBufferMat.set('linear', +standardMaterial.linear);
         }
         else {
-            gBufferMat.shader.setUniform(
-                gl, '1f', 'metalness', metalness
-            );
+            program.setUniform(gl, '1f', 'metalness', metalness);
 
-            gBufferMat.shader.setUniform(gl, '3f', 'color', color);
+            program.setUniform(gl, '3f', 'color', color);
             if (previousDiffuseMap !== diffuseMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
+                attachTextureToSlot(this, program, 'diffuseMap', diffuseMap, 0);
             }
             if (previousMetalnessMap !== metalnessMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'metalnessMap', metalnessMap, 1);
+                attachTextureToSlot(this, program, 'metalnessMap', metalnessMap, 1);
             }
-            gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
-            gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+            program.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
+            program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+            program.setUniform(gl, '2f', 'uvOffset', uvOffset);
 
-            gBufferMat.shader.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
+            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
         }
 
         previousDiffuseMap = diffuseMap;
@@ -251,7 +249,24 @@ var GBuffer = Base.extend(function () {
 
         _frameBuffer: new FrameBuffer(),
 
-        _gBufferMaterials: {},
+        _gBufferMaterial1: new Material({
+            shader: new Shader(
+                Shader.source('qtek.deferred.gbuffer.vertex'),
+                Shader.source('qtek.deferred.gbuffer1.fragment')
+            ),
+            vertexDefines: {
+                FIRST_PASS: null
+            },
+            fragmentDefines: {
+                FIRST_PASS: null
+            }
+        }),
+        _gBufferMaterial2: new Material({
+            shader: new Shader(
+                Shader.source('qtek.deferred.gbuffer.vertex'),
+                Shader.source('qtek.deferred.gbuffer2.fragment')
+            )
+        }),
 
         _debugPass: new Pass({
             fragment: Shader.source('qtek.deferred.gbuffer.debug')
@@ -326,19 +341,6 @@ var GBuffer = Base.extend(function () {
         var transparentQueue = scene.transparentQueue;
         var oldBeforeRender = renderer.beforeRenderObject;
 
-        // StandardMaterial needs updateShader method so shader can be created on demand.
-        for (var i = 0; i < opaqueQueue.length; i++) {
-            var material = opaqueQueue[i].material;
-            material.updateShader && material.updateShader(renderer);
-        }
-        for (var i = 0; i < transparentQueue.length; i++) {
-            var material = transparentQueue[i].material;
-            material.updateShader && material.updateShader(renderer);
-        }
-
-        opaqueQueue.sort(ForwardRenderer.opaqueSortFunc);
-        transparentQueue.sort(ForwardRenderer.transparentSortFunc);
-
         var offset = 0;
         var renderQueue = this._renderQueue;
         for (var i = 0; i < opaqueQueue.length; i++) {
@@ -352,7 +354,6 @@ var GBuffer = Base.extend(function () {
             }
         }
         renderQueue.length = offset;
-
 
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
@@ -389,10 +390,6 @@ var GBuffer = Base.extend(function () {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
-            this._resetGBufferMaterials();
-
-            this._replaceGBufferMat(renderQueue, 1);
-
             // FIXME Use MRT if possible
             // Pass 1
             renderer.beforeRenderObject = getBeforeRenderHook1(
@@ -400,6 +397,7 @@ var GBuffer = Base.extend(function () {
                 this._defaultNormalMap,
                 this._defaultRoughnessMap
             );
+            renderer.updatePrograms(renderQueue, null, this._gBufferMaterial1);
             renderer.renderQueue(renderQueue, camera);
 
         }
@@ -420,12 +418,12 @@ var GBuffer = Base.extend(function () {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
-            this._replaceGBufferMat(renderQueue, 2);
             renderer.beforeRenderObject = getBeforeRenderHook2(
                 gl,
                 this._defaultDiffuseMap,
                 this._defaultMetalnessMap
             );
+            renderer.updatePrograms(renderQueue, null, this._gBufferMaterial2);
             renderer.renderQueue(renderQueue, camera);
 
         }
@@ -433,8 +431,6 @@ var GBuffer = Base.extend(function () {
         renderer.bindSceneRendering(null);
 
         renderer.beforeRenderObject = oldBeforeRender;
-        this._cleanGBufferMaterials(renderer);
-        this._restoreMaterial(renderQueue);
 
         frameBuffer.unbind(renderer);
     },
@@ -513,95 +509,11 @@ var GBuffer = Base.extend(function () {
         return this._gBufferTex3;
     },
 
-    _getMaterial: function (nJoints) {
-        var gBufferMaterials = this._gBufferMaterials;
-        var obj = gBufferMaterials[nJoints];
-        if (!obj) {
-            var mat1 = new Material({
-                shader: new Shader({
-                    vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
-                    fragment: Shader.source('qtek.deferred.gbuffer1.fragment')
-                })
-            });
-            var mat2 = new Material({
-                shader: new Shader({
-                    vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
-                    fragment: Shader.source('qtek.deferred.gbuffer2.fragment')
-                })
-            });
-            mat1.shader.define('vertex', 'FIRST_PASS');
-
-            if (nJoints > 0) {
-                mat1.shader.define('vertex', 'SKINNING');
-                mat1.shader.define('vertex', 'JOINT_COUNT', nJoints);
-                mat2.shader.define('vertex', 'SKINNING');
-                mat2.shader.define('vertex', 'JOINT_COUNT', nJoints);
-            }
-
-            obj = {
-                material1: mat1,
-                material2: mat2
-            };
-
-            gBufferMaterials[nJoints] = obj;
-        }
-        obj.used = true;
-
-        return obj;
-    },
-
-    _resetGBufferMaterials: function () {
-        for (var key in this._gBufferMaterials) {
-            this._gBufferMaterials[key].used = false;
-        }
-    },
-
-    _cleanGBufferMaterials: function (renderer) {
-        for (var key in this._gBufferMaterials) {
-            var obj = this._gBufferMaterials[key];
-            if (!obj.used) {
-                obj.material1.dispose(renderer);
-                obj.material2.dispose(renderer);
-            }
-        }
-    },
-
-    _replaceGBufferMat: function (queue, pass) {
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
-
-            if (pass === 1) {
-                renderable.__standardMat = renderable.material;
-            }
-
-            var matObj = this._getMaterial(
-                renderable.joints ? renderable.joints.length : 0,
-                false
-            );
-            renderable.material = pass === 1 ? matObj.material1 : matObj.material2;
-        }
-    },
-
-    _restoreMaterial: function (queue) {
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
-
-            if (renderable.__standardMat) {
-                renderable.material = renderable.__standardMat;
-            }
-        }
-    },
-
 
     /**
      * @param  {qtek.Renderer} renderer
      */
     dispose: function (renderer) {
-        for (var name in this._gBufferMaterials) {
-            var matObj = this._gBufferMaterials[name];
-            matObj.material1.dispose(renderer);
-            matObj.material2.dispose(renderer);
-        }
     }
 });
 

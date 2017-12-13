@@ -74,8 +74,8 @@ cubemapUtil.prefilterEnvironmentMap = function (
     });
     prefilterMaterial.set('normalDistribution', normalDistribution);
 
-    textureOpts.encodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_ENCODE');
-    textureOpts.decodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_DECODE');
+    textureOpts.encodeRGBM && prefilterMaterial.define('fragment', 'RGBM_ENCODE');
+    textureOpts.decodeRGBM && prefilterMaterial.define('fragment', 'RGBM_DECODE');
 
     var dummyScene = new Scene();
     var skyEnv;

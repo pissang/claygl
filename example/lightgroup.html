@@ -52,11 +52,6 @@
             });
             material2.set('diffuseMap', diffuse);
             material2.set('normalMap', normal);
-            material1.shader.enableTexture(['diffuseMap', 'normalMap']);
-            material2.shader.enableTexture(['diffuseMap', 'normalMap']);
-
-            material1.shader.lightGroup = 0;
-            material2.shader.lightGroup = 1;
 
             var root = new qtek.Node({
                 name : 'ROOT'
@@ -67,7 +62,8 @@
                     for ( var k = 0; k < 50; k++) {
                         var mesh = new qtek.Mesh({
                             geometry: cube,
-                            material: i % 2 ? material1 : material2
+                            material: i % 2 ? material1 : material2,
+                            lightGroup: i % 2
                         });
                         mesh.position.set(50-Math.random()*100, 50-Math.random()*100, 50-Math.random()*100);
                         root.add(mesh);

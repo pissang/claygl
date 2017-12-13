@@ -1,6 +1,28 @@
 import Node from './Node';
 import Light from './Light';
 import BoundingBox from './math/BoundingBox';
+import util from './core/util';
+
+var programKeyCache = {};
+
+function getProgramKey(lightNumbers) {
+    var defineStr = [];
+    var lightTypes = Object.keys(lightNumbers);
+    lightTypes.sort();
+    for (var i = 0; i < lightTypes.length; i++) {
+        var lightType = lightNumbers[i];
+        defineStr.push(lightType + ' ' + lightNumbers[lightType]);
+    }
+    var key = defineStr.join('\n');
+
+    if (programKeyCache[key]) {
+        return programKeyCache[key];
+    }
+
+    var id = util.genGUID();
+    programKeyCache[key] = id;
+    return id;
+}
 
 /**
  * @constructor qtek.Scene
@@ -51,6 +73,8 @@ var Scene = Node.extend(function () {
         // Will be set in the render function
         _lightUniforms: {},
 
+        _previousLightNumber: {},
+
         _lightNumber: {
             // groupId: {
                 // POINT_LIGHT: 0,
@@ -60,6 +84,8 @@ var Scene = Node.extend(function () {
                 // AMBIENT_SH_LIGHT: 0
             // }
         },
+
+        _lightProgramKeys: {},
 
         _opaqueObjectCount: 0,
         _transparentObjectCount: 0,
@@ -171,13 +197,9 @@ var Scene = Node.extend(function () {
 
         // reset
         if (!notUpdateLights) {
-            var lightNumber = this._lightNumber;
-            // Reset light numbers
-            for (var group in lightNumber) {
-                for (var type in lightNumber[group]) {
-                    lightNumber[group][type] = 0;
-                }
-            }
+            this._previousLightNumber = this._lightNumber;
+
+            var lightNumber = {};
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
                 var group = light.group;
@@ -188,7 +210,11 @@ var Scene = Node.extend(function () {
                 lightNumber[group][light.type] = lightNumber[group][light.type] || 0;
                 lightNumber[group][light.type]++;
             }
-            // PENDING Remove unused group?
+            this._lightNumber = lightNumber;
+
+            for (var groupId in lightNumber) {
+                this._lightProgramKeys[groupId] = getProgramKey(lightNumber[groupId]);
+            }
 
             this._updateLightUniforms();
         }
@@ -238,7 +264,6 @@ var Scene = Node.extend(function () {
             var group = light.group;
 
             for (var symbol in light.uniformTemplates) {
-
                 var uniformTpl = light.uniformTemplates[symbol];
                 if (!lightUniforms[group]) {
                     lightUniforms[group] = {};
@@ -271,23 +296,48 @@ var Scene = Node.extend(function () {
             }
         }
     },
-    
+
+    getLightGroups: function () {
+        var lightGroups = [];
+        for (var groupId in this._lightNumber) {
+            lightGroups.push(groupId);
+        }
+        return lightGroups;
+    },
+
+    getNumberChangedLightGroups: function () {
+        var lightGroups = [];
+        for (var groupId in this._lightNumber) {
+            if (this.isLightNumberChanged(groupId)) {
+                lightGroups.push(groupId);
+            }
+        }
+        return lightGroups;
+    },
+
     /**
-     * Determine if light group of the shader is different from scene's
+     * Determine if light group is different with since last frame
      * Used to determine whether to update shader and scene's uniforms in Renderer.render
      * @param {Shader} shader
      * @returns {Boolean}
      */
-    isShaderLightNumberChanged: function (shader) {
-        var group = shader.lightGroup;
+    isLightNumberChanged: function (lightGroup) {
+        var prevLightNumber = this._previousLightNumber;
+        var currentLightNumber = this._lightNumber;
         // PENDING Performance
-        for (var type in this._lightNumber[group]) {
-            if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
+        for (var type in currentLightNumber[lightGroup]) {
+            if (!prevLightNumber[lightGroup]) {
+                return true;
+            }
+            if (currentLightNumber[lightGroup][type] !== prevLightNumber[lightGroup][type]) {
                 return true;
             }
         }
-        for (var type in shader.lightNumber) {
-            if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
+        for (var type in prevLightNumber[lightGroup]) {
+            if (!currentLightNumber[lightGroup]) {
+                return true;
+            }
+            if (currentLightNumber[lightGroup][type] !== prevLightNumber[lightGroup][type]) {
                 return true;
             }
         }
@@ -298,30 +348,29 @@ var Scene = Node.extend(function () {
      * Set shader's light group with scene's
      * @param {Shader} shader
      */
-    setShaderLightNumber: function (shader) {
-        var group = shader.lightGroup;
-        for (var type in this._lightNumber[group]) {
-            shader.lightNumber[type] = this._lightNumber[group][type];
-        }
-        shader.dirty();
+    getLightsNumbers: function (lightGroup) {
+        return this._lightNumber[lightGroup];
     },
 
-    setLightUniforms: function (shader, renderer) {
-        var group = shader.lightGroup;
-        for (var symbol in this._lightUniforms[group]) {
-            var lu = this._lightUniforms[group][symbol];
+    getProgramKey: function (lightGroup) {
+        return this._lightProgramKeys[lightGroup];
+    },
+
+    setLightUniforms: function (program, lightGroup, renderer) {
+        for (var symbol in this._lightUniforms[lightGroup]) {
+            var lu = this._lightUniforms[lightGroup][symbol];
             if (lu.type === 'tv') {
                 for (var i = 0; i < lu.value.length; i++) {
                     var texture = lu.value[i];
-                    var slot = shader.currentTextureSlot();
-                    var result = shader.setUniform(renderer.gl, '1i', symbol, slot);
+                    var slot = program.currentTextureSlot();
+                    var result = program.setUniform(renderer.gl, '1i', symbol, slot);
                     if (result) {
-                        shader.takeCurrentTextureSlot(renderer, texture);
+                        program.takeCurrentTextureSlot(renderer, texture);
                     }
                 }
             }
             else {
-                shader.setUniform(renderer.gl, lu.type, symbol, lu.value);
+                program.setUniform(renderer.gl, lu.type, symbol, lu.value);
             }
         }
     },

@@ -118,7 +118,7 @@ var GLTFLoader = Base.extend(
 /** @lends qtek.loader.GLTF# */
 {
     /**
-     * 
+     *
      * @type {qtek.Node}
      */
     rootNode: null,
@@ -240,9 +240,9 @@ function () {
             this.trigger('error', 'Only glTF2.0 is supported.');
             return;
         }
-        
+
         var dataView = new DataView(buffer, 12);
-        
+
         var json;
         var buffers = [];
         // Read chunks
@@ -321,7 +321,7 @@ function () {
             util.each(json.buffers, function (bufferInfo, idx) {
                 loading++;
                 var path = bufferInfo.uri;
-    
+
                 self._loadBuffer(path, function (buffer) {
                     lib.buffers[idx] = buffer;
                     checkLoad();
@@ -408,7 +408,7 @@ function () {
         if (path && path.match(/^data:(.*?)base64,/)) {
             return path;
         }
-        
+
         var rootPath = this.bufferRootPath;
         if (rootPath == null) {
             rootPath = this.rootPath;
@@ -484,29 +484,9 @@ function () {
             lib.skeletons[idx] = skeleton;
         }, this);
 
-        var shaderLib = this.shaderLibrary;
-        var shaderName = this.shaderName;
         function enableSkinningForMesh(mesh, skeleton, jointIndices) {
             mesh.skeleton = skeleton;
             mesh.joints = jointIndices;
-            // Make sure meshs with different joints not have same material.
-            var originalShader = mesh.material.shader;
-            var material = mesh.material.clone();
-            mesh.material = material;
-            if (material instanceof StandardMaterial) {
-                material.jointCount = jointIndices.length;
-            }
-            else {
-                material.shader = shaderLib.get(
-                    shaderName, {
-                        textures: originalShader.getEnabledTextures(),
-                        vertexDefines: {
-                            SKINNING: null,
-                            JOINT_COUNT: jointIndices.length
-                        }
-                    }
-                );
-            }
         }
 
         function getJointIndex(joint) {
@@ -608,20 +588,17 @@ function () {
             });
         }
         else {
-            var fragmentDefines = {
-                USE_ROUGHNESS: null,
-                USE_METALNESS: null
-            };
-            if (materialInfo.doubleSided) {
-                fragmentDefines.DOUBLE_SIDED = null;
-            }
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName, {
-                    fragmentDefines: fragmentDefines,
-                    textures: enabledTextures
-                })
+                shader: this.shaderLibrary.get(this.shaderName)
             });
+
+            material.define('fragment', 'USE_ROUGHNESS');
+            material.define('fragment', 'USE_METALNESS');
+
+            if (materialInfo.doubleSided) {
+                material.define('fragment', 'DOUBLE_SIDED');
+            }
         }
 
         if (uniforms.transparent) {
@@ -743,25 +720,24 @@ function () {
             }, commonProperties));
         }
         else {
-            var fragmentDefines = {
-                ROUGHNESS_CHANNEL: 1,
-                METALNESS_CHANNEL: 2,
-                USE_ROUGHNESS: null,
-                USE_METALNESS: null
-            };
-            if (alphaTest) {
-                fragmentDefines.ALPHA_TEST = null;
-            }
-            if (materialInfo.doubleSided) {
-                fragmentDefines.DOUBLE_SIDED = null;
-            }
+
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName, {
-                    fragmentDefines: fragmentDefines,
-                    textures: enabledTextures
-                })
+                shader: this.shaderLibrary.get(this.shaderName)
             });
+
+            material.define('fragment', 'USE_ROUGHNESS');
+            material.define('fragment', 'USE_METALNESS');
+            material.define('fragment', 'ROUGHNESS_CHANNEL', 1);
+            material.define('fragment', 'METALNESS_CHANNEL', 2);
+
+            if (alphaTest) {
+                material.define('fragment', 'ALPHA_TEST');
+            }
+            if (materialInfo.doubleSided) {
+                material.define('fragment', 'DOUBLE_SIDED');
+            }
+
             material.set(commonProperties);
         }
 
@@ -825,21 +801,23 @@ function () {
             commonProperties.specularColor = [1, 1, 1];
         }
 
-        var fragmentDefines = {
-            GLOSSINESS_CHANNEL: 3
-        };
-        if (alphaTest) {
-            fragmentDefines.ALPHA_TEST = null;
-        }
-        if (materialInfo.doubleSided) {
-            fragmentDefines.DOUBLE_SIDED = null;
-        }
         material = new Material({
             name: materialInfo.name,
-            shader: this.shaderLibrary.get(this.shaderName, {
-                fragmentDefines: fragmentDefines,
-                textures: enabledTextures
-            })
+            shader: this.shaderLibrary.get(this.shaderName)
+        });
+
+        material.define('fragment', 'GLOSSINESS_CHANNEL', 3);
+
+        if (alphaTest) {
+            material.define('fragment', 'ALPHA_TEST');
+        }
+        if (materialInfo.doubleSided) {
+            material.define('fragment', 'DOUBLE_SIDED');
+        }
+
+        material = new Material({
+            name: materialInfo.name,
+            shader: this.shaderLibrary.get(this.shaderName)
         });
         material.set(commonProperties);
 
@@ -973,7 +951,7 @@ function () {
                     mesh.geometry.generateVertexNormals();
                 }
                 if (((material instanceof StandardMaterial) && material.normalMap)
-                    || (material.shader && material.shader.isTextureEnabled('normalMap'))
+                    || (material.isTextureEnabled('normalMap'))
                 ) {
                     if (!mesh.geometry.attributes.tangent.value) {
                         mesh.geometry.generateTangents();

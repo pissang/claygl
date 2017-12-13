@@ -21,7 +21,7 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         texture: envMap
  *     });
  *     var carBody = car.getChildByName('body');
- *     carBody.material.shader.enableTexture('environmentMap');
+ *     carBody.material.enableTexture('environmentMap');
  *     carBody.material.set('environmentMap', envMap);
  *     ...
  *     animation.on('frame', function(frameTime) {
