@@ -108,7 +108,7 @@ var Material = Base.extend(function () {
     };
 }, function () {
     if (!this.name) {
-        this.name = 'MATERIAL_' + this.__GUID__;
+        this.name = 'MATERIAL_' + this.__uid__;
     }
 
     if (this.shader) {

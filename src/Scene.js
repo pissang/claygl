@@ -144,7 +144,7 @@ var Scene = Node.extend(function () {
                 currentNew.joints = current.joints.slice();
             }
             if (current.material) {
-                materialsMap[current.material.__GUID__] = {
+                materialsMap[current.material.__uid__] = {
                     oldMat: current.material
                 };
             }
@@ -162,7 +162,7 @@ var Scene = Node.extend(function () {
         // Replace material
         newNode.traverse(function (current) {
             if (current.material) {
-                current.material = materialsMap[current.material.__GUID__].newMat;
+                current.material = materialsMap[current.material.__uid__].newMat;
             }
         });
 

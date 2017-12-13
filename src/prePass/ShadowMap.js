@@ -536,7 +536,7 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     _getDepthMaterial: function (light) {
-        var shadowMaterial = this._lightMaterials[light.__GUID__];
+        var shadowMaterial = this._lightMaterials[light.__uid__];
         var isPointLight = light instanceof PointLight;
         if (!shadowMaterial) {
             var shaderPrefix = isPointLight ? 'qtek.sm.distance.' : 'qtek.sm.depth.';
@@ -545,7 +545,7 @@ var ShadowMapPass = Base.extend(function () {
                 shader: new Shader(Shader.source(shaderPrefix + 'vertex'), Shader.source(shaderPrefix + 'fragment'))
             });
 
-            this._lightMaterials[light.__GUID__] = shadowMaterial;
+            this._lightMaterials[light.__uid__] = shadowMaterial;
         }
         if (light.shadowSlopeScale != null) {
             shadowMaterial.setUniform('slopeScale', light.shadowSlopeScale);
@@ -592,7 +592,7 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     _getTexture: function (light, cascade) {
-        var key = light.__GUID__;
+        var key = light.__uid__;
         var texture = this._textures[key];
         var resolution = light.shadowResolution || 512;
         cascade = cascade || 1;

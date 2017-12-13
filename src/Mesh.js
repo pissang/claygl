@@ -43,7 +43,7 @@ var Mesh = Renderable.extend(
             // TODO Multiple mesh share same skeleton
             this.skeleton.update();
 
-            var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
+            var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__uid__, this.joints);
 
             // if (this.useSkinMatricesTexture) {
             //     var size;

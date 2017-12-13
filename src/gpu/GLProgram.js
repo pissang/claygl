@@ -195,7 +195,7 @@ var GLProgram = Base.extend({
             enabledAttributeListInContext = vao.__enabledAttributeList;
         }
         else {
-            enabledAttributeListInContext = enabledAttributeList[renderer.__GUID__];
+            enabledAttributeListInContext = enabledAttributeList[renderer.__uid__];
         }
         if (!enabledAttributeListInContext) {
             // In vertex array object context
@@ -207,7 +207,7 @@ var GLProgram = Base.extend({
             }
             else {
                 enabledAttributeListInContext
-                    = enabledAttributeList[renderer.__GUID__]
+                    = enabledAttributeList[renderer.__uid__]
                     = [];
             }
         }

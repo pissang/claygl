@@ -190,7 +190,7 @@ var Renderable = Node.extend(
         // Draw each chunk
         var drawHashChanged = false;
         // Hash with shader id in case previous material has less attributes than next material
-        currentDrawID = renderer.__GUID__ + '-' + geometry.__GUID__ + '-' + program.__GUID__;
+        currentDrawID = renderer.__uid__ + '-' + geometry.__uid__ + '-' + program.__uid__;
 
         if (currentDrawID !== prevDrawID) {
             drawHashChanged = true;

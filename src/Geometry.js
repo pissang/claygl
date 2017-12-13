@@ -64,7 +64,7 @@ function Attribute(name, type, size, semantic) {
      *  + `'COLOR'`
      *  + `'JOINT'`
      *  + `'WEIGHT'`
-     * 
+     *
      * In shader, attribute with same semantic will be automatically mapped. For example:
      * ```glsl
      * attribute vec3 pos: POSITION
@@ -192,7 +192,7 @@ function Attribute(name, type, size, semantic) {
 
 /**
  * Initialize attribute with given vertex count
- * @param {number} nVertex 
+ * @param {number} nVertex
  */
 Attribute.prototype.init = function (nVertex) {
     if (!this.value || this.value.length != nVertex * this.size) {
@@ -446,7 +446,7 @@ var Geometry = Base.extend(function () {
 
     /**
      * Initialize indices from an array.
-     * @param {Array} array 
+     * @param {Array} array
      */
     initIndicesFromArray: function (array) {
         var value;
@@ -543,7 +543,7 @@ var Geometry = Base.extend(function () {
 
     getBufferChunks: function (renderer) {
         var cache = this._cache;
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
         var isAttributesDirty = cache.isDirty('attributes');
         var isIndicesDirty = cache.isDirty('indices');
         if (isAttributesDirty || isIndicesDirty) {
@@ -880,7 +880,7 @@ var Geometry = Base.extend(function () {
         }
         this.dirty();
     },
-    
+
     /**
      * If vertices are not shared by different indices.
      */
@@ -955,7 +955,7 @@ var Geometry = Base.extend(function () {
             return;
         }
         array = attributes.barycentric.value = new Float32Array(indices.length * 3);
-        
+
         for (var i = 0; i < (indices ? indices.length : this.vertexCount / 3);) {
             for (var j = 0; j < 3; j++) {
                 var ii = indices ? indices[i++] : (i * 3 + j);
@@ -1004,7 +1004,7 @@ var Geometry = Base.extend(function () {
 
         var cache = this._cache;
 
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
         var chunks = cache.get('chunks');
         if (chunks) {
             for (var c = 0; c < chunks.length; c++) {
@@ -1016,7 +1016,7 @@ var Geometry = Base.extend(function () {
                 }
             }
         }
-        cache.deleteContext(renderer.__GUID__);
+        cache.deleteContext(renderer.__uid__);
     }
 
 });

@@ -127,7 +127,7 @@ var Texture = Base.extend(
     getWebGLTexture: function (renderer) {
         var _gl = renderer.gl;
         var cache = this._cache;
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         if (cache.miss('webgl_texture')) {
             // In a new gl context, create new texture and set dirty true
@@ -234,13 +234,13 @@ var Texture = Base.extend(
 
         var cache = this._cache;
 
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         var webglTexture = cache.get('webgl_texture');
         if (webglTexture){
             renderer.gl.deleteTexture(webglTexture);
         }
-        cache.deleteContext(renderer.__GUID__);
+        cache.deleteContext(renderer.__uid__);
 
     },
     /**

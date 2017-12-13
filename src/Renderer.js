@@ -452,10 +452,10 @@ var Renderer = Base.extend(function () {
     validateProgram: function (program) {
         if (program.__error) {
             var errorMsg = program.__error;
-            if (errorShader[program.__GUID__]) {
+            if (errorShader[program.__uid__]) {
                 return;
             }
-            errorShader[program.__GUID__] = true;
+            errorShader[program.__uid__] = true;
 
             if (this.throwError) {
                 throw new Error(errorMsg);
@@ -473,7 +473,7 @@ var Renderer = Base.extend(function () {
         // PENDING
         if (!globalMaterial) {
             queue.sort(function (a, b) {
-                return a.material.__GUID__ - b.material.__GUID__;
+                return a.material.__uid__ - b.material.__uid__;
             });
         }
         for (var i = 0; i < queue.length; i++) {
@@ -887,7 +887,7 @@ var Renderer = Base.extend(function () {
                 node.geometry.dispose(this);
             }
             if (node.material) {
-                materials[node.material.__GUID__] = node.material;
+                materials[node.material.__uid__] = node.material;
             }
             // Particle system and AmbientCubemap light need to dispose
             if (node.dispose) {
@@ -977,12 +977,12 @@ Renderer.opaqueSortFunc = Renderer.prototype.opaqueSortFunc = function(x, y) {
     if (x.renderOrder === y.renderOrder) {
         if (x.__program === y.__program) {
             if (x.material === y.material) {
-                return x.geometry.__GUID__ - y.geometry.__GUID__;
+                return x.geometry.__uid__ - y.geometry.__uid__;
             }
-            return x.material.__GUID__ - y.material.__GUID__;
+            return x.material.__uid__ - y.material.__uid__;
         }
         if (x.__program  && y.__program) {
-            return x.__program.__GUID__ - y.__program.__GUID__;
+            return x.__program.__uid__ - y.__program.__uid__;
         }
         return 0;
     }
@@ -1003,12 +1003,12 @@ Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function
         if (x.__depth === y.__depth) {
             if (x.__program === y.__program) {
                 if (x.material === y.material) {
-                    return x.geometry.__GUID__ - y.geometry.__GUID__;
+                    return x.geometry.__uid__ - y.geometry.__uid__;
                 }
-                return x.material.__GUID__ - y.material.__GUID__;
+                return x.material.__uid__ - y.material.__uid__;
             }
             if (x.__program  && y.__program) {
-                return x.__program.__GUID__ - y.__program.__GUID__;
+                return x.__program.__uid__ - y.__program.__uid__;
             }
             return 0;
         }

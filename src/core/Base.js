@@ -12,7 +12,7 @@ var Base = function () {
     /**
      * @type {number}
      */
-    this.__GUID__ = util.genGUID();
+    this.__uid__ = util.genGUID();
 };
 
 Base.__initializers__ = [

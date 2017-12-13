@@ -103,7 +103,7 @@ var RayPicking = Base.extend(
             var isSkinnedMesh = renderable.isSkinnedMesh();
             ray.copy(this._ray);
             Matrix4.invert(worldInverse, renderable.worldTransform);
-            
+
             // Skinned mesh will ignore the world transform.
             if (!isSkinnedMesh) {
                 ray.applyTransform(worldInverse);
@@ -149,7 +149,7 @@ var RayPicking = Base.extend(
                 return;
             }
             if (isSkinnedMesh) {
-                skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__GUID__, renderable.joints);
+                skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__uid__, renderable.joints);
                 for (var i = 0; i < renderable.joints.length; i++) {
                     skinMatrices[i] = skinMatrices[i] || [];
                     for (var k = 0; k < 16; k++) {
@@ -177,7 +177,7 @@ var RayPicking = Base.extend(
                         if (joint[k] >= 0 && weight[k] > 1e-4) {
                             vec3.transformMat4(tmp, pos, skinMatrices[joint[k]]);
                             vec3.scaleAndAdd(skinnedPos, skinnedPos, tmp, weight[k]);
-                        }   
+                        }
                     }
                     skinnedPositionAttr.set(i, skinnedPos);
                 }
