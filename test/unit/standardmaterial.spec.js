@@ -17,20 +17,11 @@ describe('StandardMaterial.Spec', function () {
             encodeRGBM : true,
         });
 
-        material.updateShader(renderer);
-
-        material.bind(renderer, null);
-
         assert(material.linear === true);
-        assert(material.metalness === 0.5);        
+        assert(material.metalness === 0.5);
         assert(material.roughness === 0.5);
         assert(material.encodeRGBM === true);
-
         assert(material.shader);
-        material.shader.bind(renderer);
-        assert(material.shader._fragmentProcessed.indexOf('#define USE_METALNESS') > 0);
-        //define added by encodeRGBM options
-        assert(material.shader._fragmentProcessed.indexOf('#define RGBM_ENCODE') > 0);
     });
 
     it('#clone', function () {
@@ -41,10 +32,10 @@ describe('StandardMaterial.Spec', function () {
             encodeRGBM : true,
         });
 
-        material2 = material.clone();
+        const material2 = material.clone();
 
         assert(material2.linear === true);
-        assert(material2.metalness === 0.5);        
+        assert(material2.metalness === 0.5);
         assert(material2.roughness === 0.5);
         assert(material2.encodeRGBM === true);
     });

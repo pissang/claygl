@@ -32,9 +32,9 @@ describe('Scene.Spec', function () {
     it('clone a node', function () {
         const mesh = new qtek.Mesh({
             material: new qtek.Material({
-                shader : qtek.shader.library.get('qtek.standard').clone()
+                shader: qtek.shader.library.get('qtek.standard')
             }),
-            geometry : new qtek.geometry.Cube()
+            geometry: new qtek.geometry.Cube()
         });
 
         const { renderer, scene, camera } = helper.createQtekScene();
@@ -46,7 +46,7 @@ describe('Scene.Spec', function () {
         assert(cloned.material instanceof qtek.Material);
         assert(cloned.material !== mesh.material);
         assert(cloned.geometry instanceof qtek.geometry.Cube);
-        //geometry 
+        //geometry
         assert(cloned.geometry === mesh.geometry);
     });
 
@@ -63,7 +63,7 @@ describe('Scene.Spec', function () {
         assert(called);
     });
 
-    it('invoking setShaderLightNumber and setLightUniforms shouldn\'t throw any error', function () {
+    it('Light uniforms', function () {
         //a little bit complicated case lended from lightgroup.html
         //ensure setShaderLightNumber and setLightUniforms are invoked
         //-------------------------------------------
@@ -75,16 +75,10 @@ describe('Scene.Spec', function () {
         const cube = new qtek.geometry.Cube();
 
         const material1 = new Material({
-            shader: new Shader({
-                vertex: Shader.source('qtek.standard.vertex'),
-                fragment: Shader.source('qtek.standard.fragment')
-            })
+            shader: new Shader(Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'))
         });
         const material2 = new Material({
-            shader: new Shader({
-                vertex: Shader.source('qtek.standard.vertex'),
-                fragment: Shader.source('qtek.standard.fragment')
-            })
+            shader: new Shader(Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'))
         });
 
         material1.shader.lightGroup = 0;
@@ -94,7 +88,7 @@ describe('Scene.Spec', function () {
             name : 'ROOT'
         });
         scene.add(root);
-        
+
         for (let i = 0; i < 2; i++) {
             const mesh = new qtek.Mesh({
                 geometry: cube,
@@ -117,29 +111,12 @@ describe('Scene.Spec', function () {
         scene.add(light1);
         scene.add(light2);
 
-        let called1 = false, called2 = false;
-
-        //check if setShaderLightNumber and setLightUniforms are called
-        const originSetShaderLightNumber = scene.setShaderLightNumber;
-        scene.setShaderLightNumber = function (...args) {
-            called1 = true;
-            originSetShaderLightNumber.apply(scene, args);
-        };
-
-        const originSetLightUniforms = scene.setLightUniforms;
-        scene.setLightUniforms = function (...args) {
-            called2 = true;
-            originSetLightUniforms.apply(scene, args);
-        };
-
         renderer.render(scene, camera);
         const lightGroup0 = scene._lightUniforms[0];
         const lightGroup1 = scene._lightUniforms[1];
 
         const expected0 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[1,0.5,0]}};
         const expected1 = {"pointLightPosition":{"type":"3fv","value":[0,0,0]},"pointLightRange":{"type":"1fv","value":[200]},"pointLightColor":{"type":"3fv","value":[0,0.5,1]}};
-
-        assert(called1 && called2);
 
         //check light uniforms
         assert.deepEqual(lightGroup0, expected0);
