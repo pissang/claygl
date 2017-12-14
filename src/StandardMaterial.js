@@ -11,15 +11,17 @@ var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessM
 var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff'];
 var PROPERTIES_CHANGE_SHADER = ['linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel'];
 
-var DEFINE_NAME_MAP = {
+var NUM_DEFINE_MAP = {
+    'roughnessChannel': 'ROUGHNESS_CHANNEL',
+    'metalnessChannel': 'METALNESS_CHANNEL'
+};
+var BOOL_DEFINE_MAP = {
     'linear': 'SRGB_DECODE',
     'encodeRGBM': 'RGBM_ENCODE',
     'decodeRGBM': 'RGBM_DECODE',
     'doubleSided': 'DOUBLE_SIDED',
-    'alphaTest': 'ALPHA_TEST',
-    'roughnessChannel': 'ROUGHNESS_CHANNEL',
-    'metalnessChannel': 'METALNESS_CHANNEL'
-};
+    'alphaTest': 'ALPHA_TEST'
+}
 
 
 var standardShader;
@@ -38,12 +40,12 @@ var StandardMaterial = Material.extend(function () {
     if (!standardShader) {
         standardShader = new Shader(Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'));
     }
-
     return /** @lends qtek.StandardMaterial# */ {
-
         shader: standardShader
     };
-}, function () {
+}, function (option) {
+    // PENDING
+    util.extend(this, option);
     // Extend after shader is created.
     util.defaults(this, {
         /**
@@ -186,6 +188,9 @@ var StandardMaterial = Material.extend(function () {
          */
         metalnessChannel: 1
     });
+
+    this.define('fragment', 'USE_METALNESS');
+    this.define('fragment', 'USE_ROUGHNESS');
 }, {
     clone: function () {
         var material = new StandardMaterial({
@@ -209,10 +214,6 @@ SIMPLE_PROPERTIES.forEach(function (propName) {
             return this.get(propName);
         },
         set: function (value) {
-            var uniforms = this.uniforms = this.uniforms || {};
-            uniforms[propName] = uniforms[propName] || {
-                value: null
-            };
             this.setUniform(propName, value);
         }
     });
@@ -224,11 +225,6 @@ TEXTURE_PROPERTIES.forEach(function (propName) {
             return this.get(propName);
         },
         set: function (value) {
-            var uniforms = this.uniforms = this.uniforms || {};
-            uniforms[propName] = uniforms[propName] || {
-                value: null
-            };
-
             this.setUniform(propName, value);
         }
     });
@@ -242,8 +238,14 @@ PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
         },
         set: function (value) {
             this[privateKey] = value;
-            var defineName = DEFINE_NAME_MAP[propName];
-            this.define(defineName, value);
+            if (propName in NUM_DEFINE_MAP) {
+                var defineName = NUM_DEFINE_MAP[propName];
+                this.define('fragment', defineName, value);
+            }
+            else {
+                var defineName = BOOL_DEFINE_MAP[propName];
+                value ? this.define('fragment', defineName) : this.undefine('fragment', defineName);
+            }
         }
     });
 });

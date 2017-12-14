@@ -46,8 +46,13 @@
                         skybox.material.set('lod', 3.0);
 
                         for (var i = 0; i < 10; i++) {
+                            // var material = new qtek.Material({
+                            //     shader: qtek.shader.library.get('qtek.standard')
+                            // });
+                            // material.set('color', [1, 1, 1]);
+                            // material.set('glossiness', i / 12);
                             var material = new qtek.StandardMaterial({
-                                metalness: 0,
+                                metalness: 1,
                                 // color: [0.7, 0.0, 0.0],
                                 roughness: i / 12
                             });

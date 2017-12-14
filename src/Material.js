@@ -112,7 +112,7 @@ var Material = Base.extend(function () {
     }
 
     if (this.shader) {
-        // Keep status, mainly preset vertexDefines and fragmentDefines
+        // Keep status, mainly preset uniforms, vertexDefines and fragmentDefines
         this.attachShader(this.shader, true);
     }
 },
