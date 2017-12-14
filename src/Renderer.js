@@ -446,6 +446,7 @@ var Renderer = Base.extend(function () {
     },
 
     getProgram: function (renderable, renderMaterial, scene) {
+        renderMaterial = renderMaterial || renderable.material;
         return this._programMgr.getProgram(renderable, renderMaterial, scene);
     },
 

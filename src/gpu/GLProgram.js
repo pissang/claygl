@@ -306,6 +306,10 @@ var GLProgram = Base.extend({
         _gl.deleteShader(fragmentShader);
 
         this._program = program;
+
+        // Save code.
+        this.vertexCode = vertexShaderCode;
+        this.fragmentCode = fragmentShaderCode;
     }
 });
 

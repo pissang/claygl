@@ -116,6 +116,7 @@ var matrixSemantics = [
 
 
 var shaderIDCache = {};
+var shaderCodeCache = {};
 
 function getShaderID(vertex, fragment) {
     var key = 'vertex:' + vertex + 'fragment:' + fragment;
@@ -124,6 +125,12 @@ function getShaderID(vertex, fragment) {
     }
     var id = util.genGUID();
     shaderIDCache[key] = id;
+
+    shaderCodeCache[id] = {
+        vertex: vertex,
+        fragment: fragment
+    };
+
     return id;
 }
 
@@ -425,7 +432,8 @@ Shader.prototype = {
      * @return {qtek.Shader}
      */
     clone: function () {
-        var shader = new Shader(this._vertexCode, this._fragmentCode);
+        var code = shaderCodeCache[this._shaderID];
+        var shader = new Shader(code.vertex, code.fragment);
         return shader;
     }
 };
