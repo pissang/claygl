@@ -202,6 +202,8 @@ var GBuffer = Base.extend(function () {
 
         enableTargetTexture3: true,
 
+        renderTransparent: false,
+
         _renderQueue: [],
         // - R: normal.x
         // - G: normal.y
@@ -348,9 +350,11 @@ var GBuffer = Base.extend(function () {
                 renderQueue[offset++] = opaqueQueue[i];
             }
         }
-        for (var i = 0; i < transparentQueue.length; i++) {
-            if (!transparentQueue[i].ignoreGBuffer) {
-                renderQueue[offset++] = transparentQueue[i];
+        if (this.renderTransparent) {
+            for (var i = 0; i < transparentQueue.length; i++) {
+                if (!transparentQueue[i].ignoreGBuffer) {
+                    renderQueue[offset++] = transparentQueue[i];
+                }
             }
         }
         renderQueue.length = offset;
@@ -398,7 +402,7 @@ var GBuffer = Base.extend(function () {
                 this._defaultRoughnessMap
             );
             renderer.updatePrograms(renderQueue, null, this._gBufferMaterial1);
-            renderer.renderQueue(renderQueue, camera);
+            renderer.renderQueue(renderQueue, camera, this._gBufferMaterial1);
 
         }
         if (enableTargetTexture3) {
@@ -424,7 +428,7 @@ var GBuffer = Base.extend(function () {
                 this._defaultMetalnessMap
             );
             renderer.updatePrograms(renderQueue, null, this._gBufferMaterial2);
-            renderer.renderQueue(renderQueue, camera);
+            renderer.renderQueue(renderQueue, camera, this._gBufferMaterial2);
 
         }
 
