@@ -95,7 +95,6 @@ var Skydome = Mesh.extend(function () {
     dispose: function (renderer) {
         this.detachScene();
         this.geometry.dispose(renderer);
-        this.material.dispose(renderer);
     }
 });
 

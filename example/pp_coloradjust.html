@@ -13,22 +13,22 @@
             var compositor = new qtek.compositor.Compositor();
 
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById('main'),
-                devicePixelRatio : 1.0
+                canvas: document.getElementById('main'),
+                devicePixelRatio: 1.0
             });
             //Create scene
             var scene = new qtek.Scene(),
                 camera = new qtek.camera.Perspective({
-                    aspect : renderer.canvas.width/renderer.canvas.height,
-                    far : 500
+                    aspect: renderer.canvas.width/renderer.canvas.height,
+                    far: 500
                 }),
                 cube = new qtek.geometry.Cube();
             var shader = new Shader({
-                vertex : Shader.source('qtek.lambert.vertex'),
-                fragment : Shader.source('qtek.lambert.fragment')
+                vertex: Shader.source('qtek.lambert.vertex'),
+                fragment: Shader.source('qtek.lambert.fragment')
             })
             var material = new qtek.Material({
-                shader : shader
+                shader: shader
             });
             var texture = new qtek.Texture2D();
             texture.image = new Image();
@@ -38,8 +38,8 @@
             texture.image.src = 'assets/textures/crate.gif';
             material.set('diffuseMap', texture );
             var mesh = new qtek.Mesh({
-                material : material,
-                geometry : cube
+                material: material,
+                geometry: cube
             })
 
             scene.add( mesh );
@@ -48,35 +48,35 @@
             camera.lookAt( new qtek.math.Vector3() );
 
             var light = new qtek.light.Directional({
-                color : [1.5, 1.5, 1.5]
+                color: [1.5, 1.5, 1.5]
             })
             light.position.set(50, 50, 50);
             light.lookAt(new qtek.math.Vector3());
-            scene.add( light );
+            scene.add(light);
 
             compositor.addNode(new pp_SceneNode({
-                name : 'scene',
-                scene : scene,
-                camera : camera,
-                outputs : {
-                    'color' : {
-                        parameters : {
-                            width : 1024,
-                            height : 1024
+                name: 'scene',
+                scene: scene,
+                camera: camera,
+                outputs: {
+                    'color': {
+                        parameters: {
+                            width: 1024,
+                            height: 1024
                         }
                     }
                 }
             }) );
             var colorAdjustNode = new pp_FilterNode({
-                name : 'coloradjust',
-                shader : Shader.source('qtek.compositor.coloradjust'),
-                inputs : {
-                    'texture' : {
-                        node : 'scene',
-                        pin : 'color'
+                name: 'coloradjust',
+                shader: Shader.source('qtek.compositor.coloradjust'),
+                inputs: {
+                    'texture': {
+                        node: 'scene',
+                        pin: 'color'
                     }
                 },
-                outputs : null
+                outputs: null
             })
             colorAdjustNode.setParameter('gamma', 1.3);
             compositor.addNode( colorAdjustNode );

@@ -143,7 +143,7 @@ define(function (require) {
     };
 
     AlchemyAO.prototype.setKernelSize = function (size) {
-        this._ssaoPass.getShader().define('fragment', 'KERNEL_SIZE', size);
+        this._ssaoPass.getMaterial().define('fragment', 'KERNEL_SIZE', size);
         var kernel = generateKernel(size);
         this._ssaoPass.setUniform('kernel', kernel);
     };

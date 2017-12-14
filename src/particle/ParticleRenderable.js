@@ -275,7 +275,7 @@ var ParticleRenderable = Renderable.extend(
             p.emitter.kill(p);
         }
         this.geometry.dispose(renderer);
-        // TODO Dispose texture, shader ?
+        // TODO Dispose texture ?
     },
 
     /**

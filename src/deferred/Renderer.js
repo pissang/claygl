@@ -672,7 +672,6 @@ var DeferredRenderer = Base.extend(function () {
         this._outputPass.dispose(renderer);
 
         this._directionalLightMat.dispose(renderer);
-        this._directionalLightMatWithShadow.dispose(renderer);
 
         this.shadowMapPass.dispose(renderer);
     }

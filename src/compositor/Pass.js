@@ -201,9 +201,7 @@ var Pass = Base.extend(function () {
     /**
      * @param  {qtek.Renderer} renderer
      */
-    dispose: function (renderer) {
-        this.material.dispose(renderer);
-    }
+    dispose: function (renderer) {}
 });
 
 export default Pass;

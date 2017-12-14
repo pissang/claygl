@@ -34,8 +34,8 @@ define(function (require) {
     PostProcessPass.prototype.getTargetTexture = function () {
         return this._targetTexture;
     };
-    PostProcessPass.prototype.getShader = function () {
-        return this._pass.material.shader;
+    PostProcessPass.prototype.getMaterial = function () {
+        return this._pass.material;
     };
 
     return PostProcessPass;

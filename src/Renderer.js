@@ -878,7 +878,6 @@ var Renderer = Base.extend(function () {
      * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
      */
     disposeNode: function(root, disposeGeometry, disposeTexture) {
-        var materials = {};
         // Dettached from parent
         if (root.getParent()) {
             root.getParent().remove(root);
@@ -887,26 +886,11 @@ var Renderer = Base.extend(function () {
             if (node.geometry && disposeGeometry) {
                 node.geometry.dispose(this);
             }
-            if (node.material) {
-                materials[node.material.__uid__] = node.material;
-            }
             // Particle system and AmbientCubemap light need to dispose
             if (node.dispose) {
                 node.dispose(this);
             }
         }, this);
-        for (var guid in materials) {
-            var mat = materials[guid];
-            mat.dispose(this, disposeTexture);
-        }
-    },
-
-    /**
-     * Dispose given shader
-     * @param {qtek.Shader} shader
-     */
-    disposeShader: function(shader) {
-        shader.dispose(this);
     },
 
     /**

@@ -7,11 +7,11 @@
         <canvas id="main"></canvas>
         <script>
             var renderer = new qtek.Renderer({
-                canvas : document.getElementById('main')
+                canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
             var camera = new qtek.camera.Perspective({
-                aspect : renderer.getViewportAspect()
+                aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 10);
 
@@ -21,22 +21,22 @@
             var GLTFLoader = new qtek.loader.GLTF();
             GLTFLoader.load("assets/models/suzanne/suzanne.gltf");
             var control = new qtek.plugin.OrbitControl({
-                target : camera,
-                domElement : renderer.canvas
+                target: camera,
+                domElement: renderer.canvas
             });
 
             GLTFLoader.on('success', function(res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
                 for (var i = 0; i < 10; i++) {
                     var material = new qtek.Material({
-                        shader : qtek.shader.library.get('qtek.standard')
+                        shader: qtek.shader.library.get('qtek.standard')
                     });
                     material.set('color', [0.7, 0.0, 0.0]);
                     material.set('specularColor', [0.1, 0.1, 0.1]);
                     material.set('glossiness', (i+1) / 12);
                     var mesh = new qtek.Mesh({
-                        material : material,
-                        geometry :suzanneGeometry
+                        material: material,
+                        geometry:suzanneGeometry
                     });
                     mesh.position.set((i - 5) * 2.1, 0, 0);
                     scene.add(mesh);

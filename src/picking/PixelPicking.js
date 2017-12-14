@@ -56,10 +56,7 @@ var PixelPicking = Base.extend(function() {
         });
         this._frameBuffer = new FrameBuffer();
 
-        this._shader = new Shader({
-            vertex: Shader.source('qtek.picking.color.vertex'),
-            fragment: Shader.source('qtek.picking.color.fragment')
-        });
+        this._shader = new Shader(Shader.source('qtek.picking.color.vertex'), Shader.source('qtek.picking.color.fragment'));
     },
     /**
      * Set picking presision
@@ -163,7 +160,6 @@ var PixelPicking = Base.extend(function() {
 
     dispose: function(renderer) {
         this._frameBuffer.dispose(renderer);
-        this._shader.dispose(renderer);
     }
 });
 
