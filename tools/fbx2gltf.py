@@ -1315,7 +1315,12 @@ def Convert(
         if binary:
             lOutFile = open(ouptutFile, 'wb')
             lJSONStr = json.dumps(lJSON, sort_keys = True, separators=(',', ':'))
-            lJSONBinary = lJSONStr.encode(encoding='UTF-8')
+            lJSONBinary = bytearray(lJSONStr.encode(encoding='UTF-8'))
+            # 4-byte-aligned
+            lAlignedLen = (len(lJSONBinary) + 3) & ~3
+            for i in range(lAlignedLen - len(lJSONBinary)):
+                lJSONBinary.extend(b' ')
+
             lOut = bytearray()
             lSize = 12 + 8 + len(lJSONBinary) + 8 + len(lBin)
             # Magic number
