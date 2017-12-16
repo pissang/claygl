@@ -1233,7 +1233,10 @@ def CorrectImagesPaths(pFilePath):
         lUri = lUri.replace(r'[\\\/]+', os.path.sep)
         lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
         if lUri:
-            lGLTFImage['uri'] = os.path.relpath(lUri, lFileDir)
+            lRelUri = os.path.relpath(lUri, lFileDir)
+            if not lRelUri == lGLTFImage['uri']:
+                print('Changed texture file path from "' + lGLTFImage['uri'] + '" to "' + lRelUri + '"')
+            lGLTFImage['uri'] = lRelUri
         else:
             print("Can\'t find texture file in the folder, path: " + lGLTFImage['uri'])
 
