@@ -1218,6 +1218,67 @@ def GetNodeIdx(pNode):
         return -1
     return _nodeIdxMap[lId]
 
+
+def FindFileInDir(pFileName, pDir):
+    for root, dirs, files in os.walk(pDir):
+        for file in files:
+            if file == pFileName:
+                return os.path.join(root, file)
+
+def CorrectImagesPaths(pFilePath):
+    lFileFullPath = os.path.join(os.getcwd(), pFilePath)
+    lFileDir = os.path.dirname(lFileFullPath)
+    for lGLTFImage in lib_images:
+        lUri = lGLTFImage['uri']
+        lUri = lUri.replace(r'[\\\/]+', os.path.sep)
+        lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
+        if lUri:
+            lGLTFImage['uri'] = os.path.relpath(lUri, lFileDir)
+        else:
+            print("Can\'t find texture file in the folder, path: " + lGLTFImage['uri'])
+
+
+def EmbedImagesToBinary(pBuffer, pFilePath):
+    lFileFullPath = os.path.join(os.getcwd(), pFilePath)
+    lFileDir = os.path.dirname(lFileFullPath)
+    for lGLTFImage in lib_images:
+        lUri = lGLTFImage['uri']
+        lImgBytes = None
+
+        if not os.path.isfile(lUri):
+            lUri = lUri.replace(r'[\\\/]+', os.path.sep)
+            lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
+        try:
+            f = open(lUri, 'rb')
+            lImgBytes = f.read()
+        except:
+            print("Can\'t find texture file in the folder, path: " + lGLTFImage['uri'])
+
+        if not lImgBytes:
+            continue
+
+        lBufferViewIdx = len(lib_buffer_views)
+
+        lGLTFImage['bufferView'] = lBufferViewIdx
+        del lGLTFImage['uri']
+
+        lBufferView = {
+            'buffer': 0,
+            'byteLength': len(lImgBytes),
+            'byteOffset': len(pBuffer)
+            # TODO Mime type
+        }
+
+        lib_buffer_views.append(lBufferView)
+
+        pBuffer.extend(lImgBytes)
+        # 4-byte-aligned
+        lAlignedLen = (len(lImgBytes) + 3) & ~3
+        for i in range(lAlignedLen - len(lImgBytes)):
+            pBuffer.extend(b' ')
+
+    return pBuffer
+
 # FIXME
 # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_fbxtime_8h_html
 TIME_INFINITY = FbxTime(0x7fffffffffffffff)
@@ -1270,6 +1331,11 @@ def Convert(
 
         CreateBufferViews(0, lBin)
 
+        if binary:
+            lBin = EmbedImagesToBinary(lBin, filePath)
+        else:
+            CorrectImagesPaths(filePath)
+
         lBufferName = lBasename + '.bin'
         if binary:
             lib_buffers.append({
@@ -1305,7 +1371,7 @@ def Convert(
         if len(lib_samplers) > 0:
             lJSON['samplers'] = lib_samplers
         if len(lib_textures) > 0:
-            lJSON['textures'] = lib_texture
+            lJSON['textures'] = lib_textures
         if len(lib_animations) > 0:
             lJSON['animations'] = lib_animations
         #Default scene
@@ -1360,8 +1426,8 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--framerate', default=20, type=float, help="Animation frame per second")
     parser.add_argument('-p', '--pose', default=0, type=float, help="Start pose time")
     parser.add_argument('-q', '--quantize', action='store_true', help="Quantize accessors with WEB3D_quantized_attributes extension")
-    parser.add_argument('-b', '--beautify', action="store_true", help="Beautify json output.")
-    parser.add_argument('--binary', action="store_true", help="Export glTF-binary")
+    parser.add_argument('-b', '--binary', action="store_true", help="Export glTF-binary")
+    parser.add_argument('--beautify', action="store_true", help="Beautify json output.")
 
     parser.add_argument('--noflipv', action="store_true", help="If not flip v in texcoord.")
     parser.add_argument('file')
