@@ -9,7 +9,7 @@ Shader['import'](standardEssl);
 
 var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
 var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff'];
-var PROPERTIES_CHANGE_SHADER = ['linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel'];
+var PROPERTIES_CHANGE_SHADER = ['linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel', 'environmentMapPrefiltered'];
 
 var NUM_DEFINE_MAP = {
     'roughnessChannel': 'ROUGHNESS_CHANNEL',
@@ -20,7 +20,8 @@ var BOOL_DEFINE_MAP = {
     'encodeRGBM': 'RGBM_ENCODE',
     'decodeRGBM': 'RGBM_DECODE',
     'doubleSided': 'DOUBLE_SIDED',
-    'alphaTest': 'ALPHA_TEST'
+    'alphaTest': 'ALPHA_TEST',
+    'environmentMapPrefiltered': 'ENVIRONMENTMAP_PREFILTER'
 }
 
 
