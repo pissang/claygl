@@ -381,9 +381,14 @@ var ShadowMapPass = Base.extend(function () {
 
         return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
-            var shadowMaterial = this._getDepthMaterial(light);
+            var defaultShadowMaterial = this._getDepthMaterial(light);
+            var passConfig = {
+                getMaterial: function (renderable) {
+                    return renderable.shadowDepthMaterial || defaultShadowMaterial;
+                }
+            };
 
-            renderer.updatePrograms(casters, scene, shadowMaterial);
+            renderer.updatePrograms(casters, scene, passConfig);
             casters.sort(Renderer.opaqueSortFunc);
 
             // First frame
@@ -458,7 +463,7 @@ var ShadowMapPass = Base.extend(function () {
                 // Reversed, left to right => far to near
                 renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
-                renderer.renderQueue(casters, lightCamera, shadowMaterial);
+                renderer.renderQueue(casters, lightCamera, passConfig);
 
                 // Filter for VSM
                 if (this.softShadow === ShadowMapPass.VSM) {
@@ -491,10 +496,16 @@ var ShadowMapPass = Base.extend(function () {
 
         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-        var shadowMaterial = this._getDepthMaterial(light);
-        renderer.updatePrograms(casters, scene, shadowMaterial);
+        var defaultShadowMaterial = this._getDepthMaterial(light);
+        var passConfig = {
+            getMaterial: function (renderable) {
+                return renderable.shadowDepthMaterial || defaultShadowMaterial;
+            }
+        };
+
+        renderer.updatePrograms(casters, scene, passConfig);
         casters.sort(Renderer.opaqueSortFunc);
-        renderer.renderQueue(casters, lightCamera, shadowMaterial);
+        renderer.renderQueue(casters, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
 
@@ -517,8 +528,14 @@ var ShadowMapPass = Base.extend(function () {
         var _gl = renderer.gl;
         pointLightShadowMaps.push(texture);
 
-        var shadowMaterial = this._getDepthMaterial(light);
-        renderer.updatePrograms(casters, scene, shadowMaterial);
+        var defaultShadowMaterial = this._getDepthMaterial(light);
+        var passConfig = {
+            getMaterial: function (renderable) {
+                return renderable.shadowDepthMaterial || defaultShadowMaterial;
+            }
+        };
+
+        renderer.updatePrograms(casters, scene, passConfig);
         casters.sort(Renderer.opaqueSortFunc);
 
         for (var i = 0; i < 6; i++) {
@@ -529,7 +546,7 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderQueue(casters, camera, shadowMaterial);
+            renderer.renderQueue(casters, camera, passConfig);
         }
 
         this._frameBuffer.unbind(renderer);

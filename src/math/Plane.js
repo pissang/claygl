@@ -29,7 +29,7 @@ Plane.prototype = {
     constructor: Plane,
 
     /**
-     * Distance from given point to plane
+     * Distance from a given point to the plane
      * @param  {qtek.math.Vector3} point
      * @return {number}
      */
@@ -38,7 +38,7 @@ Plane.prototype = {
     },
 
     /**
-     * Calculate the projection on the plane of point
+     * Calculate the projection point on the plane
      * @param  {qtek.math.Vector3} point
      * @param  {qtek.math.Vector3} out
      * @return {qtek.math.Vector3}
@@ -54,7 +54,7 @@ Plane.prototype = {
     },
 
     /**
-     * Normalize the plane's normal and calculate distance
+     * Normalize the plane's normal and calculate the distance
      */
     normalize: function() {
         var invLen = 1 / vec3.len(this.normal._array);
@@ -75,7 +75,7 @@ Plane.prototype = {
         for (var i = 1; i < 8; i++) {
             if ((vec3.dot(coords[i]._array, normal) > this.distance) != onPlane) {
                 return true;
-            } 
+            }
         }
     },
 

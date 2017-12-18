@@ -104,30 +104,29 @@ import OrbitControl$84 from './plugin/OrbitControl';
 import Skybox$85 from './plugin/Skybox';
 import Skydome$86 from './plugin/Skydome';
 import EnvironmentMap$87 from './prePass/EnvironmentMap';
-import Reflection$88 from './prePass/Reflection';
-import ShadowMap$89 from './prePass/ShadowMap';
-import Renderable$90 from './Renderable';
-import Renderer$91 from './Renderer';
-import Scene$92 from './Scene';
-import Shader$93 from './Shader';
-import library$94 from './shader/library';
-import light$95 from './shader/source/header/light';
-import Skeleton$96 from './Skeleton';
-import StandardMaterial$97 from './StandardMaterial';
-import StaticGeometry$98 from './StaticGeometry';
-import Texture$99 from './Texture';
-import Texture2D$100 from './Texture2D';
-import TextureCube$101 from './TextureCube';
-import cubemap$102 from './util/cubemap';
-import dds$103 from './util/dds';
-import delaunay$104 from './util/delaunay';
-import hdr$105 from './util/hdr';
-import mesh$106 from './util/mesh';
-import sh$107 from './util/sh';
-import texture$108 from './util/texture';
-import version$109 from './version';
-import CardboardDistorter$110 from './vr/CardboardDistorter';
-import StereoCamera$111 from './vr/StereoCamera';
+import ShadowMap$88 from './prePass/ShadowMap';
+import Renderable$89 from './Renderable';
+import Renderer$90 from './Renderer';
+import Scene$91 from './Scene';
+import Shader$92 from './Shader';
+import library$93 from './shader/library';
+import light$94 from './shader/source/header/light';
+import Skeleton$95 from './Skeleton';
+import StandardMaterial$96 from './StandardMaterial';
+import StaticGeometry$97 from './StaticGeometry';
+import Texture$98 from './Texture';
+import Texture2D$99 from './Texture2D';
+import TextureCube$100 from './TextureCube';
+import cubemap$101 from './util/cubemap';
+import dds$102 from './util/dds';
+import delaunay$103 from './util/delaunay';
+import hdr$104 from './util/hdr';
+import mesh$105 from './util/mesh';
+import sh$106 from './util/sh';
+import texture$107 from './util/texture';
+import version$108 from './version';
+import CardboardDistorter$109 from './vr/CardboardDistorter';
+import StereoCamera$110 from './vr/StereoCamera';
 
 
 var animation = {
@@ -296,49 +295,48 @@ export { plugin };
 
 var prePass = {
     EnvironmentMap : EnvironmentMap$87,
-    Reflection : Reflection$88,
-    ShadowMap : ShadowMap$89
+    ShadowMap : ShadowMap$88
 };
 export { prePass };
 
-export { Renderable$90 as Renderable };
-export { Renderer$91 as Renderer };
-export { Scene$92 as Scene };
-export { Shader$93 as Shader };
+export { Renderable$89 as Renderable };
+export { Renderer$90 as Renderer };
+export { Scene$91 as Scene };
+export { Shader$92 as Shader };
 
 var shader = {
-    library : library$94,
+    library : library$93,
     source : {
     header : {
-        light : light$95
+        light : light$94
     }
     }
 };
 export { shader };
 
-export { Skeleton$96 as Skeleton };
-export { StandardMaterial$97 as StandardMaterial };
-export { StaticGeometry$98 as StaticGeometry };
-export { Texture$99 as Texture };
-export { Texture2D$100 as Texture2D };
-export { TextureCube$101 as TextureCube };
+export { Skeleton$95 as Skeleton };
+export { StandardMaterial$96 as StandardMaterial };
+export { StaticGeometry$97 as StaticGeometry };
+export { Texture$98 as Texture };
+export { Texture2D$99 as Texture2D };
+export { TextureCube$100 as TextureCube };
 
 var util = {
-    cubemap : cubemap$102,
-    dds : dds$103,
-    delaunay : delaunay$104,
-    hdr : hdr$105,
-    mesh : mesh$106,
-    sh : sh$107,
-    texture : texture$108
+    cubemap : cubemap$101,
+    dds : dds$102,
+    delaunay : delaunay$103,
+    hdr : hdr$104,
+    mesh : mesh$105,
+    sh : sh$106,
+    texture : texture$107
 };
 export { util };
 
-export { version$109 as version };
+export { version$108 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$110,
-    StereoCamera : StereoCamera$111
+    CardboardDistorter : CardboardDistorter$109,
+    StereoCamera : StereoCamera$110
 };
 export { vr };
 ;

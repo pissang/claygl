@@ -29,6 +29,12 @@ var mat4Create = mat4.create;
 
 var errorShader = {};
 
+function defaultGetMaterial(renderable) {
+    return renderable.material;
+}
+
+function noop() {}
+
 /**
  * @constructor qtek.Renderer
  */
@@ -350,9 +356,6 @@ var Renderer = Base.extend(function () {
         this._sceneRendering = scene;
     },
 
-    // Hook before and after render each object
-    beforeRenderObject: function () {},
-    afterRenderObject: function () {},
     /**
      * Render the scene in camera to the screen or binded offline framebuffer
      * @param  {qtek.Scene}       scene
@@ -468,18 +471,12 @@ var Renderer = Base.extend(function () {
 
     },
 
-    updatePrograms: function (queue, scene, globalMaterial) {
+    updatePrograms: function (queue, scene, passConfig) {
+        var getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
         scene = scene || null;
-        // Sort based on material.
-        // PENDING
-        if (!globalMaterial) {
-            queue.sort(function (a, b) {
-                return a.material.__uid__ - b.material.__uid__;
-            });
-        }
         for (var i = 0; i < queue.length; i++) {
             var renderable = queue[i];
-            var renderMaterial = globalMaterial || renderable.material;
+            var renderMaterial = getMaterial.call(this, renderable);
             if (i > 0) {
                 var prevRenderable = queue[i - 1];
                 var prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
@@ -507,25 +504,12 @@ var Renderer = Base.extend(function () {
     // },
 
     /**
-     * Callback during rendering process to determine if render given renderable.
-     * @param {qtek.Renderable} given renderable.
-     * @return {boolean}
-     */
-    ifRenderObject: function (obj) {
-        return true;
-    },
-
-    /**
      * Do frustum culling on render queue
      */
     cullRenderQueue: function (queue, scene, camera) {
         var culledRenderQueue = [];
         for (var i = 0; i < queue.length; i++) {
             var renderable = queue[i];
-            // PENDING
-            if (!this.ifRenderObject(renderable)) {
-                continue;
-            }
 
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
             var geometry = renderable.geometry;
@@ -575,12 +559,16 @@ var Renderer = Base.extend(function () {
 
     /**
      * Render a single renderable list in camera in sequence
-     * @param  {qtek.Renderable[]} queue List of all renderables.
-     * @param  {qtek.Camera} camera
-     * @param  {qtek.Material} [globalMaterial] globalMaterial will override the material of each renderable
+     * @param {qtek.Renderable[]} queue List of all renderables.
+     * @param {qtek.Camera} camera
+     * @param {Object} [passConfig]
+     * @param {Function} [passConfig.getMaterial] Get renderable material.
+     * @param {Function} [passConfig.beforeRender] Before render each renderable.
+     * @param {Function} [passConfig.afterRender] After render each renderable
+     * @param {Function} [passCOnfig.ifRender] If render the renderable.
      * @return {IRenderInfo}
      */
-    renderQueue: function(queue, camera, globalMaterial) {
+    renderQueue: function(queue, camera, passConfig) {
         var renderInfo = {
             triangleCount: 0,
             vertexCount: 0,
@@ -588,6 +576,10 @@ var Renderer = Base.extend(function () {
             meshCount: queue.length,
             renderedMeshCount: 0
         };
+        passConfig = passConfig || {};
+        passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
+        passConfig.beforeRender = passConfig.beforeRender || noop;
+        passConfig.afterRender = passConfig.afterRender || noop;
 
         // Some common builtin uniforms
         var viewport = this.viewport;
@@ -627,14 +619,14 @@ var Renderer = Base.extend(function () {
 
         for (var i = 0; i < queue.length; i++) {
             var renderable = queue[i];
-            if (!this.ifRenderObject(renderable)) {
+            if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
                 continue;
             }
 
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
 
-            var material = globalMaterial || renderable.material;
+            var material = passConfig.getMaterial.call(this, renderable);
 
             var program = renderable.__program;
             if (!program) {
@@ -667,7 +659,7 @@ var Renderer = Base.extend(function () {
 
             // Before render hook
             renderable.beforeRender(this);
-            this.beforeRenderObject(renderable, material, prevMaterial);
+            passConfig.beforeRender.call(this, renderable, material, prevMaterial);
 
             var programChanged = program !== prevProgram;
             if (programChanged) {
@@ -765,7 +757,7 @@ var Renderer = Base.extend(function () {
             }
 
             // After render hook
-            this.afterRenderObject(renderable, objectRenderInfo);
+            passConfig.afterRender.call(this, renderable, objectRenderInfo);
             renderable.afterRender(this, objectRenderInfo);
 
             prevProgram = program;

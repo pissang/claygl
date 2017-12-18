@@ -341,7 +341,6 @@ var GBuffer = Base.extend(function () {
         var viewport = frameBuffer.viewport;
         var opaqueQueue = scene.opaqueQueue;
         var transparentQueue = scene.transparentQueue;
-        var oldBeforeRender = renderer.beforeRenderObject;
 
         var offset = 0;
         var renderQueue = this._renderQueue;
@@ -393,16 +392,16 @@ var GBuffer = Base.extend(function () {
             if (viewport) {
                 gl.disable(gl.SCISSOR_TEST);
             }
-
+            var gBufferMaterial1 = this._gBufferMaterial1;
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial1;
+                },
+                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap)
+            };
             // FIXME Use MRT if possible
-            // Pass 1
-            renderer.beforeRenderObject = getBeforeRenderHook1(
-                gl,
-                this._defaultNormalMap,
-                this._defaultRoughnessMap
-            );
-            renderer.updatePrograms(renderQueue, null, this._gBufferMaterial1);
-            renderer.renderQueue(renderQueue, camera, this._gBufferMaterial1);
+            renderer.updatePrograms(renderQueue, null, passConfig);
+            renderer.renderQueue(renderQueue, camera, passConfig);
 
         }
         if (enableTargetTexture3) {
@@ -422,20 +421,18 @@ var GBuffer = Base.extend(function () {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
-            renderer.beforeRenderObject = getBeforeRenderHook2(
-                gl,
-                this._defaultDiffuseMap,
-                this._defaultMetalnessMap
-            );
-            renderer.updatePrograms(renderQueue, null, this._gBufferMaterial2);
-            renderer.renderQueue(renderQueue, camera, this._gBufferMaterial2);
-
+            var gBufferMaterial2 = this._gBufferMaterial2;
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial2;
+                },
+                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap)
+            };
+            renderer.updatePrograms(renderQueue, null, passConfig);
+            renderer.renderQueue(renderQueue, camera, passConfig);
         }
 
         renderer.bindSceneRendering(null);
-
-        renderer.beforeRenderObject = oldBeforeRender;
-
         frameBuffer.unbind(renderer);
     },
 
