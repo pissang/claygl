@@ -1,7 +1,5 @@
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
-//
-// TODO prez skinning
 import Base from './core/Base';
 import GLInfo from './core/GLInfo';
 import glenum from './core/glenum';
@@ -419,8 +417,11 @@ var Renderer = Base.extend(function () {
         // Render pre z
         if (preZ) {
             this.renderPreZ(opaqueList, scene, camera);
+            _gl.depthFunc(_gl.LEQUAL);
         }
-        _gl.depthFunc(_gl.LESS);
+        else {
+            _gl.depthFunc(_gl.LESS);
+        }
 
         // Update the depth of transparent list.
         var worldViewMat = mat4Create();

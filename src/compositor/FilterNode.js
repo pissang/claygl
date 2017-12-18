@@ -257,22 +257,22 @@ var FilterNode = Node.extend(function () {
     //     material.shader.setFragment(shaderStr);
     //     material.attachShader(material.shader, true);
     // },
-    // /**
-    //  * Proxy of pass.material.define('fragment', xxx);
-    //  * @param  {string} symbol
-    //  * @param  {number} [val]
-    //  */
-    // shaderDefine: function (symbol, val) {
-    //     this.pass.material.define('fragment', symbol, val);
-    // },
+    /**
+     * Proxy of pass.material.define('fragment', xxx);
+     * @param  {string} symbol
+     * @param  {number} [val]
+     */
+    define: function (symbol, val) {
+        this.pass.material.define('fragment', symbol, val);
+    },
 
-    // /**
-    //  * Proxy of pass.material.undefine('fragment', xxx)
-    //  * @param  {string} symbol
-    //  */
-    // shaderUndefine: function (symbol) {
-    //     this.pass.material.undefine('fragment', symbol);
-    // },
+    /**
+     * Proxy of pass.material.undefine('fragment', xxx)
+     * @param  {string} symbol
+     */
+    undefine: function (symbol) {
+        this.pass.material.undefine('fragment', symbol);
+    },
 
     removeReference: function (outputName) {
         this._outputReferences[outputName]--;
