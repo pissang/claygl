@@ -385,11 +385,9 @@ var ShadowMapPass = Base.extend(function () {
             var passConfig = {
                 getMaterial: function (renderable) {
                     return renderable.shadowDepthMaterial || defaultShadowMaterial;
-                }
+                },
+                sortCompare: Renderer.opaqueSortCompare
             };
-
-            renderer.updatePrograms(casters, scene, passConfig);
-            casters.sort(Renderer.opaqueSortFunc);
 
             // First frame
             if (!scene.viewBoundingBoxLastFrame.isFinite()) {
@@ -500,11 +498,10 @@ var ShadowMapPass = Base.extend(function () {
         var passConfig = {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
-            }
+            },
+            sortCompare: Renderer.opaqueSortCompare
         };
 
-        renderer.updatePrograms(casters, scene, passConfig);
-        casters.sort(Renderer.opaqueSortFunc);
         renderer.renderPass(casters, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
@@ -532,11 +529,9 @@ var ShadowMapPass = Base.extend(function () {
         var passConfig = {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
-            }
+            },
+            sortCompare: Renderer.opaqueSortCompare
         };
-
-        renderer.updatePrograms(casters, scene, passConfig);
-        casters.sort(Renderer.opaqueSortFunc);
 
         for (var i = 0; i < 6; i++) {
             var target = targets[i];

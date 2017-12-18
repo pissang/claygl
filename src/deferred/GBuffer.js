@@ -397,10 +397,10 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial1;
                 },
-                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap)
+                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap),
+                sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
-            renderer.updatePrograms(renderList, null, passConfig);
             renderer.renderPass(renderList, camera, passConfig);
 
         }
@@ -426,9 +426,9 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial2;
                 },
-                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap)
+                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                sortCompare: renderer.opaqueSortCompare
             };
-            renderer.updatePrograms(renderList, null, passConfig);
             renderer.renderPass(renderList, camera, passConfig);
         }
 

@@ -422,18 +422,34 @@ var Renderer = Base.extend(function () {
         }
         _gl.depthFunc(_gl.LESS);
 
-        this.prepareRenderList(opaqueList, scene, camera, sceneMaterial, false);
-        this.prepareRenderList(transparentList, scene, camera, sceneMaterial, true);
+        // Update the depth of transparent list.
+        var worldViewMat = mat4Create();
+        var posViewSpace = vec3.create();
+        for (var i = 0; i < transparentList.length; i++) {
+            var renderable = transparentList[i];
+            mat4.multiplyAffine(worldViewMat, camera.viewMatrix._array, renderable.worldTransform._array);
+            vec3.transformMat4(posViewSpace, renderable.position._array, worldViewMat);
+            renderable.__depth = posViewSpace[2];
+        }
 
         // Render opaque list
         scene.trigger('beforerender:opaque', this, opaqueList);
-
-        var opaqueRenderInfo = this.renderPass(opaqueList, camera, sceneMaterial);
+        var opaqueRenderInfo = this.renderPass(opaqueList, camera, {
+            getMaterial: function (renderable) {
+                return sceneMaterial || renderable.material;
+            },
+            sortCompare: this.opaqueSortCompare
+        });
 
         scene.trigger('afterrender:opaque', this, opaqueList, opaqueRenderInfo);
         scene.trigger('beforerender:transparent', this, transparentList);
 
-        var transparentRenderInfo = this.renderPass(transparentList, camera, sceneMaterial);
+        var transparentRenderInfo = this.renderPass(transparentList, camera, {
+            getMaterial: function (renderable) {
+                return sceneMaterial || renderable.material;
+            },
+            sortCompare: this.transparentSortCompare
+        });
 
         scene.trigger('afterrender:transparent', this, transparentList, transparentRenderInfo);
         var renderInfo = {};
@@ -528,34 +544,6 @@ var Renderer = Base.extend(function () {
 
         return culledRenderList;
     },
-    /**
-     * Prepare for rendering a list.
-     * @param  {qtek.Renderable[]} list List of all renderables.
-     * @param  {qtek.Camera} camera
-     * @param  {qtek.Material} [globalMaterial] globalMaterial will override the material of each renderable
-     * @param  {boolean} [transparent]
-     */
-    prepareRenderList: function (list, scene, camera, globalMaterial, transparent) {
-        if (list.length === 0) {
-            return;
-        }
-        // Sort transparent list
-        // Calculate the object depth
-        if (transparent && list.length) {
-            var worldViewMat = mat4Create();
-            var posViewSpace = vec3.create();
-            for (var i = 0; i < list.length; i++) {
-                var renderable = list[i];
-                mat4.multiplyAffine(worldViewMat, camera.viewMatrix._array, renderable.worldTransform._array);
-                vec3.transformMat4(posViewSpace, renderable.position._array, worldViewMat);
-                renderable.__depth = posViewSpace[2];
-            }
-        }
-
-        this.updatePrograms(list, scene, globalMaterial);
-
-        list.sort(transparent ? this.opaqueSortFunc : this.transparentSortFunc);
-    },
 
     /**
      * Render a single renderable list in camera in sequence
@@ -565,7 +553,8 @@ var Renderer = Base.extend(function () {
      * @param {Function} [passConfig.getMaterial] Get renderable material.
      * @param {Function} [passConfig.beforeRender] Before render each renderable.
      * @param {Function} [passConfig.afterRender] After render each renderable
-     * @param {Function} [passCOnfig.ifRender] If render the renderable.
+     * @param {Function} [passConfig.ifRender] If render the renderable.
+     * @param {Function} [passConfig.sortCompare] Sort compare function.
      * @return {IRenderInfo}
      */
     renderPass: function(list, camera, passConfig) {
@@ -580,6 +569,11 @@ var Renderer = Base.extend(function () {
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
         passConfig.beforeRender = passConfig.beforeRender || noop;
         passConfig.afterRender = passConfig.afterRender || noop;
+
+        this.updatePrograms(list, this._sceneRendering, passConfig);
+        if (passConfig.sortCompare) {
+            list.sort(passConfig.sortCompare);
+        }
 
         // Some common builtin uniforms
         var viewport = this.viewport;
@@ -629,13 +623,6 @@ var Renderer = Base.extend(function () {
             var material = passConfig.getMaterial.call(this, renderable);
 
             var program = renderable.__program;
-            if (!program) {
-                // If updatePrograms is not called before render. In case like render skybox.
-                program = this._programMgr.getProgram(renderable, material, scene);
-                this.validateProgram(program);
-                renderable.__program = program;
-            }
-
             var shader = material.shader;
 
             mat4.copy(matrices.WORLD, worldM);
@@ -778,9 +765,6 @@ var Renderer = Base.extend(function () {
         });
         this._prezMaterial = preZPassMaterial;
 
-        this.updatePrograms(list, scene, preZPassMaterial);
-        list.sort(this.opaqueSortFunc);
-
         _gl.colorMask(false, false, false, false);
         _gl.depthMask(true);
 
@@ -791,7 +775,8 @@ var Renderer = Base.extend(function () {
             },
             getMaterial: function () {
                 return preZPassMaterial;
-            }
+            },
+            sort: this.opaqueSortCompare
         });
 
         _gl.colorMask(true, true, true, true);
@@ -956,7 +941,7 @@ var Renderer = Base.extend(function () {
  * @return {boolean}
  * @static
  */
-Renderer.opaqueSortFunc = Renderer.prototype.opaqueSortFunc = function(x, y) {
+Renderer.opaqueSortCompare = Renderer.prototype.opaqueSortCompare = function(x, y) {
     // Priority renderOrder -> program -> material -> geometry
     if (x.renderOrder === y.renderOrder) {
         if (x.__program === y.__program) {
@@ -980,7 +965,7 @@ Renderer.opaqueSortFunc = Renderer.prototype.opaqueSortFunc = function(x, y) {
  * @return {boolean}
  * @static
  */
-Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function(x, y) {
+Renderer.transparentSortCompare = Renderer.prototype.transparentSortCompare = function(x, y) {
     // Priority renderOrder -> depth -> program -> material -> geometry
 
     if (x.renderOrder === y.renderOrder) {
