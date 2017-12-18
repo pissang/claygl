@@ -204,7 +204,7 @@ var GBuffer = Base.extend(function () {
 
         renderTransparent: false,
 
-        _renderQueue: [],
+        _renderList: [],
         // - R: normal.x
         // - G: normal.y
         // - B: normal.z
@@ -339,24 +339,24 @@ var GBuffer = Base.extend(function () {
 
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
-        var opaqueQueue = scene.opaqueQueue;
-        var transparentQueue = scene.transparentQueue;
+        var opaqueList = scene.opaqueList;
+        var transparentList = scene.transparentList;
 
         var offset = 0;
-        var renderQueue = this._renderQueue;
-        for (var i = 0; i < opaqueQueue.length; i++) {
-            if (!opaqueQueue[i].ignoreGBuffer) {
-                renderQueue[offset++] = opaqueQueue[i];
+        var renderList = this._renderList;
+        for (var i = 0; i < opaqueList.length; i++) {
+            if (!opaqueList[i].ignoreGBuffer) {
+                renderList[offset++] = opaqueList[i];
             }
         }
         if (this.renderTransparent) {
-            for (var i = 0; i < transparentQueue.length; i++) {
-                if (!transparentQueue[i].ignoreGBuffer) {
-                    renderQueue[offset++] = transparentQueue[i];
+            for (var i = 0; i < transparentList.length; i++) {
+                if (!transparentList[i].ignoreGBuffer) {
+                    renderList[offset++] = transparentList[i];
                 }
             }
         }
-        renderQueue.length = offset;
+        renderList.length = offset;
 
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
@@ -400,8 +400,8 @@ var GBuffer = Base.extend(function () {
                 beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap)
             };
             // FIXME Use MRT if possible
-            renderer.updatePrograms(renderQueue, null, passConfig);
-            renderer.renderQueue(renderQueue, camera, passConfig);
+            renderer.updatePrograms(renderList, null, passConfig);
+            renderer.renderPass(renderList, camera, passConfig);
 
         }
         if (enableTargetTexture3) {
@@ -428,8 +428,8 @@ var GBuffer = Base.extend(function () {
                 },
                 beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap)
             };
-            renderer.updatePrograms(renderQueue, null, passConfig);
-            renderer.renderQueue(renderQueue, camera, passConfig);
+            renderer.updatePrograms(renderList, null, passConfig);
+            renderer.renderPass(renderList, camera, passConfig);
         }
 
         renderer.bindSceneRendering(null);

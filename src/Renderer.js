@@ -410,32 +410,32 @@ var Renderer = Base.extend(function () {
         scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
         scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
 
-        var opaqueQueue = this.cullRenderQueue(scene.opaqueQueue, scene, camera);
-        var transparentQueue = this.cullRenderQueue(scene.transparentQueue, scene, camera);
+        var opaqueList = this.cullRenderList(scene.opaqueList, scene, camera);
+        var transparentList = this.cullRenderList(scene.transparentList, scene, camera);
         var sceneMaterial = scene.material;
 
         scene.trigger('beforerender', this, scene, camera);
 
         // Render pre z
         if (preZ) {
-            this.renderPreZ(opaqueQueue, scene, camera);
+            this.renderPreZ(opaqueList, scene, camera);
         }
         _gl.depthFunc(_gl.LESS);
 
-        this.prepareRenderQueue(opaqueQueue, scene, camera, sceneMaterial, false);
-        this.prepareRenderQueue(transparentQueue, scene, camera, sceneMaterial, true);
+        this.prepareRenderList(opaqueList, scene, camera, sceneMaterial, false);
+        this.prepareRenderList(transparentList, scene, camera, sceneMaterial, true);
 
-        // Render Opaque queue
-        scene.trigger('beforerender:opaque', this, opaqueQueue);
+        // Render opaque list
+        scene.trigger('beforerender:opaque', this, opaqueList);
 
-        var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial);
+        var opaqueRenderInfo = this.renderPass(opaqueList, camera, sceneMaterial);
 
-        scene.trigger('afterrender:opaque', this, opaqueQueue, opaqueRenderInfo);
-        scene.trigger('beforerender:transparent', this, transparentQueue);
+        scene.trigger('afterrender:opaque', this, opaqueList, opaqueRenderInfo);
+        scene.trigger('beforerender:transparent', this, transparentList);
 
-        var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial);
+        var transparentRenderInfo = this.renderPass(transparentList, camera, sceneMaterial);
 
-        scene.trigger('afterrender:transparent', this, transparentQueue, transparentRenderInfo);
+        scene.trigger('afterrender:transparent', this, transparentList, transparentRenderInfo);
         var renderInfo = {};
         for (var name in opaqueRenderInfo) {
             renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
@@ -471,14 +471,14 @@ var Renderer = Base.extend(function () {
 
     },
 
-    updatePrograms: function (queue, scene, passConfig) {
+    updatePrograms: function (list, scene, passConfig) {
         var getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
         scene = scene || null;
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
             var renderMaterial = getMaterial.call(this, renderable);
             if (i > 0) {
-                var prevRenderable = queue[i - 1];
+                var prevRenderable = list[i - 1];
                 var prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
                 var jointsLen = renderable.joints.length ? renderable.joints.length : 0;
                 // Keep program not change if joints, material, lightGroup are same of two renderables.
@@ -504,12 +504,12 @@ var Renderer = Base.extend(function () {
     // },
 
     /**
-     * Do frustum culling on render queue
+     * Do frustum culling on render list
      */
-    cullRenderQueue: function (queue, scene, camera) {
-        var culledRenderQueue = [];
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+    cullRenderList: function (list, scene, camera) {
+        var culledRenderList = [];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
 
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
             var geometry = renderable.geometry;
@@ -523,43 +523,43 @@ var Renderer = Base.extend(function () {
                 }
             }
 
-            culledRenderQueue.push(renderable);
+            culledRenderList.push(renderable);
         }
 
-        return culledRenderQueue;
+        return culledRenderList;
     },
     /**
-     * Prepare for rendering a queue.
-     * @param  {qtek.Renderable[]} queue List of all renderables.
+     * Prepare for rendering a list.
+     * @param  {qtek.Renderable[]} list List of all renderables.
      * @param  {qtek.Camera} camera
      * @param  {qtek.Material} [globalMaterial] globalMaterial will override the material of each renderable
      * @param  {boolean} [transparent]
      */
-    prepareRenderQueue: function (queue, scene, camera, globalMaterial, transparent) {
-        if (queue.length === 0) {
+    prepareRenderList: function (list, scene, camera, globalMaterial, transparent) {
+        if (list.length === 0) {
             return;
         }
-        // Sort transparent queue
+        // Sort transparent list
         // Calculate the object depth
-        if (transparent && queue.length) {
+        if (transparent && list.length) {
             var worldViewMat = mat4Create();
             var posViewSpace = vec3.create();
-            for (var i = 0; i < queue.length; i++) {
-                var renderable = queue[i];
+            for (var i = 0; i < list.length; i++) {
+                var renderable = list[i];
                 mat4.multiplyAffine(worldViewMat, camera.viewMatrix._array, renderable.worldTransform._array);
                 vec3.transformMat4(posViewSpace, renderable.position._array, worldViewMat);
                 renderable.__depth = posViewSpace[2];
             }
         }
 
-        this.updatePrograms(queue, scene, globalMaterial);
+        this.updatePrograms(list, scene, globalMaterial);
 
-        queue.sort(transparent ? this.opaqueSortFunc : this.transparentSortFunc);
+        list.sort(transparent ? this.opaqueSortFunc : this.transparentSortFunc);
     },
 
     /**
      * Render a single renderable list in camera in sequence
-     * @param {qtek.Renderable[]} queue List of all renderables.
+     * @param {qtek.Renderable[]} list List of all renderables.
      * @param {qtek.Camera} camera
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
@@ -568,12 +568,12 @@ var Renderer = Base.extend(function () {
      * @param {Function} [passCOnfig.ifRender] If render the renderable.
      * @return {IRenderInfo}
      */
-    renderQueue: function(queue, camera, passConfig) {
+    renderPass: function(list, camera, passConfig) {
         var renderInfo = {
             triangleCount: 0,
             vertexCount: 0,
             drawCallCount: 0,
-            meshCount: queue.length,
+            meshCount: list.length,
             renderedMeshCount: 0
         };
         passConfig = passConfig || {};
@@ -617,8 +617,8 @@ var Renderer = Base.extend(function () {
         var culling, cullFace, frontFace;
         var transparent;
 
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
             if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
                 continue;
             }
@@ -764,28 +764,35 @@ var Renderer = Base.extend(function () {
         }
 
         // Remove programs incase it's not updated in the other passes.
-        for (var i = 0; i < queue.length; i++) {
-            queue[i].__program = null;
+        for (var i = 0; i < list.length; i++) {
+            list[i].__program = null;
         }
 
         return renderInfo;
     },
 
-    renderPreZ: function (queue, scene, camera) {
+    renderPreZ: function (list, scene, camera) {
         var _gl = this.gl;
         var preZPassMaterial = this._prezMaterial || new Material({
             shader: new Shader(Shader.source('qtek.prez.vertex'), Shader.source('qtek.prez.fragment'))
         });
         this._prezMaterial = preZPassMaterial;
 
-        this.updatePrograms(queue, scene, preZPassMaterial);
-        queue.sort(this.opaqueSortFunc);
+        this.updatePrograms(list, scene, preZPassMaterial);
+        list.sort(this.opaqueSortFunc);
 
         _gl.colorMask(false, false, false, false);
         _gl.depthMask(true);
 
         // Status
-        this.renderQueue(queue, camera, preZPassMaterial);
+        this.renderPass(list, camera, {
+            ifRender: function (renderable) {
+                return !renderable.ignorePreZ;
+            },
+            getMaterial: function () {
+                return preZPassMaterial;
+            }
+        });
 
         _gl.colorMask(true, true, true, true);
         _gl.depthMask(true);

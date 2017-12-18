@@ -426,10 +426,10 @@ var DeferredRenderer = Base.extend(function () {
 
             shadowCasters = this._shadowCasters || (this._shadowCasters = []);
             var count = 0;
-            var queue = scene.opaqueQueue;
-            for (var i = 0; i < queue.length; i++) {
-                if (queue[i].castShadow) {
-                    shadowCasters[count++] = queue[i];
+            var list = scene.opaqueList;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].castShadow) {
+                    shadowCasters[count++] = list[i];
                 }
             }
             shadowCasters.length = count;

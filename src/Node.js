@@ -81,7 +81,7 @@ var Node = Base.extend(
      */
     _inIterating: false,
 
-    // Depth for transparent queue sorting
+    // Depth for transparent list sorting
     __depth: 0
 
 }, function () {
@@ -563,7 +563,7 @@ var Node = Base.extend(
         return function (filter, out) {
             out = out || new BoundingBox();
             filter = filter || defaultFilter;
-            
+
             if (this._parent) {
                 Matrix4.invert(invWorldTransform, this._parent.worldTransform);
             }
@@ -579,7 +579,7 @@ var Node = Base.extend(
                     out.union(tmpBBox);
                 }
             }, this, defaultFilter);
-            
+
             return out;
         };
     })(),

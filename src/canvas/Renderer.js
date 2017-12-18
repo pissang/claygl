@@ -197,16 +197,16 @@ var CanvasRenderer = Base.extend({
         scene.update();
         camera.update();
 
-        var opaqueQueue = scene.opaqueQueue;
-        var transparentQueue = scene.transparentQueue;
+        var opaqueList = scene.opaqueList;
+        var transparentList = scene.transparentList;
         var sceneMaterial = scene.material;
 
-        var queue = opaqueQueue.concat(transparentQueue);
+        var list = opaqueList.concat(transparentList);
 
-        this.renderQueue(queue, camera);
+        this.renderPass(list, camera);
     },
 
-    renderQueue: function (queue, camera) {
+    renderPass: function (list, camera) {
         var viewProj = mat4.create();
         mat4.multiply(viewProj, camera.projectionMatrix._array, camera.viewMatrix._array);
         var worldViewProjMat = mat4.create();
@@ -225,8 +225,8 @@ var CanvasRenderer = Base.extend({
 
         var indices = [0, 0, 0];
         var matColor = [];
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
 
             mat4.multiply(worldViewProjMat, viewProj, renderable.worldTransform._array);
 

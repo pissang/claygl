@@ -194,13 +194,13 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     _update: function (renderer, scene) {
-        for (var i = 0; i < scene.opaqueQueue.length; i++) {
-            this._updateCasterAndReceiver(renderer, scene.opaqueQueue[i]);
+        for (var i = 0; i < scene.opaqueList.length; i++) {
+            this._updateCasterAndReceiver(renderer, scene.opaqueList[i]);
         }
-        for (var i = 0; i < scene.transparentQueue.length; i++) {
+        for (var i = 0; i < scene.transparentList.length; i++) {
             // TODO Transparent object receive shadow will be very slow
             // in stealth demo, still not find the reason
-            this._updateCasterAndReceiver(renderer, scene.transparentQueue[i]);
+            this._updateCasterAndReceiver(renderer, scene.transparentList[i]);
         }
         for (var i = 0; i < scene.lights.length; i++) {
             var light = scene.lights[i];
@@ -463,7 +463,7 @@ var ShadowMapPass = Base.extend(function () {
                 // Reversed, left to right => far to near
                 renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
-                renderer.renderQueue(casters, lightCamera, passConfig);
+                renderer.renderPass(casters, lightCamera, passConfig);
 
                 // Filter for VSM
                 if (this.softShadow === ShadowMapPass.VSM) {
@@ -505,7 +505,7 @@ var ShadowMapPass = Base.extend(function () {
 
         renderer.updatePrograms(casters, scene, passConfig);
         casters.sort(Renderer.opaqueSortFunc);
-        renderer.renderQueue(casters, lightCamera, passConfig);
+        renderer.renderPass(casters, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
 
@@ -546,7 +546,7 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderQueue(casters, camera, passConfig);
+            renderer.renderPass(casters, camera, passConfig);
         }
 
         this._frameBuffer.unbind(renderer);

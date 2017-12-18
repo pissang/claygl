@@ -112,7 +112,7 @@ var Skybox = Mesh.extend(function () {
         this.update();
         // Don't remember to disable blend
         renderer.gl.disable(renderer.gl.BLEND);
-        renderer.renderQueue([this], camera);
+        renderer.renderPass([this], camera);
     }
 });
 

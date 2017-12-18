@@ -81,7 +81,7 @@ var Skydome = Mesh.extend(function () {
     _beforeRenderScene: function (renderer, scene, camera) {
         this.position.copy(camera.getWorldPosition());
         this.update();
-        renderer.renderQueue([this], camera);
+        renderer.renderPass([this], camera);
     },
 
     setEnvironmentMap: function (envMap) {

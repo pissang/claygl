@@ -195,7 +195,7 @@ var Pass = Base.extend(function () {
      */
     renderQuad: function (renderer) {
         mesh.material = this.material;
-        renderer.renderQueue([mesh], camera);
+        renderer.renderPass([mesh], camera);
     },
 
     /**

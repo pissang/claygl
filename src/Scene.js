@@ -46,14 +46,14 @@ var Scene = Node.extend(function () {
          * @type {qtek.Renderable[]}
          * @readonly
          */
-        opaqueQueue: [],
+        opaqueList: [],
 
         /**
          * Opaque renderable list, it will be updated automatically
          * @type {qtek.Renderable[]}
          * @readonly
          */
-        transparentQueue: [],
+        transparentList: [],
 
         lights: [],
 
@@ -190,10 +190,10 @@ var Scene = Node.extend(function () {
 
         lights.length = 0;
 
-        this._updateRenderQueue(this, sceneMaterialTransparent);
+        this._updateRenderList(this, sceneMaterialTransparent);
 
-        this.opaqueQueue.length = this._opaqueObjectCount;
-        this.transparentQueue.length = this._transparentObjectCount;
+        this.opaqueList.length = this._opaqueObjectCount;
+        this.transparentList.length = this._transparentObjectCount;
 
         // reset
         if (!notUpdateLights) {
@@ -221,8 +221,8 @@ var Scene = Node.extend(function () {
     },
 
     // Traverse the scene and add the renderable
-    // object to the render queue
-    _updateRenderQueue: function (parent, sceneMaterialTransparent) {
+    // object to the render list
+    _updateRenderList: function (parent, sceneMaterialTransparent) {
         if (parent.invisible) {
             return;
         }
@@ -235,14 +235,14 @@ var Scene = Node.extend(function () {
             }
             if (child.isRenderable()) {
                 if (child.material.transparent || sceneMaterialTransparent) {
-                    this.transparentQueue[this._transparentObjectCount++] = child;
+                    this.transparentList[this._transparentObjectCount++] = child;
                 }
                 else {
-                    this.opaqueQueue[this._opaqueObjectCount++] = child;
+                    this.opaqueList[this._opaqueObjectCount++] = child;
                 }
             }
             if (child._children.length > 0) {
-                this._updateRenderQueue(child);
+                this._updateRenderList(child);
             }
         }
     },
@@ -382,8 +382,8 @@ var Scene = Node.extend(function () {
      */
     dispose: function () {
         this.material = null;
-        this.opaqueQueue = [];
-        this.transparentQueue = [];
+        this.opaqueList = [];
+        this.transparentList = [];
 
         this.lights = [];
 
