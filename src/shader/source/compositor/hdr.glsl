@@ -180,11 +180,12 @@ void main()
     #endif
 #endif
 
-    if (originalTexel.a <= 0.01) {
+    if (originalTexel.a <= 0.01 && gl_FragColor.a > 1e-5) {
         // bloom and lensflare out of main scene should be additive blending with the background dom.
         // Here is the tricky part. Use lum to simulate alpha and use browser's default blending.
         gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));
     }
+
     // Premultiply alpha if there is no blending.
     // webgl will divide alpha.
 #ifdef PREMULTIPLY_ALPHA
