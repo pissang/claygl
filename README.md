@@ -15,20 +15,20 @@ QTEK is a WebGL graphic library.
 [ECharts GL](https://github.com/ecomfe/echarts-gl)
 
 <a href="https://github.com/ecomfe/echarts-gl" target="_blank">
-<img src="./screenshot/echarts-gl.jpg" width="500"></img>
+<img src="./screenshot/echarts-gl.jpg" width="500" />
 </a>
 
 [QTEK Model Viewer](https://github.com/pissang/qtek-model-viewer)
 
 <a href="https://github.com/pissang/qtek-model-viewer" target="_blank">
-<img src="./screenshot/qtek-model-viewer.jpg" width="500"></img>
+<img src="./screenshot/qtek-model-viewer.jpg" width="500" />
 </a>
 
 
 [DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 <a href="https://github.com/pissang/dota2hero" target="_blank">
-<img src="./screenshot/dota2hero.jpg" width="500"></img>
+<img src="./screenshot/dota2hero.jpg" width="500" />
 </a>
 
 [Worldcup 2014 Intro Movie](https://github.com/pissang/worldcup-intro)
