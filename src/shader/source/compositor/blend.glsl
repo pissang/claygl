@@ -1,4 +1,6 @@
 @export qtek.compositor.blend
+
+#define SHADER_NAME blend
 // Blend at most 6 textures
 #ifdef TEXTURE1_ENABLED
 uniform sampler2D texture1;

@@ -72,10 +72,7 @@ var Pass = Base.extend(function () {
      * @param {} value
      */
     setUniform : function(name, value) {
-        var uniform = this.material.uniforms[name];
-        if (uniform) {
-            uniform.value = value;
-        }
+        this.material.setUniform(name, value);
     },
     /**
      * @param  {string} name
