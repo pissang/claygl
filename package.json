@@ -43,6 +43,7 @@
     "url": "https://github.com/pissang/qtek.git"
   },
   "devDependencies": {
+    "docdash": "^0.4.0",
     "electron": "1.7.9",
     "electron-mocha": "^4.0.3",
     "glob": "^7.0.0",

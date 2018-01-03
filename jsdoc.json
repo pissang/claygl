@@ -5,7 +5,7 @@
         "exclude": ["src/dep/glmatrix.js"]
     },
     "opts": {
-        "template": "node_modules/minami",
+        "template": "node_modules/docdash",
         "encoding": "utf8",
         "destination": "./doc/api/",
         "recurse": true

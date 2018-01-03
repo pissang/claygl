@@ -150,7 +150,6 @@ var Material = Base.extend(function () {
             var symbol = this._enabledUniforms[u];
             var uniform = this.uniforms[symbol];
             var uniformValue = uniform.value;
-
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
