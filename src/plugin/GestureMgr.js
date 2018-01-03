@@ -1,12 +1,5 @@
-/**
- * Only implements needed gestures for mobile.
- */
 var GestureMgr = function () {
 
-    /**
-     * @private
-     * @type {Array.<Object>}
-     */
     this._track = [];
 };
 

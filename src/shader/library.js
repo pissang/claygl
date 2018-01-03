@@ -1,37 +1,11 @@
-/**
- * @export{Object} library
- */
 import Shader from '../Shader';
 
 var _library = {};
 
-/**
- * @export qtek.shader.library~Libaray
- */
 function ShaderLibrary () {
     this._pool = {};
 }
 
-/**
- * ### Builin shaders
- * + qtek.standard
- * + qtek.basic
- * + qtek.lambert
- * + qtek.wireframe
- *
- * @namespace qtek.shader.library
- */
-/**
- *
- * Get shader from library. use shader name and option as hash key.
- *
- * @param {string} name
- * @param {Object|string|Array.<string>} [option]
- * @return {qtek.Shader}
- *
- * @example
- *     qtek.shader.library.get('qtek.standard')
- */
 ShaderLibrary.prototype.get = function(name) {
     var key = name;
 
@@ -50,19 +24,10 @@ ShaderLibrary.prototype.get = function(name) {
     }
 };
 
-/**
- * Clear shaders
- */
 ShaderLibrary.prototype.clear = function() {
     this._pool = {};
 };
 
-/**
- * @memberOf qtek.shader.library
- * @param  {string} name
- * @param  {string} vertex - Vertex shader code
- * @param  {string} fragment - Fragment shader code
- */
 function template(name, vertex, fragment) {
     _library[name] = {
         vertex: vertex,
@@ -73,7 +38,13 @@ function template(name, vertex, fragment) {
 var defaultLibrary = new ShaderLibrary();
 
 /**
- * @alias qtek.shader.library
+ * ### Builin shaders
+ * + qtek.standard
+ * + qtek.basic
+ * + qtek.lambert
+ * + qtek.wireframe
+ *
+ * @namespace qtek.shader.library
  */
 export default {
     /**
@@ -82,9 +53,23 @@ export default {
     createLibrary: function () {
         return new ShaderLibrary();
     },
+    /**
+     * Get shader from default library.
+     * @param {string} name
+     * @return {qtek.Shader}
+     * @memberOf qtek.shader.library
+     * @example
+     *     qtek.shader.library.get('qtek.standard')
+     */
     get: function () {
         return defaultLibrary.get.apply(defaultLibrary, arguments);
     },
+    /**
+     * @memberOf qtek.shader.library
+     * @param  {string} name
+     * @param  {string} vertex - Vertex shader code
+     * @param  {string} fragment - Fragment shader code
+     */
     template: template,
     clear: function () {
         return defaultLibrary.clear();

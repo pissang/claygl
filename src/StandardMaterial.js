@@ -48,7 +48,7 @@ var StandardMaterial = Material.extend(function () {
     // PENDING
     util.extend(this, option);
     // Extend after shader is created.
-    util.defaults(this, {
+    util.defaults(this, /** @lends qtek.StandardMaterial# */  {
         /**
          * @type {Array.<number>}
          * @default [1, 1, 1]

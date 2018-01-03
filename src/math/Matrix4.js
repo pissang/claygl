@@ -19,12 +19,14 @@ var Matrix4 = function() {
      * Storage of Matrix4
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Matrix4#
      */
     this._array = mat4.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Matrix4#
      */
     this._dirty = true;
 };

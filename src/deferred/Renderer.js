@@ -158,7 +158,7 @@ var DeferredRenderer = Base.extend(function () {
             fragment: Shader.source('qtek.compositor.output')
         })
     };
-}, {
+}, /** @lends qtek.deferred.Renderer# */ {
     /**
      * Do render
      * @param {qtek.Renderer} renderer

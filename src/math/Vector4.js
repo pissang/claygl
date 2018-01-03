@@ -21,6 +21,7 @@ var Vector4 = function(x, y, z, w) {
      * All methods also operate on the _array instead of x, y, z, w components
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Vector4#
      */
     this._array = vec4.fromValues(x, y, z, w);
 
@@ -29,6 +30,7 @@ var Vector4 = function(x, y, z, w) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Vector4#
      */
     this._dirty = true;
 };

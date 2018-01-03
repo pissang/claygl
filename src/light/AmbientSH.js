@@ -10,10 +10,10 @@ var AmbientSHLight = Light.extend({
 
     castShadow: false,
 
-
     /**
      * Spherical Harmonic Coefficients
      * @type {Array.<number>}
+     * @memberOf qtek.light.AmbientSH#
      */
     coefficients: [],
 

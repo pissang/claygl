@@ -11,12 +11,14 @@ var Matrix3 = function () {
      * Storage of Matrix3
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Matrix3#
      */
     this._array = mat3.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Matrix3#
      */
     this._dirty = true;
 };

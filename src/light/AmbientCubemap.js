@@ -12,6 +12,7 @@ var AmbientCubemapLight = Light.extend({
 
     /**
      * @type {qtek.TextureCube}
+     * @memberOf qtek.light.AmbientCubemap#
      */
     cubemap: null,
 
@@ -23,7 +24,7 @@ var AmbientCubemapLight = Light.extend({
     _normalDistribution: null,
     _brdfLookup: null
 
-}, {
+}, /** @lends qtek.light.AmbientCubemap# */ {
 
     type: 'AMBIENT_CUBEMAP_LIGHT',
 

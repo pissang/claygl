@@ -1,8 +1,3 @@
-/**
- * @namespace qtek.core.glinfo
- * @see http://www.khronos.org/registry/webgl/extensions/
- */
-
 var EXTENSION_LIST = [
     'OES_texture_float',
     'OES_texture_half_float',
@@ -25,7 +20,7 @@ var PARAMETER_NAMES = [
     'MAX_CUBE_MAP_TEXTURE_SIZE'
 ];
 
-function GLInfo(_gl) { 
+function GLInfo(_gl) {
     var extensions = {};
     var parameters = {};
 
@@ -40,12 +35,6 @@ function GLInfo(_gl) {
         parameters[name] = _gl.getParameter(_gl[name]);
     }
 
-    /**
-     * Get extension
-     * @param {string} name - Extension name, vendorless
-     * @return {WebGLExtension}
-     * @memberOf qtek.core.glinfo
-     */
     this.getExtension = function (name) {
         if (!(name in extensions)) {
             createExtension(name);
@@ -53,11 +42,6 @@ function GLInfo(_gl) {
         return extensions[name];
     };
 
-    /**
-     * Get parameter
-     * @param {string} name Parameter name
-     * @return {*}
-     */
     this.getParameter = function (name) {
         return parameters[name];
     };

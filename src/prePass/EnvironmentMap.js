@@ -30,7 +30,7 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *     });
  */
 var EnvironmentMapPass = Base.extend(function() {
-    var ret = {
+    var ret = /** @lends qtek.prePass.EnvironmentMap# */ {
         /**
          * Camera position
          * @type {qtek.math.Vector3}
@@ -78,10 +78,10 @@ var EnvironmentMapPass = Base.extend(function() {
     cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
 
     // FIXME In windows, use one framebuffer only renders one side of cubemap
-    ret._frameBuffer = new FrameBuffer()
+    ret._frameBuffer = new FrameBuffer();
 
     return ret;
-}, {
+},  /** @lends qtek.prePass.EnvironmentMap# */ {
     /**
      * @param  {string} target
      * @return  {qtek.Camera}
@@ -133,7 +133,7 @@ var EnvironmentMapPass = Base.extend(function() {
         }
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param {qtek.Renderer} renderer
      */
     dispose: function (renderer) {
         this._frameBuffer.dispose(renderer);

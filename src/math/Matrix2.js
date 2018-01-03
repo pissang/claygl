@@ -11,12 +11,14 @@ var Matrix2 = function() {
      * Storage of Matrix2
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Matrix2#
      */
     this._array = mat2.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Matrix2#
      */
     this._dirty = true;
 };

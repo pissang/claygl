@@ -19,11 +19,12 @@ function convertToArray(val) {
 }
 
 /**
- * @alias module:echarts-x/util/OrbitControl
+ * @constructor
+ * @alias qtek.plugin.OrbitControl
  */
 var OrbitControl = Base.extend(function () {
 
-    return {
+    return /** @lends qtek.plugin.OrbitControl# */ {
 
         animation: null,
 
@@ -152,7 +153,7 @@ var OrbitControl = Base.extend(function () {
     this.update = this.update.bind(this);
 
     this.init();
-}, {
+}, /** @lends qtek.plugin.OrbitControl# */ {
     /**
      * Initialize.
      * Mouse event binding
@@ -489,7 +490,7 @@ var OrbitControl = Base.extend(function () {
     // camera.position.y = 2;
     // camera.position.z = -4;
     // camera.lookAt(scene.position);
-    // 
+    //
     decomposeTransform: function () {
         if (!this.target) {
             return;

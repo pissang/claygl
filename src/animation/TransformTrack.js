@@ -22,18 +22,10 @@ var TransformTrack = function (opts) {
         this.addKeyFrames(opts.keyFrames);
     }
 
-    /**
-     * @type {Float32Array}
-     */
     this.position = vec3.create();
-    /**
-     * Rotation is represented by a quaternion
-     * @type {Float32Array}
-     */
+
     this.rotation = quat.create();
-    /**
-     * @type {Float32Array}
-     */
+
     this.scale = vec3.fromValues(1, 1, 1);
 
     this._cacheKey = 0;
@@ -56,7 +48,7 @@ TransformTrack.prototype.step = function (time, dTime, silent) {
     if (!silent && ret !== 'paused') {
         this.fire('frame');
     }
-    
+
     return ret;
 };
 
@@ -66,18 +58,11 @@ TransformTrack.prototype.setTime = function (time) {
     this._interpolateField(time, 'scale');
 };
 
-/**
- * @return {number}
- */
 TransformTrack.prototype.getMaxTime = function () {
     var kf = this.keyFrames[this.keyFrames.length - 1];
     return kf ? kf.time : 0;
 };
 
-/**
- * Add a key frame
- * @param {Object} kf
- */
 TransformTrack.prototype.addKeyFrame = function (kf) {
     for (var i = 0; i < this.keyFrames.length - 1; i++) {
         var prevFrame = this.keyFrames[i];
@@ -92,10 +77,6 @@ TransformTrack.prototype.addKeyFrame = function (kf) {
     this.keyFrames.push(kf);
 };
 
-/**
- * Add keyframes
- * @param {object[]} kfs
- */
 TransformTrack.prototype.addKeyFrames = function (kfs) {
     for (var i = 0; i < kfs.length; i++) {
         this.keyFrames.push(kfs[i]);
@@ -156,27 +137,13 @@ TransformTrack.prototype._interpolateField = function (time, fieldName) {
         this._cacheTime = 0;
     }
 };
-/**
- * 1D blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- * @param  {number} w
- */
+
 TransformTrack.prototype.blend1D = function (t1, t2, w) {
     vec3.lerp(this.position, t1.position, t2.position, w);
     vec3.lerp(this.scale, t1.scale, t2.scale, w);
     quat.slerp(this.rotation, t1.rotation, t2.rotation, w);
 };
 
-/**
- * 2D blending between three tracks
- * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t3
- * @param  {number} f
- * @param  {number} g
- */
 TransformTrack.prototype.blend2D = (function () {
     var q1 = quat.create();
     var q2 = quat.create();
@@ -204,22 +171,12 @@ TransformTrack.prototype.blend2D = (function () {
     };
 })();
 
-/**
- * Additive blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- */
 TransformTrack.prototype.additiveBlend = function (t1, t2) {
     vec3.add(this.position, t1.position, t2.position);
     vec3.add(this.scale, t1.scale, t2.scale);
     quat.multiply(this.rotation, t2.rotation, t1.rotation);
 };
 
-/**
- * Subtractive blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- */
 TransformTrack.prototype.subtractiveBlend = function (t1, t2) {
     vec3.sub(this.position, t1.position, t2.position);
     vec3.sub(this.scale, t1.scale, t2.scale);
@@ -227,20 +184,11 @@ TransformTrack.prototype.subtractiveBlend = function (t1, t2) {
     quat.multiply(this.rotation, this.rotation, t1.rotation);
 };
 
-/**
- * @param {number} startTime
- * @param {number} endTime
- * @param {boolean} isLoop
- */
 TransformTrack.prototype.getSubClip = function (startTime, endTime) {
     // TODO
     console.warn('TODO');
 };
 
-/**
- * Clone a new TransformTrack
- * @return {qtek.animation.TransformTrack}
- */
 TransformTrack.prototype.clone = function () {
     var track = TransformTrack.prototype.clone.call(this);
     track.keyFrames = this.keyFrames;

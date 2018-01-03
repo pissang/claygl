@@ -17,6 +17,7 @@ var Vector2 = function(x, y) {
      * All methods also operate on the _array instead of x, y components
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Vector2#
      */
     this._array = vec2.fromValues(x, y);
 
@@ -25,6 +26,7 @@ var Vector2 = function(x, y) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Vector2#
      */
     this._dirty = true;
 };

@@ -8,10 +8,6 @@ var CanvasMaterial = Base.extend({
 
     pointSize: 0,
 
-    /**
-     * Point shape. Can be 'rectangle' and 'circle'
-     * @type {string}
-     */
     pointShape: 'rectangle'
 });
 

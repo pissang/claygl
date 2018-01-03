@@ -19,6 +19,7 @@ var Vector3 = function(x, y, z) {
      * All methods also operate on the _array instead of x, y, z components
      * @name _array
      * @type {Float32Array}
+     * @memberOf qtek.math.Vector3#
      */
     this._array = vec3.fromValues(x, y, z);
 
@@ -27,6 +28,7 @@ var Vector3 = function(x, y, z) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf qtek.math.Vector3#
      */
     this._dirty = true;
 };
