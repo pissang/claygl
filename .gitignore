@@ -5,6 +5,5 @@ gh-pages
 .idea
 cloc_definitions.txt
 example/unit
-lib
-coverage/
-doc
+/coverage
+/doc
