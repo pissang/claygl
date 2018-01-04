@@ -432,7 +432,7 @@ def ConvertToPBRMaterial(pMaterial):
 
     if (lShading == 'unknown'):
         lib_materials.append(lGLTFMaterial)
-        return lMaterialIdx
+        return lMaterialIdx, 1, 1, 0, 0
 
     lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
 
