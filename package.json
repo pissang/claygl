@@ -10,14 +10,6 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
-  "watch": {
-    "glsl2js": {
-      "patterns": [
-        "src"
-      ],
-      "extensions": "glsl"
-    }
-  },
   "jsnext:main": "dist/claygl.es.js",
   "module": "dist/claygl.es.js",
   "main": "dist/claygl.js",

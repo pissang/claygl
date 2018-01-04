@@ -7,8 +7,6 @@ var OUTPUT_PORTAL = 'claygl.js';
 
 var template = fs.readFileSync(__dirname  + '/claygl_template.js', 'utf-8');
 
-var tsReferenceList = [];
-
 var idx = 0;
 var blacklist = ['shader/builtin', 'app/', 'canvas/', 'gpu/'];
 glob('**/*.js', {

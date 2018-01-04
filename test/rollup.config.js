@@ -1,7 +1,7 @@
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-    input: 'src/clay.js',
+    input: 'src/claygl.js',
     plugins: [
         commonjs({
             include: 'src/dep/*',
@@ -11,8 +11,8 @@ export default {
     output: [
         {
             format: 'umd',
-            name: 'claygl',
-            file: 'dist/clay.src.js'
+            name: 'clay',
+            file: 'dist/claygl.src.js'
         }
     ]
 };
