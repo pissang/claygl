@@ -1,16 +1,16 @@
 const assert = require('assert');
 const { util, helper } = require('./../common/');
-const qtek = require('../../dist/qtek');
+const clay = require('../../dist/claygl');
 
 describe('StandardMaterial.Spec', function () {
     it('constructor', function () {
-        const material = new qtek.StandardMaterial();
+        const material = new clay.StandardMaterial();
     });
 
     it('append defines in shader source dynamically', function () {
         const { renderer, scene, camera } = helper.createQtekScene();
 
-        const material = new qtek.StandardMaterial({
+        const material = new clay.StandardMaterial({
             linear: true,
             metalness : 0.5,
             roughness : 0.5,
@@ -25,7 +25,7 @@ describe('StandardMaterial.Spec', function () {
     });
 
     it('#clone', function () {
-        const material = new qtek.StandardMaterial({
+        const material = new clay.StandardMaterial({
             linear: true,
             metalness : 0.5,
             roughness : 0.5,

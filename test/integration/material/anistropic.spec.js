@@ -1,4 +1,4 @@
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 const { util, helper } = require('../../common');
 const path = require('path');
 
@@ -12,37 +12,37 @@ describe('Integration.Anistropic.Spec', function () {
             done();
             return;
         }
-        camera.lookAt(new qtek.math.Vector3(0, 1, 0));
+        camera.lookAt(new clay.math.Vector3(0, 1, 0));
         camera.far = 500;
 
-        const texture = qtek.util.texture.loadTexture(
+        const texture = clay.util.texture.loadTexture(
             path.join(__dirname, 'textures', 'anistropic', 'ground_tile.jpg'),
-            function () {                
-                texture.wrapS = qtek.Texture.REPEAT;
-                texture.wrapT = qtek.Texture.REPEAT;
+            function () {
+                texture.wrapS = clay.Texture.REPEAT;
+                texture.wrapT = clay.Texture.REPEAT;
                 texture.anisotropic = 4;
 
-                const shader = qtek.shader.library.get('qtek.basic', 'diffuseMap');
-                
-                const material = new qtek.Material({
+                const shader = clay.shader.library.get('clay.basic', 'diffuseMap');
+
+                const material = new clay.Material({
                     shader: shader
                 });
                 material.set("diffuseMap", texture);
                 material.set("uvRepeat", [10, 10])
 
-                const root = new qtek.Node();
+                const root = new clay.Node();
                 scene.add(root);
 
-                const plane = new qtek.geometry.Plane({
+                const plane = new clay.geometry.Plane({
                     widthSegments: 1,
                     heightSegments: 1
                 });
-                const planeMesh = new qtek.Mesh({
+                const planeMesh = new clay.Mesh({
                     geometry: plane,
                     material: material,
-                    scale: new qtek.math.Vector3(30, 30, 30)
+                    scale: new clay.math.Vector3(30, 30, 30)
                 });
-                
+
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
@@ -50,6 +50,6 @@ describe('Integration.Anistropic.Spec', function () {
 
                 util.assertWith(canvas, { fixture: path.join(__dirname, 'anistropic.png') }, done);
             });
-        
+
     });
 });

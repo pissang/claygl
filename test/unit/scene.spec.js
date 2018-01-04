@@ -1,10 +1,10 @@
 const assert = require('assert');
 const { util, helper } = require('./../common/');
-const qtek = require('../../dist/qtek');
+const clay = require('../../dist/claygl');
 
 describe('Scene.Spec', function () {
     it('constructor', function () {
-        const scene = new qtek.Scene();
+        const scene = new clay.Scene();
     });
 
     it('a clean scene', function () {
@@ -14,7 +14,7 @@ describe('Scene.Spec', function () {
 
     it('add/remove a node', function () {
         const nodeName = 'spec';
-        const root = new qtek.Node({
+        const root = new clay.Node({
             name : 'spec'
         });
 
@@ -30,22 +30,22 @@ describe('Scene.Spec', function () {
     });
 
     it('clone a node', function () {
-        const mesh = new qtek.Mesh({
-            material: new qtek.Material({
-                shader: qtek.shader.library.get('qtek.standard')
+        const mesh = new clay.Mesh({
+            material: new clay.Material({
+                shader: clay.shader.library.get('clay.standard')
             }),
-            geometry: new qtek.geometry.Cube()
+            geometry: new clay.geometry.Cube()
         });
 
         const { renderer, scene, camera } = helper.createQtekScene();
         //TODO clone of skeleton
         //cloneNode is a part deep clone: geometry won't be cloned but material and skeleton will
         const cloned = scene.cloneNode(mesh);
-        assert(cloned instanceof qtek.Mesh);
+        assert(cloned instanceof clay.Mesh);
         assert(cloned !== mesh);
-        assert(cloned.material instanceof qtek.Material);
+        assert(cloned.material instanceof clay.Material);
         assert(cloned.material !== mesh.material);
-        assert(cloned.geometry instanceof qtek.geometry.Cube);
+        assert(cloned.geometry instanceof clay.geometry.Cube);
         //geometry
         assert(cloned.geometry === mesh.geometry);
     });
@@ -67,30 +67,30 @@ describe('Scene.Spec', function () {
         //a little bit complicated case lended from lightgroup.html
         //ensure setShaderLightNumber and setLightUniforms are invoked
         //-------------------------------------------
-        const Shader = qtek.Shader,
-            Material = qtek.Material;
+        const Shader = clay.Shader,
+            Material = clay.Material;
 
         const { renderer, scene, camera } = helper.createQtekScene();
 
-        const cube = new qtek.geometry.Cube();
+        const cube = new clay.geometry.Cube();
 
         const material1 = new Material({
-            shader: new Shader(Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'))
+            shader: new Shader(Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'))
         });
         const material2 = new Material({
-            shader: new Shader(Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'))
+            shader: new Shader(Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'))
         });
 
         material1.shader.lightGroup = 0;
         material2.shader.lightGroup = 1;
 
-        const root = new qtek.Node({
+        const root = new clay.Node({
             name : 'ROOT'
         });
         scene.add(root);
 
         for (let i = 0; i < 2; i++) {
-            const mesh = new qtek.Mesh({
+            const mesh = new clay.Mesh({
                 geometry: cube,
                 material: i % 2 ? material1 : material2
             });
@@ -98,12 +98,12 @@ describe('Scene.Spec', function () {
         }
         //-------------------------------------------
 
-        const light1 = new qtek.light.Point({
+        const light1 = new clay.light.Point({
             range: 200,
             group: 0,
             color: [1, 0.5, 0]
         });
-        const light2 = new qtek.light.Point({
+        const light2 = new clay.light.Point({
             range: 200,
             group: 1,
             color: [0, 0.5, 1]

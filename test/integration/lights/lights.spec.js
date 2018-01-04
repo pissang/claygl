@@ -1,16 +1,16 @@
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 const { util, helper } = require('../../common');
 const path = require('path');
 
 function createCube() {
-    const root = new qtek.Node();
+    const root = new clay.Node();
     root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
 
-    const mesh = new qtek.Mesh({
-        material: new qtek.Material({
-            shader : qtek.shader.library.get('qtek.standard')
+    const mesh = new clay.Mesh({
+        material: new clay.Material({
+            shader : clay.shader.library.get('clay.standard')
         }),
-        geometry : new qtek.geometry.Cube()
+        geometry : new clay.geometry.Cube()
     });
     root.add(mesh);
 
@@ -21,7 +21,7 @@ describe('Integration.lights.Spec', function () {
     it('directional light', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const light = new qtek.light.Directional({
+        const light = new clay.light.Directional({
             intensity: 1
         });
         light.position.set(30, 30, 30);
@@ -40,7 +40,7 @@ describe('Integration.lights.Spec', function () {
     it('ambient light', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        scene.add(new qtek.light.Ambient({
+        scene.add(new clay.light.Ambient({
             intensity: 0.3
         }));
 
@@ -55,7 +55,7 @@ describe('Integration.lights.Spec', function () {
     it('point light', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const light = new qtek.light.Point({
+        const light = new clay.light.Point({
             castShadow: false,
             range: 200
         });

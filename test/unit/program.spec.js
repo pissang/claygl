@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { util, helper } = require('./../common/');
-const qtek = require('../../dist/qtek');
+const clay = require('../../dist/claygl');
 
 //from webglfundamentals
 const vertexCode = `
@@ -44,20 +44,20 @@ const fragmentCode =  `
     `;
 
 function createMesh() {
-    const shader = new qtek.Shader(vertexCode, fragmentCode);
-    const material = new qtek.Material({
+    const shader = new clay.Shader(vertexCode, fragmentCode);
+    const material = new clay.Material({
         shader: shader
     });
-    const mesh = new qtek.Mesh({
+    const mesh = new clay.Mesh({
         material: material,
-        geometry: new qtek.geometry.Cube()
+        geometry: new clay.geometry.Cube()
     });
     return mesh;
 }
 
 describe('Program.Spec', function () {
     it('constructor', function () {
-        const shader = new qtek.Shader(vertexCode, fragmentCode);
+        const shader = new clay.Shader(vertexCode, fragmentCode);
 
         assert(shader.attributeSemantics['POSITION']);
         assert(shader.attributeSemantics['TEXCOORD']);
@@ -134,7 +134,7 @@ describe('Program.Spec', function () {
         assert(program.currentTextureSlot() === 1);
         program.resetTextureSlot(0);
 
-        const texture = new qtek.Texture();
+        const texture = new clay.Texture();
         program.takeCurrentTextureSlot(renderer, texture);
 
         assert(program.currentTextureSlot() === 1);

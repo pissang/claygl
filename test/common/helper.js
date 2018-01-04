@@ -1,9 +1,9 @@
 const util = require('./util');
-const qtek = require('../../dist/qtek');
+const clay = require('../../dist/claygl');
 
 module.exports = {
     /**
-     * Helper to create a qtek scene
+     * Helper to create a clay scene
      * @param {Object} options
      * @param {Object} [options.size=[200, 200]]  canvas size
      * @param {Object} [options.cameraPosition=[0, 0, 20]]
@@ -13,7 +13,7 @@ module.exports = {
         const canvas = document.createElement('canvas');
         canvas.width = size[0];
         canvas.height = size[1];
-        const renderer = new qtek.Renderer({
+        const renderer = new clay.Renderer({
             canvas : canvas,
             devicePixelRatio: 1,
             //disable antialias to avoid pixel shift on different OS
@@ -21,8 +21,8 @@ module.exports = {
         });
         canvas.gl = renderer.gl;
         renderer.resize(canvas.width, canvas.height);
-        const scene = new qtek.Scene();
-        const camera = new qtek.camera.Perspective({
+        const scene = new clay.Scene();
+        const camera = new clay.camera.Perspective({
             aspect: renderer.getViewportAspect()
         });
 
@@ -35,10 +35,10 @@ module.exports = {
     },
 
     createBuiltinMaterial(shaderName) {
-        return new qtek.Material({
-            shader: new qtek.Shader({
-                vertex: qtek.Shader.source(`qtek.${shaderName}.vertex`),
-                fragment: qtek.Shader.source(`qtek.${shaderName}.fragment`)
+        return new clay.Material({
+            shader: new clay.Shader({
+                vertex: clay.Shader.source(`clay.${shaderName}.vertex`),
+                fragment: clay.Shader.source(`clay.${shaderName}.fragment`)
             })
         });
     }

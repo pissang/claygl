@@ -1,10 +1,10 @@
 require('../../common/');
 const assert = require('assert');
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 
 describe('Cube.Spec', function () {
     it('constructor', function () {
-        const geometry = new qtek.geometry.Cube({
+        const geometry = new clay.geometry.Cube({
             widthSegments : 1,
             heightSegments : 2,
             depthSegments : 3
@@ -19,14 +19,14 @@ describe('Cube.Spec', function () {
     });
 
     it('#generateFaceNormals', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new clay.geometry.Cube();
         const normal = geometry.attributes.normal.value;
         geometry.generateFaceNormals();
         assert.notDeepEqual(geometry.attributes.normal.value, normal);
     });
-    
+
     it('#generateTangents', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new clay.geometry.Cube();
         const tangent = geometry.attributes.tangent.value;
         geometry.generateTangents();
         assert.notDeepEqual(geometry.attributes.tangent.value, tangent);
@@ -34,7 +34,7 @@ describe('Cube.Spec', function () {
     });
 
     it('#generateUniqueVertex', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new clay.geometry.Cube();
         assert(!geometry.isUniqueVertex());
         assert(geometry.attributes.normal.value.length === 72);
         assert(geometry.attributes.texcoord0.value.length === 48);
@@ -44,7 +44,7 @@ describe('Cube.Spec', function () {
     });
 
     it('#generateBarycentric', function () {
-        const geometry = new qtek.geometry.Cube();
+        const geometry = new clay.geometry.Cube();
         assert(!geometry.attributes.barycentric.value);
         geometry.generateBarycentric();
         assert(geometry.attributes.barycentric.value.length === 108);

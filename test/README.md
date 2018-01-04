@@ -34,12 +34,12 @@ export ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
 Compare spec's paiting result with pre-generated fixtures.
 
 ### Test Flow with Coverage
-* build with test/rollup.config.js, generate dist/qtek.src.js, with inline sourcemap
-* run istanbul instrument, instrument qtek.src.js with code coverage wrappers and generate dist/qtek.js
+* build with test/rollup.config.js, generate dist/clay.src.js, with inline sourcemap
+* run istanbul instrument, instrument clay.src.js with code coverage wrappers and generate dist/clay.js
 * run specs
 * generate coverage-final.json and lcov.info with a customized mocha reporter (test/reporter/istanbul-reporter)
 * generate html coverage reports with remap-istanbul based on coverage-final.json and sourcemap
-* delete dist/qtek.src.js
+* delete dist/clay.src.js
 
 ### Generate Fixtures
 ```shell

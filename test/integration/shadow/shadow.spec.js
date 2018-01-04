@@ -1,16 +1,16 @@
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 const { util, helper } = require('../../common');
 const path = require('path');
 
 function createCube() {
-    const root = new qtek.Node();
+    const root = new clay.Node();
     root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
 
-    const mesh = new qtek.Mesh({
-        material: new qtek.Material({
-            shader: qtek.shader.library.get('qtek.standard')
+    const mesh = new clay.Mesh({
+        material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
         }),
-        geometry: new qtek.geometry.Cube()
+        geometry: new clay.geometry.Cube()
     });
     root.add(mesh);
 
@@ -33,11 +33,11 @@ describe('Integration.shadow.Spec', function () {
     it('directional light shadow', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const shadowMapPass = new qtek.prePass.ShadowMap({
-            softShadow: qtek.prePass.PCF
+        const shadowMapPass = new clay.prePass.ShadowMap({
+            softShadow: clay.prePass.PCF
         });
 
-        const light = new qtek.light.Directional({
+        const light = new clay.light.Directional({
             intensity: 1,
             castShadow: true,
             shadowBias: 0.001,
@@ -62,11 +62,11 @@ describe('Integration.shadow.Spec', function () {
     it('directional light shadow with VSM', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const shadowMapPass = new qtek.prePass.ShadowMap({
-            softShadow: qtek.prePass.VSM
+        const shadowMapPass = new clay.prePass.ShadowMap({
+            softShadow: clay.prePass.VSM
         });
 
-        const light = new qtek.light.Directional({
+        const light = new clay.light.Directional({
             intensity: 1,
             castShadow: true,
             shadowBias: 0.001,
@@ -92,11 +92,11 @@ describe('Integration.shadow.Spec', function () {
     it('point light shadow', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const shadowMapPass = new qtek.prePass.ShadowMap({
-            softShadow: qtek.prePass.PCF
+        const shadowMapPass = new clay.prePass.ShadowMap({
+            softShadow: clay.prePass.PCF
         });
 
-        const pointLight = new qtek.light.Point({
+        const pointLight = new clay.light.Point({
             castShadow: true,
             shadowResolution: 256,
             intensity: 1,
@@ -117,11 +117,11 @@ describe('Integration.shadow.Spec', function () {
     it('point light shadow with VSM', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const shadowMapPass = new qtek.prePass.ShadowMap({
-            softShadow: qtek.prePass.VSM
+        const shadowMapPass = new clay.prePass.ShadowMap({
+            softShadow: clay.prePass.VSM
         });
 
-        const pointLight = new qtek.light.Point({
+        const pointLight = new clay.light.Point({
             castShadow: true,
             shadowResolution: 256,
             intensity: 1,

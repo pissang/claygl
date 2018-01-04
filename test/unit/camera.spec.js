@@ -1,24 +1,24 @@
 require('./../common/');
 const assert = require('assert');
-const qtek = require('../../dist/qtek');
+const clay = require('../../dist/claygl');
 
 describe('Camera.Spec', function () {
     it('constructor', function () {
-        const camera = new qtek.Camera();
+        const camera = new clay.Camera();
     });
 
     it('#update', function () {
-        const camera = new qtek.camera.Perspective({
+        const camera = new clay.camera.Perspective({
             aspect: 4 / 3
         });
         camera.position.set(0, 0, 20);
 
         camera.update(true);
-        
-        assert.deepEqual(camera.viewMatrix.toArray(), [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -20, 1 ]);
-        assert.deepEqual(camera.worldTransform.toArray(), [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 20, 1 ]);        
 
-        assert.deepEqual(camera.projectionMatrix.toArray(), [ 
+        assert.deepEqual(camera.viewMatrix.toArray(), [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -20, 1 ]);
+        assert.deepEqual(camera.worldTransform.toArray(), [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 20, 1 ]);
+
+        assert.deepEqual(camera.projectionMatrix.toArray(), [
             1.6083801984786987,
             0,
             0,
@@ -35,7 +35,7 @@ describe('Camera.Spec', function () {
             0,
             -0.2000100016593933,
             0 ]);
-        assert.deepEqual(camera.invProjectionMatrix.toArray(), [ 
+        assert.deepEqual(camera.invProjectionMatrix.toArray(), [
             0.6217435598373413,
             -0,
             -0,
@@ -57,14 +57,14 @@ describe('Camera.Spec', function () {
     });
 
     it('#setViewMatrix', function () {
-        const Matrix4 = qtek.math.Matrix4;
+        const Matrix4 = clay.math.Matrix4;
 
         const m = new Matrix4();
         m.identity(m);
         m.rotateX(30 * Math.PI / 180);
         m.rotateY(60 * Math.PI / 180);
 
-        const camera = new qtek.Camera();
+        const camera = new clay.Camera();
         camera.setViewMatrix(m);
 
         assert.deepEqual(camera.viewMatrix.toArray(), m.toArray());
@@ -72,14 +72,14 @@ describe('Camera.Spec', function () {
     });
 
     it('#setProjectionMatrix', function () {
-        const Matrix4 = qtek.math.Matrix4;
-        
+        const Matrix4 = clay.math.Matrix4;
+
         const m = new Matrix4();
         m.identity(m);
         m.rotateX(30 * Math.PI / 180);
         m.rotateY(60 * Math.PI / 180);
 
-        const camera = new qtek.Camera();
+        const camera = new clay.Camera();
         camera.setProjectionMatrix(m);
 
         assert.deepEqual(camera.projectionMatrix.toArray(), m.toArray());
@@ -91,18 +91,18 @@ describe('Camera.Spec', function () {
     });
 
     it('#castRay', function () {
-        const camera = new qtek.camera.Perspective({
+        const camera = new clay.camera.Perspective({
             aspect: 4 / 3
         });
         camera.position.set(0, 0, 20);
 
-        const ray = camera.castRay(new qtek.math.Vector2(100, 100), new qtek.math.Ray());
+        const ray = camera.castRay(new clay.math.Vector2(100, 100), new clay.math.Ray());
         assert.deepEqual(ray.direction.toArray(), [ 0.7999337911605835, 0.59995037317276, -0.012865976430475712 ]);
         assert.deepEqual(ray.origin.toArray(), [ 6.217435359954834, 4.663076877593994, -0.10000000149011612 ]);
     });
 
     it('Orthographic Camera', function () {
-        const camera = new qtek.camera.Orthographic({
+        const camera = new clay.camera.Orthographic({
             left : -2,
             right : 3,
             top : 4,
@@ -148,7 +148,7 @@ describe('Camera.Spec', function () {
     });
 
     it('Perspective Camera', function () {
-        const camera = new qtek.camera.Perspective({
+        const camera = new clay.camera.Perspective({
             fov : 60,
             aspect : 1,
             near : 1,
@@ -178,7 +178,7 @@ describe('Camera.Spec', function () {
         assert(c2.fov === 60);
         assert(c2.aspect === 1);
         assert(c2.near === 1);
-        assert(c2.far === 8000);        
+        assert(c2.far === 8000);
 
         camera.decomposeProjectionMatrix();
         assert(closeTo(camera.fov, 60));

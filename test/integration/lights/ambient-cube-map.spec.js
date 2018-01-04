@@ -1,17 +1,17 @@
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 const { util, helper } = require('../../common');
 const path = require('path');
 
 function createCube(shader) {
-    shader = shader || qtek.shader.library.get('qtek.standard').clone();
-    const root = new qtek.Node();
+    shader = shader || clay.shader.library.get('clay.standard').clone();
+    const root = new clay.Node();
     root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
 
-    const mesh = new qtek.Mesh({
-        material: new qtek.Material({
+    const mesh = new clay.Mesh({
+        material: new clay.Material({
             shader : shader
         }),
-        geometry : new qtek.geometry.Cube()
+        geometry : new clay.geometry.Cube()
     });
     root.add(mesh);
 
@@ -23,14 +23,14 @@ describe('Integration.AmbientCubeMap.Spec', function () {
         this.timeout(10000);
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
 
-        const cubemap = qtek.util.texture.loadTexture(
+        const cubemap = clay.util.texture.loadTexture(
             path.join(__dirname, 'hdr', 'pisa.hdr'),
             {
                 exposure: 3
             },
             function () {
                 cubemap.flipY = false;
-                const ambientCubemapLight = new qtek.light.AmbientCubemap({
+                const ambientCubemapLight = new clay.light.AmbientCubemap({
                     cubemap: cubemap
                 });
                 ambientCubemapLight.prefilter(renderer);

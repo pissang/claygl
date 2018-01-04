@@ -1,15 +1,15 @@
-const qtek = require('../../../dist/qtek');
+const clay = require('../../../dist/claygl');
 const { util, helper } = require('../../common');
 const path = require('path');
 
 
 function createCube(material) {
-    const root = new qtek.Node();
+    const root = new clay.Node();
     root.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
 
-    const mesh = new qtek.Mesh({
+    const mesh = new clay.Mesh({
         material: material,
-        geometry : new qtek.geometry.Cube()
+        geometry : new clay.geometry.Cube()
     });
     mesh.scale.set(4, 4, 4);
     root.add(mesh);
@@ -20,7 +20,7 @@ function createCube(material) {
 describe('Integration.Material.Spec', function () {
     it('metalness and roughness', function (done) {
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
-        const light = new qtek.light.Point({
+        const light = new clay.light.Point({
             intensity  : 0.8,
             castShadow : false,
             range: 200
@@ -28,11 +28,11 @@ describe('Integration.Material.Spec', function () {
         light.position.set(30, -30, 30);
         light.lookAt(scene.position);
         scene.add(light);
-        scene.add(new qtek.light.Ambient({
+        scene.add(new clay.light.Ambient({
             intensity: 0.2
         }));
 
-        const material = new qtek.StandardMaterial({
+        const material = new clay.StandardMaterial({
             metalness: 0.5,
             roughness: 0.5
         });
@@ -49,7 +49,7 @@ describe('Integration.Material.Spec', function () {
         this.timeout(10000);
 
         const { renderer, scene, camera, canvas } = helper.createQtekScene();
-        const light = new qtek.light.Point({
+        const light = new clay.light.Point({
             intensity : 0.8,
             castShadow: false,
             range: 200
@@ -57,15 +57,15 @@ describe('Integration.Material.Spec', function () {
         light.position.set(30, -30, 30);
         light.lookAt(scene.position);
         scene.add(light);
-        scene.add(new qtek.light.Ambient({
+        scene.add(new clay.light.Ambient({
             intensity: 0.4
         }));
 
-        
+
         const promises = [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'],  ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness']].map(mapInfo => {
-            const tex = new qtek.Texture2D({
-                wrapS: qtek.Texture.REPEAT,
-                wratT: qtek.Texture.REPEAT
+            const tex = new clay.Texture2D({
+                wrapS: clay.Texture.REPEAT,
+                wratT: clay.Texture.REPEAT
             });
             return new Promise((resolve, reject) => {
                 const filePath = path.join(__dirname, 'textures', 'material', 'iron-rusted4-' + mapInfo[1] + '.png');
@@ -81,7 +81,7 @@ describe('Integration.Material.Spec', function () {
         });
 
         Promise.all(promises).then((textures) => {
-            const material = new qtek.StandardMaterial({
+            const material = new clay.StandardMaterial({
                 linear: true,
                 metalness: 0.5,
                 roughness: 0.5,
@@ -90,15 +90,15 @@ describe('Integration.Material.Spec', function () {
             textures.forEach(t => {
                 material[t.define] = t.texture;
             });
-            const mesh = new qtek.Mesh({
-                geometry: new qtek.geometry.Cube(),
+            const mesh = new clay.Mesh({
+                geometry: new clay.geometry.Cube(),
                 material: material
             });
             mesh.scale.set(3, 3, 3);
             // mesh.geometry.generateTangents();
             mesh.rotation.identity().rotateY(30 * Math.PI / 180).rotateX(30 * Math.PI / 180);
-    
-            const root = new qtek.Node();
+
+            const root = new clay.Node();
             root.add(mesh);
             scene.add(root);
             const drawInfo = renderer.render(scene, camera);
