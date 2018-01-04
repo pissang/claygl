@@ -1,5 +1,6 @@
 import Node from './Node';
 import Light from './Light';
+import Camera from './Camera';
 import BoundingBox from './math/BoundingBox';
 import util from './core/util';
 
@@ -69,6 +70,8 @@ var Scene = Node.extend(function () {
          */
         viewBoundingBoxLastFrame: new BoundingBox(),
 
+        _cameraList: [],
+
         // Properties to save the light information in the scene
         // Will be set in the render function
         _lightUniforms: {},
@@ -103,6 +106,12 @@ var Scene = Node.extend(function () {
      * @param {Node} node
      */
     addToScene: function (node) {
+        if (node instanceof Camera) {
+            if (this._cameraList.length > 0) {
+                console.warn('Found multiple camera in one scene. Use the fist one.');
+            }
+            this._cameraList.push(node);
+        }
         if (node.name) {
             this._nodeRepository[node.name] = node;
         }
@@ -113,6 +122,12 @@ var Scene = Node.extend(function () {
      * @param {Node} node
      */
     removeFromScene: function (node) {
+        if (node instanceof Camera) {
+            var idx = this._cameraList.indexOf(node);
+            if (idx >= 0) {
+                this._cameraList.splice(idx, 1);
+            }
+        }
         if (node.name) {
             delete this._nodeRepository[node.name];
         }
@@ -220,6 +235,10 @@ var Scene = Node.extend(function () {
         }
     },
 
+    getMainCamera: function () {
+        return this._cameraList[0];
+    },
+
     // Traverse the scene and add the renderable
     // object to the render list
     _updateRenderList: function (parent, sceneMaterialTransparent) {
@@ -233,7 +252,7 @@ var Scene = Node.extend(function () {
             if (child instanceof Light) {
                 this.lights.push(child);
             }
-            if (child.isRenderable()) {
+            else if (child.isRenderable()) {
                 if (child.material.transparent || sceneMaterialTransparent) {
                     this.transparentList[this._transparentObjectCount++] = child;
                 }

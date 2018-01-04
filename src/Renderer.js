@@ -6,7 +6,6 @@ import glenum from './core/glenum';
 import vendor from './core/vendor';
 import BoundingBox from './math/BoundingBox';
 import Matrix4 from './math/Matrix4';
-import shaderLibrary from './shader/library';
 import Material from './Material';
 import Vector2 from './math/Vector2';
 import ProgramManager from './gpu/ProgramManager';
@@ -365,8 +364,6 @@ var Renderer = Base.extend(function () {
     render: function(scene, camera, notUpdateScene, preZ) {
         var _gl = this.gl;
 
-        this._sceneRendering = scene;
-
         var clearColor = this.clearColor;
 
         if (this.clearBit) {
@@ -399,10 +396,17 @@ var Renderer = Base.extend(function () {
         if (!notUpdateScene) {
             scene.update(false);
         }
+        camera = camera || scene.getMainCamera();
+        if (!camera) {
+            console.error('Can\'t find camera in the scene.');
+            return;
+        }
         // Update if camera not mounted on the scene
         if (!camera.getScene()) {
             camera.update(true);
         }
+
+        this._sceneRendering = scene;
 
         // Reset the scene bounding box;
         scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
