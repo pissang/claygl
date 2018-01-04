@@ -8,15 +8,15 @@
     <title>Basic Cube</title>
 </head>
 <body>
-    <canvas id="main"></canvas>
-
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
     <script>
-        clay.application.create('#main', {
-
-            width: window.innerWidth,
-
-            height: window.innerHeight,
-
+        var app = clay.application.create('#main', {
             init: function (renderer, scene, timeline) {
                 // Create camera
                 var camera = new clay.camera.Perspective();
@@ -39,6 +39,10 @@
                 this._cube.rotation.rotateY(this.frameTime / 1000);
             }
         });
+
+        window.onresize = function () {
+            app.resize()
+        };
     </script>
 </body>
 </html>

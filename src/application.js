@@ -19,17 +19,24 @@ function create(dom, opts) {
     if (!dom) {
         throw new Error('Invalid dom');
     }
-    var rendererOpts = {
-        canvas: dom
-    };
+
+    var isDomCanvas = dom.nodeName.toUpperCase() === 'CANVAS';
+    var rendererOpts = {};
+    if (isDomCanvas) {
+        rendererOpts.canvas = dom;
+    }
     if (opts.devicePixelRatio) {
         rendererOpts.devicePixelRatio = opts.devicePixelRatio;
     }
 
     var gRenderer = new Renderer(rendererOpts);
-    if (opts.width && opts.height) {
-        gRenderer.resize(opts.width, opts.height);
+    var gWidth = opts.width || dom.clientWidth;
+    var gHeight = opts.height || dom.clientHeight;
+
+    if (!isDomCanvas) {
+        dom.appendChild(gRenderer.canvas);
     }
+    gRenderer.resize(gWidth, gHeight);
 
     var gScene = new Scene();
     var gTimeline = new Timeline();
@@ -40,22 +47,24 @@ function create(dom, opts) {
 
     var app = {
         get renderer () { return gRenderer; },
-
         get scene () { return gScene; },
-
         get timeline() { return gTimeline; },
-
         get frameTime() { return gFrameTime; },
-
         get elapsedTime() { return gElapsedTime; },
+
+        resize: function (width, height) {
+            gWidth = width || opts.width || dom.clientWidth;
+            gHeight = height || dom.height || dom.clientHeight;
+            gRenderer.resize(gWidth, gHeight);
+        },
 
         dispose: function () {
             if (opts.dispose) {
                 opts.dispose.call(app);
             }
-
             gTimeline.stop();
             gRenderer.disposeScene(gScene);
+            dom.innerHTML = '';
         }
     };
 
@@ -85,7 +94,7 @@ function createCube(size, mat) {
     if (typeof size === 'number') {
         size = [size, size, size];
     }
-    return new Mesh({
+    var mesh = new Mesh({
         geometry: new CubeGeo({
             width: size[0],
             height: size[1],
@@ -95,6 +104,7 @@ function createCube(size, mat) {
             shader: shaderLibrary.get(mat.shader)
         })
     });
+    return mesh;
 }
 
 
