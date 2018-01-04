@@ -6,7 +6,7 @@ define(function (require) {
     var Scene = require('clay/Scene');
     var PerspectiveCamera = require('clay/camera/Perspective');
     var Mesh = require('clay/Mesh');
-    var Animation = require('clay/animation/Animation');
+    var Timeline = require('clay/animation/Timeline');
     var GLTFLoader = require('clay/loader/GLTF');
     var OrbitControl = require('clay/plugin/OrbitControl');
 
@@ -43,7 +43,7 @@ define(function (require) {
         scene.add(mesh);
     });
 
-    var animation = new Animation();
+    var animation = new Timeline();
     animation.start();
 
     var control = new OrbitControl({

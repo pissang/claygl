@@ -17,7 +17,7 @@
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new clay.animation.Animation();
+            var animation = new clay.animation.Timeline();
             animation.start();
 
             var shadowMapPass = new clay.prePass.ShadowMap();

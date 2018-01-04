@@ -29,8 +29,8 @@ var requestAnimationFrame = window.requestAnimationFrame
  *     })
  *     .start('spline');
  */
-var Animation = Base.extend(function () {
-    return /** @lends clay.animation.Animation# */{
+var Timeline = Base.extend(function () {
+    return /** @lends clay.animation.Timeline# */{
         /**
          * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
          * @type {Object}
@@ -48,7 +48,7 @@ var Animation = Base.extend(function () {
         _pausedTime: 0
     };
 },
-/** @lends clay.animation.Animation.prototype */
+/** @lends clay.animation.Timeline.prototype */
 {
 
     /**
@@ -220,4 +220,4 @@ var Animation = Base.extend(function () {
     }
 });
 
-export default Animation;
+export default Timeline;

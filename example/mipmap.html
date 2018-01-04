@@ -124,7 +124,7 @@
                 root.add(sphere);
             }
 
-            var animation = new clay.animation.Animation();
+            var animation = new clay.animation.Timeline();
             animation.on('frame', function () {
                 renderer.render(scene, camera);
             });

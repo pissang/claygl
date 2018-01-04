@@ -47,7 +47,7 @@
                 light.lookAt(clay.math.Vector3.ZERO);
                 scene.add(light);
 
-                var animation = new clay.animation.Animation();
+                var animation = new clay.animation.Timeline();
                 animation.start();
                 animation.on('frame', function() {
                     control.update();

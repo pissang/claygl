@@ -483,12 +483,12 @@
       return this.getImmediatePose();
     };
 
-    VRDisplay.prototype.requestAnimationFrame = function(callback) {
-      return window.requestAnimationFrame(callback);
+    VRDisplay.prototype.requestTimelineFrame = function(callback) {
+      return window.requestTimelineFrame(callback);
     };
 
-    VRDisplay.prototype.cancelAnimationFrame = function(id) {
-      return window.cancelAnimationFrame(id);
+    VRDisplay.prototype.cancelTimelineFrame = function(id) {
+      return window.cancelTimelineFrame(id);
     };
 
     VRDisplay.prototype.wrapForFullscreen = function(element) {
@@ -4501,7 +4501,7 @@
 
       // Variables for keyboard-based rotation animation.
       this.targetAngle_ = null;
-      this.angleAnimation_ = null;
+      this.angleTimeline_ = null;
 
       // State variables for calculations.
       this.orientation_ = new MathUtil.Quaternion();
@@ -4562,22 +4562,22 @@
      */
     MouseKeyboardVRDisplay.prototype.animateKeyTransitions_ = function(angleName, targetAngle) {
       // If an animation is currently running, cancel it.
-      if (this.angleAnimation_) {
-        cancelAnimationFrame(this.angleAnimation_);
+      if (this.angleTimeline_) {
+        cancelTimelineFrame(this.angleTimeline_);
       }
       var startAngle = this[angleName];
       var startTime = new Date();
       // Set up an interval timer to perform the animation.
-      this.angleAnimation_ = requestAnimationFrame(function animate() {
+      this.angleTimeline_ = requestTimelineFrame(function animate() {
         // Once we're finished the animation, we're done.
         var elapsed = new Date() - startTime;
         if (elapsed >= KEY_ANIMATION_DURATION) {
           this[angleName] = targetAngle;
-          cancelAnimationFrame(this.angleAnimation_);
+          cancelTimelineFrame(this.angleTimeline_);
           return;
         }
-        // loop with requestAnimationFrame
-        this.angleAnimation_ = requestAnimationFrame(animate.bind(this))
+        // loop with requestTimelineFrame
+        this.angleTimeline_ = requestTimelineFrame(animate.bind(this))
         // Linearly interpolate the angle some amount.
         var percent = elapsed / KEY_ANIMATION_DURATION;
         this[angleName] = startAngle + (targetAngle - startAngle) * percent;

@@ -38,7 +38,7 @@
                 sensitivity : 0.4
             });
 
-            var animation = new clay.animation.Animation();
+            var animation = new clay.animation.Timeline();
             animation.start();
             animation.on('frame', function(deltaTime) {
                 control.update(deltaTime);

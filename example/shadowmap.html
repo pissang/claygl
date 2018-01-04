@@ -72,7 +72,7 @@
             var zeroVector = new Vector3();
             var upAxis = new Vector3(0, 1, 0);
 
-            var animation = new clay.animation.Animation();
+            var animation = new clay.animation.Timeline();
             animation.start();
             animation.on('frame', function () {
                 light.rotateAround(zeroVector, upAxis, 0.01);

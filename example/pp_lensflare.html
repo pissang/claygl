@@ -46,7 +46,7 @@
             skybox.material.set('environmentMap', cubeMap);
             skybox.material.define('fragment', 'RGBM_ENCODE');
 
-            var animation = new clay.animation.Animation();
+            var animation = new clay.animation.Timeline();
             animation.start();
 
             var compositor = createCompositor({

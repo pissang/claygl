@@ -6,7 +6,7 @@ define(function (require) {
     var Scene = require('clay/Scene');
     var PerspectiveCamera = require('clay/camera/Perspective');
     var Mesh = require('clay/Mesh');
-    var Animation = require('clay/animation/Animation');
+    var Timeline = require('clay/animation/Timeline');
 
     var renderer = new CanvasRenderer({
         canvas: document.getElementById('main'),
@@ -42,7 +42,7 @@ define(function (require) {
 
     scene.add(mesh);
 
-    var animation = new Animation();
+    var animation = new Timeline();
     animation.start();
 
     animation.on('frame', function (deltaTime) {
