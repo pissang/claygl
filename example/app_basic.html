@@ -17,26 +17,24 @@
     <div id="main"></div>
     <script>
         var app = clay.application.create('#main', {
-            init: function (renderer, scene, timeline) {
+            init: function (app) {
                 // Create camera
-                var camera = new clay.camera.Perspective();
-                camera.position.set(0, 2, 5);
-                camera.lookAt(clay.math.Vector3.ZERO);
-                scene.add(camera);
+                this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
                 // Create cube
-                this._cube = clay.application.createCube();
-                scene.add(this._cube);
+                this._cube = app.createCube(1, {
+                    diffuseMap: 'assets/textures/crate.gif'
+                });
 
                 // Create light
                 var light = new clay.light.Directional();
                 light.position.set(1, 1, 1);
                 light.lookAt(this._cube.position);
-                scene.add(light);
+                app.scene.add(light);
             },
 
-            loop: function (renderer, scene, timeline) {
-                this._cube.rotation.rotateY(this.frameTime / 1000);
+            loop: function (app) {
+                this._cube.rotation.rotateY(app.frameTime / 1000);
             }
         });
 
