@@ -10,7 +10,7 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var animation = new clay.animation.Timeline();
+            var timeline =  new clay.animation.Timeline();
 
             var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
@@ -110,14 +110,14 @@
                 target: camera
             });
 
-            animation.on('frame', function (deltaTime) {
+            timeline.on('frame', function (deltaTime) {
                 control.update(deltaTime);
                 // renderer.render(scene, camera);
                 deferredRenderer.render(renderer, scene, camera);
 
                 stats.update();
             });
-            animation.start();
+            timeline.start();
 
             var stats = new Stats();
             stats.domElement.style.position = 'absolute';

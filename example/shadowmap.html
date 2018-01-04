@@ -72,9 +72,9 @@
             var zeroVector = new Vector3();
             var upAxis = new Vector3(0, 1, 0);
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
-            animation.on('frame', function () {
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
+            timeline.on('frame', function () {
                 light.rotateAround(zeroVector, upAxis, 0.01);
                 light2.rotateAround(zeroVector, upAxis, -0.01);
                 light.lookAt(zeroVector);

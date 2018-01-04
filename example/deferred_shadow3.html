@@ -73,10 +73,10 @@
                 target: camera
             });
 
-            var animation = new clay.animation.Timeline();
+            var timeline =  new clay.animation.Timeline();
 
             var elapsedTime = 0;
-            animation.on('frame', function (deltaTime) {
+            timeline.on('frame', function (deltaTime) {
                 control.update(deltaTime);
 
                 elapsedTime += deltaTime;
@@ -93,7 +93,7 @@
 
                 stats.update();
             });
-            animation.start();
+            timeline.start();
 
             var stats = new Stats();
             stats.domElement.style.position = 'absolute';

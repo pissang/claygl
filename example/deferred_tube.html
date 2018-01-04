@@ -106,13 +106,13 @@
                 target: camera
             });
 
-            var animation = new clay.animation.Timeline();
+            var timeline =  new clay.animation.Timeline();
 
             var debugPass = new clay.compositor.Pass({
                 fragment: clay.Shader.source('clay.compositor.output')
             });
             debugPass.material.undefine('fragment', 'OUTPUT_ALPHA');
-            animation.on('frame', function (deltaTime) {
+            timeline.on('frame', function (deltaTime) {
                 control.update(deltaTime);
                 deferredRenderer.render(renderer, scene, camera);
 
@@ -121,7 +121,7 @@
 
                 stats.update();
             });
-            animation.start();
+            timeline.start();
 
             var stats = new Stats();
             stats.domElement.style.position = 'absolute';

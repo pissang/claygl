@@ -112,9 +112,9 @@
                     var dofCompositeNode = compositor.getNodeByName('dof_composite');
                     var compositeNode = compositor.getNodeByName('composite');
 
-                    var animation = new clay.animation.Timeline();
-                    animation.start();
-                    animation.on('frame', function(deltaTime) {
+                    var timeline =  new clay.animation.Timeline();
+                    timeline.start();
+                    timeline.on('frame', function(deltaTime) {
                         control.update(deltaTime);
 
                         compositor.render(renderer);

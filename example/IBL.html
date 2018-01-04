@@ -136,9 +136,9 @@
                 });
 
 
-                var animation = new clay.animation.Timeline();
-                animation.start();
-                animation.on('frame', function(deltaTime) {
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
+                timeline.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     var viewport = renderer.viewport;
                     compositor.render(renderer);

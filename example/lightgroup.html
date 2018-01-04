@@ -14,8 +14,8 @@
             var Cube = clay.geometry.Cube;
             var meshUtil = clay.util.mesh;
             var shaderLibrary = clay.shader.library;
-            var animation = new clay.animation.Timeline;
-            animation.start();
+            var timeline =  new clay.animation.Timeline;
+            timeline.start();
 
             var renderer = new clay.Renderer({
                 canvas : document.getElementById("main"),
@@ -88,7 +88,7 @@
 
             camera.position.set(0, 0, 10);
 
-            animation.on('frame', function(deltaTime) {
+            timeline.on('frame', function(deltaTime) {
                 var start = new Date().getTime();
                 var drawInfo = renderer.render(scene, camera);
                 var renderTime = new Date().getTime() - start;

@@ -124,11 +124,11 @@
                 root.add(sphere);
             }
 
-            var animation = new clay.animation.Timeline();
-            animation.on('frame', function () {
+            var timeline =  new clay.animation.Timeline();
+            timeline.on('frame', function () {
                 renderer.render(scene, camera);
             });
-            animation.start();
+            timeline.start();
 
         </script>
     </body>

@@ -17,8 +17,8 @@
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
             var shadowMapPass = new clay.prePass.ShadowMap();
 
@@ -86,7 +86,7 @@
             scene.add(light2);
 
             var elapsedTime = 0;
-            animation.on('frame', function(deltaTime){
+            timeline.on('frame', function(deltaTime){
                 shadowMapPass.render(renderer, scene);
                 renderer.render(scene, camera);
                 elapsedTime += deltaTime / 1000;

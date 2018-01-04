@@ -46,15 +46,15 @@
             skybox.material.set('environmentMap', cubeMap);
             skybox.material.define('fragment', 'RGBM_ENCODE');
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
             var compositor = createCompositor({
                 scene: scene,
                 camera: camera
             });
 
-            animation.on('frame', function() {
+            timeline.on('frame', function() {
                 // renderer.render(scene, camera);
                 compositor.render(renderer);
                 control.update();

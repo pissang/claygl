@@ -89,14 +89,14 @@
             scene.add( coneMesh );
             scene.add( cylinderMesh );
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
             var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
-            animation.on('frame', function(dTime) {
+            timeline.on('frame', function(dTime) {
                 renderer.render( scene, camera );
                 control.update(dTime);
                 cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);

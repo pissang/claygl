@@ -18,8 +18,8 @@
             shadowMapPass: shadowMapPass
         });
 
-        var animation = new clay.animation.Timeline();
-        animation.start();
+        var timeline =  new clay.animation.Timeline();
+        timeline.start();
 
         var GLTFLoader = new clay.loader.GLTF({
             includeLight: false
@@ -85,7 +85,7 @@
             scene.add(light3);
 
 
-            animation.on('frame', function(deltaTime) {
+            timeline.on('frame', function(deltaTime) {
                 control.update(deltaTime);
                 // shadowMapPass.render(renderer, scene, camera);
                 // renderer.render(scene, camera);

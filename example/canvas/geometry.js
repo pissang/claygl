@@ -42,10 +42,10 @@ define(function (require) {
 
     scene.add(mesh);
 
-    var animation = new Timeline();
-    animation.start();
+    var timeline =  new Timeline();
+    timeline.start();
 
-    animation.on('frame', function (deltaTime) {
+    timeline.on('frame', function (deltaTime) {
         renderer.render(scene, camera);
 
         stats.update();

@@ -89,15 +89,15 @@
                 target: camera
             });
 
-            var animation = new clay.animation.Timeline();
+            var timeline =  new clay.animation.Timeline();
 
-            animation.on('frame', function (deltaTime) {
+            timeline.on('frame', function (deltaTime) {
                 control.update(deltaTime);
                 deferredRenderer.render(renderer, scene, camera);
 
                 stats.update();
             });
-            animation.start();
+            timeline.start();
 
             var stats = new Stats();
             stats.domElement.style.position = 'absolute';

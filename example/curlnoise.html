@@ -18,8 +18,8 @@
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
             var fxLoader = new clay.loader.FX();
             fxLoader.load('assets/fx/curlnoise.json');
@@ -76,7 +76,7 @@
                     sensitivity: 0.4
                 });
 
-                animation.on('frame', function () {
+                timeline.on('frame', function () {
                     control.update();
                     var currentTime = new Date().getTime();
                     var deltaTime = (currentTime - time) / 1000;

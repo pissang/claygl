@@ -111,10 +111,10 @@
 
                 var frameBuffer = new clay.FrameBuffer();
                 var colorTex = new clay.Texture2D();
-                var animation = new clay.animation.Timeline();
+                var timeline =  new clay.animation.Timeline();
                 var elpasedTime = 0;
-                animation.start();
-                animation.on('frame', function(deltaTime) {
+                timeline.start();
+                timeline.on('frame', function(deltaTime) {
                     elpasedTime += deltaTime;
                     control.update(deltaTime);
 

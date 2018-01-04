@@ -100,9 +100,9 @@
                 });
 
 
-                var animation = new clay.animation.Timeline();
-                animation.start();
-                animation.on('frame', function(deltaTime) {
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
+                timeline.on('frame', function(deltaTime) {
                     control.update(deltaTime);
                     compositor.render(renderer);
                     // renderer.render(scene, camera);

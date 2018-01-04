@@ -64,9 +64,9 @@
 
             var orthCamera = new clay.camera.Orthographic();
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
-            animation.on('frame', function() {
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
+            timeline.on('frame', function() {
                 frameBuffer.bind(renderer);
                 renderer.render(scene, camera);
                 frameBuffer.unbind(renderer);

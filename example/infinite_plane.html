@@ -50,10 +50,10 @@
                 sensitivity: 0.4
             });
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
-            animation.on('frame', function(deltaTime) {
+            timeline.on('frame', function(deltaTime) {
                 control.update(deltaTime);
                 camera.update(true);
                 plane.updateGeometry();

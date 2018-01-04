@@ -48,8 +48,8 @@
 
                 var frameBuffer = new clay.FrameBuffer();
                 var colorTex = new clay.Texture2D();
-                var animation = new clay.animation.Timeline();
-                animation.start();
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
 
                 var camera = new clay.camera.Perspective({
                     aspect : renderer.getViewportAspect(),
@@ -91,7 +91,7 @@
                     scene.getNode('Plane').material.set('glossiness', 0.8);
                     scene.getNode('Plane').material.set('color', [0.4, 0.4, 0.4]);
 
-                    animation.on('frame', function(deltaTime) {
+                    timeline.on('frame', function(deltaTime) {
                         control.update(deltaTime);
 
                         frameBuffer.attach(colorTex);

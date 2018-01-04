@@ -138,10 +138,10 @@
 
                 var frameBuffer = new clay.FrameBuffer();
                 var colorTex = new clay.Texture2D();
-                var animation = new clay.animation.Timeline();
-                animation.start();
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
 
-                animation.on('frame', function(deltaTime) {
+                timeline.on('frame', function(deltaTime) {
                     control.update(deltaTime);
 
                     frameBuffer.attach(colorTex);

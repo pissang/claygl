@@ -96,9 +96,9 @@
                 target: camera
             });
 
-            var animation = new clay.animation.Timeline();
+            var timeline =  new clay.animation.Timeline();
 
-            animation.on('frame', function (deltaTime) {
+            timeline.on('frame', function (deltaTime) {
                 lights.forEach(function (light) {
                     light.rotation.rotateX(0.01);
                 });
@@ -110,7 +110,7 @@
 
                 stats.update();
             });
-            animation.start();
+            timeline.start();
 
             var stats = new Stats();
             stats.domElement.style.position = 'absolute';

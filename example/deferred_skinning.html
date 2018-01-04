@@ -116,13 +116,13 @@
                 intensity : 0.2
             }));
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
             animation.addClip(clip);
 
             var skeletonDebugScene = createSkeletonDebugScene(skeleton, clay);
             skeletonDebugScene.position.x = -10;
-            animation.on('frame', function() {
+            timeline.on('frame', function() {
                 control.update(50);
                 skeleton.update();
                 deferredRenderer.render(renderer, scene, camera);

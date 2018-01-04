@@ -32,9 +32,9 @@
                 var Mesh = clay.Mesh;
                 var Cube = clay.geometry.Cube;
                 var meshUtil = clay.util.mesh;
-                var animation = new clay.animation.Timeline();
+                var timeline =  new clay.animation.Timeline();
 
-                animation.start();
+                timeline.start();
 
                 var main = document.getElementById('main');
                 var viewport = document.getElementById('viewport');
@@ -131,7 +131,7 @@
                         distorter.updateFromVRDisplay(vrDisplay);
                     }
 
-                    animation.on('frame', function(deltaTime) {
+                    timeline.on('frame', function(deltaTime) {
                         var start = new Date().getTime();
 
                         if (vrDisplay) {

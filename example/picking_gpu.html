@@ -45,9 +45,9 @@
                 renderer : renderer
             });
 
-            var animation = new clay.animation.Timeline();
-            animation.start();
-            animation.on('frame', function() {
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
+            timeline.on('frame', function() {
                 picking.update(scene, camera);
                 renderer.render(scene, camera);
             });

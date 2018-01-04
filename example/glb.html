@@ -14,8 +14,8 @@
                     canvas: document.getElementById('main')
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var animation = new clay.animation.Timeline();
-                animation.start();
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
 
                 var cubemap = new clay.TextureCube({
                     type: clay.Texture.HALF_FLOAT,
@@ -85,7 +85,7 @@
                             scene.add(ambientCubemapLight);
                             scene.add(ambientSHLight);
 
-                            animation.on('frame', function(deltaTime) {
+                            timeline.on('frame', function(deltaTime) {
                                 control.update(deltaTime);
                                 compositor.render(renderer);
                             });

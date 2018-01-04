@@ -16,8 +16,8 @@
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
-            var animation = new clay.animation.Timeline();
-            animation.start();
+            var timeline =  new clay.animation.Timeline();
+            timeline.start();
 
             var texture = new clay.TextureCube({
                 flipY: false
@@ -46,7 +46,7 @@
             });
 
             renderer.render(scene, camera);
-            animation.on('frame', function(deltaTime) {
+            timeline.on('frame', function(deltaTime) {
                 control.update(deltaTime);
                 renderer.render(scene, camera);
             });

@@ -12,8 +12,8 @@
         var renderer = new clay.Renderer({
             canvas : document.getElementById("Main")
         });
-        var animation = new clay.animation.Timeline();
-        animation.start();
+        var timeline =  new clay.animation.Timeline();
+        timeline.start();
 
         renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -59,7 +59,7 @@
         light.position.z = 50;
         light.position.y = -40;
         scene.add(light);
-        animation.on('frame', function(deltaTime) {
+        timeline.on('frame', function(deltaTime) {
             particleRenderable.updateParticles(deltaTime);
             renderer.render(scene, camera);
         });

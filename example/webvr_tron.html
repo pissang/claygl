@@ -86,8 +86,8 @@
                 light.lookAt(scene.position);
                 scene.add(light);
 
-                var animation = new clay.animation.Timeline();
-                animation.start();
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
 
                 var control = new clay.plugin.OrbitControl({
                     domElement: renderer.canvas,
@@ -107,12 +107,12 @@
                 var frameBuffer = new clay.FrameBuffer();
                 frameBuffer.attach(sourceTexture);
 
-                animation.on('frame', function(dTime) {
+                timeline.on('frame', function(dTime) {
                     control.update(dTime);
                 });
 
                 function start(vrDisplay) {
-                    animation.on('frame', function(deltaTime) {
+                    timeline.on('frame', function(deltaTime) {
                         var start = new Date().getTime();
 
                         camera.update();

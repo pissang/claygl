@@ -43,14 +43,14 @@ define(function (require) {
         scene.add(mesh);
     });
 
-    var animation = new Timeline();
-    animation.start();
+    var timeline =  new Timeline();
+    timeline.start();
 
     var control = new OrbitControl({
         domElement: renderer.canvas,
         target: camera
     });
-    animation.on('frame', function (deltaTime) {
+    timeline.on('frame', function (deltaTime) {
 
         control.update();
 

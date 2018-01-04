@@ -76,8 +76,8 @@
                 light.lookAt(scene.position);
                 scene.add(light);
 
-                var animation = new clay.animation.Timeline();
-                animation.start();
+                var timeline =  new clay.animation.Timeline();
+                timeline.start();
 
                 var control = new clay.plugin.OrbitControl({
                     domElement: renderer.canvas,
@@ -91,7 +91,7 @@
                     enableLensflare: false
                 });
 
-                animation.on('frame', function(dTime) {
+                timeline.on('frame', function(dTime) {
                     compositor.render(renderer);
                     // renderer.render(scene, camera);
                     control.update(dTime);
