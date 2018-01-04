@@ -1,4 +1,4 @@
-@export qtek.basic.vertex
+@export clay.basic.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -10,7 +10,7 @@ attribute vec3 position : POSITION;
 
 attribute vec3 barycentric;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec2 v_Texcoord;
 varying vec3 v_Barycentric;
@@ -25,7 +25,7 @@ void main()
     vec3 skinnedPosition = position;
 
 #ifdef SKINNING
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -45,7 +45,7 @@ void main()
 
 
 
-@export qtek.basic.fragment
+@export clay.basic.fragment
 
 
 varying vec2 v_Texcoord;
@@ -67,11 +67,11 @@ uniform float lineWidth : 0.0;
 uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
 varying vec3 v_Barycentric;
 
-@import qtek.util.edge_factor
+@import clay.util.edge_factor
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.srgb
+@import clay.util.srgb
 
 void main()
 {

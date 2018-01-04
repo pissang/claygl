@@ -4,8 +4,8 @@ import util  from '../core/util';
 
 /**
  * @constructor
- * @alias qtek.async.Task
- * @mixes qtek.core.mixin.notifier
+ * @alias clay.async.Task
+ * @mixes clay.core.mixin.notifier
  */
 var Task = function() {
     this._fullfilled = false;
@@ -82,7 +82,7 @@ function makeRequestTask(url, responseType) {
  *         {url: 'a.json'},
  *         {url: 'b.bin', responseType: 'arraybuffer'}
  *     ]);
- * @return {qtek.async.Task|qtek.async.Task[]}
+ * @return {clay.async.Task|clay.async.Task[]}
  */
 Task.makeRequestTask = function(url, responseType) {
     if (typeof url === 'string') {
@@ -107,7 +107,7 @@ Task.makeRequestTask = function(url, responseType) {
     }
 };
 /**
- * @return {qtek.async.Task}
+ * @return {clay.async.Task}
  */
 Task.makeTask = function() {
     return new Task();

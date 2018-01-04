@@ -34,10 +34,10 @@ function defaultGetMaterial(renderable) {
 function noop() {}
 
 /**
- * @constructor qtek.Renderer
+ * @constructor clay.Renderer
  */
 var Renderer = Base.extend(function () {
-    return /** @lends qtek.Renderer# */ {
+    return /** @lends clay.Renderer# */ {
 
         /**
          * @type {HTMLCanvasElement}
@@ -177,7 +177,7 @@ var Renderer = Base.extend(function () {
     // Init managers
     this._programMgr = new ProgramManager(this);
 },
-/** @lends qtek.Renderer.prototype. **/
+/** @lends clay.Renderer.prototype. **/
 {
     /**
      * Resize the canvas
@@ -356,8 +356,8 @@ var Renderer = Base.extend(function () {
 
     /**
      * Render the scene in camera to the screen or binded offline framebuffer
-     * @param  {qtek.Scene}       scene
-     * @param  {qtek.Camera}      camera
+     * @param  {clay.Scene}       scene
+     * @param  {clay.Camera}      camera
      * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
      * @param  {boolean}     [preZ]           If use preZ optimization, default false
      * @return {IRenderInfo}
@@ -548,8 +548,8 @@ var Renderer = Base.extend(function () {
 
     /**
      * Render a single renderable list in camera in sequence
-     * @param {qtek.Renderable[]} list List of all renderables.
-     * @param {qtek.Camera} camera
+     * @param {clay.Renderable[]} list List of all renderables.
+     * @param {clay.Camera} camera
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
      * @param {Function} [passConfig.beforeRender] Before render each renderable.
@@ -762,7 +762,7 @@ var Renderer = Base.extend(function () {
     renderPreZ: function (list, scene, camera) {
         var _gl = this.gl;
         var preZPassMaterial = this._prezMaterial || new Material({
-            shader: new Shader(Shader.source('qtek.prez.vertex'), Shader.source('qtek.prez.fragment'))
+            shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
         this._prezMaterial = preZPassMaterial;
 
@@ -789,8 +789,8 @@ var Renderer = Base.extend(function () {
      *
      * Object can be a renderable or a light
      *
-     * @param {qtek.Node} Scene object
-     * @param {qtek.Camera} camera
+     * @param {clay.Node} Scene object
+     * @param {clay.Camera} camera
      * @param {Array.<number>} worldViewMat represented with array
      * @param {Array.<number>} projectionMat represented with array
      */
@@ -849,7 +849,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given scene, including all geometris, textures and shaders in the scene
-     * @param {qtek.Scene} scene
+     * @param {clay.Scene} scene
      */
     disposeScene: function(scene) {
         this.disposeNode(scene, true, true);
@@ -858,7 +858,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given node, including all geometries, textures and shaders attached on it or its descendant
-     * @param {qtek.Node} node
+     * @param {clay.Node} node
      * @param {boolean} [disposeGeometry=false] If dispose the geometries used in the descendant mesh
      * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
      */
@@ -880,7 +880,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given geometry
-     * @param {qtek.Geometry} geometry
+     * @param {clay.Geometry} geometry
      */
     disposeGeometry: function(geometry) {
         geometry.dispose(this);
@@ -888,7 +888,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given texture
-     * @param {qtek.Texture} texture
+     * @param {clay.Texture} texture
      */
     disposeTexture: function(texture) {
         texture.dispose(this);
@@ -896,7 +896,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given frame buffer
-     * @param {qtek.FrameBuffer} frameBuffer
+     * @param {clay.FrameBuffer} frameBuffer
      */
     disposeFrameBuffer: function(frameBuffer) {
         frameBuffer.dispose(this);
@@ -914,8 +914,8 @@ var Renderer = Base.extend(function () {
      *
      * @param  {number}       x
      * @param  {number}       y
-     * @param  {qtek.math.Vector2} [out]
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} [out]
+     * @return {clay.math.Vector2}
      */
     screenToNDC: function(x, y, out) {
         if (!out) {
@@ -937,8 +937,8 @@ var Renderer = Base.extend(function () {
 
 /**
  * Opaque renderables compare function
- * @param  {qtek.Renderable} x
- * @param  {qtek.Renderable} y
+ * @param  {clay.Renderable} x
+ * @param  {clay.Renderable} y
  * @return {boolean}
  * @static
  */
@@ -961,8 +961,8 @@ Renderer.opaqueSortCompare = Renderer.prototype.opaqueSortCompare = function(x, 
 
 /**
  * Transparent renderables compare function
- * @param  {qtek.Renderable} a
- * @param  {qtek.Renderable} b
+ * @param  {clay.Renderable} a
+ * @param  {clay.Renderable} b
  * @return {boolean}
  * @static
  */
@@ -1022,17 +1022,17 @@ var matrices = {
 };
 
 /**
- * @name qtek.Renderer.COLOR_BUFFER_BIT
+ * @name clay.Renderer.COLOR_BUFFER_BIT
  * @type {number}
  */
 Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
 /**
- * @name qtek.Renderer.DEPTH_BUFFER_BIT
+ * @name clay.Renderer.DEPTH_BUFFER_BIT
  * @type {number}
  */
 Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
 /**
- * @name qtek.Renderer.STENCIL_BUFFER_BIT
+ * @name clay.Renderer.STENCIL_BUFFER_BIT
  * @type {number}
  */
 Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;

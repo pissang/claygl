@@ -1,4 +1,4 @@
-@export qtek.skybox.vertex
+@export clay.skybox.vertex
 
 uniform mat4 world : WORLD;
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
@@ -15,7 +15,7 @@ void main()
 
 @end
 
-@export qtek.skybox.fragment
+@export clay.skybox.fragment
 
 uniform mat4 viewInverse : VIEWINVERSE;
 uniform samplerCube environmentMap;
@@ -23,7 +23,7 @@ uniform float lod: 0.0;
 
 varying vec3 v_WorldPosition;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

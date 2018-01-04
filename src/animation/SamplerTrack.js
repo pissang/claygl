@@ -66,17 +66,17 @@ function quatSlerp(out, a, b, t, oa, ob) {
 /**
  * SamplerTrack manages `position`, `rotation`, `scale` tracks in animation of single scene node.
  * @constructor
- * @alias qtek.animation.SamplerTrack
+ * @alias clay.animation.SamplerTrack
  * @param {Object} [opts]
  * @param {string} [opts.name] Track name
- * @param {qtek.Node} [opts.target] Target node's transform will updated automatically
+ * @param {clay.Node} [opts.target] Target node's transform will updated automatically
  */
 var SamplerTrack = function (opts) {
     opts = opts || {};
 
     this.name = opts.name || '';
     /**
-     * @param {qtek.Node}
+     * @param {clay.Node}
      */
     this.target = opts.target || null;
     /**
@@ -210,7 +210,7 @@ SamplerTrack.prototype.getMaxTime = function () {
 /**
  * @param {number} startTime
  * @param {number} endTime
- * @return {qtek.animation.SamplerTrack}
+ * @return {clay.animation.SamplerTrack}
  */
 SamplerTrack.prototype.getSubTrack = function (startTime, endTime) {
 
@@ -298,17 +298,17 @@ SamplerTrack.prototype._findRange = function (time) {
 /**
  * 1D blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  * @param  {number} w
  */
 SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
 /**
  * 2D blending between three clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c3
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c3
  * @param  {number} f
  * @param  {number} g
  */
@@ -316,21 +316,21 @@ SamplerTrack.prototype.blend2D = TransformTrack.prototype.blend2D;
 /**
  * Additive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
 SamplerTrack.prototype.additiveBlend = TransformTrack.prototype.additiveBlend;
 /**
  * Subtractive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
 SamplerTrack.prototype.subtractiveBlend = TransformTrack.prototype.subtractiveBlend;
 
 /**
  * Clone a new SamplerTrack
- * @return {qtek.animation.SamplerTrack}
+ * @return {clay.animation.SamplerTrack}
  */
 SamplerTrack.prototype.clone = function () {
     var track = SamplerTrack.prototype.clone.call(this);

@@ -2,34 +2,34 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 5);
 
-            var scene = new qtek.Scene();
-            var sphereGeo = new qtek.geometry.Sphere({
+            var scene = new clay.Scene();
+            var sphereGeo = new clay.geometry.Sphere({
                 widthSegments: 50,
                 heightSegments: 50
             });
 
-            var GLTFLoader = new qtek.loader.GLTF();
+            var GLTFLoader = new clay.loader.GLTF();
             GLTFLoader.load('assets/models/suzanne/suzanne.gltf');
             var suzanneGeometry;
             GLTFLoader.on('success', function (res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                var envMap = qtek.util.texture.loadTexture(
+                var envMap = clay.util.texture.loadTexture(
                     'assets/textures/hdr/pisa.hdr',
                     {
                         exposure: 2
@@ -37,22 +37,22 @@
                     function () {
                         envMap.flipY = false;
 
-                        var coeff = qtek.util.sh.projectEnvironmentMap(renderer, envMap);
-                        var light = new qtek.light.AmbientSH({
+                        var coeff = clay.util.sh.projectEnvironmentMap(renderer, envMap);
+                        var light = new clay.light.AmbientSH({
                             coefficients: coeff
                         });
                         console.log(coeff);
                         scene.add(light);
 
-                        var material = new qtek.Material({
-                            shader: qtek.shader.library.get('qtek.standard')
+                        var material = new clay.Material({
+                            shader: clay.shader.library.get('clay.standard')
                         });
-                        var sphere = new qtek.Mesh({
+                        var sphere = new clay.Mesh({
                             material: material,
                             geometry: sphereGeo
                         });
 
-                        var monkey = new qtek.Mesh({
+                        var monkey = new clay.Mesh({
                             geometry: suzanneGeometry,
                             material: material
                         });
@@ -62,7 +62,7 @@
                         scene.add(sphere);
                         scene.add(monkey);
 
-                        var skydome = new qtek.plugin.Skydome({
+                        var skydome = new clay.plugin.Skydome({
                             scene: scene,
                             environmentMap: envMap
                         });
@@ -70,12 +70,12 @@
                 );
             });
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function(deltaTime) {
                 control.update(deltaTime);

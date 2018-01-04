@@ -3,15 +3,15 @@ import glenum from './core/glenum';
 import Texture2D from './Texture2D';
 
 /**
- * @constructor qtek.Mesh
- * @extends qtek.Renderable
+ * @constructor clay.Mesh
+ * @extends clay.Renderable
  */
 var Mesh = Renderable.extend(
-/** @lends qtek.Mesh# */
+/** @lends clay.Mesh# */
 {
     /**
      * Used when it is a skinned mesh
-     * @type {qtek.Skeleton}
+     * @type {clay.Skeleton}
      */
     skeleton: null,
     /**

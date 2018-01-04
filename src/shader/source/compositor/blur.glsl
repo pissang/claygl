@@ -1,4 +1,4 @@
-@export qtek.compositor.kernel.gaussian_9
+@export clay.compositor.kernel.gaussian_9
 // http://dev.theomader.com/gaussian-kernel-calculator/
 // array constructor supported in GLSL ES 3.00 only
 float gaussianKernel[9];
@@ -13,7 +13,7 @@ gaussianKernel[7] = 0.09;
 gaussianKernel[8] = 0.07;
 @end
 
-@export qtek.compositor.kernel.gaussian_13
+@export clay.compositor.kernel.gaussian_13
 
 float gaussianKernel[13];
 
@@ -34,7 +34,7 @@ gaussianKernel[12] = 0.02;
 @end
 
 
-@export qtek.compositor.gaussian_blur
+@export clay.compositor.gaussian_blur
 
 #define SHADER_NAME gaussian_blur
 
@@ -46,12 +46,12 @@ uniform vec2 textureSize : [512.0, 512.0];
 // 0.0 is horizontal, 1.0 is vertical
 uniform float blurDir : 0.0;
 
-@import qtek.util.rgbm
-@import qtek.util.clamp_sample
+@import clay.util.rgbm
+@import clay.util.clamp_sample
 
 void main (void)
 {
-    @import qtek.compositor.kernel.gaussian_9
+    @import clay.compositor.kernel.gaussian_9
 
     vec2 off = blurSize / textureSize;
     off *= vec2(1.0 - blurDir, blurDir);

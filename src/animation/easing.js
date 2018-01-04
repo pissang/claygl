@@ -1,11 +1,11 @@
 // 缓动函数来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
 
 /**
- * @namespace qtek.animation.easing
+ * @namespace clay.animation.easing
  */
 var easing = {
     /**
-     * @alias qtek.animation.easing.linear
+     * @alias clay.animation.easing.linear
      * @param {number} k
      * @return {number}
      */
@@ -13,7 +13,7 @@ var easing = {
         return k;
     },
     /**
-     * @alias qtek.animation.easing.quadraticIn
+     * @alias clay.animation.easing.quadraticIn
      * @param {number} k
      * @return {number}
      */
@@ -21,7 +21,7 @@ var easing = {
         return k * k;
     },
     /**
-     * @alias qtek.animation.easing.quadraticOut
+     * @alias clay.animation.easing.quadraticOut
      * @param {number} k
      * @return {number}
      */
@@ -29,7 +29,7 @@ var easing = {
         return k * (2 - k);
     },
     /**
-     * @alias qtek.animation.easing.quadraticInOut
+     * @alias clay.animation.easing.quadraticInOut
      * @param {number} k
      * @return {number}
      */
@@ -40,7 +40,7 @@ var easing = {
         return - 0.5 * (--k * (k - 2) - 1);
     },
     /**
-     * @alias qtek.animation.easing.cubicIn
+     * @alias clay.animation.easing.cubicIn
      * @param {number} k
      * @return {number}
      */
@@ -48,7 +48,7 @@ var easing = {
         return k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.cubicOut
+     * @alias clay.animation.easing.cubicOut
      * @param {number} k
      * @return {number}
      */
@@ -56,7 +56,7 @@ var easing = {
         return --k * k * k + 1;
     },
     /**
-     * @alias qtek.animation.easing.cubicInOut
+     * @alias clay.animation.easing.cubicInOut
      * @param {number} k
      * @return {number}
      */
@@ -67,7 +67,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * k + 2);
     },
     /**
-     * @alias qtek.animation.easing.quarticIn
+     * @alias clay.animation.easing.quarticIn
      * @param {number} k
      * @return {number}
      */
@@ -75,7 +75,7 @@ var easing = {
         return k * k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.quarticOut
+     * @alias clay.animation.easing.quarticOut
      * @param {number} k
      * @return {number}
      */
@@ -83,7 +83,7 @@ var easing = {
         return 1 - (--k * k * k * k);
     },
     /**
-     * @alias qtek.animation.easing.quarticInOut
+     * @alias clay.animation.easing.quarticInOut
      * @param {number} k
      * @return {number}
      */
@@ -94,7 +94,7 @@ var easing = {
         return - 0.5 * ((k -= 2) * k * k * k - 2);
     },
     /**
-     * @alias qtek.animation.easing.quinticIn
+     * @alias clay.animation.easing.quinticIn
      * @param {number} k
      * @return {number}
      */
@@ -102,7 +102,7 @@ var easing = {
         return k * k * k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.quinticOut
+     * @alias clay.animation.easing.quinticOut
      * @param {number} k
      * @return {number}
      */
@@ -110,7 +110,7 @@ var easing = {
         return --k * k * k * k * k + 1;
     },
     /**
-     * @alias qtek.animation.easing.quinticInOut
+     * @alias clay.animation.easing.quinticInOut
      * @param {number} k
      * @return {number}
      */
@@ -121,7 +121,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * k * k * k + 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalIn
+     * @alias clay.animation.easing.sinusoidalIn
      * @param {number} k
      * @return {number}
      */
@@ -129,7 +129,7 @@ var easing = {
         return 1 - Math.cos(k * Math.PI / 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalOut
+     * @alias clay.animation.easing.sinusoidalOut
      * @param {number} k
      * @return {number}
      */
@@ -137,7 +137,7 @@ var easing = {
         return Math.sin(k * Math.PI / 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalInOut
+     * @alias clay.animation.easing.sinusoidalInOut
      * @param {number} k
      * @return {number}
      */
@@ -145,7 +145,7 @@ var easing = {
         return 0.5 * (1 - Math.cos(Math.PI * k));
     },
     /**
-     * @alias qtek.animation.easing.exponentialIn
+     * @alias clay.animation.easing.exponentialIn
      * @param {number} k
      * @return {number}
      */
@@ -153,7 +153,7 @@ var easing = {
         return k === 0 ? 0 : Math.pow(1024, k - 1);
     },
     /**
-     * @alias qtek.animation.easing.exponentialOut
+     * @alias clay.animation.easing.exponentialOut
      * @param {number} k
      * @return {number}
      */
@@ -161,7 +161,7 @@ var easing = {
         return k === 1 ? 1 : 1 - Math.pow(2, - 10 * k);
     },
     /**
-     * @alias qtek.animation.easing.exponentialInOut
+     * @alias clay.animation.easing.exponentialInOut
      * @param {number} k
      * @return {number}
      */
@@ -178,7 +178,7 @@ var easing = {
         return 0.5 * (- Math.pow(2, - 10 * (k - 1)) + 2);
     },
     /**
-     * @alias qtek.animation.easing.circularIn
+     * @alias clay.animation.easing.circularIn
      * @param {number} k
      * @return {number}
      */
@@ -186,7 +186,7 @@ var easing = {
         return 1 - Math.sqrt(1 - k * k);
     },
     /**
-     * @alias qtek.animation.easing.circularOut
+     * @alias clay.animation.easing.circularOut
      * @param {number} k
      * @return {number}
      */
@@ -194,7 +194,7 @@ var easing = {
         return Math.sqrt(1 - (--k * k));
     },
     /**
-     * @alias qtek.animation.easing.circularInOut
+     * @alias clay.animation.easing.circularInOut
      * @param {number} k
      * @return {number}
      */
@@ -205,7 +205,7 @@ var easing = {
         return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
     },
     /**
-     * @alias qtek.animation.easing.elasticIn
+     * @alias clay.animation.easing.elasticIn
      * @param {number} k
      * @return {number}
      */
@@ -226,7 +226,7 @@ var easing = {
                     Math.sin((k - s) * (2 * Math.PI) / p));
     },
     /**
-     * @alias qtek.animation.easing.elasticOut
+     * @alias clay.animation.easing.elasticOut
      * @param {number} k
      * @return {number}
      */
@@ -248,7 +248,7 @@ var easing = {
                 Math.sin((k - s) * (2 * Math.PI) / p) + 1);
     },
     /**
-     * @alias qtek.animation.easing.elasticInOut
+     * @alias clay.animation.easing.elasticInOut
      * @param {number} k
      * @return {number}
      */
@@ -275,7 +275,7 @@ var easing = {
 
     },
     /**
-     * @alias qtek.animation.easing.backIn
+     * @alias clay.animation.easing.backIn
      * @param {number} k
      * @return {number}
      */
@@ -284,7 +284,7 @@ var easing = {
         return k * k * ((s + 1) * k - s);
     },
     /**
-     * @alias qtek.animation.easing.backOut
+     * @alias clay.animation.easing.backOut
      * @param {number} k
      * @return {number}
      */
@@ -293,7 +293,7 @@ var easing = {
         return --k * k * ((s + 1) * k + s) + 1;
     },
     /**
-     * @alias qtek.animation.easing.backInOut
+     * @alias clay.animation.easing.backInOut
      * @param {number} k
      * @return {number}
      */
@@ -305,7 +305,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
     },
     /**
-     * @alias qtek.animation.easing.bounceIn
+     * @alias clay.animation.easing.bounceIn
      * @param {number} k
      * @return {number}
      */
@@ -313,7 +313,7 @@ var easing = {
         return 1 - easing.bounceOut(1 - k);
     },
     /**
-     * @alias qtek.animation.easing.bounceOut
+     * @alias clay.animation.easing.bounceOut
      * @param {number} k
      * @return {number}
      */
@@ -330,7 +330,7 @@ var easing = {
         }
     },
     /**
-     * @alias qtek.animation.easing.bounceInOut
+     * @alias clay.animation.easing.bounceInOut
      * @param {number} k
      * @return {number}
      */

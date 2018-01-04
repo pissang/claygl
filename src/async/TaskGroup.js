@@ -3,8 +3,8 @@ import Task from './Task';
 
 /**
  * @constructor
- * @alias qtek.async.TaskGroup
- * @extends qtek.async.Task
+ * @alias clay.async.TaskGroup
+ * @extends clay.async.Task
  */
 var TaskGroup = function () {
 
@@ -24,18 +24,18 @@ TaskGroup.prototype = new Ctor();
 TaskGroup.prototype.constructor = TaskGroup;
 
 /**
- * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link qtek.Texture2D}, {@link qtek.TextureCube}, {@link qtek.loader.GLTF}.
- * @param  {Array.<qtek.async.Task>} tasks
+ * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link clay.Texture2D}, {@link clay.TextureCube}, {@link clay.loader.GLTF}.
+ * @param  {Array.<clay.async.Task>} tasks
  * @chainable
  * @example
  *     // Load texture list
  *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
  *     var textures = list.map(function (src) {
- *         var texture = new qtek.Texture2D();
+ *         var texture = new clay.Texture2D();
  *         texture.load(src);
  *         return texture;
  *     });
- *     var taskGroup = new qtek.async.TaskGroup();
+ *     var taskGroup = new clay.async.TaskGroup();
  *     taskGroup.all(textures).success(function () {
  *         // Do some thing after all textures loaded
  *     });
@@ -88,8 +88,8 @@ TaskGroup.prototype.all = function (tasks) {
 };
 /**
  * Wait for all given tasks finished, either successed or failed
- * @param  {Array.<qtek.async.Task>} tasks
- * @return {qtek.async.TaskGroup}
+ * @param  {Array.<clay.async.Task>} tasks
+ * @return {clay.async.TaskGroup}
  */
 TaskGroup.prototype.allSettled = function (tasks) {
     var count = 0;

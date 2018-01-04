@@ -3,8 +3,8 @@
  */
 import Geometry from './Geometry';
 /**
- * @constructor qtek.StaticGeometry
- * @extends qtek.Geometry
+ * @constructor clay.StaticGeometry
+ * @extends clay.Geometry
  */
 var StaticGeometry = Geometry.extend({
     dynamic: false

@@ -1,8 +1,8 @@
 import Light from '../Light';
 
 /**
- * @constructor qtek.light.Ambient
- * @extends qtek.Light
+ * @constructor clay.light.Ambient
+ * @extends clay.Light
  */
 var AmbientLight = Light.extend({
 
@@ -25,8 +25,8 @@ var AmbientLight = Light.extend({
     /**
      * @method
      * @name clone
-     * @return {qtek.light.Ambient}
-     * @memberOf qtek.light.Ambient.prototype
+     * @return {clay.light.Ambient}
+     * @memberOf clay.light.Ambient.prototype
      */
 });
 

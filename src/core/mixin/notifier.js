@@ -4,7 +4,7 @@ function Handler(action, context) {
 }
 /**
  * @mixin
- * @alias qtek.core.mixin.notifier
+ * @alias clay.core.mixin.notifier
  */
 var notifier = {
     /**

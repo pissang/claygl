@@ -2,18 +2,18 @@ import Base from '../core/Base';
 import GraphNode from './Node';
 
 /**
- * @constructor qtek.compositor.Graph
- * @extends qtek.core.Base
+ * @constructor clay.compositor.Graph
+ * @extends clay.core.Base
  */
 var Graph = Base.extend(function () {
-    return /** @lends qtek.compositor.Graph# */ {
+    return /** @lends clay.compositor.Graph# */ {
         /**
-         * @type {Array.<qtek.compositor.Node>}
+         * @type {Array.<clay.compositor.Node>}
          */
         nodes: []
     };
 },
-/** @lends qtek.compositor.Graph.prototype */
+/** @lends clay.compositor.Graph.prototype */
 {
 
     /**
@@ -23,7 +23,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param {qtek.compositor.Node} node
+     * @param {clay.compositor.Node} node
      */
     addNode: function (node) {
 
@@ -36,7 +36,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param  {qtek.compositor.Node|string} node
+     * @param  {clay.compositor.Node|string} node
      */
     removeNode: function (node) {
         if (typeof node === 'string') {
@@ -50,7 +50,7 @@ var Graph = Base.extend(function () {
     },
     /**
      * @param {string} name
-     * @return {qtek.compositor.Node}
+     * @return {clay.compositor.Node}
      */
     getNodeByName: function (name) {
         for (var i = 0; i < this.nodes.length; i++) {

@@ -1,6 +1,6 @@
 // Sousa_Graphics_Gems_CryENGINE3, Siggraph 2013
 // The Skylanders SWAP Force Depth-of-Field Shader in GPU Pro 4
-@export qtek.compositor.dof.coc
+@export clay.compositor.dof.coc
 
 uniform sampler2D depth;
 
@@ -17,7 +17,7 @@ uniform float fstop: 2.8;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.encode_float
+@import clay.util.encode_float
 
 void main()
 {
@@ -60,15 +60,15 @@ void main()
 @end
 
 // Premultiply with coc to avoid bleeding in upsampling
-@export qtek.compositor.dof.premultiply
+@export clay.compositor.dof.premultiply
 
 uniform sampler2D texture;
 uniform sampler2D coc;
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.decode_float
+@import clay.util.decode_float
 
 void main() {
     float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);
@@ -80,12 +80,12 @@ void main() {
 
 
 // Get min coc tile
-@export qtek.compositor.dof.min_coc
+@export clay.compositor.dof.min_coc
 uniform sampler2D coc;
 varying vec2 v_Texcoord;
 uniform vec2 textureSize : [512.0, 512.0];
 
-@import qtek.util.float
+@import clay.util.float
 
 void main()
 {
@@ -103,12 +103,12 @@ void main()
 
 
 // Get max coc tile
-@export qtek.compositor.dof.max_coc
+@export clay.compositor.dof.max_coc
 uniform sampler2D coc;
 varying vec2 v_Texcoord;
 uniform vec2 textureSize : [512.0, 512.0];
 
-@import qtek.util.float
+@import clay.util.float
 
 void main()
 {
@@ -128,7 +128,7 @@ void main()
 
 
 
-@export qtek.compositor.dof.coc_upsample
+@export clay.compositor.dof.coc_upsample
 
 #define HIGH_QUALITY
 
@@ -139,7 +139,7 @@ uniform float sampleScale: 0.5;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.float
+@import clay.util.float
 
 void main()
 {
@@ -180,7 +180,7 @@ void main()
 
 
 
-@export qtek.compositor.dof.upsample
+@export clay.compositor.dof.upsample
 
 #define HIGH_QUALITY
 
@@ -193,9 +193,9 @@ uniform float sampleScale: 0.5;
 varying vec2 v_Texcoord;
 
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.decode_float
+@import clay.util.decode_float
 
 float tap(vec2 uv, inout vec4 color, float baseWeight) {
     float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;
@@ -243,7 +243,7 @@ void main()
 
 
 
-@export qtek.compositor.dof.downsample
+@export clay.compositor.dof.downsample
 
 uniform sampler2D texture;
 uniform sampler2D coc;
@@ -251,9 +251,9 @@ uniform vec2 textureSize : [512, 512];
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.decode_float
+@import clay.util.decode_float
 
 float tap(vec2 uv, inout vec4 color) {
     float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;
@@ -279,9 +279,9 @@ void main()
 
 
 
-@export qtek.compositor.dof.hexagonal_blur_frag
+@export clay.compositor.dof.hexagonal_blur_frag
 
-@import qtek.util.float
+@import clay.util.float
 
 
 vec4 doBlur(sampler2D targetTexture, vec2 offset) {
@@ -323,7 +323,7 @@ vec4 doBlur(sampler2D targetTexture, vec2 offset) {
 @end
 
 
-@export qtek.compositor.dof.hexagonal_blur_1
+@export clay.compositor.dof.hexagonal_blur_1
 
 #define KERNEL_SIZE 5
 
@@ -335,9 +335,9 @@ uniform float blurSize : 1.0;
 
 uniform vec2 textureSize : [512.0, 512.0];
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.compositor.dof.hexagonal_blur_frag
+@import clay.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -356,7 +356,7 @@ void main()
 
 @end
 
-@export qtek.compositor.dof.hexagonal_blur_2
+@export clay.compositor.dof.hexagonal_blur_2
 
 #define KERNEL_SIZE 5
 
@@ -368,9 +368,9 @@ uniform float blurSize : 1.0;
 
 uniform vec2 textureSize : [512.0, 512.0];
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.compositor.dof.hexagonal_blur_frag
+@import clay.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -389,7 +389,7 @@ void main()
 }
 @end
 
-@export qtek.compositor.dof.hexagonal_blur_3
+@export clay.compositor.dof.hexagonal_blur_3
 
 #define KERNEL_SIZE 5
 
@@ -403,9 +403,9 @@ uniform float blurSize : 1.0;
 
 uniform vec2 textureSize : [512.0, 512.0];
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.compositor.dof.hexagonal_blur_frag
+@import clay.compositor.dof.hexagonal_blur_frag
 
 void main()
 {
@@ -441,7 +441,7 @@ void main()
 
 @end
 
-@export qtek.compositor.dof.composite
+@export clay.compositor.dof.composite
 
 #define DEBUG 0
 
@@ -452,8 +452,8 @@ uniform sampler2D coc;
 uniform sampler2D nearcoc;
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
-@import qtek.util.float
+@import clay.util.rgbm
+@import clay.util.float
 
 void main()
 {

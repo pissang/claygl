@@ -8,9 +8,9 @@ var clipSortFunc = function (a, b) {
 };
 
 /**
- * @typedef {Object} qtek.animation.Blend1DClip.IClipInput
+ * @typedef {Object} clay.animation.Blend1DClip.IClipInput
  * @property {number} position
- * @property {qtek.animation.Clip} clip
+ * @property {clay.animation.Clip} clip
  * @property {number} offset
  */
 
@@ -18,8 +18,8 @@ var clipSortFunc = function (a, b) {
  * 1d blending node in animation blend tree.
  * output clip must have blend1D and copy method
  * @constructor
- * @alias qtek.animation.Blend1DClip
- * @extends qtek.animation.Clip
+ * @alias clay.animation.Blend1DClip
+ * @extends clay.animation.Clip
  *
  * @param {Object} [opts]
  * @param {string} [opts.name]
@@ -35,7 +35,7 @@ var clipSortFunc = function (a, b) {
  * @param {Function} [opts.onrestart]
  * @param {object[]} [opts.inputs]
  * @param {number} [opts.position]
- * @param {qtek.animation.Clip} [opts.output]
+ * @param {clay.animation.Clip} [opts.output]
  */
 var Blend1DClip = function (opts) {
 
@@ -44,11 +44,11 @@ var Blend1DClip = function (opts) {
     Clip.call(this, opts);
     /**
      * Output clip must have blend1D and copy method
-     * @type {qtek.animation.Clip}
+     * @type {clay.animation.Clip}
      */
     this.output = opts.output || null;
     /**
-     * @type {qtek.animation.Blend1DClip.IClipInput[]}
+     * @type {clay.animation.Blend1DClip.IClipInput[]}
      */
     this.inputs = opts.inputs || [];
     /**
@@ -67,9 +67,9 @@ Blend1DClip.prototype.constructor = Blend1DClip;
 
 /**
  * @param {number} position
- * @param {qtek.animation.Clip} inputClip
+ * @param {clay.animation.Clip} inputClip
  * @param {number} [offset]
- * @return {qtek.animation.Blend1DClip.IClipInput}
+ * @return {clay.animation.Blend1DClip.IClipInput}
  */
 Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
@@ -151,7 +151,7 @@ Blend1DClip.prototype.setTime = function (time) {
 /**
  * Clone a new Blend1D clip
  * @param {boolean} cloneInputs True if clone the input clips
- * @return {qtek.animation.Blend1DClip}
+ * @return {clay.animation.Blend1DClip}
  */
 Blend1DClip.prototype.clone = function (cloneInputs) {
     var clip = Clip.prototype.clone.call(this);

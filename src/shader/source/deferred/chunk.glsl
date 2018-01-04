@@ -1,4 +1,4 @@
-@export qtek.deferred.chunk.light_head
+@export clay.deferred.chunk.light_head
 
 uniform sampler2D gBufferTexture1;
 uniform sampler2D gBufferTexture2;
@@ -14,12 +14,12 @@ uniform mat4 viewProjectionInv;
 
 
 #ifdef DEPTH_ENCODED
-@import qtek.util.decode_float
+@import clay.util.decode_float
 #endif
 
 @end
 
-@export qtek.deferred.chunk.gbuffer_read
+@export clay.deferred.chunk.gbuffer_read
     // Extract
     // - N, z, position
     // - albedo, metalness, specularColor, diffuseColor
@@ -62,7 +62,7 @@ uniform mat4 viewProjectionInv;
     vec3 specularColor = mix(vec3(0.04), albedo, metalness);
 @end
 
-@export qtek.deferred.chunk.light_equation
+@export clay.deferred.chunk.light_equation
 
 float D_Phong(in float g, in float ndh) {
     // from black ops 2

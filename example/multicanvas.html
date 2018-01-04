@@ -1,38 +1,38 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="600" height="640" id="Renderer1" style="float:left"></canvas>
         <canvas width="600" height="640" id="Renderer2" style="float:left"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
-            var Material = qtek.Material;
-            var Mesh = qtek.Mesh;
-            var Cube = qtek.geometry.Cube;
-            var meshUtil = qtek.util.mesh;
-            var shaderLibrary = qtek.shader.library;
+            var Shader = clay.Shader;
+            var Material = clay.Material;
+            var Mesh = clay.Mesh;
+            var Cube = clay.geometry.Cube;
+            var meshUtil = clay.util.mesh;
+            var shaderLibrary = clay.shader.library;
 
-            var renderer1 = new qtek.Renderer({
+            var renderer1 = new clay.Renderer({
                 canvas: document.getElementById( "Renderer1")
             });
-            var renderer2 = new qtek.Renderer({
+            var renderer2 = new clay.Renderer({
                 canvas: document.getElementById( "Renderer2")
             });
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect: renderer1.getViewportAspect(),
                 far: 500
             });
 
             var cube = new Cube();
-            var shader = shaderLibrary.get('qtek.lambert');
+            var shader = shaderLibrary.get('clay.lambert');
 
             var material = new Material({
                 shader: shader
             });
-            var texture = new qtek.Texture2D;
+            var texture = new clay.Texture2D;
             texture.image = new Image;
             texture.image.onload = function(){
                 texture.dirty();
@@ -52,7 +52,7 @@
 
             scene.add( mesh );
 
-            var light = new qtek.light.Directional({
+            var light = new clay.light.Directional({
                 color: [1.5, 1.5, 1.5]
             })
             light.position.set(50, 50, 50);

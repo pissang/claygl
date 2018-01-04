@@ -1,40 +1,40 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px">
         <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
-            var Material = qtek.Material;
-            var Mesh = qtek.Mesh;
-            var Cube = qtek.geometry.Cube;
-            var meshUtil = qtek.util.mesh;
-            var shaderLibrary = qtek.shader.library;
+            var Shader = clay.Shader;
+            var Material = clay.Material;
+            var Mesh = clay.Mesh;
+            var Cube = clay.geometry.Cube;
+            var meshUtil = clay.util.mesh;
+            var shaderLibrary = clay.shader.library;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
-            var shadowMapPass = new qtek.prePass.ShadowMap();
+            var shadowMapPass = new clay.prePass.ShadowMap();
 
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
 
             var cube = new Cube();
-            var shader = shaderLibrary.get('qtek.lambert');
+            var shader = shaderLibrary.get('clay.lambert');
             var material = new Material({
                 shader: shader
             });
 
-            var root = new qtek.Node();
+            var root = new clay.Node();
             for(var i = 0; i < 2; i++){
                 for(var j = 0; j < 2; j++){
                     for(var k = 0; k < 2; k++){
@@ -50,22 +50,22 @@
             }
             scene.add(root);
 
-            var bigCube = new qtek.Mesh({
-                geometry: new qtek.geometry.Cube({
+            var bigCube = new clay.Mesh({
+                geometry: new clay.geometry.Cube({
                     inside: true
                 }),
-                material: new qtek.Material({
-                    shader: qtek.shader.library.get("qtek.lambert")
+                material: new clay.Material({
+                    shader: clay.shader.library.get("clay.lambert")
                 }),
                 culling: false,
-                scale: new qtek.math.Vector3(10, 10, 10)
+                scale: new clay.math.Vector3(10, 10, 10)
             });
             root.add(bigCube);
 
             camera.position.set(0, 2, 10);
-            camera.lookAt(new qtek.math.Vector3(0, 0, 0));
+            camera.lookAt(new clay.math.Vector3(0, 0, 0));
 
-            var light = new qtek.light.Point({
+            var light = new clay.light.Point({
                 color: [1.5, 1.5, 1.5],
                 shadowResolution: 512,
                 intensity: 0.5,
@@ -75,7 +75,7 @@
             light.position.set(0.2, 0.2, 0.2);
             scene.add(light);
 
-            var light2 = new qtek.light.Point({
+            var light2 = new clay.light.Point({
                 color: [1.5, 1.5, 1.5],
                 shadowResolution: 512,
                 range: 40,

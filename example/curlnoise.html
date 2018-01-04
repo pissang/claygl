@@ -7,21 +7,21 @@
 <body style="margin:0px;">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['../dist/qtek'], function(qtek){
+        require(['../dist/claygl'], function(clay){
 
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
             var SIZE = 1024;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById("main"),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
-            var fxLoader = new qtek.loader.FX();
+            var fxLoader = new clay.loader.FX();
             fxLoader.load('assets/fx/curlnoise.json');
             fxLoader.on('success', function(compositor) {
                 var time = new Date().getTime();
@@ -31,7 +31,7 @@
                 var particleNode = compositor.getNodeByName('particle');
 
                 // Scene
-                var geo = new qtek.StaticGeometry();
+                var geo = new clay.StaticGeometry();
                 var offset = 0;
                 geo.attributes.position.init(SIZE * SIZE);
                 for (var i = 0; i < SIZE; i++) {
@@ -39,8 +39,8 @@
                         geo.attributes.position.set(offset++, [i / SIZE, j / SIZE, 0]);
                     }
                 }
-                var mat = new qtek.Material({
-                    shader: new qtek.Shader({
+                var mat = new clay.Material({
+                    shader: new clay.Shader({
                         vertex: Shader.source('curlnoise.vertex'),
                         fragment: Shader.source('curlnoise.fragment')
                     }),
@@ -51,26 +51,26 @@
                         _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
                     }
                 });
-                var particleSystem = new qtek.Mesh({
+                var particleSystem = new clay.Mesh({
                     geometry: geo,
                     material: mat,
-                    mode: qtek.Mesh.POINTS
+                    mode: clay.Mesh.POINTS
                 });
-                var scene = new qtek.Scene();
+                var scene = new clay.Scene();
                 scene.add(particleSystem);
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.z = 0.3;
                 camera.position.y = 0.3;
                 camera.lookAt(scene.position);
 
-                var spiritTexture = new qtek.Texture2D();
+                var spiritTexture = new clay.Texture2D();
                 spiritTexture.image = generateSprite();
                 mat.set("spiritTexture", spiritTexture);
                 mat.set("color", [0.0, 0.0, 0.0]);
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas,
                     sensitivity: 0.4

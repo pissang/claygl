@@ -1,16 +1,16 @@
-# QTEK
+# ClayGL
 
-[![NPM Version](https://img.shields.io/npm/v/qtek.svg)](https://github.com/pissang/qtek) [![Circle CI](https://circleci.com/gh/pissang/qtek.svg?style=shield)](https://circleci.com/gh/pissang/qtek)
+[![NPM Version](https://img.shields.io/npm/v/qtek.svg)](https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/qtek.svg?style=shield)](https://circleci.com/gh/pissang/qtek)
 
-QTEK is a WebGL graphic library.
+ClayGL is a WebGL graphic library.
 
-### [Download](https://github.com/pissang/qtek/releases)
+#### [Download](https://github.com/pissang/claygl/releases)
 
-### [API](http://pissang.github.io/qtek/doc/api)
+#### [API](http://pissang.github.io/claygl/doc/api)
 
-### [Playground](https://github.com/pissang/qtek-playground)
+#### [Example](https://github.com/pissang/claygl-example)
 
-### Feature Projects
+### Projects
 
 [ECharts GL](https://github.com/ecomfe/echarts-gl)
 
@@ -18,10 +18,10 @@ QTEK is a WebGL graphic library.
 <img src="./screenshot/echarts-gl.jpg" width="500" />
 </a>
 
-[QTEK Model Viewer](https://github.com/pissang/qtek-model-viewer)
+[Clay Viewer](https://github.com/pissang/clay-viewer)
 
-<a href="https://github.com/pissang/qtek-model-viewer" target="_blank">
-<img src="./screenshot/qtek-model-viewer.jpg" width="500" />
+<a href="https://github.com/pissang/clay-viewer" target="_blank">
+<img src="./screenshot/clay-viewer.jpg" width="500" />
 </a>
 
 
@@ -38,33 +38,11 @@ QTEK is a WebGL graphic library.
 </a>
 
 
+### Quick Start
 
-### Quick Examples
-
-+ [Basic triangle](http://pissang.github.io/qtek/example/triangle.html)
-+ [Ten thousand cubes with normal mapping](http://pissang.github.io/qtek/example/cubes.html)
-+ [Cube animation](http://pissang.github.io/qtek/example/cubeanim.html)
-+ [A simple glTF scene](http://pissang.github.io/qtek/example/gltf.html)
-+ [glTF PBR Model](http://pissang.github.io/qtek/example/gltf2.html)
-+ [Skinning](http://pissang.github.io/qtek/example/skinning.html)
-+ [Particle effects](http://pissang.github.io/qtek/example/particle.html)
-+ [Shadowmap](http://pissang.github.io/qtek/example/shadowmap.html)
-+ [Omni light shadow mapping](http://pissang.github.io/qtek/example/cubeshadowmap.html)
-+ [RGBE Decoder](http://pissang.github.io/qtek/example/rgbedecoder.html)
-+ [Skybox](http://pissang.github.io/qtek/example/skybox.html)
-+ [Draggable cubes](http://pissang.github.io/qtek/example/picking.html)
-+ [Ambient Cubemap](http://pissang.github.io/qtek/example/ambientcubemap.html)
-+ [Spherical Harmonic Ambient](http://pissang.github.io/qtek/example/spherical_harmonic.html)
-+ [Physically based rendering with HDR IBL](http://pissang.github.io/qtek/example/IBL.html)
-+ [Standard Material](http://pissang.github.io/qtek/example/standard_material.html)
-+ [Post processing - Depth of field](http://pissang.github.io/qtek/example/dof.html)
-+ [Post processing - Bloom](http://pissang.github.io/qtek/example/tron.html)
-+ [GBuffer preview](http://pissang.github.io/qtek/example/gbuffer.html)
-+ [Deferred rendering](http://pissang.github.io/qtek/example/deferred.html)
-+ [Deferred cascade light shadow](http://pissang.github.io/qtek/example/deferred_shadow3.html)
-+ [Deferred omni light light shadow](http://pissang.github.io/qtek/example/deferred_shadow.html)
-+ [Deferred skinning](http://pissang.github.io/qtek/example/deferred_skinning.html)
-+ [Stereo rendering](http://pissang.github.io/qtek/example/stereo.html)
+```html
+<html>
+```
 
 ### Features
 
@@ -141,10 +119,10 @@ Input:
 Output:
 
 + Scene hierarchy
-+ Mesh, camera
-+ Blinn material
++ Mesh and camera
++ PBR material
 + Texture
-+ Skinning
++ Skin
 + Animation
 
 

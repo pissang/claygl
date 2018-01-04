@@ -1,34 +1,34 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var camera = new qtek.camera.Perspective();
+            var camera = new clay.camera.Perspective();
             camera.aspect = renderer.getViewportAspect();
             camera.position.z = 3;
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var loader = new qtek.loader.GLTF();
+            var loader = new clay.loader.GLTF();
             loader.load('assets/models/suzanne/suzanne.gltf');
             loader.success(function(res) {
                 var geo = res.scene.getNode('Suzanne').geometry;
-                var mesh = new qtek.Mesh({
-                    material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                var mesh = new clay.Mesh({
+                    material: new clay.Material({
+                        shader: clay.shader.library.get('clay.standard')
                     }),
                     geometry: geo
                 });
@@ -36,32 +36,32 @@
                 scene.add(mesh);
             })
 
-            var light = new qtek.light.Directional();
+            var light = new clay.light.Directional();
             light.position.set(1, 1, 1);
-            light.lookAt(qtek.math.Vector3.ZERO);
+            light.lookAt(clay.math.Vector3.ZERO);
             scene.add(light);
-            scene.add(new qtek.light.Ambient({
+            scene.add(new clay.light.Ambient({
                 intensity : 0.5
             }));
 
-            var picking = new qtek.picking.RayPicking({
+            var picking = new clay.picking.RayPicking({
                 renderer : renderer,
                 scene: scene,
                 camera: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function(dTime) {
                 control.update(dTime);
                 renderer.render(scene, camera);
             });
 
-            var sphere = new qtek.Mesh({
-                material: new qtek.Material({
-                    shader: qtek.shader.library.get('qtek.basic')
+            var sphere = new clay.Mesh({
+                material: new clay.Material({
+                    shader: clay.shader.library.get('clay.basic')
                 }),
-                geometry: new qtek.geometry.Sphere()
+                geometry: new clay.geometry.Sphere()
             });
             sphere.scale.set(0.02, 0.02, 0.02);
             sphere.material.set('color', [1, 0, 0]);

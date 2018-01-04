@@ -5,12 +5,12 @@ var quat = glMatrix.quat;
 var vec3 = glMatrix.vec3;
 
 /**
- * 
- * Animation clip that manage a collection of {@link qtek.animation.SamplerTrack}
- * @constructor
- * @alias qtek.animation.TrackClip
  *
- * @extends qtek.animation.Clip
+ * Animation clip that manage a collection of {@link clay.animation.SamplerTrack}
+ * @constructor
+ * @alias clay.animation.TrackClip
+ *
+ * @extends clay.animation.Clip
  * @param {Object} [opts]
  * @param {string} [opts.name]
  * @param {Object} [opts.target]
@@ -23,7 +23,7 @@ var vec3 = glMatrix.vec3;
  * @param {function} [opts.onframe]
  * @param {function} [opts.onfinish]
  * @param {function} [opts.onrestart]
- * @param {Array.<qtek.animation.SamplerTrack>} [opts.tracks]
+ * @param {Array.<clay.animation.SamplerTrack>} [opts.tracks]
  */
 var TrackClip = function (opts) {
 
@@ -32,8 +32,8 @@ var TrackClip = function (opts) {
     Clip.call(this, opts);
 
     /**
-     * 
-     * @type {qtek.animation.SamplerTrack[]}
+     *
+     * @type {clay.animation.SamplerTrack[]}
      */
     this.tracks = opts.tracks || [];
 };
@@ -59,7 +59,7 @@ TrackClip.prototype.step = function (time, dTime, silent) {
     if (!silent && ret !== 'paused') {
         this.fire('frame');
     }
-    
+
     return ret;
 };
 
@@ -90,14 +90,14 @@ TrackClip.prototype.calcLifeFromTracks = function () {
 };
 
 /**
- * @param {qtek.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} jointClip
  */
 TrackClip.prototype.addTrack = function (track) {
     this.tracks.push(track);
 };
 
 /**
- * @param {qtek.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} jointClip
  */
 TrackClip.prototype.removeTarck = function (track) {
     var idx = this.tracks.indexOf(track);
@@ -110,7 +110,7 @@ TrackClip.prototype.removeTarck = function (track) {
  * @param {number} startTime
  * @param {number} endTime
  * @param {boolean} isLoop
- * @return {qtek.animation.TrackClip}
+ * @return {clay.animation.TrackClip}
  */
 TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
     var subClip = new TrackClip({
@@ -133,8 +133,8 @@ TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
 
 /**
  * 1d blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  * @param  {number} w
  */
 TrackClip.prototype.blend1D = function (clip1, clip2, w) {
@@ -149,8 +149,8 @@ TrackClip.prototype.blend1D = function (clip1, clip2, w) {
 
 /**
  * Additive blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.additiveBlend = function (clip1, clip2) {
     for (var i = 0; i < this.tracks.length; i++) {
@@ -164,8 +164,8 @@ TrackClip.prototype.additiveBlend = function (clip1, clip2) {
 
 /**
  * Subtractive blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
     for (var i = 0; i < this.tracks.length; i++) {
@@ -179,9 +179,9 @@ TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
 
 /**
  * 2D blending from three skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
- * @param  {qtek.animation.TrackClip} clip3
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip3
  * @param  {number} f
  * @param  {number} g
  */
@@ -198,7 +198,7 @@ TrackClip.prototype.blend2D = function (clip1, clip2, clip3, f, g) {
 
 /**
  * Copy SRT of all joints clips from another TrackClip
- * @param  {qtek.animation.TrackClip} clip
+ * @param  {clay.animation.TrackClip} clip
  */
 TrackClip.prototype.copy = function (clip) {
     for (var i = 0; i < this.tracks.length; i++) {

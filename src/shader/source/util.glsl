@@ -1,5 +1,5 @@
 
-@export qtek.util.rand
+@export clay.util.rand
 // // http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
 // float rand(vec2 co){
 //     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -15,7 +15,7 @@ highp float rand(vec2 uv) {
 
 // Use light attenuation formula in
 // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
-@export qtek.util.calculate_attenuation
+@export clay.util.calculate_attenuation
 
 uniform float attenuationFactor : 5.0;
 
@@ -34,7 +34,7 @@ float lightAttenuation(float dist, float range)
 @end
 
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-@export qtek.util.edge_factor
+@export clay.util.edge_factor
 
 float edgeFactor(float width)
 {
@@ -47,7 +47,7 @@ float edgeFactor(float width)
 
 // Pack depth
 // !!!! Float value can only be [0.0 - 1.0)
-@export qtek.util.encode_float
+@export clay.util.encode_float
 vec4 encodeFloat(const in float depth)
 {
     // const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
@@ -67,7 +67,7 @@ vec4 encodeFloat(const in float depth)
 }
 @end
 
-@export qtek.util.decode_float
+@export clay.util.decode_float
 float decodeFloat(const in vec4 color)
 {
     // const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
@@ -82,15 +82,15 @@ float decodeFloat(const in vec4 color)
 @end
 
 
-@export qtek.util.float
-@import qtek.util.encode_float
-@import qtek.util.decode_float
+@export clay.util.float
+@import clay.util.encode_float
+@import clay.util.decode_float
 @end
 
 
 
 // http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
-@export qtek.util.rgbm_decode
+@export clay.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
   // Premultiply alpha ?
@@ -98,7 +98,7 @@ vec3 RGBMDecode(vec4 rgbm, float range) {
 }
 @end
 
-@export qtek.util.rgbm_encode
+@export clay.util.rgbm_encode
 vec4 RGBMEncode(vec3 color, float range) {
     if (dot(color, color) == 0.0) {
         return vec4(0.0);
@@ -112,9 +112,9 @@ vec4 RGBMEncode(vec3 color, float range) {
 }
 @end
 
-@export qtek.util.rgbm
-@import qtek.util.rgbm_decode
-@import qtek.util.rgbm_encode
+@export clay.util.rgbm
+@import clay.util.rgbm_decode
+@import clay.util.rgbm_encode
 
 vec4 decodeHDR(vec4 color)
 {
@@ -137,7 +137,7 @@ vec4 encodeHDR(vec4 color)
 @end
 
 
-@export qtek.util.srgb
+@export clay.util.srgb
 
 vec4 sRGBToLinear(in vec4 value) {
     return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);
@@ -149,7 +149,7 @@ vec4 linearTosRGB(in vec4 value) {
 @end
 
 
-@export qtek.chunk.skinning_header
+@export clay.chunk.skinning_header
 #ifdef SKINNING
 attribute vec3 weight : WEIGHT;
 attribute vec4 joint : JOINT;
@@ -181,7 +181,7 @@ mat4 getSkinMatrix(float idx) {
 
 @end
 
-@export qtek.chunk.skin_matrix
+@export clay.chunk.skin_matrix
 
 // Weighted Sum Skinning Matrix
 // PENDING Must be assigned.
@@ -203,7 +203,7 @@ if (weightW > 1e-4)
 
 
 
-@export qtek.util.parallax_correct
+@export clay.util.parallax_correct
 
 // https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
 vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
@@ -225,7 +225,7 @@ vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
 
 
 
-@export qtek.util.clamp_sample
+@export clay.util.clamp_sample
 // Sample with stereo clamp
 vec4 clampSample(const in sampler2D texture, const in vec2 coord)
 {

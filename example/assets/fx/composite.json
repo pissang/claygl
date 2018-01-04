@@ -6,7 +6,7 @@
     "nodes" : [
         {
             "name": "source_half",
-            "shader": "#source(qtek.compositor.downsample)",
+            "shader": "#source(clay.compositor.downsample)",
             "inputs": {
                 "texture": "source"
             },
@@ -29,7 +29,7 @@
 
         {
             "name" : "bright",
-            "shader" : "#source(qtek.compositor.bright)",
+            "shader" : "#source(clay.compositor.bright)",
             "inputs" : {
                 "texture" : "source_half"
             },
@@ -53,7 +53,7 @@
         },
         {
             "name" : "bright2",
-            "shader" : "#source(qtek.compositor.bright)",
+            "shader" : "#source(clay.compositor.bright)",
             "inputs" : {
                 "texture": "source_half"
             },
@@ -76,7 +76,7 @@
 
         {
             "name": "bright_downsample_4",
-            "shader" : "#source(qtek.compositor.downsample)",
+            "shader" : "#source(clay.compositor.downsample)",
             "inputs" : {
                 "texture" : "bright"
             },
@@ -97,7 +97,7 @@
         },
         {
             "name": "bright_downsample_8",
-            "shader" : "#source(qtek.compositor.downsample)",
+            "shader" : "#source(clay.compositor.downsample)",
             "inputs" : {
                 "texture" : "bright_downsample_4"
             },
@@ -118,7 +118,7 @@
         },
         {
             "name": "bright_downsample_16",
-            "shader" : "#source(qtek.compositor.downsample)",
+            "shader" : "#source(clay.compositor.downsample)",
             "inputs" : {
                 "texture" : "bright_downsample_8"
             },
@@ -139,7 +139,7 @@
         },
         {
             "name": "bright_downsample_32",
-            "shader" : "#source(qtek.compositor.downsample)",
+            "shader" : "#source(clay.compositor.downsample)",
             "inputs" : {
                 "texture" : "bright_downsample_16"
             },
@@ -162,7 +162,7 @@
 
         {
             "name" : "bright_upsample_16_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_32"
             },
@@ -185,7 +185,7 @@
         },
         {
             "name" : "bright_upsample_16_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_16_blur_h"
             },
@@ -211,7 +211,7 @@
 
         {
             "name" : "bright_upsample_8_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_16"
             },
@@ -234,7 +234,7 @@
         },
         {
             "name" : "bright_upsample_8_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_8_blur_h"
             },
@@ -257,7 +257,7 @@
         },
         {
             "name" : "bright_upsample_8_blend",
-            "shader" : "#source(qtek.compositor.blend)",
+            "shader" : "#source(clay.compositor.blend)",
             "inputs" : {
                 "texture1" : "bright_upsample_8_blur_v",
                 "texture2" : "bright_upsample_16_blur_v"
@@ -282,7 +282,7 @@
 
         {
             "name" : "bright_upsample_4_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_8"
             },
@@ -305,7 +305,7 @@
         },
         {
             "name" : "bright_upsample_4_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_4_blur_h"
             },
@@ -328,7 +328,7 @@
         },
         {
             "name" : "bright_upsample_4_blend",
-            "shader" : "#source(qtek.compositor.blend)",
+            "shader" : "#source(clay.compositor.blend)",
             "inputs" : {
                 "texture1" : "bright_upsample_4_blur_v",
                 "texture2" : "bright_upsample_8_blend"
@@ -356,7 +356,7 @@
 
         {
             "name" : "bright_upsample_2_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_downsample_4"
             },
@@ -379,7 +379,7 @@
         },
         {
             "name" : "bright_upsample_2_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_2_blur_h"
             },
@@ -402,7 +402,7 @@
         },
         {
             "name" : "bright_upsample_2_blend",
-            "shader" : "#source(qtek.compositor.blend)",
+            "shader" : "#source(clay.compositor.blend)",
             "inputs" : {
                 "texture1" : "bright_upsample_2_blur_v",
                 "texture2" : "bright_upsample_4_blend"
@@ -428,7 +428,7 @@
 
         {
             "name" : "bright_upsample_full_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright"
             },
@@ -451,7 +451,7 @@
         },
         {
             "name" : "bright_upsample_full_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "bright_upsample_full_blur_h"
             },
@@ -474,7 +474,7 @@
         },
         {
             "name" : "bloom_composite",
-            "shader" : "#source(qtek.compositor.blend)",
+            "shader" : "#source(clay.compositor.blend)",
             "inputs" : {
                 "texture1" : "bright_upsample_full_blur_v",
                 "texture2" : "bright_upsample_2_blend"
@@ -499,7 +499,7 @@
 
         {
             "name": "coc",
-            "shader": "#source(qtek.compositor.dof.coc)",
+            "shader": "#source(clay.compositor.dof.coc)",
             "outputs": {
                 "color": {
                     "parameters": {
@@ -514,7 +514,7 @@
 
         {
             "name": "coc_half",
-            "shader": "#source(qtek.compositor.dof.min_coc)",
+            "shader": "#source(clay.compositor.dof.min_coc)",
             "inputs": {
                 "coc": "coc"
             },
@@ -535,7 +535,7 @@
 
         {
             "name": "dof_source_half",
-            "shader": "#source(qtek.compositor.dof.downsample)",
+            "shader": "#source(clay.compositor.dof.downsample)",
             "inputs": {
                 "texture": "source",
                 "coc": "coc"
@@ -560,7 +560,7 @@
 
         {
             "name": "dof_far_blur_hexangonal_1",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_1)",
             "inputs": {
                 "texture": "dof_source_half",
                 "coc": "coc"
@@ -584,7 +584,7 @@
         },
         {
             "name": "dof_far_blur_hexangonal_2",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_2)",
             "inputs": {
                 "texture": "dof_source_half",
                 "coc": "coc"
@@ -608,7 +608,7 @@
         },
         {
             "name": "dof_far_blur_hexangonal_3",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_3)",
             "inputs": {
                 "texture1": "dof_far_blur_hexangonal_1",
                 "texture2": "dof_far_blur_hexangonal_2",
@@ -634,7 +634,7 @@
 
         {
             "name": "dof_near_blur_hexangonal_1",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_1)",
             "inputs": {
                 "texture": "dof_source_half",
                 "coc": "coc"
@@ -659,7 +659,7 @@
         },
         {
             "name": "dof_near_blur_hexangonal_2",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_2)",
             "inputs": {
                 "texture": "dof_source_half",
                 "coc": "coc"
@@ -684,7 +684,7 @@
         },
         {
             "name": "dof_near_blur_hexangonal_3",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_3)",
             "inputs": {
                 "texture1": "dof_near_blur_hexangonal_1",
                 "texture2": "dof_near_blur_hexangonal_2",
@@ -712,7 +712,7 @@
 
         {
             "name": "dof_coc_blur_hexangonal_1",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_1)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_1)",
             "inputs": {
                 "texture": "coc_half"
             },
@@ -735,7 +735,7 @@
         },
         {
             "name": "dof_coc_blur_hexangonal_2",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_2)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_2)",
             "inputs": {
                 "texture": "coc_half"
             },
@@ -758,7 +758,7 @@
         },
         {
             "name": "dof_coc_blur_hexangonal_3",
-            "shader": "#source(qtek.compositor.dof.hexagonal_blur_3)",
+            "shader": "#source(clay.compositor.dof.hexagonal_blur_3)",
             "inputs": {
                 "texture1": "dof_coc_blur_hexangonal_1",
                 "texture2": "dof_coc_blur_hexangonal_2"
@@ -783,7 +783,7 @@
 
         {
             "name": "dof_far_blur_upsample",
-            "shader": "#source(qtek.compositor.dof.upsample)",
+            "shader": "#source(clay.compositor.dof.upsample)",
             "inputs": {
                 "texture": "dof_far_blur_hexangonal_3",
                 "coc": "coc"
@@ -808,7 +808,7 @@
 
         {
             "name": "dof_near_blur_upsample",
-            "shader": "#source(qtek.compositor.dof.upsample)",
+            "shader": "#source(clay.compositor.dof.upsample)",
             "inputs": {
                 "texture": "dof_near_blur_hexangonal_3",
                 "coc": "coc"
@@ -833,7 +833,7 @@
 
         {
             "name": "dof_coc_blur_upsample",
-            "shader": "#source(qtek.compositor.dof.coc_upsample)",
+            "shader": "#source(clay.compositor.dof.coc_upsample)",
             "inputs": {
                 "coc": "dof_coc_blur_hexangonal_3"
             },
@@ -854,7 +854,7 @@
 
         {
             "name": "dof_composite",
-            "shader": "#source(qtek.compositor.dof.composite)",
+            "shader": "#source(clay.compositor.dof.composite)",
             "inputs": {
                 "original": "source",
                 "blurred": "dof_far_blur_upsample",
@@ -879,7 +879,7 @@
 
         {
             "name" : "lensflare",
-            "shader" : "#source(qtek.compositor.lensflare)",
+            "shader" : "#source(clay.compositor.lensflare)",
             "inputs" : {
                 "texture" : "bright2"
             },
@@ -901,7 +901,7 @@
         },
         {
             "name" : "lensflare_blur_h",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "lensflare"
             },
@@ -924,7 +924,7 @@
         },
         {
             "name" : "lensflare_blur_v",
-            "shader" : "#source(qtek.compositor.gaussian_blur)",
+            "shader" : "#source(clay.compositor.gaussian_blur)",
             "inputs" : {
                 "texture" : "lensflare_blur_h"
             },
@@ -947,7 +947,7 @@
         },
         {
             "name" : "composite",
-            "shader" : "#source(qtek.compositor.hdr.composite)",
+            "shader" : "#source(clay.compositor.hdr.composite)",
             "inputs" : {
                 "texture" : "dof_composite",
                 "bloom" : "bloom_composite",
@@ -967,7 +967,7 @@
         },
         {
             "name" : "FXAA",
-            "shader" : "#source(qtek.compositor.fxaa3)",
+            "shader" : "#source(clay.compositor.fxaa3)",
             "inputs" : {
                 "texture" : "composite"
             }

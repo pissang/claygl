@@ -2,50 +2,50 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
-            var gbuffer = new qtek.deferred.GBuffer();
-            var camera = new qtek.camera.Perspective({
+            var gbuffer = new clay.deferred.GBuffer();
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 6);
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var loader = new qtek.loader.GLTF();
+            var loader = new clay.loader.GLTF();
             loader.load('assets/models/suzanne/suzanne_high.gltf');
             var suzanneGeometry;
             loader.on('success', function(res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                var material = new qtek.StandardMaterial({
+                var material = new clay.StandardMaterial({
                     metalness: 0.5,
                     uvRepeat: [3, 3],
                     roughness: 0.5
                 });
-                var mesh = new qtek.Mesh({
+                var mesh = new clay.Mesh({
                     geometry: suzanneGeometry,
                     material: material
                 });
                 mesh.geometry.generateTangents();
 
                 [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                    var tex = new qtek.Texture2D({
-                        wrapS: qtek.Texture.REPEAT,
-                        wratT: qtek.Texture.REPEAT
+                    var tex = new clay.Texture2D({
+                        wrapS: clay.Texture.REPEAT,
+                        wratT: clay.Texture.REPEAT
                     });
                     tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
                         .success(function () {
                             // FIXME
-                            tex.wrapS = qtek.Texture.REPEAT;
-                            tex.wrapT = qtek.Texture.REPEAT;
+                            tex.wrapS = clay.Texture.REPEAT;
+                            tex.wrapT = clay.Texture.REPEAT;
                         });
                     material[mapInfo[0]] = tex;
                 });
@@ -54,12 +54,12 @@
                 scene.add(mesh);
             });
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function(deltaTime) {
                 control.update(deltaTime);

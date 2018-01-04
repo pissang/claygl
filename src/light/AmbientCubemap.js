@@ -5,14 +5,14 @@ import cubemapUtil from '../util/cubemap';
 /**
  * Ambient cubemap light provides specular parts of Image Based Lighting.
  * Which is a basic requirement for Physically Based Rendering
- * @constructor qtek.light.AmbientCubemap
- * @extends qtek.Light
+ * @constructor clay.light.AmbientCubemap
+ * @extends clay.Light
  */
 var AmbientCubemapLight = Light.extend({
 
     /**
-     * @type {qtek.TextureCube}
-     * @memberOf qtek.light.AmbientCubemap#
+     * @type {clay.TextureCube}
+     * @memberOf clay.light.AmbientCubemap#
      */
     cubemap: null,
 
@@ -24,13 +24,13 @@ var AmbientCubemapLight = Light.extend({
     _normalDistribution: null,
     _brdfLookup: null
 
-}, /** @lends qtek.light.AmbientCubemap# */ {
+}, /** @lends clay.light.AmbientCubemap# */ {
 
     type: 'AMBIENT_CUBEMAP_LIGHT',
 
     /**
      * Do prefitering the cubemap
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      * @param {number} [size=32]
      */
     prefilter: function (renderer, size) {
@@ -83,8 +83,8 @@ var AmbientCubemapLight = Light.extend({
     /**
      * @method
      * @name clone
-     * @return {qtek.light.AmbientCubemap}
-     * @memberOf qtek.light.AmbientCubemap.prototype
+     * @return {clay.light.AmbientCubemap}
+     * @memberOf clay.light.AmbientCubemap.prototype
      */
 });
 

@@ -2,20 +2,20 @@ import Light from '../Light';
 import Vector3 from '../math/Vector3';
 
 /**
- * @constructor qtek.light.Directional
- * @extends qtek.Light
+ * @constructor clay.light.Directional
+ * @extends clay.Light
  *
  * @example
- *     var light = new qtek.light.Directional({
+ *     var light = new clay.light.Directional({
  *         intensity: 0.5,
  *         color: [1.0, 0.0, 0.0]
  *     });
  *     light.position.set(10, 10, 10);
- *     light.lookAt(qtek.math.Vector3.ZERO);
+ *     light.lookAt(clay.math.Vector3.ZERO);
  *     scene.add(light);
  */
 var DirectionalLight = Light.extend(
-/** @lends qtek.light.Directional# */
+/** @lends clay.light.Directional# */
 {
     /**
      * @type {number}
@@ -60,8 +60,8 @@ var DirectionalLight = Light.extend(
         }
     },
     /**
-     * @return {qtek.light.Directional}
-     * @memberOf qtek.light.Directional.prototype
+     * @return {clay.light.Directional}
+     * @memberOf clay.light.Directional.prototype
      */
     clone: function () {
         var light = Light.prototype.clone.call(this);

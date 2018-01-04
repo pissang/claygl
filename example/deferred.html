@@ -1,39 +1,39 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 // devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var deferredRenderer = new qtek.deferred.Renderer();
+            var deferredRenderer = new clay.deferred.Renderer();
 
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 far: 10000,
                 aspect: renderer.getViewportAspect()
             });
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var plane = new qtek.Mesh({
-                material: new qtek.StandardMaterial({
+            var plane = new clay.Mesh({
+                material: new clay.StandardMaterial({
                     roughness: 0.9
                 }),
-                geometry: new qtek.geometry.Plane()
+                geometry: new clay.geometry.Plane()
             });
             plane.scale.set(10000, 10000, 1);
             plane.rotation.rotateX(-Math.PI / 2);
 
-            var sphereGeo = new qtek.geometry.Sphere();
+            var sphereGeo = new clay.geometry.Sphere();
             for (var i = 0; i < 100; i++) {
-                var sphere = new qtek.Mesh({
-                    material: new qtek.StandardMaterial({
+                var sphere = new clay.Mesh({
+                    material: new clay.StandardMaterial({
                         roughness: 0.9
                     }),
                     geometry: sphereGeo
@@ -49,7 +49,7 @@
                 return (Math.random() - 0.5) * size * 2
             }
 
-            var spotLight = new qtek.light.Spot({
+            var spotLight = new clay.light.Spot({
                 color: [1, 0, 0],
                 range: 500,
                 intensity: 10
@@ -59,7 +59,7 @@
             scene.add(spotLight);
 
             for (var i = 0; i < 100; i ++) {
-                var pointLight = new qtek.light.Point({
+                var pointLight = new clay.light.Point({
                     color: [Math.random(), Math.random(), Math.random()],
                     range: 100 + Math.random() * 100
                 });
@@ -69,7 +69,7 @@
                 pointLight.position.set(x, y, z);
                 scene.add(pointLight);
             }
-            var directionalLight = new qtek.light.Directional({
+            var directionalLight = new clay.light.Directional({
                 intensity: 0.5
             });
             directionalLight.position.set(10, 10, 10);
@@ -77,19 +77,19 @@
 
             scene.add(directionalLight);
 
-            scene.add(new qtek.light.Ambient({
+            scene.add(new clay.light.Ambient({
                 intensity: 0.2
             }));
 
             camera.position.set(0, 50, 100);
             camera.lookAt(scene.position);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
 
             animation.on('frame', function (deltaTime) {
                 control.update(deltaTime);

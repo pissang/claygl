@@ -6,19 +6,19 @@ import Material from '../Material';
 import basicEssl from '../shader/source/basic.glsl.js';
 Shader.import(basicEssl);
 /**
- * @constructor qtek.plugin.Skydome
+ * @constructor clay.plugin.Skydome
  *
  * @example
- *     var skyTex = new qtek.Texture2D();
+ *     var skyTex = new clay.Texture2D();
  *     skyTex.load('assets/textures/sky.jpg');
- *     var skydome = new qtek.plugin.Skydome({
+ *     var skydome = new clay.plugin.Skydome({
  *         scene: scene
  *     });
  *     skydome.material.set('diffuseMap', skyTex);
  */
 var Skydome = Mesh.extend(function () {
 
-    var skydomeShader = new Shader(Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
+    var skydomeShader = new Shader(Shader.source('clay.basic.vertex'), Shader.source('clay.basic.fragment'));
 
     var material = new Material({
         shader: skydomeShader,
@@ -28,8 +28,8 @@ var Skydome = Mesh.extend(function () {
 
     return {
         /**
-         * @type {qtek.Scene}
-         * @memberOf qtek.plugin.Skydome#
+         * @type {clay.Scene}
+         * @memberOf clay.plugin.Skydome#
          */
         scene: null,
 
@@ -57,8 +57,8 @@ var Skydome = Mesh.extend(function () {
 }, {
     /**
      * Attach the skybox to the scene
-     * @param  {qtek.Scene} scene
-     * @memberOf qtek.plugin.Skydome.prototype
+     * @param  {clay.Scene} scene
+     * @memberOf clay.plugin.Skydome.prototype
      */
     attachScene: function (scene) {
         if (this.scene) {
@@ -69,7 +69,7 @@ var Skydome = Mesh.extend(function () {
     },
     /**
      * Detach from scene
-     * @memberOf qtek.plugin.Skydome.prototype
+     * @memberOf clay.plugin.Skydome.prototype
      */
     detachScene: function () {
         if (this.scene) {

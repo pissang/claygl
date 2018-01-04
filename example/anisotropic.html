@@ -1,36 +1,36 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas width="1200" height="640" id="main"></canvas>
         <script>
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 500
             });
 
-            var shader = qtek.shader.library.get("qtek.basic");
+            var shader = clay.shader.library.get("clay.basic");
 
-            var material = new qtek.Material({
+            var material = new clay.Material({
                 shader: shader
             });
             var image = new Image;
             image.src = "assets/textures/ground_tile.jpg";
-            var texture = new qtek.Texture2D({
+            var texture = new clay.Texture2D({
                 image: image,
-                wrapS: qtek.Texture.REPEAT,
-                wrapT: qtek.Texture.REPEAT,
+                wrapS: clay.Texture.REPEAT,
+                wrapT: clay.Texture.REPEAT,
                 anisotropic: 16
             });
             image.onload = function(){
@@ -39,21 +39,21 @@
             material.set("diffuseMap", texture);
             material.set("uvRepeat", [10, 10])
 
-            var root = new qtek.Node();
+            var root = new clay.Node();
 
             camera.position.set(0, 4, 14);
-            camera.lookAt( new qtek.math.Vector3(0, 1, 0) );
+            camera.lookAt( new clay.math.Vector3(0, 1, 0) );
 
             scene.add( root );
             // Add Plane
-            var plane = new qtek.geometry.Plane({
+            var plane = new clay.geometry.Plane({
                 widthSegments: 1,
                 heightSegments: 1
             });
-            var planeMesh = new qtek.Mesh({
+            var planeMesh = new clay.Mesh({
                 geometry: plane,
                 material: material,
-                scale: new qtek.math.Vector3(60, 60, 60)
+                scale: new clay.math.Vector3(60, 60, 60)
             });
             planeMesh.position.y = -0.8;
             planeMesh.rotation.rotateX(-Math.PI/2);

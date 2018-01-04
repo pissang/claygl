@@ -27,19 +27,19 @@ function VertexArrayObject(
 }
 /**
  * @constructor
- * @alias qtek.Renderable
- * @extends qtek.Node
+ * @alias clay.Renderable
+ * @extends clay.Node
  */
 var Renderable = Node.extend(
-/** @lends qtek.Renderable# */
+/** @lends clay.Renderable# */
 {
     /**
-     * @type {qtek.Material}
+     * @type {clay.Material}
      */
     material: null,
 
     /**
-     * @type {qtek.Geometry}
+     * @type {clay.Geometry}
      */
     geometry: null,
 
@@ -55,7 +55,7 @@ var Renderable = Node.extend(
     this._drawCache = {};
     this._renderInfo = new RenderInfo();
 },
-/** @lends qtek.Renderable.prototype */
+/** @lends clay.Renderable.prototype */
 {
 
     __program: null,
@@ -83,9 +83,9 @@ var Renderable = Node.extend(
     /**
      * Specify which side of polygon will be culled.
      * Possible values:
-     *  + {@link qtek.Renderable.BACK}
-     *  + {@link qtek.Renderable.FRONT}
-     *  + {@link qtek.Renderable.FRONT_AND_BACK}
+     *  + {@link clay.Renderable.BACK}
+     *  + {@link clay.Renderable.FRONT}
+     *  + {@link clay.Renderable.FRONT_AND_BACK}
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
      * @type {number}
      */
@@ -93,8 +93,8 @@ var Renderable = Node.extend(
     /**
      * Specify which side is front face.
      * Possible values:
-     *  + {@link qtek.Renderable.CW}
-     *  + {@link qtek.Renderable.CCW}
+     *  + {@link clay.Renderable.CW}
+     *  + {@link clay.Renderable.CCW}
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
      * @type {number}
      */
@@ -158,8 +158,8 @@ var Renderable = Node.extend(
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Material} [material]
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Material} [material]
      * @return {Object}
      */
     render: function (renderer, material, program) {
@@ -362,7 +362,7 @@ var Renderable = Node.extend(
     /**
      * Clone a new renderable
      * @method
-     * @return {qtek.Renderable}
+     * @return {clay.Renderable}
      */
     clone: (function() {
         var properties = [

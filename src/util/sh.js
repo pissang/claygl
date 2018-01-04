@@ -147,8 +147,8 @@ function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
 }
 
 /**
- * @param  {qtek.Renderer} renderer
- * @param  {qtek.Texture} envMap
+ * @param  {clay.Renderer} renderer
+ * @param  {clay.Texture} envMap
  * @param  {Object} [textureOpts]
  * @param  {Object} [textureOpts.lod]
  * @param  {boolean} [textureOpts.decodeRGBM]

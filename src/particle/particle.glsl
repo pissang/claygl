@@ -1,4 +1,4 @@
-@export qtek.particle.vertex
+@export clay.particle.vertex
 
 uniform mat4 worldView : WORLDVIEW;
 uniform mat4 projection : PROJECTION;
@@ -34,7 +34,7 @@ void main() {
 
 @end
 
-@export qtek.particle.fragment
+@export clay.particle.fragment
 
 uniform sampler2D sprite;
 uniform sampler2D gradient;

@@ -8,9 +8,9 @@
   define: false, window: false, process: false, Packages: false,
   java: false, location: false */
 
-define(['module'], function (module) {
+  define(['module'], function (module) {
     'use strict';
-    
+
     var text, fs,
         progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
         xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,

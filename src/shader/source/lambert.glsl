@@ -2,7 +2,7 @@
  * http://en.wikipedia.org/wiki/Lambertian_reflectance
  */
 
-@export qtek.lambert.vertex
+@export clay.lambert.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
@@ -22,7 +22,7 @@ attribute vec4 a_Color : COLOR;
 varying vec4 v_Color;
 #endif
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -37,7 +37,7 @@ void main()
 
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     // Upper 3x3 of skinMatrix is orthogonal
@@ -60,7 +60,7 @@ void main()
 @end
 
 
-@export qtek.lambert.fragment
+@export clay.lambert.fragment
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -87,29 +87,29 @@ varying vec4 v_Color;
 #endif
 
 #ifdef AMBIENT_LIGHT_COUNT
-@import qtek.header.ambient_light
+@import clay.header.ambient_light
 #endif
 #ifdef AMBIENT_SH_LIGHT_COUNT
-@import qtek.header.ambient_sh_light
+@import clay.header.ambient_sh_light
 #endif
 #ifdef POINT_LIGHT_COUNT
-@import qtek.header.point_light
+@import clay.header.point_light
 #endif
 #ifdef DIRECTIONAL_LIGHT_COUNT
-@import qtek.header.directional_light
+@import clay.header.directional_light
 #endif
 #ifdef SPOT_LIGHT_COUNT
-@import qtek.header.spot_light
+@import clay.header.spot_light
 #endif
 
 // Import util functions and uniforms needed
-@import qtek.util.calculate_attenuation
+@import clay.util.calculate_attenuation
 
-@import qtek.util.edge_factor
+@import clay.util.edge_factor
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.plugin.compute_shadow_map
+@import clay.plugin.compute_shadow_map
 
 void main()
 {

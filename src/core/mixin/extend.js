@@ -3,7 +3,7 @@
  * @param {object|Function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
  * @param {Function} [initialize] Initialize after the sub class is instantiated
  * @param {Object} [proto] Prototype methods/properties of the sub class
- * @memberOf qtek.core.mixin.extend
+ * @memberOf clay.core.mixin.extend
  * @return {Function}
  */
 function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
@@ -94,7 +94,7 @@ function extendWithPropList(target, source, propList) {
 }
 
 /**
- * @alias qtek.core.mixin.extend
+ * @alias clay.core.mixin.extend
  * @mixin
  */
 export default {

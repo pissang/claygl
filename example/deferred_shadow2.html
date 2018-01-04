@@ -3,25 +3,25 @@
     <title>Deferred Spotlight Shadow</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="../dist/qtek.js"></script>
+    <script src="../dist/claygl.js"></script>
 </head>
 <body style="margin:0px; background-color: black">
     <canvas id="main"></canvas>
 
     <script type="text/javascript">
-        var renderer = new qtek.Renderer({
+        var renderer = new clay.Renderer({
             canvas: document.getElementById('main')
         });
         renderer.resize(window.innerWidth, window.innerHeight);
-        var shadowMapPass = new qtek.prePass.ShadowMap();
-        var deferredRenderer = new qtek.deferred.Renderer({
+        var shadowMapPass = new clay.prePass.ShadowMap();
+        var deferredRenderer = new clay.deferred.Renderer({
             shadowMapPass: shadowMapPass
         });
 
-        var animation = new qtek.animation.Animation();
+        var animation = new clay.animation.Animation();
         animation.start();
 
-        var GLTFLoader = new qtek.loader.GLTF({
+        var GLTFLoader = new clay.loader.GLTF({
             includeLight: false
         });
 
@@ -30,7 +30,7 @@
         GLTFLoader.on('success', function(res) {
             var scene = res.scene;
             scene.rotation.rotateX(-Math.PI / 2);
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 500
             });
@@ -39,13 +39,13 @@
             camera.lookAt(scene.position);
             camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas,
                 sensitivity: 0.4
             });
 
-            var light = new qtek.light.Spot({
+            var light = new clay.light.Spot({
                 color: [1, 0.3, 0.3],
                 range: 30,
                 umbraAngle: 10,
@@ -59,7 +59,7 @@
             light.lookAt(scene.position);
             scene.add(light);
 
-            var light2 = new qtek.light.Spot({
+            var light2 = new clay.light.Spot({
                 color: [0.3, 1, 0.3],
                 range: 50,
                 umbraAngle: 10,
@@ -73,7 +73,7 @@
             light2.lookAt(scene.position);
             scene.add(light2);
 
-            var light3 = new qtek.light.Point({
+            var light3 = new clay.light.Point({
                 color: [0.3, 0.3, 1],
                 range: 50,
                 shadowResolution: 512,

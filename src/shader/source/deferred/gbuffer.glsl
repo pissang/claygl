@@ -1,4 +1,4 @@
-@export qtek.deferred.gbuffer.vertex
+@export clay.deferred.gbuffer.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
@@ -14,7 +14,7 @@ attribute vec2 texcoord : TEXCOORD_0;
 attribute vec3 normal : NORMAL;
 #endif
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 
 #ifdef FIRST_PASS
@@ -42,7 +42,7 @@ void main()
 
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 
@@ -74,7 +74,7 @@ void main()
 @end
 
 
-@export qtek.deferred.gbuffer1.fragment
+@export clay.deferred.gbuffer1.fragment
 
 uniform mat4 viewInverse : VIEWINVERSE;
 
@@ -155,7 +155,7 @@ void main()
 }
 @end
 
-@export qtek.deferred.gbuffer2.fragment
+@export clay.deferred.gbuffer2.fragment
 
 // Second pass
 // - R: albedo.r
@@ -173,7 +173,7 @@ uniform bool linear;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.srgb
+@import clay.util.srgb
 
 void main ()
 {
@@ -197,9 +197,9 @@ void main ()
 @end
 
 
-@export qtek.deferred.gbuffer.debug
+@export clay.deferred.gbuffer.debug
 
-@import qtek.deferred.chunk.light_head
+@import clay.deferred.chunk.light_head
 // DEBUG
 // - 0: normal
 // - 1: depth
@@ -211,7 +211,7 @@ uniform int debug: 0;
 
 void main ()
 {
-    @import qtek.deferred.chunk.gbuffer_read
+    @import clay.deferred.chunk.gbuffer_read
 
     if (debug == 0) {
         gl_FragColor = vec4(N, 1.0);

@@ -7,26 +7,26 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
-                var renderer = new qtek.Renderer({
+            require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0, 6);
 
-                var scene = new qtek.Scene();
+                var scene = new clay.Scene();
 
-                var loader = new qtek.loader.GLTF();
+                var loader = new clay.loader.GLTF();
                 loader.load('assets/models/suzanne/suzanne_high.gltf');
                 var suzanneGeometry;
                 loader.on('success', function(res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    var envMap = qtek.util.texture.loadTexture(
+                    var envMap = clay.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
                             exposure: 3
@@ -34,7 +34,7 @@
                         function () {
                             envMap.flipY = false;
 
-                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                            var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
                                     height: 128,
@@ -42,7 +42,7 @@
                                 }
                             );
 
-                            var skybox = new qtek.plugin.Skybox({
+                            var skybox = new clay.plugin.Skybox({
                                 scene: scene,
                                 environmentMap: prefilterResult.environmentMap
                             });
@@ -51,7 +51,7 @@
                             skybox.material.define('fragment', 'RGBM_ENCODE');
                             skybox.material.define('fragment', 'RGBM_DECODE');
 
-                            var material = new qtek.StandardMaterial({
+                            var material = new clay.StandardMaterial({
                                 brdfLookup: prefilterResult.brdfLookup,
                                 environmentMap: prefilterResult.environmentMap,
                                 environmentMapPrefiltered: true,
@@ -62,22 +62,22 @@
                                 uvRepeat: [3, 3],
                                 roughness: 0.5
                             });
-                            var mesh = new qtek.Mesh({
+                            var mesh = new clay.Mesh({
                                 geometry: suzanneGeometry,
                                 material: material
                             });
                             mesh.geometry.generateTangents();
 
                             [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                                var tex = new qtek.Texture2D({
-                                    wrapS: qtek.Texture.REPEAT,
-                                    wratT: qtek.Texture.REPEAT
+                                var tex = new clay.Texture2D({
+                                    wrapS: clay.Texture.REPEAT,
+                                    wratT: clay.Texture.REPEAT
                                 });
                                 tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
                                     .success(function () {
                                         // FIXME
-                                        tex.wrapS = qtek.Texture.REPEAT;
-                                        tex.wrapT = qtek.Texture.REPEAT;
+                                        tex.wrapS = clay.Texture.REPEAT;
+                                        tex.wrapT = clay.Texture.REPEAT;
                                     });
                                 material[mapInfo[0]] = tex;
                             });
@@ -88,7 +88,7 @@
                     );
                 });
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas
                 });
@@ -100,7 +100,7 @@
                 });
 
 
-                var animation = new qtek.animation.Animation();
+                var animation = new clay.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);

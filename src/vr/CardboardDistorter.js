@@ -36,8 +36,8 @@ var CardboardDistorter = Base.extend(function () {
                 // depthMask: false,
                 depthTest: false,
                 shader: new Shader({
-                    vertex: Shader.source('qtek.vr.disorter.output.vertex'),
-                    fragment: Shader.source('qtek.vr.disorter.output.fragment')
+                    vertex: Shader.source('clay.vr.disorter.output.vertex'),
+                    fragment: Shader.source('clay.vr.disorter.output.fragment')
                 })
             })
         }),

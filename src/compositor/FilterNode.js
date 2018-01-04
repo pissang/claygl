@@ -10,13 +10,13 @@ import Node from './Node';
 /**
  * Filter node
  *
- * @constructor qtek.compositor.FilterNode
- * @extends qtek.compositor.Node
+ * @constructor clay.compositor.FilterNode
+ * @extends clay.compositor.Node
  *
  * @example
-    var node = new qtek.compositor.Node({
+    var node = new clay.compositor.Node({
         name: 'fxaa',
-        shader: qtek.Shader.source('qtek.compositor.fxaa'),
+        shader: clay.Shader.source('clay.compositor.fxaa'),
         inputs: {
             texture: {
                     node: 'scene',
@@ -26,9 +26,9 @@ import Node from './Node';
         // Multiple outputs is preserved for MRT support in WebGL2.0
         outputs: {
             color: {
-                attachment: qtek.FrameBuffer.COLOR_ATTACHMENT0
+                attachment: clay.FrameBuffer.COLOR_ATTACHMENT0
                 parameters: {
-                    format: qtek.Texture.RGBA,
+                    format: clay.Texture.RGBA,
                     width: 512,
                     height: 512
                 },
@@ -42,7 +42,7 @@ import Node from './Node';
     *
     */
 var FilterNode = Node.extend(function () {
-    return /** @lends qtek.compositor.Node# */ {
+    return /** @lends clay.compositor.Node# */ {
         /**
          * @type {string}
          */
@@ -86,7 +86,7 @@ var FilterNode = Node.extend(function () {
         outputLinks: {},
 
         /**
-         * @type {qtek.compositor.Pass}
+         * @type {clay.compositor.Pass}
          */
         pass: null,
 
@@ -111,10 +111,10 @@ var FilterNode = Node.extend(function () {
     });
     this.pass = pass;
 },
-/** @lends qtek.compositor.Node.prototype */
+/** @lends clay.compositor.Node.prototype */
 {
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     render: function (renderer, frameBuffer) {
         this.trigger('beforerender', renderer);

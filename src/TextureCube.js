@@ -7,15 +7,15 @@ var isPowerOfTwo = mathUtil.isPowerOfTwo;
 var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
- * @constructor qtek.TextureCube
- * @extends qtek.Texture
+ * @constructor clay.TextureCube
+ * @extends clay.Texture
  *
  * @example
  *     ...
- *     var mat = new qtek.Material({
- *         shader: qtek.shader.library.get('qtek.phong', 'environmentMap')
+ *     var mat = new clay.Material({
+ *         shader: clay.shader.library.get('clay.phong', 'environmentMap')
  *     });
- *     var envMap = new qtek.TextureCube();
+ *     var envMap = new clay.TextureCube();
  *     envMap.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -34,7 +34,7 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *     });
  */
 var TextureCube = Texture.extend(function () {
-    return /** @lends qtek.TextureCube# */{
+    return /** @lends clay.TextureCube# */{
         /**
          * @type {Object}
          * @property {?HTMLImageElement|HTMLCanvasElemnet} px
@@ -140,8 +140,8 @@ var TextureCube = Texture.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @memberOf qtek.TextureCube.prototype
+     * @param  {clay.Renderer} renderer
+     * @memberOf clay.TextureCube.prototype
      */
     generateMipmap: function (renderer) {
         var _gl = renderer.gl;

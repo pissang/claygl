@@ -3,7 +3,7 @@ import LinkedList from './LinkedList';
 /**
  * LRU Cache
  * @constructor
- * @alias qtek.core.LRU
+ * @alias clay.core.LRU
  */
 var LRU = function(maxSize) {
 

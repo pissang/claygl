@@ -1,21 +1,21 @@
 define(function (require) {
-    var qtek = require('../../dist/qtek');
+    var clay = require('../../dist/claygl');
     var PostProcessPass = require('./PostProcessPass');
 
-    qtek.Shader.import(require('text!../shader/ssr.glsl'));
+    clay.Shader.import(require('text!../shader/ssr.glsl'));
 
 
     function SSRPass(opt) {
         opt = opt || {};
         this._gBuffer = opt.gBuffer;
 
-        // this._mipmapPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.output'), true);
+        // this._mipmapPass = new PostProcessPass(clay.Shader.source('clay.compositor.output'), true);
         // FXIME Why ssr needs to clear color buffer
-        this._ssrPass = new PostProcessPass(qtek.Shader.source('ssr.fragment'), true, [0, 0, 0, 0]);
-        this._blurPass1 = new PostProcessPass(qtek.Shader.source('ssr.blur_h'), true);
-        this._blurPass2 = new PostProcessPass(qtek.Shader.source('ssr.blur_v'), true);
+        this._ssrPass = new PostProcessPass(clay.Shader.source('ssr.fragment'), true, [0, 0, 0, 0]);
+        this._blurPass1 = new PostProcessPass(clay.Shader.source('ssr.blur_h'), true);
+        this._blurPass2 = new PostProcessPass(clay.Shader.source('ssr.blur_v'), true);
 
-        this._blendPass = new PostProcessPass(qtek.Shader.source('qtek.compositor.blend'), opt.renderToTexture, true);
+        this._blendPass = new PostProcessPass(clay.Shader.source('clay.compositor.blend'), opt.renderToTexture, true);
         // Pass texture will all be enabled
         this._blendPass.getMaterial().disableTexturesAll();
         this._blendPass.getMaterial().enableTexture(['texture1', 'texture2']);
@@ -50,7 +50,7 @@ define(function (require) {
         this._width = width;
         this._height = height;
 
-        // var mathUtil = qtek.math.util;
+        // var mathUtil = clay.math.util;
         // var widthPOT = mathUtil.nearestPowerOfTwo(width);
         // var heightPOT = mathUtil.nearestPowerOfTwo(height);
 
@@ -77,8 +77,8 @@ define(function (require) {
 
         var ssrPass = this._ssrPass;
 
-        var viewInverseTranspose = new qtek.math.Matrix4();
-        qtek.math.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
+        var viewInverseTranspose = new clay.math.Matrix4();
+        clay.math.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
 
         ssrPass.setUniform('colorTex', colorTex);
         ssrPass.setUniform('projection', camera.projectionMatrix._array);

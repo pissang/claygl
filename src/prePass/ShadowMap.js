@@ -35,11 +35,11 @@ Shader['import'](shadowmapEssl);
 /**
  * Pass rendering shadow map.
  *
- * @constructor qtek.prePass.ShadowMap
- * @extends qtek.core.Base
+ * @constructor clay.prePass.ShadowMap
+ * @extends clay.core.Base
  * @example
- *     var shadowMapPass = new qtek.prePass.ShadowMap({
- *         softShadow: qtek.prePass.ShadowMap.VSM
+ *     var shadowMapPass = new clay.prePass.ShadowMap({
+ *         softShadow: clay.prePass.ShadowMap.VSM
  *     });
  *     ...
  *     animation.on('frame', function (frameTime) {
@@ -48,10 +48,10 @@ Shader['import'](shadowmapEssl);
  *     });
  */
 var ShadowMapPass = Base.extend(function () {
-    return /** @lends qtek.prePass.ShadowMap# */ {
+    return /** @lends clay.prePass.ShadowMap# */ {
         /**
          * Soft shadow technique.
-         * Can be {@link qtek.prePass.ShadowMap.PCF} or {@link qtek.prePass.ShadowMap.VSM}
+         * Can be {@link clay.prePass.ShadowMap.PCF} or {@link clay.prePass.ShadowMap.VSM}
          * @type {number}
          */
         softShadow: ShadowMapPass.PCF,
@@ -103,10 +103,10 @@ var ShadowMapPass = Base.extend(function () {
 }, function () {
     // Gaussian filter pass for VSM
     this._gaussianPassH = new Pass({
-        fragment: Shader.source('qtek.compositor.gaussian_blur')
+        fragment: Shader.source('clay.compositor.gaussian_blur')
     });
     this._gaussianPassV = new Pass({
-        fragment: Shader.source('qtek.compositor.gaussian_blur')
+        fragment: Shader.source('clay.compositor.gaussian_blur')
     });
     this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
     this._gaussianPassH.setUniform('blurDir', 0.0);
@@ -114,16 +114,16 @@ var ShadowMapPass = Base.extend(function () {
     this._gaussianPassV.setUniform('blurDir', 1.0);
 
     this._outputDepthPass = new Pass({
-        fragment: Shader.source('qtek.sm.debug_depth')
+        fragment: Shader.source('clay.sm.debug_depth')
     });
 }, {
     /**
      * Render scene to shadow textures
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Scene} scene
-     * @param  {qtek.Camera} sceneCamera
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Scene} scene
+     * @param  {clay.Camera} sceneCamera
      * @param  {boolean} [notUpdateScene=false]
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     render: function (renderer, scene, sceneCamera, notUpdateScene) {
         this.trigger('beforerender', this, renderer, scene, sceneCamera);
@@ -133,9 +133,9 @@ var ShadowMapPass = Base.extend(function () {
 
     /**
      * Debug rendering of shadow textures
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      * @param  {number} size
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     renderDebug: function (renderer, size) {
         renderer.saveClear();
@@ -551,7 +551,7 @@ var ShadowMapPass = Base.extend(function () {
         var shadowMaterial = this._lightMaterials[light.__uid__];
         var isPointLight = light instanceof PointLight;
         if (!shadowMaterial) {
-            var shaderPrefix = isPointLight ? 'qtek.sm.distance.' : 'qtek.sm.depth.';
+            var shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
             shadowMaterial = new Material({
                 precision: this.precision,
                 shader: new Shader(Shader.source(shaderPrefix + 'vertex'), Shader.source(shaderPrefix + 'fragment'))
@@ -747,8 +747,8 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer|WebGLRenderingContext} [renderer]
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @param  {clay.Renderer|WebGLRenderingContext} [renderer]
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     // PENDING Renderer or WebGLRenderingContext
     dispose: function (renderer) {
@@ -795,13 +795,13 @@ var ShadowMapPass = Base.extend(function () {
 });
 
 /**
- * @name qtek.prePass.ShadowMap.VSM
+ * @name clay.prePass.ShadowMap.VSM
  * @type {number}
  */
 ShadowMapPass.VSM = 1;
 
 /**
- * @name qtek.prePass.ShadowMap.PCF
+ * @name clay.prePass.ShadowMap.PCF
  * @type {number}
  */
 ShadowMapPass.PCF = 2;

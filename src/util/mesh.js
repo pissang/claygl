@@ -9,17 +9,17 @@ var mat4 = glMatrix.mat4;
 var vec3 = glMatrix.vec3;
 
 /**
- * @namespace qtek.util.mesh
+ * @namespace clay.util.mesh
  */
 var meshUtil = {
     /**
      * Merge multiple meshes to one.
      * Note that these meshes must have the same material
      *
-     * @param {Array.<qtek.Mesh>} meshes
+     * @param {Array.<clay.Mesh>} meshes
      * @param {boolean} applyWorldTransform
-     * @return qtek.Mesh
-     * @memberOf qtek.util.mesh
+     * @return clay.Mesh
+     * @memberOf clay.util.mesh
      */
     merge: function (meshes, applyWorldTransform) {
 
@@ -129,12 +129,12 @@ var meshUtil = {
 
     /**
      * Split mesh into sub meshes, each mesh will have maxJointNumber joints.
-     * @param {qtek.Mesh} mesh
+     * @param {clay.Mesh} mesh
      * @param {number} maxJointNumber
      * @param {boolean} inPlace
-     * @return {qtek.Node}
+     * @return {clay.Node}
      *
-     * @memberOf qtek.util.mesh
+     * @memberOf clay.util.mesh
      */
 
     // FIXME, Have issues on some models

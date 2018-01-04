@@ -34,7 +34,7 @@ uniform float maxMipmapLevel: 5;
 varying vec2 v_Texcoord;
 
 #ifdef DEPTH_DECODE
-@import qtek.util.decode_float
+@import clay.util.decode_float
 #endif
 
 float fetchDepth(sampler2D depthTexture, vec2 uv)
@@ -236,7 +236,7 @@ float calculateAlpha(
     return alpha;
 }
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {
@@ -309,12 +309,12 @@ varying vec2 v_Texcoord;
 uniform vec2 textureSize;
 uniform float blurSize : 2.0;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 
 void main()
 {
-    @import qtek.compositor.kernel.gaussian_13
+    @import clay.compositor.kernel.gaussian_13
 
     vec4 centerNormalTexel = texture2D(gBufferTexture1, v_Texcoord);
     float g = centerNormalTexel.a;
@@ -347,11 +347,11 @@ varying vec2 v_Texcoord;
 uniform vec2 textureSize;
 uniform float blurSize : 2.0;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {
-    @import qtek.compositor.kernel.gaussian_13
+    @import clay.compositor.kernel.gaussian_13
 
     vec4 centerNormalTexel = texture2D(gBufferTexture1, v_Texcoord);
     float g = centerNormalTexel.a;
@@ -385,7 +385,7 @@ uniform sampler2D colorTex;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

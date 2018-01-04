@@ -17,29 +17,29 @@
         </style>
         <canvas id='main'></canvas>
         <script type="text/javascript">
-            require(['../dist/qtek', 'text!./shader/tron.glsl', 'js/createCompositor'], function (qtek, tronShader, createCompositor) {
-                var Shader = qtek.Shader;
+            require(['../dist/claygl', 'text!./shader/tron.glsl', 'js/createCompositor'], function (clay, tronShader, createCompositor) {
+                var Shader = clay.Shader;
                 Shader.import(tronShader);
 
-                var renderer = new qtek.Renderer({
+                var renderer = new clay.Renderer({
                     canvas : document.getElementById('main'),
                     // devicePixelRatio: 1
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var scene = new qtek.Scene();
-                var camera = new qtek.camera.Perspective({
+                var scene = new clay.Scene();
+                var camera = new clay.camera.Perspective({
                     aspect : renderer.getViewportAspect(),
                     far : 500
                 });
 
-                var cube = new qtek.geometry.Cube({
+                var cube = new clay.geometry.Cube({
                     widthSegments : 1,
                     heightSegments : 1,
                     depthSegments : 1
                 });
 
-                var tronMaterial = new qtek.Material({
-                    shader: new qtek.Shader({
+                var tronMaterial = new clay.Material({
+                    shader: new clay.Shader({
                         vertex: Shader.source('tron.vertex'),
                         fragment: Shader.source('tron.fragment')
                     })
@@ -48,7 +48,7 @@
 
                 camera.position.set(0, 0, 7);
 
-                var cubeMeshTronOutline = new qtek.Mesh({
+                var cubeMeshTronOutline = new clay.Mesh({
                     geometry: cube,
                     material: tronMaterial,
                     culling: false,
@@ -56,10 +56,10 @@
                         renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
                     }
                 });
-                var cubeMesh = new qtek.Mesh({
+                var cubeMesh = new clay.Mesh({
                     geometry: cube,
-                    material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                    material: new clay.Material({
+                        shader: clay.shader.library.get('clay.standard')
                     })
                 });
                 cubeMesh.material.define('fragment', 'RGBM_ENCODE');
@@ -69,17 +69,17 @@
                 scene.add(cubeMesh);
                 scene.add(cubeMeshTronOutline);
 
-                var light = new qtek.light.Directional({
+                var light = new clay.light.Directional({
                     intensity: 0.5
                 });
                 light.position.set(4, 5, 2);
                 light.lookAt(scene.position);
                 scene.add(light);
 
-                var animation = new qtek.animation.Animation();
+                var animation = new clay.animation.Animation();
                 animation.start();
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     domElement: renderer.canvas,
                     target: camera
                 });

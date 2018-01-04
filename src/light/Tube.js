@@ -2,11 +2,11 @@ import Light from '../Light';
 import Vector3 from '../math/Vector3';
 
 /**
- * @constructor qtek.light.Tube
- * @extends {qtek.Light}
+ * @constructor clay.light.Tube
+ * @extends {clay.Light}
  */
 var TubeLight = Light.extend(
-/** @lends qtek.light.Tube# */
+/** @lends clay.light.Tube# */
 {
     /**
      * @type {number}

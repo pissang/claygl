@@ -1,5 +1,5 @@
 // HDR Pipeline
-@export qtek.compositor.bright
+@export clay.compositor.bright
 
 uniform sampler2D texture;
 
@@ -12,7 +12,7 @@ varying vec2 v_Texcoord;
 
 const vec3 lumWeight = vec3(0.2125, 0.7154, 0.0721);
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 
 // 3-tap median filter

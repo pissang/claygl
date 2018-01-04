@@ -2,9 +2,9 @@ import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 
 /**
- * @constructor qtek.plugin.FirstPersonControl
+ * @constructor clay.plugin.FreeControl
  * @example
- *     var control = new qtek.plugin.FirstPersonControl({
+ *     var control = new clay.plugin.FreeControl({
  *         target: camera,
  *         domElement: renderer.canvas
  *     });
@@ -14,11 +14,11 @@ import Vector3 from '../math/Vector3';
  *         renderer.render(scene, camera);
  *     });
  */
-var FirstPersonControl = Base.extend(function() {
-    return /** @lends qtek.plugin.FirstPersonControl# */ {
+var FreeControl = Base.extend(function() {
+    return /** @lends clay.plugin.FreeControl# */ {
         /**
          * Scene node to control, mostly it is a camera
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         target: null,
 
@@ -42,7 +42,7 @@ var FirstPersonControl = Base.extend(function() {
 
         /**
          * Up axis
-         * @type {qtek.math.Vector3}
+         * @type {clay.math.Vector3}
          */
         up: new Vector3(0, 1, 0),
 
@@ -53,7 +53,7 @@ var FirstPersonControl = Base.extend(function() {
         verticalMoveLock: false,
 
         /**
-         * @type {qtek.animation.Animation}
+         * @type {clay.animation.Animation}
          */
         animation: null,
 
@@ -75,7 +75,7 @@ var FirstPersonControl = Base.extend(function() {
         this.enable();
     }
 },
-/** @lends qtek.plugin.FirstPersonControl.prototype */
+/** @lends clay.plugin.FreeControl.prototype */
 {
     /**
      * Enable control
@@ -254,4 +254,4 @@ var FirstPersonControl = Base.extend(function() {
     }
 });
 
-export default FirstPersonControl;
+export default FreeControl;

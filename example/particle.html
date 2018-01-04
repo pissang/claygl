@@ -1,26 +1,26 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <script src="../dist/qtek.js"></script>
+    <script src="../dist/claygl.js"></script>
 </head>
 <body style="margin:0px;">
     <canvas id="Main"></canvas>
 
     <script type="text/javascript">
-        var Shader = qtek.Shader;
+        var Shader = clay.Shader;
 
-        var renderer = new qtek.Renderer({
+        var renderer = new clay.Renderer({
             canvas : document.getElementById("Main")
         });
-        var animation = new qtek.animation.Animation();
+        var animation = new clay.animation.Animation();
         animation.start();
 
         renderer.resize(window.innerWidth, window.innerHeight);
 
-        var Value = qtek.math.Value;
-        var Vector3 = qtek.math.Vector3;
-        var particleRenderable = new qtek.particle.ParticleRenderable();
-        var emitter = new qtek.particle.Emitter({
+        var Value = clay.math.Value;
+        var Vector3 = clay.math.Vector3;
+        var particleRenderable = new clay.particle.ParticleRenderable();
+        var emitter = new clay.particle.Emitter({
             max : 5000,
             amount : 7,
             life : Value.constant(2),
@@ -30,12 +30,12 @@
         });
         particleRenderable.addEmitter(emitter);
         particleRenderable.material.set('color', [1, 1, 1]);
-        particleRenderable.material.set('sprite', new qtek.Texture2D({
+        particleRenderable.material.set('sprite', new clay.Texture2D({
             image : generateSprite()
         }));
 
-        var scene = new qtek.Scene();
-        var camera = new qtek.camera.Perspective({
+        var scene = new clay.Scene();
+        var camera = new clay.camera.Perspective({
             aspect : renderer.getViewportAspect(),
             far : 1000,
             near : 1
@@ -43,17 +43,17 @@
         camera.position.set(0, 0, 120);
         scene.add(particleRenderable);
 
-        var planeMesh = new qtek.Mesh({
-            geometry : new qtek.geometry.Plane(),
-            material : new qtek.Material({
-                shader : qtek.shader.library.get('qtek.lambert')
+        var planeMesh = new clay.Mesh({
+            geometry : new clay.geometry.Plane(),
+            material : new clay.Material({
+                shader : clay.shader.library.get('clay.lambert')
             })
         });
         planeMesh.material.set('color', [0.3, 0, 0]);
         planeMesh.scale.set(10000, 10000, 1);
         scene.add(planeMesh);
 
-        var light = new qtek.light.Point({
+        var light = new clay.light.Point({
             range : 300
         });
         light.position.z = 50;

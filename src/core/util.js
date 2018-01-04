@@ -5,14 +5,14 @@ var nativeForEach = ArrayProto.forEach;
 
 /**
  * Util functions
- * @namespace qtek.core.util
+ * @namespace clay.core.util
  */
 var util = {
 
     /**
      * Generate GUID
      * @return {number}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     genGUID: function () {
         return ++guid;
@@ -22,7 +22,7 @@ var util = {
      * @param  {string} path
      * @param  {string} basePath
      * @return {string}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     relative2absolute: function (path, basePath) {
         if (!basePath || path.match(/^\//)) {
@@ -47,7 +47,7 @@ var util = {
      * @param  {Object} target
      * @param  {Object} source
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     extend: function (target, source) {
         if (source) {
@@ -65,7 +65,7 @@ var util = {
      * @param  {Object} target
      * @param  {Object} source
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     defaults: function (target, source) {
         if (source) {
@@ -83,7 +83,7 @@ var util = {
      * @param  {Object} source
      * @param  {Array.<string>} propList
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     extendWithPropList: function (target, source, propList) {
         if (source) {
@@ -100,7 +100,7 @@ var util = {
      * @param  {Object} source
      * @param  {Array.<string>} propList
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     defaultsWithPropList: function (target, source, propList) {
         if (source) {
@@ -117,7 +117,7 @@ var util = {
      * @param  {Object|Array} obj
      * @param  {Function} iterator
      * @param  {Object} [context]
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     each: function (obj, iterator, context) {
         if (!(obj && iterator)) {
@@ -144,7 +144,7 @@ var util = {
      * Is object
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     isObject: function (obj) {
         return obj === Object(obj);
@@ -154,7 +154,7 @@ var util = {
      * Is array ?
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     isArray: function (obj) {
         return Array.isArray(obj);
@@ -164,7 +164,7 @@ var util = {
      * Is array like, which have a length property
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     isArrayLike: function (obj) {
         if (!obj) {
@@ -178,7 +178,7 @@ var util = {
     /**
      * @param  {} obj
      * @return {}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
     clone: function (obj) {
         if (!util.isObject(obj)) {

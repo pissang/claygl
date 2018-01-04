@@ -10,32 +10,32 @@ import glmatrix from '../dep/glmatrix';
 var vec3 = glmatrix.vec3;
 
 /**
- * @constructor qtek.picking.RayPicking
- * @extends qtek.core.Base
+ * @constructor clay.picking.RayPicking
+ * @extends clay.core.Base
  */
 var RayPicking = Base.extend(
-/** @lends qtek.picking.RayPicking# */
+/** @lends clay.picking.RayPicking# */
 {
     /**
      * Target scene
-     * @type {qtek.Scene}
+     * @type {clay.Scene}
      */
     scene: null,
     /**
      * Target camera
-     * @type {qtek.Camera}
+     * @type {clay.Camera}
      */
     camera: null,
     /**
      * Target renderer
-     * @type {qtek.Renderer}
+     * @type {clay.Renderer}
      */
     renderer: null
 }, function () {
     this._ray = new Ray();
     this._ndc = new Vector2();
 },
-/** @lends qtek.picking.RayPicking.prototype */
+/** @lends clay.picking.RayPicking.prototype */
 {
 
     /**
@@ -43,7 +43,7 @@ var RayPicking = Base.extend(
      * @param  {number} x Mouse position x
      * @param  {number} y Mouse position y
      * @param  {boolean} [forcePickAll=false] ignore ignorePicking
-     * @return {qtek.picking.RayPicking~Intersection}
+     * @return {clay.picking.RayPicking~Intersection}
      */
     pick: function (x, y, forcePickAll) {
         var out = this.pickAll(x, y, [], forcePickAll);
@@ -56,7 +56,7 @@ var RayPicking = Base.extend(
      * @param  {number} y Mouse position y
      * @param  {Array} [output]
      * @param  {boolean} [forcePickAll=false] ignore ignorePicking
-     * @return {Array.<qtek.picking.RayPicking~Intersection>}
+     * @return {Array.<clay.picking.RayPicking~Intersection>}
      */
     pickAll: function (x, y, output, forcePickAll) {
         this.renderer.screenToNDC(x, y, this._ndc);
@@ -224,10 +224,10 @@ var RayPicking = Base.extend(
 });
 
 /**
- * @constructor qtek.picking.RayPicking~Intersection
- * @param {qtek.math.Vector3} point
- * @param {qtek.math.Vector3} pointWorld
- * @param {qtek.Node} target
+ * @constructor clay.picking.RayPicking~Intersection
+ * @param {clay.math.Vector3} point
+ * @param {clay.math.Vector3} pointWorld
+ * @param {clay.Node} target
  * @param {Array.<number>} triangle
  * @param {number} triangleIndex
  * @param {number} distance
@@ -235,17 +235,17 @@ var RayPicking = Base.extend(
 RayPicking.Intersection = function (point, pointWorld, target, triangle, triangleIndex, distance) {
     /**
      * Intersection point in local transform coordinates
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.point = point;
     /**
      * Intersection point in world transform coordinates
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.pointWorld = pointWorld;
     /**
      * Intersection scene node
-     * @type {qtek.Node}
+     * @type {clay.Node}
      */
     this.target = target;
     /**

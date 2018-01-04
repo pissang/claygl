@@ -3,7 +3,7 @@ import Easing from './easing';
 function noop () {}
 /**
  * @constructor
- * @alias qtek.animation.Clip
+ * @alias clay.animation.Clip
  * @param {Object} [opts]
  * @param {Object} [opts.target]
  * @param {number} [opts.life]

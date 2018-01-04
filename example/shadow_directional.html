@@ -3,38 +3,38 @@
         <title>Deferred Directional Light Shadow</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
 
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var shadowMapPass = new qtek.prePass.ShadowMap();
+            var shadowMapPass = new clay.prePass.ShadowMap();
 
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 far: 1000,
                 aspect: renderer.getViewportAspect()
             });
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var cubeGeo = new qtek.geometry.Cube();
+            var cubeGeo = new clay.geometry.Cube();
 
             var cubes = [];
 
             var CUBE_COUNT = 24;
             for (var i = 0; i < CUBE_COUNT; i++) {
                 for (var j = 0; j < CUBE_COUNT; j++) {
-                    var mesh = new qtek.Mesh({
+                    var mesh = new clay.Mesh({
                         geometry: cubeGeo,
-                        material: new qtek.Material({
-                            shader: qtek.shader.library.get('qtek.standard')
+                        material: new clay.Material({
+                            shader: clay.shader.library.get('clay.standard')
                         })
                     });
                     mesh.material.set('color', [i / CUBE_COUNT, j / CUBE_COUNT, 0.5]);
@@ -47,7 +47,7 @@
                     scene.add(mesh);
                 }
             }
-            var directionalLight = new qtek.light.Directional({
+            var directionalLight = new clay.light.Directional({
                 intensity: 1.2,
                 shadowBias: 0.004,
                 shadowResolution: 2048
@@ -57,22 +57,22 @@
 
             scene.add(directionalLight);
 
-            scene.add(new qtek.light.Point({
+            scene.add(new clay.light.Point({
                 intensity: 0.4,
                 range: 100,
-                position: new qtek.math.Vector3(-10, CUBE_COUNT, 0)
+                position: new clay.math.Vector3(-10, CUBE_COUNT, 0)
             }));
 
             camera.position.set(10, 20, 20);
             camera.lookAt(scene.position);
             camera.scale.set(0.1, 0.1, 0.1);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
 
             var elapsedTime = 0;
             animation.on('frame', function (deltaTime) {

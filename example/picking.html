@@ -1,31 +1,31 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
-            var camera = new qtek.camera.Perspective();
+            var camera = new clay.camera.Perspective();
             camera.aspect = renderer.getViewportAspect();
             camera.position.z = 10;
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var cubeGeo = new qtek.geometry.Cube();
+            var cubeGeo = new clay.geometry.Cube();
             for (var i = 0; i < 5; i++) {
                 for (var j = 0; j < 5; j++) {
-                    var material = new qtek.Material({
-                        shader : qtek.shader.library.get('qtek.lambert')
+                    var material = new clay.Material({
+                        shader : clay.shader.library.get('clay.lambert')
                     });
                     material.set('color', [Math.random(), Math.random(), Math.random()]);
-                    var mesh = new qtek.Mesh({
+                    var mesh = new clay.Mesh({
                         material : material,
                         geometry : cubeGeo
                     });
@@ -33,21 +33,21 @@
                     scene.add(mesh);
                 }
             }
-            var light = new qtek.light.Directional();
+            var light = new clay.light.Directional();
             light.position.set(4, 4, 0);
-            light.lookAt(qtek.math.Vector3.ZERO);
+            light.lookAt(clay.math.Vector3.ZERO);
             scene.add(light);
-            scene.add(new qtek.light.Ambient({
+            scene.add(new clay.light.Ambient({
                 intensity : 0.5
             }));
 
-            var picking = new qtek.picking.RayPicking({
+            var picking = new clay.picking.RayPicking({
                 renderer : renderer,
                 scene: scene,
                 camera: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function() {
                 renderer.render(scene, camera);
@@ -55,8 +55,8 @@
 
             var currentCube;
             var point;
-            var offset = new qtek.math.Vector3();
-            var plane = new qtek.math.Plane();
+            var offset = new clay.math.Vector3();
+            var plane = new clay.math.Plane();
             renderer.canvas.addEventListener('mousedown', function(e) {
                 var res = picking.pick(e.offsetX, e.offsetY);
                 if (res) {

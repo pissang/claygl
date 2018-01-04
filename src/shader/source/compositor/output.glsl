@@ -1,4 +1,4 @@
-@export qtek.compositor.output
+@export clay.compositor.output
 
 #define OUTPUT_ALPHA
 
@@ -6,7 +6,7 @@ varying vec2 v_Texcoord;
 
 uniform sampler2D texture;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

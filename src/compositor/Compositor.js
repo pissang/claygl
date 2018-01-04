@@ -5,8 +5,8 @@ import FrameBuffer from '../FrameBuffer';
 /**
  * Compositor provide graph based post processing
  *
- * @constructor qtek.compositor.Compositor
- * @extends qtek.compositor.Graph
+ * @constructor clay.compositor.Compositor
+ * @extends clay.compositor.Graph
  *
  */
 var Compositor = Graph.extend(function() {
@@ -21,14 +21,14 @@ var Compositor = Graph.extend(function() {
         })
     };
 },
-/** @lends qtek.compositor.Compositor.prototype */
+/** @lends clay.compositor.Compositor.prototype */
 {
     addNode: function(node) {
         Graph.prototype.addNode.call(this, node);
         node._compositor = this;
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     render: function(renderer, frameBuffer) {
         if (this._dirty) {
@@ -76,7 +76,7 @@ var Compositor = Graph.extend(function() {
 
     /**
      * Dispose compositor
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._texturePool.clear(renderer);

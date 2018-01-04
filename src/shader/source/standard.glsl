@@ -1,7 +1,7 @@
 
 // http://blog.selfshadow.com/publications/s2013-shading-course/
 
-@export qtek.standard.vertex
+@export clay.standard.vertex
 
 #define SHADER_NAME standard
 
@@ -29,7 +29,7 @@ varying vec4 v_Color;
 
 attribute vec3 barycentric;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
@@ -53,7 +53,7 @@ void main()
     vec3 skinnedTangent = tangent.xyz;
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     // Upper 3x3 of skinMatrix is orthogonal
@@ -86,7 +86,7 @@ void main()
 @end
 
 
-@export qtek.standard.fragment
+@export clay.standard.fragment
 
 #define PI 3.14159265358979
 
@@ -198,39 +198,39 @@ uniform float maxMipmapLevel: 5;
 #endif
 
 #ifdef AMBIENT_LIGHT_COUNT
-@import qtek.header.ambient_light
+@import clay.header.ambient_light
 #endif
 
 #ifdef AMBIENT_SH_LIGHT_COUNT
-@import qtek.header.ambient_sh_light
+@import clay.header.ambient_sh_light
 #endif
 
 #ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
-@import qtek.header.ambient_cubemap_light
+@import clay.header.ambient_cubemap_light
 #endif
 
 #ifdef POINT_LIGHT_COUNT
-@import qtek.header.point_light
+@import clay.header.point_light
 #endif
 #ifdef DIRECTIONAL_LIGHT_COUNT
-@import qtek.header.directional_light
+@import clay.header.directional_light
 #endif
 #ifdef SPOT_LIGHT_COUNT
-@import qtek.header.spot_light
+@import clay.header.spot_light
 #endif
 
 // Import util functions and uniforms needed
-@import qtek.util.calculate_attenuation
+@import clay.util.calculate_attenuation
 
-@import qtek.util.edge_factor
+@import clay.util.edge_factor
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.srgb
+@import clay.util.srgb
 
-@import qtek.plugin.compute_shadow_map
+@import clay.plugin.compute_shadow_map
 
-@import qtek.util.parallax_correct
+@import clay.util.parallax_correct
 
 
 float G_Smith(float g, float ndv, float ndl)

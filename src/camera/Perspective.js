@@ -1,11 +1,11 @@
 import Camera from '../Camera';
 
 /**
- * @constructor qtek.camera.Perspective
- * @extends qtek.Camera
+ * @constructor clay.camera.Perspective
+ * @extends clay.Camera
  */
 var Perspective = Camera.extend(
-/** @lends qtek.camera.Perspective# */
+/** @lends clay.camera.Perspective# */
 {
     /**
      * Vertical field of view in radians
@@ -28,7 +28,7 @@ var Perspective = Camera.extend(
      */
     far: 2000
 },
-/** @lends qtek.camera.Perspective.prototype */
+/** @lends clay.camera.Perspective.prototype */
 {
 
     updateProjectionMatrix: function() {
@@ -44,7 +44,7 @@ var Perspective = Camera.extend(
         this.far = m[14] / (m[10] + 1);
     },
     /**
-     * @return {qtek.camera.Perspective}
+     * @return {clay.camera.Perspective}
      */
     clone: function() {
         var camera = Camera.prototype.clone.call(this);

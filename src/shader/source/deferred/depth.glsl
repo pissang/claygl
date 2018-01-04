@@ -1,10 +1,10 @@
-@export qtek.deferred.depth.vertex
+@export clay.deferred.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec4 v_ProjPos;
 
@@ -14,7 +14,7 @@ void main(){
 
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -26,10 +26,10 @@ void main(){
 @end
 
 
-@export qtek.deferred.depth.fragment
+@export clay.deferred.depth.fragment
 
 varying vec4 v_ProjPos;
-@import qtek.util.encode_float
+@import clay.util.encode_float
 
 void main()
 {

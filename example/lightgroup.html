@@ -1,29 +1,29 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;background-color:#20242B;">
         <canvas width="1200" height="640" id="main"></canvas>
         <div id="time" style="position:absolute;left:10px;top:10px;color:white;"></div>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
-            var Material = qtek.Material;
-            var Mesh = qtek.Mesh;
-            var Cube = qtek.geometry.Cube;
-            var meshUtil = qtek.util.mesh;
-            var shaderLibrary = qtek.shader.library;
-            var animation = new qtek.animation.Animation;
+            var Shader = clay.Shader;
+            var Material = clay.Material;
+            var Mesh = clay.Mesh;
+            var Cube = clay.geometry.Cube;
+            var meshUtil = clay.util.mesh;
+            var shaderLibrary = clay.shader.library;
+            var animation = new clay.animation.Animation;
             animation.start();
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas : document.getElementById("main"),
                 devicePixelRatio : 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect : renderer.getViewportAspect(),
                 far : 500
             });
@@ -31,36 +31,36 @@
             var cube = new Cube();
             cube.generateTangents();
 
-            var diffuse = new qtek.Texture2D;
+            var diffuse = new clay.Texture2D;
             diffuse.load("assets/textures/crate.gif");
-            var normal = new qtek.Texture2D;
+            var normal = new clay.Texture2D;
             normal.load("assets/textures/normal_map.jpg");
 
             var material1 = new Material({
                 shader: new Shader({
-                    vertex: Shader.source('qtek.standard.vertex'),
-                    fragment: Shader.source('qtek.standard.fragment')
+                    vertex: Shader.source('clay.standard.vertex'),
+                    fragment: Shader.source('clay.standard.fragment')
                 })
             });
             material1.set('diffuseMap', diffuse);
             material1.set('normalMap', normal);
             var material2 = new Material({
                 shader: new Shader({
-                    vertex: Shader.source('qtek.standard.vertex'),
-                    fragment: Shader.source('qtek.standard.fragment')
+                    vertex: Shader.source('clay.standard.vertex'),
+                    fragment: Shader.source('clay.standard.fragment')
                 })
             });
             material2.set('diffuseMap', diffuse);
             material2.set('normalMap', normal);
 
-            var root = new qtek.Node({
+            var root = new clay.Node({
                 name : 'ROOT'
             });
             scene.add(root);
             for (var i = 0; i < 20; i++) {
                 for (var j = 0; j < 10; j++) {
                     for ( var k = 0; k < 50; k++) {
-                        var mesh = new qtek.Mesh({
+                        var mesh = new clay.Mesh({
                             geometry: cube,
                             material: i % 2 ? material1 : material2,
                             lightGroup: i % 2
@@ -70,19 +70,19 @@
                     }
                 }
             }
-            var light1 = new qtek.light.Point({
+            var light1 = new clay.light.Point({
                 range: 200,
                 group: 0,
                 color: [1, 0.5, 0]
             });
-            var light2 = new qtek.light.Point({
+            var light2 = new clay.light.Point({
                 range: 200,
                 group: 1,
                 color: [0, 0.5, 1]
             });
             scene.add(light1);
             scene.add(light2);
-            scene.add(new qtek.light.Ambient({
+            scene.add(new clay.light.Ambient({
                 intensity: 0.3
             }))
 

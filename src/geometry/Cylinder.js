@@ -2,8 +2,8 @@ import Geometry from '../Geometry';
 import ConeGeometry from './Cone';
 
 /**
- * @constructor qtek.geometry.Cylinder
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Cylinder
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.radius]
  * @param {number} [opt.height]
@@ -11,7 +11,7 @@ import ConeGeometry from './Cone';
  * @param {number} [opt.heightSegments]
  */
 var Cylinder = Geometry.extend(
-/** @lends qtek.geometry.Cylinder# */
+/** @lends clay.geometry.Cylinder# */
 {
     dynamic: false,
     /**
@@ -36,7 +36,7 @@ var Cylinder = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Cylinder.prototype */
+/** @lends clay.geometry.Cylinder.prototype */
 {
     /**
      * Build cylinder geometry

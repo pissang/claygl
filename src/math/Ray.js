@@ -6,17 +6,17 @@ var EPSILON = 1e-5;
 
 /**
  * @constructor
- * @alias qtek.math.Ray
- * @param {qtek.math.Vector3} [origin]
- * @param {qtek.math.Vector3} [direction]
+ * @alias clay.math.Ray
+ * @param {clay.math.Vector3} [origin]
+ * @param {clay.math.Vector3} [direction]
  */
 var Ray = function (origin, direction) {
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.origin = origin || new Vector3();
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.direction = direction || new Vector3();
 };
@@ -28,9 +28,9 @@ Ray.prototype = {
     // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
     /**
      * Calculate intersection point between ray and a give plane
-     * @param  {qtek.math.Plane} plane
-     * @param  {qtek.math.Vector3} [out]
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Plane} plane
+     * @param  {clay.math.Vector3} [out]
+     * @return {clay.math.Vector3}
      */
     intersectPlane: function (plane, out) {
         var pn = plane.normal._array;
@@ -54,7 +54,7 @@ Ray.prototype = {
 
     /**
      * Mirror the ray against plane
-     * @param  {qtek.math.Plane} plane
+     * @param  {clay.math.Plane} plane
      */
     mirrorAgainstPlane: function (plane) {
         // Distance to plane
@@ -81,10 +81,10 @@ Ray.prototype = {
 
     /**
      * Calculate intersection point between ray and sphere
-     * @param  {qtek.math.Vector3} center
+     * @param  {clay.math.Vector3} center
      * @param  {number} radius
-     * @param  {qtek.math.Vector3} out
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} out
+     * @return {clay.math.Vector3}
      */
     intersectSphere: (function () {
         var v = vec3.create();
@@ -134,9 +134,9 @@ Ray.prototype = {
     // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
     /**
      * Calculate intersection point between ray and bounding box
-     * @param {qtek.math.BoundingBox} bbox
-     * @param {qtek.math.Vector3}
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.BoundingBox} bbox
+     * @param {clay.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     intersectBoundingBox: function (bbox, out) {
         var dir = this.direction._array;
@@ -212,13 +212,13 @@ Ray.prototype = {
     // http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
     /**
      * Calculate intersection point between ray and three triangle vertices
-     * @param {qtek.math.Vector3} a
-     * @param {qtek.math.Vector3} b
-     * @param {qtek.math.Vector3} c
+     * @param {clay.math.Vector3} a
+     * @param {clay.math.Vector3} b
+     * @param {clay.math.Vector3} c
      * @param {boolean}           singleSided, CW triangle will be ignored
-     * @param {qtek.math.Vector3} [out]
-     * @param {qtek.math.Vector3} [barycenteric] barycentric coords
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.Vector3} [out]
+     * @param {clay.math.Vector3} [barycenteric] barycentric coords
+     * @return {clay.math.Vector3}
      */
     intersectTriangle: (function () {
 
@@ -286,7 +286,7 @@ Ray.prototype = {
 
     /**
      * Apply an affine transform matrix to the ray
-     * @return {qtek.math.Matrix4} matrix
+     * @return {clay.math.Matrix4} matrix
      */
     applyTransform: function (matrix) {
         Vector3.add(this.direction, this.direction, this.origin);
@@ -299,7 +299,7 @@ Ray.prototype = {
 
     /**
      * Copy values from another ray
-     * @param {qtek.math.Ray} ray
+     * @param {clay.math.Ray} ray
      */
     copy: function (ray) {
         Vector3.copy(this.origin, ray.origin);
@@ -308,7 +308,7 @@ Ray.prototype = {
 
     /**
      * Clone a new ray
-     * @return {qtek.math.Ray}
+     * @return {clay.math.Ray}
      */
     clone: function () {
         var ray = new Ray();

@@ -43,11 +43,11 @@ function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
 }
 
 /**
- * @constructor qtek.Material
- * @extends qtek.core.Base
+ * @constructor clay.Material
+ * @extends clay.core.Base
  */
 var Material = Base.extend(function () {
-    return /** @lends qtek.Material# */ {
+    return /** @lends clay.Material# */ {
         /**
          * @type {string}
          */
@@ -59,7 +59,7 @@ var Material = Base.extend(function () {
         // uniforms: null,
 
         /**
-         * @type {qtek.Shader}
+         * @type {clay.Shader}
          */
         // shader: null,
 
@@ -116,7 +116,7 @@ var Material = Base.extend(function () {
         this.attachShader(this.shader, true);
     }
 },
-/** @lends qtek.Material.prototype */
+/** @lends clay.Material.prototype */
 {
     precision: 'highp',
 
@@ -235,7 +235,7 @@ var Material = Base.extend(function () {
      * @example
      *  mat.setUniform('color', [1, 1, 1, 1]);
      * @param {string} symbol
-     * @param {number|array|qtek.Texture|ArrayBufferView} value
+     * @param {number|array|clay.Texture|ArrayBufferView} value
      */
     setUniform: function (symbol, value) {
         if (value === undefined) {
@@ -300,7 +300,7 @@ var Material = Base.extend(function () {
     /**
      * Alias of setUniform and setUniforms
      * @param {object|string} symbol
-     * @param {number|array|qtek.Texture|ArrayBufferView} [value]
+     * @param {number|array|clay.Texture|ArrayBufferView} [value]
      */
     set: function (symbol, value) {
         if (typeof(symbol) === 'object') {
@@ -316,7 +316,7 @@ var Material = Base.extend(function () {
     /**
      * Get uniform value
      * @param  {string} symbol
-     * @return {number|array|qtek.Texture|ArrayBufferView}
+     * @return {number|array|clay.Texture|ArrayBufferView}
      */
     get: function (symbol) {
         var uniform = this.uniforms[symbol];
@@ -326,7 +326,7 @@ var Material = Base.extend(function () {
     },
     /**
      * Attach a shader instance
-     * @param  {qtek.Shader} shader
+     * @param  {clay.Shader} shader
      * @param  {boolean} keepStatus If try to keep uniform and texture
      */
     attachShader: function(shader, keepStatus) {
@@ -374,7 +374,7 @@ var Material = Base.extend(function () {
 
     /**
      * Clone a new material and keep uniforms, shader will not be cloned
-     * @return {qtek.Material}
+     * @return {clay.Material}
      */
     clone: function () {
         var material = new this.constructor({

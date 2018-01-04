@@ -5,8 +5,8 @@ var vec3 = glMatrix.vec3;
 var vec2 = glMatrix.vec2;
 
 /**
- * @constructor qtek.geometry.Cone
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Cone
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.topRadius]
  * @param {number} [opt.bottomRadius]
@@ -15,7 +15,7 @@ var vec2 = glMatrix.vec2;
  * @param {number} [opt.heightSegments]
  */
 var Cone = Geometry.extend(
-/** @lends qtek.geometry.Cone# */
+/** @lends clay.geometry.Cone# */
 {
     dynamic: false,
     /**
@@ -45,7 +45,7 @@ var Cone = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Cone.prototype */
+/** @lends clay.geometry.Cone.prototype */
 {
     /**
      * Build cone geometry

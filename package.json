@@ -1,5 +1,5 @@
 {
-  "name": "qtek",
+  "name": "claygl",
   "version": "0.6.1",
   "description": "WebGL graphic library",
   "keywords": [
@@ -18,11 +18,11 @@
       "extensions": "glsl"
     }
   },
-  "jsnext:main": "dist/qtek.es.js",
-  "module": "dist/qtek.es.js",
-  "main": "dist/qtek.js",
+  "jsnext:main": "dist/claygl.es.js",
+  "module": "dist/claygl.es.js",
+  "main": "dist/claygl.js",
   "scripts": {
-    "build": "npm run glsl2js && npm run gen:entry && rollup -c && uglifyjs dist/qtek.js -c -m > dist/qtek.min.js",
+    "build": "npm run glsl2js && npm run gen:entry && rollup -c && uglifyjs dist/claygl.js -c -m > dist/claygl.min.js",
     "build:sourcemap": "npm run gen:entry && rollup --sourcemap inline -c",
     "dev": "rollup --sourcemap inline -c -w",
     "glsl2js": "node build/glsl2js.js",
@@ -30,10 +30,10 @@
     "gen:fixture": "npm run pretest && electron-mocha --require-main \"./test/genfixture-env.js\" --renderer \"./test/integration/**/*.spec.js\"",
     "prepublish": "npm run build",
     "debug": "npm run pretest && electron-mocha --debug-brk --renderer \"./test/**/*.spec.js\"",
-    "instrument": "istanbul instrument ./dist/qtek.src.js --output ./dist/qtek.js --no-compact --complete-copy --es-modules",
+    "instrument": "istanbul instrument ./dist/claygl.src.js --output ./dist/claygl.js --no-compact --complete-copy --es-modules",
     "pretest": "npm run build:sourcemap",
     "tdd": "npm run pretest && electron-mocha --interactive --renderer \"./test/**/*.spec.js\"",
-    "test:cov": "npm run pretest -- test/rollup.config.js && npm run instrument && npm run test:main -- -R test/reporter/istanbul-reporter && remap-istanbul -i coverage/coverage-final.json -o coverage/html-report -t html && node -e \"require('fs').unlinkSync('./dist/qtek.src.js')\"",
+    "test:cov": "npm run pretest -- test/rollup.config.js && npm run instrument && npm run test:main -- -R test/reporter/istanbul-reporter && remap-istanbul -i coverage/coverage-final.json -o coverage/html-report -t html && node -e \"require('fs').unlinkSync('./dist/claygl.src.js')\"",
     "test:fixture": "npm run pretest && electron-mocha --require-main ./test/ci-env.js --renderer \"./test/integration/**/*.spec.js\" -R test/reporter/fixture-reporter",
     "test:main": "electron-mocha --require-main ./test/ci-env.js --renderer \"./test/**/*.spec.js\"",
     "test": "npm run test:main",
@@ -41,7 +41,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pissang/qtek.git"
+    "url": "https://github.com/pissang/claygl.git"
   },
   "devDependencies": {
     "docdash": "^0.4.0",

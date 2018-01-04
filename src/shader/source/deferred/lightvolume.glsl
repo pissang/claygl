@@ -1,4 +1,4 @@
-@export qtek.deferred.light_volume.vertex
+@export clay.deferred.light_volume.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 

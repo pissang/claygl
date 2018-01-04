@@ -7,7 +7,7 @@ var quat = glMatrix.quat;
 
 /**
  * @constructor
- * @alias qtek.math.Matrix4
+ * @alias clay.math.Matrix4
  */
 var Matrix4 = function() {
 
@@ -19,14 +19,14 @@ var Matrix4 = function() {
      * Storage of Matrix4
      * @name _array
      * @type {Float32Array}
-     * @memberOf qtek.math.Matrix4#
+     * @memberOf clay.math.Matrix4#
      */
     this._array = mat4.create();
 
     /**
      * @name _dirty
      * @type {boolean}
-     * @memberOf qtek.math.Matrix4#
+     * @memberOf clay.math.Matrix4#
      */
     this._dirty = true;
 };
@@ -48,7 +48,7 @@ Matrix4.prototype = {
     },
     /**
      * Calculate the adjugate of self, in-place
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     adjoint: function() {
         mat4.adjoint(this._array, this._array);
@@ -58,7 +58,7 @@ Matrix4.prototype = {
 
     /**
      * Clone a new Matrix4
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     clone: function() {
         return (new Matrix4()).copy(this);
@@ -66,8 +66,8 @@ Matrix4.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     copy: function(a) {
         mat4.copy(this._array, a._array);
@@ -85,8 +85,8 @@ Matrix4.prototype = {
 
     /**
      * Set upper 3x3 part from quaternion
-     * @param  {qtek.math.Quaternion} q
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Quaternion} q
+     * @return {clay.math.Matrix4}
      */
     fromQuat: function(q) {
         mat4.fromQuat(this._array, q._array);
@@ -96,9 +96,9 @@ Matrix4.prototype = {
 
     /**
      * Set from a quaternion rotation and a vector translation
-     * @param  {qtek.math.Quaternion} q
-     * @param  {qtek.math.Vector3} v
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Quaternion} q
+     * @param  {clay.math.Vector3} v
+     * @return {clay.math.Matrix4}
      */
     fromRotationTranslation: function(q, v) {
         mat4.fromRotationTranslation(this._array, q._array, v._array);
@@ -109,8 +109,8 @@ Matrix4.prototype = {
     /**
      * Set from Matrix2d, it is used when converting a 2d shape to 3d space.
      * In 3d space it is equivalent to ranslate on xy plane and rotate about z axis
-     * @param  {qtek.math.Matrix2d} m2d
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix2d} m2d
+     * @return {clay.math.Matrix4}
      */
     fromMat2d: function(m2d) {
         Matrix4.fromMat2d(this, m2d);
@@ -125,7 +125,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     frustum: function (left, right, bottom, top, near, far) {
         mat4.frustum(this._array, left, right, bottom, top, near, far);
@@ -135,7 +135,7 @@ Matrix4.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     identity: function() {
         mat4.identity(this._array);
@@ -145,7 +145,7 @@ Matrix4.prototype = {
 
     /**
      * Invert self
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     invert: function() {
         mat4.invert(this._array, this._array);
@@ -155,10 +155,10 @@ Matrix4.prototype = {
 
     /**
      * Set as a matrix with the given eye position, focal point, and up axis
-     * @param  {qtek.math.Vector3} eye
-     * @param  {qtek.math.Vector3} center
-     * @param  {qtek.math.Vector3} up
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3} eye
+     * @param  {clay.math.Vector3} center
+     * @param  {clay.math.Vector3} up
+     * @return {clay.math.Matrix4}
      */
     lookAt: function(eye, center, up) {
         mat4.lookAt(this._array, eye._array, center._array, up._array);
@@ -168,8 +168,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     mul: function(b) {
         mat4.mul(this._array, this._array, b._array);
@@ -179,8 +179,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Matrix4} a
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} a
+     * @return {clay.math.Matrix4}
      */
     mulLeft: function(a) {
         mat4.mul(this._array, a._array, this._array);
@@ -190,8 +190,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     multiply: function(b) {
         mat4.multiply(this._array, this._array, b._array);
@@ -201,8 +201,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {qtek.math.Matrix3} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} a
+     * @return {clay.math.Matrix3}
      */
     multiplyLeft: function(a) {
         mat4.multiply(this._array, a._array, this._array);
@@ -218,7 +218,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     ortho: function(left, right, bottom, top, near, far) {
         mat4.ortho(this._array, left, right, bottom, top, near, far);
@@ -231,7 +231,7 @@ Matrix4.prototype = {
      * @param  {number} aspect
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     perspective: function(fovy, aspect, near, far) {
         mat4.perspective(this._array, fovy, aspect, near, far);
@@ -243,8 +243,8 @@ Matrix4.prototype = {
      * Rotate self by rad about axis.
      * Equal to right-multiply a rotaion matrix
      * @param  {number}   rad
-     * @param  {qtek.math.Vector3} axis
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3} axis
+     * @return {clay.math.Matrix4}
      */
     rotate: function(rad, axis) {
         mat4.rotate(this._array, this._array, rad, axis._array);
@@ -256,7 +256,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about X axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateX: function(rad) {
         mat4.rotateX(this._array, this._array, rad);
@@ -268,7 +268,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Y axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateY: function(rad) {
         mat4.rotateY(this._array, this._array, rad);
@@ -280,7 +280,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Z axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateZ: function(rad) {
         mat4.rotateZ(this._array, this._array, rad);
@@ -291,8 +291,8 @@ Matrix4.prototype = {
     /**
      * Scale self by s
      * Equal to right-multiply a scale matrix
-     * @param  {qtek.math.Vector3}  s
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3}  s
+     * @return {clay.math.Matrix4}
      */
     scale: function(v) {
         mat4.scale(this._array, this._array, v._array);
@@ -303,8 +303,8 @@ Matrix4.prototype = {
     /**
      * Translate self by v.
      * Equal to right-multiply a translate matrix
-     * @param  {qtek.math.Vector3}  v
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3}  v
+     * @return {clay.math.Matrix4}
      */
     translate: function(v) {
         mat4.translate(this._array, this._array, v._array);
@@ -314,7 +314,7 @@ Matrix4.prototype = {
 
     /**
      * Transpose self, in-place.
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     transpose: function() {
         mat4.transpose(this._array, this._array);
@@ -324,9 +324,9 @@ Matrix4.prototype = {
 
     /**
      * Decompose a matrix to SRT
-     * @param {qtek.math.Vector3} [scale]
-     * @param {qtek.math.Quaternion} rotation
-     * @param {qtek.math.Vector} position
+     * @param {clay.math.Vector3} [scale]
+     * @param {clay.math.Quaternion} rotation
+     * @param {clay.math.Vector} position
      * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
      */
     decomposeMatrix: (function() {
@@ -402,8 +402,8 @@ if (defineProperty) {
     /**
      * Z Axis of local transform
      * @name z
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty(proto, 'z', {
@@ -428,8 +428,8 @@ if (defineProperty) {
     /**
      * Y Axis of local transform
      * @name y
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty(proto, 'y', {
@@ -452,8 +452,8 @@ if (defineProperty) {
     /**
      * X Axis of local transform
      * @name x
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty(proto, 'x', {
@@ -475,9 +475,9 @@ if (defineProperty) {
 }
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.adjoint = function(out, a) {
     mat4.adjoint(out._array, a._array);
@@ -486,9 +486,9 @@ Matrix4.adjoint = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.copy = function(out, a) {
     mat4.copy(out._array, a._array);
@@ -497,7 +497,7 @@ Matrix4.copy = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} a
  * @return {number}
  */
 Matrix4.determinant = function(a) {
@@ -505,8 +505,8 @@ Matrix4.determinant = function(a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @return {clay.math.Matrix4}
  */
 Matrix4.identity = function(out) {
     mat4.identity(out._array);
@@ -515,14 +515,14 @@ Matrix4.identity = function(out) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
+ * @param  {clay.math.Matrix4} out
  * @param  {number}  left
  * @param  {number}  right
  * @param  {number}  bottom
  * @param  {number}  top
  * @param  {number}  near
  * @param  {number}  far
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
     mat4.ortho(out._array, left, right, bottom, top, near, far);
@@ -531,12 +531,12 @@ Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
+ * @param  {clay.math.Matrix4} out
  * @param  {number}  fovy
  * @param  {number}  aspect
  * @param  {number}  near
  * @param  {number}  far
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.perspective = function(out, fovy, aspect, near, far) {
     mat4.perspective(out._array, fovy, aspect, near, far);
@@ -545,11 +545,11 @@ Matrix4.perspective = function(out, fovy, aspect, near, far) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Vector3} eye
- * @param  {qtek.math.Vector3} center
- * @param  {qtek.math.Vector3} up
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Vector3} eye
+ * @param  {clay.math.Vector3} center
+ * @param  {clay.math.Vector3} up
+ * @return {clay.math.Matrix4}
  */
 Matrix4.lookAt = function(out, eye, center, up) {
     mat4.lookAt(out._array, eye._array, center._array, up._array);
@@ -558,9 +558,9 @@ Matrix4.lookAt = function(out, eye, center, up) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.invert = function(out, a) {
     mat4.invert(out._array, a._array);
@@ -569,10 +569,10 @@ Matrix4.invert = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Matrix4} b
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Matrix4} b
+ * @return {clay.math.Matrix4}
  */
 Matrix4.mul = function(out, a, b) {
     mat4.mul(out._array, a._array, b._array);
@@ -582,17 +582,17 @@ Matrix4.mul = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Matrix4} b
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Matrix4} b
+ * @return {clay.math.Matrix4}
  */
 Matrix4.multiply = Matrix4.mul;
 
 /**
- * @param  {qtek.math.Matrix4}    out
- * @param  {qtek.math.Quaternion} q
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4}    out
+ * @param  {clay.math.Quaternion} q
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromQuat = function(out, q) {
     mat4.fromQuat(out._array, q._array);
@@ -601,10 +601,10 @@ Matrix4.fromQuat = function(out, q) {
 };
 
 /**
- * @param  {qtek.math.Matrix4}    out
- * @param  {qtek.math.Quaternion} q
- * @param  {qtek.math.Vector3}    v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4}    out
+ * @param  {clay.math.Quaternion} q
+ * @param  {clay.math.Vector3}    v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromRotationTranslation = function(out, q, v) {
     mat4.fromRotationTranslation(out._array, q._array, v._array);
@@ -613,9 +613,9 @@ Matrix4.fromRotationTranslation = function(out, q, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} m4
- * @param  {qtek.math.Matrix2d} m2d
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} m4
+ * @param  {clay.math.Matrix2d} m2d
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromMat2d = function(m4, m2d) {
     m4._dirty = true;
@@ -634,11 +634,11 @@ Matrix4.fromMat2d = function(m4, m2d) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @param  {qtek.math.Vector3} axis
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Vector3} axis
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotate = function(out, a, rad, axis) {
     mat4.rotate(out._array, a._array, rad, axis._array);
@@ -647,10 +647,10 @@ Matrix4.rotate = function(out, a, rad, axis) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateX = function(out, a, rad) {
     mat4.rotateX(out._array, a._array, rad);
@@ -659,10 +659,10 @@ Matrix4.rotateX = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateY = function(out, a, rad) {
     mat4.rotateY(out._array, a._array, rad);
@@ -671,10 +671,10 @@ Matrix4.rotateY = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateZ = function(out, a, rad) {
     mat4.rotateZ(out._array, a._array, rad);
@@ -683,10 +683,10 @@ Matrix4.rotateZ = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Vector3} v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Vector3} v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.scale = function(out, a, v) {
     mat4.scale(out._array, a._array, v._array);
@@ -695,9 +695,9 @@ Matrix4.scale = function(out, a, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.transpose = function(out, a) {
     mat4.transpose(out._array, a._array);
@@ -706,10 +706,10 @@ Matrix4.transpose = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Vector3} v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Vector3} v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.translate = function(out, a, v) {
     mat4.translate(out._array, a._array, v._array);

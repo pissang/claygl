@@ -1,6 +1,6 @@
-@export qtek.deferred.ambient_cubemap_light
+@export clay.deferred.ambient_cubemap_light
 
-@import qtek.deferred.chunk.light_head
+@import clay.deferred.chunk.light_head
 
 uniform vec3 lightColor;
 uniform samplerCube lightCubemap;
@@ -8,11 +8,11 @@ uniform sampler2D brdfLookup;
 
 uniform vec3 eyePosition;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {
-    @import qtek.deferred.chunk.gbuffer_read
+    @import clay.deferred.chunk.gbuffer_read
 
     vec3 V = normalize(eyePosition - position);
     vec3 L = reflect(-V, N);

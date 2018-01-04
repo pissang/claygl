@@ -25,14 +25,14 @@ function getProgramKey(lightNumbers) {
 }
 
 /**
- * @constructor qtek.Scene
- * @extends qtek.Node
+ * @constructor clay.Scene
+ * @extends clay.Node
  */
 var Scene = Node.extend(function () {
-    return /** @lends qtek.Scene# */ {
+    return /** @lends clay.Scene# */ {
         /**
          * Global material of scene
-         * @type {qtek.Material}
+         * @type {clay.Material}
          */
         material: null,
 
@@ -43,14 +43,14 @@ var Scene = Node.extend(function () {
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {qtek.Renderable[]}
+         * @type {clay.Renderable[]}
          * @readonly
          */
         opaqueList: [],
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {qtek.Renderable[]}
+         * @type {clay.Renderable[]}
          * @readonly
          */
         transparentList: [],
@@ -65,7 +65,7 @@ var Scene = Node.extend(function () {
          * Notice:
          *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
          *
-         * @type {qtek.math.BoundingBox}
+         * @type {clay.math.BoundingBox}
          */
         viewBoundingBoxLastFrame: new BoundingBox(),
 
@@ -96,7 +96,7 @@ var Scene = Node.extend(function () {
 }, function () {
     this._scene = this;
 },
-/** @lends qtek.Scene.prototype. */
+/** @lends clay.Scene.prototype. */
 {
     /**
      * Add node to scene
@@ -131,8 +131,8 @@ var Scene = Node.extend(function () {
     /**
      * Clone a new scene node recursively, including material, skeleton.
      * Shader and geometry instances will not been cloned
-     * @param  {qtek.Node} node
-     * @return {qtek.Node}
+     * @param  {clay.Node} node
+     * @return {clay.Node}
      */
     cloneNode: function (node) {
         var newNode = node.clone();

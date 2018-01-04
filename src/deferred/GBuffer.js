@@ -185,12 +185,12 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
 /**
  * GBuffer is provided for deferred rendering and SSAO, SSR pass.
  * It will do two passes rendering to three target textures. See
- * + {@link qtek.deferred.GBuffer#getTargetTexture1}
- * + {@link qtek.deferred.GBuffer#getTargetTexture2}
- * + {@link qtek.deferred.GBuffer#getTargetTexture3}
+ * + {@link clay.deferred.GBuffer#getTargetTexture1}
+ * + {@link clay.deferred.GBuffer#getTargetTexture2}
+ * + {@link clay.deferred.GBuffer#getTargetTexture3}
  * @constructor
- * @alias qtek.deferred.GBuffer
- * @extends qtek.core.Base
+ * @alias clay.deferred.GBuffer
+ * @extends clay.core.Base
  */
 var GBuffer = Base.extend(function () {
 
@@ -253,8 +253,8 @@ var GBuffer = Base.extend(function () {
 
         _gBufferMaterial1: new Material({
             shader: new Shader(
-                Shader.source('qtek.deferred.gbuffer.vertex'),
-                Shader.source('qtek.deferred.gbuffer1.fragment')
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer1.fragment')
             ),
             vertexDefines: {
                 FIRST_PASS: null
@@ -265,16 +265,16 @@ var GBuffer = Base.extend(function () {
         }),
         _gBufferMaterial2: new Material({
             shader: new Shader(
-                Shader.source('qtek.deferred.gbuffer.vertex'),
-                Shader.source('qtek.deferred.gbuffer2.fragment')
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer2.fragment')
             )
         }),
 
         _debugPass: new Pass({
-            fragment: Shader.source('qtek.deferred.gbuffer.debug')
+            fragment: Shader.source('clay.deferred.gbuffer.debug')
         })
     };
-}, /** @lends qtek.deferred.GBuffer# */{
+}, /** @lends clay.deferred.GBuffer# */{
 
     /**
      * Set G Buffer size.
@@ -329,9 +329,9 @@ var GBuffer = Base.extend(function () {
 
     /**
      * Update G Buffer
-     * @param {qtek.Renderer} renderer
-     * @param {qtek.Scene} scene
-     * @param {qtek.camera.Perspective} camera
+     * @param {clay.Renderer} renderer
+     * @param {clay.Scene} scene
+     * @param {clay.camera.Perspective} camera
      */
     update: function (renderer, scene, camera) {
 
@@ -481,7 +481,7 @@ var GBuffer = Base.extend(function () {
      * + G: normal.y * 0.5 + 0.5
      * + B: normal.z * 0.5 + 0.5
      * + A: glossiness
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture1: function () {
         return this._gBufferTex1;
@@ -491,7 +491,7 @@ var GBuffer = Base.extend(function () {
      * Get second target texture.
      * Channel storage:
      * + R: depth
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture2: function () {
         return this._gBufferTex2;
@@ -504,7 +504,7 @@ var GBuffer = Base.extend(function () {
      * + G: albedo.g
      * + B: albedo.b
      * + A: metalness
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture3: function () {
         return this._gBufferTex3;
@@ -512,7 +512,7 @@ var GBuffer = Base.extend(function () {
 
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
     }

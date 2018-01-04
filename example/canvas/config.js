@@ -4,8 +4,8 @@ require.config({
     },
     // Debug
     packages: [{
-        name: 'qtek',
+        name: 'clay',
         location: '../../src',
-        main: 'qtek'
+        main: 'claygl'
     }]
 });

@@ -1,6 +1,6 @@
 // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
 
-@export qtek.compositor.upsample
+@export clay.compositor.upsample
 
 #define HIGH_QUALITY
 
@@ -11,9 +11,9 @@ uniform float sampleScale: 0.5;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
-@import qtek.util.clamp_sample
+@import clay.util.clamp_sample
 
 void main()
 {

@@ -7,14 +7,14 @@ var vec3 = glMatrix.vec3;
 var mat4 = glMatrix.mat4;
 
 /**
- * @constructor qtek.Skeleton
+ * @constructor clay.Skeleton
  */
 var Skeleton = Base.extend(function () {
-    return /** @lends qtek.Skeleton# */{
+    return /** @lends clay.Skeleton# */{
 
         /**
          * Relative root node that not affect transform of joint.
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         relativeRootNode: null,
         /**
@@ -24,7 +24,7 @@ var Skeleton = Base.extend(function () {
 
         /**
          * joints
-         * @type {Array.<qtek.Joint>}
+         * @type {Array.<clay.Joint>}
          */
         joints: [],
 
@@ -47,12 +47,12 @@ var Skeleton = Base.extend(function () {
         _subSkinMatricesArray: {}
     };
 },
-/** @lends qtek.Skeleton.prototype */
+/** @lends clay.Skeleton.prototype */
 {
 
     /**
      * Add a skinning clip and create a map between clip and skeleton
-     * @param {qtek.animation.SkinningClip} clip
+     * @param {clay.animation.SkinningClip} clip
      * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
      */
     addClip: function (clip, mapRule) {
@@ -92,7 +92,7 @@ var Skeleton = Base.extend(function () {
     },
 
     /**
-     * @param {qtek.animation.SkinningClip} clip
+     * @param {clay.animation.SkinningClip} clip
      */
     removeClip: function (clip) {
         var idx = -1;

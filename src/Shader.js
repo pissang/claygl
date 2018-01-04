@@ -136,13 +136,13 @@ function getShaderID(vertex, fragment) {
 
 /**
  * @constructor
- * @extends qtek.core.Base
- * @alias qtek.Shader
+ * @extends clay.core.Base
+ * @alias clay.Shader
  * @example
  * // Create a phong shader
- * var shader = new qtek.Shader(
- *      qtek.Shader.source('qtek.standard.vertex'),
- *      qtek.Shader.source('qtek.standard.fragment')
+ * var shader = new clay.Shader(
+ *      clay.Shader.source('clay.standard.vertex'),
+ *      clay.Shader.source('clay.standard.fragment')
  * );
  */
 function Shader(vertex, fragment) {
@@ -429,7 +429,7 @@ Shader.prototype = {
 
     /**
      * Clone a new shader
-     * @return {qtek.Shader}
+     * @return {clay.Shader}
      */
     clone: function () {
         var code = shaderCodeCache[this._shaderID];
@@ -482,7 +482,7 @@ var exportRegex = /(@export)\s*([0-9a-zA-Z_\-\.]*)\s*\n([\s\S]*?)@end/g;
 /**
  * Import shader source
  * @param  {string} shaderStr
- * @memberOf qtek.Shader
+ * @memberOf clay.Shader
  */
 Shader['import'] = function (shaderStr) {
     shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
@@ -510,7 +510,7 @@ Shader['import'] = function (shaderStr) {
  * Library to store all the loaded shader codes
  * @type {Object}
  * @readOnly
- * @memberOf qtek.Shader
+ * @memberOf clay.Shader
  */
 Shader.codes = {};
 

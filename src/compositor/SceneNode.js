@@ -3,19 +3,19 @@ import glenum from '../core/glenum';
 import FrameBuffer from '../FrameBuffer';
 
 /**
- * @constructor qtek.compositor.SceneNode
- * @extends qtek.compositor.Node
+ * @constructor clay.compositor.SceneNode
+ * @extends clay.compositor.Node
  */
 var SceneNode = Node.extend(
-/** @lends qtek.compositor.SceneNode# */
+/** @lends clay.compositor.SceneNode# */
 {
     name: 'scene',
     /**
-     * @type {qtek.Scene}
+     * @type {clay.Scene}
      */
     scene: null,
     /**
-     * @type {qtek.Camera}
+     * @type {clay.Camera}
      */
     camera: null,
     /**

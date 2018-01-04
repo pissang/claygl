@@ -1,4 +1,4 @@
-@export qtek.sm.depth.vertex
+@export clay.sm.depth.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
@@ -8,7 +8,7 @@ attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
 #endif
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec4 v_ViewPosition;
 
@@ -22,7 +22,7 @@ void main(){
 
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -36,7 +36,7 @@ void main(){
 }
 @end
 
-@export qtek.sm.depth.fragment
+@export clay.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
 
@@ -51,7 +51,7 @@ uniform float slopeScale : 1.0;
 uniform sampler2D transparentMap;
 #endif
 
-@import qtek.util.encode_float
+@import clay.util.encode_float
 
 void main(){
     // Whats the difference between gl_FragCoord.z and this v_ViewPosition
@@ -89,12 +89,12 @@ void main(){
 }
 @end
 
-@export qtek.sm.debug_depth
+@export clay.sm.debug_depth
 
 uniform sampler2D depthMap;
 varying vec2 v_Texcoord;
 
-@import qtek.util.decode_float
+@import clay.util.decode_float
 
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
@@ -109,14 +109,14 @@ void main() {
 @end
 
 
-@export qtek.sm.distance.vertex
+@export clay.sm.distance.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 world : WORLD;
 
 attribute vec3 position : POSITION;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 varying vec3 v_WorldPosition;
 
@@ -124,7 +124,7 @@ void main (){
 
     vec3 skinnedPosition = position;
 #ifdef SKINNING
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -135,14 +135,14 @@ void main (){
 
 @end
 
-@export qtek.sm.distance.fragment
+@export clay.sm.distance.fragment
 
 uniform vec3 lightPosition;
 uniform float range : 100;
 
 varying vec3 v_WorldPosition;
 
-@import qtek.util.encode_float
+@import clay.util.encode_float
 
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
@@ -155,9 +155,9 @@ void main(){
 }
 @end
 
-@export qtek.plugin.shadow_map_common
+@export clay.plugin.shadow_map_common
 
-@import qtek.util.decode_float
+@import clay.util.decode_float
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
@@ -263,7 +263,7 @@ float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
 
 
 
-@export qtek.plugin.compute_shadow_map
+@export clay.plugin.compute_shadow_map
 
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
@@ -298,7 +298,7 @@ uniform bool shadowEnabled : true;
 uniform vec2 pcfKernel[PCF_KERNEL_SIZE];
 #endif
 
-@import qtek.plugin.shadow_map_common
+@import clay.plugin.shadow_map_common
 
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 

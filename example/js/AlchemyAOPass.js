@@ -1,10 +1,10 @@
 define(function (require) {
-    var qtek = require('../../dist/qtek');
-    var Matrix4 = qtek.math.Matrix4;
-    var Vector2 = qtek.math.Vector2;
+    var clay = require('../../dist/claygl');
+    var Matrix4 = clay.math.Matrix4;
+    var Vector2 = clay.math.Vector2;
     var PostProcessPass = require('./PostProcessPass');
 
-    qtek.Shader.import(require('text!../shader/alchemy.glsl'));
+    clay.Shader.import(require('text!../shader/alchemy.glsl'));
 
     function generateKernel(size) {
         var kernel = new Float32Array(size * 2);
@@ -46,12 +46,12 @@ define(function (require) {
     }
 
     function generateNoiseTexture(size) {
-        return new qtek.Texture2D({
+        return new clay.Texture2D({
             pixels: generateNoiseData(size),
-            wrapS: qtek.Texture.REPEAT,
-            wrapT: qtek.Texture.REPEAT,
-            minFilter: qtek.Texture.NEAREST,
-            magFilter: qtek.Texture.NEAREST,
+            wrapS: clay.Texture.REPEAT,
+            wrapT: clay.Texture.REPEAT,
+            minFilter: clay.Texture.NEAREST,
+            magFilter: clay.Texture.NEAREST,
             width: size,
             height: size
         });
@@ -62,10 +62,10 @@ define(function (require) {
 
         this._gBuffer = opt.gBuffer;
 
-        this._ssaoPass = new PostProcessPass(qtek.Shader.source('alchemy.fragment'), true, [1, 1, 1, 1]);
+        this._ssaoPass = new PostProcessPass(clay.Shader.source('alchemy.fragment'), true, [1, 1, 1, 1]);
 
-        this._blurPass1 = new PostProcessPass(qtek.Shader.source('alchemy.blur_h'), true);
-        this._blurPass2 = new PostProcessPass(qtek.Shader.source('alchemy.blur_v'), opt.renderToTexture);
+        this._blurPass1 = new PostProcessPass(clay.Shader.source('alchemy.blur_h'), true);
+        this._blurPass2 = new PostProcessPass(clay.Shader.source('alchemy.blur_v'), opt.renderToTexture);
 
         this._blurPass1.setUniform('colorTex', this._ssaoPass.getTargetTexture());
         this._blurPass1.setUniform('depthTex', this._gBuffer.getTargetTexture2());

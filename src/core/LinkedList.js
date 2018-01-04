@@ -1,17 +1,17 @@
 /**
  * Simple double linked list. Compared with array, it has O(1) remove operation.
  * @constructor
- * @alias qtek.core.LinkedList
+ * @alias clay.core.LinkedList
  */
 var LinkedList = function () {
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.head = null;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.tail = null;
 
@@ -21,7 +21,7 @@ var LinkedList = function () {
 /**
  * Insert a new value at the tail
  * @param  {} val
- * @return {qtek.core.LinkedList.Entry}
+ * @return {clay.core.LinkedList.Entry}
  */
 LinkedList.prototype.insert = function (val) {
     var entry = new LinkedList.Entry(val);
@@ -33,7 +33,7 @@ LinkedList.prototype.insert = function (val) {
  * Insert a new value at idx
  * @param {number} idx
  * @param  {} val
- * @return {qtek.core.LinkedList.Entry}
+ * @return {clay.core.LinkedList.Entry}
  */
 LinkedList.prototype.insertAt = function (idx, val) {
     if (idx < 0) {
@@ -81,7 +81,7 @@ LinkedList.prototype.insertBeforeEntry = function (val, next) {
 
 /**
  * Insert an entry at the tail
- * @param  {qtek.core.LinkedList.Entry} entry
+ * @param  {clay.core.LinkedList.Entry} entry
  */
 LinkedList.prototype.insertEntry = function (entry) {
     if (!this.head) {
@@ -97,7 +97,7 @@ LinkedList.prototype.insertEntry = function (entry) {
 
 /**
  * Remove entry.
- * @param  {qtek.core.LinkedList.Entry} entry
+ * @param  {clay.core.LinkedList.Entry} entry
  */
 LinkedList.prototype.remove = function (entry) {
     var prev = entry.prev;
@@ -245,12 +245,12 @@ LinkedList.Entry = function (val) {
     this.value = val;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.next = null;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.prev = null;
 };

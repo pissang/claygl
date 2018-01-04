@@ -1,18 +1,18 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 30
             });
@@ -20,37 +20,37 @@
 
             camera.position.set(0, 1, 2);
 
-            var plane = new qtek.plugin.InfinitePlane({
+            var plane = new clay.plugin.InfinitePlane({
                 camera: camera,
-                material: new qtek.Material({
-                    shader: qtek.shader.library.get('qtek.lambert'),
+                material: new clay.Material({
+                    shader: clay.shader.library.get('clay.lambert'),
                     transparent: true
                 }),
                 culling: false
             });
             plane.plane.distance = -1;
             scene.add(plane);
-            var cube = new qtek.Mesh({
-                material: new qtek.Material({
-                    shader: qtek.shader.library.get('qtek.basic')
+            var cube = new clay.Mesh({
+                material: new clay.Material({
+                    shader: clay.shader.library.get('clay.basic')
                 }),
-                geometry: new qtek.geometry.Cube()
+                geometry: new clay.geometry.Cube()
             });
-            cube.material.set('diffuseMap', qtek.util.texture.createChessboard());
+            cube.material.set('diffuseMap', clay.util.texture.createChessboard());
             scene.add(cube);
 
-            var light = new qtek.light.Directional()
+            var light = new clay.light.Directional()
             light.position.set(1, 1, 1);
             light.lookAt(scene.position);
             scene.add(light);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas,
                 sensitivity: 0.4
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
             animation.on('frame', function(deltaTime) {

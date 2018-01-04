@@ -39,12 +39,12 @@ var defaultLibrary = new ShaderLibrary();
 
 /**
  * ### Builin shaders
- * + qtek.standard
- * + qtek.basic
- * + qtek.lambert
- * + qtek.wireframe
+ * + clay.standard
+ * + clay.basic
+ * + clay.lambert
+ * + clay.wireframe
  *
- * @namespace qtek.shader.library
+ * @namespace clay.shader.library
  */
 export default {
     /**
@@ -56,16 +56,16 @@ export default {
     /**
      * Get shader from default library.
      * @param {string} name
-     * @return {qtek.Shader}
-     * @memberOf qtek.shader.library
+     * @return {clay.Shader}
+     * @memberOf clay.shader.library
      * @example
-     *     qtek.shader.library.get('qtek.standard')
+     *     clay.shader.library.get('clay.standard')
      */
     get: function () {
         return defaultLibrary.get.apply(defaultLibrary, arguments);
     },
     /**
-     * @memberOf qtek.shader.library
+     * @memberOf clay.shader.library
      * @param  {string} name
      * @param  {string} vertex - Vertex shader code
      * @param  {string} fragment - Fragment shader code

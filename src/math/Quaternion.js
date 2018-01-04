@@ -3,7 +3,7 @@ var quat = glMatrix.quat;
 
 /**
  * @constructor
- * @alias qtek.math.Quaternion
+ * @alias clay.math.Quaternion
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -21,7 +21,7 @@ var Quaternion = function (x, y, z, w) {
      * All methods also operate on the _array instead of x, y, z, w components
      * @name _array
      * @type {Float32Array}
-     * @memberOf qtek.math.Quaternion#
+     * @memberOf clay.math.Quaternion#
      */
     this._array = quat.fromValues(x, y, z, w);
 
@@ -30,7 +30,7 @@ var Quaternion = function (x, y, z, w) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
-     * @memberOf qtek.math.Quaternion#
+     * @memberOf clay.math.Quaternion#
      */
     this._dirty = true;
 };
@@ -41,8 +41,8 @@ Quaternion.prototype = {
 
     /**
      * Add b to self
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     add: function (b) {
         quat.add(this._array, this._array, b._array);
@@ -52,7 +52,7 @@ Quaternion.prototype = {
 
     /**
      * Calculate the w component from x, y, z component
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     calculateW: function () {
         quat.calculateW(this._array, this._array);
@@ -66,7 +66,7 @@ Quaternion.prototype = {
      * @param  {number}  y
      * @param  {number}  z
      * @param  {number}  w
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     set: function (x, y, z, w) {
         this._array[0] = x;
@@ -80,7 +80,7 @@ Quaternion.prototype = {
     /**
      * Set x, y, z and w components from array
      * @param  {Float32Array|number[]} arr
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     setArray: function (arr) {
         this._array[0] = arr[0];
@@ -94,7 +94,7 @@ Quaternion.prototype = {
 
     /**
      * Clone a new Quaternion
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     clone: function () {
         return new Quaternion(this.x, this.y, this.z, this.w);
@@ -104,7 +104,7 @@ Quaternion.prototype = {
      * Calculates the conjugate of self If the quaternion is normalized,
      * this function is faster than invert and produces the same result.
      *
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     conjugate: function () {
         quat.conjugate(this._array, this._array);
@@ -114,8 +114,8 @@ Quaternion.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     copy: function (b) {
         quat.copy(this._array, b._array);
@@ -125,7 +125,7 @@ Quaternion.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} b
      * @return {number}
      */
     dot: function (b) {
@@ -134,8 +134,8 @@ Quaternion.prototype = {
 
     /**
      * Set from the given 3x3 rotation matrix
-     * @param  {qtek.math.Matrix3} m
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Matrix3} m
+     * @return {clay.math.Quaternion}
      */
     fromMat3: function (m) {
         quat.fromMat3(this._array, m._array);
@@ -146,8 +146,8 @@ Quaternion.prototype = {
     /**
      * Set from the given 4x4 rotation matrix
      * The 4th column and 4th row will be droped
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Quaternion}
      */
     fromMat4: (function () {
         var mat3 = glMatrix.mat3;
@@ -164,7 +164,7 @@ Quaternion.prototype = {
 
     /**
      * Set to identity quaternion
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     identity: function () {
         quat.identity(this._array);
@@ -173,7 +173,7 @@ Quaternion.prototype = {
     },
     /**
      * Invert self
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     invert: function () {
         quat.invert(this._array, this._array);
@@ -198,10 +198,10 @@ Quaternion.prototype = {
 
     /**
      * Linear interpolation between a and b
-     * @param  {qtek.math.Quaternion} a
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} a
+     * @param  {clay.math.Quaternion} b
      * @param  {number}  t
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     lerp: function (a, b, t) {
         quat.lerp(this._array, a._array, b._array, t);
@@ -211,8 +211,8 @@ Quaternion.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     mul: function (b) {
         quat.mul(this._array, this._array, b._array);
@@ -222,8 +222,8 @@ Quaternion.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Quaternion} a
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} a
+     * @return {clay.math.Quaternion}
      */
     mulLeft: function (a) {
         quat.multiply(this._array, a._array, this._array);
@@ -233,8 +233,8 @@ Quaternion.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     multiply: function (b) {
         quat.multiply(this._array, this._array, b._array);
@@ -245,8 +245,8 @@ Quaternion.prototype = {
     /**
      * Mutiply a and self
      * Quaternion mutiply is not commutative, so the result of mutiplyLeft is different with multiply.
-     * @param  {qtek.math.Quaternion} a
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} a
+     * @return {clay.math.Quaternion}
      */
     multiplyLeft: function (a) {
         quat.multiply(this._array, a._array, this._array);
@@ -256,7 +256,7 @@ Quaternion.prototype = {
 
     /**
      * Normalize self
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     normalize: function () {
         quat.normalize(this._array, this._array);
@@ -267,7 +267,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about X axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateX: function (rad) {
         quat.rotateX(this._array, this._array, rad);
@@ -278,7 +278,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about Y axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateY: function (rad) {
         quat.rotateY(this._array, this._array, rad);
@@ -289,7 +289,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about Z axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateZ: function (rad) {
         quat.rotateZ(this._array, this._array, rad);
@@ -300,9 +300,9 @@ Quaternion.prototype = {
     /**
      * Sets self to represent the shortest rotation from Vector3 a to Vector3 b.
      * a and b needs to be normalized
-     * @param  {qtek.math.Vector3} a
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Vector3} a
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Quaternion}
      */
     rotationTo: function (a, b) {
         quat.rotationTo(this._array, a._array, b._array);
@@ -311,10 +311,10 @@ Quaternion.prototype = {
     },
     /**
      * Sets self with values corresponding to the given axes
-     * @param {qtek.math.Vector3} view
-     * @param {qtek.math.Vector3} right
-     * @param {qtek.math.Vector3} up
-     * @return {qtek.math.Quaternion}
+     * @param {clay.math.Vector3} view
+     * @param {clay.math.Vector3} right
+     * @param {clay.math.Vector3} up
+     * @return {clay.math.Quaternion}
      */
     setAxes: function (view, right, up) {
         quat.setAxes(this._array, view._array, right._array, up._array);
@@ -324,9 +324,9 @@ Quaternion.prototype = {
 
     /**
      * Sets self with a rotation axis and rotation angle
-     * @param {qtek.math.Vector3} axis
+     * @param {clay.math.Vector3} axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     setAxisAngle: function (axis, rad) {
         quat.setAxisAngle(this._array, axis._array, rad);
@@ -335,10 +335,10 @@ Quaternion.prototype = {
     },
     /**
      * Perform spherical linear interpolation between a and b
-     * @param  {qtek.math.Quaternion} a
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} a
+     * @param  {clay.math.Quaternion} b
      * @param  {number} t
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     slerp: function (a, b, t) {
         quat.slerp(this._array, a._array, b._array, t);
@@ -364,7 +364,7 @@ Quaternion.prototype = {
 
     /**
      * Set from euler
-     * @param {qtek.math.Vector3} v
+     * @param {clay.math.Vector3} v
      * @param {String} order
      */
     fromEuler: function (v, order) {
@@ -388,7 +388,7 @@ if (defineProperty) {
     /**
      * @name x
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty(proto, 'x', {
@@ -404,7 +404,7 @@ if (defineProperty) {
     /**
      * @name y
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty(proto, 'y', {
@@ -420,7 +420,7 @@ if (defineProperty) {
     /**
      * @name z
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty(proto, 'z', {
@@ -436,7 +436,7 @@ if (defineProperty) {
     /**
      * @name w
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty(proto, 'w', {
@@ -453,10 +453,10 @@ if (defineProperty) {
 // Supply methods that are not in place
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.add = function (out, a, b) {
     quat.add(out._array, a._array, b._array);
@@ -465,12 +465,12 @@ Quaternion.add = function (out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
+ * @param  {clay.math.Quaternion} out
  * @param  {number}     x
  * @param  {number}     y
  * @param  {number}     z
  * @param  {number}     w
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.set = function (out, x, y, z, w) {
     quat.set(out._array, x, y, z, w);
@@ -478,9 +478,9 @@ Quaternion.set = function (out, x, y, z, w) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.copy = function (out, b) {
     quat.copy(out._array, b._array);
@@ -489,9 +489,9 @@ Quaternion.copy = function (out, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.calculateW = function (out, a) {
     quat.calculateW(out._array, a._array);
@@ -500,9 +500,9 @@ Quaternion.calculateW = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.conjugate = function (out, a) {
     quat.conjugate(out._array, a._array);
@@ -511,8 +511,8 @@ Quaternion.conjugate = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @return {clay.math.Quaternion}
  */
 Quaternion.identity = function (out) {
     quat.identity(out._array);
@@ -521,9 +521,9 @@ Quaternion.identity = function (out) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.invert = function (out, a) {
     quat.invert(out._array, a._array);
@@ -532,8 +532,8 @@ Quaternion.invert = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @return {number}
  */
 Quaternion.dot = function (a, b) {
@@ -541,7 +541,7 @@ Quaternion.dot = function (a, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.len = function (a) {
@@ -551,11 +551,11 @@ Quaternion.len = function (a) {
 // Quaternion.length = Quaternion.len;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @param  {number}     t
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.lerp = function (out, a, b, t) {
     quat.lerp(out._array, a._array, b._array, t);
@@ -564,11 +564,11 @@ Quaternion.lerp = function (out, a, b, t) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @param  {number}     t
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.slerp = function (out, a, b, t) {
     quat.slerp(out._array, a._array, b._array, t);
@@ -577,10 +577,10 @@ Quaternion.slerp = function (out, a, b, t) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.mul = function (out, a, b) {
     quat.multiply(out._array, a._array, b._array);
@@ -590,18 +590,18 @@ Quaternion.mul = function (out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.multiply = Quaternion.mul;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateX = function (out, a, rad) {
     quat.rotateX(out._array, a._array, rad);
@@ -610,10 +610,10 @@ Quaternion.rotateX = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateY = function (out, a, rad) {
     quat.rotateY(out._array, a._array, rad);
@@ -622,10 +622,10 @@ Quaternion.rotateY = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateZ = function (out, a, rad) {
     quat.rotateZ(out._array, a._array, rad);
@@ -634,10 +634,10 @@ Quaternion.rotateZ = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    axis
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    axis
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.setAxisAngle = function (out, axis, rad) {
     quat.setAxisAngle(out._array, axis._array, rad);
@@ -646,9 +646,9 @@ Quaternion.setAxisAngle = function (out, axis, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.normalize = function (out, a) {
     quat.normalize(out._array, a._array);
@@ -657,7 +657,7 @@ Quaternion.normalize = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.sqrLen = function (a) {
@@ -666,15 +666,15 @@ Quaternion.sqrLen = function (a) {
 
 /**
  * @method
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.squaredLength = Quaternion.sqrLen;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Matrix3}    m
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Matrix3}    m
+ * @return {clay.math.Quaternion}
  */
 Quaternion.fromMat3 = function (out, m) {
     quat.fromMat3(out._array, m._array);
@@ -683,11 +683,11 @@ Quaternion.fromMat3 = function (out, m) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    view
- * @param  {qtek.math.Vector3}    right
- * @param  {qtek.math.Vector3}    up
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    view
+ * @param  {clay.math.Vector3}    right
+ * @param  {clay.math.Vector3}    up
+ * @return {clay.math.Quaternion}
  */
 Quaternion.setAxes = function (out, view, right, up) {
     quat.setAxes(out._array, view._array, right._array, up._array);
@@ -696,10 +696,10 @@ Quaternion.setAxes = function (out, view, right, up) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    a
- * @param  {qtek.math.Vector3}    b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    a
+ * @param  {clay.math.Vector3}    b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotationTo = function (out, a, b) {
     quat.rotationTo(out._array, a._array, b._array);
@@ -709,8 +709,8 @@ Quaternion.rotationTo = function (out, a, b) {
 
 /**
  * Set quaternion from euler
- * @param {qtek.math.Quaternion} out
- * @param {qtek.math.Vector3} v
+ * @param {clay.math.Quaternion} out
+ * @param {clay.math.Vector3} v
  * @param {String} order
  */
 Quaternion.fromEuler = function (out, v, order) {

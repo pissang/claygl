@@ -26,7 +26,7 @@ uniform float bias: 1e-4;
 varying vec2 v_Texcoord;
 
 #ifdef DEPTH_ENCODED
-@import qtek.util.decode_float
+@import clay.util.decode_float
 #endif
 
 vec3 ssaoEstimator(in mat3 kernelBasis, in vec3 originPos) {

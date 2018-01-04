@@ -1,26 +1,26 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 10);
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
             scene.add(camera);
 
-            var GLTFLoader = new qtek.loader.GLTF();
+            var GLTFLoader = new clay.loader.GLTF();
             GLTFLoader.load("assets/models/suzanne/suzanne.gltf");
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas
             });
@@ -28,13 +28,13 @@
             GLTFLoader.on('success', function(res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
                 for (var i = 0; i < 10; i++) {
-                    var material = new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                    var material = new clay.Material({
+                        shader: clay.shader.library.get('clay.standard')
                     });
                     material.set('color', [0.7, 0.0, 0.0]);
                     material.set('specularColor', [0.1, 0.1, 0.1]);
                     material.set('glossiness', (i+1) / 12);
-                    var mesh = new qtek.Mesh({
+                    var mesh = new clay.Mesh({
                         material: material,
                         geometry:suzanneGeometry
                     });
@@ -42,12 +42,12 @@
                     scene.add(mesh);
                 }
 
-                var light = new qtek.light.Directional();
+                var light = new clay.light.Directional();
                 light.position.set(1, 4, 4);
-                light.lookAt(qtek.math.Vector3.ZERO);
+                light.lookAt(clay.math.Vector3.ZERO);
                 scene.add(light);
 
-                var animation = new qtek.animation.Animation();
+                var animation = new clay.animation.Animation();
                 animation.start();
                 animation.on('frame', function() {
                     control.update();

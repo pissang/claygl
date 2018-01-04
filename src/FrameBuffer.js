@@ -16,11 +16,11 @@ var GL_RENDERBUFFER = glenum.RENDERBUFFER;
 var GL_DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
 var GL_COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
 /**
- * @constructor qtek.FrameBuffer
- * @extends qtek.core.Base
+ * @constructor clay.FrameBuffer
+ * @extends clay.core.Base
  */
 var FrameBuffer = Base.extend(
-/** @lends qtek.FrameBuffer# */
+/** @lends clay.FrameBuffer# */
 {
     /**
      * If use depth buffer
@@ -46,7 +46,7 @@ var FrameBuffer = Base.extend(
     this._textures = {};
 },
 
-/**@lends qtek.FrameBuffer.prototype. */
+/**@lends clay.FrameBuffer.prototype. */
 {
     /**
      * Get attached texture width
@@ -67,7 +67,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Bind the framebuffer to given renderer before rendering
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     bind: function (renderer) {
 
@@ -151,7 +151,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Unbind the frame buffer after rendering
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     unbind: function (renderer) {
         // Remove status record on renderer
@@ -215,7 +215,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Attach a texture(RTT) to the framebuffer
-     * @param  {qtek.Texture} texture
+     * @param  {clay.Texture} texture
      * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
      * @param  {number} [target=gl.TEXTURE_2D]
      */

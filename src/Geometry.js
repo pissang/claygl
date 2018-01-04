@@ -26,7 +26,7 @@ function makeAttrKey(attrName) {
 }
 /**
  * Geometry attribute
- * @alias qtek.Geometry.Attribute
+ * @alias clay.Geometry.Attribute
  * @constructor
  */
 function Attribute(name, type, size, semantic) {
@@ -173,7 +173,7 @@ function Attribute(name, type, size, semantic) {
 /**
  * Set item value at give index. Second parameter val is number if size is 1
  * @method
- * @name qtek.Geometry.Attribute#set
+ * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]|number} val
  * @example
@@ -183,7 +183,7 @@ function Attribute(name, type, size, semantic) {
 /**
  * Get item value at give index. Second parameter out is no need if size is 1
  * @method
- * @name qtek.Geometry.Attribute#set
+ * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]} [out]
  * @example
@@ -262,11 +262,11 @@ function IndicesBuffer(buffer) {
 }
 
 /**
- * @constructor qtek.Geometry
- * @extends qtek.core.Base
+ * @constructor clay.Geometry
+ * @extends clay.core.Base
  */
 var Geometry = Base.extend(function () {
-    return /** @lends qtek.Geometry# */ {
+    return /** @lends clay.Geometry# */ {
         /**
          * Attributes of geometry. Including:
          *  + `position`
@@ -299,7 +299,7 @@ var Geometry = Base.extend(function () {
         },
         /**
          * Calculated bounding box of geometry.
-         * @type {qtek.math.BoundingBox}
+         * @type {clay.math.BoundingBox}
          */
         boundingBox: null,
 
@@ -324,7 +324,7 @@ var Geometry = Base.extend(function () {
 
     this._attributeList = Object.keys(this.attributes);
 },
-/** @lends qtek.Geometry.prototype */
+/** @lends clay.Geometry.prototype */
 {
     /**
      * Main attribute will be used to count vertex number
@@ -346,7 +346,7 @@ var Geometry = Base.extend(function () {
      * User defined ray picking algorithm instead of default
      * triangle ray intersection
      * ```typescript
-     * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
+     * (ray: clay.math.Ray, renderable: clay.Renderable, out: Array) => boolean
      * ```
      * @type {?Function}
      */
@@ -504,7 +504,7 @@ var Geometry = Base.extend(function () {
     /**
      * Get attribute
      * @param {string} name
-     * @return {qtek.Geometry.Attribute}
+     * @return {clay.Geometry.Attribute}
      */
     getAttribute: function (name) {
         return this.attribute[name];
@@ -967,7 +967,7 @@ var Geometry = Base.extend(function () {
 
     /**
      * Apply transform to geometry attributes.
-     * @param {qtek.math.Matrix4} matrix
+     * @param {clay.math.Matrix4} matrix
      */
     applyTransform: function (matrix) {
 
@@ -998,7 +998,7 @@ var Geometry = Base.extend(function () {
     },
     /**
      * Dispose geometry data in GL context.
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
 
@@ -1023,7 +1023,7 @@ var Geometry = Base.extend(function () {
 
 if (Object.defineProperty) {
     /**
-     * @name qtek.Geometry#vertexCount
+     * @name clay.Geometry#vertexCount
      * @type {number}
      * @readOnly
      */
@@ -1040,7 +1040,7 @@ if (Object.defineProperty) {
         }
     });
     /**
-     * @name qtek.Geometry#triangleCount
+     * @name clay.Geometry#triangleCount
      * @type {number}
      * @readOnly
      */

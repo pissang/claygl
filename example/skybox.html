@@ -1,25 +1,25 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById( "Main")
             });
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
-            var texture = new qtek.TextureCube({
+            var texture = new clay.TextureCube({
                 flipY: false
             });
             texture.load({
@@ -31,15 +31,15 @@
                 nz: 'assets/textures/cube/skybox/nz.jpg',
             });
 
-            var skybox = new qtek.plugin.Skybox({
+            var skybox = new clay.plugin.Skybox({
                 scene: scene
             });
             skybox.material.set("environmentMap", texture);
 
             camera.position.set(5, 12, 10);
-            camera.lookAt( new qtek.math.Vector3(0, 8, 0) );
+            camera.lookAt( new clay.math.Vector3(0, 8, 0) );
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas,
                 sensitivity: 0.4

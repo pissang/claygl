@@ -9,48 +9,48 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script type="text/javascript">
             require([
-                '../dist/qtek',
+                '../dist/claygl',
                 'js/createDOFCompositor'
-            ], function(qtek, createDOFCompositor){
-                var renderer = new qtek.Renderer({
+            ], function(clay, createDOFCompositor){
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('Main'),
                     devicePixelRatio: 1
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0.5, 3);
-                camera.lookAt(qtek.math.Vector3.ZERO);
+                camera.lookAt(clay.math.Vector3.ZERO);
 
-                var scene = new qtek.Scene();
-                var rootNode = new qtek.Node();
+                var scene = new clay.Scene();
+                var rootNode = new clay.Node();
                 scene.add(rootNode);
                 scene.add(camera);
 
-                var dirLight = new qtek.light.Directional({
+                var dirLight = new clay.light.Directional({
                     intensity: 0.5
                 });
                 dirLight.position.set(1, 1, 1);
-                dirLight.lookAt(qtek.math.Vector3.ZERO);
+                dirLight.lookAt(clay.math.Vector3.ZERO);
                 scene.add(dirLight);
 
-                var loader = new qtek.loader.GLTF({
+                var loader = new clay.loader.GLTF({
                     rootNode: rootNode
                 });
                 loader.load('assets/models/basic_scene/scene.gltf');
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas
                 });
 
-                var sphereGeo = new qtek.geometry.Sphere({
+                var sphereGeo = new clay.geometry.Sphere({
                     radius: 0.2
                 });
                 for (var i = 0; i < 100; i++) {
-                    var emitMesh = new qtek.Mesh({
-                        material: new qtek.Material({
-                            shader: qtek.shader.library.get('qtek.standard')
+                    var emitMesh = new clay.Mesh({
+                        material: new clay.Material({
+                            shader: clay.shader.library.get('clay.standard')
                         }),
                         geometry: sphereGeo
                     });
@@ -66,14 +66,14 @@
 
                     rootNode.rotation.rotateX(-Math.PI / 2);
 
-                    var envMap = qtek.util.texture.loadTexture(
+                    var envMap = clay.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
                             exposure: 3
                         },
                         function () {
                             envMap.flipY = false;
-                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                            var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
                                     height: 128
@@ -82,7 +82,7 @@
                             var suzanneMesh = scene.getNode('Suzanne');
                             suzanneMesh.material.set('metalness', 1);
                             suzanneMesh.material.set('color', [1, 1, 1]);
-                            // var skydome = new qtek.plugin.Skydome({
+                            // var skydome = new clay.plugin.Skydome({
                             //     scene: scene
                             // });
                             // skydome.material.set('diffuseMap', envMap);
@@ -112,7 +112,7 @@
                     var dofCompositeNode = compositor.getNodeByName('dof_composite');
                     var compositeNode = compositor.getNodeByName('composite');
 
-                    var animation = new qtek.animation.Animation();
+                    var animation = new clay.animation.Animation();
                     animation.start();
                     animation.on('frame', function(deltaTime) {
                         control.update(deltaTime);

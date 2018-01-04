@@ -12,13 +12,13 @@ var mathMin = Math.min;
 var mathMax = Math.max;
 /**
  * @constructor
- * @alias qtek.math.Frustum
+ * @alias clay.math.Frustum
  */
 var Frustum = function() {
 
     /**
      * Eight planes to enclose the frustum
-     * @type {qtek.math.Plane[]}
+     * @type {clay.math.Plane[]}
      */
     this.planes = [];
 
@@ -28,7 +28,7 @@ var Frustum = function() {
 
     /**
      * Bounding box of frustum
-     * @type {qtek.math.BoundingBox}
+     * @type {clay.math.BoundingBox}
      */
     this.boundingBox = new BoundingBox();
 
@@ -47,7 +47,7 @@ Frustum.prototype = {
     // http://web.archive.org/web/20120531231005/http://crazyjoke.free.fr/doc/3D/plane%20extraction.pdf
     /**
      * Set frustum from a projection matrix
-     * @param {qtek.math.Matrix4} projectionMatrix
+     * @param {clay.math.Matrix4} projectionMatrix
      */
     setFromProjection: function(projectionMatrix) {
 
@@ -142,9 +142,9 @@ Frustum.prototype = {
     /**
      * Apply a affine transform matrix and set to the given bounding box
      * @method
-     * @param {qtek.math.BoundingBox}
-     * @param {qtek.math.Matrix4}
-     * @return {qtek.math.BoundingBox}
+     * @param {clay.math.BoundingBox}
+     * @param {clay.math.Matrix4}
+     * @return {clay.math.BoundingBox}
      */
     getTransformedBoundingBox: (function() {
 

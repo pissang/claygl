@@ -1,18 +1,18 @@
-@export qtek.compositor.downsample
+@export clay.compositor.downsample
 
 uniform sampler2D texture;
 uniform vec2 textureSize : [512, 512];
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 // Brightness function
 float brightness(vec3 c)
 {
     return max(max(c.r, c.g), c.b);
 }
 
-@import qtek.util.clamp_sample
+@import clay.util.clamp_sample
 
 void main()
 {

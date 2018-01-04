@@ -1,4 +1,4 @@
-@export qtek.vr.disorter.output.vertex
+@export clay.vr.disorter.output.vertex
 
 attribute vec2 texcoord: TEXCOORD_0;
 attribute vec3 position: POSITION;
@@ -15,7 +15,7 @@ void main()
 
 @end
 
-@export qtek.vr.disorter.output.fragment
+@export clay.vr.disorter.output.fragment
 
 uniform sampler2D texture;
 

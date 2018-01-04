@@ -1,18 +1,18 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas : document.getElementById('main')
             });
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                     aspect : renderer.getViewportAspect(),
                     far : 500
                 });
@@ -20,31 +20,31 @@
 
             camera.position.set(0, 1, 2);
 
-            var texture = new qtek.Texture2D({
+            var texture = new clay.Texture2D({
                 flipY : false
             });
-            // Sky texture 
+            // Sky texture
             // http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
             texture.load('assets/textures/Parking_Lot_Bg.jpg');
 
-            var skydome = new qtek.plugin.Skydome({
-                scene : scene            
+            var skydome = new clay.plugin.Skydome({
+                scene : scene
             });
             skydome.material.set('diffuseMap', texture);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target : camera,
                 domElement : renderer.canvas,
                 sensitivity : 0.4
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function(deltaTime) {
                 control.update(deltaTime);
                 renderer.render(scene, camera);
             });
-            
+
         </script>
     </body>
 </html>

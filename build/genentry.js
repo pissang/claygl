@@ -3,17 +3,14 @@ var fs = require('fs');
 var path = require('path');
 
 var ROOT = __dirname + '/../src/';
-var OUTPUT_PORTAL = 'qtek.js';
+var OUTPUT_PORTAL = 'claygl.js';
 
-var TS_ROOT =  __dirname + '/../typescript/';
-var TS_PORTAL = 'qtek.d.ts';
-
-var template = fs.readFileSync(__dirname  + '/qtek_template.js', 'utf-8');
+var template = fs.readFileSync(__dirname  + '/claygl_template.js', 'utf-8');
 
 var tsReferenceList = [];
 
 var idx = 0;
-var blacklist = ['shader/builtin'];
+var blacklist = ['shader/builtin', 'app/', 'canvas/', 'gpu/'];
 glob('**/*.js', {
     cwd : ROOT
 }, function(err, files){
@@ -22,10 +19,9 @@ glob('**/*.js', {
 
     files.forEach(function(file){
         if (
-            file.match(/qtek.*?\.js/)
+            file.match(/claygl.*?\.js/)
             || file.indexOf('_') >= 0
             || file.endsWith('.glsl.js')
-            || file.indexOf('gpu/') >= 0
         ) {
             return;
         }
@@ -44,25 +40,12 @@ glob('**/*.js', {
         }, namespace);
 
         object[baseName] = `import ${baseName} from './${filePathWithOutExt}';`;
-
-        // Get typescript reference list
-        var tsPath = TS_ROOT + filePathWithOutExt + '.d.ts';
-
-        if (fs.existsSync(tsPath)) {
-            tsReferenceList.push(filePathWithOutExt);
-        }
     });
 
     var exportCode = exportPkg(namespace);
     var output = template.replace(/\{\{\$exportsObject\}\}/, exportCode);
 
     fs.writeFileSync(ROOT + OUTPUT_PORTAL, output, 'utf-8');
-
-    // Write to ts reference file
-    var referenceCode = tsReferenceList.map(function(path) {
-        return '///<reference path="' + path + '" />';
-    }).join('\n');
-    fs.writeFileSync(TS_ROOT + TS_PORTAL, referenceCode, 'utf-8');
 });
 
 /**
@@ -73,7 +56,7 @@ glob('**/*.js', {
  * @param {String[]} externImports imports
  */
 function exportPkg(pkg, isChild, pkgName, externImports) {
-    var keys = Object.keys(pkg);    
+    var keys = Object.keys(pkg);
     var imports = externImports || [];
     var children = keys.map(function (name) {
         if (isString(pkg[name])) {
@@ -87,7 +70,7 @@ function exportPkg(pkg, isChild, pkgName, externImports) {
             } else {
                 // export as a class at root level
                 return `export { ${name} as ${className} };`;
-            }            
+            }
         } else {
             // export as a child package
             return exportPkg(pkg[name], pkgName && true, name, imports);

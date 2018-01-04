@@ -6,14 +6,14 @@ var vec4 = glMatrix.vec4;
 
 /**
  * @constructor
- * @alias qtek.math.Plane
- * @param {qtek.math.Vector3} [normal]
+ * @alias clay.math.Plane
+ * @param {clay.math.Vector3} [normal]
  * @param {number} [distance]
  */
 var Plane = function(normal, distance) {
     /**
      * Normal of the plane
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.normal = normal || new Vector3(0, 1, 0);
 
@@ -30,7 +30,7 @@ Plane.prototype = {
 
     /**
      * Distance from a given point to the plane
-     * @param  {qtek.math.Vector3} point
+     * @param  {clay.math.Vector3} point
      * @return {number}
      */
     distanceToPoint: function(point) {
@@ -39,9 +39,9 @@ Plane.prototype = {
 
     /**
      * Calculate the projection point on the plane
-     * @param  {qtek.math.Vector3} point
-     * @param  {qtek.math.Vector3} out
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} point
+     * @param  {clay.math.Vector3} out
+     * @return {clay.math.Vector3}
      */
     projectPoint: function(point, out) {
         if (!out) {
@@ -64,7 +64,7 @@ Plane.prototype = {
 
     /**
      * If the plane intersect a frustum
-     * @param  {qtek.math.Frustum} Frustum
+     * @param  {clay.math.Frustum} Frustum
      * @return {boolean}
      */
     intersectFrustum: function(frustum) {
@@ -82,10 +82,10 @@ Plane.prototype = {
     /**
      * Calculate the intersection point between plane and a given line
      * @method
-     * @param {qtek.math.Vector3} start start point of line
-     * @param {qtek.math.Vector3} end end point of line
-     * @param {qtek.math.Vector3} [out]
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.Vector3} start start point of line
+     * @param {clay.math.Vector3} end end point of line
+     * @param {clay.math.Vector3} [out]
+     * @return {clay.math.Vector3}
      */
     intersectLine: (function() {
         var rd = vec3.create();
@@ -121,7 +121,7 @@ Plane.prototype = {
     /**
      * Apply an affine transform matrix to plane
      * @method
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     applyTransform: (function() {
         var inverseTranspose = mat4.create();
@@ -146,7 +146,7 @@ Plane.prototype = {
 
     /**
      * Copy from another plane
-     * @param  {qtek.math.Vector3} plane
+     * @param  {clay.math.Vector3} plane
      */
     copy: function(plane) {
         vec3.copy(this.normal._array, plane.normal._array);
@@ -156,7 +156,7 @@ Plane.prototype = {
 
     /**
      * Clone a new plane
-     * @return {qtek.math.Plane}
+     * @return {clay.math.Plane}
      */
     clone: function() {
         var plane = new Plane();

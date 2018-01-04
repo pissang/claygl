@@ -1,4 +1,4 @@
-@export qtek.compositor.vignette
+@export clay.compositor.vignette
 
 #define OUTPUT_ALPHA
 
@@ -9,7 +9,7 @@ uniform sampler2D texture;
 uniform float darkness: 1;
 uniform float offset: 1;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

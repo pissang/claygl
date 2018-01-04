@@ -1,5 +1,5 @@
 // https://github.com/mitsuhiko/webgl-meincraft/blob/master/assets/shaders/fxaa.glsl
-@export qtek.compositor.fxaa
+@export clay.compositor.fxaa
 
 uniform sampler2D texture;
 uniform vec4 viewport : VIEWPORT;
@@ -10,7 +10,7 @@ varying vec2 v_Texcoord;
 #define FXAA_REDUCE_MUL   (1.0/8.0)
 #define FXAA_SPAN_MAX     8.0
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

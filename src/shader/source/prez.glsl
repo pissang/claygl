@@ -1,11 +1,11 @@
 // Shader for prez pass
-@export qtek.prez.vertex
+@export clay.prez.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 void main()
 {
@@ -14,7 +14,7 @@ void main()
 
 #ifdef SKINNING
 
-    @import qtek.chunk.skin_matrix
+    @import clay.chunk.skin_matrix
 
     skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
@@ -25,7 +25,7 @@ void main()
 @end
 
 
-@export qtek.prez.fragment
+@export clay.prez.fragment
 
 void main()
 {

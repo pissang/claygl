@@ -1,11 +1,11 @@
 import Light from '../Light';
 
 /**
- * @constructor qtek.light.Sphere
- * @extends {qtek.Light}
+ * @constructor clay.light.Sphere
+ * @extends {clay.Light}
  */
 var SphereLight = Light.extend(
-/** @lends qtek.light.Sphere# */
+/** @lends clay.light.Sphere# */
 {
     /**
      * @type {number}

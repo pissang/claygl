@@ -1,35 +1,35 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             //Create scene
-            var scene = new qtek.Scene();
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene();
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 500
             });
-            var cube = new qtek.geometry.Cube();
+            var cube = new clay.geometry.Cube();
             var shader = new Shader({
-                vertex: Shader.source("qtek.standard.vertex"),
-                fragment: Shader.source("qtek.standard.fragment")
+                vertex: Shader.source("clay.standard.vertex"),
+                fragment: Shader.source("clay.standard.fragment")
             })
-            var material = new qtek.Material({
+            var material = new clay.Material({
                 shader: shader
             });
-            var texture = new qtek.Texture2D;
+            var texture = new clay.Texture2D;
             texture.load('assets/textures/crate.gif');
             material.set("diffuseMap", texture);
-            var mesh = new qtek.Mesh({
+            var mesh = new clay.Mesh({
                 material: material,
                 geometry: cube
             })
@@ -37,34 +37,34 @@
             scene.add(mesh);
 
             camera.position.set(0, 1.5, 3);
-            camera.lookAt(new qtek.math.Vector3(0, 0, 0));
+            camera.lookAt(new clay.math.Vector3(0, 0, 0));
 
-            var light = new qtek.light.Point({
+            var light = new clay.light.Point({
                 color: [1.5, 1.5, 1.5]
             })
             light.position.set(0, 0, 3);
             scene.add(light);
 
-            var frameBuffer = new qtek.FrameBuffer();
-            var rtt = new qtek.Texture2D({
+            var frameBuffer = new clay.FrameBuffer();
+            var rtt = new clay.Texture2D({
                 width: 1024,
                 height: 1024,
             });
             frameBuffer.attach(rtt);
-            var rttShader = qtek.shader.library.get("qtek.basic");
-            var rttMesh = new qtek.Mesh({
-                geometry: new qtek.geometry.Plane(),
-                material: new qtek.Material({
+            var rttShader = clay.shader.library.get("clay.basic");
+            var rttMesh = new clay.Mesh({
+                geometry: new clay.geometry.Plane(),
+                material: new clay.Material({
                     shader: rttShader
                 })
             });
             rttMesh.material.set('diffuseMap', rtt);
-            var rttScene = new qtek.Scene();
+            var rttScene = new clay.Scene();
             rttScene.add(rttMesh);
 
-            var orthCamera = new qtek.camera.Orthographic();
+            var orthCamera = new clay.camera.Orthographic();
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function() {
                 frameBuffer.bind(renderer);

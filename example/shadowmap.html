@@ -1,30 +1,30 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
-            var Vector3 = qtek.math.Vector3;
+            var Shader = clay.Shader;
+            var Vector3 = clay.math.Vector3;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
 
-            var shadowMapPass = new qtek.prePass.ShadowMap({
-                softShadow: qtek.prePass.ShadowMap.VSM
+            var shadowMapPass = new clay.prePass.ShadowMap({
+                softShadow: clay.prePass.ShadowMap.VSM
             });
 
-            var scene = new qtek.Scene();
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene();
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 100
             });
 
-            var light = new qtek.light.Spot({
+            var light = new clay.light.Spot({
                 position: new Vector3(0, 4, 4),
                 intensity: 0.5,
                 shadowBias: 0.001,
@@ -32,7 +32,7 @@
             });
             scene.add(light);
 
-            var light2 = new qtek.light.Spot({
+            var light2 = new clay.light.Spot({
                 position: new Vector3(0, 4, -4),
                 intensity: 0.5,
                 shadowBias: 0.001,
@@ -40,19 +40,19 @@
             });
             scene.add(light2);
 
-            var plane = new qtek.geometry.Plane({
+            var plane = new clay.geometry.Plane({
                 widthSegments: 1,
                 heightSegments: 1
             });
-            var shader = qtek.shader.library.get('qtek.standard');
+            var shader = clay.shader.library.get('clay.standard');
 
-            var material = new qtek.Material({
+            var material = new clay.Material({
                 shader: shader
             });
 
-            var cube = new qtek.Mesh({
+            var cube = new clay.Mesh({
                 material: material,
-                geometry: new qtek.geometry.Cube()
+                geometry: new clay.geometry.Cube()
             });
             cube.position.y = 1;
             scene.add(cube);
@@ -60,7 +60,7 @@
             camera.position.set(0, 4, 5);
             camera.lookAt(new Vector3(0, 1, 0));
 
-            var planeMesh = new qtek.Mesh({
+            var planeMesh = new clay.Mesh({
                 geometry: plane,
                 material: material
             });
@@ -72,7 +72,7 @@
             var zeroVector = new Vector3();
             var upAxis = new Vector3(0, 1, 0);
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function () {
                 light.rotateAround(zeroVector, upAxis, 0.01);

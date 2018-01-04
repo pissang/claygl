@@ -8,39 +8,39 @@ var vec3 = glMatrix.vec3;
 var vec4 = glMatrix.vec4;
 
 /**
- * @constructor qtek.Camera
- * @extends qtek.Node
+ * @constructor clay.Camera
+ * @extends clay.Node
  */
 var Camera = Node.extend(function () {
-    return /** @lends qtek.Camera# */ {
+    return /** @lends clay.Camera# */ {
         /**
          * Camera projection matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         projectionMatrix: new Matrix4(),
 
         /**
          * Inverse of camera projection matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         invProjectionMatrix: new Matrix4(),
 
         /**
          * View matrix, equal to inverse of camera's world matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         viewMatrix: new Matrix4(),
 
         /**
          * Camera frustum in view space
-         * @type {qtek.math.Frustum}
+         * @type {clay.math.Frustum}
          */
         frustum: new Frustum()
     };
 }, function () {
     this.update(true);
 },
-/** @lends qtek.Camera.prototype */
+/** @lends clay.Camera.prototype */
 {
 
     update: function (force) {
@@ -69,7 +69,7 @@ var Camera = Node.extend(function () {
 
     /**
      * Set camera projection matrix
-     * @param {qtek.math.Matrix4} projectionMatrix
+     * @param {clay.math.Matrix4} projectionMatrix
      */
     setProjectionMatrix: function (projectionMatrix) {
         Matrix4.copy(this.projectionMatrix, projectionMatrix);
@@ -84,9 +84,9 @@ var Camera = Node.extend(function () {
     /**
      * Cast a picking ray from camera near plane to far plane
      * @method
-     * @param {qtek.math.Vector2} ndc
-     * @param {qtek.math.Ray} [out]
-     * @return {qtek.math.Ray}
+     * @param {clay.math.Vector2} ndc
+     * @param {clay.math.Ray} [out]
+     * @return {clay.math.Ray}
      */
     castRay: (function () {
         var v4 = vec4.create();
@@ -116,8 +116,8 @@ var Camera = Node.extend(function () {
     /**
      * @method
      * @name clone
-     * @return {qtek.Camera}
-     * @memberOf qtek.Camera.prototype
+     * @return {clay.Camera}
+     * @memberOf clay.Camera.prototype
      */
 });
 

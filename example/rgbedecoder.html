@@ -1,22 +1,22 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="Main"></canvas>
         <script>
-            qtek.core.request.get({
+            clay.core.request.get({
                 url : 'assets/textures/hdr/pisa.hdr',
                 responseType : 'arraybuffer',
                 onload : function(data) {
-                    var texture = qtek.util.hdr.parseRGBE(data);
+                    var texture = clay.util.hdr.parseRGBE(data);
 
-                    var renderer = new qtek.Renderer({
+                    var renderer = new clay.Renderer({
                         canvas : document.getElementById('Main')
                     });
-                    var pass = new qtek.compositor.Pass({
-                        fragment : qtek.Shader.source('qtek.compositor.output')
+                    var pass = new clay.compositor.Pass({
+                        fragment : clay.Shader.source('clay.compositor.output')
                     });
                     pass.setUniform('texture', texture);
                     pass.render(renderer);

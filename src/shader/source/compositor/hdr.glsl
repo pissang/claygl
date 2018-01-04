@@ -1,7 +1,7 @@
 // Final composite of bloom, source, lensflare
 // with tonemapping, lut and vignette
 // http://filmicgames.com/archives/75
-@export qtek.compositor.hdr.composite
+@export clay.compositor.hdr.composite
 
 uniform sampler2D texture;
 #ifdef BLOOM_ENABLED
@@ -39,7 +39,7 @@ varying vec2 v_Texcoord;
 
 // const vec3 whiteScale = vec3(11.2);
 
-@import qtek.util.srgb
+@import clay.util.srgb
 
 // vec3 uncharted2ToneMap(vec3 x)
 // {
@@ -102,7 +102,7 @@ vec3 lutTransform(vec3 color) {
 }
 #endif
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 void main()
 {

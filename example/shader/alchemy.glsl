@@ -36,10 +36,10 @@ uniform float epsilon: 0.01;
 varying vec2 v_Texcoord;
 
 #ifdef DEPTH_DECODE
-@import qtek.util.decode_float
+@import clay.util.decode_float
 #endif
 
-@import qtek.util.rand
+@import clay.util.rand
 
 float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float sRadius) {
     float occlusion = 0.0;
@@ -178,7 +178,7 @@ uniform float edgeSharpness: 1.0;
 
 void main()
 {
-    @import qtek.compositor.kernel.gaussian_13
+    @import clay.compositor.kernel.gaussian_13
 
     vec4 centerDepthTexel = texture2D(depthTex, v_Texcoord);
 
@@ -217,7 +217,7 @@ uniform float edgeSharpness: 1.0;
 
 void main()
 {
-    @import qtek.compositor.kernel.gaussian_13
+    @import clay.compositor.kernel.gaussian_13
 
     vec4 centerDepthTexel = texture2D(depthTex, v_Texcoord);
     // Add 0.1000 bias to filling holes from missed rays.

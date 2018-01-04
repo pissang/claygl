@@ -1,13 +1,13 @@
 import Node from './Node';
 
 /**
- * @constructor qtek.compositor.TextureNode
- * @extends qtek.compositor.Node
+ * @constructor clay.compositor.TextureNode
+ * @extends clay.compositor.Node
  */
 var TextureNode = Node.extend(function() {
-    return /** @lends qtek.compositor.TextureNode# */ {
+    return /** @lends clay.compositor.TextureNode# */ {
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
          */
         texture: null,
 

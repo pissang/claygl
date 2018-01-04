@@ -23,12 +23,12 @@ Shader['import'](wireframeEssl);
 Shader['import'](skyboxEssl);
 Shader['import'](prezEssl);
 
-library.template('qtek.basic', Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
-library.template('qtek.lambert', Shader.source('qtek.lambert.vertex'), Shader.source('qtek.lambert.fragment'));
-library.template('qtek.wireframe', Shader.source('qtek.wireframe.vertex'), Shader.source('qtek.wireframe.fragment'));
-library.template('qtek.skybox', Shader.source('qtek.skybox.vertex'), Shader.source('qtek.skybox.fragment'));
-library.template('qtek.prez', Shader.source('qtek.prez.vertex'), Shader.source('qtek.prez.fragment'));
-library.template('qtek.standard', Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'));
+library.template('clay.basic', Shader.source('clay.basic.vertex'), Shader.source('clay.basic.fragment'));
+library.template('clay.lambert', Shader.source('clay.lambert.vertex'), Shader.source('clay.lambert.fragment'));
+library.template('clay.wireframe', Shader.source('clay.wireframe.vertex'), Shader.source('clay.wireframe.fragment'));
+library.template('clay.skybox', Shader.source('clay.skybox.vertex'), Shader.source('clay.skybox.fragment'));
+library.template('clay.prez', Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'));
+library.template('clay.standard', Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
 
 
 import coloradjustEssl from './source/compositor/coloradjust.glsl.js';

@@ -10,14 +10,14 @@ Shader.import(colorEssl);
 /**
  * Pixel picking is gpu based picking, which is fast and accurate.
  * But not like ray picking, it can't get the intersection point and triangle.
- * @constructor qtek.picking.PixelPicking
- * @extends qtek.core.Base
+ * @constructor clay.picking.PixelPicking
+ * @extends clay.core.Base
  */
 var PixelPicking = Base.extend(function() {
-    return /** @lends qtek.picking.PixelPicking# */ {
+    return /** @lends clay.picking.PixelPicking# */ {
         /**
          * Target renderer
-         * @type {qtek.Renderer}
+         * @type {clay.Renderer}
          */
         renderer: null,
         /**
@@ -48,7 +48,7 @@ var PixelPicking = Base.extend(function() {
         this.height = this.renderer.getHeight();
     }
     this._init();
-}, /** @lends qtek.picking.PixelPicking.prototype */ {
+}, /** @lends clay.picking.PixelPicking.prototype */ {
     _init: function() {
         this._texture = new Texture2D({
             width: this.width * this.downSampleRatio,
@@ -56,7 +56,7 @@ var PixelPicking = Base.extend(function() {
         });
         this._frameBuffer = new FrameBuffer();
 
-        this._shader = new Shader(Shader.source('qtek.picking.color.vertex'), Shader.source('qtek.picking.color.fragment'));
+        this._shader = new Shader(Shader.source('clay.picking.color.vertex'), Shader.source('clay.picking.color.fragment'));
     },
     /**
      * Set picking presision
@@ -126,7 +126,7 @@ var PixelPicking = Base.extend(function() {
      * Pick the object
      * @param  {number} x Mouse position x
      * @param  {number} y Mouse position y
-     * @return {qtek.Node}
+     * @return {clay.Node}
      */
     pick: function(x, y) {
         var renderer = this.renderer;

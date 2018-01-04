@@ -1,43 +1,43 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="main"></canvas>
 
         <script type="text/javascript">
-            var Shader = qtek.Shader;
-            var pp_FilterNode = qtek.compositor.FilterNode;
-            var pp_SceneNode = qtek.compositor.SceneNode;
-            var compositor = new qtek.compositor.Compositor();
+            var Shader = clay.Shader;
+            var pp_FilterNode = clay.compositor.FilterNode;
+            var pp_SceneNode = clay.compositor.SceneNode;
+            var compositor = new clay.compositor.Compositor();
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             //Create scene
-            var scene = new qtek.Scene(),
-                camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene(),
+                camera = new clay.camera.Perspective({
                     aspect: renderer.canvas.width/renderer.canvas.height,
                     far: 500
                 }),
-                cube = new qtek.geometry.Cube();
+                cube = new clay.geometry.Cube();
             var shader = new Shader({
-                vertex: Shader.source('qtek.lambert.vertex'),
-                fragment: Shader.source('qtek.lambert.fragment')
+                vertex: Shader.source('clay.lambert.vertex'),
+                fragment: Shader.source('clay.lambert.fragment')
             })
-            var material = new qtek.Material({
+            var material = new clay.Material({
                 shader: shader
             });
-            var texture = new qtek.Texture2D();
+            var texture = new clay.Texture2D();
             texture.image = new Image();
             texture.image.onload = function(){
                 texture.dirty();
             }
             texture.image.src = 'assets/textures/crate.gif';
             material.set('diffuseMap', texture );
-            var mesh = new qtek.Mesh({
+            var mesh = new clay.Mesh({
                 material: material,
                 geometry: cube
             })
@@ -45,13 +45,13 @@
             scene.add( mesh );
 
             camera.position.set(0, 2, 2);
-            camera.lookAt( new qtek.math.Vector3() );
+            camera.lookAt( new clay.math.Vector3() );
 
-            var light = new qtek.light.Directional({
+            var light = new clay.light.Directional({
                 color: [1.5, 1.5, 1.5]
             })
             light.position.set(50, 50, 50);
-            light.lookAt(new qtek.math.Vector3());
+            light.lookAt(new clay.math.Vector3());
             scene.add(light);
 
             compositor.addNode(new pp_SceneNode({
@@ -69,7 +69,7 @@
             }) );
             var colorAdjustNode = new pp_FilterNode({
                 name: 'coloradjust',
-                shader: Shader.source('qtek.compositor.coloradjust'),
+                shader: Shader.source('clay.compositor.coloradjust'),
                 inputs: {
                     'texture': {
                         node: 'scene',

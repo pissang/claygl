@@ -1,5 +1,5 @@
 
-@export qtek.compositor.vertex
+@export clay.compositor.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 

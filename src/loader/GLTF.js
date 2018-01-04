@@ -97,29 +97,29 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 }
 
 /**
- * @typedef {Object} qtek.loader.GLTF.IResult
+ * @typedef {Object} clay.loader.GLTF.IResult
  * @property {Object} json
- * @property {qtek.Scene} scene
- * @property {qtek.Node} rootNode
- * @property {qtek.Camera[]} cameras
- * @property {qtek.Texture[]} textures
- * @property {qtek.Material[]} materials
- * @property {qtek.Skeleton[]} skeletons
- * @property {qtek.Mesh[]} meshes
- * @property {qtek.animation.TrackClip[]} clips
- * @property {qtek.Node[]} nodes
+ * @property {clay.Scene} scene
+ * @property {clay.Node} rootNode
+ * @property {clay.Camera[]} cameras
+ * @property {clay.Texture[]} textures
+ * @property {clay.Material[]} materials
+ * @property {clay.Skeleton[]} skeletons
+ * @property {clay.Mesh[]} meshes
+ * @property {clay.animation.TrackClip[]} clips
+ * @property {clay.Node[]} nodes
  */
 
 /**
- * @constructor qtek.loader.GLTF
- * @extends qtek.core.Base
+ * @constructor clay.loader.GLTF
+ * @extends clay.core.Base
  */
 var GLTFLoader = Base.extend(
-/** @lends qtek.loader.GLTF# */
+/** @lends clay.loader.GLTF# */
 {
     /**
      *
-     * @type {qtek.Node}
+     * @type {clay.Node}
      */
     rootNode: null,
     /**
@@ -143,12 +143,12 @@ var GLTFLoader = Base.extend(
     /**
      * Shader used when creating the materials.
      * @type {string}
-     * @default 'qtek.standard'
+     * @default 'clay.standard'
      */
-    shaderName: 'qtek.standard',
+    shaderName: 'clay.standard',
 
     /**
-     * If use {@link qtek.StandardMaterial}
+     * If use {@link clay.StandardMaterial}
      * @type {string}
      */
     useStandardMaterial: false,
@@ -192,7 +192,7 @@ function () {
         this.shaderLibrary = shaderLibrary.createLibrary();
     }
 },
-/** @lends qtek.loader.GLTF.prototype */
+/** @lends clay.loader.GLTF.prototype */
 {
     /**
      * @param {string} url
@@ -228,7 +228,7 @@ function () {
     /**
      * Parse glTF binary
      * @param {ArrayBuffer} buffer
-     * @return {qtek.loader.GLTF.IResult}
+     * @return {clay.loader.GLTF.IResult}
      */
     parseBinary: function (buffer) {
         var header = new Uint32Array(buffer, 0, 4);
@@ -283,7 +283,7 @@ function () {
     /**
      * @param {Object} json
      * @param {ArrayBuffer[]} [buffer]
-     * @return {qtek.loader.GLTF.IResult}
+     * @return {clay.loader.GLTF.IResult}
      */
     parse: function (json, buffers) {
         var self = this;

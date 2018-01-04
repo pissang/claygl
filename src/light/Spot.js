@@ -2,11 +2,11 @@ import Light from '../Light';
 import Vector3 from '../math/Vector3';
 
 /**
- * @constructor qtek.light.Spot
- * @extends qtek.Light
+ * @constructor clay.light.Spot
+ * @extends clay.Light
  */
 var SpotLight = Light.extend(
-/**@lends qtek.light.Spot */
+/**@lends clay.light.Spot */
 {
     /**
      * @type {number}
@@ -85,8 +85,8 @@ var SpotLight = Light.extend(
         }
     },
     /**
-     * @return {qtek.light.Spot}
-     * @memberOf qtek.light.Spot.prototype
+     * @return {clay.light.Spot}
+     * @memberOf clay.light.Spot.prototype
      */
     clone: function () {
         var light = Light.prototype.clone.call(this);

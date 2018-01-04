@@ -1,40 +1,40 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body>
         <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas : document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect : renderer.getViewportAspect(),
                 far : 500
             });
 
-            var sphere = new qtek.geometry.Sphere({
+            var sphere = new clay.geometry.Sphere({
                 widthSegments : 20,
                 heightSegments : 20
             });
-            var cube = new qtek.geometry.Cube({
+            var cube = new clay.geometry.Cube({
                 widthSegments : 10,
                 heightSegments : 10,
                 depthSegments : 10
             });
-            var plane = new qtek.geometry.Plane({
+            var plane = new clay.geometry.Plane({
                 widthSegments : 10,
                 heightSegments : 10
             })
-            var cone = new qtek.geometry.Cone({
+            var cone = new clay.geometry.Cone({
                 heightSegments : 10
             });
-            var cylinder = new qtek.geometry.Cylinder({
+            var cylinder = new clay.geometry.Cylinder({
                 heightSegments : 10
             });
             sphere.generateBarycentric();
@@ -43,8 +43,8 @@
             cone.generateBarycentric();
             cylinder.generateBarycentric();
 
-            var shader = qtek.shader.library.get('qtek.wireframe');
-            var material = new qtek.Material({
+            var shader = clay.shader.library.get('clay.wireframe');
+            var material = new clay.Material({
                 shader : shader,
                 transparent : true,
                 depthTest : false
@@ -53,27 +53,27 @@
 
             camera.position.set(0, 0, 7);
 
-            var sphereMesh = new qtek.Mesh({
+            var sphereMesh = new clay.Mesh({
                 geometry : sphere,
                 material : material,
                 culling : false
             });
-            var cubeMesh = new qtek.Mesh({
+            var cubeMesh = new clay.Mesh({
                 geometry : cube,
                 material : material,
                 culling : false
             });
-            var planeMesh = new qtek.Mesh({
+            var planeMesh = new clay.Mesh({
                 geometry : plane,
                 material : material,
                 culling : false
             });
-            var coneMesh = new qtek.Mesh({
+            var coneMesh = new clay.Mesh({
                 geometry : cone,
                 material : material,
                 culling : false
             })
-            var cylinderMesh = new qtek.Mesh({
+            var cylinderMesh = new clay.Mesh({
                 geometry : cylinder,
                 material : material,
                 culling : false
@@ -89,10 +89,10 @@
             scene.add( coneMesh );
             scene.add( cylinderMesh );
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });

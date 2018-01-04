@@ -1,4 +1,4 @@
-@export qtek.deferred.ambient_sh_light
+@export clay.deferred.ambient_sh_light
 
 uniform sampler2D gBufferTexture1;
 uniform sampler2D gBufferTexture3;

@@ -1,6 +1,6 @@
 @export tron.vertex
 
-@import qtek.basic.vertex
+@import clay.basic.vertex
 
 @end
 
@@ -16,7 +16,7 @@ uniform float sharpness : 10.0;
 uniform float substraction: 0.3;
 uniform float strength: 50.0;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 // https://www.youtube.com/watch?v=KHiZfy5OlO8
 void main()
 {

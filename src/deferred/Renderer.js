@@ -48,15 +48,15 @@ Shader.import(prezGlsl);
 /**
  * Deferred renderer
  * @constructor
- * @alias qtek.deferred.Renderer
- * @extends qtek.core.Base
+ * @alias clay.deferred.Renderer
+ * @extends clay.core.Base
  */
 var DeferredRenderer = Base.extend(function () {
 
-    var fullQuadVertex = Shader.source('qtek.compositor.vertex');
-    var lightVolumeVertex = Shader.source('qtek.deferred.light_volume.vertex');
+    var fullQuadVertex = Shader.source('clay.compositor.vertex');
+    var lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
 
-    var directionalLightShader = new Shader(fullQuadVertex, Shader.source('qtek.deferred.directional_light'));
+    var directionalLightShader = new Shader(fullQuadVertex, Shader.source('clay.deferred.directional_light'));
 
     var lightAccumulateBlendFunc = function (gl) {
         gl.blendEquation(gl.FUNC_ADD);
@@ -73,7 +73,7 @@ var DeferredRenderer = Base.extend(function () {
     };
 
     var createVolumeShader = function (name) {
-        return new Shader(lightVolumeVertex, Shader.source('qtek.deferred.' + name));
+        return new Shader(lightVolumeVertex, Shader.source('clay.deferred.' + name));
     };
 
     // Rotate and positioning to fit the spot light
@@ -95,11 +95,11 @@ var DeferredRenderer = Base.extend(function () {
     mat.identity().rotateZ(Math.PI / 2);
     cylinderGeo.applyTransform(mat);
 
-    return /** @lends qtek.deferred.Renderer# */ {
+    return /** @lends clay.deferred.Renderer# */ {
 
         /**
          * Provide ShadowMapPass for shadow rendering.
-         * @type {qtek.prePass.ShadowMap}
+         * @type {clay.prePass.ShadowMap}
          */
         shadowMapPass: null,
         /**
@@ -130,13 +130,13 @@ var DeferredRenderer = Base.extend(function () {
         _directionalLightMat: createLightPassMat(directionalLightShader),
 
         _ambientMat: createLightPassMat(new Shader(
-            fullQuadVertex, Shader.source('qtek.deferred.ambient_light')
+            fullQuadVertex, Shader.source('clay.deferred.ambient_light')
         )),
         _ambientSHMat: createLightPassMat(new Shader(
-            fullQuadVertex, Shader.source('qtek.deferred.ambient_sh_light')
+            fullQuadVertex, Shader.source('clay.deferred.ambient_sh_light')
         )),
         _ambientCubemapMat: createLightPassMat(new Shader(
-            fullQuadVertex, Shader.source('qtek.deferred.ambient_cubemap_light')
+            fullQuadVertex, Shader.source('clay.deferred.ambient_cubemap_light')
         )),
 
         _spotLightShader: createVolumeShader('spot_light'),
@@ -155,15 +155,15 @@ var DeferredRenderer = Base.extend(function () {
         _lightCylinderGeo: cylinderGeo,
 
         _outputPass: new FullQuadPass({
-            fragment: Shader.source('qtek.compositor.output')
+            fragment: Shader.source('clay.compositor.output')
         })
     };
-}, /** @lends qtek.deferred.Renderer# */ {
+}, /** @lends clay.deferred.Renderer# */ {
     /**
      * Do render
-     * @param {qtek.Renderer} renderer
-     * @param {qtek.Scene} scene
-     * @param {qtek.Camera} camera
+     * @param {clay.Renderer} renderer
+     * @param {clay.Scene} scene
+     * @param {clay.Camera} camera
      * @param {Object} [opts]
      * @param {boolean} [opts.renderToTarget = false] If not ouput and render to the target texture
      * @param {boolean} [opts.notUpdateShadow = true] If not update the shadow.
@@ -205,21 +205,21 @@ var DeferredRenderer = Base.extend(function () {
     },
 
     /**
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture: function () {
         return this._lightAccumTex;
     },
 
     /**
-     * @return {qtek.FrameBuffer}
+     * @return {clay.FrameBuffer}
      */
     getTargetFrameBuffer: function () {
         return this._lightAccumFrameBuffer;
     },
 
     /**
-     * @return {qtek.deferred.GBuffer}
+     * @return {clay.deferred.GBuffer}
      */
     getGBuffer: function () {
         return this._gBuffer;
@@ -580,7 +580,7 @@ var DeferredRenderer = Base.extend(function () {
         var worldViewProjection = new Matrix4();
         var worldView = new Matrix4();
         var preZMaterial = new Material({
-            shader: new Shader(Shader.source('qtek.prez.vertex'), Shader.source('qtek.prez.fragment'))
+            shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
         return function (renderer, camera, volumeMeshList) {
             var gl = renderer.gl;
@@ -656,7 +656,7 @@ var DeferredRenderer = Base.extend(function () {
     })(),
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._gBuffer.dispose(renderer);

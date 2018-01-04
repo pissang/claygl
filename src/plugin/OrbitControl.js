@@ -20,11 +20,11 @@ function convertToArray(val) {
 
 /**
  * @constructor
- * @alias qtek.plugin.OrbitControl
+ * @alias clay.plugin.OrbitControl
  */
 var OrbitControl = Base.extend(function () {
 
-    return /** @lends qtek.plugin.OrbitControl# */ {
+    return /** @lends clay.plugin.OrbitControl# */ {
 
         animation: null,
 
@@ -34,11 +34,11 @@ var OrbitControl = Base.extend(function () {
         domElement: null,
 
         /**
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         target: null,
         /**
-         * @type {qtek.math.Vector3}
+         * @type {clay.math.Vector3}
          */
         _center: new Vector3(),
 
@@ -153,7 +153,7 @@ var OrbitControl = Base.extend(function () {
     this.update = this.update.bind(this);
 
     this.init();
-}, /** @lends qtek.plugin.OrbitControl# */ {
+}, /** @lends clay.plugin.OrbitControl# */ {
     /**
      * Initialize.
      * Mouse event binding

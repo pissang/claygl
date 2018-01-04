@@ -12,7 +12,7 @@ varying vec3 v_WorldPosition;
 
 const float fSampleNumber = float(SAMPLE_NUMBER);
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
     vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;

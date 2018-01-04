@@ -1,10 +1,10 @@
-@export qtek.picking.color.vertex
+@export clay.picking.color.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
 
-@import qtek.chunk.skinning_header
+@import clay.chunk.skinning_header
 
 void main(){
 
@@ -12,7 +12,7 @@ void main(){
 
     #ifdef SKINNING
 
-        @import qtek.chunk.skin_matrix
+        @import clay.chunk.skin_matrix
 
         skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
     #endif
@@ -23,7 +23,7 @@ void main(){
 @end
 
 @end
-@export qtek.picking.color.fragment
+@export clay.picking.color.fragment
 
 uniform vec4 color : [1.0, 1.0, 1.0, 1.0];
 

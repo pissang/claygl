@@ -7,14 +7,14 @@ import Shader from '../Shader';
 import particleEssl from './particle.glsl.js';
 Shader['import'](particleEssl);
 
-var particleShader = new Shader(Shader.source('qtek.particle.vertex'), Shader.source('qtek.particle.fragment'));
+var particleShader = new Shader(Shader.source('clay.particle.vertex'), Shader.source('clay.particle.fragment'));
 
 /**
- * @constructor qtek.particle.ParticleRenderable
- * @extends qtek.Renderable
+ * @constructor clay.particle.ParticleRenderable
+ * @extends clay.Renderable
  *
  * @example
- *     var particleRenderable = new qtek.particle.ParticleRenderable({
+ *     var particleRenderable = new clay.particle.ParticleRenderable({
  *         spriteAnimationTileX: 4,
  *         spriteAnimationTileY: 4,
  *         spriteAnimationRepeat: 1
@@ -22,8 +22,8 @@ var particleShader = new Shader(Shader.source('qtek.particle.vertex'), Shader.so
  *     scene.add(particleRenderable);
  *     // Enable uv animation in the shader
  *     particleRenderable.material.define('both', 'UV_ANIMATION');
- *     var Emitter = qtek.particle.Emitter;
- *     var Vector3 = qtek.math.Vector3;
+ *     var Emitter = clay.particle.Emitter;
+ *     var Vector3 = clay.math.Vector3;
  *     var emitter = new Emitter({
  *         max: 2000,
  *         amount: 100,
@@ -32,7 +32,7 @@ var particleShader = new Shader(Shader.source('qtek.particle.vertex'), Shader.so
  *         velocity: Emitter.random3D(new Vector3(-10, 0, -10), new Vector3(10, 0, 10));
  *     });
  *     particleRenderable.addEmitter(emitter);
- *     var gravityField = new qtek.particle.ForceField();
+ *     var gravityField = new clay.particle.ForceField();
  *     gravityField.force.y = -10;
  *     particleRenderable.addField(gravityField);
  *     ...
@@ -42,7 +42,7 @@ var particleShader = new Shader(Shader.source('qtek.particle.vertex'), Shader.so
  *     });
  */
 var ParticleRenderable = Renderable.extend(
-/** @lends qtek.particle.ParticleRenderable# */
+/** @lends clay.particle.ParticleRenderable# */
 {
     /**
      * @type {boolean}
@@ -100,7 +100,7 @@ var ParticleRenderable = Renderable.extend(
     this._fields = [];
     this._emitters = [];
 },
-/** @lends qtek.particle.ParticleRenderable.prototype */
+/** @lends clay.particle.ParticleRenderable.prototype */
 {
 
     culling: false,
@@ -112,7 +112,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Add emitter
-     * @param {qtek.particle.Emitter} emitter
+     * @param {clay.particle.Emitter} emitter
      */
     addEmitter: function(emitter) {
         this._emitters.push(emitter);
@@ -120,7 +120,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Remove emitter
-     * @param {qtek.particle.Emitter} emitter
+     * @param {clay.particle.Emitter} emitter
      */
     removeEmitter: function(emitter) {
         this._emitters.splice(this._emitters.indexOf(emitter), 1);
@@ -128,7 +128,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Add field
-     * @param {qtek.particle.Field} field
+     * @param {clay.particle.Field} field
      */
     addField: function(field) {
         this._fields.push(field);
@@ -136,7 +136,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Remove field
-     * @param {qtek.particle.Field} field
+     * @param {clay.particle.Field} field
      */
     removeField: function(field) {
         this._fields.splice(this._fields.indexOf(field), 1);
@@ -266,7 +266,7 @@ var ParticleRenderable = Renderable.extend(
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function(renderer) {
         // Put all the particles back
@@ -279,7 +279,7 @@ var ParticleRenderable = Renderable.extend(
     },
 
     /**
-     * @return {qtek.particle.ParticleRenderable}
+     * @return {clay.particle.ParticleRenderable}
      */
     clone: function() {
         var particleRenderable = new ParticleRenderable({

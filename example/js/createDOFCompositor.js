@@ -1,5 +1,5 @@
 define(function (require) {
-    var qtek = require('../../dist/qtek');
+    var clay = require('../../dist/claygl');
 
     var DOWNSAMPLE_REPEAT = 1;
 
@@ -7,8 +7,8 @@ define(function (require) {
         downScale = downScale || 1;
         var parameters = {
             // FIXME RGBM will have artifacts in highlight edge if using bilinear filter
-            minFilter: qtek.Texture.NEAREST,
-            magFilter: qtek.Texture.NEAREST,
+            minFilter: clay.Texture.NEAREST,
+            magFilter: clay.Texture.NEAREST,
             width: function (renderer) {
                 return renderer.getWidth() / downScale;
             },
@@ -20,8 +20,8 @@ define(function (require) {
     }
 
     function createDOFCompositor(renderer, scene, camera) {
-        var compositor = new qtek.compositor.Compositor();
-        var sceneNode = new qtek.compositor.SceneNode({
+        var compositor = new clay.compositor.Compositor();
+        var sceneNode = new clay.compositor.SceneNode({
             name: 'scene',
             scene: scene,
             camera: camera,
@@ -35,15 +35,15 @@ define(function (require) {
                     parameters: {
                         width: function(renderer) {return renderer.getWidth();},
                         height: function(renderer) {return renderer.getHeight();},
-                        type: qtek.Texture.UNSIGNED_SHORT,
-                        format: qtek.Texture.DEPTH_COMPONENT
+                        type: clay.Texture.UNSIGNED_SHORT,
+                        format: clay.Texture.DEPTH_COMPONENT
                     }
                 }
             }
         });
-        var cocNode = new qtek.compositor.FilterNode({
+        var cocNode = new clay.compositor.FilterNode({
             name: 'coc',
-            shader: qtek.Shader.source('qtek.compositor.dof.coc'),
+            shader: clay.Shader.source('clay.compositor.dof.coc'),
             inputs: {
                 depth: {
                     node: 'scene',
@@ -56,9 +56,9 @@ define(function (require) {
                 }
             }
         });
-        var premultiplyNode = new qtek.compositor.FilterNode({
+        var premultiplyNode = new clay.compositor.FilterNode({
             name: 'premultiply',
-            shader: qtek.Shader.source('qtek.compositor.dof.premultiply'),
+            shader: clay.Shader.source('clay.compositor.dof.premultiply'),
             inputs: {
                 texture: {
                     node: 'scene',
@@ -80,9 +80,9 @@ define(function (require) {
             // Downsample input texture
             var textureSize = [renderer.getWidth() / downSampleScale, renderer.getHeight() / downSampleScale];
             downSampleScale *= 2;
-            var downSampleNode = new qtek.compositor.FilterNode({
+            var downSampleNode = new clay.compositor.FilterNode({
                 name: 'downsample' + i,
-                shader: qtek.Shader.source('qtek.compositor.dof.downsample'),
+                shader: clay.Shader.source('clay.compositor.dof.downsample'),
                 inputs: {
                     // FIXME blur after premultiply will have white edge
                     texture: i === 0 ? 'scene' : 'downsample' + (i - 1),
@@ -100,9 +100,9 @@ define(function (require) {
             compositor.addNode(downSampleNode);
 
             // Downsample coc
-            var cocDownSampleNode = new qtek.compositor.FilterNode({
+            var cocDownSampleNode = new clay.compositor.FilterNode({
                 name: 'coc_downsample' + i,
-                shader: qtek.Shader.source('qtek.compositor.dof.min_coc'),
+                shader: clay.Shader.source('clay.compositor.dof.min_coc'),
                 inputs: {
                     coc: i === 0 ? 'coc' : 'coc_downsample' + (i - 1)
                 },
@@ -124,9 +124,9 @@ define(function (require) {
             var blurNodes = [];
             var prefix = target ? target + '_' : '';
             // Separable hexagonal blur
-            var blurNode1 = new qtek.compositor.FilterNode({
+            var blurNode1 = new clay.compositor.FilterNode({
                 name: prefix + 'blur_1',
-                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_1'),
+                shader: clay.Shader.source('clay.compositor.dof.hexagonal_blur_1'),
                 inputs: {
                     texture: target === 'coc' ? lastCocDownSampleName : lastDownSampleName,
                     coc: target === 'coc' ? null : 'coc'
@@ -137,9 +137,9 @@ define(function (require) {
                     }
                 }
             });
-            var blurNode2 = new qtek.compositor.FilterNode({
+            var blurNode2 = new clay.compositor.FilterNode({
                 name: prefix + 'blur_2',
-                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_2'),
+                shader: clay.Shader.source('clay.compositor.dof.hexagonal_blur_2'),
                 inputs: {
                     texture: target === 'coc' ? lastCocDownSampleName : lastDownSampleName,
                     coc: target === 'coc' ? null : 'coc'
@@ -150,9 +150,9 @@ define(function (require) {
                     }
                 }
             });
-            var blurNode3 = new qtek.compositor.FilterNode({
+            var blurNode3 = new clay.compositor.FilterNode({
                 name: prefix + 'blur_3',
-                shader: qtek.Shader.source('qtek.compositor.dof.hexagonal_blur_3'),
+                shader: clay.Shader.source('clay.compositor.dof.hexagonal_blur_3'),
                 inputs: {
                     texture1: prefix + 'blur_1',
                     texture2: prefix + 'blur_2',
@@ -199,9 +199,9 @@ define(function (require) {
             .concat(createBlurNodes('coc'));
 
         var upsampleTextureSize = [renderer.getWidth() / 2, renderer.getHeight() / 2];
-        var upSampleNode = new qtek.compositor.FilterNode({
+        var upSampleNode = new clay.compositor.FilterNode({
             name: 'upsample',
-            shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
+            shader: clay.Shader.source('clay.compositor.dof.upsample'),
             inputs: {
                 texture: 'blur_3',
                 coc: 'coc'
@@ -215,9 +215,9 @@ define(function (require) {
 
         upSampleNode.setParameter('textureSize', upsampleTextureSize);
 
-        var upSampleNearNode = new qtek.compositor.FilterNode({
+        var upSampleNearNode = new clay.compositor.FilterNode({
             name: 'upsample_near',
-            shader: qtek.Shader.source('qtek.compositor.dof.upsample'),
+            shader: clay.Shader.source('clay.compositor.dof.upsample'),
             inputs: {
                 texture: 'near_blur_3',
                 coc: 'coc'
@@ -231,9 +231,9 @@ define(function (require) {
         upSampleNearNode.setParameter('textureSize', upsampleTextureSize);
 
 
-        var upSampleCocNode = new qtek.compositor.FilterNode({
+        var upSampleCocNode = new clay.compositor.FilterNode({
             name: 'upsample_coc',
-            shader: qtek.Shader.source('qtek.compositor.dof.coc_upsample'),
+            shader: clay.Shader.source('clay.compositor.dof.coc_upsample'),
             inputs: {
                 coc: 'coc_blur_3'
             },
@@ -246,9 +246,9 @@ define(function (require) {
         upSampleCocNode.setParameter('textureSize', upsampleTextureSize);
 
 
-        var dofCompositeNode = new qtek.compositor.FilterNode({
+        var dofCompositeNode = new clay.compositor.FilterNode({
             name: 'dof_composite',
-            shader: qtek.Shader.source('qtek.compositor.dof.composite'),
+            shader: clay.Shader.source('clay.compositor.dof.composite'),
             inputs: {
                 original: {
                     node: 'scene',
@@ -268,9 +268,9 @@ define(function (require) {
                 }
             }
         });
-        var compositeNode = new qtek.compositor.FilterNode({
+        var compositeNode = new clay.compositor.FilterNode({
             name: 'composite',
-            shader: qtek.Shader.source('qtek.compositor.hdr.composite'),
+            shader: clay.Shader.source('clay.compositor.hdr.composite'),
             inputs: {
                 'texture': 'dof_composite'
             }

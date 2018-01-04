@@ -1,5 +1,5 @@
 define(function (require) {
-    var qtek = require('../../dist/qtek');
+    var clay = require('../../dist/claygl');
     var json = JSON.parse(require('text!../assets/fx/composite.json'));
 
     var parameterNodeMap = {
@@ -23,17 +23,16 @@ define(function (require) {
 
     var createCompositor = function (opt) {
         opt = opt || {};
-        var loader = new qtek.loader.FX({
-            textureRootPath: 'assets/fx'
-        });
         opt.enableBloom = opt.enableBloom == null ? true : opt.enableBloom;
         opt.enableLensflare = opt.enableLensflare == null ? true : opt.enableLensflare;
         opt.enableDepthOfField = opt.enableDepthOfField == null ? false : opt.enableDepthOfField;
 
 
-        var compositor = loader.parse(json);
+        var compositor = clay.compositor.createCompositor(json, {
+            textureRootPath: 'assets/fx'
+        });
         if (opt.scene) {
-            var sceneNode = new qtek.compositor.SceneNode({
+            var sceneNode = new clay.compositor.SceneNode({
                 name: 'source',
                 scene: opt.scene,
                 camera: opt.camera,
@@ -49,7 +48,7 @@ define(function (require) {
             compositor.addNode(sceneNode);
         }
         else if (opt.texture) {
-            var textureNode = new qtek.compositor.TextureNode({
+            var textureNode = new clay.compositor.TextureNode({
                 name: 'source',
                 texture: opt.texture,
                 outputs: {
@@ -67,9 +66,9 @@ define(function (require) {
         var finalCompositeNode = compositor.getNodeByName('composite');
         var cocNode = compositor.getNodeByName('coc');
 
-        var lensColorTex = new qtek.Texture2D();
+        var lensColorTex = new clay.Texture2D();
         lensColorTex.load('assets/textures/lensflare/lenscolor.png');
-        var lensDirtTex = new qtek.Texture2D();
+        var lensDirtTex = new clay.Texture2D();
         lensDirtTex.load('assets/textures/lensflare/lensdirt2.jpg');
 
         compositor.getNodeByName('lensflare').setParameter('lenscolor', lensDirtTex);

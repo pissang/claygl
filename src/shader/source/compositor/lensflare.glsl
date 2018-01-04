@@ -1,5 +1,5 @@
 // john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html
-@export qtek.compositor.lensflare
+@export clay.compositor.lensflare
 
 #define SAMPLE_NUMBER 8
 
@@ -14,7 +14,7 @@ uniform float distortion : 1.0;
 
 varying vec2 v_Texcoord;
 
-@import qtek.util.rgbm
+@import clay.util.rgbm
 
 vec4 textureDistorted(
     in vec2 texcoord,

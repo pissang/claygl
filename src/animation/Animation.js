@@ -1,5 +1,5 @@
 import Base from '../core/Base';
-import Animator from './Animator';    
+import Animator from './Animator';
 
 var requestAnimationFrame = window.requestAnimationFrame
                             || window.msRequestAnimationFrame
@@ -9,12 +9,12 @@ var requestAnimationFrame = window.requestAnimationFrame
 
 /**
  * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
- * @constructor qtek.animation.Animation
- * @extends qtek.core.Base
+ * @constructor clay.animation.Animation
+ * @extends clay.core.Base
  *
  * @example
- * var animation = new qtek.animation.Animation();
- * var node = new qtek.Node();
+ * var animation = new clay.animation.Animation();
+ * var node = new clay.Node();
  * animation.animate(node.position)
  *     .when(1000, {
  *         x: 500,
@@ -30,7 +30,7 @@ var requestAnimationFrame = window.requestAnimationFrame
  *     .start('spline');
  */
 var Animation = Base.extend(function () {
-    return /** @lends qtek.animation.Animation# */{
+    return /** @lends clay.animation.Animation# */{
         /**
          * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
          * @type {Object}
@@ -48,12 +48,12 @@ var Animation = Base.extend(function () {
         _pausedTime: 0
     };
 },
-/** @lends qtek.animation.Animation.prototype */
+/** @lends clay.animation.Animation.prototype */
 {
 
     /**
      * Add animator
-     * @param {qtek.animate.Animator} animator
+     * @param {clay.animate.Animator} animator
      */
     addAnimator: function (animator) {
         animator.animation = this;
@@ -64,7 +64,7 @@ var Animation = Base.extend(function () {
     },
 
     /**
-     * @param {qtek.animation.Clip} clip
+     * @param {clay.animation.Clip} clip
      */
     addClip: function (clip) {
         if (this._clips.indexOf(clip) < 0) {
@@ -73,7 +73,7 @@ var Animation = Base.extend(function () {
     },
 
     /**
-     * @param  {qtek.animation.Clip} clip
+     * @param  {clay.animation.Clip} clip
      */
     removeClip: function (clip) {
         var idx = this._clips.indexOf(clip);
@@ -84,7 +84,7 @@ var Animation = Base.extend(function () {
 
     /**
      * Remove animator
-     * @param {qtek.animate.Animator} animator
+     * @param {clay.animate.Animator} animator
      */
     removeAnimator: function (animator) {
         var clips = animator.getClips();
@@ -204,7 +204,7 @@ var Animation = Base.extend(function () {
      * @param  {Function} [options.getter]
      * @param  {Function} [options.setter]
      * @param  {Function} [options.interpolater]
-     * @return {qtek.animation.Animator}
+     * @return {clay.animation.Animator}
      */
     animate: function (target, options) {
         options = options || {};

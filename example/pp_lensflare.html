@@ -7,31 +7,31 @@
 <body style="margin:0px">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
-            var renderer = new qtek.Renderer({
+        require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
+            var renderer = new clay.Renderer({
                 canvas : document.getElementById('main'),
                 devicePixelRatio : 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
 
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 aspect : renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 20);
 
-            var scene = new qtek.Scene();
-            var control = new qtek.plugin.OrbitControl({
+            var scene = new clay.Scene();
+            var control = new clay.plugin.OrbitControl({
                 domElement : renderer.canvas,
                 target : camera
             });
 
-            var cubeMap = new qtek.TextureCube({
+            var cubeMap = new clay.TextureCube({
                 width : 512,
                 height : 512,
-                type : qtek.Texture.FLOAT
+                type : clay.Texture.FLOAT
             });
 
-            qtek.util.texture.loadPanorama(
+            clay.util.texture.loadPanorama(
                 renderer,
                 'assets/textures/hdr/pisa.hdr',
                 cubeMap,
@@ -40,13 +40,13 @@
                 }
             );
 
-            var skybox = new qtek.plugin.Skybox({
+            var skybox = new clay.plugin.Skybox({
                 scene : scene
             });
             skybox.material.set('environmentMap', cubeMap);
             skybox.material.define('fragment', 'RGBM_ENCODE');
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
             var compositor = createCompositor({

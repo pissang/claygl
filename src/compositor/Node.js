@@ -6,12 +6,12 @@ import Base from '../core/Base';
 /**
  * Node of graph based post processing.
  *
- * @constructor qtek.compositor.Node
- * @extends qtek.core.Base
+ * @constructor clay.compositor.Node
+ * @extends clay.core.Base
  *
  */
 var Node = Base.extend(function () {
-    return /** @lends qtek.compositor.Node# */ {
+    return /** @lends clay.compositor.Node# */ {
         /**
          * @type {string}
          */
@@ -54,7 +54,7 @@ var Node = Base.extend(function () {
         _compositor: null
     };
 },
-/** @lends qtek.compositor.Node.prototype */
+/** @lends clay.compositor.Node.prototype */
 {
 
     // TODO Remove parameter function callback

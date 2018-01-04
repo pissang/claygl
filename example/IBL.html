@@ -7,33 +7,33 @@
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
-                var renderer = new qtek.Renderer({
+            require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
                 renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0, 20);
 
-                var scene = new qtek.Scene();
-                var sphereGeo = new qtek.geometry.Sphere({
+                var scene = new clay.Scene();
+                var sphereGeo = new clay.geometry.Sphere({
                     widthSegments: 50,
                     heightSegments: 50
                 });
 
-                var normalDistribution = qtek.util.cubemap.generateNormalDistribution();
-                var brdfLookup = qtek.util.cubemap.integrateBRDF(renderer, normalDistribution);
+                var normalDistribution = clay.util.cubemap.generateNormalDistribution();
+                var brdfLookup = clay.util.cubemap.integrateBRDF(renderer, normalDistribution);
 
-                var GLTFLoader = new qtek.loader.GLTF();
+                var GLTFLoader = new clay.loader.GLTF();
                 GLTFLoader.load('assets/models/suzanne/suzanne.gltf');
                 var suzanneGeometry;
                 GLTFLoader.on('success', function (res) {
                     suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                    var envMap = qtek.util.texture.loadTexture(
+                    var envMap = clay.util.texture.loadTexture(
                         'assets/textures/hdr/pisa.hdr',
                         {
                             exposure: 2
@@ -41,28 +41,28 @@
                         function () {
                             envMap.flipY = false;
 
-                            var prefilterResult = qtek.util.cubemap.prefilterEnvironmentMap(
+                            var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
                                 renderer, envMap, {
                                     width: 128,
                                     height: 128,
                                     encodeRGBM: true
-                                    // type: qtek.Texture.UNSIGNED_BYTE
+                                    // type: clay.Texture.UNSIGNED_BYTE
                                 }, normalDistribution, brdfLookup
                             );
 
-                            var skybox = new qtek.plugin.Skybox({
+                            var skybox = new clay.plugin.Skybox({
                                 scene: scene
                             });
                             skybox.material.set('environmentMap', prefilterResult.environmentMap);
                             skybox.material.define('fragment', 'RGBM');
 
-                            var shader = qtek.shader.library.get('qtek.standard');
+                            var shader = clay.shader.library.get('clay.standard');
                             for (var i = 0; i < 10; i++) {
-                                var material = new qtek.Material({
+                                var material = new clay.Material({
                                     shader: shader
                                 });
                                 var roughness = i / 9;
-                                var mesh = new qtek.Mesh({
+                                var mesh = new clay.Mesh({
                                     geometry: sphereGeo,
                                     material: material
                                 });
@@ -79,11 +79,11 @@
                             }
 
                             for (var i = 0; i < 10; i++) {
-                                var material = new qtek.Material({
+                                var material = new clay.Material({
                                     shader: shader
                                 });
                                 var roughness = i / 9;
-                                var mesh = new qtek.Mesh({
+                                var mesh = new clay.Mesh({
                                     geometry: sphereGeo,
                                     material: material
                                 });
@@ -97,11 +97,11 @@
 
                             var monkeys = [];
                             for (var i = 0; i < 4; i++) {
-                                var material = new qtek.Material({
+                                var material = new clay.Material({
                                     shader: shader
                                 });
                                 var roughness = 0.4;
-                                var mesh = new qtek.Mesh({
+                                var mesh = new clay.Mesh({
                                     geometry: suzanneGeometry,
                                     material: material
                                 });
@@ -121,13 +121,13 @@
                     );
                 });
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas
                 });
 
-                var debugPass = new qtek.compositor.Pass({
-                    fragment: qtek.Shader.source('qtek.compositor.output')
+                var debugPass = new clay.compositor.Pass({
+                    fragment: clay.Shader.source('clay.compositor.output')
                 });
 
                 var compositor = createCompositor({
@@ -136,7 +136,7 @@
                 });
 
 
-                var animation = new qtek.animation.Animation();
+                var animation = new clay.animation.Animation();
                 animation.start();
                 animation.on('frame', function(deltaTime) {
                     control.update(deltaTime);
@@ -146,7 +146,7 @@
                     var x = 0, y = 0;
                     var width = viewport.width / 10;
                     var height = width;
-                    renderer.clearBit = qtek.Renderer.DEPTH_BUFFER_BIT;
+                    renderer.clearBit = clay.Renderer.DEPTH_BUFFER_BIT;
                     renderer.setViewport(x, y, width, height);
                     debugPass.setUniform('texture', normalDistribution);
                     debugPass.render(renderer);

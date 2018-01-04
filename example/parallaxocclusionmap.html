@@ -1,31 +1,31 @@
 <html>
     <head>
         <meta charset='utf-8'>
-        <script src='../dist/qtek.js'></script>
+        <script src='../dist/claygl.js'></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body>
         <canvas width='1200' height='640' id="main"></canvas>
         <script type="text/javascript">
-            var Shader = qtek.Shader;
+            var Shader = clay.Shader;
 
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
-            var scene = new qtek.Scene;
-            var camera = new qtek.camera.Perspective({
+            var scene = new clay.Scene;
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect(),
                 far: 500
             });
-            var cube = new qtek.geometry.Cube({
+            var cube = new clay.geometry.Cube({
                 widthSegments: 10,
                 heightSegments: 10
             });
             cube.generateUniqueVertex();
             cube.generateTangents();
 
-            var shader = qtek.shader.library.get('qtek.standard');
-            var material = new qtek.Material({
+            var shader = clay.shader.library.get('clay.standard');
+            var material = new clay.Material({
                 shader: shader
             });
             material.set('parallaxOcclusionMap', loadTexture('assets/textures/depth.png'));
@@ -36,13 +36,13 @@
             camera.position.set(0, 2, 4);
             camera.lookAt(scene.position);
 
-            var mesh = new qtek.Mesh({
+            var mesh = new clay.Mesh({
                 geometry: cube,
                 material: material
             });
             scene.add(mesh);
-            var light = new qtek.light.Directional({
-                position: new qtek.math.Vector3(10, 10, 10)
+            var light = new clay.light.Directional({
+                position: new clay.math.Vector3(10, 10, 10)
             })
             light.lookAt(mesh.position);
             scene.add(light);
@@ -54,7 +54,7 @@
 
 
             function loadTexture(src) {
-                var texture = new qtek.Texture2D();
+                var texture = new clay.Texture2D();
                 texture.load(src);
                 return texture;
             }

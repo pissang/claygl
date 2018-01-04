@@ -342,10 +342,10 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
 
 /**
  * @description Animator object can only be created by Animation.prototype.animate method.
- * After created, we can use {@link qtek.animation.Animator#when} to add all keyframes and {@link qtek.animation.Animator#start} it.
+ * After created, we can use {@link clay.animation.Animator#when} to add all keyframes and {@link clay.animation.Animator#start} it.
  * Clips will be automatically created and added to the animation instance which created this deferred object.
  *
- * @constructor qtek.animation.Animator
+ * @constructor clay.animation.Animator
  *
  * @param {Object} target
  * @param {boolean} loop
@@ -380,8 +380,8 @@ Animator.prototype = {
     /**
      * @param  {number} time Keyframe time using millisecond
      * @param  {Object} props A key-value object. Value can be number, 1d and 2d array
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     when: function (time, props) {
         for (var propName in props) {
@@ -410,8 +410,8 @@ Animator.prototype = {
     /**
      * callback when running animation
      * @param  {Function} callback callback have two args, animating target and current percent
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     during: function (callback) {
         this._onframeList.push(callback);
@@ -433,8 +433,8 @@ Animator.prototype = {
     /**
      * Start the animation
      * @param  {string|function} easing
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     start: function (easing) {
 
@@ -487,7 +487,7 @@ Animator.prototype = {
 
     /**
      * Stop the animation
-     * @memberOf qtek.animation.Animator.prototype
+     * @memberOf clay.animation.Animator.prototype
      */
     stop: function () {
         for (var i = 0; i < this._clipList.length; i++) {
@@ -499,8 +499,8 @@ Animator.prototype = {
     /**
      * Delay given milliseconds
      * @param  {number} time
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     delay: function (time){
         this._delay = time;
@@ -509,8 +509,8 @@ Animator.prototype = {
     /**
      * Callback after animation finished
      * @param {Function} func
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     done: function (func) {
         if (func) {
@@ -520,8 +520,8 @@ Animator.prototype = {
     },
     /**
      * Get all clips created in start method.
-     * @return {qtek.animation.Clip[]}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Clip[]}
+     * @memberOf clay.animation.Animator.prototype
      */
     getClips: function () {
         return this._clipList;

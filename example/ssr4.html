@@ -13,7 +13,7 @@
         </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['../dist/qtek', 'js/SSRPass'], function(qtek, SSRPass) {
+            require(['../dist/claygl', 'js/SSRPass'], function(clay, SSRPass) {
 
                 var config = {
                     maxIteration: 32,
@@ -31,35 +31,35 @@
                     zThicknessThreshold: 0.1
                 };
 
-                var renderer = new qtek.Renderer({
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 4, 4);
-                camera.lookAt(qtek.math.Vector3.ZERO);
+                camera.lookAt(clay.math.Vector3.ZERO);
 
-                var gBuffer = new qtek.deferred.GBuffer();
+                var gBuffer = new clay.deferred.GBuffer();
                 var ssrPass = new SSRPass({
                     gBuffer: gBuffer
                 });
 
-                var frameBuffer = new qtek.FrameBuffer();
-                var colorTex = new qtek.Texture2D();
-                var animation = new qtek.animation.Animation();
+                var frameBuffer = new clay.FrameBuffer();
+                var colorTex = new clay.Texture2D();
+                var animation = new clay.animation.Animation();
                 animation.start();
 
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect : renderer.getViewportAspect(),
                     far : 100
                 });
 
                 camera.position.set(2, 2, 2);
-                camera.lookAt(qtek.math.Vector3.ZERO);
+                camera.lookAt(clay.math.Vector3.ZERO);
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target : camera,
                     domElement : renderer.canvas,
                     sensitivity : 0.4,
@@ -67,7 +67,7 @@
                     minPolarAngle : 0.1
                 });
 
-                var loader = new qtek.loader.GLTF();
+                var loader = new clay.loader.GLTF();
                 loader.load('assets/scenes/gltf/scene.json');
 
                 loader.success(function (res) {

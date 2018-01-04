@@ -1,6 +1,6 @@
 
 // https://github.com/BradLarson/GPUImage?source=c
-@export qtek.compositor.lut
+@export clay.compositor.lut
 
 varying vec2 v_Texcoord;
 

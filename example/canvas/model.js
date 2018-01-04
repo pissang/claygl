@@ -1,14 +1,14 @@
 define(function (require) {
 
-    var CanvasRenderer = require('qtek/canvas/Renderer');
-    var CanvasMaterial = require('qtek/canvas/Material');
-    var SphereGeometry = require('qtek/geometry/Sphere');
-    var Scene = require('qtek/Scene');
-    var PerspectiveCamera = require('qtek/camera/Perspective');
-    var Mesh = require('qtek/Mesh');
-    var Animation = require('qtek/animation/Animation');
-    var GLTFLoader = require('qtek/loader/GLTF');
-    var OrbitControl = require('qtek/plugin/OrbitControl');
+    var CanvasRenderer = require('clay/canvas/Renderer');
+    var CanvasMaterial = require('clay/canvas/Material');
+    var SphereGeometry = require('clay/geometry/Sphere');
+    var Scene = require('clay/Scene');
+    var PerspectiveCamera = require('clay/camera/Perspective');
+    var Mesh = require('clay/Mesh');
+    var Animation = require('clay/animation/Animation');
+    var GLTFLoader = require('clay/loader/GLTF');
+    var OrbitControl = require('clay/plugin/OrbitControl');
 
     var renderer = new CanvasRenderer({
         canvas: document.getElementById('main'),

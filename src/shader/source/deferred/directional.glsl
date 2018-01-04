@@ -1,8 +1,8 @@
-@export qtek.deferred.directional_light
+@export clay.deferred.directional_light
 
-@import qtek.deferred.chunk.light_head
+@import clay.deferred.chunk.light_head
 
-@import qtek.deferred.chunk.light_equation
+@import clay.deferred.chunk.light_equation
 
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
@@ -17,11 +17,11 @@ uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
 uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
 #endif
 
-@import qtek.plugin.shadow_map_common
+@import clay.plugin.shadow_map_common
 
 void main()
 {
-    @import qtek.deferred.chunk.gbuffer_read
+    @import clay.deferred.chunk.gbuffer_read
 
     vec3 L = -normalize(lightDirection);
     vec3 V = normalize(eyePosition - position);

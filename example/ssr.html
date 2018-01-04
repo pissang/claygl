@@ -13,7 +13,7 @@
         </style>
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            require(['../dist/qtek', 'js/SSRPass'], function (qtek, SSRPass) {
+            require(['../dist/claygl', 'js/SSRPass'], function (clay, SSRPass) {
 
                 var config = {
                     maxIteration: 20,
@@ -28,40 +28,40 @@
                     roughness: 0.5
                 };
 
-                var renderer = new qtek.Renderer({
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1.0
                 });
-                var camera = new qtek.camera.Perspective({
+                var camera = new clay.camera.Perspective({
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 4, 4);
-                camera.lookAt(qtek.math.Vector3.ZERO);
+                camera.lookAt(clay.math.Vector3.ZERO);
 
-                var gBuffer = new qtek.deferred.GBuffer();
+                var gBuffer = new clay.deferred.GBuffer();
                 var ssrPass = new SSRPass({
                     gBuffer: gBuffer
                 });
 
-                var scene = new qtek.Scene();
-                var planeGeo = new qtek.geometry.Plane();
-                var plane = new qtek.Mesh({
+                var scene = new clay.Scene();
+                var planeGeo = new clay.geometry.Plane();
+                var plane = new clay.Mesh({
                     geometry: planeGeo,
-                    material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                    material: new clay.Material({
+                        shader: clay.shader.library.get('clay.standard')
                     })
                 });
                 plane.scale.set(14, 14, 1);
                 plane.rotation.rotateX(-Math.PI / 2);
                 // plane.material.set('color', [0.2, 0.2, 0.2]);
 
-                var diffuseTex = new qtek.Texture2D({
-                    wrapS: qtek.Texture.REPEAT,
-                    wrapT: qtek.Texture.REPEAT
+                var diffuseTex = new clay.Texture2D({
+                    wrapS: clay.Texture.REPEAT,
+                    wrapT: clay.Texture.REPEAT
                 });
-                var normalTex = new qtek.Texture2D({
-                    wrapS: qtek.Texture.REPEAT,
-                    wrapT: qtek.Texture.REPEAT
+                var normalTex = new clay.Texture2D({
+                    wrapS: clay.Texture.REPEAT,
+                    wrapT: clay.Texture.REPEAT
                 });
                 diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
                 normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
@@ -71,14 +71,14 @@
                 plane.material.set('uvRepeat', [5, 5]);
 
                 scene.add(plane);
-                var mainLight = new qtek.light.Directional({
+                var mainLight = new clay.light.Directional({
                     intensity: 2
                 });
                 mainLight.position.set(12, 12, 12);
                 mainLight.lookAt(scene.position);
                 scene.add(mainLight);
 
-                var loader = new qtek.loader.GLTF();
+                var loader = new clay.loader.GLTF();
                 loader.load('assets/models/suzanne/suzanne.gltf');
                 var suzanneGeometry;
                 var monkeys = [];
@@ -87,10 +87,10 @@
 
                     for (var i = 0; i < 8; i++) {
                         for (var j = 0; j < 8; j++) {
-                            var mesh = new qtek.Mesh({
+                            var mesh = new clay.Mesh({
                                 geometry: suzanneGeometry,
-                                material: new qtek.Material({
-                                    shader: qtek.shader.library.get('qtek.standard')
+                                material: new clay.Material({
+                                    shader: clay.shader.library.get('clay.standard')
                                 })
                             });
                             mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
@@ -104,14 +104,14 @@
                     }
                 });
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     target: camera,
                     domElement: renderer.canvas
                 });
 
-                var frameBuffer = new qtek.FrameBuffer();
-                var colorTex = new qtek.Texture2D();
-                var animation = new qtek.animation.Animation();
+                var frameBuffer = new clay.FrameBuffer();
+                var colorTex = new clay.Texture2D();
+                var animation = new clay.animation.Animation();
                 var elpasedTime = 0;
                 animation.start();
                 animation.on('frame', function(deltaTime) {

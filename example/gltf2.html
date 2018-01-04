@@ -9,50 +9,50 @@
     <canvas id="main"></canvas>
 
     <script type="text/javascript">
-        require(['../dist/qtek', 'js/createCompositor'], function(qtek, createCompositor) {
-            var renderer = new qtek.Renderer({
+        require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
 
-            var shadowMapPass = new qtek.prePass.ShadowMap({
-                softShadow: qtek.prePass.ShadowMap.VSM
+            var shadowMapPass = new clay.prePass.ShadowMap({
+                softShadow: clay.prePass.ShadowMap.VSM
             });
 
-            var cubemap = new qtek.TextureCube({
-                type: qtek.Texture.HALF_FLOAT,
+            var cubemap = new clay.TextureCube({
+                type: clay.Texture.HALF_FLOAT,
                 width: 128,
                 height: 128
             });
-            qtek.util.texture.loadPanorama(
+            clay.util.texture.loadPanorama(
                 renderer,
                 'assets/textures/hdr/pisa.hdr',
                 cubemap,
                 { exposure: 1 },
                 function () {
 
-                    var ambientCubemapLight = new qtek.light.AmbientCubemap({
+                    var ambientCubemapLight = new clay.light.AmbientCubemap({
                         cubemap: cubemap,
                         intensity: 1
                     });
                     ambientCubemapLight.prefilter(renderer);
-                    var ambientSHLight = new qtek.light.AmbientSH({
+                    var ambientSHLight = new clay.light.AmbientSH({
                         coefficients: [0.8450393676757812, 0.7135089635848999, 0.6934053897857666, 0.02310405671596527, 0.17135757207870483, 0.28332242369651794, 0.343019962310791, 0.2880895435810089, 0.2998031973838806, 0.08001846075057983, 0.10719859600067139, 0.12824314832687378, 0.003927173092961311, 0.04206192493438721, 0.06470289081335068, 0.036095526069402695, 0.04928380250930786, 0.058642253279685974, -0.009344635531306267, 0.06963406503200531, 0.1312279999256134, -0.05935414880514145, -0.04865729808807373, -0.060036804527044296, 0.04625355824828148, 0.0563165508210659, 0.050963230431079865],
                         intensity: 0.
                     });
 
-                    var loader = new qtek.loader.GLTF({
-                        rootNode: new qtek.Node()
+                    var loader = new clay.loader.GLTF({
+                        rootNode: new clay.Node()
                     });
                     loader.load("assets/models/gltf2/BoomBox/BoomBox.gltf");
 
                     loader.on('success', function (res) {
-                        var scene = new qtek.Scene();
+                        var scene = new clay.Scene();
                         scene.add(loader.rootNode);
                         loader.rootNode.scale.set(100, 100, 100);
-                        var camera = new qtek.camera.Perspective({
+                        var camera = new clay.camera.Perspective({
                             aspect: renderer.getViewportAspect()
                         });
                         camera.position.y = 2;
@@ -66,13 +66,13 @@
                             }
                         });
 
-                        var control = new qtek.plugin.OrbitControl({
+                        var control = new clay.plugin.OrbitControl({
                             target: camera,
                             domElement: renderer.canvas,
                             sensitivity: 0.4
                         });
 
-                        var light = new qtek.light.Directional({
+                        var light = new clay.light.Directional({
                             intensity: 3,
                             shadowResolution: 1024
                         });
@@ -89,11 +89,11 @@
                         scene.add(ambientCubemapLight);
                         scene.add(ambientSHLight);
 
-                        var planeGeo = new qtek.geometry.Plane();
-                        var plane = new qtek.Mesh({
+                        var planeGeo = new clay.geometry.Plane();
+                        var plane = new clay.Mesh({
                             geometry: planeGeo,
-                            material: new qtek.Material({
-                                shader: qtek.shader.library.get('qtek.standard')
+                            material: new clay.Material({
+                                shader: clay.shader.library.get('clay.standard')
                             }),
                         });
                         plane.material.define('fragment', 'RGBM');
@@ -101,11 +101,11 @@
                         plane.scale.set(10, 10, 1);
                         plane.position.set(0, -1, 0);
                         plane.rotation.rotateX(-Math.PI / 2);
-                        var diffuseTex = new qtek.Texture2D({
-                            wrapS: qtek.Texture.REPEAT, wrapT: qtek.Texture.REPEAT
+                        var diffuseTex = new clay.Texture2D({
+                            wrapS: clay.Texture.REPEAT, wrapT: clay.Texture.REPEAT
                         });
-                        var normalTex = new qtek.Texture2D({
-                            wrapS: qtek.Texture.REPEAT, wrapT: qtek.Texture.REPEAT
+                        var normalTex = new clay.Texture2D({
+                            wrapS: clay.Texture.REPEAT, wrapT: clay.Texture.REPEAT
                         });
                         diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
                         normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');

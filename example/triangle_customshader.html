@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="../dist/qtek.js"></script>
+    <script src="../dist/claygl.js"></script>
     <title>Triangle with Custom Shader</title>
 
     <script type="x-shader/x-vertex" id="vs">
@@ -21,7 +21,7 @@ void main() {
 </head>
 <body>
     <canvas id="main"></canvas>
-    
+
     <script>
     var TRIANGLE_POSITIONS = [
         [-0.5, -0.5, 0],
@@ -29,21 +29,21 @@ void main() {
         [0, 0.5, 0]
     ];
 
-    var renderer = new qtek.Renderer({
+    var renderer = new clay.Renderer({
         canvas: document.getElementById("main")
     });
     renderer.resize(400, 400);
-    var scene = new qtek.Scene();
-    var dummyCamera = new qtek.camera.Perspective();
-    var geometry = new qtek.StaticGeometry();
-    
+    var scene = new clay.Scene();
+    var dummyCamera = new clay.camera.Perspective();
+    var geometry = new clay.StaticGeometry();
+
     // Add triangle vertices to position attribute.
     geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
-    var mesh = new qtek.Mesh({
+    var mesh = new clay.Mesh({
         geometry: geometry,
-        material: new qtek.Material({
-            shader: new qtek.Shader({
+        material: new clay.Material({
+            shader: new clay.Shader({
                 vertex: document.getElementById('vs').textContent,
                 fragment: document.getElementById('fs').textContent
             })

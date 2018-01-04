@@ -1,11 +1,11 @@
 import Node from './Node';
 
 /**
- * @constructor qtek.Light
- * @extends qtek.Node
+ * @constructor clay.Light
+ * @extends clay.Node
  */
 var Light = Node.extend(function(){
-    return /** @lends qtek.Light# */ {
+    return /** @lends clay.Light# */ {
         /**
          * Light RGB color
          * @type {number[]}
@@ -40,18 +40,18 @@ var Light = Node.extend(function(){
         group: 0
     };
 },
-/** @lends qtek.Light.prototype. */
+/** @lends clay.Light.prototype. */
 {
     /**
      * Light type
      * @type {string}
-     * @memberOf qtek.Light#
+     * @memberOf clay.Light#
      */
     type: '',
 
     /**
-     * @return {qtek.Light}
-     * @memberOf qtek.Light.prototype
+     * @return {clay.Light}
+     * @memberOf clay.Light.prototype
      */
     clone: function() {
         var light = Node.prototype.clone.call(this);

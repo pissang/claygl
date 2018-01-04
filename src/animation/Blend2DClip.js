@@ -1,13 +1,13 @@
 // 2D Blend clip of blend tree
 // http://docs.unity3d.com/Documentation/Manual/2DBlending.html
 import Clip from './Clip';
-import delaunay from '../util/delaunay';    
+import delaunay from '../util/delaunay';
 import Vector2 from '../math/Vector2';
 
 /**
- * @typedef {Object} qtek.animation.Blend2DClip.IClipInput
- * @property {qtek.math.Vector2} position
- * @property {qtek.animation.Clip} clip
+ * @typedef {Object} clay.animation.Blend2DClip.IClipInput
+ * @property {clay.math.Vector2} position
+ * @property {clay.animation.Clip} clip
  * @property {number} offset
  */
 
@@ -15,8 +15,8 @@ import Vector2 from '../math/Vector2';
  * 2d blending node in animation blend tree.
  * output clip must have blend2D method
  * @constructor
- * @alias qtek.animation.Blend2DClip
- * @extends qtek.animation.Clip
+ * @alias clay.animation.Blend2DClip
+ * @extends clay.animation.Clip
  *
  * @param {Object} [opts]
  * @param {string} [opts.name]
@@ -31,8 +31,8 @@ import Vector2 from '../math/Vector2';
  * @param {Function} [opts.onfinish]
  * @param {Function} [opts.onrestart]
  * @param {object[]} [opts.inputs]
- * @param {qtek.math.Vector2} [opts.position]
- * @param {qtek.animation.Clip} [opts.output]
+ * @param {clay.math.Vector2} [opts.position]
+ * @param {clay.animation.Clip} [opts.output]
  */
 var Blend2DClip = function (opts) {
 
@@ -41,15 +41,15 @@ var Blend2DClip = function (opts) {
     Clip.call(this, opts);
     /**
      * Output clip must have blend2D method
-     * @type {qtek.animation.Clip}
+     * @type {clay.animation.Clip}
      */
     this.output = opts.output || null;
     /**
-     * @type {qtek.animation.Blend2DClip.IClipInput[]}
+     * @type {clay.animation.Blend2DClip.IClipInput[]}
      */
     this.inputs = opts.inputs || [];
     /**
-     * @type {qtek.math.Vector2}
+     * @type {clay.math.Vector2}
      */
     this.position = new Vector2();
 
@@ -63,10 +63,10 @@ var Blend2DClip = function (opts) {
 Blend2DClip.prototype = new Clip();
 Blend2DClip.prototype.constructor = Blend2DClip;
 /**
- * @param {qtek.math.Vector2} position
- * @param {qtek.animation.Clip} inputClip
+ * @param {clay.math.Vector2} position
+ * @param {clay.animation.Clip} inputClip
  * @param {number} [offset]
- * @return {qtek.animation.Blend2DClip.IClipInput}
+ * @return {clay.animation.Blend2DClip.IClipInput}
  */
 Blend2DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
@@ -91,7 +91,7 @@ Blend2DClip.prototype._updateTriangles = function () {
 };
 
 Blend2DClip.prototype.step = function (time, dTime, silent) {
-    
+
     var ret = Clip.prototype.step.call(this, time);
 
     if (ret !== 'finish') {
@@ -137,7 +137,7 @@ Blend2DClip.prototype.setTime = function (time) {
 /**
  * Clone a new Blend2D clip
  * @param {boolean} cloneInputs True if clone the input clips
- * @return {qtek.animation.Blend2DClip}
+ * @return {clay.animation.Blend2DClip}
  */
 Blend2DClip.prototype.clone = function (cloneInputs) {
     var clip = Clip.prototype.clone.call(this);

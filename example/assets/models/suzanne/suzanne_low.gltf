@@ -64,7 +64,7 @@
     }
   ],
   "asset": {
-    "generator": "qtek fbx2gltf",
+    "generator": "clay fbx2gltf",
     "version": "2.0"
   },
   "bufferViews": [

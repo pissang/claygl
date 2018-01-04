@@ -4,27 +4,27 @@ var vec3 = glMatrix.vec3;
 
 /**
  * @constructor
- * @alias qtek.particle.Particle
+ * @alias clay.particle.Particle
  */
 var Particle = function() {
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.position = new Vector3();
 
     /**
      * Use euler angle to represent particle rotation
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.rotation = new Vector3();
 
     /**
-     * @type {?qtek.math.Vector3}
+     * @type {?clay.math.Vector3}
      */
     this.velocity = null;
 
     /**
-     * @type {?qtek.math.Vector3}
+     * @type {?clay.math.Vector3}
      */
     this.angularVelocity = null;
 
@@ -49,7 +49,7 @@ var Particle = function() {
     this.weight = 1;
 
     /**
-     * @type {qtek.particle.Emitter}
+     * @type {clay.particle.Emitter}
      */
     this.emitter = null;
 };

@@ -8,15 +8,15 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 /**
  * Pass rendering scene to a environment cube map
  *
- * @constructor qtek.prePass.EnvironmentMap
- * @extends qtek.core.Base
+ * @constructor clay.prePass.EnvironmentMap
+ * @extends clay.core.Base
  * @example
  *     // Example of car reflection
- *     var envMap = new qtek.TextureCube({
+ *     var envMap = new clay.TextureCube({
  *         width: 256,
  *         height: 256
  *     });
- *     var envPass = new qtek.prePass.EnvironmentMap({
+ *     var envPass = new clay.prePass.EnvironmentMap({
  *         position: car.position,
  *         texture: envMap
  *     });
@@ -30,35 +30,35 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *     });
  */
 var EnvironmentMapPass = Base.extend(function() {
-    var ret = /** @lends qtek.prePass.EnvironmentMap# */ {
+    var ret = /** @lends clay.prePass.EnvironmentMap# */ {
         /**
          * Camera position
-         * @type {qtek.math.Vector3}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @type {clay.math.Vector3}
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         position: new Vector3(),
         /**
          * Camera far plane
          * @type {number}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         far: 1000,
         /**
          * Camera near plane
          * @type {number}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         near: 0.1,
         /**
          * Environment cube map
-         * @type {qtek.TextureCube}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @type {clay.TextureCube}
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         texture: null,
 
         /**
          * Used if you wan't have shadow in environment map
-         * @type {qtek.prePass.ShadowMap}
+         * @type {clay.prePass.ShadowMap}
          */
         shadowMapPass: null,
     };
@@ -81,17 +81,17 @@ var EnvironmentMapPass = Base.extend(function() {
     ret._frameBuffer = new FrameBuffer();
 
     return ret;
-},  /** @lends qtek.prePass.EnvironmentMap# */ {
+},  /** @lends clay.prePass.EnvironmentMap# */ {
     /**
      * @param  {string} target
-     * @return  {qtek.Camera}
+     * @return  {clay.Camera}
      */
     getCamera: function (target) {
         return this._cameras[target];
     },
     /**
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Scene} scene
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Scene} scene
      * @param  {boolean} [notUpdateScene=false]
      */
     render: function(renderer, scene, notUpdateScene) {
@@ -133,7 +133,7 @@ var EnvironmentMapPass = Base.extend(function() {
         }
     },
     /**
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._frameBuffer.dispose(renderer);

@@ -2,14 +2,14 @@ import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 
 /**
- * @constructor qtek.geometry.Plane
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Plane
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
  */
 var Plane = Geometry.extend(
-/** @lends qtek.geometry.Plane# */
+/** @lends clay.geometry.Plane# */
 {
     dynamic: false,
     /**
@@ -23,7 +23,7 @@ var Plane = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Plane.prototype */
+/** @lends clay.geometry.Plane.prototype */
 {
     /**
      * Build plane geometry

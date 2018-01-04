@@ -1,10 +1,10 @@
-@export qtek.deferred.point_light
+@export clay.deferred.point_light
 
-@import qtek.deferred.chunk.light_head
+@import clay.deferred.chunk.light_head
 
-@import qtek.util.calculate_attenuation
+@import clay.util.calculate_attenuation
 
-@import qtek.deferred.chunk.light_equation
+@import clay.deferred.chunk.light_equation
 
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
@@ -19,11 +19,11 @@ uniform float lightShadowMapSize;
 
 varying vec3 v_Position;
 
-@import qtek.plugin.shadow_map_common
+@import clay.plugin.shadow_map_common
 
 void main()
 {
-    @import qtek.deferred.chunk.gbuffer_read
+    @import clay.deferred.chunk.gbuffer_read
 
     vec3 L = lightPosition - position;
     vec3 V = normalize(eyePosition - position);

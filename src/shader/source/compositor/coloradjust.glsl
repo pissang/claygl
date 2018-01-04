@@ -1,4 +1,4 @@
-@export qtek.compositor.coloradjust
+@export clay.compositor.coloradjust
 
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
@@ -34,7 +34,7 @@ void main()
 @end
 
 // Seperate shader for float texture
-@export qtek.compositor.brightness
+@export clay.compositor.brightness
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -48,7 +48,7 @@ void main()
 }
 @end
 
-@export qtek.compositor.contrast
+@export clay.compositor.contrast
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -62,7 +62,7 @@ void main()
 }
 @end
 
-@export qtek.compositor.exposure
+@export clay.compositor.exposure
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -76,7 +76,7 @@ void main()
 }
 @end
 
-@export qtek.compositor.gamma
+@export clay.compositor.gamma
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -90,7 +90,7 @@ void main()
 }
 @end
 
-@export qtek.compositor.saturation
+@export clay.compositor.saturation
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 

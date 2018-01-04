@@ -7,10 +7,10 @@ import Material from '../Material';
 import skyboxEssl from '../shader/source/skybox.glsl.js';
 Shader.import(skyboxEssl);
 /**
- * @constructor qtek.plugin.Skybox
+ * @constructor clay.plugin.Skybox
  *
  * @example
- *     var skyTex = new qtek.TextureCube();
+ *     var skyTex = new clay.TextureCube();
  *     skyTex.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -19,7 +19,7 @@ Shader.import(skyboxEssl);
  *         'pz': 'assets/textures/sky/pz.jpg'
  *         'nz': 'assets/textures/sky/nz.jpg'
  *     });
- *     var skybox = new qtek.plugin.Skybox({
+ *     var skybox = new clay.plugin.Skybox({
  *         scene: scene
  *     });
  *     skybox.material.set('environmentMap', skyTex);
@@ -27,8 +27,8 @@ Shader.import(skyboxEssl);
 var Skybox = Mesh.extend(function () {
 
     var skyboxShader = new Shader({
-        vertex: Shader.source('qtek.skybox.vertex'),
-        fragment: Shader.source('qtek.skybox.fragment')
+        vertex: Shader.source('clay.skybox.vertex'),
+        fragment: Shader.source('clay.skybox.fragment')
     });
     var material = new Material({
         shader: skyboxShader,
@@ -37,8 +37,8 @@ var Skybox = Mesh.extend(function () {
 
     return {
         /**
-         * @type {qtek.Scene}
-         * @memberOf qtek.plugin.Skybox.prototype
+         * @type {clay.Scene}
+         * @memberOf clay.plugin.Skybox.prototype
          */
         scene: null,
 
@@ -58,10 +58,10 @@ var Skybox = Mesh.extend(function () {
     if (this.environmentMap) {
         this.setEnvironmentMap(this.environmentMap);
     }
-}, /** @lends qtek.plugin.Skybox# */ {
+}, /** @lends clay.plugin.Skybox# */ {
     /**
      * Attach the skybox to the scene
-     * @param  {qtek.Scene} scene
+     * @param  {clay.Scene} scene
      */
     attachScene: function (scene) {
         if (this.scene) {
@@ -82,7 +82,7 @@ var Skybox = Mesh.extend(function () {
 
     /**
      * Dispose skybox
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this.detachScene();
@@ -90,14 +90,14 @@ var Skybox = Mesh.extend(function () {
     },
     /**
      * Set environment map
-     * @param {qtek.TextureCube} envMap
+     * @param {clay.TextureCube} envMap
      */
     setEnvironmentMap: function (envMap) {
         this.material.set('environmentMap', envMap);
     },
     /**
      * Get environment map
-     * @return {qtek.TextureCube}
+     * @return {clay.TextureCube}
      */
     getEnvironmentMap: function () {
         return this.material.get('environmentMap');

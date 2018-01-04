@@ -4,8 +4,8 @@ import glMatrix from '../dep/glmatrix';
 var vec3 =  glMatrix.vec3;
 
 /**
- * @constructor qtek.particle.ForceField
- * @extends qtek.particle.Field
+ * @constructor clay.particle.ForceField
+ * @extends clay.particle.Field
  */
 var ForceField = Field.extend(function() {
     return {

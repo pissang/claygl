@@ -8,11 +8,11 @@ import Cache from './core/Cache';
 
 /**
  * @constructor
- * @alias qtek.Texture
- * @extends qtek.core.Base
+ * @alias clay.Texture
+ * @extends clay.core.Base
  */
 var Texture = Base.extend(
-/** @lends qtek.Texture# */
+/** @lends clay.Texture# */
 {
     /**
      * Texture width, readonly when the texture source is image
@@ -27,56 +27,56 @@ var Texture = Base.extend(
     /**
      * Texel data type.
      * Possible values:
-     *  + {@link qtek.Texture.UNSIGNED_BYTE}
-     *  + {@link qtek.Texture.HALF_FLOAT}
-     *  + {@link qtek.Texture.FLOAT}
-     *  + {@link qtek.Texture.UNSIGNED_INT_24_8_WEBGL}
-     *  + {@link qtek.Texture.UNSIGNED_INT}
+     *  + {@link clay.Texture.UNSIGNED_BYTE}
+     *  + {@link clay.Texture.HALF_FLOAT}
+     *  + {@link clay.Texture.FLOAT}
+     *  + {@link clay.Texture.UNSIGNED_INT_24_8_WEBGL}
+     *  + {@link clay.Texture.UNSIGNED_INT}
      * @type {number}
      */
     type: glenum.UNSIGNED_BYTE,
     /**
      * Format of texel data
      * Possible values:
-     *  + {@link qtek.Texture.RGBA}
-     *  + {@link qtek.Texture.DEPTH_COMPONENT}
-     *  + {@link qtek.Texture.DEPTH_STENCIL}
+     *  + {@link clay.Texture.RGBA}
+     *  + {@link clay.Texture.DEPTH_COMPONENT}
+     *  + {@link clay.Texture.DEPTH_STENCIL}
      * @type {number}
      */
     format: glenum.RGBA,
     /**
      * Texture wrap. Default to be REPEAT.
      * Possible values:
-     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
-     *  + {@link qtek.Texture.REPEAT}
-     *  + {@link qtek.Texture.MIRRORED_REPEAT}
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapS: glenum.REPEAT,
     /**
      * Texture wrap. Default to be REPEAT.
      * Possible values:
-     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
-     *  + {@link qtek.Texture.REPEAT}
-     *  + {@link qtek.Texture.MIRRORED_REPEAT}
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapT: glenum.REPEAT,
     /**
      * Possible values:
-     *  + {@link qtek.Texture.NEAREST}
-     *  + {@link qtek.Texture.LINEAR}
-     *  + {@link qtek.Texture.NEAREST_MIPMAP_NEAREST}
-     *  + {@link qtek.Texture.LINEAR_MIPMAP_NEAREST}
-     *  + {@link qtek.Texture.NEAREST_MIPMAP_LINEAR}
-     *  + {@link qtek.Texture.LINEAR_MIPMAP_LINEAR}
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_LINEAR}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_LINEAR}
      * @type {number}
      */
     minFilter: glenum.LINEAR_MIPMAP_LINEAR,
     /**
      * Possible values:
-     *  + {@link qtek.Texture.NEAREST}
-     *  + {@link qtek.Texture.LINEAR}
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
      * @type {number}
      */
     magFilter: glenum.LINEAR,
@@ -121,7 +121,7 @@ var Texture = Base.extend(
 }, function () {
     this._cache = new Cache();
 },
-/** @lends qtek.Texture.prototype */
+/** @lends clay.Texture.prototype */
 {
 
     getWebGLTexture: function (renderer) {
@@ -228,7 +228,7 @@ var Texture = Base.extend(
         return x + 1;
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
 

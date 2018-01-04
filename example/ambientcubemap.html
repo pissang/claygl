@@ -2,43 +2,43 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script type="text/javascript">
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 // devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 6);
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var loader = new qtek.loader.GLTF();
+            var loader = new clay.loader.GLTF();
             loader.load('assets/models/suzanne/suzanne_high.gltf');
             var suzanneGeometry;
             loader.on('success', function(res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                var cubemap = qtek.util.texture.loadTexture(
+                var cubemap = clay.util.texture.loadTexture(
                     'assets/textures/hdr/pisa.hdr',
                     {
                         exposure: 3
                     },
                     function () {
                         cubemap.flipY = false;
-                        var ambientCubemapLight = new qtek.light.AmbientCubemap({
+                        var ambientCubemapLight = new clay.light.AmbientCubemap({
                             cubemap: cubemap
                         });
                         ambientCubemapLight.prefilter(renderer);
                         scene.add(ambientCubemapLight);
 
-                        var skybox = new qtek.plugin.Skybox({
+                        var skybox = new clay.plugin.Skybox({
                             scene: scene,
                             environmentMap: ambientCubemapLight.cubemap
                         });
@@ -46,17 +46,17 @@
                         skybox.material.set('lod', 3.0);
 
                         for (var i = 0; i < 10; i++) {
-                            // var material = new qtek.Material({
-                            //     shader: qtek.shader.library.get('qtek.standard')
+                            // var material = new clay.Material({
+                            //     shader: clay.shader.library.get('clay.standard')
                             // });
                             // material.set('color', [1, 1, 1]);
                             // material.set('glossiness', i / 12);
-                            var material = new qtek.StandardMaterial({
+                            var material = new clay.StandardMaterial({
                                 metalness: 1,
                                 // color: [0.7, 0.0, 0.0],
                                 roughness: i / 12
                             });
-                            var mesh = new qtek.Mesh({
+                            var mesh = new clay.Mesh({
                                 material: material,
                                 geometry: suzanneGeometry
                             });
@@ -69,12 +69,12 @@
                 );
             });
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 target: camera,
                 domElement: renderer.canvas
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
             animation.start();
             animation.on('frame', function(deltaTime) {
                 control.update(deltaTime);

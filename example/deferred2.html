@@ -1,31 +1,31 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
         <script type="text/javascript" src="lib/dat.gui.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var deferredRenderer = new qtek.deferred.Renderer();
+            var deferredRenderer = new clay.deferred.Renderer();
 
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 far: 10000,
                 aspect: renderer.getViewportAspect()
             });
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var loader = new qtek.loader.GLTF();
+            var loader = new clay.loader.GLTF();
             loader.load('assets/models/suzanne/suzanne_high.gltf');
             var suzanneGeometry;
-            var material = new qtek.StandardMaterial({
+            var material = new clay.StandardMaterial({
                 metalness: 0.5,
                 uvRepeat: [3, 3],
                 roughness: 0.5,
@@ -34,22 +34,22 @@
             loader.on('success', function(res) {
                 suzanneGeometry = res.scene.getNode('Suzanne').geometry;
 
-                var mesh = new qtek.Mesh({
+                var mesh = new clay.Mesh({
                     geometry: suzanneGeometry,
                     material: material
                 });
                 mesh.geometry.generateTangents();
 
                 [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                    var tex = new qtek.Texture2D({
-                        wrapS: qtek.Texture.REPEAT,
-                        wratT: qtek.Texture.REPEAT
+                    var tex = new clay.Texture2D({
+                        wrapS: clay.Texture.REPEAT,
+                        wratT: clay.Texture.REPEAT
                     });
                     tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
                         .success(function () {
                             // FIXME
-                            tex.wrapS = qtek.Texture.REPEAT;
-                            tex.wrapT = qtek.Texture.REPEAT;
+                            tex.wrapS = clay.Texture.REPEAT;
+                            tex.wrapT = clay.Texture.REPEAT;
                         });
                     material[mapInfo[0]] = tex;
                 });
@@ -60,10 +60,10 @@
 
 
             var lights = [];
-            var sphereGeo = new qtek.geometry.Sphere();
+            var sphereGeo = new clay.geometry.Sphere();
             for (var i = 0; i < 100; i ++) {
-                var rotNode = new qtek.Node();
-                var pointLight = new qtek.light.Point({
+                var rotNode = new clay.Node();
+                var pointLight = new clay.light.Point({
                     color: [Math.random(), Math.random(), Math.random()],
                     range: 4 + Math.random() * 3
                 });
@@ -77,8 +77,8 @@
                 lights.push(rotNode);
                 scene.add(rotNode);
 
-                var debugMesh = new qtek.Mesh({
-                    material: new qtek.StandardMaterial({
+                var debugMesh = new clay.Mesh({
+                    material: new clay.StandardMaterial({
                         color: [0, 0, 0],
                         rougness: 1,
                         emission: pointLight.color
@@ -91,12 +91,12 @@
             camera.position.set(0, 0, 6);
             camera.lookAt(scene.position);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
 
             animation.on('frame', function (deltaTime) {
                 lights.forEach(function (light) {

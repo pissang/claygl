@@ -4,15 +4,15 @@ import mathUtil from './math/util';
 var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
 /**
- * @constructor qtek.Texture2D
- * @extends qtek.Texture
+ * @constructor clay.Texture2D
+ * @extends clay.Texture
  *
  * @example
  *     ...
- *     var mat = new qtek.Material({
- *         shader: qtek.shader.library.get('qtek.phong', 'diffuseMap')
+ *     var mat = new clay.Material({
+ *         shader: clay.shader.library.get('clay.phong', 'diffuseMap')
  *     });
- *     var diffuseMap = new qtek.Texture2D();
+ *     var diffuseMap = new clay.Texture2D();
  *     diffuseMap.load('assets/textures/diffuse.jpg');
  *     mat.set('diffuseMap', diffuseMap);
  *     ...
@@ -24,7 +24,7 @@ var isPowerOfTwo = mathUtil.isPowerOfTwo;
  *     });
  */
 var Texture2D = Texture.extend(function () {
-    return /** @lends qtek.Texture2D# */ {
+    return /** @lends clay.Texture2D# */ {
         /**
          * @type {?HTMLImageElement|HTMLCanvasElemnet}
          */
@@ -118,8 +118,8 @@ var Texture2D = Texture.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @memberOf qtek.Texture2D.prototype
+     * @param  {clay.Renderer} renderer
+     * @memberOf clay.Texture2D.prototype
      */
     generateMipmap: function (renderer) {
         var _gl = renderer.gl;

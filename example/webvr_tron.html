@@ -27,29 +27,29 @@
         <canvas id='main'></canvas>
         <!--<div id="split-line"></div>-->
         <script type="text/javascript">
-            require(['../dist/qtek', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (qtek, tronShader, createCompositor) {
-                var Shader = qtek.Shader;
+            require(['../dist/claygl', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (clay, tronShader, createCompositor) {
+                var Shader = clay.Shader;
                 Shader.import(tronShader);
 
-                var renderer = new qtek.Renderer({
+                var renderer = new clay.Renderer({
                     canvas: document.getElementById('main'),
                     devicePixelRatio: 1
                 });
-                var scene = new qtek.Scene();
-                var camera = new qtek.camera.Perspective({
+                var scene = new clay.Scene();
+                var camera = new clay.camera.Perspective({
                     aspect : renderer.getViewportAspect(),
                     far : 500
                 });
-                var stereoCamera = new qtek.vr.StereoCamera();
+                var stereoCamera = new clay.vr.StereoCamera();
 
-                var cube = new qtek.geometry.Cube({
+                var cube = new clay.geometry.Cube({
                     widthSegments : 1,
                     heightSegments : 1,
                     depthSegments : 1
                 });
 
-                var tronMaterial = new qtek.Material({
-                    shader: new qtek.Shader({
+                var tronMaterial = new clay.Material({
+                    shader: new clay.Shader({
                         vertex: Shader.source('tron.vertex'),
                         fragment: Shader.source('tron.fragment')
                     })
@@ -58,7 +58,7 @@
 
                 camera.position.set(0, 0, 7);
 
-                var cubeMeshTronOutline = new qtek.Mesh({
+                var cubeMeshTronOutline = new clay.Mesh({
                     geometry: cube,
                     material: tronMaterial,
                     culling: false,
@@ -66,10 +66,10 @@
                         _gl.clear(_gl.DEPTH_BUFFER_BIT);
                     }
                 });
-                var cubeMesh = new qtek.Mesh({
+                var cubeMesh = new clay.Mesh({
                     geometry: cube,
-                    material: new qtek.Material({
-                        shader: qtek.shader.library.get('qtek.standard')
+                    material: new clay.Material({
+                        shader: clay.shader.library.get('clay.standard')
                     })
                 });
                 cubeMesh.material.define('fragment', 'RGBM_ENCODE');
@@ -79,23 +79,23 @@
                 scene.add(cubeMesh);
                 scene.add(cubeMeshTronOutline);
 
-                var light = new qtek.light.Directional({
+                var light = new clay.light.Directional({
                     intensity: 0.5
                 });
                 light.position.set(4, 5, 2);
                 light.lookAt(scene.position);
                 scene.add(light);
 
-                var animation = new qtek.animation.Animation();
+                var animation = new clay.animation.Animation();
                 animation.start();
 
-                var control = new qtek.plugin.OrbitControl({
+                var control = new clay.plugin.OrbitControl({
                     domElement: renderer.canvas,
                     target: camera
                 });
 
-                var sourceTexture = new qtek.Texture2D({
-                    type: qtek.Texture.HALF_FLOAT
+                var sourceTexture = new clay.Texture2D({
+                    type: clay.Texture.HALF_FLOAT
                 });
 
                 var compositor = createCompositor({
@@ -104,7 +104,7 @@
                     enableLensflare: false
                 });
 
-                var frameBuffer = new qtek.FrameBuffer();
+                var frameBuffer = new clay.FrameBuffer();
                 frameBuffer.attach(sourceTexture);
 
                 animation.on('frame', function(dTime) {

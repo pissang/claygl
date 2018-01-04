@@ -4,14 +4,14 @@ import Vector2 from './Vector2';
 /**
  * Random or constant 1d, 2d, 3d vector generator
  * @constructor
- * @alias qtek.math.Value
+ * @alias clay.math.Value
  */
 var Value = function() {};
 
 /**
  * @method
- * @param {number|qtek.math.Vector2|qtek.math.Vector3} [out]
- * @return {number|qtek.math.Vector2|qtek.math.Vector3}
+ * @param {number|clay.math.Vector2|clay.math.Vector3} [out]
+ * @return {number|clay.math.Vector2|clay.math.Vector3}
  */
 Value.prototype.get = function(out) {};
 
@@ -95,7 +95,7 @@ Random3D.prototype.constructor = Random3D;
 /**
  * Create a constant 1d value generator
  * @param  {number} constant
- * @return {qtek.math.Value}
+ * @return {clay.math.Value}
  */
 Value.constant = function(constant) {
     return new ConstantValue(constant);
@@ -103,8 +103,8 @@ Value.constant = function(constant) {
 
 /**
  * Create a constant vector value(2d or 3d) generator
- * @param  {qtek.math.Vector2|qtek.math.Vector3} vector
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector2|clay.math.Vector3} vector
+ * @return {clay.math.Value}
  */
 Value.vector = function(vector) {
     return new VectorValue(vector);
@@ -114,7 +114,7 @@ Value.vector = function(vector) {
  * Create a random 1d value generator
  * @param  {number} min
  * @param  {number} max
- * @return {qtek.math.Value}
+ * @return {clay.math.Value}
  */
 Value.random1D = function(min, max) {
     return new Random1D(min, max);
@@ -122,9 +122,9 @@ Value.random1D = function(min, max) {
 
 /**
  * Create a random 2d value generator
- * @param  {qtek.math.Vector2} min
- * @param  {qtek.math.Vector2} max
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector2} min
+ * @param  {clay.math.Vector2} max
+ * @return {clay.math.Value}
  */
 Value.random2D = function(min, max) {
     return new Random2D(min, max);
@@ -132,9 +132,9 @@ Value.random2D = function(min, max) {
 
 /**
  * Create a random 3d value generator
- * @param  {qtek.math.Vector3} min
- * @param  {qtek.math.Vector3} max
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector3} min
+ * @param  {clay.math.Vector3} max
+ * @return {clay.math.Value}
  */
 Value.random3D = function(min, max) {
     return new Random3D(min, max);

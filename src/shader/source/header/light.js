@@ -2,7 +2,7 @@ import calcAmbientSHLightEssl from './calcAmbientSHLight.glsl.js';
 
 var uniformVec3Prefix = 'uniform vec3 ';
 var uniformFloatPrefix = 'uniform float ';
-var exportHeaderPrefix = '@export qtek.header.';
+var exportHeaderPrefix = '@export clay.header.';
 var exportEnd = '@end';
 var unconfigurable = ':unconfigurable;';
 export default [

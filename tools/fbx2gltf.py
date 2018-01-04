@@ -1353,7 +1353,7 @@ def Convert(
         #Output json
         lJSON = {
             'asset': {
-                'generator': 'qtek fbx2gltf',
+                'generator': 'ClayGL - fbx2gltf',
                 'version': '2.0'
             },
             'accessors' : lib_accessors,

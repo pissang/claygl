@@ -1,40 +1,40 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="../dist/qtek.js"></script>
+        <script src="../dist/claygl.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
     </head>
     <body style="margin:0px;">
         <canvas id="main"></canvas>
         <script>
-            var renderer = new qtek.Renderer({
+            var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
                 devicePixelRatio: 1.0
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var deferredRenderer = new qtek.deferred.Renderer();
+            var deferredRenderer = new clay.deferred.Renderer();
 
-            var camera = new qtek.camera.Perspective({
+            var camera = new clay.camera.Perspective({
                 far: 10000,
                 aspect: renderer.getViewportAspect()
             });
 
-            var texture = new qtek.Texture2D({
-                wrapS: qtek.Texture.REPEAT,
-                wrapT: qtek.Texture.REPEAT,
+            var texture = new clay.Texture2D({
+                wrapS: clay.Texture.REPEAT,
+                wrapT: clay.Texture.REPEAT,
                 anisotropic: 32
             });
             texture.load('assets/textures/rockwall_n.jpg');
 
-            var scene = new qtek.Scene();
+            var scene = new clay.Scene();
 
-            var plane = new qtek.Mesh({
-                material: new qtek.StandardMaterial({
+            var plane = new clay.Mesh({
+                material: new clay.StandardMaterial({
                     glossiness: 0.5,
                     uvRepeat: [100, 100],
                     normalMap: texture
                 }),
-                geometry: new qtek.geometry.Plane()
+                geometry: new clay.geometry.Plane()
             });
             plane.scale.set(10000, 10000, 1);
             plane.rotation.rotateX(-Math.PI / 2);
@@ -46,10 +46,10 @@
                 return (Math.random() - 0.5) * size * 2
             }
 
-            var cylinder = new qtek.geometry.Cylinder();
-            cylinder.applyTransform(new qtek.math.Matrix4().rotateZ(Math.PI / 2));
+            var cylinder = new clay.geometry.Cylinder();
+            cylinder.applyTransform(new clay.math.Matrix4().rotateZ(Math.PI / 2));
             for (var i = 0; i < 20; i ++) {
-                var tubeLight = new qtek.light.Tube({
+                var tubeLight = new clay.light.Tube({
                     color: [1, 1, 1],
                     range: 400,
                     intensity: 2.0,
@@ -63,8 +63,8 @@
                 tubeLight.position.set(x, y, z);
                 scene.add(tubeLight);
 
-                var lightMesh = new qtek.Mesh({
-                    material: new qtek.StandardMaterial({
+                var lightMesh = new clay.Mesh({
+                    material: new clay.StandardMaterial({
                         color: [0, 0, 0],
                         specularColor: [0, 0, 0],
                         glossiness: 0.0,
@@ -79,14 +79,14 @@
                 tubeLight.add(lightMesh);
             }
 
-            var sphereGeo = new qtek.geometry.Sphere({
+            var sphereGeo = new clay.geometry.Sphere({
                 widthSegments: 50,
                 heightSegments: 50
             });
             for (var i = 0; i < 10; i++) {
                 for (var j = 0; j < 10; j++) {
-                    var sphere = new qtek.Mesh({
-                        material: new qtek.StandardMaterial({
+                    var sphere = new clay.Mesh({
+                        material: new clay.StandardMaterial({
                             glossiness: 0.4,
                             color: [0, 0, 0]
                         }),
@@ -101,15 +101,15 @@
             camera.position.set(0, 50, 100);
             camera.lookAt(scene.position);
 
-            var control = new qtek.plugin.OrbitControl({
+            var control = new clay.plugin.OrbitControl({
                 domElement: renderer.canvas,
                 target: camera
             });
 
-            var animation = new qtek.animation.Animation();
+            var animation = new clay.animation.Animation();
 
-            var debugPass = new qtek.compositor.Pass({
-                fragment: qtek.Shader.source('qtek.compositor.output')
+            var debugPass = new clay.compositor.Pass({
+                fragment: clay.Shader.source('clay.compositor.output')
             });
             debugPass.material.undefine('fragment', 'OUTPUT_ALPHA');
             animation.on('frame', function (deltaTime) {

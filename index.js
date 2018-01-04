@@ -1,1 +1,1 @@
-module.exports = require('./lib/qtek');
+module.exports = require('./dist/claygl');

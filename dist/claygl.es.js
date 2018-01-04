@@ -1,15 +1,9 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.qtek = {})));
-}(this, (function (exports) { 'use strict';
-
 /**
  * Extend a sub class from base class
  * @param {object|Function} makeDefaultOpt default option of this sub class, method of the sub can use this.xxx to access this option
  * @param {Function} [initialize] Initialize after the sub class is instantiated
  * @param {Object} [proto] Prototype methods/properties of the sub class
- * @memberOf qtek.core.mixin.extend
+ * @memberOf clay.core.mixin.extend
  * @return {Function}
  */
 function derive(makeDefaultOpt, initialize/*optional*/, proto/*optional*/) {
@@ -100,7 +94,7 @@ function extendWithPropList(target, source, propList) {
 }
 
 /**
- * @alias qtek.core.mixin.extend
+ * @alias clay.core.mixin.extend
  * @mixin
  */
 var extendMixin = {
@@ -117,7 +111,7 @@ function Handler(action, context) {
 }
 /**
  * @mixin
- * @alias qtek.core.mixin.notifier
+ * @alias clay.core.mixin.notifier
  */
 var notifier = {
     /**
@@ -320,16 +314,16 @@ var nativeForEach = ArrayProto.forEach;
 
 /**
  * Util functions
- * @namespace qtek.core.util
+ * @namespace clay.core.util
  */
 var util$1 = {
 
     /**
      * Generate GUID
      * @return {number}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    genGUID: function() {
+    genGUID: function () {
         return ++guid;
     },
     /**
@@ -337,9 +331,9 @@ var util$1 = {
      * @param  {string} path
      * @param  {string} basePath
      * @return {string}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    relative2absolute: function(path, basePath) {
+    relative2absolute: function (path, basePath) {
         if (!basePath || path.match(/^\//)) {
             return path;
         }
@@ -362,9 +356,9 @@ var util$1 = {
      * @param  {Object} target
      * @param  {Object} source
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    extend: function(target, source) {
+    extend: function (target, source) {
         if (source) {
             for (var name in source) {
                 if (source.hasOwnProperty(name)) {
@@ -380,9 +374,9 @@ var util$1 = {
      * @param  {Object} target
      * @param  {Object} source
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    defaults: function(target, source) {
+    defaults: function (target, source) {
         if (source) {
             for (var propName in source) {
                 if (target[propName] === undefined) {
@@ -398,9 +392,9 @@ var util$1 = {
      * @param  {Object} source
      * @param  {Array.<string>} propList
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    extendWithPropList: function(target, source, propList) {
+    extendWithPropList: function (target, source, propList) {
         if (source) {
             for (var i = 0; i < propList.length; i++) {
                 var propName = propList[i];
@@ -415,9 +409,9 @@ var util$1 = {
      * @param  {Object} source
      * @param  {Array.<string>} propList
      * @return {Object}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    defaultsWithPropList: function(target, source, propList) {
+    defaultsWithPropList: function (target, source, propList) {
         if (source) {
             for (var i = 0; i < propList.length; i++) {
                 var propName = propList[i];
@@ -432,19 +426,21 @@ var util$1 = {
      * @param  {Object|Array} obj
      * @param  {Function} iterator
      * @param  {Object} [context]
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    each: function(obj, iterator, context) {
+    each: function (obj, iterator, context) {
         if (!(obj && iterator)) {
             return;
         }
         if (obj.forEach && obj.forEach === nativeForEach) {
             obj.forEach(iterator, context);
-        } else if (obj.length === + obj.length) {
+        }
+        else if (obj.length === + obj.length) {
             for (var i = 0, len = obj.length; i < len; i++) {
                 iterator.call(context, obj[i], i, obj);
             }
-        } else {
+        }
+        else {
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
                     iterator.call(context, obj[key], key, obj);
@@ -454,12 +450,12 @@ var util$1 = {
     },
 
     /**
-     * Is object ?
+     * Is object
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    isObject: function(obj) {
+    isObject: function (obj) {
         return obj === Object(obj);
     },
 
@@ -467,9 +463,9 @@ var util$1 = {
      * Is array ?
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    isArray: function(obj) {
+    isArray: function (obj) {
         return Array.isArray(obj);
     },
 
@@ -477,12 +473,13 @@ var util$1 = {
      * Is array like, which have a length property
      * @param  {}  obj
      * @return {boolean}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    isArrayLike: function(obj) {
+    isArrayLike: function (obj) {
         if (!obj) {
             return false;
-        } else {
+        }
+        else {
             return obj.length === + obj.length;
         }
     },
@@ -490,20 +487,23 @@ var util$1 = {
     /**
      * @param  {} obj
      * @return {}
-     * @memberOf qtek.core.util
+     * @memberOf clay.core.util
      */
-    clone: function(obj) {
+    clone: function (obj) {
         if (!util$1.isObject(obj)) {
             return obj;
-        } else if (util$1.isArray(obj)) {
+        }
+        else if (util$1.isArray(obj)) {
             return obj.slice();
-        } else if (util$1.isArrayLike(obj)) { // is typed array
+        }
+        else if (util$1.isArrayLike(obj)) { // is typed array
             var ret = new obj.constructor(obj.length);
             for (var i = 0; i < obj.length; i++) {
                 ret[i] = obj[i];
             }
             return ret;
-        } else {
+        }
+        else {
             return util$1.extend({}, obj);
         }
     }
@@ -512,14 +512,14 @@ var util$1 = {
 /**
  * Base class of all objects
  * @constructor
- * @alias qtek.core.Base
- * @mixes qtek.core.mixin.notifier
+ * @alias clay.core.Base
+ * @mixes clay.core.mixin.notifier
  */
 var Base = function () {
     /**
      * @type {number}
      */
-    this.__GUID__ = util$1.genGUID();
+    this.__uid__ = util$1.genGUID();
 };
 
 Base.__initializers__ = [
@@ -534,11 +534,11 @@ util$1.extend(Base.prototype, notifier);
 // 缓动函数来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
 
 /**
- * @namespace qtek.animation.easing
+ * @namespace clay.animation.easing
  */
 var easing = {
     /**
-     * @alias qtek.animation.easing.linear
+     * @alias clay.animation.easing.linear
      * @param {number} k
      * @return {number}
      */
@@ -546,7 +546,7 @@ var easing = {
         return k;
     },
     /**
-     * @alias qtek.animation.easing.quadraticIn
+     * @alias clay.animation.easing.quadraticIn
      * @param {number} k
      * @return {number}
      */
@@ -554,7 +554,7 @@ var easing = {
         return k * k;
     },
     /**
-     * @alias qtek.animation.easing.quadraticOut
+     * @alias clay.animation.easing.quadraticOut
      * @param {number} k
      * @return {number}
      */
@@ -562,7 +562,7 @@ var easing = {
         return k * (2 - k);
     },
     /**
-     * @alias qtek.animation.easing.quadraticInOut
+     * @alias clay.animation.easing.quadraticInOut
      * @param {number} k
      * @return {number}
      */
@@ -573,7 +573,7 @@ var easing = {
         return - 0.5 * (--k * (k - 2) - 1);
     },
     /**
-     * @alias qtek.animation.easing.cubicIn
+     * @alias clay.animation.easing.cubicIn
      * @param {number} k
      * @return {number}
      */
@@ -581,7 +581,7 @@ var easing = {
         return k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.cubicOut
+     * @alias clay.animation.easing.cubicOut
      * @param {number} k
      * @return {number}
      */
@@ -589,7 +589,7 @@ var easing = {
         return --k * k * k + 1;
     },
     /**
-     * @alias qtek.animation.easing.cubicInOut
+     * @alias clay.animation.easing.cubicInOut
      * @param {number} k
      * @return {number}
      */
@@ -600,7 +600,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * k + 2);
     },
     /**
-     * @alias qtek.animation.easing.quarticIn
+     * @alias clay.animation.easing.quarticIn
      * @param {number} k
      * @return {number}
      */
@@ -608,7 +608,7 @@ var easing = {
         return k * k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.quarticOut
+     * @alias clay.animation.easing.quarticOut
      * @param {number} k
      * @return {number}
      */
@@ -616,7 +616,7 @@ var easing = {
         return 1 - (--k * k * k * k);
     },
     /**
-     * @alias qtek.animation.easing.quarticInOut
+     * @alias clay.animation.easing.quarticInOut
      * @param {number} k
      * @return {number}
      */
@@ -627,7 +627,7 @@ var easing = {
         return - 0.5 * ((k -= 2) * k * k * k - 2);
     },
     /**
-     * @alias qtek.animation.easing.quinticIn
+     * @alias clay.animation.easing.quinticIn
      * @param {number} k
      * @return {number}
      */
@@ -635,7 +635,7 @@ var easing = {
         return k * k * k * k * k;
     },
     /**
-     * @alias qtek.animation.easing.quinticOut
+     * @alias clay.animation.easing.quinticOut
      * @param {number} k
      * @return {number}
      */
@@ -643,7 +643,7 @@ var easing = {
         return --k * k * k * k * k + 1;
     },
     /**
-     * @alias qtek.animation.easing.quinticInOut
+     * @alias clay.animation.easing.quinticInOut
      * @param {number} k
      * @return {number}
      */
@@ -654,7 +654,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * k * k * k + 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalIn
+     * @alias clay.animation.easing.sinusoidalIn
      * @param {number} k
      * @return {number}
      */
@@ -662,7 +662,7 @@ var easing = {
         return 1 - Math.cos(k * Math.PI / 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalOut
+     * @alias clay.animation.easing.sinusoidalOut
      * @param {number} k
      * @return {number}
      */
@@ -670,7 +670,7 @@ var easing = {
         return Math.sin(k * Math.PI / 2);
     },
     /**
-     * @alias qtek.animation.easing.sinusoidalInOut
+     * @alias clay.animation.easing.sinusoidalInOut
      * @param {number} k
      * @return {number}
      */
@@ -678,7 +678,7 @@ var easing = {
         return 0.5 * (1 - Math.cos(Math.PI * k));
     },
     /**
-     * @alias qtek.animation.easing.exponentialIn
+     * @alias clay.animation.easing.exponentialIn
      * @param {number} k
      * @return {number}
      */
@@ -686,7 +686,7 @@ var easing = {
         return k === 0 ? 0 : Math.pow(1024, k - 1);
     },
     /**
-     * @alias qtek.animation.easing.exponentialOut
+     * @alias clay.animation.easing.exponentialOut
      * @param {number} k
      * @return {number}
      */
@@ -694,7 +694,7 @@ var easing = {
         return k === 1 ? 1 : 1 - Math.pow(2, - 10 * k);
     },
     /**
-     * @alias qtek.animation.easing.exponentialInOut
+     * @alias clay.animation.easing.exponentialInOut
      * @param {number} k
      * @return {number}
      */
@@ -711,7 +711,7 @@ var easing = {
         return 0.5 * (- Math.pow(2, - 10 * (k - 1)) + 2);
     },
     /**
-     * @alias qtek.animation.easing.circularIn
+     * @alias clay.animation.easing.circularIn
      * @param {number} k
      * @return {number}
      */
@@ -719,7 +719,7 @@ var easing = {
         return 1 - Math.sqrt(1 - k * k);
     },
     /**
-     * @alias qtek.animation.easing.circularOut
+     * @alias clay.animation.easing.circularOut
      * @param {number} k
      * @return {number}
      */
@@ -727,7 +727,7 @@ var easing = {
         return Math.sqrt(1 - (--k * k));
     },
     /**
-     * @alias qtek.animation.easing.circularInOut
+     * @alias clay.animation.easing.circularInOut
      * @param {number} k
      * @return {number}
      */
@@ -738,7 +738,7 @@ var easing = {
         return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
     },
     /**
-     * @alias qtek.animation.easing.elasticIn
+     * @alias clay.animation.easing.elasticIn
      * @param {number} k
      * @return {number}
      */
@@ -759,7 +759,7 @@ var easing = {
                     Math.sin((k - s) * (2 * Math.PI) / p));
     },
     /**
-     * @alias qtek.animation.easing.elasticOut
+     * @alias clay.animation.easing.elasticOut
      * @param {number} k
      * @return {number}
      */
@@ -781,7 +781,7 @@ var easing = {
                 Math.sin((k - s) * (2 * Math.PI) / p) + 1);
     },
     /**
-     * @alias qtek.animation.easing.elasticInOut
+     * @alias clay.animation.easing.elasticInOut
      * @param {number} k
      * @return {number}
      */
@@ -808,7 +808,7 @@ var easing = {
 
     },
     /**
-     * @alias qtek.animation.easing.backIn
+     * @alias clay.animation.easing.backIn
      * @param {number} k
      * @return {number}
      */
@@ -817,7 +817,7 @@ var easing = {
         return k * k * ((s + 1) * k - s);
     },
     /**
-     * @alias qtek.animation.easing.backOut
+     * @alias clay.animation.easing.backOut
      * @param {number} k
      * @return {number}
      */
@@ -826,7 +826,7 @@ var easing = {
         return --k * k * ((s + 1) * k + s) + 1;
     },
     /**
-     * @alias qtek.animation.easing.backInOut
+     * @alias clay.animation.easing.backInOut
      * @param {number} k
      * @return {number}
      */
@@ -838,7 +838,7 @@ var easing = {
         return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
     },
     /**
-     * @alias qtek.animation.easing.bounceIn
+     * @alias clay.animation.easing.bounceIn
      * @param {number} k
      * @return {number}
      */
@@ -846,7 +846,7 @@ var easing = {
         return 1 - easing.bounceOut(1 - k);
     },
     /**
-     * @alias qtek.animation.easing.bounceOut
+     * @alias clay.animation.easing.bounceOut
      * @param {number} k
      * @return {number}
      */
@@ -863,7 +863,7 @@ var easing = {
         }
     },
     /**
-     * @alias qtek.animation.easing.bounceInOut
+     * @alias clay.animation.easing.bounceInOut
      * @param {number} k
      * @return {number}
      */
@@ -878,7 +878,7 @@ var easing = {
 function noop () {}
 /**
  * @constructor
- * @alias qtek.animation.Clip
+ * @alias clay.animation.Clip
  * @param {Object} [opts]
  * @param {Object} [opts.target]
  * @param {number} [opts.life]
@@ -1468,10 +1468,10 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
 
 /**
  * @description Animator object can only be created by Animation.prototype.animate method.
- * After created, we can use {@link qtek.animation.Animator#when} to add all keyframes and {@link qtek.animation.Animator#start} it.
+ * After created, we can use {@link clay.animation.Animator#when} to add all keyframes and {@link clay.animation.Animator#start} it.
  * Clips will be automatically created and added to the animation instance which created this deferred object.
  *
- * @constructor qtek.animation.Animator
+ * @constructor clay.animation.Animator
  *
  * @param {Object} target
  * @param {boolean} loop
@@ -1506,8 +1506,8 @@ Animator.prototype = {
     /**
      * @param  {number} time Keyframe time using millisecond
      * @param  {Object} props A key-value object. Value can be number, 1d and 2d array
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     when: function (time, props) {
         for (var propName in props) {
@@ -1536,8 +1536,8 @@ Animator.prototype = {
     /**
      * callback when running animation
      * @param  {Function} callback callback have two args, animating target and current percent
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     during: function (callback) {
         this._onframeList.push(callback);
@@ -1559,8 +1559,8 @@ Animator.prototype = {
     /**
      * Start the animation
      * @param  {string|function} easing
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     start: function (easing) {
 
@@ -1613,7 +1613,7 @@ Animator.prototype = {
 
     /**
      * Stop the animation
-     * @memberOf qtek.animation.Animator.prototype
+     * @memberOf clay.animation.Animator.prototype
      */
     stop: function () {
         for (var i = 0; i < this._clipList.length; i++) {
@@ -1625,8 +1625,8 @@ Animator.prototype = {
     /**
      * Delay given milliseconds
      * @param  {number} time
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     delay: function (time){
         this._delay = time;
@@ -1635,8 +1635,8 @@ Animator.prototype = {
     /**
      * Callback after animation finished
      * @param {Function} func
-     * @return {qtek.animation.Animator}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
      */
     done: function (func) {
         if (func) {
@@ -1646,8 +1646,8 @@ Animator.prototype = {
     },
     /**
      * Get all clips created in start method.
-     * @return {qtek.animation.Clip[]}
-     * @memberOf qtek.animation.Animator.prototype
+     * @return {clay.animation.Clip[]}
+     * @memberOf clay.animation.Animator.prototype
      */
     getClips: function () {
         return this._clipList;
@@ -1662,12 +1662,12 @@ var requestAnimationFrame = window.requestAnimationFrame
 
 /**
  * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
- * @constructor qtek.animation.Animation
- * @extends qtek.core.Base
+ * @constructor clay.animation.Animation
+ * @extends clay.core.Base
  *
  * @example
- * var animation = new qtek.animation.Animation();
- * var node = new qtek.Node();
+ * var animation = new clay.animation.Animation();
+ * var node = new clay.Node();
  * animation.animate(node.position)
  *     .when(1000, {
  *         x: 500,
@@ -1683,7 +1683,7 @@ var requestAnimationFrame = window.requestAnimationFrame
  *     .start('spline');
  */
 var Animation = Base.extend(function () {
-    return /** @lends qtek.animation.Animation# */{
+    return /** @lends clay.animation.Animation# */{
         /**
          * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
          * @type {Object}
@@ -1701,12 +1701,12 @@ var Animation = Base.extend(function () {
         _pausedTime: 0
     };
 },
-/** @lends qtek.animation.Animation.prototype */
+/** @lends clay.animation.Animation.prototype */
 {
 
     /**
      * Add animator
-     * @param {qtek.animate.Animator} animator
+     * @param {clay.animate.Animator} animator
      */
     addAnimator: function (animator) {
         animator.animation = this;
@@ -1717,7 +1717,7 @@ var Animation = Base.extend(function () {
     },
 
     /**
-     * @param {qtek.animation.Clip} clip
+     * @param {clay.animation.Clip} clip
      */
     addClip: function (clip) {
         if (this._clips.indexOf(clip) < 0) {
@@ -1726,7 +1726,7 @@ var Animation = Base.extend(function () {
     },
 
     /**
-     * @param  {qtek.animation.Clip} clip
+     * @param  {clay.animation.Clip} clip
      */
     removeClip: function (clip) {
         var idx = this._clips.indexOf(clip);
@@ -1737,7 +1737,7 @@ var Animation = Base.extend(function () {
 
     /**
      * Remove animator
-     * @param {qtek.animate.Animator} animator
+     * @param {clay.animate.Animator} animator
      */
     removeAnimator: function (animator) {
         var clips = animator.getClips();
@@ -1857,7 +1857,7 @@ var Animation = Base.extend(function () {
      * @param  {Function} [options.getter]
      * @param  {Function} [options.setter]
      * @param  {Function} [options.interpolater]
-     * @return {qtek.animation.Animator}
+     * @return {clay.animation.Animator}
      */
     animate: function (target, options) {
         options = options || {};
@@ -1881,9 +1881,9 @@ var clipSortFunc = function (a, b) {
 };
 
 /**
- * @typedef {Object} qtek.animation.Blend1DClip.IClipInput
+ * @typedef {Object} clay.animation.Blend1DClip.IClipInput
  * @property {number} position
- * @property {qtek.animation.Clip} clip
+ * @property {clay.animation.Clip} clip
  * @property {number} offset
  */
 
@@ -1891,8 +1891,8 @@ var clipSortFunc = function (a, b) {
  * 1d blending node in animation blend tree.
  * output clip must have blend1D and copy method
  * @constructor
- * @alias qtek.animation.Blend1DClip
- * @extends qtek.animation.Clip
+ * @alias clay.animation.Blend1DClip
+ * @extends clay.animation.Clip
  *
  * @param {Object} [opts]
  * @param {string} [opts.name]
@@ -1908,7 +1908,7 @@ var clipSortFunc = function (a, b) {
  * @param {Function} [opts.onrestart]
  * @param {object[]} [opts.inputs]
  * @param {number} [opts.position]
- * @param {qtek.animation.Clip} [opts.output]
+ * @param {clay.animation.Clip} [opts.output]
  */
 var Blend1DClip = function (opts) {
 
@@ -1917,11 +1917,11 @@ var Blend1DClip = function (opts) {
     Clip.call(this, opts);
     /**
      * Output clip must have blend1D and copy method
-     * @type {qtek.animation.Clip}
+     * @type {clay.animation.Clip}
      */
     this.output = opts.output || null;
     /**
-     * @type {qtek.animation.Blend1DClip.IClipInput[]}
+     * @type {clay.animation.Blend1DClip.IClipInput[]}
      */
     this.inputs = opts.inputs || [];
     /**
@@ -1940,9 +1940,9 @@ Blend1DClip.prototype.constructor = Blend1DClip;
 
 /**
  * @param {number} position
- * @param {qtek.animation.Clip} inputClip
+ * @param {clay.animation.Clip} inputClip
  * @param {number} [offset]
- * @return {qtek.animation.Blend1DClip.IClipInput}
+ * @return {clay.animation.Blend1DClip.IClipInput}
  */
 Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
@@ -2024,7 +2024,7 @@ Blend1DClip.prototype.setTime = function (time) {
 /**
  * Clone a new Blend1D clip
  * @param {boolean} cloneInputs True if clone the input clips
- * @return {qtek.animation.Blend1DClip}
+ * @return {clay.animation.Blend1DClip}
  */
 Blend1DClip.prototype.clone = function (cloneInputs) {
     var clip = Clip.prototype.clone.call(this);
@@ -6672,7 +6672,7 @@ var vec2 = glmatrix.vec2;
 
 /**
  * @constructor
- * @alias qtek.math.Vector2
+ * @alias clay.math.Vector2
  * @param {number} x
  * @param {number} y
  */
@@ -6686,6 +6686,7 @@ var Vector2 = function(x, y) {
      * All methods also operate on the _array instead of x, y components
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Vector2#
      */
     this._array = vec2.fromValues(x, y);
 
@@ -6694,6 +6695,7 @@ var Vector2 = function(x, y) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Vector2#
      */
     this._dirty = true;
 };
@@ -6704,8 +6706,8 @@ Vector2.prototype = {
 
     /**
      * Add b to self
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     add: function(b) {
         vec2.add(this._array, this._array, b._array);
@@ -6717,7 +6719,7 @@ Vector2.prototype = {
      * Set x and y components
      * @param  {number}  x
      * @param  {number}  y
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     set: function(x, y) {
         this._array[0] = x;
@@ -6729,7 +6731,7 @@ Vector2.prototype = {
     /**
      * Set x and y components from array
      * @param  {Float32Array|number[]} arr
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     setArray: function(arr) {
         this._array[0] = arr[0];
@@ -6741,7 +6743,7 @@ Vector2.prototype = {
 
     /**
      * Clone a new Vector2
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     clone: function() {
         return new Vector2(this.x, this.y);
@@ -6749,8 +6751,8 @@ Vector2.prototype = {
 
     /**
      * Copy x, y from b
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     copy: function(b) {
         vec2.copy(this._array, b._array);
@@ -6760,9 +6762,9 @@ Vector2.prototype = {
 
     /**
      * Cross product of self and b, written to a Vector3 out
-     * @param  {qtek.math.Vector3} out
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector3} out
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     cross: function(out, b) {
         vec2.cross(out._array, this._array, b._array);
@@ -6772,7 +6774,7 @@ Vector2.prototype = {
 
     /**
      * Alias for distance
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @return {number}
      */
     dist: function(b) {
@@ -6781,7 +6783,7 @@ Vector2.prototype = {
 
     /**
      * Distance between self and b
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @return {number}
      */
     distance: function(b) {
@@ -6790,8 +6792,8 @@ Vector2.prototype = {
 
     /**
      * Alias for divide
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     div: function(b) {
         vec2.div(this._array, this._array, b._array);
@@ -6801,8 +6803,8 @@ Vector2.prototype = {
 
     /**
      * Divide self by b
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     divide: function(b) {
         vec2.divide(this._array, this._array, b._array);
@@ -6812,7 +6814,7 @@ Vector2.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @return {number}
      */
     dot: function(b) {
@@ -6837,10 +6839,10 @@ Vector2.prototype = {
 
     /**
      * Linear interpolation between a and b
-     * @param  {qtek.math.Vector2} a
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} a
+     * @param  {clay.math.Vector2} b
      * @param  {number}  t
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     lerp: function(a, b, t) {
         vec2.lerp(this._array, a._array, b._array, t);
@@ -6850,8 +6852,8 @@ Vector2.prototype = {
 
     /**
      * Minimum of self and b
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     min: function(b) {
         vec2.min(this._array, this._array, b._array);
@@ -6861,8 +6863,8 @@ Vector2.prototype = {
 
     /**
      * Maximum of self and b
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     max: function(b) {
         vec2.max(this._array, this._array, b._array);
@@ -6872,8 +6874,8 @@ Vector2.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     mul: function(b) {
         vec2.mul(this._array, this._array, b._array);
@@ -6883,8 +6885,8 @@ Vector2.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     multiply: function(b) {
         vec2.multiply(this._array, this._array, b._array);
@@ -6894,7 +6896,7 @@ Vector2.prototype = {
 
     /**
      * Negate self
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     negate: function() {
         vec2.negate(this._array, this._array);
@@ -6904,7 +6906,7 @@ Vector2.prototype = {
 
     /**
      * Normalize self
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     normalize: function() {
         vec2.normalize(this._array, this._array);
@@ -6915,7 +6917,7 @@ Vector2.prototype = {
     /**
      * Generate random x, y components with a given scale
      * @param  {number} scale
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     random: function(scale) {
         vec2.random(this._array, scale);
@@ -6926,7 +6928,7 @@ Vector2.prototype = {
     /**
      * Scale self
      * @param  {number}  scale
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     scale: function(s) {
         vec2.scale(this._array, this._array, s);
@@ -6936,9 +6938,9 @@ Vector2.prototype = {
 
     /**
      * Scale b and add to self
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @param  {number}  scale
-     * @return {qtek.math.Vector2}
+     * @return {clay.math.Vector2}
      */
     scaleAndAdd: function(b, s) {
         vec2.scaleAndAdd(this._array, this._array, b._array, s);
@@ -6948,7 +6950,7 @@ Vector2.prototype = {
 
     /**
      * Alias for squaredDistance
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @return {number}
      */
     sqrDist: function(b) {
@@ -6957,7 +6959,7 @@ Vector2.prototype = {
 
     /**
      * Squared distance between self and b
-     * @param  {qtek.math.Vector2} b
+     * @param  {clay.math.Vector2} b
      * @return {number}
      */
     squaredDistance: function(b) {
@@ -6982,8 +6984,8 @@ Vector2.prototype = {
 
     /**
      * Alias for subtract
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     sub: function(b) {
         vec2.sub(this._array, this._array, b._array);
@@ -6993,8 +6995,8 @@ Vector2.prototype = {
 
     /**
      * Subtract b from self
-     * @param  {qtek.math.Vector2} b
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} b
+     * @return {clay.math.Vector2}
      */
     subtract: function(b) {
         vec2.subtract(this._array, this._array, b._array);
@@ -7004,8 +7006,8 @@ Vector2.prototype = {
 
     /**
      * Transform self with a Matrix2 m
-     * @param  {qtek.math.Matrix2} m
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Matrix2} m
+     * @return {clay.math.Vector2}
      */
     transformMat2: function(m) {
         vec2.transformMat2(this._array, this._array, m._array);
@@ -7015,8 +7017,8 @@ Vector2.prototype = {
 
     /**
      * Transform self with a Matrix2d m
-     * @param  {qtek.math.Matrix2d} m
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Matrix2d} m
+     * @return {clay.math.Vector2}
      */
     transformMat2d: function(m) {
         vec2.transformMat2d(this._array, this._array, m._array);
@@ -7026,8 +7028,8 @@ Vector2.prototype = {
 
     /**
      * Transform self with a Matrix3 m
-     * @param  {qtek.math.Matrix3} m
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Matrix3} m
+     * @return {clay.math.Vector2}
      */
     transformMat3: function(m) {
         vec2.transformMat3(this._array, this._array, m._array);
@@ -7037,8 +7039,8 @@ Vector2.prototype = {
 
     /**
      * Transform self with a Matrix4 m
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Vector2}
      */
     transformMat4: function(m) {
         vec2.transformMat4(this._array, this._array, m._array);
@@ -7062,7 +7064,7 @@ if (Object.defineProperty) {
     /**
      * @name x
      * @type {number}
-     * @memberOf qtek.math.Vector2
+     * @memberOf clay.math.Vector2
      * @instance
      */
     Object.defineProperty(proto, 'x', {
@@ -7078,7 +7080,7 @@ if (Object.defineProperty) {
     /**
      * @name y
      * @type {number}
-     * @memberOf qtek.math.Vector2
+     * @memberOf clay.math.Vector2
      * @instance
      */
     Object.defineProperty(proto, 'y', {
@@ -7095,10 +7097,10 @@ if (Object.defineProperty) {
 // Supply methods that are not in place
 
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.add = function(out, a, b) {
     vec2.add(out._array, a._array, b._array);
@@ -7107,10 +7109,10 @@ Vector2.add = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector2} out
+ * @param  {clay.math.Vector2} out
  * @param  {number}  x
  * @param  {number}  y
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.set = function(out, x, y) {
     vec2.set(out._array, x, y);
@@ -7119,9 +7121,9 @@ Vector2.set = function(out, x, y) {
 };
 
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.copy = function(out, b) {
     vec2.copy(out._array, b._array);
@@ -7130,10 +7132,10 @@ Vector2.copy = function(out, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.cross = function(out, a, b) {
     vec2.cross(out._array, a._array, b._array);
@@ -7141,8 +7143,8 @@ Vector2.cross = function(out, a, b) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @return {number}
  */
 Vector2.dist = function(a, b) {
@@ -7150,16 +7152,16 @@ Vector2.dist = function(a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @return {number}
  */
 Vector2.distance = Vector2.dist;
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.div = function(out, a, b) {
     vec2.divide(out._array, a._array, b._array);
@@ -7168,15 +7170,15 @@ Vector2.div = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.divide = Vector2.div;
 /**
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @return {number}
  */
 Vector2.dot = function(a, b) {
@@ -7184,7 +7186,7 @@ Vector2.dot = function(a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector2} a
+ * @param  {clay.math.Vector2} a
  * @return {number}
  */
 Vector2.len = function(b) {
@@ -7194,11 +7196,11 @@ Vector2.len = function(b) {
 // Vector2.length = Vector2.len;
 
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @param  {number}  t
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.lerp = function(out, a, b, t) {
     vec2.lerp(out._array, a._array, b._array, t);
@@ -7206,10 +7208,10 @@ Vector2.lerp = function(out, a, b, t) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.min = function(out, a, b) {
     vec2.min(out._array, a._array, b._array);
@@ -7218,10 +7220,10 @@ Vector2.min = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.max = function(out, a, b) {
     vec2.max(out._array, a._array, b._array);
@@ -7229,10 +7231,10 @@ Vector2.max = function(out, a, b) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.mul = function(out, a, b) {
     vec2.multiply(out._array, a._array, b._array);
@@ -7241,16 +7243,16 @@ Vector2.mul = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.multiply = Vector2.mul;
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @return {clay.math.Vector2}
  */
 Vector2.negate = function(out, a) {
     vec2.negate(out._array, a._array);
@@ -7258,9 +7260,9 @@ Vector2.negate = function(out, a) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @return {clay.math.Vector2}
  */
 Vector2.normalize = function(out, a) {
     vec2.normalize(out._array, a._array);
@@ -7268,9 +7270,9 @@ Vector2.normalize = function(out, a) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
+ * @param  {clay.math.Vector2} out
  * @param  {number}  scale
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.random = function(out, scale) {
     vec2.random(out._array, scale);
@@ -7278,10 +7280,10 @@ Vector2.random = function(out, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
  * @param  {number}  scale
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.scale = function(out, a, scale) {
     vec2.scale(out._array, a._array, scale);
@@ -7289,11 +7291,11 @@ Vector2.scale = function(out, a, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @param  {number}  scale
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.scaleAndAdd = function(out, a, b, scale) {
     vec2.scaleAndAdd(out._array, a._array, b._array, scale);
@@ -7301,8 +7303,8 @@ Vector2.scaleAndAdd = function(out, a, b, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @return {number}
  */
 Vector2.sqrDist = function(a, b) {
@@ -7310,14 +7312,14 @@ Vector2.sqrDist = function(a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
  * @return {number}
  */
 Vector2.squaredDistance = Vector2.sqrDist;
 
 /**
- * @param  {qtek.math.Vector2} a
+ * @param  {clay.math.Vector2} a
  * @return {number}
  */
 Vector2.sqrLen = function(a) {
@@ -7325,16 +7327,16 @@ Vector2.sqrLen = function(a) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} a
+ * @param  {clay.math.Vector2} a
  * @return {number}
  */
 Vector2.squaredLength = Vector2.sqrLen;
 
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.sub = function(out, a, b) {
     vec2.subtract(out._array, a._array, b._array);
@@ -7343,17 +7345,17 @@ Vector2.sub = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Vector2} b
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Vector2} b
+ * @return {clay.math.Vector2}
  */
 Vector2.subtract = Vector2.sub;
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Matrix2} m
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Matrix2} m
+ * @return {clay.math.Vector2}
  */
 Vector2.transformMat2 = function(out, a, m) {
     vec2.transformMat2(out._array, a._array, m._array);
@@ -7361,10 +7363,10 @@ Vector2.transformMat2 = function(out, a, m) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2}  out
- * @param  {qtek.math.Vector2}  a
- * @param  {qtek.math.Matrix2d} m
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2}  out
+ * @param  {clay.math.Vector2}  a
+ * @param  {clay.math.Matrix2d} m
+ * @return {clay.math.Vector2}
  */
 Vector2.transformMat2d = function(out, a, m) {
     vec2.transformMat2d(out._array, a._array, m._array);
@@ -7372,10 +7374,10 @@ Vector2.transformMat2d = function(out, a, m) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
  * @param  {Matrix3} m
- * @return {qtek.math.Vector2}
+ * @return {clay.math.Vector2}
  */
 Vector2.transformMat3 = function(out, a, m) {
     vec2.transformMat3(out._array, a._array, m._array);
@@ -7383,10 +7385,10 @@ Vector2.transformMat3 = function(out, a, m) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector2} out
- * @param  {qtek.math.Vector2} a
- * @param  {qtek.math.Matrix4} m
- * @return {qtek.math.Vector2}
+ * @param  {clay.math.Vector2} out
+ * @param  {clay.math.Vector2} a
+ * @param  {clay.math.Matrix4} m
+ * @return {clay.math.Vector2}
  */
 Vector2.transformMat4 = function(out, a, m) {
     vec2.transformMat4(out._array, a._array, m._array);
@@ -7397,9 +7399,9 @@ Vector2.transformMat4 = function(out, a, m) {
 // 2D Blend clip of blend tree
 // http://docs.unity3d.com/Documentation/Manual/2DBlending.html
 /**
- * @typedef {Object} qtek.animation.Blend2DClip.IClipInput
- * @property {qtek.math.Vector2} position
- * @property {qtek.animation.Clip} clip
+ * @typedef {Object} clay.animation.Blend2DClip.IClipInput
+ * @property {clay.math.Vector2} position
+ * @property {clay.animation.Clip} clip
  * @property {number} offset
  */
 
@@ -7407,8 +7409,8 @@ Vector2.transformMat4 = function(out, a, m) {
  * 2d blending node in animation blend tree.
  * output clip must have blend2D method
  * @constructor
- * @alias qtek.animation.Blend2DClip
- * @extends qtek.animation.Clip
+ * @alias clay.animation.Blend2DClip
+ * @extends clay.animation.Clip
  *
  * @param {Object} [opts]
  * @param {string} [opts.name]
@@ -7423,8 +7425,8 @@ Vector2.transformMat4 = function(out, a, m) {
  * @param {Function} [opts.onfinish]
  * @param {Function} [opts.onrestart]
  * @param {object[]} [opts.inputs]
- * @param {qtek.math.Vector2} [opts.position]
- * @param {qtek.animation.Clip} [opts.output]
+ * @param {clay.math.Vector2} [opts.position]
+ * @param {clay.animation.Clip} [opts.output]
  */
 var Blend2DClip = function (opts) {
 
@@ -7433,15 +7435,15 @@ var Blend2DClip = function (opts) {
     Clip.call(this, opts);
     /**
      * Output clip must have blend2D method
-     * @type {qtek.animation.Clip}
+     * @type {clay.animation.Clip}
      */
     this.output = opts.output || null;
     /**
-     * @type {qtek.animation.Blend2DClip.IClipInput[]}
+     * @type {clay.animation.Blend2DClip.IClipInput[]}
      */
     this.inputs = opts.inputs || [];
     /**
-     * @type {qtek.math.Vector2}
+     * @type {clay.math.Vector2}
      */
     this.position = new Vector2();
 
@@ -7455,10 +7457,10 @@ var Blend2DClip = function (opts) {
 Blend2DClip.prototype = new Clip();
 Blend2DClip.prototype.constructor = Blend2DClip;
 /**
- * @param {qtek.math.Vector2} position
- * @param {qtek.animation.Clip} inputClip
+ * @param {clay.math.Vector2} position
+ * @param {clay.animation.Clip} inputClip
  * @param {number} [offset]
- * @return {qtek.animation.Blend2DClip.IClipInput}
+ * @return {clay.animation.Blend2DClip.IClipInput}
  */
 Blend2DClip.prototype.addInput = function (position, inputClip, offset) {
     var obj = {
@@ -7483,7 +7485,7 @@ Blend2DClip.prototype._updateTriangles = function () {
 };
 
 Blend2DClip.prototype.step = function (time, dTime, silent) {
-    
+
     var ret = Clip.prototype.step.call(this, time);
 
     if (ret !== 'finish') {
@@ -7529,7 +7531,7 @@ Blend2DClip.prototype.setTime = function (time) {
 /**
  * Clone a new Blend2D clip
  * @param {boolean} cloneInputs True if clone the input clips
- * @return {qtek.animation.Blend2DClip}
+ * @return {clay.animation.Blend2DClip}
  */
 Blend2DClip.prototype.clone = function (cloneInputs) {
     var clip = Clip.prototype.clone.call(this);
@@ -7579,18 +7581,10 @@ var TransformTrack = function (opts) {
         this.addKeyFrames(opts.keyFrames);
     }
 
-    /**
-     * @type {Float32Array}
-     */
     this.position = vec3$1.create();
-    /**
-     * Rotation is represented by a quaternion
-     * @type {Float32Array}
-     */
+
     this.rotation = quat$1.create();
-    /**
-     * @type {Float32Array}
-     */
+
     this.scale = vec3$1.fromValues(1, 1, 1);
 
     this._cacheKey = 0;
@@ -7613,7 +7607,7 @@ TransformTrack.prototype.step = function (time, dTime, silent) {
     if (!silent && ret !== 'paused') {
         this.fire('frame');
     }
-    
+
     return ret;
 };
 
@@ -7623,18 +7617,11 @@ TransformTrack.prototype.setTime = function (time) {
     this._interpolateField(time, 'scale');
 };
 
-/**
- * @return {number}
- */
 TransformTrack.prototype.getMaxTime = function () {
     var kf = this.keyFrames[this.keyFrames.length - 1];
     return kf ? kf.time : 0;
 };
 
-/**
- * Add a key frame
- * @param {Object} kf
- */
 TransformTrack.prototype.addKeyFrame = function (kf) {
     for (var i = 0; i < this.keyFrames.length - 1; i++) {
         var prevFrame = this.keyFrames[i];
@@ -7649,10 +7636,6 @@ TransformTrack.prototype.addKeyFrame = function (kf) {
     this.keyFrames.push(kf);
 };
 
-/**
- * Add keyframes
- * @param {object[]} kfs
- */
 TransformTrack.prototype.addKeyFrames = function (kfs) {
     for (var i = 0; i < kfs.length; i++) {
         this.keyFrames.push(kfs[i]);
@@ -7713,27 +7696,13 @@ TransformTrack.prototype._interpolateField = function (time, fieldName) {
         this._cacheTime = 0;
     }
 };
-/**
- * 1D blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- * @param  {number} w
- */
+
 TransformTrack.prototype.blend1D = function (t1, t2, w) {
     vec3$1.lerp(this.position, t1.position, t2.position, w);
     vec3$1.lerp(this.scale, t1.scale, t2.scale, w);
     quat$1.slerp(this.rotation, t1.rotation, t2.rotation, w);
 };
 
-/**
- * 2D blending between three tracks
- * @method
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t3
- * @param  {number} f
- * @param  {number} g
- */
 TransformTrack.prototype.blend2D = (function () {
     var q1 = quat$1.create();
     var q2 = quat$1.create();
@@ -7761,22 +7730,12 @@ TransformTrack.prototype.blend2D = (function () {
     };
 })();
 
-/**
- * Additive blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- */
 TransformTrack.prototype.additiveBlend = function (t1, t2) {
     vec3$1.add(this.position, t1.position, t2.position);
     vec3$1.add(this.scale, t1.scale, t2.scale);
     quat$1.multiply(this.rotation, t2.rotation, t1.rotation);
 };
 
-/**
- * Subtractive blending between two tracks
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t1
- * @param  {qtek.animation.SamplerClip|qtek.animation.TransformTrack} t2
- */
 TransformTrack.prototype.subtractiveBlend = function (t1, t2) {
     vec3$1.sub(this.position, t1.position, t2.position);
     vec3$1.sub(this.scale, t1.scale, t2.scale);
@@ -7784,20 +7743,11 @@ TransformTrack.prototype.subtractiveBlend = function (t1, t2) {
     quat$1.multiply(this.rotation, this.rotation, t1.rotation);
 };
 
-/**
- * @param {number} startTime
- * @param {number} endTime
- * @param {boolean} isLoop
- */
 TransformTrack.prototype.getSubClip = function (startTime, endTime) {
     // TODO
     console.warn('TODO');
 };
 
-/**
- * Clone a new TransformTrack
- * @return {qtek.animation.TransformTrack}
- */
 TransformTrack.prototype.clone = function () {
     var track = TransformTrack.prototype.clone.call(this);
     track.keyFrames = this.keyFrames;
@@ -7874,17 +7824,17 @@ function quatSlerp(out, a, b, t, oa, ob) {
 /**
  * SamplerTrack manages `position`, `rotation`, `scale` tracks in animation of single scene node.
  * @constructor
- * @alias qtek.animation.SamplerTrack
+ * @alias clay.animation.SamplerTrack
  * @param {Object} [opts]
  * @param {string} [opts.name] Track name
- * @param {qtek.Node} [opts.target] Target node's transform will updated automatically
+ * @param {clay.Node} [opts.target] Target node's transform will updated automatically
  */
 var SamplerTrack = function (opts) {
     opts = opts || {};
 
     this.name = opts.name || '';
     /**
-     * @param {qtek.Node}
+     * @param {clay.Node}
      */
     this.target = opts.target || null;
     /**
@@ -8018,7 +7968,7 @@ SamplerTrack.prototype.getMaxTime = function () {
 /**
  * @param {number} startTime
  * @param {number} endTime
- * @return {qtek.animation.SamplerTrack}
+ * @return {clay.animation.SamplerTrack}
  */
 SamplerTrack.prototype.getSubTrack = function (startTime, endTime) {
 
@@ -8106,17 +8056,17 @@ SamplerTrack.prototype._findRange = function (time) {
 /**
  * 1D blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  * @param  {number} w
  */
 SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
 /**
  * 2D blending between three clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c3
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c3
  * @param  {number} f
  * @param  {number} g
  */
@@ -8124,21 +8074,21 @@ SamplerTrack.prototype.blend2D = TransformTrack.prototype.blend2D;
 /**
  * Additive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
 SamplerTrack.prototype.additiveBlend = TransformTrack.prototype.additiveBlend;
 /**
  * Subtractive blending between two clips
  * @method
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c1
- * @param  {qtek.animation.SamplerTrack|qtek.animation.TransformTrack} c2
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
+ * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
 SamplerTrack.prototype.subtractiveBlend = TransformTrack.prototype.subtractiveBlend;
 
 /**
  * Clone a new SamplerTrack
- * @return {qtek.animation.SamplerTrack}
+ * @return {clay.animation.SamplerTrack}
  */
 SamplerTrack.prototype.clone = function () {
     var track = SamplerTrack.prototype.clone.call(this);
@@ -8163,12 +8113,12 @@ var quat$2 = glmatrix.quat;
 var vec3$2 = glmatrix.vec3;
 
 /**
- * 
- * Animation clip that manage a collection of {@link qtek.animation.SamplerTrack}
- * @constructor
- * @alias qtek.animation.TrackClip
  *
- * @extends qtek.animation.Clip
+ * Animation clip that manage a collection of {@link clay.animation.SamplerTrack}
+ * @constructor
+ * @alias clay.animation.TrackClip
+ *
+ * @extends clay.animation.Clip
  * @param {Object} [opts]
  * @param {string} [opts.name]
  * @param {Object} [opts.target]
@@ -8181,7 +8131,7 @@ var vec3$2 = glmatrix.vec3;
  * @param {function} [opts.onframe]
  * @param {function} [opts.onfinish]
  * @param {function} [opts.onrestart]
- * @param {Array.<qtek.animation.SamplerTrack>} [opts.tracks]
+ * @param {Array.<clay.animation.SamplerTrack>} [opts.tracks]
  */
 var TrackClip = function (opts) {
 
@@ -8190,8 +8140,8 @@ var TrackClip = function (opts) {
     Clip.call(this, opts);
 
     /**
-     * 
-     * @type {qtek.animation.SamplerTrack[]}
+     *
+     * @type {clay.animation.SamplerTrack[]}
      */
     this.tracks = opts.tracks || [];
 };
@@ -8217,7 +8167,7 @@ TrackClip.prototype.step = function (time, dTime, silent) {
     if (!silent && ret !== 'paused') {
         this.fire('frame');
     }
-    
+
     return ret;
 };
 
@@ -8248,14 +8198,14 @@ TrackClip.prototype.calcLifeFromTracks = function () {
 };
 
 /**
- * @param {qtek.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} jointClip
  */
 TrackClip.prototype.addTrack = function (track) {
     this.tracks.push(track);
 };
 
 /**
- * @param {qtek.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} jointClip
  */
 TrackClip.prototype.removeTarck = function (track) {
     var idx = this.tracks.indexOf(track);
@@ -8268,7 +8218,7 @@ TrackClip.prototype.removeTarck = function (track) {
  * @param {number} startTime
  * @param {number} endTime
  * @param {boolean} isLoop
- * @return {qtek.animation.TrackClip}
+ * @return {clay.animation.TrackClip}
  */
 TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
     var subClip = new TrackClip({
@@ -8291,8 +8241,8 @@ TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
 
 /**
  * 1d blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  * @param  {number} w
  */
 TrackClip.prototype.blend1D = function (clip1, clip2, w) {
@@ -8307,8 +8257,8 @@ TrackClip.prototype.blend1D = function (clip1, clip2, w) {
 
 /**
  * Additive blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.additiveBlend = function (clip1, clip2) {
     for (var i = 0; i < this.tracks.length; i++) {
@@ -8322,8 +8272,8 @@ TrackClip.prototype.additiveBlend = function (clip1, clip2) {
 
 /**
  * Subtractive blending from two skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
     for (var i = 0; i < this.tracks.length; i++) {
@@ -8337,9 +8287,9 @@ TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
 
 /**
  * 2D blending from three skinning clips
- * @param  {qtek.animation.TrackClip} clip1
- * @param  {qtek.animation.TrackClip} clip2
- * @param  {qtek.animation.TrackClip} clip3
+ * @param  {clay.animation.TrackClip} clip1
+ * @param  {clay.animation.TrackClip} clip2
+ * @param  {clay.animation.TrackClip} clip3
  * @param  {number} f
  * @param  {number} g
  */
@@ -8356,7 +8306,7 @@ TrackClip.prototype.blend2D = function (clip1, clip2, clip3, f, g) {
 
 /**
  * Copy SRT of all joints clips from another TrackClip
- * @param  {qtek.animation.TrackClip} clip
+ * @param  {clay.animation.TrackClip} clip
  */
 TrackClip.prototype.copy = function (clip) {
     for (var i = 0; i < this.tracks.length; i++) {
@@ -8421,8 +8371,8 @@ var request = {
 
 /**
  * @constructor
- * @alias qtek.async.Task
- * @mixes qtek.core.mixin.notifier
+ * @alias clay.async.Task
+ * @mixes clay.core.mixin.notifier
  */
 var Task = function() {
     this._fullfilled = false;
@@ -8499,7 +8449,7 @@ function makeRequestTask(url, responseType) {
  *         {url: 'a.json'},
  *         {url: 'b.bin', responseType: 'arraybuffer'}
  *     ]);
- * @return {qtek.async.Task|qtek.async.Task[]}
+ * @return {clay.async.Task|clay.async.Task[]}
  */
 Task.makeRequestTask = function(url, responseType) {
     if (typeof url === 'string') {
@@ -8524,7 +8474,7 @@ Task.makeRequestTask = function(url, responseType) {
     }
 };
 /**
- * @return {qtek.async.Task}
+ * @return {clay.async.Task}
  */
 Task.makeTask = function() {
     return new Task();
@@ -8534,8 +8484,8 @@ util$1.extend(Task.prototype, notifier);
 
 /**
  * @constructor
- * @alias qtek.async.TaskGroup
- * @extends qtek.async.Task
+ * @alias clay.async.TaskGroup
+ * @extends clay.async.Task
  */
 var TaskGroup = function () {
 
@@ -8555,18 +8505,18 @@ TaskGroup.prototype = new Ctor();
 TaskGroup.prototype.constructor = TaskGroup;
 
 /**
- * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link qtek.Texture2D}, {@link qtek.TextureCube}, {@link qtek.loader.GLTF}.
- * @param  {Array.<qtek.async.Task>} tasks
+ * Wait for all given tasks successed, task can also be any notifier object which will trigger success and error events. Like {@link clay.Texture2D}, {@link clay.TextureCube}, {@link clay.loader.GLTF}.
+ * @param  {Array.<clay.async.Task>} tasks
  * @chainable
  * @example
  *     // Load texture list
  *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
  *     var textures = list.map(function (src) {
- *         var texture = new qtek.Texture2D();
+ *         var texture = new clay.Texture2D();
  *         texture.load(src);
  *         return texture;
  *     });
- *     var taskGroup = new qtek.async.TaskGroup();
+ *     var taskGroup = new clay.async.TaskGroup();
  *     taskGroup.all(textures).success(function () {
  *         // Do some thing after all textures loaded
  *     });
@@ -8619,8 +8569,8 @@ TaskGroup.prototype.all = function (tasks) {
 };
 /**
  * Wait for all given tasks finished, either successed or failed
- * @param  {Array.<qtek.async.Task>} tasks
- * @return {qtek.async.TaskGroup}
+ * @param  {Array.<clay.async.Task>} tasks
+ * @return {clay.async.TaskGroup}
  */
 TaskGroup.prototype.allSettled = function (tasks) {
     var count = 0;
@@ -8762,7 +8712,7 @@ var vec3$4 = glmatrix.vec3;
 
 /**
  * @constructor
- * @alias qtek.math.Vector3
+ * @alias clay.math.Vector3
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -8778,6 +8728,7 @@ var Vector3 = function(x, y, z) {
      * All methods also operate on the _array instead of x, y, z components
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Vector3#
      */
     this._array = vec3$4.fromValues(x, y, z);
 
@@ -8786,6 +8737,7 @@ var Vector3 = function(x, y, z) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Vector3#
      */
     this._dirty = true;
 };
@@ -8796,8 +8748,8 @@ Vector3.prototype = {
 
     /**
      * Add b to self
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     add: function (b) {
         vec3$4.add(this._array, this._array, b._array);
@@ -8810,7 +8762,7 @@ Vector3.prototype = {
      * @param  {number}  x
      * @param  {number}  y
      * @param  {number}  z
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     set: function (x, y, z) {
         this._array[0] = x;
@@ -8823,7 +8775,7 @@ Vector3.prototype = {
     /**
      * Set x, y and z components from array
      * @param  {Float32Array|number[]} arr
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     setArray: function (arr) {
         this._array[0] = arr[0];
@@ -8836,7 +8788,7 @@ Vector3.prototype = {
 
     /**
      * Clone a new Vector3
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     clone: function () {
         return new Vector3(this.x, this.y, this.z);
@@ -8844,8 +8796,8 @@ Vector3.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     copy: function (b) {
         vec3$4.copy(this._array, b._array);
@@ -8855,9 +8807,9 @@ Vector3.prototype = {
 
     /**
      * Cross product of self and b, written to a Vector3 out
-     * @param  {qtek.math.Vector3} a
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} a
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     cross: function (a, b) {
         vec3$4.cross(this._array, a._array, b._array);
@@ -8867,7 +8819,7 @@ Vector3.prototype = {
 
     /**
      * Alias for distance
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @return {number}
      */
     dist: function (b) {
@@ -8876,7 +8828,7 @@ Vector3.prototype = {
 
     /**
      * Distance between self and b
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @return {number}
      */
     distance: function (b) {
@@ -8885,8 +8837,8 @@ Vector3.prototype = {
 
     /**
      * Alias for divide
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     div: function (b) {
         vec3$4.div(this._array, this._array, b._array);
@@ -8896,8 +8848,8 @@ Vector3.prototype = {
 
     /**
      * Divide self by b
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     divide: function (b) {
         vec3$4.divide(this._array, this._array, b._array);
@@ -8907,7 +8859,7 @@ Vector3.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @return {number}
      */
     dot: function (b) {
@@ -8931,10 +8883,10 @@ Vector3.prototype = {
     },
     /**
      * Linear interpolation between a and b
-     * @param  {qtek.math.Vector3} a
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} a
+     * @param  {clay.math.Vector3} b
      * @param  {number}  t
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     lerp: function (a, b, t) {
         vec3$4.lerp(this._array, a._array, b._array, t);
@@ -8944,8 +8896,8 @@ Vector3.prototype = {
 
     /**
      * Minimum of self and b
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     min: function (b) {
         vec3$4.min(this._array, this._array, b._array);
@@ -8955,8 +8907,8 @@ Vector3.prototype = {
 
     /**
      * Maximum of self and b
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     max: function (b) {
         vec3$4.max(this._array, this._array, b._array);
@@ -8966,8 +8918,8 @@ Vector3.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     mul: function (b) {
         vec3$4.mul(this._array, this._array, b._array);
@@ -8977,8 +8929,8 @@ Vector3.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     multiply: function (b) {
         vec3$4.multiply(this._array, this._array, b._array);
@@ -8988,7 +8940,7 @@ Vector3.prototype = {
 
     /**
      * Negate self
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     negate: function () {
         vec3$4.negate(this._array, this._array);
@@ -8998,7 +8950,7 @@ Vector3.prototype = {
 
     /**
      * Normalize self
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     normalize: function () {
         vec3$4.normalize(this._array, this._array);
@@ -9009,7 +8961,7 @@ Vector3.prototype = {
     /**
      * Generate random x, y, z components with a given scale
      * @param  {number} scale
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     random: function (scale) {
         vec3$4.random(this._array, scale);
@@ -9020,7 +8972,7 @@ Vector3.prototype = {
     /**
      * Scale self
      * @param  {number}  scale
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     scale: function (s) {
         vec3$4.scale(this._array, this._array, s);
@@ -9030,9 +8982,9 @@ Vector3.prototype = {
 
     /**
      * Scale b and add to self
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @param  {number}  scale
-     * @return {qtek.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     scaleAndAdd: function (b, s) {
         vec3$4.scaleAndAdd(this._array, this._array, b._array, s);
@@ -9042,7 +8994,7 @@ Vector3.prototype = {
 
     /**
      * Alias for squaredDistance
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @return {number}
      */
     sqrDist: function (b) {
@@ -9051,7 +9003,7 @@ Vector3.prototype = {
 
     /**
      * Squared distance between self and b
-     * @param  {qtek.math.Vector3} b
+     * @param  {clay.math.Vector3} b
      * @return {number}
      */
     squaredDistance: function (b) {
@@ -9076,8 +9028,8 @@ Vector3.prototype = {
 
     /**
      * Alias for subtract
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     sub: function (b) {
         vec3$4.sub(this._array, this._array, b._array);
@@ -9087,8 +9039,8 @@ Vector3.prototype = {
 
     /**
      * Subtract b from self
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Vector3}
      */
     subtract: function (b) {
         vec3$4.subtract(this._array, this._array, b._array);
@@ -9098,8 +9050,8 @@ Vector3.prototype = {
 
     /**
      * Transform self with a Matrix3 m
-     * @param  {qtek.math.Matrix3} m
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Matrix3} m
+     * @return {clay.math.Vector3}
      */
     transformMat3: function (m) {
         vec3$4.transformMat3(this._array, this._array, m._array);
@@ -9109,8 +9061,8 @@ Vector3.prototype = {
 
     /**
      * Transform self with a Matrix4 m
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Vector3}
      */
     transformMat4: function (m) {
         vec3$4.transformMat4(this._array, this._array, m._array);
@@ -9119,8 +9071,8 @@ Vector3.prototype = {
     },
     /**
      * Transform self with a Quaternion q
-     * @param  {qtek.math.Quaternion} q
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Quaternion} q
+     * @return {clay.math.Vector3}
      */
     transformQuat: function (q) {
         vec3$4.transformQuat(this._array, this._array, q._array);
@@ -9130,8 +9082,8 @@ Vector3.prototype = {
 
     /**
      * Trasnform self into projection space with m
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Vector3}
      */
     applyProjection: function (m) {
         var v = this._array;
@@ -9179,7 +9131,7 @@ if (defineProperty) {
     /**
      * @name x
      * @type {number}
-     * @memberOf qtek.math.Vector3
+     * @memberOf clay.math.Vector3
      * @instance
      */
     defineProperty(proto$1, 'x', {
@@ -9195,7 +9147,7 @@ if (defineProperty) {
     /**
      * @name y
      * @type {number}
-     * @memberOf qtek.math.Vector3
+     * @memberOf clay.math.Vector3
      * @instance
      */
     defineProperty(proto$1, 'y', {
@@ -9211,7 +9163,7 @@ if (defineProperty) {
     /**
      * @name z
      * @type {number}
-     * @memberOf qtek.math.Vector3
+     * @memberOf clay.math.Vector3
      * @instance
      */
     defineProperty(proto$1, 'z', {
@@ -9229,10 +9181,10 @@ if (defineProperty) {
 // Supply methods that are not in place
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.add = function(out, a, b) {
     vec3$4.add(out._array, a._array, b._array);
@@ -9241,11 +9193,11 @@ Vector3.add = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
+ * @param  {clay.math.Vector3} out
  * @param  {number}  x
  * @param  {number}  y
  * @param  {number}  z
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.set = function(out, x, y, z) {
     vec3$4.set(out._array, x, y, z);
@@ -9253,9 +9205,9 @@ Vector3.set = function(out, x, y, z) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.copy = function(out, b) {
     vec3$4.copy(out._array, b._array);
@@ -9264,10 +9216,10 @@ Vector3.copy = function(out, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.cross = function(out, a, b) {
     vec3$4.cross(out._array, a._array, b._array);
@@ -9276,8 +9228,8 @@ Vector3.cross = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @return {number}
  */
 Vector3.dist = function(a, b) {
@@ -9286,17 +9238,17 @@ Vector3.dist = function(a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @return {number}
  */
 Vector3.distance = Vector3.dist;
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.div = function(out, a, b) {
     vec3$4.divide(out._array, a._array, b._array);
@@ -9306,16 +9258,16 @@ Vector3.div = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.divide = Vector3.div;
 
 /**
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @return {number}
  */
 Vector3.dot = function(a, b) {
@@ -9323,7 +9275,7 @@ Vector3.dot = function(a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} a
+ * @param  {clay.math.Vector3} a
  * @return {number}
  */
 Vector3.len = function(b) {
@@ -9333,11 +9285,11 @@ Vector3.len = function(b) {
 // Vector3.length = Vector3.len;
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @param  {number}  t
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.lerp = function(out, a, b, t) {
     vec3$4.lerp(out._array, a._array, b._array, t);
@@ -9345,10 +9297,10 @@ Vector3.lerp = function(out, a, b, t) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.min = function(out, a, b) {
     vec3$4.min(out._array, a._array, b._array);
@@ -9357,10 +9309,10 @@ Vector3.min = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.max = function(out, a, b) {
     vec3$4.max(out._array, a._array, b._array);
@@ -9368,10 +9320,10 @@ Vector3.max = function(out, a, b) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.mul = function(out, a, b) {
     vec3$4.multiply(out._array, a._array, b._array);
@@ -9380,16 +9332,16 @@ Vector3.mul = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.multiply = Vector3.mul;
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @return {clay.math.Vector3}
  */
 Vector3.negate = function(out, a) {
     vec3$4.negate(out._array, a._array);
@@ -9397,9 +9349,9 @@ Vector3.negate = function(out, a) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @return {clay.math.Vector3}
  */
 Vector3.normalize = function(out, a) {
     vec3$4.normalize(out._array, a._array);
@@ -9407,9 +9359,9 @@ Vector3.normalize = function(out, a) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
+ * @param  {clay.math.Vector3} out
  * @param  {number}  scale
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.random = function(out, scale) {
     vec3$4.random(out._array, scale);
@@ -9417,10 +9369,10 @@ Vector3.random = function(out, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
  * @param  {number}  scale
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.scale = function(out, a, scale) {
     vec3$4.scale(out._array, a._array, scale);
@@ -9428,11 +9380,11 @@ Vector3.scale = function(out, a, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @param  {number}  scale
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.scaleAndAdd = function(out, a, b, scale) {
     vec3$4.scaleAndAdd(out._array, a._array, b._array, scale);
@@ -9440,8 +9392,8 @@ Vector3.scaleAndAdd = function(out, a, b, scale) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @return {number}
  */
 Vector3.sqrDist = function(a, b) {
@@ -9449,13 +9401,13 @@ Vector3.sqrDist = function(a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
  * @return {number}
  */
 Vector3.squaredDistance = Vector3.sqrDist;
 /**
- * @param  {qtek.math.Vector3} a
+ * @param  {clay.math.Vector3} a
  * @return {number}
  */
 Vector3.sqrLen = function(a) {
@@ -9463,16 +9415,16 @@ Vector3.sqrLen = function(a) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector3} a
+ * @param  {clay.math.Vector3} a
  * @return {number}
  */
 Vector3.squaredLength = Vector3.sqrLen;
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.sub = function(out, a, b) {
     vec3$4.subtract(out._array, a._array, b._array);
@@ -9481,18 +9433,18 @@ Vector3.sub = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Vector3} b
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Vector3} b
+ * @return {clay.math.Vector3}
  */
 Vector3.subtract = Vector3.sub;
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
  * @param  {Matrix3} m
- * @return {qtek.math.Vector3}
+ * @return {clay.math.Vector3}
  */
 Vector3.transformMat3 = function(out, a, m) {
     vec3$4.transformMat3(out._array, a._array, m._array);
@@ -9501,10 +9453,10 @@ Vector3.transformMat3 = function(out, a, m) {
 };
 
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Matrix4} m
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Matrix4} m
+ * @return {clay.math.Vector3}
  */
 Vector3.transformMat4 = function(out, a, m) {
     vec3$4.transformMat4(out._array, a._array, m._array);
@@ -9512,10 +9464,10 @@ Vector3.transformMat4 = function(out, a, m) {
     return out;
 };
 /**
- * @param  {qtek.math.Vector3} out
- * @param  {qtek.math.Vector3} a
- * @param  {qtek.math.Quaternion} q
- * @return {qtek.math.Vector3}
+ * @param  {clay.math.Vector3} out
+ * @param  {clay.math.Vector3} a
+ * @param  {clay.math.Quaternion} q
+ * @return {clay.math.Vector3}
  */
 Vector3.transformQuat = function(out, a, q) {
     vec3$4.transformQuat(out._array, a._array, q._array);
@@ -9674,35 +9626,35 @@ Vector3.eulerFromMat3 = function (out, m, order) {
 };
 
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.POSITIVE_X = new Vector3(1, 0, 0);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.NEGATIVE_X = new Vector3(-1, 0, 0);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.POSITIVE_Y = new Vector3(0, 1, 0);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.NEGATIVE_Y = new Vector3(0, -1, 0);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.POSITIVE_Z = new Vector3(0, 0, 1);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.UP = new Vector3(0, 1, 0);
 /**
- * @type {qtek.math.Vector3}
+ * @type {clay.math.Vector3}
  */
 Vector3.ZERO = new Vector3(0, 0, 0);
 
@@ -9710,7 +9662,7 @@ var quat$3 = glmatrix.quat;
 
 /**
  * @constructor
- * @alias qtek.math.Quaternion
+ * @alias clay.math.Quaternion
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -9728,6 +9680,7 @@ var Quaternion = function (x, y, z, w) {
      * All methods also operate on the _array instead of x, y, z, w components
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Quaternion#
      */
     this._array = quat$3.fromValues(x, y, z, w);
 
@@ -9736,6 +9689,7 @@ var Quaternion = function (x, y, z, w) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Quaternion#
      */
     this._dirty = true;
 };
@@ -9746,8 +9700,8 @@ Quaternion.prototype = {
 
     /**
      * Add b to self
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     add: function (b) {
         quat$3.add(this._array, this._array, b._array);
@@ -9757,7 +9711,7 @@ Quaternion.prototype = {
 
     /**
      * Calculate the w component from x, y, z component
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     calculateW: function () {
         quat$3.calculateW(this._array, this._array);
@@ -9771,7 +9725,7 @@ Quaternion.prototype = {
      * @param  {number}  y
      * @param  {number}  z
      * @param  {number}  w
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     set: function (x, y, z, w) {
         this._array[0] = x;
@@ -9785,7 +9739,7 @@ Quaternion.prototype = {
     /**
      * Set x, y, z and w components from array
      * @param  {Float32Array|number[]} arr
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     setArray: function (arr) {
         this._array[0] = arr[0];
@@ -9799,7 +9753,7 @@ Quaternion.prototype = {
 
     /**
      * Clone a new Quaternion
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     clone: function () {
         return new Quaternion(this.x, this.y, this.z, this.w);
@@ -9809,7 +9763,7 @@ Quaternion.prototype = {
      * Calculates the conjugate of self If the quaternion is normalized,
      * this function is faster than invert and produces the same result.
      *
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     conjugate: function () {
         quat$3.conjugate(this._array, this._array);
@@ -9819,8 +9773,8 @@ Quaternion.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     copy: function (b) {
         quat$3.copy(this._array, b._array);
@@ -9830,7 +9784,7 @@ Quaternion.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} b
      * @return {number}
      */
     dot: function (b) {
@@ -9839,8 +9793,8 @@ Quaternion.prototype = {
 
     /**
      * Set from the given 3x3 rotation matrix
-     * @param  {qtek.math.Matrix3} m
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Matrix3} m
+     * @return {clay.math.Quaternion}
      */
     fromMat3: function (m) {
         quat$3.fromMat3(this._array, m._array);
@@ -9851,8 +9805,8 @@ Quaternion.prototype = {
     /**
      * Set from the given 4x4 rotation matrix
      * The 4th column and 4th row will be droped
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Quaternion}
      */
     fromMat4: (function () {
         var mat3 = glmatrix.mat3;
@@ -9869,7 +9823,7 @@ Quaternion.prototype = {
 
     /**
      * Set to identity quaternion
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     identity: function () {
         quat$3.identity(this._array);
@@ -9878,7 +9832,7 @@ Quaternion.prototype = {
     },
     /**
      * Invert self
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     invert: function () {
         quat$3.invert(this._array, this._array);
@@ -9903,10 +9857,10 @@ Quaternion.prototype = {
 
     /**
      * Linear interpolation between a and b
-     * @param  {qtek.math.Quaternion} a
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} a
+     * @param  {clay.math.Quaternion} b
      * @param  {number}  t
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     lerp: function (a, b, t) {
         quat$3.lerp(this._array, a._array, b._array, t);
@@ -9916,8 +9870,8 @@ Quaternion.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     mul: function (b) {
         quat$3.mul(this._array, this._array, b._array);
@@ -9927,8 +9881,8 @@ Quaternion.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Quaternion} a
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} a
+     * @return {clay.math.Quaternion}
      */
     mulLeft: function (a) {
         quat$3.multiply(this._array, a._array, this._array);
@@ -9938,8 +9892,8 @@ Quaternion.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {qtek.math.Quaternion} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} b
+     * @return {clay.math.Quaternion}
      */
     multiply: function (b) {
         quat$3.multiply(this._array, this._array, b._array);
@@ -9950,8 +9904,8 @@ Quaternion.prototype = {
     /**
      * Mutiply a and self
      * Quaternion mutiply is not commutative, so the result of mutiplyLeft is different with multiply.
-     * @param  {qtek.math.Quaternion} a
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Quaternion} a
+     * @return {clay.math.Quaternion}
      */
     multiplyLeft: function (a) {
         quat$3.multiply(this._array, a._array, this._array);
@@ -9961,7 +9915,7 @@ Quaternion.prototype = {
 
     /**
      * Normalize self
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     normalize: function () {
         quat$3.normalize(this._array, this._array);
@@ -9972,7 +9926,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about X axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateX: function (rad) {
         quat$3.rotateX(this._array, this._array, rad);
@@ -9983,7 +9937,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about Y axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateY: function (rad) {
         quat$3.rotateY(this._array, this._array, rad);
@@ -9994,7 +9948,7 @@ Quaternion.prototype = {
     /**
      * Rotate self by a given radian about Z axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     rotateZ: function (rad) {
         quat$3.rotateZ(this._array, this._array, rad);
@@ -10005,9 +9959,9 @@ Quaternion.prototype = {
     /**
      * Sets self to represent the shortest rotation from Vector3 a to Vector3 b.
      * a and b needs to be normalized
-     * @param  {qtek.math.Vector3} a
-     * @param  {qtek.math.Vector3} b
-     * @return {qtek.math.Quaternion}
+     * @param  {clay.math.Vector3} a
+     * @param  {clay.math.Vector3} b
+     * @return {clay.math.Quaternion}
      */
     rotationTo: function (a, b) {
         quat$3.rotationTo(this._array, a._array, b._array);
@@ -10016,10 +9970,10 @@ Quaternion.prototype = {
     },
     /**
      * Sets self with values corresponding to the given axes
-     * @param {qtek.math.Vector3} view
-     * @param {qtek.math.Vector3} right
-     * @param {qtek.math.Vector3} up
-     * @return {qtek.math.Quaternion}
+     * @param {clay.math.Vector3} view
+     * @param {clay.math.Vector3} right
+     * @param {clay.math.Vector3} up
+     * @return {clay.math.Quaternion}
      */
     setAxes: function (view, right, up) {
         quat$3.setAxes(this._array, view._array, right._array, up._array);
@@ -10029,9 +9983,9 @@ Quaternion.prototype = {
 
     /**
      * Sets self with a rotation axis and rotation angle
-     * @param {qtek.math.Vector3} axis
+     * @param {clay.math.Vector3} axis
      * @param {number} rad
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     setAxisAngle: function (axis, rad) {
         quat$3.setAxisAngle(this._array, axis._array, rad);
@@ -10040,10 +9994,10 @@ Quaternion.prototype = {
     },
     /**
      * Perform spherical linear interpolation between a and b
-     * @param  {qtek.math.Quaternion} a
-     * @param  {qtek.math.Quaternion} b
+     * @param  {clay.math.Quaternion} a
+     * @param  {clay.math.Quaternion} b
      * @param  {number} t
-     * @return {qtek.math.Quaternion}
+     * @return {clay.math.Quaternion}
      */
     slerp: function (a, b, t) {
         quat$3.slerp(this._array, a._array, b._array, t);
@@ -10069,7 +10023,7 @@ Quaternion.prototype = {
 
     /**
      * Set from euler
-     * @param {qtek.math.Vector3} v
+     * @param {clay.math.Vector3} v
      * @param {String} order
      */
     fromEuler: function (v, order) {
@@ -10093,7 +10047,7 @@ if (defineProperty$1) {
     /**
      * @name x
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty$1(proto$2, 'x', {
@@ -10109,7 +10063,7 @@ if (defineProperty$1) {
     /**
      * @name y
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty$1(proto$2, 'y', {
@@ -10125,7 +10079,7 @@ if (defineProperty$1) {
     /**
      * @name z
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty$1(proto$2, 'z', {
@@ -10141,7 +10095,7 @@ if (defineProperty$1) {
     /**
      * @name w
      * @type {number}
-     * @memberOf qtek.math.Quaternion
+     * @memberOf clay.math.Quaternion
      * @instance
      */
     defineProperty$1(proto$2, 'w', {
@@ -10158,10 +10112,10 @@ if (defineProperty$1) {
 // Supply methods that are not in place
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.add = function (out, a, b) {
     quat$3.add(out._array, a._array, b._array);
@@ -10170,12 +10124,12 @@ Quaternion.add = function (out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
+ * @param  {clay.math.Quaternion} out
  * @param  {number}     x
  * @param  {number}     y
  * @param  {number}     z
  * @param  {number}     w
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.set = function (out, x, y, z, w) {
     quat$3.set(out._array, x, y, z, w);
@@ -10183,9 +10137,9 @@ Quaternion.set = function (out, x, y, z, w) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.copy = function (out, b) {
     quat$3.copy(out._array, b._array);
@@ -10194,9 +10148,9 @@ Quaternion.copy = function (out, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.calculateW = function (out, a) {
     quat$3.calculateW(out._array, a._array);
@@ -10205,9 +10159,9 @@ Quaternion.calculateW = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.conjugate = function (out, a) {
     quat$3.conjugate(out._array, a._array);
@@ -10216,8 +10170,8 @@ Quaternion.conjugate = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @return {clay.math.Quaternion}
  */
 Quaternion.identity = function (out) {
     quat$3.identity(out._array);
@@ -10226,9 +10180,9 @@ Quaternion.identity = function (out) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.invert = function (out, a) {
     quat$3.invert(out._array, a._array);
@@ -10237,8 +10191,8 @@ Quaternion.invert = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @return {number}
  */
 Quaternion.dot = function (a, b) {
@@ -10246,7 +10200,7 @@ Quaternion.dot = function (a, b) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.len = function (a) {
@@ -10256,11 +10210,11 @@ Quaternion.len = function (a) {
 // Quaternion.length = Quaternion.len;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @param  {number}     t
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.lerp = function (out, a, b, t) {
     quat$3.lerp(out._array, a._array, b._array, t);
@@ -10269,11 +10223,11 @@ Quaternion.lerp = function (out, a, b, t) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
  * @param  {number}     t
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.slerp = function (out, a, b, t) {
     quat$3.slerp(out._array, a._array, b._array, t);
@@ -10282,10 +10236,10 @@ Quaternion.slerp = function (out, a, b, t) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.mul = function (out, a, b) {
     quat$3.multiply(out._array, a._array, b._array);
@@ -10295,18 +10249,18 @@ Quaternion.mul = function (out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @param  {qtek.math.Quaternion} b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @param  {clay.math.Quaternion} b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.multiply = Quaternion.mul;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateX = function (out, a, rad) {
     quat$3.rotateX(out._array, a._array, rad);
@@ -10315,10 +10269,10 @@ Quaternion.rotateX = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateY = function (out, a, rad) {
     quat$3.rotateY(out._array, a._array, rad);
@@ -10327,10 +10281,10 @@ Quaternion.rotateY = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotateZ = function (out, a, rad) {
     quat$3.rotateZ(out._array, a._array, rad);
@@ -10339,10 +10293,10 @@ Quaternion.rotateZ = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    axis
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    axis
  * @param  {number}     rad
- * @return {qtek.math.Quaternion}
+ * @return {clay.math.Quaternion}
  */
 Quaternion.setAxisAngle = function (out, axis, rad) {
     quat$3.setAxisAngle(out._array, axis._array, rad);
@@ -10351,9 +10305,9 @@ Quaternion.setAxisAngle = function (out, axis, rad) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Quaternion}
  */
 Quaternion.normalize = function (out, a) {
     quat$3.normalize(out._array, a._array);
@@ -10362,7 +10316,7 @@ Quaternion.normalize = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.sqrLen = function (a) {
@@ -10371,15 +10325,15 @@ Quaternion.sqrLen = function (a) {
 
 /**
  * @method
- * @param  {qtek.math.Quaternion} a
+ * @param  {clay.math.Quaternion} a
  * @return {number}
  */
 Quaternion.squaredLength = Quaternion.sqrLen;
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Matrix3}    m
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Matrix3}    m
+ * @return {clay.math.Quaternion}
  */
 Quaternion.fromMat3 = function (out, m) {
     quat$3.fromMat3(out._array, m._array);
@@ -10388,11 +10342,11 @@ Quaternion.fromMat3 = function (out, m) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    view
- * @param  {qtek.math.Vector3}    right
- * @param  {qtek.math.Vector3}    up
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    view
+ * @param  {clay.math.Vector3}    right
+ * @param  {clay.math.Vector3}    up
+ * @return {clay.math.Quaternion}
  */
 Quaternion.setAxes = function (out, view, right, up) {
     quat$3.setAxes(out._array, view._array, right._array, up._array);
@@ -10401,10 +10355,10 @@ Quaternion.setAxes = function (out, view, right, up) {
 };
 
 /**
- * @param  {qtek.math.Quaternion} out
- * @param  {qtek.math.Vector3}    a
- * @param  {qtek.math.Vector3}    b
- * @return {qtek.math.Quaternion}
+ * @param  {clay.math.Quaternion} out
+ * @param  {clay.math.Vector3}    a
+ * @param  {clay.math.Vector3}    b
+ * @return {clay.math.Quaternion}
  */
 Quaternion.rotationTo = function (out, a, b) {
     quat$3.rotationTo(out._array, a._array, b._array);
@@ -10414,8 +10368,8 @@ Quaternion.rotationTo = function (out, a, b) {
 
 /**
  * Set quaternion from euler
- * @param {qtek.math.Quaternion} out
- * @param {qtek.math.Vector3} v
+ * @param {clay.math.Quaternion} out
+ * @param {clay.math.Vector3} v
  * @param {String} order
  */
 Quaternion.fromEuler = function (out, v, order) {
@@ -10484,7 +10438,7 @@ var quat$4 = glmatrix.quat;
 
 /**
  * @constructor
- * @alias qtek.math.Matrix4
+ * @alias clay.math.Matrix4
  */
 var Matrix4 = function() {
 
@@ -10496,12 +10450,14 @@ var Matrix4 = function() {
      * Storage of Matrix4
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Matrix4#
      */
     this._array = mat4$1.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Matrix4#
      */
     this._dirty = true;
 };
@@ -10523,7 +10479,7 @@ Matrix4.prototype = {
     },
     /**
      * Calculate the adjugate of self, in-place
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     adjoint: function() {
         mat4$1.adjoint(this._array, this._array);
@@ -10533,7 +10489,7 @@ Matrix4.prototype = {
 
     /**
      * Clone a new Matrix4
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     clone: function() {
         return (new Matrix4()).copy(this);
@@ -10541,8 +10497,8 @@ Matrix4.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     copy: function(a) {
         mat4$1.copy(this._array, a._array);
@@ -10560,8 +10516,8 @@ Matrix4.prototype = {
 
     /**
      * Set upper 3x3 part from quaternion
-     * @param  {qtek.math.Quaternion} q
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Quaternion} q
+     * @return {clay.math.Matrix4}
      */
     fromQuat: function(q) {
         mat4$1.fromQuat(this._array, q._array);
@@ -10571,9 +10527,9 @@ Matrix4.prototype = {
 
     /**
      * Set from a quaternion rotation and a vector translation
-     * @param  {qtek.math.Quaternion} q
-     * @param  {qtek.math.Vector3} v
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Quaternion} q
+     * @param  {clay.math.Vector3} v
+     * @return {clay.math.Matrix4}
      */
     fromRotationTranslation: function(q, v) {
         mat4$1.fromRotationTranslation(this._array, q._array, v._array);
@@ -10584,8 +10540,8 @@ Matrix4.prototype = {
     /**
      * Set from Matrix2d, it is used when converting a 2d shape to 3d space.
      * In 3d space it is equivalent to ranslate on xy plane and rotate about z axis
-     * @param  {qtek.math.Matrix2d} m2d
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix2d} m2d
+     * @return {clay.math.Matrix4}
      */
     fromMat2d: function(m2d) {
         Matrix4.fromMat2d(this, m2d);
@@ -10600,7 +10556,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     frustum: function (left, right, bottom, top, near, far) {
         mat4$1.frustum(this._array, left, right, bottom, top, near, far);
@@ -10610,7 +10566,7 @@ Matrix4.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     identity: function() {
         mat4$1.identity(this._array);
@@ -10620,7 +10576,7 @@ Matrix4.prototype = {
 
     /**
      * Invert self
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     invert: function() {
         mat4$1.invert(this._array, this._array);
@@ -10630,10 +10586,10 @@ Matrix4.prototype = {
 
     /**
      * Set as a matrix with the given eye position, focal point, and up axis
-     * @param  {qtek.math.Vector3} eye
-     * @param  {qtek.math.Vector3} center
-     * @param  {qtek.math.Vector3} up
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3} eye
+     * @param  {clay.math.Vector3} center
+     * @param  {clay.math.Vector3} up
+     * @return {clay.math.Matrix4}
      */
     lookAt: function(eye, center, up) {
         mat4$1.lookAt(this._array, eye._array, center._array, up._array);
@@ -10643,8 +10599,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     mul: function(b) {
         mat4$1.mul(this._array, this._array, b._array);
@@ -10654,8 +10610,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Matrix4} a
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} a
+     * @return {clay.math.Matrix4}
      */
     mulLeft: function(a) {
         mat4$1.mul(this._array, a._array, this._array);
@@ -10665,8 +10621,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {qtek.math.Matrix4} b
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Matrix4} b
+     * @return {clay.math.Matrix4}
      */
     multiply: function(b) {
         mat4$1.multiply(this._array, this._array, b._array);
@@ -10676,8 +10632,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {qtek.math.Matrix3} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} a
+     * @return {clay.math.Matrix3}
      */
     multiplyLeft: function(a) {
         mat4$1.multiply(this._array, a._array, this._array);
@@ -10693,7 +10649,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     ortho: function(left, right, bottom, top, near, far) {
         mat4$1.ortho(this._array, left, right, bottom, top, near, far);
@@ -10706,7 +10662,7 @@ Matrix4.prototype = {
      * @param  {number} aspect
      * @param  {number} near
      * @param  {number} far
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     perspective: function(fovy, aspect, near, far) {
         mat4$1.perspective(this._array, fovy, aspect, near, far);
@@ -10718,8 +10674,8 @@ Matrix4.prototype = {
      * Rotate self by rad about axis.
      * Equal to right-multiply a rotaion matrix
      * @param  {number}   rad
-     * @param  {qtek.math.Vector3} axis
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3} axis
+     * @return {clay.math.Matrix4}
      */
     rotate: function(rad, axis) {
         mat4$1.rotate(this._array, this._array, rad, axis._array);
@@ -10731,7 +10687,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about X axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateX: function(rad) {
         mat4$1.rotateX(this._array, this._array, rad);
@@ -10743,7 +10699,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Y axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateY: function(rad) {
         mat4$1.rotateY(this._array, this._array, rad);
@@ -10755,7 +10711,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Z axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     rotateZ: function(rad) {
         mat4$1.rotateZ(this._array, this._array, rad);
@@ -10766,8 +10722,8 @@ Matrix4.prototype = {
     /**
      * Scale self by s
      * Equal to right-multiply a scale matrix
-     * @param  {qtek.math.Vector3}  s
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3}  s
+     * @return {clay.math.Matrix4}
      */
     scale: function(v) {
         mat4$1.scale(this._array, this._array, v._array);
@@ -10778,8 +10734,8 @@ Matrix4.prototype = {
     /**
      * Translate self by v.
      * Equal to right-multiply a translate matrix
-     * @param  {qtek.math.Vector3}  v
-     * @return {qtek.math.Matrix4}
+     * @param  {clay.math.Vector3}  v
+     * @return {clay.math.Matrix4}
      */
     translate: function(v) {
         mat4$1.translate(this._array, this._array, v._array);
@@ -10789,7 +10745,7 @@ Matrix4.prototype = {
 
     /**
      * Transpose self, in-place.
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     transpose: function() {
         mat4$1.transpose(this._array, this._array);
@@ -10799,9 +10755,9 @@ Matrix4.prototype = {
 
     /**
      * Decompose a matrix to SRT
-     * @param {qtek.math.Vector3} [scale]
-     * @param {qtek.math.Quaternion} rotation
-     * @param {qtek.math.Vector} position
+     * @param {clay.math.Vector3} [scale]
+     * @param {clay.math.Quaternion} rotation
+     * @param {clay.math.Vector} position
      * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
      */
     decomposeMatrix: (function() {
@@ -10877,8 +10833,8 @@ if (defineProperty$2) {
     /**
      * Z Axis of local transform
      * @name z
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty$2(proto$3, 'z', {
@@ -10903,8 +10859,8 @@ if (defineProperty$2) {
     /**
      * Y Axis of local transform
      * @name y
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty$2(proto$3, 'y', {
@@ -10927,8 +10883,8 @@ if (defineProperty$2) {
     /**
      * X Axis of local transform
      * @name x
-     * @type {qtek.math.Vector3}
-     * @memberOf qtek.math.Matrix4
+     * @type {clay.math.Vector3}
+     * @memberOf clay.math.Matrix4
      * @instance
      */
     defineProperty$2(proto$3, 'x', {
@@ -10950,9 +10906,9 @@ if (defineProperty$2) {
 }
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.adjoint = function(out, a) {
     mat4$1.adjoint(out._array, a._array);
@@ -10961,9 +10917,9 @@ Matrix4.adjoint = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.copy = function(out, a) {
     mat4$1.copy(out._array, a._array);
@@ -10972,7 +10928,7 @@ Matrix4.copy = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} a
  * @return {number}
  */
 Matrix4.determinant = function(a) {
@@ -10980,8 +10936,8 @@ Matrix4.determinant = function(a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @return {clay.math.Matrix4}
  */
 Matrix4.identity = function(out) {
     mat4$1.identity(out._array);
@@ -10990,14 +10946,14 @@ Matrix4.identity = function(out) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
+ * @param  {clay.math.Matrix4} out
  * @param  {number}  left
  * @param  {number}  right
  * @param  {number}  bottom
  * @param  {number}  top
  * @param  {number}  near
  * @param  {number}  far
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
     mat4$1.ortho(out._array, left, right, bottom, top, near, far);
@@ -11006,12 +10962,12 @@ Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
+ * @param  {clay.math.Matrix4} out
  * @param  {number}  fovy
  * @param  {number}  aspect
  * @param  {number}  near
  * @param  {number}  far
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.perspective = function(out, fovy, aspect, near, far) {
     mat4$1.perspective(out._array, fovy, aspect, near, far);
@@ -11020,11 +10976,11 @@ Matrix4.perspective = function(out, fovy, aspect, near, far) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Vector3} eye
- * @param  {qtek.math.Vector3} center
- * @param  {qtek.math.Vector3} up
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Vector3} eye
+ * @param  {clay.math.Vector3} center
+ * @param  {clay.math.Vector3} up
+ * @return {clay.math.Matrix4}
  */
 Matrix4.lookAt = function(out, eye, center, up) {
     mat4$1.lookAt(out._array, eye._array, center._array, up._array);
@@ -11033,9 +10989,9 @@ Matrix4.lookAt = function(out, eye, center, up) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.invert = function(out, a) {
     mat4$1.invert(out._array, a._array);
@@ -11044,10 +11000,10 @@ Matrix4.invert = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Matrix4} b
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Matrix4} b
+ * @return {clay.math.Matrix4}
  */
 Matrix4.mul = function(out, a, b) {
     mat4$1.mul(out._array, a._array, b._array);
@@ -11057,17 +11013,17 @@ Matrix4.mul = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Matrix4} b
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Matrix4} b
+ * @return {clay.math.Matrix4}
  */
 Matrix4.multiply = Matrix4.mul;
 
 /**
- * @param  {qtek.math.Matrix4}    out
- * @param  {qtek.math.Quaternion} q
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4}    out
+ * @param  {clay.math.Quaternion} q
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromQuat = function(out, q) {
     mat4$1.fromQuat(out._array, q._array);
@@ -11076,10 +11032,10 @@ Matrix4.fromQuat = function(out, q) {
 };
 
 /**
- * @param  {qtek.math.Matrix4}    out
- * @param  {qtek.math.Quaternion} q
- * @param  {qtek.math.Vector3}    v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4}    out
+ * @param  {clay.math.Quaternion} q
+ * @param  {clay.math.Vector3}    v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromRotationTranslation = function(out, q, v) {
     mat4$1.fromRotationTranslation(out._array, q._array, v._array);
@@ -11088,9 +11044,9 @@ Matrix4.fromRotationTranslation = function(out, q, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} m4
- * @param  {qtek.math.Matrix2d} m2d
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} m4
+ * @param  {clay.math.Matrix2d} m2d
+ * @return {clay.math.Matrix4}
  */
 Matrix4.fromMat2d = function(m4, m2d) {
     m4._dirty = true;
@@ -11109,11 +11065,11 @@ Matrix4.fromMat2d = function(m4, m2d) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @param  {qtek.math.Vector3} axis
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Vector3} axis
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotate = function(out, a, rad, axis) {
     mat4$1.rotate(out._array, a._array, rad, axis._array);
@@ -11122,10 +11078,10 @@ Matrix4.rotate = function(out, a, rad, axis) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateX = function(out, a, rad) {
     mat4$1.rotateX(out._array, a._array, rad);
@@ -11134,10 +11090,10 @@ Matrix4.rotateX = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateY = function(out, a, rad) {
     mat4$1.rotateY(out._array, a._array, rad);
@@ -11146,10 +11102,10 @@ Matrix4.rotateY = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix4}
+ * @return {clay.math.Matrix4}
  */
 Matrix4.rotateZ = function(out, a, rad) {
     mat4$1.rotateZ(out._array, a._array, rad);
@@ -11158,10 +11114,10 @@ Matrix4.rotateZ = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Vector3} v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Vector3} v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.scale = function(out, a, v) {
     mat4$1.scale(out._array, a._array, v._array);
@@ -11170,9 +11126,9 @@ Matrix4.scale = function(out, a, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix4}
  */
 Matrix4.transpose = function(out, a) {
     mat4$1.transpose(out._array, a._array);
@@ -11181,10 +11137,10 @@ Matrix4.transpose = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix4} out
- * @param  {qtek.math.Matrix4} a
- * @param  {qtek.math.Vector3} v
- * @return {qtek.math.Matrix4}
+ * @param  {clay.math.Matrix4} out
+ * @param  {clay.math.Matrix4} a
+ * @param  {clay.math.Vector3} v
+ * @return {clay.math.Matrix4}
  */
 Matrix4.translate = function(out, a, v) {
     mat4$1.translate(out._array, a._array, v._array);
@@ -11200,21 +11156,21 @@ var vec3Set = vec3$6.set;
 /**
  * Axis aligned bounding box
  * @constructor
- * @alias qtek.math.BoundingBox
- * @param {qtek.math.Vector3} [min]
- * @param {qtek.math.Vector3} [max]
+ * @alias clay.math.BoundingBox
+ * @param {clay.math.Vector3} [min]
+ * @param {clay.math.Vector3} [max]
  */
 var BoundingBox = function (min, max) {
 
     /**
      * Minimum coords of bounding box
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.min = min || new Vector3(Infinity, Infinity, Infinity);
 
     /**
      * Maximum coords of bounding box
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.max = max || new Vector3(-Infinity, -Infinity, -Infinity);
 };
@@ -11252,7 +11208,7 @@ BoundingBox.prototype = {
 
     /**
      * Union operation with another bounding box
-     * @param  {qtek.math.BoundingBox} bbox
+     * @param  {clay.math.BoundingBox} bbox
      */
     union: function (bbox) {
         var min = this.min;
@@ -11266,7 +11222,7 @@ BoundingBox.prototype = {
 
     /**
      * Intersection operation with another bounding box
-     * @param  {qtek.math.BoundingBox} bbox
+     * @param  {clay.math.BoundingBox} bbox
      */
     intersection: function (bbox) {
         var min = this.min;
@@ -11280,7 +11236,7 @@ BoundingBox.prototype = {
 
     /**
      * If intersect with another bounding box
-     * @param  {qtek.math.BoundingBox} bbox
+     * @param  {clay.math.BoundingBox} bbox
      * @return {boolean}
      */
     intersectBoundingBox: function (bbox) {
@@ -11296,7 +11252,7 @@ BoundingBox.prototype = {
 
     /**
      * If contain another bounding box entirely
-     * @param  {qtek.math.BoundingBox} bbox
+     * @param  {clay.math.BoundingBox} bbox
      * @return {boolean}
      */
     containBoundingBox: function (bbox) {
@@ -11313,7 +11269,7 @@ BoundingBox.prototype = {
 
     /**
      * If contain point entirely
-     * @param  {qtek.math.Vector3} point
+     * @param  {clay.math.Vector3} point
      * @return {boolean}
      */
     containPoint: function (p) {
@@ -11338,7 +11294,7 @@ BoundingBox.prototype = {
 
     /**
      * Apply an affine transform matrix to the bounding box
-     * @param  {qtek.math.Matrix4} matrix
+     * @param  {clay.math.Matrix4} matrix
      */
     applyTransform: (function () {
         // http://dev.theomader.com/transform-bounding-boxes/
@@ -11381,7 +11337,7 @@ BoundingBox.prototype = {
 
     /**
      * Apply a projection matrix to the bounding box
-     * @param  {qtek.math.Matrix4} matrix
+     * @param  {clay.math.Matrix4} matrix
      */
     applyProjection: function (matrix) {
         var min = this.min._array;
@@ -11464,7 +11420,7 @@ BoundingBox.prototype = {
     },
     /**
      * Copy values from another bounding box
-     * @param  {qtek.math.BoundingBox} bbox
+     * @param  {clay.math.BoundingBox} bbox
      */
     copy: function (bbox) {
         var min = this.min;
@@ -11478,7 +11434,7 @@ BoundingBox.prototype = {
 
     /**
      * Clone a new bounding box
-     * @return {qtek.math.BoundingBox}
+     * @return {clay.math.BoundingBox}
      */
     clone: function () {
         var boundingBox = new BoundingBox();
@@ -11492,11 +11448,11 @@ var mat4 = glmatrix.mat4;
 var nameId = 0;
 
 /**
- * @constructor qtek.Node
- * @extends qtek.core.Base
+ * @constructor clay.Node
+ * @extends clay.core.Base
  */
 var Node = Base.extend(
-/** @lends qtek.Node# */
+/** @lends clay.Node# */
 {
     /**
      * Scene node name
@@ -11506,32 +11462,32 @@ var Node = Base.extend(
 
     /**
      * Position relative to its parent node. aka translation.
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     position: null,
 
     /**
      * Rotation relative to its parent node. Represented by a quaternion
-     * @type {qtek.math.Quaternion}
+     * @type {clay.math.Quaternion}
      */
     rotation: null,
 
     /**
      * Scale relative to its parent node
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     scale: null,
 
     /**
      * Affine transform matrix relative to its root scene.
-     * @type {qtek.math.Matrix4}
+     * @type {clay.math.Matrix4}
      */
     worldTransform: null,
 
     /**
      * Affine transform matrix relative to its parent node.
      * Composited with position, rotation and scale.
-     * @type {qtek.math.Matrix4}
+     * @type {clay.math.Matrix4}
      */
     localTransform: null,
 
@@ -11543,13 +11499,13 @@ var Node = Base.extend(
 
     /**
      * Parent of current scene node
-     * @type {?qtek.Node}
+     * @type {?clay.Node}
      * @private
      */
     _parent: null,
     /**
      * The root scene mounted. Null if it is a isolated node
-     * @type {?qtek.Scene}
+     * @type {?clay.Scene}
      * @private
      */
     _scene: null,
@@ -11564,7 +11520,7 @@ var Node = Base.extend(
      */
     _inIterating: false,
 
-    // Depth for transparent queue sorting
+    // Depth for transparent list sorting
     __depth: 0
 
 }, function () {
@@ -11589,11 +11545,11 @@ var Node = Base.extend(
     this._children = [];
 
 },
-/**@lends qtek.Node.prototype. */
+/**@lends clay.Node.prototype. */
 {
 
     /**
-     * @type {?qtek.math.Vector3}
+     * @type {?clay.math.Vector3}
      * @instance
      */
     target: null,
@@ -11635,7 +11591,7 @@ var Node = Base.extend(
 
     /**
      * Add a child node
-     * @param {qtek.Node} node
+     * @param {clay.Node} node
      */
     add: function (node) {
         if (this._inIterating) {
@@ -11662,7 +11618,7 @@ var Node = Base.extend(
 
     /**
      * Remove the given child scene node
-     * @param {qtek.Node} node
+     * @param {clay.Node} node
      */
     remove: function (node) {
         if (this._inIterating) {
@@ -11701,7 +11657,7 @@ var Node = Base.extend(
 
     /**
      * Get the scene mounted
-     * @return {qtek.Scene}
+     * @return {clay.Scene}
      */
     getScene: function () {
         return this._scene;
@@ -11709,7 +11665,7 @@ var Node = Base.extend(
 
     /**
      * Get parent node
-     * @return {qtek.Scene}
+     * @return {clay.Scene}
      */
     getParent: function () {
         return this._parent;
@@ -11727,7 +11683,7 @@ var Node = Base.extend(
 
     /**
      * Return true if it is ancestor of the given scene node
-     * @param {qtek.Node} node
+     * @param {clay.Node} node
      */
     isAncestor: function (node) {
         var parent = node._parent;
@@ -11742,7 +11698,7 @@ var Node = Base.extend(
 
     /**
      * Get a new created array of all children nodes
-     * @return {qtek.Node[]}
+     * @return {clay.Node[]}
      */
     children: function () {
         return this._children.slice();
@@ -11751,7 +11707,7 @@ var Node = Base.extend(
     /**
      * Get child scene node at given index.
      * @param {number} idx
-     * @return {qtek.Node}
+     * @return {clay.Node}
      */
     childAt: function (idx) {
         return this._children[idx];
@@ -11760,7 +11716,7 @@ var Node = Base.extend(
     /**
      * Get first child with the given name
      * @param {string} name
-     * @return {qtek.Node}
+     * @return {clay.Node}
      */
     getChildByName: function (name) {
         var children = this._children;
@@ -11774,7 +11730,7 @@ var Node = Base.extend(
     /**
      * Get first descendant have the given name
      * @param {string} name
-     * @return {qtek.Node}
+     * @return {clay.Node}
      */
     getDescendantByName: function (name) {
         var children = this._children;
@@ -11794,7 +11750,7 @@ var Node = Base.extend(
     /**
      * Query descendant node by path
      * @param {string} path
-     * @return {qtek.Node}
+     * @return {clay.Node}
      * @example
      *  node.queryNode('root/parent/child');
      */
@@ -11832,7 +11788,7 @@ var Node = Base.extend(
 
     /**
      * Get query path, relative to rootNode(default is scene)
-     * @param {qtek.Node} [rootNode]
+     * @param {clay.Node} [rootNode]
      * @return {string}
      */
     getPath: function (rootNode) {
@@ -11893,7 +11849,7 @@ var Node = Base.extend(
 
     /**
      * Set the local transform and decompose to SRT
-     * @param {qtek.math.Matrix4} matrix
+     * @param {clay.math.Matrix4} matrix
      */
     setLocalTransform: function (matrix) {
         mat4.copy(this.localTransform._array, matrix._array);
@@ -11910,7 +11866,7 @@ var Node = Base.extend(
 
     /**
      * Set the world transform and decompose to SRT
-     * @param {qtek.math.Matrix4} matrix
+     * @param {clay.math.Matrix4} matrix
      */
     setWorldTransform: function (matrix) {
         mat4.copy(this.worldTransform._array, matrix._array);
@@ -12032,8 +11988,8 @@ var Node = Base.extend(
     /**
      * Get bounding box of node
      * @param  {Function} [filter]
-     * @param  {qtek.math.BoundingBox} [out]
-     * @return {qtek.math.BoundingBox}
+     * @param  {clay.math.BoundingBox} [out]
+     * @return {clay.math.BoundingBox}
      */
     // TODO Skinning
     getBoundingBox: (function () {
@@ -12046,7 +12002,7 @@ var Node = Base.extend(
         return function (filter, out) {
             out = out || new BoundingBox();
             filter = filter || defaultFilter;
-            
+
             if (this._parent) {
                 Matrix4.invert(invWorldTransform, this._parent.worldTransform);
             }
@@ -12062,15 +12018,15 @@ var Node = Base.extend(
                     out.union(tmpBBox);
                 }
             }, this, defaultFilter);
-            
+
             return out;
         };
     })(),
 
     /**
      * Get world position, extracted from world transform
-     * @param  {qtek.math.Vector3} [out]
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} [out]
+     * @return {clay.math.Vector3}
      */
     getWorldPosition: function (out) {
         // PENDING
@@ -12111,8 +12067,8 @@ var Node = Base.extend(
 
     /**
      * Rotate the node around a axis by angle degrees, axis passes through point
-     * @param {qtek.math.Vector3} point Center point
-     * @param {qtek.math.Vector3} axis  Center axis
+     * @param {clay.math.Vector3} point Center point
+     * @param {clay.math.Vector3} axis  Center axis
      * @param {number}       angle Rotation angle
      * @see http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
      * @method
@@ -12142,8 +12098,8 @@ var Node = Base.extend(
     })(),
 
     /**
-     * @param {qtek.math.Vector3} target
-     * @param {qtek.math.Vector3} [up]
+     * @param {clay.math.Vector3} target
+     * @param {clay.math.Vector3} [up]
      * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
      * @method
      */
@@ -12164,14 +12120,14 @@ var vec4$1 = glmatrix.vec4;
 
 /**
  * @constructor
- * @alias qtek.math.Plane
- * @param {qtek.math.Vector3} [normal]
+ * @alias clay.math.Plane
+ * @param {clay.math.Vector3} [normal]
  * @param {number} [distance]
  */
 var Plane = function(normal, distance) {
     /**
      * Normal of the plane
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.normal = normal || new Vector3(0, 1, 0);
 
@@ -12187,8 +12143,8 @@ Plane.prototype = {
     constructor: Plane,
 
     /**
-     * Distance from given point to plane
-     * @param  {qtek.math.Vector3} point
+     * Distance from a given point to the plane
+     * @param  {clay.math.Vector3} point
      * @return {number}
      */
     distanceToPoint: function(point) {
@@ -12196,10 +12152,10 @@ Plane.prototype = {
     },
 
     /**
-     * Calculate the projection on the plane of point
-     * @param  {qtek.math.Vector3} point
-     * @param  {qtek.math.Vector3} out
-     * @return {qtek.math.Vector3}
+     * Calculate the projection point on the plane
+     * @param  {clay.math.Vector3} point
+     * @param  {clay.math.Vector3} out
+     * @return {clay.math.Vector3}
      */
     projectPoint: function(point, out) {
         if (!out) {
@@ -12212,7 +12168,7 @@ Plane.prototype = {
     },
 
     /**
-     * Normalize the plane's normal and calculate distance
+     * Normalize the plane's normal and calculate the distance
      */
     normalize: function() {
         var invLen = 1 / vec3$8.len(this.normal._array);
@@ -12222,7 +12178,7 @@ Plane.prototype = {
 
     /**
      * If the plane intersect a frustum
-     * @param  {qtek.math.Frustum} Frustum
+     * @param  {clay.math.Frustum} Frustum
      * @return {boolean}
      */
     intersectFrustum: function(frustum) {
@@ -12233,17 +12189,17 @@ Plane.prototype = {
         for (var i = 1; i < 8; i++) {
             if ((vec3$8.dot(coords[i]._array, normal) > this.distance) != onPlane) {
                 return true;
-            } 
+            }
         }
     },
 
     /**
      * Calculate the intersection point between plane and a given line
      * @method
-     * @param {qtek.math.Vector3} start start point of line
-     * @param {qtek.math.Vector3} end end point of line
-     * @param {qtek.math.Vector3} [out]
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.Vector3} start start point of line
+     * @param {clay.math.Vector3} end end point of line
+     * @param {clay.math.Vector3} [out]
+     * @return {clay.math.Vector3}
      */
     intersectLine: (function() {
         var rd = vec3$8.create();
@@ -12279,7 +12235,7 @@ Plane.prototype = {
     /**
      * Apply an affine transform matrix to plane
      * @method
-     * @return {qtek.math.Matrix4}
+     * @return {clay.math.Matrix4}
      */
     applyTransform: (function() {
         var inverseTranspose = mat4$2.create();
@@ -12304,7 +12260,7 @@ Plane.prototype = {
 
     /**
      * Copy from another plane
-     * @param  {qtek.math.Vector3} plane
+     * @param  {clay.math.Vector3} plane
      */
     copy: function(plane) {
         vec3$8.copy(this.normal._array, plane.normal._array);
@@ -12314,7 +12270,7 @@ Plane.prototype = {
 
     /**
      * Clone a new plane
-     * @return {qtek.math.Plane}
+     * @return {clay.math.Plane}
      */
     clone: function() {
         var plane = new Plane();
@@ -12332,13 +12288,13 @@ var mathMin = Math.min;
 var mathMax = Math.max;
 /**
  * @constructor
- * @alias qtek.math.Frustum
+ * @alias clay.math.Frustum
  */
 var Frustum = function() {
 
     /**
      * Eight planes to enclose the frustum
-     * @type {qtek.math.Plane[]}
+     * @type {clay.math.Plane[]}
      */
     this.planes = [];
 
@@ -12348,7 +12304,7 @@ var Frustum = function() {
 
     /**
      * Bounding box of frustum
-     * @type {qtek.math.BoundingBox}
+     * @type {clay.math.BoundingBox}
      */
     this.boundingBox = new BoundingBox();
 
@@ -12367,7 +12323,7 @@ Frustum.prototype = {
     // http://web.archive.org/web/20120531231005/http://crazyjoke.free.fr/doc/3D/plane%20extraction.pdf
     /**
      * Set frustum from a projection matrix
-     * @param {qtek.math.Matrix4} projectionMatrix
+     * @param {clay.math.Matrix4} projectionMatrix
      */
     setFromProjection: function(projectionMatrix) {
 
@@ -12462,9 +12418,9 @@ Frustum.prototype = {
     /**
      * Apply a affine transform matrix and set to the given bounding box
      * @method
-     * @param {qtek.math.BoundingBox}
-     * @param {qtek.math.Matrix4}
-     * @return {qtek.math.BoundingBox}
+     * @param {clay.math.BoundingBox}
+     * @param {clay.math.Matrix4}
+     * @return {clay.math.BoundingBox}
      */
     getTransformedBoundingBox: (function() {
 
@@ -12510,17 +12466,17 @@ var EPSILON$1 = 1e-5;
 
 /**
  * @constructor
- * @alias qtek.math.Ray
- * @param {qtek.math.Vector3} [origin]
- * @param {qtek.math.Vector3} [direction]
+ * @alias clay.math.Ray
+ * @param {clay.math.Vector3} [origin]
+ * @param {clay.math.Vector3} [direction]
  */
 var Ray = function (origin, direction) {
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.origin = origin || new Vector3();
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.direction = direction || new Vector3();
 };
@@ -12532,9 +12488,9 @@ Ray.prototype = {
     // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
     /**
      * Calculate intersection point between ray and a give plane
-     * @param  {qtek.math.Plane} plane
-     * @param  {qtek.math.Vector3} [out]
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Plane} plane
+     * @param  {clay.math.Vector3} [out]
+     * @return {clay.math.Vector3}
      */
     intersectPlane: function (plane, out) {
         var pn = plane.normal._array;
@@ -12558,7 +12514,7 @@ Ray.prototype = {
 
     /**
      * Mirror the ray against plane
-     * @param  {qtek.math.Plane} plane
+     * @param  {clay.math.Plane} plane
      */
     mirrorAgainstPlane: function (plane) {
         // Distance to plane
@@ -12585,10 +12541,10 @@ Ray.prototype = {
 
     /**
      * Calculate intersection point between ray and sphere
-     * @param  {qtek.math.Vector3} center
+     * @param  {clay.math.Vector3} center
      * @param  {number} radius
-     * @param  {qtek.math.Vector3} out
-     * @return {qtek.math.Vector3}
+     * @param  {clay.math.Vector3} out
+     * @return {clay.math.Vector3}
      */
     intersectSphere: (function () {
         var v = vec3$9.create();
@@ -12638,9 +12594,9 @@ Ray.prototype = {
     // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
     /**
      * Calculate intersection point between ray and bounding box
-     * @param {qtek.math.BoundingBox} bbox
-     * @param {qtek.math.Vector3}
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.BoundingBox} bbox
+     * @param {clay.math.Vector3}
+     * @return {clay.math.Vector3}
      */
     intersectBoundingBox: function (bbox, out) {
         var dir = this.direction._array;
@@ -12716,13 +12672,13 @@ Ray.prototype = {
     // http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
     /**
      * Calculate intersection point between ray and three triangle vertices
-     * @param {qtek.math.Vector3} a
-     * @param {qtek.math.Vector3} b
-     * @param {qtek.math.Vector3} c
+     * @param {clay.math.Vector3} a
+     * @param {clay.math.Vector3} b
+     * @param {clay.math.Vector3} c
      * @param {boolean}           singleSided, CW triangle will be ignored
-     * @param {qtek.math.Vector3} [out]
-     * @param {qtek.math.Vector3} [barycenteric] barycentric coords
-     * @return {qtek.math.Vector3}
+     * @param {clay.math.Vector3} [out]
+     * @param {clay.math.Vector3} [barycenteric] barycentric coords
+     * @return {clay.math.Vector3}
      */
     intersectTriangle: (function () {
 
@@ -12790,7 +12746,7 @@ Ray.prototype = {
 
     /**
      * Apply an affine transform matrix to the ray
-     * @return {qtek.math.Matrix4} matrix
+     * @return {clay.math.Matrix4} matrix
      */
     applyTransform: function (matrix) {
         Vector3.add(this.direction, this.direction, this.origin);
@@ -12803,7 +12759,7 @@ Ray.prototype = {
 
     /**
      * Copy values from another ray
-     * @param {qtek.math.Ray} ray
+     * @param {clay.math.Ray} ray
      */
     copy: function (ray) {
         Vector3.copy(this.origin, ray.origin);
@@ -12812,7 +12768,7 @@ Ray.prototype = {
 
     /**
      * Clone a new ray
-     * @return {qtek.math.Ray}
+     * @return {clay.math.Ray}
      */
     clone: function () {
         var ray = new Ray();
@@ -12825,39 +12781,39 @@ var vec3$3 = glmatrix.vec3;
 var vec4 = glmatrix.vec4;
 
 /**
- * @constructor qtek.Camera
- * @extends qtek.Node
+ * @constructor clay.Camera
+ * @extends clay.Node
  */
 var Camera = Node.extend(function () {
-    return /** @lends qtek.Camera# */ {
+    return /** @lends clay.Camera# */ {
         /**
          * Camera projection matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         projectionMatrix: new Matrix4(),
 
         /**
          * Inverse of camera projection matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         invProjectionMatrix: new Matrix4(),
 
         /**
          * View matrix, equal to inverse of camera's world matrix
-         * @type {qtek.math.Matrix4}
+         * @type {clay.math.Matrix4}
          */
         viewMatrix: new Matrix4(),
 
         /**
          * Camera frustum in view space
-         * @type {qtek.math.Frustum}
+         * @type {clay.math.Frustum}
          */
         frustum: new Frustum()
     };
 }, function () {
     this.update(true);
 },
-/** @lends qtek.Camera.prototype */
+/** @lends clay.Camera.prototype */
 {
 
     update: function (force) {
@@ -12886,7 +12842,7 @@ var Camera = Node.extend(function () {
 
     /**
      * Set camera projection matrix
-     * @param {qtek.math.Matrix4} projectionMatrix
+     * @param {clay.math.Matrix4} projectionMatrix
      */
     setProjectionMatrix: function (projectionMatrix) {
         Matrix4.copy(this.projectionMatrix, projectionMatrix);
@@ -12901,9 +12857,9 @@ var Camera = Node.extend(function () {
     /**
      * Cast a picking ray from camera near plane to far plane
      * @method
-     * @param {qtek.math.Vector2} ndc
-     * @param {qtek.math.Ray} [out]
-     * @return {qtek.math.Ray}
+     * @param {clay.math.Vector2} ndc
+     * @param {clay.math.Ray} [out]
+     * @return {clay.math.Ray}
      */
     castRay: (function () {
         var v4 = vec4.create();
@@ -12933,17 +12889,17 @@ var Camera = Node.extend(function () {
     /**
      * @method
      * @name clone
-     * @return {qtek.Camera}
-     * @memberOf qtek.Camera.prototype
+     * @return {clay.Camera}
+     * @memberOf clay.Camera.prototype
      */
 });
 
 /**
- * @constructor qtek.camera.Orthographic
- * @extends qtek.Camera
+ * @constructor clay.camera.Orthographic
+ * @extends clay.Camera
  */
 var Orthographic$1 = Camera.extend(
-/** @lends qtek.camera.Orthographic# */
+/** @lends clay.camera.Orthographic# */
 {
     /**
      * @type {number}
@@ -12970,7 +12926,7 @@ var Orthographic$1 = Camera.extend(
      */
     bottom: -1
 },
-/** @lends qtek.camera.Orthographic.prototype */
+/** @lends clay.camera.Orthographic.prototype */
 {
 
     updateProjectionMatrix: function() {
@@ -12987,7 +12943,7 @@ var Orthographic$1 = Camera.extend(
         this.far = -(1 - m[14]) / m[10];
     },
     /**
-     * @return {qtek.camera.Orthographic}
+     * @return {clay.camera.Orthographic}
      */
     clone: function() {
         var camera = Camera.prototype.clone.call(this);
@@ -13003,11 +12959,11 @@ var Orthographic$1 = Camera.extend(
 });
 
 /**
- * @constructor qtek.camera.Perspective
- * @extends qtek.Camera
+ * @constructor clay.camera.Perspective
+ * @extends clay.Camera
  */
 var Perspective$1 = Camera.extend(
-/** @lends qtek.camera.Perspective# */
+/** @lends clay.camera.Perspective# */
 {
     /**
      * Vertical field of view in radians
@@ -13030,7 +12986,7 @@ var Perspective$1 = Camera.extend(
      */
     far: 2000
 },
-/** @lends qtek.camera.Perspective.prototype */
+/** @lends clay.camera.Perspective.prototype */
 {
 
     updateProjectionMatrix: function() {
@@ -13046,7 +13002,7 @@ var Perspective$1 = Camera.extend(
         this.far = m[14] / (m[10] + 1);
     },
     /**
-     * @return {qtek.camera.Perspective}
+     * @return {clay.camera.Perspective}
      */
     clone: function() {
         var camera = Camera.prototype.clone.call(this);
@@ -13067,15 +13023,11 @@ var CanvasMaterial = Base.extend({
 
     pointSize: 0,
 
-    /**
-     * Point shape. Can be 'rectangle' and 'circle'
-     * @type {string}
-     */
     pointShape: 'rectangle'
 });
 
 /**
- * @namespace qtek.core.glenum
+ * @namespace clay.core.glenum
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
  */
 var glenum = {
@@ -13688,14 +13640,14 @@ var CanvasRenderer = Base.extend({
         scene.update();
         camera.update();
 
-        var opaqueQueue = scene.opaqueQueue;
-        var transparentQueue = scene.transparentQueue;
-        var queue = opaqueQueue.concat(transparentQueue);
+        var opaqueList = scene.opaqueList;
+        var transparentList = scene.transparentList;
+        var list = opaqueList.concat(transparentList);
 
-        this.renderQueue(queue, camera);
+        this.renderPass(list, camera);
     },
 
-    renderQueue: function (queue, camera) {
+    renderPass: function (list, camera) {
         var viewProj = mat4$3.create();
         mat4$3.multiply(viewProj, camera.projectionMatrix._array, camera.viewMatrix._array);
         var worldViewProjMat = mat4$3.create();
@@ -13714,8 +13666,8 @@ var CanvasRenderer = Base.extend({
 
         var indices = [0, 0, 0];
         var matColor = [];
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
 
             mat4$3.multiply(worldViewProjMat, viewProj, renderable.worldTransform._array);
 
@@ -13972,12 +13924,12 @@ var CanvasRenderer = Base.extend({
 /**
  * Node of graph based post processing.
  *
- * @constructor qtek.compositor.Node
- * @extends qtek.core.Base
+ * @constructor clay.compositor.Node
+ * @extends clay.core.Base
  *
  */
 var Node$1 = Base.extend(function () {
-    return /** @lends qtek.compositor.Node# */ {
+    return /** @lends clay.compositor.Node# */ {
         /**
          * @type {string}
          */
@@ -14020,7 +13972,7 @@ var Node$1 = Base.extend(function () {
         _compositor: null
     };
 },
-/** @lends qtek.compositor.Node.prototype */
+/** @lends clay.compositor.Node.prototype */
 {
 
     // TODO Remove parameter function callback
@@ -14160,8 +14112,7 @@ var Node$1 = Base.extend(function () {
         });
 
         // Enabled the pin texture in shader
-        var shader = this.pass.material.shader;
-        shader.enableTexture(inputPinName);
+        this.pass.material.enableTexture(inputPinName);
     },
 
     clear: function () {
@@ -14211,18 +14162,18 @@ var Node$1 = Base.extend(function () {
 });
 
 /**
- * @constructor qtek.compositor.Graph
- * @extends qtek.core.Base
+ * @constructor clay.compositor.Graph
+ * @extends clay.core.Base
  */
 var Graph = Base.extend(function () {
-    return /** @lends qtek.compositor.Graph# */ {
+    return /** @lends clay.compositor.Graph# */ {
         /**
-         * @type {Array.<qtek.compositor.Node>}
+         * @type {Array.<clay.compositor.Node>}
          */
         nodes: []
     };
 },
-/** @lends qtek.compositor.Graph.prototype */
+/** @lends clay.compositor.Graph.prototype */
 {
 
     /**
@@ -14232,7 +14183,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param {qtek.compositor.Node} node
+     * @param {clay.compositor.Node} node
      */
     addNode: function (node) {
 
@@ -14245,7 +14196,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param  {qtek.compositor.Node|string} node
+     * @param  {clay.compositor.Node|string} node
      */
     removeNode: function (node) {
         if (typeof node === 'string') {
@@ -14259,7 +14210,7 @@ var Graph = Base.extend(function () {
     },
     /**
      * @param {string} name
-     * @return {qtek.compositor.Node}
+     * @return {clay.compositor.Node}
      */
     getNodeByName: function (name) {
         for (var i = 0; i < this.nodes.length; i++) {
@@ -14460,11 +14411,11 @@ Cache.prototype.constructor = Cache;
  */
 /**
  * @constructor
- * @alias qtek.Texture
- * @extends qtek.core.Base
+ * @alias clay.Texture
+ * @extends clay.core.Base
  */
 var Texture = Base.extend(
-/** @lends qtek.Texture# */
+/** @lends clay.Texture# */
 {
     /**
      * Texture width, readonly when the texture source is image
@@ -14479,56 +14430,56 @@ var Texture = Base.extend(
     /**
      * Texel data type.
      * Possible values:
-     *  + {@link qtek.Texture.UNSIGNED_BYTE}
-     *  + {@link qtek.Texture.HALF_FLOAT}
-     *  + {@link qtek.Texture.FLOAT}
-     *  + {@link qtek.Texture.UNSIGNED_INT_24_8_WEBGL}
-     *  + {@link qtek.Texture.UNSIGNED_INT}
+     *  + {@link clay.Texture.UNSIGNED_BYTE}
+     *  + {@link clay.Texture.HALF_FLOAT}
+     *  + {@link clay.Texture.FLOAT}
+     *  + {@link clay.Texture.UNSIGNED_INT_24_8_WEBGL}
+     *  + {@link clay.Texture.UNSIGNED_INT}
      * @type {number}
      */
     type: glenum.UNSIGNED_BYTE,
     /**
      * Format of texel data
      * Possible values:
-     *  + {@link qtek.Texture.RGBA}
-     *  + {@link qtek.Texture.DEPTH_COMPONENT}
-     *  + {@link qtek.Texture.DEPTH_STENCIL}
+     *  + {@link clay.Texture.RGBA}
+     *  + {@link clay.Texture.DEPTH_COMPONENT}
+     *  + {@link clay.Texture.DEPTH_STENCIL}
      * @type {number}
      */
     format: glenum.RGBA,
     /**
      * Texture wrap. Default to be REPEAT.
      * Possible values:
-     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
-     *  + {@link qtek.Texture.REPEAT}
-     *  + {@link qtek.Texture.MIRRORED_REPEAT}
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapS: glenum.REPEAT,
     /**
      * Texture wrap. Default to be REPEAT.
      * Possible values:
-     *  + {@link qtek.Texture.CLAMP_TO_EDGE}
-     *  + {@link qtek.Texture.REPEAT}
-     *  + {@link qtek.Texture.MIRRORED_REPEAT}
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
      * @type {number}
      */
     wrapT: glenum.REPEAT,
     /**
      * Possible values:
-     *  + {@link qtek.Texture.NEAREST}
-     *  + {@link qtek.Texture.LINEAR}
-     *  + {@link qtek.Texture.NEAREST_MIPMAP_NEAREST}
-     *  + {@link qtek.Texture.LINEAR_MIPMAP_NEAREST}
-     *  + {@link qtek.Texture.NEAREST_MIPMAP_LINEAR}
-     *  + {@link qtek.Texture.LINEAR_MIPMAP_LINEAR}
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_LINEAR}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_LINEAR}
      * @type {number}
      */
     minFilter: glenum.LINEAR_MIPMAP_LINEAR,
     /**
      * Possible values:
-     *  + {@link qtek.Texture.NEAREST}
-     *  + {@link qtek.Texture.LINEAR}
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
      * @type {number}
      */
     magFilter: glenum.LINEAR,
@@ -14573,13 +14524,13 @@ var Texture = Base.extend(
 }, function () {
     this._cache = new Cache();
 },
-/** @lends qtek.Texture.prototype */
+/** @lends clay.Texture.prototype */
 {
 
     getWebGLTexture: function (renderer) {
         var _gl = renderer.gl;
         var cache = this._cache;
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         if (cache.miss('webgl_texture')) {
             // In a new gl context, create new texture and set dirty true
@@ -14680,19 +14631,19 @@ var Texture = Base.extend(
         return x + 1;
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
 
         var cache = this._cache;
 
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         var webglTexture = cache.get('webgl_texture');
         if (webglTexture){
             renderer.gl.deleteTexture(webglTexture);
         }
-        cache.deleteContext(renderer.__GUID__);
+        cache.deleteContext(renderer.__uid__);
 
     },
     /**
@@ -14880,15 +14831,15 @@ mathUtil.nearestPowerOfTwo = function (value) {
 var isPowerOfTwo$1 = mathUtil.isPowerOfTwo;
 
 /**
- * @constructor qtek.Texture2D
- * @extends qtek.Texture
+ * @constructor clay.Texture2D
+ * @extends clay.Texture
  *
  * @example
  *     ...
- *     var mat = new qtek.Material({
- *         shader: qtek.shader.library.get('qtek.phong', 'diffuseMap')
+ *     var mat = new clay.Material({
+ *         shader: clay.shader.library.get('clay.phong', 'diffuseMap')
  *     });
- *     var diffuseMap = new qtek.Texture2D();
+ *     var diffuseMap = new clay.Texture2D();
  *     diffuseMap.load('assets/textures/diffuse.jpg');
  *     mat.set('diffuseMap', diffuseMap);
  *     ...
@@ -14900,7 +14851,7 @@ var isPowerOfTwo$1 = mathUtil.isPowerOfTwo;
  *     });
  */
 var Texture2D = Texture.extend(function () {
-    return /** @lends qtek.Texture2D# */ {
+    return /** @lends clay.Texture2D# */ {
         /**
          * @type {?HTMLImageElement|HTMLCanvasElemnet}
          */
@@ -14994,8 +14945,8 @@ var Texture2D = Texture.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @memberOf qtek.Texture2D.prototype
+     * @param  {clay.Renderer} renderer
+     * @memberOf clay.Texture2D.prototype
      */
     generateMipmap: function (renderer) {
         var _gl = renderer.gl;
@@ -15209,15 +15160,15 @@ var isPowerOfTwo$2 = mathUtil.isPowerOfTwo;
 var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
- * @constructor qtek.TextureCube
- * @extends qtek.Texture
+ * @constructor clay.TextureCube
+ * @extends clay.Texture
  *
  * @example
  *     ...
- *     var mat = new qtek.Material({
- *         shader: qtek.shader.library.get('qtek.phong', 'environmentMap')
+ *     var mat = new clay.Material({
+ *         shader: clay.shader.library.get('clay.phong', 'environmentMap')
  *     });
- *     var envMap = new qtek.TextureCube();
+ *     var envMap = new clay.TextureCube();
  *     envMap.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -15236,7 +15187,7 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *     });
  */
 var TextureCube = Texture.extend(function () {
-    return /** @lends qtek.TextureCube# */{
+    return /** @lends clay.TextureCube# */{
         /**
          * @type {Object}
          * @property {?HTMLImageElement|HTMLCanvasElemnet} px
@@ -15342,8 +15293,8 @@ var TextureCube = Texture.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @memberOf qtek.TextureCube.prototype
+     * @param  {clay.Renderer} renderer
+     * @memberOf clay.TextureCube.prototype
      */
     generateMipmap: function (renderer) {
         var _gl = renderer.gl;
@@ -15473,11 +15424,11 @@ var GL_RENDERBUFFER = glenum.RENDERBUFFER;
 var GL_DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
 var GL_COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
 /**
- * @constructor qtek.FrameBuffer
- * @extends qtek.core.Base
+ * @constructor clay.FrameBuffer
+ * @extends clay.core.Base
  */
 var FrameBuffer = Base.extend(
-/** @lends qtek.FrameBuffer# */
+/** @lends clay.FrameBuffer# */
 {
     /**
      * If use depth buffer
@@ -15503,7 +15454,7 @@ var FrameBuffer = Base.extend(
     this._textures = {};
 },
 
-/**@lends qtek.FrameBuffer.prototype. */
+/**@lends clay.FrameBuffer.prototype. */
 {
     /**
      * Get attached texture width
@@ -15524,7 +15475,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Bind the framebuffer to given renderer before rendering
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     bind: function (renderer) {
 
@@ -15608,7 +15559,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Unbind the frame buffer after rendering
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     unbind: function (renderer) {
         // Remove status record on renderer
@@ -15619,7 +15570,7 @@ var FrameBuffer = Base.extend(
         _gl.bindFramebuffer(GL_FRAMEBUFFER, null);
         this._boundRenderer = null;
 
-        this._cache.use(renderer.__GUID__);
+        this._cache.use(renderer.__uid__);
         var viewport = this._cache.get('viewport');
         // Reset viewport;
         if (viewport) {
@@ -15649,7 +15600,7 @@ var FrameBuffer = Base.extend(
         }
     },
 
-    
+
     // 0x8CD5, 36053, FRAMEBUFFER_COMPLETE
     // 0x8CD6, 36054, FRAMEBUFFER_INCOMPLETE_ATTACHMENT
     // 0x8CD7, 36055, FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
@@ -15661,7 +15612,7 @@ var FrameBuffer = Base.extend(
 
     _getFrameBufferGL: function (renderer) {
         var cache = this._cache;
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         if (cache.miss(KEY_FRAMEBUFFER)) {
             cache.put(KEY_FRAMEBUFFER, renderer.gl.createFramebuffer());
@@ -15672,7 +15623,7 @@ var FrameBuffer = Base.extend(
 
     /**
      * Attach a texture(RTT) to the framebuffer
-     * @param  {qtek.Texture} texture
+     * @param  {clay.Texture} texture
      * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
      * @param  {number} [target=gl.TEXTURE_2D]
      */
@@ -15695,7 +15646,7 @@ var FrameBuffer = Base.extend(
 
         if (_gl) {
             var cache = this._cache;
-            cache.use(boundRenderer.__GUID__);
+            cache.use(boundRenderer.__uid__);
             attachedTextures = cache.get('attached_textures');
         }
 
@@ -15810,7 +15761,7 @@ var FrameBuffer = Base.extend(
         this._textures[attachment] = null;
         if (this._boundRenderer) {
             var cache = this._cache;
-            cache.use(this._boundRenderer.__GUID__);
+            cache.use(this._boundRenderer.__uid__);
             this._doDetach(this._boundRenderer.gl, attachment, target);
         }
     },
@@ -15823,7 +15774,7 @@ var FrameBuffer = Base.extend(
         var _gl = renderer.gl;
         var cache = this._cache;
 
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
 
         var renderBuffer = cache.get(KEY_RENDERBUFFER);
         if (renderBuffer) {
@@ -15833,7 +15784,7 @@ var FrameBuffer = Base.extend(
         if (frameBuffer) {
             _gl.deleteFramebuffer(frameBuffer);
         }
-        cache.deleteContext(renderer.__GUID__);
+        cache.deleteContext(renderer.__uid__);
 
         // Clear cache for reusing
         this._textures = {};
@@ -15849,8 +15800,8 @@ FrameBuffer.DEPTH_STENCIL_ATTACHMENT = glenum.DEPTH_STENCIL_ATTACHMENT;
 /**
  * Compositor provide graph based post processing
  *
- * @constructor qtek.compositor.Compositor
- * @extends qtek.compositor.Graph
+ * @constructor clay.compositor.Compositor
+ * @extends clay.compositor.Graph
  *
  */
 var Compositor = Graph.extend(function() {
@@ -15865,14 +15816,14 @@ var Compositor = Graph.extend(function() {
         })
     };
 },
-/** @lends qtek.compositor.Compositor.prototype */
+/** @lends clay.compositor.Compositor.prototype */
 {
     addNode: function(node) {
         Graph.prototype.addNode.call(this, node);
         node._compositor = this;
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     render: function(renderer, frameBuffer) {
         if (this._dirty) {
@@ -15920,11 +15871,129 @@ var Compositor = Graph.extend(function() {
 
     /**
      * Dispose compositor
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._texturePool.clear(renderer);
     }
+});
+
+/**
+ * @constructor clay.compositor.SceneNode
+ * @extends clay.compositor.Node
+ */
+var SceneNode$1 = Node$1.extend(
+/** @lends clay.compositor.SceneNode# */
+{
+    name: 'scene',
+    /**
+     * @type {clay.Scene}
+     */
+    scene: null,
+    /**
+     * @type {clay.Camera}
+     */
+    camera: null,
+    /**
+     * @type {boolean}
+     */
+    autoUpdateScene: true,
+    /**
+     * @type {boolean}
+     */
+    preZ: false
+
+}, function() {
+    this.frameBuffer = new FrameBuffer();
+}, {
+    render: function(renderer) {
+
+        this._rendering = true;
+        var _gl = renderer.gl;
+
+        this.trigger('beforerender');
+
+        var renderInfo;
+
+        if (!this.outputs) {
+
+            renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+
+        }
+        else {
+
+            var frameBuffer = this.frameBuffer;
+            for (var name in this.outputs) {
+                var parameters = this.updateParameter(name, renderer);
+                var outputInfo = this.outputs[name];
+                var texture = this._compositor.allocateTexture(parameters);
+                this._outputTextures[name] = texture;
+
+                var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
+                if (typeof(attachment) == 'string') {
+                    attachment = _gl[attachment];
+                }
+                frameBuffer.attach(texture, attachment);
+            }
+            frameBuffer.bind(renderer);
+
+            // MRT Support in chrome
+            // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+            var ext = renderer.getGLExtension('EXT_draw_buffers');
+            if (ext) {
+                var bufs = [];
+                for (var attachment in this.outputs) {
+                    attachment = parseInt(attachment);
+                    if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
+                        bufs.push(attachment);
+                    }
+                }
+                ext.drawBuffersEXT(bufs);
+            }
+
+            // Always clear
+            // PENDING
+            renderer.saveClear();
+            renderer.clearBit = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
+            renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
+            renderer.restoreClear();
+
+            frameBuffer.unbind(renderer);
+        }
+
+        this.trigger('afterrender', renderInfo);
+
+        this._rendering = false;
+        this._rendered = true;
+    }
+});
+
+/**
+ * @constructor clay.compositor.TextureNode
+ * @extends clay.compositor.Node
+ */
+var TextureNode$1 = Node$1.extend(function() {
+    return /** @lends clay.compositor.TextureNode# */ {
+        /**
+         * @type {clay.Texture2D}
+         */
+        texture: null,
+
+        // Texture node must have output without parameters
+        outputs: {
+            color: {}
+        }
+    };
+}, function () {
+}, {
+
+    getOutput: function (renderer, name) {
+        return this.texture;
+    },
+
+    // Do nothing
+    beforeFrame: function () {},
+    afterFrame: function () {}
 });
 
 var supportWebGL = true;
@@ -15984,7 +16053,7 @@ function makeAttrKey(attrName) {
 }
 /**
  * Geometry attribute
- * @alias qtek.Geometry.Attribute
+ * @alias clay.Geometry.Attribute
  * @constructor
  */
 function Attribute(name, type, size, semantic) {
@@ -16022,7 +16091,7 @@ function Attribute(name, type, size, semantic) {
      *  + `'COLOR'`
      *  + `'JOINT'`
      *  + `'WEIGHT'`
-     * 
+     *
      * In shader, attribute with same semantic will be automatically mapped. For example:
      * ```glsl
      * attribute vec3 pos: POSITION
@@ -16131,7 +16200,7 @@ function Attribute(name, type, size, semantic) {
 /**
  * Set item value at give index. Second parameter val is number if size is 1
  * @method
- * @name qtek.Geometry.Attribute#set
+ * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]|number} val
  * @example
@@ -16141,7 +16210,7 @@ function Attribute(name, type, size, semantic) {
 /**
  * Get item value at give index. Second parameter out is no need if size is 1
  * @method
- * @name qtek.Geometry.Attribute#set
+ * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]} [out]
  * @example
@@ -16150,7 +16219,7 @@ function Attribute(name, type, size, semantic) {
 
 /**
  * Initialize attribute with given vertex count
- * @param {number} nVertex 
+ * @param {number} nVertex
  */
 Attribute.prototype.init = function (nVertex) {
     if (!this.value || this.value.length != nVertex * this.size) {
@@ -16220,11 +16289,11 @@ function IndicesBuffer(buffer) {
 }
 
 /**
- * @constructor qtek.Geometry
- * @extends qtek.core.Base
+ * @constructor clay.Geometry
+ * @extends clay.core.Base
  */
 var Geometry = Base.extend(function () {
-    return /** @lends qtek.Geometry# */ {
+    return /** @lends clay.Geometry# */ {
         /**
          * Attributes of geometry. Including:
          *  + `position`
@@ -16257,7 +16326,7 @@ var Geometry = Base.extend(function () {
         },
         /**
          * Calculated bounding box of geometry.
-         * @type {qtek.math.BoundingBox}
+         * @type {clay.math.BoundingBox}
          */
         boundingBox: null,
 
@@ -16282,7 +16351,7 @@ var Geometry = Base.extend(function () {
 
     this._attributeList = Object.keys(this.attributes);
 },
-/** @lends qtek.Geometry.prototype */
+/** @lends clay.Geometry.prototype */
 {
     /**
      * Main attribute will be used to count vertex number
@@ -16304,7 +16373,7 @@ var Geometry = Base.extend(function () {
      * User defined ray picking algorithm instead of default
      * triangle ray intersection
      * ```typescript
-     * (ray: qtek.math.Ray, renderable: qtek.Renderable, out: Array) => boolean
+     * (ray: clay.math.Ray, renderable: clay.Renderable, out: Array) => boolean
      * ```
      * @type {?Function}
      */
@@ -16404,7 +16473,7 @@ var Geometry = Base.extend(function () {
 
     /**
      * Initialize indices from an array.
-     * @param {Array} array 
+     * @param {Array} array
      */
     initIndicesFromArray: function (array) {
         var value;
@@ -16462,7 +16531,7 @@ var Geometry = Base.extend(function () {
     /**
      * Get attribute
      * @param {string} name
-     * @return {qtek.Geometry.Attribute}
+     * @return {clay.Geometry.Attribute}
      */
     getAttribute: function (name) {
         return this.attribute[name];
@@ -16501,7 +16570,7 @@ var Geometry = Base.extend(function () {
 
     getBufferChunks: function (renderer) {
         var cache = this._cache;
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
         var isAttributesDirty = cache.isDirty('attributes');
         var isIndicesDirty = cache.isDirty('indices');
         if (isAttributesDirty || isIndicesDirty) {
@@ -16838,7 +16907,7 @@ var Geometry = Base.extend(function () {
         }
         this.dirty();
     },
-    
+
     /**
      * If vertices are not shared by different indices.
      */
@@ -16913,7 +16982,7 @@ var Geometry = Base.extend(function () {
             return;
         }
         array = attributes.barycentric.value = new Float32Array(indices.length * 3);
-        
+
         for (var i = 0; i < (indices ? indices.length : this.vertexCount / 3);) {
             for (var j = 0; j < 3; j++) {
                 var ii = indices ? indices[i++] : (i * 3 + j);
@@ -16925,7 +16994,7 @@ var Geometry = Base.extend(function () {
 
     /**
      * Apply transform to geometry attributes.
-     * @param {qtek.math.Matrix4} matrix
+     * @param {clay.math.Matrix4} matrix
      */
     applyTransform: function (matrix) {
 
@@ -16956,13 +17025,13 @@ var Geometry = Base.extend(function () {
     },
     /**
      * Dispose geometry data in GL context.
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
 
         var cache = this._cache;
 
-        cache.use(renderer.__GUID__);
+        cache.use(renderer.__uid__);
         var chunks = cache.get('chunks');
         if (chunks) {
             for (var c = 0; c < chunks.length; c++) {
@@ -16974,14 +17043,14 @@ var Geometry = Base.extend(function () {
                 }
             }
         }
-        cache.deleteContext(renderer.__GUID__);
+        cache.deleteContext(renderer.__uid__);
     }
 
 });
 
 if (Object.defineProperty) {
     /**
-     * @name qtek.Geometry#vertexCount
+     * @name clay.Geometry#vertexCount
      * @type {number}
      * @readOnly
      */
@@ -16998,7 +17067,7 @@ if (Object.defineProperty) {
         }
     });
     /**
-     * @name qtek.Geometry#triangleCount
+     * @name clay.Geometry#triangleCount
      * @type {number}
      * @readOnly
      */
@@ -17028,14 +17097,14 @@ Geometry.IndicesBuffer = IndicesBuffer;
 Geometry.Attribute = Attribute;
 
 /**
- * @constructor qtek.geometry.Plane
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Plane
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
  */
 var Plane$2 = Geometry.extend(
-/** @lends qtek.geometry.Plane# */
+/** @lends clay.geometry.Plane# */
 {
     dynamic: false,
     /**
@@ -17049,7 +17118,7 @@ var Plane$2 = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Plane.prototype */
+/** @lends clay.geometry.Plane.prototype */
 {
     /**
      * Build plane geometry
@@ -17111,7 +17180,6 @@ var mat4$5 = glmatrix.mat4;
 var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\w\,]+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
 var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
 var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*;?\s*\n/g;
-var loopRegex = /for\s*?\(int\s*?_idx_\s*\=\s*([\w-]+)\;\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
 
 var uniformTypeMap = {
     'bool': '1i',
@@ -17152,7 +17220,7 @@ var uniformValueConstructor = {
     'array': function () {return [];}
 };
 
-var attribSemantics = [
+var attributeSemantics = [
     'POSITION',
     'NORMAL',
     'BINORMAL',
@@ -17208,750 +17276,113 @@ var matrixSemantics = [
     'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
 ];
 
-// Enable attribute operation is global to all programs
-// Here saved the list of all enabled attribute index
-// http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
-var enabledAttributeList = {};
 
-var SHADER_STATE_TO_ENABLE = 1;
-var SHADER_STATE_KEEP_ENABLE = 2;
-var SHADER_STATE_PENDING = 3;
+var shaderIDCache = {};
+var shaderCodeCache = {};
+
+function getShaderID(vertex, fragment) {
+    var key = 'vertex:' + vertex + 'fragment:' + fragment;
+    if (shaderIDCache[key]) {
+        return shaderIDCache[key];
+    }
+    var id = util$1.genGUID();
+    shaderIDCache[key] = id;
+
+    shaderCodeCache[id] = {
+        vertex: vertex,
+        fragment: fragment
+    };
+
+    return id;
+}
 
 /**
  * @constructor
- * @extends qtek.core.Base
- * @alias qtek.Shader
+ * @extends clay.core.Base
+ * @alias clay.Shader
  * @example
  * // Create a phong shader
- * var shader = new qtek.Shader({
- *     vertex: qtek.Shader.source('qtek.phong.vertex'),
- *     fragment: qtek.Shader.source('qtek.phong.fragment')
- * });
- * // Enable diffuse texture
- * shader.enableTexture('diffuseMap');
- * // Use alpha channel in diffuse texture
- * shader.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
+ * var shader = new clay.Shader(
+ *      clay.Shader.source('clay.standard.vertex'),
+ *      clay.Shader.source('clay.standard.fragment')
+ * );
  */
-var Shader = Base.extend(function () {
-    return /** @lends qtek.Shader# */ {
-        /**
-         * Vertex shader code
-         * @type {string}
-         */
-        vertex: '',
+function Shader(vertex, fragment) {
+    // First argument can be { vertex, fragment }
+    if (typeof vertex === 'object') {
+        fragment = vertex.fragment;
+        vertex = vertex.vertex;
+    }
 
-        /**
-         * Fragment shader code
-         * @type {string}
-         */
-        fragment: '',
+    this._shaderID = getShaderID(vertex, fragment);
 
-
-        // FIXME mediump is toooooo low for depth on mobile
-        precision: 'highp',
-
-        // Properties follow will be generated by the program
-        attribSemantics: {},
-        matrixSemantics: {},
-        uniformSemantics: {},
-        matrixSemanticKeys: [],
-
-        uniformTemplates: {},
-        attributeTemplates: {},
-
-        /**
-         * Custom defined values in the vertex shader
-         * @type {Object}
-         */
-        vertexDefines: {},
-        /**
-         * Custom defined values in the vertex shader
-         * @type {Object}
-         */
-        fragmentDefines: {},
-
-        /**
-         * Enabled extensions
-         * @type {Array.<string>}
-         */
-        extensions: [
-            'OES_standard_derivatives',
-            'EXT_shader_texture_lod'
-        ],
-
-        /**
-         * Used light group. default is all zero
-         */
-        lightGroup: 0,
-
-        // Defines the each type light number in the scene
-        // AMBIENT_LIGHT
-        // AMBIENT_SH_LIGHT
-        // AMBIENT_CUBEMAP_LIGHT
-        // POINT_LIGHT
-        // SPOT_LIGHT
-        // AREA_LIGHT
-        lightNumber: {},
-
-        _textureSlot: 0,
-
-        _attacheMaterialNumber: 0,
-
-        _uniformList: [],
-        // {
-        //  enabled: true
-        //  shaderType: "vertex",
-        // }
-        _textureStatus: {},
-
-        _vertexProcessed: '',
-        _fragmentProcessed: '',
-
-        _currentLocationsMap: {}
-    };
-}, function () {
-
-    this._cache = new Cache();
-
-    // All context use same code
-    this._codeDirty = true;
-
-    this._updateShaderString();
-},
-/** @lends qtek.Shader.prototype */
-{
-    /**
-     * If code is equal with given shader.
-     * @param {qtek.Shader}
-     * @return {boolean}
-     */
-    isEqual: function (otherShader) {
-        if (!otherShader) {
-            return false;
-        }
-        if (this === otherShader) {
-            // Still needs update and rebind if dirty.
-            return !this._codeDirty;
-        }
-        if (otherShader._codeDirty) {
-            otherShader._updateShaderString();
-        }
-        if (this._codeDirty) {
-            this._updateShaderString();
-        }
-        return !(otherShader._vertexProcessed !== this._vertexProcessed
-            || otherShader._fragmentProcessed !== this._fragmentProcessed);
-    },
-    /**
-     * Set vertex shader code
-     * @param {string} str
-     */
-    setVertex: function (str) {
-        this.vertex = str;
-        this._updateShaderString();
-        this.dirty();
-    },
+    this._vertexCode = Shader.parseImport(vertex);
+    this._fragmentCode = Shader.parseImport(fragment);
 
     /**
-     * Set fragment shader code
-     * @param {string} str
+     * @readOnly
      */
-    setFragment: function (str) {
-        this.fragment = str;
-        this._updateShaderString();
-        this.dirty();
-    },
-
+    this.attributeSemantics = {};
     /**
-     * Bind shader program
-     * Return true or error msg if error happened
-     * @param {qtek.Renderer} renderer
+     * @readOnly
      */
-    bind: function (renderer) {
-        var cache = this._cache;
-        var _gl = renderer.gl;
-        cache.use(renderer.__GUID__, getCacheSchema);
-
-        this._currentLocationsMap = cache.get('locations');
-
-        // Reset slot
-        this._textureSlot = 0;
-
-        if (this._codeDirty) {
-            // PENDING
-            // var availableExts = [];
-            // var extensions = this.extensions;
-            // for (var i = 0; i < extensions.length; i++) {
-            //     if (glInfo.getExtension(_gl, extensions[i])) {
-            //         availableExts.push(extensions[i]);
-            //     }
-            // }
-            this._updateShaderString();
-        }
-
-        if (cache.isDirty('program')) {
-            var errMsg = this._buildProgram(_gl, this._vertexProcessed, this._fragmentProcessed);
-            cache.fresh('program');
-
-            if (errMsg) {
-                return errMsg;
-            }
-        }
-
-        _gl.useProgram(cache.get('program'));
-    },
-
+    this.matrixSemantics = {};
     /**
-     * Mark dirty and update program in next frame
+     * @readOnly
      */
-    dirty: function () {
-        var cache = this._cache;
-        this._codeDirty = true;
-        cache.dirtyAll('program');
-        for (var i = 0; i < cache._caches.length; i++) {
-            if (cache._caches[i]) {
-                var context = cache._caches[i];
-                context['locations'] = {};
-                context['attriblocations'] = {};
-            }
-        }
-    },
-
-    _updateShaderString: function (exts) {
-
-        if (this.vertex !== this._vertexPrev ||
-            this.fragment !== this._fragmentPrev
-        ) {
-
-            this._parseImport();
-
-            this.attribSemantics = {};
-            this.matrixSemantics = {};
-            this._textureStatus = {};
-
-            this._parseUniforms();
-            this._parseAttributes();
-            this._parseDefines();
-
-            this._vertexPrev = this.vertex;
-            this._fragmentPrev = this.fragment;
-        }
-
-        this._addDefineExtensionAndPrecision(exts);
-
-        this._vertexProcessed = this._unrollLoop(this._vertexProcessed, this.vertexDefines);
-        this._fragmentProcessed = this._unrollLoop(this._fragmentProcessed, this.fragmentDefines);
-
-        this._codeDirty = false;
-    },
-
+    this.uniformSemantics = {};
     /**
-     * Add a #define macro in shader code
-     * @param  {string} shaderType Can be vertex, fragment or both
-     * @param  {string} symbol
-     * @param  {number} [val]
+     * @readOnly
      */
-    define: function (shaderType, symbol, val) {
-        var vertexDefines = this.vertexDefines;
-        var fragmentDefines = this.fragmentDefines;
-        if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
-            && arguments.length < 3
-        ) {
-            // shaderType default to be 'both'
-            val = symbol;
-            symbol = shaderType;
-            shaderType = 'both';
-        }
-        val = val != null ? val : null;
-        if (shaderType === 'vertex' || shaderType === 'both') {
-            if (vertexDefines[symbol] !== val) {
-                vertexDefines[symbol] = val;
-                // Mark as dirty
-                this.dirty();
-            }
-        }
-        if (shaderType === 'fragment' || shaderType === 'both') {
-            if (fragmentDefines[symbol] !== val) {
-                fragmentDefines[symbol] = val;
-                if (shaderType !== 'both') {
-                    this.dirty();
-                }
-            }
-        }
-    },
-
+    this.matrixSemanticKeys = [];
     /**
-     * Remove a #define macro in shader code
-     * @param  {string} shaderType Can be vertex, fragment or both
-     * @param  {string} symbol
+     * @readOnly
      */
-    undefine: function (shaderType, symbol) {
-        if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
-            && arguments.length < 2
-        ) {
-            // shaderType default to be 'both'
-            symbol = shaderType;
-            shaderType = 'both';
-        }
-        if (shaderType === 'vertex' || shaderType === 'both') {
-            if (this.isDefined('vertex', symbol)) {
-                delete this.vertexDefines[symbol];
-                // Mark as dirty
-                this.dirty();
-            }
-        }
-        if (shaderType === 'fragment' || shaderType === 'both') {
-            if (this.isDefined('fragment', symbol)) {
-                delete this.fragmentDefines[symbol];
-                if (shaderType !== 'both') {
-                    this.dirty();
-                }
-            }
-        }
-    },
-
+    this.uniformTemplates = {};
     /**
-     * If macro is defined in shader.
-     * @param  {string} shaderType Can be vertex, fragment or both
-     * @param  {string} symbol
+     * @readOnly
      */
-    isDefined: function (shaderType, symbol) {
-        switch (shaderType) {
-            case 'vertex':
-                return this.vertexDefines[symbol] !== undefined;
-            case 'fragment':
-                return this.fragmentDefines[symbol] !== undefined;
-        }
-    },
+    this.attributes = {};
     /**
-     * Get macro value defined in shader.
-     * @param  {string} shaderType Can be vertex, fragment or both
-     * @param  {string} symbol
+     * @readOnly
      */
-    getDefine: function (shaderType, symbol) {
-        switch(shaderType) {
-            case 'vertex':
-                return this.vertexDefines[symbol];
-            case 'fragment':
-                return this.fragmentDefines[symbol];
-        }
-    },
+    this.textures = {};
     /**
-     * Enable a texture, actually it will add a #define macro in the shader code
-     * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
-     * @param  {string} symbol
+     * @readOnly
      */
-    enableTexture: function (symbol) {
-        if (Array.isArray(symbol)) {
-            for (var i = 0; i < symbol.length; i++) {
-                this.enableTexture(symbol[i]);
-            }
-            return;
-        }
-
-        var status = this._textureStatus[symbol];
-        if (status) {
-            var isEnabled = status.enabled;
-            if (!isEnabled) {
-                status.enabled = true;
-                this.dirty();
-            }
-        }
-    },
+    this.vertexDefines = {};
     /**
-     * Enable all textures used in the shader
+     * @readOnly
      */
-    enableTexturesAll: function () {
-        var textureStatus = this._textureStatus;
-        for (var symbol in textureStatus) {
-            textureStatus[symbol].enabled = true;
+    this.fragmentDefines = {};
+
+    this._parseAttributes();
+    this._parseUniforms();
+    this._parseDefines();
+}
+
+Shader.prototype = {
+
+    constructor: Shader,
+
+    // Create a new uniform instance for material
+    createUniforms: function () {
+        var uniforms = {};
+
+        for (var symbol in this.uniformTemplates){
+            var uniformTpl = this.uniformTemplates[symbol];
+            uniforms[symbol] = {
+                type: uniformTpl.type,
+                value: uniformTpl.value()
+            };
         }
 
-        this.dirty();
-    },
-    /**
-     * Disable a texture, it remove a #define macro in the shader
-     * @param  {string} symbol
-     */
-    disableTexture: function (symbol) {
-        if (Array.isArray(symbol)) {
-            for (var i = 0; i < symbol.length; i++) {
-                this.disableTexture(symbol[i]);
-            }
-            return;
-        }
-
-        var status = this._textureStatus[symbol];
-        if (status) {
-            var isDisabled = ! status.enabled;
-            if (!isDisabled) {
-                status.enabled = false;
-                this.dirty();
-            }
-        }
-    },
-    /**
-     * Disable all textures used in the shader
-     */
-    disableTexturesAll: function () {
-        var textureStatus = this._textureStatus;
-        for (var symbol in textureStatus) {
-            textureStatus[symbol].enabled = false;
-        }
-
-        this.dirty();
-    },
-    /**
-     * If texture of given type is enabled.
-     * @param  {string}  symbol
-     * @return {boolean}
-     */
-    isTextureEnabled: function (symbol) {
-        var textureStatus = this._textureStatus;
-        return !!textureStatus[symbol]
-            && textureStatus[symbol].enabled;
-    },
-
-    /**
-     * Get all enabled textures
-     * @return {string[]}
-     */
-    getEnabledTextures: function () {
-        var enabledTextures = [];
-        var textureStatus = this._textureStatus;
-        for (var symbol in textureStatus) {
-            if (textureStatus[symbol].enabled) {
-                enabledTextures.push(symbol);
-            }
-        }
-        return enabledTextures;
-    },
-
-    hasUniform: function (symbol) {
-        var location = this._currentLocationsMap[symbol];
-        return location !== null && location !== undefined;
-    },
-
-    currentTextureSlot: function () {
-        return this._textureSlot;
-    },
-
-    resetTextureSlot: function (slot) {
-        this._textureSlot = slot || 0;
-    },
-
-    takeCurrentTextureSlot: function (_gl, texture) {
-        var textureSlot = this._textureSlot;
-
-        this.useTextureSlot(_gl, texture, textureSlot);
-
-        this._textureSlot++;
-
-        return textureSlot;
-    },
-
-    useTextureSlot: function (renderer, texture, slot) {
-        if (texture) {
-            renderer.gl.activeTexture(renderer.gl.TEXTURE0 + slot);
-            // Maybe texture is not loaded yet;
-            if (texture.isRenderable()) {
-                texture.bind(renderer);
-            }
-            else {
-                // Bind texture to null
-                texture.unbind(renderer);
-            }
-        }
-    },
-
-    setUniform: function (_gl, type, symbol, value) {
-        var locationMap = this._currentLocationsMap;
-        var location = locationMap[symbol];
-        // Uniform is not existed in the shader
-        if (location === null || location === undefined) {
-            return false;
-        }
-        switch (type) {
-            case 'm4':
-                // The matrix must be created by glmatrix and can pass it directly.
-                _gl.uniformMatrix4fv(location, false, value);
-                break;
-            case '2i':
-                _gl.uniform2i(location, value[0], value[1]);
-                break;
-            case '2f':
-                _gl.uniform2f(location, value[0], value[1]);
-                break;
-            case '3i':
-                _gl.uniform3i(location, value[0], value[1], value[2]);
-                break;
-            case '3f':
-                _gl.uniform3f(location, value[0], value[1], value[2]);
-                break;
-            case '4i':
-                _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
-                break;
-            case '4f':
-                _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
-                break;
-            case '1i':
-                _gl.uniform1i(location, value);
-                break;
-            case '1f':
-                _gl.uniform1f(location, value);
-                break;
-            case '1fv':
-                _gl.uniform1fv(location, value);
-                break;
-            case '1iv':
-                _gl.uniform1iv(location, value);
-                break;
-            case '2iv':
-                _gl.uniform2iv(location, value);
-                break;
-            case '2fv':
-                _gl.uniform2fv(location, value);
-                break;
-            case '3iv':
-                _gl.uniform3iv(location, value);
-                break;
-            case '3fv':
-                _gl.uniform3fv(location, value);
-                break;
-            case '4iv':
-                _gl.uniform4iv(location, value);
-                break;
-            case '4fv':
-                _gl.uniform4fv(location, value);
-                break;
-            case 'm2':
-            case 'm2v':
-                _gl.uniformMatrix2fv(location, false, value);
-                break;
-            case 'm3':
-            case 'm3v':
-                _gl.uniformMatrix3fv(location, false, value);
-                break;
-            case 'm4v':
-                // Raw value
-                if (Array.isArray(value)) {
-                    var array = new vendor.Float32Array(value.length * 16);
-                    var cursor = 0;
-                    for (var i = 0; i < value.length; i++) {
-                        var item = value[i];
-                        for (var j = 0; j < 16; j++) {
-                            array[cursor++] = item[j];
-                        }
-                    }
-                    _gl.uniformMatrix4fv(location, false, array);
-                }
-                else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
-                    _gl.uniformMatrix4fv(location, false, value);
-                }
-                break;
-        }
-        return true;
-    },
-
-    setUniformOfSemantic: function (_gl, semantic, val) {
-        var semanticInfo = this.uniformSemantics[semantic];
-        if (semanticInfo) {
-            return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
-        }
-        return false;
-    },
-
-    // Used for creating VAO
-    // Enable the attributes passed in and disable the rest
-    // Example Usage:
-    // enableAttributes(renderer, ["position", "texcoords"])
-    enableAttributes: function (renderer, attribList, vao) {
-        var _gl = renderer.gl;
-        var program = this._cache.get('program');
-
-        var locationMap = this._cache.get('attriblocations');
-
-        var enabledAttributeListInContext;
-        if (vao) {
-            enabledAttributeListInContext = vao.__enabledAttributeList;
-        }
-        else {
-            enabledAttributeListInContext = enabledAttributeList[renderer.__GUID__];
-        }
-        if (! enabledAttributeListInContext) {
-            // In vertex array object context
-            // PENDING Each vao object needs to enable attributes again?
-            if (vao) {
-                enabledAttributeListInContext
-                    = vao.__enabledAttributeList
-                    = [];
-            }
-            else {
-                enabledAttributeListInContext
-                    = enabledAttributeList[renderer.__GUID__]
-                    = [];
-            }
-        }
-        var locationList = [];
-        for (var i = 0; i < attribList.length; i++) {
-            var symbol = attribList[i];
-            if (!this.attributeTemplates[symbol]) {
-                locationList[i] = -1;
-                continue;
-            }
-            var location = locationMap[symbol];
-            if (location === undefined) {
-                location = _gl.getAttribLocation(program, symbol);
-                // Attrib location is a number from 0 to ...
-                if (location === -1) {
-                    locationList[i] = -1;
-                    continue;
-                }
-                locationMap[symbol] = location;
-            }
-            locationList[i] = location;
-
-            if (!enabledAttributeListInContext[location]) {
-                enabledAttributeListInContext[location] = SHADER_STATE_TO_ENABLE;
-            }
-            else {
-                enabledAttributeListInContext[location] = SHADER_STATE_KEEP_ENABLE;
-            }
-        }
-
-        for (var i = 0; i < enabledAttributeListInContext.length; i++) {
-            switch(enabledAttributeListInContext[i]){
-                case SHADER_STATE_TO_ENABLE:
-                    _gl.enableVertexAttribArray(i);
-                    enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
-                    break;
-                case SHADER_STATE_KEEP_ENABLE:
-                    enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
-                    break;
-                // Expired
-                case SHADER_STATE_PENDING:
-                    _gl.disableVertexAttribArray(i);
-                    enabledAttributeListInContext[i] = 0;
-                    break;
-            }
-        }
-
-        return locationList;
+        return uniforms;
     },
 
     _parseImport: function () {
-
-        this._vertexProcessedWithoutDefine = Shader.parseImport(this.vertex);
-        this._fragmentProcessedWithoutDefine = Shader.parseImport(this.fragment);
-
-    },
-
-    _addDefineExtensionAndPrecision: function (exts) {
-
-        exts = exts || this.extensions;
-        // Extension declaration must before all non-preprocessor codes
-        // TODO vertex ? extension enum ?
-        var extensionStr = [];
-        for (var i = 0; i < exts.length; i++) {
-            extensionStr.push('#extension GL_' + exts[i] + ' : enable');
-        }
-
-        // Add defines
-        // VERTEX
-        var defineStr = this._getDefineStr(this.vertexDefines);
-        this._vertexProcessed = defineStr + '\n' + this._vertexProcessedWithoutDefine;
-
-        // FRAGMENT
-        defineStr = this._getDefineStr(this.fragmentDefines);
-        var code = defineStr + '\n' + this._fragmentProcessedWithoutDefine;
-
-        // Add precision
-        this._fragmentProcessed = extensionStr.join('\n') + '\n'
-            + ['precision', this.precision, 'float'].join(' ') + ';\n'
-            + ['precision', this.precision, 'int'].join(' ') + ';\n'
-            // depth texture may have precision problem on iOS device.
-            + ['precision', this.precision, 'sampler2D'].join(' ') + ';\n'
-            + code;
-    },
-
-    _getDefineStr: function (defines) {
-
-        var lightNumber = this.lightNumber;
-        var textureStatus = this._textureStatus;
-        var defineStr = [];
-        for (var lightType in lightNumber) {
-            var count = lightNumber[lightType];
-            if (count > 0) {
-                defineStr.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
-            }
-        }
-        for (var symbol in textureStatus) {
-            var status = textureStatus[symbol];
-            if (status.enabled) {
-                defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
-            }
-        }
-        // Custom Defines
-        for (var symbol in defines) {
-            var value = defines[symbol];
-            if (value === null) {
-                defineStr.push('#define ' + symbol);
-            }
-            else{
-                defineStr.push('#define ' + symbol + ' ' + value.toString());
-            }
-        }
-        return defineStr.join('\n');
-    },
-
-    _unrollLoop: function (shaderStr, defines) {
-        // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
-        // In some case like shadowMap in loop use 'i' to index value much slower.
-
-        // Loop use _idx_ and increased with _idx_++ will be unrolled
-        // Use {{ }} to match the pair so the if statement will not be affected
-        // Write like following
-        // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
-        //     vec3 color = texture2D(textures[_idx_], uv).rgb;
-        // }}
-        function replace(match, start, end, snippet) {
-            var unroll = '';
-            // Try to treat as define
-            if (isNaN(start)) {
-                if (start in defines) {
-                    start = defines[start];
-                }
-                else {
-                    start = lightNumberDefines[start];
-                }
-            }
-            if (isNaN(end)) {
-                if (end in defines) {
-                    end = defines[end];
-                }
-                else {
-                    end = lightNumberDefines[end];
-                }
-            }
-            // TODO Error checking
-
-            for (var idx = parseInt(start); idx < parseInt(end); idx++) {
-                // PENDING Add scope?
-                unroll += '{'
-                    + snippet
-                        .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
-                        .replace(/_idx_/g, idx)
-                + '}';
-            }
-
-            return unroll;
-        }
-
-        var lightNumberDefines = {};
-        for (var lightType in this.lightNumber) {
-            lightNumberDefines[lightType + '_COUNT'] = this.lightNumber[lightType];
-        }
-        return shaderStr.replace(loopRegex, replace);
+        this._vertexCode = Shader.parseImport(this.vertex);
+        this._fragmentCode = Shader.parseImport(this.fragment);
     },
 
     _parseUniforms: function () {
@@ -17960,9 +17391,9 @@ var Shader = Base.extend(function () {
         var shaderType = 'vertex';
         this._uniformList = [];
 
-        this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
+        this._vertexCode = this._vertexCode.replace(uniformRegex, _uniformParser);
         shaderType = 'fragment';
-        this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(uniformRegex, _uniformParser);
+        this._fragmentCode = this._fragmentCode.replace(uniformRegex, _uniformParser);
 
         self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
@@ -17975,9 +17406,9 @@ var Shader = Base.extend(function () {
                     self._uniformList.push(symbol);
                     if (type === 'sampler2D' || type === 'samplerCube') {
                         // Texture is default disabled
-                        self._textureStatus[symbol] = {
-                            enabled: false,
-                            shaderType: shaderType
+                        self.textures[symbol] = {
+                            shaderType: shaderType,
+                            type: type
                         };
                     }
                     if (isArray) {
@@ -17986,8 +17417,8 @@ var Shader = Base.extend(function () {
                     if (semantic) {
                         // This case is only for SKIN_MATRIX
                         // TODO
-                        if (attribSemantics.indexOf(semantic) >= 0) {
-                            self.attribSemantics[semantic] = {
+                        if (attributeSemantics.indexOf(semantic) >= 0) {
+                            self.attributeSemantics[semantic] = {
                                 symbol: symbol,
                                 type: uniformType
                             };
@@ -18082,41 +17513,10 @@ var Shader = Base.extend(function () {
         }
     },
 
-    // Create a new uniform instance for material
-    createUniforms: function () {
-        var uniforms = {};
-
-        for (var symbol in this.uniformTemplates){
-            var uniformTpl = this.uniformTemplates[symbol];
-            uniforms[symbol] = {
-                type: uniformTpl.type,
-                value: uniformTpl.value()
-            };
-        }
-
-        return uniforms;
-    },
-
-    // Attached to material
-    attached: function () {
-        this._attacheMaterialNumber++;
-    },
-
-    // Detached to material
-    detached: function () {
-        this._attacheMaterialNumber--;
-    },
-
-    isAttachedToAny: function () {
-        return this._attacheMaterialNumber !== 0;
-    },
-
     _parseAttributes: function () {
         var attributes = {};
         var self = this;
-        this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(
-            attributeRegex, _attributeParser
-        );
+        this._vertexCode = this._vertexCode.replace(attributeRegex, _attributeParser);
 
         function _attributeParser(str, type, symbol, semanticWrapper, semantic) {
             if (type && symbol) {
@@ -18144,11 +17544,11 @@ var Shader = Base.extend(function () {
                 };
 
                 if (semantic) {
-                    if (attribSemantics.indexOf(semantic) < 0) {
+                    if (attributeSemantics.indexOf(semantic) < 0) {
                         throw new Error('Unkown semantic "' + semantic + '"');
                     }
                     else {
-                        self.attribSemantics[semantic] = {
+                        self.attributeSemantics[semantic] = {
                             symbol: symbol,
                             type: type
                         };
@@ -18159,15 +17559,15 @@ var Shader = Base.extend(function () {
             return ['attribute', type, symbol].join(' ') + ';\n';
         }
 
-        this.attributeTemplates = attributes;
+        this.attributes = attributes;
     },
 
     _parseDefines: function () {
         var self = this;
         var shaderType = 'vertex';
-        this._vertexProcessedWithoutDefine = this._vertexProcessedWithoutDefine.replace(defineRegex, _defineParser);
+        this._vertexCode = this._vertexCode.replace(defineRegex, _defineParser);
         shaderType = 'fragment';
-        this._fragmentProcessedWithoutDefine = this._fragmentProcessedWithoutDefine.replace(defineRegex, _defineParser);
+        this._fragmentCode = this._fragmentCode.replace(defineRegex, _defineParser);
 
         function _defineParser(str, symbol, value) {
             var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
@@ -18179,7 +17579,7 @@ var Shader = Base.extend(function () {
                     defines[symbol] = true;
                 }
                 else {
-                    defines[symbol] = value 
+                    defines[symbol] = value
                         // If can parse to float
                         ? (isNaN(parseFloat(value)) ? value : parseFloat(value))
                         : null;
@@ -18189,119 +17589,38 @@ var Shader = Base.extend(function () {
         }
     },
 
-    // Return true or error msg if error happened
-    _buildProgram: function (_gl, vertexShaderString, fragmentShaderString) {
-        var cache = this._cache;
-        if (cache.get('program')) {
-            _gl.deleteProgram(cache.get('program'));
-        }
-        var program = _gl.createProgram();
-
-        var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
-        _gl.shaderSource(vertexShader, vertexShaderString);
-        _gl.compileShader(vertexShader);
-
-        var fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
-        _gl.shaderSource(fragmentShader, fragmentShaderString);
-        _gl.compileShader(fragmentShader);
-
-        var msg = checkShaderErrorMsg(_gl, vertexShader, vertexShaderString);
-        if (msg) {
-            return msg;
-        }
-        msg = checkShaderErrorMsg(_gl, fragmentShader, fragmentShaderString);
-        if (msg) {
-            return msg;
-        }
-
-        _gl.attachShader(program, vertexShader);
-        _gl.attachShader(program, fragmentShader);
-        // Force the position bind to location 0;
-        if (this.attribSemantics['POSITION']) {
-            _gl.bindAttribLocation(program, 0, this.attribSemantics['POSITION'].symbol);
-        }
-        else {
-            // Else choose an attribute and bind to location 0;
-            var keys = Object.keys(this.attributeTemplates);
-            _gl.bindAttribLocation(program, 0, keys[0]);
-        }
-
-        _gl.linkProgram(program);
-
-        if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-            return 'Could not link program\n' + 'VALIDATE_STATUS: ' + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ', gl error [' + _gl.getError() + ']';
-        }
-
-        // Cache uniform locations
-        for (var i = 0; i < this._uniformList.length; i++) {
-            var uniformSymbol = this._uniformList[i];
-            var locationMap = cache.get('locations');
-            locationMap[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
-        }
-
-        _gl.deleteShader(vertexShader);
-        _gl.deleteShader(fragmentShader);
-
-        cache.put('program', program);
-    },
-
     /**
      * Clone a new shader
-     * @return {qtek.Shader}
+     * @return {clay.Shader}
      */
     clone: function () {
-        var shader = new Shader({
-            vertex: this.vertex,
-            fragment: this.fragment,
-            vertexDefines: util$1.clone(this.vertexDefines),
-            fragmentDefines: util$1.clone(this.fragmentDefines)
-        });
-        for (var name in this._textureStatus) {
-            shader._textureStatus[name] = util$1.clone(this._textureStatus[name]);
-        }
+        var code = shaderCodeCache[this._shaderID];
+        var shader = new Shader(code.vertex, code.fragment);
         return shader;
-    },
-    /**
-     * Dispose given context
-     * @param  {qtek.Renderer} renderer
-     */
-    dispose: function (renderer) {
-        var cache = this._cache;
+    }
+};
 
-        cache.use(renderer.__GUID__);
-        var program = cache.get('program');
-        if (program) {
-            renderer.gl.deleteProgram(program);
+if (Object.defineProperty) {
+    Object.defineProperty(Shader.prototype, 'shaderID', {
+        get: function () {
+            return this._shaderID;
         }
-        cache.deleteContext(renderer.__GUID__);
-
-        this._locations = {};
-    }
-});
-
-function getCacheSchema() {
-    return {
-        locations: {},
-        attriblocations: {}
-    };
-}
-
-// Return true or error msg if error happened
-function checkShaderErrorMsg(_gl, shader, shaderString) {
-    if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
-        return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
-    }
-}
-
-// some util functions
-function addLineNumbers(string) {
-    var chunks = string.split('\n');
-    for (var i = 0, il = chunks.length; i < il; i ++) {
-        // Chrome reports shader errors on lines
-        // starting counting from 1
-        chunks[i] = (i + 1) + ': ' + chunks[i];
-    }
-    return chunks.join('\n');
+    });
+    Object.defineProperty(Shader.prototype, 'vertex', {
+        get: function () {
+            return this._vertexCode;
+        }
+    });
+    Object.defineProperty(Shader.prototype, 'fragment', {
+        get: function () {
+            return this._fragmentCode;
+        }
+    });
+    Object.defineProperty(Shader.prototype, 'uniforms', {
+        get: function () {
+            return this._uniformList;
+        }
+    });
 }
 
 var importRegex = /(@import)\s*([0-9a-zA-Z_\-\.]*)/g;
@@ -18325,7 +17644,7 @@ var exportRegex = /(@export)\s*([0-9a-zA-Z_\-\.]*)\s*\n([\s\S]*?)@end/g;
 /**
  * Import shader source
  * @param  {string} shaderStr
- * @memberOf qtek.Shader
+ * @memberOf clay.Shader
  */
 Shader['import'] = function (shaderStr) {
     shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
@@ -18353,7 +17672,7 @@ Shader['import'] = function (shaderStr) {
  * Library to store all the loaded shader codes
  * @type {Object}
  * @readOnly
- * @memberOf qtek.Shader
+ * @memberOf clay.Shader
  */
 Shader.codes = {};
 
@@ -18378,85 +17697,133 @@ Shader.source = function (name) {
     return obj;
 };
 
+var programKeyCache = {};
+
+function getDefineCode(defines, lightsNumbers, enabledTextures) {
+    var defineKeys = Object.keys(defines);
+    defineKeys.sort();
+    var defineStr = [];
+    // Custom Defines
+    for (var i = 0; i < defineKeys.length; i++) {
+        var key = defineKeys[i];
+        var value = defines[key];
+        if (value === null) {
+            defineStr.push(key);
+        }
+        else{
+            defineStr.push(key + ' ' + value.toString());
+        }
+    }
+    return defineStr.join('\n');
+}
+
+function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
+    enabledTextures.sort();
+    var defineStr = [];
+    for (var i = 0; i < enabledTextures.length; i++) {
+        var symbol = enabledTextures[i];
+        defineStr.push(symbol);
+    }
+    var key = getDefineCode(vertexDefines) + '\n'
+        + getDefineCode(fragmentDefines) + '\n'
+        + defineStr.join('\n');
+
+    if (programKeyCache[key]) {
+        return programKeyCache[key];
+    }
+
+    var id = util$1.genGUID();
+    programKeyCache[key] = id;
+    return id;
+}
+
 /**
- * @constructor qtek.Material
- * @extends qtek.core.Base
+ * @constructor clay.Material
+ * @extends clay.core.Base
  */
-var Material = Base.extend(
-/** @lends qtek.Material# */
-{
-    /**
-     * @type {string}
-     */
-    name: '',
+var Material = Base.extend(function () {
+    return /** @lends clay.Material# */ {
+        /**
+         * @type {string}
+         */
+        name: '',
 
-    /**
-     * @type {Object}
-     */
-    // uniforms: null,
+        /**
+         * @type {Object}
+         */
+        // uniforms: null,
 
-    /**
-     * @type {qtek.Shader}
-     */
-    // shader: null,
+        /**
+         * @type {clay.Shader}
+         */
+        // shader: null,
 
-    /**
-     * @type {boolean}
-     */
-    depthTest: true,
+        /**
+         * @type {boolean}
+         */
+        depthTest: true,
 
-    /**
-     * @type {boolean}
-     */
-    depthMask: true,
+        /**
+         * @type {boolean}
+         */
+        depthMask: true,
 
-    /**
-     * @type {boolean}
-     */
-    transparent: false,
-    /**
-     * Blend func is a callback function when the material
-     * have custom blending
-     * The gl context will be the only argument passed in tho the
-     * blend function
-     * Detail of blend function in WebGL:
-     * http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
-     *
-     * Example :
-     * function(_gl) {
-     *  _gl.blendEquation(_gl.FUNC_ADD);
-     *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-     * }
-     */
-    blend: null,
+        /**
+         * @type {boolean}
+         */
+        transparent: false,
+        /**
+         * Blend func is a callback function when the material
+         * have custom blending
+         * The gl context will be the only argument passed in tho the
+         * blend function
+         * Detail of blend function in WebGL:
+         * http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
+         *
+         * Example :
+         * function(_gl) {
+         *  _gl.blendEquation(_gl.FUNC_ADD);
+         *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+         * }
+         */
+        blend: null,
 
-    // shadowTransparentMap : null
+        /**
+         * If update texture status automatically.
+         */
+        autoUpdateTextureStatus: true,
 
-    _enabledUniforms: null,
+        uniforms: {},
+        vertexDefines: {},
+        fragmentDefines: {},
+        _textureStatus: {},
+
+        // shadowTransparentMap : null
+        _enabledUniforms: null,
+    };
 }, function () {
     if (!this.name) {
-        this.name = 'MATERIAL_' + this.__GUID__;
+        this.name = 'MATERIAL_' + this.__uid__;
     }
+
     if (this.shader) {
-        this.attachShader(this.shader);
-    }
-    if (!this.uniforms) {
-        this.uniforms = {};
+        // Keep status, mainly preset uniforms, vertexDefines and fragmentDefines
+        this.attachShader(this.shader, true);
     }
 },
-/** @lends qtek.Material.prototype */
+/** @lends clay.Material.prototype */
 {
+    precision: 'highp',
 
-    bind: function(renderer, shader, prevMaterial, prevShader) {
+    bind: function(renderer, program, prevMaterial, prevProgram) {
         var _gl = renderer.gl;
         // PENDING Same texture in different material take different slot?
 
         // May use shader of other material if shader code are same
-        var shader = shader || this.shader;
 
-        // var sameShader = prevShader === shader;
+        // var sameProgram = prevProgram === program;
 
-        var currentTextureSlot = shader.currentTextureSlot();
+        var currentTextureSlot = program.currentTextureSlot();
 
         for (var u = 0; u < this._enabledUniforms.length; u++) {
             var symbol = this._enabledUniforms[u];
@@ -18478,7 +17845,6 @@ var Material = Base.extend(
             var symbol = this._enabledUniforms[u];
             var uniform = this.uniforms[symbol];
             var uniformValue = uniform.value;
-
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
@@ -18488,34 +17854,34 @@ var Material = Base.extend(
             //         continue;
             //     }
             // }
-            
+
             if (uniformValue === null) {
                 // FIXME Assume material with same shader have same order uniforms
                 // Or if different material use same textures,
                 // the slot will be different and still skipped because optimization
                 if (uniform.type === 't') {
-                    var slot = shader.currentTextureSlot();
-                    var res = shader.setUniform(_gl, '1i', symbol, slot);
+                    var slot = program.currentTextureSlot();
+                    var res = program.setUniform(_gl, '1i', symbol, slot);
                     if (res) { // Texture is enabled
                         // Still occupy the slot to make sure same texture in different materials have same slot.
-                        shader.takeCurrentTextureSlot(renderer, null);
+                        program.takeCurrentTextureSlot(renderer, null);
                     }
                 }
                 continue;
             }
             else if (uniformValue instanceof Texture) {
                 if (uniformValue.__slot < 0) {
-                    var slot = shader.currentTextureSlot();
-                    var res = shader.setUniform(_gl, '1i', symbol, slot);
+                    var slot = program.currentTextureSlot();
+                    var res = program.setUniform(_gl, '1i', symbol, slot);
                     if (!res) { // Texture uniform is not enabled
                         continue;
                     }
-                    shader.takeCurrentTextureSlot(renderer, uniformValue);
+                    program.takeCurrentTextureSlot(renderer, uniformValue);
                     uniformValue.__slot = slot;
                 }
                 // Multiple uniform use same texture..
                 else {
-                    shader.setUniform(_gl, '1i', symbol, uniformValue.__slot);
+                    program.setUniform(_gl, '1i', symbol, uniformValue.__slot);
                 }
             }
             else if (Array.isArray(uniformValue)) {
@@ -18526,7 +17892,7 @@ var Material = Base.extend(
                 var exampleValue = uniformValue[0];
 
                 if (exampleValue instanceof Texture) {
-                    if (!shader.hasUniform(symbol)) {
+                    if (!program.hasUniform(symbol)) {
                         continue;
                     }
 
@@ -18535,9 +17901,9 @@ var Material = Base.extend(
                         var texture = uniformValue[i];
 
                         if (texture.__slot < 0) {
-                            var slot = shader.currentTextureSlot();
+                            var slot = program.currentTextureSlot();
                             arr.push(slot);
-                            shader.takeCurrentTextureSlot(renderer, texture);
+                            program.takeCurrentTextureSlot(renderer, texture);
                             texture.__slot = slot;
                         }
                         else {
@@ -18545,18 +17911,18 @@ var Material = Base.extend(
                         }
                     }
 
-                    shader.setUniform(_gl, '1iv', symbol, arr);
+                    program.setUniform(_gl, '1iv', symbol, arr);
                 }
                 else {
-                    shader.setUniform(_gl, uniform.type, symbol, uniformValue);
+                    program.setUniform(_gl, uniform.type, symbol, uniformValue);
                 }
             }
             else{
-                shader.setUniform(_gl, uniform.type, symbol, uniformValue);
+                program.setUniform(_gl, uniform.type, symbol, uniformValue);
             }
         }
         // Texture slot maybe used out of material.
-        shader.resetTextureSlot(currentTextureSlot);
+        program.resetTextureSlot(currentTextureSlot);
     },
 
     /**
@@ -18564,7 +17930,7 @@ var Material = Base.extend(
      * @example
      *  mat.setUniform('color', [1, 1, 1, 1]);
      * @param {string} symbol
-     * @param {number|array|qtek.Texture|ArrayBufferView} value
+     * @param {number|array|clay.Texture|ArrayBufferView} value
      */
     setUniform: function (symbol, value) {
         if (value === undefined) {
@@ -18573,6 +17939,15 @@ var Material = Base.extend(
         var uniform = this.uniforms[symbol];
         if (uniform) {
             uniform.value = value;
+
+            if (this.autoUpdateTextureStatus && uniform.type === 't') {
+                if (value) {
+                    this.enableTexture(symbol);
+                }
+                else {
+                    this.disableTexture(symbol);
+                }
+            }
         }
     },
 
@@ -18620,30 +17995,23 @@ var Material = Base.extend(
     /**
      * Alias of setUniform and setUniforms
      * @param {object|string} symbol
-     * @param {number|array|qtek.Texture|ArrayBufferView} [value]
+     * @param {number|array|clay.Texture|ArrayBufferView} [value]
      */
     set: function (symbol, value) {
         if (typeof(symbol) === 'object') {
             for (var key in symbol) {
                 var val = symbol[key];
-                this.set(key, val);
+                this.setUniform(key, val);
             }
         }
         else {
-            var uniform = this.uniforms[symbol];
-            if (uniform) {
-                if (typeof value === 'undefined') {
-                    console.warn('Uniform value "' + symbol + '" is undefined');
-                    value = null;
-                }
-                uniform.value = value;
-            }
+            this.setUniform(symbol, value);
         }
     },
     /**
      * Get uniform value
      * @param  {string} symbol
-     * @return {number|array|qtek.Texture|ArrayBufferView}
+     * @return {number|array|clay.Texture|ArrayBufferView}
      */
     get: function (symbol) {
         var uniform = this.uniforms[symbol];
@@ -18653,14 +18021,10 @@ var Material = Base.extend(
     },
     /**
      * Attach a shader instance
-     * @param  {qtek.Shader} shader
-     * @param  {boolean} keepUniform If try to keep uniform value
+     * @param  {clay.Shader} shader
+     * @param  {boolean} keepStatus If try to keep uniform and texture
      */
-    attachShader: function(shader, keepUniform) {
-        if (this.shader) {
-            this.shader.detached();
-        }
-
+    attachShader: function(shader, keepStatus) {
         var originalUniforms = this.uniforms;
 
         // Ignore if uniform can use in shader.
@@ -18672,29 +18036,40 @@ var Material = Base.extend(
         // Make sure uniforms are set in same order to avoid texture slot wrong
         this._enabledUniforms.sort();
 
-        if (keepUniform) {
+        var originalVertexDefines = this.vertexDefines;
+        var originalFragmentDefines = this.fragmentDefines;
+
+        this.vertexDefines = util$1.clone(shader.vertexDefines);
+        this.fragmentDefines = util$1.clone(shader.fragmentDefines);
+
+        if (keepStatus) {
             for (var symbol in originalUniforms) {
                 if (uniforms[symbol]) {
                     uniforms[symbol].value = originalUniforms[symbol].value;
                 }
             }
+
+            util$1.defaults(this.vertexDefines, originalVertexDefines);
+            util$1.defaults(this.fragmentDefines, originalFragmentDefines);
         }
 
-        shader.attached();
-    },
+        var textureStatus = {};
+        for (var key in shader.textures) {
+            textureStatus[key] = {
+                shaderType: shader.textures[key].shaderType,
+                type: shader.textures[key].type,
+                enabled: (keepStatus && this._textureStatus[key]) ? this._textureStatus[key].enabled : false
+            };
+        }
 
-    /**
-     * Detach a shader instance
-     */
-    detachShader: function() {
-        this.shader.detached();
-        this.shader = null;
-        this.uniforms = {};
+        this._textureStatus = textureStatus;
+
+        this._programKey = '';
     },
 
     /**
      * Clone a new material and keep uniforms, shader will not be cloned
-     * @return {qtek.Material}
+     * @return {clay.Material}
      */
     clone: function () {
         var material = new this.constructor({
@@ -18713,39 +18088,220 @@ var Material = Base.extend(
     },
 
     /**
-     * Dispose material, if material shader is not attached to any other materials
-     * Shader will also be disposed
-     * @param {WebGLRenderingContext} gl
-     * @param {boolean} [disposeTexture=false] If dispose the textures used in the material
+     * Add a #define macro in shader code
+     * @param  {string} shaderType Can be vertex, fragment or both
+     * @param  {string} symbol
+     * @param  {number} [val]
      */
-    dispose: function(renderer, disposeTexture) {
-        if (disposeTexture) {
-            for (var name in this.uniforms) {
-                var val = this.uniforms[name].value;
-                if (!val) {
-                    continue;
-                }
-                if (val instanceof Texture) {
-                    val.dispose(renderer);
-                }
-                else if (Array.isArray(val)) {
-                    for (var i = 0; i < val.length; i++) {
-                        if (val[i] instanceof Texture) {
-                            val[i].dispose(renderer);
-                        }
-                    }
+    define: function (shaderType, symbol, val) {
+        var vertexDefines = this.vertexDefines;
+        var fragmentDefines = this.fragmentDefines;
+        if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
+            && arguments.length < 3
+        ) {
+            // shaderType default to be 'both'
+            val = symbol;
+            symbol = shaderType;
+            shaderType = 'both';
+        }
+        val = val != null ? val : null;
+        if (shaderType === 'vertex' || shaderType === 'both') {
+            if (vertexDefines[symbol] !== val) {
+                vertexDefines[symbol] = val;
+                // Mark as dirty
+                this._programKey = '';
+            }
+        }
+        if (shaderType === 'fragment' || shaderType === 'both') {
+            if (fragmentDefines[symbol] !== val) {
+                fragmentDefines[symbol] = val;
+                if (shaderType !== 'both') {
+                    this._programKey = '';
                 }
             }
         }
-        var shader = this.shader;
-        if (shader) {
-            this.detachShader();
-            if (!shader.isAttachedToAny()) {
-                shader.dispose(renderer);
+    },
+
+    /**
+     * Remove a #define macro in shader code
+     * @param  {string} shaderType Can be vertex, fragment or both
+     * @param  {string} symbol
+     */
+    undefine: function (shaderType, symbol) {
+        if (shaderType !== 'vertex' && shaderType !== 'fragment' && shaderType !== 'both'
+            && arguments.length < 2
+        ) {
+            // shaderType default to be 'both'
+            symbol = shaderType;
+            shaderType = 'both';
+        }
+        if (shaderType === 'vertex' || shaderType === 'both') {
+            if (this.isDefined('vertex', symbol)) {
+                delete this.vertexDefines[symbol];
+                // Mark as dirty
+                this._programKey = '';
             }
         }
+        if (shaderType === 'fragment' || shaderType === 'both') {
+            if (this.isDefined('fragment', symbol)) {
+                delete this.fragmentDefines[symbol];
+                if (shaderType !== 'both') {
+                    this._programKey = '';
+                }
+            }
+        }
+    },
+
+    /**
+     * If macro is defined in shader.
+     * @param  {string} shaderType Can be vertex, fragment or both
+     * @param  {string} symbol
+     */
+    isDefined: function (shaderType, symbol) {
+        // PENDING hasOwnProperty ?
+        switch (shaderType) {
+            case 'vertex':
+                return this.vertexDefines[symbol] !== undefined;
+            case 'fragment':
+                return this.fragmentDefines[symbol] !== undefined;
+        }
+    },
+    /**
+     * Get macro value defined in shader.
+     * @param  {string} shaderType Can be vertex, fragment or both
+     * @param  {string} symbol
+     */
+    getDefine: function (shaderType, symbol) {
+        switch(shaderType) {
+            case 'vertex':
+                return this.vertexDefines[symbol];
+            case 'fragment':
+                return this.fragmentDefines[symbol];
+        }
+    },
+    /**
+     * Enable a texture, actually it will add a #define macro in the shader code
+     * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
+     * @param  {string} symbol
+     */
+    enableTexture: function (symbol) {
+        if (Array.isArray(symbol)) {
+            for (var i = 0; i < symbol.length; i++) {
+                this.enableTexture(symbol[i]);
+            }
+            return;
+        }
+
+        var status = this._textureStatus[symbol];
+        if (status) {
+            var isEnabled = status.enabled;
+            if (!isEnabled) {
+                status.enabled = true;
+                this._programKey = '';
+            }
+        }
+    },
+    /**
+     * Enable all textures used in the shader
+     */
+    enableTexturesAll: function () {
+        var textureStatus = this._textureStatus;
+        for (var symbol in textureStatus) {
+            textureStatus[symbol].enabled = true;
+        }
+
+        this._programKey = '';
+    },
+    /**
+     * Disable a texture, it remove a #define macro in the shader
+     * @param  {string} symbol
+     */
+    disableTexture: function (symbol) {
+        if (Array.isArray(symbol)) {
+            for (var i = 0; i < symbol.length; i++) {
+                this.disableTexture(symbol[i]);
+            }
+            return;
+        }
+
+        var status = this._textureStatus[symbol];
+        if (status) {
+            var isDisabled = ! status.enabled;
+            if (!isDisabled) {
+                status.enabled = false;
+                this._programKey = '';
+            }
+        }
+    },
+    /**
+     * Disable all textures used in the shader
+     */
+    disableTexturesAll: function () {
+        var textureStatus = this._textureStatus;
+        for (var symbol in textureStatus) {
+            textureStatus[symbol].enabled = false;
+        }
+
+        this._programKey = '';
+    },
+    /**
+     * If texture of given type is enabled.
+     * @param  {string}  symbol
+     * @return {boolean}
+     */
+    isTextureEnabled: function (symbol) {
+        var textureStatus = this._textureStatus;
+        return !!textureStatus[symbol]
+            && textureStatus[symbol].enabled;
+    },
+
+    /**
+     * Get all enabled textures
+     * @return {string[]}
+     */
+    getEnabledTextures: function () {
+        var enabledTextures = [];
+        var textureStatus = this._textureStatus;
+        for (var symbol in textureStatus) {
+            if (textureStatus[symbol].enabled) {
+                enabledTextures.push(symbol);
+            }
+        }
+        return enabledTextures;
+    },
+
+    /**
+     * Mark defines are updated.
+     */
+    dirtyDefines: function () {
+        this._programKey = '';
     }
 });
+
+if (Object.defineProperty) {
+    Object.defineProperty(Material.prototype, 'shader', {
+        get: function () {
+            return this._shader || null;
+        },
+
+        set: function (val) {
+            // TODO
+            // console.warn('You need to use attachShader to set the shader.');
+            this._shader = val;
+        }
+    });
+
+    Object.defineProperty(Material.prototype, 'programKey', {
+        get: function () {
+            if (!this._programKey) {
+                this._programKey = getProgramKey(
+                    this.vertexDefines, this.fragmentDefines, this.getEnabledTextures()
+                );
+            }
+            return this._programKey;
+        }
+    });
+}
 
 // Cache
 var prevDrawID = 0;
@@ -18773,19 +18329,19 @@ function VertexArrayObject(
 }
 /**
  * @constructor
- * @alias qtek.Renderable
- * @extends qtek.Node
+ * @alias clay.Renderable
+ * @extends clay.Node
  */
 var Renderable = Node.extend(
-/** @lends qtek.Renderable# */
+/** @lends clay.Renderable# */
 {
     /**
-     * @type {qtek.Material}
+     * @type {clay.Material}
      */
     material: null,
 
     /**
-     * @type {qtek.Geometry}
+     * @type {clay.Geometry}
      */
     geometry: null,
 
@@ -18801,9 +18357,15 @@ var Renderable = Node.extend(
     this._drawCache = {};
     this._renderInfo = new RenderInfo();
 },
-/** @lends qtek.Renderable.prototype */
+/** @lends clay.Renderable.prototype */
 {
 
+    __program: null,
+
+    /**
+     * Group of received light.
+     */
+    lightGroup: 0,
     /**
      * Render order, Nodes with smaller value renders before nodes with larger values.
      * @type {Number}
@@ -18823,9 +18385,9 @@ var Renderable = Node.extend(
     /**
      * Specify which side of polygon will be culled.
      * Possible values:
-     *  + {@link qtek.Renderable.BACK}
-     *  + {@link qtek.Renderable.FRONT}
-     *  + {@link qtek.Renderable.FRONT_AND_BACK}
+     *  + {@link clay.Renderable.BACK}
+     *  + {@link clay.Renderable.FRONT}
+     *  + {@link clay.Renderable.FRONT_AND_BACK}
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
      * @type {number}
      */
@@ -18833,15 +18395,15 @@ var Renderable = Node.extend(
     /**
      * Specify which side is front face.
      * Possible values:
-     *  + {@link qtek.Renderable.CW}
-     *  + {@link qtek.Renderable.CCW}
+     *  + {@link clay.Renderable.CW}
+     *  + {@link clay.Renderable.CCW}
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
      * @type {number}
      */
     frontFace: glenum.CCW,
 
     /**
-     * If enable software frustum culling 
+     * If enable software frustum culling
      * @type {boolean}
      */
     frustumCulling: true,
@@ -18866,7 +18428,7 @@ var Renderable = Node.extend(
      * @type {boolean}
      */
     ignoreGBuffer: false,
-    
+
     /**
      * @return {boolean}
      */
@@ -18898,14 +18460,15 @@ var Renderable = Node.extend(
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Shader} [shader] May use shader of other material if shader code are same
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Material} [material]
      * @return {Object}
      */
-    render: function (renderer, shader) {
+    render: function (renderer, material, program) {
         var _gl = renderer.gl;
+        material = material || this.material;
         // May use shader of other material if shader code are same
-        var shader = shader || this.material.shader;
+        var shader = material.shader;
         var geometry = this.geometry;
 
         var glDrawMode = this.mode;
@@ -18929,7 +18492,7 @@ var Renderable = Node.extend(
         // Draw each chunk
         var drawHashChanged = false;
         // Hash with shader id in case previous material has less attributes than next material
-        currentDrawID = renderer.__GUID__ + '-' + geometry.__GUID__ + '-' + shader.__GUID__;
+        currentDrawID = renderer.__uid__ + '-' + geometry.__uid__ + '-' + program.__uid__;
 
         if (currentDrawID !== prevDrawID) {
             drawHashChanged = true;
@@ -18984,13 +18547,13 @@ var Renderable = Node.extend(
                         var semantic = attributeBufferInfo.semantic;
                         var symbol;
                         if (semantic) {
-                            var semanticInfo = shader.attribSemantics[semantic];
+                            var semanticInfo = shader.attributeSemantics[semantic];
                             symbol = semanticInfo && semanticInfo.symbol;
                         }
                         else {
                             symbol = name;
                         }
-                        if (symbol && shader.attributeTemplates[symbol]) {
+                        if (symbol && program.attributes[symbol]) {
                             availableAttributes.push(attributeBufferInfo);
                             availableAttributeSymbols.push(symbol);
                         }
@@ -19030,7 +18593,7 @@ var Renderable = Node.extend(
                 var indicesBuffer = vao.indicesBuffer;
 
                 if (needsBindAttributes) {
-                    var locationList = shader.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
+                    var locationList = program.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
                     // Setting attributes;
                     for (var a = 0; a < availableAttributes.length; a++) {
                         var location = locationList[a];
@@ -19101,7 +18664,7 @@ var Renderable = Node.extend(
     /**
      * Clone a new renderable
      * @method
-     * @return {qtek.Renderable}
+     * @return {clay.Renderable}
      */
     clone: (function() {
         var properties = [
@@ -19182,15 +18745,15 @@ Renderable.CCW = glenum.CCW;
 Renderable.RenderInfo = RenderInfo;
 
 /**
- * @constructor qtek.Mesh
- * @extends qtek.Renderable
+ * @constructor clay.Mesh
+ * @extends clay.Renderable
  */
 var Mesh = Renderable.extend(
-/** @lends qtek.Mesh# */
+/** @lends clay.Mesh# */
 {
     /**
      * Used when it is a skinned mesh
-     * @type {qtek.Skeleton}
+     * @type {clay.Skeleton}
      */
     skeleton: null,
     /**
@@ -19212,53 +18775,52 @@ var Mesh = Renderable.extend(
 }, {
 
     isSkinnedMesh: function () {
-        return !!(this.skeleton && this.material.shader.isDefined('vertex', 'SKINNING'));
+        return !!(this.skeleton && this.joints && this.joints.length > 0);
     },
 
-    render: function (renderer, shader) {
+    render: function (renderer, shader, program) {
         var _gl = renderer.gl;
-        shader = shader || this.material.shader;
         // Set pose matrices of skinned mesh
         if (this.skeleton) {
             // TODO Multiple mesh share same skeleton
             this.skeleton.update();
 
-            var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__GUID__, this.joints);
+            var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__uid__, this.joints);
 
-            if (this.useSkinMatricesTexture) {
-                var size;
-                var numJoints = this.joints.length;
-                if (numJoints > 256) {
-                    size = 64;
-                }
-                else if (numJoints > 64) {
-                    size = 32;
-                }
-                else if (numJoints > 16) {
-                    size = 16;
-                }
-                else {
-                    size = 8;
-                }
+            // if (this.useSkinMatricesTexture) {
+            //     var size;
+            //     var numJoints = this.joints.length;
+            //     if (numJoints > 256) {
+            //         size = 64;
+            //     }
+            //     else if (numJoints > 64) {
+            //         size = 32;
+            //     }
+            //     else if (numJoints > 16) {
+            //         size = 16;
+            //     }
+            //     else {
+            //         size = 8;
+            //     }
 
-                var texture = this.getSkinMatricesTexture();
-                texture.width = size;
-                texture.height = size;
+            //     var texture = this.getSkinMatricesTexture();
+            //     texture.width = size;
+            //     texture.height = size;
 
-                if (!texture.pixels || texture.pixels.length !== size * size * 4) {
-                    texture.pixels = new Float32Array(size * size * 4);
-                }
-                texture.pixels.set(skinMatricesArray);
-                texture.dirty();
+            //     if (!texture.pixels || texture.pixels.length !== size * size * 4) {
+            //         texture.pixels = new Float32Array(size * size * 4);
+            //     }
+            //     texture.pixels.set(skinMatricesArray);
+            //     texture.dirty();
 
-                shader.setUniform(_gl, '1f', 'skinMatricesTextureSize', size);
-            }
-            else {
-                shader.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
-            }
+            //     shader.setUniform(_gl, '1f', 'skinMatricesTextureSize', size);
+            // }
+            // else {
+            program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+            // }
         }
 
-        return Renderable.prototype.render.call(this, renderer, shader);
+        return Renderable.prototype.render.call(this, renderer, shader, program);
     },
 
     getSkinMatricesTexture: function () {
@@ -19289,7 +18851,7 @@ Mesh.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
 Mesh.CW = glenum.CW;
 Mesh.CCW = glenum.CCW;
 
-var vertexEssl = "\n@export qtek.compositor.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end";
+var vertexEssl = "\n@export clay.compositor.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end";
 
 Shader['import'](vertexEssl);
 
@@ -19301,11 +18863,11 @@ var mesh = new Mesh({
 var camera$1 = new Orthographic$1();
 
 /**
- * @constructor qtek.compositor.Pass
- * @extends qtek.core.Base
+ * @constructor clay.compositor.Pass
+ * @extends clay.core.Base
  */
 var Pass = Base.extend(function () {
-    return /** @lends qtek.compositor.Pass# */ {
+    return /** @lends clay.compositor.Pass# */ {
         /**
          * Fragment shader string
          * @type {string}
@@ -19319,7 +18881,7 @@ var Pass = Base.extend(function () {
         outputs : null,
 
         /**
-         * @type {qtek.Material}
+         * @type {clay.Material}
          */
         material : null,
 
@@ -19340,29 +18902,23 @@ var Pass = Base.extend(function () {
     };
 }, function() {
 
-    var shader = new Shader({
-        vertex : Shader.source('qtek.compositor.vertex'),
-        fragment : this.fragment
-    });
+    var shader = new Shader(Shader.source('clay.compositor.vertex'), this.fragment);
     var material = new Material({
-        shader : shader
+        shader: shader
     });
-    shader.enableTexturesAll();
+    material.enableTexturesAll();
 
     this.material = material;
 
 },
-/** @lends qtek.compositor.Pass.prototype */
+/** @lends clay.compositor.Pass.prototype */
 {
     /**
      * @param {string} name
      * @param {} value
      */
     setUniform : function(name, value) {
-        var uniform = this.material.uniforms[name];
-        if (uniform) {
-            uniform.value = value;
-        }
+        this.material.setUniform(name, value);
     },
     /**
      * @param  {string} name
@@ -19375,7 +18931,7 @@ var Pass = Base.extend(function () {
         }
     },
     /**
-     * @param  {qtek.Texture} texture
+     * @param  {clay.Texture} texture
      * @param  {number} attachment
      */
     attachOutput : function(texture, attachment) {
@@ -19386,7 +18942,7 @@ var Pass = Base.extend(function () {
         this.outputs[attachment] = texture;
     },
     /**
-     * @param  {qtek.Texture} texture
+     * @param  {clay.Texture} texture
      */
     detachOutput : function(texture) {
         for (var attachment in this.outputs) {
@@ -19416,8 +18972,8 @@ var Pass = Base.extend(function () {
         frameBuffer.unbind(renderer);
     },
     /**
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.FrameBuffer} [frameBuffer]
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.FrameBuffer} [frameBuffer]
      */
     render : function(renderer, frameBuffer) {
 
@@ -19482,15 +19038,13 @@ var Pass = Base.extend(function () {
      */
     renderQuad: function (renderer) {
         mesh.material = this.material;
-        renderer.renderQueue([mesh], camera$1);
+        renderer.renderPass([mesh], camera$1);
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
-    dispose: function (renderer) {
-        this.material.dispose(renderer);
-    }
+    dispose: function (renderer) {}
 });
 
 // TODO Shader library
@@ -19502,13 +19056,13 @@ var Pass = Base.extend(function () {
 /**
  * Filter node
  *
- * @constructor qtek.compositor.FilterNode
- * @extends qtek.compositor.Node
+ * @constructor clay.compositor.FilterNode
+ * @extends clay.compositor.Node
  *
  * @example
-    var node = new qtek.compositor.Node({
+    var node = new clay.compositor.Node({
         name: 'fxaa',
-        shader: qtek.Shader.source('qtek.compositor.fxaa'),
+        shader: clay.Shader.source('clay.compositor.fxaa'),
         inputs: {
             texture: {
                     node: 'scene',
@@ -19518,9 +19072,9 @@ var Pass = Base.extend(function () {
         // Multiple outputs is preserved for MRT support in WebGL2.0
         outputs: {
             color: {
-                attachment: qtek.FrameBuffer.COLOR_ATTACHMENT0
+                attachment: clay.FrameBuffer.COLOR_ATTACHMENT0
                 parameters: {
-                    format: qtek.Texture.RGBA,
+                    format: clay.Texture.RGBA,
                     width: 512,
                     height: 512
                 },
@@ -19534,7 +19088,7 @@ var Pass = Base.extend(function () {
     *
     */
 var FilterNode$1 = Node$1.extend(function () {
-    return /** @lends qtek.compositor.Node# */ {
+    return /** @lends clay.compositor.Node# */ {
         /**
          * @type {string}
          */
@@ -19578,7 +19132,7 @@ var FilterNode$1 = Node$1.extend(function () {
         outputLinks: {},
 
         /**
-         * @type {qtek.compositor.Pass}
+         * @type {clay.compositor.Pass}
          */
         pass: null,
 
@@ -19603,10 +19157,10 @@ var FilterNode$1 = Node$1.extend(function () {
     });
     this.pass = pass;
 },
-/** @lends qtek.compositor.Node.prototype */
+/** @lends clay.compositor.Node.prototype */
 {
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     render: function (renderer, frameBuffer) {
         this.trigger('beforerender', renderer);
@@ -19740,30 +19294,30 @@ var FilterNode$1 = Node$1.extend(function () {
             this.setParameter(name, obj[name]);
         }
     },
+    // /**
+    //  * Set shader code
+    //  * @param {string} shaderStr
+    //  */
+    // setShader: function (shaderStr) {
+    //     var material = this.pass.material;
+    //     material.shader.setFragment(shaderStr);
+    //     material.attachShader(material.shader, true);
+    // },
     /**
-     * Set shader code
-     * @param {string} shaderStr
-     */
-    setShader: function (shaderStr) {
-        var material = this.pass.material;
-        material.shader.setFragment(shaderStr);
-        material.attachShader(material.shader, true);
-    },
-    /**
-     * Proxy of pass.material.shader.define('fragment', xxx);
+     * Proxy of pass.material.define('fragment', xxx);
      * @param  {string} symbol
      * @param  {number} [val]
      */
-    shaderDefine: function (symbol, val) {
-        this.pass.material.shader.define('fragment', symbol, val);
+    define: function (symbol, val) {
+        this.pass.material.define('fragment', symbol, val);
     },
 
     /**
-     * Proxy of pass.material.shader.undefine('fragment', xxx)
+     * Proxy of pass.material.undefine('fragment', xxx)
      * @param  {string} symbol
      */
-    shaderUndefine: function (symbol) {
-        this.pass.material.shader.undefine('fragment', symbol);
+    undefine: function (symbol) {
+        this.pass.material.undefine('fragment', symbol);
     },
 
     removeReference: function (outputName) {
@@ -19784,197 +19338,285 @@ var FilterNode$1 = Node$1.extend(function () {
         }
     },
 
-    link: function (inputPinName, fromNode, fromPinName) {
-
-        // The relationship from output pin to input pin is one-on-multiple
-        this.inputLinks[inputPinName] = {
-            node: fromNode,
-            pin: fromPinName
-        };
-        if (!fromNode.outputLinks[fromPinName]) {
-            fromNode.outputLinks[fromPinName] = [];
-        }
-        fromNode.outputLinks[ fromPinName ].push({
-            node: this,
-            pin: inputPinName
-        });
-
-        // Enabled the pin texture in shader
-        var shader = this.pass.material.shader;
-        shader.enableTexture(inputPinName);
-    },
-
     clear: function () {
         Node$1.prototype.clear.call(this);
 
-        var shader = this.pass.material.shader;
         // Default disable all texture
-        shader.disableTexturesAll();
-    },
-
-    updateReference: function (outputName) {
-        if (!this._rendering) {
-            this._rendering = true;
-            for (var inputName in this.inputLinks) {
-                var link = this.inputLinks[inputName];
-                link.node.updateReference(link.pin);
-            }
-            this._rendering = false;
-        }
-        if (outputName) {
-            this._outputReferences[outputName] ++;
-        }
-    },
-
-    beforeFrame: function () {
-        this._rendered = false;
-
-        for (var name in this.outputLinks) {
-            this._outputReferences[name] = 0;
-        }
-    },
-
-    afterFrame: function () {
-        // Put back all the textures to pool
-        for (var name in this.outputLinks) {
-            if (this._outputReferences[name] > 0) {
-                var outputInfo = this.outputs[name];
-                if (outputInfo.keepLastFrame) {
-                    if (this._prevOutputTextures[name]) {
-                        this._compositor.releaseTexture(this._prevOutputTextures[name]);
-                    }
-                    this._prevOutputTextures[name] = this._outputTextures[name];
-                }
-                else {
-                    this._compositor.releaseTexture(this._outputTextures[name]);
-                }
-            }
-        }
+        this.pass.material.disableTexturesAll();
     }
 });
 
-/**
- * @constructor qtek.compositor.SceneNode
- * @extends qtek.compositor.Node
- */
-var SceneNode$1 = Node$1.extend(
-/** @lends qtek.compositor.SceneNode# */
-{
-    name: 'scene',
-    /**
-     * @type {qtek.Scene}
-     */
-    scene: null,
-    /**
-     * @type {qtek.Camera}
-     */
-    camera: null,
-    /**
-     * @type {boolean}
-     */
-    autoUpdateScene: true,
-    /**
-     * @type {boolean}
-     */
-    preZ: false
-
-}, function() {
-    this.frameBuffer = new FrameBuffer();
-}, {
-    render: function(renderer) {
-
-        this._rendering = true;
-        var _gl = renderer.gl;
-
-        this.trigger('beforerender');
-
-        var renderInfo;
-
-        if (!this.outputs) {
-
-            renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
-
-        }
-        else {
-
-            var frameBuffer = this.frameBuffer;
-            for (var name in this.outputs) {
-                var parameters = this.updateParameter(name, renderer);
-                var outputInfo = this.outputs[name];
-                var texture = this._compositor.allocateTexture(parameters);
-                this._outputTextures[name] = texture;
-
-                var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                if (typeof(attachment) == 'string') {
-                    attachment = _gl[attachment];
-                }
-                frameBuffer.attach(texture, attachment);
-            }
-            frameBuffer.bind(renderer);
-
-            // MRT Support in chrome
-            // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-            var ext = renderer.getGLExtension('EXT_draw_buffers');
-            if (ext) {
-                var bufs = [];
-                for (var attachment in this.outputs) {
-                    attachment = parseInt(attachment);
-                    if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
-                        bufs.push(attachment);
-                    }
-                }
-                ext.drawBuffersEXT(bufs);
-            }
-
-            // Always clear
-            // PENDING
-            renderer.saveClear();
-            renderer.clearBit = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
-            renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
-            renderer.restoreClear();
-
-            frameBuffer.unbind(renderer);
-        }
-
-        this.trigger('afterrender', renderInfo);
-
-        this._rendering = false;
-        this._rendered = true;
-    }
-});
+var shaderSourceReg = /^#source\((.*?)\)/;
 
 /**
- * @constructor qtek.compositor.TextureNode
- * @extends qtek.compositor.Node
+ * @param {Object} json
+ * @param {Object} [opts]
+ * @return {clay.compositor.Compositor}
  */
-var TextureNode$1 = Node$1.extend(function() {
-    return /** @lends qtek.compositor.TextureNode# */ {
-        /**
-         * @type {qtek.Texture2D}
-         */
-        texture: null,
+function createCompositor(json, opts) {
+    var compositor = new Compositor();
+    opts = opts || {};
 
-        // Texture node must have output without parameters
-        outputs: {
-            color: {}
+    var lib = {
+        textures: {},
+        parameters: {}
+    };
+    var afterLoad = function(shaderLib, textureLib) {
+        for (var i = 0; i < json.nodes.length; i++) {
+            var nodeInfo = json.nodes[i];
+            var node = createNode(nodeInfo, lib, opts);
+            if (node) {
+                compositor.addNode(node);
+            }
         }
     };
-}, function () {
-}, {
 
-    getOutput: function (renderer, name) {
-        return this.texture;
-    },
+    for (var name in json.parameters) {
+        var paramInfo = json.parameters[name];
+        lib.parameters[name] = convertParameter(paramInfo);
+    }
+    // TODO load texture asynchronous
+    loadTextures(json, lib, opts, function(textureLib) {
+        lib.textures = textureLib;
+        afterLoad();
+    });
 
-    // Do nothing
-    beforeFrame: function () {},
-    afterFrame: function () {}
-});
+    return compositor;
+}
 
-/**
- * @namespace qtek.core.glinfo
- * @see http://www.khronos.org/registry/webgl/extensions/
- */
+function createNode(nodeInfo, lib, opts) {
+    var type = nodeInfo.type || 'filter';
+    var shaderSource;
+    var inputs;
+    var outputs;
+
+    if (type === 'filter') {
+        var shaderExp = nodeInfo.shader.trim();
+        var res = shaderSourceReg.exec(shaderExp);
+        if (res) {
+            shaderSource = Shader.source(res[1].trim());
+        }
+        else if (shaderExp.charAt(0) === '#') {
+            shaderSource = lib.shaders[shaderExp.substr(1)];
+        }
+        if (!shaderSource) {
+            shaderSource = shaderExp;
+        }
+        if (!shaderSource) {
+            return;
+        }
+    }
+
+    if (nodeInfo.inputs) {
+        inputs = {};
+        for (var name in nodeInfo.inputs) {
+            if (typeof nodeInfo.inputs[name] === 'string') {
+                inputs[name] = nodeInfo.inputs[name];
+            }
+            else {
+                inputs[name] = {
+                    node: nodeInfo.inputs[name].node,
+                    pin: nodeInfo.inputs[name].pin
+                };
+            }
+        }
+    }
+    if (nodeInfo.outputs) {
+        outputs = {};
+        for (var name in nodeInfo.outputs) {
+            var outputInfo = nodeInfo.outputs[name];
+            outputs[name] = {};
+            if (outputInfo.attachment != null) {
+                outputs[name].attachment = outputInfo.attachment;
+            }
+            if (outputInfo.keepLastFrame != null) {
+                outputs[name].keepLastFrame = outputInfo.keepLastFrame;
+            }
+            if (outputInfo.outputLastFrame != null) {
+                outputs[name].outputLastFrame = outputInfo.outputLastFrame;
+            }
+            if (outputInfo.parameters) {
+                outputs[name].parameters = convertParameter(outputInfo.parameters);
+            }
+        }
+    }
+    var node;
+    if (type === 'scene') {
+        node = new SceneNode$1({
+            name: nodeInfo.name,
+            scene: opts.scene,
+            camera: opts.camera,
+            outputs: outputs
+        });
+    }
+    else if (type === 'texture') {
+        node = new TextureNode$1({
+            name: nodeInfo.name,
+            outputs: outputs
+        });
+    }
+    // Default is filter
+    else {
+        node = new FilterNode$1({
+            name: nodeInfo.name,
+            shader: shaderSource,
+            inputs: inputs,
+            outputs: outputs
+        });
+    }
+    if (node) {
+        if (nodeInfo.parameters) {
+            for (var name in nodeInfo.parameters) {
+                var val = nodeInfo.parameters[name];
+                if (typeof(val) === 'string') {
+                    val = val.trim();
+                    if (val.charAt(0) === '#') {
+                        val = lib.textures[val.substr(1)];
+                    }
+                    else {
+                        node.on(
+                            'beforerender', createSizeSetHandler(
+                                name, tryConvertExpr(val)
+                            )
+                        );
+                    }
+                }
+                node.setParameter(name, val);
+            }
+        }
+        if (nodeInfo.defines && node.pass) {
+            for (var name in nodeInfo.defines) {
+                var val = nodeInfo.defines[name];
+                node.pass.material.define('fragment', name, val);
+            }
+        }
+    }
+    return node;
+}
+
+function convertParameter(paramInfo) {
+    var param = {};
+    if (!paramInfo) {
+        return param;
+    }
+    ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT', 'flipY', 'useMipmap']
+        .forEach(function(name) {
+            var val = paramInfo[name];
+            if (val != null) {
+                // Convert string to enum
+                if (typeof val === 'string') {
+                    val = Texture[val];
+                }
+                param[name] = val;
+            }
+        });
+    ['width', 'height']
+        .forEach(function(name) {
+            if (paramInfo[name] != null) {
+                var val = paramInfo[name];
+                if (typeof val === 'string') {
+                    val = val.trim();
+                    param[name] = createSizeParser(
+                        name, tryConvertExpr(val)
+                    );
+                }
+                else {
+                    param[name] = val;
+                }
+            }
+        });
+    if (paramInfo.useMipmap != null) {
+        param.useMipmap = paramInfo.useMipmap;
+    }
+    return param;
+}
+
+function loadTextures(json, lib, opts, callback) {
+    if (!json.textures) {
+        callback({});
+        return;
+    }
+    var textures = {};
+    var loading = 0;
+
+    var cbd = false;
+    var textureRootPath = opts.textureRootPath;
+    util$1.each(json.textures, function(textureInfo, name) {
+        var texture;
+        var path = textureInfo.path;
+        var parameters = convertParameter(textureInfo.parameters);
+        if (Array.isArray(path) && path.length === 6) {
+            if (textureRootPath) {
+                path = path.map(function(item) {
+                    return util$1.relative2absolute(item, textureRootPath);
+                });
+            }
+            texture = new TextureCube(parameters);
+        }
+        else if(typeof path === 'string') {
+            if (textureRootPath) {
+                path = util$1.relative2absolute(path, textureRootPath);
+            }
+            texture = new Texture2D(parameters);
+        }
+        else {
+            return;
+        }
+
+        texture.load(path);
+        loading++;
+        texture.once('success', function() {
+            textures[name] = texture;
+            loading--;
+            if (loading === 0) {
+                callback(textures);
+                cbd = true;
+            }
+        });
+    });
+
+    if (loading === 0 && !cbd) {
+        callback(textures);
+    }
+}
+
+function createSizeSetHandler(name, exprFunc) {
+    return function (renderer) {
+        // PENDING viewport size or window size
+        var dpr = renderer.getDevicePixelRatio();
+        // PENDING If multiply dpr ?
+        var width = renderer.getWidth();
+        var height = renderer.getHeight();
+        var result = exprFunc(width, height, dpr);
+        this.setParameter(name, result);
+    };
+}
+
+function createSizeParser(name, exprFunc) {
+    return function (renderer) {
+        var dpr = renderer.getDevicePixelRatio();
+        var width = renderer.getWidth();
+        var height = renderer.getHeight();
+        return exprFunc(width, height, dpr);
+    };
+}
+
+function tryConvertExpr(string) {
+    // PENDING
+    var exprRes = /^expr\((.*)\)$/.exec(string);
+    if (exprRes) {
+        try {
+            var func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
+            // Try run t
+            func(1, 1);
+
+            return func;
+        }
+        catch (e) {
+            throw new Error('Invalid expression.');
+        }
+    }
+}
 
 var EXTENSION_LIST = [
     'OES_texture_float',
@@ -19998,7 +19640,7 @@ var PARAMETER_NAMES = [
     'MAX_CUBE_MAP_TEXTURE_SIZE'
 ];
 
-function GLInfo(_gl) { 
+function GLInfo(_gl) {
     var extensions = {};
     var parameters = {};
 
@@ -20013,12 +19655,6 @@ function GLInfo(_gl) {
         parameters[name] = _gl.getParameter(_gl[name]);
     }
 
-    /**
-     * Get extension
-     * @param {string} name - Extension name, vendorless
-     * @return {WebGLExtension}
-     * @memberOf qtek.core.glinfo
-     */
     this.getExtension = function (name) {
         if (!(name in extensions)) {
             createExtension(name);
@@ -20026,11 +19662,6 @@ function GLInfo(_gl) {
         return extensions[name];
     };
 
-    /**
-     * Get parameter
-     * @param {string} name Parameter name
-     * @return {*}
-     */
     this.getParameter = function (name) {
         return parameters[name];
     };
@@ -20050,17 +19681,17 @@ function GLInfo(_gl) {
 /**
  * Simple double linked list. Compared with array, it has O(1) remove operation.
  * @constructor
- * @alias qtek.core.LinkedList
+ * @alias clay.core.LinkedList
  */
 var LinkedList = function () {
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.head = null;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.tail = null;
 
@@ -20070,7 +19701,7 @@ var LinkedList = function () {
 /**
  * Insert a new value at the tail
  * @param  {} val
- * @return {qtek.core.LinkedList.Entry}
+ * @return {clay.core.LinkedList.Entry}
  */
 LinkedList.prototype.insert = function (val) {
     var entry = new LinkedList.Entry(val);
@@ -20082,7 +19713,7 @@ LinkedList.prototype.insert = function (val) {
  * Insert a new value at idx
  * @param {number} idx
  * @param  {} val
- * @return {qtek.core.LinkedList.Entry}
+ * @return {clay.core.LinkedList.Entry}
  */
 LinkedList.prototype.insertAt = function (idx, val) {
     if (idx < 0) {
@@ -20130,7 +19761,7 @@ LinkedList.prototype.insertBeforeEntry = function (val, next) {
 
 /**
  * Insert an entry at the tail
- * @param  {qtek.core.LinkedList.Entry} entry
+ * @param  {clay.core.LinkedList.Entry} entry
  */
 LinkedList.prototype.insertEntry = function (entry) {
     if (!this.head) {
@@ -20146,7 +19777,7 @@ LinkedList.prototype.insertEntry = function (entry) {
 
 /**
  * Remove entry.
- * @param  {qtek.core.LinkedList.Entry} entry
+ * @param  {clay.core.LinkedList.Entry} entry
  */
 LinkedList.prototype.remove = function (entry) {
     var prev = entry.prev;
@@ -20294,12 +19925,12 @@ LinkedList.Entry = function (val) {
     this.value = val;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.next = null;
 
     /**
-     * @type {qtek.core.LinkedList.Entry}
+     * @type {clay.core.LinkedList.Entry}
      */
     this.prev = null;
 };
@@ -20307,7 +19938,7 @@ LinkedList.Entry = function (val) {
 /**
  * LRU Cache
  * @constructor
- * @alias qtek.core.LRU
+ * @alias clay.core.LRU
  */
 var LRU = function(maxSize) {
 
@@ -20382,86 +20013,14 @@ LRU.prototype.clear = function() {
     this._map = {};
 };
 
-/**
- * @export{Object} library
- */
 var _library = {};
 
-/**
- * @export qtek.shader.library~Libaray
- */
 function ShaderLibrary () {
     this._pool = {};
 }
 
-/**
- * ### Builin shaders
- * + qtek.standard
- * + qtek.basic
- * + qtek.lambert
- * + qtek.wireframe
- *
- * @namespace qtek.shader.library
- */
-/**
- *
- * Get shader from library. use shader name and option as hash key.
- *
- * @param {string} name
- * @param {Object|string|Array.<string>} [option]
- * @return {qtek.Shader}
- *
- * @example
- *     qtek.shader.library.get('qtek.standard', 'diffuseMap', 'normalMap');
- *     qtek.shader.library.get('qtek.standard', ['diffuseMap', 'normalMap']);
- *     qtek.shader.library.get('qtek.standard', {
- *         textures: ['diffuseMap'],
- *         vertexDefines: {},
- *         fragmentDefines: {}
- *         precision: 'mediump'
- *     })
- */
-ShaderLibrary.prototype.get = function(name, option) {
-    var enabledTextures = [];
-    var vertexDefines = {};
-    var fragmentDefines = {};
-    var precision;
-    if (typeof(option) === 'string') {
-        enabledTextures = Array.prototype.slice.call(arguments, 1);
-    }
-    else if (Object.prototype.toString.call(option) == '[object Object]') {
-        enabledTextures = option.textures || [];
-        vertexDefines = option.vertexDefines || {};
-        fragmentDefines = option.fragmentDefines || {};
-        precision = option.precision;
-    }
-    else if (Array.isArray(option)) {
-        enabledTextures = option;
-    }
-    var vertexDefineKeys = Object.keys(vertexDefines);
-    var fragmentDefineKeys = Object.keys(fragmentDefines);
-    enabledTextures.sort();
-    vertexDefineKeys.sort();
-    fragmentDefineKeys.sort();
-
-    var keyArr = [name];
-    keyArr = keyArr.concat(enabledTextures);
-    for (var i = 0; i < vertexDefineKeys.length; i++) {
-        keyArr.push(
-            vertexDefineKeys[i],
-            vertexDefines[vertexDefineKeys[i]]
-        );
-    }
-    for (var i = 0; i < fragmentDefineKeys.length; i++) {
-        keyArr.push(
-            fragmentDefineKeys[i],
-            fragmentDefines[fragmentDefineKeys[i]]
-        );
-    }
-    if (precision) {
-        keyArr.push(precision);
-    }
-    var key = keyArr.join('_');
+ShaderLibrary.prototype.get = function(name) {
+    var key = name;
 
     if (this._pool[key]) {
         return this._pool[key];
@@ -20472,40 +20031,16 @@ ShaderLibrary.prototype.get = function(name, option) {
             console.error('Shader "' + name + '"' + ' is not in the library');
             return;
         }
-        var shader = new Shader({
-            'vertex': source.vertex,
-            'fragment': source.fragment
-        });
-        if (precision) {
-            shader.precision = precision;
-        }
-        for (var i = 0; i < enabledTextures.length; i++) {
-            shader.enableTexture(enabledTextures[i]);
-        }
-        for (var name in vertexDefines) {
-            shader.define('vertex', name, vertexDefines[name]);
-        }
-        for (var name in fragmentDefines) {
-            shader.define('fragment', name, fragmentDefines[name]);
-        }
+        var shader = new Shader(source.vertex, source.fragment);
         this._pool[key] = shader;
         return shader;
     }
 };
 
-/**
- * Clear shaders
- */
 ShaderLibrary.prototype.clear = function() {
     this._pool = {};
 };
 
-/**
- * @memberOf qtek.shader.library
- * @param  {string} name
- * @param  {string} vertex - Vertex shader code
- * @param  {string} fragment - Fragment shader code
- */
 function template(name, vertex, fragment) {
     _library[name] = {
         vertex: vertex,
@@ -20516,7 +20051,13 @@ function template(name, vertex, fragment) {
 var defaultLibrary = new ShaderLibrary();
 
 /**
- * @alias qtek.shader.library
+ * ### Builin shaders
+ * + clay.standard
+ * + clay.basic
+ * + clay.lambert
+ * + clay.wireframe
+ *
+ * @namespace clay.shader.library
  */
 var library = {
     /**
@@ -20525,20 +20066,506 @@ var library = {
     createLibrary: function () {
         return new ShaderLibrary();
     },
+    /**
+     * Get shader from default library.
+     * @param {string} name
+     * @return {clay.Shader}
+     * @memberOf clay.shader.library
+     * @example
+     *     clay.shader.library.get('clay.standard')
+     */
     get: function () {
         return defaultLibrary.get.apply(defaultLibrary, arguments);
     },
+    /**
+     * @memberOf clay.shader.library
+     * @param  {string} name
+     * @param  {string} vertex - Vertex shader code
+     * @param  {string} fragment - Fragment shader code
+     */
     template: template,
     clear: function () {
         return defaultLibrary.clear();
     }
 };
 
+var SHADER_STATE_TO_ENABLE = 1;
+var SHADER_STATE_KEEP_ENABLE = 2;
+var SHADER_STATE_PENDING = 3;
+
+// Enable attribute operation is global to all programs
+// Here saved the list of all enabled attribute index
+// http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
+var enabledAttributeList = {};
+
+// some util functions
+function addLineNumbers(string) {
+    var chunks = string.split('\n');
+    for (var i = 0, il = chunks.length; i < il; i ++) {
+        // Chrome reports shader errors on lines
+        // starting counting from 1
+        chunks[i] = (i + 1) + ': ' + chunks[i];
+    }
+    return chunks.join('\n');
+}
+
+// Return true or error msg if error happened
+function checkShaderErrorMsg(_gl, shader, shaderString) {
+    if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
+        return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
+    }
+}
+
+var GLProgram = Base.extend({
+
+    uniformSemantics: {},
+    attributes: {}
+
+}, function () {
+    this._locations = {};
+
+    this._textureSlot = 0;
+
+    this._program = null;
+}, {
+
+    bind: function (renderer) {
+        this._textureSlot = 0;
+        renderer.gl.useProgram(this._program);
+    },
+
+    hasUniform: function (symbol) {
+        var location = this._locations[symbol];
+        return location !== null && location !== undefined;
+    },
+
+    useTextureSlot: function (renderer, texture, slot) {
+        if (texture) {
+            renderer.gl.activeTexture(renderer.gl.TEXTURE0 + slot);
+            // Maybe texture is not loaded yet;
+            if (texture.isRenderable()) {
+                texture.bind(renderer);
+            }
+            else {
+                // Bind texture to null
+                texture.unbind(renderer);
+            }
+        }
+    },
+
+    currentTextureSlot: function () {
+        return this._textureSlot;
+    },
+
+    resetTextureSlot: function (slot) {
+        this._textureSlot = slot || 0;
+    },
+
+    takeCurrentTextureSlot: function (renderer, texture) {
+        var textureSlot = this._textureSlot;
+
+        this.useTextureSlot(renderer, texture, textureSlot);
+
+        this._textureSlot++;
+
+        return textureSlot;
+    },
+
+    setUniform: function (_gl, type, symbol, value) {
+        var locationMap = this._locations;
+        var location = locationMap[symbol];
+        // Uniform is not existed in the shader
+        if (location === null || location === undefined) {
+            return false;
+        }
+        switch (type) {
+            case 'm4':
+                // The matrix must be created by glmatrix and can pass it directly.
+                _gl.uniformMatrix4fv(location, false, value);
+                break;
+            case '2i':
+                _gl.uniform2i(location, value[0], value[1]);
+                break;
+            case '2f':
+                _gl.uniform2f(location, value[0], value[1]);
+                break;
+            case '3i':
+                _gl.uniform3i(location, value[0], value[1], value[2]);
+                break;
+            case '3f':
+                _gl.uniform3f(location, value[0], value[1], value[2]);
+                break;
+            case '4i':
+                _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
+                break;
+            case '4f':
+                _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
+                break;
+            case '1i':
+                _gl.uniform1i(location, value);
+                break;
+            case '1f':
+                _gl.uniform1f(location, value);
+                break;
+            case '1fv':
+                _gl.uniform1fv(location, value);
+                break;
+            case '1iv':
+                _gl.uniform1iv(location, value);
+                break;
+            case '2iv':
+                _gl.uniform2iv(location, value);
+                break;
+            case '2fv':
+                _gl.uniform2fv(location, value);
+                break;
+            case '3iv':
+                _gl.uniform3iv(location, value);
+                break;
+            case '3fv':
+                _gl.uniform3fv(location, value);
+                break;
+            case '4iv':
+                _gl.uniform4iv(location, value);
+                break;
+            case '4fv':
+                _gl.uniform4fv(location, value);
+                break;
+            case 'm2':
+            case 'm2v':
+                _gl.uniformMatrix2fv(location, false, value);
+                break;
+            case 'm3':
+            case 'm3v':
+                _gl.uniformMatrix3fv(location, false, value);
+                break;
+            case 'm4v':
+                // Raw value
+                if (Array.isArray(value)) {
+                    var array = new vendor.Float32Array(value.length * 16);
+                    var cursor = 0;
+                    for (var i = 0; i < value.length; i++) {
+                        var item = value[i];
+                        for (var j = 0; j < 16; j++) {
+                            array[cursor++] = item[j];
+                        }
+                    }
+                    _gl.uniformMatrix4fv(location, false, array);
+                }
+                else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
+                    _gl.uniformMatrix4fv(location, false, value);
+                }
+                break;
+        }
+        return true;
+    },
+
+    setUniformOfSemantic: function (_gl, semantic, val) {
+        var semanticInfo = this.uniformSemantics[semantic];
+        if (semanticInfo) {
+            return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
+        }
+        return false;
+    },
+
+    // Used for creating VAO
+    // Enable the attributes passed in and disable the rest
+    // Example Usage:
+    // enableAttributes(renderer, ["position", "texcoords"])
+    enableAttributes: function (renderer, attribList, vao) {
+        var _gl = renderer.gl;
+        var program = this._program;
+
+        var locationMap = this._locations;
+
+        var enabledAttributeListInContext;
+        if (vao) {
+            enabledAttributeListInContext = vao.__enabledAttributeList;
+        }
+        else {
+            enabledAttributeListInContext = enabledAttributeList[renderer.__uid__];
+        }
+        if (!enabledAttributeListInContext) {
+            // In vertex array object context
+            // PENDING Each vao object needs to enable attributes again?
+            if (vao) {
+                enabledAttributeListInContext
+                    = vao.__enabledAttributeList
+                    = [];
+            }
+            else {
+                enabledAttributeListInContext
+                    = enabledAttributeList[renderer.__uid__]
+                    = [];
+            }
+        }
+        var locationList = [];
+        for (var i = 0; i < attribList.length; i++) {
+            var symbol = attribList[i];
+            if (!this.attributes[symbol]) {
+                locationList[i] = -1;
+                continue;
+            }
+            var location = locationMap[symbol];
+            if (location == null) {
+                location = _gl.getAttribLocation(program, symbol);
+                // Attrib location is a number from 0 to ...
+                if (location === -1) {
+                    locationList[i] = -1;
+                    continue;
+                }
+                locationMap[symbol] = location;
+            }
+            locationList[i] = location;
+
+            if (!enabledAttributeListInContext[location]) {
+                enabledAttributeListInContext[location] = SHADER_STATE_TO_ENABLE;
+            }
+            else {
+                enabledAttributeListInContext[location] = SHADER_STATE_KEEP_ENABLE;
+            }
+        }
+
+        for (var i = 0; i < enabledAttributeListInContext.length; i++) {
+            switch(enabledAttributeListInContext[i]){
+                case SHADER_STATE_TO_ENABLE:
+                    _gl.enableVertexAttribArray(i);
+                    enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
+                    break;
+                case SHADER_STATE_KEEP_ENABLE:
+                    enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
+                    break;
+                // Expired
+                case SHADER_STATE_PENDING:
+                    _gl.disableVertexAttribArray(i);
+                    enabledAttributeListInContext[i] = 0;
+                    break;
+            }
+        }
+
+        return locationList;
+    },
+
+    buildProgram: function (_gl, shader, vertexShaderCode, fragmentShaderCode) {
+        var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
+        var program = _gl.createProgram();
+
+        _gl.shaderSource(vertexShader, vertexShaderCode);
+        _gl.compileShader(vertexShader);
+
+        var fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
+        _gl.shaderSource(fragmentShader, fragmentShaderCode);
+        _gl.compileShader(fragmentShader);
+
+        var msg = checkShaderErrorMsg(_gl, vertexShader, vertexShaderCode);
+        if (msg) {
+            return msg;
+        }
+        msg = checkShaderErrorMsg(_gl, fragmentShader, fragmentShaderCode);
+        if (msg) {
+            return msg;
+        }
+
+        _gl.attachShader(program, vertexShader);
+        _gl.attachShader(program, fragmentShader);
+        // Force the position bind to location 0;
+        if (shader.attributeSemantics['POSITION']) {
+            _gl.bindAttribLocation(program, 0, shader.attributeSemantics['POSITION'].symbol);
+        }
+        else {
+            // Else choose an attribute and bind to location 0;
+            var keys = Object.keys(this.attributes);
+            _gl.bindAttribLocation(program, 0, keys[0]);
+        }
+
+        _gl.linkProgram(program);
+
+        if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
+            return 'Could not link program\n' + 'VALIDATE_STATUS: ' + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ', gl error [' + _gl.getError() + ']';
+        }
+
+        // Cache uniform locations
+        for (var i = 0; i < shader.uniforms.length; i++) {
+            var uniformSymbol = shader.uniforms[i];
+            this._locations[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
+        }
+
+        _gl.deleteShader(vertexShader);
+        _gl.deleteShader(fragmentShader);
+
+        this._program = program;
+
+        // Save code.
+        this.vertexCode = vertexShaderCode;
+        this.fragmentCode = fragmentShaderCode;
+    }
+});
+
+var loopRegex = /for\s*?\(int\s*?_idx_\s*\=\s*([\w-]+)\;\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
+
+function unrollLoop(shaderStr, defines, lightsNumbers) {
+    // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
+    // In some case like shadowMap in loop use 'i' to index value much slower.
+
+    // Loop use _idx_ and increased with _idx_++ will be unrolled
+    // Use {{ }} to match the pair so the if statement will not be affected
+    // Write like following
+    // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
+    //     vec3 color = texture2D(textures[_idx_], uv).rgb;
+    // }}
+    function replace(match, start, end, snippet) {
+        var unroll = '';
+        // Try to treat as define
+        if (isNaN(start)) {
+            if (start in defines) {
+                start = defines[start];
+            }
+            else {
+                start = lightNumberDefines[start];
+            }
+        }
+        if (isNaN(end)) {
+            if (end in defines) {
+                end = defines[end];
+            }
+            else {
+                end = lightNumberDefines[end];
+            }
+        }
+        // TODO Error checking
+
+        for (var idx = parseInt(start); idx < parseInt(end); idx++) {
+            // PENDING Add scope?
+            unroll += '{'
+                + snippet
+                    .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+                    .replace(/_idx_/g, idx)
+            + '}';
+        }
+
+        return unroll;
+    }
+
+    var lightNumberDefines = {};
+    for (var lightType in lightsNumbers) {
+        lightNumberDefines[lightType + '_COUNT'] = lightsNumbers[lightType];
+    }
+    return shaderStr.replace(loopRegex, replace);
+}
+
+function getDefineCode$1(defines, lightsNumbers, enabledTextures) {
+    var defineStr = [];
+    if (lightsNumbers) {
+        for (var lightType in lightsNumbers) {
+            var count = lightsNumbers[lightType];
+            if (count > 0) {
+                defineStr.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
+            }
+        }
+    }
+    if (enabledTextures) {
+        for (var i = 0; i < enabledTextures.length; i++) {
+            var symbol = enabledTextures[i];
+            defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
+        }
+    }
+    // Custom Defines
+    for (var symbol in defines) {
+        var value = defines[symbol];
+        if (value === null) {
+            defineStr.push('#define ' + symbol);
+        }
+        else{
+            defineStr.push('#define ' + symbol + ' ' + value.toString());
+        }
+    }
+    return defineStr.join('\n');
+}
+
+function getExtensionCode(exts) {
+    // Extension declaration must before all non-preprocessor codes
+    // TODO vertex ? extension enum ?
+    var extensionStr = [];
+    for (var i = 0; i < exts.length; i++) {
+        extensionStr.push('#extension GL_' + exts[i] + ' : enable');
+    }
+    return extensionStr.join('\n');
+}
+
+function getPrecisionCode(precision) {
+    return ['precision', precision, 'float'].join(' ') + ';\n'
+        + ['precision', precision, 'int'].join(' ') + ';\n'
+        // depth texture may have precision problem on iOS device.
+        + ['precision', precision, 'sampler2D'].join(' ') + ';\n';
+}
+
+function ProgramManager(renderer) {
+    this._renderer = renderer;
+    this._cache = {};
+}
+
+ProgramManager.prototype.getProgram = function (renderable, material, scene) {
+    var cache = this._cache;
+
+    var key = 's' + material.shader.shaderID + 'm' + material.programKey;
+    if (scene) {
+        key += 'se' + scene.getProgramKey(renderable.lightGroup);
+    }
+    if (renderable.isSkinnedMesh()) {
+        key += ',' + renderable.joints.length;
+    }
+    var program = cache[key];
+
+    if (program) {
+        return program;
+    }
+
+    var lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup) : {};
+    var renderer = this._renderer;
+    var _gl = renderer.gl;
+    var enabledTextures = material.getEnabledTextures();
+    var skinDefineCode = '';
+    if (renderable.isSkinnedMesh()) {
+        // TODO Add skinning code?
+        skinDefineCode = '\n' + getDefineCode$1({
+            SKINNING: null,
+            JOINT_COUNT: renderable.joints.length
+        }) + '\n';
+    }
+    // TODO Optimize key generation
+    // VERTEX
+    var vertexDefineStr = skinDefineCode + getDefineCode$1(material.vertexDefines, lightsNumbers, enabledTextures);
+    // FRAGMENT
+    var fragmentDefineStr = skinDefineCode + getDefineCode$1(material.fragmentDefines, lightsNumbers, enabledTextures);
+
+    var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
+    var fragmentCode = getExtensionCode([
+            // TODO Not hard coded
+            'OES_standard_derivatives',
+            'EXT_shader_texture_lod'
+        ]) + '\n'
+            + getPrecisionCode(material.precision) + '\n'
+            + fragmentDefineStr + '\n' + material.shader.fragment;
+
+    var finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
+    var finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
+
+    var program = new GLProgram();
+    program.uniformSemantics = material.shader.uniformSemantics;
+    program.attributes = material.shader.attributes;
+    var errorMsg = program.buildProgram(_gl, material.shader, finalVertexCode, finalFragmentCode);
+    program.__error = errorMsg;
+
+    cache[key] = program;
+
+    return program;
+};
+
 var calcAmbientSHLightEssl = "vec3 calcAmbientSHLight(int idx, vec3 N) {\n    int offset = 9 * idx;\n    return ambientSHLightCoefficients[0]\n        + ambientSHLightCoefficients[1] * N.x\n        + ambientSHLightCoefficients[2] * N.y\n        + ambientSHLightCoefficients[3] * N.z\n        + ambientSHLightCoefficients[4] * N.x * N.z\n        + ambientSHLightCoefficients[5] * N.z * N.y\n        + ambientSHLightCoefficients[6] * N.y * N.x\n        + ambientSHLightCoefficients[7] * (3.0 * N.z * N.z - 1.0)\n        + ambientSHLightCoefficients[8] * (N.x * N.x - N.y * N.y);\n}";
 
 var uniformVec3Prefix = 'uniform vec3 ';
 var uniformFloatPrefix = 'uniform float ';
-var exportHeaderPrefix = '@export qtek.header.';
+var exportHeaderPrefix = '@export clay.header.';
 var exportEnd = '@end';
 var unconfigurable = ':unconfigurable;';
 var lightEssl = [
@@ -20580,12 +20607,10 @@ var lightEssl = [
     exportEnd
 ].join('\n');
 
-var prezEssl = "@export qtek.prez.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n@import qtek.chunk.skinning_header\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@export qtek.prez.fragment\nvoid main()\n{\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n@end";
+var prezEssl = "@export clay.prez.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@export clay.prez.fragment\nvoid main()\n{\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n@end";
 
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
-//
-// TODO prez skinning
 // Light header
 Shader['import'](lightEssl);
 Shader['import'](prezEssl);
@@ -20597,11 +20622,17 @@ var mat4Create = mat4$6.create;
 
 var errorShader = {};
 
+function defaultGetMaterial(renderable) {
+    return renderable.material;
+}
+
+function noop$1() {}
+
 /**
- * @constructor qtek.Renderer
+ * @constructor clay.Renderer
  */
 var Renderer = Base.extend(function () {
-    return /** @lends qtek.Renderer# */ {
+    return /** @lends clay.Renderer# */ {
 
         /**
          * @type {HTMLCanvasElement}
@@ -20737,8 +20768,11 @@ var Renderer = Base.extend(function () {
     catch (e) {
         throw 'Error creating WebGL Context ' + e;
     }
+
+    // Init managers
+    this._programMgr = new ProgramManager(this);
 },
-/** @lends qtek.Renderer.prototype. **/
+/** @lends clay.Renderer.prototype. **/
 {
     /**
      * Resize the canvas
@@ -20915,13 +20949,10 @@ var Renderer = Base.extend(function () {
         this._sceneRendering = scene;
     },
 
-    // Hook before and after render each object
-    beforeRenderObject: function () {},
-    afterRenderObject: function () {},
     /**
      * Render the scene in camera to the screen or binded offline framebuffer
-     * @param  {qtek.Scene}       scene
-     * @param  {qtek.Camera}      camera
+     * @param  {clay.Scene}       scene
+     * @param  {clay.Camera}      camera
      * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
      * @param  {boolean}     [preZ]           If use preZ optimization, default false
      * @return {IRenderInfo}
@@ -20968,55 +20999,55 @@ var Renderer = Base.extend(function () {
             camera.update(true);
         }
 
-        var opaqueQueue = scene.opaqueQueue;
-        var transparentQueue = scene.transparentQueue;
-        var sceneMaterial = scene.material;
-
-        // StandardMaterial needs updateShader method so shader can be created on demand.
-        for (var i = 0; i < opaqueQueue.length; i++) {
-            var material = opaqueQueue[i].material;
-            material.updateShader && material.updateShader(this);
-        }
-        // StandardMaterial needs updateShader method so shader can be created on demand.
-        for (var i = 0; i < transparentQueue.length; i++) {
-            var material = transparentQueue[i].material;
-            material.updateShader && material.updateShader(this);
-        }
-        scene.trigger('beforerender', this, scene, camera);
-        // Sort render queue
-        // Calculate the object depth
-        if (transparentQueue.length > 0) {
-            var worldViewMat = mat4Create();
-            var posViewSpace = vec3$12.create();
-            for (var i = 0; i < transparentQueue.length; i++) {
-                var node = transparentQueue[i];
-                mat4$6.multiplyAffine(worldViewMat, camera.viewMatrix._array, node.worldTransform._array);
-                vec3$12.transformMat4(posViewSpace, node.position._array, worldViewMat);
-                node.__depth = posViewSpace[2];
-            }
-        }
-        opaqueQueue.sort(this.opaqueSortFunc);
-        transparentQueue.sort(this.transparentSortFunc);
-
-        // Render Opaque queue
-        scene.trigger('beforerender:opaque', this, opaqueQueue);
-
         // Reset the scene bounding box;
         scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
         scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
 
-        _gl.disable(_gl.BLEND);
-        _gl.enable(_gl.DEPTH_TEST);
-        var opaqueRenderInfo = this.renderQueue(opaqueQueue, camera, sceneMaterial, preZ);
+        var opaqueList = this.cullRenderList(scene.opaqueList, scene, camera);
+        var transparentList = this.cullRenderList(scene.transparentList, scene, camera);
+        var sceneMaterial = scene.material;
 
-        scene.trigger('afterrender:opaque', this, opaqueQueue, opaqueRenderInfo);
-        scene.trigger('beforerender:transparent', this, transparentQueue);
+        scene.trigger('beforerender', this, scene, camera);
 
-        // Render Transparent Queue
-        _gl.enable(_gl.BLEND);
-        var transparentRenderInfo = this.renderQueue(transparentQueue, camera, sceneMaterial);
+        // Render pre z
+        if (preZ) {
+            this.renderPreZ(opaqueList, scene, camera);
+            _gl.depthFunc(_gl.LEQUAL);
+        }
+        else {
+            _gl.depthFunc(_gl.LESS);
+        }
 
-        scene.trigger('afterrender:transparent', this, transparentQueue, transparentRenderInfo);
+        // Update the depth of transparent list.
+        var worldViewMat = mat4Create();
+        var posViewSpace = vec3$12.create();
+        for (var i = 0; i < transparentList.length; i++) {
+            var renderable = transparentList[i];
+            mat4$6.multiplyAffine(worldViewMat, camera.viewMatrix._array, renderable.worldTransform._array);
+            vec3$12.transformMat4(posViewSpace, renderable.position._array, worldViewMat);
+            renderable.__depth = posViewSpace[2];
+        }
+
+        // Render opaque list
+        scene.trigger('beforerender:opaque', this, opaqueList);
+        var opaqueRenderInfo = this.renderPass(opaqueList, camera, {
+            getMaterial: function (renderable) {
+                return sceneMaterial || renderable.material;
+            },
+            sortCompare: this.opaqueSortCompare
+        });
+
+        scene.trigger('afterrender:opaque', this, opaqueList, opaqueRenderInfo);
+        scene.trigger('beforerender:transparent', this, transparentList);
+
+        var transparentRenderInfo = this.renderPass(transparentList, camera, {
+            getMaterial: function (renderable) {
+                return sceneMaterial || renderable.material;
+            },
+            sortCompare: this.transparentSortCompare
+        });
+
+        scene.trigger('afterrender:transparent', this, transparentList, transparentRenderInfo);
         var renderInfo = {};
         for (var name in opaqueRenderInfo) {
             renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
@@ -21029,36 +21060,116 @@ var Renderer = Base.extend(function () {
         return renderInfo;
     },
 
-    resetRenderStatus: function () {
-        this._currentShader = null;
+    getProgram: function (renderable, renderMaterial, scene) {
+        renderMaterial = renderMaterial || renderable.material;
+        return this._programMgr.getProgram(renderable, renderMaterial, scene);
     },
 
+    validateProgram: function (program) {
+        if (program.__error) {
+            var errorMsg = program.__error;
+            if (errorShader[program.__uid__]) {
+                return;
+            }
+            errorShader[program.__uid__] = true;
+
+            if (this.throwError) {
+                throw new Error(errorMsg);
+            }
+            else {
+                this.trigger('error', errorMsg);
+            }
+        }
+
+    },
+
+    updatePrograms: function (list, scene, passConfig) {
+        var getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
+        scene = scene || null;
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
+            var renderMaterial = getMaterial.call(this, renderable);
+            if (i > 0) {
+                var prevRenderable = list[i - 1];
+                var prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
+                var jointsLen = renderable.joints.length ? renderable.joints.length : 0;
+                // Keep program not change if joints, material, lightGroup are same of two renderables.
+                if (jointsLen === prevJointsLen
+                    && renderable.material === prevRenderable.material
+                    && renderable.lightGroup === prevRenderable.lightGroup
+                ) {
+                    renderable.__program = prevRenderable.__program;
+                    continue;
+                }
+            }
+
+            var program = this._programMgr.getProgram(renderable, renderMaterial, scene);
+
+            this.validateProgram(program);
+
+            renderable.__program = program;
+        }
+    },
+
+    // resetRenderStatus: function () {
+    //     this._currentShader = null;
+    // },
+
     /**
-     * Callback during rendering process to determine if render given renderable.
-     * @param {qtek.Renderable} given renderable.
-     * @return {boolean}
+     * Do frustum culling on render list
      */
-    ifRenderObject: function (obj) {
-        return true;
+    cullRenderList: function (list, scene, camera) {
+        var culledRenderList = [];
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
+
+            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
+            var geometry = renderable.geometry;
+
+            mat4$6.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix._array , worldM);
+            if (geometry.boundingBox) {
+                if (this.isFrustumCulled(
+                    renderable, scene, camera, matrices.WORLDVIEW, camera.projectionMatrix._array
+                )) {
+                    continue;
+                }
+            }
+
+            culledRenderList.push(renderable);
+        }
+
+        return culledRenderList;
     },
 
     /**
      * Render a single renderable list in camera in sequence
-     * @param  {qtek.Renderable[]} queue       List of all renderables.
-     *                                         Best to be sorted by Renderer.opaqueSortFunc or Renderer.transparentSortFunc
-     * @param  {qtek.Camera}       camera
-     * @param  {qtek.Material}     [globalMaterial] globalMaterial will override the material of each renderable
-     * @param  {boolean}           [preZ]           If use preZ optimization, default false
+     * @param {clay.Renderable[]} list List of all renderables.
+     * @param {clay.Camera} camera
+     * @param {Object} [passConfig]
+     * @param {Function} [passConfig.getMaterial] Get renderable material.
+     * @param {Function} [passConfig.beforeRender] Before render each renderable.
+     * @param {Function} [passConfig.afterRender] After render each renderable
+     * @param {Function} [passConfig.ifRender] If render the renderable.
+     * @param {Function} [passConfig.sortCompare] Sort compare function.
      * @return {IRenderInfo}
      */
-    renderQueue: function(queue, camera, globalMaterial, preZ) {
+    renderPass: function(list, camera, passConfig) {
         var renderInfo = {
             triangleCount: 0,
             vertexCount: 0,
             drawCallCount: 0,
-            meshCount: queue.length,
+            meshCount: list.length,
             renderedMeshCount: 0
         };
+        passConfig = passConfig || {};
+        passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
+        passConfig.beforeRender = passConfig.beforeRender || noop$1;
+        passConfig.afterRender = passConfig.afterRender || noop$1;
+
+        this.updatePrograms(list, this._sceneRendering, passConfig);
+        if (passConfig.sortCompare) {
+            list.sort(passConfig.sortCompare);
+        }
 
         // Some common builtin uniforms
         var viewport = this.viewport;
@@ -21089,44 +21200,25 @@ var Renderer = Base.extend(function () {
         var scene = this._sceneRendering;
 
         var prevMaterial;
-        var prevShader;
-
-        var culledRenderQueue;
-        if (preZ) {
-            culledRenderQueue = this._renderPreZ(queue, scene, camera);
-        }
-        else {
-            culledRenderQueue = queue;
-            _gl.depthFunc(_gl.LESS);
-        }
+        var prevProgram;
 
         // Status
         var depthTest, depthMask;
         var culling, cullFace, frontFace;
+        var transparent;
 
-        for (var i = 0; i < culledRenderQueue.length; i++) {
-            var renderable = culledRenderQueue[i];
-            if (!this.ifRenderObject(renderable)) {
+        for (var i = 0; i < list.length; i++) {
+            var renderable = list[i];
+            if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
                 continue;
             }
 
-            var geometry = renderable.geometry;
-
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
-            // All matrices ralated to world matrix will be updated on demand;
-            mat4$6.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
-            // TODO Skinned mesh may have wrong bounding box.
-            if (geometry.boundingBox && !preZ) {
-                if (this.isFrustumCulled(
-                    renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
-                )) {
-                    continue;
-                }
-            }
 
-            var material = globalMaterial || renderable.material;
+            var material = passConfig.getMaterial.call(this, renderable);
 
+            var program = renderable.__program;
             var shader = material.shader;
 
             mat4$6.copy(matrices.WORLD, worldM);
@@ -21150,43 +21242,26 @@ var Renderer = Base.extend(function () {
 
             // Before render hook
             renderable.beforeRender(this);
-            this.beforeRenderObject(renderable, prevMaterial, prevShader);
+            passConfig.beforeRender.call(this, renderable, material, prevMaterial);
 
-            var shaderChanged = !shader.isEqual(prevShader);
-            if (shaderChanged) {
+            var programChanged = program !== prevProgram;
+            if (programChanged) {
                 // Set lights number
-                if (scene && scene.isShaderLightNumberChanged(shader)) {
-                    scene.setShaderLightNumber(shader);
-                }
-                var errMsg = shader.bind(this);
-                if (errMsg) {
-
-                    if (errorShader[shader.__GUID__]) {
-                        continue;
-                    }
-                    errorShader[shader.__GUID__] = true;
-
-                    if (this.throwError) {
-                        throw new Error(errMsg);
-                    }
-                    else {
-                        this.trigger('error', errMsg);
-                    }
-                }
+                program.bind(this);
                 // Set some common uniforms
-                shader.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
-                shader.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
-                shader.setUniformOfSemantic(_gl, 'NEAR', camera.near);
-                shader.setUniformOfSemantic(_gl, 'FAR', camera.far);
-                shader.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
-                shader.setUniformOfSemantic(_gl, 'TIME', time);
+                program.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
+                program.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
+                program.setUniformOfSemantic(_gl, 'NEAR', camera.near);
+                program.setUniformOfSemantic(_gl, 'FAR', camera.far);
+                program.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
+                program.setUniformOfSemantic(_gl, 'TIME', time);
                 // DEPRECATED
-                shader.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
+                program.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
 
                 // Set lights uniforms
                 // TODO needs optimized
                 if (scene) {
-                    scene.setLightUniforms(shader, this);
+                    scene.setLightUniforms(program, renderable.lightGroup, this);
                 }
 
                 // Save current used shader in the renderer
@@ -21194,35 +21269,40 @@ var Renderer = Base.extend(function () {
                 // this._currentShader = shader;
             }
             else {
-                shader = prevShader;
+                program = prevProgram;
             }
 
             if (prevMaterial !== material) {
-                if (!preZ) {
-                    if (material.depthTest !== depthTest) {
-                        material.depthTest ?
-                            _gl.enable(_gl.DEPTH_TEST) :
-                            _gl.disable(_gl.DEPTH_TEST);
-                        depthTest = material.depthTest;
-                    }
-                    if (material.depthMask !== depthMask) {
-                        _gl.depthMask(material.depthMask);
-                        depthMask = material.depthMask;
-                    }
+                if (material.depthTest !== depthTest) {
+                    material.depthTest
+                        ? _gl.enable(_gl.DEPTH_TEST)
+                        : _gl.disable(_gl.DEPTH_TEST);
+                    depthTest = material.depthTest;
                 }
-                material.bind(this, shader, prevMaterial, prevShader);
-                prevMaterial = material;
-
+                if (material.depthMask !== depthMask) {
+                    _gl.depthMask(material.depthMask);
+                    depthMask = material.depthMask;
+                }
+                if (material.transparent !== transparent) {
+                    material.transparent
+                        ? _gl.enable(_gl.BLEND)
+                        : _gl.disable(_gl.BLEND);
+                    transparent = material.transparent;
+                }
                 // TODO cache blending
                 if (material.transparent) {
                     if (material.blend) {
                         material.blend(_gl);
                     }
-                    else {    // Default blend function
+                    else {
+                        // Default blend function
                         _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
                         _gl.blendFuncSeparate(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
                     }
                 }
+
+                material.bind(this, program, prevMaterial, prevProgram);
+                prevMaterial = material;
             }
 
             var matrixSemanticKeys = shader.matrixSemanticKeys;
@@ -21234,7 +21314,7 @@ var Renderer = Base.extend(function () {
                     var matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
                     mat4$6.transpose(matrix, matrixNoTranspose);
                 }
-                shader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
+                program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
             }
 
             if (renderable.cullFace !== cullFace) {
@@ -21250,7 +21330,7 @@ var Renderer = Base.extend(function () {
                 culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
             }
 
-            var objectRenderInfo = renderable.render(this, shader);
+            var objectRenderInfo = renderable.render(this, material, program);
 
             if (objectRenderInfo) {
                 renderInfo.triangleCount += objectRenderInfo.triangleCount;
@@ -21260,84 +21340,43 @@ var Renderer = Base.extend(function () {
             }
 
             // After render hook
-            this.afterRenderObject(renderable, objectRenderInfo);
+            passConfig.afterRender.call(this, renderable, objectRenderInfo);
             renderable.afterRender(this, objectRenderInfo);
 
-            prevShader = shader;
+            prevProgram = program;
+        }
+
+        // Remove programs incase it's not updated in the other passes.
+        for (var i = 0; i < list.length; i++) {
+            list[i].__program = null;
         }
 
         return renderInfo;
     },
 
-    _renderPreZ: function (queue, scene, camera) {
+    renderPreZ: function (list, scene, camera) {
         var _gl = this.gl;
         var preZPassMaterial = this._prezMaterial || new Material({
-            shader: new Shader({
-                vertex: Shader.source('qtek.prez.vertex'),
-                fragment: Shader.source('qtek.prez.fragment')
-            })
+            shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
         this._prezMaterial = preZPassMaterial;
-        var preZPassShader = preZPassMaterial.shader;
 
-        var culledRenderQueue = [];
-        // Status
-        var culling, cullFace, frontFace;
-
-        preZPassShader.bind(this);
         _gl.colorMask(false, false, false, false);
         _gl.depthMask(true);
-        _gl.enable(_gl.DEPTH_TEST);
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
-            // PENDING
-            if (!this.ifRenderObject(renderable)) {
-                continue;
-            }
 
-            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
-            var geometry = renderable.geometry;
+        // Status
+        this.renderPass(list, camera, {
+            ifRender: function (renderable) {
+                return !renderable.ignorePreZ;
+            },
+            getMaterial: function () {
+                return preZPassMaterial;
+            },
+            sort: this.opaqueSortCompare
+        });
 
-            mat4$6.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW , worldM);
-
-            if (geometry.boundingBox) {
-                if (this.isFrustumCulled(
-                    renderable, scene, camera, matrices.WORLDVIEW, matrices.PROJECTION
-                )) {
-                    continue;
-                }
-            }
-            culledRenderQueue.push(renderable);
-            if (renderable.skeleton || renderable.ignorePreZ) {  // FIXME  skinned mesh and custom vertex shader material.
-                continue;
-            }
-
-            mat4$6.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
-
-            if (renderable.cullFace !== cullFace) {
-                cullFace = renderable.cullFace;
-                _gl.cullFace(cullFace);
-            }
-            if (renderable.frontFace !== frontFace) {
-                frontFace = renderable.frontFace;
-                _gl.frontFace(frontFace);
-            }
-            if (renderable.culling !== culling) {
-                culling = renderable.culling;
-                culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
-            }
-
-            var semanticInfo = preZPassShader.matrixSemantics.WORLDVIEWPROJECTION;
-            preZPassShader.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrices.WORLDVIEWPROJECTION);
-
-            // PENDING If invoke beforeRender hook
-            renderable.render(this, preZPassMaterial.shader);
-        }
-        _gl.depthFunc(_gl.LEQUAL);
         _gl.colorMask(true, true, true, true);
         _gl.depthMask(true);
-
-        return culledRenderQueue;
     },
 
     /**
@@ -21345,8 +21384,8 @@ var Renderer = Base.extend(function () {
      *
      * Object can be a renderable or a light
      *
-     * @param {qtek.Node} Scene object
-     * @param {qtek.Camera} camera
+     * @param {clay.Node} Scene object
+     * @param {clay.Camera} camera
      * @param {Array.<number>} worldViewMat represented with array
      * @param {Array.<number>} projectionMat represented with array
      */
@@ -21405,7 +21444,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given scene, including all geometris, textures and shaders in the scene
-     * @param {qtek.Scene} scene
+     * @param {clay.Scene} scene
      */
     disposeScene: function(scene) {
         this.disposeNode(scene, true, true);
@@ -21414,12 +21453,11 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given node, including all geometries, textures and shaders attached on it or its descendant
-     * @param {qtek.Node} node
+     * @param {clay.Node} node
      * @param {boolean} [disposeGeometry=false] If dispose the geometries used in the descendant mesh
      * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
      */
     disposeNode: function(root, disposeGeometry, disposeTexture) {
-        var materials = {};
         // Dettached from parent
         if (root.getParent()) {
             root.getParent().remove(root);
@@ -21428,31 +21466,16 @@ var Renderer = Base.extend(function () {
             if (node.geometry && disposeGeometry) {
                 node.geometry.dispose(this);
             }
-            if (node.material) {
-                materials[node.material.__GUID__] = node.material;
-            }
             // Particle system and AmbientCubemap light need to dispose
             if (node.dispose) {
                 node.dispose(this);
             }
         }, this);
-        for (var guid in materials) {
-            var mat = materials[guid];
-            mat.dispose(this, disposeTexture);
-        }
-    },
-
-    /**
-     * Dispose given shader
-     * @param {qtek.Shader} shader
-     */
-    disposeShader: function(shader) {
-        shader.dispose(this);
     },
 
     /**
      * Dispose given geometry
-     * @param {qtek.Geometry} geometry
+     * @param {clay.Geometry} geometry
      */
     disposeGeometry: function(geometry) {
         geometry.dispose(this);
@@ -21460,7 +21483,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given texture
-     * @param {qtek.Texture} texture
+     * @param {clay.Texture} texture
      */
     disposeTexture: function(texture) {
         texture.dispose(this);
@@ -21468,7 +21491,7 @@ var Renderer = Base.extend(function () {
 
     /**
      * Dispose given frame buffer
-     * @param {qtek.FrameBuffer} frameBuffer
+     * @param {clay.FrameBuffer} frameBuffer
      */
     disposeFrameBuffer: function(frameBuffer) {
         frameBuffer.dispose(this);
@@ -21486,8 +21509,8 @@ var Renderer = Base.extend(function () {
      *
      * @param  {number}       x
      * @param  {number}       y
-     * @param  {qtek.math.Vector2} [out]
-     * @return {qtek.math.Vector2}
+     * @param  {clay.math.Vector2} [out]
+     * @return {clay.math.Vector2}
      */
     screenToNDC: function(x, y, out) {
         if (!out) {
@@ -21509,44 +21532,50 @@ var Renderer = Base.extend(function () {
 
 /**
  * Opaque renderables compare function
- * @param  {qtek.Renderable} x
- * @param  {qtek.Renderable} y
+ * @param  {clay.Renderable} x
+ * @param  {clay.Renderable} y
  * @return {boolean}
  * @static
  */
-Renderer.opaqueSortFunc = Renderer.prototype.opaqueSortFunc = function(x, y) {
-    // Priority renderOrder -> shader -> material -> geometry
+Renderer.opaqueSortCompare = Renderer.prototype.opaqueSortCompare = function(x, y) {
+    // Priority renderOrder -> program -> material -> geometry
     if (x.renderOrder === y.renderOrder) {
-        if (x.material.shader === y.material.shader) {
+        if (x.__program === y.__program) {
             if (x.material === y.material) {
-                return x.geometry.__GUID__ - y.geometry.__GUID__;
+                return x.geometry.__uid__ - y.geometry.__uid__;
             }
-            return x.material.__GUID__ - y.material.__GUID__;
+            return x.material.__uid__ - y.material.__uid__;
         }
-        return x.material.shader.__GUID__ - y.material.shader.__GUID__;
+        if (x.__program  && y.__program) {
+            return x.__program.__uid__ - y.__program.__uid__;
+        }
+        return 0;
     }
     return x.renderOrder - y.renderOrder;
 };
 
 /**
  * Transparent renderables compare function
- * @param  {qtek.Renderable} a
- * @param  {qtek.Renderable} b
+ * @param  {clay.Renderable} a
+ * @param  {clay.Renderable} b
  * @return {boolean}
  * @static
  */
-Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function(x, y) {
-    // Priority renderOrder -> depth -> shader -> material -> geometry
+Renderer.transparentSortCompare = Renderer.prototype.transparentSortCompare = function(x, y) {
+    // Priority renderOrder -> depth -> program -> material -> geometry
 
     if (x.renderOrder === y.renderOrder) {
         if (x.__depth === y.__depth) {
-            if (x.material.shader === y.material.shader) {
+            if (x.__program === y.__program) {
                 if (x.material === y.material) {
-                    return x.geometry.__GUID__ - y.geometry.__GUID__;
+                    return x.geometry.__uid__ - y.geometry.__uid__;
                 }
-                return x.material.__GUID__ - y.material.__GUID__;
+                return x.material.__uid__ - y.material.__uid__;
             }
-            return x.material.shader.__GUID__ - y.material.shader.__GUID__;
+            if (x.__program  && y.__program) {
+                return x.__program.__uid__ - y.__program.__uid__;
+            }
+            return 0;
         }
         // Depth is negative
         // So farther object has smaller depth value
@@ -21558,7 +21587,7 @@ Renderer.transparentSortFunc = Renderer.prototype.transparentSortFunc = function
 // Temporary variables
 var matrices = {
     IDENTITY: mat4Create(),
-    
+
     WORLD: mat4Create(),
     VIEW: mat4Create(),
     PROJECTION: mat4Create(),
@@ -21588,24 +21617,24 @@ var matrices = {
 };
 
 /**
- * @name qtek.Renderer.COLOR_BUFFER_BIT
+ * @name clay.Renderer.COLOR_BUFFER_BIT
  * @type {number}
  */
 Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
 /**
- * @name qtek.Renderer.DEPTH_BUFFER_BIT
+ * @name clay.Renderer.DEPTH_BUFFER_BIT
  * @type {number}
  */
 Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
 /**
- * @name qtek.Renderer.STENCIL_BUFFER_BIT
+ * @name clay.Renderer.STENCIL_BUFFER_BIT
  * @type {number}
  */
 Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;
 
-var gbufferEssl = "@export qtek.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n@import qtek.chunk.skinning_header\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef FIRST_PASS\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n    bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    #ifdef FIRST_PASS\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    if (hasTangent) {\n        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n    }\n    #endif\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n#ifdef FIRST_PASS\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n    if (hasTangent) {\n        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n    }\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n}\n@end\n@export qtek.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n    if (idx == 3) return texel.a;\n    else if (idx == 1) return texel.g;\n    else if (idx == 2) return texel.b;\n    else return texel.r;\n}\nvoid main()\n{\n    vec3 N = v_Normal;\n    if (doubleSided) {\n        vec3 eyePos = viewInverse[3].xyz;\n        vec3 V = eyePos - v_WorldPosition;\n        if (dot(N, V) < 0.0) {\n            N = -N;\n        }\n    }\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {            N = normalTexel * 2.0 - 1.0;\n            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n            N = normalize(tbn * N);\n        }\n    }\n    gl_FragColor.rgb = (N + 1.0) * 0.5;\n    float g = glossiness;\n    if (useRoughGlossMap) {\n        float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n        if (useRoughness) {\n            g2 = 1.0 - g2;\n        }\n        g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    }\n    gl_FragColor.a = g;\n}\n@end\n@export qtek.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nvarying vec2 v_Texcoord;\n@import qtek.util.srgb\nvoid main ()\n{\n    float m = metalness;\n    if (useMetalnessMap) {\n        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n    }\n    vec4 texel = texture2D(diffuseMap, v_Texcoord);\n    if (linear) {\n        texel = sRGBToLinear(texel);\n    }\n    gl_FragColor.rgb = texel.rgb * color;\n    gl_FragColor.a = m;\n}\n@end\n@export qtek.deferred.gbuffer.debug\n@import qtek.deferred.chunk.light_head\nuniform int debug: 0;\nvoid main ()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    if (debug == 0) {\n        gl_FragColor = vec4(N, 1.0);\n    }\n    else if (debug == 1) {\n        gl_FragColor = vec4(vec3(z), 1.0);\n    }\n    else if (debug == 2) {\n        gl_FragColor = vec4(position, 1.0);\n    }\n    else if (debug == 3) {\n        gl_FragColor = vec4(vec3(glossiness), 1.0);\n    }\n    else if (debug == 4) {\n        gl_FragColor = vec4(vec3(metalness), 1.0);\n    }\n    else {\n        gl_FragColor = vec4(albedo, 1.0);\n    }\n}\n@end";
+var gbufferEssl = "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n@import clay.chunk.skinning_header\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef FIRST_PASS\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n    bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    #ifdef FIRST_PASS\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    if (hasTangent) {\n        skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n    }\n    #endif\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n#ifdef FIRST_PASS\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n    if (hasTangent) {\n        v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n        v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n    }\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n    if (idx == 3) return texel.a;\n    else if (idx == 1) return texel.g;\n    else if (idx == 2) return texel.b;\n    else return texel.r;\n}\nvoid main()\n{\n    vec3 N = v_Normal;\n    if (doubleSided) {\n        vec3 eyePos = viewInverse[3].xyz;\n        vec3 V = eyePos - v_WorldPosition;\n        if (dot(N, V) < 0.0) {\n            N = -N;\n        }\n    }\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {            N = normalTexel * 2.0 - 1.0;\n            mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n            N = normalize(tbn * N);\n        }\n    }\n    gl_FragColor.rgb = (N + 1.0) * 0.5;\n    float g = glossiness;\n    if (useRoughGlossMap) {\n        float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n        if (useRoughness) {\n            g2 = 1.0 - g2;\n        }\n        g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    }\n    gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main ()\n{\n    float m = metalness;\n    if (useMetalnessMap) {\n        vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n        m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n    }\n    vec4 texel = texture2D(diffuseMap, v_Texcoord);\n    if (linear) {\n        texel = sRGBToLinear(texel);\n    }\n    gl_FragColor.rgb = texel.rgb * color;\n    gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform int debug: 0;\nvoid main ()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    if (debug == 0) {\n        gl_FragColor = vec4(N, 1.0);\n    }\n    else if (debug == 1) {\n        gl_FragColor = vec4(vec3(z), 1.0);\n    }\n    else if (debug == 2) {\n        gl_FragColor = vec4(position, 1.0);\n    }\n    else if (debug == 3) {\n        gl_FragColor = vec4(vec3(glossiness), 1.0);\n    }\n    else if (debug == 4) {\n        gl_FragColor = vec4(vec3(metalness), 1.0);\n    }\n    else {\n        gl_FragColor = vec4(albedo, 1.0);\n    }\n}\n@end";
 
-var chunkEssl = "@export qtek.deferred.chunk.light_head\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\nuniform vec2 windowSize: WINDOW_SIZE;\nuniform vec4 viewport: VIEWPORT;\nuniform mat4 viewProjectionInv;\n#ifdef DEPTH_ENCODED\n@import qtek.util.decode_float\n#endif\n@end\n@export qtek.deferred.chunk.gbuffer_read\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    vec4 texel3 = texture2D(gBufferTexture3, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    float glossiness = texel1.a;\n    float metalness = texel3.a;\n    vec3 N = texel1.rgb * 2.0 - 1.0;\n    float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n    vec2 xy = uv2 * 2.0 - 1.0;\n    vec4 projectedPos = vec4(xy, z, 1.0);\n    vec4 p4 = viewProjectionInv * projectedPos;\n    vec3 position = p4.xyz / p4.w;\n    vec3 albedo = texel3.rgb;\n    vec3 diffuseColor = albedo * (1.0 - metalness);\n    vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n@export qtek.deferred.chunk.light_equation\nfloat D_Phong(in float g, in float ndh) {\n    float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(in float g, in float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (3.1415926 * tmp * tmp);\n}\nvec3 F_Schlick(in float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nvec3 lightEquation(\n    in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n    in float ndl, in float ndh, in float ndv, in float g\n)\n{\n    return ndl * lightColor\n        * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n@end";
+var chunkEssl = "@export clay.deferred.chunk.light_head\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\nuniform vec2 windowSize: WINDOW_SIZE;\nuniform vec4 viewport: VIEWPORT;\nuniform mat4 viewProjectionInv;\n#ifdef DEPTH_ENCODED\n@import clay.util.decode_float\n#endif\n@end\n@export clay.deferred.chunk.gbuffer_read\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    vec4 texel3 = texture2D(gBufferTexture3, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    float glossiness = texel1.a;\n    float metalness = texel3.a;\n    vec3 N = texel1.rgb * 2.0 - 1.0;\n    float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n    vec2 xy = uv2 * 2.0 - 1.0;\n    vec4 projectedPos = vec4(xy, z, 1.0);\n    vec4 p4 = viewProjectionInv * projectedPos;\n    vec3 position = p4.xyz / p4.w;\n    vec3 albedo = texel3.rgb;\n    vec3 diffuseColor = albedo * (1.0 - metalness);\n    vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n@export clay.deferred.chunk.light_equation\nfloat D_Phong(in float g, in float ndh) {\n    float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(in float g, in float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (3.1415926 * tmp * tmp);\n}\nvec3 F_Schlick(in float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nvec3 lightEquation(\n    in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n    in float ndl, in float ndh, in float ndv, in float g\n)\n{\n    return ndl * lightColor\n        * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n@end";
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
@@ -21620,9 +21649,9 @@ function createFillCanvas(color) {
     return canvas;
 }
 
-function attachTextureToSlot(renderer, shader, symbol, texture, slot) {
+function attachTextureToSlot(renderer, program, symbol, texture, slot) {
     var gl = renderer.gl;
-    shader.setUniform(gl, '1i', symbol, slot);
+    program.setUniform(gl, '1i', symbol, slot);
 
     gl.activeTexture(gl.TEXTURE0 + slot);
     // Maybe texture is not loaded yet;
@@ -21642,29 +21671,29 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
     var previousRougGlossMap;
     var previousRenderable;
 
-    return function (renderable, prevMaterial, prevShader) {
+    return function (renderable, gBufferMat, prevMaterial) {
         // Material not change
-        if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+        if (previousRenderable && previousRenderable.material === renderable.material) {
             return;
         }
 
-        var standardMaterial = renderable.__standardMat;
-        var gBufferMat = renderable.material;
+        var standardMaterial = renderable.material;
+        var program = renderable.__program;
 
         var glossiness;
         var roughGlossMap;
-        var useRoughnessWorkflow = standardMaterial.shader.isDefined('fragment', 'USE_ROUGHNESS');
-        var doubleSided = standardMaterial.shader.isDefined('fragment', 'DOUBLE_SIDED');
+        var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
+        var doubleSided = standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
         var roughGlossChannel;
         if (useRoughnessWorkflow) {
             glossiness = 1.0 - standardMaterial.get('roughness');
             roughGlossMap = standardMaterial.get('roughnessMap');
-            roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'ROUGHNESS_CHANNEL');
+            roughGlossChannel = standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL');
         }
         else {
             glossiness = standardMaterial.get('glossiness');
             roughGlossMap = standardMaterial.get('glossinessMap');
-            roughGlossChannel = standardMaterial.shader.getDefine('fragment', 'GLOSSINESS_CHANNEL');
+            roughGlossChannel = standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
         }
         var useRoughGlossMap = !!roughGlossMap;
 
@@ -21686,25 +21715,25 @@ function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
             gBufferMat.set('uvOffset', uvOffset);
         }
         else {
-            gBufferMat.shader.setUniform(
+            program.setUniform(
                 gl, '1f', 'glossiness', glossiness
             );
 
             if (previousNormalMap !== normalMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'normalMap', normalMap, 0);
+                attachTextureToSlot(this, program, 'normalMap', normalMap, 0);
             }
             if (previousRougGlossMap !== roughGlossMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'roughGlossMap', roughGlossMap, 1);
+                attachTextureToSlot(this, program, 'roughGlossMap', roughGlossMap, 1);
             }
-            gBufferMat.shader.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
-            gBufferMat.shader.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
-            gBufferMat.shader.setUniform(gl, '1i', 'doubleSided', +doubleSided);
-            gBufferMat.shader.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
+            program.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
+            program.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
+            program.setUniform(gl, '1i', 'doubleSided', +doubleSided);
+            program.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
             if (uvRepeat != null) {
-                gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+                program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
             }
             if (uvOffset != null) {
-                gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+                program.setUniform(gl, '2f', 'uvOffset', uvOffset);
             }
         }
 
@@ -21720,14 +21749,14 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
     var previousRenderable;
     var previousMetalnessMap;
 
-    return function (renderable, prevMaterial, prevShader) {
+    return function (renderable, gBufferMat, prevMaterial) {
         // Material not change
-        if (previousRenderable && previousRenderable.__standardMat === renderable.__standardMat) {
+        if (previousRenderable && previousRenderable.material === renderable.material) {
             return;
         }
 
-        var standardMaterial = renderable.__standardMat;
-        var gBufferMat = renderable.material;
+        var program = renderable.__program;
+        var standardMaterial = renderable.material;
 
         var color = standardMaterial.get('color');
         var metalness = standardMaterial.get('metalness');
@@ -21755,22 +21784,20 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
             gBufferMat.set('linear', +standardMaterial.linear);
         }
         else {
-            gBufferMat.shader.setUniform(
-                gl, '1f', 'metalness', metalness
-            );
+            program.setUniform(gl, '1f', 'metalness', metalness);
 
-            gBufferMat.shader.setUniform(gl, '3f', 'color', color);
+            program.setUniform(gl, '3f', 'color', color);
             if (previousDiffuseMap !== diffuseMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'diffuseMap', diffuseMap, 0);
+                attachTextureToSlot(this, program, 'diffuseMap', diffuseMap, 0);
             }
             if (previousMetalnessMap !== metalnessMap) {
-                attachTextureToSlot(this, gBufferMat.shader, 'metalnessMap', metalnessMap, 1);
+                attachTextureToSlot(this, program, 'metalnessMap', metalnessMap, 1);
             }
-            gBufferMat.shader.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
-            gBufferMat.shader.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            gBufferMat.shader.setUniform(gl, '2f', 'uvOffset', uvOffset);
+            program.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
+            program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
+            program.setUniform(gl, '2f', 'uvOffset', uvOffset);
 
-            gBufferMat.shader.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
+            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
         }
 
         previousDiffuseMap = diffuseMap;
@@ -21783,12 +21810,12 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
 /**
  * GBuffer is provided for deferred rendering and SSAO, SSR pass.
  * It will do two passes rendering to three target textures. See
- * + {@link qtek.deferred.GBuffer#getTargetTexture1}
- * + {@link qtek.deferred.GBuffer#getTargetTexture2}
- * + {@link qtek.deferred.GBuffer#getTargetTexture3}
+ * + {@link clay.deferred.GBuffer#getTargetTexture1}
+ * + {@link clay.deferred.GBuffer#getTargetTexture2}
+ * + {@link clay.deferred.GBuffer#getTargetTexture3}
  * @constructor
- * @alias qtek.deferred.GBuffer
- * @extends qtek.core.Base
+ * @alias clay.deferred.GBuffer
+ * @extends clay.core.Base
  */
 var GBuffer = Base.extend(function () {
 
@@ -21800,7 +21827,9 @@ var GBuffer = Base.extend(function () {
 
         enableTargetTexture3: true,
 
-        _renderQueue: [],
+        renderTransparent: false,
+
+        _renderList: [],
         // - R: normal.x
         // - G: normal.y
         // - B: normal.z
@@ -21847,13 +21876,30 @@ var GBuffer = Base.extend(function () {
 
         _frameBuffer: new FrameBuffer(),
 
-        _gBufferMaterials: {},
+        _gBufferMaterial1: new Material({
+            shader: new Shader(
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer1.fragment')
+            ),
+            vertexDefines: {
+                FIRST_PASS: null
+            },
+            fragmentDefines: {
+                FIRST_PASS: null
+            }
+        }),
+        _gBufferMaterial2: new Material({
+            shader: new Shader(
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer2.fragment')
+            )
+        }),
 
         _debugPass: new Pass({
-            fragment: Shader.source('qtek.deferred.gbuffer.debug')
+            fragment: Shader.source('clay.deferred.gbuffer.debug')
         })
     };
-}, /** @lends qtek.deferred.GBuffer# */{
+}, /** @lends clay.deferred.GBuffer# */{
 
     /**
      * Set G Buffer size.
@@ -21908,9 +21954,9 @@ var GBuffer = Base.extend(function () {
 
     /**
      * Update G Buffer
-     * @param {qtek.Renderer} renderer
-     * @param {qtek.Scene} scene
-     * @param {qtek.camera.Perspective} camera
+     * @param {clay.Renderer} renderer
+     * @param {clay.Scene} scene
+     * @param {clay.camera.Perspective} camera
      */
     update: function (renderer, scene, camera) {
 
@@ -21918,37 +21964,24 @@ var GBuffer = Base.extend(function () {
 
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
-        var opaqueQueue = scene.opaqueQueue;
-        var transparentQueue = scene.transparentQueue;
-        var oldBeforeRender = renderer.beforeRenderObject;
-
-        // StandardMaterial needs updateShader method so shader can be created on demand.
-        for (var i = 0; i < opaqueQueue.length; i++) {
-            var material = opaqueQueue[i].material;
-            material.updateShader && material.updateShader(renderer);
-        }
-        for (var i = 0; i < transparentQueue.length; i++) {
-            var material = transparentQueue[i].material;
-            material.updateShader && material.updateShader(renderer);
-        }
-
-        opaqueQueue.sort(Renderer.opaqueSortFunc);
-        transparentQueue.sort(Renderer.transparentSortFunc);
+        var opaqueList = scene.opaqueList;
+        var transparentList = scene.transparentList;
 
         var offset = 0;
-        var renderQueue = this._renderQueue;
-        for (var i = 0; i < opaqueQueue.length; i++) {
-            if (!opaqueQueue[i].ignoreGBuffer) {
-                renderQueue[offset++] = opaqueQueue[i];
+        var renderList = this._renderList;
+        for (var i = 0; i < opaqueList.length; i++) {
+            if (!opaqueList[i].ignoreGBuffer) {
+                renderList[offset++] = opaqueList[i];
             }
         }
-        for (var i = 0; i < transparentQueue.length; i++) {
-            if (!transparentQueue[i].ignoreGBuffer) {
-                renderQueue[offset++] = transparentQueue[i];
+        if (this.renderTransparent) {
+            for (var i = 0; i < transparentList.length; i++) {
+                if (!transparentList[i].ignoreGBuffer) {
+                    renderList[offset++] = transparentList[i];
+                }
             }
         }
-        renderQueue.length = offset;
-
+        renderList.length = offset;
 
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
@@ -21984,19 +22017,16 @@ var GBuffer = Base.extend(function () {
             if (viewport) {
                 gl.disable(gl.SCISSOR_TEST);
             }
-
-            this._resetGBufferMaterials();
-
-            this._replaceGBufferMat(renderQueue, 1);
-
+            var gBufferMaterial1 = this._gBufferMaterial1;
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial1;
+                },
+                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap),
+                sortCompare: renderer.opaqueSortCompare
+            };
             // FIXME Use MRT if possible
-            // Pass 1
-            renderer.beforeRenderObject = getBeforeRenderHook1(
-                gl,
-                this._defaultNormalMap,
-                this._defaultRoughnessMap
-            );
-            renderer.renderQueue(renderQueue, camera);
+            renderer.renderPass(renderList, camera, passConfig);
 
         }
         if (enableTargetTexture3) {
@@ -22016,22 +22046,18 @@ var GBuffer = Base.extend(function () {
                 gl.disable(gl.SCISSOR_TEST);
             }
 
-            this._replaceGBufferMat(renderQueue, 2);
-            renderer.beforeRenderObject = getBeforeRenderHook2(
-                gl,
-                this._defaultDiffuseMap,
-                this._defaultMetalnessMap
-            );
-            renderer.renderQueue(renderQueue, camera);
-
+            var gBufferMaterial2 = this._gBufferMaterial2;
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial2;
+                },
+                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                sortCompare: renderer.opaqueSortCompare
+            };
+            renderer.renderPass(renderList, camera, passConfig);
         }
 
         renderer.bindSceneRendering(null);
-
-        renderer.beforeRenderObject = oldBeforeRender;
-        this._cleanGBufferMaterials(renderer);
-        this._restoreMaterial(renderQueue);
-
         frameBuffer.unbind(renderer);
     },
 
@@ -22080,7 +22106,7 @@ var GBuffer = Base.extend(function () {
      * + G: normal.y * 0.5 + 0.5
      * + B: normal.z * 0.5 + 0.5
      * + A: glossiness
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture1: function () {
         return this._gBufferTex1;
@@ -22090,7 +22116,7 @@ var GBuffer = Base.extend(function () {
      * Get second target texture.
      * Channel storage:
      * + R: depth
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture2: function () {
         return this._gBufferTex2;
@@ -22103,107 +22129,23 @@ var GBuffer = Base.extend(function () {
      * + G: albedo.g
      * + B: albedo.b
      * + A: metalness
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture3: function () {
         return this._gBufferTex3;
     },
 
-    _getMaterial: function (nJoints) {
-        var gBufferMaterials = this._gBufferMaterials;
-        var obj = gBufferMaterials[nJoints];
-        if (!obj) {
-            var mat1 = new Material({
-                shader: new Shader({
-                    vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
-                    fragment: Shader.source('qtek.deferred.gbuffer1.fragment')
-                })
-            });
-            var mat2 = new Material({
-                shader: new Shader({
-                    vertex: Shader.source('qtek.deferred.gbuffer.vertex'),
-                    fragment: Shader.source('qtek.deferred.gbuffer2.fragment')
-                })
-            });
-            mat1.shader.define('vertex', 'FIRST_PASS');
-
-            if (nJoints > 0) {
-                mat1.shader.define('vertex', 'SKINNING');
-                mat1.shader.define('vertex', 'JOINT_COUNT', nJoints);
-                mat2.shader.define('vertex', 'SKINNING');
-                mat2.shader.define('vertex', 'JOINT_COUNT', nJoints);
-            }
-
-            obj = {
-                material1: mat1,
-                material2: mat2
-            };
-
-            gBufferMaterials[nJoints] = obj;
-        }
-        obj.used = true;
-
-        return obj;
-    },
-
-    _resetGBufferMaterials: function () {
-        for (var key in this._gBufferMaterials) {
-            this._gBufferMaterials[key].used = false;
-        }
-    },
-
-    _cleanGBufferMaterials: function (renderer) {
-        for (var key in this._gBufferMaterials) {
-            var obj = this._gBufferMaterials[key];
-            if (!obj.used) {
-                obj.material1.dispose(renderer);
-                obj.material2.dispose(renderer);
-            }
-        }
-    },
-
-    _replaceGBufferMat: function (queue, pass) {
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
-
-            if (pass === 1) {
-                renderable.__standardMat = renderable.material;
-            }
-
-            var matObj = this._getMaterial(
-                renderable.joints ? renderable.joints.length : 0,
-                false
-            );
-            renderable.material = pass === 1 ? matObj.material1 : matObj.material2;
-        }
-    },
-
-    _restoreMaterial: function (queue) {
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
-
-            if (renderable.__standardMat) {
-                renderable.material = renderable.__standardMat;
-            }
-        }
-    },
-
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
-        for (var name in this._gBufferMaterials) {
-            var matObj = this._gBufferMaterials[name];
-            matObj.material1.dispose(renderer);
-            matObj.material2.dispose(renderer);
-        }
     }
 });
 
 /**
- * @constructor qtek.geometry.Sphere
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Sphere
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [widthSegments]
  * @param {number} [heightSegments]
@@ -22214,7 +22156,7 @@ var GBuffer = Base.extend(function () {
  * @param {number} [radius]
  */
 var Sphere = Geometry.extend(
-/** @lends qtek.geometry.Sphere# */
+/** @lends clay.geometry.Sphere# */
 {
     dynamic: false,
     /**
@@ -22252,7 +22194,7 @@ var Sphere = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Sphere.prototype */
+/** @lends clay.geometry.Sphere.prototype */
 {
     /**
      * Build sphere geometry
@@ -22342,8 +22284,8 @@ var vec3$13 = glmatrix.vec3;
 var vec2$1 = glmatrix.vec2;
 
 /**
- * @constructor qtek.geometry.Cone
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Cone
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.topRadius]
  * @param {number} [opt.bottomRadius]
@@ -22352,7 +22294,7 @@ var vec2$1 = glmatrix.vec2;
  * @param {number} [opt.heightSegments]
  */
 var Cone$1 = Geometry.extend(
-/** @lends qtek.geometry.Cone# */
+/** @lends clay.geometry.Cone# */
 {
     dynamic: false,
     /**
@@ -22382,7 +22324,7 @@ var Cone$1 = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Cone.prototype */
+/** @lends clay.geometry.Cone.prototype */
 {
     /**
      * Build cone geometry
@@ -22476,8 +22418,8 @@ var Cone$1 = Geometry.extend(
 });
 
 /**
- * @constructor qtek.geometry.Cylinder
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Cylinder
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.radius]
  * @param {number} [opt.height]
@@ -22485,7 +22427,7 @@ var Cone$1 = Geometry.extend(
  * @param {number} [opt.heightSegments]
  */
 var Cylinder$1 = Geometry.extend(
-/** @lends qtek.geometry.Cylinder# */
+/** @lends clay.geometry.Cylinder# */
 {
     dynamic: false,
     /**
@@ -22510,7 +22452,7 @@ var Cylinder$1 = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Cylinder.prototype */
+/** @lends clay.geometry.Cylinder.prototype */
 {
     /**
      * Build cylinder geometry
@@ -22533,64 +22475,57 @@ var Cylinder$1 = Geometry.extend(
     }
 });
 
-var utilEssl = "\n@export qtek.util.rand\nhighp float rand(vec2 uv) {\n    const highp float a = 12.9898, b = 78.233, c = 43758.5453;\n    highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);\n    return fract(sin(sn) * c);\n}\n@end\n@export qtek.util.calculate_attenuation\nuniform float attenuationFactor : 5.0;\nfloat lightAttenuation(float dist, float range)\n{\n    float attenuation = 1.0;\n    attenuation = dist*dist/(range*range+1.0);\n    float att_s = attenuationFactor;\n    attenuation = 1.0/(attenuation*att_s+1.0);\n    att_s = 1.0/(att_s+1.0);\n    attenuation = attenuation - att_s;\n    attenuation /= 1.0 - att_s;\n    return clamp(attenuation, 0.0, 1.0);\n}\n@end\n@export qtek.util.edge_factor\nfloat edgeFactor(float width)\n{\n    vec3 d = fwidth(v_Barycentric);\n    vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);\n    return min(min(a3.x, a3.y), a3.z);\n}\n@end\n@export qtek.util.encode_float\nvec4 encodeFloat(const in float depth)\n{\n    const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);\n    const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);\n    vec4 res = fract(depth * bitShifts);\n    res -= res.xxyz * bit_mask;\n    return res;\n}\n@end\n@export qtek.util.decode_float\nfloat decodeFloat(const in vec4 color)\n{\n    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);\n    return dot(color, bitShifts);\n}\n@end\n@export qtek.util.float\n@import qtek.util.encode_float\n@import qtek.util.decode_float\n@end\n@export qtek.util.rgbm_decode\nvec3 RGBMDecode(vec4 rgbm, float range) {\n  return range * rgbm.rgb * rgbm.a;\n}\n@end\n@export qtek.util.rgbm_encode\nvec4 RGBMEncode(vec3 color, float range) {\n    if (dot(color, color) == 0.0) {\n        return vec4(0.0);\n    }\n    vec4 rgbm;\n    color /= range;\n    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6)), 0.0, 1.0);\n    rgbm.a = ceil(rgbm.a * 255.0) / 255.0;\n    rgbm.rgb = color / rgbm.a;\n    return rgbm;\n}\n@end\n@export qtek.util.rgbm\n@import qtek.util.rgbm_decode\n@import qtek.util.rgbm_encode\nvec4 decodeHDR(vec4 color)\n{\n#if defined(RGBM_DECODE) || defined(RGBM)\n    return vec4(RGBMDecode(color, 51.5), 1.0);\n#else\n    return color;\n#endif\n}\nvec4 encodeHDR(vec4 color)\n{\n#if defined(RGBM_ENCODE) || defined(RGBM)\n    return RGBMEncode(color.xyz, 51.5);\n#else\n    return color;\n#endif\n}\n@end\n@export qtek.util.srgb\nvec4 sRGBToLinear(in vec4 value) {\n    return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);\n}\nvec4 linearTosRGB(in vec4 value) {\n    return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);\n}\n@end\n@export qtek.chunk.skinning_header\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n#ifdef USE_SKIN_MATRICES_TEXTURE\nuniform sampler2D skinMatricesTexture;\nuniform float skinMatricesTextureSize: unconfigurable;\nmat4 getSkinMatrix(float idx) {\n    float j = idx * 4.0;\n    float x = mod(j, skinMatricesTextureSize);\n    float y = floor(j / skinMatricesTextureSize) + 0.5;\n    vec2 scale = vec2(skinMatricesTextureSize);\n    return mat4(\n        texture2D(skinMatricesTexture, vec2(x + 0.5, y) / scale),\n        texture2D(skinMatricesTexture, vec2(x + 1.5, y) / scale),\n        texture2D(skinMatricesTexture, vec2(x + 2.5, y) / scale),\n        texture2D(skinMatricesTexture, vec2(x + 3.5, y) / scale)\n    );\n}\n#else\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\nmat4 getSkinMatrix(float idx) {\n    return skinMatrix[int(idx)];\n}\n#endif\n#endif\n@end\n@export qtek.chunk.skin_matrix\nmat4 skinMatrixWS = getSkinMatrix(joint.x) * weight.x;\nif (weight.y > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.y) * weight.y;\n}\nif (weight.z > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.z) * weight.z;\n}\nfloat weightW = 1.0-weight.x-weight.y-weight.z;\nif (weightW > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.w) * weightW;\n}\n@end\n@export qtek.util.parallax_correct\nvec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {\n    vec3 first = (boxMax - pos) / dir;\n    vec3 second = (boxMin - pos) / dir;\n    vec3 further = max(first, second);\n    float dist = min(further.x, min(further.y, further.z));\n    vec3 fixedPos = pos + dir * dist;\n    vec3 boxCenter = (boxMax + boxMin) * 0.5;\n    return normalize(fixedPos - boxCenter);\n}\n@end\n@export qtek.util.clamp_sample\nvec4 clampSample(const in sampler2D texture, const in vec2 coord)\n{\n#ifdef STEREO\n    float eye = step(0.5, coord.x) * 0.5;\n    vec2 coordClamped = clamp(coord, vec2(eye, 0.0), vec2(0.5 + eye, 1.0));\n#else\n    vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));\n#endif\n    return texture2D(texture, coordClamped);\n}\n@end";
+var utilEssl = "\n@export clay.util.rand\nhighp float rand(vec2 uv) {\n    const highp float a = 12.9898, b = 78.233, c = 43758.5453;\n    highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);\n    return fract(sin(sn) * c);\n}\n@end\n@export clay.util.calculate_attenuation\nuniform float attenuationFactor : 5.0;\nfloat lightAttenuation(float dist, float range)\n{\n    float attenuation = 1.0;\n    attenuation = dist*dist/(range*range+1.0);\n    float att_s = attenuationFactor;\n    attenuation = 1.0/(attenuation*att_s+1.0);\n    att_s = 1.0/(att_s+1.0);\n    attenuation = attenuation - att_s;\n    attenuation /= 1.0 - att_s;\n    return clamp(attenuation, 0.0, 1.0);\n}\n@end\n@export clay.util.edge_factor\nfloat edgeFactor(float width)\n{\n    vec3 d = fwidth(v_Barycentric);\n    vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);\n    return min(min(a3.x, a3.y), a3.z);\n}\n@end\n@export clay.util.encode_float\nvec4 encodeFloat(const in float depth)\n{\n    const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);\n    const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);\n    vec4 res = fract(depth * bitShifts);\n    res -= res.xxyz * bit_mask;\n    return res;\n}\n@end\n@export clay.util.decode_float\nfloat decodeFloat(const in vec4 color)\n{\n    const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);\n    return dot(color, bitShifts);\n}\n@end\n@export clay.util.float\n@import clay.util.encode_float\n@import clay.util.decode_float\n@end\n@export clay.util.rgbm_decode\nvec3 RGBMDecode(vec4 rgbm, float range) {\n  return range * rgbm.rgb * rgbm.a;\n}\n@end\n@export clay.util.rgbm_encode\nvec4 RGBMEncode(vec3 color, float range) {\n    if (dot(color, color) == 0.0) {\n        return vec4(0.0);\n    }\n    vec4 rgbm;\n    color /= range;\n    rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6)), 0.0, 1.0);\n    rgbm.a = ceil(rgbm.a * 255.0) / 255.0;\n    rgbm.rgb = color / rgbm.a;\n    return rgbm;\n}\n@end\n@export clay.util.rgbm\n@import clay.util.rgbm_decode\n@import clay.util.rgbm_encode\nvec4 decodeHDR(vec4 color)\n{\n#if defined(RGBM_DECODE) || defined(RGBM)\n    return vec4(RGBMDecode(color, 51.5), 1.0);\n#else\n    return color;\n#endif\n}\nvec4 encodeHDR(vec4 color)\n{\n#if defined(RGBM_ENCODE) || defined(RGBM)\n    return RGBMEncode(color.xyz, 51.5);\n#else\n    return color;\n#endif\n}\n@end\n@export clay.util.srgb\nvec4 sRGBToLinear(in vec4 value) {\n    return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);\n}\nvec4 linearTosRGB(in vec4 value) {\n    return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);\n}\n@end\n@export clay.chunk.skinning_header\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\nmat4 getSkinMatrix(float idx) {\n    return skinMatrix[int(idx)];\n}\n#endif\n@end\n@export clay.chunk.skin_matrix\nmat4 skinMatrixWS = getSkinMatrix(joint.x) * weight.x;\nif (weight.y > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.y) * weight.y;\n}\nif (weight.z > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.z) * weight.z;\n}\nfloat weightW = 1.0-weight.x-weight.y-weight.z;\nif (weightW > 1e-4)\n{\n    skinMatrixWS += getSkinMatrix(joint.w) * weightW;\n}\n@end\n@export clay.util.parallax_correct\nvec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {\n    vec3 first = (boxMax - pos) / dir;\n    vec3 second = (boxMin - pos) / dir;\n    vec3 further = max(first, second);\n    float dist = min(further.x, min(further.y, further.z));\n    vec3 fixedPos = pos + dir * dist;\n    vec3 boxCenter = (boxMax + boxMin) * 0.5;\n    return normalize(fixedPos - boxCenter);\n}\n@end\n@export clay.util.clamp_sample\nvec4 clampSample(const in sampler2D texture, const in vec2 coord)\n{\n#ifdef STEREO\n    float eye = step(0.5, coord.x) * 0.5;\n    vec2 coordClamped = clamp(coord, vec2(eye, 0.0), vec2(0.5 + eye, 1.0));\n#else\n    vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));\n#endif\n    return texture2D(texture, coordClamped);\n}\n@end";
 
-var lightvolumeEssl = "@export qtek.deferred.light_volume.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_Position;\nvoid main()\n{\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n    v_Position = position;\n}\n@end";
+var lightvolumeGlsl = "@export clay.deferred.light_volume.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_Position;\nvoid main()\n{\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n    v_Position = position;\n}\n@end";
 
-var spotEssl = "@export qtek.deferred.spot_light\n@import qtek.deferred.chunk.light_head\n@import qtek.deferred.chunk.light_equation\n@import qtek.util.calculate_attenuation\nuniform vec3 lightPosition;\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform float umbraAngleCosine;\nuniform float penumbraAngleCosine;\nuniform float lightRange;\nuniform float falloffFactor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform mat4 lightMatrix;\nuniform float lightShadowMapSize;\n#endif\n@import qtek.plugin.shadow_map_common\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    L /= dist;\n    float attenuation = lightAttenuation(dist, lightRange);\n    float c = dot(-normalize(lightDirection), L);\n    float falloff = clamp((c - umbraAngleCosine) / (penumbraAngleCosine - umbraAngleCosine), 0.0, 1.0);\n    falloff = pow(falloff, falloffFactor);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = computeShadowContrib(\n        lightShadowMap, lightMatrix, position, lightShadowMapSize\n    );\n    gl_FragColor.rgb *= shadowContrib;\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end\n";
+var spotGlsl = "@export clay.deferred.spot_light\n@import clay.deferred.chunk.light_head\n@import clay.deferred.chunk.light_equation\n@import clay.util.calculate_attenuation\nuniform vec3 lightPosition;\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform float umbraAngleCosine;\nuniform float penumbraAngleCosine;\nuniform float lightRange;\nuniform float falloffFactor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform mat4 lightMatrix;\nuniform float lightShadowMapSize;\n#endif\n@import clay.plugin.shadow_map_common\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    L /= dist;\n    float attenuation = lightAttenuation(dist, lightRange);\n    float c = dot(-normalize(lightDirection), L);\n    float falloff = clamp((c - umbraAngleCosine) / (penumbraAngleCosine - umbraAngleCosine), 0.0, 1.0);\n    falloff = pow(falloff, falloffFactor);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = computeShadowContrib(\n        lightShadowMap, lightMatrix, position, lightShadowMapSize\n    );\n    gl_FragColor.rgb *= shadowContrib;\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end\n";
 
-var directionalEssl = "@export qtek.deferred.directional_light\n@import qtek.deferred.chunk.light_head\n@import qtek.deferred.chunk.light_equation\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform float lightShadowMapSize;\nuniform mat4 lightMatrices[SHADOW_CASCADE];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#endif\n@import qtek.plugin.shadow_map_common\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 L = -normalize(lightDirection);\n    vec3 V = normalize(eyePosition - position);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    gl_FragColor.rgb = lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = 1.0;\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            z >= shadowCascadeClipsNear[_idx_] &&\n            z <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                lightShadowMap, lightMatrices[_idx_], position, lightShadowMapSize,\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n        }\n    }}\n    gl_FragColor.rgb *= shadowContrib;\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end\n";
+var directionalGlsl = "@export clay.deferred.directional_light\n@import clay.deferred.chunk.light_head\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform float lightShadowMapSize;\nuniform mat4 lightMatrices[SHADOW_CASCADE];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#endif\n@import clay.plugin.shadow_map_common\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 L = -normalize(lightDirection);\n    vec3 V = normalize(eyePosition - position);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    gl_FragColor.rgb = lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = 1.0;\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            z >= shadowCascadeClipsNear[_idx_] &&\n            z <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                lightShadowMap, lightMatrices[_idx_], position, lightShadowMapSize,\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n        }\n    }}\n    gl_FragColor.rgb *= shadowContrib;\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end\n";
 
-var ambientEssl = "@export qtek.deferred.ambient_light\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture3;\nuniform vec3 lightColor;\nuniform vec2 windowSize: WINDOW_SIZE;\nvoid main()\n{\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    vec3 albedo = texture2D(gBufferTexture3, uv).rgb;\n    gl_FragColor.rgb = lightColor * albedo;\n    gl_FragColor.a = 1.0;\n}\n@end";
+var ambientGlsl = "@export clay.deferred.ambient_light\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture3;\nuniform vec3 lightColor;\nuniform vec2 windowSize: WINDOW_SIZE;\nvoid main()\n{\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    vec3 albedo = texture2D(gBufferTexture3, uv).rgb;\n    gl_FragColor.rgb = lightColor * albedo;\n    gl_FragColor.a = 1.0;\n}\n@end";
 
-var ambientshEssl = "@export qtek.deferred.ambient_sh_light\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture3;\nuniform vec3 lightColor;\nuniform vec3 lightCoefficients[9];\nuniform vec2 windowSize: WINDOW_SIZE;\nvec3 calcAmbientSHLight(vec3 N) {\n    return lightCoefficients[0]\n        + lightCoefficients[1] * N.x\n        + lightCoefficients[2] * N.y\n        + lightCoefficients[3] * N.z\n        + lightCoefficients[4] * N.x * N.z\n        + lightCoefficients[5] * N.z * N.y\n        + lightCoefficients[6] * N.y * N.x\n        + lightCoefficients[7] * (3.0 * N.z * N.z - 1.0)\n        + lightCoefficients[8] * (N.x * N.x - N.y * N.y);\n}\nvoid main()\n{\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    vec3 N = texel1.rgb * 2.0 - 1.0;\n    vec3 albedo = texture2D(gBufferTexture3, uv).rgb;\n    gl_FragColor.rgb = lightColor * albedo * calcAmbientSHLight(N);\n    gl_FragColor.a = 1.0;\n}\n@end";
+var ambientshGlsl = "@export clay.deferred.ambient_sh_light\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture3;\nuniform vec3 lightColor;\nuniform vec3 lightCoefficients[9];\nuniform vec2 windowSize: WINDOW_SIZE;\nvec3 calcAmbientSHLight(vec3 N) {\n    return lightCoefficients[0]\n        + lightCoefficients[1] * N.x\n        + lightCoefficients[2] * N.y\n        + lightCoefficients[3] * N.z\n        + lightCoefficients[4] * N.x * N.z\n        + lightCoefficients[5] * N.z * N.y\n        + lightCoefficients[6] * N.y * N.x\n        + lightCoefficients[7] * (3.0 * N.z * N.z - 1.0)\n        + lightCoefficients[8] * (N.x * N.x - N.y * N.y);\n}\nvoid main()\n{\n    vec2 uv = gl_FragCoord.xy / windowSize;\n    vec4 texel1 = texture2D(gBufferTexture1, uv);\n    if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n        discard;\n    }\n    vec3 N = texel1.rgb * 2.0 - 1.0;\n    vec3 albedo = texture2D(gBufferTexture3, uv).rgb;\n    gl_FragColor.rgb = lightColor * albedo * calcAmbientSHLight(N);\n    gl_FragColor.a = 1.0;\n}\n@end";
 
-var ambientcubemapEssl = "@export qtek.deferred.ambient_cubemap_light\n@import qtek.deferred.chunk.light_head\nuniform vec3 lightColor;\nuniform samplerCube lightCubemap;\nuniform sampler2D brdfLookup;\nuniform vec3 eyePosition;\n@import qtek.util.rgbm\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 V = normalize(eyePosition - position);\n    vec3 L = reflect(-V, N);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float rough = clamp(1.0 - glossiness, 0.0, 1.0);\n    float bias = rough * 5.0;\n    vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n    vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;\n    vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 51.5);\n    gl_FragColor.rgb = lightColor * envTexel * envWeight;\n    gl_FragColor.a = 1.0;\n}\n@end";
+var ambientcubemapGlsl = "@export clay.deferred.ambient_cubemap_light\n@import clay.deferred.chunk.light_head\nuniform vec3 lightColor;\nuniform samplerCube lightCubemap;\nuniform sampler2D brdfLookup;\nuniform vec3 eyePosition;\n@import clay.util.rgbm\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 V = normalize(eyePosition - position);\n    vec3 L = reflect(-V, N);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float rough = clamp(1.0 - glossiness, 0.0, 1.0);\n    float bias = rough * 5.0;\n    vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n    vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;\n    vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 51.5);\n    gl_FragColor.rgb = lightColor * envTexel * envWeight;\n    gl_FragColor.a = 1.0;\n}\n@end";
 
-var pointEssl = "@export qtek.deferred.point_light\n@import qtek.deferred.chunk.light_head\n@import qtek.util.calculate_attenuation\n@import qtek.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform samplerCube lightShadowMap;\nuniform float lightShadowMapSize;\n#endif\nvarying vec3 v_Position;\n@import qtek.plugin.shadow_map_common\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    L /= dist;\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float attenuation = lightAttenuation(dist, lightRange);\n    gl_FragColor.rgb = attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = computeShadowContribOmni(\n        lightShadowMap, -L * dist, lightRange\n    );\n    gl_FragColor.rgb *= clamp(shadowContrib, 0.0, 1.0);\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end";
+var pointGlsl = "@export clay.deferred.point_light\n@import clay.deferred.chunk.light_head\n@import clay.util.calculate_attenuation\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform samplerCube lightShadowMap;\nuniform float lightShadowMapSize;\n#endif\nvarying vec3 v_Position;\n@import clay.plugin.shadow_map_common\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    L /= dist;\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float attenuation = lightAttenuation(dist, lightRange);\n    gl_FragColor.rgb = attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n#ifdef SHADOWMAP_ENABLED\n    float shadowContrib = computeShadowContribOmni(\n        lightShadowMap, -L * dist, lightRange\n    );\n    gl_FragColor.rgb *= clamp(shadowContrib, 0.0, 1.0);\n#endif\n    gl_FragColor.a = 1.0;\n}\n@end";
 
-var sphereEssl = "@export qtek.deferred.sphere_light\n@import qtek.deferred.chunk.light_head\n@import qtek.util.calculate_attenuation\n@import qtek.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform float lightRadius;\nuniform vec3 eyePosition;\nvarying vec3 v_Position;\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    vec3 R = reflect(V, N);\n    float tmp = dot(L, R);\n    vec3 cToR = tmp * R - L;\n    float d = length(cToR);\n    L = L + cToR * clamp(lightRadius / d, 0.0, 1.0);\n    L = normalize(L);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float attenuation = lightAttenuation(dist, lightRange);\n    gl_FragColor.rgb = lightColor * ndl * attenuation;\n    glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);\n    gl_FragColor.rgb = attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n    gl_FragColor.a = 1.0;\n}\n@end";
+var sphereGlsl = "@export clay.deferred.sphere_light\n@import clay.deferred.chunk.light_head\n@import clay.util.calculate_attenuation\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform float lightRadius;\nuniform vec3 eyePosition;\nvarying vec3 v_Position;\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    float dist = length(L);\n    vec3 R = reflect(V, N);\n    float tmp = dot(L, R);\n    vec3 cToR = tmp * R - L;\n    float d = length(cToR);\n    L = L + cToR * clamp(lightRadius / d, 0.0, 1.0);\n    L = normalize(L);\n    vec3 H = normalize(L + V);\n    float ndl = clamp(dot(N, L), 0.0, 1.0);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    float attenuation = lightAttenuation(dist, lightRange);\n    gl_FragColor.rgb = lightColor * ndl * attenuation;\n    glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);\n    gl_FragColor.rgb = attenuation * lightEquation(\n        lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n    );\n    gl_FragColor.a = 1.0;\n}\n@end";
 
-var tubeEssl = "@export qtek.deferred.tube_light\n@import qtek.deferred.chunk.light_head\n@import qtek.util.calculate_attenuation\n@import qtek.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 lightExtend;\nuniform vec3 eyePosition;\nvarying vec3 v_Position;\nvoid main()\n{\n    @import qtek.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    vec3 R = reflect(V, N);\n    vec3 L0 = lightPosition - lightExtend - position;\n    vec3 L1 = lightPosition + lightExtend - position;\n    vec3 LD = L1 - L0;\n    float len0 = length(L0);\n    float len1 = length(L1);\n    float irra = 2.0 * clamp(dot(N, L0) / (2.0 * len0) + dot(N, L1) / (2.0 * len1), 0.0, 1.0);\n    float LDDotR = dot(R, LD);\n    float t = (LDDotR * dot(R, L0) - dot(L0, LD)) / (dot(LD, LD) - LDDotR * LDDotR);\n    t = clamp(t, 0.0, 1.0);\n    L = L0 + t * LD;\n    float dist = length(L);\n    L /= dist;\n    vec3 H = normalize(L + V);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);\n    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)\n        * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));\n    gl_FragColor.a = 1.0;\n}\n@end";
+var tubeGlsl = "@export clay.deferred.tube_light\n@import clay.deferred.chunk.light_head\n@import clay.util.calculate_attenuation\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform vec3 lightExtend;\nuniform vec3 eyePosition;\nvarying vec3 v_Position;\nvoid main()\n{\n    @import clay.deferred.chunk.gbuffer_read\n    vec3 L = lightPosition - position;\n    vec3 V = normalize(eyePosition - position);\n    vec3 R = reflect(V, N);\n    vec3 L0 = lightPosition - lightExtend - position;\n    vec3 L1 = lightPosition + lightExtend - position;\n    vec3 LD = L1 - L0;\n    float len0 = length(L0);\n    float len1 = length(L1);\n    float irra = 2.0 * clamp(dot(N, L0) / (2.0 * len0) + dot(N, L1) / (2.0 * len1), 0.0, 1.0);\n    float LDDotR = dot(R, LD);\n    float t = (LDDotR * dot(R, L0) - dot(L0, LD)) / (dot(LD, LD) - LDDotR * LDDotR);\n    t = clamp(t, 0.0, 1.0);\n    L = L0 + t * LD;\n    float dist = length(L);\n    L /= dist;\n    vec3 H = normalize(L + V);\n    float ndh = clamp(dot(N, H), 0.0, 1.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);\n    gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)\n        * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));\n    gl_FragColor.a = 1.0;\n}\n@end";
 
 // Light-pre pass deferred rendering
 // http://www.realtimerendering.com/blog/deferred-lighting-approaches/
 // Light shaders
 Shader.import(prezEssl);
 Shader.import(utilEssl);
-Shader.import(lightvolumeEssl);
+Shader.import(lightvolumeGlsl);
 
 // Light shaders
-Shader.import(spotEssl);
-Shader.import(directionalEssl);
-Shader.import(ambientEssl);
-Shader.import(ambientshEssl);
-Shader.import(ambientcubemapEssl);
-Shader.import(pointEssl);
-Shader.import(sphereEssl);
-Shader.import(tubeEssl);
+Shader.import(spotGlsl);
+Shader.import(directionalGlsl);
+Shader.import(ambientGlsl);
+Shader.import(ambientshGlsl);
+Shader.import(ambientcubemapGlsl);
+Shader.import(pointGlsl);
+Shader.import(sphereGlsl);
+Shader.import(tubeGlsl);
 
 Shader.import(prezEssl);
-
-var errorShader$1 = {};
 
 /**
  * Deferred renderer
  * @constructor
- * @alias qtek.deferred.Renderer
- * @extends qtek.core.Base
+ * @alias clay.deferred.Renderer
+ * @extends clay.core.Base
  */
 var DeferredRenderer = Base.extend(function () {
 
-    var fullQuadVertex = Shader.source('qtek.compositor.vertex');
-    var lightVolumeVertex = Shader.source('qtek.deferred.light_volume.vertex');
+    var fullQuadVertex = Shader.source('clay.compositor.vertex');
+    var lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
 
-    var directionalLightShader = new Shader({
-        vertex: fullQuadVertex,
-        fragment: Shader.source('qtek.deferred.directional_light')
-    });
-    var directionalLightShaderWithShadow = directionalLightShader.clone();
-    directionalLightShaderWithShadow.define('fragment', 'SHADOWMAP_ENABLED');
+    var directionalLightShader = new Shader(fullQuadVertex, Shader.source('clay.deferred.directional_light'));
 
     var lightAccumulateBlendFunc = function (gl) {
         gl.blendEquation(gl.FUNC_ADD);
@@ -22606,15 +22541,8 @@ var DeferredRenderer = Base.extend(function () {
         });
     };
 
-    var createVolumeShader = function (name, enableShadow) {
-        var shader = new Shader({
-            vertex: lightVolumeVertex,
-            fragment: Shader.source('qtek.deferred.' + name)
-        });
-        if (enableShadow) {
-            shader.define('fragment', 'SHADOWMAP_ENABLED');
-        }
-        return shader;
+    var createVolumeShader = function (name) {
+        return new Shader(lightVolumeVertex, Shader.source('clay.deferred.' + name));
     };
 
     // Rotate and positioning to fit the spot light
@@ -22636,11 +22564,11 @@ var DeferredRenderer = Base.extend(function () {
     mat.identity().rotateZ(Math.PI / 2);
     cylinderGeo.applyTransform(mat);
 
-    return /** @lends qtek.deferred.Renderer# */ {
+    return /** @lends clay.deferred.Renderer# */ {
 
         /**
          * Provide ShadowMapPass for shadow rendering.
-         * @type {qtek.prePass.ShadowMap}
+         * @type {clay.prePass.ShadowMap}
          */
         shadowMapPass: null,
         /**
@@ -22669,25 +22597,19 @@ var DeferredRenderer = Base.extend(function () {
         }),
 
         _directionalLightMat: createLightPassMat(directionalLightShader),
-        _directionalLightMatWithShadow: createLightPassMat(directionalLightShaderWithShadow),
 
-        _ambientMat: createLightPassMat(new Shader({
-            vertex: fullQuadVertex,
-            fragment: Shader.source('qtek.deferred.ambient_light')
-        })),
-        _ambientSHMat: createLightPassMat(new Shader({
-            vertex: fullQuadVertex,
-            fragment: Shader.source('qtek.deferred.ambient_sh_light')
-        })),
-        _ambientCubemapMat: createLightPassMat(new Shader({
-            vertex: fullQuadVertex,
-            fragment: Shader.source('qtek.deferred.ambient_cubemap_light')
-        })),
+        _ambientMat: createLightPassMat(new Shader(
+            fullQuadVertex, Shader.source('clay.deferred.ambient_light')
+        )),
+        _ambientSHMat: createLightPassMat(new Shader(
+            fullQuadVertex, Shader.source('clay.deferred.ambient_sh_light')
+        )),
+        _ambientCubemapMat: createLightPassMat(new Shader(
+            fullQuadVertex, Shader.source('clay.deferred.ambient_cubemap_light')
+        )),
 
         _spotLightShader: createVolumeShader('spot_light'),
         _pointLightShader: createVolumeShader('point_light'),
-        _spotLightShaderWithShadow: createVolumeShader('spot_light', true),
-        _pointLightShaderWithShadow: createVolumeShader('point_light', true),
 
         _sphereLightShader: createVolumeShader('sphere_light'),
         _tubeLightShader: createVolumeShader('tube_light'),
@@ -22702,15 +22624,15 @@ var DeferredRenderer = Base.extend(function () {
         _lightCylinderGeo: cylinderGeo,
 
         _outputPass: new Pass({
-            fragment: Shader.source('qtek.compositor.output')
+            fragment: Shader.source('clay.compositor.output')
         })
     };
-}, {
+}, /** @lends clay.deferred.Renderer# */ {
     /**
      * Do render
-     * @param {qtek.Renderer} renderer
-     * @param {qtek.Scene} scene
-     * @param {qtek.Camera} camera
+     * @param {clay.Renderer} renderer
+     * @param {clay.Scene} scene
+     * @param {clay.Camera} camera
      * @param {Object} [opts]
      * @param {boolean} [opts.renderToTarget = false] If not ouput and render to the target texture
      * @param {boolean} [opts.notUpdateShadow = true] If not update the shadow.
@@ -22752,21 +22674,21 @@ var DeferredRenderer = Base.extend(function () {
     },
 
     /**
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     getTargetTexture: function () {
         return this._lightAccumTex;
     },
 
     /**
-     * @return {qtek.FrameBuffer}
+     * @return {clay.FrameBuffer}
      */
     getTargetFrameBuffer: function () {
         return this._lightAccumFrameBuffer;
     },
 
     /**
-     * @return {qtek.deferred.GBuffer}
+     * @return {clay.deferred.GBuffer}
      */
     getGBuffer: function () {
         return this._gBuffer;
@@ -22781,7 +22703,7 @@ var DeferredRenderer = Base.extend(function () {
     // getFullQuadLightPass: function () {
     //     return this._fullQuadPass;
     // },
-    
+
     /**
      * Set renderer size.
      * @param {number} width
@@ -22809,7 +22731,6 @@ var DeferredRenderer = Base.extend(function () {
 
         var shadowMapPass = this.shadowMapPass;
         if (shadowMapPass && updateShadow) {
-
             gl.clearColor(1, 1, 1, 1);
             this._prepareLightShadow(renderer, scene, camera);
         }
@@ -22920,11 +22841,10 @@ var DeferredRenderer = Base.extend(function () {
                         break;
                     case 'DIRECTIONAL_LIGHT':
                         var hasShadow = shadowMapPass && light.castShadow;
-                        pass.material = hasShadow
-                            ? this._directionalLightMatWithShadow
-                            : this._directionalLightMat;
+                        pass.material = this._directionalLightMat;
+                        pass.material[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
                         if (hasShadow) {
-                            pass.material.shader.define('fragment', 'SHADOW_CASCADE', light.shadowCascade);
+                            pass.material.define('fragment', 'SHADOW_CASCADE', light.shadowCascade);
                         }
                         pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
                         pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
@@ -22960,13 +22880,6 @@ var DeferredRenderer = Base.extend(function () {
 
         this._renderVolumeMeshList(renderer, camera, volumeMeshList);
 
-        // if (shadowMapPass && updateShadow) { // FIXME Extension may have shadow rendered ignore updateShadow flag
-        if (shadowMapPass && this._shadowCasters) {
-            shadowMapPass.restoreMaterial(
-                this._shadowCasters
-            );
-        }
-
         this.trigger('lightaccumulate', renderer, scene, camera);
 
         lightAccumFrameBuffer.unbind(renderer);
@@ -22982,15 +22895,13 @@ var DeferredRenderer = Base.extend(function () {
 
             shadowCasters = this._shadowCasters || (this._shadowCasters = []);
             var count = 0;
-            var queue = scene.opaqueQueue;
-            for (var i = 0; i < queue.length; i++) {
-                if (queue[i].castShadow) {
-                    shadowCasters[count++] = queue[i];
+            var list = scene.opaqueList;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].castShadow) {
+                    shadowCasters[count++] = list[i];
                 }
             }
             shadowCasters.length = count;
-
-            this.shadowMapPass.saveMaterial(shadowCasters);
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -23028,7 +22939,7 @@ var DeferredRenderer = Base.extend(function () {
             case 'POINT_LIGHT':
                 var shadowMaps = [];
                 this.shadowMapPass.renderPointLightShadow(
-                    renderer, light, casters, shadowMaps
+                    renderer, scene, light, casters, shadowMaps
                 );
                 material.setUniform('lightShadowMap', shadowMaps[0]);
                 material.setUniform('lightShadowMapSize', light.shadowResolution);
@@ -23037,7 +22948,7 @@ var DeferredRenderer = Base.extend(function () {
                 var shadowMaps = [];
                 var lightMatrices = [];
                 this.shadowMapPass.renderSpotLightShadow(
-                    renderer, light, casters, lightMatrices, shadowMaps
+                    renderer, scene, light, casters, lightMatrices, shadowMaps
                 );
                 material.setUniform('lightShadowMap', shadowMaps[0]);
                 material.setUniform('lightMatrix', lightMatrices[0]);
@@ -23080,45 +22991,35 @@ var DeferredRenderer = Base.extend(function () {
             volumeMesh = light.volumeMesh;
         }
         else {
-            var hasShadow = this.shadowMapPass && light.castShadow;
             switch (light.type) {
                 // Only local light (point and spot) needs volume mesh.
                 // Directional and ambient light renders in full quad
                 case 'POINT_LIGHT':
                 case 'SPHERE_LIGHT':
-                    // Volume mesh created automatically
                     var shader = light.type === 'SPHERE_LIGHT'
-                        ? this._sphereLightShader
-                        : (hasShadow ? this._pointLightShaderWithShadow : this._pointLightShader);
-                    light.__volumeMesh = light.__volumeMesh || new Mesh({
-                        material: this._createLightPassMat(shader),
-                        geometry: this._lightSphereGeo,
-                        // Disable culling
-                        // if light volume mesh intersect camera near plane
-                        // We need mesh inside can still be rendered
-                        culling: false
-                    });
-                    volumeMesh = light.__volumeMesh;
-                    // castShadow changed
-                    if (volumeMesh.material.shader !== shader) {
-                        volumeMesh.material.attachShader(shader, true);
+                        ? this._sphereLightShader : this._pointLightShader;
+                    // Volume mesh created automatically
+                    if (!light.__volumeMesh) {
+                        light.__volumeMesh = new Mesh({
+                            material: this._createLightPassMat(shader),
+                            geometry: this._lightSphereGeo,
+                            // Disable culling
+                            // if light volume mesh intersect camera near plane
+                            // We need mesh inside can still be rendered
+                            culling: false
+                        });
                     }
+                    volumeMesh = light.__volumeMesh;
                     var r = light.range + (light.radius || 0);
                     volumeMesh.scale.set(r, r, r);
                     break;
                 case 'SPOT_LIGHT':
-                    var shader = hasShadow ? this._spotLightShaderWithShadow : this._spotLightShader;
                     light.__volumeMesh = light.__volumeMesh || new Mesh({
-                        material: this._createLightPassMat(shader),
+                        material: this._createLightPassMat(this._spotLightShader),
                         geometry: this._lightConeGeo,
                         culling: false
                     });
                     volumeMesh = light.__volumeMesh;
-                    // castShadow changed
-                    if (volumeMesh.material.shader !== shader) {
-                        volumeMesh.material.attachShader(shader, true);
-                    }
-
                     var aspect = Math.tan(light.penumbraAngle * Math.PI / 180);
                     var range = light.range;
                     volumeMesh.scale.set(aspect * range, aspect * range, range / 2);
@@ -23139,6 +23040,8 @@ var DeferredRenderer = Base.extend(function () {
             volumeMesh.update();
             // Apply light transform
             Matrix4.multiply(volumeMesh.worldTransform, light.worldTransform, volumeMesh.worldTransform);
+            var hasShadow = this.shadowMapPass && light.castShadow;
+            volumeMesh.material[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
         }
     },
 
@@ -23146,10 +23049,7 @@ var DeferredRenderer = Base.extend(function () {
         var worldViewProjection = new Matrix4();
         var worldView = new Matrix4();
         var preZMaterial = new Material({
-            shader: new Shader({
-                vertex: Shader.source('qtek.prez.vertex'),
-                fragment: Shader.source('qtek.prez.fragment')
-            })
+            shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
         return function (renderer, camera, volumeMeshList) {
             var gl = renderer.gl;
@@ -23159,6 +23059,8 @@ var DeferredRenderer = Base.extend(function () {
             gl.blendEquation(gl.FUNC_ADD);
             gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
             gl.depthFunc(gl.LEQUAL);
+
+            gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var viewport = renderer.viewport;
             var dpr = viewport.devicePixelRatio;
@@ -23191,69 +23093,45 @@ var DeferredRenderer = Base.extend(function () {
 
                 Matrix4.multiply(worldViewProjection, camera.projectionMatrix, worldView);
 
-                var prezShader = preZMaterial.shader;
-                this._bindShader(renderer, prezShader);
+                var preZProgram = renderer.getProgram(volumeMesh, preZMaterial);
+                volumeMesh.__program = preZProgram;
+                renderer.validateProgram(preZProgram);
+                preZProgram.bind(renderer);
 
-                var semanticInfo = prezShader.matrixSemantics.WORLDVIEWPROJECTION;
-                prezShader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
-                volumeMesh.render(renderer, prezShader);
+                var semanticInfo = preZMaterial.shader.matrixSemantics.WORLDVIEWPROJECTION;
+                preZProgram.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                volumeMesh.render(renderer, preZMaterial, preZProgram);
 
                 // Render light
                 gl.colorMask(true, true, true, true);
                 gl.depthMask(false);
-                var shader = volumeMesh.material.shader;
-                this._bindShader(renderer, shader);
+                var program = renderer.getProgram(volumeMesh, volumeMesh.material);
+                volumeMesh.__program = program;
+                renderer.validateProgram(program);
+                program.bind(renderer);
 
-                var semanticInfo = shader.matrixSemantics.WORLDVIEWPROJECTION;
+                var semanticInfo = volumeMesh.material.shader.matrixSemantics.WORLDVIEWPROJECTION;
                 // Set some common uniforms
-                shader.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
-                shader.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
-                shader.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
+                program.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                program.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
+                program.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 
-                volumeMesh.material.bind(renderer);
-                volumeMesh.render(renderer, shader);
+                volumeMesh.material.bind(renderer, program);
+                volumeMesh.render(renderer, volumeMesh.material, program);
             }
 
             gl.depthFunc(gl.LESS);
-
-            renderer.resetRenderStatus();
         };
     })(),
 
-    _bindShader: function (renderer, shader) {
-        var errMsg = shader.bind(renderer);
-        if (errMsg) {
-
-            if (errorShader$1[shader.__GUID__]) {
-                return;
-            }
-            errorShader$1[shader.__GUID__] = true;
-
-            if (renderer.throwError) {
-                throw new Error(errMsg);
-            }
-            else {
-                renderer.trigger('error', errMsg);
-            }
-        }
-    },
-
-
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._gBuffer.dispose(renderer);
 
         this._lightAccumFrameBuffer.dispose(renderer);
         this._lightAccumTex.dispose(renderer);
-
-        this._pointLightShader.dispose(renderer);
-        this._pointLightShaderWithShadow.dispose(renderer);
-        this._spotLightShader.dispose(renderer);
-        this._spotLightShaderWithShadow.dispose(renderer);
-        this._sphereLightShader.dispose(renderer);
-        this._tubeLightShader.dispose(renderer);
 
         this._lightConeGeo.dispose(renderer);
         this._lightCylinderGeo.dispose(renderer);
@@ -23263,7 +23141,6 @@ var DeferredRenderer = Base.extend(function () {
         this._outputPass.dispose(renderer);
 
         this._directionalLightMat.dispose(renderer);
-        this._directionalLightMatWithShadow.dispose(renderer);
 
         this.shadowMapPass.dispose(renderer);
     }
@@ -23272,8 +23149,8 @@ var DeferredRenderer = Base.extend(function () {
 var planeMatrix = new Matrix4();
 
 /**
- * @constructor qtek.geometry.Cube
- * @extends qtek.Geometry
+ * @constructor clay.geometry.Cube
+ * @extends clay.Geometry
  * @param {Object} [opt]
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
@@ -23281,7 +23158,7 @@ var planeMatrix = new Matrix4();
  * @param {boolean} [opt.inside]
  */
 var Cube = Geometry.extend(
-/**@lends qtek.geometry.Cube# */
+/**@lends clay.geometry.Cube# */
 {
     dynamic: false,
     /**
@@ -23303,7 +23180,7 @@ var Cube = Geometry.extend(
 }, function() {
     this.build();
 },
-/** @lends qtek.geometry.Cube.prototype */
+/** @lends clay.geometry.Cube.prototype */
 {
     /**
      * Build cube geometry
@@ -23399,11 +23276,11 @@ function createPlane(pos, widthSegments, heightSegments) {
 }
 
 /**
- * @constructor qtek.Joint
- * @extends qtek.core.Base
+ * @constructor clay.Joint
+ * @extends clay.core.Base
  */
 var Joint = Base.extend(
-/** @lends qtek.Joint# */
+/** @lends clay.Joint# */
 {
     // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576
     /**
@@ -23419,23 +23296,23 @@ var Joint = Base.extend(
 
     /**
      * Scene node attached to
-     * @type {qtek.Node}
+     * @type {clay.Node}
      */
     node: null,
 
     /**
      * Root scene node of the skeleton, which parent node is null or don't have a joint
-     * @type {qtek.Node}
+     * @type {clay.Node}
      */
     rootNode: null
 });
 
 /**
- * @constructor qtek.Light
- * @extends qtek.Node
+ * @constructor clay.Light
+ * @extends clay.Node
  */
 var Light = Node.extend(function(){
-    return /** @lends qtek.Light# */ {
+    return /** @lends clay.Light# */ {
         /**
          * Light RGB color
          * @type {number[]}
@@ -23470,18 +23347,18 @@ var Light = Node.extend(function(){
         group: 0
     };
 },
-/** @lends qtek.Light.prototype. */
+/** @lends clay.Light.prototype. */
 {
     /**
      * Light type
      * @type {string}
-     * @memberOf qtek.Light#
+     * @memberOf clay.Light#
      */
     type: '',
 
     /**
-     * @return {qtek.Light}
-     * @memberOf qtek.Light.prototype
+     * @return {clay.Light}
+     * @memberOf clay.Light.prototype
      */
     clone: function() {
         var light = Node.prototype.clone.call(this);
@@ -23495,8 +23372,8 @@ var Light = Node.extend(function(){
 });
 
 /**
- * @constructor qtek.light.Ambient
- * @extends qtek.Light
+ * @constructor clay.light.Ambient
+ * @extends clay.Light
  */
 var AmbientLight = Light.extend({
 
@@ -23519,20 +23396,20 @@ var AmbientLight = Light.extend({
     /**
      * @method
      * @name clone
-     * @return {qtek.light.Ambient}
-     * @memberOf qtek.light.Ambient.prototype
+     * @return {clay.light.Ambient}
+     * @memberOf clay.light.Ambient.prototype
      */
 });
 
-var skyboxEssl = "@export qtek.skybox.vertex\nuniform mat4 world : WORLD;\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_WorldPosition;\nvoid main()\n{\n    v_WorldPosition = (world * vec4(position, 1.0)).xyz;\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end\n@export qtek.skybox.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform float lod: 0.0;\nvarying vec3 v_WorldPosition;\n@import qtek.util.rgbm\nvoid main()\n{\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 viewDirection = normalize(v_WorldPosition - eyePos);\n    vec3 tex = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod)).rgb;\n#ifdef SRGB_DECODE\n    tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n    gl_FragColor = encodeHDR(vec4(tex, 1.0));\n}\n@end";
+var skyboxEssl = "@export clay.skybox.vertex\nuniform mat4 world : WORLD;\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_WorldPosition;\nvoid main()\n{\n    v_WorldPosition = (world * vec4(position, 1.0)).xyz;\n    gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end\n@export clay.skybox.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform float lod: 0.0;\nvarying vec3 v_WorldPosition;\n@import clay.util.rgbm\nvoid main()\n{\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 viewDirection = normalize(v_WorldPosition - eyePos);\n    vec3 tex = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod)).rgb;\n#ifdef SRGB_DECODE\n    tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n    gl_FragColor = encodeHDR(vec4(tex, 1.0));\n}\n@end";
 
 // TODO Should not derived from mesh?
 Shader.import(skyboxEssl);
 /**
- * @constructor qtek.plugin.Skybox
+ * @constructor clay.plugin.Skybox
  *
  * @example
- *     var skyTex = new qtek.TextureCube();
+ *     var skyTex = new clay.TextureCube();
  *     skyTex.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -23541,7 +23418,7 @@ Shader.import(skyboxEssl);
  *         'pz': 'assets/textures/sky/pz.jpg'
  *         'nz': 'assets/textures/sky/nz.jpg'
  *     });
- *     var skybox = new qtek.plugin.Skybox({
+ *     var skybox = new clay.plugin.Skybox({
  *         scene: scene
  *     });
  *     skybox.material.set('environmentMap', skyTex);
@@ -23549,8 +23426,8 @@ Shader.import(skyboxEssl);
 var Skybox = Mesh.extend(function () {
 
     var skyboxShader = new Shader({
-        vertex: Shader.source('qtek.skybox.vertex'),
-        fragment: Shader.source('qtek.skybox.fragment')
+        vertex: Shader.source('clay.skybox.vertex'),
+        fragment: Shader.source('clay.skybox.fragment')
     });
     var material = new Material({
         shader: skyboxShader,
@@ -23559,8 +23436,8 @@ var Skybox = Mesh.extend(function () {
 
     return {
         /**
-         * @type {qtek.Scene}
-         * @memberOf qtek.plugin.Skybox.prototype
+         * @type {clay.Scene}
+         * @memberOf clay.plugin.Skybox.prototype
          */
         scene: null,
 
@@ -23580,11 +23457,10 @@ var Skybox = Mesh.extend(function () {
     if (this.environmentMap) {
         this.setEnvironmentMap(this.environmentMap);
     }
-}, {
+}, /** @lends clay.plugin.Skybox# */ {
     /**
      * Attach the skybox to the scene
-     * @param  {qtek.Scene} scene
-     * @memberOf qtek.plugin.Skybox.prototype
+     * @param  {clay.Scene} scene
      */
     attachScene: function (scene) {
         if (this.scene) {
@@ -23595,7 +23471,6 @@ var Skybox = Mesh.extend(function () {
     },
     /**
      * Detach from scene
-     * @memberOf qtek.plugin.Skybox.prototype
      */
     detachScene: function () {
         if (this.scene) {
@@ -23606,18 +23481,23 @@ var Skybox = Mesh.extend(function () {
 
     /**
      * Dispose skybox
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this.detachScene();
         this.geometry.dispose(renderer);
-        this.material.dispose(renderer);
     },
-
+    /**
+     * Set environment map
+     * @param {clay.TextureCube} envMap
+     */
     setEnvironmentMap: function (envMap) {
         this.material.set('environmentMap', envMap);
     },
-
+    /**
+     * Get environment map
+     * @return {clay.TextureCube}
+     */
     getEnvironmentMap: function () {
         return this.material.get('environmentMap');
     },
@@ -23631,19 +23511,40 @@ var Skybox = Mesh.extend(function () {
         this.update();
         // Don't remember to disable blend
         renderer.gl.disable(renderer.gl.BLEND);
-        renderer.renderQueue([this], camera);
+        renderer.renderPass([this], camera);
     }
 });
 
+var programKeyCache$1 = {};
+
+function getProgramKey$1(lightNumbers) {
+    var defineStr = [];
+    var lightTypes = Object.keys(lightNumbers);
+    lightTypes.sort();
+    for (var i = 0; i < lightTypes.length; i++) {
+        var lightType = lightNumbers[i];
+        defineStr.push(lightType + ' ' + lightNumbers[lightType]);
+    }
+    var key = defineStr.join('\n');
+
+    if (programKeyCache$1[key]) {
+        return programKeyCache$1[key];
+    }
+
+    var id = util$1.genGUID();
+    programKeyCache$1[key] = id;
+    return id;
+}
+
 /**
- * @constructor qtek.Scene
- * @extends qtek.Node
+ * @constructor clay.Scene
+ * @extends clay.Node
  */
 var Scene = Node.extend(function () {
-    return /** @lends qtek.Scene# */ {
+    return /** @lends clay.Scene# */ {
         /**
          * Global material of scene
-         * @type {qtek.Material}
+         * @type {clay.Material}
          */
         material: null,
 
@@ -23654,17 +23555,17 @@ var Scene = Node.extend(function () {
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {qtek.Renderable[]}
+         * @type {clay.Renderable[]}
          * @readonly
          */
-        opaqueQueue: [],
+        opaqueList: [],
 
         /**
          * Opaque renderable list, it will be updated automatically
-         * @type {qtek.Renderable[]}
+         * @type {clay.Renderable[]}
          * @readonly
          */
-        transparentQueue: [],
+        transparentList: [],
 
         lights: [],
 
@@ -23676,13 +23577,15 @@ var Scene = Node.extend(function () {
          * Notice:
          *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
          *
-         * @type {qtek.math.BoundingBox}
+         * @type {clay.math.BoundingBox}
          */
         viewBoundingBoxLastFrame: new BoundingBox(),
 
         // Properties to save the light information in the scene
         // Will be set in the render function
         _lightUniforms: {},
+
+        _previousLightNumber: {},
 
         _lightNumber: {
             // groupId: {
@@ -23694,6 +23597,8 @@ var Scene = Node.extend(function () {
             // }
         },
 
+        _lightProgramKeys: {},
+
         _opaqueObjectCount: 0,
         _transparentObjectCount: 0,
 
@@ -23703,7 +23608,7 @@ var Scene = Node.extend(function () {
 }, function () {
     this._scene = this;
 },
-/** @lends qtek.Scene.prototype. */
+/** @lends clay.Scene.prototype. */
 {
     /**
      * Add node to scene
@@ -23738,8 +23643,8 @@ var Scene = Node.extend(function () {
     /**
      * Clone a new scene node recursively, including material, skeleton.
      * Shader and geometry instances will not been cloned
-     * @param  {qtek.Node} node
-     * @return {qtek.Node}
+     * @param  {clay.Node} node
+     * @return {clay.Node}
      */
     cloneNode: function (node) {
         var newNode = node.clone();
@@ -23751,7 +23656,7 @@ var Scene = Node.extend(function () {
                 currentNew.joints = current.joints.slice();
             }
             if (current.material) {
-                materialsMap[current.material.__GUID__] = {
+                materialsMap[current.material.__uid__] = {
                     oldMat: current.material
                 };
             }
@@ -23769,7 +23674,7 @@ var Scene = Node.extend(function () {
         // Replace material
         newNode.traverse(function (current) {
             if (current.material) {
-                current.material = materialsMap[current.material.__GUID__].newMat;
+                current.material = materialsMap[current.material.__uid__].newMat;
             }
         });
 
@@ -23797,20 +23702,16 @@ var Scene = Node.extend(function () {
 
         lights.length = 0;
 
-        this._updateRenderQueue(this, sceneMaterialTransparent);
+        this._updateRenderList(this, sceneMaterialTransparent);
 
-        this.opaqueQueue.length = this._opaqueObjectCount;
-        this.transparentQueue.length = this._transparentObjectCount;
+        this.opaqueList.length = this._opaqueObjectCount;
+        this.transparentList.length = this._transparentObjectCount;
 
         // reset
         if (!notUpdateLights) {
-            var lightNumber = this._lightNumber;
-            // Reset light numbers
-            for (var group in lightNumber) {
-                for (var type in lightNumber[group]) {
-                    lightNumber[group][type] = 0;
-                }
-            }
+            this._previousLightNumber = this._lightNumber;
+
+            var lightNumber = {};
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
                 var group = light.group;
@@ -23821,15 +23722,19 @@ var Scene = Node.extend(function () {
                 lightNumber[group][light.type] = lightNumber[group][light.type] || 0;
                 lightNumber[group][light.type]++;
             }
-            // PENDING Remove unused group?
+            this._lightNumber = lightNumber;
+
+            for (var groupId in lightNumber) {
+                this._lightProgramKeys[groupId] = getProgramKey$1(lightNumber[groupId]);
+            }
 
             this._updateLightUniforms();
         }
     },
 
     // Traverse the scene and add the renderable
-    // object to the render queue
-    _updateRenderQueue: function (parent, sceneMaterialTransparent) {
+    // object to the render list
+    _updateRenderList: function (parent, sceneMaterialTransparent) {
         if (parent.invisible) {
             return;
         }
@@ -23842,14 +23747,14 @@ var Scene = Node.extend(function () {
             }
             if (child.isRenderable()) {
                 if (child.material.transparent || sceneMaterialTransparent) {
-                    this.transparentQueue[this._transparentObjectCount++] = child;
+                    this.transparentList[this._transparentObjectCount++] = child;
                 }
                 else {
-                    this.opaqueQueue[this._opaqueObjectCount++] = child;
+                    this.opaqueList[this._opaqueObjectCount++] = child;
                 }
             }
             if (child._children.length > 0) {
-                this._updateRenderQueue(child);
+                this._updateRenderList(child);
             }
         }
     },
@@ -23871,7 +23776,6 @@ var Scene = Node.extend(function () {
             var group = light.group;
 
             for (var symbol in light.uniformTemplates) {
-
                 var uniformTpl = light.uniformTemplates[symbol];
                 if (!lightUniforms[group]) {
                     lightUniforms[group] = {};
@@ -23904,23 +23808,48 @@ var Scene = Node.extend(function () {
             }
         }
     },
-    
+
+    getLightGroups: function () {
+        var lightGroups = [];
+        for (var groupId in this._lightNumber) {
+            lightGroups.push(groupId);
+        }
+        return lightGroups;
+    },
+
+    getNumberChangedLightGroups: function () {
+        var lightGroups = [];
+        for (var groupId in this._lightNumber) {
+            if (this.isLightNumberChanged(groupId)) {
+                lightGroups.push(groupId);
+            }
+        }
+        return lightGroups;
+    },
+
     /**
-     * Determine if light group of the shader is different from scene's
+     * Determine if light group is different with since last frame
      * Used to determine whether to update shader and scene's uniforms in Renderer.render
      * @param {Shader} shader
      * @returns {Boolean}
      */
-    isShaderLightNumberChanged: function (shader) {
-        var group = shader.lightGroup;
+    isLightNumberChanged: function (lightGroup) {
+        var prevLightNumber = this._previousLightNumber;
+        var currentLightNumber = this._lightNumber;
         // PENDING Performance
-        for (var type in this._lightNumber[group]) {
-            if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
+        for (var type in currentLightNumber[lightGroup]) {
+            if (!prevLightNumber[lightGroup]) {
+                return true;
+            }
+            if (currentLightNumber[lightGroup][type] !== prevLightNumber[lightGroup][type]) {
                 return true;
             }
         }
-        for (var type in shader.lightNumber) {
-            if (this._lightNumber[group][type] !== shader.lightNumber[type]) {
+        for (var type in prevLightNumber[lightGroup]) {
+            if (!currentLightNumber[lightGroup]) {
+                return true;
+            }
+            if (currentLightNumber[lightGroup][type] !== prevLightNumber[lightGroup][type]) {
                 return true;
             }
         }
@@ -23931,30 +23860,29 @@ var Scene = Node.extend(function () {
      * Set shader's light group with scene's
      * @param {Shader} shader
      */
-    setShaderLightNumber: function (shader) {
-        var group = shader.lightGroup;
-        for (var type in this._lightNumber[group]) {
-            shader.lightNumber[type] = this._lightNumber[group][type];
-        }
-        shader.dirty();
+    getLightsNumbers: function (lightGroup) {
+        return this._lightNumber[lightGroup];
     },
 
-    setLightUniforms: function (shader, renderer) {
-        var group = shader.lightGroup;
-        for (var symbol in this._lightUniforms[group]) {
-            var lu = this._lightUniforms[group][symbol];
+    getProgramKey: function (lightGroup) {
+        return this._lightProgramKeys[lightGroup];
+    },
+
+    setLightUniforms: function (program, lightGroup, renderer) {
+        for (var symbol in this._lightUniforms[lightGroup]) {
+            var lu = this._lightUniforms[lightGroup][symbol];
             if (lu.type === 'tv') {
                 for (var i = 0; i < lu.value.length; i++) {
                     var texture = lu.value[i];
-                    var slot = shader.currentTextureSlot();
-                    var result = shader.setUniform(renderer.gl, '1i', symbol, slot);
+                    var slot = program.currentTextureSlot();
+                    var result = program.setUniform(renderer.gl, '1i', symbol, slot);
                     if (result) {
-                        shader.takeCurrentTextureSlot(renderer, texture);
+                        program.takeCurrentTextureSlot(renderer, texture);
                     }
                 }
             }
             else {
-                shader.setUniform(renderer.gl, lu.type, symbol, lu.value);
+                program.setUniform(renderer.gl, lu.type, symbol, lu.value);
             }
         }
     },
@@ -23966,8 +23894,8 @@ var Scene = Node.extend(function () {
      */
     dispose: function () {
         this.material = null;
-        this.opaqueQueue = [];
-        this.transparentQueue = [];
+        this.opaqueList = [];
+        this.transparentList = [];
 
         this.lights = [];
 
@@ -23989,20 +23917,20 @@ var targets$1 = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 /**
  * Pass rendering scene to a environment cube map
  *
- * @constructor qtek.prePass.EnvironmentMap
- * @extends qtek.core.Base
+ * @constructor clay.prePass.EnvironmentMap
+ * @extends clay.core.Base
  * @example
  *     // Example of car reflection
- *     var envMap = new qtek.TextureCube({
+ *     var envMap = new clay.TextureCube({
  *         width: 256,
  *         height: 256
  *     });
- *     var envPass = new qtek.prePass.EnvironmentMap({
+ *     var envPass = new clay.prePass.EnvironmentMap({
  *         position: car.position,
  *         texture: envMap
  *     });
  *     var carBody = car.getChildByName('body');
- *     carBody.material.shader.enableTexture('environmentMap');
+ *     carBody.material.enableTexture('environmentMap');
  *     carBody.material.set('environmentMap', envMap);
  *     ...
  *     animation.on('frame', function(frameTime) {
@@ -24011,35 +23939,35 @@ var targets$1 = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *     });
  */
 var EnvironmentMapPass = Base.extend(function() {
-    var ret = {
+    var ret = /** @lends clay.prePass.EnvironmentMap# */ {
         /**
          * Camera position
-         * @type {qtek.math.Vector3}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @type {clay.math.Vector3}
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         position: new Vector3(),
         /**
          * Camera far plane
          * @type {number}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         far: 1000,
         /**
          * Camera near plane
          * @type {number}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         near: 0.1,
         /**
          * Environment cube map
-         * @type {qtek.TextureCube}
-         * @memberOf qtek.prePass.EnvironmentMap#
+         * @type {clay.TextureCube}
+         * @memberOf clay.prePass.EnvironmentMap#
          */
         texture: null,
 
         /**
          * Used if you wan't have shadow in environment map
-         * @type {qtek.prePass.ShadowMap}
+         * @type {clay.prePass.ShadowMap}
          */
         shadowMapPass: null,
     };
@@ -24062,17 +23990,17 @@ var EnvironmentMapPass = Base.extend(function() {
     ret._frameBuffer = new FrameBuffer();
 
     return ret;
-}, {
+},  /** @lends clay.prePass.EnvironmentMap# */ {
     /**
      * @param  {string} target
-     * @return  {qtek.Camera}
+     * @return  {clay.Camera}
      */
     getCamera: function (target) {
         return this._cameras[target];
     },
     /**
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Scene} scene
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Scene} scene
      * @param  {boolean} [notUpdateScene=false]
      */
     render: function(renderer, scene, notUpdateScene) {
@@ -24114,44 +24042,41 @@ var EnvironmentMapPass = Base.extend(function() {
         }
     },
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
         this._frameBuffer.dispose(renderer);
     }
 });
 
-var basicEssl = "@export qtek.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import qtek.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_Barycentric = barycentric;\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n}\n@end\n@export qtek.basic.fragment\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import qtek.util.edge_factor\n@import qtek.util.rgbm\n@import qtek.util.srgb\nvoid main()\n{\n#ifdef RENDER_TEXCOORD\n    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n    return;\n#endif\n    gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 tex = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n    tex = sRGBToLinear(tex);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n    gl_FragColor.a = tex.a;\n#endif\n    gl_FragColor.rgb *= tex.rgb;\n#endif\n    gl_FragColor.rgb += emission;\n    if( lineWidth > 0.)\n    {\n        gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef GAMMA_ENCODE\n    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1 / 2.2));\n#endif\n#ifdef ALPHA_TEST\n    if (gl_FragColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var basicEssl = "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_Barycentric = barycentric;\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n}\n@end\n@export clay.basic.fragment\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\nvoid main()\n{\n#ifdef RENDER_TEXCOORD\n    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n    return;\n#endif\n    gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 tex = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n    tex = sRGBToLinear(tex);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n    gl_FragColor.a = tex.a;\n#endif\n    gl_FragColor.rgb *= tex.rgb;\n#endif\n    gl_FragColor.rgb += emission;\n    if( lineWidth > 0.)\n    {\n        gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef GAMMA_ENCODE\n    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1 / 2.2));\n#endif\n#ifdef ALPHA_TEST\n    if (gl_FragColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
 Shader.import(basicEssl);
 /**
- * @constructor qtek.plugin.Skydome
+ * @constructor clay.plugin.Skydome
  *
  * @example
- *     var skyTex = new qtek.Texture2D();
+ *     var skyTex = new clay.Texture2D();
  *     skyTex.load('assets/textures/sky.jpg');
- *     var skydome = new qtek.plugin.Skydome({
+ *     var skydome = new clay.plugin.Skydome({
  *         scene: scene
  *     });
  *     skydome.material.set('diffuseMap', skyTex);
  */
 var Skydome = Mesh.extend(function () {
 
-    var skydomeShader = new Shader({
-        vertex: Shader.source('qtek.basic.vertex'),
-        fragment: Shader.source('qtek.basic.fragment')
-    });
-    skydomeShader.enableTexture('diffuseMap');
+    var skydomeShader = new Shader(Shader.source('clay.basic.vertex'), Shader.source('clay.basic.fragment'));
 
     var material = new Material({
         shader: skydomeShader,
         depthMask: false
     });
+    material.enableTexture('diffuseMap');
 
     return {
         /**
-         * @type {qtek.Scene}
-         * @memberOf qtek.plugin.Skydome#
+         * @type {clay.Scene}
+         * @memberOf clay.plugin.Skydome#
          */
         scene: null,
 
@@ -24179,8 +24104,8 @@ var Skydome = Mesh.extend(function () {
 }, {
     /**
      * Attach the skybox to the scene
-     * @param  {qtek.Scene} scene
-     * @memberOf qtek.plugin.Skydome.prototype
+     * @param  {clay.Scene} scene
+     * @memberOf clay.plugin.Skydome.prototype
      */
     attachScene: function (scene) {
         if (this.scene) {
@@ -24191,7 +24116,7 @@ var Skydome = Mesh.extend(function () {
     },
     /**
      * Detach from scene
-     * @memberOf qtek.plugin.Skydome.prototype
+     * @memberOf clay.plugin.Skydome.prototype
      */
     detachScene: function () {
         if (this.scene) {
@@ -24203,7 +24128,7 @@ var Skydome = Mesh.extend(function () {
     _beforeRenderScene: function (renderer, scene, camera) {
         this.position.copy(camera.getWorldPosition());
         this.update();
-        renderer.renderQueue([this], camera);
+        renderer.renderPass([this], camera);
     },
 
     setEnvironmentMap: function (envMap) {
@@ -24217,7 +24142,6 @@ var Skydome = Mesh.extend(function () {
     dispose: function (renderer) {
         this.detachScene();
         this.geometry.dispose(renderer);
-        this.material.dispose(renderer);
     }
 });
 
@@ -24508,7 +24432,7 @@ var ret$1 = {
 };
 
 /**
- * @alias qtek.util.texture
+ * @alias clay.util.texture
  */
 var textureUtil = {
     /**
@@ -24516,7 +24440,7 @@ var textureUtil = {
      * @param  {object} [option]
      * @param  {Function} [onsuccess]
      * @param  {Function} [onerror]
-     * @return {qtek.Texture}
+     * @return {clay.Texture}
      */
     loadTexture: function (path, option, onsuccess, onerror) {
         var texture;
@@ -24578,9 +24502,9 @@ var textureUtil = {
 
     /**
      * Load a panorama texture and render it to a cube map
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      * @param  {string} path
-     * @param  {qtek.TextureCube} cubeMap
+     * @param  {clay.TextureCube} cubeMap
      * @param  {object} [option]
      * @param  {boolean} [option.encodeRGBM]
      * @param  {number} [option.exposure]
@@ -24610,9 +24534,9 @@ var textureUtil = {
 
     /**
      * Render a panorama texture to a cube map
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Texture2D} panoramaMap
-     * @param  {qtek.TextureCube} cubeMap
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Texture2D} panoramaMap
+     * @param  {clay.TextureCube} cubeMap
      * @param  {Object} option
      * @param  {boolean} [option.encodeRGBM]
      */
@@ -24625,7 +24549,7 @@ var textureUtil = {
 
         option = option || {};
         if (option.encodeRGBM) {
-            skydome.material.shader.define('fragment', 'RGBM_ENCODE');
+            skydome.material.define('fragment', 'RGBM_ENCODE');
         }
 
         environmentMapPass.texture = cubeMap;
@@ -24748,7 +24672,7 @@ var textureUtil = {
      * @param  {number} [unitSize]
      * @param  {string} [color1]
      * @param  {string} [color2]
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     createChessboard: function (size, unitSize, color1, color2) {
         size = size || 512;
@@ -24786,7 +24710,7 @@ var textureUtil = {
     /**
      * Create a blank pure color 1x1 texture
      * @param  {string} color
-     * @return {qtek.Texture2D}
+     * @return {clay.Texture2D}
      */
     createBlank: function (color) {
         var canvas = document.createElement('canvas');
@@ -24806,7 +24730,7 @@ var textureUtil = {
 
 var integrateBRDFShaderCode = "#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform sampler2D normalDistribution;\nuniform vec2 viewportSize : [512, 256];\nconst vec3 N = vec3(0.0, 0.0, 1.0);\nconst float fSampleNumber = float(SAMPLE_NUMBER);\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n    vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);\n    vec3 tangentX = normalize(cross(upVector, N));\n    vec3 tangentY = cross(N, tangentX);\n    return tangentX * H.x + tangentY * H.y + N * H.z;\n}\nfloat G_Smith(float roughness, float NoV, float NoL) {\n    float k = roughness * roughness / 2.0;\n    float G1V = NoV / (NoV * (1.0 - k) + k);\n    float G1L = NoL / (NoL * (1.0 - k) + k);\n    return G1L * G1V;\n}\nvoid main() {\n    vec2 uv = gl_FragCoord.xy / viewportSize;\n    float NoV = uv.x;\n    float roughness = uv.y;\n    vec3 V;\n    V.x = sqrt(1.0 - NoV * NoV);\n    V.y = 0.0;\n    V.z = NoV;\n    float A = 0.0;\n    float B = 0.0;\n    for (int i = 0; i < SAMPLE_NUMBER; i++) {\n        vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);\n        vec3 L = reflect(-V, H);\n        float NoL = clamp(L.z, 0.0, 1.0);\n        float NoH = clamp(H.z, 0.0, 1.0);\n        float VoH = clamp(dot(V, H), 0.0, 1.0);\n        if (NoL > 0.0) {\n            float G = G_Smith(roughness, NoV, NoL);\n            float G_Vis = G * VoH / (NoH * NoV);\n            float Fc = pow(1.0 - VoH, 5.0);\n            A += (1.0 - Fc) * G_Vis;\n            B += Fc * G_Vis;\n        }\n    }\n    gl_FragColor = vec4(vec2(A, B) / fSampleNumber, 0.0, 1.0);\n}\n";
 
-var prefilterFragCode = "#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform sampler2D normalDistribution;\nuniform float roughness : 0.5;\nvarying vec2 v_Texcoord;\nvarying vec3 v_WorldPosition;\nconst float fSampleNumber = float(SAMPLE_NUMBER);\n@import qtek.util.rgbm\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n    vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);\n    vec3 tangentX = normalize(cross(upVector, N));\n    vec3 tangentY = cross(N, tangentX);\n    return tangentX * H.x + tangentY * H.y + N * H.z;\n}\nvoid main() {\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 V = normalize(v_WorldPosition - eyePos);\n    vec3 N = V;\n    vec3 R = V;\n    vec3 prefilteredColor = vec3(0.0);\n    float totalWeight = 0.0;\n    for (int i = 0; i < SAMPLE_NUMBER; i++) {\n        vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);\n        vec3 L = reflect(-V, H);\n        float NoL = clamp(dot(N, L), 0.0, 1.0);\n        if (NoL > 0.0) {\n            prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;\n            totalWeight += NoL;\n        }\n    }\n    gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));\n}\n";
+var prefilterFragCode = "#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform sampler2D normalDistribution;\nuniform float roughness : 0.5;\nvarying vec2 v_Texcoord;\nvarying vec3 v_WorldPosition;\nconst float fSampleNumber = float(SAMPLE_NUMBER);\n@import clay.util.rgbm\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n    vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);\n    vec3 tangentX = normalize(cross(upVector, N));\n    vec3 tangentY = cross(N, tangentX);\n    return tangentX * H.x + tangentY * H.y + N * H.z;\n}\nvoid main() {\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 V = normalize(v_WorldPosition - eyePos);\n    vec3 N = V;\n    vec3 R = V;\n    vec3 prefilteredColor = vec3(0.0);\n    float totalWeight = 0.0;\n    for (int i = 0; i < SAMPLE_NUMBER; i++) {\n        vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);\n        vec3 L = reflect(-V, H);\n        float NoL = clamp(dot(N, L), 0.0, 1.0);\n        if (NoL > 0.0) {\n            prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;\n            totalWeight += NoL;\n        }\n    }\n    gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));\n}\n";
 
 // Cubemap prefilter utility
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
@@ -24816,17 +24740,17 @@ var cubemapUtil = {};
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
- * @name qtek.util.cubemap.prefilterEnvironmentMap
- * @param  {qtek.Renderer} renderer
- * @param  {qtek.Texture} envMap
+ * @name clay.util.cubemap.prefilterEnvironmentMap
+ * @param  {clay.Renderer} renderer
+ * @param  {clay.Texture} envMap
  * @param  {Object} [textureOpts]
  * @param  {number} [textureOpts.width=64]
  * @param  {number} [textureOpts.height=64]
  * @param  {number} [textureOpts.type]
  * @param  {boolean} [textureOpts.encodeRGBM=false]
  * @param  {boolean} [textureOpts.decodeRGBM=false]
- * @param  {qtek.Texture2D} [normalDistribution]
- * @param  {qtek.Texture2D} [brdfLookup]
+ * @param  {clay.Texture2D} [normalDistribution]
+ * @param  {clay.Texture2D} [brdfLookup]
  */
 cubemapUtil.prefilterEnvironmentMap = function (
     renderer, envMap, textureOpts, normalDistribution, brdfLookup
@@ -24862,14 +24786,14 @@ cubemapUtil.prefilterEnvironmentMap = function (
 
     var prefilterMaterial = new Material({
         shader: new Shader({
-            vertex: Shader.source('qtek.skybox.vertex'),
+            vertex: Shader.source('clay.skybox.vertex'),
             fragment: prefilterFragCode
         })
     });
     prefilterMaterial.set('normalDistribution', normalDistribution);
 
-    textureOpts.encodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_ENCODE');
-    textureOpts.decodeRGBM && prefilterMaterial.shader.define('fragment', 'RGBM_DECODE');
+    textureOpts.encodeRGBM && prefilterMaterial.define('fragment', 'RGBM_ENCODE');
+    textureOpts.decodeRGBM && prefilterMaterial.define('fragment', 'RGBM_DECODE');
 
     var dummyScene = new Scene();
     var skyEnv;
@@ -25064,13 +24988,14 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
 /**
  * Ambient cubemap light provides specular parts of Image Based Lighting.
  * Which is a basic requirement for Physically Based Rendering
- * @constructor qtek.light.AmbientCubemap
- * @extends qtek.Light
+ * @constructor clay.light.AmbientCubemap
+ * @extends clay.Light
  */
 var AmbientCubemapLight = Light.extend({
 
     /**
-     * @type {qtek.TextureCube}
+     * @type {clay.TextureCube}
+     * @memberOf clay.light.AmbientCubemap#
      */
     cubemap: null,
 
@@ -25082,13 +25007,13 @@ var AmbientCubemapLight = Light.extend({
     _normalDistribution: null,
     _brdfLookup: null
 
-}, {
+}, /** @lends clay.light.AmbientCubemap# */ {
 
     type: 'AMBIENT_CUBEMAP_LIGHT',
 
     /**
      * Do prefitering the cubemap
-     * @param {qtek.Renderer} renderer
+     * @param {clay.Renderer} renderer
      * @param {number} [size=32]
      */
     prefilter: function (renderer, size) {
@@ -25141,24 +25066,24 @@ var AmbientCubemapLight = Light.extend({
     /**
      * @method
      * @name clone
-     * @return {qtek.light.AmbientCubemap}
-     * @memberOf qtek.light.AmbientCubemap.prototype
+     * @return {clay.light.AmbientCubemap}
+     * @memberOf clay.light.AmbientCubemap.prototype
      */
 });
 
 /**
  * Spherical Harmonic Ambient Light
- * @constructor qtek.light.AmbientSH
- * @extends qtek.Light
+ * @constructor clay.light.AmbientSH
+ * @extends clay.Light
  */
 var AmbientSHLight = Light.extend({
 
     castShadow: false,
 
-
     /**
      * Spherical Harmonic Coefficients
      * @type {Array.<number>}
+     * @memberOf clay.light.AmbientSH#
      */
     coefficients: [],
 
@@ -25192,26 +25117,26 @@ var AmbientSHLight = Light.extend({
     /**
      * @method
      * @name clone
-     * @return {qtek.light.Ambient}
-     * @memberOf qtek.light.Ambient.prototype
+     * @return {clay.light.Ambient}
+     * @memberOf clay.light.Ambient.prototype
      */
 });
 
 /**
- * @constructor qtek.light.Directional
- * @extends qtek.Light
+ * @constructor clay.light.Directional
+ * @extends clay.Light
  *
  * @example
- *     var light = new qtek.light.Directional({
+ *     var light = new clay.light.Directional({
  *         intensity: 0.5,
  *         color: [1.0, 0.0, 0.0]
  *     });
  *     light.position.set(10, 10, 10);
- *     light.lookAt(qtek.math.Vector3.ZERO);
+ *     light.lookAt(clay.math.Vector3.ZERO);
  *     scene.add(light);
  */
 var DirectionalLight = Light.extend(
-/** @lends qtek.light.Directional# */
+/** @lends clay.light.Directional# */
 {
     /**
      * @type {number}
@@ -25256,8 +25181,8 @@ var DirectionalLight = Light.extend(
         }
     },
     /**
-     * @return {qtek.light.Directional}
-     * @memberOf qtek.light.Directional.prototype
+     * @return {clay.light.Directional}
+     * @memberOf clay.light.Directional.prototype
      */
     clone: function () {
         var light = Light.prototype.clone.call(this);
@@ -25268,11 +25193,11 @@ var DirectionalLight = Light.extend(
 });
 
 /**
- * @constructor qtek.light.Point
- * @extends qtek.Light
+ * @constructor clay.light.Point
+ * @extends clay.Light
  */
 var PointLight = Light.extend(
-/** @lends qtek.light.Point# */
+/** @lends clay.light.Point# */
 {
     /**
      * @type {number}
@@ -25310,8 +25235,8 @@ var PointLight = Light.extend(
         }
     },
     /**
-     * @return {qtek.light.Point}
-     * @memberOf qtek.light.Point.prototype
+     * @return {clay.light.Point}
+     * @memberOf clay.light.Point.prototype
      */
     clone: function() {
         var light = Light.prototype.clone.call(this);
@@ -25321,11 +25246,11 @@ var PointLight = Light.extend(
 });
 
 /**
- * @constructor qtek.light.Sphere
- * @extends {qtek.Light}
+ * @constructor clay.light.Sphere
+ * @extends {clay.Light}
  */
 var SphereLight = Light.extend(
-/** @lends qtek.light.Sphere# */
+/** @lends clay.light.Sphere# */
 {
     /**
      * @type {number}
@@ -25371,11 +25296,11 @@ var SphereLight = Light.extend(
 });
 
 /**
- * @constructor qtek.light.Spot
- * @extends qtek.Light
+ * @constructor clay.light.Spot
+ * @extends clay.Light
  */
 var SpotLight = Light.extend(
-/**@lends qtek.light.Spot */
+/**@lends clay.light.Spot */
 {
     /**
      * @type {number}
@@ -25454,8 +25379,8 @@ var SpotLight = Light.extend(
         }
     },
     /**
-     * @return {qtek.light.Spot}
-     * @memberOf qtek.light.Spot.prototype
+     * @return {clay.light.Spot}
+     * @memberOf clay.light.Spot.prototype
      */
     clone: function () {
         var light = Light.prototype.clone.call(this);
@@ -25470,11 +25395,11 @@ var SpotLight = Light.extend(
 });
 
 /**
- * @constructor qtek.light.Tube
- * @extends {qtek.Light}
+ * @constructor clay.light.Tube
+ * @extends {clay.Light}
  */
 var TubeLight = Light.extend(
-/** @lends qtek.light.Tube# */
+/** @lends clay.light.Tube# */
 {
     /**
      * @type {number}
@@ -25527,15 +25452,12 @@ var TubeLight = Light.extend(
     }
 });
 
-var shaderSourceReg = /#source\((.*?)\)/;
-var urlReg = /#url\((.*?)\)/;
-
 /**
- * @constructor qtek.loader.FX
- * @extends qtek.core.Base
+ * @constructor clay.loader.FX
+ * @extends clay.core.Base
  */
 var FXLoader = Base.extend(
-/** @lends qtek.loader.FX# */
+/** @lends clay.loader.FX# */
 {
     /**
      * @type {string}
@@ -25551,16 +25473,16 @@ var FXLoader = Base.extend(
     shaderRootPath: '',
 
     /**
-     * @type {qtek.Scene}
+     * @type {clay.Scene}
      */
     scene: null,
 
     /**
-     * @type {qtek.Camera}
+     * @type {clay.Camera}
      */
     camera: null
 },
-/** @lends qtek.loader.FX.prototype */
+/** @lends clay.loader.FX.prototype */
 {
     /**
      * @param  {string} url
@@ -25581,461 +25503,64 @@ var FXLoader = Base.extend(
                 self.trigger('error', e);
             },
             responseType: 'text',
-            onload: function(data) {
-                self.parse(JSON.parse(data));
-            }
-        });
-    },
-
-    /**
-     * @param {Object} json
-     * @return {qtek.compositor.Compositor}
-     */
-    parse: function(json) {
-        var self = this;
-        var compositor = new Compositor();
-
-        var lib = {
-            textures: {},
-            shaders: {},
-            parameters: {}
-        };
-        var afterLoad = function(shaderLib, textureLib) {
-            for (var i = 0; i < json.nodes.length; i++) {
-                var nodeInfo = json.nodes[i];
-                var node = self._createNode(nodeInfo, lib);
-                if (node) {
-                    compositor.addNode(node);
-                }
-            }
-
-            self.trigger('success', compositor);
-        };
-
-        for (var name in json.parameters) {
-            var paramInfo = json.parameters[name];
-            lib.parameters[name] = this._convertParameter(paramInfo);
-        }
-        this._loadShaders(json, function(shaderLib) {
-            // TODO load texture asynchronous
-            self._loadTextures(json, lib, function(textureLib) {
-                lib.textures = textureLib;
-                lib.shaders = shaderLib;
-                afterLoad();
-            });
-        });
-
-        return compositor;
-    },
-
-    _createNode: function(nodeInfo, lib) {
-        var type = nodeInfo.type || 'filter';
-        var shaderSource;
-        var inputs;
-        var outputs;
-
-        if (type === 'filter') {
-            var shaderExp = nodeInfo.shader.trim();
-            var res = shaderSourceReg.exec(shaderExp);
-            if (res) {
-                shaderSource = Shader.source(res[1].trim());
-            }
-            else if (shaderExp.charAt(0) === '#') {
-                shaderSource = lib.shaders[shaderExp.substr(1)];
-            }
-            if (!shaderSource) {
-                shaderSource = shaderExp;
-            }
-            if (!shaderSource) {
-                return;
-            }
-        }
-
-        if (nodeInfo.inputs) {
-            inputs = {};
-            for (var name in nodeInfo.inputs) {
-                if (typeof nodeInfo.inputs[name] === 'string') {
-                    inputs[name] = nodeInfo.inputs[name];
-                }
-                else {
-                    inputs[name] = {
-                        node: nodeInfo.inputs[name].node,
-                        pin: nodeInfo.inputs[name].pin
-                    };
-                }
-            }
-        }
-        if (nodeInfo.outputs) {
-            outputs = {};
-            for (var name in nodeInfo.outputs) {
-                var outputInfo = nodeInfo.outputs[name];
-                outputs[name] = {};
-                if (outputInfo.attachment != null) {
-                    outputs[name].attachment = outputInfo.attachment;
-                }
-                if (outputInfo.keepLastFrame != null) {
-                    outputs[name].keepLastFrame = outputInfo.keepLastFrame;
-                }
-                if (outputInfo.outputLastFrame != null) {
-                    outputs[name].outputLastFrame = outputInfo.outputLastFrame;
-                }
-                if (typeof(outputInfo.parameters) === 'string') {
-                    var paramExp = outputInfo.parameters;
-                    if (paramExp.charAt(0) === '#') {
-                        outputs[name].parameters = lib.parameters[paramExp.substr(1)];
-                    }
-                }
-                else if (outputInfo.parameters) {
-                    outputs[name].parameters = this._convertParameter(outputInfo.parameters);
-                }
-            }
-        }
-        var node;
-        if (type === 'scene') {
-            node = new SceneNode$1({
-                name: nodeInfo.name,
-                scene: this.scene,
-                camera: this.camera,
-                outputs: outputs
-            });
-        }
-        else if (type === 'texture') {
-            node = new TextureNode$1({
-                name: nodeInfo.name,
-                outputs: outputs
-            });
-        }
-        // Default is filter
-        else {
-            node = new FilterNode$1({
-                name: nodeInfo.name,
-                shader: shaderSource,
-                inputs: inputs,
-                outputs: outputs
-            });
-        }
-        if (node) {
-            if (nodeInfo.parameters) {
-                for (var name in nodeInfo.parameters) {
-                    var val = nodeInfo.parameters[name];
-                    if (typeof(val) === 'string') {
-                        val = val.trim();
-                        if (val.charAt(0) === '#') {
-                            val = lib.textures[val.substr(1)];
-                        }
-                        else {
-                            node.on(
-                                'beforerender', createSizeSetHandler(
-                                    name, tryConvertExpr(val)
-                                )
-                            );
-                        }
-                    }
-                    node.setParameter(name, val);
-                }
-            }
-            if (nodeInfo.defines && node.pass) {
-                for (var name in nodeInfo.defines) {
-                    var val = nodeInfo.defines[name];
-                    node.pass.material.shader.define('fragment', name, val);
-                }
-            }
-        }
-        return node;
-    },
-
-    _convertParameter: function(paramInfo) {
-        var param = {};
-        if (!paramInfo) {
-            return param;
-        }
-        ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT', 'flipY', 'useMipmap']
-            .forEach(function(name) {
-                var val = paramInfo[name];
-                if (val != null) {
-                    // Convert string to enum
-                    if (typeof val === 'string') {
-                        val = Texture[val];
-                    }
-                    param[name] = val;
-                }
-            });
-        ['width', 'height']
-            .forEach(function(name) {
-                if (paramInfo[name] != null) {
-                    var val = paramInfo[name];
-                    if (typeof val === 'string') {
-                        val = val.trim();
-                        param[name] = createSizeParser(
-                            name, tryConvertExpr(val)
-                        );
-                    }
-                    else {
-                        param[name] = val;
-                    }
-                }
-            });
-        if (paramInfo.useMipmap != null) {
-            param.useMipmap = paramInfo.useMipmap;
-        }
-        return param;
-    },
-
-    _loadShaders: function(json, callback) {
-        if (!json.shaders) {
-            callback({});
-            return;
-        }
-        var shaders = {};
-        var loading = 0;
-        var cbd = false;
-        var shaderRootPath = this.shaderRootPath || this.rootPath;
-        util$1.each(json.shaders, function(shaderExp, name) {
-            var res = urlReg.exec(shaderExp);
-            if (res) {
-                var path = res[1];
-                path = util$1.relative2absolute(path, shaderRootPath);
-                loading++;
-                request.get({
-                    url: path,
-                    onload: function(shaderSource) {
-                        shaders[name] = shaderSource;
-                        Shader['import'](shaderSource);
-                        loading--;
-                        if (loading === 0) {
-                            callback(shaders);
-                            cbd = true;
-                        }
-                    }
+            onload: function (data) {
+                createCompositor(JSON.parse(data), {
+                    textureRootPath: this.textureRootPath || this.rootPath,
+                    camera: this.camera,
+                    scene: this.scene
                 });
             }
-            else {
-                shaders[name] = shaderExp;
-                // Try import shader
-                Shader['import'](shaderExp);
-            }
-        }, this);
-        if (loading === 0 && !cbd) {
-            callback(shaders);
-        }
-    },
-
-    _loadTextures: function(json, lib, callback) {
-        if (!json.textures) {
-            callback({});
-            return;
-        }
-        var textures = {};
-        var loading = 0;
-
-        var cbd = false;
-        var textureRootPath = this.textureRootPath || this.rootPath;
-        util$1.each(json.textures, function(textureInfo, name) {
-            var texture;
-            var path = textureInfo.path;
-            var parameters = this._convertParameter(textureInfo.parameters);
-            if (Array.isArray(path) && path.length === 6) {
-                path = path.map(function(item) {
-                    return util$1.relative2absolute(item, textureRootPath);
-                });
-                texture = new TextureCube(parameters);
-            }
-            else if(typeof path === 'string') {
-                path = util$1.relative2absolute(path, textureRootPath);
-                texture = new Texture2D(parameters);
-            }
-            else {
-                return;
-            }
-
-            texture.load(path);
-            loading++;
-            texture.once('success', function() {
-                textures[name] = texture;
-                loading--;
-                if (loading === 0) {
-                    callback(textures);
-                    cbd = true;
-                }
-            });
-        }, this);
-
-        if (loading === 0 && !cbd) {
-            callback(textures);
-        }
+        });
     }
 });
 
-function createSizeSetHandler(name, exprFunc) {
-    return function (renderer) {
-        // PENDING viewport size or window size
-        var dpr = renderer.getDevicePixelRatio();
-        // PENDING If multiply dpr ?
-        var width = renderer.getWidth();
-        var height = renderer.getHeight();
-        var result = exprFunc(width, height, dpr);
-        this.setParameter(name, result);
-    };
-}
-
-function createSizeParser(name, exprFunc) {
-    return function (renderer) {
-        var dpr = renderer.getDevicePixelRatio();
-        var width = renderer.getWidth();
-        var height = renderer.getHeight();
-        return exprFunc(width, height, dpr);
-    };
-}
-
-function tryConvertExpr(string) {
-    // PENDING
-    var exprRes = /^expr\((.*)\)$/.exec(string);
-    if (exprRes) {
-        try {
-            var func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
-            // Try run t
-            func(1, 1);
-
-            return func;
-        }
-        catch (e) {
-            throw new Error('Invalid expression.');
-        }
-    }
-}
-
-var standardEssl = "\n@export qtek.standard.vertex\n#define SHADER_NAME standard\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#if defined(AOMAP_ENABLED)\nattribute vec2 texcoord2 : TEXCOORD_1;\n#endif\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nattribute vec3 barycentric;\n@import qtek.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#if defined(AOMAP_ENABLED)\nvarying vec2 v_Texcoord2;\n#endif\nvoid main()\n{\n    vec3 skinnedPosition = position;\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n    v_Barycentric = barycentric;\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n#endif\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n#if defined(AOMAP_ENABLED)\n    v_Texcoord2 = texcoord2;\n#endif\n}\n@end\n@export qtek.standard.fragment\n#define PI 3.14159265358979\n#define GLOSSINESS_CHANNEL 0\n#define ROUGHNESS_CHANNEL 0\n#define METALNESS_CHANNEL 1\nuniform mat4 viewInverse : VIEWINVERSE;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#ifdef NORMALMAP_ENABLED\nuniform sampler2D normalMap;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\nuniform sampler2D diffuseMap;\n#endif\n#ifdef SPECULARMAP_ENABLED\nuniform sampler2D specularMap;\n#endif\n#ifdef USE_ROUGHNESS\nuniform float roughness : 0.5;\n    #ifdef ROUGHNESSMAP_ENABLED\nuniform sampler2D roughnessMap;\n    #endif\n#else\nuniform float glossiness: 0.5;\n    #ifdef GLOSSINESSMAP_ENABLED\nuniform sampler2D glossinessMap;\n    #endif\n#endif\n#ifdef METALNESSMAP_ENABLED\nuniform sampler2D metalnessMap;\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\nuniform samplerCube environmentMap;\n    #ifdef PARALLAX_CORRECTED\nuniform vec3 environmentBoxMin;\nuniform vec3 environmentBoxMax;\n    #endif\n#endif\n#ifdef BRDFLOOKUP_ENABLED\nuniform sampler2D brdfLookup;\n#endif\n#ifdef EMISSIVEMAP_ENABLED\nuniform sampler2D emissiveMap;\n#endif\n#ifdef SSAOMAP_ENABLED\nuniform sampler2D ssaoMap;\nuniform vec4 viewport : VIEWPORT;\n#endif\n#ifdef AOMAP_ENABLED\nuniform sampler2D aoMap;\nuniform float aoIntensity;\nvarying vec2 v_Texcoord2;\n#endif\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef USE_METALNESS\nuniform float metalness : 0.0;\n#else\nuniform vec3 specularColor : [0.1, 0.1, 0.1];\n#endif\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float emissionIntensity: 1;\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef ENVIRONMENTMAP_PREFILTER\nuniform float maxMipmapLevel: 5;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import qtek.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import qtek.header.ambient_sh_light\n#endif\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n@import qtek.header.ambient_cubemap_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import qtek.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import qtek.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import qtek.header.spot_light\n#endif\n@import qtek.util.calculate_attenuation\n@import qtek.util.edge_factor\n@import qtek.util.rgbm\n@import qtek.util.srgb\n@import qtek.plugin.compute_shadow_map\n@import qtek.util.parallax_correct\nfloat G_Smith(float g, float ndv, float ndl)\n{\n    float roughness = 1.0 - g;\n    float k = roughness * roughness / 2.0;\n    float G1V = ndv / (ndv * (1.0 - k) + k);\n    float G1L = ndl / (ndl * (1.0 - k) + k);\n    return G1L * G1V;\n}\nvec3 F_Schlick(float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nfloat D_Phong(float g, float ndh) {\n    float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(float g, float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (PI * tmp * tmp);\n}\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\nuniform float parallaxOcclusionScale : 0.02;\nuniform float parallaxMaxLayers : 20;\nuniform float parallaxMinLayers : 5;\nuniform sampler2D parallaxOcclusionMap;\nmat3 transpose(in mat3 inMat)\n{\n    vec3 i0 = inMat[0];\n    vec3 i1 = inMat[1];\n    vec3 i2 = inMat[2];\n    return mat3(\n        vec3(i0.x, i1.x, i2.x),\n        vec3(i0.y, i1.y, i2.y),\n        vec3(i0.z, i1.z, i2.z)\n    );\n}\nvec2 parallaxUv(vec2 uv, vec3 viewDir)\n{\n    float numLayers = mix(parallaxMaxLayers, parallaxMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));\n    float layerHeight = 1.0 / numLayers;\n    float curLayerHeight = 0.0;\n    vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);\n    vec2 curUv = uv;\n    float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n    for (int i = 0; i < 30; i++) {\n        curLayerHeight += layerHeight;\n        curUv -= deltaUv;\n        height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n        if (height < curLayerHeight) {\n            break;\n        }\n    }\n    vec2 prevUv = curUv + deltaUv;\n    float next = height - curLayerHeight;\n    float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;\n    return mix(curUv, prevUv, next / (next - prev));\n}\n#endif\nvoid main() {\n    \n    vec4 albedoColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    albedoColor *= v_Color;\n#endif\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 V = normalize(eyePos - v_WorldPosition);\n    vec2 uv = v_Texcoord;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n    mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n#endif\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\n    uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 texel = texture2D(diffuseMap, uv);\n    #ifdef SRGB_DECODE\n    texel = sRGBToLinear(texel);\n    #endif\n    albedoColor.rgb *= texel.rgb;\n    #ifdef DIFFUSEMAP_ALPHA_ALPHA\n    albedoColor.a *= texel.a;\n    #endif\n#endif\n#ifdef USE_METALNESS\n    float m = metalness;\n    #ifdef METALNESSMAP_ENABLED\n    float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];\n    m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n    vec3 baseColor = albedoColor.rgb;\n    albedoColor.rgb = baseColor * (1.0 - m);\n    vec3 spec = mix(vec3(0.04), baseColor, m);\n#else\n    vec3 spec = specularColor;\n#endif\n#ifdef USE_ROUGHNESS\n    float g = 1.0 - roughness;\n    #ifdef ROUGHNESSMAP_ENABLED\n    float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];\n    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n#else\n    float g = glossiness;\n    #ifdef GLOSSINESSMAP_ENABLED\n    float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];\n    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n#endif\n#ifdef SPECULARMAP_ENABLED\n    spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;\n#endif\n    vec3 N = v_Normal;\n#ifdef DOUBLE_SIDED\n    if (dot(N, V) < 0.0) {\n        N = -N;\n    }\n#endif\n#ifdef NORMALMAP_ENABLED\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, uv).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {            N = normalTexel * 2.0 - 1.0;\n            tbn[1] = -tbn[1];\n            N = normalize(tbn * N);\n        }\n    }\n#endif\n    vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);\n    vec3 specularTerm = vec3(0.0, 0.0, 0.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    vec3 fresnelTerm = F_Schlick(ndv, spec);\n#ifdef AMBIENT_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseTerm += ambientLightColor[_idx_];\n    }}\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseTerm += calcAmbientSHLight(_idx_, N) * ambientSHLightColor[_idx_];\n    }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsPoint[POINT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n    }\n#endif\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_COUNT; _idx_++)\n    {{\n        vec3 lightPosition = pointLightPosition[_idx_];\n        vec3 lc = pointLightColor[_idx_];\n        float range = pointLightRange[_idx_];\n        vec3 L = lightPosition - v_WorldPosition;\n        float dist = length(L);\n        float attenuation = lightAttenuation(dist, range);\n        L /= dist;\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n        if(shadowEnabled)\n        {\n            shadowContrib = shadowContribsPoint[_idx_];\n        }\n#endif\n        vec3 li = lc * ndl * attenuation * shadowContrib;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }}\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n    }\n#endif\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++)\n    {{\n        vec3 L = -normalize(directionalLightDirection[_idx_]);\n        vec3 lc = directionalLightColor[_idx_];\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n        if(shadowEnabled)\n        {\n            shadowContrib = shadowContribsDir[_idx_];\n        }\n#endif\n        vec3 li = lc * ndl * shadowContrib;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }}\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsSpot[SPOT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n    }\n#endif\n    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = spotLightPosition[i];\n        vec3 spotLightDirection = -normalize(spotLightDirection[i]);\n        vec3 lc = spotLightColor[i];\n        float range = spotLightRange[i];\n        float a = spotLightUmbraAngleCosine[i];\n        float b = spotLightPenumbraAngleCosine[i];\n        float falloffFactor = spotLightFalloffFactor[i];\n        vec3 L = lightPosition - v_WorldPosition;\n        float dist = length(L);\n        float attenuation = lightAttenuation(dist, range);\n        L /= dist;\n        float c = dot(spotLightDirection, L);\n        float falloff;\n        falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n        falloff = pow(falloff, falloffFactor);\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n        if (shadowEnabled)\n        {\n            shadowContrib = shadowContribsSpot[i];\n        }\n#endif\n        vec3 li = lc * attenuation * (1.0 - falloff) * shadowContrib * ndl;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }\n#endif\n    vec4 outColor = albedoColor;\n    outColor.rgb *= diffuseTerm;\n    outColor.rgb += specularTerm;\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n    vec3 L = reflect(-V, N);\n    float rough2 = clamp(1.0 - g, 0.0, 1.0);\n    float bias2 = rough2 * 5.0;\n    vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;\n    vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;\n    vec3 envTexel2;\n    for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)\n    {{\n        envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 51.5);\n        outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;\n    }}\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\n    vec3 envWeight = g * fresnelTerm;\n    vec3 L = reflect(-V, N);\n    #ifdef PARALLAX_CORRECTED\n    L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);\n    #endif\n    #ifdef ENVIRONMENTMAP_PREFILTER\n    float rough = clamp(1.0 - g, 0.0, 1.0);\n    float bias = rough * maxMipmapLevel;\n    vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;\n        #ifdef BRDFLOOKUP_ENABLED\n    vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n    envWeight = spec * brdfParam.x + brdfParam.y;\n        #endif\n    #else\n    vec3 envTexel = textureCube(environmentMap, L).xyz;\n    #endif\n    outColor.rgb += envTexel * envWeight;\n#endif\n    float aoFactor = 1.0;\n#ifdef SSAOMAP_ENABLED\n    aoFactor = min(texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);\n#endif\n#ifdef AOMAP_ENABLED\n    aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);\n#endif\n    outColor.rgb *= aoFactor;\n    vec3 lEmission = emission;\n#ifdef EMISSIVEMAP_ENABLED\n    lEmission *= texture2D(emissiveMap, uv).rgb;\n#endif\n    outColor.rgb += lEmission * emissionIntensity;\n#ifdef GAMMA_ENCODE\n    outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));\n#endif\n    if(lineWidth > 0.)\n    {\n        outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef ALPHA_TEST\n    if (outColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(outColor);\n}\n@end\n";
+var standardEssl = "\n@export clay.standard.vertex\n#define SHADER_NAME standard\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#if defined(AOMAP_ENABLED)\nattribute vec2 texcoord2 : TEXCOORD_1;\n#endif\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#if defined(AOMAP_ENABLED)\nvarying vec2 v_Texcoord2;\n#endif\nvoid main()\n{\n    vec3 skinnedPosition = position;\n    vec3 skinnedNormal = normal;\n    vec3 skinnedTangent = tangent.xyz;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n    v_Barycentric = barycentric;\n    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n#endif\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n#if defined(AOMAP_ENABLED)\n    v_Texcoord2 = texcoord2;\n#endif\n}\n@end\n@export clay.standard.fragment\n#define PI 3.14159265358979\n#define GLOSSINESS_CHANNEL 0\n#define ROUGHNESS_CHANNEL 0\n#define METALNESS_CHANNEL 1\nuniform mat4 viewInverse : VIEWINVERSE;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#ifdef NORMALMAP_ENABLED\nuniform sampler2D normalMap;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\nuniform sampler2D diffuseMap;\n#endif\n#ifdef SPECULARMAP_ENABLED\nuniform sampler2D specularMap;\n#endif\n#ifdef USE_ROUGHNESS\nuniform float roughness : 0.5;\n    #ifdef ROUGHNESSMAP_ENABLED\nuniform sampler2D roughnessMap;\n    #endif\n#else\nuniform float glossiness: 0.5;\n    #ifdef GLOSSINESSMAP_ENABLED\nuniform sampler2D glossinessMap;\n    #endif\n#endif\n#ifdef METALNESSMAP_ENABLED\nuniform sampler2D metalnessMap;\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\nuniform samplerCube environmentMap;\n    #ifdef PARALLAX_CORRECTED\nuniform vec3 environmentBoxMin;\nuniform vec3 environmentBoxMax;\n    #endif\n#endif\n#ifdef BRDFLOOKUP_ENABLED\nuniform sampler2D brdfLookup;\n#endif\n#ifdef EMISSIVEMAP_ENABLED\nuniform sampler2D emissiveMap;\n#endif\n#ifdef SSAOMAP_ENABLED\nuniform sampler2D ssaoMap;\nuniform vec4 viewport : VIEWPORT;\n#endif\n#ifdef AOMAP_ENABLED\nuniform sampler2D aoMap;\nuniform float aoIntensity;\nvarying vec2 v_Texcoord2;\n#endif\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef USE_METALNESS\nuniform float metalness : 0.0;\n#else\nuniform vec3 specularColor : [0.1, 0.1, 0.1];\n#endif\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float emissionIntensity: 1;\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef ENVIRONMENTMAP_PREFILTER\nuniform float maxMipmapLevel: 5;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n@import clay.header.ambient_cubemap_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.plugin.compute_shadow_map\n@import clay.util.parallax_correct\nfloat G_Smith(float g, float ndv, float ndl)\n{\n    float roughness = 1.0 - g;\n    float k = roughness * roughness / 2.0;\n    float G1V = ndv / (ndv * (1.0 - k) + k);\n    float G1L = ndl / (ndl * (1.0 - k) + k);\n    return G1L * G1V;\n}\nvec3 F_Schlick(float ndv, vec3 spec) {\n    return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nfloat D_Phong(float g, float ndh) {\n    float a = pow(8192.0, g);\n    return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(float g, float ndh) {\n    float r = 1.0 - g;\n    float a = r * r;\n    float tmp = ndh * ndh * (a - 1.0) + 1.0;\n    return a / (PI * tmp * tmp);\n}\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\nuniform float parallaxOcclusionScale : 0.02;\nuniform float parallaxMaxLayers : 20;\nuniform float parallaxMinLayers : 5;\nuniform sampler2D parallaxOcclusionMap;\nmat3 transpose(in mat3 inMat)\n{\n    vec3 i0 = inMat[0];\n    vec3 i1 = inMat[1];\n    vec3 i2 = inMat[2];\n    return mat3(\n        vec3(i0.x, i1.x, i2.x),\n        vec3(i0.y, i1.y, i2.y),\n        vec3(i0.z, i1.z, i2.z)\n    );\n}\nvec2 parallaxUv(vec2 uv, vec3 viewDir)\n{\n    float numLayers = mix(parallaxMaxLayers, parallaxMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));\n    float layerHeight = 1.0 / numLayers;\n    float curLayerHeight = 0.0;\n    vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);\n    vec2 curUv = uv;\n    float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n    for (int i = 0; i < 30; i++) {\n        curLayerHeight += layerHeight;\n        curUv -= deltaUv;\n        height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n        if (height < curLayerHeight) {\n            break;\n        }\n    }\n    vec2 prevUv = curUv + deltaUv;\n    float next = height - curLayerHeight;\n    float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;\n    return mix(curUv, prevUv, next / (next - prev));\n}\n#endif\nvoid main() {\n    vec4 albedoColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    albedoColor *= v_Color;\n#endif\n    vec3 eyePos = viewInverse[3].xyz;\n    vec3 V = normalize(eyePos - v_WorldPosition);\n    vec2 uv = v_Texcoord;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n    mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n#endif\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\n    uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 texel = texture2D(diffuseMap, uv);\n    #ifdef SRGB_DECODE\n    texel = sRGBToLinear(texel);\n    #endif\n    albedoColor.rgb *= texel.rgb;\n    #ifdef DIFFUSEMAP_ALPHA_ALPHA\n    albedoColor.a *= texel.a;\n    #endif\n#endif\n#ifdef USE_METALNESS\n    float m = metalness;\n    #ifdef METALNESSMAP_ENABLED\n    float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];\n    m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n    vec3 baseColor = albedoColor.rgb;\n    albedoColor.rgb = baseColor * (1.0 - m);\n    vec3 spec = mix(vec3(0.04), baseColor, m);\n#else\n    vec3 spec = specularColor;\n#endif\n#ifdef USE_ROUGHNESS\n    float g = 1.0 - roughness;\n    #ifdef ROUGHNESSMAP_ENABLED\n    float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];\n    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n#else\n    float g = glossiness;\n    #ifdef GLOSSINESSMAP_ENABLED\n    float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];\n    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n    #endif\n#endif\n#ifdef SPECULARMAP_ENABLED\n    spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;\n#endif\n    vec3 N = v_Normal;\n#ifdef DOUBLE_SIDED\n    if (dot(N, V) < 0.0) {\n        N = -N;\n    }\n#endif\n#ifdef NORMALMAP_ENABLED\n    if (dot(v_Tangent, v_Tangent) > 0.0) {\n        vec3 normalTexel = texture2D(normalMap, uv).xyz;\n        if (dot(normalTexel, normalTexel) > 0.0) {            N = normalTexel * 2.0 - 1.0;\n            tbn[1] = -tbn[1];\n            N = normalize(tbn * N);\n        }\n    }\n#endif\n    vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);\n    vec3 specularTerm = vec3(0.0, 0.0, 0.0);\n    float ndv = clamp(dot(N, V), 0.0, 1.0);\n    vec3 fresnelTerm = F_Schlick(ndv, spec);\n#ifdef AMBIENT_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseTerm += ambientLightColor[_idx_];\n    }}\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseTerm += calcAmbientSHLight(_idx_, N) * ambientSHLightColor[_idx_];\n    }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsPoint[POINT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n    }\n#endif\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_COUNT; _idx_++)\n    {{\n        vec3 lightPosition = pointLightPosition[_idx_];\n        vec3 lc = pointLightColor[_idx_];\n        float range = pointLightRange[_idx_];\n        vec3 L = lightPosition - v_WorldPosition;\n        float dist = length(L);\n        float attenuation = lightAttenuation(dist, range);\n        L /= dist;\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n        if(shadowEnabled)\n        {\n            shadowContrib = shadowContribsPoint[_idx_];\n        }\n#endif\n        vec3 li = lc * ndl * attenuation * shadowContrib;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }}\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n    }\n#endif\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++)\n    {{\n        vec3 L = -normalize(directionalLightDirection[_idx_]);\n        vec3 lc = directionalLightColor[_idx_];\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n        if(shadowEnabled)\n        {\n            shadowContrib = shadowContribsDir[_idx_];\n        }\n#endif\n        vec3 li = lc * ndl * shadowContrib;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }}\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsSpot[SPOT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n    }\n#endif\n    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = spotLightPosition[i];\n        vec3 spotLightDirection = -normalize(spotLightDirection[i]);\n        vec3 lc = spotLightColor[i];\n        float range = spotLightRange[i];\n        float a = spotLightUmbraAngleCosine[i];\n        float b = spotLightPenumbraAngleCosine[i];\n        float falloffFactor = spotLightFalloffFactor[i];\n        vec3 L = lightPosition - v_WorldPosition;\n        float dist = length(L);\n        float attenuation = lightAttenuation(dist, range);\n        L /= dist;\n        float c = dot(spotLightDirection, L);\n        float falloff;\n        falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n        falloff = pow(falloff, falloffFactor);\n        vec3 H = normalize(L + V);\n        float ndl = clamp(dot(N, L), 0.0, 1.0);\n        float ndh = clamp(dot(N, H), 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n        if (shadowEnabled)\n        {\n            shadowContrib = shadowContribsSpot[i];\n        }\n#endif\n        vec3 li = lc * attenuation * (1.0 - falloff) * shadowContrib * ndl;\n        diffuseTerm += li;\n        specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n    }\n#endif\n    vec4 outColor = albedoColor;\n    outColor.rgb *= diffuseTerm;\n    outColor.rgb += specularTerm;\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n    vec3 L = reflect(-V, N);\n    float rough2 = clamp(1.0 - g, 0.0, 1.0);\n    float bias2 = rough2 * 5.0;\n    vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;\n    vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;\n    vec3 envTexel2;\n    for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)\n    {{\n        envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 51.5);\n        outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;\n    }}\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\n    vec3 envWeight = g * fresnelTerm;\n    vec3 L = reflect(-V, N);\n    #ifdef PARALLAX_CORRECTED\n    L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);\n    #endif\n    #ifdef ENVIRONMENTMAP_PREFILTER\n    float rough = clamp(1.0 - g, 0.0, 1.0);\n    float bias = rough * maxMipmapLevel;\n    vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;\n        #ifdef BRDFLOOKUP_ENABLED\n    vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n    envWeight = spec * brdfParam.x + brdfParam.y;\n        #endif\n    #else\n    vec3 envTexel = textureCube(environmentMap, L).xyz;\n    #endif\n    outColor.rgb += envTexel * envWeight;\n#endif\n    float aoFactor = 1.0;\n#ifdef SSAOMAP_ENABLED\n    aoFactor = min(texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);\n#endif\n#ifdef AOMAP_ENABLED\n    aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);\n#endif\n    outColor.rgb *= aoFactor;\n    vec3 lEmission = emission;\n#ifdef EMISSIVEMAP_ENABLED\n    lEmission *= texture2D(emissiveMap, uv).rgb;\n#endif\n    outColor.rgb += lEmission * emissionIntensity;\n#ifdef GAMMA_ENCODE\n    outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));\n#endif\n    if(lineWidth > 0.)\n    {\n        outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef ALPHA_TEST\n    if (outColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(outColor);\n}\n@end\n";
 
 // Import standard shader
 Shader['import'](standardEssl);
 
-var shaderLibrary = {};
-var shaderUsedCount = {};
-
 var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
 var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff'];
-var PROPERTIES_CHANGE_SHADER = ['jointCount', 'linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel'];
+var PROPERTIES_CHANGE_SHADER = ['linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel', 'environmentMapPrefiltered'];
 
-var OTHER_SHADER_KEYS = [
-    'environmentMapPrefiltered',
-    'linear',
-    'encodeRGBM',
-    'decodeRGBM',
-    'doubleSided',
-    'alphaTest',
-    'parallaxCorrected'
-];
-var SHADER_KEYS = TEXTURE_PROPERTIES.concat(OTHER_SHADER_KEYS);
+var NUM_DEFINE_MAP = {
+    'roughnessChannel': 'ROUGHNESS_CHANNEL',
+    'metalnessChannel': 'METALNESS_CHANNEL'
+};
+var BOOL_DEFINE_MAP = {
+    'linear': 'SRGB_DECODE',
+    'encodeRGBM': 'RGBM_ENCODE',
+    'decodeRGBM': 'RGBM_DECODE',
+    'doubleSided': 'DOUBLE_SIDED',
+    'alphaTest': 'ALPHA_TEST',
+    'environmentMapPrefiltered': 'ENVIRONMENTMAP_PREFILTER'
+};
 
-var KEY_OFFSETS = SHADER_KEYS.reduce(function (obj, name, idx) {
-    obj[name] = 4096 << idx;
-    return obj;
-}, {});
 
-function makeKey(enabledMaps, jointCount, shaderDefines) {
-    // jointCount from 0 to 255
-    var key = jointCount;
-    // roughnessChannel from 256 to 1024
-    // metalnessChannel from 1024 to 4096
-    key += 256 * shaderDefines.roughnessChannel;
-    key += 1024 * shaderDefines.metalnessChannel;
-
-    for (var i = 0; i < enabledMaps.length; i++) {
-        key += KEY_OFFSETS[enabledMaps[i]];
-    }
-    for (var i = 0; i < OTHER_SHADER_KEYS.length; i++) {
-        var propName = OTHER_SHADER_KEYS[i];
-        if (shaderDefines[propName]) {
-            key += KEY_OFFSETS[propName];
-        }
-    }
-
-    return key;
-}
-
-function allocateShader(renderer, enabledMaps, jointCount, shaderDefines) {
-    var key = makeKey(enabledMaps, jointCount, shaderDefines);
-    if (!shaderUsedCount[renderer.__GUID__]) {
-        shaderUsedCount[renderer.__GUID__] = {};
-    }
-
-    var shader = shaderLibrary[key];
-
-    if (!shader) {
-        shader = new Shader({
-            vertex: Shader.source('qtek.standard.vertex'),
-            fragment: Shader.source('qtek.standard.fragment')
-        });
-        shader.enableTexture(enabledMaps);
-        shader.define('fragment', 'USE_METALNESS');
-        shader.define('fragment', 'USE_ROUGHNESS');
-        shader.define('ROUGHNESS_CHANNEL', shaderDefines.roughnessChannel);
-        shader.define('METALNESS_CHANNEL', shaderDefines.metalnessChannel);
-        if (jointCount) {
-            shader.define('vertex', 'SKINNING');
-            shader.define('vertex', 'JOINT_COUNT', jointCount);
-        }
-        if (shaderDefines.environmentMapPrefiltered) {
-            shader.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-        }
-        if (shaderDefines.linear) {
-            shader.define('fragment', 'SRGB_DECODE');
-        }
-        if (shaderDefines.encodeRGBM) {
-            shader.define('fragment', 'RGBM_ENCODE');
-        }
-        if (shaderDefines.decodeRGBM) {
-            shader.define('fragment', 'RGBM_DECODE');
-        }
-        if (shaderDefines.parallaxCorrected) {
-            shader.define('fragment', 'PARALLAX_CORRECTED');
-        }
-        if (shaderDefines.doubleSided) {
-            shader.define('fragment', 'DOUBLE_SIDED');
-        }
-        if (shaderDefines.alphaTest) {
-            shader.define('fragment', 'ALPHA_TEST');
-        }
-
-        shaderLibrary[key] = shader;
-    }
-    if (!shaderUsedCount[renderer.__GUID__][key]) {
-        shaderUsedCount[renderer.__GUID__][key] = 0;
-    }
-    shaderUsedCount[renderer.__GUID__][key]++;
-
-    shader.__key__ = key;
-
-    return shader;
-}
-function releaseShader(shader, renderer) {
-    var key = shader.__key__;
-    if (shaderLibrary[key]) {
-        shaderUsedCount[renderer.__GUID__][key]--;
-        if (!shaderUsedCount[renderer.__GUID__][key]) {
-            if (renderer) {
-                // Since shader may not be used on any material. We need to dispose it
-                shader.dispose(renderer);
-            }
-        }
-    }
-}
-
+var standardShader;
 /**
  * Standard material without custom shader.
- * @constructor qtek.StandardMaterial
- * @extends qtek.Base
+ * @constructor clay.StandardMaterial
+ * @extends clay.Base
  * @example
- * var mat = new qtek.StandardMaterial({
+ * var mat = new clay.StandardMaterial({
  *     color: [1, 1, 1],
  *     diffuseMap: diffuseTexture
  * });
  * mat.roughness = 1;
  */
 var StandardMaterial = Material.extend(function () {
-
-    return /** @lends qtek.StandardMaterial# */ {
-
+    if (!standardShader) {
+        standardShader = new Shader(Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
+    }
+    return /** @lends clay.StandardMaterial# */ {
+        shader: standardShader
+    };
+}, function (option) {
+    // PENDING
+    util$1.extend(this, option);
+    // Extend after shader is created.
+    util$1.defaults(this, /** @lends clay.StandardMaterial# */  {
         /**
          * @type {Array.<number>}
          * @default [1, 1, 1]
@@ -26090,43 +25615,43 @@ var StandardMaterial = Material.extend(function () {
         doubleSided: false,
 
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
          */
 
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
          */
 
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
          */
 
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
          */
         /**
-         * @type {qtek.Texture2D}
-         */
-
-        /**
-         * @type {qtek.TextureCube}
+         * @type {clay.Texture2D}
          */
 
         /**
-         * @type {qtek.math.BoundingBox}
+         * @type {clay.TextureCube}
          */
 
         /**
-         * BRDF Lookup is generated by qtek.util.cubemap.integrateBrdf
-         * @type {qtek.Texture2D}
+         * @type {clay.math.BoundingBox}
          */
 
         /**
-         * @type {qtek.Texture2D}
+         * BRDF Lookup is generated by clay.util.cubemap.integrateBrdf
+         * @type {clay.Texture2D}
          */
 
         /**
-         * @type {qtek.Texture2D}
+         * @type {clay.Texture2D}
+         */
+
+        /**
+         * @type {clay.Texture2D}
          */
 
         /**
@@ -26146,13 +25671,6 @@ var StandardMaterial = Material.extend(function () {
          * @default 1
          */
         aoIntensity: 1,
-
-        /**
-         * @type {number}
-         * @default 0
-         */
-        // FIXME Redundant with mesh
-        jointCount: 0,
 
         /**
          * @type {boolean}
@@ -26182,72 +25700,11 @@ var StandardMaterial = Material.extend(function () {
          * @type {Number}
          */
         metalnessChannel: 1
-    };
+    });
+
+    this.define('fragment', 'USE_METALNESS');
+    this.define('fragment', 'USE_ROUGHNESS');
 }, {
-
-    _doUpdateShader: function (renderer) {
-        var enabledTextures = TEXTURE_PROPERTIES.filter(function (name) {
-            return !!this[name];
-        }, this);
-        if (this._shader) {
-            releaseShader(this._shader, renderer);
-            this._shader.detached();
-        }
-
-        var shader = allocateShader(
-            renderer, enabledTextures, this.jointCount || 0, {
-                environmentMapPrefiltered: this.environmentMapPrefiltered,
-                linear: this.linear,
-                encodeRGBM: this.encodeRGBM,
-                decodeRGBM: this.decodeRGBM,
-                parallaxCorrected: !!this._environmentBox,
-                alphaTest: this.alphaTest,
-                doubleSided: this.doubleSided,
-                metalnessChannel: this.metalnessChannel,
-                roughnessChannel: this.roughnessChannel
-            }
-        );
-        var originalUniforms = this.uniforms;
-
-        // Ignore if uniform can use in shader.
-        this.uniforms = shader.createUniforms();
-        this._shader = shader;
-
-        var uniforms = this.uniforms;
-        this._enabledUniforms = Object.keys(uniforms);
-
-        // Keep uniform
-        for (var symbol in originalUniforms) {
-            if (uniforms[symbol]) {
-                uniforms[symbol].value = originalUniforms[symbol].value;
-            }
-        }
-
-        shader.attached();
-
-        this._shaderDirty = false;
-    },
-
-    updateShader: function (renderer) {
-        if (this._shaderDirty) {
-            this._doUpdateShader(renderer);
-            this._shaderDirty = false;
-        }
-    },
-
-    attachShader: function () {
-        // Do nothing.
-        // console.warn('StandardMaterial can\'t change shader');
-    },
-
-    dispose: function (gl, disposeTexture) {
-        if (this._shader) {
-            releaseShader(this._shader);
-        }
-        Material.prototype.dispose.call(gl, disposeTexture);
-    },
-
-
     clone: function () {
         var material = new StandardMaterial({
             name: this.name
@@ -26270,10 +25727,6 @@ SIMPLE_PROPERTIES.forEach(function (propName) {
             return this.get(propName);
         },
         set: function (value) {
-            var uniforms = this.uniforms = this.uniforms || {};
-            uniforms[propName] = uniforms[propName] || {
-                value: null
-            };
             this.setUniform(propName, value);
         }
     });
@@ -26285,17 +25738,7 @@ TEXTURE_PROPERTIES.forEach(function (propName) {
             return this.get(propName);
         },
         set: function (value) {
-            var uniforms = this.uniforms = this.uniforms || {};
-            uniforms[propName] = uniforms[propName] || {
-                value: null
-            };
-
-            var oldVal = this.get(propName);
             this.setUniform(propName, value);
-
-            if (!oldVal !== !value) {
-                this._shaderDirty = true;
-            }
         }
     });
 });
@@ -26307,10 +25750,14 @@ PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
             return this[privateKey];
         },
         set: function (value) {
-            var oldVal = this[privateKey];
             this[privateKey] = value;
-            if (oldVal !== value) {
-                this._shaderDirty = true;
+            if (propName in NUM_DEFINE_MAP) {
+                var defineName = NUM_DEFINE_MAP[propName];
+                this.define('fragment', defineName, value);
+            }
+            else {
+                var defineName = BOOL_DEFINE_MAP[propName];
+                value ? this.define('fragment', defineName) : this.undefine('fragment', defineName);
             }
         }
     });
@@ -26327,7 +25774,6 @@ Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
     },
 
     set: function (value) {
-        var oldVal = this._environmentBox;
         this._environmentBox = value;
 
         var uniforms = this.uniforms = this.uniforms || {};
@@ -26344,19 +25790,12 @@ Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
             this.setUniform('environmentBoxMax', value.max._array);
         }
 
-        if (oldVal !== value) {
-            this._shaderDirty = true;
+        if (value) {
+            this.define('fragment', 'PARALLAX_CORRECTED');
         }
-    }
-});
-
-Object.defineProperty(StandardMaterial.prototype, 'shader', {
-    get: function () {
-        // FIXME updateShader needs gl context.
-        return this._shader;
-    },
-    set: function () {
-        console.warn('StandardMaterial can\'t change shader');
+        else {
+            this.undefine('fragment', 'PARALLAX_CORRECTED');
+        }
     }
 });
 
@@ -26365,14 +25804,14 @@ var vec3$14 = glmatrix.vec3;
 var mat4$7 = glmatrix.mat4;
 
 /**
- * @constructor qtek.Skeleton
+ * @constructor clay.Skeleton
  */
 var Skeleton = Base.extend(function () {
-    return /** @lends qtek.Skeleton# */{
+    return /** @lends clay.Skeleton# */{
 
         /**
          * Relative root node that not affect transform of joint.
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         relativeRootNode: null,
         /**
@@ -26382,7 +25821,7 @@ var Skeleton = Base.extend(function () {
 
         /**
          * joints
-         * @type {Array.<qtek.Joint>}
+         * @type {Array.<clay.Joint>}
          */
         joints: [],
 
@@ -26405,12 +25844,12 @@ var Skeleton = Base.extend(function () {
         _subSkinMatricesArray: {}
     };
 },
-/** @lends qtek.Skeleton.prototype */
+/** @lends clay.Skeleton.prototype */
 {
 
     /**
      * Add a skinning clip and create a map between clip and skeleton
-     * @param {qtek.animation.SkinningClip} clip
+     * @param {clay.animation.SkinningClip} clip
      * @param {Object} [mapRule] Map between joint name in skeleton and joint name in clip
      */
     addClip: function (clip, mapRule) {
@@ -26450,7 +25889,7 @@ var Skeleton = Base.extend(function () {
     },
 
     /**
-     * @param {qtek.animation.SkinningClip} clip
+     * @param {clay.animation.SkinningClip} clip
      */
     removeClip: function (clip) {
         var idx = -1;
@@ -26659,39 +26098,39 @@ var Skeleton = Base.extend(function () {
     }
 });
 
-var lambertEssl = "\n@export qtek.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import qtek.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n    vec3 skinnedNormal = normal;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n    v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n    v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n}\n@end\n@export qtek.lambert.fragment\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import qtek.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import qtek.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import qtek.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import qtek.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import qtek.header.spot_light\n#endif\n@import qtek.util.calculate_attenuation\n@import qtek.util.edge_factor\n@import qtek.util.rgbm\n@import qtek.plugin.compute_shadow_map\nvoid main()\n{\n#ifdef RENDER_NORMAL\n    gl_FragColor = vec4(v_Normal * 0.5 + 0.5, 1.0);\n    return;\n#endif\n#ifdef RENDER_TEXCOORD\n    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n    return;\n#endif\n    gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n    tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n    gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n    gl_FragColor.a *= tex.a;\n#endif\n#endif\n    vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n    {\n        diffuseColor += ambientLightColor[_idx_];\n    }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n    }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsPoint[POINT_LIGHT_COUNT];\n    if( shadowEnabled )\n    {\n        computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n    }\n#endif\n    for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = pointLightPosition[i];\n        vec3 lightColor = pointLightColor[i];\n        float range = pointLightRange[i];\n        vec3 lightDirection = lightPosition - v_WorldPosition;\n        float dist = length(lightDirection);\n        float attenuation = lightAttenuation(dist, range);\n        lightDirection /= dist;\n        float ndl = dot( v_Normal, lightDirection );\n        float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsPoint[i];\n        }\n#endif\n        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n    }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n    }\n#endif\n    for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n    {\n        vec3 lightDirection = -directionalLightDirection[i];\n        vec3 lightColor = directionalLightColor[i];\n        float ndl = dot(v_Normal, normalize(lightDirection));\n        float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsDir[i];\n        }\n#endif\n        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n    }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsSpot[SPOT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n    }\n#endif\n    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = -spotLightPosition[i];\n        vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n        vec3 lightColor = spotLightColor[i];\n        float range = spotLightRange[i];\n        float a = spotLightUmbraAngleCosine[i];\n        float b = spotLightPenumbraAngleCosine[i];\n        float falloffFactor = spotLightFalloffFactor[i];\n        vec3 lightDirection = lightPosition - v_WorldPosition;\n        float dist = length(lightDirection);\n        float attenuation = lightAttenuation(dist, range);\n        lightDirection /= dist;\n        float c = dot(spotLightDirection, lightDirection);\n        float falloff;\n        falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n        falloff = pow(falloff, falloffFactor);\n        float ndl = dot(v_Normal, lightDirection);\n        ndl = clamp(ndl, 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsSpot[i];\n        }\n#endif\n        diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n    }\n#endif\n    gl_FragColor.rgb *= diffuseColor;\n    gl_FragColor.rgb += emission;\n    if(lineWidth > 0.)\n    {\n        gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef ALPHA_TEST\n    if (gl_FragColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var lambertEssl = "\n@export clay.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n    vec3 skinnedNormal = normal;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n    v_Texcoord = texcoord * uvRepeat + uvOffset;\n    v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n    v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n    v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n    v_Color = a_Color;\n#endif\n}\n@end\n@export clay.lambert.fragment\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.plugin.compute_shadow_map\nvoid main()\n{\n#ifdef RENDER_NORMAL\n    gl_FragColor = vec4(v_Normal * 0.5 + 0.5, 1.0);\n    return;\n#endif\n#ifdef RENDER_TEXCOORD\n    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n    return;\n#endif\n    gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n    gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n    vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n    tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n    gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n    gl_FragColor.a *= tex.a;\n#endif\n#endif\n    vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n    {\n        diffuseColor += ambientLightColor[_idx_];\n    }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n    for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n    {{\n        diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n    }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsPoint[POINT_LIGHT_COUNT];\n    if( shadowEnabled )\n    {\n        computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n    }\n#endif\n    for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = pointLightPosition[i];\n        vec3 lightColor = pointLightColor[i];\n        float range = pointLightRange[i];\n        vec3 lightDirection = lightPosition - v_WorldPosition;\n        float dist = length(lightDirection);\n        float attenuation = lightAttenuation(dist, range);\n        lightDirection /= dist;\n        float ndl = dot( v_Normal, lightDirection );\n        float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsPoint[i];\n        }\n#endif\n        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n    }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n    }\n#endif\n    for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n    {\n        vec3 lightDirection = -directionalLightDirection[i];\n        vec3 lightColor = directionalLightColor[i];\n        float ndl = dot(v_Normal, normalize(lightDirection));\n        float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsDir[i];\n        }\n#endif\n        diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n    }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n    float shadowContribsSpot[SPOT_LIGHT_COUNT];\n    if(shadowEnabled)\n    {\n        computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n    }\n#endif\n    for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n    {\n        vec3 lightPosition = -spotLightPosition[i];\n        vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n        vec3 lightColor = spotLightColor[i];\n        float range = spotLightRange[i];\n        float a = spotLightUmbraAngleCosine[i];\n        float b = spotLightPenumbraAngleCosine[i];\n        float falloffFactor = spotLightFalloffFactor[i];\n        vec3 lightDirection = lightPosition - v_WorldPosition;\n        float dist = length(lightDirection);\n        float attenuation = lightAttenuation(dist, range);\n        lightDirection /= dist;\n        float c = dot(spotLightDirection, lightDirection);\n        float falloff;\n        falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n        falloff = pow(falloff, falloffFactor);\n        float ndl = dot(v_Normal, lightDirection);\n        ndl = clamp(ndl, 0.0, 1.0);\n        float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n        if( shadowEnabled )\n        {\n            shadowContrib = shadowContribsSpot[i];\n        }\n#endif\n        diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n    }\n#endif\n    gl_FragColor.rgb *= diffuseColor;\n    gl_FragColor.rgb += emission;\n    if(lineWidth > 0.)\n    {\n        gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n    }\n#ifdef ALPHA_TEST\n    if (gl_FragColor.a < alphaCutoff) {\n        discard;\n    }\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
-var wireframeEssl = "@export qtek.wireframe.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import qtek.chunk.skinning_header\nvarying vec3 v_Barycentric;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );\n    v_Barycentric = barycentric;\n}\n@end\n@export qtek.wireframe.fragment\nuniform vec3 color : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\nuniform float lineWidth : 1.0;\nvarying vec3 v_Barycentric;\n@import qtek.util.edge_factor\nvoid main()\n{\n    gl_FragColor.rgb = color;\n    gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;\n}\n@end";
+var wireframeEssl = "@export clay.wireframe.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec3 v_Barycentric;\nvoid main()\n{\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );\n    v_Barycentric = barycentric;\n}\n@end\n@export clay.wireframe.fragment\nuniform vec3 color : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\nuniform float lineWidth : 1.0;\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\nvoid main()\n{\n    gl_FragColor.rgb = color;\n    gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;\n}\n@end";
 
-var coloradjustEssl = "@export qtek.compositor.coloradjust\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float exposure : 0.0;\nuniform float gamma : 1.0;\nuniform float saturation : 1.0;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = clamp(tex.rgb + vec3(brightness), 0.0, 1.0);\n    color = clamp( (color-vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n    color = clamp( color * pow(2.0, exposure), 0.0, 1.0);\n    color = clamp( pow(color, vec3(gamma)), 0.0, 1.0);\n    float luminance = dot( color, w );\n    color = mix(vec3(luminance), color, saturation);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export qtek.compositor.brightness\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float brightness : 0.0;\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = tex.rgb + vec3(brightness);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export qtek.compositor.contrast\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float contrast : 1.0;\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = (tex.rgb-vec3(0.5))*contrast+vec3(0.5);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export qtek.compositor.exposure\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float exposure : 0.0;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = tex.rgb * pow(2.0, exposure);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export qtek.compositor.gamma\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float gamma : 1.0;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = pow(tex.rgb, vec3(gamma));\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export qtek.compositor.saturation\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float saturation : 1.0;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = tex.rgb;\n    float luminance = dot(color, w);\n    color = mix(vec3(luminance), color, saturation);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end";
+var coloradjustEssl = "@export clay.compositor.coloradjust\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float exposure : 0.0;\nuniform float gamma : 1.0;\nuniform float saturation : 1.0;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = clamp(tex.rgb + vec3(brightness), 0.0, 1.0);\n    color = clamp( (color-vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n    color = clamp( color * pow(2.0, exposure), 0.0, 1.0);\n    color = clamp( pow(color, vec3(gamma)), 0.0, 1.0);\n    float luminance = dot( color, w );\n    color = mix(vec3(luminance), color, saturation);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export clay.compositor.brightness\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float brightness : 0.0;\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = tex.rgb + vec3(brightness);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export clay.compositor.contrast\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float contrast : 1.0;\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord);\n    vec3 color = (tex.rgb-vec3(0.5))*contrast+vec3(0.5);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export clay.compositor.exposure\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float exposure : 0.0;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = tex.rgb * pow(2.0, exposure);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export clay.compositor.gamma\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float gamma : 1.0;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = pow(tex.rgb, vec3(gamma));\n    gl_FragColor = vec4(color, tex.a);\n}\n@end\n@export clay.compositor.saturation\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float saturation : 1.0;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    vec3 color = tex.rgb;\n    float luminance = dot(color, w);\n    color = mix(vec3(luminance), color, saturation);\n    gl_FragColor = vec4(color, tex.a);\n}\n@end";
 
-var blurEssl = "@export qtek.compositor.kernel.gaussian_9\nfloat gaussianKernel[9];\ngaussianKernel[0] = 0.07;\ngaussianKernel[1] = 0.09;\ngaussianKernel[2] = 0.12;\ngaussianKernel[3] = 0.14;\ngaussianKernel[4] = 0.16;\ngaussianKernel[5] = 0.14;\ngaussianKernel[6] = 0.12;\ngaussianKernel[7] = 0.09;\ngaussianKernel[8] = 0.07;\n@end\n@export qtek.compositor.kernel.gaussian_13\nfloat gaussianKernel[13];\ngaussianKernel[0] = 0.02;\ngaussianKernel[1] = 0.03;\ngaussianKernel[2] = 0.06;\ngaussianKernel[3] = 0.08;\ngaussianKernel[4] = 0.11;\ngaussianKernel[5] = 0.13;\ngaussianKernel[6] = 0.14;\ngaussianKernel[7] = 0.13;\ngaussianKernel[8] = 0.11;\ngaussianKernel[9] = 0.08;\ngaussianKernel[10] = 0.06;\ngaussianKernel[11] = 0.03;\ngaussianKernel[12] = 0.02;\n@end\n@export qtek.compositor.gaussian_blur\n#define SHADER_NAME gaussian_blur\nuniform sampler2D texture;varying vec2 v_Texcoord;\nuniform float blurSize : 2.0;\nuniform vec2 textureSize : [512.0, 512.0];\nuniform float blurDir : 0.0;\n@import qtek.util.rgbm\n@import qtek.util.clamp_sample\nvoid main (void)\n{\n    @import qtek.compositor.kernel.gaussian_9\n    vec2 off = blurSize / textureSize;\n    off *= vec2(1.0 - blurDir, blurDir);\n    vec4 sum = vec4(0.0);\n    float weightAll = 0.0;\n    for (int i = 0; i < 9; i++) {\n        float w = gaussianKernel[i];\n        vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));\n        sum += texel * w;\n        weightAll += w;\n    }\n    gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));\n}\n@end\n";
+var blurEssl = "@export clay.compositor.kernel.gaussian_9\nfloat gaussianKernel[9];\ngaussianKernel[0] = 0.07;\ngaussianKernel[1] = 0.09;\ngaussianKernel[2] = 0.12;\ngaussianKernel[3] = 0.14;\ngaussianKernel[4] = 0.16;\ngaussianKernel[5] = 0.14;\ngaussianKernel[6] = 0.12;\ngaussianKernel[7] = 0.09;\ngaussianKernel[8] = 0.07;\n@end\n@export clay.compositor.kernel.gaussian_13\nfloat gaussianKernel[13];\ngaussianKernel[0] = 0.02;\ngaussianKernel[1] = 0.03;\ngaussianKernel[2] = 0.06;\ngaussianKernel[3] = 0.08;\ngaussianKernel[4] = 0.11;\ngaussianKernel[5] = 0.13;\ngaussianKernel[6] = 0.14;\ngaussianKernel[7] = 0.13;\ngaussianKernel[8] = 0.11;\ngaussianKernel[9] = 0.08;\ngaussianKernel[10] = 0.06;\ngaussianKernel[11] = 0.03;\ngaussianKernel[12] = 0.02;\n@end\n@export clay.compositor.gaussian_blur\n#define SHADER_NAME gaussian_blur\nuniform sampler2D texture;varying vec2 v_Texcoord;\nuniform float blurSize : 2.0;\nuniform vec2 textureSize : [512.0, 512.0];\nuniform float blurDir : 0.0;\n@import clay.util.rgbm\n@import clay.util.clamp_sample\nvoid main (void)\n{\n    @import clay.compositor.kernel.gaussian_9\n    vec2 off = blurSize / textureSize;\n    off *= vec2(1.0 - blurDir, blurDir);\n    vec4 sum = vec4(0.0);\n    float weightAll = 0.0;\n    for (int i = 0; i < 9; i++) {\n        float w = gaussianKernel[i];\n        vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));\n        sum += texel * w;\n        weightAll += w;\n    }\n    gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));\n}\n@end\n";
 
-var lumEssl = "@export qtek.compositor.hdr.log_lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\n@import qtek.util.rgbm\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    float luminance = dot(tex.rgb, w);\n    luminance = log(luminance + 0.001);\n    gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));\n}\n@end\n@export qtek.compositor.hdr.lum_adaption\nvarying vec2 v_Texcoord;\nuniform sampler2D adaptedLum;\nuniform sampler2D currentLum;\nuniform float frameTime : 0.02;\n@import qtek.util.rgbm\nvoid main()\n{\n    float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;\n    float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);\n    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));\n    gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));\n}\n@end\n@export qtek.compositor.lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord );\n    float luminance = dot(tex.rgb, w);\n    gl_FragColor = vec4(vec3(luminance), 1.0);\n}\n@end";
+var lumEssl = "@export clay.compositor.hdr.log_lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\n@import clay.util.rgbm\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    float luminance = dot(tex.rgb, w);\n    luminance = log(luminance + 0.001);\n    gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));\n}\n@end\n@export clay.compositor.hdr.lum_adaption\nvarying vec2 v_Texcoord;\nuniform sampler2D adaptedLum;\nuniform sampler2D currentLum;\nuniform float frameTime : 0.02;\n@import clay.util.rgbm\nvoid main()\n{\n    float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;\n    float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);\n    fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));\n    gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));\n}\n@end\n@export clay.compositor.lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n    vec4 tex = texture2D( texture, v_Texcoord );\n    float luminance = dot(tex.rgb, w);\n    gl_FragColor = vec4(vec3(luminance), 1.0);\n}\n@end";
 
-var lutEssl = "\n@export qtek.compositor.lut\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform sampler2D lookup;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    float blueColor = tex.b * 63.0;\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.g);\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.g);\n    vec4 newColor1 = texture2D(lookup, texPos1);\n    vec4 newColor2 = texture2D(lookup, texPos2);\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    gl_FragColor = vec4(newColor.rgb, tex.w);\n}\n@end";
+var lutEssl = "\n@export clay.compositor.lut\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform sampler2D lookup;\nvoid main()\n{\n    vec4 tex = texture2D(texture, v_Texcoord);\n    float blueColor = tex.b * 63.0;\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.g);\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.g);\n    vec4 newColor1 = texture2D(lookup, texPos1);\n    vec4 newColor2 = texture2D(lookup, texPos2);\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    gl_FragColor = vec4(newColor.rgb, tex.w);\n}\n@end";
 
-var vigentteEssl = "@export qtek.compositor.vignette\n#define OUTPUT_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float darkness: 1;\nuniform float offset: 1;\n@import qtek.util.rgbm\nvoid main()\n{\n    vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));\n    gl_FragColor.rgb = texel.rgb;\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(offset);\n    gl_FragColor = encodeHDR(vec4(mix(texel.rgb, vec3(1.0 - darkness), dot(uv, uv)), texel.a));\n}\n@end";
+var vigentteEssl = "@export clay.compositor.vignette\n#define OUTPUT_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nuniform float darkness: 1;\nuniform float offset: 1;\n@import clay.util.rgbm\nvoid main()\n{\n    vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));\n    gl_FragColor.rgb = texel.rgb;\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(offset);\n    gl_FragColor = encodeHDR(vec4(mix(texel.rgb, vec3(1.0 - darkness), dot(uv, uv)), texel.a));\n}\n@end";
 
-var outputEssl = "@export qtek.compositor.output\n#define OUTPUT_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\n@import qtek.util.rgbm\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    gl_FragColor.rgb = tex.rgb;\n#ifdef OUTPUT_ALPHA\n    gl_FragColor.a = tex.a;\n#else\n    gl_FragColor.a = 1.0;\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n#ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
+var outputEssl = "@export clay.compositor.output\n#define OUTPUT_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\n@import clay.util.rgbm\nvoid main()\n{\n    vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n    gl_FragColor.rgb = tex.rgb;\n#ifdef OUTPUT_ALPHA\n    gl_FragColor.a = tex.a;\n#else\n    gl_FragColor.a = 1.0;\n#endif\n    gl_FragColor = encodeHDR(gl_FragColor);\n#ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
 
-var brightEssl = "@export qtek.compositor.bright\nuniform sampler2D texture;\nuniform float threshold : 1;\nuniform float scale : 1.0;\nuniform vec2 textureSize: [512, 512];\nvarying vec2 v_Texcoord;\nconst vec3 lumWeight = vec3(0.2125, 0.7154, 0.0721);\n@import qtek.util.rgbm\nvec4 median(vec4 a, vec4 b, vec4 c)\n{\n    return a + b + c - min(min(a, b), c) - max(max(a, b), c);\n}\nvoid main()\n{\n    vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));\n#ifdef ANTI_FLICKER\n    vec3 d = 1.0 / textureSize.xyx * vec3(1.0, 1.0, 0.0);\n    vec4 s1 = decodeHDR(texture2D(texture, v_Texcoord - d.xz));\n    vec4 s2 = decodeHDR(texture2D(texture, v_Texcoord + d.xz));\n    vec4 s3 = decodeHDR(texture2D(texture, v_Texcoord - d.zy));\n    vec4 s4 = decodeHDR(texture2D(texture, v_Texcoord + d.zy));\n    texel = median(median(texel, s1, s2), s3, s4);\n#endif\n    float lum = dot(texel.rgb , lumWeight);\n    vec4 color;\n    if (lum > threshold && texel.a > 0.0)\n    {\n        color = vec4(texel.rgb * scale, texel.a * scale);\n    }\n    else\n    {\n        color = vec4(0.0);\n    }\n    gl_FragColor = encodeHDR(color);\n}\n@end\n";
+var brightEssl = "@export clay.compositor.bright\nuniform sampler2D texture;\nuniform float threshold : 1;\nuniform float scale : 1.0;\nuniform vec2 textureSize: [512, 512];\nvarying vec2 v_Texcoord;\nconst vec3 lumWeight = vec3(0.2125, 0.7154, 0.0721);\n@import clay.util.rgbm\nvec4 median(vec4 a, vec4 b, vec4 c)\n{\n    return a + b + c - min(min(a, b), c) - max(max(a, b), c);\n}\nvoid main()\n{\n    vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));\n#ifdef ANTI_FLICKER\n    vec3 d = 1.0 / textureSize.xyx * vec3(1.0, 1.0, 0.0);\n    vec4 s1 = decodeHDR(texture2D(texture, v_Texcoord - d.xz));\n    vec4 s2 = decodeHDR(texture2D(texture, v_Texcoord + d.xz));\n    vec4 s3 = decodeHDR(texture2D(texture, v_Texcoord - d.zy));\n    vec4 s4 = decodeHDR(texture2D(texture, v_Texcoord + d.zy));\n    texel = median(median(texel, s1, s2), s3, s4);\n#endif\n    float lum = dot(texel.rgb , lumWeight);\n    vec4 color;\n    if (lum > threshold && texel.a > 0.0)\n    {\n        color = vec4(texel.rgb * scale, texel.a * scale);\n    }\n    else\n    {\n        color = vec4(0.0);\n    }\n    gl_FragColor = encodeHDR(color);\n}\n@end\n";
 
-var downsampleEssl = "@export qtek.compositor.downsample\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\nfloat brightness(vec3 c)\n{\n    return max(max(c.r, c.g), c.b);\n}\n@import qtek.util.clamp_sample\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n#ifdef ANTI_FLICKER\n    vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;\n    vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;\n    vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;\n    vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;\n    float s1w = 1.0 / (brightness(s1) + 1.0);\n    float s2w = 1.0 / (brightness(s2) + 1.0);\n    float s3w = 1.0 / (brightness(s3) + 1.0);\n    float s4w = 1.0 / (brightness(s4) + 1.0);\n    float oneDivideSum = 1.0 / (s1w + s2w + s3w + s4w);\n    vec4 color = vec4(\n        (s1 * s1w + s2 * s2w + s3 * s3w + s4 * s4w) * oneDivideSum,\n        1.0\n    );\n#else\n    vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n    color *= 0.25;\n#endif\n    gl_FragColor = encodeHDR(color);\n}\n@end";
+var downsampleEssl = "@export clay.compositor.downsample\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nfloat brightness(vec3 c)\n{\n    return max(max(c.r, c.g), c.b);\n}\n@import clay.util.clamp_sample\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n#ifdef ANTI_FLICKER\n    vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;\n    vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;\n    vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;\n    vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;\n    float s1w = 1.0 / (brightness(s1) + 1.0);\n    float s2w = 1.0 / (brightness(s2) + 1.0);\n    float s3w = 1.0 / (brightness(s3) + 1.0);\n    float s4w = 1.0 / (brightness(s4) + 1.0);\n    float oneDivideSum = 1.0 / (s1w + s2w + s3w + s4w);\n    vec4 color = vec4(\n        (s1 * s1w + s2 * s2w + s3 * s3w + s4 * s4w) * oneDivideSum,\n        1.0\n    );\n#else\n    vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n    color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n    color *= 0.25;\n#endif\n    gl_FragColor = encodeHDR(color);\n}\n@end";
 
-var upsampleEssl = "\n@export qtek.compositor.upsample\n#define HIGH_QUALITY\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\n@import qtek.util.clamp_sample\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    vec4 s;\n    s  = decodeHDR(clampSample(texture, v_Texcoord - d.xy));\n    s += decodeHDR(clampSample(texture, v_Texcoord - d.wy)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord - d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zw)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord       )) * 4.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xw)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    gl_FragColor = encodeHDR(s / 16.0);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    vec4 s;\n    s  = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n    gl_FragColor = encodeHDR(s / 4.0);\n#endif\n}\n@end";
+var upsampleEssl = "\n@export clay.compositor.upsample\n#define HIGH_QUALITY\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.clamp_sample\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    vec4 s;\n    s  = decodeHDR(clampSample(texture, v_Texcoord - d.xy));\n    s += decodeHDR(clampSample(texture, v_Texcoord - d.wy)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord - d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zw)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord       )) * 4.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xw)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    gl_FragColor = encodeHDR(s / 16.0);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    vec4 s;\n    s  = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n    s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n    gl_FragColor = encodeHDR(s / 4.0);\n#endif\n}\n@end";
 
-var hdrEssl = "@export qtek.compositor.hdr.composite\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n#ifdef COLOR_CORRECTION\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float saturation : 1.0;\n#endif\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\nvarying vec2 v_Texcoord;\n@import qtek.util.srgb\nvec3 ACESToneMapping(vec3 color)\n{\n    const float A = 2.51;\n    const float B = 0.03;\n    const float C = 2.43;\n    const float D = 0.59;\n    const float E = 0.14;\n    return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\nfloat eyeAdaption(float fLum)\n{\n    return mix(0.2, fLum, 0.5);\n}\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n    float blueColor = color.b * 63.0;\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n    vec4 newColor1 = texture2D(lut, texPos1);\n    vec4 newColor2 = texture2D(lut, texPos2);\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor.rgb;\n}\n#endif\n@import qtek.util.rgbm\nvoid main()\n{\n    vec4 texel = vec4(0.0);\n    vec4 originalTexel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n    texel = decodeHDR(texture2D(texture, v_Texcoord));\n    originalTexel = texel;\n#endif\n#ifdef BLOOM_ENABLED\n    vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));\n    texel.rgb += bloomTexel.rgb * bloomIntensity;\n    texel.a += bloomTexel.a * bloomIntensity;\n#endif\n#ifdef LENSFLARE_ENABLED\n    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n    texel.a = min(texel.a, 1.0);\n#ifdef LUM_ENABLED\n    float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n    float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n    float exposureBias = adaptedLumDest * exposure;\n#else\n    float exposureBias = exposure;\n#endif\n    texel.rgb *= exposureBias;\n    texel.rgb = ACESToneMapping(texel.rgb);\n    texel = linearTosRGB(texel);\n#ifdef LUT_ENABLED\n    texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n#ifdef COLOR_CORRECTION\n    texel.rgb = clamp(texel.rgb + vec3(brightness), 0.0, 1.0);\n    texel.rgb = clamp((texel.rgb - vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n    float lum = dot(texel.rgb, vec3(0.2125, 0.7154, 0.0721));\n    texel.rgb = mix(vec3(lum), texel.rgb, saturation);\n#endif\n#ifdef VIGNETTE\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n    texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n    gl_FragColor = encodeHDR(texel);\n#ifdef DEBUG\n    #if DEBUG == 1\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n    #elif DEBUG == 2\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);\n    #elif DEBUG == 3\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));\n    #endif\n#endif\n    if (originalTexel.a <= 0.01) {\n        gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));\n    }\n#ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
+var hdrEssl = "@export clay.compositor.hdr.composite\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n#ifdef COLOR_CORRECTION\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float saturation : 1.0;\n#endif\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvec3 ACESToneMapping(vec3 color)\n{\n    const float A = 2.51;\n    const float B = 0.03;\n    const float C = 2.43;\n    const float D = 0.59;\n    const float E = 0.14;\n    return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\nfloat eyeAdaption(float fLum)\n{\n    return mix(0.2, fLum, 0.5);\n}\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n    float blueColor = color.b * 63.0;\n    vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n    vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n    vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n    vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n    vec4 newColor1 = texture2D(lut, texPos1);\n    vec4 newColor2 = texture2D(lut, texPos2);\n    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor.rgb;\n}\n#endif\n@import clay.util.rgbm\nvoid main()\n{\n    vec4 texel = vec4(0.0);\n    vec4 originalTexel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n    texel = decodeHDR(texture2D(texture, v_Texcoord));\n    originalTexel = texel;\n#endif\n#ifdef BLOOM_ENABLED\n    vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));\n    texel.rgb += bloomTexel.rgb * bloomIntensity;\n    texel.a += bloomTexel.a * bloomIntensity;\n#endif\n#ifdef LENSFLARE_ENABLED\n    texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n    texel.a = min(texel.a, 1.0);\n#ifdef LUM_ENABLED\n    float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n    float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n    float exposureBias = adaptedLumDest * exposure;\n#else\n    float exposureBias = exposure;\n#endif\n    texel.rgb *= exposureBias;\n    texel.rgb = ACESToneMapping(texel.rgb);\n    texel = linearTosRGB(texel);\n#ifdef LUT_ENABLED\n    texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n#ifdef COLOR_CORRECTION\n    texel.rgb = clamp(texel.rgb + vec3(brightness), 0.0, 1.0);\n    texel.rgb = clamp((texel.rgb - vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n    float lum = dot(texel.rgb, vec3(0.2125, 0.7154, 0.0721));\n    texel.rgb = mix(vec3(lum), texel.rgb, saturation);\n#endif\n#ifdef VIGNETTE\n    vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n    texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n    gl_FragColor = encodeHDR(texel);\n#ifdef DEBUG\n    #if DEBUG == 1\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n    #elif DEBUG == 2\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);\n    #elif DEBUG == 3\n    gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));\n    #endif\n#endif\n    if (originalTexel.a <= 0.01 && gl_FragColor.a > 1e-5) {\n        gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));\n    }\n#ifdef PREMULTIPLY_ALPHA\n    gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
 
-var dofEssl = "@export qtek.compositor.dof.coc\nuniform sampler2D depth;\nuniform float zNear: 0.1;\nuniform float zFar: 2000;\nuniform float focalDist: 3;\nuniform float focalRange: 1;\nuniform float focalLength: 30;\nuniform float fstop: 2.8;\nvarying vec2 v_Texcoord;\n@import qtek.util.encode_float\nvoid main()\n{\n    float z = texture2D(depth, v_Texcoord).r * 2.0 - 1.0;\n    float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));\n    float aperture = focalLength / fstop;\n    float coc;\n    float uppper = focalDist + focalRange;\n    float lower = focalDist - focalRange;\n    if (dist <= uppper && dist >= lower) {\n        coc = 0.5;\n    }\n    else {\n        float focalAdjusted = dist > uppper ? uppper : lower;\n        coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));\n        coc = clamp(coc, 0.0, 0.4) / 0.4000001;\n        if (dist < lower) {\n            coc = -coc;\n        }\n        coc = coc * 0.5 + 0.5;\n    }\n    gl_FragColor = encodeFloat(coc);\n}\n@end\n@export qtek.compositor.dof.premultiply\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\n@import qtek.util.decode_float\nvoid main() {\n    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);\n    gl_FragColor = encodeHDR(\n        vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)\n    );\n}\n@end\n@export qtek.compositor.dof.min_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import qtek.util.float\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n    gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export qtek.compositor.dof.max_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import qtek.util.float\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n    gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export qtek.compositor.dof.coc_upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import qtek.util.float\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord       )) * 4.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    gl_FragColor = encodeFloat(s / 16.0);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));\n    gl_FragColor = encodeFloat(s / 4.0);\n#endif\n}\n@end\n@export qtek.compositor.dof.upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\n@import qtek.util.decode_float\nfloat tap(vec2 uv, inout vec4 color, float baseWeight) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 16.0;\n    float w  = tap(v_Texcoord - d.xy, color, baseWeight);\n    w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord - d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord       , color, baseWeight * 4.0);\n    w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.xy, color, baseWeight);\n    gl_FragColor = encodeHDR(color / w);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 4.0;\n    float w  = tap(v_Texcoord + d.xy, color, baseWeight);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.xw, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight);\n    gl_FragColor = encodeHDR(color / w);\n#endif\n}\n@end\n@export qtek.compositor.dof.downsample\nuniform sampler2D texture;\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\n@import qtek.util.decode_float\nfloat tap(vec2 uv, inout vec4 color) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    vec4 color = vec4(0.0);\n    float weight = tap(v_Texcoord + d.xy, color);\n    weight += tap(v_Texcoord + d.zy, color);\n    weight += tap(v_Texcoord + d.xw, color);\n    weight += tap(v_Texcoord + d.zw, color);\n    color /= weight;\n    gl_FragColor = encodeHDR(color);\n}\n@end\n@export qtek.compositor.dof.hexagonal_blur_frag\n@import qtek.util.float\nvec4 doBlur(sampler2D targetTexture, vec2 offset) {\n#ifdef BLUR_COC\n    float cocSum = 0.0;\n#else\n    vec4 color = vec4(0.0);\n#endif\n    float weightSum = 0.0;\n    float kernelWeight = 1.0 / float(KERNEL_SIZE);\n    for (int i = 0; i < KERNEL_SIZE; i++) {\n        vec2 coord = v_Texcoord + offset * float(i);\n        float w = kernelWeight;\n#ifdef BLUR_COC\n        float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;\n        cocSum += clamp(fCoc, -1.0, 0.0) * w;\n#else\n        float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;\n        vec4 texel = texture2D(targetTexture, coord);\n    #if !defined(BLUR_NEARFIELD)\n        w *= abs(fCoc);\n    #endif\n        color += decodeHDR(texel) * w;\n#endif\n        weightSum += w;\n    }\n#ifdef BLUR_COC\n    return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);\n#else\n    return color / weightSum;\n#endif\n}\n@end\n@export qtek.compositor.dof.hexagonal_blur_1\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import qtek.util.rgbm\n@import qtek.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    gl_FragColor = doBlur(texture, vec2(0.0, offset.y));\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export qtek.compositor.dof.hexagonal_blur_2\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import qtek.util.rgbm\n@import qtek.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    offset.y /= 2.0;\n    gl_FragColor = doBlur(texture, -offset);\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export qtek.compositor.dof.hexagonal_blur_3\n#define KERNEL_SIZE 5\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import qtek.util.rgbm\n@import qtek.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    offset.y /= 2.0;\n    vec2 vDownRight = vec2(offset.x, -offset.y);\n    vec4 texel1 = doBlur(texture1, -offset);\n    vec4 texel2 = doBlur(texture1, vDownRight);\n    vec4 texel3 = doBlur(texture2, vDownRight);\n#ifdef BLUR_COC\n    float coc1 = decodeFloat(texel1) * 2.0 - 1.0;\n    float coc2 = decodeFloat(texel2) * 2.0 - 1.0;\n    float coc3 = decodeFloat(texel3) * 2.0 - 1.0;\n    gl_FragColor = encodeFloat(\n        ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5\n    );\n#else\n    vec4 color = (texel1 + texel2 + texel3) / 3.0;\n    gl_FragColor = encodeHDR(color);\n#endif\n}\n@end\n@export qtek.compositor.dof.composite\n#define DEBUG 0\nuniform sampler2D original;\nuniform sampler2D blurred;\nuniform sampler2D nearfield;\nuniform sampler2D coc;\nuniform sampler2D nearcoc;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\n@import qtek.util.float\nvoid main()\n{\n    vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));\n    vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord));\n    fCoc = abs(fCoc * 2.0 - 1.0);\n    float weight = smoothstep(0.0, 1.0, fCoc);\n#ifdef NEARFIELD_ENABLED\n    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));\n    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));\n    fNearCoc = abs(fNearCoc * 2.0 - 1.0);\n    gl_FragColor = encodeHDR(\n        mix(\n            nearfieldColor, mix(originalColor, blurredColor, weight),\n            pow(1.0 - fNearCoc, 4.0)\n        )\n    );\n#else\n    gl_FragColor = encodeHDR(mix(originalColor, blurredColor, weight));\n#endif\n#if DEBUG == 1\n    gl_FragColor = vec4(vec3(fCoc), 1.0);\n#elif DEBUG == 2\n    gl_FragColor = vec4(vec3(fNearCoc), 1.0);\n#elif DEBUG == 3\n    gl_FragColor = encodeHDR(blurredColor);\n#elif DEBUG == 4\n    gl_FragColor = encodeHDR(nearfieldColor);\n#endif\n}\n@end";
+var dofEssl = "@export clay.compositor.dof.coc\nuniform sampler2D depth;\nuniform float zNear: 0.1;\nuniform float zFar: 2000;\nuniform float focalDist: 3;\nuniform float focalRange: 1;\nuniform float focalLength: 30;\nuniform float fstop: 2.8;\nvarying vec2 v_Texcoord;\n@import clay.util.encode_float\nvoid main()\n{\n    float z = texture2D(depth, v_Texcoord).r * 2.0 - 1.0;\n    float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));\n    float aperture = focalLength / fstop;\n    float coc;\n    float uppper = focalDist + focalRange;\n    float lower = focalDist - focalRange;\n    if (dist <= uppper && dist >= lower) {\n        coc = 0.5;\n    }\n    else {\n        float focalAdjusted = dist > uppper ? uppper : lower;\n        coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));\n        coc = clamp(coc, 0.0, 0.4) / 0.4000001;\n        if (dist < lower) {\n            coc = -coc;\n        }\n        coc = coc * 0.5 + 0.5;\n    }\n    gl_FragColor = encodeFloat(coc);\n}\n@end\n@export clay.compositor.dof.premultiply\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nvoid main() {\n    float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);\n    gl_FragColor = encodeHDR(\n        vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)\n    );\n}\n@end\n@export clay.compositor.dof.min_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.float\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n    gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export clay.compositor.dof.max_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.float\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n    fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n    gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export clay.compositor.dof.coc_upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.float\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord - d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord       )) * 4.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    gl_FragColor = encodeFloat(s / 16.0);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    float s;\n    s  = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));\n    s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));\n    gl_FragColor = encodeFloat(s / 4.0);\n#endif\n}\n@end\n@export clay.compositor.dof.upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nfloat tap(vec2 uv, inout vec4 color, float baseWeight) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\nvoid main()\n{\n#ifdef HIGH_QUALITY\n    vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 16.0;\n    float w  = tap(v_Texcoord - d.xy, color, baseWeight);\n    w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord - d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord       , color, baseWeight * 4.0);\n    w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);\n    w += tap(v_Texcoord + d.xy, color, baseWeight);\n    gl_FragColor = encodeHDR(color / w);\n#else\n    vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n    vec4 color = vec4(0.0);\n    float baseWeight = 1.0 / 4.0;\n    float w  = tap(v_Texcoord + d.xy, color, baseWeight);\n    w += tap(v_Texcoord + d.zy, color, baseWeight);\n    w += tap(v_Texcoord + d.xw, color, baseWeight);\n    w += tap(v_Texcoord + d.zw, color, baseWeight);\n    gl_FragColor = encodeHDR(color / w);\n#endif\n}\n@end\n@export clay.compositor.dof.downsample\nuniform sampler2D texture;\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nfloat tap(vec2 uv, inout vec4 color) {\n    float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;\n    color += decodeHDR(texture2D(texture, uv)) * weight;\n    return weight;\n}\nvoid main()\n{\n    vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n    vec4 color = vec4(0.0);\n    float weight = tap(v_Texcoord + d.xy, color);\n    weight += tap(v_Texcoord + d.zy, color);\n    weight += tap(v_Texcoord + d.xw, color);\n    weight += tap(v_Texcoord + d.zw, color);\n    color /= weight;\n    gl_FragColor = encodeHDR(color);\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_frag\n@import clay.util.float\nvec4 doBlur(sampler2D targetTexture, vec2 offset) {\n#ifdef BLUR_COC\n    float cocSum = 0.0;\n#else\n    vec4 color = vec4(0.0);\n#endif\n    float weightSum = 0.0;\n    float kernelWeight = 1.0 / float(KERNEL_SIZE);\n    for (int i = 0; i < KERNEL_SIZE; i++) {\n        vec2 coord = v_Texcoord + offset * float(i);\n        float w = kernelWeight;\n#ifdef BLUR_COC\n        float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;\n        cocSum += clamp(fCoc, -1.0, 0.0) * w;\n#else\n        float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;\n        vec4 texel = texture2D(targetTexture, coord);\n    #if !defined(BLUR_NEARFIELD)\n        w *= abs(fCoc);\n    #endif\n        color += decodeHDR(texel) * w;\n#endif\n        weightSum += w;\n    }\n#ifdef BLUR_COC\n    return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);\n#else\n    return color / weightSum;\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_1\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    gl_FragColor = doBlur(texture, vec2(0.0, offset.y));\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_2\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    offset.y /= 2.0;\n    gl_FragColor = doBlur(texture, -offset);\n#if !defined(BLUR_COC)\n    gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_3\n#define KERNEL_SIZE 5\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n    vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n    offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n    offset.y /= 2.0;\n    vec2 vDownRight = vec2(offset.x, -offset.y);\n    vec4 texel1 = doBlur(texture1, -offset);\n    vec4 texel2 = doBlur(texture1, vDownRight);\n    vec4 texel3 = doBlur(texture2, vDownRight);\n#ifdef BLUR_COC\n    float coc1 = decodeFloat(texel1) * 2.0 - 1.0;\n    float coc2 = decodeFloat(texel2) * 2.0 - 1.0;\n    float coc3 = decodeFloat(texel3) * 2.0 - 1.0;\n    gl_FragColor = encodeFloat(\n        ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5\n    );\n#else\n    vec4 color = (texel1 + texel2 + texel3) / 3.0;\n    gl_FragColor = encodeHDR(color);\n#endif\n}\n@end\n@export clay.compositor.dof.composite\n#define DEBUG 0\nuniform sampler2D original;\nuniform sampler2D blurred;\nuniform sampler2D nearfield;\nuniform sampler2D coc;\nuniform sampler2D nearcoc;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.float\nvoid main()\n{\n    vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));\n    vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));\n    float fCoc = decodeFloat(texture2D(coc, v_Texcoord));\n    fCoc = abs(fCoc * 2.0 - 1.0);\n    float weight = smoothstep(0.0, 1.0, fCoc);\n#ifdef NEARFIELD_ENABLED\n    vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));\n    float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));\n    fNearCoc = abs(fNearCoc * 2.0 - 1.0);\n    gl_FragColor = encodeHDR(\n        mix(\n            nearfieldColor, mix(originalColor, blurredColor, weight),\n            pow(1.0 - fNearCoc, 4.0)\n        )\n    );\n#else\n    gl_FragColor = encodeHDR(mix(originalColor, blurredColor, weight));\n#endif\n#if DEBUG == 1\n    gl_FragColor = vec4(vec3(fCoc), 1.0);\n#elif DEBUG == 2\n    gl_FragColor = vec4(vec3(fNearCoc), 1.0);\n#elif DEBUG == 3\n    gl_FragColor = encodeHDR(blurredColor);\n#elif DEBUG == 4\n    gl_FragColor = encodeHDR(nearfieldColor);\n#endif\n}\n@end";
 
-var lensflareEssl = "@export qtek.compositor.lensflare\n#define SAMPLE_NUMBER 8\nuniform sampler2D texture;\nuniform sampler2D lenscolor;\nuniform vec2 textureSize : [512, 512];\nuniform float dispersal : 0.3;\nuniform float haloWidth : 0.4;\nuniform float distortion : 1.0;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\nvec4 textureDistorted(\n    in vec2 texcoord,\n    in vec2 direction,\n    in vec3 distortion\n) {\n    return vec4(\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.r)).r,\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.g)).g,\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.b)).b,\n        1.0\n    );\n}\nvoid main()\n{\n    vec2 texcoord = -v_Texcoord + vec2(1.0);    vec2 textureOffset = 1.0 / textureSize;\n    vec2 ghostVec = (vec2(0.5) - texcoord) * dispersal;\n    vec2 haloVec = normalize(ghostVec) * haloWidth;\n    vec3 distortion = vec3(-textureOffset.x * distortion, 0.0, textureOffset.x * distortion);\n    vec4 result = vec4(0.0);\n    for (int i = 0; i < SAMPLE_NUMBER; i++)\n    {\n        vec2 offset = fract(texcoord + ghostVec * float(i));\n        float weight = length(vec2(0.5) - offset) / length(vec2(0.5));\n        weight = pow(1.0 - weight, 10.0);\n        result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n    }\n    result *= texture2D(lenscolor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));\n    float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));\n    weight = pow(1.0 - weight, 10.0);\n    vec2 offset = fract(texcoord + haloVec);\n    result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n    gl_FragColor = result;\n}\n@end";
+var lensflareEssl = "@export clay.compositor.lensflare\n#define SAMPLE_NUMBER 8\nuniform sampler2D texture;\nuniform sampler2D lenscolor;\nuniform vec2 textureSize : [512, 512];\nuniform float dispersal : 0.3;\nuniform float haloWidth : 0.4;\nuniform float distortion : 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nvec4 textureDistorted(\n    in vec2 texcoord,\n    in vec2 direction,\n    in vec3 distortion\n) {\n    return vec4(\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.r)).r,\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.g)).g,\n        decodeHDR(texture2D(texture, texcoord + direction * distortion.b)).b,\n        1.0\n    );\n}\nvoid main()\n{\n    vec2 texcoord = -v_Texcoord + vec2(1.0);    vec2 textureOffset = 1.0 / textureSize;\n    vec2 ghostVec = (vec2(0.5) - texcoord) * dispersal;\n    vec2 haloVec = normalize(ghostVec) * haloWidth;\n    vec3 distortion = vec3(-textureOffset.x * distortion, 0.0, textureOffset.x * distortion);\n    vec4 result = vec4(0.0);\n    for (int i = 0; i < SAMPLE_NUMBER; i++)\n    {\n        vec2 offset = fract(texcoord + ghostVec * float(i));\n        float weight = length(vec2(0.5) - offset) / length(vec2(0.5));\n        weight = pow(1.0 - weight, 10.0);\n        result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n    }\n    result *= texture2D(lenscolor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));\n    float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));\n    weight = pow(1.0 - weight, 10.0);\n    vec2 offset = fract(texcoord + haloVec);\n    result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n    gl_FragColor = result;\n}\n@end";
 
-var blendEssl = "@export qtek.compositor.blend\n#ifdef TEXTURE1_ENABLED\nuniform sampler2D texture1;\nuniform float weight1 : 1.0;\n#endif\n#ifdef TEXTURE2_ENABLED\nuniform sampler2D texture2;\nuniform float weight2 : 1.0;\n#endif\n#ifdef TEXTURE3_ENABLED\nuniform sampler2D texture3;\nuniform float weight3 : 1.0;\n#endif\n#ifdef TEXTURE4_ENABLED\nuniform sampler2D texture4;\nuniform float weight4 : 1.0;\n#endif\n#ifdef TEXTURE5_ENABLED\nuniform sampler2D texture5;\nuniform float weight5 : 1.0;\n#endif\n#ifdef TEXTURE6_ENABLED\nuniform sampler2D texture6;\nuniform float weight6 : 1.0;\n#endif\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\nvoid main()\n{\n    vec4 tex = vec4(0.0);\n#ifdef TEXTURE1_ENABLED\n    tex += decodeHDR(texture2D(texture1, v_Texcoord)) * weight1;\n#endif\n#ifdef TEXTURE2_ENABLED\n    tex += decodeHDR(texture2D(texture2, v_Texcoord)) * weight2;\n#endif\n#ifdef TEXTURE3_ENABLED\n    tex += decodeHDR(texture2D(texture3, v_Texcoord)) * weight3;\n#endif\n#ifdef TEXTURE4_ENABLED\n    tex += decodeHDR(texture2D(texture4, v_Texcoord)) * weight4;\n#endif\n#ifdef TEXTURE5_ENABLED\n    tex += decodeHDR(texture2D(texture5, v_Texcoord)) * weight5;\n#endif\n#ifdef TEXTURE6_ENABLED\n    tex += decodeHDR(texture2D(texture6, v_Texcoord)) * weight6;\n#endif\n    gl_FragColor = encodeHDR(tex);\n}\n@end";
+var blendEssl = "@export clay.compositor.blend\n#define SHADER_NAME blend\n#ifdef TEXTURE1_ENABLED\nuniform sampler2D texture1;\nuniform float weight1 : 1.0;\n#endif\n#ifdef TEXTURE2_ENABLED\nuniform sampler2D texture2;\nuniform float weight2 : 1.0;\n#endif\n#ifdef TEXTURE3_ENABLED\nuniform sampler2D texture3;\nuniform float weight3 : 1.0;\n#endif\n#ifdef TEXTURE4_ENABLED\nuniform sampler2D texture4;\nuniform float weight4 : 1.0;\n#endif\n#ifdef TEXTURE5_ENABLED\nuniform sampler2D texture5;\nuniform float weight5 : 1.0;\n#endif\n#ifdef TEXTURE6_ENABLED\nuniform sampler2D texture6;\nuniform float weight6 : 1.0;\n#endif\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nvoid main()\n{\n    vec4 tex = vec4(0.0);\n#ifdef TEXTURE1_ENABLED\n    tex += decodeHDR(texture2D(texture1, v_Texcoord)) * weight1;\n#endif\n#ifdef TEXTURE2_ENABLED\n    tex += decodeHDR(texture2D(texture2, v_Texcoord)) * weight2;\n#endif\n#ifdef TEXTURE3_ENABLED\n    tex += decodeHDR(texture2D(texture3, v_Texcoord)) * weight3;\n#endif\n#ifdef TEXTURE4_ENABLED\n    tex += decodeHDR(texture2D(texture4, v_Texcoord)) * weight4;\n#endif\n#ifdef TEXTURE5_ENABLED\n    tex += decodeHDR(texture2D(texture5, v_Texcoord)) * weight5;\n#endif\n#ifdef TEXTURE6_ENABLED\n    tex += decodeHDR(texture2D(texture6, v_Texcoord)) * weight6;\n#endif\n    gl_FragColor = encodeHDR(tex);\n}\n@end";
 
-var fxaaEssl = "@export qtek.compositor.fxaa\nuniform sampler2D texture;\nuniform vec4 viewport : VIEWPORT;\nvarying vec2 v_Texcoord;\n#define FXAA_REDUCE_MIN   (1.0/128.0)\n#define FXAA_REDUCE_MUL   (1.0/8.0)\n#define FXAA_SPAN_MAX     8.0\n@import qtek.util.rgbm\nvoid main()\n{\n    vec2 resolution = 1.0 / viewport.zw;\n    vec3 rgbNW =  decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbNE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbSW = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbSE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ) ).xyz;\n    vec4 rgbaM  = decodeHDR( texture2D( texture,  gl_FragCoord.xy  * resolution ) );\n    vec3 rgbM  = rgbaM.xyz;\n    float opacity  = rgbaM.w;\n    vec3 luma = vec3( 0.299, 0.587, 0.114 );\n    float lumaNW = dot( rgbNW, luma );\n    float lumaNE = dot( rgbNE, luma );\n    float lumaSW = dot( rgbSW, luma );\n    float lumaSE = dot( rgbSE, luma );\n    float lumaM  = dot( rgbM,  luma );\n    float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );\n    float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );\n    vec2 dir;\n    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));\n    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));\n    float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );\n    float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );\n    dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),\n          max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),\n                dir * rcpDirMin)) * resolution;\n    vec3 rgbA = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 1.0 / 3.0 - 0.5 ) ) ).xyz;\n    rgbA += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 2.0 / 3.0 - 0.5 ) ) ).xyz;\n    rgbA *= 0.5;\n    vec3 rgbB = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * -0.5 ) ).xyz;\n    rgbB += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * 0.5 ) ).xyz;\n    rgbB *= 0.25;\n    rgbB += rgbA * 0.5;\n    float lumaB = dot( rgbB, luma );\n    if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) )\n    {\n        gl_FragColor = vec4( rgbA, opacity );\n    }\n    else {\n        gl_FragColor = vec4( rgbB, opacity );\n    }\n}\n@end";
+var fxaaEssl = "@export clay.compositor.fxaa\nuniform sampler2D texture;\nuniform vec4 viewport : VIEWPORT;\nvarying vec2 v_Texcoord;\n#define FXAA_REDUCE_MIN   (1.0/128.0)\n#define FXAA_REDUCE_MUL   (1.0/8.0)\n#define FXAA_SPAN_MAX     8.0\n@import clay.util.rgbm\nvoid main()\n{\n    vec2 resolution = 1.0 / viewport.zw;\n    vec3 rgbNW =  decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbNE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbSW = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ) ).xyz;\n    vec3 rgbSE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ) ).xyz;\n    vec4 rgbaM  = decodeHDR( texture2D( texture,  gl_FragCoord.xy  * resolution ) );\n    vec3 rgbM  = rgbaM.xyz;\n    float opacity  = rgbaM.w;\n    vec3 luma = vec3( 0.299, 0.587, 0.114 );\n    float lumaNW = dot( rgbNW, luma );\n    float lumaNE = dot( rgbNE, luma );\n    float lumaSW = dot( rgbSW, luma );\n    float lumaSE = dot( rgbSE, luma );\n    float lumaM  = dot( rgbM,  luma );\n    float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );\n    float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );\n    vec2 dir;\n    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));\n    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));\n    float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );\n    float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );\n    dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),\n          max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),\n                dir * rcpDirMin)) * resolution;\n    vec3 rgbA = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 1.0 / 3.0 - 0.5 ) ) ).xyz;\n    rgbA += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 2.0 / 3.0 - 0.5 ) ) ).xyz;\n    rgbA *= 0.5;\n    vec3 rgbB = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * -0.5 ) ).xyz;\n    rgbB += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * 0.5 ) ).xyz;\n    rgbB *= 0.25;\n    rgbB += rgbA * 0.5;\n    float lumaB = dot( rgbB, luma );\n    if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) )\n    {\n        gl_FragColor = vec4( rgbA, opacity );\n    }\n    else {\n        gl_FragColor = vec4( rgbB, opacity );\n    }\n}\n@end";
 
-var fxaa3Essl = "@export qtek.compositor.fxaa3\nuniform sampler2D texture;\nuniform vec4 viewport : VIEWPORT;\nuniform float subpixel: 0.75;\nuniform float edgeThreshold: 0.125;\nuniform float edgeThresholdMin: 0.0625;\nvarying vec2 v_Texcoord;\n@import qtek.util.rgbm\nfloat FxaaLuma(vec4 rgba) { return rgba.y; }\nvec4 FxaaPixelShader(\n    vec2 pos\n    ,sampler2D tex\n    ,vec2 fxaaQualityRcpFrame\n    ,float fxaaQualitySubpix\n    ,float fxaaQualityEdgeThreshold\n    ,float fxaaQualityEdgeThresholdMin\n) {\n    vec2 posM;\n    posM.x = pos.x;\n    posM.y = pos.y;\n    vec4 rgbyM = decodeHDR(texture2D(texture, posM, 0.0));\n    float lumaS = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 0.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaN = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 0.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float maxSM = max(lumaS, rgbyM.y);\n    float minSM = min(lumaS, rgbyM.y);\n    float maxESM = max(lumaE, maxSM);\n    float minESM = min(lumaE, minSM);\n    float maxWN = max(lumaN, lumaW);\n    float minWN = min(lumaN, lumaW);\n    float rangeMax = max(maxWN, maxESM);\n    float rangeMin = min(minWN, minESM);\n    float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;\n    float range = rangeMax - rangeMin;\n    float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);\n    bool earlyExit = range < rangeMaxClamped;\n    if(earlyExit) return rgbyM;\n    float lumaNW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaSE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaNE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaSW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaNS = lumaN + lumaS;\n    float lumaWE = lumaW + lumaE;\n    float subpixRcpRange = 1.0/range;\n    float subpixNSWE = lumaNS + lumaWE;\n    float edgeHorz1 = (-2.0 * rgbyM.y) + lumaNS;\n    float edgeVert1 = (-2.0 * rgbyM.y) + lumaWE;\n    float lumaNESE = lumaNE + lumaSE;\n    float lumaNWNE = lumaNW + lumaNE;\n    float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;\n    float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;\n    float lumaNWSW = lumaNW + lumaSW;\n    float lumaSWSE = lumaSW + lumaSE;\n    float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);\n    float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);\n    float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;\n    float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;\n    float edgeHorz = abs(edgeHorz3) + edgeHorz4;\n    float edgeVert = abs(edgeVert3) + edgeVert4;\n    float subpixNWSWNESE = lumaNWSW + lumaNESE;\n    float lengthSign = fxaaQualityRcpFrame.x;\n    bool horzSpan = edgeHorz >= edgeVert;\n    float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;\n    if(!horzSpan) lumaN = lumaW;\n    if(!horzSpan) lumaS = lumaE;\n    if(horzSpan) lengthSign = fxaaQualityRcpFrame.y;\n    float subpixB = (subpixA * (1.0/12.0)) - rgbyM.y;\n    float gradientN = lumaN - rgbyM.y;\n    float gradientS = lumaS - rgbyM.y;\n    float lumaNN = lumaN + rgbyM.y;\n    float lumaSS = lumaS + rgbyM.y;\n    bool pairN = abs(gradientN) >= abs(gradientS);\n    float gradient = max(abs(gradientN), abs(gradientS));\n    if(pairN) lengthSign = -lengthSign;\n    float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);\n    vec2 posB;\n    posB.x = posM.x;\n    posB.y = posM.y;\n    vec2 offNP;\n    offNP.x = (!horzSpan) ? 0.0 : fxaaQualityRcpFrame.x;\n    offNP.y = ( horzSpan) ? 0.0 : fxaaQualityRcpFrame.y;\n    if(!horzSpan) posB.x += lengthSign * 0.5;\n    if( horzSpan) posB.y += lengthSign * 0.5;\n    vec2 posN;\n    posN.x = posB.x - offNP.x * 1.0;\n    posN.y = posB.y - offNP.y * 1.0;\n    vec2 posP;\n    posP.x = posB.x + offNP.x * 1.0;\n    posP.y = posB.y + offNP.y * 1.0;\n    float subpixD = ((-2.0)*subpixC) + 3.0;\n    float lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN, 0.0)));\n    float subpixE = subpixC * subpixC;\n    float lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP, 0.0)));\n    if(!pairN) lumaNN = lumaSS;\n    float gradientScaled = gradient * 1.0/4.0;\n    float lumaMM = rgbyM.y - lumaNN * 0.5;\n    float subpixF = subpixD * subpixE;\n    bool lumaMLTZero = lumaMM < 0.0;\n    lumaEndN -= lumaNN * 0.5;\n    lumaEndP -= lumaNN * 0.5;\n    bool doneN = abs(lumaEndN) >= gradientScaled;\n    bool doneP = abs(lumaEndP) >= gradientScaled;\n    if(!doneN) posN.x -= offNP.x * 1.5;\n    if(!doneN) posN.y -= offNP.y * 1.5;\n    bool doneNP = (!doneN) || (!doneP);\n    if(!doneP) posP.x += offNP.x * 1.5;\n    if(!doneP) posP.y += offNP.y * 1.5;\n    if(doneNP) {\n        if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n        if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n        if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n        if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n        doneN = abs(lumaEndN) >= gradientScaled;\n        doneP = abs(lumaEndP) >= gradientScaled;\n        if(!doneN) posN.x -= offNP.x * 2.0;\n        if(!doneN) posN.y -= offNP.y * 2.0;\n        doneNP = (!doneN) || (!doneP);\n        if(!doneP) posP.x += offNP.x * 2.0;\n        if(!doneP) posP.y += offNP.y * 2.0;\n        if(doneNP) {\n            if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n            if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n            if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n            if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n            doneN = abs(lumaEndN) >= gradientScaled;\n            doneP = abs(lumaEndP) >= gradientScaled;\n            if(!doneN) posN.x -= offNP.x * 4.0;\n            if(!doneN) posN.y -= offNP.y * 4.0;\n            doneNP = (!doneN) || (!doneP);\n            if(!doneP) posP.x += offNP.x * 4.0;\n            if(!doneP) posP.y += offNP.y * 4.0;\n            if(doneNP) {\n                if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n                if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n                if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n                if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n                doneN = abs(lumaEndN) >= gradientScaled;\n                doneP = abs(lumaEndP) >= gradientScaled;\n                if(!doneN) posN.x -= offNP.x * 12.0;\n                if(!doneN) posN.y -= offNP.y * 12.0;\n                doneNP = (!doneN) || (!doneP);\n                if(!doneP) posP.x += offNP.x * 12.0;\n                if(!doneP) posP.y += offNP.y * 12.0;\n            }\n        }\n    }\n    float dstN = posM.x - posN.x;\n    float dstP = posP.x - posM.x;\n    if(!horzSpan) dstN = posM.y - posN.y;\n    if(!horzSpan) dstP = posP.y - posM.y;\n    bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;\n    float spanLength = (dstP + dstN);\n    bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;\n    float spanLengthRcp = 1.0/spanLength;\n    bool directionN = dstN < dstP;\n    float dst = min(dstN, dstP);\n    bool goodSpan = directionN ? goodSpanN : goodSpanP;\n    float subpixG = subpixF * subpixF;\n    float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;\n    float subpixH = subpixG * fxaaQualitySubpix;\n    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;\n    float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);\n    if(!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;\n    if( horzSpan) posM.y += pixelOffsetSubpix * lengthSign;\n    return vec4(decodeHDR(texture2D(texture, posM, 0.0)).xyz, rgbyM.y);\n}\nvoid main()\n{\n    vec4 color = FxaaPixelShader(\n        v_Texcoord,\n        texture,\n        vec2(1.0) / viewport.zw,\n        subpixel,\n        edgeThreshold,\n        edgeThresholdMin\n    );\n    gl_FragColor = vec4(color.rgb, 1.0);\n}\n@end";
+var fxaa3Essl = "@export clay.compositor.fxaa3\nuniform sampler2D texture;\nuniform vec4 viewport : VIEWPORT;\nuniform float subpixel: 0.75;\nuniform float edgeThreshold: 0.125;\nuniform float edgeThresholdMin: 0.0625;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nfloat FxaaLuma(vec4 rgba) { return rgba.y; }\nvec4 FxaaPixelShader(\n    vec2 pos\n    ,sampler2D tex\n    ,vec2 fxaaQualityRcpFrame\n    ,float fxaaQualitySubpix\n    ,float fxaaQualityEdgeThreshold\n    ,float fxaaQualityEdgeThresholdMin\n) {\n    vec2 posM;\n    posM.x = pos.x;\n    posM.y = pos.y;\n    vec4 rgbyM = decodeHDR(texture2D(texture, posM, 0.0));\n    float lumaS = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 0.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaN = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 0.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float maxSM = max(lumaS, rgbyM.y);\n    float minSM = min(lumaS, rgbyM.y);\n    float maxESM = max(lumaE, maxSM);\n    float minESM = min(lumaE, minSM);\n    float maxWN = max(lumaN, lumaW);\n    float minWN = min(lumaN, lumaW);\n    float rangeMax = max(maxWN, maxESM);\n    float rangeMin = min(minWN, minESM);\n    float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;\n    float range = rangeMax - rangeMin;\n    float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);\n    bool earlyExit = range < rangeMaxClamped;\n    if(earlyExit) return rgbyM;\n    float lumaNW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaSE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaNE = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2( 1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaSW = FxaaLuma(decodeHDR(texture2D(texture, posM + (vec2(-1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));\n    float lumaNS = lumaN + lumaS;\n    float lumaWE = lumaW + lumaE;\n    float subpixRcpRange = 1.0/range;\n    float subpixNSWE = lumaNS + lumaWE;\n    float edgeHorz1 = (-2.0 * rgbyM.y) + lumaNS;\n    float edgeVert1 = (-2.0 * rgbyM.y) + lumaWE;\n    float lumaNESE = lumaNE + lumaSE;\n    float lumaNWNE = lumaNW + lumaNE;\n    float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;\n    float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;\n    float lumaNWSW = lumaNW + lumaSW;\n    float lumaSWSE = lumaSW + lumaSE;\n    float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);\n    float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);\n    float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;\n    float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;\n    float edgeHorz = abs(edgeHorz3) + edgeHorz4;\n    float edgeVert = abs(edgeVert3) + edgeVert4;\n    float subpixNWSWNESE = lumaNWSW + lumaNESE;\n    float lengthSign = fxaaQualityRcpFrame.x;\n    bool horzSpan = edgeHorz >= edgeVert;\n    float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;\n    if(!horzSpan) lumaN = lumaW;\n    if(!horzSpan) lumaS = lumaE;\n    if(horzSpan) lengthSign = fxaaQualityRcpFrame.y;\n    float subpixB = (subpixA * (1.0/12.0)) - rgbyM.y;\n    float gradientN = lumaN - rgbyM.y;\n    float gradientS = lumaS - rgbyM.y;\n    float lumaNN = lumaN + rgbyM.y;\n    float lumaSS = lumaS + rgbyM.y;\n    bool pairN = abs(gradientN) >= abs(gradientS);\n    float gradient = max(abs(gradientN), abs(gradientS));\n    if(pairN) lengthSign = -lengthSign;\n    float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);\n    vec2 posB;\n    posB.x = posM.x;\n    posB.y = posM.y;\n    vec2 offNP;\n    offNP.x = (!horzSpan) ? 0.0 : fxaaQualityRcpFrame.x;\n    offNP.y = ( horzSpan) ? 0.0 : fxaaQualityRcpFrame.y;\n    if(!horzSpan) posB.x += lengthSign * 0.5;\n    if( horzSpan) posB.y += lengthSign * 0.5;\n    vec2 posN;\n    posN.x = posB.x - offNP.x * 1.0;\n    posN.y = posB.y - offNP.y * 1.0;\n    vec2 posP;\n    posP.x = posB.x + offNP.x * 1.0;\n    posP.y = posB.y + offNP.y * 1.0;\n    float subpixD = ((-2.0)*subpixC) + 3.0;\n    float lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN, 0.0)));\n    float subpixE = subpixC * subpixC;\n    float lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP, 0.0)));\n    if(!pairN) lumaNN = lumaSS;\n    float gradientScaled = gradient * 1.0/4.0;\n    float lumaMM = rgbyM.y - lumaNN * 0.5;\n    float subpixF = subpixD * subpixE;\n    bool lumaMLTZero = lumaMM < 0.0;\n    lumaEndN -= lumaNN * 0.5;\n    lumaEndP -= lumaNN * 0.5;\n    bool doneN = abs(lumaEndN) >= gradientScaled;\n    bool doneP = abs(lumaEndP) >= gradientScaled;\n    if(!doneN) posN.x -= offNP.x * 1.5;\n    if(!doneN) posN.y -= offNP.y * 1.5;\n    bool doneNP = (!doneN) || (!doneP);\n    if(!doneP) posP.x += offNP.x * 1.5;\n    if(!doneP) posP.y += offNP.y * 1.5;\n    if(doneNP) {\n        if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n        if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n        if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n        if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n        doneN = abs(lumaEndN) >= gradientScaled;\n        doneP = abs(lumaEndP) >= gradientScaled;\n        if(!doneN) posN.x -= offNP.x * 2.0;\n        if(!doneN) posN.y -= offNP.y * 2.0;\n        doneNP = (!doneN) || (!doneP);\n        if(!doneP) posP.x += offNP.x * 2.0;\n        if(!doneP) posP.y += offNP.y * 2.0;\n        if(doneNP) {\n            if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n            if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n            if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n            if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n            doneN = abs(lumaEndN) >= gradientScaled;\n            doneP = abs(lumaEndP) >= gradientScaled;\n            if(!doneN) posN.x -= offNP.x * 4.0;\n            if(!doneN) posN.y -= offNP.y * 4.0;\n            doneNP = (!doneN) || (!doneP);\n            if(!doneP) posP.x += offNP.x * 4.0;\n            if(!doneP) posP.y += offNP.y * 4.0;\n            if(doneNP) {\n                if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture2D(texture, posN.xy, 0.0)));\n                if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture2D(texture, posP.xy, 0.0)));\n                if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\n                if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\n                doneN = abs(lumaEndN) >= gradientScaled;\n                doneP = abs(lumaEndP) >= gradientScaled;\n                if(!doneN) posN.x -= offNP.x * 12.0;\n                if(!doneN) posN.y -= offNP.y * 12.0;\n                doneNP = (!doneN) || (!doneP);\n                if(!doneP) posP.x += offNP.x * 12.0;\n                if(!doneP) posP.y += offNP.y * 12.0;\n            }\n        }\n    }\n    float dstN = posM.x - posN.x;\n    float dstP = posP.x - posM.x;\n    if(!horzSpan) dstN = posM.y - posN.y;\n    if(!horzSpan) dstP = posP.y - posM.y;\n    bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;\n    float spanLength = (dstP + dstN);\n    bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;\n    float spanLengthRcp = 1.0/spanLength;\n    bool directionN = dstN < dstP;\n    float dst = min(dstN, dstP);\n    bool goodSpan = directionN ? goodSpanN : goodSpanP;\n    float subpixG = subpixF * subpixF;\n    float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;\n    float subpixH = subpixG * fxaaQualitySubpix;\n    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;\n    float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);\n    if(!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;\n    if( horzSpan) posM.y += pixelOffsetSubpix * lengthSign;\n    return vec4(decodeHDR(texture2D(texture, posM, 0.0)).xyz, rgbyM.y);\n}\nvoid main()\n{\n    vec4 color = FxaaPixelShader(\n        v_Texcoord,\n        texture,\n        vec2(1.0) / viewport.zw,\n        subpixel,\n        edgeThreshold,\n        edgeThresholdMin\n    );\n    gl_FragColor = vec4(color.rgb, 1.0);\n}\n@end";
 
 Shader['import'](lightEssl);
 Shader['import'](utilEssl);
@@ -26704,12 +26143,12 @@ Shader['import'](wireframeEssl);
 Shader['import'](skyboxEssl);
 Shader['import'](prezEssl);
 
-library.template('qtek.basic', Shader.source('qtek.basic.vertex'), Shader.source('qtek.basic.fragment'));
-library.template('qtek.lambert', Shader.source('qtek.lambert.vertex'), Shader.source('qtek.lambert.fragment'));
-library.template('qtek.wireframe', Shader.source('qtek.wireframe.vertex'), Shader.source('qtek.wireframe.fragment'));
-library.template('qtek.skybox', Shader.source('qtek.skybox.vertex'), Shader.source('qtek.skybox.fragment'));
-library.template('qtek.prez', Shader.source('qtek.prez.vertex'), Shader.source('qtek.prez.fragment'));
-library.template('qtek.standard', Shader.source('qtek.standard.vertex'), Shader.source('qtek.standard.fragment'));
+library.template('clay.basic', Shader.source('clay.basic.vertex'), Shader.source('clay.basic.fragment'));
+library.template('clay.lambert', Shader.source('clay.lambert.vertex'), Shader.source('clay.lambert.fragment'));
+library.template('clay.wireframe', Shader.source('clay.wireframe.vertex'), Shader.source('clay.wireframe.fragment'));
+library.template('clay.skybox', Shader.source('clay.skybox.vertex'), Shader.source('clay.skybox.fragment'));
+library.template('clay.prez', Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'));
+library.template('clay.standard', Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
 
 
 // Some build in shaders
@@ -26801,29 +26240,29 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 }
 
 /**
- * @typedef {Object} qtek.loader.GLTF.IResult
+ * @typedef {Object} clay.loader.GLTF.IResult
  * @property {Object} json
- * @property {qtek.Scene} scene
- * @property {qtek.Node} rootNode
- * @property {qtek.Camera[]} cameras
- * @property {qtek.Texture[]} textures
- * @property {qtek.Material[]} materials
- * @property {qtek.Skeleton[]} skeletons
- * @property {qtek.Mesh[]} meshes
- * @property {qtek.animation.TrackClip[]} clips
- * @property {qtek.Node[]} nodes
+ * @property {clay.Scene} scene
+ * @property {clay.Node} rootNode
+ * @property {clay.Camera[]} cameras
+ * @property {clay.Texture[]} textures
+ * @property {clay.Material[]} materials
+ * @property {clay.Skeleton[]} skeletons
+ * @property {clay.Mesh[]} meshes
+ * @property {clay.animation.TrackClip[]} clips
+ * @property {clay.Node[]} nodes
  */
 
 /**
- * @constructor qtek.loader.GLTF
- * @extends qtek.core.Base
+ * @constructor clay.loader.GLTF
+ * @extends clay.core.Base
  */
 var GLTFLoader = Base.extend(
-/** @lends qtek.loader.GLTF# */
+/** @lends clay.loader.GLTF# */
 {
     /**
-     * 
-     * @type {qtek.Node}
+     *
+     * @type {clay.Node}
      */
     rootNode: null,
     /**
@@ -26847,12 +26286,12 @@ var GLTFLoader = Base.extend(
     /**
      * Shader used when creating the materials.
      * @type {string}
-     * @default 'qtek.standard'
+     * @default 'clay.standard'
      */
-    shaderName: 'qtek.standard',
+    shaderName: 'clay.standard',
 
     /**
-     * If use {@link qtek.StandardMaterial}
+     * If use {@link clay.StandardMaterial}
      * @type {string}
      */
     useStandardMaterial: false,
@@ -26896,7 +26335,7 @@ function () {
         this.shaderLibrary = library.createLibrary();
     }
 },
-/** @lends qtek.loader.GLTF.prototype */
+/** @lends clay.loader.GLTF.prototype */
 {
     /**
      * @param {string} url
@@ -26932,7 +26371,7 @@ function () {
     /**
      * Parse glTF binary
      * @param {ArrayBuffer} buffer
-     * @return {qtek.loader.GLTF.IResult}
+     * @return {clay.loader.GLTF.IResult}
      */
     parseBinary: function (buffer) {
         var header = new Uint32Array(buffer, 0, 4);
@@ -26944,9 +26383,9 @@ function () {
             this.trigger('error', 'Only glTF2.0 is supported.');
             return;
         }
-        
+
         var dataView = new DataView(buffer, 12);
-        
+
         var json;
         var buffers = [];
         // Read chunks
@@ -26987,7 +26426,7 @@ function () {
     /**
      * @param {Object} json
      * @param {ArrayBuffer[]} [buffer]
-     * @return {qtek.loader.GLTF.IResult}
+     * @return {clay.loader.GLTF.IResult}
      */
     parse: function (json, buffers) {
         var self = this;
@@ -27025,7 +26464,7 @@ function () {
             util$1.each(json.buffers, function (bufferInfo, idx) {
                 loading++;
                 var path = bufferInfo.uri;
-    
+
                 self._loadBuffer(path, function (buffer) {
                     lib.buffers[idx] = buffer;
                     checkLoad();
@@ -27112,7 +26551,7 @@ function () {
         if (path && path.match(/^data:(.*?)base64,/)) {
             return path;
         }
-        
+
         var rootPath = this.bufferRootPath;
         if (rootPath == null) {
             rootPath = this.rootPath;
@@ -27186,29 +26625,9 @@ function () {
             lib.skeletons[idx] = skeleton;
         }, this);
 
-        var shaderLib = this.shaderLibrary;
-        var shaderName = this.shaderName;
         function enableSkinningForMesh(mesh, skeleton, jointIndices) {
             mesh.skeleton = skeleton;
             mesh.joints = jointIndices;
-            // Make sure meshs with different joints not have same material.
-            var originalShader = mesh.material.shader;
-            var material = mesh.material.clone();
-            mesh.material = material;
-            if (material instanceof StandardMaterial) {
-                material.jointCount = jointIndices.length;
-            }
-            else {
-                material.shader = shaderLib.get(
-                    shaderName, {
-                        textures: originalShader.getEnabledTextures(),
-                        vertexDefines: {
-                            SKINNING: null,
-                            JOINT_COUNT: jointIndices.length
-                        }
-                    }
-                );
-            }
         }
 
         function getJointIndex(joint) {
@@ -27310,20 +26729,17 @@ function () {
             });
         }
         else {
-            var fragmentDefines = {
-                USE_ROUGHNESS: null,
-                USE_METALNESS: null
-            };
-            if (materialInfo.doubleSided) {
-                fragmentDefines.DOUBLE_SIDED = null;
-            }
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName, {
-                    fragmentDefines: fragmentDefines,
-                    textures: enabledTextures
-                })
+                shader: this.shaderLibrary.get(this.shaderName)
             });
+
+            material.define('fragment', 'USE_ROUGHNESS');
+            material.define('fragment', 'USE_METALNESS');
+
+            if (materialInfo.doubleSided) {
+                material.define('fragment', 'DOUBLE_SIDED');
+            }
         }
 
         if (uniforms.transparent) {
@@ -27445,25 +26861,24 @@ function () {
             }, commonProperties));
         }
         else {
-            var fragmentDefines = {
-                ROUGHNESS_CHANNEL: 1,
-                METALNESS_CHANNEL: 2,
-                USE_ROUGHNESS: null,
-                USE_METALNESS: null
-            };
-            if (alphaTest) {
-                fragmentDefines.ALPHA_TEST = null;
-            }
-            if (materialInfo.doubleSided) {
-                fragmentDefines.DOUBLE_SIDED = null;
-            }
+
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName, {
-                    fragmentDefines: fragmentDefines,
-                    textures: enabledTextures
-                })
+                shader: this.shaderLibrary.get(this.shaderName)
             });
+
+            material.define('fragment', 'USE_ROUGHNESS');
+            material.define('fragment', 'USE_METALNESS');
+            material.define('fragment', 'ROUGHNESS_CHANNEL', 1);
+            material.define('fragment', 'METALNESS_CHANNEL', 2);
+
+            if (alphaTest) {
+                material.define('fragment', 'ALPHA_TEST');
+            }
+            if (materialInfo.doubleSided) {
+                material.define('fragment', 'DOUBLE_SIDED');
+            }
+
             material.set(commonProperties);
         }
 
@@ -27527,21 +26942,23 @@ function () {
             commonProperties.specularColor = [1, 1, 1];
         }
 
-        var fragmentDefines = {
-            GLOSSINESS_CHANNEL: 3
-        };
-        if (alphaTest) {
-            fragmentDefines.ALPHA_TEST = null;
-        }
-        if (materialInfo.doubleSided) {
-            fragmentDefines.DOUBLE_SIDED = null;
-        }
         material = new Material({
             name: materialInfo.name,
-            shader: this.shaderLibrary.get(this.shaderName, {
-                fragmentDefines: fragmentDefines,
-                textures: enabledTextures
-            })
+            shader: this.shaderLibrary.get(this.shaderName)
+        });
+
+        material.define('fragment', 'GLOSSINESS_CHANNEL', 3);
+
+        if (alphaTest) {
+            material.define('fragment', 'ALPHA_TEST');
+        }
+        if (materialInfo.doubleSided) {
+            material.define('fragment', 'DOUBLE_SIDED');
+        }
+
+        material = new Material({
+            name: materialInfo.name,
+            shader: this.shaderLibrary.get(this.shaderName)
         });
         material.set(commonProperties);
 
@@ -27648,7 +27065,10 @@ function () {
                     geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
                     if (geometry.vertexCount <= 0xffff && geometry.indices instanceof vendor.Uint32Array) {
                         geometry.indices = new vendor.Uint16Array(geometry.indices);
-                    }   
+                    }
+                    if(geometry.indices instanceof vendor.Uint8Array) {
+                        geometry.indices = new vendor.Uint16Array(geometry.indices);
+                    }
                 }
 
                 var material = lib.materials[primitiveInfo.material];
@@ -27672,7 +27092,7 @@ function () {
                     mesh.geometry.generateVertexNormals();
                 }
                 if (((material instanceof StandardMaterial) && material.normalMap)
-                    || (material.shader && material.shader.isTextureEnabled('normalMap'))
+                    || (material.isTextureEnabled('normalMap'))
                 ) {
                     if (!mesh.geometry.attributes.tangent.value) {
                         mesh.geometry.generateTangents();
@@ -27876,7 +27296,7 @@ var mat2$1 = glmatrix.mat2;
 
 /**
  * @constructor
- * @alias qtek.math.Matrix2
+ * @alias clay.math.Matrix2
  */
 var Matrix2 = function() {
 
@@ -27884,12 +27304,14 @@ var Matrix2 = function() {
      * Storage of Matrix2
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Matrix2#
      */
     this._array = mat2$1.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Matrix2#
      */
     this._dirty = true;
 };
@@ -27911,7 +27333,7 @@ Matrix2.prototype = {
     },
     /**
      * Clone a new Matrix2
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     clone: function() {
         return (new Matrix2()).copy(this);
@@ -27919,8 +27341,8 @@ Matrix2.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Matrix2} b
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Matrix2} b
+     * @return {clay.math.Matrix2}
      */
     copy: function(b) {
         mat2$1.copy(this._array, b._array);
@@ -27930,7 +27352,7 @@ Matrix2.prototype = {
 
     /**
      * Calculate the adjugate of self, in-place
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     adjoint: function() {
         mat2$1.adjoint(this._array, this._array);
@@ -27948,7 +27370,7 @@ Matrix2.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     identity: function() {
         mat2$1.identity(this._array);
@@ -27958,7 +27380,7 @@ Matrix2.prototype = {
 
     /**
      * Invert self
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     invert: function() {
         mat2$1.invert(this._array, this._array);
@@ -27968,8 +27390,8 @@ Matrix2.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {qtek.math.Matrix2} b
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Matrix2} b
+     * @return {clay.math.Matrix2}
      */
     mul: function(b) {
         mat2$1.mul(this._array, this._array, b._array);
@@ -27979,8 +27401,8 @@ Matrix2.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Matrix2} a
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Matrix2} a
+     * @return {clay.math.Matrix2}
      */
     mulLeft: function(a) {
         mat2$1.mul(this._array, a._array, this._array);
@@ -27990,8 +27412,8 @@ Matrix2.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {qtek.math.Matrix2} b
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Matrix2} b
+     * @return {clay.math.Matrix2}
      */
     multiply: function(b) {
         mat2$1.multiply(this._array, this._array, b._array);
@@ -28001,8 +27423,8 @@ Matrix2.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {qtek.math.Matrix2} a
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Matrix2} a
+     * @return {clay.math.Matrix2}
      */
     multiplyLeft: function(a) {
         mat2$1.multiply(this._array, a._array, this._array);
@@ -28013,7 +27435,7 @@ Matrix2.prototype = {
     /**
      * Rotate self by a given radian
      * @param  {number}   rad
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     rotate: function(rad) {
         mat2$1.rotate(this._array, this._array, rad);
@@ -28023,8 +27445,8 @@ Matrix2.prototype = {
 
     /**
      * Scale self by s
-     * @param  {qtek.math.Vector2}  s
-     * @return {qtek.math.Matrix2}
+     * @param  {clay.math.Vector2}  s
+     * @return {clay.math.Matrix2}
      */
     scale: function(v) {
         mat2$1.scale(this._array, this._array, v._array);
@@ -28033,7 +27455,7 @@ Matrix2.prototype = {
     },
     /**
      * Transpose self, in-place.
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     transpose: function() {
         mat2$1.transpose(this._array, this._array);
@@ -28062,9 +27484,9 @@ Matrix2.adjoint = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
+ * @return {clay.math.Matrix2}
  */
 Matrix2.copy = function(out, a) {
     mat2$1.copy(out._array, a._array);
@@ -28073,7 +27495,7 @@ Matrix2.copy = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} a
+ * @param  {clay.math.Matrix2} a
  * @return {number}
  */
 Matrix2.determinant = function(a) {
@@ -28081,8 +27503,8 @@ Matrix2.determinant = function(a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @return {clay.math.Matrix2}
  */
 Matrix2.identity = function(out) {
     mat2$1.identity(out._array);
@@ -28091,9 +27513,9 @@ Matrix2.identity = function(out) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
+ * @return {clay.math.Matrix2}
  */
 Matrix2.invert = function(out, a) {
     mat2$1.invert(out._array, a._array);
@@ -28102,10 +27524,10 @@ Matrix2.invert = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
- * @param  {qtek.math.Matrix2} b
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
+ * @param  {clay.math.Matrix2} b
+ * @return {clay.math.Matrix2}
  */
 Matrix2.mul = function(out, a, b) {
     mat2$1.mul(out._array, a._array, b._array);
@@ -28115,18 +27537,18 @@ Matrix2.mul = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
- * @param  {qtek.math.Matrix2} b
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
+ * @param  {clay.math.Matrix2} b
+ * @return {clay.math.Matrix2}
  */
 Matrix2.multiply = Matrix2.mul;
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
  * @param  {number}   rad
- * @return {qtek.math.Matrix2}
+ * @return {clay.math.Matrix2}
  */
 Matrix2.rotate = function(out, a, rad) {
     mat2$1.rotate(out._array, a._array, rad);
@@ -28135,10 +27557,10 @@ Matrix2.rotate = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix2} out
- * @param  {qtek.math.Matrix2} a
- * @param  {qtek.math.Vector2}  v
- * @return {qtek.math.Matrix2}
+ * @param  {clay.math.Matrix2} out
+ * @param  {clay.math.Matrix2} a
+ * @param  {clay.math.Vector2}  v
+ * @return {clay.math.Matrix2}
  */
 Matrix2.scale = function(out, a, v) {
     mat2$1.scale(out._array, a._array, v._array);
@@ -28160,19 +27582,21 @@ var mat2d = glmatrix.mat2d;
 
 /**
  * @constructor
- * @alias qtek.math.Matrix2d
+ * @alias clay.math.Matrix2d
  */
 var Matrix2d = function() {
     /**
      * Storage of Matrix2d
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Matrix2d#
      */
     this._array = mat2d.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Matrix2d#
      */
     this._dirty = true;
 };
@@ -28194,7 +27618,7 @@ Matrix2d.prototype = {
     },
     /**
      * Clone a new Matrix2d
-     * @return {qtek.math.Matrix2d}
+     * @return {clay.math.Matrix2d}
      */
     clone: function() {
         return (new Matrix2d()).copy(this);
@@ -28202,8 +27626,8 @@ Matrix2d.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Matrix2d} b
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Matrix2d} b
+     * @return {clay.math.Matrix2d}
      */
     copy: function(b) {
         mat2d.copy(this._array, b._array);
@@ -28221,7 +27645,7 @@ Matrix2d.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {qtek.math.Matrix2d}
+     * @return {clay.math.Matrix2d}
      */
     identity: function() {
         mat2d.identity(this._array);
@@ -28231,7 +27655,7 @@ Matrix2d.prototype = {
 
     /**
      * Invert self
-     * @return {qtek.math.Matrix2d}
+     * @return {clay.math.Matrix2d}
      */
     invert: function() {
         mat2d.invert(this._array, this._array);
@@ -28241,8 +27665,8 @@ Matrix2d.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {qtek.math.Matrix2d} b
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Matrix2d} b
+     * @return {clay.math.Matrix2d}
      */
     mul: function(b) {
         mat2d.mul(this._array, this._array, b._array);
@@ -28252,8 +27676,8 @@ Matrix2d.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Matrix2d} a
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Matrix2d} a
+     * @return {clay.math.Matrix2d}
      */
     mulLeft: function(b) {
         mat2d.mul(this._array, b._array, this._array);
@@ -28263,8 +27687,8 @@ Matrix2d.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {qtek.math.Matrix2d} b
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Matrix2d} b
+     * @return {clay.math.Matrix2d}
      */
     multiply: function(b) {
         mat2d.multiply(this._array, this._array, b._array);
@@ -28274,8 +27698,8 @@ Matrix2d.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {qtek.math.Matrix2d} a
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Matrix2d} a
+     * @return {clay.math.Matrix2d}
      */
     multiplyLeft: function(b) {
         mat2d.multiply(this._array, b._array, this._array);
@@ -28286,7 +27710,7 @@ Matrix2d.prototype = {
     /**
      * Rotate self by a given radian
      * @param  {number}   rad
-     * @return {qtek.math.Matrix2d}
+     * @return {clay.math.Matrix2d}
      */
     rotate: function(rad) {
         mat2d.rotate(this._array, this._array, rad);
@@ -28296,8 +27720,8 @@ Matrix2d.prototype = {
 
     /**
      * Scale self by s
-     * @param  {qtek.math.Vector2}  s
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Vector2}  s
+     * @return {clay.math.Matrix2d}
      */
     scale: function(s) {
         mat2d.scale(this._array, this._array, s._array);
@@ -28307,8 +27731,8 @@ Matrix2d.prototype = {
 
     /**
      * Translate self by v
-     * @param  {qtek.math.Vector2}  v
-     * @return {qtek.math.Matrix2d}
+     * @param  {clay.math.Vector2}  v
+     * @return {clay.math.Matrix2d}
      */
     translate: function(v) {
         mat2d.translate(this._array, this._array, v._array);
@@ -28326,9 +27750,9 @@ Matrix2d.prototype = {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.copy = function(out, a) {
     mat2d.copy(out._array, a._array);
@@ -28337,7 +27761,7 @@ Matrix2d.copy = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} a
+ * @param  {clay.math.Matrix2d} a
  * @return {number}
  */
 Matrix2d.determinant = function(a) {
@@ -28345,8 +27769,8 @@ Matrix2d.determinant = function(a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.identity = function(out) {
     mat2d.identity(out._array);
@@ -28355,9 +27779,9 @@ Matrix2d.identity = function(out) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.invert = function(out, a) {
     mat2d.invert(out._array, a._array);
@@ -28366,10 +27790,10 @@ Matrix2d.invert = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @param  {qtek.math.Matrix2d} b
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @param  {clay.math.Matrix2d} b
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.mul = function(out, a, b) {
     mat2d.mul(out._array, a._array, b._array);
@@ -28379,18 +27803,18 @@ Matrix2d.mul = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @param  {qtek.math.Matrix2d} b
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @param  {clay.math.Matrix2d} b
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.multiply = Matrix2d.mul;
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
  * @param  {number}   rad
- * @return {qtek.math.Matrix2d}
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.rotate = function(out, a, rad) {
     mat2d.rotate(out._array, a._array, rad);
@@ -28399,10 +27823,10 @@ Matrix2d.rotate = function(out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @param  {qtek.math.Vector2}  v
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @param  {clay.math.Vector2}  v
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.scale = function(out, a, v) {
     mat2d.scale(out._array, a._array, v._array);
@@ -28411,10 +27835,10 @@ Matrix2d.scale = function(out, a, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix2d} out
- * @param  {qtek.math.Matrix2d} a
- * @param  {qtek.math.Vector2}  v
- * @return {qtek.math.Matrix2d}
+ * @param  {clay.math.Matrix2d} out
+ * @param  {clay.math.Matrix2d} a
+ * @param  {clay.math.Vector2}  v
+ * @return {clay.math.Matrix2d}
  */
 Matrix2d.translate = function(out, a, v) {
     mat2d.translate(out._array, a._array, v._array);
@@ -28426,7 +27850,7 @@ var mat3$2 = glmatrix.mat3;
 
 /**
  * @constructor
- * @alias qtek.math.Matrix3
+ * @alias clay.math.Matrix3
  */
 var Matrix3 = function () {
 
@@ -28434,12 +27858,14 @@ var Matrix3 = function () {
      * Storage of Matrix3
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Matrix3#
      */
     this._array = mat3$2.create();
 
     /**
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Matrix3#
      */
     this._dirty = true;
 };
@@ -28461,7 +27887,7 @@ Matrix3.prototype = {
     },
     /**
      * Calculate the adjugate of self, in-place
-     * @return {qtek.math.Matrix3}
+     * @return {clay.math.Matrix3}
      */
     adjoint: function () {
         mat3$2.adjoint(this._array, this._array);
@@ -28471,7 +27897,7 @@ Matrix3.prototype = {
 
     /**
      * Clone a new Matrix3
-     * @return {qtek.math.Matrix3}
+     * @return {clay.math.Matrix3}
      */
     clone: function () {
         return (new Matrix3()).copy(this);
@@ -28479,8 +27905,8 @@ Matrix3.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Matrix3} b
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} b
+     * @return {clay.math.Matrix3}
      */
     copy: function (b) {
         mat3$2.copy(this._array, b._array);
@@ -28498,8 +27924,8 @@ Matrix3.prototype = {
 
     /**
      * Copy the values from Matrix2d a
-     * @param  {qtek.math.Matrix2d} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix2d} a
+     * @return {clay.math.Matrix3}
      */
     fromMat2d: function (a) {
         mat3$2.fromMat2d(this._array, a._array);
@@ -28509,8 +27935,8 @@ Matrix3.prototype = {
 
     /**
      * Copies the upper-left 3x3 values of Matrix4
-     * @param  {qtek.math.Matrix4} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix4} a
+     * @return {clay.math.Matrix3}
      */
     fromMat4: function (a) {
         mat3$2.fromMat4(this._array, a._array);
@@ -28520,8 +27946,8 @@ Matrix3.prototype = {
 
     /**
      * Calculates a rotation matrix from the given quaternion
-     * @param  {qtek.math.Quaternion} q
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Quaternion} q
+     * @return {clay.math.Matrix3}
      */
     fromQuat: function (q) {
         mat3$2.fromQuat(this._array, q._array);
@@ -28531,7 +27957,7 @@ Matrix3.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {qtek.math.Matrix3}
+     * @return {clay.math.Matrix3}
      */
     identity: function () {
         mat3$2.identity(this._array);
@@ -28541,7 +27967,7 @@ Matrix3.prototype = {
 
     /**
      * Invert self
-     * @return {qtek.math.Matrix3}
+     * @return {clay.math.Matrix3}
      */
     invert: function () {
         mat3$2.invert(this._array, this._array);
@@ -28551,8 +27977,8 @@ Matrix3.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {qtek.math.Matrix3} b
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} b
+     * @return {clay.math.Matrix3}
      */
     mul: function (b) {
         mat3$2.mul(this._array, this._array, b._array);
@@ -28562,8 +27988,8 @@ Matrix3.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {qtek.math.Matrix3} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} a
+     * @return {clay.math.Matrix3}
      */
     mulLeft: function (a) {
         mat3$2.mul(this._array, a._array, this._array);
@@ -28573,8 +27999,8 @@ Matrix3.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {qtek.math.Matrix3} b
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} b
+     * @return {clay.math.Matrix3}
      */
     multiply: function (b) {
         mat3$2.multiply(this._array, this._array, b._array);
@@ -28584,8 +28010,8 @@ Matrix3.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {qtek.math.Matrix3} a
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Matrix3} a
+     * @return {clay.math.Matrix3}
      */
     multiplyLeft: function (a) {
         mat3$2.multiply(this._array, a._array, this._array);
@@ -28596,7 +28022,7 @@ Matrix3.prototype = {
     /**
      * Rotate self by a given radian
      * @param  {number}   rad
-     * @return {qtek.math.Matrix3}
+     * @return {clay.math.Matrix3}
      */
     rotate: function (rad) {
         mat3$2.rotate(this._array, this._array, rad);
@@ -28606,8 +28032,8 @@ Matrix3.prototype = {
 
     /**
      * Scale self by s
-     * @param  {qtek.math.Vector2}  s
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Vector2}  s
+     * @return {clay.math.Matrix3}
      */
     scale: function (v) {
         mat3$2.scale(this._array, this._array, v._array);
@@ -28617,8 +28043,8 @@ Matrix3.prototype = {
 
     /**
      * Translate self by v
-     * @param  {qtek.math.Vector2}  v
-     * @return {qtek.math.Matrix3}
+     * @param  {clay.math.Vector2}  v
+     * @return {clay.math.Matrix3}
      */
     translate: function (v) {
         mat3$2.translate(this._array, this._array, v._array);
@@ -28627,7 +28053,7 @@ Matrix3.prototype = {
     },
     /**
      * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
-     * @param {qtek.math.Matrix4} a
+     * @param {clay.math.Matrix4} a
      */
     normalFromMat4: function (a) {
         mat3$2.normalFromMat4(this._array, a._array);
@@ -28637,7 +28063,7 @@ Matrix3.prototype = {
 
     /**
      * Transpose self, in-place.
-     * @return {qtek.math.Matrix2}
+     * @return {clay.math.Matrix2}
      */
     transpose: function () {
         mat3$2.transpose(this._array, this._array);
@@ -28654,9 +28080,9 @@ Matrix3.prototype = {
     }
 };
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.adjoint = function (out, a) {
     mat3$2.adjoint(out._array, a._array);
@@ -28665,9 +28091,9 @@ Matrix3.adjoint = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.copy = function (out, a) {
     mat3$2.copy(out._array, a._array);
@@ -28676,7 +28102,7 @@ Matrix3.copy = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} a
+ * @param  {clay.math.Matrix3} a
  * @return {number}
  */
 Matrix3.determinant = function (a) {
@@ -28684,8 +28110,8 @@ Matrix3.determinant = function (a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @return {clay.math.Matrix3}
  */
 Matrix3.identity = function (out) {
     mat3$2.identity(out._array);
@@ -28694,9 +28120,9 @@ Matrix3.identity = function (out) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.invert = function (out, a) {
     mat3$2.invert(out._array, a._array);
@@ -28704,10 +28130,10 @@ Matrix3.invert = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @param  {qtek.math.Matrix3} b
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @param  {clay.math.Matrix3} b
+ * @return {clay.math.Matrix3}
  */
 Matrix3.mul = function (out, a, b) {
     mat3$2.mul(out._array, a._array, b._array);
@@ -28717,17 +28143,17 @@ Matrix3.mul = function (out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @param  {qtek.math.Matrix3} b
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @param  {clay.math.Matrix3} b
+ * @return {clay.math.Matrix3}
  */
 Matrix3.multiply = Matrix3.mul;
 
 /**
- * @param  {qtek.math.Matrix3}  out
- * @param  {qtek.math.Matrix2d} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3}  out
+ * @param  {clay.math.Matrix2d} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.fromMat2d = function (out, a) {
     mat3$2.fromMat2d(out._array, a._array);
@@ -28736,9 +28162,9 @@ Matrix3.fromMat2d = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.fromMat4 = function (out, a) {
     mat3$2.fromMat4(out._array, a._array);
@@ -28747,9 +28173,9 @@ Matrix3.fromMat4 = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3}    out
- * @param  {qtek.math.Quaternion} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3}    out
+ * @param  {clay.math.Quaternion} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.fromQuat = function (out, q) {
     mat3$2.fromQuat(out._array, q._array);
@@ -28758,9 +28184,9 @@ Matrix3.fromQuat = function (out, q) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix4} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix4} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.normalFromMat4 = function (out, a) {
     mat3$2.normalFromMat4(out._array, a._array);
@@ -28769,10 +28195,10 @@ Matrix3.normalFromMat4 = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
  * @param  {number}  rad
- * @return {qtek.math.Matrix3}
+ * @return {clay.math.Matrix3}
  */
 Matrix3.rotate = function (out, a, rad) {
     mat3$2.rotate(out._array, a._array, rad);
@@ -28781,10 +28207,10 @@ Matrix3.rotate = function (out, a, rad) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @param  {qtek.math.Vector2} v
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @param  {clay.math.Vector2} v
+ * @return {clay.math.Matrix3}
  */
 Matrix3.scale = function (out, a, v) {
     mat3$2.scale(out._array, a._array, v._array);
@@ -28793,9 +28219,9 @@ Matrix3.scale = function (out, a, v) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @return {clay.math.Matrix3}
  */
 Matrix3.transpose = function (out, a) {
     mat3$2.transpose(out._array, a._array);
@@ -28804,10 +28230,10 @@ Matrix3.transpose = function (out, a) {
 };
 
 /**
- * @param  {qtek.math.Matrix3} out
- * @param  {qtek.math.Matrix3} a
- * @param  {qtek.math.Vector2} v
- * @return {qtek.math.Matrix3}
+ * @param  {clay.math.Matrix3} out
+ * @param  {clay.math.Matrix3} a
+ * @param  {clay.math.Vector2} v
+ * @return {clay.math.Matrix3}
  */
 Matrix3.translate = function (out, a, v) {
     mat3$2.translate(out._array, a._array, v._array);
@@ -28818,14 +28244,14 @@ Matrix3.translate = function (out, a, v) {
 /**
  * Random or constant 1d, 2d, 3d vector generator
  * @constructor
- * @alias qtek.math.Value
+ * @alias clay.math.Value
  */
 var Value = function() {};
 
 /**
  * @method
- * @param {number|qtek.math.Vector2|qtek.math.Vector3} [out]
- * @return {number|qtek.math.Vector2|qtek.math.Vector3}
+ * @param {number|clay.math.Vector2|clay.math.Vector3} [out]
+ * @return {number|clay.math.Vector2|clay.math.Vector3}
  */
 Value.prototype.get = function(out) {};
 
@@ -28909,7 +28335,7 @@ Random3D.prototype.constructor = Random3D;
 /**
  * Create a constant 1d value generator
  * @param  {number} constant
- * @return {qtek.math.Value}
+ * @return {clay.math.Value}
  */
 Value.constant = function(constant) {
     return new ConstantValue(constant);
@@ -28917,8 +28343,8 @@ Value.constant = function(constant) {
 
 /**
  * Create a constant vector value(2d or 3d) generator
- * @param  {qtek.math.Vector2|qtek.math.Vector3} vector
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector2|clay.math.Vector3} vector
+ * @return {clay.math.Value}
  */
 Value.vector = function(vector) {
     return new VectorValue(vector);
@@ -28928,7 +28354,7 @@ Value.vector = function(vector) {
  * Create a random 1d value generator
  * @param  {number} min
  * @param  {number} max
- * @return {qtek.math.Value}
+ * @return {clay.math.Value}
  */
 Value.random1D = function(min, max) {
     return new Random1D(min, max);
@@ -28936,9 +28362,9 @@ Value.random1D = function(min, max) {
 
 /**
  * Create a random 2d value generator
- * @param  {qtek.math.Vector2} min
- * @param  {qtek.math.Vector2} max
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector2} min
+ * @param  {clay.math.Vector2} max
+ * @return {clay.math.Value}
  */
 Value.random2D = function(min, max) {
     return new Random2D(min, max);
@@ -28946,9 +28372,9 @@ Value.random2D = function(min, max) {
 
 /**
  * Create a random 3d value generator
- * @param  {qtek.math.Vector3} min
- * @param  {qtek.math.Vector3} max
- * @return {qtek.math.Value}
+ * @param  {clay.math.Vector3} min
+ * @param  {clay.math.Vector3} max
+ * @return {clay.math.Value}
  */
 Value.random3D = function(min, max) {
     return new Random3D(min, max);
@@ -28958,7 +28384,7 @@ var vec4$3 = glmatrix.vec4;
 
 /**
  * @constructor
- * @alias qtek.math.Vector4
+ * @alias clay.math.Vector4
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -28976,6 +28402,7 @@ var Vector4 = function(x, y, z, w) {
      * All methods also operate on the _array instead of x, y, z, w components
      * @name _array
      * @type {Float32Array}
+     * @memberOf clay.math.Vector4#
      */
     this._array = vec4$3.fromValues(x, y, z, w);
 
@@ -28984,6 +28411,7 @@ var Vector4 = function(x, y, z, w) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
+     * @memberOf clay.math.Vector4#
      */
     this._dirty = true;
 };
@@ -28994,8 +28422,8 @@ Vector4.prototype = {
 
     /**
      * Add b to self
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     add: function(b) {
         vec4$3.add(this._array, this._array, b._array);
@@ -29009,7 +28437,7 @@ Vector4.prototype = {
      * @param  {number}  y
      * @param  {number}  z
      * @param  {number}  w
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     set: function(x, y, z, w) {
         this._array[0] = x;
@@ -29023,7 +28451,7 @@ Vector4.prototype = {
     /**
      * Set x, y, z and w components from array
      * @param  {Float32Array|number[]} arr
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     setArray: function(arr) {
         this._array[0] = arr[0];
@@ -29037,7 +28465,7 @@ Vector4.prototype = {
 
     /**
      * Clone a new Vector4
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     clone: function() {
         return new Vector4(this.x, this.y, this.z, this.w);
@@ -29045,8 +28473,8 @@ Vector4.prototype = {
 
     /**
      * Copy from b
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     copy: function(b) {
         vec4$3.copy(this._array, b._array);
@@ -29056,7 +28484,7 @@ Vector4.prototype = {
 
     /**
      * Alias for distance
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @return {number}
      */
     dist: function(b) {
@@ -29065,7 +28493,7 @@ Vector4.prototype = {
 
     /**
      * Distance between self and b
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @return {number}
      */
     distance: function(b) {
@@ -29074,8 +28502,8 @@ Vector4.prototype = {
 
     /**
      * Alias for divide
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     div: function(b) {
         vec4$3.div(this._array, this._array, b._array);
@@ -29085,8 +28513,8 @@ Vector4.prototype = {
 
     /**
      * Divide self by b
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     divide: function(b) {
         vec4$3.divide(this._array, this._array, b._array);
@@ -29096,7 +28524,7 @@ Vector4.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @return {number}
      */
     dot: function(b) {
@@ -29120,10 +28548,10 @@ Vector4.prototype = {
     },
     /**
      * Linear interpolation between a and b
-     * @param  {qtek.math.Vector4} a
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} a
+     * @param  {clay.math.Vector4} b
      * @param  {number}  t
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     lerp: function(a, b, t) {
         vec4$3.lerp(this._array, a._array, b._array, t);
@@ -29133,8 +28561,8 @@ Vector4.prototype = {
 
     /**
      * Minimum of self and b
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     min: function(b) {
         vec4$3.min(this._array, this._array, b._array);
@@ -29144,8 +28572,8 @@ Vector4.prototype = {
 
     /**
      * Maximum of self and b
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     max: function(b) {
         vec4$3.max(this._array, this._array, b._array);
@@ -29155,8 +28583,8 @@ Vector4.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     mul: function(b) {
         vec4$3.mul(this._array, this._array, b._array);
@@ -29166,8 +28594,8 @@ Vector4.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     multiply: function(b) {
         vec4$3.multiply(this._array, this._array, b._array);
@@ -29177,7 +28605,7 @@ Vector4.prototype = {
 
     /**
      * Negate self
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     negate: function() {
         vec4$3.negate(this._array, this._array);
@@ -29187,7 +28615,7 @@ Vector4.prototype = {
 
     /**
      * Normalize self
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     normalize: function() {
         vec4$3.normalize(this._array, this._array);
@@ -29198,7 +28626,7 @@ Vector4.prototype = {
     /**
      * Generate random x, y, z, w components with a given scale
      * @param  {number} scale
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     random: function(scale) {
         vec4$3.random(this._array, scale);
@@ -29209,7 +28637,7 @@ Vector4.prototype = {
     /**
      * Scale self
      * @param  {number}  scale
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     scale: function(s) {
         vec4$3.scale(this._array, this._array, s);
@@ -29218,9 +28646,9 @@ Vector4.prototype = {
     },
     /**
      * Scale b and add to self
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @param  {number}  scale
-     * @return {qtek.math.Vector4}
+     * @return {clay.math.Vector4}
      */
     scaleAndAdd: function(b, s) {
         vec4$3.scaleAndAdd(this._array, this._array, b._array, s);
@@ -29230,7 +28658,7 @@ Vector4.prototype = {
 
     /**
      * Alias for squaredDistance
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @return {number}
      */
     sqrDist: function(b) {
@@ -29239,7 +28667,7 @@ Vector4.prototype = {
 
     /**
      * Squared distance between self and b
-     * @param  {qtek.math.Vector4} b
+     * @param  {clay.math.Vector4} b
      * @return {number}
      */
     squaredDistance: function(b) {
@@ -29264,8 +28692,8 @@ Vector4.prototype = {
 
     /**
      * Alias for subtract
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     sub: function(b) {
         vec4$3.sub(this._array, this._array, b._array);
@@ -29275,8 +28703,8 @@ Vector4.prototype = {
 
     /**
      * Subtract b from self
-     * @param  {qtek.math.Vector4} b
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Vector4} b
+     * @return {clay.math.Vector4}
      */
     subtract: function(b) {
         vec4$3.subtract(this._array, this._array, b._array);
@@ -29286,8 +28714,8 @@ Vector4.prototype = {
 
     /**
      * Transform self with a Matrix4 m
-     * @param  {qtek.math.Matrix4} m
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Matrix4} m
+     * @return {clay.math.Vector4}
      */
     transformMat4: function(m) {
         vec4$3.transformMat4(this._array, this._array, m._array);
@@ -29297,8 +28725,8 @@ Vector4.prototype = {
 
     /**
      * Transform self with a Quaternion q
-     * @param  {qtek.math.Quaternion} q
-     * @return {qtek.math.Vector4}
+     * @param  {clay.math.Quaternion} q
+     * @return {clay.math.Vector4}
      */
     transformQuat: function(q) {
         vec4$3.transformQuat(this._array, this._array, q._array);
@@ -29323,7 +28751,7 @@ if (defineProperty$3) {
     /**
      * @name x
      * @type {number}
-     * @memberOf qtek.math.Vector4
+     * @memberOf clay.math.Vector4
      * @instance
      */
     defineProperty$3(proto$4, 'x', {
@@ -29339,7 +28767,7 @@ if (defineProperty$3) {
     /**
      * @name y
      * @type {number}
-     * @memberOf qtek.math.Vector4
+     * @memberOf clay.math.Vector4
      * @instance
      */
     defineProperty$3(proto$4, 'y', {
@@ -29355,7 +28783,7 @@ if (defineProperty$3) {
     /**
      * @name z
      * @type {number}
-     * @memberOf qtek.math.Vector4
+     * @memberOf clay.math.Vector4
      * @instance
      */
     defineProperty$3(proto$4, 'z', {
@@ -29371,7 +28799,7 @@ if (defineProperty$3) {
     /**
      * @name w
      * @type {number}
-     * @memberOf qtek.math.Vector4
+     * @memberOf clay.math.Vector4
      * @instance
      */
     defineProperty$3(proto$4, 'w', {
@@ -29388,10 +28816,10 @@ if (defineProperty$3) {
 // Supply methods that are not in place
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.add = function(out, a, b) {
     vec4$3.add(out._array, a._array, b._array);
@@ -29400,11 +28828,11 @@ Vector4.add = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
+ * @param  {clay.math.Vector4} out
  * @param  {number}  x
  * @param  {number}  y
  * @param  {number}  z
- * @return {qtek.math.Vector4}
+ * @return {clay.math.Vector4}
  */
 Vector4.set = function(out, x, y, z, w) {
     vec4$3.set(out._array, x, y, z, w);
@@ -29412,9 +28840,9 @@ Vector4.set = function(out, x, y, z, w) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.copy = function(out, b) {
     vec4$3.copy(out._array, b._array);
@@ -29423,8 +28851,8 @@ Vector4.copy = function(out, b) {
 };
 
 /**
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @return {number}
  */
 Vector4.dist = function(a, b) {
@@ -29433,17 +28861,17 @@ Vector4.dist = function(a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @return {number}
  */
 Vector4.distance = Vector4.dist;
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.div = function(out, a, b) {
     vec4$3.divide(out._array, a._array, b._array);
@@ -29453,16 +28881,16 @@ Vector4.div = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.divide = Vector4.div;
 
 /**
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @return {number}
  */
 Vector4.dot = function(a, b) {
@@ -29470,7 +28898,7 @@ Vector4.dot = function(a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector4} a
+ * @param  {clay.math.Vector4} a
  * @return {number}
  */
 Vector4.len = function(b) {
@@ -29480,11 +28908,11 @@ Vector4.len = function(b) {
 // Vector4.length = Vector4.len;
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @param  {number}  t
- * @return {qtek.math.Vector4}
+ * @return {clay.math.Vector4}
  */
 Vector4.lerp = function(out, a, b, t) {
     vec4$3.lerp(out._array, a._array, b._array, t);
@@ -29493,10 +28921,10 @@ Vector4.lerp = function(out, a, b, t) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.min = function(out, a, b) {
     vec4$3.min(out._array, a._array, b._array);
@@ -29505,10 +28933,10 @@ Vector4.min = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.max = function(out, a, b) {
     vec4$3.max(out._array, a._array, b._array);
@@ -29517,10 +28945,10 @@ Vector4.max = function(out, a, b) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.mul = function(out, a, b) {
     vec4$3.multiply(out._array, a._array, b._array);
@@ -29530,17 +28958,17 @@ Vector4.mul = function(out, a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.multiply = Vector4.mul;
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @return {clay.math.Vector4}
  */
 Vector4.negate = function(out, a) {
     vec4$3.negate(out._array, a._array);
@@ -29549,9 +28977,9 @@ Vector4.negate = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @return {clay.math.Vector4}
  */
 Vector4.normalize = function(out, a) {
     vec4$3.normalize(out._array, a._array);
@@ -29560,9 +28988,9 @@ Vector4.normalize = function(out, a) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
+ * @param  {clay.math.Vector4} out
  * @param  {number}  scale
- * @return {qtek.math.Vector4}
+ * @return {clay.math.Vector4}
  */
 Vector4.random = function(out, scale) {
     vec4$3.random(out._array, scale);
@@ -29571,10 +28999,10 @@ Vector4.random = function(out, scale) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
  * @param  {number}  scale
- * @return {qtek.math.Vector4}
+ * @return {clay.math.Vector4}
  */
 Vector4.scale = function(out, a, scale) {
     vec4$3.scale(out._array, a._array, scale);
@@ -29583,11 +29011,11 @@ Vector4.scale = function(out, a, scale) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @param  {number}  scale
- * @return {qtek.math.Vector4}
+ * @return {clay.math.Vector4}
  */
 Vector4.scaleAndAdd = function(out, a, b, scale) {
     vec4$3.scaleAndAdd(out._array, a._array, b._array, scale);
@@ -29596,8 +29024,8 @@ Vector4.scaleAndAdd = function(out, a, b, scale) {
 };
 
 /**
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @return {number}
  */
 Vector4.sqrDist = function(a, b) {
@@ -29606,14 +29034,14 @@ Vector4.sqrDist = function(a, b) {
 
 /**
  * @method
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
  * @return {number}
  */
 Vector4.squaredDistance = Vector4.sqrDist;
 
 /**
- * @param  {qtek.math.Vector4} a
+ * @param  {clay.math.Vector4} a
  * @return {number}
  */
 Vector4.sqrLen = function(a) {
@@ -29621,16 +29049,16 @@ Vector4.sqrLen = function(a) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector4} a
+ * @param  {clay.math.Vector4} a
  * @return {number}
  */
 Vector4.squaredLength = Vector4.sqrLen;
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.sub = function(out, a, b) {
     vec4$3.subtract(out._array, a._array, b._array);
@@ -29639,18 +29067,18 @@ Vector4.sub = function(out, a, b) {
 };
 /**
  * @method
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Vector4} b
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Vector4} b
+ * @return {clay.math.Vector4}
  */
 Vector4.subtract = Vector4.sub;
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Matrix4} m
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Matrix4} m
+ * @return {clay.math.Vector4}
  */
 Vector4.transformMat4 = function(out, a, m) {
     vec4$3.transformMat4(out._array, a._array, m._array);
@@ -29659,10 +29087,10 @@ Vector4.transformMat4 = function(out, a, m) {
 };
 
 /**
- * @param  {qtek.math.Vector4} out
- * @param  {qtek.math.Vector4} a
- * @param  {qtek.math.Quaternion} q
- * @return {qtek.math.Vector4}
+ * @param  {clay.math.Vector4} out
+ * @param  {clay.math.Vector4} a
+ * @param  {clay.math.Quaternion} q
+ * @return {clay.math.Vector4}
  */
 Vector4.transformQuat = function(out, a, q) {
     vec4$3.transformQuat(out._array, a._array, q._array);
@@ -29674,27 +29102,27 @@ var vec3$16 = glmatrix.vec3;
 
 /**
  * @constructor
- * @alias qtek.particle.Particle
+ * @alias clay.particle.Particle
  */
 var Particle = function() {
     /**
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.position = new Vector3();
 
     /**
      * Use euler angle to represent particle rotation
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.rotation = new Vector3();
 
     /**
-     * @type {?qtek.math.Vector3}
+     * @type {?clay.math.Vector3}
      */
     this.velocity = null;
 
     /**
-     * @type {?qtek.math.Vector3}
+     * @type {?clay.math.Vector3}
      */
     this.angularVelocity = null;
 
@@ -29719,7 +29147,7 @@ var Particle = function() {
     this.weight = 1;
 
     /**
-     * @type {qtek.particle.Emitter}
+     * @type {clay.particle.Emitter}
      */
     this.emitter = null;
 };
@@ -29738,11 +29166,11 @@ Particle.prototype.update = function(deltaTime) {
 };
 
 /**
- * @constructor qtek.particle.Emitter
- * @extends qtek.core.Base
+ * @constructor clay.particle.Emitter
+ * @extends clay.core.Base
  */
 var Emitter = Base.extend(
-/** @lends qtek.particle.Emitter# */
+/** @lends clay.particle.Emitter# */
 {
     /**
      * Maximum number of particles created by this emitter
@@ -29758,37 +29186,37 @@ var Emitter = Base.extend(
     // Init status for each particle
     /**
      * Particle life generator
-     * @type {?qtek.math.Value.<number>}
+     * @type {?clay.math.Value.<number>}
      */
     life: null,
     /**
      * Particle position generator
-     * @type {?qtek.math.Value.<qtek.math.Vector3>}
+     * @type {?clay.math.Value.<clay.math.Vector3>}
      */
     position: null,
     /**
      * Particle rotation generator
-     * @type {?qtek.math.Value.<qtek.math.Vector3>}
+     * @type {?clay.math.Value.<clay.math.Vector3>}
      */
     rotation: null,
     /**
      * Particle velocity generator
-     * @type {?qtek.math.Value.<qtek.math.Vector3>}
+     * @type {?clay.math.Value.<clay.math.Vector3>}
      */
     velocity: null,
     /**
      * Particle angular velocity generator
-     * @type {?qtek.math.Value.<qtek.math.Vector3>}
+     * @type {?clay.math.Value.<clay.math.Vector3>}
      */
     angularVelocity: null,
     /**
      * Particle sprite size generator
-     * @type {?qtek.math.Value.<number>}
+     * @type {?clay.math.Value.<number>}
      */
     spriteSize: null,
     /**
      * Particle weight generator
-     * @type {?qtek.math.Value.<number>}
+     * @type {?clay.math.Value.<number>}
      */
     weight: null,
 
@@ -29812,11 +29240,11 @@ var Emitter = Base.extend(
         }
     }
 },
-/** @lends qtek.particle.Emitter.prototype */
+/** @lends clay.particle.Emitter.prototype */
 {
     /**
      * Emitter number of particles and push them to a given particle list. Emmit number is defined by amount property
-     * @param  {Array.<qtek.particle.Particle>} out
+     * @param  {Array.<clay.particle.Particle>} out
      */
     emit: function(out) {
         var amount = Math.min(this._particlePool.length, this.amount);
@@ -29853,7 +29281,7 @@ var Emitter = Base.extend(
     },
     /**
      * Kill a dead particle and put it back in the pool
-     * @param  {qtek.particle.Particle} particle
+     * @param  {clay.particle.Particle} particle
      */
     kill: function(particle) {
         this._particlePool.push(particle);
@@ -29861,47 +29289,47 @@ var Emitter = Base.extend(
 });
 
 /**
- * Create a constant 1d value generator. Alias for {@link qtek.math.Value.constant}
- * @method qtek.particle.Emitter.constant
+ * Create a constant 1d value generator. Alias for {@link clay.math.Value.constant}
+ * @method clay.particle.Emitter.constant
  */
 Emitter.constant = Value.constant;
 
 /**
- * Create a constant vector value(2d or 3d) generator. Alias for {@link qtek.math.Value.vector}
- * @method qtek.particle.Emitter.vector
+ * Create a constant vector value(2d or 3d) generator. Alias for {@link clay.math.Value.vector}
+ * @method clay.particle.Emitter.vector
  */
 Emitter.vector = Value.vector;
 
 /**
- * Create a random 1d value generator. Alias for {@link qtek.math.Value.random1D}
- * @method qtek.particle.Emitter.random1D
+ * Create a random 1d value generator. Alias for {@link clay.math.Value.random1D}
+ * @method clay.particle.Emitter.random1D
  */
 Emitter.random1D = Value.random1D;
 
 /**
- * Create a random 2d value generator. Alias for {@link qtek.math.Value.random2D}
- * @method qtek.particle.Emitter.random2D
+ * Create a random 2d value generator. Alias for {@link clay.math.Value.random2D}
+ * @method clay.particle.Emitter.random2D
  */
 Emitter.random2D = Value.random2D;
 
 /**
- * Create a random 3d value generator. Alias for {@link qtek.math.Value.random3D}
- * @method qtek.particle.Emitter.random3D
+ * Create a random 3d value generator. Alias for {@link clay.math.Value.random3D}
+ * @method clay.particle.Emitter.random3D
  */
 Emitter.random3D = Value.random3D;
 
 /**
- * @constructor qtek.particle.Field
- * @extends qtek.core.Base
+ * @constructor clay.particle.Field
+ * @extends clay.core.Base
  */
 var Field = Base.extend({}, {
     /**
      * Apply a field to the particle and update the particle velocity
-     * @param  {qtek.math.Vector3} velocity
-     * @param  {qtek.math.Vector3} position
+     * @param  {clay.math.Vector3} velocity
+     * @param  {clay.math.Vector3} position
      * @param  {number} weight
      * @param  {number} deltaTime
-     * @memberOf qtek.particle.Field.prototype
+     * @memberOf clay.particle.Field.prototype
      */
     applyTo: function(velocity, position, weight, deltaTime) {}
 });
@@ -29909,8 +29337,8 @@ var Field = Base.extend({}, {
 var vec3$17 =  glmatrix.vec3;
 
 /**
- * @constructor qtek.particle.ForceField
- * @extends qtek.particle.Field
+ * @constructor clay.particle.ForceField
+ * @extends clay.particle.Field
  */
 var ForceField = Field.extend(function() {
     return {
@@ -29924,31 +29352,27 @@ var ForceField = Field.extend(function() {
     }
 });
 
-var particleEssl = "@export qtek.particle.vertex\nuniform mat4 worldView : WORLDVIEW;\nuniform mat4 projection : PROJECTION;\nattribute vec3 position : POSITION;\nattribute vec3 normal : NORMAL;\n#ifdef UV_ANIMATION\nattribute vec2 texcoord0 : TEXCOORD_0;\nattribute vec2 texcoord1 : TEXCOORD_1;\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvarying float v_Age;\nvoid main() {\n    v_Age = normal.x;\n    float rotation = normal.y;\n    vec4 worldViewPosition = worldView * vec4(position, 1.0);\n    gl_Position = projection * worldViewPosition;\n    float w = gl_Position.w;\n    gl_PointSize = normal.z * projection[0].x / w;\n    #ifdef UV_ANIMATION\n        v_Uv0 = texcoord0;\n        v_Uv1 = texcoord1;\n    #endif\n}\n@end\n@export qtek.particle.fragment\nuniform sampler2D sprite;\nuniform sampler2D gradient;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\nvarying float v_Age;\n#ifdef UV_ANIMATION\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvoid main() {\n    vec4 color = vec4(color, alpha);\n    #ifdef SPRITE_ENABLED\n        #ifdef UV_ANIMATION\n            color *= texture2D(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));\n        #else\n            color *= texture2D(sprite, gl_PointCoord);\n        #endif\n    #endif\n    #ifdef GRADIENT_ENABLED\n        color *= texture2D(gradient, vec2(v_Age, 0.5));\n    #endif\n    gl_FragColor = color;\n}\n@end";
+var particleEssl = "@export clay.particle.vertex\nuniform mat4 worldView : WORLDVIEW;\nuniform mat4 projection : PROJECTION;\nattribute vec3 position : POSITION;\nattribute vec3 normal : NORMAL;\n#ifdef UV_ANIMATION\nattribute vec2 texcoord0 : TEXCOORD_0;\nattribute vec2 texcoord1 : TEXCOORD_1;\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvarying float v_Age;\nvoid main() {\n    v_Age = normal.x;\n    float rotation = normal.y;\n    vec4 worldViewPosition = worldView * vec4(position, 1.0);\n    gl_Position = projection * worldViewPosition;\n    float w = gl_Position.w;\n    gl_PointSize = normal.z * projection[0].x / w;\n    #ifdef UV_ANIMATION\n        v_Uv0 = texcoord0;\n        v_Uv1 = texcoord1;\n    #endif\n}\n@end\n@export clay.particle.fragment\nuniform sampler2D sprite;\nuniform sampler2D gradient;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\nvarying float v_Age;\n#ifdef UV_ANIMATION\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvoid main() {\n    vec4 color = vec4(color, alpha);\n    #ifdef SPRITE_ENABLED\n        #ifdef UV_ANIMATION\n            color *= texture2D(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));\n        #else\n            color *= texture2D(sprite, gl_PointCoord);\n        #endif\n    #endif\n    #ifdef GRADIENT_ENABLED\n        color *= texture2D(gradient, vec2(v_Age, 0.5));\n    #endif\n    gl_FragColor = color;\n}\n@end";
 
 Shader['import'](particleEssl);
 
-var particleShader = new Shader({
-    vertex: Shader.source('qtek.particle.vertex'),
-    fragment: Shader.source('qtek.particle.fragment')
-});
-particleShader.enableTexture('sprite');
+var particleShader = new Shader(Shader.source('clay.particle.vertex'), Shader.source('clay.particle.fragment'));
 
 /**
- * @constructor qtek.particle.ParticleRenderable
- * @extends qtek.Renderable
+ * @constructor clay.particle.ParticleRenderable
+ * @extends clay.Renderable
  *
  * @example
- *     var particleRenderable = new qtek.particle.ParticleRenderable({
+ *     var particleRenderable = new clay.particle.ParticleRenderable({
  *         spriteAnimationTileX: 4,
  *         spriteAnimationTileY: 4,
  *         spriteAnimationRepeat: 1
  *     });
  *     scene.add(particleRenderable);
  *     // Enable uv animation in the shader
- *     particleRenderable.material.shader.define('both', 'UV_ANIMATION');
- *     var Emitter = qtek.particle.Emitter;
- *     var Vector3 = qtek.math.Vector3;
+ *     particleRenderable.material.define('both', 'UV_ANIMATION');
+ *     var Emitter = clay.particle.Emitter;
+ *     var Vector3 = clay.math.Vector3;
  *     var emitter = new Emitter({
  *         max: 2000,
  *         amount: 100,
@@ -29957,7 +29381,7 @@ particleShader.enableTexture('sprite');
  *         velocity: Emitter.random3D(new Vector3(-10, 0, -10), new Vector3(10, 0, 10));
  *     });
  *     particleRenderable.addEmitter(emitter);
- *     var gravityField = new qtek.particle.ForceField();
+ *     var gravityField = new clay.particle.ForceField();
  *     gravityField.force.y = -10;
  *     particleRenderable.addField(gravityField);
  *     ...
@@ -29967,7 +29391,7 @@ particleShader.enableTexture('sprite');
  *     });
  */
 var ParticleRenderable = Renderable.extend(
-/** @lends qtek.particle.ParticleRenderable# */
+/** @lends clay.particle.ParticleRenderable# */
 {
     /**
      * @type {boolean}
@@ -30017,13 +29441,15 @@ var ParticleRenderable = Renderable.extend(
             transparent: true,
             depthMask: false
         });
+
+        this.material.enableTexture('sprite');
     }
 
     this._particles = [];
     this._fields = [];
     this._emitters = [];
 },
-/** @lends qtek.particle.ParticleRenderable.prototype */
+/** @lends clay.particle.ParticleRenderable.prototype */
 {
 
     culling: false,
@@ -30035,7 +29461,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Add emitter
-     * @param {qtek.particle.Emitter} emitter
+     * @param {clay.particle.Emitter} emitter
      */
     addEmitter: function(emitter) {
         this._emitters.push(emitter);
@@ -30043,7 +29469,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Remove emitter
-     * @param {qtek.particle.Emitter} emitter
+     * @param {clay.particle.Emitter} emitter
      */
     removeEmitter: function(emitter) {
         this._emitters.splice(this._emitters.indexOf(emitter), 1);
@@ -30051,7 +29477,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Add field
-     * @param {qtek.particle.Field} field
+     * @param {clay.particle.Field} field
      */
     addField: function(field) {
         this._fields.push(field);
@@ -30059,7 +29485,7 @@ var ParticleRenderable = Renderable.extend(
 
     /**
      * Remove field
-     * @param {qtek.particle.Field} field
+     * @param {clay.particle.Field} field
      */
     removeField: function(field) {
         this._fields.splice(this._fields.indexOf(field), 1);
@@ -30189,7 +29615,7 @@ var ParticleRenderable = Renderable.extend(
     },
 
     /**
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      */
     dispose: function(renderer) {
         // Put all the particles back
@@ -30198,11 +29624,11 @@ var ParticleRenderable = Renderable.extend(
             p.emitter.kill(p);
         }
         this.geometry.dispose(renderer);
-        // TODO Dispose texture, shader ?
+        // TODO Dispose texture ?
     },
 
     /**
-     * @return {qtek.particle.ParticleRenderable}
+     * @return {clay.particle.ParticleRenderable}
      */
     clone: function() {
         var particleRenderable = new ParticleRenderable({
@@ -30226,21 +29652,21 @@ var ParticleRenderable = Renderable.extend(
     }
 });
 
-var colorEssl = "@export qtek.picking.color.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n@import qtek.chunk.skinning_header\nvoid main(){\n    vec3 skinnedPosition = position;\n    #ifdef SKINNING\n        @import qtek.chunk.skin_matrix\n        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    #endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@end\n@export qtek.picking.color.fragment\nuniform vec4 color : [1.0, 1.0, 1.0, 1.0];\nvoid main() {\n    gl_FragColor = color;\n}\n@end";
+var colorEssl = "@export clay.picking.color.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvoid main(){\n    vec3 skinnedPosition = position;\n    #ifdef SKINNING\n        @import clay.chunk.skin_matrix\n        skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n    #endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@end\n@export clay.picking.color.fragment\nuniform vec4 color : [1.0, 1.0, 1.0, 1.0];\nvoid main() {\n    gl_FragColor = color;\n}\n@end";
 
 Shader.import(colorEssl);
 
 /**
  * Pixel picking is gpu based picking, which is fast and accurate.
  * But not like ray picking, it can't get the intersection point and triangle.
- * @constructor qtek.picking.PixelPicking
- * @extends qtek.core.Base
+ * @constructor clay.picking.PixelPicking
+ * @extends clay.core.Base
  */
 var PixelPicking = Base.extend(function() {
-    return /** @lends qtek.picking.PixelPicking# */ {
+    return /** @lends clay.picking.PixelPicking# */ {
         /**
          * Target renderer
-         * @type {qtek.Renderer}
+         * @type {clay.Renderer}
          */
         renderer: null,
         /**
@@ -30271,7 +29697,7 @@ var PixelPicking = Base.extend(function() {
         this.height = this.renderer.getHeight();
     }
     this._init();
-}, /** @lends qtek.picking.PixelPicking.prototype */ {
+}, /** @lends clay.picking.PixelPicking.prototype */ {
     _init: function() {
         this._texture = new Texture2D({
             width: this.width * this.downSampleRatio,
@@ -30279,10 +29705,7 @@ var PixelPicking = Base.extend(function() {
         });
         this._frameBuffer = new FrameBuffer();
 
-        this._shader = new Shader({
-            vertex: Shader.source('qtek.picking.color.vertex'),
-            fragment: Shader.source('qtek.picking.color.fragment')
-        });
+        this._shader = new Shader(Shader.source('clay.picking.color.vertex'), Shader.source('clay.picking.color.fragment'));
     },
     /**
      * Set picking presision
@@ -30352,7 +29775,7 @@ var PixelPicking = Base.extend(function() {
      * Pick the object
      * @param  {number} x Mouse position x
      * @param  {number} y Mouse position y
-     * @return {qtek.Node}
+     * @return {clay.Node}
      */
     pick: function(x, y) {
         var renderer = this.renderer;
@@ -30386,7 +29809,6 @@ var PixelPicking = Base.extend(function() {
 
     dispose: function(renderer) {
         this._frameBuffer.dispose(renderer);
-        this._shader.dispose(renderer);
     }
 });
 
@@ -30404,32 +29826,32 @@ function unpackID(r, g, b){
 var vec3$18 = glmatrix.vec3;
 
 /**
- * @constructor qtek.picking.RayPicking
- * @extends qtek.core.Base
+ * @constructor clay.picking.RayPicking
+ * @extends clay.core.Base
  */
 var RayPicking = Base.extend(
-/** @lends qtek.picking.RayPicking# */
+/** @lends clay.picking.RayPicking# */
 {
     /**
      * Target scene
-     * @type {qtek.Scene}
+     * @type {clay.Scene}
      */
     scene: null,
     /**
      * Target camera
-     * @type {qtek.Camera}
+     * @type {clay.Camera}
      */
     camera: null,
     /**
      * Target renderer
-     * @type {qtek.Renderer}
+     * @type {clay.Renderer}
      */
     renderer: null
 }, function () {
     this._ray = new Ray();
     this._ndc = new Vector2();
 },
-/** @lends qtek.picking.RayPicking.prototype */
+/** @lends clay.picking.RayPicking.prototype */
 {
 
     /**
@@ -30437,7 +29859,7 @@ var RayPicking = Base.extend(
      * @param  {number} x Mouse position x
      * @param  {number} y Mouse position y
      * @param  {boolean} [forcePickAll=false] ignore ignorePicking
-     * @return {qtek.picking.RayPicking~Intersection}
+     * @return {clay.picking.RayPicking~Intersection}
      */
     pick: function (x, y, forcePickAll) {
         var out = this.pickAll(x, y, [], forcePickAll);
@@ -30450,7 +29872,7 @@ var RayPicking = Base.extend(
      * @param  {number} y Mouse position y
      * @param  {Array} [output]
      * @param  {boolean} [forcePickAll=false] ignore ignorePicking
-     * @return {Array.<qtek.picking.RayPicking~Intersection>}
+     * @return {Array.<clay.picking.RayPicking~Intersection>}
      */
     pickAll: function (x, y, output, forcePickAll) {
         this.renderer.screenToNDC(x, y, this._ndc);
@@ -30497,7 +29919,7 @@ var RayPicking = Base.extend(
             var isSkinnedMesh = renderable.isSkinnedMesh();
             ray.copy(this._ray);
             Matrix4.invert(worldInverse, renderable.worldTransform);
-            
+
             // Skinned mesh will ignore the world transform.
             if (!isSkinnedMesh) {
                 ray.applyTransform(worldInverse);
@@ -30543,7 +29965,7 @@ var RayPicking = Base.extend(
                 return;
             }
             if (isSkinnedMesh) {
-                skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__GUID__, renderable.joints);
+                skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__uid__, renderable.joints);
                 for (var i = 0; i < renderable.joints.length; i++) {
                     skinMatrices[i] = skinMatrices[i] || [];
                     for (var k = 0; k < 16; k++) {
@@ -30571,7 +29993,7 @@ var RayPicking = Base.extend(
                         if (joint[k] >= 0 && weight[k] > 1e-4) {
                             vec3$18.transformMat4(tmp, pos, skinMatrices[joint[k]]);
                             vec3$18.scaleAndAdd(skinnedPos, skinnedPos, tmp, weight[k]);
-                        }   
+                        }
                     }
                     skinnedPositionAttr.set(i, skinnedPos);
                 }
@@ -30618,10 +30040,10 @@ var RayPicking = Base.extend(
 });
 
 /**
- * @constructor qtek.picking.RayPicking~Intersection
- * @param {qtek.math.Vector3} point
- * @param {qtek.math.Vector3} pointWorld
- * @param {qtek.Node} target
+ * @constructor clay.picking.RayPicking~Intersection
+ * @param {clay.math.Vector3} point
+ * @param {clay.math.Vector3} pointWorld
+ * @param {clay.Node} target
  * @param {Array.<number>} triangle
  * @param {number} triangleIndex
  * @param {number} distance
@@ -30629,17 +30051,17 @@ var RayPicking = Base.extend(
 RayPicking.Intersection = function (point, pointWorld, target, triangle, triangleIndex, distance) {
     /**
      * Intersection point in local transform coordinates
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.point = point;
     /**
      * Intersection point in world transform coordinates
-     * @type {qtek.math.Vector3}
+     * @type {clay.math.Vector3}
      */
     this.pointWorld = pointWorld;
     /**
      * Intersection scene node
-     * @type {qtek.Node}
+     * @type {clay.Node}
      */
     this.target = target;
     /**
@@ -30659,9 +30081,9 @@ RayPicking.Intersection = function (point, pointWorld, target, triangle, triangl
 };
 
 /**
- * @constructor qtek.plugin.FirstPersonControl
+ * @constructor clay.plugin.FreeControl
  * @example
- *     var control = new qtek.plugin.FirstPersonControl({
+ *     var control = new clay.plugin.FreeControl({
  *         target: camera,
  *         domElement: renderer.canvas
  *     });
@@ -30671,11 +30093,11 @@ RayPicking.Intersection = function (point, pointWorld, target, triangle, triangl
  *         renderer.render(scene, camera);
  *     });
  */
-var FirstPersonControl = Base.extend(function() {
-    return /** @lends qtek.plugin.FirstPersonControl# */ {
+var FreeControl = Base.extend(function() {
+    return /** @lends clay.plugin.FreeControl# */ {
         /**
          * Scene node to control, mostly it is a camera
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         target: null,
 
@@ -30699,7 +30121,7 @@ var FirstPersonControl = Base.extend(function() {
 
         /**
          * Up axis
-         * @type {qtek.math.Vector3}
+         * @type {clay.math.Vector3}
          */
         up: new Vector3(0, 1, 0),
 
@@ -30710,7 +30132,7 @@ var FirstPersonControl = Base.extend(function() {
         verticalMoveLock: false,
 
         /**
-         * @type {qtek.animation.Animation}
+         * @type {clay.animation.Animation}
          */
         animation: null,
 
@@ -30732,7 +30154,7 @@ var FirstPersonControl = Base.extend(function() {
         this.enable();
     }
 },
-/** @lends qtek.plugin.FirstPersonControl.prototype */
+/** @lends clay.plugin.FreeControl.prototype */
 {
     /**
      * Enable control
@@ -30911,15 +30333,8 @@ var FirstPersonControl = Base.extend(function() {
     }
 });
 
-/**
- * Only implements needed gestures for mobile.
- */
 var GestureMgr = function () {
 
-    /**
-     * @private
-     * @type {Array.<Object>}
-     */
     this._track = [];
 };
 
@@ -31159,11 +30574,12 @@ function convertToArray(val) {
 }
 
 /**
- * @alias module:echarts-x/util/OrbitControl
+ * @constructor
+ * @alias clay.plugin.OrbitControl
  */
 var OrbitControl = Base.extend(function () {
 
-    return {
+    return /** @lends clay.plugin.OrbitControl# */ {
 
         animation: null,
 
@@ -31173,11 +30589,11 @@ var OrbitControl = Base.extend(function () {
         domElement: null,
 
         /**
-         * @type {qtek.Node}
+         * @type {clay.Node}
          */
         target: null,
         /**
-         * @type {qtek.math.Vector3}
+         * @type {clay.math.Vector3}
          */
         _center: new Vector3(),
 
@@ -31292,7 +30708,7 @@ var OrbitControl = Base.extend(function () {
     this.update = this.update.bind(this);
 
     this.init();
-}, {
+}, /** @lends clay.plugin.OrbitControl# */ {
     /**
      * Initialize.
      * Mouse event binding
@@ -31629,7 +31045,7 @@ var OrbitControl = Base.extend(function () {
     // camera.position.y = 2;
     // camera.position.z = -4;
     // camera.lookAt(scene.position);
-    // 
+    //
     decomposeTransform: function () {
         if (!this.target) {
             return;
@@ -31842,15 +31258,7 @@ Object.defineProperty(OrbitControl.prototype, 'target', {
     }
 });
 
-var ReflectionPass = Base.extend(function() {
-    console.warn('TODO');
-}, {
-    render : function(renderer, scene, camera) {
-
-    }
-});
-
-var shadowmapEssl = "@export qtek.sm.depth.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n#ifdef SHADOW_TRANSPARENT\nattribute vec2 texcoord : TEXCOORD_0;\n#endif\n@import qtek.chunk.skinning_header\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nvoid main(){\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n    gl_Position = v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\n    v_Texcoord = texcoord;\n#endif\n}\n@end\n@export qtek.sm.depth.fragment\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\n#ifdef SHADOW_TRANSPARENT\nuniform sampler2D transparentMap;\n#endif\n@import qtek.util.encode_float\nvoid main(){\n    float depth = v_ViewPosition.z / v_ViewPosition.w;\n#ifdef USE_VSM\n    depth = depth * 0.5 + 0.5;\n    float moment1 = depth;\n    float moment2 = depth * depth;\n    float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    moment2 += 0.25*(dx*dx+dy*dy);\n    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n    float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n#ifdef SHADOW_TRANSPARENT\n    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {\n        gl_FragColor = encodeFloat(0.9999);\n        return;\n    }\n#endif\n    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n@export qtek.sm.debug_depth\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n@import qtek.util.decode_float\nvoid main() {\n    vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n    gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n    float depth = decodeFloat(tex);\n    gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n@end\n@export qtek.sm.distance.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\n@import qtek.chunk.skinning_header\nvarying vec3 v_WorldPosition;\nvoid main (){\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import qtek.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n@end\n@export qtek.sm.distance.fragment\nuniform vec3 lightPosition;\nuniform float range : 100;\nvarying vec3 v_WorldPosition;\n@import qtek.util.encode_float\nvoid main(){\n    float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n    dist = dist / range;\n    gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n@export qtek.plugin.shadow_map_common\n@import qtek.util.decode_float\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n    vec4 tex = texture2D(map, uv);\n    return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n    float shadowContrib = tapShadowMap(map, uv, z);\n    vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n    for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n        shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n    }}\n    return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#else\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n    return shadowContrib / 9.0;\n#endif\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n    return pcf(map, uv, z, textureSize, vec2(1.0));\n}\nfloat chebyshevUpperBound(vec2 moments, float z){\n    float p = 0.0;\n    z = z * 0.5 + 0.5;\n    if (z <= moments.x) {\n        p = 1.0;\n    }\n    float variance = moments.y - moments.x * moments.x;\n    variance = max(variance, 0.0000001);\n    float mD = moments.x - z;\n    float pMax = variance / (variance + mD * mD);\n    pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n    return max(p, pMax);\n}\nfloat computeShadowContrib(\n    sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n    vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n    posInLightSpace.xyz /= posInLightSpace.w;\n    float z = posInLightSpace.z;\n    if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n        all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n        vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n        #ifdef USE_VSM\n            vec2 moments = texture2D(map, uv * scale + offset).xy;\n            return chebyshevUpperBound(moments, z);\n        #else\n            return pcf(map, uv * scale + offset, z, textureSize, scale);\n        #endif\n    }\n    return 1.0;\n}\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n    return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n    float dist = length(direction);\n    vec4 shadowTex = textureCube(map, direction);\n#ifdef USE_VSM\n    vec2 moments = shadowTex.xy;\n    float variance = moments.y - moments.x * moments.x;\n    float mD = moments.x - dist;\n    float p = variance / (variance + mD * mD);\n    if(moments.x + 0.001 < dist){\n        return clamp(p, 0.0, 1.0);\n    }else{\n        return 1.0;\n    }\n#else\n    return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n@end\n@export qtek.plugin.compute_shadow_map\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];\n#endif\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1];\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE];\nuniform float directionalLightShadowMapSizes[1];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\n#endif\n#endif\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];\nuniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];\n#endif\nuniform bool shadowEnabled : true;\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n@import qtek.plugin.shadow_map_common\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n            spotLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n    for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n#ifdef SHADOW_CASCADE\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n                    / (gl_DepthRange.far - gl_DepthRange.near);\n    float shadowContrib;\n    shadowContribs[0] = 1.0;\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            depth >= shadowCascadeClipsNear[_idx_] &&\n            depth <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n                directionalLightShadowMapSizes[0],\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n            shadowContribs[0] = shadowContrib;\n        }\n    }}\n    for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#else\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n            directionalLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n    for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#endif\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n    vec3 lightPosition;\n    vec3 direction;\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        lightPosition = pointLightPosition[_idx_];\n        direction = position - lightPosition;\n        shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n    }}\n    for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#endif\n@end";
+var shadowmapEssl = "@export clay.sm.depth.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n#ifdef SHADOW_TRANSPARENT\nattribute vec2 texcoord : TEXCOORD_0;\n#endif\n@import clay.chunk.skinning_header\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nvoid main(){\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n    gl_Position = v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\n    v_Texcoord = texcoord;\n#endif\n}\n@end\n@export clay.sm.depth.fragment\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\n#ifdef SHADOW_TRANSPARENT\nuniform sampler2D transparentMap;\n#endif\n@import clay.util.encode_float\nvoid main(){\n    float depth = v_ViewPosition.z / v_ViewPosition.w;\n#ifdef USE_VSM\n    depth = depth * 0.5 + 0.5;\n    float moment1 = depth;\n    float moment2 = depth * depth;\n    float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    moment2 += 0.25*(dx*dx+dy*dy);\n    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n    float dx = dFdx(depth);\n    float dy = dFdy(depth);\n    depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n#ifdef SHADOW_TRANSPARENT\n    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {\n        gl_FragColor = encodeFloat(0.9999);\n        return;\n    }\n#endif\n    gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n@export clay.sm.debug_depth\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n@import clay.util.decode_float\nvoid main() {\n    vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n    gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n    float depth = decodeFloat(tex);\n    gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n@end\n@export clay.sm.distance.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvarying vec3 v_WorldPosition;\nvoid main (){\n    vec3 skinnedPosition = position;\n#ifdef SKINNING\n    @import clay.chunk.skin_matrix\n    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n@end\n@export clay.sm.distance.fragment\nuniform vec3 lightPosition;\nuniform float range : 100;\nvarying vec3 v_WorldPosition;\n@import clay.util.encode_float\nvoid main(){\n    float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n    dist = dist / range;\n    gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n@export clay.plugin.shadow_map_common\n@import clay.util.decode_float\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n    vec4 tex = texture2D(map, uv);\n    return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n    float shadowContrib = tapShadowMap(map, uv, z);\n    vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n    for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n        shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n    }}\n    return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#else\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n    shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n    return shadowContrib / 9.0;\n#endif\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n    return pcf(map, uv, z, textureSize, vec2(1.0));\n}\nfloat chebyshevUpperBound(vec2 moments, float z){\n    float p = 0.0;\n    z = z * 0.5 + 0.5;\n    if (z <= moments.x) {\n        p = 1.0;\n    }\n    float variance = moments.y - moments.x * moments.x;\n    variance = max(variance, 0.0000001);\n    float mD = moments.x - z;\n    float pMax = variance / (variance + mD * mD);\n    pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n    return max(p, pMax);\n}\nfloat computeShadowContrib(\n    sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n    vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n    posInLightSpace.xyz /= posInLightSpace.w;\n    float z = posInLightSpace.z;\n    if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n        all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n        vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n        #ifdef USE_VSM\n            vec2 moments = texture2D(map, uv * scale + offset).xy;\n            return chebyshevUpperBound(moments, z);\n        #else\n            return pcf(map, uv * scale + offset, z, textureSize, scale);\n        #endif\n    }\n    return 1.0;\n}\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n    return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n    float dist = length(direction);\n    vec4 shadowTex = textureCube(map, direction);\n#ifdef USE_VSM\n    vec2 moments = shadowTex.xy;\n    float variance = moments.y - moments.x * moments.x;\n    float mD = moments.x - dist;\n    float p = variance / (variance + mD * mD);\n    if(moments.x + 0.001 < dist){\n        return clamp(p, 0.0, 1.0);\n    }else{\n        return 1.0;\n    }\n#else\n    return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n@end\n@export clay.plugin.compute_shadow_map\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];\n#endif\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1];\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE];\nuniform float directionalLightShadowMapSizes[1];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];\n#endif\n#endif\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];\nuniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];\n#endif\nuniform bool shadowEnabled : true;\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n@import clay.plugin.shadow_map_common\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n            spotLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n    for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n#ifdef SHADOW_CASCADE\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n                    / (gl_DepthRange.far - gl_DepthRange.near);\n    float shadowContrib;\n    shadowContribs[0] = 1.0;\n    for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n        if (\n            depth >= shadowCascadeClipsNear[_idx_] &&\n            depth <= shadowCascadeClipsFar[_idx_]\n        ) {\n            shadowContrib = computeShadowContrib(\n                directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n                directionalLightShadowMapSizes[0],\n                vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n                vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n            );\n            shadowContribs[0] = shadowContrib;\n        }\n    }}\n    for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#else\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n    float shadowContrib;\n    for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        shadowContrib = computeShadowContrib(\n            directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n            directionalLightShadowMapSizes[_idx_]\n        );\n        shadowContribs[_idx_] = shadowContrib;\n    }}\n    for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#endif\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n    vec3 lightPosition;\n    vec3 direction;\n    for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n        lightPosition = pointLightPosition[_idx_];\n        direction = position - lightPosition;\n        shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n    }}\n    for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n        shadowContribs[_idx_] = 1.0;\n    }}\n}\n#endif\n#endif\n@end";
 
 var mat4$9 = glmatrix.mat4;
 var targets$2 = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
@@ -31860,11 +31268,11 @@ Shader['import'](shadowmapEssl);
 /**
  * Pass rendering shadow map.
  *
- * @constructor qtek.prePass.ShadowMap
- * @extends qtek.core.Base
+ * @constructor clay.prePass.ShadowMap
+ * @extends clay.core.Base
  * @example
- *     var shadowMapPass = new qtek.prePass.ShadowMap({
- *         softShadow: qtek.prePass.ShadowMap.VSM
+ *     var shadowMapPass = new clay.prePass.ShadowMap({
+ *         softShadow: clay.prePass.ShadowMap.VSM
  *     });
  *     ...
  *     animation.on('frame', function (frameTime) {
@@ -31873,10 +31281,10 @@ Shader['import'](shadowmapEssl);
  *     });
  */
 var ShadowMapPass = Base.extend(function () {
-    return /** @lends qtek.prePass.ShadowMap# */ {
+    return /** @lends clay.prePass.ShadowMap# */ {
         /**
          * Soft shadow technique.
-         * Can be {@link qtek.prePass.ShadowMap.PCF} or {@link qtek.prePass.ShadowMap.VSM}
+         * Can be {@link clay.prePass.ShadowMap.PCF} or {@link clay.prePass.ShadowMap.VSM}
          * @type {number}
          */
         softShadow: ShadowMapPass.PCF,
@@ -31913,9 +31321,7 @@ var ShadowMapPass = Base.extend(function () {
             'SPOT_LIGHT': 0
         },
 
-        _meshMaterials: {},
         _depthMaterials: {},
-        _depthShaders: {},
         _distanceMaterials: {},
 
         _opaqueCasters: [],
@@ -31923,16 +31329,17 @@ var ShadowMapPass = Base.extend(function () {
         _lightsCastShadow: [],
 
         _lightCameras: {},
+        _lightMaterials: {},
 
         _texturePool: new TexturePool()
     };
 }, function () {
     // Gaussian filter pass for VSM
     this._gaussianPassH = new Pass({
-        fragment: Shader.source('qtek.compositor.gaussian_blur')
+        fragment: Shader.source('clay.compositor.gaussian_blur')
     });
     this._gaussianPassV = new Pass({
-        fragment: Shader.source('qtek.compositor.gaussian_blur')
+        fragment: Shader.source('clay.compositor.gaussian_blur')
     });
     this._gaussianPassH.setUniform('blurSize', this.shadowBlur);
     this._gaussianPassH.setUniform('blurDir', 0.0);
@@ -31940,16 +31347,16 @@ var ShadowMapPass = Base.extend(function () {
     this._gaussianPassV.setUniform('blurDir', 1.0);
 
     this._outputDepthPass = new Pass({
-        fragment: Shader.source('qtek.sm.debug_depth')
+        fragment: Shader.source('clay.sm.debug_depth')
     });
 }, {
     /**
      * Render scene to shadow textures
-     * @param  {qtek.Renderer} renderer
-     * @param  {qtek.Scene} scene
-     * @param  {qtek.Camera} sceneCamera
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Scene} scene
+     * @param  {clay.Camera} sceneCamera
      * @param  {boolean} [notUpdateScene=false]
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     render: function (renderer, scene, sceneCamera, notUpdateScene) {
         this.trigger('beforerender', this, renderer, scene, sceneCamera);
@@ -31959,9 +31366,9 @@ var ShadowMapPass = Base.extend(function () {
 
     /**
      * Debug rendering of shadow textures
-     * @param  {qtek.Renderer} renderer
+     * @param  {clay.Renderer} renderer
      * @param  {number} size
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     renderDebug: function (renderer, size) {
         renderer.saveClear();
@@ -31970,10 +31377,10 @@ var ShadowMapPass = Base.extend(function () {
         var width = size || viewport.width / 4;
         var height = width;
         if (this.softShadow === ShadowMapPass.VSM) {
-            this._outputDepthPass.material.shader.define('fragment', 'USE_VSM');
+            this._outputDepthPass.material.define('fragment', 'USE_VSM');
         }
         else {
-            this._outputDepthPass.material.shader.undefine('fragment', 'USE_VSM');
+            this._outputDepthPass.material.undefine('fragment', 'USE_VSM');
         }
         for (var name in this._textures) {
             var texture = this._textures[name];
@@ -31984,130 +31391,6 @@ var ShadowMapPass = Base.extend(function () {
         }
         renderer.setViewport(viewport);
         renderer.restoreClear();
-    },
-
-    _bindDepthMaterial: function (casters, bias, slopeScale) {
-        for (var i = 0; i < casters.length; i++) {
-            var mesh = casters[i];
-            var isShadowTransparent = mesh.material.shadowTransparentMap instanceof Texture2D;
-            var transparentMap = mesh.material.shadowTransparentMap;
-            var nJoints = mesh.joints && mesh.joints.length;
-            var matHashKey;
-            var shaderHashKey;
-            if (isShadowTransparent) {
-                matHashKey = nJoints + '-' + transparentMap.__GUID__;
-                shaderHashKey = nJoints + '-t';
-            }
-            else {
-                matHashKey = nJoints;
-                shaderHashKey = nJoints;
-            }
-            if (mesh.useSkinMatricesTexture) {
-                matHashKey += '-s';
-                shaderHashKey += '-s';
-            }
-            // Use custom shadow depth material
-            var depthMaterial = mesh.shadowDepthMaterial || this._depthMaterials[matHashKey];
-            var depthShader = mesh.shadowDepthMaterial ? mesh.shadowDepthMaterial.shader : this._depthShaders[shaderHashKey];
-
-            if (mesh.material !== depthMaterial) {  // Not binded yet
-                if (!depthShader) {
-                    depthShader = new Shader({
-                        vertex: Shader.source('qtek.sm.depth.vertex'),
-                        fragment: Shader.source('qtek.sm.depth.fragment'),
-                        precision: this.precision
-                    });
-                    if (nJoints > 0) {
-                        depthShader.define('vertex', 'SKINNING');
-                        depthShader.define('vertex', 'JOINT_COUNT', nJoints);
-                    }
-                    if (isShadowTransparent) {
-                        depthShader.define('both', 'SHADOW_TRANSPARENT');
-                    }
-                    if (mesh.useSkinMatricesTexture) {
-                        depthShader.define('vertex', 'USE_SKIN_MATRICES_TEXTURE');
-                    }
-                    this._depthShaders[shaderHashKey] = depthShader;
-                }
-                if (!depthMaterial) {
-                    // Skinned mesh
-                    depthMaterial = new Material({
-                        shader: depthShader
-                    });
-                    this._depthMaterials[matHashKey] = depthMaterial;
-                }
-
-                mesh.material = depthMaterial;
-
-                if (this.softShadow === ShadowMapPass.VSM) {
-                    depthShader.define('fragment', 'USE_VSM');
-                }
-                else {
-                    depthShader.undefine('fragment', 'USE_VSM');
-                }
-
-                depthMaterial.setUniform('bias', bias);
-                depthMaterial.setUniform('slopeScale', slopeScale);
-                if (isShadowTransparent) {
-                    depthMaterial.set('shadowTransparentMap', transparentMap);
-                }
-            }
-        }
-    },
-
-    _bindDistanceMaterial: function (casters, light) {
-        var lightPosition = light.getWorldPosition()._array;
-        for (var i = 0; i < casters.length; i++) {
-            var mesh = casters[i];
-            var nJoints = mesh.joints && mesh.joints.length;
-            var distanceMaterial = this._distanceMaterials[nJoints];
-            if (mesh.material !== distanceMaterial) {
-                if (!distanceMaterial) {
-                    // Skinned mesh
-                    distanceMaterial = new Material({
-                        shader: new Shader({
-                            vertex: Shader.source('qtek.sm.distance.vertex'),
-                            fragment: Shader.source('qtek.sm.distance.fragment'),
-                            precision: this.precision
-                        })
-                    });
-                    if (nJoints > 0) {
-                        distanceMaterial.shader.define('vertex', 'SKINNING');
-                        distanceMaterial.shader.define('vertex', 'JOINT_COUNT', nJoints);
-                    }
-                    this._distanceMaterials[nJoints] = distanceMaterial;
-                }
-                mesh.material = distanceMaterial;
-
-                if (this.softShadow === ShadowMapPass.VSM) {
-                    distanceMaterial.shader.define('fragment', 'USE_VSM');
-                }
-                else {
-                    distanceMaterial.shader.undefine('fragment', 'USE_VSM');
-                }
-            }
-
-            distanceMaterial.set('lightPosition', lightPosition);
-            distanceMaterial.set('range', light.range);
-        }
-    },
-
-    saveMaterial: function (casters) {
-        for (var i = 0; i < casters.length; i++) {
-            var mesh = casters[i];
-            this._meshMaterials[mesh.__GUID__] = mesh.material;
-        }
-    },
-
-    restoreMaterial: function (casters) {
-        for (var i = 0; i < casters.length; i++) {
-            var mesh = casters[i];
-            var material = this._meshMaterials[mesh.__GUID__];
-            // In case restoreMaterial when no shadowMap is rendered
-            if (material) {
-                mesh.material = material;
-            }
-        }
     },
 
     _updateCasterAndReceiver: function (renderer, mesh) {
@@ -32127,31 +31410,30 @@ var ShadowMapPass = Base.extend(function () {
         if (!mesh.material.shader && mesh.material.updateShader) {
             mesh.material.updateShader(renderer);
         }
-        var shader = mesh.material.shader;
         if (this.softShadow === ShadowMapPass.VSM) {
-            shader.define('fragment', 'USE_VSM');
-            shader.undefine('fragment', 'PCF_KERNEL_SIZE');
+            mesh.material.define('fragment', 'USE_VSM');
+            mesh.material.undefine('fragment', 'PCF_KERNEL_SIZE');
         }
         else {
-            shader.undefine('fragment', 'USE_VSM');
+            mesh.material.undefine('fragment', 'USE_VSM');
             var kernelPCF = this.kernelPCF;
             if (kernelPCF && kernelPCF.length) {
-                shader.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
+                mesh.material.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
             }
             else {
-                shader.undefine('fragment', 'PCF_KERNEL_SIZE');
+                mesh.material.undefine('fragment', 'PCF_KERNEL_SIZE');
             }
         }
     },
 
     _update: function (renderer, scene) {
-        for (var i = 0; i < scene.opaqueQueue.length; i++) {
-            this._updateCasterAndReceiver(renderer, scene.opaqueQueue[i]);
+        for (var i = 0; i < scene.opaqueList.length; i++) {
+            this._updateCasterAndReceiver(renderer, scene.opaqueList[i]);
         }
-        for (var i = 0; i < scene.transparentQueue.length; i++) {
+        for (var i = 0; i < scene.transparentList.length; i++) {
             // TODO Transparent object receive shadow will be very slow
             // in stealth demo, still not find the reason
-            this._updateCasterAndReceiver(renderer, scene.transparentQueue[i]);
+            this._updateCasterAndReceiver(renderer, scene.transparentList[i]);
         }
         for (var i = 0; i < scene.lights.length; i++) {
             var light = scene.lights[i];
@@ -32176,7 +31458,7 @@ var ShadowMapPass = Base.extend(function () {
             scene.update();
         }
         if (sceneCamera) {
-            sceneCamera.update();   
+            sceneCamera.update();
         }
 
         this._update(renderer, scene);
@@ -32204,8 +31486,6 @@ var ShadowMapPass = Base.extend(function () {
         var directionalLightMatrices = [];
         var shadowCascadeClips = [];
         var pointLightShadowMaps = [];
-
-        this.saveMaterial(this._opaqueCasters);
 
         var dirLightHasCascade;
         // Create textures for shadow map
@@ -32240,6 +31520,7 @@ var ShadowMapPass = Base.extend(function () {
             else if (light instanceof SpotLight) {
                 this.renderSpotLightShadow(
                     renderer,
+                    scene,
                     light,
                     this._opaqueCasters,
                     spotLightMatrices,
@@ -32249,6 +31530,7 @@ var ShadowMapPass = Base.extend(function () {
             else if (light instanceof PointLight) {
                 this.renderPointLightShadow(
                     renderer,
+                    scene,
                     light,
                     this._opaqueCasters,
                     pointLightShadowMaps
@@ -32257,18 +31539,6 @@ var ShadowMapPass = Base.extend(function () {
 
             this._shadowMapNumber[light.type]++;
         }
-        this.restoreMaterial(this._opaqueCasters);
-
-        var shadowCascadeClipsNear = shadowCascadeClips.slice();
-        var shadowCascadeClipsFar = shadowCascadeClips.slice();
-        shadowCascadeClipsNear.pop();
-        shadowCascadeClipsFar.shift();
-
-        // Iterate from far to near
-        shadowCascadeClipsNear.reverse();
-        shadowCascadeClipsFar.reverse();
-        // directionalLightShadowMaps.reverse();
-        directionalLightMatrices.reverse();
 
         function getSize(texture) {
             return texture.height;
@@ -32276,41 +31546,30 @@ var ShadowMapPass = Base.extend(function () {
         var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
         var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
 
-        var shadowDefineUpdatedShader = {};
-
+        for (var lightType in this._shadowMapNumber) {
+            var number = this._shadowMapNumber[lightType];
+            var key = lightType + '_SHADOWMAP_COUNT';
+            for (var i = 0; i < this._receivers.length; i++) {
+                var mesh = this._receivers[i];
+                var material = mesh.material;
+                if (material.fragmentDefines[key] !== number) {
+                    if (number > 0) {
+                        material.define('fragment', key, number);
+                    }
+                    else if (material.isDefined('fragment', key)) {
+                        material.undefine('fragment', key);
+                    }
+                }
+            }
+        }
         for (var i = 0; i < this._receivers.length; i++) {
             var mesh = this._receivers[i];
             var material = mesh.material;
-
-            var shader = material.shader;
-
-            if (!shadowDefineUpdatedShader[shader.__GUID__]) {
-                var shaderNeedsUpdate = false;
-                for (var lightType in this._shadowMapNumber) {
-                    var number = this._shadowMapNumber[lightType];
-                    var key = lightType + '_SHADOWMAP_COUNT';
-
-                    if (shader.fragmentDefines[key] !== number) {
-                        if (number > 0) {
-                            shader.fragmentDefines[key] = number;
-                            shaderNeedsUpdate = true;
-                        }
-                        else if (shader.isDefined('fragment', key)) {
-                            shader.undefine('fragment', key);
-                            shaderNeedsUpdate = true;
-                        }
-                    }
-                }
-                if (shaderNeedsUpdate) {
-                    shader.dirty();
-                }
-                if (dirLightHasCascade) {
-                    shader.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
-                }
-                else {
-                    shader.undefine('fragment', 'SHADOW_CASCADE');
-                }
-                shadowDefineUpdatedShader[shader.__GUID__] = true;
+            if (dirLightHasCascade) {
+                material.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
+            }
+            else {
+                material.undefine('fragment', 'SHADOW_CASCADE');
             }
 
             if (spotLightShadowMaps.length > 0) {
@@ -32321,6 +31580,16 @@ var ShadowMapPass = Base.extend(function () {
             if (directionalLightShadowMaps.length > 0) {
                 material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
                 if (dirLightHasCascade) {
+                    var shadowCascadeClipsNear = shadowCascadeClips.slice();
+                    var shadowCascadeClipsFar = shadowCascadeClips.slice();
+                    shadowCascadeClipsNear.pop();
+                    shadowCascadeClipsFar.shift();
+
+                    // Iterate from far to near
+                    shadowCascadeClipsNear.reverse();
+                    shadowCascadeClipsFar.reverse();
+                    // directionalLightShadowMaps.reverse();
+                    directionalLightMatrices.reverse();
                     material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
                     material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
                 }
@@ -32345,10 +31614,13 @@ var ShadowMapPass = Base.extend(function () {
 
         return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
-            var shadowBias = light.shadowBias;
-            this._bindDepthMaterial(casters, shadowBias, light.shadowSlopeScale);
-
-            casters.sort(Renderer.opaqueSortFunc);
+            var defaultShadowMaterial = this._getDepthMaterial(light);
+            var passConfig = {
+                getMaterial: function (renderable) {
+                    return renderable.shadowDepthMaterial || defaultShadowMaterial;
+                },
+                sortCompare: Renderer.opaqueSortCompare
+            };
 
             // First frame
             if (!scene.viewBoundingBoxLastFrame.isFinite()) {
@@ -32422,13 +31694,7 @@ var ShadowMapPass = Base.extend(function () {
                 // Reversed, left to right => far to near
                 renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
-                // Set bias seperately for each cascade
-                // TODO Simply divide 1.5 ?
-                for (var key in this._depthMaterials) {
-                    this._depthMaterials[key].set('shadowBias', shadowBias);
-                }
-
-                renderer.renderQueue(casters, lightCamera);
+                renderer.renderPass(casters, lightCamera, passConfig);
 
                 // Filter for VSM
                 if (this.softShadow === ShadowMapPass.VSM) {
@@ -32450,13 +31716,10 @@ var ShadowMapPass = Base.extend(function () {
         };
     })(),
 
-    renderSpotLightShadow: function (renderer, light, casters, spotLightMatrices, spotLightShadowMaps) {
-
-        this._bindDepthMaterial(casters, light.shadowBias, light.shadowSlopeScale);
-        casters.sort(Renderer.opaqueSortFunc);
+    renderSpotLightShadow: function (renderer, scene, light, casters, spotLightMatrices, spotLightShadowMaps) {
 
         var texture = this._getTexture(light);
-        var camera = this._getSpotLightCamera(light);
+        var lightCamera = this._getSpotLightCamera(light);
         var _gl = renderer.gl;
 
         this._frameBuffer.attach(texture);
@@ -32464,7 +31727,15 @@ var ShadowMapPass = Base.extend(function () {
 
         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-        renderer.renderQueue(casters, camera);
+        var defaultShadowMaterial = this._getDepthMaterial(light);
+        var passConfig = {
+            getMaterial: function (renderable) {
+                return renderable.shadowDepthMaterial || defaultShadowMaterial;
+            },
+            sortCompare: Renderer.opaqueSortCompare
+        };
+
+        renderer.renderPass(casters, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
 
@@ -32474,20 +31745,27 @@ var ShadowMapPass = Base.extend(function () {
         }
 
         var matrix = new Matrix4();
-        matrix.copy(camera.worldTransform)
+        matrix.copy(lightCamera.worldTransform)
             .invert()
-            .multiplyLeft(camera.projectionMatrix);
+            .multiplyLeft(lightCamera.projectionMatrix);
 
         spotLightShadowMaps.push(texture);
         spotLightMatrices.push(matrix._array);
     },
 
-    renderPointLightShadow: function (renderer, light, casters, pointLightShadowMaps) {
+    renderPointLightShadow: function (renderer, scene, light, casters, pointLightShadowMaps) {
         var texture = this._getTexture(light);
         var _gl = renderer.gl;
         pointLightShadowMaps.push(texture);
 
-        this._bindDistanceMaterial(casters, light);
+        var defaultShadowMaterial = this._getDepthMaterial(light);
+        var passConfig = {
+            getMaterial: function (renderable) {
+                return renderable.shadowDepthMaterial || defaultShadowMaterial;
+            },
+            sortCompare: Renderer.opaqueSortCompare
+        };
+
         for (var i = 0; i < 6; i++) {
             var target = targets$2[i];
             var camera = this._getPointLightCamera(light, target);
@@ -32496,9 +31774,43 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderQueue(casters, camera);
+            renderer.renderPass(casters, camera, passConfig);
         }
-            this._frameBuffer.unbind(renderer);
+
+        this._frameBuffer.unbind(renderer);
+    },
+
+    _getDepthMaterial: function (light) {
+        var shadowMaterial = this._lightMaterials[light.__uid__];
+        var isPointLight = light instanceof PointLight;
+        if (!shadowMaterial) {
+            var shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
+            shadowMaterial = new Material({
+                precision: this.precision,
+                shader: new Shader(Shader.source(shaderPrefix + 'vertex'), Shader.source(shaderPrefix + 'fragment'))
+            });
+
+            this._lightMaterials[light.__uid__] = shadowMaterial;
+        }
+        if (light.shadowSlopeScale != null) {
+            shadowMaterial.setUniform('slopeScale', light.shadowSlopeScale);
+        }
+        if (light.shadowBias != null) {
+            shadowMaterial.setUniform('shadowBias', light.shadowBias);
+        }
+        if (this.softShadow === ShadowMapPass.VSM) {
+            shadowMaterial.define('fragment', 'USE_VSM');
+        }
+        else {
+            shadowMaterial.undefine('fragment', 'USE_VSM');
+        }
+
+        if (isPointLight) {
+            shadowMaterial.set('lightPosition', light.getWorldPosition()._array);
+            shadowMaterial.set('range', light.range);
+        }
+
+        return shadowMaterial;
     },
 
     _gaussianFilter: function (renderer, texture, size) {
@@ -32525,7 +31837,7 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     _getTexture: function (light, cascade) {
-        var key = light.__GUID__;
+        var key = light.__uid__;
         var texture = this._textures[key];
         var resolution = light.shadowResolution || 512;
         cascade = cascade || 1;
@@ -32668,21 +31980,12 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     /**
-     * @param  {qtek.Renderer|WebGLRenderingContext} [renderer]
-     * @memberOf qtek.prePass.ShadowMap.prototype
+     * @param  {clay.Renderer|WebGLRenderingContext} [renderer]
+     * @memberOf clay.prePass.ShadowMap.prototype
      */
     // PENDING Renderer or WebGLRenderingContext
     dispose: function (renderer) {
         var _gl = renderer.gl || renderer;
-
-        for (var guid in this._depthMaterials) {
-            var mat = this._depthMaterials[guid];
-            mat.dispose(_gl);
-        }
-        for (var guid in this._distanceMaterials) {
-            var mat = this._distanceMaterials[guid];
-            mat.dispose(_gl);
-        }
 
         if (this._frameBuffer) {
             this._frameBuffer.dispose(_gl);
@@ -32725,13 +32028,13 @@ var ShadowMapPass = Base.extend(function () {
 });
 
 /**
- * @name qtek.prePass.ShadowMap.VSM
+ * @name clay.prePass.ShadowMap.VSM
  * @type {number}
  */
 ShadowMapPass.VSM = 1;
 
 /**
- * @name qtek.prePass.ShadowMap.PCF
+ * @name clay.prePass.ShadowMap.PCF
  * @type {number}
  */
 ShadowMapPass.PCF = 2;
@@ -32740,8 +32043,8 @@ ShadowMapPass.PCF = 2;
  * StaticGeometry can not be changed once they've been setup
  */
 /**
- * @constructor qtek.StaticGeometry
- * @extends qtek.Geometry
+ * @constructor clay.StaticGeometry
+ * @extends clay.Geometry
  */
 var StaticGeometry = Geometry.extend({
     dynamic: false
@@ -32752,17 +32055,17 @@ var mat4$10 = glmatrix.mat4;
 var vec3$21 = glmatrix.vec3;
 
 /**
- * @namespace qtek.util.mesh
+ * @namespace clay.util.mesh
  */
 var meshUtil = {
     /**
      * Merge multiple meshes to one.
      * Note that these meshes must have the same material
      *
-     * @param {Array.<qtek.Mesh>} meshes
+     * @param {Array.<clay.Mesh>} meshes
      * @param {boolean} applyWorldTransform
-     * @return qtek.Mesh
-     * @memberOf qtek.util.mesh
+     * @return clay.Mesh
+     * @memberOf clay.util.mesh
      */
     merge: function (meshes, applyWorldTransform) {
 
@@ -32872,22 +32175,19 @@ var meshUtil = {
 
     /**
      * Split mesh into sub meshes, each mesh will have maxJointNumber joints.
-     * @param {qtek.Mesh} mesh
+     * @param {clay.Mesh} mesh
      * @param {number} maxJointNumber
      * @param {boolean} inPlace
-     * @param {qtek.shader.library} [shaderLib]
-     * @param {string} [shaderType]
-     * @return {qtek.Node}
+     * @return {clay.Node}
      *
-     * @memberOf qtek.util.mesh
+     * @memberOf clay.util.mesh
      */
 
     // FIXME, Have issues on some models
-    splitByJoints: function (mesh, maxJointNumber, inPlace, shaderLib, shaderType) {
+    splitByJoints: function (mesh, maxJointNumber, inPlace) {
         var geometry = mesh.geometry;
         var skeleton = mesh.skeleton;
         var material = mesh.material;
-        var shader = material.shader;
         var joints = mesh.joints;
         if (!geometry || !skeleton || !joints.length) {
             return;
@@ -32896,7 +32196,6 @@ var meshUtil = {
             return mesh;
         }
 
-        var shaders = {};
 
         var indices = geometry.indices;
 
@@ -32985,34 +32284,6 @@ var meshUtil = {
             var subJointNumber = bucket.joints.length;
 
             var subMat = material.clone();
-            if (material instanceof StandardMaterial) {
-                subMat.jointCount = subJointNumber;
-            }
-            else {
-                var subShader;
-                if (shaderLib && shaderType) {
-                    var vertexDefines = {};
-                    for (var name in shader.vertexDefines) {
-                        vertexDefines[name] = shader.vertexDefines[name];
-                    }
-                    vertexDefines.JOINT_COUNT = subJointNumber;
-                    subShader = shaderLib.get(shaderType, {
-                        textures: shader.getEnabledTextures(),
-                        vertexDefines: vertexDefines,
-                        fragmentDefines: shader.fragmentDefines,
-                        precision: shader.precision
-                    });
-                }
-                else {
-                    subShader = shaders[subJointNumber];
-                    if (!subShader) {
-                        subShader = shader.clone();
-                        subShader.define('vertex', 'JOINT_COUNT', subJointNumber);
-                        shaders[subJointNumber] = subShader;
-                    }
-                }
-                subMat.attachShader(subShader, true);
-            }
             subMat.name = [material.name, b].join('-');
 
             var subGeo = new Geometry();
@@ -33218,8 +32489,8 @@ function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
 }
 
 /**
- * @param  {qtek.Renderer} renderer
- * @param  {qtek.Texture} envMap
+ * @param  {clay.Renderer} renderer
+ * @param  {clay.Texture} envMap
  * @param  {Object} [textureOpts]
  * @param  {Object} [textureOpts.lod]
  * @param  {boolean} [textureOpts.decodeRGBM]
@@ -33255,9 +32526,9 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
         height: height
     });
     var framebuffer = new FrameBuffer();
-    skybox.material.shader.define('fragment', 'RGBM_ENCODE');
+    skybox.material.define('fragment', 'RGBM_ENCODE');
     if (opts.decodeRGBM) {
-        skybox.material.shader.define('fragment', 'RGBM_DECODE');
+        skybox.material.define('fragment', 'RGBM_DECODE');
     }
     skybox.material.set('lod', opts.lod);
     var envMapPass = new EnvironmentMapPass({
@@ -33286,11 +32557,11 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
 };
 
 /**
- * @name qtek.version
+ * @name clay.version
  */
 var version = '0.6.1';
 
-var outputEssl$1 = "@export qtek.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export qtek.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
+var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 
 // https://github.com/googlevr/webvr-polyfill/blob/master/src/cardboard-distorter.js
 
@@ -33321,8 +32592,8 @@ var CardboardDistorter = Base.extend(function () {
                 // depthMask: false,
                 depthTest: false,
                 shader: new Shader({
-                    vertex: Shader.source('qtek.vr.disorter.output.vertex'),
-                    fragment: Shader.source('qtek.vr.disorter.output.fragment')
+                    vertex: Shader.source('clay.vr.disorter.output.vertex'),
+                    fragment: Shader.source('clay.vr.disorter.output.fragment')
                 })
             })
         }),
@@ -33343,7 +32614,7 @@ var CardboardDistorter = Base.extend(function () {
         // Full size?
         renderer.saveViewport();
         renderer.setViewport(0, 0, renderer.getWidth(), renderer.getHeight());
-        renderer.renderQueue([this._mesh], this._fakeCamera);
+        renderer.renderPass([this._mesh], this._fakeCamera);
         renderer.restoreViewport();
         // this._mesh.material.shader.bind(renderer);
         // this._mesh.material.bind(renderer);
@@ -33583,23 +32854,23 @@ var StereoCamera = Node.extend(function () {
     }
 });
 
-/** @namespace qtek */
-/** @namespace qtek.math */
-/** @namespace qtek.animation */
-/** @namespace qtek.async */
-/** @namespace qtek.camera */
-/** @namespace qtek.compositor */
-/** @namespace qtek.core */
-/** @namespace qtek.geometry */
-/** @namespace qtek.helper */
-/** @namespace qtek.light */
-/** @namespace qtek.loader */
-/** @namespace qtek.particleSystem */
-/** @namespace qtek.plugin */
-/** @namespace qtek.prePass */
-/** @namespace qtek.shader */
-/** @namespace qtek.texture */
-/** @namespace qtek.util */
+/** @namespace clay */
+/** @namespace clay.math */
+/** @namespace clay.animation */
+/** @namespace clay.async */
+/** @namespace clay.camera */
+/** @namespace clay.compositor */
+/** @namespace clay.core */
+/** @namespace clay.geometry */
+/** @namespace clay.helper */
+/** @namespace clay.light */
+/** @namespace clay.loader */
+/** @namespace clay.particleSystem */
+/** @namespace clay.plugin */
+/** @namespace clay.prePass */
+/** @namespace clay.shader */
+/** @namespace clay.texture */
+/** @namespace clay.util */
 
 var animation = {
     Animation : Animation,
@@ -33626,6 +32897,7 @@ var canvas = {
 };
 var compositor = {
     Compositor : Compositor,
+    createCompositor : createCompositor,
     FilterNode : FilterNode$1,
     Graph : Graph,
     Node : Node$1,
@@ -33662,6 +32934,10 @@ var geometry = {
     Cylinder : Cylinder$1,
     Plane : Plane$2,
     Sphere : Sphere
+};
+var gpu = {
+    GLProgram : GLProgram,
+    ProgramManager : ProgramManager
 };
 var light = {
     Ambient : AmbientLight,
@@ -33705,7 +32981,7 @@ var picking = {
     RayPicking : RayPicking
 };
 var plugin = {
-    FirstPersonControl : FirstPersonControl,
+    FreeControl : FreeControl,
     GestureMgr : GestureMgr,
     InfinitePlane : InfinitePlane,
     OrbitControl : OrbitControl,
@@ -33714,7 +32990,6 @@ var plugin = {
 };
 var prePass = {
     EnvironmentMap : EnvironmentMapPass,
-    Reflection : ReflectionPass,
     ShadowMap : ShadowMapPass
 };
 var shader = {
@@ -33739,45 +33014,4 @@ var vr = {
     StereoCamera : StereoCamera
 };
 
-exports.animation = animation;
-exports.async = async;
-exports.Camera = Camera;
-exports.camera = camera;
-exports.canvas = canvas;
-exports.compositor = compositor;
-exports.core = core;
-exports.deferred = deferred;
-exports.dep = dep;
-exports.FrameBuffer = FrameBuffer;
-exports.Geometry = Geometry;
-exports.geometry = geometry;
-exports.Joint = Joint;
-exports.Light = Light;
-exports.light = light;
-exports.loader = loader;
-exports.Material = Material;
-exports.math = math;
-exports.Mesh = Mesh;
-exports.Node = Node;
-exports.particle = particle;
-exports.picking = picking;
-exports.plugin = plugin;
-exports.prePass = prePass;
-exports.Renderable = Renderable;
-exports.Renderer = Renderer;
-exports.Scene = Scene;
-exports.Shader = Shader;
-exports.shader = shader;
-exports.Skeleton = Skeleton;
-exports.StandardMaterial = StandardMaterial;
-exports.StaticGeometry = StaticGeometry;
-exports.Texture = Texture;
-exports.Texture2D = Texture2D;
-exports.TextureCube = TextureCube;
-exports.util = util;
-exports.version = version;
-exports.vr = vr;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+export { animation, async, Camera, camera, canvas, compositor, core, deferred, dep, FrameBuffer, Geometry, geometry, gpu, Joint, Light, light, loader, Material, math, Mesh, Node, particle, picking, plugin, prePass, Renderable, Renderer, Scene, Shader, shader, Skeleton, StandardMaterial, StaticGeometry, Texture, Texture2D, TextureCube, util, version, vr };
