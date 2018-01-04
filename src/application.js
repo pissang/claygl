@@ -12,6 +12,7 @@ import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
 import CylinderGeo from './geometry/Cylinder';
 import Texture2D from './Texture2D';
+import Texture from './Texture';
 import shaderLibrary from './shader/library';
 import Mesh from './Mesh';
 import Material from './Material';
@@ -80,9 +81,12 @@ function App3D(dom, appNS) {
         gTimeline.stop();
         gRenderer.disposeScene(gScene);
         dom.innerHTML = '';
-    }
+    };
 
     appNS.init && appNS.init(this);
+
+    var gTexturesList = {};
+    var gGeometriesList = {};
 
     if (appNS.loop) {
         gTimeline.on('frame', function (frameTime) {
@@ -90,12 +94,97 @@ function App3D(dom, appNS) {
             gElapsedTime += frameTime;
             appNS.loop(this);
 
-            var camera = gScene.getMainCamera();
-            camera.aspect = gRenderer.getViewportAspect();
-            gRenderer.render(gScene);
+            this._doRender(gRenderer, gScene);
+
+            // Mark all resources unused;
+            markUsed(gTexturesList);
+            markUsed(gGeometriesList);
+
+            // Collect resources used in this frame.
+            var newTexturesList = [];
+            var newGeometriesList = [];
+            this._collectResources(newTexturesList, newGeometriesList);
+
+            // Dispose those unsed resources.
+            checkAndDispose(this.renderer, gTexturesList);
+            checkAndDispose(this.renderer, gGeometriesList);
+
+            gTexturesList = newTexturesList;
+            gGeometriesList = newGeometriesList;
         }, this);
     }
 }
+
+function isImageLikeElement(val) {
+    return val instanceof Image
+        || val instanceof HTMLCanvasElement
+        || val instanceof HTMLVideoElement;
+}
+
+App3D.prototype._doRender = function (renderer, scene) {
+    var camera = scene.getMainCamera();
+    camera.aspect = renderer.getViewportAspect();
+    renderer.render(scene);
+};
+
+
+function markUsed(resourceList) {
+    for (var i = 0; i < resourceList.length; i++) {
+        resourceList[i].__used__ = 0;
+    }
+}
+
+function checkAndDispose(renderer, resourceList) {
+    for (var i = 0; i < resourceList.length; i++) {
+        if (!resourceList[i].__used__) {
+            resourceList[i].dispose(renderer);
+        }
+    }
+}
+
+function updateUsed(resource, list) {
+    list.push(resource);
+    resource.__used__ = resource.__used__ || 0;
+    resource.__used__++;
+}
+App3D.prototype._collectResources = function (textureResourceList, geometryResourceList) {
+
+    function trackQueue(queue) {
+        for (var i = 0; i < queue.length; i++) {
+            var renderable = queue[i];
+            var geometry = renderable.geometry;
+            var material = renderable.material;
+            updateUsed(geometry, geometryResourceList);
+
+            for (var name in material.uniforms) {
+                var val = material.uniforms[name].value;
+                if (val instanceof Texture) {
+                    updateUsed(val, textureResourceList);
+                }
+                else if (val instanceof Array) {
+                    for (var k = 0; k < val.length; k++) {
+                        if (val[k] instanceof Texture) {
+                            updateUsed(val[k], textureResourceList);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var scene = this.scene;
+
+    trackQueue(scene.opaqueList);
+    trackQueue(scene.transparentList);
+
+    for (var k = 0; k < scene.lights.length; k++) {
+        // Track AmbientCubemap
+        if (scene.lights[k].cubemap) {
+            updateUsed(scene.lights[k].cubemap, textureResourceList);
+        }
+    }
+
+};
 
 App3D.prototype.loadTexture = function (urlOrImg) {
     // TODO Promise ?
@@ -110,10 +199,9 @@ App3D.prototype.loadTexture = function (urlOrImg) {
                 reject();
             });
         }
-        else if (urlOrImg instanceof Image
-            || urlOrImg instanceof HTMLCanvasElement
-        ) {
+        else if (isImageLikeElement(urlOrImg)) {
             texture.image = urlOrImg;
+            texture.dynamic = urlOrImg instanceof HTMLVideoElement;
             resolve(texture);
         }
     });
@@ -134,7 +222,7 @@ App3D.prototype.createMaterial = function (matConfig) {
         if (material.uniforms[key]) {
             var val = matConfig[key];
             if (material.uniforms[key].type === 't'
-                && (typeof val === 'string' || val instanceof Image || val instanceof HTMLCanvasElement)
+                && (typeof val === 'string' || isImageLikeElement(val))
             ) {
                 // Try to load a texture.
                 this.loadTexture(val).then(makeTextureSetter(key));

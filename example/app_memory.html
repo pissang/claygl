@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <title>Memory test</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+            init: function (app) {
+                // Create camera
+                this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+
+                // Create light
+                var light = new clay.light.Directional();
+                light.position.set(1, 1, 1);
+                light.lookAt(clay.math.Vector3.ZERO);
+                app.scene.add(light);
+            },
+
+            loop: function (app) {
+                app.scene.remove(this._cube);
+                this._cube = app.createCube(1, {
+                    color: [Math.random(), Math.random(), Math.random()]
+                });
+                this._cube.position.set(Math.random(), Math.random(), Math.random());
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>

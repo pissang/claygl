@@ -1014,6 +1014,10 @@ var Geometry = Base.extend(function () {
                     var attribs = chunk.attributeBuffers[k];
                     renderer.gl.deleteBuffer(attribs.buffer);
                 }
+
+                if (chunk.indicesBuffer) {
+                    renderer.gl.deleteBuffer(chunk.indicesBuffer.buffer);
+                }
             }
         }
         cache.deleteContext(renderer.__uid__);
