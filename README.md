@@ -40,8 +40,49 @@ ClayGL is a WebGL graphic library.
 
 ### Quick Start
 
+##### Create a rotating cube
+
 ```html
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="lib/claygl.js"></script>
+</head>
+<body>
+    <canvas id="main"></canvas>
+
+    <script>
+        clay.application.create('#main', {
+
+            width: window.innerWidth,
+
+            height: window.innerHeight,
+
+            init: function (renderer, scene, timeline) {
+                // Create camera
+                var camera = new clay.camera.Perspective();
+                camera.position.set(0, 2, 5);
+                camera.lookAt(clay.math.Vector3.ZERO);
+                scene.add(camera);
+
+                // Create cube
+                this._cube = clay.application.createCube();
+                scene.add(this._cube);
+
+                // Create light
+                var light = new clay.light.Directional();
+                light.position.set(1, 1, 1);
+                light.lookAt(this._cube.position);
+                scene.add(light);
+            },
+
+            loop: function (renderer, scene, timeline) {
+                this._cube.rotation.rotateY(this.frameTime / 1000);
+            }
+        });
+    </script>
+</body>
+</html>
 ```
 
 ### Features
