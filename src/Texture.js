@@ -88,7 +88,7 @@ var Texture = Base.extend(
 
     /**
      * Anisotropic filtering, enabled if value is larger than 1
-     * @see http://blog.tojicode.com/2012/03/anisotropic-filtering-in-webgl.html
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/EXT_texture_filter_anisotropic
      * @type {number}
      */
     anisotropic: 1,

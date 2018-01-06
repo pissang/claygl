@@ -22,7 +22,18 @@ import Vector3 from './math/Vector3';
 
 import './shader/builtin';
 
-
+/**
+ * @constructor
+ * @alias clay.application.App3D
+ * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
+ * @param {Object} appNS
+ * @param {Function} init Initialization callback that will be called when initing app.
+ * @param {Function} loop Loop callback that will be called each frame.
+ * @param {number} [width] Container width.
+ * @param {number} [height] Container height.
+ * @param {number} [devicePixelRatio]
+ *
+ */
 function App3D(dom, appNS) {
 
     appNS = appNS || {};
@@ -61,13 +72,42 @@ function App3D(dom, appNS) {
     gTimeline.start();
 
     Object.defineProperties(this, {
+        /**
+         * @name clay.application.App3D#renderer
+         * @type {clay.Renderer}
+         */
         renderer: { get: function () { return gRenderer; }},
+        /**
+         * @name clay.application.App3D#scene
+         * @type {clay.Renderer}
+         */
         scene: { get: function () { return gScene; }},
+        /**
+         * @name clay.application.App3D#timeline
+         * @type {clay.Renderer}
+         */
         timeline: { get: function () { return gTimeline; }},
+        /**
+         * Time elapsed since last frame. Can be used in loop to calculate the movement.
+         * @name clay.application.App3D#frameTime
+         * @type {number}
+         */
         frameTime: { get: function () { return gFrameTime; }},
+        /**
+         * Time elapsed since application created.
+         * @name clay.application.App3D#elapsedTime
+         * @type {number}
+         */
         elapsedTime: { get: function () { return gElapsedTime; }}
     });
 
+    /**
+     * Resize the application. Will use the container clientWidth/clientHeight if width/height in parameters are not given.
+     * @method
+     * @memberOf {clay.application.App3D}
+     * @param {number} [width]
+     * @param {number} [height]
+     */
     this.resize = function (width, height) {
         gWidth = width || appNS.width || dom.clientWidth;
         gHeight = height || dom.height || dom.clientHeight;
@@ -185,13 +225,29 @@ App3D.prototype._collectResources = function (textureResourceList, geometryResou
     }
 
 };
-
-App3D.prototype.loadTexture = function (urlOrImg) {
+/**
+ * Load a texture from image or string.
+ * @param {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} img
+ * @param {Object} [opts] Texture options.
+ * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
+ * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
+ * @param {number} [opts.wrapS=clay.Texture.REPEAT] See {@link clay.Texture.wrapS}
+ * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
+ * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
+ * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
+ * @return {Promise}
+ * @example
+ *  app.loadTexture('diffuseMap.jpg')
+ *      .then(function (texture) {
+ *          material.set('diffuseMap', texture);
+ *      });
+ */
+App3D.prototype.loadTexture = function (urlOrImg, opts) {
+    var self = this;
     // TODO Promise ?
     return new Promise(function (resolve, reject) {
-        var texture = new Texture2D();
-        if (typeof urlOrImg === 'string') {
-            texture.load(urlOrImg);
+        var texture = self.loadTextureSync(urlOrImg, opts);
+        if (!texture.isRenderable()) {
             texture.success(function () {
                 resolve(texture);
             });
@@ -199,14 +255,50 @@ App3D.prototype.loadTexture = function (urlOrImg) {
                 reject();
             });
         }
-        else if (isImageLikeElement(urlOrImg)) {
-            texture.image = urlOrImg;
-            texture.dynamic = urlOrImg instanceof HTMLVideoElement;
+        else {
             resolve(texture);
         }
     });
 };
 
+/**
+ * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
+ * @param {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} img
+ * @param {Object} [opts] Texture options.
+ * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
+ * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
+ * @param {number} [opts.wrapS=clay.Texture.REPEAT] See {@link clay.Texture.wrapS}
+ * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
+ * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
+ * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
+ * @return {Promise}
+ * @example
+ *  var texture = app.loadTexture('diffuseMap.jpg', {
+ *      anisotropic: 8,
+ *      flipY: false
+ *  });
+ *  material.set('diffuseMap', texture);
+ */
+App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
+    var texture = new Texture2D(opts);
+    if (typeof urlOrImg === 'string') {
+        texture.load(urlOrImg);
+    }
+    else if (isImageLikeElement(urlOrImg)) {
+        texture.image = urlOrImg;
+        texture.dynamic = urlOrImg instanceof HTMLVideoElement;
+    }
+    return texture;
+};
+
+/**
+ * Create a material.
+ * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
+ *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
+ * @param {string} [shader='clay.standard']
+ * @param {boolean} [transparent=false] If material is transparent.
+ * @return {clay.Material}
+ */
 App3D.prototype.createMaterial = function (matConfig) {
     matConfig = matConfig || {};
     matConfig.shader = matConfig.shader || 'clay.standard';
@@ -221,9 +313,7 @@ App3D.prototype.createMaterial = function (matConfig) {
     for (var key in matConfig) {
         if (material.uniforms[key]) {
             var val = matConfig[key];
-            if (material.uniforms[key].type === 't'
-                && (typeof val === 'string' || isImageLikeElement(val))
-            ) {
+            if (material.uniforms[key].type === 't' || isImageLikeElement(val)) {
                 // Try to load a texture.
                 this.loadTexture(val).then(makeTextureSetter(key));
             }
@@ -231,6 +321,11 @@ App3D.prototype.createMaterial = function (matConfig) {
                 material.setUniform(key, val);
             }
         }
+    }
+
+    if (matConfig.transparent) {
+        matConfig.depthMask = false;
+        matConfig.transparent = true;
     }
     return material;
 };
@@ -246,6 +341,16 @@ function makeProceduralMeshCreator(createGeo) {
     };
 }
 
+/**
+ * Create a cube mesh and add it to the scene.
+ * @method
+ * @param {Array.<number>|number} [size=1] Cube size. Can be a number to represent both width, height and depth. Or an array to represent them respectively.
+ * @param {Object} [materialConfig]
+ * @return {clay.Mesh}
+ * @example
+ *  // Create a 2 width, 1 height, 3 depth white cube.
+ *  app.createCube([2, 1, 3])
+ */
 App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
     if (size == null) {
         size = 1;
@@ -260,6 +365,20 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
     });
 });
 
+/**
+ * Create a sphere mesh and add it to the scene.
+ * @method
+ * @param {number} [size=1] Sphere radius.
+ * @param {Object} [materialConfig]
+ * @return {clay.Mesh}
+ * @example
+ *  // Create a 2 radius blue semi-transparent sphere.
+ *  app.createSphere(2, {
+ *      color: [0, 0, 1],
+ *      transparent: true,
+ *      alpha: 0.5
+ *  })
+ */
 App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
     if (radius == null) {
         radius = 1;
@@ -269,6 +388,18 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
     });
 });
 
+/**
+ * Create a plane mesh and add it to the scene.
+ * @method
+ * @param {Array.<number>|number} [size=1] Plane size. Can be a number to represent both width and height. Or an array to represent them respectively.
+ * @param {Object} [materialConfig]
+ * @return {clay.Mesh}
+ * @example
+ *  // Create a 2 width, 1 height red color plane.
+ *  app.createPlane([2, 1], {
+ *      color: [1, 0, 0]
+ *  })
+ */
 App3D.prototype.createPlane = makeProceduralMeshCreator(function (size) {
     if (size == null) {
         size = 1;
@@ -282,9 +413,24 @@ App3D.prototype.createPlane = makeProceduralMeshCreator(function (size) {
     });
 });
 
+/**
+ * Create a perspective or orthographic camera and add it to the scene.
+ * @param {Array.<number>|clay.math.Vector3} position
+ * @param {Array.<number>|clay.math.Vector3} target
+ * @param {string} [type="perspective"] Can be 'perspective' or 'orthographic'(in short 'ortho')
+ * @return {clay.camera.Perspective}
+ */
 App3D.prototype.createCamera = function (position, target, type) {
-    var CameraCtor = (type === 'ortho' || type === 'orthographic')
-        ? OrthographicCamera : PerspectiveCamera;
+    var CameraCtor;
+    if (type === 'ortho' || type === 'orthographic') {
+        CameraCtor = OrthographicCamera;
+    }
+    else {
+        if (type !== 'perspective') {
+            console.error('Unkown camera type ' + type + '. Use default perspective camera');
+        }
+        CameraCtor = PerspectiveCamera;
+    }
 
     var camera = new CameraCtor();
     if (position instanceof Vector3) {
@@ -308,6 +454,29 @@ App3D.prototype.createCamera = function (position, target, type) {
 
 
 export default {
+    App3D: App3D,
+    /**
+     * Create a 3D application that will manage the app initialization and loop.
+     * @name clay.application.create
+     * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
+     * @param {Object} appNS
+     * @param {Function} init Initialization callback that will be called when initing app.
+     * @param {Function} loop Loop callback that will be called each frame.
+     * @param {number} [width] Container width.
+     * @param {number} [height] Container height.
+     * @param {number} [devicePixelRatio]
+     * @return {clay.application.App3D}
+     *
+     * @example
+     *  clay.application.create('#app', {
+     *      init: function (app) {
+     *          app.createCube();
+     *          var camera = app.createCamera();
+     *          camera.position.set(0, 0, 2);
+     *      },
+     *      loop: function () { // noop }
+     *  })
+     */
     create: function (dom, appNS) {
         return new App3D(dom, appNS);
     }
