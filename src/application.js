@@ -4,6 +4,7 @@
  * @namespace clay.application
  */
 
+ // TODO loadModel, createLight, geoCache, Shadow, RayPicking and event.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -19,6 +20,8 @@ import Material from './Material';
 import PerspectiveCamera from './camera/Perspective';
 import OrthographicCamera from './camera/Orthographic';
 import Vector3 from './math/Vector3';
+import GLTFLoader from './loader/GLTF';
+import Node from './Node';
 
 import './shader/builtin';
 
@@ -72,6 +75,12 @@ function App3D(dom, appNS) {
     gTimeline.start();
 
     Object.defineProperties(this, {
+        /**
+         * Container dom element
+         * @name clay.application.App3D#container
+         * @type {HTMLDomElement}
+         */
+        container: { get: function () { return dom; } },
         /**
          * @name clay.application.App3D#renderer
          * @type {clay.Renderer}
@@ -334,7 +343,7 @@ function makeProceduralMeshCreator(createGeo) {
     return function (size, mat) {
         var mesh = new Mesh({
             geometry: createGeo(size),
-            material: this.createMaterial(mat)
+            material: mat instanceof Material ? mat : this.createMaterial(mat)
         });
         this.scene.add(mesh);
         return mesh;
@@ -345,7 +354,7 @@ function makeProceduralMeshCreator(createGeo) {
  * Create a cube mesh and add it to the scene.
  * @method
  * @param {Array.<number>|number} [size=1] Cube size. Can be a number to represent both width, height and depth. Or an array to represent them respectively.
- * @param {Object} [materialConfig]
+ * @param {Object|clay.Material} [material]
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 width, 1 height, 3 depth white cube.
@@ -369,7 +378,7 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
  * Create a sphere mesh and add it to the scene.
  * @method
  * @param {number} [size=1] Sphere radius.
- * @param {Object} [materialConfig]
+ * @param {Object|clay.Material} [material]
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 radius blue semi-transparent sphere.
@@ -392,7 +401,7 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
  * Create a plane mesh and add it to the scene.
  * @method
  * @param {Array.<number>|number} [size=1] Plane size. Can be a number to represent both width and height. Or an array to represent them respectively.
- * @param {Object} [materialConfig]
+ * @param {Object|clay.Material} [material]
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 width, 1 height red color plane.
@@ -426,7 +435,7 @@ App3D.prototype.createCamera = function (position, target, type) {
         CameraCtor = OrthographicCamera;
     }
     else {
-        if (type !== 'perspective') {
+        if (type && type !== 'perspective') {
             console.error('Unkown camera type ' + type + '. Use default perspective camera');
         }
         CameraCtor = PerspectiveCamera;
@@ -450,6 +459,80 @@ App3D.prototype.createCamera = function (position, target, type) {
     this.scene.add(camera);
 
     return camera;
+};
+
+/**
+ * Load a [glTF](https://github.com/KhronosGroup/glTF) format model.
+ * You can convert FBX/DAE/OBJ format models to [glTF](https://github.com/KhronosGroup/glTF) with [fbx2gltf](https://github.com/pissang/claygl#fbx-to-gltf20-converter) python script,
+ * or more simply using the [Clay Viewer](https://github.com/pissang/clay-viewer) client application.
+ * @param {string} url
+ * @param {Object} opts
+ * @param {string} [opts.shader='lambert'] 'basic'|'lambert'|'standard'
+ * @param {boolean} [opts.waitTextureLoaded=false] If add to scene util textures are all loaded.
+ * @param {boolean} [opts.autoPlayAnimation=false] If autoplay the animation of model.
+ * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
+ * @param {boolean} [opts.textureFlipY=false]
+ * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
+ * @return {Promise}
+ */
+App3D.prototype.loadModel = function (url, opts) {
+    if (typeof url !== 'string') {
+        throw new Error('Invalid URL.');
+    }
+
+    opts = opts || {};
+    var shaderName = opts.shader || 'standard';
+
+    var loaderOpts = {
+        rootNode: new Node(),
+        shaderName: 'clay.' + shaderName,
+        textureRootPath: opts.textureRootPath,
+        crossOrigin: 'Anonymous',
+        textureFlipY: opts.textureFlipY
+    };
+
+    var loader = new GLTFLoader(loaderOpts);
+
+    var scene = this.scene;
+    var timeline = this.timeline;
+
+    return new Promise(function (resolve, reject) {
+        function afterLoad(result) {
+            scene.add(result.rootNode);
+            if (opts.autoPlayAnimation) {
+                result.clips.forEach(function (clip) {
+                    timeline.addClip(clip);
+                });
+            }
+            resolve(result);
+        }
+        loader.success(function (result) {
+            if (!opts.waitTextureLoaded) {
+                afterLoad(result);
+            }
+            else {
+                Promise.all(result.textures.map(function (texture) {
+                    if (texture.isRenderable()) {
+                        return Promise.resolve(texture);
+                    }
+                    else {
+                        return new Promise(function (resolve) {
+                            texture.success(resolve);
+                            texture.error(resolve);
+                        });
+                    }
+                })).then(function () {
+                    afterLoad(result);
+                }).catch(function () {
+                    afterLoad(result);
+                });
+            }
+        });
+        loader.error(function () {
+            reject();
+        });
+        loader.load(url);
+    });
 };
 
 
