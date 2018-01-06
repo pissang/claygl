@@ -4,7 +4,9 @@
  * @namespace clay.application
  */
 
- // TODO createCompositor, ambientCubemap, ambientSH, geoCache, Shadow, RayPicking and event.
+ // TODO createCompositor, ambientCubemap, ambientSH, geoCache.
+ // TODO mobile. scroll events.
+ // TODO Dispose test.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -29,6 +31,8 @@ import AmbientLight from './light/Ambient';
 import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
+import RayPicking from './picking/RayPicking';
+import util from './core/util';
 
 import { parseToFloat as parseColor } from './core/color';
 
@@ -53,7 +57,8 @@ import './shader/builtin';
  * @param {number} [height] Container height.
  * @param {number} [devicePixelRatio]
  * @param {Object} [graphic] Graphic configuration including shadow, postEffect
- * @param {boolean} [graphic.shadow] If enable shadow
+ * @param {boolean} [graphic.shadow=false] If enable shadow
+ * @param {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
  */
 function App3D(dom, appNS) {
 
@@ -64,32 +69,29 @@ function App3D(dom, appNS) {
         dom = document.querySelector(dom);
     }
 
-    if (!dom) {
-        throw new Error('Invalid dom');
-    }
+    if (!dom) { throw new Error('Invalid dom'); }
 
     var isDomCanvas = dom.nodeName.toUpperCase() === 'CANVAS';
     var rendererOpts = {};
-    if (isDomCanvas) {
-        rendererOpts.canvas = dom;
-    }
-    if (appNS.devicePixelRatio) {
-        rendererOpts.devicePixelRatio = appNS.devicePixelRatio;
-    }
+    isDomCanvas && (rendererOpts.canvas = dom);
+    appNS.devicePixelRatio && (rendererOpts.devicePixelRatio = appNS.devicePixelRatio);
 
     var gRenderer = new Renderer(rendererOpts);
     var gWidth = appNS.width || dom.clientWidth;
     var gHeight = appNS.height || dom.clientHeight;
 
-    var gShadowPass = appNS.graphic.shadow && new ShadowMapPass();
-
-    if (!isDomCanvas) {
-        dom.appendChild(gRenderer.canvas);
-    }
-    gRenderer.resize(gWidth, gHeight);
-
     var gScene = new Scene();
     var gTimeline = new Timeline();
+    var gShadowPass = appNS.graphic.shadow && new ShadowMapPass();
+    var gRayPicking = appNS.event && new RayPicking({
+        scene: gScene,
+        renderer: gRenderer
+    });
+
+    !isDomCanvas && dom.appendChild(gRenderer.canvas);
+
+    gRenderer.resize(gWidth, gHeight);
+
     var gFrameTime = 0;
     var gElapsedTime = 0;
 
@@ -144,6 +146,10 @@ function App3D(dom, appNS) {
         gRenderer.resize(gWidth, gHeight);
     };
 
+    /**
+     * Dispose the application
+     * @method
+     */
     this.dispose = function () {
         if (appNS.dispose) {
             appNS.dispose(this);
@@ -151,9 +157,16 @@ function App3D(dom, appNS) {
         gTimeline.stop();
         gRenderer.disposeScene(gScene);
         dom.innerHTML = '';
+        ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
+            this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
+        });
     };
 
+    gRayPicking && this._initMouseEvents(gRayPicking);
+
     appNS.init && appNS.init(this);
+    // Use the inited camera.
+    gRayPicking.camera = gScene.getMainCamera();
 
     var gTexturesList = {};
     var gGeometriesList = {};
@@ -165,10 +178,9 @@ function App3D(dom, appNS) {
             appNS.loop(this);
 
             gScene.update();
+            gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
             // Render shadow pass
-            if (gShadowPass) {
-                gShadowPass.render(gRenderer, gScene, null, true);
-            }
+            gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
 
             this._doRender(gRenderer, gScene, true);
 
@@ -179,15 +191,18 @@ function App3D(dom, appNS) {
             // Collect resources used in this frame.
             var newTexturesList = [];
             var newGeometriesList = [];
-            collectResources(this.scene, newTexturesList, newGeometriesList);
+            collectResources(gScene, newTexturesList, newGeometriesList);
 
             // Dispose those unsed resources.
-            checkAndDispose(this.renderer, gTexturesList);
-            checkAndDispose(this.renderer, gGeometriesList);
+            checkAndDispose(gRenderer, gTexturesList);
+            checkAndDispose(gRenderer, gGeometriesList);
 
             gTexturesList = newTexturesList;
             gGeometriesList = newGeometriesList;
         }, this);
+    }
+    else {
+        console.warn('Miss loop method.');
     }
 }
 
@@ -196,6 +211,65 @@ function isImageLikeElement(val) {
         || val instanceof HTMLCanvasElement
         || val instanceof HTMLVideoElement;
 }
+
+function makeHandlerName(eveType) {
+    return '_' + eveType + 'Handler';
+}
+
+function packageEvent(eventType, pickResult, offsetX, offsetY) {
+    var event = util.clone(pickResult);
+    event.type = eventType;
+    event.offsetX = offsetX;
+    event.offsetY = offsetY;
+    return event;
+}
+
+function bubblingEvent(target, event) {
+    while (target && !event.cancelBubble) {
+        target.trigger(event.type, event);
+        target = target.getParent();
+    }
+}
+
+App3D.prototype._initMouseEvents = function (rayPicking) {
+    var dom = this.container;
+
+    var oldTarget = null;
+    ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
+        dom.addEventListener(eveType, this[makeHandlerName(eveType)] = function (e) {
+            var box = dom.getBoundingClientRect();
+            var offsetX = e.clientX - box.left;
+            var offsetY = e.clientY - box.top;
+
+            var pickResult = rayPicking.pick(offsetX, offsetY);
+
+            if (pickResult) {
+                if (eveType === 'mousemove') {
+                    var targetChanged = pickResult.target !== oldTarget;
+                    if (targetChanged) {
+                        oldTarget && bubblingEvent(oldTarget, packageEvent('mouseout', {
+                            target: oldTarget
+                        }, offsetX, offsetY));
+                    }
+                    bubblingEvent(pickResult.target, packageEvent('mousemove', pickResult, offsetX, offsetY));
+                    if (targetChanged) {
+                        bubblingEvent(pickResult.target, packageEvent('mouseover', pickResult, offsetX, offsetY));
+                    }
+                }
+                else {
+                    bubblingEvent(pickResult.target, packageEvent(eveType, pickResult, offsetX, offsetY));
+                }
+                oldTarget = pickResult.target;
+            }
+            else if (oldTarget) {
+                bubblingEvent(oldTarget, packageEvent('mouseout', {
+                    target: oldTarget
+                }, offsetX, offsetY));
+                oldTarget = null;
+            }
+        });
+    }, this);
+};
 
 App3D.prototype._doRender = function (renderer, scene) {
     var camera = scene.getMainCamera();
