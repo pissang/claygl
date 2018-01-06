@@ -83,8 +83,9 @@ var Cube = Geometry.extend(
                     this.attributes[attrName].value[i + attrSize * vertexOffset] = value;
                 }
             }
+            var len = plane.indices.length;
             for (var i = 0; i < plane.indices.length; i++) {
-                this.indices[i + faceOffset] = vertexOffset + plane.indices[i];
+                this.indices[i + faceOffset] = vertexOffset + plane.indices[this.inside ? (len - i - 1) : i];
             }
             faceOffset += plane.indices.length;
             vertexOffset += plane.vertexCount;

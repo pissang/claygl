@@ -49,14 +49,14 @@
                 }, this._pointLight2);
 
 
-                var plane = app.createPlane(1, {
+                var cube = app.createCubeInside(1, {
                     roughness: 1,
                     color: [0.3, 0.3, 0.3]
                 });
                 // Plane not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
-                plane.castShadow = false;
-                plane.scale.set(1000, 1000, 1);
-                plane.rotation.rotateX(-Math.PI / 2);
+                cube.castShadow = false;
+                cube.scale.set(400, 400, 400);
+                cube.position.y = 400;
 
                 // Use orbit control
                 this._control = new clay.plugin.OrbitControl({
@@ -67,8 +67,8 @@
 
             loop: function (app) {
                 this._control.update(app.frameTime);
-                this._pointLight1.rotateAround(new clay.math.Vector3(0, 100, 0), new clay.math.Vector3(0.1, 0.1, 1), 0.1);
-                this._pointLight2.rotateAround(new clay.math.Vector3(0, 120, 0), new clay.math.Vector3(-0.1, -0.2, 1), 0.05);
+                this._pointLight1.rotateAround(new clay.math.Vector3(0, 100, 0), new clay.math.Vector3(0.1, 1, 0.1), 0.1);
+                this._pointLight2.rotateAround(new clay.math.Vector3(0, 120, 0), new clay.math.Vector3(-0.1, 1, -0.2), 0.05);
             }
         });
 

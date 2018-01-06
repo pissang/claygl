@@ -383,8 +383,8 @@ function makeProceduralMeshCreator(createGeo) {
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
- *  // Create a 2 width, 1 height, 3 depth white cube.
- *  app.createCube([2, 1, 3])
+ *  // Create a white cube.
+ *  app.createCube()
  */
 App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
     if (subdiv == null) {
@@ -401,6 +401,33 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
 });
 
 /**
+ * Create a cube mesh that camera is inside the cube.
+ * @method
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
+ *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
+ * @param {Object|clay.Material} [material]
+ * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @return {clay.Mesh}
+ * @example
+ *  // Create a white cube inside.
+ *  app.createCubeInside()
+ */
+App3D.prototype.createCubeInside = makeProceduralMeshCreator(function (subdiv) {
+    if (subdiv == null) {
+        subdiv = 1;
+    }
+    if (typeof subdiv === 'number') {
+        subdiv = [subdiv, subdiv, subdiv];
+    }
+    return new CubeGeo({
+        inside: true,
+        widthSegments: subdiv[0],
+        heightSegments: subdiv[1],
+        depthSegments: subdiv[2]
+    });
+});
+
+/**
  * Create a sphere mesh and add it to the scene or the given parent node.
  * @method
  * @param {number} [subdivision=20] Subdivision of sphere.
@@ -408,8 +435,8 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
- *  // Create a 2 radius blue semi-transparent sphere.
- *  app.createSphere(2, {
+ *  // Create a semi-transparent sphere.
+ *  app.createSphere(20, {
  *      color: [0, 0, 1],
  *      transparent: true,
  *      alpha: 0.5
@@ -434,8 +461,8 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (subdivision) 
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
- *  // Create a 2 width, 1 height red color plane.
- *  app.createPlane([2, 1], {
+ *  // Create a red color plane.
+ *  app.createPlane(1, {
  *      color: [1, 0, 0]
  *  })
  */
