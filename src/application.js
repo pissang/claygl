@@ -7,6 +7,7 @@
  // TODO createCompositor, ambientCubemap, ambientSH, geoCache.
  // TODO mobile. scroll events.
  // TODO Dispose test.
+ // TODO fitModel, normal generation.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -166,7 +167,7 @@ function App3D(dom, appNS) {
 
     appNS.init && appNS.init(this);
     // Use the inited camera.
-    gRayPicking.camera = gScene.getMainCamera();
+    gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
 
     var gTexturesList = {};
     var gGeometriesList = {};
@@ -422,6 +423,10 @@ App3D.prototype.createMaterial = function (matConfig) {
             if (material.uniforms[key].type === 't' || isImageLikeElement(val)) {
                 // Try to load a texture.
                 this.loadTexture(val).then(makeTextureSetter(key));
+            }
+            else if (typeof val === 'string') {
+                // Try to parse as a color.
+                material.setUniform(key, parseColor(val) || val);
             }
             else {
                 material.setUniform(key, val);
