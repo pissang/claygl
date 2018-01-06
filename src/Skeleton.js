@@ -145,16 +145,16 @@ var Skeleton = Base.extend(function () {
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
                 // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
                 //     mat4.multiply(
                 //         m4,
                 //         m4,
-                //         joint.node.worldTransform._array
+                //         joint.node.worldTransform.array
                 //     );
                 //     mat4.invert(m4, m4);
                 // }
                 // else {
-                    mat4.copy(m4, joint.node.worldTransform._array);
+                    mat4.copy(m4, joint.node.worldTransform.array);
                     mat4.invert(m4, m4);
                 // }
 
@@ -191,13 +191,13 @@ var Skeleton = Base.extend(function () {
                 var joint = this.joints[i];
                 mat4.multiply(
                     this._skinMatricesSubArrays[i],
-                    joint.node.worldTransform._array,
+                    joint.node.worldTransform.array,
                     this._jointMatricesSubArrays[i]
                 );
 
                 // Joint space is relative to root, if have
                 // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform._array);
+                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
                 //     mat4.multiply(
                 //         this._skinMatricesSubArrays[i],
                 //         m4,
@@ -244,13 +244,13 @@ var Skeleton = Base.extend(function () {
                 // Not update if there is no data.
                 // PENDING If sync pose.position, pose.rotation, pose.scale
                 if (pose.channels.position) {
-                    vec3.copy(joint.node.position._array, pose.position);
+                    vec3.copy(joint.node.position.array, pose.position);
                 }
                 if (pose.channels.rotation) {
-                    quat.copy(joint.node.rotation._array, pose.rotation);
+                    quat.copy(joint.node.rotation.array, pose.rotation);
                 }
                 if (pose.channels.scale) {
-                    vec3.copy(joint.node.scale._array, pose.scale);
+                    vec3.copy(joint.node.scale.array, pose.scale);
                 }
 
                 joint.node.position._dirty = true;

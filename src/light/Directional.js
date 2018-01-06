@@ -47,7 +47,7 @@ var DirectionalLight = Light.extend(
             value: function (instance) {
                 instance.__dir = instance.__dir || new Vector3();
                 // Direction is target to eye
-                return instance.__dir.copy(instance.worldTransform.z).normalize().negate()._array;
+                return instance.__dir.copy(instance.worldTransform.z).normalize().negate().array;
             }
         },
         directionalLightColor: {

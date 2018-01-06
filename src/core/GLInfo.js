@@ -4,7 +4,7 @@ var EXTENSION_LIST = [
     'OES_texture_float_linear',
     'OES_texture_half_float_linear',
     'OES_standard_derivatives',
-    'OES_vertex_array_object',
+    'OES_vertexarray_object',
     'OES_element_index_uint',
     'WEBGL_compressed_texture_s3tc',
     'WEBGL_depth_texture',

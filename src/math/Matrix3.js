@@ -9,11 +9,11 @@ var Matrix3 = function () {
 
     /**
      * Storage of Matrix3
-     * @name _array
+     * @name array
      * @type {Float32Array}
      * @memberOf clay.math.Matrix3#
      */
-    this._array = mat3.create();
+    this.array = mat3.create();
 
     /**
      * @name _dirty
@@ -32,8 +32,8 @@ Matrix3.prototype = {
      * @param  {Float32Array|number[]} arr
      */
     setArray: function (arr) {
-        for (var i = 0; i < this._array.length; i++) {
-            this._array[i] = arr[i];
+        for (var i = 0; i < this.array.length; i++) {
+            this.array[i] = arr[i];
         }
         this._dirty = true;
         return this;
@@ -43,7 +43,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     adjoint: function () {
-        mat3.adjoint(this._array, this._array);
+        mat3.adjoint(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -62,7 +62,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     copy: function (b) {
-        mat3.copy(this._array, b._array);
+        mat3.copy(this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -72,7 +72,7 @@ Matrix3.prototype = {
      * @return {number}
      */
     determinant: function () {
-        return mat3.determinant(this._array);
+        return mat3.determinant(this.array);
     },
 
     /**
@@ -81,7 +81,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     fromMat2d: function (a) {
-        mat3.fromMat2d(this._array, a._array);
+        mat3.fromMat2d(this.array, a.array);
         this._dirty = true;
         return this;
     },
@@ -92,7 +92,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     fromMat4: function (a) {
-        mat3.fromMat4(this._array, a._array);
+        mat3.fromMat4(this.array, a.array);
         this._dirty = true;
         return this;
     },
@@ -103,7 +103,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     fromQuat: function (q) {
-        mat3.fromQuat(this._array, q._array);
+        mat3.fromQuat(this.array, q.array);
         this._dirty = true;
         return this;
     },
@@ -113,7 +113,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     identity: function () {
-        mat3.identity(this._array);
+        mat3.identity(this.array);
         this._dirty = true;
         return this;
     },
@@ -123,7 +123,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     invert: function () {
-        mat3.invert(this._array, this._array);
+        mat3.invert(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -134,7 +134,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     mul: function (b) {
-        mat3.mul(this._array, this._array, b._array);
+        mat3.mul(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -145,7 +145,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     mulLeft: function (a) {
-        mat3.mul(this._array, a._array, this._array);
+        mat3.mul(this.array, a.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -156,7 +156,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     multiply: function (b) {
-        mat3.multiply(this._array, this._array, b._array);
+        mat3.multiply(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -167,7 +167,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     multiplyLeft: function (a) {
-        mat3.multiply(this._array, a._array, this._array);
+        mat3.multiply(this.array, a.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -178,7 +178,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     rotate: function (rad) {
-        mat3.rotate(this._array, this._array, rad);
+        mat3.rotate(this.array, this.array, rad);
         this._dirty = true;
         return this;
     },
@@ -189,7 +189,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     scale: function (v) {
-        mat3.scale(this._array, this._array, v._array);
+        mat3.scale(this.array, this.array, v.array);
         this._dirty = true;
         return this;
     },
@@ -200,7 +200,7 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix3}
      */
     translate: function (v) {
-        mat3.translate(this._array, this._array, v._array);
+        mat3.translate(this.array, this.array, v.array);
         this._dirty = true;
         return this;
     },
@@ -209,7 +209,7 @@ Matrix3.prototype = {
      * @param {clay.math.Matrix4} a
      */
     normalFromMat4: function (a) {
-        mat3.normalFromMat4(this._array, a._array);
+        mat3.normalFromMat4(this.array, a.array);
         this._dirty = true;
         return this;
     },
@@ -219,17 +219,17 @@ Matrix3.prototype = {
      * @return {clay.math.Matrix2}
      */
     transpose: function () {
-        mat3.transpose(this._array, this._array);
+        mat3.transpose(this.array, this.array);
         this._dirty = true;
         return this;
     },
 
     toString: function () {
-        return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        return '[' + Array.prototype.join.call(this.array, ',') + ']';
     },
 
     toArray: function () {
-        return Array.prototype.slice.call(this._array);
+        return Array.prototype.slice.call(this.array);
     }
 };
 /**
@@ -238,7 +238,7 @@ Matrix3.prototype = {
  * @return {clay.math.Matrix3}
  */
 Matrix3.adjoint = function (out, a) {
-    mat3.adjoint(out._array, a._array);
+    mat3.adjoint(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -249,7 +249,7 @@ Matrix3.adjoint = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.copy = function (out, a) {
-    mat3.copy(out._array, a._array);
+    mat3.copy(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -259,7 +259,7 @@ Matrix3.copy = function (out, a) {
  * @return {number}
  */
 Matrix3.determinant = function (a) {
-    return mat3.determinant(a._array);
+    return mat3.determinant(a.array);
 };
 
 /**
@@ -267,7 +267,7 @@ Matrix3.determinant = function (a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.identity = function (out) {
-    mat3.identity(out._array);
+    mat3.identity(out.array);
     out._dirty = true;
     return out;
 };
@@ -278,7 +278,7 @@ Matrix3.identity = function (out) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.invert = function (out, a) {
-    mat3.invert(out._array, a._array);
+    mat3.invert(out.array, a.array);
     return out;
 };
 
@@ -289,7 +289,7 @@ Matrix3.invert = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.mul = function (out, a, b) {
-    mat3.mul(out._array, a._array, b._array);
+    mat3.mul(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -309,7 +309,7 @@ Matrix3.multiply = Matrix3.mul;
  * @return {clay.math.Matrix3}
  */
 Matrix3.fromMat2d = function (out, a) {
-    mat3.fromMat2d(out._array, a._array);
+    mat3.fromMat2d(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -320,7 +320,7 @@ Matrix3.fromMat2d = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.fromMat4 = function (out, a) {
-    mat3.fromMat4(out._array, a._array);
+    mat3.fromMat4(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -331,7 +331,7 @@ Matrix3.fromMat4 = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.fromQuat = function (out, q) {
-    mat3.fromQuat(out._array, q._array);
+    mat3.fromQuat(out.array, q.array);
     out._dirty = true;
     return out;
 };
@@ -342,7 +342,7 @@ Matrix3.fromQuat = function (out, q) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.normalFromMat4 = function (out, a) {
-    mat3.normalFromMat4(out._array, a._array);
+    mat3.normalFromMat4(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -354,7 +354,7 @@ Matrix3.normalFromMat4 = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.rotate = function (out, a, rad) {
-    mat3.rotate(out._array, a._array, rad);
+    mat3.rotate(out.array, a.array, rad);
     out._dirty = true;
     return out;
 };
@@ -366,7 +366,7 @@ Matrix3.rotate = function (out, a, rad) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.scale = function (out, a, v) {
-    mat3.scale(out._array, a._array, v._array);
+    mat3.scale(out.array, a.array, v.array);
     out._dirty = true;
     return out;
 };
@@ -377,7 +377,7 @@ Matrix3.scale = function (out, a, v) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.transpose = function (out, a) {
-    mat3.transpose(out._array, a._array);
+    mat3.transpose(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -389,7 +389,7 @@ Matrix3.transpose = function (out, a) {
  * @return {clay.math.Matrix3}
  */
 Matrix3.translate = function (out, a, v) {
-    mat3.translate(out._array, a._array, v._array);
+    mat3.translate(out.array, a.array, v.array);
     out._dirty = true;
     return out;
 };

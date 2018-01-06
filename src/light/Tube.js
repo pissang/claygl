@@ -25,7 +25,7 @@ var TubeLight = Light.extend(
         tubeLightPosition: {
             type: '3f',
             value: function(instance) {
-                return instance.getWorldPosition()._array;
+                return instance.getWorldPosition().array;
             }
         },
 
@@ -36,7 +36,7 @@ var TubeLight = Light.extend(
                 return function(instance) {
                     // Extend in x axis
                     return x.copy(instance.worldTransform.x)
-                        .normalize().scale(instance.length / 2)._array;
+                        .normalize().scale(instance.length / 2).array;
                 };
             })()
         },

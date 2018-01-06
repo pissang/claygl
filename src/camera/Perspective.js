@@ -36,7 +36,7 @@ var Perspective = Camera.extend(
         this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
     },
     decomposeProjectionMatrix: function () {
-        var m = this.projectionMatrix._array;
+        var m = this.projectionMatrix.array;
         var rad = Math.atan(1 / m[5]) * 2;
         this.fov = rad / Math.PI * 180;
         this.aspect = m[5] / m[0];

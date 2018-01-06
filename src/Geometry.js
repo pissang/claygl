@@ -364,8 +364,8 @@ var Geometry = Base.extend(function () {
         if (posArr && posArr.length) {
             var min = bbox.min;
             var max = bbox.max;
-            var minArr = min._array;
-            var maxArr = max._array;
+            var minArr = min.array;
+            var maxArr = max.array;
             vec3.set(minArr, posArr[0], posArr[1], posArr[2]);
             vec3.set(maxArr, posArr[0], posArr[1], posArr[2]);
             for (var i = 3; i < posArr.length;) {
@@ -976,7 +976,7 @@ var Geometry = Base.extend(function () {
         var normals = attributes.normal.value;
         var tangents = attributes.tangent.value;
 
-        matrix = matrix._array;
+        matrix = matrix.array;
         // Normal Matrix
         var inverseTransposeMatrix = mat4.create();
         mat4.invert(inverseTransposeMatrix, matrix);

@@ -9,11 +9,11 @@ var Matrix2 = function() {
 
     /**
      * Storage of Matrix2
-     * @name _array
+     * @name array
      * @type {Float32Array}
      * @memberOf clay.math.Matrix2#
      */
-    this._array = mat2.create();
+    this.array = mat2.create();
 
     /**
      * @name _dirty
@@ -32,8 +32,8 @@ Matrix2.prototype = {
      * @param  {Float32Array|number[]} arr
      */
     setArray: function (arr) {
-        for (var i = 0; i < this._array.length; i++) {
-            this._array[i] = arr[i];
+        for (var i = 0; i < this.array.length; i++) {
+            this.array[i] = arr[i];
         }
         this._dirty = true;
         return this;
@@ -52,7 +52,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     copy: function(b) {
-        mat2.copy(this._array, b._array);
+        mat2.copy(this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -62,7 +62,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     adjoint: function() {
-        mat2.adjoint(this._array, this._array);
+        mat2.adjoint(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -72,7 +72,7 @@ Matrix2.prototype = {
      * @return {number}
      */
     determinant: function() {
-        return mat2.determinant(this._array);
+        return mat2.determinant(this.array);
     },
 
     /**
@@ -80,7 +80,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     identity: function() {
-        mat2.identity(this._array);
+        mat2.identity(this.array);
         this._dirty = true;
         return this;
     },
@@ -90,7 +90,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     invert: function() {
-        mat2.invert(this._array, this._array);
+        mat2.invert(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -101,7 +101,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     mul: function(b) {
-        mat2.mul(this._array, this._array, b._array);
+        mat2.mul(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -112,7 +112,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     mulLeft: function(a) {
-        mat2.mul(this._array, a._array, this._array);
+        mat2.mul(this.array, a.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -123,7 +123,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     multiply: function(b) {
-        mat2.multiply(this._array, this._array, b._array);
+        mat2.multiply(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -134,7 +134,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     multiplyLeft: function(a) {
-        mat2.multiply(this._array, a._array, this._array);
+        mat2.multiply(this.array, a.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -145,7 +145,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     rotate: function(rad) {
-        mat2.rotate(this._array, this._array, rad);
+        mat2.rotate(this.array, this.array, rad);
         this._dirty = true;
         return this;
     },
@@ -156,7 +156,7 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     scale: function(v) {
-        mat2.scale(this._array, this._array, v._array);
+        mat2.scale(this.array, this.array, v.array);
         this._dirty = true;
         return this;
     },
@@ -165,17 +165,17 @@ Matrix2.prototype = {
      * @return {clay.math.Matrix2}
      */
     transpose: function() {
-        mat2.transpose(this._array, this._array);
+        mat2.transpose(this.array, this.array);
         this._dirty = true;
         return this;
     },
 
     toString: function() {
-        return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        return '[' + Array.prototype.join.call(this.array, ',') + ']';
     },
 
     toArray: function () {
-        return Array.prototype.slice.call(this._array);
+        return Array.prototype.slice.call(this.array);
     }
 };
 
@@ -185,7 +185,7 @@ Matrix2.prototype = {
  * @return {Matrix2}
  */
 Matrix2.adjoint = function(out, a) {
-    mat2.adjoint(out._array, a._array);
+    mat2.adjoint(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -196,7 +196,7 @@ Matrix2.adjoint = function(out, a) {
  * @return {clay.math.Matrix2}
  */
 Matrix2.copy = function(out, a) {
-    mat2.copy(out._array, a._array);
+    mat2.copy(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -206,7 +206,7 @@ Matrix2.copy = function(out, a) {
  * @return {number}
  */
 Matrix2.determinant = function(a) {
-    return mat2.determinant(a._array);
+    return mat2.determinant(a.array);
 };
 
 /**
@@ -214,7 +214,7 @@ Matrix2.determinant = function(a) {
  * @return {clay.math.Matrix2}
  */
 Matrix2.identity = function(out) {
-    mat2.identity(out._array);
+    mat2.identity(out.array);
     out._dirty = true;
     return out;
 };
@@ -225,7 +225,7 @@ Matrix2.identity = function(out) {
  * @return {clay.math.Matrix2}
  */
 Matrix2.invert = function(out, a) {
-    mat2.invert(out._array, a._array);
+    mat2.invert(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -237,7 +237,7 @@ Matrix2.invert = function(out, a) {
  * @return {clay.math.Matrix2}
  */
 Matrix2.mul = function(out, a, b) {
-    mat2.mul(out._array, a._array, b._array);
+    mat2.mul(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -258,7 +258,7 @@ Matrix2.multiply = Matrix2.mul;
  * @return {clay.math.Matrix2}
  */
 Matrix2.rotate = function(out, a, rad) {
-    mat2.rotate(out._array, a._array, rad);
+    mat2.rotate(out.array, a.array, rad);
     out._dirty = true;
     return out;
 };
@@ -270,7 +270,7 @@ Matrix2.rotate = function(out, a, rad) {
  * @return {clay.math.Matrix2}
  */
 Matrix2.scale = function(out, a, v) {
-    mat2.scale(out._array, a._array, v._array);
+    mat2.scale(out.array, a.array, v.array);
     out._dirty = true;
     return out;
 };
@@ -280,7 +280,7 @@ Matrix2.scale = function(out, a, v) {
  * @return {Matrix2}
  */
 Matrix2.transpose = function(out, a) {
-    mat2.transpose(out._array, a._array);
+    mat2.transpose(out.array, a.array);
     out._dirty = true;
     return out;
 };

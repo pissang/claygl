@@ -33,10 +33,10 @@ Ray.prototype = {
      * @return {clay.math.Vector3}
      */
     intersectPlane: function (plane, out) {
-        var pn = plane.normal._array;
+        var pn = plane.normal.array;
         var d = plane.distance;
-        var ro = this.origin._array;
-        var rd = this.direction._array;
+        var ro = this.origin.array;
+        var rd = this.direction.array;
 
         var divider = vec3.dot(pn, rd);
         // ray is parallel to the plane
@@ -47,7 +47,7 @@ Ray.prototype = {
             out = new Vector3();
         }
         var t = (vec3.dot(pn, ro) - d) / divider;
-        vec3.scaleAndAdd(out._array, ro, rd, -t);
+        vec3.scaleAndAdd(out.array, ro, rd, -t);
         out._dirty = true;
         return out;
     },
@@ -58,19 +58,19 @@ Ray.prototype = {
      */
     mirrorAgainstPlane: function (plane) {
         // Distance to plane
-        var d = vec3.dot(plane.normal._array, this.direction._array);
-        vec3.scaleAndAdd(this.direction._array, this.direction._array, plane.normal._array, -d * 2);
+        var d = vec3.dot(plane.normal.array, this.direction.array);
+        vec3.scaleAndAdd(this.direction.array, this.direction.array, plane.normal.array, -d * 2);
         this.direction._dirty = true;
     },
 
     distanceToPoint: (function () {
         var v = vec3.create();
         return function (point) {
-            vec3.sub(v, point, this.origin._array);
+            vec3.sub(v, point, this.origin.array);
             // Distance from projection point to origin
-            var b = vec3.dot(v, this.direction._array);
+            var b = vec3.dot(v, this.direction.array);
             if (b < 0) {
-                return vec3.distance(this.origin._array, point);
+                return vec3.distance(this.origin.array, point);
             }
             // Squared distance from center to origin
             var c2 = vec3.lenSquared(v);
@@ -89,9 +89,9 @@ Ray.prototype = {
     intersectSphere: (function () {
         var v = vec3.create();
         return function (center, radius, out) {
-            var origin = this.origin._array;
-            var direction = this.direction._array;
-            center = center._array;
+            var origin = this.origin.array;
+            var direction = this.direction.array;
+            center = center.array;
             vec3.sub(v, center, origin);
             // Distance from projection point to origin
             var b = vec3.dot(v, direction);
@@ -120,12 +120,12 @@ Ray.prototype = {
                     return null;
                 }
                 else {
-                    vec3.scaleAndAdd(out._array, origin, direction, t1);
+                    vec3.scaleAndAdd(out.array, origin, direction, t1);
                     return out;
                 }
             }
             else {
-                vec3.scaleAndAdd(out._array, origin, direction, t0);
+                vec3.scaleAndAdd(out.array, origin, direction, t0);
                 return out;
             }
         };
@@ -139,10 +139,10 @@ Ray.prototype = {
      * @return {clay.math.Vector3}
      */
     intersectBoundingBox: function (bbox, out) {
-        var dir = this.direction._array;
-        var origin = this.origin._array;
-        var min = bbox.min._array;
-        var max = bbox.max._array;
+        var dir = this.direction.array;
+        var origin = this.origin.array;
+        var min = bbox.min.array;
+        var max = bbox.max.array;
 
         var invdirx = 1 / dir[0];
         var invdiry = 1 / dir[1];
@@ -205,7 +205,7 @@ Ray.prototype = {
         if (!out) {
             out = new Vector3();
         }
-        vec3.scaleAndAdd(out._array, origin, dir, t);
+        vec3.scaleAndAdd(out.array, origin, dir, t);
         return out;
     },
 
@@ -228,11 +228,11 @@ Ray.prototype = {
         var vCross = vec3.create();
 
         return function (a, b, c, singleSided, out, barycenteric) {
-            var dir = this.direction._array;
-            var origin = this.origin._array;
-            a = a._array;
-            b = b._array;
-            c = c._array;
+            var dir = this.direction.array;
+            var origin = this.origin.array;
+            a = a.array;
+            b = b.array;
+            c = c.array;
 
             vec3.sub(eBA, b, a);
             vec3.sub(eCA, c, a);
@@ -278,7 +278,7 @@ Ray.prototype = {
             if (barycenteric) {
                 Vector3.set(barycenteric, (1 - u - v), u, v);
             }
-            vec3.scaleAndAdd(out._array, origin, dir, t);
+            vec3.scaleAndAdd(out.array, origin, dir, t);
 
             return out;
         };

@@ -4,7 +4,7 @@
  * @namespace clay.application
  */
 
- // TODO loadModel, createLight, geoCache, Shadow, RayPicking and event.
+ // TODO createCompositor, createLight(ambientCubemap), geoCache, Shadow, RayPicking and event.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -22,6 +22,11 @@ import OrthographicCamera from './camera/Orthographic';
 import Vector3 from './math/Vector3';
 import GLTFLoader from './loader/GLTF';
 import Node from './Node';
+import DirectionalLight from './light/Directional';
+import PointLight from './light/Point';
+import AmbientLight from './light/Ambient';
+import AmbientCubemapLight from './light/AmbientCubemap';
+import AmbientSHLight from './light/AmbientSH';
 
 import './shader/builtin';
 
@@ -35,7 +40,8 @@ import './shader/builtin';
  * @param {number} [width] Container width.
  * @param {number} [height] Container height.
  * @param {number} [devicePixelRatio]
- *
+ * @param {Object} [graphic] Graphic configuration including shadow, postEffect
+ * @param {boolean} [graphic.shadow] If enable shadow
  */
 function App3D(dom, appNS) {
 
@@ -152,7 +158,7 @@ function App3D(dom, appNS) {
             // Collect resources used in this frame.
             var newTexturesList = [];
             var newGeometriesList = [];
-            this._collectResources(newTexturesList, newGeometriesList);
+            collectResources(this.scene, newTexturesList, newGeometriesList);
 
             // Dispose those unsed resources.
             checkAndDispose(this.renderer, gTexturesList);
@@ -196,8 +202,7 @@ function updateUsed(resource, list) {
     resource.__used__ = resource.__used__ || 0;
     resource.__used__++;
 }
-App3D.prototype._collectResources = function (textureResourceList, geometryResourceList) {
-
+function collectResources(scene, textureResourceList, geometryResourceList) {
     function trackQueue(queue) {
         for (var i = 0; i < queue.length; i++) {
             var renderable = queue[i];
@@ -221,8 +226,6 @@ App3D.prototype._collectResources = function (textureResourceList, geometryResou
         }
     }
 
-    var scene = this.scene;
-
     trackQueue(scene.opaqueList);
     trackQueue(scene.transparentList);
 
@@ -232,8 +235,7 @@ App3D.prototype._collectResources = function (textureResourceList, geometryResou
             updateUsed(scene.lights[k].cubemap, textureResourceList);
         }
     }
-
-};
+}
 /**
  * Load a texture from image or string.
  * @param {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} img
@@ -462,9 +464,23 @@ App3D.prototype.createCamera = function (position, target, type) {
 };
 
 /**
+ * Create a directional light and add it to the scene.
+ * @param {Array.<number>|clay.Vector3} dir
+ * @param {Array.<number>} [color] Light color, default to be white.
+ * @param {number} [intensity] Light intensity, default to be 1.
+ */
+App3D.prototype.createDirectionalLight = function (dir, color, intensity) {
+    var light = new DirectionalLight();
+    if (dir instanceof Vector3) {
+        dir = dir.array;
+    }
+    light.position.set();
+};
+
+/**
  * Load a [glTF](https://github.com/KhronosGroup/glTF) format model.
  * You can convert FBX/DAE/OBJ format models to [glTF](https://github.com/KhronosGroup/glTF) with [fbx2gltf](https://github.com/pissang/claygl#fbx-to-gltf20-converter) python script,
- * or more simply using the [Clay Viewer](https://github.com/pissang/clay-viewer) client application.
+ * or simply using the [Clay Viewer](https://github.com/pissang/clay-viewer) client application.
  * @param {string} url
  * @param {Object} opts
  * @param {string} [opts.shader='lambert'] 'basic'|'lambert'|'standard'

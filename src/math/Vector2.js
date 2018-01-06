@@ -13,13 +13,13 @@ var Vector2 = function(x, y) {
     y = y || 0;
 
     /**
-     * Storage of Vector2, read and write of x, y will change the values in _array
-     * All methods also operate on the _array instead of x, y components
-     * @name _array
+     * Storage of Vector2, read and write of x, y will change the values in array
+     * All methods also operate on the array instead of x, y components
+     * @name array
      * @type {Float32Array}
      * @memberOf clay.math.Vector2#
      */
-    this._array = vec2.fromValues(x, y);
+    this.array = vec2.fromValues(x, y);
 
     /**
      * Dirty flag is used by the Node to determine
@@ -41,7 +41,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     add: function(b) {
-        vec2.add(this._array, this._array, b._array);
+        vec2.add(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -53,8 +53,8 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     set: function(x, y) {
-        this._array[0] = x;
-        this._array[1] = y;
+        this.array[0] = x;
+        this.array[1] = y;
         this._dirty = true;
         return this;
     },
@@ -65,8 +65,8 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     setArray: function(arr) {
-        this._array[0] = arr[0];
-        this._array[1] = arr[1];
+        this.array[0] = arr[0];
+        this.array[1] = arr[1];
 
         this._dirty = true;
         return this;
@@ -86,7 +86,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     copy: function(b) {
-        vec2.copy(this._array, b._array);
+        vec2.copy(this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -98,7 +98,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     cross: function(out, b) {
-        vec2.cross(out._array, this._array, b._array);
+        vec2.cross(out.array, this.array, b.array);
         out._dirty = true;
         return this;
     },
@@ -109,7 +109,7 @@ Vector2.prototype = {
      * @return {number}
      */
     dist: function(b) {
-        return vec2.dist(this._array, b._array);
+        return vec2.dist(this.array, b.array);
     },
 
     /**
@@ -118,7 +118,7 @@ Vector2.prototype = {
      * @return {number}
      */
     distance: function(b) {
-        return vec2.distance(this._array, b._array);
+        return vec2.distance(this.array, b.array);
     },
 
     /**
@@ -127,7 +127,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     div: function(b) {
-        vec2.div(this._array, this._array, b._array);
+        vec2.div(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -138,7 +138,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     divide: function(b) {
-        vec2.divide(this._array, this._array, b._array);
+        vec2.divide(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -149,7 +149,7 @@ Vector2.prototype = {
      * @return {number}
      */
     dot: function(b) {
-        return vec2.dot(this._array, b._array);
+        return vec2.dot(this.array, b.array);
     },
 
     /**
@@ -157,7 +157,7 @@ Vector2.prototype = {
      * @return {number}
      */
     len: function() {
-        return vec2.len(this._array);
+        return vec2.len(this.array);
     },
 
     /**
@@ -165,7 +165,7 @@ Vector2.prototype = {
      * @return {number}
      */
     length: function() {
-        return vec2.length(this._array);
+        return vec2.length(this.array);
     },
 
     /**
@@ -176,7 +176,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     lerp: function(a, b, t) {
-        vec2.lerp(this._array, a._array, b._array, t);
+        vec2.lerp(this.array, a.array, b.array, t);
         this._dirty = true;
         return this;
     },
@@ -187,7 +187,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     min: function(b) {
-        vec2.min(this._array, this._array, b._array);
+        vec2.min(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -198,7 +198,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     max: function(b) {
-        vec2.max(this._array, this._array, b._array);
+        vec2.max(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -209,7 +209,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     mul: function(b) {
-        vec2.mul(this._array, this._array, b._array);
+        vec2.mul(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -220,7 +220,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     multiply: function(b) {
-        vec2.multiply(this._array, this._array, b._array);
+        vec2.multiply(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -230,7 +230,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     negate: function() {
-        vec2.negate(this._array, this._array);
+        vec2.negate(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -240,7 +240,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     normalize: function() {
-        vec2.normalize(this._array, this._array);
+        vec2.normalize(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -251,7 +251,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     random: function(scale) {
-        vec2.random(this._array, scale);
+        vec2.random(this.array, scale);
         this._dirty = true;
         return this;
     },
@@ -262,7 +262,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     scale: function(s) {
-        vec2.scale(this._array, this._array, s);
+        vec2.scale(this.array, this.array, s);
         this._dirty = true;
         return this;
     },
@@ -274,7 +274,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     scaleAndAdd: function(b, s) {
-        vec2.scaleAndAdd(this._array, this._array, b._array, s);
+        vec2.scaleAndAdd(this.array, this.array, b.array, s);
         this._dirty = true;
         return this;
     },
@@ -285,7 +285,7 @@ Vector2.prototype = {
      * @return {number}
      */
     sqrDist: function(b) {
-        return vec2.sqrDist(this._array, b._array);
+        return vec2.sqrDist(this.array, b.array);
     },
 
     /**
@@ -294,7 +294,7 @@ Vector2.prototype = {
      * @return {number}
      */
     squaredDistance: function(b) {
-        return vec2.squaredDistance(this._array, b._array);
+        return vec2.squaredDistance(this.array, b.array);
     },
 
     /**
@@ -302,7 +302,7 @@ Vector2.prototype = {
      * @return {number}
      */
     sqrLen: function() {
-        return vec2.sqrLen(this._array);
+        return vec2.sqrLen(this.array);
     },
 
     /**
@@ -310,7 +310,7 @@ Vector2.prototype = {
      * @return {number}
      */
     squaredLength: function() {
-        return vec2.squaredLength(this._array);
+        return vec2.squaredLength(this.array);
     },
 
     /**
@@ -319,7 +319,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     sub: function(b) {
-        vec2.sub(this._array, this._array, b._array);
+        vec2.sub(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -330,7 +330,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     subtract: function(b) {
-        vec2.subtract(this._array, this._array, b._array);
+        vec2.subtract(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -341,7 +341,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     transformMat2: function(m) {
-        vec2.transformMat2(this._array, this._array, m._array);
+        vec2.transformMat2(this.array, this.array, m.array);
         this._dirty = true;
         return this;
     },
@@ -352,7 +352,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     transformMat2d: function(m) {
-        vec2.transformMat2d(this._array, this._array, m._array);
+        vec2.transformMat2d(this.array, this.array, m.array);
         this._dirty = true;
         return this;
     },
@@ -363,7 +363,7 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     transformMat3: function(m) {
-        vec2.transformMat3(this._array, this._array, m._array);
+        vec2.transformMat3(this.array, this.array, m.array);
         this._dirty = true;
         return this;
     },
@@ -374,17 +374,17 @@ Vector2.prototype = {
      * @return {clay.math.Vector2}
      */
     transformMat4: function(m) {
-        vec2.transformMat4(this._array, this._array, m._array);
+        vec2.transformMat4(this.array, this.array, m.array);
         this._dirty = true;
         return this;
     },
 
     toString: function() {
-        return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        return '[' + Array.prototype.join.call(this.array, ',') + ']';
     },
 
     toArray: function () {
-        return Array.prototype.slice.call(this._array);
+        return Array.prototype.slice.call(this.array);
     }
 };
 
@@ -400,10 +400,10 @@ if (Object.defineProperty) {
      */
     Object.defineProperty(proto, 'x', {
         get: function () {
-            return this._array[0];
+            return this.array[0];
         },
         set: function (value) {
-            this._array[0] = value;
+            this.array[0] = value;
             this._dirty = true;
         }
     });
@@ -416,10 +416,10 @@ if (Object.defineProperty) {
      */
     Object.defineProperty(proto, 'y', {
         get: function () {
-            return this._array[1];
+            return this.array[1];
         },
         set: function (value) {
-            this._array[1] = value;
+            this.array[1] = value;
             this._dirty = true;
         }
     });
@@ -434,7 +434,7 @@ if (Object.defineProperty) {
  * @return {clay.math.Vector2}
  */
 Vector2.add = function(out, a, b) {
-    vec2.add(out._array, a._array, b._array);
+    vec2.add(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -446,7 +446,7 @@ Vector2.add = function(out, a, b) {
  * @return {clay.math.Vector2}
  */
 Vector2.set = function(out, x, y) {
-    vec2.set(out._array, x, y);
+    vec2.set(out.array, x, y);
     out._dirty = true;
     return out;
 };
@@ -457,7 +457,7 @@ Vector2.set = function(out, x, y) {
  * @return {clay.math.Vector2}
  */
 Vector2.copy = function(out, b) {
-    vec2.copy(out._array, b._array);
+    vec2.copy(out.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -469,7 +469,7 @@ Vector2.copy = function(out, b) {
  * @return {clay.math.Vector2}
  */
 Vector2.cross = function(out, a, b) {
-    vec2.cross(out._array, a._array, b._array);
+    vec2.cross(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -479,7 +479,7 @@ Vector2.cross = function(out, a, b) {
  * @return {number}
  */
 Vector2.dist = function(a, b) {
-    return vec2.distance(a._array, b._array);
+    return vec2.distance(a.array, b.array);
 };
 /**
  * @method
@@ -495,7 +495,7 @@ Vector2.distance = Vector2.dist;
  * @return {clay.math.Vector2}
  */
 Vector2.div = function(out, a, b) {
-    vec2.divide(out._array, a._array, b._array);
+    vec2.divide(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -513,7 +513,7 @@ Vector2.divide = Vector2.div;
  * @return {number}
  */
 Vector2.dot = function(a, b) {
-    return vec2.dot(a._array, b._array);
+    return vec2.dot(a.array, b.array);
 };
 
 /**
@@ -521,7 +521,7 @@ Vector2.dot = function(a, b) {
  * @return {number}
  */
 Vector2.len = function(b) {
-    return vec2.length(b._array);
+    return vec2.length(b.array);
 };
 
 // Vector2.length = Vector2.len;
@@ -534,7 +534,7 @@ Vector2.len = function(b) {
  * @return {clay.math.Vector2}
  */
 Vector2.lerp = function(out, a, b, t) {
-    vec2.lerp(out._array, a._array, b._array, t);
+    vec2.lerp(out.array, a.array, b.array, t);
     out._dirty = true;
     return out;
 };
@@ -545,7 +545,7 @@ Vector2.lerp = function(out, a, b, t) {
  * @return {clay.math.Vector2}
  */
 Vector2.min = function(out, a, b) {
-    vec2.min(out._array, a._array, b._array);
+    vec2.min(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -557,7 +557,7 @@ Vector2.min = function(out, a, b) {
  * @return {clay.math.Vector2}
  */
 Vector2.max = function(out, a, b) {
-    vec2.max(out._array, a._array, b._array);
+    vec2.max(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -568,7 +568,7 @@ Vector2.max = function(out, a, b) {
  * @return {clay.math.Vector2}
  */
 Vector2.mul = function(out, a, b) {
-    vec2.multiply(out._array, a._array, b._array);
+    vec2.multiply(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -586,7 +586,7 @@ Vector2.multiply = Vector2.mul;
  * @return {clay.math.Vector2}
  */
 Vector2.negate = function(out, a) {
-    vec2.negate(out._array, a._array);
+    vec2.negate(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -596,7 +596,7 @@ Vector2.negate = function(out, a) {
  * @return {clay.math.Vector2}
  */
 Vector2.normalize = function(out, a) {
-    vec2.normalize(out._array, a._array);
+    vec2.normalize(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -606,7 +606,7 @@ Vector2.normalize = function(out, a) {
  * @return {clay.math.Vector2}
  */
 Vector2.random = function(out, scale) {
-    vec2.random(out._array, scale);
+    vec2.random(out.array, scale);
     out._dirty = true;
     return out;
 };
@@ -617,7 +617,7 @@ Vector2.random = function(out, scale) {
  * @return {clay.math.Vector2}
  */
 Vector2.scale = function(out, a, scale) {
-    vec2.scale(out._array, a._array, scale);
+    vec2.scale(out.array, a.array, scale);
     out._dirty = true;
     return out;
 };
@@ -629,7 +629,7 @@ Vector2.scale = function(out, a, scale) {
  * @return {clay.math.Vector2}
  */
 Vector2.scaleAndAdd = function(out, a, b, scale) {
-    vec2.scaleAndAdd(out._array, a._array, b._array, scale);
+    vec2.scaleAndAdd(out.array, a.array, b.array, scale);
     out._dirty = true;
     return out;
 };
@@ -639,7 +639,7 @@ Vector2.scaleAndAdd = function(out, a, b, scale) {
  * @return {number}
  */
 Vector2.sqrDist = function(a, b) {
-    return vec2.sqrDist(a._array, b._array);
+    return vec2.sqrDist(a.array, b.array);
 };
 /**
  * @method
@@ -654,7 +654,7 @@ Vector2.squaredDistance = Vector2.sqrDist;
  * @return {number}
  */
 Vector2.sqrLen = function(a) {
-    return vec2.sqrLen(a._array);
+    return vec2.sqrLen(a.array);
 };
 /**
  * @method
@@ -670,7 +670,7 @@ Vector2.squaredLength = Vector2.sqrLen;
  * @return {clay.math.Vector2}
  */
 Vector2.sub = function(out, a, b) {
-    vec2.subtract(out._array, a._array, b._array);
+    vec2.subtract(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -689,7 +689,7 @@ Vector2.subtract = Vector2.sub;
  * @return {clay.math.Vector2}
  */
 Vector2.transformMat2 = function(out, a, m) {
-    vec2.transformMat2(out._array, a._array, m._array);
+    vec2.transformMat2(out.array, a.array, m.array);
     out._dirty = true;
     return out;
 };
@@ -700,7 +700,7 @@ Vector2.transformMat2 = function(out, a, m) {
  * @return {clay.math.Vector2}
  */
 Vector2.transformMat2d = function(out, a, m) {
-    vec2.transformMat2d(out._array, a._array, m._array);
+    vec2.transformMat2d(out.array, a.array, m.array);
     out._dirty = true;
     return out;
 };
@@ -711,7 +711,7 @@ Vector2.transformMat2d = function(out, a, m) {
  * @return {clay.math.Vector2}
  */
 Vector2.transformMat3 = function(out, a, m) {
-    vec2.transformMat3(out._array, a._array, m._array);
+    vec2.transformMat3(out.array, a.array, m.array);
     out._dirty = true;
     return out;
 };
@@ -722,7 +722,7 @@ Vector2.transformMat3 = function(out, a, m) {
  * @return {clay.math.Vector2}
  */
 Vector2.transformMat4 = function(out, a, m) {
-    vec2.transformMat4(out._array, a._array, m._array);
+    vec2.transformMat4(out.array, a.array, m.array);
     out._dirty = true;
     return out;
 };

@@ -274,8 +274,8 @@ Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
 
         // TODO Can't detect operation like box.min = new Vector()
         if (value) {
-            this.setUniform('environmentBoxMin', value.min._array);
-            this.setUniform('environmentBoxMax', value.max._array);
+            this.setUniform('environmentBoxMin', value.min.array);
+            this.setUniform('environmentBoxMax', value.max.array);
         }
 
         if (value) {

@@ -402,11 +402,11 @@ var ShadowMapPass = Base.extend(function () {
 
             var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
-            var lvpMat4Arr = lightViewProjMatrix._array;
+            var lvpMat4Arr = lightViewProjMatrix.array;
             lightProjMatrix.copy(lightCamera.projectionMatrix);
-            mat4.invert(lightViewMatrix._array, lightCamera.worldTransform._array);
-            mat4.multiply(lightViewMatrix._array, lightViewMatrix._array, sceneCamera.worldTransform._array);
-            mat4.multiply(lvpMat4Arr, lightProjMatrix._array, lightViewMatrix._array);
+            mat4.invert(lightViewMatrix.array, lightCamera.worldTransform.array);
+            mat4.multiply(lightViewMatrix.array, lightViewMatrix.array, sceneCamera.worldTransform.array);
+            mat4.multiply(lvpMat4Arr, lightProjMatrix.array, lightViewMatrix.array);
 
             var clipPlanes = [];
             var isPerspective = sceneCamera instanceof PerspectiveCamera;
@@ -435,11 +435,11 @@ var ShadowMapPass = Base.extend(function () {
                 var nearPlane = clipPlanes[i];
                 var farPlane = clipPlanes[i + 1];
                 if (isPerspective) {
-                    mat4.perspective(splitProjMatrix._array, sceneCamera.fov / 180 * Math.PI, sceneCamera.aspect, nearPlane, farPlane);
+                    mat4.perspective(splitProjMatrix.array, sceneCamera.fov / 180 * Math.PI, sceneCamera.aspect, nearPlane, farPlane);
                 }
                 else {
                     mat4.ortho(
-                        splitProjMatrix._array,
+                        splitProjMatrix.array,
                         sceneCamera.left, sceneCamera.right, sceneCamera.bottom, sceneCamera.top,
                         nearPlane, farPlane
                     );
@@ -447,8 +447,8 @@ var ShadowMapPass = Base.extend(function () {
                 splitFrustum.setFromProjection(splitProjMatrix);
                 splitFrustum.getTransformedBoundingBox(cropBBox, lightViewMatrix);
                 cropBBox.applyProjection(lightProjMatrix);
-                var _min = cropBBox.min._array;
-                var _max = cropBBox.max._array;
+                var _min = cropBBox.min.array;
+                var _max = cropBBox.max.array;
                 _min[0] = Math.max(_min[0], -1);
                 _min[1] = Math.max(_min[1], -1);
                 _max[0] = Math.min(_max[0], 1);
@@ -472,7 +472,7 @@ var ShadowMapPass = Base.extend(function () {
                 matrix.copy(lightCamera.viewMatrix)
                     .multiplyLeft(lightCamera.projectionMatrix);
 
-                directionalLightMatrices.push(matrix._array);
+                directionalLightMatrices.push(matrix.array);
 
                 lightCamera.projectionMatrix.copy(lightProjMatrix);
             }
@@ -517,7 +517,7 @@ var ShadowMapPass = Base.extend(function () {
             .multiplyLeft(lightCamera.projectionMatrix);
 
         spotLightShadowMaps.push(texture);
-        spotLightMatrices.push(matrix._array);
+        spotLightMatrices.push(matrix.array);
     },
 
     renderPointLightShadow: function (renderer, scene, light, casters, pointLightShadowMaps) {
@@ -573,7 +573,7 @@ var ShadowMapPass = Base.extend(function () {
         }
 
         if (isPointLight) {
-            shadowMaterial.set('lightPosition', light.getWorldPosition()._array);
+            shadowMaterial.set('lightPosition', light.getWorldPosition().array);
             shadowMaterial.set('range', light.range);
         }
 
@@ -706,8 +706,8 @@ var ShadowMapPass = Base.extend(function () {
 
             lightViewBBox.copy(sceneViewBoundingBox).applyTransform(lightViewMatrix);
 
-            var min = lightViewBBox.min._array;
-            var max = lightViewBBox.max._array;
+            var min = lightViewBBox.min.array;
+            var max = lightViewBBox.max.array;
 
             // Move camera to adjust the near to 0
             camera.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, max[2])
@@ -741,7 +741,7 @@ var ShadowMapPass = Base.extend(function () {
         camera.far = light.range;
         camera.worldTransform.copy(light.worldTransform);
         camera.updateProjectionMatrix();
-        mat4.invert(camera.viewMatrix._array, camera.worldTransform._array);
+        mat4.invert(camera.viewMatrix.array, camera.worldTransform.array);
 
         return camera;
     },

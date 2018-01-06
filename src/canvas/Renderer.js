@@ -208,7 +208,7 @@ var CanvasRenderer = Base.extend({
 
     renderPass: function (list, camera) {
         var viewProj = mat4.create();
-        mat4.multiply(viewProj, camera.projectionMatrix._array, camera.viewMatrix._array);
+        mat4.multiply(viewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
         var worldViewProjMat = mat4.create();
         var posViewSpace = vec3.create();
 
@@ -228,7 +228,7 @@ var CanvasRenderer = Base.extend({
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
 
-            mat4.multiply(worldViewProjMat, viewProj, renderable.worldTransform._array);
+            mat4.multiply(worldViewProjMat, viewProj, renderable.worldTransform.array);
 
             var geometry = renderable.geometry;
             var material = renderable.material;

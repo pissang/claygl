@@ -413,7 +413,7 @@ var Node = Base.extend(
      * @param {clay.math.Matrix4} matrix
      */
     setLocalTransform: function (matrix) {
-        mat4.copy(this.localTransform._array, matrix._array);
+        mat4.copy(this.localTransform.array, matrix.array);
         this.decomposeLocalTransform();
     },
 
@@ -430,7 +430,7 @@ var Node = Base.extend(
      * @param {clay.math.Matrix4} matrix
      */
     setWorldTransform: function (matrix) {
-        mat4.copy(this.worldTransform._array, matrix._array);
+        mat4.copy(this.worldTransform.array, matrix.array);
         this.decomposeWorldTransform();
     },
 
@@ -447,10 +447,10 @@ var Node = Base.extend(
             var worldTransform = this.worldTransform;
             // Assume world transform is updated
             if (this._parent) {
-                mat4.invert(tmp, this._parent.worldTransform._array);
-                mat4.multiply(localTransform._array, tmp, worldTransform._array);
+                mat4.invert(tmp, this._parent.worldTransform.array);
+                mat4.multiply(localTransform.array, tmp, worldTransform.array);
             } else {
-                mat4.copy(localTransform._array, worldTransform._array);
+                mat4.copy(localTransform.array, worldTransform.array);
             }
             var scale = !keepScale ? this.scale: null;
             localTransform.decomposeMatrix(scale, this.rotation, this.position);
@@ -473,12 +473,12 @@ var Node = Base.extend(
         var scale = this.scale;
 
         if (this.transformNeedsUpdate()) {
-            var m = this.localTransform._array;
+            var m = this.localTransform.array;
 
             // Transform order, scale->rotation->position
-            mat4.fromRotationTranslation(m, rotation._array, position._array);
+            mat4.fromRotationTranslation(m, rotation.array, position.array);
 
-            mat4.scale(m, m, scale._array);
+            mat4.scale(m, m, scale.array);
 
             rotation._dirty = false;
             scale._dirty = false;
@@ -493,12 +493,12 @@ var Node = Base.extend(
      * @private
      */
     _updateWorldTransformTopDown: function () {
-        var localTransform = this.localTransform._array;
-        var worldTransform = this.worldTransform._array;
+        var localTransform = this.localTransform.array;
+        var worldTransform = this.worldTransform.array;
         if (this._parent) {
             mat4.multiplyAffine(
                 worldTransform,
-                this._parent.worldTransform._array,
+                this._parent.worldTransform.array,
                 localTransform
             );
         }
@@ -594,9 +594,9 @@ var Node = Base.extend(
         if (this.transformNeedsUpdate()) {
             this.updateWorldTransform();
         }
-        var m = this.worldTransform._array;
+        var m = this.worldTransform.array;
         if (out) {
-            var arr = out._array;
+            var arr = out.array;
             arr[0] = m[12];
             arr[1] = m[13];
             arr[2] = m[14];

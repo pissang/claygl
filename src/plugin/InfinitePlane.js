@@ -49,8 +49,8 @@ var InfinitePlane = Mesh.extend({
 
         for (var i = 0; i < 6; i++) {
             var idx = tris[i];
-            positionAttr.set(i, coords[idx]._array);
-            normalAttr.set(i, this.plane.normal._array);
+            positionAttr.set(i, coords[idx].array);
+            normalAttr.set(i, this.plane.normal.array);
             texcoords.set(i, uvs[idx]);
             indices[i] = i;
         }
@@ -91,8 +91,8 @@ var InfinitePlane = Mesh.extend({
             var nPoints = 0;
             // Intersect with lines of frustum
             for (var i = 0; i < 12; i++) {
-                start._array = frustumVertices[lines[i * 2]];
-                end._array = frustumVertices[lines[i * 2 + 1]];
+                start.array = frustumVertices[lines[i * 2]];
+                end.array = frustumVertices[lines[i * 2 + 1]];
 
                 var point = planeViewSpace.intersectLine(start, end, points[nPoints]);
                 if (point) {
@@ -108,27 +108,27 @@ var InfinitePlane = Mesh.extend({
             for (var i = 0; i < nPoints; i++) {
                 points[i].applyProjection(this.camera.projectionMatrix);
             }
-            var minX = points[0]._array[0];
-            var minY = points[0]._array[1];
-            var maxX = points[0]._array[0];
-            var maxY = points[0]._array[1];
+            var minX = points[0].array[0];
+            var minY = points[0].array[1];
+            var maxX = points[0].array[0];
+            var maxY = points[0].array[1];
             for (var i = 1; i < nPoints; i++) {
-                maxX = Math.max(maxX, points[i]._array[0]);
-                maxY = Math.max(maxY, points[i]._array[1]);
-                minX = Math.min(minX, points[i]._array[0]);
-                minY = Math.min(minY, points[i]._array[1]);
+                maxX = Math.max(maxX, points[i].array[0]);
+                maxY = Math.max(maxY, points[i].array[1]);
+                minX = Math.min(minX, points[i].array[0]);
+                minY = Math.min(minY, points[i].array[1]);
             }
             if (minX == maxX || minY == maxY) {
                 return;
             }
-            coords[0]._array[0] = minX;
-            coords[0]._array[1] = minY;
-            coords[1]._array[0] = minX;
-            coords[1]._array[1] = maxY;
-            coords[2]._array[0] = maxX;
-            coords[2]._array[1] = maxY;
-            coords[3]._array[0] = maxX;
-            coords[3]._array[1] = minY;
+            coords[0].array[0] = minX;
+            coords[0].array[1] = minY;
+            coords[1].array[0] = minX;
+            coords[1].array[1] = maxY;
+            coords[2].array[0] = maxX;
+            coords[2].array[1] = maxY;
+            coords[3].array[0] = maxX;
+            coords[3].array[1] = minY;
 
             for (var i = 0; i < 4; i++) {
                 this.camera.castRay(coords[i], ray);

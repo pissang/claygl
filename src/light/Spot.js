@@ -40,7 +40,7 @@ var SpotLight = Light.extend(
         spotLightPosition: {
             type: '3f',
             value: function (instance) {
-                return instance.getWorldPosition()._array;
+                return instance.getWorldPosition().array;
             }
         },
         spotLightRange: {
@@ -72,7 +72,7 @@ var SpotLight = Light.extend(
             value: function (instance) {
                 instance.__dir = instance.__dir || new Vector3();
                 // Direction is target to eye
-                return instance.__dir.copy(instance.worldTransform.z).negate()._array;
+                return instance.__dir.copy(instance.worldTransform.z).negate().array;
             }
         },
         spotLightColor: {

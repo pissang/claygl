@@ -190,9 +190,9 @@ var RayPicking = Base.extend(
                 var finalPosAttr = isSkinnedMesh
                     ? geometry.attributes.skinnedPosition
                     : positionAttr;
-                finalPosAttr.get(i1, v1._array);
-                finalPosAttr.get(i2, v2._array);
-                finalPosAttr.get(i3, v3._array);
+                finalPosAttr.get(i1, v1.array);
+                finalPosAttr.get(i2, v2.array);
+                finalPosAttr.get(i3, v3.array);
 
                 if (cullBack) {
                     point = ray.intersectTriangle(v1, v2, v3, renderable.culling);

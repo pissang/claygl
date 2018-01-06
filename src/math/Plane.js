@@ -34,7 +34,7 @@ Plane.prototype = {
      * @return {number}
      */
     distanceToPoint: function(point) {
-        return vec3.dot(point._array, this.normal._array) - this.distance;
+        return vec3.dot(point.array, this.normal.array) - this.distance;
     },
 
     /**
@@ -48,7 +48,7 @@ Plane.prototype = {
             out = new Vector3();
         }
         var d = this.distanceToPoint(point);
-        vec3.scaleAndAdd(out._array, point._array, this.normal._array, -d);
+        vec3.scaleAndAdd(out.array, point.array, this.normal.array, -d);
         out._dirty = true;
         return out;
     },
@@ -57,8 +57,8 @@ Plane.prototype = {
      * Normalize the plane's normal and calculate the distance
      */
     normalize: function() {
-        var invLen = 1 / vec3.len(this.normal._array);
-        vec3.scale(this.normal._array, invLen);
+        var invLen = 1 / vec3.len(this.normal.array);
+        vec3.scale(this.normal.array, invLen);
         this.distance *= invLen;
     },
 
@@ -70,10 +70,10 @@ Plane.prototype = {
     intersectFrustum: function(frustum) {
         // Check if all coords of frustum is on plane all under plane
         var coords = frustum.vertices;
-        var normal = this.normal._array;
-        var onPlane = vec3.dot(coords[0]._array, normal) > this.distance;
+        var normal = this.normal.array;
+        var onPlane = vec3.dot(coords[0].array, normal) > this.distance;
         for (var i = 1; i < 8; i++) {
-            if ((vec3.dot(coords[i]._array, normal) > this.distance) != onPlane) {
+            if ((vec3.dot(coords[i].array, normal) > this.distance) != onPlane) {
                 return true;
             }
         }
@@ -96,11 +96,11 @@ Plane.prototype = {
                 return null;
             }
             // Ray intersection
-            var pn = this.normal._array;
+            var pn = this.normal.array;
             var d = this.distance;
-            var ro = start._array;
+            var ro = start.array;
             // direction
-            vec3.sub(rd, end._array, start._array);
+            vec3.sub(rd, end.array, start.array);
             vec3.normalize(rd, rd);
 
             var divider = vec3.dot(pn, rd);
@@ -112,7 +112,7 @@ Plane.prototype = {
                 out = new Vector3();
             }
             var t = (vec3.dot(pn, ro) - d) / divider;
-            vec3.scaleAndAdd(out._array, ro, rd, -t);
+            vec3.scaleAndAdd(out.array, ro, rd, -t);
             out._dirty = true;
             return out;
         };
@@ -129,18 +129,18 @@ Plane.prototype = {
         var pointv4 = vec4.create();
         pointv4[3] = 1;
         return function(m4) {
-            m4 = m4._array;
+            m4 = m4.array;
             // Transform point on plane
-            vec3.scale(pointv4, this.normal._array, this.distance);
+            vec3.scale(pointv4, this.normal.array, this.distance);
             vec4.transformMat4(pointv4, pointv4, m4);
-            this.distance = vec3.dot(pointv4, this.normal._array);
+            this.distance = vec3.dot(pointv4, this.normal.array);
             // Transform plane normal
             mat4.invert(inverseTranspose, m4);
             mat4.transpose(inverseTranspose, inverseTranspose);
             normalv4[3] = 0;
-            vec3.copy(normalv4, this.normal._array);
+            vec3.copy(normalv4, this.normal.array);
             vec4.transformMat4(normalv4, normalv4, inverseTranspose);
-            vec3.copy(this.normal._array, normalv4);
+            vec3.copy(this.normal.array, normalv4);
         };
     })(),
 
@@ -149,7 +149,7 @@ Plane.prototype = {
      * @param  {clay.math.Vector3} plane
      */
     copy: function(plane) {
-        vec3.copy(this.normal._array, plane.normal._array);
+        vec3.copy(this.normal.array, plane.normal.array);
         this.normal._dirty = true;
         this.distance = plane.distance;
     },

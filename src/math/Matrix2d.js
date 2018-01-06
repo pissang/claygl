@@ -8,11 +8,11 @@ var mat2d = glMatrix.mat2d;
 var Matrix2d = function() {
     /**
      * Storage of Matrix2d
-     * @name _array
+     * @name array
      * @type {Float32Array}
      * @memberOf clay.math.Matrix2d#
      */
-    this._array = mat2d.create();
+    this.array = mat2d.create();
 
     /**
      * @name _dirty
@@ -31,8 +31,8 @@ Matrix2d.prototype = {
      * @param  {Float32Array|number[]} arr
      */
     setArray: function (arr) {
-        for (var i = 0; i < this._array.length; i++) {
-            this._array[i] = arr[i];
+        for (var i = 0; i < this.array.length; i++) {
+            this.array[i] = arr[i];
         }
         this._dirty = true;
         return this;
@@ -51,7 +51,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     copy: function(b) {
-        mat2d.copy(this._array, b._array);
+        mat2d.copy(this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -61,7 +61,7 @@ Matrix2d.prototype = {
      * @return {number}
      */
     determinant: function() {
-        return mat2d.determinant(this._array);
+        return mat2d.determinant(this.array);
     },
 
     /**
@@ -69,7 +69,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     identity: function() {
-        mat2d.identity(this._array);
+        mat2d.identity(this.array);
         this._dirty = true;
         return this;
     },
@@ -79,7 +79,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     invert: function() {
-        mat2d.invert(this._array, this._array);
+        mat2d.invert(this.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -90,7 +90,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     mul: function(b) {
-        mat2d.mul(this._array, this._array, b._array);
+        mat2d.mul(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -101,7 +101,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     mulLeft: function(b) {
-        mat2d.mul(this._array, b._array, this._array);
+        mat2d.mul(this.array, b.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -112,7 +112,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     multiply: function(b) {
-        mat2d.multiply(this._array, this._array, b._array);
+        mat2d.multiply(this.array, this.array, b.array);
         this._dirty = true;
         return this;
     },
@@ -123,7 +123,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     multiplyLeft: function(b) {
-        mat2d.multiply(this._array, b._array, this._array);
+        mat2d.multiply(this.array, b.array, this.array);
         this._dirty = true;
         return this;
     },
@@ -134,7 +134,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     rotate: function(rad) {
-        mat2d.rotate(this._array, this._array, rad);
+        mat2d.rotate(this.array, this.array, rad);
         this._dirty = true;
         return this;
     },
@@ -145,7 +145,7 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     scale: function(s) {
-        mat2d.scale(this._array, this._array, s._array);
+        mat2d.scale(this.array, this.array, s.array);
         this._dirty = true;
         return this;
     },
@@ -156,17 +156,17 @@ Matrix2d.prototype = {
      * @return {clay.math.Matrix2d}
      */
     translate: function(v) {
-        mat2d.translate(this._array, this._array, v._array);
+        mat2d.translate(this.array, this.array, v.array);
         this._dirty = true;
         return this;
     },
 
     toString: function() {
-        return '[' + Array.prototype.join.call(this._array, ',') + ']';
+        return '[' + Array.prototype.join.call(this.array, ',') + ']';
     },
 
     toArray: function () {
-        return Array.prototype.slice.call(this._array);
+        return Array.prototype.slice.call(this.array);
     }
 };
 
@@ -176,7 +176,7 @@ Matrix2d.prototype = {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.copy = function(out, a) {
-    mat2d.copy(out._array, a._array);
+    mat2d.copy(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -186,7 +186,7 @@ Matrix2d.copy = function(out, a) {
  * @return {number}
  */
 Matrix2d.determinant = function(a) {
-    return mat2d.determinant(a._array);
+    return mat2d.determinant(a.array);
 };
 
 /**
@@ -194,7 +194,7 @@ Matrix2d.determinant = function(a) {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.identity = function(out) {
-    mat2d.identity(out._array);
+    mat2d.identity(out.array);
     out._dirty = true;
     return out;
 };
@@ -205,7 +205,7 @@ Matrix2d.identity = function(out) {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.invert = function(out, a) {
-    mat2d.invert(out._array, a._array);
+    mat2d.invert(out.array, a.array);
     out._dirty = true;
     return out;
 };
@@ -217,7 +217,7 @@ Matrix2d.invert = function(out, a) {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.mul = function(out, a, b) {
-    mat2d.mul(out._array, a._array, b._array);
+    mat2d.mul(out.array, a.array, b.array);
     out._dirty = true;
     return out;
 };
@@ -238,7 +238,7 @@ Matrix2d.multiply = Matrix2d.mul;
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.rotate = function(out, a, rad) {
-    mat2d.rotate(out._array, a._array, rad);
+    mat2d.rotate(out.array, a.array, rad);
     out._dirty = true;
     return out;
 };
@@ -250,7 +250,7 @@ Matrix2d.rotate = function(out, a, rad) {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.scale = function(out, a, v) {
-    mat2d.scale(out._array, a._array, v._array);
+    mat2d.scale(out.array, a.array, v.array);
     out._dirty = true;
     return out;
 };
@@ -262,7 +262,7 @@ Matrix2d.scale = function(out, a, v) {
  * @return {clay.math.Matrix2d}
  */
 Matrix2d.translate = function(out, a, v) {
-    mat2d.translate(out._array, a._array, v._array);
+    mat2d.translate(out.array, a.array, v.array);
     out._dirty = true;
     return out;
 };

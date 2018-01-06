@@ -253,7 +253,7 @@ var DeferredRenderer = Base.extend(function () {
         var lightAccumTex = this._lightAccumTex;
         var lightAccumFrameBuffer = this._lightAccumFrameBuffer;
 
-        var eyePosition = camera.getWorldPosition()._array;
+        var eyePosition = camera.getWorldPosition().array;
 
         // Update volume meshes
         for (var i = 0; i < scene.lights.length; i++) {
@@ -342,7 +342,7 @@ var DeferredRenderer = Base.extend(function () {
                 }
 
                 material.setUniform('eyePosition', eyePosition);
-                material.setUniform('viewProjectionInv', viewProjectionInv._array);
+                material.setUniform('viewProjectionInv', viewProjectionInv.array);
                 material.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                 material.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                 material.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -390,7 +390,7 @@ var DeferredRenderer = Base.extend(function () {
 
                 var passMaterial = pass.material;
                 passMaterial.setUniform('eyePosition', eyePosition);
-                passMaterial.setUniform('viewProjectionInv', viewProjectionInv._array);
+                passMaterial.setUniform('viewProjectionInv', viewProjectionInv.array);
                 passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
                 passMaterial.setUniform('gBufferTexture2', this._gBuffer.getTargetTexture2());
                 passMaterial.setUniform('gBufferTexture3', this._gBuffer.getTargetTexture3());
@@ -447,7 +447,7 @@ var DeferredRenderer = Base.extend(function () {
                         // Frustum culling
                         Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
                         if (renderer.isFrustumCulled(
-                            volumeMesh, null, camera, worldView._array, camera.projectionMatrix._array
+                            volumeMesh, null, camera, worldView.array, camera.projectionMatrix.array
                         )) {
                             continue;
                         }
@@ -611,7 +611,7 @@ var DeferredRenderer = Base.extend(function () {
                 // Frustum culling
                 Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
                 if (renderer.isFrustumCulled(
-                    volumeMesh, null, camera, worldView._array, camera.projectionMatrix._array
+                    volumeMesh, null, camera, worldView.array, camera.projectionMatrix.array
                 )) {
                     continue;
                 }
@@ -630,7 +630,7 @@ var DeferredRenderer = Base.extend(function () {
                 preZProgram.bind(renderer);
 
                 var semanticInfo = preZMaterial.shader.matrixSemantics.WORLDVIEWPROJECTION;
-                preZProgram.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                preZProgram.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection.array);
                 volumeMesh.render(renderer, preZMaterial, preZProgram);
 
                 // Render light
@@ -643,7 +643,7 @@ var DeferredRenderer = Base.extend(function () {
 
                 var semanticInfo = volumeMesh.material.shader.matrixSemantics.WORLDVIEWPROJECTION;
                 // Set some common uniforms
-                program.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection._array);
+                program.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection.array);
                 program.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
                 program.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
 

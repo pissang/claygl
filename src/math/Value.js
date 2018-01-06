@@ -58,8 +58,8 @@ var Random2D = function(min, max) {
         }
         Vector2.set(
             out,
-            rangeX * Math.random() + min._array[0],
-            rangeY * Math.random() + min._array[1]
+            rangeX * Math.random() + min.array[0],
+            rangeY * Math.random() + min.array[1]
         );
 
         return out;
@@ -79,9 +79,9 @@ var Random3D = function(min, max) {
         }
         Vector3.set(
             out,
-            rangeX * Math.random() + min._array[0],
-            rangeY * Math.random() + min._array[1],
-            rangeZ * Math.random() + min._array[2]
+            rangeX * Math.random() + min.array[0],
+            rangeY * Math.random() + min.array[1],
+            rangeZ * Math.random() + min.array[2]
         );
 
         return out;

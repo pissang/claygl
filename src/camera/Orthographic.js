@@ -39,7 +39,7 @@ var Orthographic = Camera.extend(
     },
 
     decomposeProjectionMatrix: function () {
-        var m = this.projectionMatrix._array;
+        var m = this.projectionMatrix.array;
         this.left = (-1 - m[12]) / m[0];
         this.right = (1 - m[12]) / m[0];
         this.top = (1 - m[13]) / m[5];

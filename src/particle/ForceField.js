@@ -14,7 +14,7 @@ var ForceField = Field.extend(function() {
 }, {
     applyTo: function(velocity, position, weight, deltaTime) {
         if (weight > 0) {
-            vec3.scaleAndAdd(velocity._array, velocity._array, this.force._array, deltaTime / weight);
+            vec3.scaleAndAdd(velocity.array, velocity.array, this.force.array, deltaTime / weight);
         }
     }
 });

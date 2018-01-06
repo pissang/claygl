@@ -432,8 +432,8 @@ var Renderer = Base.extend(function () {
         var posViewSpace = vec3.create();
         for (var i = 0; i < transparentList.length; i++) {
             var renderable = transparentList[i];
-            mat4.multiplyAffine(worldViewMat, camera.viewMatrix._array, renderable.worldTransform._array);
-            vec3.transformMat4(posViewSpace, renderable.position._array, worldViewMat);
+            mat4.multiplyAffine(worldViewMat, camera.viewMatrix.array, renderable.worldTransform.array);
+            vec3.transformMat4(posViewSpace, renderable.position.array, worldViewMat);
             renderable.__depth = posViewSpace[2];
         }
 
@@ -532,13 +532,13 @@ var Renderer = Base.extend(function () {
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
 
-            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
+            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform.array;
             var geometry = renderable.geometry;
 
-            mat4.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix._array , worldM);
+            mat4.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix.array , worldM);
             if (geometry.boundingBox) {
                 if (this.isFrustumCulled(
-                    renderable, scene, camera, matrices.WORLDVIEW, camera.projectionMatrix._array
+                    renderable, scene, camera, matrices.WORLDVIEW, camera.projectionMatrix.array
                 )) {
                     continue;
                 }
@@ -598,10 +598,10 @@ var Renderer = Base.extend(function () {
         var time = Date.now();
 
         // Calculate view and projection matrix
-        mat4.copy(matrices.VIEW, camera.viewMatrix._array);
-        mat4.copy(matrices.PROJECTION, camera.projectionMatrix._array);
-        mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix._array, matrices.VIEW);
-        mat4.copy(matrices.VIEWINVERSE, camera.worldTransform._array);
+        mat4.copy(matrices.VIEW, camera.viewMatrix.array);
+        mat4.copy(matrices.PROJECTION, camera.projectionMatrix.array);
+        mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix.array, matrices.VIEW);
+        mat4.copy(matrices.VIEWINVERSE, camera.worldTransform.array);
         mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
         mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
@@ -623,7 +623,7 @@ var Renderer = Base.extend(function () {
             }
 
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
-            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform._array;
+            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform.array;
 
             var material = passConfig.getMaterial.call(this, renderable);
 
@@ -806,7 +806,7 @@ var Renderer = Base.extend(function () {
         return function (object, scene, camera, worldViewMat, projectionMat) {
             // Bounding box can be a property of object(like light) or renderable.geometry
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
-            cullingMatrix._array = worldViewMat;
+            cullingMatrix.array = worldViewMat;
             cullingBoundingBox.copy(geoBBox);
             cullingBoundingBox.applyTransform(cullingMatrix);
 
@@ -824,19 +824,19 @@ var Renderer = Base.extend(function () {
                     return true;
                 }
 
-                cullingMatrix._array = projectionMat;
+                cullingMatrix.array = projectionMat;
                 if (
-                    cullingBoundingBox.max._array[2] > 0 &&
-                    cullingBoundingBox.min._array[2] < 0
+                    cullingBoundingBox.max.array[2] > 0 &&
+                    cullingBoundingBox.min.array[2] < 0
                 ) {
                     // Clip in the near plane
-                    cullingBoundingBox.max._array[2] = -1e-20;
+                    cullingBoundingBox.max.array[2] = -1e-20;
                 }
 
                 cullingBoundingBox.applyProjection(cullingMatrix);
 
-                var min = cullingBoundingBox.min._array;
-                var max = cullingBoundingBox.max._array;
+                var min = cullingBoundingBox.min.array;
+                var max = cullingBoundingBox.max.array;
 
                 if (
                     max[0] < -1 || min[0] > 1
@@ -929,7 +929,7 @@ var Renderer = Base.extend(function () {
         y = this._height - y;
 
         var viewport = this.viewport;
-        var arr = out._array;
+        var arr = out.array;
         arr[0] = (x - viewport.x) / viewport.width;
         arr[0] = arr[0] * 2 - 1;
         arr[1] = (y - viewport.y) / viewport.height;

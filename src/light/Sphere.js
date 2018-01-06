@@ -24,7 +24,7 @@ var SphereLight = Light.extend(
         sphereLightPosition: {
             type: '3f',
             value: function(instance) {
-                return instance.getWorldPosition()._array;
+                return instance.getWorldPosition().array;
             }
         },
         sphereLightRange: {

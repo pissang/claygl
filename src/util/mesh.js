@@ -82,7 +82,7 @@ var meshUtil = {
 
             var nVertex = currentGeo.vertexCount;
 
-            var matrix = applyWorldTransform ? mesh.worldTransform._array : mesh.localTransform._array;
+            var matrix = applyWorldTransform ? mesh.worldTransform.array : mesh.localTransform.array;
             mat4.invert(inverseTransposeMatrix, matrix);
             mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 

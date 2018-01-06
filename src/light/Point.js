@@ -24,7 +24,7 @@ var PointLight = Light.extend(
         pointLightPosition: {
             type: '3f',
             value: function(instance) {
-                return instance.getWorldPosition()._array;
+                return instance.getWorldPosition().array;
             }
         },
         pointLightRange: {

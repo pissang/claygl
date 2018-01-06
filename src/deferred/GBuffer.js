@@ -467,7 +467,7 @@ var GBuffer = Base.extend(function () {
         debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
         debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
         debugPass.setUniform('debug', debugTypes[type]);
-        debugPass.setUniform('viewProjectionInv', viewProjectionInv._array);
+        debugPass.setUniform('viewProjectionInv', viewProjectionInv.array);
         debugPass.render(renderer);
 
         renderer.restoreViewport();

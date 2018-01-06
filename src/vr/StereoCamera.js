@@ -43,15 +43,15 @@ var StereoCamera = Base.extend(function () {
         var xmin, xmax;
 
         // translate xOffset
-        this._eyeLeft._array[12] = - eyeSep;
-        this._eyeRight._array[12] = eyeSep;
+        this._eyeLeft.array[12] = - eyeSep;
+        this._eyeRight.array[12] = eyeSep;
 
         // for left eye
         xmin = - ymax * aspect + eyeSepOnProjection;
         xmax = ymax * aspect + eyeSepOnProjection;
 
-        tmpProjectionMatrix._array[0] = 2 * near / (xmax - xmin);
-        tmpProjectionMatrix._array[8] = (xmax + xmin ) / (xmax - xmin);
+        tmpProjectionMatrix.array[0] = 2 * near / (xmax - xmin);
+        tmpProjectionMatrix.array[8] = (xmax + xmin ) / (xmax - xmin);
 
         this._leftCamera.projectionMatrix.copy(tmpProjectionMatrix);
 
@@ -59,8 +59,8 @@ var StereoCamera = Base.extend(function () {
         xmin = - ymax * aspect - eyeSepOnProjection;
         xmax = ymax * aspect - eyeSepOnProjection;
 
-        tmpProjectionMatrix._array[0] = 2 * near / (xmax - xmin);
-        tmpProjectionMatrix._array[8] = (xmax + xmin ) / (xmax - xmin);
+        tmpProjectionMatrix.array[0] = 2 * near / (xmax - xmin);
+        tmpProjectionMatrix.array[8] = (xmax + xmin ) / (xmax - xmin);
 
         this._rightCamera.projectionMatrix.copy(tmpProjectionMatrix);
 

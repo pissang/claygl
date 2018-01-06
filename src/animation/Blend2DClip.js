@@ -87,7 +87,7 @@ Blend2DClip.prototype._updateTriangles = function () {
     var inputs = this.inputs.map(function (a) {
         return a.position;
     });
-    this._triangles = delaunay.triangulate(inputs, '_array');
+    this._triangles = delaunay.triangulate(inputs, 'array');
 };
 
 Blend2DClip.prototype.step = function (time, dTime, silent) {
@@ -151,14 +151,14 @@ Blend2DClip.prototype.clone = function (cloneInputs) {
 
 Blend2DClip.prototype._findTriangle = function (position) {
     if (this._cacheTriangle) {
-        var res = delaunay.contains(this._cacheTriangle.vertices, position._array);
+        var res = delaunay.contains(this._cacheTriangle.vertices, position.array);
         if (res) {
             return [this._cacheTriangle, res[0], res[1]];
         }
     }
     for (var i = 0; i < this._triangles.length; i++) {
         var tri = this._triangles[i];
-        var res = delaunay.contains(tri.vertices, this.position._array);
+        var res = delaunay.contains(tri.vertices, this.position.array);
         if (res) {
             this._cacheTriangle = tri;
             return [tri, res[0], res[1]];
