@@ -631,3 +631,20 @@ void main() {
 }
 
 @end
+
+
+
+@export clay.standardMR.vertex
+
+@import clay.standard.vertex
+
+@end
+
+@export clay.standardMR.fragment
+
+#define USE_METALNESS
+#define USE_ROUGHNESS
+
+@import clay.standard.fragment
+
+@end

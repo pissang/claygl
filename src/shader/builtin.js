@@ -29,6 +29,7 @@ library.template('clay.wireframe', Shader.source('clay.wireframe.vertex'), Shade
 library.template('clay.skybox', Shader.source('clay.skybox.vertex'), Shader.source('clay.skybox.fragment'));
 library.template('clay.prez', Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'));
 library.template('clay.standard', Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
+library.template('clay.standardMR', Shader.source('clay.standardMR.vertex'), Shader.source('clay.standardMR.fragment'));
 
 
 import coloradjustEssl from './source/compositor/coloradjust.glsl.js';

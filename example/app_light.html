@@ -10,6 +10,7 @@
 <body>
     <style>
         html, body, #main {
+            overflow: hidden;
             background: #111;
             height: 100%;
             margin: 0;
@@ -29,18 +30,26 @@
                 app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
                 app.createAmbientLight('#fff', 0.3);
 
-                this._pointLight1 = app.createPointLight([50, 100, 50], 500, '#00f', 3);
-                this._pointLight2 = app.createPointLight([-80, 150, 70], 500, '#0f0', 3);
+                this._pointLight1 = app.createPointLight([50, 100, 50], 500, '#00f', 2);
+                this._pointLight2 = app.createPointLight([-80, 150, 70], 500, '#0f0', 2);
 
-                app.createSphere(2, {
+                app.createSphere(20, {
                     shader: 'clay.basic',
                     color: [0, 0, 1]
                 }, this._pointLight1);
 
-                app.createSphere(2, {
+                app.createSphere(20, {
                     shader: 'clay.basic',
                     color: [0, 1, 0]
                 }, this._pointLight2);
+
+
+                var plane = app.createPlane(1, {
+                    roughness: 1,
+                    color: [0.3, 0.3, 0.3]
+                });
+                plane.scale.set(1000, 1000, 1);
+                plane.rotation.rotateX(-Math.PI / 2);
 
                 // Use orbit control
                 this._control = new clay.plugin.OrbitControl({

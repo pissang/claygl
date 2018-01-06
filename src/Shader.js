@@ -7,7 +7,6 @@
  *
  * TODO: Use etpl or other string template engine
  */
-import Base from './core/Base';
 import util from './core/util';
 import vendor from './core/vendor';
 import glMatrix from './dep/glmatrix';
@@ -419,7 +418,7 @@ Shader.prototype = {
                 else {
                     defines[symbol] = value
                         // If can parse to float
-                        ? (isNaN(parseFloat(value)) ? value : parseFloat(value))
+                        ? (isNaN(parseFloat(value)) ? value.trim() : parseFloat(value))
                         : null;
                 }
             }

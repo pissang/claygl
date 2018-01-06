@@ -20,7 +20,7 @@ var Sphere = Geometry.extend(
     /**
      * @type {number}
      */
-    widthSegments: 20,
+    widthSegments: 40,
     /**
      * @type {number}
      */

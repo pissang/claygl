@@ -317,13 +317,13 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
  * Create a material.
  * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
- * @param {string} [shader='clay.standard']
+ * @param {string} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
  * @return {clay.Material}
  */
 App3D.prototype.createMaterial = function (matConfig) {
     matConfig = matConfig || {};
-    matConfig.shader = matConfig.shader || 'clay.standard';
+    matConfig.shader = matConfig.shader || 'clay.standardMR';
     var material = new Material({
         shader: shaderLibrary.get(matConfig.shader)
     });
@@ -367,7 +367,8 @@ function makeProceduralMeshCreator(createGeo) {
 /**
  * Create a cube mesh and add it to the scene or the given parent node.
  * @method
- * @param {Array.<number>|number} [size=1] Size of cube. Can be a number to represent both width, height and depth. Or an array to represent them respectively.
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
+ *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
@@ -375,24 +376,24 @@ function makeProceduralMeshCreator(createGeo) {
  *  // Create a 2 width, 1 height, 3 depth white cube.
  *  app.createCube([2, 1, 3])
  */
-App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
-    if (size == null) {
-        size = 1;
+App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
+    if (subdiv == null) {
+        subdiv = 1;
     }
-    if (typeof size === 'number') {
-        size = [size, size, size];
+    if (typeof subdiv === 'number') {
+        subdiv = [subdiv, subdiv, subdiv];
     }
     return new CubeGeo({
-        width: size[0],
-        height: size[1],
-        depth: size[2]
+        widthSegments: subdiv[0],
+        heightSegments: subdiv[1],
+        depthSegments: subdiv[2]
     });
 });
 
 /**
  * Create a sphere mesh and add it to the scene or the given parent node.
  * @method
- * @param {number} [size=1] Radius of sphere.
+ * @param {number} [subdivision=20] Subdivision of sphere.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
@@ -404,19 +405,21 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
  *      alpha: 0.5
  *  })
  */
-App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
-    if (radius == null) {
-        radius = 1;
+App3D.prototype.createSphere = makeProceduralMeshCreator(function (subdivision) {
+    if (subdivision == null) {
+        subdivision = 20;
     }
     return new SphereGeo({
-        radius: radius
+        widthSegments: subdivision * 2,
+        heightSegments: subdivision
     });
 });
 
 /**
  * Create a plane mesh and add it to the scene or the given parent node.
  * @method
- * @param {Array.<number>|number} [size=1] Size of plane. Can be a number to represent both width and height. Or an array to represent them respectively.
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of plane.
+ *          Can be a number to represent both width and height dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
@@ -426,16 +429,16 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
  *      color: [1, 0, 0]
  *  })
  */
-App3D.prototype.createPlane = makeProceduralMeshCreator(function (size) {
-    if (size == null) {
-        size = 1;
+App3D.prototype.createPlane = makeProceduralMeshCreator(function (subdiv) {
+    if (subdiv == null) {
+        subdiv = 1;
     }
-    if (typeof size === 'number') {
-        size = [size, size];
+    if (typeof subdiv === 'number') {
+        subdiv = [subdiv, subdiv];
     }
     return new PlaneGeo({
-        width: size[0],
-        height: size[1]
+        widthSegments: subdiv[0],
+        heightSegments: subdiv[1]
     });
 });
 

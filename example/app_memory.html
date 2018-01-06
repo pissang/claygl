@@ -27,7 +27,7 @@
 
             loop: function (app) {
                 app.scene.remove(this._sphere);
-                this._sphere = app.createSphere(1, {
+                this._sphere = app.createSphere(50, {
                     color: [Math.random(), Math.random(), Math.random()]
                 });
                 this._sphere.position.set(Math.random(), Math.random(), Math.random());
