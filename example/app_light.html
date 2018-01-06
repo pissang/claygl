@@ -19,6 +19,11 @@
     <div id="main"></div>
     <script>
         var app = clay.application.create('#main', {
+
+            graphic: {
+                shadow: true
+            },
+
             init: function (app) {
                 // Create camera
                 this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);
@@ -32,15 +37,15 @@
 
                 this._pointLight1 = app.createPointLight([50, 100, 50], 500, '#00f', 2);
                 this._pointLight2 = app.createPointLight([-80, 150, 70], 500, '#0f0', 2);
+                this._pointLight1.castShadow = true;
+                this._pointLight2.castShadow = true;
 
                 app.createSphere(20, {
-                    shader: 'clay.basic',
-                    color: [0, 0, 1]
+                    shader: 'clay.basic', color: [0, 0, 1]
                 }, this._pointLight1);
 
                 app.createSphere(20, {
-                    shader: 'clay.basic',
-                    color: [0, 1, 0]
+                    shader: 'clay.basic', color: [0, 1, 0]
                 }, this._pointLight2);
 
 
@@ -48,6 +53,8 @@
                     roughness: 1,
                     color: [0.3, 0.3, 0.3]
                 });
+                // Plane not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
+                plane.castShadow = false;
                 plane.scale.set(1000, 1000, 1);
                 plane.rotation.rotateX(-Math.PI / 2);
 

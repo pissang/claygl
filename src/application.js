@@ -4,7 +4,7 @@
  * @namespace clay.application
  */
 
- // TODO createCompositor, createLight(ambientCubemap), geoCache, Shadow, RayPicking and event.
+ // TODO createCompositor, ambientCubemap, ambientSH, geoCache, Shadow, RayPicking and event.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -28,6 +28,7 @@ import SpotLight from './light/Spot';
 import AmbientLight from './light/Ambient';
 import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
+import ShadowMapPass from './prePass/ShadowMap';
 
 import { parseToFloat as parseColor } from './core/color';
 
@@ -57,6 +58,7 @@ import './shader/builtin';
 function App3D(dom, appNS) {
 
     appNS = appNS || {};
+    appNS.graphic = appNS.graphic || {};
 
     if (typeof dom === 'string') {
         dom = document.querySelector(dom);
@@ -78,6 +80,8 @@ function App3D(dom, appNS) {
     var gRenderer = new Renderer(rendererOpts);
     var gWidth = appNS.width || dom.clientWidth;
     var gHeight = appNS.height || dom.clientHeight;
+
+    var gShadowPass = appNS.graphic.shadow && new ShadowMapPass();
 
     if (!isDomCanvas) {
         dom.appendChild(gRenderer.canvas);
@@ -160,7 +164,13 @@ function App3D(dom, appNS) {
             gElapsedTime += frameTime;
             appNS.loop(this);
 
-            this._doRender(gRenderer, gScene);
+            gScene.update();
+            // Render shadow pass
+            if (gShadowPass) {
+                gShadowPass.render(gRenderer, gScene, null, true);
+            }
+
+            this._doRender(gRenderer, gScene, true);
 
             // Mark all resources unused;
             markUsed(gTexturesList);

@@ -126,6 +126,9 @@ var ShadowMapPass = Base.extend(function () {
      * @memberOf clay.prePass.ShadowMap.prototype
      */
     render: function (renderer, scene, sceneCamera, notUpdateScene) {
+        if (!sceneCamera) {
+            sceneCamera = scene.getMainCamera();
+        }
         this.trigger('beforerender', this, renderer, scene, sceneCamera);
         this._renderShadowPass(renderer, scene, sceneCamera, notUpdateScene);
         this.trigger('afterrender', this, renderer, scene, sceneCamera);
