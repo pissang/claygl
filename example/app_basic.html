@@ -27,10 +27,7 @@
                 });
 
                 // Create light
-                var light = new clay.light.Directional();
-                light.position.set(1, 1, 1);
-                light.lookAt(this._cube.position);
-                app.scene.add(light);
+                this._mainLight = app.createDirectionalLight([-1, -1, -1]);
             },
 
             loop: function (app) {

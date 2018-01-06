@@ -29,10 +29,7 @@
                 });
 
                 // Create light
-                var light = new clay.light.Directional();
-                light.position.set(1, 1, 1);
-                light.lookAt(clay.math.Vector3.ZERO);
-                app.scene.add(light);
+                app.createDirectionalLight([-1, -1, -1]);
 
                 // Use orbit control
                 this._control = new clay.plugin.OrbitControl({

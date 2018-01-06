@@ -132,7 +132,7 @@ var Renderable = Node.extend(
      */
     isRenderable: function() {
         // TODO Shader ?
-        return this.geometry && this.material && !this.invisible
+        return this.geometry && this.material && this.material.shader && !this.invisible
             && this.geometry.vertexCount > 0;
     },
 

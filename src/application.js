@@ -24,11 +24,22 @@ import GLTFLoader from './loader/GLTF';
 import Node from './Node';
 import DirectionalLight from './light/Directional';
 import PointLight from './light/Point';
+import SpotLight from './light/Spot';
 import AmbientLight from './light/Ambient';
 import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 
+import { parseToFloat as parseColor } from './core/color';
+
 import './shader/builtin';
+
+/**
+ * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
+ */
+
+/**
+ * @typedef {string|Array.<number>} Color
+ */
 
 /**
  * @constructor
@@ -238,7 +249,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
 }
 /**
  * Load a texture from image or string.
- * @param {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} img
+ * @param {ImageLike} img
  * @param {Object} [opts] Texture options.
  * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
  * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
@@ -274,7 +285,7 @@ App3D.prototype.loadTexture = function (urlOrImg, opts) {
 
 /**
  * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
- * @param {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} img
+ * @param {ImageLike} img
  * @param {Object} [opts] Texture options.
  * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
  * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
@@ -342,21 +353,23 @@ App3D.prototype.createMaterial = function (matConfig) {
 };
 
 function makeProceduralMeshCreator(createGeo) {
-    return function (size, mat) {
+    return function (size, mat, parentNode) {
         var mesh = new Mesh({
             geometry: createGeo(size),
             material: mat instanceof Material ? mat : this.createMaterial(mat)
         });
-        this.scene.add(mesh);
+        parentNode = parentNode || this.scene;
+        parentNode.add(mesh);
         return mesh;
     };
 }
 
 /**
- * Create a cube mesh and add it to the scene.
+ * Create a cube mesh and add it to the scene or the given parent node.
  * @method
- * @param {Array.<number>|number} [size=1] Cube size. Can be a number to represent both width, height and depth. Or an array to represent them respectively.
+ * @param {Array.<number>|number} [size=1] Size of cube. Can be a number to represent both width, height and depth. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
+ * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 width, 1 height, 3 depth white cube.
@@ -377,10 +390,11 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (size) {
 });
 
 /**
- * Create a sphere mesh and add it to the scene.
+ * Create a sphere mesh and add it to the scene or the given parent node.
  * @method
- * @param {number} [size=1] Sphere radius.
+ * @param {number} [size=1] Radius of sphere.
  * @param {Object|clay.Material} [material]
+ * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 radius blue semi-transparent sphere.
@@ -400,10 +414,11 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (radius) {
 });
 
 /**
- * Create a plane mesh and add it to the scene.
+ * Create a plane mesh and add it to the scene or the given parent node.
  * @method
- * @param {Array.<number>|number} [size=1] Plane size. Can be a number to represent both width and height. Or an array to represent them respectively.
+ * @param {Array.<number>|number} [size=1] Size of plane. Can be a number to represent both width and height. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
+ * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
  * @return {clay.Mesh}
  * @example
  *  // Create a 2 width, 1 height red color plane.
@@ -465,16 +480,108 @@ App3D.prototype.createCamera = function (position, target, type) {
 
 /**
  * Create a directional light and add it to the scene.
- * @param {Array.<number>|clay.Vector3} dir
- * @param {Array.<number>} [color] Light color, default to be white.
- * @param {number} [intensity] Light intensity, default to be 1.
+ * @param {Array.<number>|clay.math.Vector3} dir A Vector3 or array to represent the direction.
+ * @param {Color} [color='#fff'] Color of directional light, default to be white.
+ * @param {number} [intensity] Intensity of directional light, default to be 1.
+ *
+ * @example
+ *  app.createDirectionalLight([-1, -1, -1], '#fff', 2);
  */
 App3D.prototype.createDirectionalLight = function (dir, color, intensity) {
     var light = new DirectionalLight();
     if (dir instanceof Vector3) {
         dir = dir.array;
     }
-    light.position.set();
+    light.position.setArray(dir).negate();
+    light.lookAt(Vector3.ZERO);
+    if (typeof color === 'string') {
+        color = parseColor(color);
+    }
+    color != null && (light.color = color);
+    intensity != null && (light.intensity = intensity);
+
+    this.scene.add(light);
+    return light;
+};
+
+/**
+ * Create a spot light and add it to the scene.
+ * @param {Array.<number>|clay.math.Vector3} position Position of the spot light.
+ * @param {Array.<number>|clay.math.Vector3} [target] Target position where spot light points to.
+ * @param {number} [range=20] Falloff range of spot light. Default to be 20.
+ * @param {Color} [color='#fff'] Color of spot light, default to be white.
+ * @param {number} [intensity=1] Intensity of spot light, default to be 1.
+ * @param {number} [umbraAngle=30] Umbra angle of spot light. Default to be 30 degree from the middle line.
+ * @param {number} [penumbraAngle=45] Penumbra angle of spot light. Default to be 45 degree from the middle line.
+ *
+ * @example
+ *  app.createSpotLight([5, 5, 5], [0, 0, 0], 20, #900);
+ */
+App3D.prototype.createSpotLight = function (position, target, range, color, intensity, umbraAngle, penumbraAngle) {
+    var light = new SpotLight();
+    light.position.setArray(position instanceof Vector3 ? position.array : position);
+
+    if (target instanceof Array) {
+        target = new Vector3(target[0], target[1], target[2]);
+    }
+    if (target instanceof Vector3) {
+        light.lookAt(target);
+    }
+
+    if (typeof color === 'string') {
+        color = parseColor(color);
+    }
+    range != null && (light.range = range);
+    color != null && (light.color = color);
+    intensity != null && (light.intensity = intensity);
+    umbraAngle != null && (light.umbraAngle = umbraAngle);
+    penumbraAngle != null && (light.penumbraAngle = penumbraAngle);
+
+    this.scene.add(light);
+
+    return light;
+};
+
+/**
+ * Create a point light.
+ * @param {Array.<number>|clay.math.Vector3} position Position of point light..
+ * @param {number} [range=100] Falloff range of point light.
+ * @param {Color} [color='#fff'] Color of point light.
+ * @param {number} [intensity=1] Intensity of point light.
+ */
+App3D.prototype.createPointLight = function (position, range, color, intensity) {
+    var light = new PointLight();
+    light.position.setArray(position instanceof Vector3 ? position.array : position);
+
+    if (typeof color === 'string') {
+        color = parseColor(color);
+    }
+    range != null && (light.range = range);
+    color != null && (light.color = color);
+    intensity != null && (light.intensity = intensity);
+
+    this.scene.add(light);
+
+    return light;
+};
+
+/**
+ * Create a ambient light.
+ * @param {Color} [color='#fff'] Color of ambient light.
+ * @param {number} [intensity=1] Intensity of ambient light.
+ */
+App3D.prototype.createAmbientLight = function (color, intensity) {
+    var light = new AmbientLight();
+
+    if (typeof color === 'string') {
+        color = parseColor(color);
+    }
+    color != null && (light.color = color);
+    intensity != null && (light.intensity = intensity);
+
+    this.scene.add(light);
+
+    return light;
 };
 
 /**
