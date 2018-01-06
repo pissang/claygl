@@ -469,7 +469,7 @@ App3D.prototype.createCamera = function (position, target, type) {
  * @param {Object} opts
  * @param {string} [opts.shader='lambert'] 'basic'|'lambert'|'standard'
  * @param {boolean} [opts.waitTextureLoaded=false] If add to scene util textures are all loaded.
- * @param {boolean} [opts.autoPlayAnimation=false] If autoplay the animation of model.
+ * @param {boolean} [opts.autoPlayAnimation=true] If autoplay the animation of model.
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
@@ -481,6 +481,9 @@ App3D.prototype.loadModel = function (url, opts) {
     }
 
     opts = opts || {};
+    if (opts.autoPlayAnimation == null) {
+        opts.autoPlayAnimation = true;
+    }
     var shaderName = opts.shader || 'standard';
 
     var loaderOpts = {

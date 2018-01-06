@@ -19,14 +19,10 @@
         var app = clay.application.create('#main', {
             init: function (app) {
                 // Create camera
-                this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+                this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);
 
                 // Load boombox model.
-                app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
-                    waitTextureLoaded: true
-                }).then(function (result) {
-                    result.rootNode.scale.set(100, 100, 100);
-                });
+                app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf');
 
                 // Create light
                 var light = new clay.light.Directional();
