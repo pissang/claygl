@@ -509,7 +509,7 @@ var Geometry = Base.extend(function () {
      * @return {clay.Geometry.Attribute}
      */
     getAttribute: function (name) {
-        return this.attribute[name];
+        return this.attributes[name];
     },
 
     /**
