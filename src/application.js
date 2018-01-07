@@ -160,6 +160,8 @@ function App3D(dom, appNS) {
         }
         gTimeline.stop();
         gRenderer.disposeScene(gScene);
+        gShadowPass && gShadowPass.dispose(gRenderer);
+
         dom.innerHTML = '';
         ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
             this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
@@ -197,8 +199,8 @@ function App3D(dom, appNS) {
             self._doRender(gRenderer, gScene, true);
 
             // Mark all resources unused;
-            markUsed(gTexturesList);
-            markUsed(gGeometriesList);
+            markUnused(gTexturesList);
+            markUnused(gGeometriesList);
 
             // Collect resources used in this frame.
             var newTexturesList = [];
@@ -292,7 +294,7 @@ App3D.prototype._doRender = function (renderer, scene) {
 };
 
 
-function markUsed(resourceList) {
+function markUnused(resourceList) {
     for (var i = 0; i < resourceList.length; i++) {
         resourceList[i].__used__ = 0;
     }
@@ -307,31 +309,45 @@ function checkAndDispose(renderer, resourceList) {
 }
 
 function updateUsed(resource, list) {
-    list.push(resource);
     resource.__used__ = resource.__used__ || 0;
     resource.__used__++;
+    if (resource.__used__ === 1) {
+        // Don't push to the list twice.
+        list.push(resource);
+    }
 }
 function collectResources(scene, textureResourceList, geometryResourceList) {
     function trackQueue(queue) {
+        var prevMaterial;
+        var prevGeometry;
         for (var i = 0; i < queue.length; i++) {
             var renderable = queue[i];
             var geometry = renderable.geometry;
             var material = renderable.material;
-            updateUsed(geometry, geometryResourceList);
 
-            for (var name in material.uniforms) {
-                var val = material.uniforms[name].value;
-                if (val instanceof Texture) {
-                    updateUsed(val, textureResourceList);
-                }
-                else if (val instanceof Array) {
-                    for (var k = 0; k < val.length; k++) {
-                        if (val[k] instanceof Texture) {
-                            updateUsed(val[k], textureResourceList);
+            if (material !== prevMaterial) {
+                var uniformNames = material.getEnabledUniforms();
+                for (var u = 0; u < uniformNames.length; u++) {
+                    var uniformName = uniformNames[u];
+                    var val = material.uniforms[uniformName].value;
+                    if (val instanceof Texture) {
+                        updateUsed(val, textureResourceList);
+                    }
+                    else if (val instanceof Array) {
+                        for (var k = 0; k < val.length; k++) {
+                            if (val[k] instanceof Texture) {
+                                updateUsed(val[k], textureResourceList);
+                            }
                         }
                     }
                 }
             }
+            if (geometry !== prevGeometry) {
+                updateUsed(geometry, geometryResourceList);
+            }
+
+            prevMaterial = material;
+            prevGeometry = geometry;
         }
     }
 

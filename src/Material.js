@@ -106,6 +106,8 @@ var Material = Base.extend(function () {
         _textureStatus: {},
 
         // shadowTransparentMap : null
+
+        // PENDING enable the uniform that only used in shader.
         _enabledUniforms: null,
     };
 }, function () {
@@ -303,6 +305,10 @@ var Material = Base.extend(function () {
      */
     isUniformEnabled: function (symbol) {
         return this._enabledUniforms.indexOf(symbol) >= 0;
+    },
+
+    getEnabledUniforms: function () {
+        return this._enabledUniforms;
     },
 
     /**

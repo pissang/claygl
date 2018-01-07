@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <title>Stress Test</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            overflow: hidden;
+            background: #111;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+
+            graphic: {
+                shadow: true
+            },
+
+            init: function (app) {
+                // Create camera
+                this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);
+
+                this._initLights(app);
+
+                // Create a room.
+                var cube = app.createCubeInside(1, {
+                    roughness: 1,
+                    color: [0.3, 0.3, 0.3]
+                });
+                // Cube not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
+                cube.castShadow = false;
+                cube.scale.set(400, 400, 400);
+                cube.position.y = 400;
+
+                this._initCubes(app);
+
+                // Use orbit control
+                this._control = new clay.plugin.OrbitControl({
+                    target: this._camera,
+                    domElement: app.container
+                });
+
+                // Load model. return a load promise to make sure the look will be start after model loaded.
+                return app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf');
+            },
+
+            _initLights: function (app) {
+                // Create lights
+                app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
+                app.createAmbientLight('#fff', 0.3);
+
+                this._pointLight1 = app.createPointLight([50, 100, 50], 500, '#00f', 2);
+                this._pointLight2 = app.createPointLight([-80, 150, 70], 500, '#0f0', 2);
+                this._pointLight1.castShadow = true;
+                this._pointLight2.castShadow = true;
+
+                app.createSphere(20, {
+                    shader: 'clay.basic', color: [0, 0, 1]
+                }, this._pointLight1);
+
+                app.createSphere(20, {
+                    shader: 'clay.basic', color: [0, 1, 0]
+                }, this._pointLight2);
+            },
+
+            _initCubes: function (app) {
+                var cubes = [];
+                function randPos() {
+                    var r = Math.random() * 200 + 100;
+                    var alpha = Math.PI * 2 * Math.random();
+                    var beta = Math.PI / 6 * Math.random() + Math.PI / 2.5;
+                    return [
+                        Math.cos(alpha) * Math.sin(beta) * r,
+                        Math.cos(beta) * r + 100,
+                        Math.sin(alpha) * Math.sin(beta) * r
+                    ];
+                }
+                for (var i = 0; i < 600; i++) {
+                    var cube = app.createCube();
+                    cube.position.setArray(randPos());
+                    cube.center = new clay.math.Vector3(0, cube.position.y, 0);
+                    cube.moveSpeed = Math.random();
+                    cube.rotateSpeed = Math.random();
+                    cubes.push(cube);
+                }
+                this._cubes = cubes;
+            },
+
+            loop: function (app) {
+                this._control.update(app.frameTime);
+                this._pointLight1.rotateAround(new clay.math.Vector3(0, 100, 0), new clay.math.Vector3(0.1, 1, 0.1), 0.1);
+                this._pointLight2.rotateAround(new clay.math.Vector3(0, 120, 0), new clay.math.Vector3(-0.1, 1, -0.2), 0.05);
+
+                var frameTimeSecond = app.frameTime / 1000;
+                this._cubes.forEach(function (cube) {
+                    cube.rotateAround(cube.center, clay.math.Vector3.UP, cube.moveSpeed * frameTimeSecond);
+                    cube.rotation.rotateX(cube.rotateSpeed * frameTimeSecond).rotateY(cube.rotateSpeed * frameTimeSecond)
+                });
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>

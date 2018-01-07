@@ -394,6 +394,8 @@ var Geometry = Base.extend(function () {
         }
         this.dirtyIndices();
         this._enabledAttributes = null;
+
+        this._cache.dirty('any');
     },
     /**
      * Mark the indices needs to update.
@@ -555,6 +557,7 @@ var Geometry = Base.extend(function () {
             cache.fresh('attributes');
             cache.fresh('indices');
         }
+        cache.fresh('any');
         return cache.get('chunks');
     },
 

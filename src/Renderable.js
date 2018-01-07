@@ -197,13 +197,13 @@ var Renderable = Node.extend(
         }
         else {
             // The cache will be invalid in the following cases
-            // 1. Geometry is splitted to multiple chunks
-            // 2. VAO is enabled and is binded to null after render
-            // 3. Geometry needs update
+            // 1. VAO is enabled and is binded to null after render
+            // 2. Geometry needs update
             if (
-                ((nVertex > 0xffff && !uintExt) && isUseIndices)
-                || (vaoExt && isStatic)
-                || geometry._cache.isDirty()
+                // TODO Optimize
+                (vaoExt && isStatic)
+                // PENDING
+                || geometry._cache.isDirty('any')
             ) {
                 drawHashChanged = true;
             }

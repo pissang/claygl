@@ -916,6 +916,7 @@ Vector3.eulerFromMat3 = function (out, m, order) {
     return out;
 };
 
+// TODO return new.
 /**
  * @type {clay.math.Vector3}
  */
