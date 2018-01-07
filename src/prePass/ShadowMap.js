@@ -508,7 +508,7 @@ var ShadowMapPass = Base.extend(function () {
             sortCompare: Renderer.opaqueSortCompare
         };
 
-        renderer.renderPass(casters, lightCamera, passConfig);
+        renderer.renderPass(renderer.cullRenderList(casters, null, lightCamera), lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
 
@@ -547,7 +547,7 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderPass(casters, camera, passConfig);
+            renderer.renderPass(renderer.cullRenderList(casters, null, camera), camera, passConfig);
         }
 
         this._frameBuffer.unbind(renderer);
