@@ -69,7 +69,7 @@ npm test
 ```
 * run tests matching patterns
 ```shell
-npm test -- -g "texture anistropic"
+npm test -- -- -g "texture anistropic"
 ```
 ```shell
 npm run tdd -- -g "texture anistropic"
