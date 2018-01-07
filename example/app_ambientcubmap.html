@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="../dist/claygl.js"></script>
-    <title>Model loading</title>
+    <title>Ambient Cubemap Light</title>
 </head>
 <body>
     <style>
@@ -27,14 +27,16 @@
                     domElement: app.container
                 });
 
-                app.createAmbientCubemapLight(
-                    './assets/textures/hdr/pisa.hdr',
-                    '#fff', 1, 2
-                );
+                app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
 
                 for (var i = 0; i < 10; i++) {
                     app.createSphere(20, {
                         metalness: 1,
+                        roughness: i / 10
+                    }).position.set((i - 5) * 3, -2, 0);
+
+                    app.createSphere(20, {
+                        metalness: 0,
                         roughness: i / 10
                     }).position.set((i - 5) * 3, -5, 0);
                 }
@@ -43,7 +45,8 @@
                 return app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
                     waitTextureLoaded: true
                 }).then(function (result) {
-                    result.rootNode.scale.set(200, 200, 200);
+                    result.rootNode.position.y = 5;
+                    result.rootNode.scale.set(300, 300, 300);
                 });
             },
 

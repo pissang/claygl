@@ -34,6 +34,7 @@ import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
 import LRUCache from './core/LRU';
 import util from './core/util';
+import shUtil from './util/sh';
 import textureUtil from './util/texture';
 
 import colorUtil from './core/color';
@@ -172,7 +173,7 @@ function App3D(dom, appNS) {
     gRayPicking && this._initMouseEvents(gRayPicking);
 
     this._geoCache = new LRUCache(20);
-    this._texCache = new LRUCache(5);
+    this._texCache = new LRUCache(20);
 
     // Do init the application.
     var initPromise = Promise.resolve(appNS.init && appNS.init(this));
@@ -223,6 +224,11 @@ function isImageLikeElement(val) {
     return val instanceof Image
         || val instanceof HTMLCanvasElement
         || val instanceof HTMLVideoElement;
+}
+
+function getKeyFromImageLike(val) {
+    typeof val === 'string'
+        ? val : (val.__key__ || (val.__key__ = util.genGUID()));
 }
 
 function makeHandlerName(eveType) {
@@ -378,6 +384,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
  * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
  * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
  * @param {number} [opts.exposure] Only be used when source is a HDR image.
+ * @param {boolean} [useCache] If use cache.
  * @return {Promise}
  * @example
  *  app.loadTexture('diffuseMap.jpg')
@@ -385,10 +392,16 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
  *          material.set('diffuseMap', texture);
  *      });
  */
-App3D.prototype.loadTexture = function (urlOrImg, opts) {
+App3D.prototype.loadTexture = function (urlOrImg, opts, useCache) {
     var self = this;
+    var key = getKeyFromImageLike(urlOrImg);
+    if (useCache) {
+        if (this._texCache.get(key)) {
+            return this._texCache.get(key);
+        }
+    }
     // TODO Promise ?
-    return new Promise(function (resolve, reject) {
+    var promise = new Promise(function (resolve, reject) {
         var texture = self.loadTextureSync(urlOrImg, opts);
         if (!texture.isRenderable()) {
             texture.success(function () {
@@ -408,6 +421,10 @@ App3D.prototype.loadTexture = function (urlOrImg, opts) {
             resolve(texture);
         }
     });
+    if (useCache) {
+        this._texCache.put(key, promise);
+    }
+    return promise;
 };
 
 /**
@@ -782,56 +799,47 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
 };
 
 /**
- * Create an cubemap ambient light for specular lighting in PBR rendering.
+ * Create an cubemap ambient light and an spherical harmonic ambient light
+ * for specular and diffuse lighting in PBR rendering
  * @param {ImageLike} [envImage] Panorama environment image, HDR format is better.
- * @param {Color} [color='#fff'] Color of light.
- * @param {number} [intensity=1] Intensity of light.
+ * @param {number} [specularIntenstity=0.7] Intensity of specular light.
+ * @param {number} [diffuseIntenstity=0.7] Intensity of diffuse light.
  * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
  */
-App3D.prototype.createAmbientCubemapLight = function (envImage, color, intensity, exposure) {
-    var texCache = this._texCache;
+App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure) {
     var self = this;
-    if (typeof color === 'string') {
-        color = parseColor(color);
-    }
     if (exposure == null) {
         exposure = 1;
     }
-    var key = typeof envImage === 'string'
-        ? envImage : (envImage.__key__ || (envImage.__key__ = util.genGUID()));
 
-    key += '_' + exposure;
-
-    var prefilterTexturePromise = texCache.get(key);
     var scene = this.scene;
 
-    if (prefilterTexturePromise) {
-        return prefilterTexturePromise.then(function (prefilterTexture) {
-            var light =  new AmbientCubemapLight({
-                color: color || [1, 1, 1],
-                intensity: intensity != null ? intensity : 1,
-                cubemap: prefilterTexture
-            });
-            scene.add(light);
-        });
-    }
-
     return this.loadTexture(envImage, {
-            exposure: exposure
-        }).then(function (texture) {
-        var light = new AmbientCubemapLight({
-            color: color || [1, 1, 1],
-            intensity: intensity != null ? intensity : 1
+        exposure: exposure
+    }).then(function (texture) {
+        var specLight = new AmbientCubemapLight({
+            intensity: specIntensity != null ? specIntensity : 0.7
         });
-        light.cubemap = texture;
+        specLight.cubemap = texture;
         texture.flipY = false;
-        light.prefilter(self.renderer, 64);
+        // TODO Cache prefilter ?
+        specLight.prefilter(self.renderer, 64);
 
-        texCache.put(key, light.cubemap);
+        var diffLight = new AmbientSHLight({
+            intensity: diffIntensity != null ? diffIntensity : 0.7,
+            coefficients: shUtil.projectEnvironmentMap(
+                self.renderer, specLight.cubemap, {
+                    lod: 1
+                }
+            )
+        });
+        scene.add(specLight);
+        scene.add(diffLight);
 
-        scene.add(light);
-
-        return light;
+        return {
+            specular: specLight,
+            diffuse: diffLight
+        };
     });
 };
 
