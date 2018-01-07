@@ -9,6 +9,7 @@
  // TODO Dispose test. geoCache test.
  // TODO fitModel, normal generation.
  // TODO Skybox, Skydome.
+ // TODO Particle ?
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -49,23 +50,28 @@ import './shader/builtin';
 /**
  * @typedef {string|Array.<number>} Color
  */
+/**
+ * @typedef {HTMLDomElement|string} DomQuery
+ */
 
 /**
  * @constructor
  * @alias clay.application.App3D
- * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
+ * @param {DomQuery} dom Container dom element or a selector string that can be used in `querySelector`
  * @param {Object} appNS
- * @param {Function} init Initialization callback that will be called when initing app.
+ * @param {Function} appNS.init Initialization callback that will be called when initing app.
  *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
- * @param {Function} loop Loop callback that will be called each frame.
- * @param {number} [width] Container width.
- * @param {number} [height] Container height.
- * @param {number} [devicePixelRatio]
- * @param {Object} [graphic] Graphic configuration including shadow, postEffect
- * @param {boolean} [graphic.shadow=false] If enable shadow
- * @param {boolean} [graphic.linear=false] If use linear space
- * @param {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
- * @param {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+ * @param {Function} appNS.loop Loop callback that will be called each frame.
+ * @param {Function} appNS.beforeRender
+ * @param {Function} appNS.afterRender
+ * @param {number} [appNS.width] Container width.
+ * @param {number} [appNS.height] Container height.
+ * @param {number} [appNS.devicePixelRatio]
+ * @param {Object} [appNS.graphic] Graphic configuration including shadow, postEffect
+ * @param {boolean} [appNS.graphic.shadow=false] If enable shadow
+ * @param {boolean} [appNS.graphic.linear=false] If use linear space
+ * @param {boolean} [appNS.graphic.tonemapping=false] If enable ACES tone mapping.
+ * @param {boolean} [appNS.event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
  */
 function App3D(dom, appNS) {
 
@@ -205,7 +211,9 @@ function App3D(dom, appNS) {
             // Render shadow pass
             gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
 
+            appNS.beforeRender && appNS.beforeRender(self);
             self._doRender(gRenderer, gScene, true);
+            appNS.afterRender && appNS.afterRender(self);
 
             // Mark all resources unused;
             markUnused(gTexturesList);
