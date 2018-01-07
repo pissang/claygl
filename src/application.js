@@ -37,7 +37,8 @@ import RayPicking from './picking/RayPicking';
 import LRUCache from './core/LRU';
 import util from './core/util';
 
-import { parseToFloat as parseColor } from './core/color';
+import colorUtil from './core/color';
+var parseColor = colorUtil.parseToFloat;
 
 import './shader/builtin';
 

@@ -1,5 +1,7 @@
 import LRU from '../core/LRU';
 
+var colorUtil = {};
+
 var kCSSColorTable = {
     'transparent': [0,0,0,0], 'aliceblue': [240,248,255,1],
     'antiquewhite': [250,235,215,1], 'aqua': [0,255,255,1],
@@ -155,7 +157,7 @@ function putToCache(colorStr, rgbaArr) {
  * @return {Array.<number>}
  * @memberOf module:zrender/util/color
  */
-export function parse(colorStr, rgbaArr) {
+colorUtil.parse = function (colorStr, rgbaArr) {
     if (!colorStr) {
         return;
     }
@@ -263,10 +265,10 @@ export function parse(colorStr, rgbaArr) {
 
     setRgba(rgbaArr, 0, 0, 0, 1);
     return;
-}
+};
 
-export function parseToFloat(colorStr, rgbaArr) {
-    rgbaArr = parse(colorStr, rgbaArr);
+colorUtil.parseToFloat = function (colorStr, rgbaArr) {
+    rgbaArr = colorUtil.parse(colorStr, rgbaArr);
     if (!rgbaArr) {
         return;
     }
@@ -377,8 +379,8 @@ function rgba2hsla(rgba) {
  * @return {string}
  * @memberOf module:zrender/util/color
  */
-export function lift(color, level) {
-    var colorArr = parse(color);
+colorUtil.lift = function (color, level) {
+    var colorArr = colorUtil.parse(color);
     if (colorArr) {
         for (var i = 0; i < 3; i++) {
             if (level < 0) {
@@ -388,7 +390,7 @@ export function lift(color, level) {
                 colorArr[i] = ((255 - colorArr[i]) * level + colorArr[i]) | 0;
             }
         }
-        return stringify(colorArr, colorArr.length === 4 ? 'rgba' : 'rgb');
+        return colorUtil.stringify(colorArr, colorArr.length === 4 ? 'rgba' : 'rgb');
     }
 }
 
@@ -397,8 +399,8 @@ export function lift(color, level) {
  * @return {string}
  * @memberOf module:zrender/util/color
  */
-export function toHex(color) {
-    var colorArr = parse(color);
+colorUtil.toHex = function (color) {
+    var colorArr = colorUtil.parse(color);
     if (colorArr) {
         return ((1 << 24) + (colorArr[0] << 16) + (colorArr[1] << 8) + (+colorArr[2])).toString(16).slice(1);
     }
@@ -411,7 +413,7 @@ export function toHex(color) {
  * @param {Array.<number>} [out] Mapped gba color array
  * @return {Array.<number>} will be null/undefined if input illegal.
  */
-export function fastLerp(normalizedValue, colors, out) {
+colorUtil.fastLerp = function (normalizedValue, colors, out) {
     if (!(colors && colors.length)
         || !(normalizedValue >= 0 && normalizedValue <= 1)
     ) {
@@ -437,7 +439,7 @@ export function fastLerp(normalizedValue, colors, out) {
 /**
  * @deprecated
  */
-export var fastMapToColor = fastLerp;
+colorUtil.fastMapToColor = colorUtil.fastLerp;
 
 /**
  * @param {number} normalizedValue A float between 0 and 1.
@@ -447,7 +449,7 @@ export var fastMapToColor = fastLerp;
  *                           return {color: ..., leftIndex: ..., rightIndex: ..., value: ...},
  * @memberOf module:zrender/util/color
  */
-export function lerp(normalizedValue, colors, fullOutput) {
+colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
     if (!(colors && colors.length)
         || !(normalizedValue >= 0 && normalizedValue <= 1)
     ) {
@@ -457,11 +459,11 @@ export function lerp(normalizedValue, colors, fullOutput) {
     var value = normalizedValue * (colors.length - 1);
     var leftIndex = Math.floor(value);
     var rightIndex = Math.ceil(value);
-    var leftColor = parse(colors[leftIndex]);
-    var rightColor = parse(colors[rightIndex]);
+    var leftColor = colorUtil.parse(colors[leftIndex]);
+    var rightColor = colorUtil.parse(colors[rightIndex]);
     var dv = value - leftIndex;
 
-    var color = stringify(
+    var color = colorUtil.stringify(
         [
             clampCssByte(lerpNumber(leftColor[0], rightColor[0], dv)),
             clampCssByte(lerpNumber(leftColor[1], rightColor[1], dv)),
@@ -484,7 +486,7 @@ export function lerp(normalizedValue, colors, fullOutput) {
 /**
  * @deprecated
  */
-export var mapToColor = lerp;
+colorUtil.mapToColor = colorUtil.lerp;
 
 /**
  * @param {string} color
@@ -494,8 +496,8 @@ export var mapToColor = lerp;
  * @return {string} Color string in rgba format.
  * @memberOf module:zrender/util/color
  */
-export function modifyHSL(color, h, s, l) {
-    color = parse(color);
+colorUtil.modifyHSL = function (color, h, s, l) {
+    color = colorUtil.parse(color);
 
     if (color) {
         color = rgba2hsla(color);
@@ -503,7 +505,7 @@ export function modifyHSL(color, h, s, l) {
         s != null && (color[1] = parseCssFloat(s));
         l != null && (color[2] = parseCssFloat(l));
 
-        return stringify(hsla2rgba(color), 'rgba');
+        return colorUtil.stringify(hsla2rgba(color), 'rgba');
     }
 }
 
@@ -513,12 +515,12 @@ export function modifyHSL(color, h, s, l) {
  * @return {string} Color string in rgba format.
  * @memberOf module:zrender/util/color
  */
-export function modifyAlpha(color, alpha) {
-    color = parse(color);
+colorUtil.modifyAlpha = function (color, alpha) {
+    color = colorUtil.parse(color);
 
     if (color && alpha != null) {
         color[3] = clampCssFloat(alpha);
-        return stringify(color, 'rgba');
+        return colorUtil.stringify(color, 'rgba');
     }
 }
 
@@ -527,7 +529,7 @@ export function modifyAlpha(color, alpha) {
  * @param {string} type 'rgba', 'hsva', ...
  * @return {string} Result color. (If input illegal, return undefined).
  */
-export function stringify(arrColor, type) {
+colorUtil.stringify = function (arrColor, type) {
     if (!arrColor || !arrColor.length) {
         return;
     }
@@ -536,4 +538,8 @@ export function stringify(arrColor, type) {
         colorStr += ',' + arrColor[3];
     }
     return type + '(' + colorStr + ')';
-}
+};
+
+
+
+export default colorUtil;

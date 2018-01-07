@@ -178,7 +178,7 @@ var Renderable = Node.extend(
         var useUintExt = uintExt && nVertex > 0xffff;
         var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
-        var vaoExt = renderer.getGLExtension('OES_vertexarray_object');
+        var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
         // var vaoExt = null;
 
         var isStatic = !geometry.dynamic;

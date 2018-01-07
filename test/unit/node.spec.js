@@ -3,7 +3,7 @@ const clay = require('../../dist/claygl');
 const helper = require('../common/helper');
 
 function getBBoxArr(bbox) {
-    return [bbox.min._array, bbox.max._array];
+    return [bbox.min.array, bbox.max.array];
 }
 
 describe('Scene.Spec', function () {

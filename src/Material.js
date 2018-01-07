@@ -1,7 +1,8 @@
 import Base from './core/Base';
 import Texture from './Texture';
 import util from './core/util';
-import { parseToFloat as parseColor } from './core/color';
+import colorUtil from './core/color';
+var parseColor = colorUtil.parseToFloat;
 
 var programKeyCache = {};
 
