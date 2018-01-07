@@ -2,11 +2,6 @@ import util from '../core/util';
 import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 import Vector3 from '../math/Vector3';
-import Cube from '../geometry/Cube';
-import Cone from '../geometry/Cone';
-import Cylinder from '../geometry/Cylinder';
-import Plane from '../geometry/Plane';
-import Sphere from '../geometry/Sphere';
 
 var META = {
     version: 1.0,
