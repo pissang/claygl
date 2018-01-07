@@ -325,11 +325,15 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
             var geometry = renderable.geometry;
             var material = renderable.material;
 
+            // TODO optimize!!
             if (material !== prevMaterial) {
-                var uniformNames = material.getEnabledUniforms();
-                for (var u = 0; u < uniformNames.length; u++) {
-                    var uniformName = uniformNames[u];
+                var textureUniforms = material.getTextureUniforms();
+                for (var u = 0; u < textureUniforms.length; u++) {
+                    var uniformName = textureUniforms[u];
                     var val = material.uniforms[uniformName].value;
+                    if (!val) {
+                        continue;
+                    }
                     if (val instanceof Texture) {
                         updateUsed(val, textureResourceList);
                     }

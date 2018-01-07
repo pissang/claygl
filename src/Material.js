@@ -310,6 +310,9 @@ var Material = Base.extend(function () {
     getEnabledUniforms: function () {
         return this._enabledUniforms;
     },
+    getTextureUniforms: function () {
+        return this._textureUniforms;
+    },
 
     /**
      * Alias of setUniform and setUniforms
@@ -354,6 +357,10 @@ var Material = Base.extend(function () {
         this._enabledUniforms = Object.keys(uniforms);
         // Make sure uniforms are set in same order to avoid texture slot wrong
         this._enabledUniforms.sort();
+        this._textureUniforms = this._enabledUniforms.filter(function (uniformName) {
+            var type = this.uniforms[uniformName].type;
+            return type === 't' || type === 'tv';
+        }, this);
 
         var originalVertexDefines = this.vertexDefines;
         var originalFragmentDefines = this.fragmentDefines;

@@ -37,8 +37,8 @@
                 });
                 // Cube not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
                 cube.castShadow = false;
-                cube.scale.set(400, 400, 400);
-                cube.position.y = 400;
+                cube.scale.set(400, 200, 400);
+                cube.position.y = 200;
 
                 this._initCubes(app);
 
@@ -49,25 +49,28 @@
                 });
 
                 // Load model. return a load promise to make sure the look will be start after model loaded.
-                return app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf');
+                return app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf').then(function (result) {
+                    result.materials.forEach(function (mat) {
+                        mat.set('roughness', 1);
+                    });
+                });
             },
 
             _initLights: function (app) {
                 // Create lights
-                app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
-                app.createAmbientLight('#fff', 0.3);
+                app.createAmbientLight('#fff', 0.2);
 
-                this._pointLight1 = app.createPointLight([50, 100, 50], 500, '#00f', 2);
-                this._pointLight2 = app.createPointLight([-80, 150, 70], 500, '#0f0', 2);
+                this._pointLight1 = app.createPointLight([100, 300, 100], 800, '#22f', 2);
+                this._pointLight2 = app.createPointLight([-160, 250, 200], 800, '#2f2', 2);
                 this._pointLight1.castShadow = true;
                 this._pointLight2.castShadow = true;
 
                 app.createSphere(20, {
-                    shader: 'clay.basic', color: [0, 0, 1]
+                    shader: 'clay.basic', color: [0.3, 0.3, 1]
                 }, this._pointLight1);
 
                 app.createSphere(20, {
-                    shader: 'clay.basic', color: [0, 1, 0]
+                    shader: 'clay.basic', color: [0.3, 1, 0.3]
                 }, this._pointLight2);
             },
 
@@ -90,7 +93,7 @@
                     cube.position.setArray(randPos());
                     cube.center = new clay.math.Vector3(0, cube.position.y, 0);
                     cube.moveSpeed = Math.random();
-                    cube.rotateSpeed = Math.random();
+                    cube.rotateSpeed = Math.random() * 5;
                     cubes.push(cube);
                 }
                 this._cubes = cubes;
