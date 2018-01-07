@@ -6,7 +6,7 @@ import Vector3 from '../math/Vector3';
 var META = {
     version: 1.0,
     type: 'Geometry',
-    generator: 'transferableUtil.toTransferable'
+    generator: 'util.transferable.toObject'
 };
 
 /**

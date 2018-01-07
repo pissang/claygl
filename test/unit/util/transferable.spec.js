@@ -28,7 +28,7 @@ function assertUnitCube(object) {
 }
 
 describe('util.transferable.Spec', function () {
-    it('#toTransferable', function () {
+    it('#toObject', function () {
         const geometry = new clay.geometry.Cube({
             widthSegments : 1,
             heightSegments : 2,
@@ -42,7 +42,7 @@ describe('util.transferable.Spec', function () {
         assert(object.data.attributes.position.value !== geometry.getAttribute('position').value);
     });
 
-    it('#toTransferable with shallow', function () {
+    it('#toObject with shallow', function () {
         const geometry = new clay.geometry.Cube({
             widthSegments : 1,
             heightSegments : 2,
