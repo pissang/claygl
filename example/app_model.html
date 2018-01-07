@@ -21,13 +21,6 @@
                 // Create camera
                 this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
-                // Load boombox model.
-                app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
-                    waitTextureLoaded: true
-                }).then(function (result) {
-                    result.rootNode.scale.set(100, 100, 100);
-                });
-
                 // Create light
                 app.createDirectionalLight([-1, -1, -1]);
 
@@ -35,6 +28,13 @@
                 this._control = new clay.plugin.OrbitControl({
                     target: this._camera,
                     domElement: app.container
+                });
+
+                // Load boombox model. return a load promise to make sure the look will be start after model loaded.
+                return app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
+                    waitTextureLoaded: true
+                }).then(function (result) {
+                    result.rootNode.scale.set(100, 100, 100);
                 });
             },
 

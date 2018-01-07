@@ -55,6 +55,7 @@ import './shader/builtin';
  * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
  * @param {Object} appNS
  * @param {Function} init Initialization callback that will be called when initing app.
+ *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
  * @param {Function} loop Loop callback that will be called each frame.
  * @param {number} [width] Container width.
  * @param {number} [height] Container height.
@@ -170,25 +171,30 @@ function App3D(dom, appNS) {
     this._geoCache = new LRUCache(20);
 
     // Do init the application.
-    appNS.init && appNS.init(this);
+    var initPromise = Promise.resolve(appNS.init && appNS.init(this));
     // Use the inited camera.
     gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
 
     var gTexturesList = {};
     var gGeometriesList = {};
 
-    if (appNS.loop) {
-        gTimeline.on('frame', function (frameTime) {
+    if (!appNS.loop) {
+        console.warn('Miss loop method.');
+    }
+
+    var self = this;
+    initPromise.then(function () {
+        appNS.loop && gTimeline.on('frame', function (frameTime) {
             gFrameTime = frameTime;
             gElapsedTime += frameTime;
-            appNS.loop(this);
+            appNS.loop(self);
 
             gScene.update();
             gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
             // Render shadow pass
             gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
 
-            this._doRender(gRenderer, gScene, true);
+            self._doRender(gRenderer, gScene, true);
 
             // Mark all resources unused;
             markUsed(gTexturesList);
@@ -205,11 +211,8 @@ function App3D(dom, appNS) {
 
             gTexturesList = newTexturesList;
             gGeometriesList = newGeometriesList;
-        }, this);
-    }
-    else {
-        console.warn('Miss loop method.');
-    }
+        });
+    });
 }
 
 function isImageLikeElement(val) {
