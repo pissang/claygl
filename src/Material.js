@@ -1,6 +1,7 @@
 import Base from './core/Base';
 import Texture from './Texture';
 import util from './core/util';
+import { parseToFloat as parseColor } from './core/color';
 
 var programKeyCache = {};
 
@@ -243,6 +244,12 @@ var Material = Base.extend(function () {
         }
         var uniform = this.uniforms[symbol];
         if (uniform) {
+
+            if (typeof value === 'string') {
+                // Try to parse as a color. Invalid color string will return null.
+                value = parseColor(value) || value;
+            }
+
             uniform.value = value;
 
             if (this.autoUpdateTextureStatus && uniform.type === 't') {

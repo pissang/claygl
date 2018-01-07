@@ -4,9 +4,9 @@
  * @namespace clay.application
  */
 
- // TODO createCompositor, ambientCubemap, ambientSH, geoCache.
+ // TODO createCompositor, ambientCubemap, ambientSH.
  // TODO mobile. scroll events.
- // TODO Dispose test.
+ // TODO Dispose test. geoCache test.
  // TODO fitModel, normal generation.
 import Renderer from './Renderer';
 import Scene from './Scene';
@@ -15,6 +15,7 @@ import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
 import CylinderGeo from './geometry/Cylinder';
+import ConeGeo from './geometry/Cone';
 import Texture2D from './Texture2D';
 import Texture from './Texture';
 import shaderLibrary from './shader/library';
@@ -33,6 +34,7 @@ import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
+import LRUCache from './core/LRU';
 import util from './core/util';
 
 import { parseToFloat as parseColor } from './core/color';
@@ -42,7 +44,6 @@ import './shader/builtin';
 /**
  * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
  */
-
 /**
  * @typedef {string|Array.<number>} Color
  */
@@ -165,6 +166,9 @@ function App3D(dom, appNS) {
 
     gRayPicking && this._initMouseEvents(gRayPicking);
 
+    this._geoCache = new LRUCache(20);
+
+    // Do init the application.
     appNS.init && appNS.init(this);
     // Use the inited camera.
     gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
@@ -245,6 +249,11 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
             var pickResult = rayPicking.pick(offsetX, offsetY);
 
             if (pickResult) {
+                // Just ignore silent element.
+                if (pickResult.target.silent) {
+                    return;
+                }
+
                 if (eveType === 'mousemove') {
                     var targetChanged = pickResult.target !== oldTarget;
                     if (targetChanged) {
@@ -424,10 +433,6 @@ App3D.prototype.createMaterial = function (matConfig) {
                 // Try to load a texture.
                 this.loadTexture(val).then(makeTextureSetter(key));
             }
-            else if (typeof val === 'string') {
-                // Try to parse as a color.
-                material.setUniform(key, parseColor(val) || val);
-            }
             else {
                 material.setUniform(key, val);
             }
@@ -441,18 +446,6 @@ App3D.prototype.createMaterial = function (matConfig) {
     return material;
 };
 
-function makeProceduralMeshCreator(createGeo) {
-    return function (size, mat, parentNode) {
-        var mesh = new Mesh({
-            geometry: createGeo(size),
-            material: mat instanceof Material ? mat : this.createMaterial(mat)
-        });
-        parentNode = parentNode || this.scene;
-        parentNode.add(mesh);
-        return mesh;
-    };
-}
-
 /**
  * Create a cube mesh and add it to the scene or the given parent node.
  * @method
@@ -465,19 +458,26 @@ function makeProceduralMeshCreator(createGeo) {
  *  // Create a white cube.
  *  app.createCube()
  */
-App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
+App3D.prototype.createCube = function (subdiv, material, parentNode) {
     if (subdiv == null) {
         subdiv = 1;
     }
     if (typeof subdiv === 'number') {
         subdiv = [subdiv, subdiv, subdiv];
     }
-    return new CubeGeo({
-        widthSegments: subdiv[0],
-        heightSegments: subdiv[1],
-        depthSegments: subdiv[2]
-    });
-});
+
+    var geoKey = 'cube-' + subdiv.join('-');
+    var cube = this._geoCache.get(geoKey);
+    if (!cube) {
+        cube = new CubeGeo({
+            widthSegments: subdiv[0],
+            heightSegments: subdiv[1],
+            depthSegments: subdiv[2]
+        });
+        this._geoCache.put(geoKey, cube);
+    }
+    return this.createMesh(cube, material, parentNode);
+};
 
 /**
  * Create a cube mesh that camera is inside the cube.
@@ -491,20 +491,27 @@ App3D.prototype.createCube = makeProceduralMeshCreator(function (subdiv) {
  *  // Create a white cube inside.
  *  app.createCubeInside()
  */
-App3D.prototype.createCubeInside = makeProceduralMeshCreator(function (subdiv) {
+App3D.prototype.createCubeInside = function (subdiv, material, parentNode) {
     if (subdiv == null) {
         subdiv = 1;
     }
     if (typeof subdiv === 'number') {
         subdiv = [subdiv, subdiv, subdiv];
     }
-    return new CubeGeo({
-        inside: true,
-        widthSegments: subdiv[0],
-        heightSegments: subdiv[1],
-        depthSegments: subdiv[2]
-    });
-});
+    var geoKey = 'cubeInside-' + subdiv.join('-');
+    var cube = this._geoCache.get(geoKey);
+    if (!cube) {
+        cube = new CubeGeo({
+            inside: true,
+            widthSegments: subdiv[0],
+            heightSegments: subdiv[1],
+            depthSegments: subdiv[2]
+        });
+        this._geoCache.put(geoKey, cube);
+    }
+
+    return this.createMesh(cube, material, parentNode);
+};
 
 /**
  * Create a sphere mesh and add it to the scene or the given parent node.
@@ -521,15 +528,21 @@ App3D.prototype.createCubeInside = makeProceduralMeshCreator(function (subdiv) {
  *      alpha: 0.5
  *  })
  */
-App3D.prototype.createSphere = makeProceduralMeshCreator(function (subdivision) {
+App3D.prototype.createSphere = function (subdivision, material, parentNode) {
     if (subdivision == null) {
         subdivision = 20;
     }
-    return new SphereGeo({
-        widthSegments: subdivision * 2,
-        heightSegments: subdivision
-    });
-});
+    var geoKey = 'sphere-' + subdivision;
+    var sphere = this._geoCache.get(geoKey);
+    if (!sphere) {
+        sphere = new SphereGeo({
+            widthSegments: subdivision * 2,
+            heightSegments: subdivision
+        });
+        this._geoCache.put(geoKey, sphere);
+    }
+    return this.createMesh(sphere, material, parentNode);
+};
 
 /**
  * Create a plane mesh and add it to the scene or the given parent node.
@@ -545,18 +558,38 @@ App3D.prototype.createSphere = makeProceduralMeshCreator(function (subdivision) 
  *      color: [1, 0, 0]
  *  })
  */
-App3D.prototype.createPlane = makeProceduralMeshCreator(function (subdiv) {
+App3D.prototype.createPlane = function (subdiv, material, parentNode) {
     if (subdiv == null) {
         subdiv = 1;
     }
     if (typeof subdiv === 'number') {
         subdiv = [subdiv, subdiv];
     }
-    return new PlaneGeo({
-        widthSegments: subdiv[0],
-        heightSegments: subdiv[1]
+    var geoKey = 'plane-' + subdiv.join('-');
+    var planeGeo = this._geoCache.get(geoKey);
+    if (!planeGeo) {
+        planeGeo = new PlaneGeo({
+            widthSegments: subdiv[0],
+            heightSegments: subdiv[1]
+        });
+        this._geoCache.put(geoKey, planeGeo);
+    }
+    return this.createMesh(planeGeo, material, parentNode);
+};
+
+/**
+ * Create a general mesh with given geometry instance and material config.
+ * @param {*} geometry
+ */
+App3D.prototype.createMesh = function (geometry, mat, parentNode) {
+    var mesh = new Mesh({
+        geometry: geometry,
+        material: mat instanceof Material ? mat : this.createMaterial(mat)
     });
-});
+    parentNode = parentNode || this.scene;
+    parentNode.add(mesh);
+    return mesh;
+};
 
 /**
  * Create a perspective or orthographic camera and add it to the scene.
@@ -760,12 +793,10 @@ App3D.prototype.loadModel = function (url, opts) {
                     if (texture.isRenderable()) {
                         return Promise.resolve(texture);
                     }
-                    else {
-                        return new Promise(function (resolve) {
-                            texture.success(resolve);
-                            texture.error(resolve);
-                        });
-                    }
+                    return new Promise(function (resolve) {
+                        texture.success(resolve);
+                        texture.error(resolve);
+                    });
                 })).then(function () {
                     afterLoad(result);
                 }).catch(function () {
