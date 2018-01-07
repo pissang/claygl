@@ -17,6 +17,12 @@
     <div id="main"></div>
     <script>
         var app = clay.application.create('#main', {
+
+            graphic: {
+                linear: true,
+                tonemapping: true
+            },
+
             init: function (app) {
                 // Create camera
                 this._camera = app.createCamera([0, 10, 25], [0, 0, 0]);

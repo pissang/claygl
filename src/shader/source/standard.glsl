@@ -232,6 +232,7 @@ uniform float maxMipmapLevel: 5;
 
 @import clay.util.parallax_correct
 
+@import clay.util.ACES
 
 float G_Smith(float g, float ndv, float ndl)
 {
@@ -627,6 +628,12 @@ void main() {
     }
 #endif
 
+#ifdef TONEMAPPING
+    outColor.rgb = ACESToneMapping(outColor.rgb);
+#endif
+#ifdef SRGB_ENCODE
+    outColor = linearTosRGB(outColor);
+#endif
     gl_FragColor = encodeHDR(outColor);
 }
 

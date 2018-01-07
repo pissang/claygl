@@ -240,3 +240,15 @@ vec4 clampSample(const in sampler2D texture, const in vec2 coord)
     return texture2D(texture, coordClamped);
 }
 @end
+
+@export clay.util.ACES
+vec3 ACESToneMapping(vec3 color)
+{
+    const float A = 2.51;
+    const float B = 0.03;
+    const float C = 2.43;
+    const float D = 0.59;
+    const float E = 0.14;
+    return (color * (A * color + B)) / (color * (C * color + D) + E);
+}
+@end

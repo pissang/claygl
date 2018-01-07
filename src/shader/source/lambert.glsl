@@ -111,6 +111,8 @@ varying vec4 v_Color;
 
 @import clay.plugin.compute_shadow_map
 
+@import clay.util.ACES
+
 void main()
 {
 #ifdef RENDER_NORMAL
@@ -275,6 +277,13 @@ void main()
     if (gl_FragColor.a < alphaCutoff) {
         discard;
     }
+#endif
+
+#ifdef TONEMAPPING
+    gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);
+#endif
+#ifdef SRGB_ENCODE
+    gl_FragColor = linearTosRGB(gl_FragColor);
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);

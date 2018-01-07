@@ -73,6 +73,8 @@ varying vec3 v_Barycentric;
 
 @import clay.util.srgb
 
+@import clay.util.ACES
+
 void main()
 {
 
@@ -116,6 +118,13 @@ void main()
     if (gl_FragColor.a < alphaCutoff) {
         discard;
     }
+#endif
+
+#ifdef TONEMAPPING
+    gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);
+#endif
+#ifdef SRGB_ENCODE
+    gl_FragColor = linearTosRGB(gl_FragColor);
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);

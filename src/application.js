@@ -4,10 +4,11 @@
  * @namespace clay.application
  */
 
- // TODO createCompositor, ambientCubemap, ambientSH.
+ // TODO createCompositor
  // TODO mobile. scroll events.
  // TODO Dispose test. geoCache test.
  // TODO fitModel, normal generation.
+ // TODO Skybox, Skydome.
 import Renderer from './Renderer';
 import Scene from './Scene';
 import Timeline from './animation/Timeline';
@@ -62,6 +63,8 @@ import './shader/builtin';
  * @param {number} [devicePixelRatio]
  * @param {Object} [graphic] Graphic configuration including shadow, postEffect
  * @param {boolean} [graphic.shadow=false] If enable shadow
+ * @param {boolean} [graphic.linear=false] If use linear space
+ * @param {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
  * @param {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
  */
 function App3D(dom, appNS) {
@@ -195,6 +198,9 @@ function App3D(dom, appNS) {
             appNS.loop(self);
 
             gScene.update();
+            self._updateGraphicOptions(appNS.graphic, gScene.opaqueList);
+            self._updateGraphicOptions(appNS.graphic, gScene.transparentList);
+
             gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
             // Render shadow pass
             gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
@@ -293,6 +299,32 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
             }
         });
     }, this);
+};
+
+App3D.prototype._updateGraphicOptions = function (graphicOpts, list) {
+    var enableTonemapping = !!graphicOpts.tonemapping;
+    var isLinearSpace = !!graphicOpts.linear;
+
+    var prevMaterial;
+
+    for (var i = 0; i < list.length; i++) {
+        var mat = list[i].material;
+        if (mat === prevMaterial) {
+            continue;
+        }
+
+        enableTonemapping ? mat.define('fragment', 'TONEMAPPING') : mat.undefine('fragment', 'TONEMAPPING');
+        if (isLinearSpace) {
+            mat.define('fragment', 'SRGB_ENCODE');
+            mat.define('fragment', 'SRGB_DECODE');
+        }
+        else {
+            mat.undefine('fragment', 'SRGB_ENCODE');
+            mat.undefine('fragment', 'SRGB_DECODE');
+        }
+
+        prevMaterial = mat;
+    }
 };
 
 App3D.prototype._doRender = function (renderer, scene) {
