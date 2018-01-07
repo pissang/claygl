@@ -14,8 +14,6 @@ import Timeline from './animation/Timeline';
 import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
-import CylinderGeo from './geometry/Cylinder';
-import ConeGeo from './geometry/Cone';
 import Texture2D from './Texture2D';
 import Texture from './Texture';
 import shaderLibrary from './shader/library';
@@ -36,6 +34,7 @@ import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
 import LRUCache from './core/LRU';
 import util from './core/util';
+import textureUtil from './util/texture';
 
 import colorUtil from './core/color';
 var parseColor = colorUtil.parseToFloat;
@@ -155,6 +154,8 @@ function App3D(dom, appNS) {
      * @method
      */
     this.dispose = function () {
+        this._disposed = true;
+
         if (appNS.dispose) {
             appNS.dispose(this);
         }
@@ -171,6 +172,7 @@ function App3D(dom, appNS) {
     gRayPicking && this._initMouseEvents(gRayPicking);
 
     this._geoCache = new LRUCache(20);
+    this._texCache = new LRUCache(5);
 
     // Do init the application.
     var initPromise = Promise.resolve(appNS.init && appNS.init(this));
@@ -375,6 +377,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
  * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
  * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
  * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
+ * @param {number} [opts.exposure] Only be used when source is a HDR image.
  * @return {Promise}
  * @example
  *  app.loadTexture('diffuseMap.jpg')
@@ -389,9 +392,15 @@ App3D.prototype.loadTexture = function (urlOrImg, opts) {
         var texture = self.loadTextureSync(urlOrImg, opts);
         if (!texture.isRenderable()) {
             texture.success(function () {
+                if (self._disposed) {
+                    return;
+                }
                 resolve(texture);
             });
             texture.error(function () {
+                if (self._disposed) {
+                    return;
+                }
                 reject();
             });
         }
@@ -411,6 +420,7 @@ App3D.prototype.loadTexture = function (urlOrImg, opts) {
  * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
  * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
  * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
+ * @param {number} [opts.exposure] Only be used when source is a HDR image.
  * @return {Promise}
  * @example
  *  var texture = app.loadTexture('diffuseMap.jpg', {
@@ -422,7 +432,18 @@ App3D.prototype.loadTexture = function (urlOrImg, opts) {
 App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
     var texture = new Texture2D(opts);
     if (typeof urlOrImg === 'string') {
-        texture.load(urlOrImg);
+        if (urlOrImg.match(/.hdr$|^data:application\/octet-stream/)) {
+            texture = textureUtil.loadTexture(urlOrImg, {
+                exposure: opts && opts.exposure,
+                fileType: 'hdr'
+            }, function () {
+                texture.dirty();
+                texture.trigger('success');
+            });
+        }
+        else {
+            texture.load(urlOrImg);
+        }
     }
     else if (isImageLikeElement(urlOrImg)) {
         texture.image = urlOrImg;
@@ -761,6 +782,60 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
 };
 
 /**
+ * Create an cubemap ambient light for specular lighting in PBR rendering.
+ * @param {ImageLike} [envImage] Panorama environment image, HDR format is better.
+ * @param {Color} [color='#fff'] Color of light.
+ * @param {number} [intensity=1] Intensity of light.
+ * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
+ */
+App3D.prototype.createAmbientCubemapLight = function (envImage, color, intensity, exposure) {
+    var texCache = this._texCache;
+    var self = this;
+    if (typeof color === 'string') {
+        color = parseColor(color);
+    }
+    if (exposure == null) {
+        exposure = 1;
+    }
+    var key = typeof envImage === 'string'
+        ? envImage : (envImage.__key__ || (envImage.__key__ = util.genGUID()));
+
+    key += '_' + exposure;
+
+    var prefilterTexturePromise = texCache.get(key);
+    var scene = this.scene;
+
+    if (prefilterTexturePromise) {
+        return prefilterTexturePromise.then(function (prefilterTexture) {
+            var light =  new AmbientCubemapLight({
+                color: color || [1, 1, 1],
+                intensity: intensity != null ? intensity : 1,
+                cubemap: prefilterTexture
+            });
+            scene.add(light);
+        });
+    }
+
+    return this.loadTexture(envImage, {
+            exposure: exposure
+        }).then(function (texture) {
+        var light = new AmbientCubemapLight({
+            color: color || [1, 1, 1],
+            intensity: intensity != null ? intensity : 1
+        });
+        light.cubemap = texture;
+        texture.flipY = false;
+        light.prefilter(self.renderer, 64);
+
+        texCache.put(key, light.cubemap);
+
+        scene.add(light);
+
+        return light;
+    });
+};
+
+/**
  * Load a [glTF](https://github.com/KhronosGroup/glTF) format model.
  * You can convert FBX/DAE/OBJ format models to [glTF](https://github.com/KhronosGroup/glTF) with [fbx2gltf](https://github.com/pissang/claygl#fbx-to-gltf20-converter) python script,
  * or simply using the [Clay Viewer](https://github.com/pissang/clay-viewer) client application.
@@ -797,9 +872,14 @@ App3D.prototype.loadModel = function (url, opts) {
 
     var scene = this.scene;
     var timeline = this.timeline;
+    var self = this;
 
     return new Promise(function (resolve, reject) {
         function afterLoad(result) {
+            if (self._disposed) {
+                return;
+            }
+
             scene.add(result.rootNode);
             if (opts.autoPlayAnimation) {
                 result.clips.forEach(function (clip) {
@@ -809,6 +889,10 @@ App3D.prototype.loadModel = function (url, opts) {
             resolve(result);
         }
         loader.success(function (result) {
+            if (self._disposed) {
+                return;
+            }
+
             if (!opts.waitTextureLoaded) {
                 afterLoad(result);
             }

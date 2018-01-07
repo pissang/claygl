@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <title>Model loading</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+            init: function (app) {
+                // Create camera
+                this._camera = app.createCamera([0, 10, 25], [0, 0, 0]);
+
+                // Use orbit control
+                this._control = new clay.plugin.OrbitControl({
+                    target: this._camera,
+                    domElement: app.container
+                });
+
+                app.createAmbientCubemapLight(
+                    './assets/textures/hdr/pisa.hdr',
+                    '#fff', 1, 2
+                );
+
+                for (var i = 0; i < 10; i++) {
+                    app.createSphere(20, {
+                        metalness: 1,
+                        roughness: i / 10
+                    }).position.set((i - 5) * 3, -5, 0);
+                }
+
+                // Load boombox model. return a load promise to make sure the look will be start after model loaded.
+                return app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
+                    waitTextureLoaded: true
+                }).then(function (result) {
+                    result.rootNode.scale.set(200, 200, 200);
+                });
+            },
+
+            loop: function (app) {
+                this._control.update(app.frameTime);
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>
