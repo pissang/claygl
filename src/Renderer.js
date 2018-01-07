@@ -520,10 +520,6 @@ var Renderer = Base.extend(function () {
         }
     },
 
-    // resetRenderStatus: function () {
-    //     this._currentShader = null;
-    // },
-
     /**
      * Do frustum culling on render list
      */
@@ -645,10 +641,6 @@ var Renderer = Base.extend(function () {
                 mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
             }
 
-            // FIXME Optimize for compositing.
-            // var prevShader = this._sceneRendering ? null : this._currentShader;
-            // var prevShader = null;
-
             // Before render hook
             renderable.beforeRender(this);
             passConfig.beforeRender.call(this, renderable, material, prevMaterial);
@@ -672,16 +664,13 @@ var Renderer = Base.extend(function () {
                 if (scene) {
                     scene.setLightUniforms(program, renderable.lightGroup, this);
                 }
-
-                // Save current used shader in the renderer
-                // ALWAYS USE RENDERER TO DRAW THE MESH
-                // this._currentShader = shader;
             }
             else {
                 program = prevProgram;
             }
 
-            if (prevMaterial !== material) {
+            // Program changes also needs reset the materials.
+            if (prevMaterial !== material || programChanged) {
                 if (material.depthTest !== depthTest) {
                     material.depthTest
                         ? _gl.enable(_gl.DEPTH_TEST)
