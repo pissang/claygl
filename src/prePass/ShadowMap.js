@@ -264,16 +264,15 @@ var ShadowMapPass = Base.extend(function () {
             if (light instanceof DirectionalLight) {
 
                 if (dirLightHasCascade) {
-                    console.warn('Only one dire light supported with shadow cascade');
+                    console.warn('Only one direectional light supported with shadow cascade');
+                    continue;
+                }
+                if (light.shadowCascade > 4) {
+                    console.warn('Support at most 4 cascade');
                     continue;
                 }
                 if (light.shadowCascade > 1) {
-                    dirLightHasCascade = light;
-
-                    if (light.shadowCascade > 4) {
-                        console.warn('Support at most 4 cascade');
-                        continue;
-                    }
+                    dirLightHasCascade = light.shadowCascade;
                 }
 
                 this.renderDirectionalLightShadow(
@@ -310,12 +309,6 @@ var ShadowMapPass = Base.extend(function () {
             this._shadowMapNumber[light.type]++;
         }
 
-        function getSize(texture) {
-            return texture.height;
-        }
-        var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
-        var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
-
         for (var lightType in this._shadowMapNumber) {
             var number = this._shadowMapNumber[lightType];
             var key = lightType + '_SHADOWMAP_COUNT';
@@ -341,34 +334,44 @@ var ShadowMapPass = Base.extend(function () {
             else {
                 material.undefine('fragment', 'SHADOW_CASCADE');
             }
+        }
 
-            if (spotLightShadowMaps.length > 0) {
-                material.setUniform('spotLightShadowMaps', spotLightShadowMaps);
-                material.setUniform('spotLightMatrices', spotLightMatrices);
-                material.setUniform('spotLightShadowMapSizes', spotLightShadowMapSizes);
-            }
-            if (directionalLightShadowMaps.length > 0) {
-                material.setUniform('directionalLightShadowMaps', directionalLightShadowMaps);
-                if (dirLightHasCascade) {
-                    var shadowCascadeClipsNear = shadowCascadeClips.slice();
-                    var shadowCascadeClipsFar = shadowCascadeClips.slice();
-                    shadowCascadeClipsNear.pop();
-                    shadowCascadeClipsFar.shift();
+        var shadowUniforms = scene.shadowUniforms;
 
-                    // Iterate from far to near
-                    shadowCascadeClipsNear.reverse();
-                    shadowCascadeClipsFar.reverse();
-                    // directionalLightShadowMaps.reverse();
-                    directionalLightMatrices.reverse();
-                    material.setUniform('shadowCascadeClipsNear', shadowCascadeClipsNear);
-                    material.setUniform('shadowCascadeClipsFar', shadowCascadeClipsFar);
-                }
-                material.setUniform('directionalLightMatrices', directionalLightMatrices);
-                material.setUniform('directionalLightShadowMapSizes', directionalLightShadowMapSizes);
+        function getSize(texture) {
+            return texture.height;
+        }
+        if (directionalLightShadowMaps.length > 0) {
+            var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
+            shadowUniforms.directionalLightShadowMaps = { value: directionalLightShadowMaps, type: 'tv' };
+            shadowUniforms.directionalLightMatrices = { value: directionalLightMatrices, type: 'm4v' };
+            shadowUniforms.directionalLightShadowMapSizes = { value: directionalLightShadowMapSizes, type: '1fv' };
+            if (dirLightHasCascade) {
+                var shadowCascadeClipsNear = shadowCascadeClips.slice();
+                var shadowCascadeClipsFar = shadowCascadeClips.slice();
+                shadowCascadeClipsNear.pop();
+                shadowCascadeClipsFar.shift();
+
+                // Iterate from far to near
+                shadowCascadeClipsNear.reverse();
+                shadowCascadeClipsFar.reverse();
+                // directionalLightShadowMaps.reverse();
+                directionalLightMatrices.reverse();
+                shadowUniforms.shadowCascadeClipsNear = { value: shadowCascadeClipsNear, type: '1fv' };
+                shadowUniforms.shadowCascadeClipsFar = { value: shadowCascadeClipsFar, type: '1fv' };
             }
-            if (pointLightShadowMaps.length > 0) {
-                material.setUniform('pointLightShadowMaps', pointLightShadowMaps);
-            }
+        }
+
+        if (spotLightShadowMaps.length > 0) {
+            var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
+            var shadowUniforms = scene.shadowUniforms;
+            shadowUniforms.spotLightShadowMaps = { value: spotLightShadowMaps, type: 'tv' };
+            shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'm4v' };
+            shadowUniforms.spotLightShadowMapSizes = { value: spotLightShadowMapSizes, type: '1fv' };
+        }
+
+        if (pointLightShadowMaps.length > 0) {
+            shadowUniforms.pointLightShadowMaps = { value: pointLightShadowMaps, type: 'tv' };
         }
     },
 

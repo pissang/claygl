@@ -70,6 +70,9 @@ var Scene = Node.extend(function () {
          */
         viewBoundingBoxLastFrame: new BoundingBox(),
 
+        // Uniforms for shadow map.
+        shadowUniforms: {},
+
         _cameraList: [],
 
         // Properties to save the light information in the scene
@@ -284,6 +287,10 @@ var Scene = Node.extend(function () {
 
             for (var symbol in light.uniformTemplates) {
                 var uniformTpl = light.uniformTemplates[symbol];
+                var value = uniformTpl.value(light);
+                if (value == null) {
+                    continue;
+                }
                 if (!lightUniforms[group]) {
                     lightUniforms[group] = {};
                 }
@@ -293,7 +300,6 @@ var Scene = Node.extend(function () {
                         value: []
                     };
                 }
-                var value = uniformTpl.value(light);
                 var lu = lightUniforms[group][symbol];
                 lu.type = uniformTpl.type + 'v';
                 switch (uniformTpl.type) {
@@ -305,7 +311,7 @@ var Scene = Node.extend(function () {
                     case '2f':
                     case '3f':
                     case '4f':
-                        for (var j =0; j < value.length; j++) {
+                        for (var j = 0; j < value.length; j++) {
                             lu.value.push(value[j]);
                         }
                         break;
@@ -375,24 +381,34 @@ var Scene = Node.extend(function () {
         return this._lightProgramKeys[lightGroup];
     },
 
-    setLightUniforms: function (program, lightGroup, renderer) {
-        for (var symbol in this._lightUniforms[lightGroup]) {
-            var lu = this._lightUniforms[lightGroup][symbol];
-            if (lu.type === 'tv') {
-                for (var i = 0; i < lu.value.length; i++) {
-                    var texture = lu.value[i];
-                    var slot = program.currentTextureSlot();
-                    var result = program.setUniform(renderer.gl, '1i', symbol, slot);
-                    if (result) {
-                        program.takeCurrentTextureSlot(renderer, texture);
+    setLightUniforms: (function () {
+        function setUniforms(uniforms, program, renderer) {
+            for (var symbol in uniforms) {
+                var lu = uniforms[symbol];
+                if (lu.type === 'tv') {
+                    if (!program.hasUniform(symbol)) {
+                        continue;
                     }
+                    var texSlots = [];
+                    for (var i = 0; i < lu.value.length; i++) {
+                        var texture = lu.value[i];
+                        var slot = program.takeCurrentTextureSlot(renderer, texture);
+                        texSlots.push(slot);
+                    }
+                    program.setUniform(renderer.gl, '1iv', symbol, texSlots);
+                }
+                else {
+                    program.setUniform(renderer.gl, lu.type, symbol, lu.value);
                 }
             }
-            else {
-                program.setUniform(renderer.gl, lu.type, symbol, lu.value);
-            }
         }
-    },
+
+        return function (program, lightGroup, renderer) {
+            setUniforms(this._lightUniforms[lightGroup], program, renderer);
+            // Set shadows
+            setUniforms(this.shadowUniforms, program, renderer);
+        };
+    })(),
 
     /**
      * Dispose self, clear all the scene objects

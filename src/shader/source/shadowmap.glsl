@@ -268,28 +268,27 @@ float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
 #ifdef SPOT_LIGHT_SHADOWMAP_COUNT
-uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
-uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
-uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
+uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
+uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
 #endif
 
 #ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
 #if defined(SHADOW_CASCADE)
-uniform sampler2D directionalLightShadowMaps[1];
-uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
-uniform float directionalLightShadowMapSizes[1];
-uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
-uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
+uniform sampler2D directionalLightShadowMaps[1]:unconfigurable;
+uniform mat4 directionalLightMatrices[SHADOW_CASCADE]:unconfigurable;
+uniform float directionalLightShadowMapSizes[1]:unconfigurable;
+uniform float shadowCascadeClipsNear[SHADOW_CASCADE]:unconfigurable;
+uniform float shadowCascadeClipsFar[SHADOW_CASCADE]:unconfigurable;
 #else
-uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
+uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
+uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
 #endif
 #endif
 
 #ifdef POINT_LIGHT_SHADOWMAP_COUNT
-uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
-uniform float pointLightShadowMapSizes[POINT_LIGHT_SHADOWMAP_COUNT];
+uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;
 #endif
 
 uniform bool shadowEnabled : true;
