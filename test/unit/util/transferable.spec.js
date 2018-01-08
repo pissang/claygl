@@ -20,10 +20,11 @@ function assertUnitCube(object) {
         assert(attributes[k].value.length > 0);
     });
     
-    //buffers
-    const counts = [132, 156, 104, 156];
+    //buffer length
+    const counts = [264, 624, 416, 624];
     object.buffers.forEach((b, idx) => {
-        assert(b.length === counts[idx]);
+        assert(b instanceof ArrayBuffer);
+        assert(b.byteLength === counts[idx]);
     });
 }
 

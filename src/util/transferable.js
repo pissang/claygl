@@ -43,7 +43,7 @@ var transferableUtil = {
         //indices
         if (geometry.indices && geometry.indices.length > 0) {
             data.indices = copyIfNecessary(geometry.indices, shallow);
-            buffers.push(data.indices);
+            buffers.push(data.indices.buffer);
         }
 
         //attributes
@@ -54,7 +54,7 @@ var transferableUtil = {
                 //ignore empty attributes
                 if (attr && attr.value && attr.value.length > 0) {
                     attr = data.attributes[p] = copyAttribute(attr, shallow);
-                    buffers.push(attr.value);
+                    buffers.push(attr.value.buffer);
                 }
             }
         }
