@@ -521,7 +521,7 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
 App3D.prototype.createMaterial = function (matConfig) {
     matConfig = matConfig || {};
     matConfig.shader = matConfig.shader || 'clay.standardMR';
-    var shader = shader instanceof Shader ? shader : shaderLibrary.get(matConfig.shader);
+    var shader = matConfig.shader instanceof Shader ? matConfig.shader : shaderLibrary.get(matConfig.shader);
     var material = new Material({
         shader: shader
     });

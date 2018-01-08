@@ -132,7 +132,7 @@ var CanvasRenderer = Base.extend({
     try {
         this.ctx = canvas.getContext('2d');
         var ctx = this.ctx;
-        if (! ctx) {
+        if (!ctx) {
             throw new Error();
         }
     }

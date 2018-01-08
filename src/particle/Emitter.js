@@ -130,31 +130,31 @@ var Emitter = Base.extend(
 
 /**
  * Create a constant 1d value generator. Alias for {@link clay.math.Value.constant}
- * @method clay.particle.Emitter.constant
+ * @function clay.particle.Emitter.constant
  */
 Emitter.constant = Value.constant;
 
 /**
  * Create a constant vector value(2d or 3d) generator. Alias for {@link clay.math.Value.vector}
- * @method clay.particle.Emitter.vector
+ * @function clay.particle.Emitter.vector
  */
 Emitter.vector = Value.vector;
 
 /**
  * Create a random 1d value generator. Alias for {@link clay.math.Value.random1D}
- * @method clay.particle.Emitter.random1D
+ * @function clay.particle.Emitter.random1D
  */
 Emitter.random1D = Value.random1D;
 
 /**
  * Create a random 2d value generator. Alias for {@link clay.math.Value.random2D}
- * @method clay.particle.Emitter.random2D
+ * @function clay.particle.Emitter.random2D
  */
 Emitter.random2D = Value.random2D;
 
 /**
  * Create a random 3d value generator. Alias for {@link clay.math.Value.random3D}
- * @method clay.particle.Emitter.random3D
+ * @function clay.particle.Emitter.random3D
  */
 Emitter.random3D = Value.random3D;
 
