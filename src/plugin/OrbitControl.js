@@ -26,7 +26,7 @@ var OrbitControl = Base.extend(function () {
 
     return /** @lends clay.plugin.OrbitControl# */ {
 
-        animation: null,
+        timeline: null,
 
         /**
          * @type {HTMLDomElement}
@@ -166,8 +166,8 @@ var OrbitControl = Base.extend(function () {
         dom.addEventListener('mousedown', this._mouseDownHandler);
         dom.addEventListener('mousewheel', this._mouseWheelHandler);
 
-        if (this.animation) {
-            this.animation.on('frame', this.update);
+        if (this.timeline) {
+            this.timeline.on('frame', this.update);
         }
     },
 
@@ -187,8 +187,8 @@ var OrbitControl = Base.extend(function () {
         dom.removeEventListener('mouseup', this._mouseUpHandler);
         dom.removeEventListener('mousewheel', this._mouseWheelHandler);
 
-        if (this.animation) {
-            this.animation.off('frame', this.update);
+        if (this.timeline) {
+            this.timeline.off('frame', this.update);
         }
         this.stopAllAnimation();
     },
@@ -313,8 +313,8 @@ var OrbitControl = Base.extend(function () {
 
         var obj = {};
         var target = {};
-        var animation = this.animation;
-        if (!animation) {
+        var timeline = this.timeline;
+        if (!timeline) {
             return;
         }
         if (opts.distance != null) {
@@ -335,7 +335,7 @@ var OrbitControl = Base.extend(function () {
         }
 
         return this._addAnimator(
-            animation.animate(obj)
+            timeline.animate(obj)
                 .when(opts.duration || 1000, target)
                 .during(function () {
                     if (obj.alpha != null) {
@@ -357,7 +357,7 @@ var OrbitControl = Base.extend(function () {
     },
 
     /**
-     * Stop all animation
+     * Stop all animations
      */
     stopAllAnimation: function () {
         for (var i = 0; i < this._animators.length; i++) {
