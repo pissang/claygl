@@ -528,7 +528,7 @@ Vector3.dist = function(a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} a
  * @param  {clay.math.Vector3} b
  * @return {number}
@@ -548,7 +548,7 @@ Vector3.div = function(out, a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} out
  * @param  {clay.math.Vector3} a
  * @param  {clay.math.Vector3} b
@@ -622,7 +622,7 @@ Vector3.mul = function(out, a, b) {
     return out;
 };
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} out
  * @param  {clay.math.Vector3} a
  * @param  {clay.math.Vector3} b
@@ -691,7 +691,7 @@ Vector3.sqrDist = function(a, b) {
     return vec3.sqrDist(a.array, b.array);
 };
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} a
  * @param  {clay.math.Vector3} b
  * @return {number}
@@ -705,7 +705,7 @@ Vector3.sqrLen = function(a) {
     return vec3.sqrLen(a.array);
 };
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} a
  * @return {number}
  */
@@ -723,7 +723,7 @@ Vector3.sub = function(out, a, b) {
     return out;
 };
 /**
- * @method
+ * @function
  * @param  {clay.math.Vector3} out
  * @param  {clay.math.Vector3} a
  * @param  {clay.math.Vector3} b

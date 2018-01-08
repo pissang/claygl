@@ -81,7 +81,7 @@ Plane.prototype = {
 
     /**
      * Calculate the intersection point between plane and a given line
-     * @method
+     * @function
      * @param {clay.math.Vector3} start start point of line
      * @param {clay.math.Vector3} end end point of line
      * @param {clay.math.Vector3} [out]
@@ -120,7 +120,7 @@ Plane.prototype = {
 
     /**
      * Apply an affine transform matrix to plane
-     * @method
+     * @function
      * @return {clay.math.Matrix4}
      */
     applyTransform: (function() {

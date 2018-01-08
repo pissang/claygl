@@ -141,7 +141,7 @@ Frustum.prototype = {
 
     /**
      * Apply a affine transform matrix and set to the given bounding box
-     * @method
+     * @function
      * @param {clay.math.BoundingBox}
      * @param {clay.math.Matrix4}
      * @return {clay.math.BoundingBox}

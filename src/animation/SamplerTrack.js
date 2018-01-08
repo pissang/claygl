@@ -297,7 +297,7 @@ SamplerTrack.prototype._findRange = function (time) {
 
 /**
  * 1D blending between two clips
- * @method
+ * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  * @param  {number} w
@@ -305,7 +305,7 @@ SamplerTrack.prototype._findRange = function (time) {
 SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
 /**
  * 2D blending between three clips
- * @method
+ * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c3
@@ -315,14 +315,14 @@ SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
 SamplerTrack.prototype.blend2D = TransformTrack.prototype.blend2D;
 /**
  * Additive blending between two clips
- * @method
+ * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
 SamplerTrack.prototype.additiveBlend = TransformTrack.prototype.additiveBlend;
 /**
  * Subtractive blending between two clips
- * @method
+ * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */

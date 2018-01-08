@@ -43,6 +43,7 @@ import colorUtil from './core/color';
 var parseColor = colorUtil.parseToFloat;
 
 import './shader/builtin';
+import Shader from './Shader';
 
 /**
  * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
@@ -148,7 +149,7 @@ function App3D(dom, appNS) {
 
     /**
      * Resize the application. Will use the container clientWidth/clientHeight if width/height in parameters are not given.
-     * @method
+     * @function
      * @memberOf {clay.application.App3D}
      * @param {number} [width]
      * @param {number} [height]
@@ -161,7 +162,7 @@ function App3D(dom, appNS) {
 
     /**
      * Dispose the application
-     * @method
+     * @function
      */
     this.dispose = function () {
         this._disposed = true;
@@ -513,15 +514,16 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
  * Create a material.
  * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
- * @param {string} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
+ * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
  * @return {clay.Material}
  */
 App3D.prototype.createMaterial = function (matConfig) {
     matConfig = matConfig || {};
     matConfig.shader = matConfig.shader || 'clay.standardMR';
+    var shader = shader instanceof Shader ? shader : shaderLibrary.get(matConfig.shader);
     var material = new Material({
-        shader: shaderLibrary.get(matConfig.shader)
+        shader: shader
     });
     function makeTextureSetter(key) {
         return function (texture) {
@@ -550,7 +552,7 @@ App3D.prototype.createMaterial = function (matConfig) {
 
 /**
  * Create a cube mesh and add it to the scene or the given parent node.
- * @method
+ * @function
  * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
  *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
@@ -583,7 +585,7 @@ App3D.prototype.createCube = function (subdiv, material, parentNode) {
 
 /**
  * Create a cube mesh that camera is inside the cube.
- * @method
+ * @function
  * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
  *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
@@ -617,7 +619,7 @@ App3D.prototype.createCubeInside = function (subdiv, material, parentNode) {
 
 /**
  * Create a sphere mesh and add it to the scene or the given parent node.
- * @method
+ * @function
  * @param {number} [subdivision=20] Subdivision of sphere.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
@@ -648,7 +650,7 @@ App3D.prototype.createSphere = function (subdivision, material, parentNode) {
 
 /**
  * Create a plane mesh and add it to the scene or the given parent node.
- * @method
+ * @function
  * @param {Array.<number>|number} [subdivision=1] Subdivision of plane.
  *          Can be a number to represent both width and height dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
@@ -889,7 +891,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * or simply using the [Clay Viewer](https://github.com/pissang/clay-viewer) client application.
  * @param {string} url
  * @param {Object} opts
- * @param {string} [opts.shader='lambert'] 'basic'|'lambert'|'standard'
+ * @param {string|clay.Shader} [opts.shader='clay.standard'] 'basic'|'lambert'|'standard'.
  * @param {boolean} [opts.waitTextureLoaded=false] If add to scene util textures are all loaded.
  * @param {boolean} [opts.autoPlayAnimation=true] If autoplay the animation of model.
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
@@ -906,11 +908,11 @@ App3D.prototype.loadModel = function (url, opts) {
     if (opts.autoPlayAnimation == null) {
         opts.autoPlayAnimation = true;
     }
-    var shaderName = opts.shader || 'standard';
+    var shader = opts.shader || 'clay.standard';
 
     var loaderOpts = {
         rootNode: new Node(),
-        shaderName: 'clay.' + shaderName,
+        shader: shader,
         textureRootPath: opts.textureRootPath,
         crossOrigin: 'Anonymous',
         textureFlipY: opts.textureFlipY

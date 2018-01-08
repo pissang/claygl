@@ -436,7 +436,7 @@ var Node = Base.extend(
 
     /**
      * Decompose the world transform to SRT
-     * @method
+     * @function
      */
     decomposeWorldTransform: (function () {
 
@@ -632,7 +632,7 @@ var Node = Base.extend(
      * @param {clay.math.Vector3} axis  Center axis
      * @param {number}       angle Rotation angle
      * @see http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
-     * @method
+     * @function
      */
     rotateAround: (function () {
         var v = new Vector3();
@@ -662,7 +662,7 @@ var Node = Base.extend(
      * @param {clay.math.Vector3} target
      * @param {clay.math.Vector3} [up]
      * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
-     * @method
+     * @function
      */
     lookAt: (function () {
         var m = new Matrix4();

@@ -32,6 +32,7 @@ import Geometry from '../Geometry';
 
 // Import builtin shader
 import '../shader/builtin';
+import Shader from '../Shader';
 
 var semanticAttributeMap = {
     'NORMAL': 'normal',
@@ -142,10 +143,10 @@ var GLTFLoader = Base.extend(
 
     /**
      * Shader used when creating the materials.
-     * @type {string}
+     * @type {string|clay.Shader}
      * @default 'clay.standard'
      */
-    shaderName: 'clay.standard',
+    shader: 'clay.standard',
 
     /**
      * If use {@link clay.StandardMaterial}
@@ -432,6 +433,15 @@ function () {
         return util.relative2absolute(path, rootPath);
     },
 
+    _getShader: function () {
+        if (typeof this.shader === 'string') {
+            return this.shaderLibrary.get(this.shader);
+        }
+        else if (this.shader instanceof Shader) {
+            return this.shader;
+        }
+    },
+
     _loadBuffer: function (path, onsuccess, onerror) {
         request.get({
             url: this.resolveBinaryPath(path),
@@ -590,7 +600,7 @@ function () {
         else {
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName)
+                shader: this._getShader()
             });
 
             material.define('fragment', 'USE_ROUGHNESS');
@@ -723,7 +733,7 @@ function () {
 
             material = new Material({
                 name: materialInfo.name,
-                shader: this.shaderLibrary.get(this.shaderName)
+                shader: this._getShader()
             });
 
             material.define('fragment', 'USE_ROUGHNESS');
@@ -803,7 +813,7 @@ function () {
 
         material = new Material({
             name: materialInfo.name,
-            shader: this.shaderLibrary.get(this.shaderName)
+            shader: this._getShader()
         });
 
         material.define('fragment', 'GLOSSINESS_CHANNEL', 3);
@@ -815,10 +825,6 @@ function () {
             material.define('fragment', 'DOUBLE_SIDED');
         }
 
-        material = new Material({
-            name: materialInfo.name,
-            shader: this.shaderLibrary.get(this.shaderName)
-        });
         material.set(commonProperties);
 
         if (materialInfo.alphaMode === 'BLEND') {
@@ -935,7 +941,7 @@ function () {
                 // Use default material
                 if (!material) {
                     material = new Material({
-                        shader: this.shaderLibrary.get(self.shaderName)
+                        shader: self._getShader()
                     });
                 }
                 var mesh = new Mesh({

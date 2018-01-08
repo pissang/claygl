@@ -410,6 +410,11 @@ var Material = Base.extend(function () {
         material.transparent = this.transparent;
         material.blend = this.blend;
 
+        material.vertexDefines = util.clone(this.vertexDefines);
+        material.fragmentDefines = util.clone(this.fragmentDefines);
+        material.enableTexture(this.getEnabledTextures());
+        material.precision = this.precision;
+
         return material;
     },
 

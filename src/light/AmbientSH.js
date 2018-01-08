@@ -45,7 +45,7 @@ var AmbientSHLight = Light.extend({
         }
     }
     /**
-     * @method
+     * @function
      * @name clone
      * @return {clay.light.Ambient}
      * @memberOf clay.light.Ambient.prototype

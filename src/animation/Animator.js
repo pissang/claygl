@@ -131,12 +131,6 @@ function fillArr(arr0, arr1, arrDim) {
     }
 }
 
-/**
- * @param  {Array} arr0
- * @param  {Array} arr1
- * @param  {number} arrDim
- * @return {boolean}
- */
 function isArraySame(arr0, arr1, arrDim) {
     if (arr0 === arr1) {
         return true;
@@ -432,7 +426,7 @@ Animator.prototype = {
     },
     /**
      * Start the animation
-     * @param  {string|function} easing
+     * @param  {string|Function} easing
      * @return {clay.animation.Animator}
      * @memberOf clay.animation.Animator.prototype
      */

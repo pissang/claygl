@@ -223,7 +223,7 @@ Matrix2d.mul = function(out, a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Matrix2d} out
  * @param  {clay.math.Matrix2d} a
  * @param  {clay.math.Matrix2d} b

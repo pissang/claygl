@@ -83,7 +83,7 @@ var Camera = Node.extend(function () {
 
     /**
      * Cast a picking ray from camera near plane to far plane
-     * @method
+     * @function
      * @param {clay.math.Vector2} ndc
      * @param {clay.math.Ray} [out]
      * @return {clay.math.Ray}
@@ -114,7 +114,7 @@ var Camera = Node.extend(function () {
     })()
 
     /**
-     * @method
+     * @function
      * @name clone
      * @return {clay.Camera}
      * @memberOf clay.Camera.prototype

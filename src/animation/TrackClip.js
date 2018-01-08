@@ -19,10 +19,10 @@ var vec3 = glMatrix.vec3;
  * @param {number} [opts.gap]
  * @param {number} [opts.playbackRatio]
  * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
- * @param {string|function} [opts.easing]
- * @param {function} [opts.onframe]
- * @param {function} [opts.onfinish]
- * @param {function} [opts.onrestart]
+ * @param {string|Function} [opts.easing]
+ * @param {Function} [opts.onframe]
+ * @param {Function} [opts.onfinish]
+ * @param {Function} [opts.onrestart]
  * @param {Array.<clay.animation.SamplerTrack>} [opts.tracks]
  */
 var TrackClip = function (opts) {

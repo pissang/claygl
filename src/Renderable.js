@@ -361,7 +361,7 @@ var Renderable = Node.extend(
 
     /**
      * Clone a new renderable
-     * @method
+     * @function
      * @return {clay.Renderable}
      */
     clone: (function() {

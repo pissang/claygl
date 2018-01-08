@@ -81,7 +81,7 @@ var AmbientCubemapLight = Light.extend({
         }
     }
     /**
-     * @method
+     * @function
      * @name clone
      * @return {clay.light.AmbientCubemap}
      * @memberOf clay.light.AmbientCubemap.prototype

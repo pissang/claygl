@@ -589,7 +589,7 @@ Quaternion.mul = function (out, a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Quaternion} out
  * @param  {clay.math.Quaternion} a
  * @param  {clay.math.Quaternion} b
@@ -665,7 +665,7 @@ Quaternion.sqrLen = function (a) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Quaternion} a
  * @return {number}
  */

@@ -295,7 +295,7 @@ Matrix3.mul = function (out, a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Matrix3} out
  * @param  {clay.math.Matrix3} a
  * @param  {clay.math.Matrix3} b

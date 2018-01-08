@@ -9,7 +9,7 @@ import Vector2 from './Vector2';
 var Value = function() {};
 
 /**
- * @method
+ * @function
  * @param {number|clay.math.Vector2|clay.math.Vector3} [out]
  * @return {number|clay.math.Vector2|clay.math.Vector3}
  */

@@ -132,7 +132,7 @@ var Skeleton = Base.extend(function () {
 
     /**
      * Calculate joint matrices from node transform
-     * @method
+     * @function
      */
     updateJointMatrices: (function () {
 

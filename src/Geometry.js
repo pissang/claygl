@@ -172,7 +172,7 @@ function Attribute(name, type, size, semantic) {
 
 /**
  * Set item value at give index. Second parameter val is number if size is 1
- * @method
+ * @function
  * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]|number} val
@@ -182,7 +182,7 @@ function Attribute(name, type, size, semantic) {
 
 /**
  * Get item value at give index. Second parameter out is no need if size is 1
- * @method
+ * @function
  * @name clay.Geometry.Attribute#set
  * @param {number} idx
  * @param {number[]} [out]

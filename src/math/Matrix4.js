@@ -581,7 +581,7 @@ Matrix4.mul = function(out, a, b) {
 };
 
 /**
- * @method
+ * @function
  * @param  {clay.math.Matrix4} out
  * @param  {clay.math.Matrix4} a
  * @param  {clay.math.Matrix4} b

@@ -104,7 +104,7 @@ Clip.prototype = {
     },
 
     /**
-     * @param {string|function} easing
+     * @param {string|Function} easing
      */
     setEasing: function (easing) {
         if (typeof(easing) === 'string') {
