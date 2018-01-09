@@ -271,6 +271,10 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
     var oldTarget = null;
     ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
         dom.addEventListener(eveType, this[makeHandlerName(eveType)] = function (e) {
+            if (!rayPicking.camera) { // Not have camera yet.
+                return;
+            }
+
             var box = dom.getBoundingClientRect();
             var offsetX = e.clientX - box.left;
             var offsetY = e.clientY - box.top;
@@ -858,12 +862,12 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
 
     return this.loadTexture(envImage, {
         exposure: exposure
-    }).then(function (texture) {
+    }).then(function (envTexture) {
         var specLight = new AmbientCubemapLight({
             intensity: specIntensity != null ? specIntensity : 0.7
         });
-        specLight.cubemap = texture;
-        texture.flipY = false;
+        specLight.cubemap = envTexture;
+        envTexture.flipY = false;
         // TODO Cache prefilter ?
         specLight.prefilter(self.renderer, 64);
 
@@ -880,7 +884,9 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
 
         return {
             specular: specLight,
-            diffuse: diffLight
+            diffuse: diffLight,
+            // Original environment map
+            environmentMap: envTexture
         };
     });
 };

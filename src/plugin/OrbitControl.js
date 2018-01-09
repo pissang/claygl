@@ -486,11 +486,6 @@ var OrbitControl = Base.extend(function () {
         v.normalize().scale(speed);
     },
 
-    // TODO Following code will cause decompose problem.
-    // camera.position.y = 2;
-    // camera.position.z = -4;
-    // camera.lookAt(scene.position);
-    //
     decomposeTransform: function () {
         if (!this.target) {
             return;
@@ -498,13 +493,21 @@ var OrbitControl = Base.extend(function () {
 
         // FIXME euler order......
         // FIXME alpha is not certain when beta is 90 or -90
-        var euler = new Vector3();
-        euler.eulerFromQuat(
-            this.target.rotation.normalize(), 'ZYX'
-        );
+        // var euler = new Vector3();
+        // euler.eulerFromMat3(
+        //    new Matrix3().fromQuat(this.target.rotation), 'ZYX'
+        // );
+        // euler.eulerFromQuat(
+        //     this.target.rotation.normalize(), 'ZYX'
+        // );
+        this.target.updateWorldTransform();
 
-        this._theta = -euler.x;
-        this._phi = -euler.y;
+        var forward = this.target.worldTransform.z;
+        var alpha = Math.asin(forward.y);
+        var beta = Math.atan2(forward.x, forward.z);
+
+        this._theta = alpha;
+        this._phi = -beta;
 
         this.setBeta(this.getBeta());
         this.setAlpha(this.getAlpha());
