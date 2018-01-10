@@ -2,7 +2,7 @@
 
 <img width="100%" src="./screenshot/claygl-logo.jpg" />
 
-[![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
+<!-- [![NPM Version](https://img.shields.io/npm/v/claygl.svg)] -->(https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
 ClayGL is a WebGL graphic library helping you to build scalable Web3D applications.
 
@@ -14,7 +14,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 
 #### [Examples](https://github.com/pissang/claygl-example)
 
-### Projects
+## Projects
 
 [ECharts GL](https://github.com/ecomfe/echarts-gl)
 
@@ -42,7 +42,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 </a>
 
 
-### Quick Start
+## Quick Start
 
 ##### Create a rotating cube
 
@@ -78,7 +78,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 </html>
 ```
 
-### Current Features
+## Current Features
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
 + Basic primitive geometry procedural generate
@@ -106,7 +106,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 + Stereo rendering, VR ready.
 
 
-### FBX to glTF2.0 Converter
+## FBX to glTF2.0 Converter
 
 [Get it](https://github.com/pissang/claygl/blob/master/tools/fbx2gltf.py)
 
