@@ -1,4 +1,6 @@
-# ClayGL
+<h1><img src="./asset/logo.svg" style="height:30px">  ClayGL</h1>
+
+<img width="600" src="./screenshot/claygl-logo.jpg" />
 
 [![NPM Version](https://img.shields.io/npm/v/qtek.svg)](https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/qtek)
 
