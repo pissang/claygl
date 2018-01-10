@@ -2,15 +2,17 @@
 
 <img width="100%" src="./screenshot/claygl-logo.jpg" />
 
-[![NPM Version](https://img.shields.io/npm/v/qtek.svg)](https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/qtek)
+[![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
-ClayGL is a WebGL graphic library.
+ClayGL is a WebGL graphic library helping you to build scalable Web3D applications.
+
+It's easy to use, configurable for high-quality graphics. Benefit from the modularity and tree shaking, it can be scaled down to 40k(gzipped) for a basic 3D application.
 
 #### [Download](https://github.com/pissang/claygl/releases)
 
 #### [API](http://pissang.github.io/claygl/doc/api)
 
-#### [Example](https://github.com/pissang/claygl-example)
+#### [Examples](https://github.com/pissang/claygl-example)
 
 ### Projects
 
@@ -76,7 +78,7 @@ ClayGL is a WebGL graphic library.
 </html>
 ```
 
-### Features
+### Current Features
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
 + Basic primitive geometry procedural generate
@@ -106,7 +108,7 @@ ClayGL is a WebGL graphic library.
 
 ### FBX to glTF2.0 Converter
 
-[Get it](https://github.com/pissang/qtek/blob/master/tools/fbx2gltf.py)
+[Get it](https://github.com/pissang/claygl/blob/master/tools/fbx2gltf.py)
 
 Needs [python3.3](https://www.python.org/download/releases/3.3.0/) and [FBX SDK 2018.1.1](http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26416130).
 <!--
