@@ -2,7 +2,9 @@
 
 <img width="100%" src="./screenshot/claygl-logo.jpg" />
 
-<!-- [![NPM Version](https://img.shields.io/npm/v/claygl.svg)] -->(https://github.com/pissang/claygl) [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
+<!-- [![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl) -->
+
+[![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
 ClayGL is a WebGL graphic library helping you to build scalable Web3D applications.
 
@@ -106,14 +108,11 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 + Stereo rendering, VR ready.
 
 
-## FBX to glTF2.0 Converter
+### FBX to glTF2.0 Converter
 
 [Get it](https://github.com/pissang/claygl/blob/master/tools/fbx2gltf.py)
 
 Needs [python3.3](https://www.python.org/download/releases/3.3.0/) and [FBX SDK 2018.1.1](http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=26416130).
-<!--
-[Pillow](https://pillow.readthedocs.io) is optional and only needed if you want to export glTF-binary and embed the images.
--->
 
 ```
 usage: fbx2gltf.py [-h] [-e EXCLUDE] [-t TIMERANGE] [-o OUTPUT]
