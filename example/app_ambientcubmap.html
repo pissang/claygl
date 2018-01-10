@@ -36,12 +36,12 @@
                 app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
 
                 for (var i = 0; i < 10; i++) {
-                    app.createSphere(20, {
+                    app.createSphere({
                         metalness: 1,
                         roughness: i / 10
                     }).position.set((i - 5) * 3, -2, 0);
 
-                    app.createSphere(20, {
+                    app.createSphere({
                         metalness: 0,
                         roughness: i / 10
                     }).position.set((i - 5) * 3, -5, 0);

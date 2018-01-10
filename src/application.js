@@ -557,16 +557,16 @@ App3D.prototype.createMaterial = function (matConfig) {
 /**
  * Create a cube mesh and add it to the scene or the given parent node.
  * @function
- * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
- *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
+ *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @return {clay.Mesh}
  * @example
  *  // Create a white cube.
  *  app.createCube()
  */
-App3D.prototype.createCube = function (subdiv, material, parentNode) {
+App3D.prototype.createCube = function (material, parentNode, subdiv) {
     if (subdiv == null) {
         subdiv = 1;
     }
@@ -590,16 +590,16 @@ App3D.prototype.createCube = function (subdiv, material, parentNode) {
 /**
  * Create a cube mesh that camera is inside the cube.
  * @function
- * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
- *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of cube.
+ *          Can be a number to represent both width, height and depth dimensions. Or an array to represent them respectively.
  * @return {clay.Mesh}
  * @example
  *  // Create a white cube inside.
  *  app.createCubeInside()
  */
-App3D.prototype.createCubeInside = function (subdiv, material, parentNode) {
+App3D.prototype.createCubeInside = function (material, parentNode, subdiv) {
     if (subdiv == null) {
         subdiv = 1;
     }
@@ -624,19 +624,19 @@ App3D.prototype.createCubeInside = function (subdiv, material, parentNode) {
 /**
  * Create a sphere mesh and add it to the scene or the given parent node.
  * @function
- * @param {number} [subdivision=20] Subdivision of sphere.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @param {number} [subdivision=20] Subdivision of sphere.
  * @return {clay.Mesh}
  * @example
  *  // Create a semi-transparent sphere.
- *  app.createSphere(20, {
+ *  app.createSphere({
  *      color: [0, 0, 1],
  *      transparent: true,
  *      alpha: 0.5
  *  })
  */
-App3D.prototype.createSphere = function (subdivision, material, parentNode) {
+App3D.prototype.createSphere = function (material, parentNode, subdivision) {
     if (subdivision == null) {
         subdivision = 20;
     }
@@ -655,18 +655,18 @@ App3D.prototype.createSphere = function (subdivision, material, parentNode) {
 /**
  * Create a plane mesh and add it to the scene or the given parent node.
  * @function
- * @param {Array.<number>|number} [subdivision=1] Subdivision of plane.
- *          Can be a number to represent both width and height dimensions. Or an array to represent them respectively.
  * @param {Object|clay.Material} [material]
  * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @param {Array.<number>|number} [subdivision=1] Subdivision of plane.
+ *          Can be a number to represent both width and height dimensions. Or an array to represent them respectively.
  * @return {clay.Mesh}
  * @example
  *  // Create a red color plane.
- *  app.createPlane(1, {
+ *  app.createPlane({
  *      color: [1, 0, 0]
  *  })
  */
-App3D.prototype.createPlane = function (subdiv, material, parentNode) {
+App3D.prototype.createPlane = function (material, parentNode, subdiv) {
     if (subdiv == null) {
         subdiv = 1;
     }
