@@ -11,6 +11,8 @@ import TextureCube from '../TextureCube';
 var shaderSourceReg = /^#source\((.*?)\)/;
 
 /**
+ * @name clay.compositor.createCompositor
+ * @function
  * @param {Object} json
  * @param {Object} [opts]
  * @return {clay.compositor.Compositor}

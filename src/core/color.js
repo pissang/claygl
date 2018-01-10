@@ -1,3 +1,6 @@
+/**
+ * @namespace clay.core.color
+ */
 import LRU from '../core/LRU';
 
 var colorUtil = {};
@@ -152,10 +155,10 @@ function putToCache(colorStr, rgbaArr) {
 }
 
 /**
+ * @name clay.core.color.parse
  * @param {string} colorStr
  * @param {Array.<number>} out
  * @return {Array.<number>}
- * @memberOf module:zrender/util/color
  */
 colorUtil.parse = function (colorStr, rgbaArr) {
     if (!colorStr) {
@@ -279,6 +282,7 @@ colorUtil.parseToFloat = function (colorStr, rgbaArr) {
 }
 
 /**
+ * @name clay.core.color.hsla2rgba
  * @param {Array.<number>} hsla
  * @param {Array.<number>} rgba
  * @return {Array.<number>} rgba
@@ -308,6 +312,7 @@ function hsla2rgba(hsla, rgba) {
 }
 
 /**
+ * @name clay.core.color.rgba2hsla
  * @param {Array.<number>} rgba
  * @return {Array.<number>} hsla
  */
@@ -374,10 +379,10 @@ function rgba2hsla(rgba) {
 }
 
 /**
+ * @name clay.core.color.lift
  * @param {string} color
  * @param {number} level
  * @return {string}
- * @memberOf module:zrender/util/color
  */
 colorUtil.lift = function (color, level) {
     var colorArr = colorUtil.parse(color);
@@ -395,19 +400,20 @@ colorUtil.lift = function (color, level) {
 }
 
 /**
+ * @name clay.core.color.toHex
  * @param {string} color
  * @return {string}
- * @memberOf module:zrender/util/color
  */
 colorUtil.toHex = function (color) {
     var colorArr = colorUtil.parse(color);
     if (colorArr) {
         return ((1 << 24) + (colorArr[0] << 16) + (colorArr[1] << 8) + (+colorArr[2])).toString(16).slice(1);
     }
-}
+};
 
 /**
  * Map value to color. Faster than lerp methods because color is represented by rgba array.
+ * @name clay.core.color
  * @param {number} normalizedValue A float between 0 and 1.
  * @param {Array.<Array.<number>>} colors List of rgba color array
  * @param {Array.<number>} [out] Mapped gba color array
@@ -436,9 +442,6 @@ colorUtil.fastLerp = function (normalizedValue, colors, out) {
     return out;
 }
 
-/**
- * @deprecated
- */
 colorUtil.fastMapToColor = colorUtil.fastLerp;
 
 /**
@@ -447,7 +450,6 @@ colorUtil.fastMapToColor = colorUtil.fastLerp;
  * @param {boolean=} fullOutput Default false.
  * @return {(string|Object)} Result color. If fullOutput,
  *                           return {color: ..., leftIndex: ..., rightIndex: ..., value: ...},
- * @memberOf module:zrender/util/color
  */
 colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
     if (!(colors && colors.length)
@@ -489,12 +491,12 @@ colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
 colorUtil.mapToColor = colorUtil.lerp;
 
 /**
+ * @name clay.core.color
  * @param {string} color
  * @param {number=} h 0 ~ 360, ignore when null.
  * @param {number=} s 0 ~ 1, ignore when null.
  * @param {number=} l 0 ~ 1, ignore when null.
  * @return {string} Color string in rgba format.
- * @memberOf module:zrender/util/color
  */
 colorUtil.modifyHSL = function (color, h, s, l) {
     color = colorUtil.parse(color);
@@ -513,7 +515,6 @@ colorUtil.modifyHSL = function (color, h, s, l) {
  * @param {string} color
  * @param {number=} alpha 0 ~ 1
  * @return {string} Color string in rgba format.
- * @memberOf module:zrender/util/color
  */
 colorUtil.modifyAlpha = function (color, alpha) {
     color = colorUtil.parse(color);
