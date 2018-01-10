@@ -129,9 +129,10 @@ import hdr$109 from './util/hdr';
 import mesh$110 from './util/mesh';
 import sh$111 from './util/sh';
 import texture$112 from './util/texture';
-import version$113 from './version';
-import CardboardDistorter$114 from './vr/CardboardDistorter';
-import StereoCamera$115 from './vr/StereoCamera';
+import transferable$113 from './util/transferable';
+import version$114 from './version';
+import CardboardDistorter$115 from './vr/CardboardDistorter';
+import StereoCamera$116 from './vr/StereoCamera';
 
 
 var animation = {
@@ -343,15 +344,16 @@ var util = {
     hdr : hdr$109,
     mesh : mesh$110,
     sh : sh$111,
-    texture : texture$112
+    texture : texture$112,
+    transferable : transferable$113
 };
 export { util };
 
-export { version$113 as version };
+export { version$114 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$114,
-    StereoCamera : StereoCamera$115
+    CardboardDistorter : CardboardDistorter$115,
+    StereoCamera : StereoCamera$116
 };
 export { vr };
 ;

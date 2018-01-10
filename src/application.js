@@ -851,11 +851,15 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
  * @param {number} [specularIntenstity=0.7] Intensity of specular light.
  * @param {number} [diffuseIntenstity=0.7] Intensity of diffuse light.
  * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
+ * @param {number} [prefilteredCubemapSize=32] The size of prefilerted cubemap. Larger value will take more time to do expensive prefiltering.
  */
-App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure) {
+App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure, prefilteredCubemapSize) {
     var self = this;
     if (exposure == null) {
         exposure = 1;
+    }
+    if (prefilteredCubemapSize == null) {
+        prefilteredCubemapSize = 32;
     }
 
     var scene = this.scene;
@@ -869,7 +873,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
         specLight.cubemap = envTexture;
         envTexture.flipY = false;
         // TODO Cache prefilter ?
-        specLight.prefilter(self.renderer, 64);
+        specLight.prefilter(self.renderer, 32);
 
         var diffLight = new AmbientSHLight({
             intensity: diffIntensity != null ? diffIntensity : 0.7,
@@ -923,6 +927,9 @@ App3D.prototype.loadModel = function (url, opts) {
         crossOrigin: 'Anonymous',
         textureFlipY: opts.textureFlipY
     };
+    if (opts.upAxis && opts.upAxis.toLowerCase() === 'z') {
+        loaderOpts.rootNode.rotation.identity().rotateX(-Math.PI / 2);
+    }
 
     var loader = new GLTFLoader(loaderOpts);
 
