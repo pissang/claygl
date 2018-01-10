@@ -24,6 +24,8 @@
     var scene = new clay.Scene();
     var camera = new clay.camera.Orthographic();
     var geometry = new clay.StaticGeometry();
+    // Add triangle vertices to position attribute.
+     geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
     var mesh = new clay.Mesh({
         geometry: geometry,

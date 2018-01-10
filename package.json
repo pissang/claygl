@@ -1,6 +1,6 @@
 {
-  "name": "claygl",
-  "version": "0.6.1",
+  "name": "claygl-rc",
+  "version": "1.0.0-rc.1",
   "description": "WebGL graphic library",
   "keywords": [
     "graphic",

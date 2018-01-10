@@ -52,27 +52,17 @@ ClayGL is a WebGL graphic library.
   <canvas id="main"></canvas>
   <script>
     clay.application.create('#main', {
-
-      width: window.innerWidth,
-
-      height: window.innerHeight,
-
       init: function (renderer, scene, timeline) {
         // Create camera
-        var camera = new clay.camera.Perspective();
-        camera.position.set(0, 2, 5);
-        camera.lookAt(clay.math.Vector3.ZERO);
-        scene.add(camera);
+        this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
-        // Create cube
-        this._cube = clay.application.createCube();
-        scene.add(this._cube);
+        // Create a RED cube
+        this._cube = app.createCube(1, {
+            color: '#f00'
+        });
 
         // Create light
-        var light = new clay.light.Directional();
-        light.position.set(1, 1, 1);
-        light.lookAt(this._cube.position);
-        scene.add(light);
+        this._mainLight = app.createDirectionalLight([-1, -1, -1]);
       },
 
       loop: function (renderer, scene, timeline) {
@@ -109,7 +99,7 @@ ClayGL is a WebGL graphic library.
 + Timeline based animation, support spline interpolation between keyframes.
 + Full deferred pipeline.
 + Physically based rendering, Full HDR pipeline.
-+ Stereo rendering, VR prepared.
++ Stereo rendering, VR ready.
 
 
 ### FBX to glTF2.0 Converter
