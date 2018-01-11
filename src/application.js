@@ -8,7 +8,6 @@
  // TODO Dispose test. geoCache test.
  // TODO Tonemapping exposure
  // TODO fitModel.
- // TODO Skybox, Skydome.
  // TODO Particle ?
 import Renderer from './Renderer';
 import Scene from './Scene';

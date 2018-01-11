@@ -331,6 +331,12 @@ function () {
         }
 
         function getResult() {
+            var meshes = [];
+            lib.meshes.forEach(function (meshList) {
+                for (var i = 0; i < meshList.length; i++) {
+                    meshes.push(meshList[i]);
+                }
+            });
             return {
                 json: json,
                 scene: self.rootNode ? null : rootNode,
@@ -339,7 +345,7 @@ function () {
                 textures: lib.textures,
                 materials: lib.materials,
                 skeletons: lib.skeletons,
-                meshes: lib.meshes,
+                meshes: meshes,
                 clips: lib.clips,
                 nodes: lib.nodes
             };
