@@ -37,11 +37,27 @@
             var cylinder = new clay.geometry.Cylinder({
                 heightSegments : 10
             });
+            var parametricSurfae = new clay.geometry.ParametricSurface({
+                generator: {
+                    u: [-Math.PI, Math.PI, Math.PI / 20],
+                    v: [-15, 6, 0.21],
+                    x: function (u, v) {
+                        return Math.pow(1.16, v) * Math.cos(v) * (1 + Math.cos(u));
+                    },
+                    y: function (u, v) {
+                        return -2 * Math.pow(1.16, v) * (1 + Math.sin(u));
+                    },
+                    z: function (u, v) {
+                        return -Math.pow(1.16, v) * Math.sin(v) * (1 + Math.cos(u));
+                    }
+                }
+            })
             sphere.generateBarycentric();
             cube.generateBarycentric();
             plane.generateBarycentric();
             cone.generateBarycentric();
             cylinder.generateBarycentric();
+            parametricSurfae.generateBarycentric();
 
             var shader = clay.shader.library.get('clay.wireframe');
             var material = new clay.Material({
@@ -51,7 +67,7 @@
             })
             material.set("lineWidth", 2);
 
-            camera.position.set(0, 0, 7);
+            camera.position.set(0, 0, 9);
 
             var sphereMesh = new clay.Mesh({
                 geometry : sphere,
@@ -72,9 +88,14 @@
                 geometry : cone,
                 material : material,
                 culling : false
-            })
+            });
             var cylinderMesh = new clay.Mesh({
                 geometry : cylinder,
+                material : material,
+                culling : false
+            });
+            var parametricSurfaceMesh = new clay.Mesh({
+                geometry : parametricSurfae,
                 material : material,
                 culling : false
             })
@@ -83,11 +104,15 @@
             cubeMesh.scale.set(0.7, 0.7, 0.7);
             coneMesh.position.x = 1.5;
             cylinderMesh.position.x = 3;
+            parametricSurfaceMesh.position.x = 5;
+            parametricSurfaceMesh.scale.set(0.2, 0.2, 0.2);
+
             scene.add( sphereMesh );
             scene.add( planeMesh );
             scene.add( cubeMesh );
             scene.add( coneMesh );
             scene.add( cylinderMesh );
+            scene.add( parametricSurfaceMesh );
 
             var timeline =  new clay.animation.Timeline();
             timeline.start();
@@ -104,6 +129,7 @@
                 sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
                 coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
                 cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
+                parametricSurfaceMesh.rotation.rotateY(Math.PI * dTime / 5000);
             });
 
         </script>
