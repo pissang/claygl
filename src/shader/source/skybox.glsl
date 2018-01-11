@@ -33,8 +33,11 @@ void main()
 {
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);
-
+#ifdef LOD
     vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod));
+#else
+    vec4 texel = decodeHDR(textureCube(environmentMap, viewDirection));
+#endif
 
 #ifdef SRGB_DECODE
     texel = sRGBToLinear(texel);
