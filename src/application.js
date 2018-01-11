@@ -5,7 +5,6 @@
  */
 
  // TODO createCompositor
- // TODO mobile. scroll events.
  // TODO Dispose test. geoCache test.
  // TODO Tonemapping exposure
  // TODO fitModel.
@@ -49,6 +48,11 @@ var parseColor = colorUtil.parseToFloat;
 
 import './shader/builtin';
 import Shader from './Shader';
+
+var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
+    'touchstart', 'touchend', 'touchmove',
+    'mousewheel', 'DOMMouseScroll'
+];
 
 /**
  * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
@@ -180,7 +184,7 @@ function App3D(dom, appNS) {
         gShadowPass && gShadowPass.dispose(gRenderer);
 
         dom.innerHTML = '';
-        ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
+        EVE_NAMES.forEach(function (eveType) {
             this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
         });
     };
@@ -260,11 +264,14 @@ function makeHandlerName(eveType) {
     return '_' + eveType + 'Handler';
 }
 
-function packageEvent(eventType, pickResult, offsetX, offsetY) {
+function packageEvent(eventType, pickResult, offsetX, offsetY, wheelDelta) {
     var event = util.clone(pickResult);
     event.type = eventType;
     event.offsetX = offsetX;
     event.offsetY = offsetY;
+    if (wheelDelta !== null) {
+        event.wheelDelta = wheelDelta;
+    }
     return event;
 }
 
@@ -279,17 +286,44 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
     var dom = this.container;
 
     var oldTarget = null;
-    ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove'].forEach(function (eveType) {
-        dom.addEventListener(eveType, this[makeHandlerName(eveType)] = function (e) {
+    EVE_NAMES.forEach(function (_eveType) {
+        dom.addEventListener(_eveType, this[makeHandlerName(_eveType)] = function (e) {
             if (!rayPicking.camera) { // Not have camera yet.
                 return;
             }
+            e.preventDefault();
 
             var box = dom.getBoundingClientRect();
-            var offsetX = e.clientX - box.left;
-            var offsetY = e.clientY - box.top;
+            var offsetX, offsetY;
+            var eveType = _eveType;
+
+            if (eveType.indexOf('touch') >= 0) {
+                var touch = eveType != 'touchend'
+                ? e.targetTouches[0]
+                : e.changedTouches[0];
+                if (eveType === 'touchstart') {
+                    eveType = 'mousedown';
+                }
+                else if (eveType === 'touchend') {
+                    eveType = 'mouseup';
+                }
+                else if (eveType === 'touchmove') {
+                    eveType = 'mousemove';
+                }
+                offsetX = touch.clientX - box.left;
+                offsetY = touch.clientY - box.top;
+            }
+            else {
+                offsetX = e.clientX - box.left;
+                offsetY = e.clientY - box.top;
+            }
 
             var pickResult = rayPicking.pick(offsetX, offsetY);
+
+            var delta;
+            if (eveType === 'DOMMouseScroll' || eveType === 'mousewheel') {
+                delta = (e.wheelDelta) ? e.wheelDelta / 120 : -(e.detail || 0) / 3;
+            }
 
             if (pickResult) {
                 // Just ignore silent element.
@@ -298,6 +332,7 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
                 }
 
                 if (eveType === 'mousemove') {
+                    // PENDING touchdown should trigger mouseover event ?
                     var targetChanged = pickResult.target !== oldTarget;
                     if (targetChanged) {
                         oldTarget && bubblingEvent(oldTarget, packageEvent('mouseout', {
@@ -310,7 +345,7 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
                     }
                 }
                 else {
-                    bubblingEvent(pickResult.target, packageEvent(eveType, pickResult, offsetX, offsetY));
+                    bubblingEvent(pickResult.target, packageEvent(eveType, pickResult, offsetX, offsetY, delta));
                 }
                 oldTarget = pickResult.target;
             }
