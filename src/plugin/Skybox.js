@@ -67,6 +67,8 @@ var Skybox = Mesh.extend(function () {
         if (this.scene) {
             this.detachScene();
         }
+        scene.skybox = this;
+
         this.scene = scene;
         scene.on('beforerender', this._beforeRenderScene, this);
     },
@@ -76,6 +78,7 @@ var Skybox = Mesh.extend(function () {
     detachScene: function () {
         if (this.scene) {
             this.scene.off('beforerender', this._beforeRenderScene);
+            this.scene.skybox = null;
         }
         this.scene = null;
     },

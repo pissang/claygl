@@ -33,7 +33,8 @@ var textureUtil = {
             if (path.match(/.hdr$/) || option.fileType === 'hdr') {
                 texture = new Texture2D({
                     width: 0,
-                    height: 0
+                    height: 0,
+                    sRGB: false
                 });
                 textureUtil._fetchTexture(
                     path,
@@ -128,6 +129,9 @@ var textureUtil = {
         if (option.encodeRGBM) {
             skydome.material.define('fragment', 'RGBM_ENCODE');
         }
+
+        // Share sRGB
+        cubeMap.sRGB = panoramaMap.sRGB;
 
         environmentMapPass.texture = cubeMap;
         environmentMapPass.render(renderer, skydome.scene);

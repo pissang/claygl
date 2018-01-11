@@ -64,6 +64,8 @@ var Skydome = Mesh.extend(function () {
         if (this.scene) {
             this.detachScene();
         }
+        scene.skydome = this;
+
         this.scene = scene;
         scene.on('beforerender', this._beforeRenderScene, this);
     },
@@ -74,6 +76,7 @@ var Skydome = Mesh.extend(function () {
     detachScene: function () {
         if (this.scene) {
             this.scene.off('beforerender', this._beforeRenderScene);
+            this.scene.skydome = null;
         }
         this.scene = null;
     },

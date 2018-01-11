@@ -438,16 +438,12 @@ var Renderer = Base.extend(function () {
         }
 
         // Render opaque list
-        scene.trigger('beforerender:opaque', this, opaqueList);
         var opaqueRenderInfo = this.renderPass(opaqueList, camera, {
             getMaterial: function (renderable) {
                 return sceneMaterial || renderable.material;
             },
             sortCompare: this.opaqueSortCompare
         });
-
-        scene.trigger('afterrender:opaque', this, opaqueList, opaqueRenderInfo);
-        scene.trigger('beforerender:transparent', this, transparentList);
 
         var transparentRenderInfo = this.renderPass(transparentList, camera, {
             getMaterial: function (renderable) {
@@ -456,7 +452,6 @@ var Renderer = Base.extend(function () {
             sortCompare: this.transparentSortCompare
         });
 
-        scene.trigger('afterrender:transparent', this, transparentList, transparentRenderInfo);
         var renderInfo = {};
         for (var name in opaqueRenderInfo) {
             renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
@@ -559,6 +554,8 @@ var Renderer = Base.extend(function () {
      * @return {IRenderInfo}
      */
     renderPass: function(list, camera, passConfig) {
+        this.trigger('beforerenderpass', this, list, camera, passConfig);
+
         var renderInfo = {
             triangleCount: 0,
             vertexCount: 0,
@@ -748,6 +745,8 @@ var Renderer = Base.extend(function () {
         for (var i = 0; i < list.length; i++) {
             list[i].__program = null;
         }
+
+        this.trigger('afterrenderpass', this, list, camera, passConfig);
 
         return renderInfo;
     },

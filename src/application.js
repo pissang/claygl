@@ -208,8 +208,13 @@ function App3D(dom, appNS) {
             appNS.loop(self);
 
             gScene.update();
-            self._updateGraphicOptions(appNS.graphic, gScene.opaqueList);
-            self._updateGraphicOptions(appNS.graphic, gScene.transparentList);
+
+            self._updateGraphicOptions(appNS.graphic, gScene.opaqueList, false);
+            self._updateGraphicOptions(appNS.graphic, gScene.transparentList, false);
+            var skyboxList = [];
+            gScene.skybox && skyboxList.push(gScene.skybox);
+            gScene.skydome && skyboxList.push(gScene.skydome);
+            self._updateGraphicOptions(appNS.graphic, skyboxList, true);
 
             gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
             // Render shadow pass
@@ -317,7 +322,7 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
     }, this);
 };
 
-App3D.prototype._updateGraphicOptions = function (graphicOpts, list) {
+App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
     var enableTonemapping = !!graphicOpts.tonemapping;
     var isLinearSpace = !!graphicOpts.linear;
 
@@ -331,12 +336,16 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list) {
 
         enableTonemapping ? mat.define('fragment', 'TONEMAPPING') : mat.undefine('fragment', 'TONEMAPPING');
         if (isLinearSpace) {
+            var decodeSRGB = true;
+            if (isSkybox && mat.get('environmentMap') && !mat.get('environmentMap').sRGB) {
+                decodeSRGB = false;
+            }
+            decodeSRGB && mat.define('fragment', 'SRGB_DECODE');
             mat.define('fragment', 'SRGB_ENCODE');
-            mat.define('fragment', 'SRGB_DECODE');
         }
         else {
-            mat.undefine('fragment', 'SRGB_ENCODE');
             mat.undefine('fragment', 'SRGB_DECODE');
+            mat.undefine('fragment', 'SRGB_ENCODE');
         }
 
         prevMaterial = mat;

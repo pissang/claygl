@@ -100,6 +100,11 @@ var Texture = Base.extend(
      * @default true
      */
     flipY: true,
+
+    /**
+     * A flag to indicate if texture source is sRGB
+     */
+    sRGB: true,
     /**
      * @type {number}
      * @default 4
