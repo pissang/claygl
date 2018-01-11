@@ -25,17 +25,29 @@ varying vec3 v_WorldPosition;
 
 @import clay.util.rgbm
 
+@import clay.util.srgb
+
+@import clay.util.ACES
+
 void main()
 {
     vec3 eyePos = viewInverse[3].xyz;
     vec3 viewDirection = normalize(v_WorldPosition - eyePos);
 
-    vec3 tex = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod)).rgb;
+    vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod));
 
 #ifdef SRGB_DECODE
-    tex.rgb = pow(tex.rgb, vec3(2.2));
+    texel = sRGBToLinear(texel);
 #endif
 
-    gl_FragColor = encodeHDR(vec4(tex, 1.0));
+#ifdef TONEMAPPING
+    texel.rgb = ACESToneMapping(texel.rgb);
+#endif
+
+#ifdef SRGB_ENCODE
+    texel = linearTosRGB(texel);
+#endif
+
+    gl_FragColor = encodeHDR(vec4(texel.rgb, 1.0));
 }
 @end

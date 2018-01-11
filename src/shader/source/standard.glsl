@@ -612,11 +612,6 @@ void main() {
 #endif
     outColor.rgb += lEmission * emissionIntensity;
 
-#ifdef GAMMA_ENCODE
-    // Not linear
-    outColor.rgb = pow(outColor.rgb, vec3(1 / 2.2));
-#endif
-
     if(lineWidth > 0.)
     {
         outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);

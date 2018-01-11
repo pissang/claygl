@@ -109,11 +109,6 @@ void main()
         gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
     }
 
-#ifdef GAMMA_ENCODE
-    // Not linear
-    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1 / 2.2));
-#endif
-
 #ifdef ALPHA_TEST
     if (gl_FragColor.a < alphaCutoff) {
         discard;

@@ -7,7 +7,8 @@
  // TODO createCompositor
  // TODO mobile. scroll events.
  // TODO Dispose test. geoCache test.
- // TODO fitModel, normal generation.
+ // TODO Tonemapping exposure
+ // TODO fitModel.
  // TODO Skybox, Skydome.
  // TODO Particle ?
 import Renderer from './Renderer';
@@ -17,6 +18,7 @@ import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
 import Texture2D from './Texture2D';
+import TextureCube from './TextureCube';
 import Texture from './Texture';
 import shaderLibrary from './shader/library';
 import Mesh from './Mesh';
@@ -34,6 +36,7 @@ import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
+import DeferredRenderer from './deferred/Renderer';
 import LRUCache from './core/LRU';
 import util from './core/util';
 import shUtil from './util/sh';
@@ -423,6 +426,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
  * @param {ImageLike} img
  * @param {Object} [opts] Texture options.
  * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
+ * @param {boolean} [opts.convertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
  * @param {number} [opts.wrapS=clay.Texture.REPEAT] See {@link clay.Texture.wrapS}
  * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
@@ -472,18 +476,42 @@ App3D.prototype.loadTexture = function (urlOrImg, opts, useCache) {
     return promise;
 };
 
+function nearestPowerOfTwo(val) {
+    return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
+}
+function convertTextureToPowerOfTwo(texture) {
+    if ((texture.wrapS === Texture.REPEAT || texture.wrapT === Texture.REPEAT)
+     && texture.image
+     ) {
+        // var canvas = document.createElement('canvas');
+        var width = nearestPowerOfTwo(texture.width);
+        var height = nearestPowerOfTwo(texture.height);
+        if (width !== texture.width || height !== texture.height) {
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(texture.image, 0, 0, width, height);
+            canvas.srcImage = texture.image;
+            texture.image = canvas;
+            texture.dirty();
+        }
+    }
+}
+
 /**
  * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
  * @param {ImageLike} img
  * @param {Object} [opts] Texture options.
  * @param {boolean} [opts.flipY=true] If flipY. See {@link clay.Texture.flipY}
+ * @param {boolean} [opts.convertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {number} [opts.anisotropic] Anisotropic filtering. See {@link clay.Texture.anisotropic}
  * @param {number} [opts.wrapS=clay.Texture.REPEAT] See {@link clay.Texture.wrapS}
  * @param {number} [opts.wrapT=clay.Texture.REPEAT] See {@link clay.Texture.wrapT}
  * @param {number} [opts.minFilter=clay.Texture.LINEAR_MIPMAP_LINEAR] See {@link clay.Texture.minFilter}
  * @param {number} [opts.magFilter=clay.Texture.LINEAR] See {@link clay.Texture.magFilter}
  * @param {number} [opts.exposure] Only be used when source is a HDR image.
- * @return {Promise}
+ * @return {clay.Texture2D}
  * @example
  *  var texture = app.loadTexture('diffuseMap.jpg', {
  *      anisotropic: 8,
@@ -505,6 +533,11 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
         }
         else {
             texture.load(urlOrImg);
+            if (opts && opts.convertToPOT) {
+                texture.success(function () {
+                    convertTextureToPowerOfTwo(texture);
+                });
+            }
         }
     }
     else if (isImageLikeElement(urlOrImg)) {
@@ -515,11 +548,71 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
 };
 
 /**
+ * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
+ * @param {ImageLike} img
+ * @param {Object} [opts] Texture options.
+ * @param {boolean} [opts.flipY=false] If flipY. See {@link clay.Texture.flipY}
+ * @return {Promise}
+ * @example
+ *  app.loadTextureCube({
+ *      px: 'skybox/px.jpg', py: 'skybox/py.jpg', pz: 'skybox/pz.jpg',
+ *      nx: 'skybox/nx.jpg', ny: 'skybox/ny.jpg', nz: 'skybox/nz.jpg'
+ *  }).then(function (texture) {
+ *      skybox.setEnvironmentMap(texture);
+ *  })
+ */
+App3D.prototype.loadTextureCube = function (imgList, opts) {
+    var textureCube = this.loadTextureCubeSync(imgList, opts);
+    return new Promise(function (resolve, reject) {
+        if (textureCube.isRenderable()) {
+            resolve(textureCube);
+        }
+        else {
+            textureCube.success(function () {
+                resolve(textureCube);
+            }).error(function () {
+                reject();
+            });
+        }
+    });
+};
+
+/**
+ * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
+ * @param {ImageLike} img
+ * @param {Object} [opts] Texture options.
+ * @param {boolean} [opts.flipY=false] If flipY. See {@link clay.Texture.flipY}
+ * @return {clay.TextureCube}
+ * @example
+ *  var texture = app.loadTextureCubeSync({
+ *      px: 'skybox/px.jpg', py: 'skybox/py.jpg', pz: 'skybox/pz.jpg',
+ *      nx: 'skybox/nx.jpg', ny: 'skybox/ny.jpg', nz: 'skybox/nz.jpg'
+ *  });
+ *  skybox.setEnvironmentMap(texture);
+ */
+App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
+    opts = opts || {};
+    opts.flipY = opts.flipY || false;
+    var textureCube = new TextureCube(opts);
+    if (!imgList || !imgList.px || !imgList.nx || !imgList.py || !imgList.ny || !imgList.pz || !imgList.nz) {
+        throw new Error('Invalid cubemap format. Should be an object including px,nx,py,ny,pz,nz');
+    }
+    if (typeof imgList.px === 'string') {
+        textureCube.load(imgList);
+    }
+    else {
+        textureCube.image = util.clone(imgList);
+    }
+    return textureCube;
+};
+
+/**
  * Create a material.
  * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
+ * @param {boolean} [convertTextureToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @return {clay.Material}
  */
 App3D.prototype.createMaterial = function (matConfig) {
@@ -537,9 +630,13 @@ App3D.prototype.createMaterial = function (matConfig) {
     for (var key in matConfig) {
         if (material.uniforms[key]) {
             var val = matConfig[key];
-            if (material.uniforms[key].type === 't' || isImageLikeElement(val)) {
+            if ((material.uniforms[key].type === 't' || isImageLikeElement(val))
+                && !(val instanceof Texture)
+            ) {
                 // Try to load a texture.
-                this.loadTexture(val).then(makeTextureSetter(key));
+                this.loadTexture(val, {
+                    convertToPOT: matConfig.convertTextureToPOT
+                }).then(makeTextureSetter(key));
             }
             else {
                 material.setUniform(key, val);
@@ -582,6 +679,7 @@ App3D.prototype.createCube = function (material, parentNode, subdiv) {
             heightSegments: subdiv[1],
             depthSegments: subdiv[2]
         });
+        cube.generateTangents();
         this._geoCache.put(geoKey, cube);
     }
     return this.createMesh(cube, material, parentNode);
@@ -615,6 +713,7 @@ App3D.prototype.createCubeInside = function (material, parentNode, subdiv) {
             heightSegments: subdiv[1],
             depthSegments: subdiv[2]
         });
+        cube.generateTangents();
         this._geoCache.put(geoKey, cube);
     }
 
@@ -647,6 +746,7 @@ App3D.prototype.createSphere = function (material, parentNode, subdivision) {
             widthSegments: subdivision * 2,
             heightSegments: subdivision
         });
+        sphere.generateTangents();
         this._geoCache.put(geoKey, sphere);
     }
     return this.createMesh(sphere, material, parentNode);
@@ -680,6 +780,7 @@ App3D.prototype.createPlane = function (material, parentNode, subdiv) {
             widthSegments: subdiv[0],
             heightSegments: subdiv[1]
         });
+        planeGeo.generateTangents();
         this._geoCache.put(geoKey, planeGeo);
     }
     return this.createMesh(planeGeo, material, parentNode);
@@ -847,7 +948,7 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
 /**
  * Create an cubemap ambient light and an spherical harmonic ambient light
  * for specular and diffuse lighting in PBR rendering
- * @param {ImageLike} [envImage] Panorama environment image, HDR format is better.
+ * @param {ImageLike|TextureCube} [envImage] Panorama environment image, HDR format is better. Or a pre loaded texture cube
  * @param {number} [specularIntenstity=0.7] Intensity of specular light.
  * @param {number} [diffuseIntenstity=0.7] Intensity of diffuse light.
  * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
@@ -864,9 +965,23 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
 
     var scene = this.scene;
 
-    return this.loadTexture(envImage, {
-        exposure: exposure
-    }).then(function (envTexture) {
+    var loadPromise;
+    if (envImage instanceof TextureCube) {
+        loadPromise = envImage.isRenderable()
+            ? Promise.resolve(envImage)
+            : new Promise(function (resolve, reject) {
+                envImage.success(function () {
+                    resolve(envImage);
+                });
+            });
+    }
+    else {
+        loadPromise = this.loadTexture(envImage, {
+            exposure: exposure
+        });
+    }
+
+    return loadPromise.then(function (envTexture) {
         var specLight = new AmbientCubemapLight({
             intensity: specIntensity != null ? specIntensity : 0.7
         });

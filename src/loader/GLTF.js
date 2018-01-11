@@ -710,6 +710,7 @@ function () {
             metalness: metallicRoughnessMatInfo.metallicFactor || 0,
             roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
+            emissionIntensity: 1,
             alphaCutoff: materialInfo.alphaCutoff || 0
         };
         if (commonProperties.roughnessMap) {
@@ -800,6 +801,7 @@ function () {
             specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],
             glossiness: specularGlossinessMatInfo.glossinessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
+            emissionIntensity: 1,
             alphaCutoff: materialInfo.alphaCutoff == null ? 0.9 : materialInfo.alphaCutoff
         };
         if (commonProperties.glossinessMap) {

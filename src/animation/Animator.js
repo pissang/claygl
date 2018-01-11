@@ -1,6 +1,3 @@
-/**
- * @module echarts/animation/Animator
- */
 import Clip from './Clip';
 
 var arraySlice = Array.prototype.slice;

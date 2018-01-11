@@ -35,6 +35,14 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  */
 var TextureCube = Texture.extend(function () {
     return /** @lends clay.TextureCube# */{
+
+        /**
+         * @type {boolean}
+         * @default false
+         */
+        // PENDING cubemap should not flipY in default.
+        // flipY: false,
+
         /**
          * @type {Object}
          * @property {?HTMLImageElement|HTMLCanvasElemnet} px
