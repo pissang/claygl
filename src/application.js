@@ -17,6 +17,8 @@ import Timeline from './animation/Timeline';
 import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
+import Geometry from './Geometry';
+import ParametricSurfaceGeo from './geometry/ParametricSurface';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
 import Texture from './Texture';
@@ -539,6 +541,9 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
                 texture.dirty();
                 texture.trigger('success');
             });
+            for (var key in opts) {
+                texture[key] = opts[key];
+            }
         }
         else {
             texture.load(urlOrImg);
@@ -794,6 +799,27 @@ App3D.prototype.createPlane = function (material, parentNode, subdiv) {
     }
     return this.createMesh(planeGeo, material, parentNode);
 };
+
+/**
+ * Create mesh with parametric surface function
+ * @param {Object|clay.Material} [material]
+ * @param {clay.Node} [parentNode] Parent node to append. Default to be scene.
+ * @param {Object} generator
+ * @param {Function} generator.x
+ * @param {Function} generator.y
+ * @param {Function} generator.z
+ * @param {Array} [generator.u=[0, 1, 0.05]]
+ * @param {Array} [generator.v=[0, 1, 0.05]]
+ * @return {clay.Mesh}
+ */
+App3D.prototype.createParametricSurface = function (material, parentNode, generator) {
+    var geo = new ParametricSurfaceGeo({
+        generator: generator
+    });
+    geo.generateTangents();
+    return this.createMesh(geo, material, parentNode);
+};
+
 
 /**
  * Create a general mesh with given geometry instance and material config.
