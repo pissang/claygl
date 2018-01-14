@@ -857,7 +857,8 @@ App3D.prototype.createParametricSurface = function (material, parentNode, genera
 
 /**
  * Create a general mesh with given geometry instance and material config.
- * @param {*} geometry
+ * @param {clay.Geometry} geometry
+ * @return {clay.Mesh}
  */
 App3D.prototype.createMesh = function (geometry, mat, parentNode) {
     var mesh = new Mesh({
@@ -867,6 +868,18 @@ App3D.prototype.createMesh = function (geometry, mat, parentNode) {
     parentNode = parentNode || this.scene;
     parentNode.add(mesh);
     return mesh;
+};
+
+/**
+ * Create an empty node
+ * @param {clay.Node} parentNode
+ * @return {clay.Node}
+ */
+App3D.prototype.createNode = function (parentNode) {
+    var node = new Node()
+    parentNode = parentNode || this.scene;
+    parentNode.add(node);
+    return node;
 };
 
 /**
