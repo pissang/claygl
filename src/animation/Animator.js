@@ -1,4 +1,5 @@
 import Clip from './Clip';
+import easingFuncs from './easing';
 
 var arraySlice = Array.prototype.slice;
 
@@ -19,7 +20,8 @@ function interpolateArray(p0, p1, percent, out, arrDim) {
         for (var i = 0; i < len; i++) {
             out[i] = interpolateNumber(p0[i], p1[i], percent);
         }
-    } else {
+    }
+    else {
         var len2 = p0[0].length;
         for (var i = 0; i < len; i++) {
             for (var j = 0; j < len2; j++) {
@@ -156,10 +158,10 @@ function isArraySame(arr0, arr1, arrDim) {
     return true;
 }
 
-function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, interpolater) {
+function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propName, interpolater) {
     var getter = animator._getter;
     var setter = animator._setter;
-    var useSpline = easing === 'spline';
+    var useSpline = globalEasing === 'spline';
 
     var trackLen = keyframes.length;
     if (!trackLen) {
@@ -185,6 +187,8 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
     var kfPercents = [];
     // Value of each keyframe
     var kfValues = [];
+    // Easing funcs of each keyframe.
+    var kfEasings = [];
 
     var prevValue = keyframes[0].value;
     var isAllValueEqual = true;
@@ -202,6 +206,7 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
         prevValue = value;
 
         kfValues.push(value);
+        kfEasings.push(keyframes[i].easing);
     }
     if (isAllValueEqual) {
         return;
@@ -232,7 +237,7 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
     var onframe = function(target, percent) {
         // Find the range keyframes
         // kf1-----kf2---------current--------kf3
-        // find kf2(i) and kf3(i+1) and do interpolation
+        // find kf2(i) and kf3(i + 1) and do interpolation
         if (percent < cachePercent) {
             // Start from next key
             start = Math.min(cacheKey + 1, trackLen - 1);
@@ -241,24 +246,28 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
                     break;
                 }
             }
-            i = Math.min(i, trackLen-2);
-        } else {
+            i = Math.min(i, trackLen - 2);
+        }
+        else {
             for (i = cacheKey; i < trackLen; i++) {
                 if (kfPercents[i] > percent) {
                     break;
                 }
             }
-            i = Math.min(i-1, trackLen-2);
+            i = Math.min(i - 1, trackLen - 2);
         }
         cacheKey = i;
         cachePercent = percent;
 
-        var range = (kfPercents[i+1] - kfPercents[i]);
+        var range = (kfPercents[i + 1] - kfPercents[i]);
         if (range === 0) {
             return;
-        } else {
+        }
+        else {
             w = (percent - kfPercents[i]) / range;
         }
+        w = kfEasings[i + 1](w);
+
         if (useSpline) {
             p1 = kfValues[i];
             p0 = kfValues[i === 0 ? i : i - 1];
@@ -273,20 +282,23 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
                         p0, p1, p2, p3, w
                     )
                 );
-            } else if (isValueArray) {
+            }
+            else if (isValueArray) {
                 catmullRomInterpolateArray(
                     p0, p1, p2, p3, w, w*w, w*w*w,
                     getter(target, propName),
                     arrDim
                 );
-            } else {
+            }
+            else {
                 setter(
                     target,
                     propName,
                     catmullRomInterpolate(p0, p1, p2, p3, w, w*w, w*w*w)
                 );
             }
-        } else {
+        }
+        else {
             if (interpolater) {
                 setter(
                     target,
@@ -299,13 +311,15 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
                     )
                 );
             }
+
             else if (isValueArray) {
                 interpolateArray(
                     kfValues[i], kfValues[i+1], w,
                     getter(target, propName),
                     arrDim
                 );
-            } else {
+            }
+            else {
                 setter(
                     target,
                     propName,
@@ -324,8 +338,8 @@ function createTrackClip(animator, easing, oneTrackDone, keyframes, propName, in
         onfinish: oneTrackDone
     });
 
-    if (easing && easing !== 'spline') {
-        clip.setEasing(easing);
+    if (globalEasing && globalEasing !== 'spline') {
+        clip.setEasing(globalEasing);
     }
 
     return clip;
@@ -364,17 +378,23 @@ function Animator(target, loop, getter, setter, interpolater) {
     this._clipList = [];
 }
 
+function noopEasing(w) {
+    return w;
+}
+
 Animator.prototype = {
 
     constructor: Animator,
 
     /**
-     * @param  {number} time Keyframe time using millisecond
-     * @param  {Object} props A key-value object. Value can be number, 1d and 2d array
+     * @param {number} time Keyframe time using millisecond
+     * @param {Object} props A key-value object. Value can be number, 1d and 2d array
+     * @param {string|Function} [easing]
      * @return {clay.animation.Animator}
      * @memberOf clay.animation.Animator.prototype
      */
-    when: function (time, props) {
+    when: function (time, props, easing) {
+        easing = (typeof easing === 'function' ? easing : easingFuncs[easing]) || noopEasing;
         for (var propName in props) {
             if (!this._tracks[propName]) {
                 this._tracks[propName] = [];
@@ -387,13 +407,15 @@ Animator.prototype = {
                         time: 0,
                         value: cloneValue(
                             this._getter(this._target, propName)
-                        )
+                        ),
+                        easing: easing
                     });
                 }
             }
             this._tracks[propName].push({
                 time: parseInt(time),
-                value: props[propName]
+                value: props[propName],
+                easing: easing
             });
         }
         return this;
@@ -427,7 +449,7 @@ Animator.prototype = {
      * @return {clay.animation.Animator}
      * @memberOf clay.animation.Animator.prototype
      */
-    start: function (easing) {
+    start: function (globalEasing) {
 
         var self = this;
         var clipCount = 0;
@@ -442,7 +464,7 @@ Animator.prototype = {
         var lastClip;
         for (var propName in this._tracks) {
             var clip = createTrackClip(
-                this, easing, oneTrackDone,
+                this, globalEasing, oneTrackDone,
                 this._tracks[propName], propName, self._interpolater
             );
             if (clip) {
