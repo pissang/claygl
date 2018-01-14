@@ -158,7 +158,7 @@ function isArraySame(arr0, arr1, arrDim) {
     return true;
 }
 
-function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propName, interpolater) {
+function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propName, interpolater, maxTime) {
     var getter = animator._getter;
     var setter = animator._setter;
     var useSpline = globalEasing === 'spline';
@@ -182,7 +182,6 @@ function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propNa
         return a.time - b.time;
     });
 
-    var trackMaxTime = keyframes[trackLen - 1].time;
     // Percents of each keyframe
     var kfPercents = [];
     // Value of each keyframe
@@ -193,7 +192,7 @@ function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propNa
     var prevValue = keyframes[0].value;
     var isAllValueEqual = true;
     for (var i = 0; i < trackLen; i++) {
-        kfPercents.push(keyframes[i].time / trackMaxTime);
+        kfPercents.push(keyframes[i].time / maxTime);
 
         // Assume value is a color when it is a string
         var value = keyframes[i].value;
@@ -331,7 +330,7 @@ function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propNa
 
     var clip = new Clip({
         target: animator._target,
-        life: trackMaxTime,
+        life: maxTime,
         loop: animator._loop,
         delay: animator._delay,
         onframe: onframe,
@@ -376,6 +375,8 @@ function Animator(target, loop, getter, setter, interpolater) {
     this._onframeList = [];
 
     this._clipList = [];
+
+    this._maxTime = 0;
 }
 
 function noopEasing(w) {
@@ -394,6 +395,9 @@ Animator.prototype = {
      * @memberOf clay.animation.Animator.prototype
      */
     when: function (time, props, easing) {
+
+        this._maxTime = Math.max(time, this._maxTime);
+
         easing = (typeof easing === 'function' ? easing : easingFuncs[easing]) || noopEasing;
         for (var propName in props) {
             if (!this._tracks[propName]) {
@@ -462,12 +466,14 @@ Animator.prototype = {
         };
 
         var lastClip;
+        var clipMaxTime = 0;
         for (var propName in this._tracks) {
             var clip = createTrackClip(
                 this, globalEasing, oneTrackDone,
-                this._tracks[propName], propName, self._interpolater
+                this._tracks[propName], propName, self._interpolater, self._maxTime
             );
             if (clip) {
+                clipMaxTime = Math.max(clipMaxTime, clip.life);
                 this._clipList.push(clip);
                 clipCount++;
 
