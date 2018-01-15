@@ -216,7 +216,7 @@
             var current = crossPosArr;
             setInterval(function() {
                 var another = current == crossPosArr ? checkPosArr: crossPosArr;
-                animation.animate(obj)
+                timeline.animate(obj)
                 .when(1000, {
                     position: another
                 }).start("CubicInOut");

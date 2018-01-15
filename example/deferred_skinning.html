@@ -49,8 +49,8 @@
                 updates.push(function() {
                     sphere.localTransform.copy(joint.node.worldTransform);
                     if (parentJoint) {
-                        lineGeoVertices.set(0, joint.node.getWorldPosition()._array);
-                        lineGeoVertices.set(1, parentJoint.node.getWorldPosition()._array);
+                        lineGeoVertices.set(0, joint.node.getWorldPosition().array);
+                        lineGeoVertices.set(1, parentJoint.node.getWorldPosition().array);
                     }
                     lineGeo.dirty();
                 });
@@ -118,7 +118,7 @@
 
             var timeline =  new clay.animation.Timeline();
             timeline.start();
-            animation.addClip(clip);
+            timeline.addClip(clip);
 
             var skeletonDebugScene = createSkeletonDebugScene(skeleton, clay);
             skeletonDebugScene.position.x = -10;

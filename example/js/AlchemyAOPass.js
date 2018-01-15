@@ -106,9 +106,9 @@ define(function (require) {
         var viewInverseTranspose = new Matrix4();
         Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
 
-        ssaoPass.setUniform('projection', camera.projectionMatrix._array);
-        ssaoPass.setUniform('projectionInv', camera.invProjectionMatrix._array);
-        ssaoPass.setUniform('viewInverseTranspose', viewInverseTranspose._array);
+        ssaoPass.setUniform('projection', camera.projectionMatrix.array);
+        ssaoPass.setUniform('projectionInv', camera.invProjectionMatrix.array);
+        ssaoPass.setUniform('viewInverseTranspose', viewInverseTranspose.array);
 
         var ssaoTexture = this._ssaoPass.getTargetTexture();
         if (width !== ssaoTexture.width || height !== ssaoTexture.height) {

@@ -90,7 +90,7 @@
                 debugMesh.scale.set(0.1, 0.1, 0.1);
                 pointLight.add(debugMesh);
 
-                var animator = animation.animate(pointLight.position, { loop: true });
+                var animator = timeline.animate(pointLight.position, { loop: true });
                 for (var k = 0; k < 10; k++) {
                     animator.when(k * 4000 + i * 1000, {
                         x: randomInSquare(5),

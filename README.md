@@ -6,7 +6,7 @@
 
 [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
-ClayGL is a WebGL graphic library helping you to build scalable Web3D applications.
+ClayGL is a WebGL graphic library for building scalable Web3D applications.
 
 It's easy to use, configurable for high-quality graphics. Benefit from the modularity and tree shaking, it can be scaled down to 40k(gzipped) for a basic 3D application.
 

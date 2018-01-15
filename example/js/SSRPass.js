@@ -81,9 +81,9 @@ define(function (require) {
         clay.math.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
 
         ssrPass.setUniform('colorTex', colorTex);
-        ssrPass.setUniform('projection', camera.projectionMatrix._array);
-        ssrPass.setUniform('projectionInv', camera.invProjectionMatrix._array);
-        ssrPass.setUniform('viewInverseTranspose', viewInverseTranspose._array);
+        ssrPass.setUniform('projection', camera.projectionMatrix.array);
+        ssrPass.setUniform('projectionInv', camera.invProjectionMatrix.array);
+        ssrPass.setUniform('viewInverseTranspose', viewInverseTranspose.array);
 
         ssrPass.setUniform('nearZ', camera.near);
 
