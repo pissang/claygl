@@ -331,12 +331,6 @@ function () {
         }
 
         function getResult() {
-            var meshes = [];
-            lib.meshes.forEach(function (meshList) {
-                for (var i = 0; i < meshList.length; i++) {
-                    meshes.push(meshList[i]);
-                }
-            });
             return {
                 json: json,
                 scene: self.rootNode ? null : rootNode,
@@ -345,7 +339,7 @@ function () {
                 textures: lib.textures,
                 materials: lib.materials,
                 skeletons: lib.skeletons,
-                meshes: meshes,
+                meshes: lib.instancedMeshes,
                 clips: lib.clips,
                 nodes: lib.nodes
             };
@@ -1018,6 +1012,8 @@ function () {
             });
         }
 
+        lib.instancedMeshes = [];
+
         util.each(json.nodes, function (nodeInfo, idx) {
             var node;
             if (nodeInfo.camera != null && this.includeCamera) {
@@ -1031,12 +1027,15 @@ function () {
                         // Replace the node with mesh directly
                         node = instanceMesh(primitives[0]);
                         node.setName(nodeInfo.name);
+                        lib.instancedMeshes.push(node);
                     }
                     else {
                         node = new Node();
                         node.setName(nodeInfo.name);
                         for (var j = 0; j < primitives.length; j++) {
-                            node.add(instanceMesh(primitives[j]));
+                            var newMesh = instanceMesh(primitives[j]);
+                            node.add(newMesh);
+                            lib.instancedMeshes.push(newMesh);
                         }
                     }
                 }

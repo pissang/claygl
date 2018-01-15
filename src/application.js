@@ -876,7 +876,7 @@ App3D.prototype.createMesh = function (geometry, mat, parentNode) {
  * @return {clay.Node}
  */
 App3D.prototype.createNode = function (parentNode) {
-    var node = new Node()
+    var node = new Node();
     parentNode = parentNode || this.scene;
     parentNode.add(node);
     return node;
