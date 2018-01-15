@@ -377,6 +377,8 @@ function Animator(target, loop, getter, setter, interpolater) {
     this._clipList = [];
 
     this._maxTime = 0;
+
+    this._lastKFTime = 0;
 }
 
 function noopEasing(w) {
@@ -422,6 +424,18 @@ Animator.prototype = {
                 easing: easing
             });
         }
+        return this;
+    },
+    /**
+     * @param {number} time Keyframe elapsed time since last keyframe
+     * @param {Object} props A key-value object. Value can be number, 1d and 2d array
+     * @param {string|Function} [easing]
+     * @return {clay.animation.Animator}
+     * @memberOf clay.animation.Animator.prototype
+     */
+    then: function (duringTime, props, easing) {
+        this.when(duringTime + this._lastKFTime, props, easing);
+        this._lastKFTime += duringTime;
         return this;
     },
     /**
