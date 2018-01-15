@@ -264,6 +264,8 @@ function createTrackClip(animator, globalEasing, oneTrackDone, keyframes, propNa
         }
         else {
             w = (percent - kfPercents[i]) / range;
+            // Clamp 0 - 1
+            w = Math.max(Math.min(1, w), 0);
         }
         w = kfEasings[i + 1](w);
 
