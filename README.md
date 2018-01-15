@@ -12,9 +12,9 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 
 #### [Download](https://github.com/pissang/claygl/releases)
 
-#### [API](http://pissang.github.io/claygl/doc/api)
+#### [API](http://docs.claygl.com/api)
 
-#### [Examples](https://github.com/pissang/claygl-example)
+#### [Examples](http://examples.claygl.com)
 
 ## Projects
 
@@ -63,7 +63,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
         this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
         // Create a RED cube
-        this._cube = app.createCube(1, {
+        this._cube = app.createCube({
             color: '#f00'
         });
 
