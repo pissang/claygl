@@ -12,9 +12,9 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 
 #### [Download](https://github.com/pissang/claygl/releases)
 
-#### [API](http://docs.claygl.com/api)
+#### [API](http://docs.claygl.xyz/api)
 
-#### [Examples](http://examples.claygl.com)
+#### [Examples](http://examples.claygl.xyz)
 
 ## Projects
 
