@@ -93,18 +93,18 @@ var transferableUtil = {
             options.boundingBox = new BoundingBox(min, max);
         }
 
+        const geometry = new Geometry(options);
+        
         //attributes
-        var attributes = {};
         for (var p in object.attributes) {
             if (object.attributes.hasOwnProperty(p)) {
                 var attr = object.attributes[p];
-                attributes[p] = new Geometry.Attribute(attr.name, attr.type, attr.size, attr.semantic);
-                attributes[p].value = attr.value;
+                geometry.attributes[p] = new Geometry.Attribute(attr.name, attr.type, attr.size, attr.semantic);
+                geometry.attributes[p].value = attr.value;
             }
         }
-        options.attributes = attributes;
 
-        return new Geometry(options);
+        return geometry;
     }
     
 }

@@ -74,5 +74,7 @@ describe('util.transferable.Spec', function () {
         assert(geometry.getAttribute('position').value.length === 156);
         assert(geometry.getAttribute('texcoord0').value.length === 104);
         assert(geometry.getAttribute('normal').value.length === 156);
+        assert(geometry.getAttribute('texcoord0'));
+        assert(geometry.getAttribute('texcoord1'));
     });
 });
