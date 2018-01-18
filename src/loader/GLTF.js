@@ -41,7 +41,7 @@ var semanticAttributeMap = {
     'TEXCOORD_1': 'texcoord1',
     'WEIGHTS_0': 'weight',
     'JOINTS_0': 'joint',
-    'COLOR': 'color'
+    'COLOR_0': 'color'
 };
 
 var ARRAY_CTOR_MAP = {
@@ -964,6 +964,9 @@ function () {
                     if (!mesh.geometry.attributes.tangent.value) {
                         mesh.geometry.generateTangents();
                     }
+                }
+                if (mesh.geometry.attributes.color.value) {
+                    mesh.material.define('VERTEX_COLOR');
                 }
 
                 mesh.name = GLTFLoader.generateMeshName(json.meshes, idx, pp);

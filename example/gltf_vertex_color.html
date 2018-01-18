@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <title>Model loading</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+            init: function (app) {
+                // Create camera
+                this._camera = app.createCamera([0, 0, 3], [0, 0, 0]);
+                // Load boombox model. return a load promise to make sure the look will be start after model loaded.
+                return app.loadModel('./assets/models/test/VertexColorTest.glb', {
+                    shader: 'clay.basic',
+                    waitTextureLoaded: true
+                });
+            },
+
+            loop: function (app) {
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>
