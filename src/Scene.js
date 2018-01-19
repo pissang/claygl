@@ -104,10 +104,8 @@ var Scene = Node.extend(function () {
 },
 /** @lends clay.Scene.prototype. */
 {
-    /**
-     * Add node to scene
-     * @param {Node} node
-     */
+
+    // Add node to scene
     addToScene: function (node) {
         if (node instanceof Camera) {
             if (this._cameraList.length > 0) {
@@ -120,10 +118,7 @@ var Scene = Node.extend(function () {
         }
     },
 
-    /**
-     * Remove node from scene
-     * @param {Node} node
-     */
+    // Remove node from scene
     removeFromScene: function (node) {
         if (node instanceof Camera) {
             var idx = this._cameraList.indexOf(node);
