@@ -261,7 +261,7 @@ var ShadowMapPass = Base.extend(function () {
         // Create textures for shadow map
         for (var i = 0; i < this._lightsCastShadow.length; i++) {
             var light = this._lightsCastShadow[i];
-            if (light instanceof DirectionalLight) {
+            if (light.type === 'DIRECTIONAL_LIGHT') {
 
                 if (dirLightHasCascade) {
                     console.warn('Only one direectional light supported with shadow cascade');
@@ -286,7 +286,7 @@ var ShadowMapPass = Base.extend(function () {
                     directionalLightShadowMaps
                 );
             }
-            else if (light instanceof SpotLight) {
+            else if (light.type === 'SPOT_LIGHT') {
                 this.renderSpotLightShadow(
                     renderer,
                     scene,
@@ -296,7 +296,7 @@ var ShadowMapPass = Base.extend(function () {
                     spotLightShadowMaps
                 );
             }
-            else if (light instanceof PointLight) {
+            else if (light.type === 'POINT_LIGHT') {
                 this.renderPointLightShadow(
                     renderer,
                     scene,

@@ -80,7 +80,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
     var dummyScene = new Scene();
     var skyEnv;
 
-    if (envMap instanceof Texture2D) {
+    if (envMap.textureType === 'texture2D') {
         // Convert panorama to cubemap
         var envCubemap = new TextureCube({
             width: width,

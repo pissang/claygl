@@ -183,7 +183,7 @@ var FrameBuffer = Base.extend(
                 // FIXME some texture format can't generate mipmap
                 if (!texture.NPOT && texture.useMipmap
                     && texture.minFilter === Texture.LINEAR_MIPMAP_LINEAR) {
-                    var target = texture instanceof TextureCube ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
+                    var target = texture.textureType === 'textureCube' ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(renderer));
                     _gl.generateMipmap(target);
                     _gl.bindTexture(target, null);

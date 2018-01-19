@@ -163,7 +163,7 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
     var skybox;
     var dummyScene = new Scene();
     var size = 64;
-    if (envMap instanceof Texture2D) {
+    if (envMap.textureType === 'texture2D') {
         skybox = new Skydome({
             scene: dummyScene,
             environmentMap: envMap

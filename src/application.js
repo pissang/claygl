@@ -432,15 +432,16 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
                 for (var u = 0; u < textureUniforms.length; u++) {
                     var uniformName = textureUniforms[u];
                     var val = material.uniforms[uniformName].value;
+                    var uniformType = material.uniforms[uniformName].type;
                     if (!val) {
                         continue;
                     }
-                    if (val instanceof Texture) {
+                    if (uniformType === 't' && val) {
                         updateUsed(val, textureResourceList);
                     }
-                    else if (val instanceof Array) {
+                    else if (uniformType === 'tv') {
                         for (var k = 0; k < val.length; k++) {
-                            if (val[k] instanceof Texture) {
+                            if (val[k]) {
                                 updateUsed(val[k], textureResourceList);
                             }
                         }
@@ -1048,7 +1049,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
     var scene = this.scene;
 
     var loadPromise;
-    if (envImage instanceof TextureCube) {
+    if (envImage.textureType === 'textureCube') {
         loadPromise = envImage.isRenderable()
             ? Promise.resolve(envImage)
             : new Promise(function (resolve, reject) {

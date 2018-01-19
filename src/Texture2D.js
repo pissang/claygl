@@ -48,6 +48,9 @@ var Texture2D = Texture.extend(function () {
         mipmaps: []
     };
 }, {
+
+    textureType: 'texture2D',
+
     update: function (renderer) {
 
         var _gl = renderer.gl;

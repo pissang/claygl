@@ -85,6 +85,9 @@ var TextureCube = Texture.extend(function () {
         mipmaps: []
     };
 }, {
+
+    textureType: 'textureCube',
+
     update: function (renderer) {
         var _gl = renderer.gl;
         _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
