@@ -155,8 +155,8 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
             gBufferMat.set('useMetalnessMap', +useMetalnessMap);
             gBufferMat.set('uvRepeat', uvRepeat);
             gBufferMat.set('uvOffset', uvOffset);
-
-            gBufferMat.set('linear', +standardMaterial.linear);
+            // TODO
+            gBufferMat.set('linear', +standardMaterial.linear || 0);
         }
         else {
             program.setUniform(gl, '1f', 'metalness', metalness);
@@ -172,7 +172,7 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
             program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
             program.setUniform(gl, '2f', 'uvOffset', uvOffset);
 
-            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear);
+            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear || 0);
         }
 
         previousDiffuseMap = diffuseMap;

@@ -92,6 +92,7 @@ var GLProgram = Base.extend({
         if (location === null || location === undefined) {
             return false;
         }
+
         switch (type) {
             case 'm4':
                 if (!(value instanceof Float32Array)) {

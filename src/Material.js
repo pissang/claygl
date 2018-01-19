@@ -137,11 +137,15 @@ var Material = Base.extend(function () {
         for (var u = 0; u < this._enabledUniforms.length; u++) {
             var symbol = this._enabledUniforms[u];
             var uniformValue = this.uniforms[symbol].value;
-            if (uniformValue instanceof Texture) {
+            var uniformType = this.uniforms[symbol].type;
+            // Not use `instanceof` to determine if a value is texture in Material#bind.
+            // Use type instead, in some case texture may be in different namespaces.
+            // TODO Duck type validate.
+            if (uniformType === 't' && uniformValue) {
                 // Reset slot
                 uniformValue.__slot = -1;
             }
-            else if (Array.isArray(uniformValue)) {
+            else if (uniformType === 'tv') {
                 for (var i = 0; i < uniformValue.length; i++) {
                     if (uniformValue[i] instanceof Texture) {
                         uniformValue[i].__slot = -1;
@@ -154,6 +158,7 @@ var Material = Base.extend(function () {
             var symbol = this._enabledUniforms[u];
             var uniform = this.uniforms[symbol];
             var uniformValue = uniform.value;
+            var uniformType = uniform.type;
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
@@ -178,7 +183,7 @@ var Material = Base.extend(function () {
                 }
                 continue;
             }
-            else if (uniformValue instanceof Texture) {
+            else if (uniformType === 't') {
                 if (uniformValue.__slot < 0) {
                     var slot = program.currentTextureSlot();
                     var res = program.setUniform(_gl, '1i', symbol, slot);
@@ -198,9 +203,7 @@ var Material = Base.extend(function () {
                     continue;
                 }
                 // Texture Array
-                var exampleValue = uniformValue[0];
-
-                if (exampleValue instanceof Texture) {
+                if (uniformType === 'tv') {
                     if (!program.hasUniform(symbol)) {
                         continue;
                     }
