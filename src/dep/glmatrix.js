@@ -71,17 +71,20 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-
-if(!GLMAT_EPSILON) {
-    var GLMAT_EPSILON = 0.000001;
+var GLMAT_EPSILON = window.GLMAT_EPSILON;
+if(GLMAT_EPSILON == null) {
+    GLMAT_EPSILON = 0.000001;
 }
 
-if(!GLMAT_ARRAY_TYPE) {
-    var GLMAT_ARRAY_TYPE = (typeof Float32Array !== 'undefined') ? Float32Array : Array;
-}
+// Use Array instead of Float32Array. It seems to be much faster and higher precision.
+var GLMAT_ARRAY_TYPE = window.GLMAT_ARRAY_TYPE || Array;
+// if(!GLMAT_ARRAY_TYPE) {
+//     GLMAT_ARRAY_TYPE = (typeof Float32Array !== 'undefined') ? Float32Array : Array;
+// }
 
+var GLMAT_RANDOM = window.GLMAT_RANDOM;
 if(!GLMAT_RANDOM) {
-    var GLMAT_RANDOM = Math.random;
+    GLMAT_RANDOM = Math.random;
 }
 
 /**

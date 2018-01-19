@@ -28,6 +28,8 @@ function checkShaderErrorMsg(_gl, shader, shaderString) {
     }
 }
 
+var tmpFloat32Array16 = new vendor.Float32Array(16);
+
 var GLProgram = Base.extend({
 
     uniformSemantics: {},
@@ -92,7 +94,13 @@ var GLProgram = Base.extend({
         }
         switch (type) {
             case 'm4':
-                // The matrix must be created by glmatrix and can pass it directly.
+                if (!(value instanceof Float32Array)) {
+                    // Use Float32Array is much faster than array when uniformMatrix4fv.
+                    for (var i = 0; i < value.length; i++) {
+                        tmpFloat32Array16[i] = value[i];
+                    }
+                    value = tmpFloat32Array16;
+                }
                 _gl.uniformMatrix4fv(location, false, value);
                 break;
             case '2i':
@@ -153,7 +161,7 @@ var GLProgram = Base.extend({
                 break;
             case 'm4v':
                 // Raw value
-                if (Array.isArray(value)) {
+                if (Array.isArray(value) && Array.isArray(value[0])) {
                     var array = new vendor.Float32Array(value.length * 16);
                     var cursor = 0;
                     for (var i = 0; i < value.length; i++) {
@@ -164,7 +172,7 @@ var GLProgram = Base.extend({
                     }
                     _gl.uniformMatrix4fv(location, false, array);
                 }
-                else if (value instanceof vendor.Float32Array) {   // ArrayBufferView
+                else {   // ArrayBufferView
                     _gl.uniformMatrix4fv(location, false, value);
                 }
                 break;
