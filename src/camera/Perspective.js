@@ -8,7 +8,7 @@ var Perspective = Camera.extend(
 /** @lends clay.camera.Perspective# */
 {
     /**
-     * Vertical field of view in radians
+     * Vertical field of view in degrees
      * @type {number}
      */
     fov: 50,
