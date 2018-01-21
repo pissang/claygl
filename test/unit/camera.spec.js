@@ -19,39 +19,39 @@ describe('Camera.Spec', function () {
         assert.deepEqual(camera.worldTransform.toArray(), [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 20, 1 ]);
 
         assert.deepEqual(camera.projectionMatrix.toArray(), [
-            1.6083801984786987,
+            1.608380190382169,
             0,
             0,
             0,
             0,
-            2.1445069313049316,
+            2.1445069205095586,
             0,
             0,
             0,
             0,
-            -1.000100016593933,
+            -1.00010000500025,
             -1,
             0,
             0,
-            -0.2000100016593933,
+            -0.20001000050002501,
             0 ]);
         assert.deepEqual(camera.invProjectionMatrix.toArray(), [
-            0.6217435598373413,
+            0.6217435442066648,
             -0,
             -0,
             -0,
             -0,
-            0.466307669878006,
+            0.46630765815499864,
             0,
             -0,
             -0,
             -0,
             -0,
-            -4.999750137329102,
+            -4.99975,
             -0,
             -0,
             -1,
-            5.000249862670898 ]);
+            5.000249999999999 ]);
 
         assert(camera.frustum);
     });
@@ -97,8 +97,8 @@ describe('Camera.Spec', function () {
         camera.position.set(0, 0, 20);
 
         const ray = camera.castRay(new clay.math.Vector2(100, 100), new clay.math.Ray());
-        assert.deepEqual(ray.direction.toArray(), [ 0.7999337911605835, 0.59995037317276, -0.012865976430475712 ]);
-        assert.deepEqual(ray.origin.toArray(), [ 6.217435359954834, 4.663076877593994, -0.10000000149011612 ]);
+        assert.deepEqual(ray.direction.toArray(), [ 0.7999337839189524, 0.5999503379392145, -0.012865976516726937 ]);
+        assert.deepEqual(ray.origin.toArray(), [ 6.217435442066648, 4.663076581549986, -0.1 ]);
     });
 
     it('Orthographic Camera', function () {
@@ -113,20 +113,21 @@ describe('Camera.Spec', function () {
 
         camera.position.set(0, 0, 20);
         camera.updateProjectionMatrix();
-        assert.deepEqual(camera.projectionMatrix.toArray(), [ 0.4000000059604645,
+        assert.deepEqual(camera.projectionMatrix.toArray(), [ 
+            0.4,
             0,
             0,
             0,
             0,
-            0.2222222238779068,
+            0.2222222222222222,
             0,
             0,
             0,
             0,
             -0.5,
             0,
-            -0.20000000298023224,
-            0.1111111119389534,
+            -0.2,
+            0.1111111111111111,
             -0,
             1 ]);
 
@@ -157,21 +158,21 @@ describe('Camera.Spec', function () {
 
         camera.position.set(0, 0, 20);
         camera.updateProjectionMatrix();
-        assert.deepEqual(camera.projectionMatrix.toArray(), [ 1.7320507764816284,
+        assert.deepEqual(camera.projectionMatrix.toArray(), [ 1.7320508075688774,
             0,
             0,
             0,
             0,
-            1.7320507764816284,
+            1.7320508075688774,
             0,
             0,
             0,
             0,
-            -1.000249981880188,
+            -1.0002500312539069,
             -1,
             0,
             0,
-            -2.0002501010894775,
+            -2.000250031253907,
             0 ]);
 
         const c2 = camera.clone();
@@ -184,7 +185,7 @@ describe('Camera.Spec', function () {
         assert(closeTo(camera.fov, 60));
         assert(closeTo(camera.aspect, 1));
         assert(closeTo(camera.near, 1));
-        assert(Math.round(camera.far) === 8002, camera.far);
+        assert(Math.round(camera.far) === 8000, camera.far);
     });
 });
 
