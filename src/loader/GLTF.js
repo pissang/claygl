@@ -742,6 +742,8 @@ function () {
             material.define('fragment', 'ROUGHNESS_CHANNEL', 1);
             material.define('fragment', 'METALNESS_CHANNEL', 2);
 
+            material.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
+
             if (alphaTest) {
                 material.define('fragment', 'ALPHA_TEST');
             }
@@ -819,6 +821,7 @@ function () {
         });
 
         material.define('fragment', 'GLOSSINESS_CHANNEL', 3);
+        material.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
 
         if (alphaTest) {
             material.define('fragment', 'ALPHA_TEST');
