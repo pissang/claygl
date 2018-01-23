@@ -1310,6 +1310,9 @@ def Convert(
     else:
         lBasename, lExt = os.path.splitext(ouptutFile)
 
+        # PENDING, if it will affect the conversion after.
+        FbxAxisSystem.OpenGL.ConvertScene(lScene)
+
         # Do it before SplitMeshesPerMaterial or the vertices of split mesh will be wrong.
         PrepareBakeTransform(lScene.GetRootNode())
         lScene.GetRootNode().ConvertPivotAnimationRecursive(None, FbxNode.eDestinationPivot, 60)
