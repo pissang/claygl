@@ -83,6 +83,7 @@
                     scene.update();
                     camera.update();
                     gBuffer.update(renderer, scene, camera);
+                    // gBuffer.renderDebug(renderer, camera, 'depth');
                     ssaoPass.render(renderer, camera);
                 });
                 timeline.start();
