@@ -899,9 +899,21 @@ function () {
                         }
                         geometry.attributes[attributeName].value = weightArray;
                     }
+                    else if (semantic === 'COLOR_0' && size === 3) {
+                        var colorArray = new attributeArray.constructor(attributeInfo.count * 4);
+                        for (var i = 0; i < attributeInfo.count; i++) {
+                            var i4 = i * 4, i3 = i * 3;
+                            colorArray[i4] = attributeArray[i3];
+                            colorArray[i4 + 1] = attributeArray[i3 + 1];
+                            colorArray[i4 + 2] = attributeArray[i3 + 2];
+                            colorArray[i4 + 3] = 1;
+                        }
+                        geometry.attributes[attributeName].value = colorArray;
+                    }
                     else {
                         geometry.attributes[attributeName].value = attributeArray;
                     }
+
                     var attributeType = 'float';
                     if (attributeArray instanceof vendor.Uint16Array) {
                         attributeType = 'ushort';
