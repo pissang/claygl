@@ -429,7 +429,7 @@ Animator.prototype = {
         return this;
     },
     /**
-     * @param {number} time Keyframe elapsed time since last keyframe
+     * @param {number} time During time since last keyframe
      * @param {Object} props A key-value object. Value can be number, 1d and 2d array
      * @param {string|Function} [easing]
      * @return {clay.animation.Animator}

@@ -1070,8 +1070,9 @@ def ConvertNodeAnimation(pGLTFAnimation, pAnimLayer, pNode, pSampleRate, pStartT
             lQuaternion = lTransform.GetQ()
             lScale = lTransform.GetS()
 
-            #Convert quaternion to axis angle
-            lTimeChannel.append(lSecondDouble)
+            # Convert quaternion to axis angle
+            # PENDING. minus pStartTime or lStartTimeDouble?
+            lTimeChannel.append(lSecondDouble - pStartTime)
 
             if lHaveRotation:
                 lRotationChannel.append(list(lQuaternion))
