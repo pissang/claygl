@@ -233,6 +233,20 @@ var Scene = Node.extend(function () {
         }
     },
 
+    /**
+     * Set main camera of the scene.
+     * @param {claygl.Camera} camera
+     */
+    setMainCamera: function (camera) {
+        var idx = this._cameraList.indexOf(camera);
+        if (idx >= 0) {
+            this._cameraList.splice(idx, 1);
+        }
+        this._cameraList.unshift(camera);
+    },
+    /**
+     * Get main camera of the scene.
+     */
     getMainCamera: function () {
         return this._cameraList[0];
     },

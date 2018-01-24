@@ -999,7 +999,7 @@ function () {
             return new PerspectiveCamera({
                 name: nodeInfo.name,
                 aspect: perspectiveInfo.aspectRatio,
-                fov: perspectiveInfo.yfov,
+                fov: perspectiveInfo.yfov / Math.PI * 180,
                 far: perspectiveInfo.zfar,
                 near: perspectiveInfo.znear
             });
