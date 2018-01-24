@@ -75,7 +75,7 @@ var ShadowMapPass = Base.extend(function () {
             0, -1
         ]),
 
-        precision: 'mediump',
+        precision: 'highp',
 
         _lastRenderNotCastShadow: false,
 
