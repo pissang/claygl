@@ -784,12 +784,11 @@ var ShadowMapPass = Base.extend(function () {
         for (var i = 0; i < this._receivers.length; i++) {
             var mesh = this._receivers[i];
             // Mesh may be disposed
-            if (mesh.material && mesh.material.shader) {
+            if (mesh.material) {
                 var material = mesh.material;
-                var shader = material.shader;
-                shader.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
-                shader.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
-                shader.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
                 material.set('shadowEnabled', 0);
             }
         }
