@@ -25359,12 +25359,11 @@ var ShadowMapPass = Base.extend(function () {
         for (var i = 0; i < this._receivers.length; i++) {
             var mesh = this._receivers[i];
             // Mesh may be disposed
-            if (mesh.material && mesh.material.shader) {
+            if (mesh.material) {
                 var material = mesh.material;
-                var shader = material.shader;
-                shader.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
-                shader.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
-                shader.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
+                material.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');
                 material.set('shadowEnabled', 0);
             }
         }
@@ -34691,7 +34690,7 @@ function copyIfNecessary(arr, shallow) {
 /**
  * @name clay.version
  */
-var version = '1.0.2';
+var version = '1.0.3';
 
 var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 
