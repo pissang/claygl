@@ -11,7 +11,7 @@ function getProgramKey(lightNumbers) {
     var lightTypes = Object.keys(lightNumbers);
     lightTypes.sort();
     for (var i = 0; i < lightTypes.length; i++) {
-        var lightType = lightNumbers[i];
+        var lightType = lightTypes[i];
         defineStr.push(lightType + ' ' + lightNumbers[lightType]);
     }
     var key = defineStr.join('\n');
@@ -349,12 +349,8 @@ var Scene = Node.extend(function () {
         return lightGroups;
     },
 
-    /**
-     * Determine if light group is different with since last frame
-     * Used to determine whether to update shader and scene's uniforms in Renderer.render
-     * @param {Shader} shader
-     * @returns {Boolean}
-     */
+    // Determine if light group is different with since last frame
+    // Used to determine whether to update shader and scene's uniforms in Renderer.render
     isLightNumberChanged: function (lightGroup) {
         var prevLightNumber = this._previousLightNumber;
         var currentLightNumber = this._lightNumber;
@@ -378,10 +374,6 @@ var Scene = Node.extend(function () {
         return false;
     },
 
-    /**
-     * Set shader's light group with scene's
-     * @param {Shader} shader
-     */
     getLightsNumbers: function (lightGroup) {
         return this._lightNumber[lightGroup];
     },
