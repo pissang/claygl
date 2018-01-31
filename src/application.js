@@ -888,11 +888,14 @@ App3D.prototype.createNode = function (parentNode) {
  * @param {Array.<number>|clay.math.Vector3} position
  * @param {Array.<number>|clay.math.Vector3} target
  * @param {string} [type="perspective"] Can be 'perspective' or 'orthographic'(in short 'ortho')
+ * @param {Array.<number>|clay.math.Vector3} [extent] Extent is available only if type is orthographic.
  * @return {clay.camera.Perspective}
  */
-App3D.prototype.createCamera = function (position, target, type) {
+App3D.prototype.createCamera = function (position, target, type, extent) {
     var CameraCtor;
+    var isOrtho = false;
     if (type === 'ortho' || type === 'orthographic') {
+        isOrtho = true;
         CameraCtor = OrthographicCamera;
     }
     else {
@@ -915,6 +918,16 @@ App3D.prototype.createCamera = function (position, target, type) {
     }
     if (target instanceof Vector3) {
         camera.lookAt(target);
+    }
+
+    if (extent && isOrtho) {
+        extent = extent.array || extent;
+        camera.left = -extent[0] / 2;
+        camera.right = extent[0] / 2;
+        camera.top = extent[1] / 2;
+        camera.bottom = -extent[1] / 2;
+        camera.near = 0;
+        camera.far = extent[2];
     }
 
     this.scene.add(camera);
