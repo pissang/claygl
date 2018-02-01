@@ -80,16 +80,16 @@ var SamplerTrack = function (opts) {
      */
     this.target = opts.target || null;
     /**
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.position = vec3.create();
     /**
      * Rotation is represented by a quaternion
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.rotation = quat.create();
     /**
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.scale = vec3.fromValues(1, 1, 1);
 

@@ -1118,9 +1118,10 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
+ * @param {clay.Node} [parentNode] Parent node that model will be mounted. Default to be scene
  * @return {Promise}
  */
-App3D.prototype.loadModel = function (url, opts) {
+App3D.prototype.loadModel = function (url, opts, parentNode) {
     if (typeof url !== 'string') {
         throw new Error('Invalid URL.');
     }
@@ -1144,7 +1145,7 @@ App3D.prototype.loadModel = function (url, opts) {
 
     var loader = new GLTFLoader(loaderOpts);
 
-    var scene = this.scene;
+    parentNode = parentNode || this.scene;
     var timeline = this.timeline;
     var self = this;
 
@@ -1154,7 +1155,7 @@ App3D.prototype.loadModel = function (url, opts) {
                 return;
             }
 
-            scene.add(result.rootNode);
+            parentNode.add(result.rootNode);
             if (opts.autoPlayAnimation) {
                 result.clips.forEach(function (clip) {
                     timeline.addClip(clip);
@@ -1191,6 +1192,50 @@ App3D.prototype.loadModel = function (url, opts) {
         });
         loader.load(url);
     });
+};
+
+
+// TODO cloneModel
+
+/**
+ * Clone a node and it's children, including mesh, camera, light, etc.
+ * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
+ *
+ * @param {clay.Node} node
+ * @param {clay.Node} [parentNode] Parent node that new cloned node will be mounted.
+ *          Default to have same parent with source node.
+ * @return {clay.Node}
+ */
+App3D.prototype.cloneNode = function (node, parentNode) {
+    parentNode = parentNode || node.getParent();
+
+    var newNode = node.clone();
+    var clonedNodesMap = {};
+    function buildNodesMap(sNode, tNode) {
+        clonedNodesMap[sNode.__uid__] = tNode;
+
+        for (var i = 0; i < sNode._children.length; i++) {
+            var sChild = sNode._children[i];
+            var tChild = tNode._children[i];
+            buildNodesMap(sChild, tChild);
+        }
+    }
+    buildNodesMap(node, newNode);
+
+    newNode.traverse(function (newChild) {
+        if (newChild.skeleton) {
+            newChild.skeleton = newChild.skeleton.clone(clonedNodesMap);
+        }
+        if (newChild.material) {
+            newChild.material = newChild.material.clone();
+        }
+    });
+
+    if (parentNode) {
+        parentNode.add(newNode);
+    }
+
+    return newNode;
 };
 
 

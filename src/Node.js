@@ -393,16 +393,18 @@ var Node = Base.extend(
         this._inIterating = false;
     },
 
+    /**
+     * Traverse all children nodes.
+     * @param {Function} callback
+     * @param {Node} [context]
+     */
     eachChild: function (callback, context, ctor) {
         this._inIterating = true;
 
         var _children = this._children;
-        var noCtor = ctor == null;
         for(var i = 0, len = _children.length; i < len; i++) {
             var child = _children[i];
-            if (noCtor || child.constructor === ctor) {
-                callback.call(context, child, i);
-            }
+            callback.call(context, child, i);
         }
 
         this._inIterating = false;
@@ -613,6 +615,7 @@ var Node = Base.extend(
      */
     clone: function () {
         var node = new this.constructor();
+
         var children = this._children;
 
         node.setName(this.name);
@@ -623,6 +626,7 @@ var Node = Base.extend(
         for (var i = 0; i < children.length; i++) {
             node.add(children[i].clone());
         }
+
         return node;
     },
 

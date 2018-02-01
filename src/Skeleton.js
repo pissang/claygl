@@ -144,19 +144,8 @@ var Skeleton = Base.extend(function () {
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
-                // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
-                //     mat4.multiply(
-                //         m4,
-                //         m4,
-                //         joint.node.worldTransform.array
-                //     );
-                //     mat4.invert(m4, m4);
-                // }
-                // else {
-                    mat4.copy(m4, joint.node.worldTransform.array);
-                    mat4.invert(m4, m4);
-                // }
+                mat4.copy(m4, joint.node.worldTransform.array);
+                mat4.invert(m4, m4);
 
                 var offset = i * 16;
                 for (var j = 0; j < 16; j++) {
@@ -184,29 +173,19 @@ var Skeleton = Base.extend(function () {
     /**
      * Update skinning matrices
      */
-    update: (function () {
-        // var m4 = mat4.create();
-        return function () {
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                mat4.multiply(
-                    this._skinMatricesSubArrays[i],
-                    joint.node.worldTransform.array,
-                    this._jointMatricesSubArrays[i]
-                );
+    update: function () {
 
-                // Joint space is relative to root, if have
-                // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
-                //     mat4.multiply(
-                //         this._skinMatricesSubArrays[i],
-                //         m4,
-                //         this._skinMatricesSubArrays[i]
-                //     );
-                // }
-            }
-        };
-    })(),
+        this._setPose();
+
+        for (var i = 0; i < this.joints.length; i++) {
+            var joint = this.joints[i];
+            mat4.multiply(
+                this._skinMatricesSubArrays[i],
+                joint.node.worldTransform.array,
+                this._jointMatricesSubArrays[i]
+            );
+        }
+    },
 
     getSubSkinMatrices: function (meshId, joints) {
         var subArray = this._subSkinMatricesArray[meshId];
@@ -225,14 +204,10 @@ var Skeleton = Base.extend(function () {
         return subArray;
     },
 
-    /**
-     * Set pose and update skinning matrices
-     * @param {number} clipIndex
-     */
-    setPose: function (clipIndex) {
-        if (this._clips[clipIndex]) {
-            var clip = this._clips[clipIndex].clip;
-            var maps = this._clips[clipIndex].maps;
+    _setPose: function () {
+        if (this._clips[0]) {
+            var clip = this._clips[0].clip;
+            var maps = this._clips[0].maps;
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
@@ -258,28 +233,32 @@ var Skeleton = Base.extend(function () {
                 joint.node.scale._dirty = true;
             }
         }
-        this.update();
     },
 
-    clone: function (rootNode, newRootNode) {
+    clone: function (clonedNodesMap) {
         var skeleton = new Skeleton();
         skeleton.name = this.name;
 
         for (var i = 0; i < this.joints.length; i++) {
             var newJoint = new Joint();
-            newJoint.name = this.joints[i].name;
-            newJoint.index = this.joints[i].index;
+            var joint = this.joints[i];
+            newJoint.name = joint.name;
+            newJoint.index = joint.index;
 
-            var path = this.joints[i].node.getPath(rootNode);
-            var rootNodePath = this.joints[i].rootNode.getPath(rootNode);
+            if (clonedNodesMap) {
+                var newNode = clonedNodesMap[joint.node.__uid__];
 
-            if (path != null && rootNodePath != null) {
-                newJoint.node = newRootNode.queryNode(path);
+                if (!newNode) {
+                    // PENDING
+                    console.warn('Can\'t find node');
+                }
+
+                newJoint.node = newNode || joint.node;
             }
             else {
-                // PENDING
-                console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.')
+                newJoint.node = joint.node;
             }
+
             skeleton.joints.push(newJoint);
         }
 

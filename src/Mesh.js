@@ -40,7 +40,6 @@ var Mesh = Renderable.extend(
         var _gl = renderer.gl;
         // Set pose matrices of skinned mesh
         if (this.skeleton) {
-            // TODO Multiple mesh share same skeleton
             this.skeleton.update();
 
             var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__uid__, this.joints);
@@ -91,6 +90,15 @@ var Mesh = Renderable.extend(
         });
 
         return this._skinMatricesTexture;
+    },
+
+    clone: function () {
+        var mesh = Renderable.prototype.clone.call(this);
+        mesh.skeleton = this.skeleton;
+        if (this.joints) {
+            mesh.joints = this.joints.slice();
+        }
+        return mesh;
     }
 });
 

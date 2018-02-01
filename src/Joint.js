@@ -23,13 +23,7 @@ var Joint = Base.extend(
      * Scene node attached to
      * @type {clay.Node}
      */
-    node: null,
-
-    /**
-     * Root scene node of the skeleton, which parent node is null or don't have a joint
-     * @type {clay.Node}
-     */
-    rootNode: null
+    node: null
 });
 
 export default Joint;

@@ -50,7 +50,8 @@
             var directionalLight = new clay.light.Directional({
                 intensity: 1.2,
                 shadowBias: 0.004,
-                shadowResolution: 2048
+                shadowResolution: 1024,
+                shadowCascade: 2
             });
             directionalLight.position.set(10, 10, 10);
             directionalLight.lookAt(scene.position);
