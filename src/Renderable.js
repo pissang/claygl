@@ -172,10 +172,10 @@ var Renderable = Node.extend(
         var glDrawMode = this.mode;
 
         var nVertex = geometry.vertexCount;
-        var isUseIndices = geometry.isUseIndices();
 
         var uintExt = renderer.getGLExtension('OES_element_index_uint');
-        var useUintExt = uintExt && nVertex > 0xffff;
+        // var useUintExt = uintExt && nVertex > 0xffff;
+        var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
         var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
         var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
@@ -328,9 +328,9 @@ var Renderable = Node.extend(
                     }
                 }
                 if (
-                    glDrawMode == glenum.LINES ||
-                    glDrawMode == glenum.LINE_STRIP ||
-                    glDrawMode == glenum.LINE_LOOP
+                    glDrawMode === glenum.LINES ||
+                    glDrawMode === glenum.LINE_STRIP ||
+                    glDrawMode === glenum.LINE_LOOP
                 ) {
                     _gl.lineWidth(this.lineWidth);
                 }
@@ -344,7 +344,8 @@ var Renderable = Node.extend(
                     }
                     _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
                     renderInfo.triangleCount += indicesBuffer.count / 3;
-                } else {
+                }
+                else {
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
 
