@@ -272,7 +272,7 @@ var ShadowMapPass = Base.extend(function () {
                     continue;
                 }
                 if (light.shadowCascade > 1) {
-                    dirLightHasCascade = light.shadowCascade;
+                    dirLightHasCascade = light;
                 }
 
                 this.renderDirectionalLightShadow(
