@@ -262,6 +262,71 @@ function IndicesBuffer(buffer) {
 }
 
 /**
+ * Geometry in ClayGL contains vertex attributes of mesh. These vertex attributes will be finally provided to the {@link clay.Shader}.
+ * Different {@link clay.Shader} needs different attributes. Here is a list of attributes used in the builtin shaders.
+ *
+ * + position: `clay.basic`, `clay.lambert`, `clay.standard`
+ * + texcoord0: `clay.basic`, `clay.lambert`, `clay.standard`
+ * + color: `clay.basic`, `clay.lambert`, `clay.standard`
+ * + weight: `clay.basic`, `clay.lambert`, `clay.standard`
+ * + joint: `clay.basic`, `clay.lambert`, `clay.standard`
+ * + normal: `clay.lambert`, `clay.standard`
+ * + tangent: `clay.standard`
+ *
+ * #### Create a procedural geometry
+ *
+ * ClayGL provides a couple of builtin procedural geometries. Inlcuding:
+ *
+ *  + {@link clay.geometry.Cube}
+ *  + {@link clay.geometry.Sphere}
+ *  + {@link clay.geometry.Plane}
+ *  + {@link clay.geometry.Cylinder}
+ *  + {@link clay.geometry.Cone}
+ *  + {@link clay.geometry.ParametricSurface}
+ *
+ * It's simple to create a basic geometry with these classes.
+ *
+```js
+var sphere = new clay.geometry.Sphere({
+    radius: 2
+});
+```
+ *
+ * #### Create the geometry data by yourself
+ *
+ * Usually the vertex attributes data are created by the {@link clay.loader.GLTF} or procedural geometries like {@link clay.geometry.Sphere}.
+ * Besides these, you can create the data manually. Here is a simple example to create a triangle.
+```js
+var TRIANGLE_POSITIONS = [
+    [-0.5, -0.5, 0],
+    [0.5, -0.5, 0],
+    [0, 0.5, 0]
+];
+var geometry = new clay.StaticGeometry();
+// Add triangle vertices to position attribute.
+geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
+```
+ * Then you can use the utility methods like `generateVertexNormals`, `generateTangents` to create the remaining necessary attributes.
+ *
+ *
+ * #### Use with custom shaders
+ *
+ * If you wan't to write custom shaders. Don't forget to add SEMANTICS to these attributes. For example
+ *
+ ```glsl
+uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
+uniform mat4 world : WORLD;
+
+attribute vec3 position : POSITION;
+attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 normal : NORMAL;
+```
+ * These `POSITION`, `TEXCOORD_0`, `NORMAL` are SEMANTICS which will map the attributes in shader to the attributes in the Geometry
+ *
+ * Available attributes SEMANTICS includes `POSITION`, `TEXCOORD_0`, `TEXCOORD_1` `NORMAL`, `TANGENT`, `COLOR`, `WEIGHT`, `JOINT`.
+ *
+ *
  * @constructor clay.Geometry
  * @extends clay.core.Base
  */
@@ -278,7 +343,8 @@ var Geometry = Base.extend(function () {
          *  + `weight`
          *  + `joint`
          *  + `barycentric`
-         * @type {Object}
+         *
+         * @type {Object.<string, clay.Geometry.Attribute>}
          */
         attributes: {
             position: new Attribute('position', 'float', 3, 'POSITION'),
@@ -386,6 +452,7 @@ var Geometry = Base.extend(function () {
     },
     /**
      * Mark attributes and indices in geometry needs to update.
+     * Usually called after you change the data in attributes.
      */
     dirty: function () {
         var enabledAttributes = this.getEnabledAttributes();

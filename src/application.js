@@ -64,6 +64,37 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  */
 
 /**
+ * Using App3D is a much convenient way to create and manage your 3D application.
+ *
+ * It provides the abilities to:
+ *
+ * + Manage application loop and rendering.
+ * + GPU resource collection automatically without memory leak concern.
+ * + Mouse event management.
+ * + Create scene objects, materials, textures with simpler code.
+ * + Load models with one line of code.
+ * + Promised interfaces.
+ *
+ * Here is a basic example to create a rotating cube.
+ *
+```js
+var app = clay.application.create('#viewport', {
+    init: function (app) {
+        // Create a perspective camera.
+        // First parameter is the camera position. Which is in front of the cube.
+        // Second parameter is the camera lookAt target. Which is the origin of the world, and where the cube puts.
+        this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+        // Create a sample cube
+        this._cube = app.createCube();
+        // Create a directional light. The direction is from top right to left bottom, away from camera.
+        this._mainLight = app.createDirectionalLight([-1, -1, -1]);
+    },
+    loop: function (app) {
+        // Simply rotating the cube every frame.
+        this._cube.rotation.rotateY(app.frameTime / 1000);
+    }
+});
+```
  * @constructor
  * @alias clay.application.App3D
  * @param {DomQuery} dom Container dom element or a selector string that can be used in `querySelector`
@@ -1243,6 +1274,9 @@ export default {
     App3D: App3D,
     /**
      * Create a 3D application that will manage the app initialization and loop.
+     *
+     * See more details at {@link clay.application.App3D}
+     *
      * @name clay.application.create
      * @method
      * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
