@@ -1244,6 +1244,7 @@ export default {
     /**
      * Create a 3D application that will manage the app initialization and loop.
      * @name clay.application.create
+     * @method
      * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
      * @param {Object} appNS
      * @param {Function} appNS.init Initialization callback that will be called when initing app.
@@ -1259,6 +1260,8 @@ export default {
      * @param {boolean} [appNS.graphic.linear=false] If use linear space
      * @param {boolean} [appNS.graphic.tonemapping=false] If enable ACES tone mapping.
      * @param {boolean} [appNS.event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+     *
+     * @return {clay.application.App3D}
      *
      * @example
      *  clay.application.create('#app', {
