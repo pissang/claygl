@@ -35,7 +35,7 @@
             }
             var light = new clay.light.Directional();
             light.position.set(4, 4, 0);
-            light.lookAt(clay.math.Vector3.ZERO);
+            light.lookAt(clay.Vector3.ZERO);
             scene.add(light);
             scene.add(new clay.light.Ambient({
                 intensity : 0.5
@@ -47,7 +47,7 @@
                 camera: camera
             });
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.on('frame', function() {
                 renderer.render(scene, camera);
@@ -55,8 +55,8 @@
 
             var currentCube;
             var point;
-            var offset = new clay.math.Vector3();
-            var plane = new clay.math.Plane();
+            var offset = new clay.Vector3();
+            var plane = new clay.Plane();
             renderer.canvas.addEventListener('mousedown', function(e) {
                 var res = picking.pick(e.offsetX, e.offsetY);
                 if (res) {

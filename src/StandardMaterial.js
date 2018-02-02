@@ -126,7 +126,7 @@ var StandardMaterial = Material.extend(function () {
          */
 
         /**
-         * @type {clay.math.BoundingBox}
+         * @type {clay.BoundingBox}
          */
 
         /**

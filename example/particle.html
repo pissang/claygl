@@ -12,13 +12,13 @@
         var renderer = new clay.Renderer({
             canvas : document.getElementById("Main")
         });
-        var timeline =  new clay.animation.Timeline();
+        var timeline =  new clay.Timeline();
         timeline.start();
 
         renderer.resize(window.innerWidth, window.innerHeight);
 
-        var Value = clay.math.Value;
-        var Vector3 = clay.math.Vector3;
+        var Value = clay.Value;
+        var Vector3 = clay.Vector3;
         var particleRenderable = new clay.particle.ParticleRenderable();
         var emitter = new clay.particle.Emitter({
             max : 5000,

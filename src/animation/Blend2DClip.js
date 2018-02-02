@@ -6,7 +6,7 @@ import Vector2 from '../math/Vector2';
 
 /**
  * @typedef {Object} clay.animation.Blend2DClip.IClipInput
- * @property {clay.math.Vector2} position
+ * @property {clay.Vector2} position
  * @property {clay.animation.Clip} clip
  * @property {number} offset
  */
@@ -31,7 +31,7 @@ import Vector2 from '../math/Vector2';
  * @param {Function} [opts.onfinish]
  * @param {Function} [opts.onrestart]
  * @param {object[]} [opts.inputs]
- * @param {clay.math.Vector2} [opts.position]
+ * @param {clay.Vector2} [opts.position]
  * @param {clay.animation.Clip} [opts.output]
  */
 var Blend2DClip = function (opts) {
@@ -49,7 +49,7 @@ var Blend2DClip = function (opts) {
      */
     this.inputs = opts.inputs || [];
     /**
-     * @type {clay.math.Vector2}
+     * @type {clay.Vector2}
      */
     this.position = new Vector2();
 
@@ -63,7 +63,7 @@ var Blend2DClip = function (opts) {
 Blend2DClip.prototype = new Clip();
 Blend2DClip.prototype.constructor = Blend2DClip;
 /**
- * @param {clay.math.Vector2} position
+ * @param {clay.Vector2} position
  * @param {clay.animation.Clip} inputClip
  * @param {number} [offset]
  * @return {clay.animation.Blend2DClip.IClipInput}

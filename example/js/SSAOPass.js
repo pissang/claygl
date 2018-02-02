@@ -1,7 +1,7 @@
 define(function (require) {
     var clay = require('../../dist/claygl');
-    var Matrix4 = clay.math.Matrix4;
-    var Vector3 = clay.math.Vector3;
+    var Matrix4 = clay.Matrix4;
+    var Vector3 = clay.Vector3;
 
     clay.Shader.import(require('text!../shader/ssao.glsl'));
 

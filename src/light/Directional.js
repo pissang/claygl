@@ -11,7 +11,7 @@ import Vector3 from '../math/Vector3';
  *         color: [1.0, 0.0, 0.0]
  *     });
  *     light.position.set(10, 10, 10);
- *     light.lookAt(clay.math.Vector3.ZERO);
+ *     light.lookAt(clay.Vector3.ZERO);
  *     scene.add(light);
  */
 var DirectionalLight = Light.extend(

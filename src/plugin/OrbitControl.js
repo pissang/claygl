@@ -38,7 +38,7 @@ var OrbitControl = Base.extend(function () {
          */
         target: null,
         /**
-         * @type {clay.math.Vector3}
+         * @type {clay.Vector3}
          */
         _center: new Vector3(),
 

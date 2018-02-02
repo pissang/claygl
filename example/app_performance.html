@@ -91,7 +91,7 @@
                         color: [Math.random(), Math.random(), Math.random()]
                     });
                     cube.position.setArray(randPos());
-                    cube.center = new clay.math.Vector3(0, cube.position.y, 0);
+                    cube.center = new clay.Vector3(0, cube.position.y, 0);
                     cube.moveSpeed = Math.random();
                     cube.rotateSpeed = Math.random() * 5;
                     cubes.push(cube);
@@ -101,12 +101,12 @@
 
             loop: function (app) {
                 this._control.update(app.frameTime);
-                this._pointLight1.rotateAround(new clay.math.Vector3(0, 100, 0), new clay.math.Vector3(0.1, 1, 0.1), 0.1);
-                this._pointLight2.rotateAround(new clay.math.Vector3(0, 120, 0), new clay.math.Vector3(-0.1, 1, -0.2), 0.05);
+                this._pointLight1.rotateAround(new clay.Vector3(0, 100, 0), new clay.Vector3(0.1, 1, 0.1), 0.1);
+                this._pointLight2.rotateAround(new clay.Vector3(0, 120, 0), new clay.Vector3(-0.1, 1, -0.2), 0.05);
 
                 var frameTimeSecond = app.frameTime / 1000;
                 this._cubes.forEach(function (cube) {
-                    cube.rotateAround(cube.center, clay.math.Vector3.UP, cube.moveSpeed * frameTimeSecond);
+                    cube.rotateAround(cube.center, clay.Vector3.UP, cube.moveSpeed * frameTimeSecond);
                     cube.rotation.rotateX(cube.rotateSpeed * frameTimeSecond).rotateY(cube.rotateSpeed * frameTimeSecond)
                 });
             }

@@ -21,7 +21,7 @@
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 0.5, 3);
-                camera.lookAt(clay.math.Vector3.ZERO);
+                camera.lookAt(clay.Vector3.ZERO);
 
                 var scene = new clay.Scene();
                 var rootNode = new clay.Node();
@@ -32,7 +32,7 @@
                     intensity: 0.5
                 });
                 dirLight.position.set(1, 1, 1);
-                dirLight.lookAt(clay.math.Vector3.ZERO);
+                dirLight.lookAt(clay.Vector3.ZERO);
                 scene.add(dirLight);
 
                 var loader = new clay.loader.GLTF({
@@ -112,7 +112,7 @@
                     var dofCompositeNode = compositor.getNodeByName('dof_composite');
                     var compositeNode = compositor.getNodeByName('composite');
 
-                    var timeline =  new clay.animation.Timeline();
+                    var timeline =  new clay.Timeline();
                     timeline.start();
                     timeline.on('frame', function(deltaTime) {
                         control.update(deltaTime);

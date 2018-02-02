@@ -16,7 +16,7 @@
                     aspect: renderer.getViewportAspect(),
                     far: 500
                 });
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
 
             var texture = new clay.TextureCube({
@@ -37,7 +37,7 @@
             skybox.material.set("environmentMap", texture);
 
             camera.position.set(5, 12, 10);
-            camera.lookAt( new clay.math.Vector3(0, 8, 0) );
+            camera.lookAt( new clay.Vector3(0, 8, 0) );
 
             var control = new clay.plugin.OrbitControl({
                 target: camera,

@@ -37,7 +37,7 @@
             scene.add(mesh);
 
             camera.position.set(0, 1.5, 3);
-            camera.lookAt(new clay.math.Vector3(0, 0, 0));
+            camera.lookAt(new clay.Vector3(0, 0, 0));
 
             var light = new clay.light.Point({
                 color: [1.5, 1.5, 1.5]
@@ -64,7 +64,7 @@
 
             var orthCamera = new clay.camera.Orthographic();
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.on('frame', function() {
                 frameBuffer.bind(renderer);

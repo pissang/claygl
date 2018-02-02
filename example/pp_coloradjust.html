@@ -45,13 +45,13 @@
             scene.add( mesh );
 
             camera.position.set(0, 2, 2);
-            camera.lookAt( new clay.math.Vector3() );
+            camera.lookAt( new clay.Vector3() );
 
             var light = new clay.light.Directional({
                 color: [1.5, 1.5, 1.5]
             })
             light.position.set(50, 50, 50);
-            light.lookAt(new clay.math.Vector3());
+            light.lookAt(new clay.Vector3());
             scene.add(light);
 
             compositor.addNode(new pp_SceneNode({

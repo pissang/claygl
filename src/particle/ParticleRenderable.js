@@ -23,7 +23,7 @@ var particleShader = new Shader(Shader.source('clay.particle.vertex'), Shader.so
  *     // Enable uv animation in the shader
  *     particleRenderable.material.define('both', 'UV_ANIMATION');
  *     var Emitter = clay.particle.Emitter;
- *     var Vector3 = clay.math.Vector3;
+ *     var Vector3 = clay.Vector3;
  *     var emitter = new Emitter({
  *         max: 2000,
  *         amount: 100,

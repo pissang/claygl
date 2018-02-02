@@ -26,37 +26,37 @@ var Emitter = Base.extend(
     // Init status for each particle
     /**
      * Particle life generator
-     * @type {?clay.math.Value.<number>}
+     * @type {?clay.Value.<number>}
      */
     life: null,
     /**
      * Particle position generator
-     * @type {?clay.math.Value.<clay.math.Vector3>}
+     * @type {?clay.Value.<clay.Vector3>}
      */
     position: null,
     /**
      * Particle rotation generator
-     * @type {?clay.math.Value.<clay.math.Vector3>}
+     * @type {?clay.Value.<clay.Vector3>}
      */
     rotation: null,
     /**
      * Particle velocity generator
-     * @type {?clay.math.Value.<clay.math.Vector3>}
+     * @type {?clay.Value.<clay.Vector3>}
      */
     velocity: null,
     /**
      * Particle angular velocity generator
-     * @type {?clay.math.Value.<clay.math.Vector3>}
+     * @type {?clay.Value.<clay.Vector3>}
      */
     angularVelocity: null,
     /**
      * Particle sprite size generator
-     * @type {?clay.math.Value.<number>}
+     * @type {?clay.Value.<number>}
      */
     spriteSize: null,
     /**
      * Particle weight generator
-     * @type {?clay.math.Value.<number>}
+     * @type {?clay.Value.<number>}
      */
     weight: null,
 
@@ -129,31 +129,31 @@ var Emitter = Base.extend(
 });
 
 /**
- * Create a constant 1d value generator. Alias for {@link clay.math.Value.constant}
+ * Create a constant 1d value generator. Alias for {@link clay.Value.constant}
  * @function clay.particle.Emitter.constant
  */
 Emitter.constant = Value.constant;
 
 /**
- * Create a constant vector value(2d or 3d) generator. Alias for {@link clay.math.Value.vector}
+ * Create a constant vector value(2d or 3d) generator. Alias for {@link clay.Value.vector}
  * @function clay.particle.Emitter.vector
  */
 Emitter.vector = Value.vector;
 
 /**
- * Create a random 1d value generator. Alias for {@link clay.math.Value.random1D}
+ * Create a random 1d value generator. Alias for {@link clay.Value.random1D}
  * @function clay.particle.Emitter.random1D
  */
 Emitter.random1D = Value.random1D;
 
 /**
- * Create a random 2d value generator. Alias for {@link clay.math.Value.random2D}
+ * Create a random 2d value generator. Alias for {@link clay.Value.random2D}
  * @function clay.particle.Emitter.random2D
  */
 Emitter.random2D = Value.random2D;
 
 /**
- * Create a random 3d value generator. Alias for {@link clay.math.Value.random3D}
+ * Create a random 3d value generator. Alias for {@link clay.Value.random3D}
  * @function clay.particle.Emitter.random3D
  */
 Emitter.random3D = Value.random3D;

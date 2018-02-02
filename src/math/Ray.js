@@ -6,17 +6,17 @@ var EPSILON = 1e-5;
 
 /**
  * @constructor
- * @alias clay.math.Ray
- * @param {clay.math.Vector3} [origin]
- * @param {clay.math.Vector3} [direction]
+ * @alias clay.Ray
+ * @param {clay.Vector3} [origin]
+ * @param {clay.Vector3} [direction]
  */
 var Ray = function (origin, direction) {
     /**
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.origin = origin || new Vector3();
     /**
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.direction = direction || new Vector3();
 };
@@ -28,9 +28,9 @@ Ray.prototype = {
     // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rayplane_intersection.htm
     /**
      * Calculate intersection point between ray and a give plane
-     * @param  {clay.math.Plane} plane
-     * @param  {clay.math.Vector3} [out]
-     * @return {clay.math.Vector3}
+     * @param  {clay.Plane} plane
+     * @param  {clay.Vector3} [out]
+     * @return {clay.Vector3}
      */
     intersectPlane: function (plane, out) {
         var pn = plane.normal.array;
@@ -54,7 +54,7 @@ Ray.prototype = {
 
     /**
      * Mirror the ray against plane
-     * @param  {clay.math.Plane} plane
+     * @param  {clay.Plane} plane
      */
     mirrorAgainstPlane: function (plane) {
         // Distance to plane
@@ -81,10 +81,10 @@ Ray.prototype = {
 
     /**
      * Calculate intersection point between ray and sphere
-     * @param  {clay.math.Vector3} center
+     * @param  {clay.Vector3} center
      * @param  {number} radius
-     * @param  {clay.math.Vector3} out
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} out
+     * @return {clay.Vector3}
      */
     intersectSphere: (function () {
         var v = vec3.create();
@@ -134,9 +134,9 @@ Ray.prototype = {
     // http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
     /**
      * Calculate intersection point between ray and bounding box
-     * @param {clay.math.BoundingBox} bbox
-     * @param {clay.math.Vector3}
-     * @return {clay.math.Vector3}
+     * @param {clay.BoundingBox} bbox
+     * @param {clay.Vector3}
+     * @return {clay.Vector3}
      */
     intersectBoundingBox: function (bbox, out) {
         var dir = this.direction.array;
@@ -212,13 +212,13 @@ Ray.prototype = {
     // http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
     /**
      * Calculate intersection point between ray and three triangle vertices
-     * @param {clay.math.Vector3} a
-     * @param {clay.math.Vector3} b
-     * @param {clay.math.Vector3} c
+     * @param {clay.Vector3} a
+     * @param {clay.Vector3} b
+     * @param {clay.Vector3} c
      * @param {boolean}           singleSided, CW triangle will be ignored
-     * @param {clay.math.Vector3} [out]
-     * @param {clay.math.Vector3} [barycenteric] barycentric coords
-     * @return {clay.math.Vector3}
+     * @param {clay.Vector3} [out]
+     * @param {clay.Vector3} [barycenteric] barycentric coords
+     * @return {clay.Vector3}
      */
     intersectTriangle: (function () {
 
@@ -286,7 +286,7 @@ Ray.prototype = {
 
     /**
      * Apply an affine transform matrix to the ray
-     * @return {clay.math.Matrix4} matrix
+     * @return {clay.Matrix4} matrix
      */
     applyTransform: function (matrix) {
         Vector3.add(this.direction, this.direction, this.origin);
@@ -299,7 +299,7 @@ Ray.prototype = {
 
     /**
      * Copy values from another ray
-     * @param {clay.math.Ray} ray
+     * @param {clay.Ray} ray
      */
     copy: function (ray) {
         Vector3.copy(this.origin, ray.origin);
@@ -308,7 +308,7 @@ Ray.prototype = {
 
     /**
      * Clone a new ray
-     * @return {clay.math.Ray}
+     * @return {clay.Ray}
      */
     clone: function () {
         var ray = new Ray();

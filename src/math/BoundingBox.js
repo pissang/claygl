@@ -8,21 +8,21 @@ var vec3Set = vec3.set;
 /**
  * Axis aligned bounding box
  * @constructor
- * @alias clay.math.BoundingBox
- * @param {clay.math.Vector3} [min]
- * @param {clay.math.Vector3} [max]
+ * @alias clay.BoundingBox
+ * @param {clay.Vector3} [min]
+ * @param {clay.Vector3} [max]
  */
 var BoundingBox = function (min, max) {
 
     /**
      * Minimum coords of bounding box
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.min = min || new Vector3(Infinity, Infinity, Infinity);
 
     /**
      * Maximum coords of bounding box
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.max = max || new Vector3(-Infinity, -Infinity, -Infinity);
 };
@@ -60,7 +60,7 @@ BoundingBox.prototype = {
 
     /**
      * Union operation with another bounding box
-     * @param  {clay.math.BoundingBox} bbox
+     * @param  {clay.BoundingBox} bbox
      */
     union: function (bbox) {
         var min = this.min;
@@ -74,7 +74,7 @@ BoundingBox.prototype = {
 
     /**
      * Intersection operation with another bounding box
-     * @param  {clay.math.BoundingBox} bbox
+     * @param  {clay.BoundingBox} bbox
      */
     intersection: function (bbox) {
         var min = this.min;
@@ -88,7 +88,7 @@ BoundingBox.prototype = {
 
     /**
      * If intersect with another bounding box
-     * @param  {clay.math.BoundingBox} bbox
+     * @param  {clay.BoundingBox} bbox
      * @return {boolean}
      */
     intersectBoundingBox: function (bbox) {
@@ -104,7 +104,7 @@ BoundingBox.prototype = {
 
     /**
      * If contain another bounding box entirely
-     * @param  {clay.math.BoundingBox} bbox
+     * @param  {clay.BoundingBox} bbox
      * @return {boolean}
      */
     containBoundingBox: function (bbox) {
@@ -121,7 +121,7 @@ BoundingBox.prototype = {
 
     /**
      * If contain point entirely
-     * @param  {clay.math.Vector3} point
+     * @param  {clay.Vector3} point
      * @return {boolean}
      */
     containPoint: function (p) {
@@ -146,7 +146,7 @@ BoundingBox.prototype = {
 
     /**
      * Apply an affine transform matrix to the bounding box
-     * @param  {clay.math.Matrix4} matrix
+     * @param  {clay.Matrix4} matrix
      */
     applyTransform: (function () {
         // http://dev.theomader.com/transform-bounding-boxes/
@@ -189,7 +189,7 @@ BoundingBox.prototype = {
 
     /**
      * Apply a projection matrix to the bounding box
-     * @param  {clay.math.Matrix4} matrix
+     * @param  {clay.Matrix4} matrix
      */
     applyProjection: function (matrix) {
         var min = this.min.array;
@@ -272,7 +272,7 @@ BoundingBox.prototype = {
     },
     /**
      * Copy values from another bounding box
-     * @param  {clay.math.BoundingBox} bbox
+     * @param  {clay.BoundingBox} bbox
      */
     copy: function (bbox) {
         var min = this.min;
@@ -286,7 +286,7 @@ BoundingBox.prototype = {
 
     /**
      * Clone a new bounding box
-     * @return {clay.math.BoundingBox}
+     * @return {clay.BoundingBox}
      */
     clone: function () {
         var boundingBox = new BoundingBox();

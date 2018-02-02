@@ -1,6 +1,6 @@
 import Base from '../core/Base';
 import request from '../core/request';
-import createCompositor from '../compositor/createCompositor';
+import createCompositor from '../createCompositor';
 
 /**
  * @constructor clay.loader.FX

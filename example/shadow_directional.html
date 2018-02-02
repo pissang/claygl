@@ -61,7 +61,7 @@
             scene.add(new clay.light.Point({
                 intensity: 0.4,
                 range: 100,
-                position: new clay.math.Vector3(-10, CUBE_COUNT, 0)
+                position: new clay.Vector3(-10, CUBE_COUNT, 0)
             }));
 
             camera.position.set(10, 20, 20);
@@ -73,7 +73,7 @@
                 target: camera
             });
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
 
             var elapsedTime = 0;
             timeline.on('frame', function (deltaTime) {

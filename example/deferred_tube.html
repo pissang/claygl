@@ -47,7 +47,7 @@
             }
 
             var cylinder = new clay.geometry.Cylinder();
-            cylinder.applyTransform(new clay.math.Matrix4().rotateZ(Math.PI / 2));
+            cylinder.applyTransform(new clay.Matrix4().rotateZ(Math.PI / 2));
             for (var i = 0; i < 20; i ++) {
                 var tubeLight = new clay.light.Tube({
                     color: [1, 1, 1],
@@ -106,7 +106,7 @@
                 target: camera
             });
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
 
             var debugPass = new clay.compositor.Pass({
                 fragment: clay.Shader.source('clay.compositor.output')

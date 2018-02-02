@@ -365,7 +365,7 @@ var Geometry = Base.extend(function () {
         },
         /**
          * Calculated bounding box of geometry.
-         * @type {clay.math.BoundingBox}
+         * @type {clay.BoundingBox}
          */
         boundingBox: null,
 
@@ -412,7 +412,7 @@ var Geometry = Base.extend(function () {
      * User defined ray picking algorithm instead of default
      * triangle ray intersection
      * ```typescript
-     * (ray: clay.math.Ray, renderable: clay.Renderable, out: Array) => boolean
+     * (ray: clay.Ray, renderable: clay.Renderable, out: Array) => boolean
      * ```
      * @type {?Function}
      */
@@ -1037,7 +1037,7 @@ var Geometry = Base.extend(function () {
 
     /**
      * Apply transform to geometry attributes.
-     * @param {clay.math.Matrix4} matrix
+     * @param {clay.Matrix4} matrix
      */
     applyTransform: function (matrix) {
 

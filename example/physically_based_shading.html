@@ -44,10 +44,10 @@
 
                 var light = new clay.light.Directional();
                 light.position.set(1, 4, 4);
-                light.lookAt(clay.math.Vector3.ZERO);
+                light.lookAt(clay.Vector3.ZERO);
                 scene.add(light);
 
-                var timeline =  new clay.animation.Timeline();
+                var timeline =  new clay.Timeline();
                 timeline.start();
                 timeline.on('frame', function() {
                     control.update();

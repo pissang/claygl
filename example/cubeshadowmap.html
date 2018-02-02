@@ -17,7 +17,7 @@
                 canvas: document.getElementById('main')
             });
             renderer.resize(window.innerWidth, window.innerHeight);
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
 
             var shadowMapPass = new clay.prePass.ShadowMap();
@@ -58,12 +58,12 @@
                     shader: clay.shader.library.get("clay.lambert")
                 }),
                 culling: false,
-                scale: new clay.math.Vector3(10, 10, 10)
+                scale: new clay.Vector3(10, 10, 10)
             });
             root.add(bigCube);
 
             camera.position.set(0, 2, 10);
-            camera.lookAt(new clay.math.Vector3(0, 0, 0));
+            camera.lookAt(new clay.Vector3(0, 0, 0));
 
             var light = new clay.light.Point({
                 color: [1.5, 1.5, 1.5],

@@ -3,21 +3,21 @@ var mat2d = glMatrix.mat2d;
 
 /**
  * @constructor
- * @alias clay.math.Matrix2d
+ * @alias clay.Matrix2d
  */
 var Matrix2d = function() {
     /**
      * Storage of Matrix2d
      * @name array
      * @type {Float32Array}
-     * @memberOf clay.math.Matrix2d#
+     * @memberOf clay.Matrix2d#
      */
     this.array = mat2d.create();
 
     /**
      * @name _dirty
      * @type {boolean}
-     * @memberOf clay.math.Matrix2d#
+     * @memberOf clay.Matrix2d#
      */
     this._dirty = true;
 };
@@ -39,7 +39,7 @@ Matrix2d.prototype = {
     },
     /**
      * Clone a new Matrix2d
-     * @return {clay.math.Matrix2d}
+     * @return {clay.Matrix2d}
      */
     clone: function() {
         return (new Matrix2d()).copy(this);
@@ -47,8 +47,8 @@ Matrix2d.prototype = {
 
     /**
      * Copy from b
-     * @param  {clay.math.Matrix2d} b
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Matrix2d} b
+     * @return {clay.Matrix2d}
      */
     copy: function(b) {
         mat2d.copy(this.array, b.array);
@@ -66,7 +66,7 @@ Matrix2d.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {clay.math.Matrix2d}
+     * @return {clay.Matrix2d}
      */
     identity: function() {
         mat2d.identity(this.array);
@@ -76,7 +76,7 @@ Matrix2d.prototype = {
 
     /**
      * Invert self
-     * @return {clay.math.Matrix2d}
+     * @return {clay.Matrix2d}
      */
     invert: function() {
         mat2d.invert(this.array, this.array);
@@ -86,8 +86,8 @@ Matrix2d.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {clay.math.Matrix2d} b
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Matrix2d} b
+     * @return {clay.Matrix2d}
      */
     mul: function(b) {
         mat2d.mul(this.array, this.array, b.array);
@@ -97,8 +97,8 @@ Matrix2d.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {clay.math.Matrix2d} a
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Matrix2d} a
+     * @return {clay.Matrix2d}
      */
     mulLeft: function(b) {
         mat2d.mul(this.array, b.array, this.array);
@@ -108,8 +108,8 @@ Matrix2d.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {clay.math.Matrix2d} b
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Matrix2d} b
+     * @return {clay.Matrix2d}
      */
     multiply: function(b) {
         mat2d.multiply(this.array, this.array, b.array);
@@ -119,8 +119,8 @@ Matrix2d.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {clay.math.Matrix2d} a
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Matrix2d} a
+     * @return {clay.Matrix2d}
      */
     multiplyLeft: function(b) {
         mat2d.multiply(this.array, b.array, this.array);
@@ -131,7 +131,7 @@ Matrix2d.prototype = {
     /**
      * Rotate self by a given radian
      * @param  {number}   rad
-     * @return {clay.math.Matrix2d}
+     * @return {clay.Matrix2d}
      */
     rotate: function(rad) {
         mat2d.rotate(this.array, this.array, rad);
@@ -141,8 +141,8 @@ Matrix2d.prototype = {
 
     /**
      * Scale self by s
-     * @param  {clay.math.Vector2}  s
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Vector2}  s
+     * @return {clay.Matrix2d}
      */
     scale: function(s) {
         mat2d.scale(this.array, this.array, s.array);
@@ -152,8 +152,8 @@ Matrix2d.prototype = {
 
     /**
      * Translate self by v
-     * @param  {clay.math.Vector2}  v
-     * @return {clay.math.Matrix2d}
+     * @param  {clay.Vector2}  v
+     * @return {clay.Matrix2d}
      */
     translate: function(v) {
         mat2d.translate(this.array, this.array, v.array);
@@ -171,9 +171,9 @@ Matrix2d.prototype = {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @return {clay.Matrix2d}
  */
 Matrix2d.copy = function(out, a) {
     mat2d.copy(out.array, a.array);
@@ -182,7 +182,7 @@ Matrix2d.copy = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} a
+ * @param  {clay.Matrix2d} a
  * @return {number}
  */
 Matrix2d.determinant = function(a) {
@@ -190,8 +190,8 @@ Matrix2d.determinant = function(a) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @return {clay.Matrix2d}
  */
 Matrix2d.identity = function(out) {
     mat2d.identity(out.array);
@@ -200,9 +200,9 @@ Matrix2d.identity = function(out) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @return {clay.Matrix2d}
  */
 Matrix2d.invert = function(out, a) {
     mat2d.invert(out.array, a.array);
@@ -211,10 +211,10 @@ Matrix2d.invert = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @param  {clay.math.Matrix2d} b
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @param  {clay.Matrix2d} b
+ * @return {clay.Matrix2d}
  */
 Matrix2d.mul = function(out, a, b) {
     mat2d.mul(out.array, a.array, b.array);
@@ -224,18 +224,18 @@ Matrix2d.mul = function(out, a, b) {
 
 /**
  * @function
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @param  {clay.math.Matrix2d} b
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @param  {clay.Matrix2d} b
+ * @return {clay.Matrix2d}
  */
 Matrix2d.multiply = Matrix2d.mul;
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
  * @param  {number}   rad
- * @return {clay.math.Matrix2d}
+ * @return {clay.Matrix2d}
  */
 Matrix2d.rotate = function(out, a, rad) {
     mat2d.rotate(out.array, a.array, rad);
@@ -244,10 +244,10 @@ Matrix2d.rotate = function(out, a, rad) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @param  {clay.math.Vector2}  v
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @param  {clay.Vector2}  v
+ * @return {clay.Matrix2d}
  */
 Matrix2d.scale = function(out, a, v) {
     mat2d.scale(out.array, a.array, v.array);
@@ -256,10 +256,10 @@ Matrix2d.scale = function(out, a, v) {
 };
 
 /**
- * @param  {clay.math.Matrix2d} out
- * @param  {clay.math.Matrix2d} a
- * @param  {clay.math.Vector2}  v
- * @return {clay.math.Matrix2d}
+ * @param  {clay.Matrix2d} out
+ * @param  {clay.Matrix2d} a
+ * @param  {clay.Vector2}  v
+ * @return {clay.Matrix2d}
  */
 Matrix2d.translate = function(out, a, v) {
     mat2d.translate(out.array, a.array, v.array);

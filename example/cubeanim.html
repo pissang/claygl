@@ -176,7 +176,7 @@
                 intensity: 0.3
             }));
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
 
             timeline.on('frame', function(deltaTime) {
@@ -198,8 +198,8 @@
                 for (var i = 0; i < cubeList.length; i++) {
                     cubeList[i].material.set('color', color);
                     var pos = positionArr[i];
-                    clay.math.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
-                    clay.math.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
+                    clay.Quaternion.rotateY(cubeList[i].rotation, cubeList[i].rotation, deltaTime / 500);
+                    clay.Vector3.set(cubeList[i].position, pos[0], pos[1], pos[2]);
                 }
             });
 

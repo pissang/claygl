@@ -42,7 +42,7 @@ var FreeControl = Base.extend(function() {
 
         /**
          * Up axis
-         * @type {clay.math.Vector3}
+         * @type {clay.Vector3}
          */
         up: new Vector3(0, 1, 0),
 
@@ -53,7 +53,7 @@ var FreeControl = Base.extend(function() {
         verticalMoveLock: false,
 
         /**
-         * @type {clay.animation.Animation}
+         * @type {clay.Timeline}
          */
         animation: null,
 

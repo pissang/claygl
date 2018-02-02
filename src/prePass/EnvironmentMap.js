@@ -33,7 +33,7 @@ var EnvironmentMapPass = Base.extend(function() {
     var ret = /** @lends clay.prePass.EnvironmentMap# */ {
         /**
          * Camera position
-         * @type {clay.math.Vector3}
+         * @type {clay.Vector3}
          * @memberOf clay.prePass.EnvironmentMap#
          */
         position: new Vector3(),

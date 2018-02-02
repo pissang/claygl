@@ -7,7 +7,7 @@
         <canvas width="1200" height="640" id="main"></canvas>
         <script type="text/javascript">
             var Shader = clay.Shader;
-            var Vector3 = clay.math.Vector3;
+            var Vector3 = clay.Vector3;
 
             var renderer = new clay.Renderer({
                 canvas: document.getElementById('main'),
@@ -72,7 +72,7 @@
             var zeroVector = new Vector3();
             var upAxis = new Vector3(0, 1, 0);
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.on('frame', function () {
                 light.rotateAround(zeroVector, upAxis, 0.01);

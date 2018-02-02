@@ -8,23 +8,23 @@ var vec3 = glMatrix.vec3;
  */
 var Particle = function() {
     /**
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.position = new Vector3();
 
     /**
      * Use euler angle to represent particle rotation
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.rotation = new Vector3();
 
     /**
-     * @type {?clay.math.Vector3}
+     * @type {?clay.Vector3}
      */
     this.velocity = null;
 
     /**
-     * @type {?clay.math.Vector3}
+     * @type {?clay.Vector3}
      */
     this.angularVelocity = null;
 

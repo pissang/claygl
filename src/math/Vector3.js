@@ -3,7 +3,7 @@ var vec3 = glMatrix.vec3;
 
 /**
  * @constructor
- * @alias clay.math.Vector3
+ * @alias clay.Vector3
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -19,7 +19,7 @@ var Vector3 = function(x, y, z) {
      * All methods also operate on the array instead of x, y, z components
      * @name array
      * @type {Float32Array}
-     * @memberOf clay.math.Vector3#
+     * @memberOf clay.Vector3#
      */
     this.array = vec3.fromValues(x, y, z);
 
@@ -28,7 +28,7 @@ var Vector3 = function(x, y, z) {
      * if the matrix is updated to latest
      * @name _dirty
      * @type {boolean}
-     * @memberOf clay.math.Vector3#
+     * @memberOf clay.Vector3#
      */
     this._dirty = true;
 };
@@ -39,8 +39,8 @@ Vector3.prototype = {
 
     /**
      * Add b to self
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     add: function (b) {
         vec3.add(this.array, this.array, b.array);
@@ -53,7 +53,7 @@ Vector3.prototype = {
      * @param  {number}  x
      * @param  {number}  y
      * @param  {number}  z
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     set: function (x, y, z) {
         this.array[0] = x;
@@ -66,7 +66,7 @@ Vector3.prototype = {
     /**
      * Set x, y and z components from array
      * @param  {Float32Array|number[]} arr
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     setArray: function (arr) {
         this.array[0] = arr[0];
@@ -79,7 +79,7 @@ Vector3.prototype = {
 
     /**
      * Clone a new Vector3
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     clone: function () {
         return new Vector3(this.x, this.y, this.z);
@@ -87,8 +87,8 @@ Vector3.prototype = {
 
     /**
      * Copy from b
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     copy: function (b) {
         vec3.copy(this.array, b.array);
@@ -98,9 +98,9 @@ Vector3.prototype = {
 
     /**
      * Cross product of self and b, written to a Vector3 out
-     * @param  {clay.math.Vector3} a
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} a
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     cross: function (a, b) {
         vec3.cross(this.array, a.array, b.array);
@@ -110,7 +110,7 @@ Vector3.prototype = {
 
     /**
      * Alias for distance
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @return {number}
      */
     dist: function (b) {
@@ -119,7 +119,7 @@ Vector3.prototype = {
 
     /**
      * Distance between self and b
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @return {number}
      */
     distance: function (b) {
@@ -128,8 +128,8 @@ Vector3.prototype = {
 
     /**
      * Alias for divide
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     div: function (b) {
         vec3.div(this.array, this.array, b.array);
@@ -139,8 +139,8 @@ Vector3.prototype = {
 
     /**
      * Divide self by b
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     divide: function (b) {
         vec3.divide(this.array, this.array, b.array);
@@ -150,7 +150,7 @@ Vector3.prototype = {
 
     /**
      * Dot product of self and b
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @return {number}
      */
     dot: function (b) {
@@ -174,10 +174,10 @@ Vector3.prototype = {
     },
     /**
      * Linear interpolation between a and b
-     * @param  {clay.math.Vector3} a
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} a
+     * @param  {clay.Vector3} b
      * @param  {number}  t
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     lerp: function (a, b, t) {
         vec3.lerp(this.array, a.array, b.array, t);
@@ -187,8 +187,8 @@ Vector3.prototype = {
 
     /**
      * Minimum of self and b
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     min: function (b) {
         vec3.min(this.array, this.array, b.array);
@@ -198,8 +198,8 @@ Vector3.prototype = {
 
     /**
      * Maximum of self and b
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     max: function (b) {
         vec3.max(this.array, this.array, b.array);
@@ -209,8 +209,8 @@ Vector3.prototype = {
 
     /**
      * Alias for multiply
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     mul: function (b) {
         vec3.mul(this.array, this.array, b.array);
@@ -220,8 +220,8 @@ Vector3.prototype = {
 
     /**
      * Mutiply self and b
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     multiply: function (b) {
         vec3.multiply(this.array, this.array, b.array);
@@ -231,7 +231,7 @@ Vector3.prototype = {
 
     /**
      * Negate self
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     negate: function () {
         vec3.negate(this.array, this.array);
@@ -241,7 +241,7 @@ Vector3.prototype = {
 
     /**
      * Normalize self
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     normalize: function () {
         vec3.normalize(this.array, this.array);
@@ -252,7 +252,7 @@ Vector3.prototype = {
     /**
      * Generate random x, y, z components with a given scale
      * @param  {number} scale
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     random: function (scale) {
         vec3.random(this.array, scale);
@@ -263,7 +263,7 @@ Vector3.prototype = {
     /**
      * Scale self
      * @param  {number}  scale
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     scale: function (s) {
         vec3.scale(this.array, this.array, s);
@@ -273,9 +273,9 @@ Vector3.prototype = {
 
     /**
      * Scale b and add to self
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @param  {number}  scale
-     * @return {clay.math.Vector3}
+     * @return {clay.Vector3}
      */
     scaleAndAdd: function (b, s) {
         vec3.scaleAndAdd(this.array, this.array, b.array, s);
@@ -285,7 +285,7 @@ Vector3.prototype = {
 
     /**
      * Alias for squaredDistance
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @return {number}
      */
     sqrDist: function (b) {
@@ -294,7 +294,7 @@ Vector3.prototype = {
 
     /**
      * Squared distance between self and b
-     * @param  {clay.math.Vector3} b
+     * @param  {clay.Vector3} b
      * @return {number}
      */
     squaredDistance: function (b) {
@@ -319,8 +319,8 @@ Vector3.prototype = {
 
     /**
      * Alias for subtract
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     sub: function (b) {
         vec3.sub(this.array, this.array, b.array);
@@ -330,8 +330,8 @@ Vector3.prototype = {
 
     /**
      * Subtract b from self
-     * @param  {clay.math.Vector3} b
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} b
+     * @return {clay.Vector3}
      */
     subtract: function (b) {
         vec3.subtract(this.array, this.array, b.array);
@@ -341,8 +341,8 @@ Vector3.prototype = {
 
     /**
      * Transform self with a Matrix3 m
-     * @param  {clay.math.Matrix3} m
-     * @return {clay.math.Vector3}
+     * @param  {clay.Matrix3} m
+     * @return {clay.Vector3}
      */
     transformMat3: function (m) {
         vec3.transformMat3(this.array, this.array, m.array);
@@ -352,8 +352,8 @@ Vector3.prototype = {
 
     /**
      * Transform self with a Matrix4 m
-     * @param  {clay.math.Matrix4} m
-     * @return {clay.math.Vector3}
+     * @param  {clay.Matrix4} m
+     * @return {clay.Vector3}
      */
     transformMat4: function (m) {
         vec3.transformMat4(this.array, this.array, m.array);
@@ -362,8 +362,8 @@ Vector3.prototype = {
     },
     /**
      * Transform self with a Quaternion q
-     * @param  {clay.math.Quaternion} q
-     * @return {clay.math.Vector3}
+     * @param  {clay.Quaternion} q
+     * @return {clay.Vector3}
      */
     transformQuat: function (q) {
         vec3.transformQuat(this.array, this.array, q.array);
@@ -373,8 +373,8 @@ Vector3.prototype = {
 
     /**
      * Trasnform self into projection space with m
-     * @param  {clay.math.Matrix4} m
-     * @return {clay.math.Vector3}
+     * @param  {clay.Matrix4} m
+     * @return {clay.Vector3}
      */
     applyProjection: function (m) {
         var v = this.array;
@@ -422,7 +422,7 @@ if (defineProperty) {
     /**
      * @name x
      * @type {number}
-     * @memberOf clay.math.Vector3
+     * @memberOf clay.Vector3
      * @instance
      */
     defineProperty(proto, 'x', {
@@ -438,7 +438,7 @@ if (defineProperty) {
     /**
      * @name y
      * @type {number}
-     * @memberOf clay.math.Vector3
+     * @memberOf clay.Vector3
      * @instance
      */
     defineProperty(proto, 'y', {
@@ -454,7 +454,7 @@ if (defineProperty) {
     /**
      * @name z
      * @type {number}
-     * @memberOf clay.math.Vector3
+     * @memberOf clay.Vector3
      * @instance
      */
     defineProperty(proto, 'z', {
@@ -472,10 +472,10 @@ if (defineProperty) {
 // Supply methods that are not in place
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.add = function(out, a, b) {
     vec3.add(out.array, a.array, b.array);
@@ -484,11 +484,11 @@ Vector3.add = function(out, a, b) {
 };
 
 /**
- * @param  {clay.math.Vector3} out
+ * @param  {clay.Vector3} out
  * @param  {number}  x
  * @param  {number}  y
  * @param  {number}  z
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.set = function(out, x, y, z) {
     vec3.set(out.array, x, y, z);
@@ -496,9 +496,9 @@ Vector3.set = function(out, x, y, z) {
 };
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.copy = function(out, b) {
     vec3.copy(out.array, b.array);
@@ -507,10 +507,10 @@ Vector3.copy = function(out, b) {
 };
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.cross = function(out, a, b) {
     vec3.cross(out.array, a.array, b.array);
@@ -519,8 +519,8 @@ Vector3.cross = function(out, a, b) {
 };
 
 /**
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @return {number}
  */
 Vector3.dist = function(a, b) {
@@ -529,17 +529,17 @@ Vector3.dist = function(a, b) {
 
 /**
  * @function
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @return {number}
  */
 Vector3.distance = Vector3.dist;
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.div = function(out, a, b) {
     vec3.divide(out.array, a.array, b.array);
@@ -549,16 +549,16 @@ Vector3.div = function(out, a, b) {
 
 /**
  * @function
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.divide = Vector3.div;
 
 /**
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @return {number}
  */
 Vector3.dot = function(a, b) {
@@ -566,7 +566,7 @@ Vector3.dot = function(a, b) {
 };
 
 /**
- * @param  {clay.math.Vector3} a
+ * @param  {clay.Vector3} a
  * @return {number}
  */
 Vector3.len = function(b) {
@@ -576,11 +576,11 @@ Vector3.len = function(b) {
 // Vector3.length = Vector3.len;
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @param  {number}  t
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.lerp = function(out, a, b, t) {
     vec3.lerp(out.array, a.array, b.array, t);
@@ -588,10 +588,10 @@ Vector3.lerp = function(out, a, b, t) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.min = function(out, a, b) {
     vec3.min(out.array, a.array, b.array);
@@ -600,10 +600,10 @@ Vector3.min = function(out, a, b) {
 };
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.max = function(out, a, b) {
     vec3.max(out.array, a.array, b.array);
@@ -611,10 +611,10 @@ Vector3.max = function(out, a, b) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.mul = function(out, a, b) {
     vec3.multiply(out.array, a.array, b.array);
@@ -623,16 +623,16 @@ Vector3.mul = function(out, a, b) {
 };
 /**
  * @function
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.multiply = Vector3.mul;
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @return {clay.Vector3}
  */
 Vector3.negate = function(out, a) {
     vec3.negate(out.array, a.array);
@@ -640,9 +640,9 @@ Vector3.negate = function(out, a) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @return {clay.Vector3}
  */
 Vector3.normalize = function(out, a) {
     vec3.normalize(out.array, a.array);
@@ -650,9 +650,9 @@ Vector3.normalize = function(out, a) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
+ * @param  {clay.Vector3} out
  * @param  {number}  scale
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.random = function(out, scale) {
     vec3.random(out.array, scale);
@@ -660,10 +660,10 @@ Vector3.random = function(out, scale) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
  * @param  {number}  scale
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.scale = function(out, a, scale) {
     vec3.scale(out.array, a.array, scale);
@@ -671,11 +671,11 @@ Vector3.scale = function(out, a, scale) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @param  {number}  scale
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.scaleAndAdd = function(out, a, b, scale) {
     vec3.scaleAndAdd(out.array, a.array, b.array, scale);
@@ -683,8 +683,8 @@ Vector3.scaleAndAdd = function(out, a, b, scale) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @return {number}
  */
 Vector3.sqrDist = function(a, b) {
@@ -692,13 +692,13 @@ Vector3.sqrDist = function(a, b) {
 };
 /**
  * @function
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
  * @return {number}
  */
 Vector3.squaredDistance = Vector3.sqrDist;
 /**
- * @param  {clay.math.Vector3} a
+ * @param  {clay.Vector3} a
  * @return {number}
  */
 Vector3.sqrLen = function(a) {
@@ -706,16 +706,16 @@ Vector3.sqrLen = function(a) {
 };
 /**
  * @function
- * @param  {clay.math.Vector3} a
+ * @param  {clay.Vector3} a
  * @return {number}
  */
 Vector3.squaredLength = Vector3.sqrLen;
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.sub = function(out, a, b) {
     vec3.subtract(out.array, a.array, b.array);
@@ -724,18 +724,18 @@ Vector3.sub = function(out, a, b) {
 };
 /**
  * @function
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Vector3} b
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Vector3} b
+ * @return {clay.Vector3}
  */
 Vector3.subtract = Vector3.sub;
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
  * @param  {Matrix3} m
- * @return {clay.math.Vector3}
+ * @return {clay.Vector3}
  */
 Vector3.transformMat3 = function(out, a, m) {
     vec3.transformMat3(out.array, a.array, m.array);
@@ -744,10 +744,10 @@ Vector3.transformMat3 = function(out, a, m) {
 };
 
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Matrix4} m
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Matrix4} m
+ * @return {clay.Vector3}
  */
 Vector3.transformMat4 = function(out, a, m) {
     vec3.transformMat4(out.array, a.array, m.array);
@@ -755,10 +755,10 @@ Vector3.transformMat4 = function(out, a, m) {
     return out;
 };
 /**
- * @param  {clay.math.Vector3} out
- * @param  {clay.math.Vector3} a
- * @param  {clay.math.Quaternion} q
- * @return {clay.math.Vector3}
+ * @param  {clay.Vector3} out
+ * @param  {clay.Vector3} a
+ * @param  {clay.Quaternion} q
+ * @return {clay.Vector3}
  */
 Vector3.transformQuat = function(out, a, q) {
     vec3.transformQuat(out.array, a.array, q.array);
@@ -918,35 +918,35 @@ Vector3.eulerFromMat3 = function (out, m, order) {
 
 // TODO return new.
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.POSITIVE_X = new Vector3(1, 0, 0);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.NEGATIVE_X = new Vector3(-1, 0, 0);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.POSITIVE_Y = new Vector3(0, 1, 0);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.NEGATIVE_Y = new Vector3(0, -1, 0);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.POSITIVE_Z = new Vector3(0, 0, 1);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.UP = new Vector3(0, 1, 0);
 /**
- * @type {clay.math.Vector3}
+ * @type {clay.Vector3}
  */
 Vector3.ZERO = new Vector3(0, 0, 0);
 

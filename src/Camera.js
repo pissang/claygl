@@ -15,25 +15,25 @@ var Camera = Node.extend(function () {
     return /** @lends clay.Camera# */ {
         /**
          * Camera projection matrix
-         * @type {clay.math.Matrix4}
+         * @type {clay.Matrix4}
          */
         projectionMatrix: new Matrix4(),
 
         /**
          * Inverse of camera projection matrix
-         * @type {clay.math.Matrix4}
+         * @type {clay.Matrix4}
          */
         invProjectionMatrix: new Matrix4(),
 
         /**
          * View matrix, equal to inverse of camera's world matrix
-         * @type {clay.math.Matrix4}
+         * @type {clay.Matrix4}
          */
         viewMatrix: new Matrix4(),
 
         /**
          * Camera frustum in view space
-         * @type {clay.math.Frustum}
+         * @type {clay.Frustum}
          */
         frustum: new Frustum()
     };
@@ -69,7 +69,7 @@ var Camera = Node.extend(function () {
 
     /**
      * Set camera projection matrix
-     * @param {clay.math.Matrix4} projectionMatrix
+     * @param {clay.Matrix4} projectionMatrix
      */
     setProjectionMatrix: function (projectionMatrix) {
         Matrix4.copy(this.projectionMatrix, projectionMatrix);
@@ -84,9 +84,9 @@ var Camera = Node.extend(function () {
     /**
      * Cast a picking ray from camera near plane to far plane
      * @function
-     * @param {clay.math.Vector2} ndc
-     * @param {clay.math.Ray} [out]
-     * @return {clay.math.Ray}
+     * @param {clay.Vector2} ndc
+     * @param {clay.Ray} [out]
+     * @return {clay.Ray}
      */
     castRay: (function () {
         var v4 = vec4.create();

@@ -6,7 +6,7 @@ var parseColor = colorUtil.parseToFloat;
 
 var programKeyCache = {};
 
-function getDefineCode(defines, lightsNumbers, enabledTextures) {
+function getDefineCode(defines) {
     var defineKeys = Object.keys(defines);
     defineKeys.sort();
     var defineStr = [];
@@ -45,6 +45,15 @@ function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
 }
 
 /**
+ * Material defines the appearance of mesh surface, like `color`, `roughness`, `metalness`, etc.
+ * It contains a {@link clay.Shader} and corresponding uniforms.
+ *
+ * Here is a basic example to create a standard material
+```js
+var material = new clay.Material({
+
+});
+```
  * @constructor clay.Material
  * @extends clay.core.Base
  */

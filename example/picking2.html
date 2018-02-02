@@ -38,7 +38,7 @@
 
             var light = new clay.light.Directional();
             light.position.set(1, 1, 1);
-            light.lookAt(clay.math.Vector3.ZERO);
+            light.lookAt(clay.Vector3.ZERO);
             scene.add(light);
             scene.add(new clay.light.Ambient({
                 intensity : 0.5
@@ -50,7 +50,7 @@
                 camera: camera
             });
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.on('frame', function(dTime) {
                 control.update(dTime);

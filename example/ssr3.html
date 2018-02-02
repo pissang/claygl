@@ -37,7 +37,7 @@
                     aspect: renderer.getViewportAspect()
                 });
                 camera.position.set(0, 4, 4);
-                camera.lookAt(clay.math.Vector3.ZERO);
+                camera.lookAt(clay.Vector3.ZERO);
 
                 var gBuffer = new clay.deferred.GBuffer();
                 var ssrPass = new SSRPass({
@@ -138,7 +138,7 @@
 
                 var frameBuffer = new clay.FrameBuffer();
                 var colorTex = new clay.Texture2D();
-                var timeline =  new clay.animation.Timeline();
+                var timeline =  new clay.Timeline();
                 timeline.start();
 
                 timeline.on('frame', function(deltaTime) {

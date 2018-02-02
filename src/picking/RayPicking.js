@@ -225,8 +225,8 @@ var RayPicking = Base.extend(
 
 /**
  * @constructor clay.picking.RayPicking~Intersection
- * @param {clay.math.Vector3} point
- * @param {clay.math.Vector3} pointWorld
+ * @param {clay.Vector3} point
+ * @param {clay.Vector3} pointWorld
  * @param {clay.Node} target
  * @param {Array.<number>} triangle
  * @param {number} triangleIndex
@@ -235,12 +235,12 @@ var RayPicking = Base.extend(
 RayPicking.Intersection = function (point, pointWorld, target, triangle, triangleIndex, distance) {
     /**
      * Intersection point in local transform coordinates
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.point = point;
     /**
      * Intersection point in world transform coordinates
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     this.pointWorld = pointWorld;
     /**

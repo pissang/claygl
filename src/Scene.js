@@ -66,7 +66,7 @@ var Scene = Node.extend(function () {
          * Notice:
          *  It is updated after rendering (in the step of frustum culling passingly). So may be not so accurate, but saves a lot of calculation
          *
-         * @type {clay.math.BoundingBox}
+         * @type {clay.BoundingBox}
          */
         viewBoundingBoxLastFrame: new BoundingBox(),
 

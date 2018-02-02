@@ -906,8 +906,8 @@ var Renderer = Base.extend(function () {
      *
      * @param  {number}       x
      * @param  {number}       y
-     * @param  {clay.math.Vector2} [out]
-     * @return {clay.math.Vector2}
+     * @param  {clay.Vector2} [out]
+     * @return {clay.Vector2}
      */
     screenToNDC: function(x, y, out) {
         if (!out) {

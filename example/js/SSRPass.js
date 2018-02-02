@@ -50,7 +50,7 @@ define(function (require) {
         this._width = width;
         this._height = height;
 
-        // var mathUtil = clay.math.util;
+        // var mathUtil = clay.util;
         // var widthPOT = mathUtil.nearestPowerOfTwo(width);
         // var heightPOT = mathUtil.nearestPowerOfTwo(height);
 
@@ -77,8 +77,8 @@ define(function (require) {
 
         var ssrPass = this._ssrPass;
 
-        var viewInverseTranspose = new clay.math.Matrix4();
-        clay.math.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
+        var viewInverseTranspose = new clay.Matrix4();
+        clay.Matrix4.transpose(viewInverseTranspose, camera.worldTransform);
 
         ssrPass.setUniform('colorTex', colorTex);
         ssrPass.setUniform('projection', camera.projectionMatrix.array);

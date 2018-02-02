@@ -91,7 +91,7 @@
             var root = new clay.Node();
 
             camera.position.set(0, 4, 14);
-            camera.lookAt(new clay.math.Vector3(0, 1, 0));
+            camera.lookAt(new clay.Vector3(0, 1, 0));
 
             scene.add(root);
             // Add Plane
@@ -102,7 +102,7 @@
             var planeMesh = new clay.Mesh({
                 geometry: plane,
                 material: material,
-                scale: new clay.math.Vector3(60, 60, 60)
+                scale: new clay.Vector3(60, 60, 60)
             });
             planeMesh.position.y = -0.8;
             planeMesh.rotation.rotateX(-Math.PI/2);
@@ -124,7 +124,7 @@
                 root.add(sphere);
             }
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.on('frame', function () {
                 renderer.render(scene, camera);
             });

@@ -23,32 +23,32 @@ var Node = Base.extend(
 
     /**
      * Position relative to its parent node. aka translation.
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     position: null,
 
     /**
      * Rotation relative to its parent node. Represented by a quaternion
-     * @type {clay.math.Quaternion}
+     * @type {clay.Quaternion}
      */
     rotation: null,
 
     /**
      * Scale relative to its parent node
-     * @type {clay.math.Vector3}
+     * @type {clay.Vector3}
      */
     scale: null,
 
     /**
      * Affine transform matrix relative to its root scene.
-     * @type {clay.math.Matrix4}
+     * @type {clay.Matrix4}
      */
     worldTransform: null,
 
     /**
      * Affine transform matrix relative to its parent node.
      * Composited with position, rotation and scale.
-     * @type {clay.math.Matrix4}
+     * @type {clay.Matrix4}
      */
     localTransform: null,
 
@@ -110,7 +110,7 @@ var Node = Base.extend(
 {
 
     /**
-     * @type {?clay.math.Vector3}
+     * @type {?clay.Vector3}
      * @instance
      */
     target: null,
@@ -412,7 +412,7 @@ var Node = Base.extend(
 
     /**
      * Set the local transform and decompose to SRT
-     * @param {clay.math.Matrix4} matrix
+     * @param {clay.Matrix4} matrix
      */
     setLocalTransform: function (matrix) {
         mat4.copy(this.localTransform.array, matrix.array);
@@ -429,7 +429,7 @@ var Node = Base.extend(
 
     /**
      * Set the world transform and decompose to SRT
-     * @param {clay.math.Matrix4} matrix
+     * @param {clay.Matrix4} matrix
      */
     setWorldTransform: function (matrix) {
         mat4.copy(this.worldTransform.array, matrix.array);
@@ -551,8 +551,8 @@ var Node = Base.extend(
     /**
      * Get bounding box of node
      * @param  {Function} [filter]
-     * @param  {clay.math.BoundingBox} [out]
-     * @return {clay.math.BoundingBox}
+     * @param  {clay.BoundingBox} [out]
+     * @return {clay.BoundingBox}
      */
     // TODO Skinning
     getBoundingBox: (function () {
@@ -588,8 +588,8 @@ var Node = Base.extend(
 
     /**
      * Get world position, extracted from world transform
-     * @param  {clay.math.Vector3} [out]
-     * @return {clay.math.Vector3}
+     * @param  {clay.Vector3} [out]
+     * @return {clay.Vector3}
      */
     getWorldPosition: function (out) {
         // PENDING
@@ -632,8 +632,8 @@ var Node = Base.extend(
 
     /**
      * Rotate the node around a axis by angle degrees, axis passes through point
-     * @param {clay.math.Vector3} point Center point
-     * @param {clay.math.Vector3} axis  Center axis
+     * @param {clay.Vector3} point Center point
+     * @param {clay.Vector3} axis  Center axis
      * @param {number}       angle Rotation angle
      * @see http://docs.unity3d.com/Documentation/ScriptReference/Transform.RotateAround.html
      * @function
@@ -663,8 +663,8 @@ var Node = Base.extend(
     })(),
 
     /**
-     * @param {clay.math.Vector3} target
-     * @param {clay.math.Vector3} [up]
+     * @param {clay.Vector3} target
+     * @param {clay.Vector3} [up]
      * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
      * @function
      */

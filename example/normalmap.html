@@ -38,7 +38,7 @@
             });
             scene.add(mesh);
             var light = new clay.light.Directional({
-                position: new clay.math.Vector3(10, 10, 10)
+                position: new clay.Vector3(10, 10, 10)
             })
             light.lookAt(mesh.position);
             scene.add(light);

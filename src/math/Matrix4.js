@@ -7,7 +7,7 @@ var quat = glMatrix.quat;
 
 /**
  * @constructor
- * @alias clay.math.Matrix4
+ * @alias clay.Matrix4
  */
 var Matrix4 = function() {
 
@@ -19,14 +19,14 @@ var Matrix4 = function() {
      * Storage of Matrix4
      * @name array
      * @type {Float32Array}
-     * @memberOf clay.math.Matrix4#
+     * @memberOf clay.Matrix4#
      */
     this.array = mat4.create();
 
     /**
      * @name _dirty
      * @type {boolean}
-     * @memberOf clay.math.Matrix4#
+     * @memberOf clay.Matrix4#
      */
     this._dirty = true;
 };
@@ -48,7 +48,7 @@ Matrix4.prototype = {
     },
     /**
      * Calculate the adjugate of self, in-place
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     adjoint: function() {
         mat4.adjoint(this.array, this.array);
@@ -58,7 +58,7 @@ Matrix4.prototype = {
 
     /**
      * Clone a new Matrix4
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     clone: function() {
         return (new Matrix4()).copy(this);
@@ -66,8 +66,8 @@ Matrix4.prototype = {
 
     /**
      * Copy from b
-     * @param  {clay.math.Matrix4} b
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Matrix4} b
+     * @return {clay.Matrix4}
      */
     copy: function(a) {
         mat4.copy(this.array, a.array);
@@ -85,8 +85,8 @@ Matrix4.prototype = {
 
     /**
      * Set upper 3x3 part from quaternion
-     * @param  {clay.math.Quaternion} q
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Quaternion} q
+     * @return {clay.Matrix4}
      */
     fromQuat: function(q) {
         mat4.fromQuat(this.array, q.array);
@@ -96,9 +96,9 @@ Matrix4.prototype = {
 
     /**
      * Set from a quaternion rotation and a vector translation
-     * @param  {clay.math.Quaternion} q
-     * @param  {clay.math.Vector3} v
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Quaternion} q
+     * @param  {clay.Vector3} v
+     * @return {clay.Matrix4}
      */
     fromRotationTranslation: function(q, v) {
         mat4.fromRotationTranslation(this.array, q.array, v.array);
@@ -109,8 +109,8 @@ Matrix4.prototype = {
     /**
      * Set from Matrix2d, it is used when converting a 2d shape to 3d space.
      * In 3d space it is equivalent to ranslate on xy plane and rotate about z axis
-     * @param  {clay.math.Matrix2d} m2d
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Matrix2d} m2d
+     * @return {clay.Matrix4}
      */
     fromMat2d: function(m2d) {
         Matrix4.fromMat2d(this, m2d);
@@ -125,7 +125,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     frustum: function (left, right, bottom, top, near, far) {
         mat4.frustum(this.array, left, right, bottom, top, near, far);
@@ -135,7 +135,7 @@ Matrix4.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     identity: function() {
         mat4.identity(this.array);
@@ -145,7 +145,7 @@ Matrix4.prototype = {
 
     /**
      * Invert self
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     invert: function() {
         mat4.invert(this.array, this.array);
@@ -155,10 +155,10 @@ Matrix4.prototype = {
 
     /**
      * Set as a matrix with the given eye position, focal point, and up axis
-     * @param  {clay.math.Vector3} eye
-     * @param  {clay.math.Vector3} center
-     * @param  {clay.math.Vector3} up
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Vector3} eye
+     * @param  {clay.Vector3} center
+     * @param  {clay.Vector3} up
+     * @return {clay.Matrix4}
      */
     lookAt: function(eye, center, up) {
         mat4.lookAt(this.array, eye.array, center.array, up.array);
@@ -168,8 +168,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {clay.math.Matrix4} b
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Matrix4} b
+     * @return {clay.Matrix4}
      */
     mul: function(b) {
         mat4.mul(this.array, this.array, b.array);
@@ -179,8 +179,8 @@ Matrix4.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {clay.math.Matrix4} a
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Matrix4} a
+     * @return {clay.Matrix4}
      */
     mulLeft: function(a) {
         mat4.mul(this.array, a.array, this.array);
@@ -190,8 +190,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {clay.math.Matrix4} b
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Matrix4} b
+     * @return {clay.Matrix4}
      */
     multiply: function(b) {
         mat4.multiply(this.array, this.array, b.array);
@@ -201,8 +201,8 @@ Matrix4.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {clay.math.Matrix3} a
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} a
+     * @return {clay.Matrix3}
      */
     multiplyLeft: function(a) {
         mat4.multiply(this.array, a.array, this.array);
@@ -218,7 +218,7 @@ Matrix4.prototype = {
      * @param  {number} top
      * @param  {number} near
      * @param  {number} far
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     ortho: function(left, right, bottom, top, near, far) {
         mat4.ortho(this.array, left, right, bottom, top, near, far);
@@ -231,7 +231,7 @@ Matrix4.prototype = {
      * @param  {number} aspect
      * @param  {number} near
      * @param  {number} far
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     perspective: function(fovy, aspect, near, far) {
         mat4.perspective(this.array, fovy, aspect, near, far);
@@ -243,8 +243,8 @@ Matrix4.prototype = {
      * Rotate self by rad about axis.
      * Equal to right-multiply a rotaion matrix
      * @param  {number}   rad
-     * @param  {clay.math.Vector3} axis
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Vector3} axis
+     * @return {clay.Matrix4}
      */
     rotate: function(rad, axis) {
         mat4.rotate(this.array, this.array, rad, axis.array);
@@ -256,7 +256,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about X axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     rotateX: function(rad) {
         mat4.rotateX(this.array, this.array, rad);
@@ -268,7 +268,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Y axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     rotateY: function(rad) {
         mat4.rotateY(this.array, this.array, rad);
@@ -280,7 +280,7 @@ Matrix4.prototype = {
      * Rotate self by a given radian about Z axis.
      * Equal to right-multiply a rotaion matrix
      * @param {number} rad
-     * @return {clay.math.Matrix4}
+     * @return {clay.Matrix4}
      */
     rotateZ: function(rad) {
         mat4.rotateZ(this.array, this.array, rad);
@@ -291,8 +291,8 @@ Matrix4.prototype = {
     /**
      * Scale self by s
      * Equal to right-multiply a scale matrix
-     * @param  {clay.math.Vector3}  s
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Vector3}  s
+     * @return {clay.Matrix4}
      */
     scale: function(v) {
         mat4.scale(this.array, this.array, v.array);
@@ -303,8 +303,8 @@ Matrix4.prototype = {
     /**
      * Translate self by v.
      * Equal to right-multiply a translate matrix
-     * @param  {clay.math.Vector3}  v
-     * @return {clay.math.Matrix4}
+     * @param  {clay.Vector3}  v
+     * @return {clay.Matrix4}
      */
     translate: function(v) {
         mat4.translate(this.array, this.array, v.array);
@@ -314,7 +314,7 @@ Matrix4.prototype = {
 
     /**
      * Transpose self, in-place.
-     * @return {clay.math.Matrix2}
+     * @return {clay.Matrix2}
      */
     transpose: function() {
         mat4.transpose(this.array, this.array);
@@ -324,9 +324,9 @@ Matrix4.prototype = {
 
     /**
      * Decompose a matrix to SRT
-     * @param {clay.math.Vector3} [scale]
-     * @param {clay.math.Quaternion} rotation
-     * @param {clay.math.Vector} position
+     * @param {clay.Vector3} [scale]
+     * @param {clay.Quaternion} rotation
+     * @param {clay.Vector} position
      * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
      */
     decomposeMatrix: (function() {
@@ -402,8 +402,8 @@ if (defineProperty) {
     /**
      * Z Axis of local transform
      * @name z
-     * @type {clay.math.Vector3}
-     * @memberOf clay.math.Matrix4
+     * @type {clay.Vector3}
+     * @memberOf clay.Matrix4
      * @instance
      */
     defineProperty(proto, 'z', {
@@ -428,8 +428,8 @@ if (defineProperty) {
     /**
      * Y Axis of local transform
      * @name y
-     * @type {clay.math.Vector3}
-     * @memberOf clay.math.Matrix4
+     * @type {clay.Vector3}
+     * @memberOf clay.Matrix4
      * @instance
      */
     defineProperty(proto, 'y', {
@@ -452,8 +452,8 @@ if (defineProperty) {
     /**
      * X Axis of local transform
      * @name x
-     * @type {clay.math.Vector3}
-     * @memberOf clay.math.Matrix4
+     * @type {clay.Vector3}
+     * @memberOf clay.Matrix4
      * @instance
      */
     defineProperty(proto, 'x', {
@@ -475,9 +475,9 @@ if (defineProperty) {
 }
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix4}
  */
 Matrix4.adjoint = function(out, a) {
     mat4.adjoint(out.array, a.array);
@@ -486,9 +486,9 @@ Matrix4.adjoint = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix4}
  */
 Matrix4.copy = function(out, a) {
     mat4.copy(out.array, a.array);
@@ -497,7 +497,7 @@ Matrix4.copy = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix4} a
+ * @param  {clay.Matrix4} a
  * @return {number}
  */
 Matrix4.determinant = function(a) {
@@ -505,8 +505,8 @@ Matrix4.determinant = function(a) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @return {clay.Matrix4}
  */
 Matrix4.identity = function(out) {
     mat4.identity(out.array);
@@ -515,14 +515,14 @@ Matrix4.identity = function(out) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
+ * @param  {clay.Matrix4} out
  * @param  {number}  left
  * @param  {number}  right
  * @param  {number}  bottom
  * @param  {number}  top
  * @param  {number}  near
  * @param  {number}  far
- * @return {clay.math.Matrix4}
+ * @return {clay.Matrix4}
  */
 Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
     mat4.ortho(out.array, left, right, bottom, top, near, far);
@@ -531,12 +531,12 @@ Matrix4.ortho = function(out, left, right, bottom, top, near, far) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
+ * @param  {clay.Matrix4} out
  * @param  {number}  fovy
  * @param  {number}  aspect
  * @param  {number}  near
  * @param  {number}  far
- * @return {clay.math.Matrix4}
+ * @return {clay.Matrix4}
  */
 Matrix4.perspective = function(out, fovy, aspect, near, far) {
     mat4.perspective(out.array, fovy, aspect, near, far);
@@ -545,11 +545,11 @@ Matrix4.perspective = function(out, fovy, aspect, near, far) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Vector3} eye
- * @param  {clay.math.Vector3} center
- * @param  {clay.math.Vector3} up
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Vector3} eye
+ * @param  {clay.Vector3} center
+ * @param  {clay.Vector3} up
+ * @return {clay.Matrix4}
  */
 Matrix4.lookAt = function(out, eye, center, up) {
     mat4.lookAt(out.array, eye.array, center.array, up.array);
@@ -558,9 +558,9 @@ Matrix4.lookAt = function(out, eye, center, up) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix4}
  */
 Matrix4.invert = function(out, a) {
     mat4.invert(out.array, a.array);
@@ -569,10 +569,10 @@ Matrix4.invert = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @param  {clay.math.Matrix4} b
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @param  {clay.Matrix4} b
+ * @return {clay.Matrix4}
  */
 Matrix4.mul = function(out, a, b) {
     mat4.mul(out.array, a.array, b.array);
@@ -582,17 +582,17 @@ Matrix4.mul = function(out, a, b) {
 
 /**
  * @function
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @param  {clay.math.Matrix4} b
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @param  {clay.Matrix4} b
+ * @return {clay.Matrix4}
  */
 Matrix4.multiply = Matrix4.mul;
 
 /**
- * @param  {clay.math.Matrix4}    out
- * @param  {clay.math.Quaternion} q
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4}    out
+ * @param  {clay.Quaternion} q
+ * @return {clay.Matrix4}
  */
 Matrix4.fromQuat = function(out, q) {
     mat4.fromQuat(out.array, q.array);
@@ -601,10 +601,10 @@ Matrix4.fromQuat = function(out, q) {
 };
 
 /**
- * @param  {clay.math.Matrix4}    out
- * @param  {clay.math.Quaternion} q
- * @param  {clay.math.Vector3}    v
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4}    out
+ * @param  {clay.Quaternion} q
+ * @param  {clay.Vector3}    v
+ * @return {clay.Matrix4}
  */
 Matrix4.fromRotationTranslation = function(out, q, v) {
     mat4.fromRotationTranslation(out.array, q.array, v.array);
@@ -613,9 +613,9 @@ Matrix4.fromRotationTranslation = function(out, q, v) {
 };
 
 /**
- * @param  {clay.math.Matrix4} m4
- * @param  {clay.math.Matrix2d} m2d
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} m4
+ * @param  {clay.Matrix2d} m2d
+ * @return {clay.Matrix4}
  */
 Matrix4.fromMat2d = function(m4, m2d) {
     m4._dirty = true;
@@ -634,11 +634,11 @@ Matrix4.fromMat2d = function(m4, m2d) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
  * @param  {number}  rad
- * @param  {clay.math.Vector3} axis
- * @return {clay.math.Matrix4}
+ * @param  {clay.Vector3} axis
+ * @return {clay.Matrix4}
  */
 Matrix4.rotate = function(out, a, rad, axis) {
     mat4.rotate(out.array, a.array, rad, axis.array);
@@ -647,10 +647,10 @@ Matrix4.rotate = function(out, a, rad, axis) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
  * @param  {number}  rad
- * @return {clay.math.Matrix4}
+ * @return {clay.Matrix4}
  */
 Matrix4.rotateX = function(out, a, rad) {
     mat4.rotateX(out.array, a.array, rad);
@@ -659,10 +659,10 @@ Matrix4.rotateX = function(out, a, rad) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
  * @param  {number}  rad
- * @return {clay.math.Matrix4}
+ * @return {clay.Matrix4}
  */
 Matrix4.rotateY = function(out, a, rad) {
     mat4.rotateY(out.array, a.array, rad);
@@ -671,10 +671,10 @@ Matrix4.rotateY = function(out, a, rad) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
  * @param  {number}  rad
- * @return {clay.math.Matrix4}
+ * @return {clay.Matrix4}
  */
 Matrix4.rotateZ = function(out, a, rad) {
     mat4.rotateZ(out.array, a.array, rad);
@@ -683,10 +683,10 @@ Matrix4.rotateZ = function(out, a, rad) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @param  {clay.math.Vector3} v
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @param  {clay.Vector3} v
+ * @return {clay.Matrix4}
  */
 Matrix4.scale = function(out, a, v) {
     mat4.scale(out.array, a.array, v.array);
@@ -695,9 +695,9 @@ Matrix4.scale = function(out, a, v) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix4}
  */
 Matrix4.transpose = function(out, a) {
     mat4.transpose(out.array, a.array);
@@ -706,10 +706,10 @@ Matrix4.transpose = function(out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix4} out
- * @param  {clay.math.Matrix4} a
- * @param  {clay.math.Vector3} v
- * @return {clay.math.Matrix4}
+ * @param  {clay.Matrix4} out
+ * @param  {clay.Matrix4} a
+ * @param  {clay.Vector3} v
+ * @return {clay.Matrix4}
  */
 Matrix4.translate = function(out, a, v) {
     mat4.translate(out.array, a.array, v.array);

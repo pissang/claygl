@@ -11,7 +11,7 @@
  // TODO Particle ?
 import Renderer from './Renderer';
 import Scene from './Scene';
-import Timeline from './animation/Timeline';
+import Timeline from './Timeline';
 import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
@@ -916,10 +916,10 @@ App3D.prototype.createNode = function (parentNode) {
 
 /**
  * Create a perspective or orthographic camera and add it to the scene.
- * @param {Array.<number>|clay.math.Vector3} position
- * @param {Array.<number>|clay.math.Vector3} target
+ * @param {Array.<number>|clay.Vector3} position
+ * @param {Array.<number>|clay.Vector3} target
  * @param {string} [type="perspective"] Can be 'perspective' or 'orthographic'(in short 'ortho')
- * @param {Array.<number>|clay.math.Vector3} [extent] Extent is available only if type is orthographic.
+ * @param {Array.<number>|clay.Vector3} [extent] Extent is available only if type is orthographic.
  * @return {clay.camera.Perspective|clay.camera.Orthographic}
  */
 App3D.prototype.createCamera = function (position, target, type, extent) {
@@ -968,7 +968,7 @@ App3D.prototype.createCamera = function (position, target, type, extent) {
 
 /**
  * Create a directional light and add it to the scene.
- * @param {Array.<number>|clay.math.Vector3} dir A Vector3 or array to represent the direction.
+ * @param {Array.<number>|clay.Vector3} dir A Vector3 or array to represent the direction.
  * @param {Color} [color='#fff'] Color of directional light, default to be white.
  * @param {number} [intensity] Intensity of directional light, default to be 1.
  *
@@ -994,8 +994,8 @@ App3D.prototype.createDirectionalLight = function (dir, color, intensity) {
 
 /**
  * Create a spot light and add it to the scene.
- * @param {Array.<number>|clay.math.Vector3} position Position of the spot light.
- * @param {Array.<number>|clay.math.Vector3} [target] Target position where spot light points to.
+ * @param {Array.<number>|clay.Vector3} position Position of the spot light.
+ * @param {Array.<number>|clay.Vector3} [target] Target position where spot light points to.
  * @param {number} [range=20] Falloff range of spot light. Default to be 20.
  * @param {Color} [color='#fff'] Color of spot light, default to be white.
  * @param {number} [intensity=1] Intensity of spot light, default to be 1.
@@ -1032,7 +1032,7 @@ App3D.prototype.createSpotLight = function (position, target, range, color, inte
 
 /**
  * Create a point light.
- * @param {Array.<number>|clay.math.Vector3} position Position of point light..
+ * @param {Array.<number>|clay.Vector3} position Position of point light..
  * @param {number} [range=100] Falloff range of point light.
  * @param {Color} [color='#fff'] Color of point light.
  * @param {number} [intensity=1] Intensity of point light.

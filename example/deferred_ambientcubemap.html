@@ -83,7 +83,7 @@
                 domElement: renderer.canvas
             });
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.on('frame', function(deltaTime) {
                 control.update(deltaTime);

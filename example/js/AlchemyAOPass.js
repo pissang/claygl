@@ -1,7 +1,7 @@
 define(function (require) {
     var clay = require('../../dist/claygl');
-    var Matrix4 = clay.math.Matrix4;
-    var Vector2 = clay.math.Vector2;
+    var Matrix4 = clay.Matrix4;
+    var Vector2 = clay.Vector2;
     var PostProcessPass = require('./PostProcessPass');
 
     clay.Shader.import(require('text!../shader/alchemy.glsl'));

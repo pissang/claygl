@@ -3,7 +3,7 @@ var mat3 = glMatrix.mat3;
 
 /**
  * @constructor
- * @alias clay.math.Matrix3
+ * @alias clay.Matrix3
  */
 var Matrix3 = function () {
 
@@ -11,14 +11,14 @@ var Matrix3 = function () {
      * Storage of Matrix3
      * @name array
      * @type {Float32Array}
-     * @memberOf clay.math.Matrix3#
+     * @memberOf clay.Matrix3#
      */
     this.array = mat3.create();
 
     /**
      * @name _dirty
      * @type {boolean}
-     * @memberOf clay.math.Matrix3#
+     * @memberOf clay.Matrix3#
      */
     this._dirty = true;
 };
@@ -40,7 +40,7 @@ Matrix3.prototype = {
     },
     /**
      * Calculate the adjugate of self, in-place
-     * @return {clay.math.Matrix3}
+     * @return {clay.Matrix3}
      */
     adjoint: function () {
         mat3.adjoint(this.array, this.array);
@@ -50,7 +50,7 @@ Matrix3.prototype = {
 
     /**
      * Clone a new Matrix3
-     * @return {clay.math.Matrix3}
+     * @return {clay.Matrix3}
      */
     clone: function () {
         return (new Matrix3()).copy(this);
@@ -58,8 +58,8 @@ Matrix3.prototype = {
 
     /**
      * Copy from b
-     * @param  {clay.math.Matrix3} b
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} b
+     * @return {clay.Matrix3}
      */
     copy: function (b) {
         mat3.copy(this.array, b.array);
@@ -77,8 +77,8 @@ Matrix3.prototype = {
 
     /**
      * Copy the values from Matrix2d a
-     * @param  {clay.math.Matrix2d} a
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix2d} a
+     * @return {clay.Matrix3}
      */
     fromMat2d: function (a) {
         mat3.fromMat2d(this.array, a.array);
@@ -88,8 +88,8 @@ Matrix3.prototype = {
 
     /**
      * Copies the upper-left 3x3 values of Matrix4
-     * @param  {clay.math.Matrix4} a
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix4} a
+     * @return {clay.Matrix3}
      */
     fromMat4: function (a) {
         mat3.fromMat4(this.array, a.array);
@@ -99,8 +99,8 @@ Matrix3.prototype = {
 
     /**
      * Calculates a rotation matrix from the given quaternion
-     * @param  {clay.math.Quaternion} q
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Quaternion} q
+     * @return {clay.Matrix3}
      */
     fromQuat: function (q) {
         mat3.fromQuat(this.array, q.array);
@@ -110,7 +110,7 @@ Matrix3.prototype = {
 
     /**
      * Set to a identity matrix
-     * @return {clay.math.Matrix3}
+     * @return {clay.Matrix3}
      */
     identity: function () {
         mat3.identity(this.array);
@@ -120,7 +120,7 @@ Matrix3.prototype = {
 
     /**
      * Invert self
-     * @return {clay.math.Matrix3}
+     * @return {clay.Matrix3}
      */
     invert: function () {
         mat3.invert(this.array, this.array);
@@ -130,8 +130,8 @@ Matrix3.prototype = {
 
     /**
      * Alias for mutiply
-     * @param  {clay.math.Matrix3} b
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} b
+     * @return {clay.Matrix3}
      */
     mul: function (b) {
         mat3.mul(this.array, this.array, b.array);
@@ -141,8 +141,8 @@ Matrix3.prototype = {
 
     /**
      * Alias for multiplyLeft
-     * @param  {clay.math.Matrix3} a
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} a
+     * @return {clay.Matrix3}
      */
     mulLeft: function (a) {
         mat3.mul(this.array, a.array, this.array);
@@ -152,8 +152,8 @@ Matrix3.prototype = {
 
     /**
      * Multiply self and b
-     * @param  {clay.math.Matrix3} b
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} b
+     * @return {clay.Matrix3}
      */
     multiply: function (b) {
         mat3.multiply(this.array, this.array, b.array);
@@ -163,8 +163,8 @@ Matrix3.prototype = {
 
     /**
      * Multiply a and self, a is on the left
-     * @param  {clay.math.Matrix3} a
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Matrix3} a
+     * @return {clay.Matrix3}
      */
     multiplyLeft: function (a) {
         mat3.multiply(this.array, a.array, this.array);
@@ -175,7 +175,7 @@ Matrix3.prototype = {
     /**
      * Rotate self by a given radian
      * @param  {number}   rad
-     * @return {clay.math.Matrix3}
+     * @return {clay.Matrix3}
      */
     rotate: function (rad) {
         mat3.rotate(this.array, this.array, rad);
@@ -185,8 +185,8 @@ Matrix3.prototype = {
 
     /**
      * Scale self by s
-     * @param  {clay.math.Vector2}  s
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Vector2}  s
+     * @return {clay.Matrix3}
      */
     scale: function (v) {
         mat3.scale(this.array, this.array, v.array);
@@ -196,8 +196,8 @@ Matrix3.prototype = {
 
     /**
      * Translate self by v
-     * @param  {clay.math.Vector2}  v
-     * @return {clay.math.Matrix3}
+     * @param  {clay.Vector2}  v
+     * @return {clay.Matrix3}
      */
     translate: function (v) {
         mat3.translate(this.array, this.array, v.array);
@@ -206,7 +206,7 @@ Matrix3.prototype = {
     },
     /**
      * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
-     * @param {clay.math.Matrix4} a
+     * @param {clay.Matrix4} a
      */
     normalFromMat4: function (a) {
         mat3.normalFromMat4(this.array, a.array);
@@ -216,7 +216,7 @@ Matrix3.prototype = {
 
     /**
      * Transpose self, in-place.
-     * @return {clay.math.Matrix2}
+     * @return {clay.Matrix2}
      */
     transpose: function () {
         mat3.transpose(this.array, this.array);
@@ -233,9 +233,9 @@ Matrix3.prototype = {
     }
 };
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @return {clay.Matrix3}
  */
 Matrix3.adjoint = function (out, a) {
     mat3.adjoint(out.array, a.array);
@@ -244,9 +244,9 @@ Matrix3.adjoint = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @return {clay.Matrix3}
  */
 Matrix3.copy = function (out, a) {
     mat3.copy(out.array, a.array);
@@ -255,7 +255,7 @@ Matrix3.copy = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} a
+ * @param  {clay.Matrix3} a
  * @return {number}
  */
 Matrix3.determinant = function (a) {
@@ -263,8 +263,8 @@ Matrix3.determinant = function (a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @return {clay.Matrix3}
  */
 Matrix3.identity = function (out) {
     mat3.identity(out.array);
@@ -273,9 +273,9 @@ Matrix3.identity = function (out) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @return {clay.Matrix3}
  */
 Matrix3.invert = function (out, a) {
     mat3.invert(out.array, a.array);
@@ -283,10 +283,10 @@ Matrix3.invert = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @param  {clay.math.Matrix3} b
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @param  {clay.Matrix3} b
+ * @return {clay.Matrix3}
  */
 Matrix3.mul = function (out, a, b) {
     mat3.mul(out.array, a.array, b.array);
@@ -296,17 +296,17 @@ Matrix3.mul = function (out, a, b) {
 
 /**
  * @function
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @param  {clay.math.Matrix3} b
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @param  {clay.Matrix3} b
+ * @return {clay.Matrix3}
  */
 Matrix3.multiply = Matrix3.mul;
 
 /**
- * @param  {clay.math.Matrix3}  out
- * @param  {clay.math.Matrix2d} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3}  out
+ * @param  {clay.Matrix2d} a
+ * @return {clay.Matrix3}
  */
 Matrix3.fromMat2d = function (out, a) {
     mat3.fromMat2d(out.array, a.array);
@@ -315,9 +315,9 @@ Matrix3.fromMat2d = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix3}
  */
 Matrix3.fromMat4 = function (out, a) {
     mat3.fromMat4(out.array, a.array);
@@ -326,9 +326,9 @@ Matrix3.fromMat4 = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3}    out
- * @param  {clay.math.Quaternion} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3}    out
+ * @param  {clay.Quaternion} a
+ * @return {clay.Matrix3}
  */
 Matrix3.fromQuat = function (out, q) {
     mat3.fromQuat(out.array, q.array);
@@ -337,9 +337,9 @@ Matrix3.fromQuat = function (out, q) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix4} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix4} a
+ * @return {clay.Matrix3}
  */
 Matrix3.normalFromMat4 = function (out, a) {
     mat3.normalFromMat4(out.array, a.array);
@@ -348,10 +348,10 @@ Matrix3.normalFromMat4 = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
  * @param  {number}  rad
- * @return {clay.math.Matrix3}
+ * @return {clay.Matrix3}
  */
 Matrix3.rotate = function (out, a, rad) {
     mat3.rotate(out.array, a.array, rad);
@@ -360,10 +360,10 @@ Matrix3.rotate = function (out, a, rad) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @param  {clay.math.Vector2} v
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @param  {clay.Vector2} v
+ * @return {clay.Matrix3}
  */
 Matrix3.scale = function (out, a, v) {
     mat3.scale(out.array, a.array, v.array);
@@ -372,9 +372,9 @@ Matrix3.scale = function (out, a, v) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @return {clay.Matrix3}
  */
 Matrix3.transpose = function (out, a) {
     mat3.transpose(out.array, a.array);
@@ -383,10 +383,10 @@ Matrix3.transpose = function (out, a) {
 };
 
 /**
- * @param  {clay.math.Matrix3} out
- * @param  {clay.math.Matrix3} a
- * @param  {clay.math.Vector2} v
- * @return {clay.math.Matrix3}
+ * @param  {clay.Matrix3} out
+ * @param  {clay.Matrix3} a
+ * @param  {clay.Vector2} v
+ * @return {clay.Matrix3}
  */
 Matrix3.translate = function (out, a, v) {
     mat3.translate(out.array, a.array, v.array);

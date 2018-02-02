@@ -87,7 +87,7 @@
             });
 
             camera.position.set(0, 10, 30);
-            camera.lookAt(new clay.math.Vector3(0, 2, 0));
+            camera.lookAt(new clay.Vector3(0, 2, 0));
 
             camera.aspect = renderer.canvas.width / renderer.canvas.height;
 
@@ -116,7 +116,7 @@
                 intensity : 0.2
             }));
 
-            var timeline =  new clay.animation.Timeline();
+            var timeline =  new clay.Timeline();
             timeline.start();
             timeline.addClip(clip);
 
