@@ -7121,16 +7121,16 @@ var SamplerTrack = function (opts) {
      */
     this.target = opts.target || null;
     /**
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.position = vec3.create();
     /**
      * Rotation is represented by a quaternion
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.rotation = quat.create();
     /**
-     * @type {Float32Array}
+     * @type {Array}
      */
     this.scale = vec3.fromValues(1, 1, 1);
 
@@ -16108,16 +16108,18 @@ var Node = Base.extend(
         this._inIterating = false;
     },
 
+    /**
+     * Traverse all children nodes.
+     * @param {Function} callback
+     * @param {Node} [context]
+     */
     eachChild: function (callback, context, ctor) {
         this._inIterating = true;
 
         var _children = this._children;
-        var noCtor = ctor == null;
         for(var i = 0, len = _children.length; i < len; i++) {
             var child = _children[i];
-            if (noCtor || child.constructor === ctor) {
-                callback.call(context, child, i);
-            }
+            callback.call(context, child, i);
         }
 
         this._inIterating = false;
@@ -16328,6 +16330,7 @@ var Node = Base.extend(
      */
     clone: function () {
         var node = new this.constructor();
+
         var children = this._children;
 
         node.setName(this.name);
@@ -16338,6 +16341,7 @@ var Node = Base.extend(
         for (var i = 0; i < children.length; i++) {
             node.add(children[i].clone());
         }
+
         return node;
     },
 
@@ -17241,7 +17245,7 @@ function getProgramKey$1(lightNumbers) {
     var lightTypes = Object.keys(lightNumbers);
     lightTypes.sort();
     for (var i = 0; i < lightTypes.length; i++) {
-        var lightType = lightNumbers[i];
+        var lightType = lightTypes[i];
         defineStr.push(lightType + ' ' + lightNumbers[lightType]);
     }
     var key = defineStr.join('\n');
@@ -17579,12 +17583,8 @@ var Scene = Node.extend(function () {
         return lightGroups;
     },
 
-    /**
-     * Determine if light group is different with since last frame
-     * Used to determine whether to update shader and scene's uniforms in Renderer.render
-     * @param {Shader} shader
-     * @returns {Boolean}
-     */
+    // Determine if light group is different with since last frame
+    // Used to determine whether to update shader and scene's uniforms in Renderer.render
     isLightNumberChanged: function (lightGroup) {
         var prevLightNumber = this._previousLightNumber;
         var currentLightNumber = this._lightNumber;
@@ -17608,10 +17608,6 @@ var Scene = Node.extend(function () {
         return false;
     },
 
-    /**
-     * Set shader's light group with scene's
-     * @param {Shader} shader
-     */
     getLightsNumbers: function (lightGroup) {
         return this._lightNumber[lightGroup];
     },
@@ -19941,10 +19937,10 @@ var Renderable = Node.extend(
         var glDrawMode = this.mode;
 
         var nVertex = geometry.vertexCount;
-        var isUseIndices = geometry.isUseIndices();
 
         var uintExt = renderer.getGLExtension('OES_element_index_uint');
-        var useUintExt = uintExt && nVertex > 0xffff;
+        // var useUintExt = uintExt && nVertex > 0xffff;
+        var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
         var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
         var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
@@ -20097,9 +20093,9 @@ var Renderable = Node.extend(
                     }
                 }
                 if (
-                    glDrawMode == glenum.LINES ||
-                    glDrawMode == glenum.LINE_STRIP ||
-                    glDrawMode == glenum.LINE_LOOP
+                    glDrawMode === glenum.LINES ||
+                    glDrawMode === glenum.LINE_STRIP ||
+                    glDrawMode === glenum.LINE_LOOP
                 ) {
                     _gl.lineWidth(this.lineWidth);
                 }
@@ -20113,7 +20109,8 @@ var Renderable = Node.extend(
                     }
                     _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
                     renderInfo.triangleCount += indicesBuffer.count / 3;
-                } else {
+                }
+                else {
                     _gl.drawArrays(glDrawMode, 0, nVertex);
                 }
 
@@ -20249,7 +20246,6 @@ var Mesh = Renderable.extend(
         var _gl = renderer.gl;
         // Set pose matrices of skinned mesh
         if (this.skeleton) {
-            // TODO Multiple mesh share same skeleton
             this.skeleton.update();
 
             var skinMatricesArray = this.skeleton.getSubSkinMatrices(this.__uid__, this.joints);
@@ -20300,6 +20296,15 @@ var Mesh = Renderable.extend(
         });
 
         return this._skinMatricesTexture;
+    },
+
+    clone: function () {
+        var mesh = Renderable.prototype.clone.call(this);
+        mesh.skeleton = this.skeleton;
+        if (this.joints) {
+            mesh.joints = this.joints.slice();
+        }
+        return mesh;
     }
 });
 
@@ -20788,13 +20793,7 @@ var Joint = Base.extend(
      * Scene node attached to
      * @type {clay.Node}
      */
-    node: null,
-
-    /**
-     * Root scene node of the skeleton, which parent node is null or don't have a joint
-     * @type {clay.Node}
-     */
-    rootNode: null
+    node: null
 });
 
 var quat$5 = glmatrix.quat;
@@ -20939,19 +20938,8 @@ var Skeleton = Base.extend(function () {
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
-                // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
-                //     mat4.multiply(
-                //         m4,
-                //         m4,
-                //         joint.node.worldTransform.array
-                //     );
-                //     mat4.invert(m4, m4);
-                // }
-                // else {
-                    mat4$6.copy(m4, joint.node.worldTransform.array);
-                    mat4$6.invert(m4, m4);
-                // }
+                mat4$6.copy(m4, joint.node.worldTransform.array);
+                mat4$6.invert(m4, m4);
 
                 var offset = i * 16;
                 for (var j = 0; j < 16; j++) {
@@ -20979,29 +20967,19 @@ var Skeleton = Base.extend(function () {
     /**
      * Update skinning matrices
      */
-    update: (function () {
-        // var m4 = mat4.create();
-        return function () {
-            for (var i = 0; i < this.joints.length; i++) {
-                var joint = this.joints[i];
-                mat4$6.multiply(
-                    this._skinMatricesSubArrays[i],
-                    joint.node.worldTransform.array,
-                    this._jointMatricesSubArrays[i]
-                );
+    update: function () {
 
-                // Joint space is relative to root, if have
-                // if (this.relativeRootNode) {
-                //     mat4.invert(m4, this.relativeRootNode.worldTransform.array);
-                //     mat4.multiply(
-                //         this._skinMatricesSubArrays[i],
-                //         m4,
-                //         this._skinMatricesSubArrays[i]
-                //     );
-                // }
-            }
-        };
-    })(),
+        this._setPose();
+
+        for (var i = 0; i < this.joints.length; i++) {
+            var joint = this.joints[i];
+            mat4$6.multiply(
+                this._skinMatricesSubArrays[i],
+                joint.node.worldTransform.array,
+                this._jointMatricesSubArrays[i]
+            );
+        }
+    },
 
     getSubSkinMatrices: function (meshId, joints) {
         var subArray = this._subSkinMatricesArray[meshId];
@@ -21020,14 +20998,10 @@ var Skeleton = Base.extend(function () {
         return subArray;
     },
 
-    /**
-     * Set pose and update skinning matrices
-     * @param {number} clipIndex
-     */
-    setPose: function (clipIndex) {
-        if (this._clips[clipIndex]) {
-            var clip = this._clips[clipIndex].clip;
-            var maps = this._clips[clipIndex].maps;
+    _setPose: function () {
+        if (this._clips[0]) {
+            var clip = this._clips[0].clip;
+            var maps = this._clips[0].maps;
 
             for (var i = 0; i < this.joints.length; i++) {
                 var joint = this.joints[i];
@@ -21053,28 +21027,32 @@ var Skeleton = Base.extend(function () {
                 joint.node.scale._dirty = true;
             }
         }
-        this.update();
     },
 
-    clone: function (rootNode, newRootNode) {
+    clone: function (clonedNodesMap) {
         var skeleton = new Skeleton();
         skeleton.name = this.name;
 
         for (var i = 0; i < this.joints.length; i++) {
             var newJoint = new Joint();
-            newJoint.name = this.joints[i].name;
-            newJoint.index = this.joints[i].index;
+            var joint = this.joints[i];
+            newJoint.name = joint.name;
+            newJoint.index = joint.index;
 
-            var path = this.joints[i].node.getPath(rootNode);
-            var rootNodePath = this.joints[i].rootNode.getPath(rootNode);
+            if (clonedNodesMap) {
+                var newNode = clonedNodesMap[joint.node.__uid__];
 
-            if (path != null && rootNodePath != null) {
-                newJoint.node = newRootNode.queryNode(path);
+                if (!newNode) {
+                    // PENDING
+                    console.warn('Can\'t find node');
+                }
+
+                newJoint.node = newNode || joint.node;
             }
             else {
-                // PENDING
-                console.warn('Something wrong in clone, may be the skeleton root nodes is not mounted on the cloned root node.');
+                newJoint.node = joint.node;
             }
+
             skeleton.joints.push(newJoint);
         }
 
@@ -24847,7 +24825,7 @@ var ShadowMapPass = Base.extend(function () {
                     continue;
                 }
                 if (light.shadowCascade > 1) {
-                    dirLightHasCascade = light.shadowCascade;
+                    dirLightHasCascade = light;
                 }
 
                 this.renderDirectionalLightShadow(
@@ -28039,11 +28017,14 @@ App3D.prototype.createNode = function (parentNode) {
  * @param {Array.<number>|clay.math.Vector3} position
  * @param {Array.<number>|clay.math.Vector3} target
  * @param {string} [type="perspective"] Can be 'perspective' or 'orthographic'(in short 'ortho')
+ * @param {Array.<number>|clay.math.Vector3} [extent] Extent is available only if type is orthographic.
  * @return {clay.camera.Perspective}
  */
-App3D.prototype.createCamera = function (position, target, type) {
+App3D.prototype.createCamera = function (position, target, type, extent) {
     var CameraCtor;
+    var isOrtho = false;
     if (type === 'ortho' || type === 'orthographic') {
+        isOrtho = true;
         CameraCtor = Orthographic$1;
     }
     else {
@@ -28066,6 +28047,16 @@ App3D.prototype.createCamera = function (position, target, type) {
     }
     if (target instanceof Vector3) {
         camera.lookAt(target);
+    }
+
+    if (extent && isOrtho) {
+        extent = extent.array || extent;
+        camera.left = -extent[0] / 2;
+        camera.right = extent[0] / 2;
+        camera.top = extent[1] / 2;
+        camera.bottom = -extent[1] / 2;
+        camera.near = 0;
+        camera.far = extent[2];
     }
 
     this.scene.add(camera);
@@ -28256,9 +28247,10 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
+ * @param {clay.Node} [parentNode] Parent node that model will be mounted. Default to be scene
  * @return {Promise}
  */
-App3D.prototype.loadModel = function (url, opts) {
+App3D.prototype.loadModel = function (url, opts, parentNode) {
     if (typeof url !== 'string') {
         throw new Error('Invalid URL.');
     }
@@ -28282,7 +28274,7 @@ App3D.prototype.loadModel = function (url, opts) {
 
     var loader = new GLTFLoader(loaderOpts);
 
-    var scene = this.scene;
+    parentNode = parentNode || this.scene;
     var timeline = this.timeline;
     var self = this;
 
@@ -28292,7 +28284,7 @@ App3D.prototype.loadModel = function (url, opts) {
                 return;
             }
 
-            scene.add(result.rootNode);
+            parentNode.add(result.rootNode);
             if (opts.autoPlayAnimation) {
                 result.clips.forEach(function (clip) {
                     timeline.addClip(clip);
@@ -28329,6 +28321,50 @@ App3D.prototype.loadModel = function (url, opts) {
         });
         loader.load(url);
     });
+};
+
+
+// TODO cloneModel
+
+/**
+ * Clone a node and it's children, including mesh, camera, light, etc.
+ * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
+ *
+ * @param {clay.Node} node
+ * @param {clay.Node} [parentNode] Parent node that new cloned node will be mounted.
+ *          Default to have same parent with source node.
+ * @return {clay.Node}
+ */
+App3D.prototype.cloneNode = function (node, parentNode) {
+    parentNode = parentNode || node.getParent();
+
+    var newNode = node.clone();
+    var clonedNodesMap = {};
+    function buildNodesMap(sNode, tNode) {
+        clonedNodesMap[sNode.__uid__] = tNode;
+
+        for (var i = 0; i < sNode._children.length; i++) {
+            var sChild = sNode._children[i];
+            var tChild = tNode._children[i];
+            buildNodesMap(sChild, tChild);
+        }
+    }
+    buildNodesMap(node, newNode);
+
+    newNode.traverse(function (newChild) {
+        if (newChild.skeleton) {
+            newChild.skeleton = newChild.skeleton.clone(clonedNodesMap);
+        }
+        if (newChild.material) {
+            newChild.material = newChild.material.clone();
+        }
+    });
+
+    if (parentNode) {
+        parentNode.add(newNode);
+    }
+
+    return newNode;
 };
 
 
@@ -34690,7 +34726,7 @@ function copyIfNecessary(arr, shallow) {
 /**
  * @name clay.version
  */
-var version = '1.0.3';
+var version = '1.0.4';
 
 var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    v_Texcoord = texcoord;\n    gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n    gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 
@@ -34996,7 +35032,7 @@ var StereoCamera = Node.extend(function () {
 /** @namespace clay.helper */
 /** @namespace clay.light */
 /** @namespace clay.loader */
-/** @namespace clay.particleSystem */
+/** @namespace clay.particle */
 /** @namespace clay.plugin */
 /** @namespace clay.prePass */
 /** @namespace clay.shader */
