@@ -889,7 +889,7 @@ App3D.prototype.createNode = function (parentNode) {
  * @param {Array.<number>|clay.math.Vector3} target
  * @param {string} [type="perspective"] Can be 'perspective' or 'orthographic'(in short 'ortho')
  * @param {Array.<number>|clay.math.Vector3} [extent] Extent is available only if type is orthographic.
- * @return {clay.camera.Perspective}
+ * @return {clay.camera.Perspective|clay.camera.Orthographic}
  */
 App3D.prototype.createCamera = function (position, target, type, extent) {
     var CameraCtor;
@@ -1246,12 +1246,19 @@ export default {
      * @name clay.application.create
      * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
      * @param {Object} appNS
-     * @param {Function} init Initialization callback that will be called when initing app.
-     * @param {Function} loop Loop callback that will be called each frame.
-     * @param {number} [width] Container width.
-     * @param {number} [height] Container height.
-     * @param {number} [devicePixelRatio]
-     * @return {clay.application.App3D}
+     * @param {Function} appNS.init Initialization callback that will be called when initing app.
+     *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
+     * @param {Function} appNS.loop Loop callback that will be called each frame.
+     * @param {Function} appNS.beforeRender
+     * @param {Function} appNS.afterRender
+     * @param {number} [appNS.width] Container width.
+     * @param {number} [appNS.height] Container height.
+     * @param {number} [appNS.devicePixelRatio]
+     * @param {Object} [appNS.graphic] Graphic configuration including shadow, postEffect
+     * @param {boolean} [appNS.graphic.shadow=false] If enable shadow
+     * @param {boolean} [appNS.graphic.linear=false] If use linear space
+     * @param {boolean} [appNS.graphic.tonemapping=false] If enable ACES tone mapping.
+     * @param {boolean} [appNS.event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
      *
      * @example
      *  clay.application.create('#app', {
