@@ -21,10 +21,10 @@ export module loader {
 
         load(url: string): void;
 
-        parse(json: Object): compositor.Compositor;
+        parse(json: Object): Compositor;
 
-        once(name: "success", handler: (compositor: compositor.Compositor) => void, context?: any): void;
+        once(name: "success", handler: (compositor: Compositor) => void, context?: any): void;
         once(name: string, handler: Function, context?: any): void;
-        success(handler: (compositor: compositor.Compositor) => void, context?: any): void;
+        success(handler: (compositor: Compositor) => void, context?: any): void;
     }
 }

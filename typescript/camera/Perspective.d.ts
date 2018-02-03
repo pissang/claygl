@@ -1,26 +1,22 @@
-///<reference path="../Camera.d.ts" />
-export namespace clay {
 
-    export module camera {
+import { Camera, ICameraOption } from '../Camera';
 
-        interface IPerspectiveCameraOption extends ICameraOption {
-            fov?: number;
-            aspect?: number;
-            near?: number;
-            far?: number;
-        }
+interface IPerspectiveCameraOption extends ICameraOption {
+    fov?: number;
+    aspect?: number;
+    near?: number;
+    far?: number;
+}
 
-        export class Perspective extends Camera {
+export class Perspective extends Camera {
 
-            constructor(option?: IPerspectiveCameraOption);
+    constructor(option?: IPerspectiveCameraOption);
 
-            fov: number;
+    fov: number;
 
-            aspect: number;
+    aspect: number;
 
-            near: number;
+    near: number;
 
-            far: number;
-        }
-    }
+    far: number;
 }

@@ -1,34 +1,29 @@
-///<reference path="../Material.d.ts" />
-///<reference path="../Texture.d.ts" />
-///<reference path="../Renderer.d.ts" />
-///<reference path="../FrameBuffer.d.ts" />
-///<reference path="../core/container.d.ts" />
-///<reference path="../core/Base.d.ts" />
-export namespace clay {
+import { Material } from '../Material';
+import { Texture } from '../Texture';
+import { Renderer } from '../Renderer';
+import { FrameBuffer } from '../FrameBuffer';
+import { IDictionary } from '../core/container';
+import { Base } from '../core/Base';
 
-    export module compositor {
+export class Pass extends Base {
 
-        export class Pass extends clay.core.Base {
+    fragment: string;
 
-            fragment: string;
+    outputs: IDictionary<Texture>;
 
-            outputs: IDictionary<Texture>;
+    material: Material;
 
-            material: Material;
+    setUniform(name: string, value: any): void;
 
-            setUniform(name: string, value: any): void;
+    getUniform(name: string): any;
 
-            getUniform(name: string): any;
+    attachOutput(texture: Texture, attachment?: number): void;
 
-            attachOutput(texture: Texture, attachment?: number): void;
+    detachOutput(texture: Texture): void;
 
-            detachOutput(texture: Texture): void;
+    render(renderer: Renderer, frameBuffer: FrameBuffer): void;
 
-            render(renderer: Renderer, frameBuffer: FrameBuffer): void;
+    bind(renderer: Renderer, frameBuffer: FrameBuffer): void;
 
-            bind(renderer: Renderer, frameBuffer: FrameBuffer): void;
-
-            unbind(renderer: Renderer, frameBuffer: FrameBuffer): void;
-        }
-    }
+    unbind(renderer: Renderer, frameBuffer: FrameBuffer): void;
 }

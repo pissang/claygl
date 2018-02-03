@@ -1,6 +1,6 @@
-///<reference path="mixin/notifier.d.ts" />
+import { notifier } from './mixin/notifier';
 
-export class Base implements mixin.notifier {
+export class Base implements notifier {
     __GUID__ : number
 
     trigger(name: string, ...args): void;

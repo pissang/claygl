@@ -41,7 +41,7 @@ import CompositorNode from './CompositorNode';
     });
     *
     */
-var FilterNode = Node.extend(function () {
+var FilterNode = CompositorNode.extend(function () {
     return /** @lends clay.compositor.FilterNode# */ {
         /**
          * @type {string}

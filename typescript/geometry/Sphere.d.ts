@@ -1,22 +1,31 @@
-///<reference path="../DynamicGeometry.d.ts" />
+import { Geometry } from '../Geometry'
 
-export namespace geometry {
 
-    interface ISphereGeometryOption extends IGeometryOption {
-        widthSegments?: number;
-        heightSegements?: number;
+interface ISphereGeometryOption {
+    widthSegments?: number;
+    heightSegements?: number;
 
-        phiStart?: number;
-        phiLength?: number;
+    phiStart?: number;
+    phiLength?: number;
 
-        thetaStart?: number;
-        thetaLength?: number;
+    thetaStart?: number;
+    thetaLength?: number;
 
-        radius?: number;
-    }
+    radius?: number;
+}
 
-    export class Sphere extends DynamicGeometry{
+export class Sphere extends Geometry {
 
-        constructor(option?: ISphereGeometryOption);
-    }
+    constructor(option?: ISphereGeometryOption);
+
+    widthSegments?: number;
+    heightSegements?: number;
+
+    phiStart?: number;
+    phiLength?: number;
+
+    thetaStart?: number;
+    thetaLength?: number;
+
+    radius?: number;
 }

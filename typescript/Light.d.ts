@@ -1,6 +1,6 @@
 import { Node } from './Node';
 
-interface ILightOption extends INodeOption {}
+export interface ILightOption extends INodeOption {}
 
 interface ILightUniformTemplate<T> {
     type: string;

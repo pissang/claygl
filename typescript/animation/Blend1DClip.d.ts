@@ -1,4 +1,4 @@
-///<reference path="Clip.d.ts" />
+import { Clip } from './Clip';
 
 interface IBlend1DClipOption<T extends BlendClip> extends IClipOption {
     output?: T;

@@ -1,4 +1,4 @@
-///<reference path="Task.d.ts" />
+import { Task } from './Task';
 
 export class TaskGroup extends Task {
 

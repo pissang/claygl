@@ -5,7 +5,7 @@ import { Matrix4 } from './math/Matrix4';
 import { Frustum } from './math/Frustum';
 import { BoundingBox } from './math/BoundingBox';
 
-interface ICameraOption extends INodeOption {}
+export interface ICameraOption extends INodeOption {}
 
 export class Camera extends Node {
 

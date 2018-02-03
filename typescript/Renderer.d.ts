@@ -118,7 +118,7 @@ export class Renderer {
 
     dispose(): void;
 
-    screenToNdc(x: number, y: number, out?: math.Vector2): math.Vector2;
+    screenToNdc(x: number, y: number, out?: Vector2): Vector2;
 
     // Events
     on(name: 'beforerender', handler: (renderer?: Renderer, scene?: Scene, camera?: Camera) => void, context?: any): void;

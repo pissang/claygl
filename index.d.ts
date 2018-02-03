@@ -10,6 +10,7 @@ export * from './typescript/Scene';
 export * from './typescript/Texture2D';
 export * from './typescript/TextureCube';
 export * from './typescript/Texture';
+export * from './typescript/Timeline';
 
 export * from './typescript/math/Vector2';
 export * from './typescript/math/Vector3';

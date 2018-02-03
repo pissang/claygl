@@ -1,21 +1,16 @@
-///<reference path="../Light.d.ts" />
-export namespace clay {
+import { Light, ILightOption } from '../Light';
 
-    export module light {
+interface IAmbientLightOption extends ILightOption {}
 
-        interface IAmbientLightOption extends ILightOption {}
+export class Ambient extends Light {
 
-        export class Ambient extends Light {
+    constructor(option?: IAmbientLightOption);
 
-            constructor(option?: IAmbientLightOption);
+    type: string;
 
-            type: string;
+    // uniformTemplates : {
 
-            uniformTemplates : {
+    //     ambientLightColor: ILightUniformTemplate<number[]>;
 
-                ambientLightColor: ILightUniformTemplate<number[]>;
-
-            }
-        }
-    }
+    // }
 }

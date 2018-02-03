@@ -1,25 +1,24 @@
-///<reference path="../Mesh.d.ts" />
-///<reference path="../Scene.d.ts" />
-export namespace clay {
+import { Mesh } from '../Mesh';
+import { Scene } from '../Scene';
+import { TextureCube } from '../TextureCube';
 
-    export module plugin {
+interface ISkyboxOption {
+    scene?: Scene;
+}
 
-        interface ISkyboxOption {
-            scene?: Scene;
-        }
+export class Skybox extends Mesh {
 
-        export class Skybox extends Mesh {
+    constructor(option?: ISkyboxOption);
 
-            constructor(option?: ISkyboxOption);
+    scene: Scene;
 
-            scene: Scene;
+    setEnvironmentMap(envMap: TextureCube): void;
 
-            attachScene(scene: Scene): void;
+    getEnvironmentMap(): TextureCube;
 
-            detachScene(): void;
+    attachScene(scene: Scene): void;
 
-            dispose(): void;
+    detachScene(): void;
 
-        }
-    }
+    dispose(): void;
 }

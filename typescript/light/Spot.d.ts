@@ -1,52 +1,47 @@
-///<reference path="../Light.d.ts" />
-export namespace clay {
+import { Light, ILightOption } from '../Light';
 
-    export module light {
+interface ISpotLightOption extends ILightOption {
+    range?: number;
+    umbraAngle?: number;
+    penumbraAngle?: number;
+    falloffFactor?: number;
 
-        interface ISpotLightOption extends ILightOption {
-            range?: number;
-            umbraAngle?: number;
-            penumbraAngle?: number;
-            falloffFactor?: number;
+    shadowBias?: number;
+    shadowSlopeScale?: number;
+}
 
-            shadowBias?: number;
-            shadowSlopeScale?: number;
-        }
+export class Spot extends Light {
 
-        export class Spot extends Light {
+    constructor(option?: ISpotLightOption);
 
-            constructor(option?: ISpotLightOption);
+    range: number;
 
-            range: number;
+    umbraAngle: number;
 
-            umbraAngle: number;
+    penumbraAngle: number;
 
-            penumbraAngle: number;
+    falloffFactor: number;
 
-            falloffFactor: number;
+    shadowBias: number;
 
-            shadowBias: number;
+    shadowSlopeScale: number;
 
-            shadowSlopeScale: number;
+    type: string;
 
-            type: string;
+    // uniformTemplates : {
 
-            uniformTemplates : {
+    //     spotLightPosition: ILightUniformTemplate<number[]>;
 
-                spotLightPosition: ILightUniformTemplate<number[]>;
+    //     spotLightRange: ILightUniformTemplate<number>;
 
-                spotLightRange: ILightUniformTemplate<number>;
+    //     spotLightUmbraAngleCosine: ILightUniformTemplate<number>;
 
-                spotLightUmbraAngleCosine: ILightUniformTemplate<number>;
+    //     spotLightPenumbraAngleCosine: ILightUniformTemplate<number>;
 
-                spotLightPenumbraAngleCosine: ILightUniformTemplate<number>;
+    //     spotLightFalloffFactor: ILightUniformTemplate<number>;
 
-                spotLightFalloffFactor: ILightUniformTemplate<number>;
+    //     spotLightDirection: ILightUniformTemplate<number[]>;
 
-                spotLightDirection: ILightUniformTemplate<number[]>;
-
-                spotLightColor: ILightUniformTemplate<number[]>;
-            }
-        }
-    }
+    //     spotLightColor: ILightUniformTemplate<number[]>;
+    // }
 }

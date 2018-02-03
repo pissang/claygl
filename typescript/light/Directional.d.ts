@@ -1,31 +1,26 @@
-///<reference path="../Light.d.ts" />
-export namespace clay {
+import { Light, ILightOption } from '../Light';
 
-    export module light {
+interface IDirectionalLightOption extends ILightOption {
+    shadowBias?: number;
+    shadowSlopeScale?: number;
+}
 
-        interface IDirectionalLightOption extends ILightOption {
-            shadowBias?: number;
-            shadowSlopeScale?: number;
-        }
+export class Directional extends Light {
 
-        export class Directional extends Light {
+    constructor(option?: IDirectionalLightOption);
 
-            constructor(option?: IDirectionalLightOption);
+    type: string;
 
-            type: string;
+    range: number;
 
-            range: number;
+    shadowBias: number;
 
-            shadowBias: number;
+    shadowSlopeScale: number;
 
-            shadowSlopeScale: number;
+    // uniformTemplates : {
 
-            uniformTemplates : {
+    //     directionalLightColor: ILightUniformTemplate<number[]>;
 
-                directionalLightColor: ILightUniformTemplate<number[]>;
-
-                directionalLightDirection: ILightUniformTemplate<number[]>;
-            }
-        }
-    }
+    //     directionalLightDirection: ILightUniformTemplate<number[]>;
+    // }
 }

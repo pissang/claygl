@@ -1,50 +1,68 @@
-///<reference path="../core/Base.d.ts" />
-///<reference path="../core/container.d.ts" />
-///<reference path="../Mesh.d.ts" />
-///<reference path="../Texture.d.ts" />
-///<reference path="../animation/SkinningClip.d.ts" />
-///<reference path="../Material.d.ts" />
-///<reference path="../Skeleton.d.ts" />
-///<reference path="../Scene.d.ts" />
-///<reference path="../Camera.d.ts" />
-export namespace clay {
+import { Base} from '../core/Base';
+import { Mesh} from '../Mesh';
+import { Texture} from '../Texture';
+import { TrackClip} from '../animation/TrackClip';
+import { Material} from '../Material';
+import { Skeleton} from '../Skeleton';
+import { Scene} from '../Scene';
+import { Camera} from '../Camera';
+import { Node } from '../Node';
 
-    export module loader {
+interface IGLTFLoaderOption {
+    rootPath?: string;
+    textureRootPath?: string;
+    bufferRootPath?: string;
 
-        interface IGLTFLoaderOption {
-            rootPath?: string;
-            textureRootPath?: string;
-            bufferRootPath?: string;
+    shader?: string;
+    crossOrigin?: string;
+    textureFlipY?: boolean;
 
-            shaderName?: string;
-        }
+    includeMaterial?: boolean;
+    includeCamera?: boolean;
+    includeMesh?: boolean;
+    includeTexture?: boolean;
 
-        interface IGLTFLoaderResult {
-            scene: Scene;
-            cameras: IDictionary<Camera>;
-            textures: IDictionary<Texture>;
-            materials: IDictionary<Material>;
-            skeletons: IDictionary<Skeleton>;
-            clip: animation.SkinningClip
-        }
+    shaderName?: string;
+}
 
-        export class GLTF extends core.Base {
+interface IGLTFLoaderResult {
+    scene?: Scene;
+    rootNode?: Node;
+    nodes: Nodes[];
+    cameras: Camera[];
+    textures: Texture[];
+    materials: Material[];
+    skeletons: Skeleton[];
+    clips: TrackClip[];
+    meshes: Mesh[];
+    json: Object
+}
 
-            constructor(option?: IGLTFLoaderOption);
+export class GLTF extends core.Base {
 
-            rootPath: string;
-            textureRootPath: string;
-            bufferRootPath: string;
+    constructor(option?: IGLTFLoaderOption);
 
-            shaderName: string;
+    rootPath: string;
+    textureRootPath: string;
+    bufferRootPath: string;
 
-            load(url: string): void;
+    shader?: string;
+    crossOrigin?: string;
+    textureFlipY?: boolean;
 
-            parse(json: Object): IGLTFLoaderResult;
+    includeMaterial?: boolean;
+    includeCamera?: boolean;
+    includeMesh?: boolean;
+    includeTexture?: boolean;
 
-            once(name: "success", handler: (result?: IGLTFLoaderResult) => void, context?: any): void;
-            once(name: string, handler: Function, context?: any): void;
-            success(handler: (result: IGLTFLoaderResult)=> void, context?: any);
-        }
-    }
+
+    load(url: string): void;
+
+    parseBinary(buffer:ArrayBuffer): IGLTFLoaderResult;
+
+    parse(json: Object, buffers?: ArrayBuffer[]): IGLTFLoaderResult;
+
+    once(name: "success", handler: (result?: IGLTFLoaderResult) => void, context?: any): void;
+    once(name: string, handler: Function, context?: any): void;
+    success(handler: (result: IGLTFLoaderResult)=> void, context?: any);
 }

@@ -1,48 +1,43 @@
-///<reference path="../Node.d.ts" />
-///<reference path="../math/Vector3.d.ts" />
-export namespace clay {
+import { Node } from '../Node';
+import { Vector3 } from '../math/Vector3';
 
-    export module plugin {
+interface IOrbitControlOption {
+    target?: Node;
+    domElement?: HTMLElement;
+    sensitivity?: number;
+    origin?: Vector3;
+    up?: Vector3;
+    minDistance?: number;
+    maxDistance?: number;
+    minPolarAngle?: number;
+    maxPolarAngle?: number;
+}
 
-        interface IOrbitControlOption {
-            target?: Node;
-            domElement?: HTMLElement;
-            sensitivity?: number;
-            origin?: math.Vector3;
-            up?: math.Vector3;
-            minDistance?: number;
-            maxDistance?: number;
-            minPolarAngle?: number;
-            maxPolarAngle?: number;
-        }
+export class OrbitControl {
 
-        export class OrbitControl {
+    constructor(option?: IOrbitControlOption);
 
-            constructor(option?: IOrbitControlOption);
+    target: Node;
 
-            target: Node;
+    domElement: HTMLElement;
 
-            domElement: HTMLElement;
+    sensitivity: number;
 
-            sensitivity: number;
+    origin: Vector3;
 
-            origin: math.Vector3;
+    up: Vector3;
 
-            up: math.Vector3;
+    minDistance: number;
 
-            minDistance: number;
+    maxDistance: number;
 
-            maxDistance: number;
+    minPolarAngle: number;
 
-            minPolarAngle: number;
+    maxPolarAngle: number;
 
-            maxPolarAngle: number;
+    enable(): void;
 
-            enable(): void;
+    disable(): void;
 
-            disable(): void;
-
-            update(deltaTime: number): void;
-        }
-    }
+    update(deltaTime: number): void;
 }

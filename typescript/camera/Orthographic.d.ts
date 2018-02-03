@@ -1,33 +1,29 @@
-///<reference path="../Camera.d.ts" />
-export namespace clay {
 
-    export module camera {
+import { Camera, ICameraOption } from '../Camera';
 
-        interface IOrthographicCameraOption extends ICameraOption {
-            left?: number;
-            right?: number;
-            near?: number;
-            far?: number;
-            top?: number;
-            bottom?: number;
-        }
+interface IOrthographicCameraOption extends ICameraOption {
+    left?: number;
+    right?: number;
+    near?: number;
+    far?: number;
+    top?: number;
+    bottom?: number;
+}
 
-        export class Orthographic extends Camera {
+export class Orthographic extends Camera {
 
-            constructor(option?: IOrthographicCameraOption);
+    constructor(option?: IOrthographicCameraOption);
 
-            left: number;
+    left: number;
 
-            right: number;
+    right: number;
 
-            near: number;
+    near: number;
 
-            far: number;
+    far: number;
 
-            top: number;
+    top: number;
 
-            bottom: number;
+    bottom: number;
 
-        }
-    }
 }

@@ -1,34 +1,25 @@
-export namespace clay{
+interface INotifierEventHandler {
+    action: Function;
+    context: any;
+}
 
-    interface INotifierEventHandler {
-        action: Function;
-        context: any;
-    }
+export interface notifier {
 
-    export module core {
+    trigger?(name: string, ...args): void;
 
-        export module mixin {
+    on?(name: string, action: Function, context?:any): void;
 
-            export interface notifier {
+    once?(name: string, action: Function, context?:any): void;
 
-                trigger?(name: string, ...args): void;
+    before?(name: string, action: Function, context?:any): void;
 
-                on?(name: string, action: Function, context?:any): void;
+    after?(name: string, action: Function, context?:any): void;
 
-                once?(name: string, action: Function, context?:any): void;
+    success?(action: Function, context?:any): void;
 
-                before?(name: string, action: Function, context?:any): void;
+    error?(action: Function, context?:any): void;
 
-                after?(name: string, action: Function, context?:any): void;
+    off?(name: string, action?: Function): void;
 
-                success?(action: Function, context?:any): void;
-
-                error?(action: Function, context?:any): void;
-
-                off?(name: string, action?: Function): void;
-
-                has?(name: string, action: Function): void;
-            }
-        }
-    }
+    has?(name: string, action: Function): void;
 }

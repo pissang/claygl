@@ -1,7 +1,7 @@
 import { Texture } from './Texture';
 import { Renderer } from './Renderer';
 
-interface ITexture2DOption extends ITextureOption {
+export interface ITexture2DOption extends ITextureOption {
     image?: HTMLElement;
     pixels?: ArrayBufferView;
     mipmaps?: ArrayBufferView[];

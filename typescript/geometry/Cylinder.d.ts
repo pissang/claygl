@@ -1,16 +1,20 @@
-///<reference path="../DynamicGeometry.d.ts" />
-export namespace geometry {
+import { Geometry } from '../Geometry'
 
-    interface ICylinderGeometryOption extends IGeometryOption {
-        radius?: number;
-        height?: number;
+interface ICylinderGeometryOption {
+    radius?: number;
+    height?: number;
 
-        capSegments?: number;
-        heightSegements?: number;
-    }
+    capSegments?: number;
+    heightSegements?: number;
+}
 
-    export class Cylinder extends DynamicGeometry{
+export class Cylinder extends Geometry {
 
-        constructor(option?: ICylinderGeometryOption);
-    }
+    constructor(option?: ICylinderGeometryOption);
+
+    radius?: number;
+    height?: number;
+
+    capSegments?: number;
+    heightSegements?: number;
 }

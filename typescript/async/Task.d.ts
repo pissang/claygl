@@ -1,11 +1,11 @@
-///<reference path="../core/mixin/notifier.d.ts" />
+import { notifier } from '../core/mixin/notifier';
 
 interface IRequestTaskOption {
     url: string;
     responseType?: string;
 }
 
-export class Task implements core.mixin.notifier {
+export class Task implements notifier {
 
     resolve(data?: any): void;
 

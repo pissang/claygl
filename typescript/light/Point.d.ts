@@ -1,28 +1,23 @@
-///<reference path="../Light.d.ts" />
-export namespace clay {
+import { Light, ILightOption } from '../Light';
 
-    export module light {
+interface IPointLightOption extends ILightOption {
+    range?: number;
+}
 
-        interface IPointLightOption extends ILightOption {
-            range?: number;
-        }
+export class Point extends Light {
 
-        export class Point extends Light {
+    constructor(option?: IPointLightOption);
 
-            constructor(option?: IPointLightOption);
+    type: string;
 
-            type: string;
+    range: number;
 
-            range: number;
+    // uniformTemplates : {
 
-            uniformTemplates : {
+    //     pointLightColor: ILightUniformTemplate<number[]>;
 
-                pointLightColor: ILightUniformTemplate<number[]>;
+    //     pointLightRange: ILightUniformTemplate<number>;
 
-                pointLightRange: ILightUniformTemplate<number>;
-
-                pointLightPosition: ILightUniformTemplate<number[]>;
-            }
-        }
-    }
+    //     pointLightPosition: ILightUniformTemplate<number[]>;
+    // }
 }

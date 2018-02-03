@@ -1,12 +1,11 @@
-///<reference path="Clip.d.ts" />
 
-interface ISamplerClipOption extends IClipOption {
-    name?: string;
+interface ISamplerTrackOption {
+
 }
 
-export class SamplerClip extends Clip {
+export class SamplerTrack {
 
-    constructor(option?: ISamplerClipOption);
+    constructor(option?: ISamplerTrackOption);
 
     name: string;
 

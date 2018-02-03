@@ -1,17 +1,12 @@
-///<reference path="Graph.d.ts" />
-///<reference path="Node.d.ts" />
-///<reference path="../Renderer.d.ts" />
-export namespace clay {
+import { Graph } from './Graph';
+import { Node } from './Node';
+import { Renderer } from '../Renderer';
 
-    export module compositor {
+export class Compositor extends Graph {
 
-        export class Compositor extends Graph {
+    render(renderer: Renderer): void;
 
-            render(renderer: Renderer): void;
+    addOutput(node: Node): void;
 
-            addOutput(node: Node): void;
-
-            removeOutput(node: Node): void;
-        }
-    }
+    removeOutput(node: Node): void;
 }

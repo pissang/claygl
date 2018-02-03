@@ -1,16 +1,14 @@
-///<reference path="../DynamicGeometry.d.ts" />
-export namespace clay {
+import { Geometry } from '../Geometry'
 
-    export module geometry {
+interface IPlaneGeometryOption {
+    widthSegments?: number;
+    heightSegements?: number;
+}
 
-        interface IPlaneGeometryOption extends IGeometryOption {
-            widthSegments?: number;
-            heightSegements?: number;
-        }
+export class Plane extends Geometry {
 
-        export class Plane extends DynamicGeometry{
+    constructor(option?: IPlaneGeometryOption);
 
-            constructor(option?: IPlaneGeometryOption);
-        }
-    }
+    widthSegments?: number;
+    heightSegements?: number;
 }

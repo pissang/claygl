@@ -1,30 +1,25 @@
 ///<reference path="Node.d.ts" />
 ///<reference path="../Scene.d.ts" />
 ///<reference path="../Camera.d.ts" />
-export namespace clay {
 
-    export module compositor {
+interface ICompositorSceneNodeOption {
+    name?: string;
+    scene?: Scene;
+    camera?: Camera;
+    autoUpdateScene?: boolean;
+    preZ?: boolean;
+    outputs?: IDictionary<ICompositorNodeOutput>;
+}
 
-        interface ICompositorSceneNodeOption {
-            name?: string;
-            scene?: Scene;
-            camera?: Camera;
-            autoUpdateScene?: boolean;
-            preZ?: boolean;
-            outputs?: IDictionary<ICompositorNodeOutput>;
-        }
+export class SceneNode extends Node {
 
-        export class SceneNode extends Node {
+    constructor(option: ICompositorSceneNodeOption);
 
-            constructor(option: ICompositorSceneNodeOption);
+    scene: Scene;
 
-            scene: Scene;
+    camera: Camera;
 
-            camera: Camera;
+    autoUpdateScene: boolean;
 
-            autoUpdateScene: boolean;
-
-            preZ: boolean;
-        }
-    }
+    preZ: boolean;
 }

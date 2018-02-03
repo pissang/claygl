@@ -38,7 +38,7 @@ interface IDefaultStaticGeometryAttributes {
     barycentric: IStaticGeometryAttribute;
 }
 
-export class StaticGeometry extends Geometry {
+export class Geometry extends Base {
 
     attributes: IDefaultStaticGeometryAttributes;
 
@@ -74,7 +74,7 @@ export class StaticGeometry extends Geometry {
 
     generateBarycentric(): void;
 
-    applyTransform(matrix: math.Matrix4): void;
+    applyTransform(matrix: Matrix4): void;
 
     dispose(gl: WebGLRenderingContext): void;
 

@@ -7,9 +7,9 @@ import { Base } from './core/Base';
 export interface INodeOption {
     name?: string;
     autoUpdateLocalTransform?: boolean;
-    position?: math.Vector3;
-    rotation?: math.Quaternion;
-    scale?: math.Vector3;
+    position?: Vector3;
+    rotation?: Quaternion;
+    scale?: Vector3;
 }
 
 export class Node extends core.Base {
@@ -24,15 +24,15 @@ export class Node extends core.Base {
 
     autoUpdateLocalTransform: boolean;
 
-    position: math.Vector3;
+    position: Vector3;
 
-    rotation: math.Quaternion;
+    rotation: Quaternion;
 
-    scale: math.Vector3;
+    scale: Vector3;
 
-    worldTransform: math.Matrix4;
+    worldTransform: Matrix4;
 
-    localTransform: math.Matrix4;
+    localTransform: Matrix4;
 
     isRenderable(): boolean;
 
@@ -54,9 +54,9 @@ export class Node extends core.Base {
 
     traverse(callback: (current: Node, parent: Node) => void, parent?: Node, ctor?: Function): void;
 
-    setLocalTransform(matrix: math.Matrix4): void;
+    setLocalTransform(matrix: Matrix4): void;
 
-    setWorldTransform(matrix: math.Matrix4): void;
+    setWorldTransform(matrix: Matrix4): void;
 
     decomposeLocalTransform(): void;
 
@@ -68,11 +68,11 @@ export class Node extends core.Base {
 
     update(forceUpdateWorld: boolean): void;
 
-    getWorldPosition(out?: math.Vector3): math.Vector3;
+    getWorldPosition(out?: Vector3): Vector3;
 
     clone(): Node;
 
-    rotateAround(point: math.Vector3, axis: math.Vector3, angle: number): void;
+    rotateAround(point: Vector3, axis: Vector3, angle: number): void;
 
-    lookAt(target: math.Vector3, up?: math.Vector3);
+    lookAt(target: Vector3, up?: Vector3);
 }

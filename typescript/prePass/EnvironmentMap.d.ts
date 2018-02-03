@@ -7,7 +7,7 @@
 
 
 interface IEnvironmentMapOption {
-    position?: math.Vector3;
+    position?: Vector3;
     far?: number;
     near?: number;
     texture?: clay.texture.TextureCube;
@@ -17,7 +17,7 @@ export class EnvironmentMap extends core.Base {
 
     constructor(option?: IEnvironmentMapOption);
 
-    position: math.Vector3;
+    position: Vector3;
 
     far: number;
 

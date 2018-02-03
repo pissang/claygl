@@ -1,13 +1,19 @@
-///<reference path="../DynamicGeometry.d.ts" />
+import { Geometry } from '../Geometry'
 
-interface ICubeGeometryOption extends IGeometryOption {
+interface ICubeGeometryOption {
     widthSegments?: number;
     heightSegements?: number;
     depthSegments?: number;
     inside?: boolean;
 }
 
-export class Cube extends DynamicGeometry{
+export class Cube extends Geometry {
 
     constructor(option?: ICubeGeometryOption);
+
+    widthSegments?: number;
+    heightSegements?: number;
+    depthSegments?: number;
+    inside?: boolean;
+
 }

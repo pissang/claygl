@@ -1,8 +1,8 @@
-export module glinfo {
+export class GLInfo {
 
-    export function initialize(gl: WebGLRenderingContext): void;
+    constructor(gl: WebGLRenderingContext)
 
-    export function getExtension(gl: WebGLRenderingContext, name: String): any;
+    getExtension(name: String): any;
 
-    export function dispose(gl: WebGLRenderingContext): void;
+    getParameter(name: String): any;
 }

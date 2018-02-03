@@ -1,21 +1,14 @@
-///<reference path="Node.d.ts" />
-export namespace clay {
+import { CompositorNode } from './CompositorNode';
 
-    export module compositor {
+export class Graph {
 
-        export class Graph {
+    nodes: CompositorNode[];
 
-            nodes: Node[];
+    addNode(node: CompositorNode): void;
 
-            addNode(node: Node): void;
+    removeNode(node: CompositorNode): void;
 
-            removeNode(node: Node): void;
+    findNode(name: string): CompositorNode;
 
-            findNode(name: string): Node;
-
-            update(): void;
-
-            findPin(input: ICompositorNodeInput): void;
-        }
-    }
+    update(): void;
 }
