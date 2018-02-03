@@ -1,4 +1,4 @@
-///<reference path="core/Base.d.ts" />
+import { Base } from './core/Base';
 
 
 interface ITextureOption {

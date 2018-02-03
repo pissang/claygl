@@ -1,5 +1,5 @@
-///<reference path="Node.d.ts" />
-///<reference path="core/Base.d.ts" />
+import { Node } from './Node';
+import { Base } from './core/Base';
 
 export class Joint extends core.Base{
 
@@ -10,6 +10,4 @@ export class Joint extends core.Base{
     parentIndex: number;
 
     node: Node;
-
-    rootNode: Node;
 }

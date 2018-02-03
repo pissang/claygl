@@ -36,20 +36,21 @@ glob('**/*.js', {
 
     var namespace = {};
 
-    var tsReferenceList = [];
+    // var tsReferenceList = [];
 
     files.forEach(function(file){
+        var filePathWithOutExt = file.slice(0, -3);
         if (
             file.match(/claygl.*?\.js/)
             || file.indexOf('_') >= 0
             || file.endsWith('.glsl.js')
+            || blacklist.find(function (item) {
+                return filePathWithOutExt.indexOf(item) >= 0;
+            })
         ) {
             return;
         }
-        var filePathWithOutExt = file.slice(0, -3);
-        if (blacklist.indexOf(filePathWithOutExt) >= 0) {
-            return;
-        }
+
         var pathArray = filePathWithOutExt.split('/');
         var baseName = pathArray.pop() + '$' + idx++;
 
@@ -62,11 +63,11 @@ glob('**/*.js', {
 
         object[baseName] = `import ${baseName} from './${filePathWithOutExt}';`;
 
-        var tsPath = TS_ROOT + filePathWithOutExt + '.d.ts';
+        // var tsPath = TS_ROOT + filePathWithOutExt + '.d.ts';
 
-        if (fs.existsSync(tsPath)) {
-            tsReferenceList.push(filePathWithOutExt);
-        }
+        // if (fs.existsSync(tsPath)) {
+        //     tsReferenceList.push(filePathWithOutExt);
+        // }
     });
 
     var exportCode = exportPkg(namespace);

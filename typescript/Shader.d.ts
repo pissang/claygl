@@ -1,5 +1,5 @@
-///<reference path="core/util.d.ts" />
-///<reference path="core/Base.d.ts" />
+import { IDictionary, IList } from './core/container';
+import { Base } from './core/Base';
 
 interface IShaderAttribSemantic {
     symbol: string;
@@ -25,7 +25,7 @@ interface IShaderAttributeTemplate {
     semantic: string;
 }
 
-interface IShaderUniform {
+export interface IShaderUniform {
     type: string;
     value: any;
 }

@@ -1,8 +1,8 @@
-interface IList<T> {
+export interface IList<T> {
     [index: number]: T;
     length: number;
 }
 
-interface IDictionary<T> {
+export interface IDictionary<T> {
     [index: string]: T;
 }

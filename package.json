@@ -11,9 +11,10 @@
     "url": "https://github.com/pissang"
   },
   "jsnext:main": "dist/claygl.es.js",
-  "module": "dist/claygl.es.js",
+  "module": "src/claygl.js",
   "main": "dist/claygl.js",
   "types": "index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "npm run glsl2js && npm run gen:entry && rollup -c && uglifyjs dist/claygl.js -c -m > dist/claygl.min.js",
     "build:sourcemap": "npm run gen:entry && rollup --sourcemap inline -c",

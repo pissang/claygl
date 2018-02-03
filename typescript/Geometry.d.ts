@@ -1,7 +1,7 @@
-///<reference path="math/BoundingBox.d.ts" />
-///<reference path="core/Base.d.ts" />
-///<reference path="core/Cache.d.ts" />
-///<reference path="math/Matrix4.d.ts" />
+import { BoundingBox } from './math/BoundingBox';
+import { Base } from './core/Base';
+import { Matrix4 } from './math/Matrix4';
+
 
 interface IGeometryAttributeBuffer {
     name: string;
@@ -46,7 +46,7 @@ export class StaticGeometry extends Geometry {
 
     hint: number;
 
-    boundingBox: math.BoundingBox;
+    boundingBox: BoundingBox;
 
     dirty(): void;
 

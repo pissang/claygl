@@ -1,5 +1,5 @@
-///<reference path="core/Base.d.ts" />
-///<reference path="Shader.d.ts" />
+import { Base } from './core/Base';
+import { Shader, IShaderUniform } from './Shader';
 
 interface IMaterialOption {
     name?: string;

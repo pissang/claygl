@@ -1,5 +1,4 @@
-///<reference path="Node.d.ts" />
-
+import { Node } from './Node';
 
 interface ILightOption extends INodeOption {}
 

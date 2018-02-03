@@ -1,8 +1,8 @@
-///<reference path="core/Base.d.ts" />
-///<reference path="Scene.d.ts" />
-///<reference path="math/Vector3.d.ts" />
-///<reference path="math/Quaternion.d.ts" />
-///<reference path="math/Matrix4.d.ts" />
+import { Vector3 } from './math/Vector3';
+import { Quaternion } from './math/Quaternion';
+import { Matrix4 } from './math/Matrix4';
+import { Scene } from './Scene';
+import { Base } from './core/Base';
 
 export interface INodeOption {
     name?: string;

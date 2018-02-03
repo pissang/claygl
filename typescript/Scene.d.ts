@@ -1,7 +1,7 @@
-///<reference path="Material.d.ts" />
-///<reference path="Renderable.d.ts" />
-///<reference path="Shader.d.ts" />
-///<reference path="Node.d.ts" />
+import { Material } from './Material';
+import { Renderable } from './Renderable';
+import { Shader } from './Shader';
+import { Node } from './Node';
 
 interface ISceneOption extends INodeOption {
     material?: Material;

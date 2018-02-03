@@ -1,6 +1,6 @@
-///<reference path="core/Base.d.ts" />
-///<reference path="Joint.d.ts" />
-///<reference path="animation/SkinningClip.d.ts" />
+import { Base } from './core/Base';
+import { Joint } from './Joint';
+import { SkinningClip } from './animation/SkinningClip';
 
 
 interface ISkeletonClipEntry {

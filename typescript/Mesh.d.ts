@@ -1,5 +1,5 @@
-///<reference path="Renderable.d.ts" />
-///<reference path="Skeleton.d.ts" />
+import { Renderable } from './Renderable';
+import { Skeleton } from './Skeleton';
 
 interface IMeshOption extends IRenderableOption {
     skeleton?: Skeleton;

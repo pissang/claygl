@@ -1,4 +1,5 @@
-///<reference path="container.d.ts" />
+import { IList, IDictionary } from './container';
+
 export namespace util {
 
     interface ListIterator<T, TResult> {

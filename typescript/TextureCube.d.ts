@@ -1,4 +1,4 @@
-///<reference path="./Texture.d.ts" />
+import { Texture } from './Texture';
 
 interface ITextureCubeImages {
     px: HTMLElement;

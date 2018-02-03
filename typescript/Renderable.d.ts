@@ -1,7 +1,7 @@
-///<reference path="Node.d.ts" />
-///<reference path="Material.d.ts" />
-///<reference path="Geometry.d.ts" />
-///<reference path="Skeleton.d.ts" />
+import { Node } from './Node';
+import { Material } from './Material';
+import { Geometry } from './Geometry';
+import { Skeleton } from './Skeleton';
 
 interface IRenderableOption extends INodeOption {
 
