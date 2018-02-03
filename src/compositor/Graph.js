@@ -8,7 +8,7 @@ import GraphNode from './Node';
 var Graph = Base.extend(function () {
     return /** @lends clay.compositor.Graph# */ {
         /**
-         * @type {Array.<clay.compositor.Node>}
+         * @type {Array.<clay.compositor.CompositorNode>}
          */
         nodes: []
     };
@@ -23,7 +23,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param {clay.compositor.Node} node
+     * @param {clay.compositor.CompositorNode} node
      */
     addNode: function (node) {
 
@@ -36,7 +36,7 @@ var Graph = Base.extend(function () {
         this._dirty = true;
     },
     /**
-     * @param  {clay.compositor.Node|string} node
+     * @param  {clay.compositor.CompositorNode|string} node
      */
     removeNode: function (node) {
         if (typeof node === 'string') {
@@ -50,7 +50,7 @@ var Graph = Base.extend(function () {
     },
     /**
      * @param {string} name
-     * @return {clay.compositor.Node}
+     * @return {clay.compositor.CompositorNode}
      */
     getNodeByName: function (name) {
         for (var i = 0; i < this.nodes.length; i++) {

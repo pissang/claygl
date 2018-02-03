@@ -6,12 +6,12 @@ import Base from '../core/Base';
 /**
  * Node of graph based post processing.
  *
- * @constructor clay.compositor.Node
+ * @constructor clay.compositor.CompositorNode
  * @extends clay.core.Base
  *
  */
-var Node = Base.extend(function () {
-    return /** @lends clay.compositor.Node# */ {
+var CompositorNode = Base.extend(function () {
+    return /** @lends clay.compositor.CompositorNode# */ {
         /**
          * @type {string}
          */
@@ -54,7 +54,7 @@ var Node = Base.extend(function () {
         _compositor: null
     };
 },
-/** @lends clay.compositor.Node.prototype */
+/** @lends clay.compositor.CompositorNode.prototype */
 {
 
     // TODO Remove parameter function callback
@@ -243,4 +243,4 @@ var Node = Base.extend(function () {
     }
 });
 
-export default Node;
+export default CompositorNode;

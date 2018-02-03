@@ -1,6 +1,6 @@
 // TODO Shader library
 import Pass from './Pass';
-import Node from './Node';
+import CompositorNode from './CompositorNode';
 
 // TODO curlnoise demo wrong
 
@@ -11,10 +11,10 @@ import Node from './Node';
  * Filter node
  *
  * @constructor clay.compositor.FilterNode
- * @extends clay.compositor.Node
+ * @extends clay.compositor.CompositorNode
  *
  * @example
-    var node = new clay.compositor.Node({
+    var node = new clay.compositor.FilterNode({
         name: 'fxaa',
         shader: clay.Shader.source('clay.compositor.fxaa'),
         inputs: {
@@ -42,7 +42,7 @@ import Node from './Node';
     *
     */
 var FilterNode = Node.extend(function () {
-    return /** @lends clay.compositor.Node# */ {
+    return /** @lends clay.compositor.FilterNode# */ {
         /**
          * @type {string}
          */
@@ -111,7 +111,7 @@ var FilterNode = Node.extend(function () {
     });
     this.pass = pass;
 },
-/** @lends clay.compositor.Node.prototype */
+/** @lends clay.compositor.FilterNode.prototype */
 {
     /**
      * @param  {clay.Renderer} renderer

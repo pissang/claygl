@@ -1,12 +1,12 @@
-import Node from './Node';
+import CompositorNode from './CompositorNode';
 import glenum from '../core/glenum';
 import FrameBuffer from '../FrameBuffer';
 
 /**
  * @constructor clay.compositor.SceneNode
- * @extends clay.compositor.Node
+ * @extends clay.compositor.CompositorNode
  */
-var SceneNode = Node.extend(
+var SceneNode = CompositorNode.extend(
 /** @lends clay.compositor.SceneNode# */
 {
     name: 'scene',

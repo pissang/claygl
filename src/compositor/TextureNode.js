@@ -1,10 +1,10 @@
-import Node from './Node';
+import CompositorNode from './CompositorNode';
 
 /**
  * @constructor clay.compositor.TextureNode
- * @extends clay.compositor.Node
+ * @extends clay.compositor.CompositorNode
  */
-var TextureNode = Node.extend(function() {
+var TextureNode = CompositorNode.extend(function() {
     return /** @lends clay.compositor.TextureNode# */ {
         /**
          * @type {clay.Texture2D}

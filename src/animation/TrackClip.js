@@ -90,14 +90,14 @@ TrackClip.prototype.calcLifeFromTracks = function () {
 };
 
 /**
- * @param {clay.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} track
  */
 TrackClip.prototype.addTrack = function (track) {
     this.tracks.push(track);
 };
 
 /**
- * @param {clay.animation.SamplerTrack} jointClip
+ * @param {clay.animation.SamplerTrack} track
  */
 TrackClip.prototype.removeTarck = function (track) {
     var idx = this.tracks.indexOf(track);
