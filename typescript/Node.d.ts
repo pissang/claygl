@@ -12,7 +12,7 @@ export interface INodeOption {
     scale?: Vector3;
 }
 
-export class Node extends core.Base {
+export class Node extends Base {
 
     constructor(option?: INodeOption);
 

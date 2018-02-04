@@ -1,7 +1,7 @@
 import { Node } from './Node';
 import { Base } from './core/Base';
 
-export class Joint extends core.Base{
+export class Joint extends Base{
 
     name: string;
 

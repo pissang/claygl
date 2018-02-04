@@ -1,5 +1,6 @@
 import { Base } from './core/Base';
 import { Shader, IShaderUniform } from './Shader';
+import { Renderer } from './Renderer';
 
 interface IMaterialOption {
     name?: string;
@@ -10,7 +11,7 @@ interface IMaterialOption {
     blend?: (gl: WebGLRenderingContext) => void;
 }
 
-export class Material extends core.Base {
+export class Material extends Base {
 
     constructor(option?: IMaterialOption);
 
@@ -28,9 +29,9 @@ export class Material extends core.Base {
 
     precision: string;
 
-    blend: (gl: WebGLRenderingContext) => void;
+    blend: (renderer: Renderer) => void;
 
-    bind(gl: WebGLRenderingContext): void;
+    bind(renderer: Renderer): void;
 
     setUniform(symbol: string, value: any): void;
 

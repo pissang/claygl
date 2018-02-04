@@ -1,6 +1,6 @@
-///<reference path="Matrix3.d.ts" />
-///<reference path="Matrix4.d.ts" />
-///<reference path="Vector3.d.ts" />
+import { Matrix3 } from './Matrix3';
+import { Matrix4 } from './Matrix4';
+import { Vector3 } from './Vector3';
 
 
 export class Quaternion {

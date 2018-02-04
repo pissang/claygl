@@ -36,7 +36,7 @@ interface IAnimator<T> {
     done(callback: Function): IAnimator<T>;
 }
 
-export class Timeline extends clay.core.Base {
+export class Timeline extends clay.Base {
 
     constructor(option?: IAnimationOption);
 

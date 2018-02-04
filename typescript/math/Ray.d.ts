@@ -1,5 +1,5 @@
-///<reference path="Vector3.d.ts" />
-///<reference path="Plane.d.ts" />
+import { Vector3 } from './Vector3';
+import { Plane } from './Plane';
 
 
 export class Ray {

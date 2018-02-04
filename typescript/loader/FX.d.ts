@@ -9,7 +9,7 @@ export module loader {
         bufferRootPath?: string;
     }
 
-    export class FX extends core.Base {
+    export class FX extends Base {
 
         constructor(option?: IFXLoaderOption);
 

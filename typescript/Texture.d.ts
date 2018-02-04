@@ -18,7 +18,7 @@ interface ITextureOption {
     dynamic?: boolean;
 }
 
-export class Texture extends core.Base {
+export class Texture extends Base {
 
     constructor(option?: ITextureOption);
 

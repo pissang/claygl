@@ -1,35 +1,30 @@
-///<reference path="../Renderer.d.ts" />
-///<reference path="../Scene.d.ts" />
-///<reference path="../Camera.d.ts" />
-export namespace clay {
+import { Renderer } from '../Renderer';
+import { Scene } from '../Scene';
+import { Camera } from '../Camera';
 
-    export module prePass {
+interface IShadowMapOption {
+    softShadow?: number;
+    shadowBlur?: number;
+    shadowCascade?: number;
+    cascadeSplitLogFactor?: number;
+}
 
-        interface IShadowMapOption {
-            softShadow?: number;
-            shadowBlur?: number;
-            shadowCascade?: number;
-            cascadeSplitLogFactor?: number;
-        }
+export class ShadowMap {
 
-        export class ShadowMap {
+    softShadow: number;
 
-            softShadow: number;
+    shadowBlur: number;
 
-            shadowBlur: number;
+    shadowCascade: number;
 
-            shadowCascade: number;
+    cascadeSplitLogFactor: number;
 
-            cascadeSplitLogFactor: number;
+    render(renderer: Renderer, scene: Scene, sceneCamera?: Camera): void;
 
-            render(renderer: Renderer, scene: Scene, sceneCamera?: Camera): void;
+    renderDebug(renderer: Renderer, size?: number): void;
 
-            renderDebug(renderer: Renderer, size?: number): void;
+    dispose(renderer: Renderer): void;
 
-            dispose(gl: WebGLRenderingContext): void;
-
-            static VSM: number;
-            static PCF: number;
-        }
-    }
+    static VSM: number;
+    static PCF: number;
 }

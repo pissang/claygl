@@ -1,9 +1,9 @@
-///<reference path="../core/Base.d.ts" />
-///<reference path="../math/Vector3.d.ts" />
-///<reference path="../math/Vector3.d.ts" />
-///<reference path="../TextureCube.d.ts" />
-///<reference path="../Renderer.d.ts" />
-///<reference path="../Scene.d.ts" />
+import { Base } from '../core/Base';
+import { Vector3 } from '../math/Vector3';
+import { Vector3 } from '../math/Vector3';
+import { TextureCube } from '../TextureCube';
+import { Renderer } from '../Renderer';
+import { Scene } from '../Scene';
 
 
 interface IEnvironmentMapOption {
@@ -13,7 +13,7 @@ interface IEnvironmentMapOption {
     texture?: clay.texture.TextureCube;
 }
 
-export class EnvironmentMap extends core.Base {
+export class EnvironmentMap extends Base {
 
     constructor(option?: IEnvironmentMapOption);
 

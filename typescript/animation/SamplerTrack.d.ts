@@ -1,11 +1,6 @@
-
-interface ISamplerTrackOption {
-
-}
-
 export class SamplerTrack {
 
-    constructor(option?: ISamplerTrackOption);
+    constructor();
 
     name: string;
 

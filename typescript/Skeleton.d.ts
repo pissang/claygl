@@ -8,7 +8,7 @@ interface ISkeletonClipEntry {
     maps: number[]
 }
 
-export class Skeleton extends core.Base {
+export class Skeleton extends Base {
 
     name: string;
 

@@ -1,7 +1,8 @@
-///<reference path="../Texture2D.d.ts" />
-///<reference path="../TextureCube.d.ts" />
-///<reference path="../Renderer.d.ts" />
-export namespace clay.util.texture {
+import { Texture2D } from '../Texture2D';
+import { TextureCube } from '../TextureCube';
+import { Renderer } from '../Renderer';
+
+export namespace texture {
 
     interface ITextureCubeImageSrc {
         px: string;

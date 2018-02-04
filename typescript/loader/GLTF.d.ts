@@ -38,7 +38,7 @@ interface IGLTFLoaderResult {
     json: Object
 }
 
-export class GLTF extends core.Base {
+export class GLTF extends Base {
 
     constructor(option?: IGLTFLoaderOption);
 

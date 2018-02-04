@@ -1,6 +1,7 @@
 import { BoundingBox } from './math/BoundingBox';
 import { Base } from './core/Base';
 import { Matrix4 } from './math/Matrix4';
+import { Renderer } from './Renderer';
 
 
 interface IGeometryAttributeBuffer {
@@ -42,9 +43,9 @@ export class Geometry extends Base {
 
     attributes: IDefaultStaticGeometryAttributes;
 
-    faces: ArrayBufferView;
+    indices: Uint16Array | Uint32Array;
 
-    hint: number;
+    dynamic: boolean;
 
     boundingBox: BoundingBox;
 
@@ -66,8 +67,6 @@ export class Geometry extends Base {
 
     getEnabledAttributes(): string[];
 
-    getBufferChunks(gl: WebGLRenderingContext) : IGeometryBufferChunk[];
-
     generateTangents(): void;
 
     generateUniqueVertex(): void;
@@ -76,7 +75,7 @@ export class Geometry extends Base {
 
     applyTransform(matrix: Matrix4): void;
 
-    dispose(gl: WebGLRenderingContext): void;
+    dispose(renderer: Renderer): void;
 
     static STATIC_DRAW: number;
     static DYNAMIC_DRAW: number;

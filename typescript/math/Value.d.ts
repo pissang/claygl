@@ -1,5 +1,5 @@
-///<reference path="Vector3.d.ts" />
-///<reference path="Vector2.d.ts" />
+import { Vector3 } from './Vector3';
+import { Vector2 } from './Vector2';
 
 interface ConstantValue {
     get(): number;

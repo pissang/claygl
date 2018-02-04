@@ -1,6 +1,6 @@
-///<reference path="Node.d.ts" />
-///<reference path="../Scene.d.ts" />
-///<reference path="../Camera.d.ts" />
+import { Node } from 'Node';
+import { Scene } from '../Scene';
+import { Camera } from '../Camera';
 
 interface ICompositorSceneNodeOption {
     name?: string;

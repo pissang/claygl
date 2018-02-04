@@ -42,7 +42,7 @@ interface  IShaderOption {
     fragment?: string;
 }
 
-export class Shader extends core.Base {
+export class Shader extends Base {
 
     constructor(option?: IShaderOption);
 

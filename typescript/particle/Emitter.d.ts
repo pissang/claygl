@@ -26,7 +26,7 @@ interface IParticleEmitterOption {
     weight?: IValueGetter1D;
 }
 
-export class Emitter extends core.Base {
+export class Emitter extends Base {
 
     constructor(option?: IParticleEmitterOption);
 

@@ -1,5 +1,5 @@
-///<reference path="Node.d.ts" />
-///<reference path="../Texture.d.ts" />
+import { Node } from 'Node';
+import { Texture } from '../Texture';
 
 interface ICompositorTextureNodeOption {
     name?: string;

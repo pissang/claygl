@@ -1,7 +1,7 @@
-///<reference path="BoundingBox.d.ts" />
-///<reference path="Vector3.d.ts" />
-///<reference path="Matrix4.d.ts" />
-///<reference path="Frustum.d.ts" />
+import { BoundingBox } from './BoundingBox';
+import { Vector3 } from './Vector3';
+import { Matrix4 } from './Matrix4';
+import { Frustum } from './Frustum';
 
 export class Plane {
 
