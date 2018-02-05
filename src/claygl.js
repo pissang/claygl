@@ -32,10 +32,10 @@ import Camera$12 from './Camera';
 import Orthographic$13 from './camera/Orthographic';
 import Perspective$14 from './camera/Perspective';
 import Compositor$15 from './compositor/Compositor';
-import createCompositor$16 from './compositor/createCompositor';
-import FilterNode$17 from './compositor/FilterNode';
-import Graph$18 from './compositor/Graph';
-import Node$19 from './compositor/Node';
+import CompositorNode$16 from './compositor/CompositorNode';
+import createCompositor$17 from './compositor/createCompositor';
+import FilterNode$18 from './compositor/FilterNode';
+import Graph$19 from './compositor/Graph';
 import Pass$20 from './compositor/Pass';
 import SceneNode$21 from './compositor/SceneNode';
 import TextureNode$22 from './compositor/TextureNode';
@@ -166,10 +166,10 @@ export { camera };
 
 var compositor = {
     Compositor : Compositor$15,
-    createCompositor : createCompositor$16,
-    FilterNode : FilterNode$17,
-    Graph : Graph$18,
-    Node : Node$19,
+    CompositorNode : CompositorNode$16,
+    createCompositor : createCompositor$17,
+    FilterNode : FilterNode$18,
+    Graph : Graph$19,
     Pass : Pass$20,
     SceneNode : SceneNode$21,
     TextureNode : TextureNode$22,

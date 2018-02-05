@@ -15,7 +15,6 @@ import Timeline from './Timeline';
 import CubeGeo from './geometry/Cube';
 import SphereGeo from './geometry/Sphere';
 import PlaneGeo from './geometry/Plane';
-import Geometry from './Geometry';
 import ParametricSurfaceGeo from './geometry/ParametricSurface';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
@@ -36,7 +35,6 @@ import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
-import DeferredRenderer from './deferred/Renderer';
 import LRUCache from './core/LRU';
 import util from './core/util';
 import shUtil from './util/sh';
@@ -60,7 +58,24 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @typedef {string|Array.<number>} Color
  */
 /**
- * @typedef {HTMLDomElement|string} DomQuery
+ * @typedef {HTMLElement|string} DomQuery
+ */
+
+/**
+ * @typedef {Object} App3DNamespace
+ * @property {Function} init Initialization callback that will be called when initing app.
+ *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
+ * @property {Function} loop Loop callback that will be called each frame.
+ * @property {Function} beforeRender
+ * @property {Function} afterRender
+ * @property {number} [width] Container width.
+ * @property {number} [height] Container height.
+ * @property {number} [devicePixelRatio]
+ * @property {Object} [graphic] Graphic configuration including shadow, postEffect
+ * @property {boolean} [graphic.shadow=false] If enable shadow
+ * @property {boolean} [graphic.linear=false] If use linear space
+ * @property {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
+ * @property {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
  */
 
 /**
@@ -98,20 +113,7 @@ var app = clay.application.create('#viewport', {
  * @constructor
  * @alias clay.application.App3D
  * @param {DomQuery} dom Container dom element or a selector string that can be used in `querySelector`
- * @param {Object} appNS
- * @param {Function} appNS.init Initialization callback that will be called when initing app.
- *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
- * @param {Function} appNS.loop Loop callback that will be called each frame.
- * @param {Function} appNS.beforeRender
- * @param {Function} appNS.afterRender
- * @param {number} [appNS.width] Container width.
- * @param {number} [appNS.height] Container height.
- * @param {number} [appNS.devicePixelRatio]
- * @param {Object} [appNS.graphic] Graphic configuration including shadow, postEffect
- * @param {boolean} [appNS.graphic.shadow=false] If enable shadow
- * @param {boolean} [appNS.graphic.linear=false] If use linear space
- * @param {boolean} [appNS.graphic.tonemapping=false] If enable ACES tone mapping.
- * @param {boolean} [appNS.event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+ * @param {App3DNamespace} appNS Options and namespace used in creating app3D
  */
 function App3D(dom, appNS) {
 
@@ -154,7 +156,7 @@ function App3D(dom, appNS) {
         /**
          * Container dom element
          * @name clay.application.App3D#container
-         * @type {HTMLDomElement}
+         * @type {HTMLElement}
          */
         container: { get: function () { return dom; } },
         /**
@@ -1279,21 +1281,8 @@ export default {
      *
      * @name clay.application.create
      * @method
-     * @param {HTMLDomElement|string} dom Container dom element or a selector string that can be used in `querySelector`
-     * @param {Object} appNS
-     * @param {Function} appNS.init Initialization callback that will be called when initing app.
-     *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
-     * @param {Function} appNS.loop Loop callback that will be called each frame.
-     * @param {Function} appNS.beforeRender
-     * @param {Function} appNS.afterRender
-     * @param {number} [appNS.width] Container width.
-     * @param {number} [appNS.height] Container height.
-     * @param {number} [appNS.devicePixelRatio]
-     * @param {Object} [appNS.graphic] Graphic configuration including shadow, postEffect
-     * @param {boolean} [appNS.graphic.shadow=false] If enable shadow
-     * @param {boolean} [appNS.graphic.linear=false] If use linear space
-     * @param {boolean} [appNS.graphic.tonemapping=false] If enable ACES tone mapping.
-     * @param {boolean} [appNS.event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+     * @param {HTMLElement|string} dom Container dom element or a selector string that can be used in `querySelector`
+     * @param {App3DNamespace} appNS Options and namespace used in creating app3D
      *
      * @return {clay.application.App3D}
      *

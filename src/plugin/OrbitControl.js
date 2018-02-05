@@ -29,7 +29,7 @@ var OrbitControl = Base.extend(function () {
         timeline: null,
 
         /**
-         * @type {HTMLDomElement}
+         * @type {HTMLElement}
          */
         domElement: null,
 

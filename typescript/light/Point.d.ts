@@ -8,7 +8,7 @@ export class Point extends Light {
 
     constructor(option?: IPointLightOption);
 
-    type: string;
+    type: 'POINT_LIGHT';
 
     range: number;
 

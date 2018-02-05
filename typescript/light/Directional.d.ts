@@ -9,7 +9,7 @@ export class Directional extends Light {
 
     constructor(option?: IDirectionalLightOption);
 
-    type: string;
+    type: 'DIRECTIONAL_LIGHT';
 
     range: number;
 

@@ -25,7 +25,7 @@ interface IGLTFLoaderOption {
     shaderName?: string;
 }
 
-interface IGLTFLoaderResult {
+export interface IGLTFLoaderResult {
     scene?: Scene;
     rootNode?: Node;
     nodes: Nodes[];

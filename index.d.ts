@@ -25,3 +25,5 @@ export * from './typescript/math/Plane';
 export * from './typescript/math/Value';
 export * from './typescript/math/BoundingBox';
 export * from './typescript/math/Ray';
+
+export * from './typescript/application';

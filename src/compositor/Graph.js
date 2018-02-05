@@ -1,5 +1,5 @@
 import Base from '../core/Base';
-import GraphNode from './Node';
+import GraphNode from './CompositorNode';
 
 /**
  * @constructor clay.compositor.Graph

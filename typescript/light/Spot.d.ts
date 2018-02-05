@@ -26,7 +26,7 @@ export class Spot extends Light {
 
     shadowSlopeScale: number;
 
-    type: string;
+    type: 'SPOT_LIGHT';
 
     // uniformTemplates : {
 

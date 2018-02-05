@@ -6,7 +6,9 @@ export class Ambient extends Light {
 
     constructor(option?: IAmbientLightOption);
 
-    type: string;
+    type: 'AMBIENT_LIGHT';
+
+    castShadow: false;
 
     // uniformTemplates : {
 

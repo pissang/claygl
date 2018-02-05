@@ -15,7 +15,7 @@ interface IRendererOption {
     width?: number;
     height?: number;
     devicePixelRatio?: number;
-    color?: number[];
+    clearColor?: number[];
     alhpa?: boolean;
     depth?: boolean;
     stencil?: boolean;
@@ -54,9 +54,9 @@ export class Renderer {
 
     devicePixelRatio: number;
 
-    color: any;
+    clearColor: number[];
 
-    clear: number;
+    clearBit: number;
 
     alhpa: boolean;
 
