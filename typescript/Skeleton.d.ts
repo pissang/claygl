@@ -1,10 +1,10 @@
 import { Base } from './core/Base';
 import { Joint } from './Joint';
-import { SkinningClip } from './animation/SkinningClip';
+import { TrackClip } from './animation/TrackClip';
 
 
 interface ISkeletonClipEntry {
-    clip: animation.SkinningClip;
+    clip: TrackClip;
     maps: number[]
 }
 
@@ -26,13 +26,13 @@ export class Skeleton extends Base {
 
     getSubSkinMatrices(meshId: number, joints: number[]): Float32Array;
 
-    addClip(clip: animation.SkinningClip, mapRule?: Object): number;
+    addClip(clip: TrackClip, mapRule?: Object): number;
 
-    removeClip(clip: animation.SkinningClip): void;
+    removeClip(clip: TrackClip): void;
 
     removeClipsAll(): void;
 
-    getClip(index: number): animation.SkinningClip;
+    getClip(index: number): TrackClip;
 
     getClipNumber(): number;
 

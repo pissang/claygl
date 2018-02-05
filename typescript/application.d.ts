@@ -61,8 +61,8 @@ interface IMaterialBasicConfig {
 
 interface IStandardMRMaterialConfig {
     shader: 'clay.standardMR';
-    color?: ColorLike;
-    emission?: ColorLike;
+    color?: RGBLike;
+    emission?: RGBLike;
 
     alpha?: number;
     roughness?: number;
@@ -80,9 +80,9 @@ interface IStandardMRMaterialConfig {
 type MaterialConfig = IMaterialBasicConfig|IStandardMRMaterialConfig;
 type MaterialLike = MaterialConfig|Material;
 
-type Vector3Like = Vector3|number[]|Float32Array|Float64Array;
+type Vector3Like = Vector3|[number, number, number]|Float32Array|Float64Array;
 
-type ColorLike = number[]|string;
+type RGBLike = [number, number, number]|string;
 
 export namespace application {
 
@@ -143,10 +143,10 @@ export namespace application {
         createCamera(position?: Vector3Like, target?: Vector3Like, type?: 'orthographic'|'ortho'|'perspective'): PerspectiveCamera|OrthographicCamera;
         createCamera(position?: Vector3Like, target?: Vector3Like, type?: 'orthographic'|'ortho', extent?: Vector3Like): PerspectiveCamera|OrthographicCamera;
 
-        createDirectionalLight(direction?: Vector3Like, color?: ColorLike, intensity?: number): DirectionalLight;
-        createSpotLight(position?: Vector3Like, target?: Vector3Like, range?: number, color?: ColorLike, intensity?: number): SpotLight;
-        createPointLight(position?: Vector3Like, range?: number, color?: ColorLike, intensity?: number): PointLight;
-        createAmbientLight(color?: ColorLike, intensity?: number): AmbientLight;
+        createDirectionalLight(direction?: Vector3Like, color?: RGBLike, intensity?: number): DirectionalLight;
+        createSpotLight(position?: Vector3Like, target?: Vector3Like, range?: number, color?: RGBLike, intensity?: number): SpotLight;
+        createPointLight(position?: Vector3Like, range?: number, color?: RGBLike, intensity?: number): PointLight;
+        createAmbientLight(color?: RGBLike, intensity?: number): AmbientLight;
         createAmbientCubemapLight(envImage: ImageLike|TextureCube, specularIntensity?: number, diffuseIntensity?: number, exposure?: number, prefilteredCubemapSize?: number): {
             specular: AmbientCubemapLight,
             diffuse: AmbientSHLight,
