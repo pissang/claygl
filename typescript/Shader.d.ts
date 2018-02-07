@@ -1,5 +1,4 @@
 import { IDictionary, IList } from './core/container';
-import { Base } from './core/Base';
 
 interface IShaderAttribSemantic {
     symbol: string;
@@ -37,14 +36,9 @@ interface ILightNumber {
     AREA_LIGHT: number;
 }
 
-interface  IShaderOption {
-    vertex?: string;
-    fragment?: string;
-}
+export class Shader {
 
-export class Shader extends Base {
-
-    constructor(option?: IShaderOption);
+    constructor(vertex: string, fragment: string);
 
     vertex: string;
 
