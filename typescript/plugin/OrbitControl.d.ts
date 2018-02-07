@@ -1,43 +1,85 @@
 import { Node } from '../Node';
 import { Vector3 } from '../math/Vector3';
+import { Timeline } from '../Timeline';
 
 interface IOrbitControlOption {
     target?: Node;
     domElement?: HTMLElement;
-    sensitivity?: number;
-    origin?: Vector3;
-    up?: Vector3;
+    timeline?: Timeline;
+
     minDistance?: number;
     maxDistance?: number;
-    minPolarAngle?: number;
-    maxPolarAngle?: number;
+
+    minAlpha?: number;
+    maxAlpha?: number;
+
+    minBeta?: number;
+    maxBeta?: number;
+
+    autoRotate?: boolean;
+    autoRotateAfterStill?: number;
+    autoRotateDirection?: 'cw'|'ccw';
+    autoRotateSpeed?: number;
+
+    damping?: number;
+    rotateSensitivity?: number;
+    zoomSensitivity?: number;
+    panSensitivity?: number;
 }
 
 export class OrbitControl {
 
     constructor(option?: IOrbitControlOption);
 
-    target: Node;
+    target?: Node;
+    domElement?: HTMLElement;
+    timeline?: Timeline;
 
-    domElement: HTMLElement;
+    minDistance?: number;
+    maxDistance?: number;
 
-    sensitivity: number;
+    minAlpha?: number;
+    maxAlpha?: number;
 
-    origin: Vector3;
+    minBeta?: number;
+    maxBeta?: number;
 
-    up: Vector3;
+    autoRotateAfterStill?: number;
+    autoRotateDirection?: 'cw'|'ccw';
+    autoRotateSpeed?: number;
 
-    minDistance: number;
+    damping?: number;
+    rotateSensitivity?: number;
+    zoomSensitivity?: number;
+    panSensitivity?: number
 
-    maxDistance: number;
+    init(): void;
 
-    minPolarAngle: number;
+    dispose(): void;
 
-    maxPolarAngle: number;
+    getDistance(): number;
+    setDistance(distance: number): void;
 
-    enable(): void;
+    getAlpha(): number;
+    setAlpha(alpha: number): void;
 
-    disable(): void;
+    getBeta(): number;
+    setBeta(beta: number): void;
+
+    getCenter(): [number, number, number];
+    setCenter(center: [number, number, number]): void;
+
+    animateTo(opts: {
+        distance?: number;
+        alpha?: number;
+        beta?: number;
+        center?: [number, number, number];
+        duration?: number;
+        easing?: string|function;
+        done?: () => void;
+    });
+
+    stopAllAnimation(): void;
 
     update(deltaTime: number): void;
 }

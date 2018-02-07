@@ -304,6 +304,7 @@ var OrbitControl = Base.extend(function () {
      * @param {number} opts.distance
      * @param {number} opts.alpha
      * @param {number} opts.beta
+     * @param {Array.<number>} opts.center
      * @param {number} [opts.duration=1000]
      * @param {number} [opts.easing='linear']
      * @param {number} [opts.done]
