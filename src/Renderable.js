@@ -1,38 +1,12 @@
 import Node from './Node';
 import glenum from './core/glenum';
 
-// Cache
-var prevDrawID = 0;
-var prevDrawIndicesBuffer = null;
-var prevDrawIsUseIndices = true;
-
-var currentDrawID;
-
-var RenderInfo = function() {
-    this.triangleCount = 0;
-    this.vertexCount = 0;
-    this.drawCallCount = 0;
-};
-
-function VertexArrayObject(
-    availableAttributes,
-    availableAttributeSymbols,
-    indicesBuffer
-) {
-    this.availableAttributes = availableAttributes;
-    this.availableAttributeSymbols = availableAttributeSymbols;
-    this.indicesBuffer = indicesBuffer;
-
-    this.vao = null;
-}
 /**
  * @constructor
  * @alias clay.Renderable
  * @extends clay.Node
  */
-var Renderable = Node.extend(
-/** @lends clay.Renderable# */
-{
+var Renderable = Node.extend(/** @lends clay.Renderable# */ {
     /**
      * @type {clay.Material}
      */
@@ -48,12 +22,7 @@ var Renderable = Node.extend(
      */
     mode: glenum.TRIANGLES,
 
-    _drawCache: null,
-
     _renderInfo: null
-}, function() {
-    this._drawCache = {};
-    this._renderInfo = new RenderInfo();
 },
 /** @lends clay.Renderable.prototype */
 {
@@ -158,209 +127,6 @@ var Renderable = Node.extend(
     },
 
     /**
-     * @param  {clay.Renderer} renderer
-     * @param  {clay.Material} [material]
-     * @return {Object}
-     */
-    render: function (renderer, material, program) {
-        var _gl = renderer.gl;
-        material = material || this.material;
-        // May use shader of other material if shader code are same
-        var shader = material.shader;
-        var geometry = this.geometry;
-
-        var glDrawMode = this.mode;
-
-        var nVertex = geometry.vertexCount;
-
-        var uintExt = renderer.getGLExtension('OES_element_index_uint');
-        // var useUintExt = uintExt && nVertex > 0xffff;
-        var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
-        var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
-
-        var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-        // var vaoExt = null;
-
-        var isStatic = !geometry.dynamic;
-
-        var renderInfo = this._renderInfo;
-        renderInfo.vertexCount = nVertex;
-        renderInfo.triangleCount = 0;
-        renderInfo.drawCallCount = 0;
-        // Draw each chunk
-        var drawHashChanged = false;
-        // Hash with shader id in case previous material has less attributes than next material
-        currentDrawID = renderer.__uid__ + '-' + geometry.__uid__ + '-' + program.__uid__;
-
-        if (currentDrawID !== prevDrawID) {
-            drawHashChanged = true;
-        }
-        else {
-            // The cache will be invalid in the following cases
-            // 1. VAO is enabled and is binded to null after render
-            // 2. Geometry needs update
-            if (
-                // TODO Optimize
-                (vaoExt && isStatic)
-                // PENDING
-                || geometry._cache.isDirty('any')
-            ) {
-                drawHashChanged = true;
-            }
-        }
-        prevDrawID = currentDrawID;
-
-        if (!drawHashChanged) {
-            // Direct draw
-            if (prevDrawIsUseIndices) {
-                _gl.drawElements(glDrawMode, prevDrawIndicesBuffer.count, indicesType, 0);
-                renderInfo.triangleCount = prevDrawIndicesBuffer.count / 3;
-            }
-            else {
-                // FIXME Use vertex number in buffer
-                // vertexCount may get the wrong value when geometry forget to mark dirty after update
-                _gl.drawArrays(glDrawMode, 0, nVertex);
-            }
-            renderInfo.drawCallCount = 1;
-        }
-        else {
-            // Use the cache of static geometry
-            var vaoList = this._drawCache[currentDrawID];
-            if (!vaoList) {
-                var chunks = geometry.getBufferChunks(renderer);
-                if (!chunks) {  // Empty mesh
-                    return;
-                }
-                vaoList = [];
-                for (var c = 0; c < chunks.length; c++) {
-                    var chunk = chunks[c];
-                    var attributeBuffers = chunk.attributeBuffers;
-                    var indicesBuffer = chunk.indicesBuffer;
-
-                    var availableAttributes = [];
-                    var availableAttributeSymbols = [];
-                    for (var a = 0; a < attributeBuffers.length; a++) {
-                        var attributeBufferInfo = attributeBuffers[a];
-                        var name = attributeBufferInfo.name;
-                        var semantic = attributeBufferInfo.semantic;
-                        var symbol;
-                        if (semantic) {
-                            var semanticInfo = shader.attributeSemantics[semantic];
-                            symbol = semanticInfo && semanticInfo.symbol;
-                        }
-                        else {
-                            symbol = name;
-                        }
-                        if (symbol && program.attributes[symbol]) {
-                            availableAttributes.push(attributeBufferInfo);
-                            availableAttributeSymbols.push(symbol);
-                        }
-                    }
-
-                    var vao = new VertexArrayObject(
-                        availableAttributes,
-                        availableAttributeSymbols,
-                        indicesBuffer
-                    );
-                    vaoList.push(vao);
-                }
-                if (isStatic) {
-                    this._drawCache[currentDrawID] = vaoList;
-                }
-            }
-
-            for (var i = 0; i < vaoList.length; i++) {
-                var vao = vaoList[i];
-                var needsBindAttributes = true;
-
-                // Create vertex object array cost a lot
-                // So we don't use it on the dynamic object
-                if (vaoExt && isStatic) {
-                    // Use vertex array object
-                    // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
-                    if (vao.vao == null) {
-                        vao.vao = vaoExt.createVertexArrayOES();
-                    }
-                    else {
-                        needsBindAttributes = false;
-                    }
-                    vaoExt.bindVertexArrayOES(vao.vao);
-                }
-
-                var availableAttributes = vao.availableAttributes;
-                var indicesBuffer = vao.indicesBuffer;
-
-                if (needsBindAttributes) {
-                    var locationList = program.enableAttributes(renderer, vao.availableAttributeSymbols, (vaoExt && isStatic && vao.vao));
-                    // Setting attributes;
-                    for (var a = 0; a < availableAttributes.length; a++) {
-                        var location = locationList[a];
-                        if (location === -1) {
-                            continue;
-                        }
-                        var attributeBufferInfo = availableAttributes[a];
-                        var buffer = attributeBufferInfo.buffer;
-                        var size = attributeBufferInfo.size;
-                        var glType;
-                        switch (attributeBufferInfo.type) {
-                            case 'float':
-                                glType = _gl.FLOAT;
-                                break;
-                            case 'byte':
-                                glType = _gl.BYTE;
-                                break;
-                            case 'ubyte':
-                                glType = _gl.UNSIGNED_BYTE;
-                                break;
-                            case 'short':
-                                glType = _gl.SHORT;
-                                break;
-                            case 'ushort':
-                                glType = _gl.UNSIGNED_SHORT;
-                                break;
-                            default:
-                                glType = _gl.FLOAT;
-                                break;
-                        }
-
-                        _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                        _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-                    }
-                }
-                if (
-                    glDrawMode === glenum.LINES ||
-                    glDrawMode === glenum.LINE_STRIP ||
-                    glDrawMode === glenum.LINE_LOOP
-                ) {
-                    _gl.lineWidth(this.lineWidth);
-                }
-
-                prevDrawIndicesBuffer = indicesBuffer;
-                prevDrawIsUseIndices = geometry.isUseIndices();
-                // Do drawing
-                if (prevDrawIsUseIndices) {
-                    if (needsBindAttributes) {
-                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-                    }
-                    _gl.drawElements(glDrawMode, indicesBuffer.count, indicesType, 0);
-                    renderInfo.triangleCount += indicesBuffer.count / 3;
-                }
-                else {
-                    _gl.drawArrays(glDrawMode, 0, nVertex);
-                }
-
-                if (vaoExt && isStatic) {
-                    vaoExt.bindVertexArrayOES(null);
-                }
-
-                renderInfo.drawCallCount++;
-            }
-        }
-
-        return renderInfo;
-    },
-
-    /**
      * Clone a new renderable
      * @function
      * @return {clay.Renderable}
@@ -440,7 +206,5 @@ Renderable.CW = glenum.CW;
  * @type {number}
  */
 Renderable.CCW = glenum.CCW;
-
-Renderable.RenderInfo = RenderInfo;
 
 export default Renderable;

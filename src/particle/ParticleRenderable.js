@@ -41,9 +41,7 @@ var particleShader = new Shader(Shader.source('clay.particle.vertex'), Shader.so
  *         renderer.render(scene, camera);
  *     });
  */
-var ParticleRenderable = Renderable.extend(
-/** @lends clay.particle.ParticleRenderable# */
-{
+var ParticleRenderable = Renderable.extend(/** @lends clay.particle.ParticleRenderable# */ {
     /**
      * @type {boolean}
      */

@@ -58,7 +58,6 @@ var Scene = Node.extend(function () {
 
         lights: [],
 
-
         /**
          * Scene bounding box in view space.
          * Used when camera needs to adujst the near and far plane automatically
@@ -113,6 +112,9 @@ var Scene = Node.extend(function () {
             }
             this._cameraList.push(node);
         }
+        else if (node instanceof Light) {
+            this.lights.push(node);
+        }
         if (node.name) {
             this._nodeRepository[node.name] = node;
         }
@@ -124,6 +126,12 @@ var Scene = Node.extend(function () {
             var idx = this._cameraList.indexOf(node);
             if (idx >= 0) {
                 this._cameraList.splice(idx, 1);
+            }
+        }
+        else if (node instanceof Light) {
+            var idx = this.lights.indexOf(node);
+            if (idx >= 0) {
+                this.lights.splice(idx, 1);
             }
         }
         if (node.name) {
@@ -201,8 +209,6 @@ var Scene = Node.extend(function () {
         this._opaqueObjectCount = 0;
         this._transparentObjectCount = 0;
 
-        lights.length = 0;
-
         this._updateRenderList(this, sceneMaterialTransparent);
 
         this.opaqueList.length = this._opaqueObjectCount;
@@ -261,10 +267,7 @@ var Scene = Node.extend(function () {
         for (var i = 0; i < parent._children.length; i++) {
             var child = parent._children[i];
 
-            if (child instanceof Light) {
-                this.lights.push(child);
-            }
-            else if (child.isRenderable()) {
+            if (child.isRenderable()) {
                 if (child.material.transparent || sceneMaterialTransparent) {
                     this.transparentList[this._transparentObjectCount++] = child;
                 }
@@ -273,7 +276,7 @@ var Scene = Node.extend(function () {
                 }
             }
             if (child._children.length > 0) {
-                this._updateRenderList(child);
+                this._updateRenderList(child, sceneMaterialTransparent);
             }
         }
     },

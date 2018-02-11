@@ -32,6 +32,21 @@ function defaultGetMaterial(renderable) {
 
 function noop() {}
 
+var attributeBufferTypeMap = {
+    float: glenum.FLOAT,
+    byte: glenum.BYTE,
+    ubyte: glenum.UNSIGNED_BYTE,
+    short: glenum.SHORT,
+    ushort: glenum.UNSIGNED_SHORT
+};
+
+function VertexArrayObject(availableAttributes, availableAttributeSymbols, indicesBuffer) {
+    this.availableAttributes = availableAttributes;
+    this.availableAttributeSymbols = availableAttributeSymbols;
+    this.indicesBuffer = indicesBuffer;
+
+    this.vao = null;
+}
 /**
  * @constructor clay.Renderer
  */
@@ -608,6 +623,8 @@ var Renderer = Base.extend(function () {
         var depthTest, depthMask;
         var culling, cullFace, frontFace;
         var transparent;
+        var drawID;
+        var currentVAO;
 
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
@@ -617,7 +634,7 @@ var Renderer = Base.extend(function () {
 
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
             var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform.array;
-
+            var geometry = renderable.geometry;
             var material = passConfig.getMaterial.call(this, renderable);
 
             var program = renderable.__program;
@@ -669,9 +686,7 @@ var Renderer = Base.extend(function () {
             // Program changes also needs reset the materials.
             if (prevMaterial !== material || programChanged) {
                 if (material.depthTest !== depthTest) {
-                    material.depthTest
-                        ? _gl.enable(_gl.DEPTH_TEST)
-                        : _gl.disable(_gl.DEPTH_TEST);
+                    material.depthTest ? _gl.enable(_gl.DEPTH_TEST) : _gl.disable(_gl.DEPTH_TEST);
                     depthTest = material.depthTest;
                 }
                 if (material.depthMask !== depthMask) {
@@ -679,9 +694,7 @@ var Renderer = Base.extend(function () {
                     depthMask = material.depthMask;
                 }
                 if (material.transparent !== transparent) {
-                    material.transparent
-                        ? _gl.enable(_gl.BLEND)
-                        : _gl.disable(_gl.BLEND);
+                    material.transparent ? _gl.enable(_gl.BLEND) : _gl.disable(_gl.BLEND);
                     transparent = material.transparent;
                 }
                 // TODO cache blending
@@ -725,18 +738,17 @@ var Renderer = Base.extend(function () {
                 culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
             }
 
-            var objectRenderInfo = renderable.render(this, material, program);
-
-            if (objectRenderInfo) {
-                renderInfo.triangleCount += objectRenderInfo.triangleCount;
-                renderInfo.vertexCount += objectRenderInfo.vertexCount;
-                renderInfo.drawCallCount += objectRenderInfo.drawCallCount;
-                renderInfo.renderedMeshCount ++;
+            this._updateSkeleton(renderable, program);
+            var currentDrawID = geometry.__uid__ + '-' + program.__uid__;
+            if (currentDrawID !== drawID) {
+                currentVAO = this._bindVAO(shader, geometry, program);
+                drawID = currentDrawID;
             }
+            this._renderObject(renderable, currentVAO);
 
             // After render hook
-            passConfig.afterRender.call(this, renderable, objectRenderInfo);
-            renderable.afterRender(this, objectRenderInfo);
+            passConfig.afterRender.call(this, renderable);
+            renderable.afterRender(this);
 
             prevProgram = program;
         }
@@ -749,6 +761,143 @@ var Renderer = Base.extend(function () {
         this.trigger('afterrenderpass', this, list, camera, passConfig);
 
         return renderInfo;
+    },
+
+    _updateSkeleton: function (object, program) {
+        var _gl = this.gl;
+        // Set pose matrices of skinned mesh
+        if (object.skeleton) {
+            object.skeleton.update();
+            var skinMatricesArray = object.skeleton.getSubSkinMatrices(object.__uid__, object.joints);
+            program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+        }
+    },
+    /**
+     * @param  {clay.Renderer} renderer
+     * @param  {clay.Material} [material]
+     * @return {Object}
+     * @private
+     */
+    _renderObject: function (renderable, vao) {
+        var _gl = this.gl;
+        var geometry = renderable.geometry;
+
+        var glDrawMode = renderable.mode;
+
+        var uintExt = this.getGLExtension('OES_element_index_uint');
+        var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
+        var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+
+        var renderInfo = this._renderInfo;
+
+        if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
+            _gl.lineWidth(this.lineWidth);
+        }
+
+        if (vao.indicesBuffer) {
+            _gl.drawElements(glDrawMode, vao.indicesBuffer.count, indicesType, 0);
+        }
+        else {
+            // FIXME Use vertex number in buffer
+            // vertexCount may get the wrong value when geometry forget to mark dirty after update
+            _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
+        }
+        return renderInfo;
+    },
+
+    _bindVAO: function (shader, geometry, program) {
+        var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        var isStatic = !geometry.dynamic;
+        var _gl = this.gl;
+
+        var vaoId = this.__uid__ + '_' + program.__uid__;
+        geometry.__vaoCache = geometry.__vaoCache || {};
+        var vao = geometry.__vaoCache[vaoId];
+        if (!vao) {
+            var chunks = geometry.getBufferChunks(this);
+            if (!chunks || !chunks.length) {  // Empty mesh
+                return;
+            }
+            var chunk = chunks[0];
+            var attributeBuffers = chunk.attributeBuffers;
+            var indicesBuffer = chunk.indicesBuffer;
+
+            var availableAttributes = [];
+            var availableAttributeSymbols = [];
+            for (var a = 0; a < attributeBuffers.length; a++) {
+                var attributeBufferInfo = attributeBuffers[a];
+                var name = attributeBufferInfo.name;
+                var semantic = attributeBufferInfo.semantic;
+                var symbol;
+                if (semantic) {
+                    var semanticInfo = shader.attributeSemantics[semantic];
+                    symbol = semanticInfo && semanticInfo.symbol;
+                }
+                else {
+                    symbol = name;
+                }
+                if (symbol && program.attributes[symbol]) {
+                    availableAttributes.push(attributeBufferInfo);
+                    availableAttributeSymbols.push(symbol);
+                }
+            }
+
+            vao = new VertexArrayObject(
+                availableAttributes,
+                availableAttributeSymbols,
+                indicesBuffer
+            );
+
+            if (isStatic) {
+                geometry.__vaoCache[vaoId] = vao;
+            }
+        }
+
+        var needsBindAttributes = true;
+
+        // Create vertex object array cost a lot
+        // So we don't use it on the dynamic object
+        if (vaoExt && isStatic) {
+            // Use vertex array object
+            // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
+            if (vao.vao == null) {
+                vao.vao = vaoExt.createVertexArrayOES();
+            }
+            else {
+                needsBindAttributes = false;
+            }
+            vaoExt.bindVertexArrayOES(vao.vao);
+        }
+        else if (vaoExt) {
+            vaoExt.bindVertexArrayOES(null);
+        }
+
+        var availableAttributes = vao.availableAttributes;
+        var indicesBuffer = vao.indicesBuffer;
+
+        if (needsBindAttributes) {
+            var locationList = program.enableAttributes(this, vao.availableAttributeSymbols, (vaoExt && isStatic && vao));
+            // Setting attributes;
+            for (var a = 0; a < availableAttributes.length; a++) {
+                var location = locationList[a];
+                if (location === -1) {
+                    continue;
+                }
+                var attributeBufferInfo = availableAttributes[a];
+                var buffer = attributeBufferInfo.buffer;
+                var size = attributeBufferInfo.size;
+                var glType = attributeBufferTypeMap[attributeBufferInfo.type] || _gl.FLOAT;
+
+                _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
+            }
+
+            if (geometry.isUseIndices()) {
+                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+            }
+        }
+
+        return vao;
     },
 
     renderPreZ: function (list, scene, camera) {
