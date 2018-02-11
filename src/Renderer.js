@@ -806,11 +806,14 @@ var Renderer = Base.extend(function () {
     },
 
     _bindVAO: function (shader, geometry, program) {
-        var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        // TODO FIX VAO EXT
+        // TODO ADD deleteVertexArrayOES
+        // var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        var vaoExt = null;
         var isStatic = !geometry.dynamic;
         var _gl = this.gl;
 
-        var vaoId = this.__uid__ + '_' + program.__uid__;
+        var vaoId = this.__uid__ + '-' + program.__uid__;
         geometry.__vaoCache = geometry.__vaoCache || {};
         var vao = geometry.__vaoCache[vaoId];
         if (!vao) {
@@ -866,6 +869,7 @@ var Renderer = Base.extend(function () {
             else {
                 needsBindAttributes = false;
             }
+            vaoExt.bindVertexArrayOES(null);
             vaoExt.bindVertexArrayOES(vao.vao);
         }
         else if (vaoExt) {

@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <style>
+            html, body {
+                padding: 0;
+                margin: 0;
+            }
+
+            canvas {
+                position: absolute;
+                left: 0;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+
+            #stats {
+                z-index: 10;
+                position: relative;
+            }
+        </style>
+        <script src="lib/stats.js"></script>
+        <script src="../dist/claygl.js"></script>
+    </head>
+    <body onload="init()">
+        <canvas id="main"></canvas>
+        <script>
+        function init() {
+            var dom = document.getElementById('main');
+            var width = dom.width = window.innerWidth;
+            var height = dom.height = window.innerHeight;
+
+            stats = new Stats();
+            document.body.insertBefore(stats.domElement, dom);
+
+            var app = clay.application.create('#main', {
+                // Enable event. Or the mouseover, mouseout events will not be triggered.
+                event: true,
+
+                init: function (app) {
+                    // Create camera
+                    this._camera = app.createCamera(
+                        [500, 500, 500],
+                        [0, 0, 0],
+                        'ortho',
+                        [width, height, 10000]
+                    );
+
+                    this._cubes = [];
+
+                    var cnt = 100;
+                    var distance = 20;
+                    var size = 10 / 2;
+                    var material = app.createMaterial({
+                        color: 'red',
+                        shader: 'clay.basic'
+                    });
+                    for (var i = 0; i < cnt; ++i) {
+                        for (var j = 0; j < cnt; ++j) {
+                            var cube = app.createCube(material);
+                            cube.position.set(
+                                (i - cnt / 2) * distance,
+                                (j - cnt / 2) * distance,
+                                0
+                            );
+                            cube.scale.set(size, size, size);
+                            this._cubes.push(cube);
+                        }
+                    }
+                },
+
+                loop: function (app) {
+                    stats.end();
+
+                    stats.begin();
+                }
+            });
+        }
+        </script>
+    </body>
+</html>
