@@ -469,7 +469,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
                     if (!val) {
                         continue;
                     }
-                    if (uniformType === 't' && val) {
+                    if (uniformType === 't') {
                         updateUsed(val, textureResourceList);
                     }
                     else if (uniformType === 'tv') {

@@ -14,8 +14,8 @@ var mat2 = glMatrix.mat2;
 var mat3 = glMatrix.mat3;
 var mat4 = glMatrix.mat4;
 
-var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\w\,]+)?(\[.*?\])?\s*(:\s*([\S\s]+?))?;/g;
-var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+(\w*)\s*(:\s*(\w+))?;/g;
+var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\s\S]*?);/g;
+var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+([\s\S]*?);/g;
 var defineRegex = /#define\s+(\w+)?(\s+[\w-.]+)?\s*;?\s*\n/g;
 
 var uniformTypeMap = {
@@ -36,25 +36,25 @@ var uniformTypeMap = {
 };
 
 var uniformValueConstructor = {
-    'bool': function () {return true;},
-    'int': function () {return 0;},
-    'float': function () {return 0;},
-    'sampler2D': function () {return null;},
-    'samplerCube': function () {return null;},
+    'bool': function () { return true; },
+    'int': function () { return 0; },
+    'float': function () { return 0; },
+    'sampler2D': function () { return null; },
+    'samplerCube': function () { return null; },
 
-    'vec2': function () {return [0, 0];},
-    'vec3': function () {return [0, 0, 0];},
-    'vec4': function () {return [0, 0, 0, 0];},
+    'vec2': function () { return [0, 0]; },
+    'vec3': function () { return [0, 0, 0]; },
+    'vec4': function () { return [0, 0, 0, 0]; },
 
-    'ivec2': function () {return [0, 0];},
-    'ivec3': function () {return [0, 0, 0];},
-    'ivec4': function () {return [0, 0, 0, 0];},
+    'ivec2': function () { return [0, 0]; },
+    'ivec3': function () { return [0, 0, 0]; },
+    'ivec4': function () { return [0, 0, 0, 0]; },
 
-    'mat2': function () {return mat2.create();},
-    'mat3': function () {return mat3.create();},
-    'mat4': function () {return mat4.create();},
+    'mat2': function () { return mat2.create(); },
+    'mat3': function () { return mat3.create(); },
+    'mat4': function () { return mat4.create(); },
 
-    'array': function () {return [];}
+    'array': function () { return []; }
 };
 
 var attributeSemantics = [
@@ -113,6 +113,14 @@ var matrixSemantics = [
     'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
 ];
 
+var attributeSizeMap = {
+    // WebGL does not support integer attributes
+    'vec4': 4,
+    'vec3': 3,
+    'vec2': 2,
+    'float': 1
+};
+
 
 var shaderIDCache = {};
 var shaderCodeCache = {};
@@ -133,10 +141,177 @@ function getShaderID(vertex, fragment) {
     return id;
 }
 
+function removeComment(code) {
+    return code.replace(/[ \t]*\/\/.*\n/g, '' )   // remove //
+        .replace(/[ \t]*\/\*[\s\S]*?\*\//g, '' ); // remove /* */
+}
+
+function logSyntaxError() {
+    console.warn('Wrong uniform/attributes syntax');
+}
+
+function parseDeclarations(type, line) {
+    var speratorsRegexp = /[,=\(\):]/;
+    var tokens = removeComment(line)
+        // Convert `symbol: [1,2,3]` to `symbol: vec3(1,2,3)`
+        .replace(/:\s*\[\s*(.*)\s*\]/g, '=' + type + '($1)')
+        .replace(/\s+/g, '')
+        .split(/(?=[,=\(\):])/g);
+
+    var newTokens = [];
+    for (var i = 0; i < tokens.length; i++) {
+        if (tokens[i].match(speratorsRegexp)) {
+            newTokens.push(
+                tokens[i].charAt(0),
+                tokens[i].slice(1)
+            );
+        }
+        else {
+            newTokens.push(tokens[i]);
+        }
+    }
+
+    tokens = newTokens;
+
+    var TOKEN_TYPE_SYMBOL = 0;
+    var TOKEN_TYPE_ASSIGN = 1;
+    var TOKEN_TYPE_VEC = 2;
+    var TOKEN_TYPE_ARR = 3;
+    var TOKEN_TYPE_SEMANTIC = 4;
+
+    var tokenType = TOKEN_TYPE_SYMBOL;
+    var declarations = {};
+    var declarationValue = null;
+    var currentDeclaration;
+
+    addSymbol(tokens[0]);
+
+    function addSymbol(symbol) {
+        if (!symbol) {
+            logSyntaxError();
+        }
+        var arrResult = symbol.match(/\[(.*?)\]/);
+        currentDeclaration = symbol.replace(/\[(.*?)\]/, '');
+        declarations[currentDeclaration] = {};
+        if (arrResult) {
+            declarations[currentDeclaration].isArray = true;
+            declarations[currentDeclaration].arraySize = arrResult[1];
+        }
+    }
+
+    for (var i = 1; i < tokens.length; i++) {
+        var token = tokens[i];
+        if (!token) {   // Empty token;
+            continue;
+        }
+        if (token === '=') {
+            if (tokenType !== TOKEN_TYPE_SYMBOL
+            && tokenType !== TOKEN_TYPE_ARR) {
+                logSyntaxError();
+                break;
+            }
+            tokenType = TOKEN_TYPE_ASSIGN;
+
+            continue;
+        }
+        else if (token === ':') {
+            tokenType = TOKEN_TYPE_SEMANTIC;
+
+            continue;
+        }
+        else if (token === ',') {
+            if (tokenType === TOKEN_TYPE_SYMBOL) {
+                continue;
+            }
+            else if (tokenType === TOKEN_TYPE_VEC) {
+                if (!(declarationValue instanceof Array)) {
+                    logSyntaxError();
+                    break;
+                }
+                declarationValue.push(+tokens[++i]);
+
+                continue;
+            }
+            else {
+                logSyntaxError();
+                break;
+            }
+        }
+        else if (token === ')') {
+            declarations[currentDeclaration].value = new vendor.Float32Array(declarationValue);
+            declarationValue = null;
+            continue;
+        }
+        else if (token === '(') {
+            if (tokenType !== TOKEN_TYPE_VEC) {
+                logSyntaxError();
+                break;
+            }
+            if (!(declarationValue instanceof Array)) {
+                logSyntaxError();
+                break;
+            }
+            declarationValue.push(+tokens[++i]);
+            continue;
+        }
+        else if (token.indexOf('vec') >= 0) {
+            if (tokenType !== TOKEN_TYPE_ASSIGN
+            // Compatitable with old syntax `symbol: [1,2,3]`
+            && tokenType !== TOKEN_TYPE_SEMANTIC) {
+                logSyntaxError();
+                break;
+            }
+            tokenType = TOKEN_TYPE_VEC;
+            declarationValue = [];
+            continue;
+        }
+        else if (tokenType === TOKEN_TYPE_ASSIGN) {
+            if (type === 'bool') {
+                declarations[currentDeclaration].value = tokens[++i] === 'true';
+            }
+            else {
+                declarations[currentDeclaration].value = parseFloat(tokens[++i]);
+            }
+            declarationValue = null;
+            continue;
+        }
+        else if (tokenType === TOKEN_TYPE_SEMANTIC) {
+            var semantic = token;
+            if (attributeSemantics.indexOf(semantic) >= 0
+                || uniformSemantics.indexOf(semantic) >= 0
+                || matrixSemantics.indexOf(semantic) >= 0
+            ) {
+                declarations[currentDeclaration].semantic = semantic;
+            }
+            else if (semantic === 'ignore' || semantic === 'unconfigurable') {
+                declarations[currentDeclaration].ignore = true;
+            }
+            else {
+                // Try to parse as a default tvalue.
+                if (type === 'bool') {
+                    declarations[currentDeclaration].value = semantic === 'true';
+                }
+                else {
+                    declarations[currentDeclaration].value = parseFloat(semantic);
+                }
+            }
+            continue;
+        }
+
+        // treat as symbol.
+        addSymbol(token);
+    }
+
+    return declarations;
+}
+
+
 /**
  * @constructor
  * @extends clay.core.Base
  * @alias clay.Shader
+ * @param {string} vertex
+ * @param {string} fragment
  * @example
  * // Create a phong shader
  * var shader = new clay.Shader(
@@ -222,6 +397,45 @@ Shader.prototype = {
         this._fragmentCode = Shader.parseImport(this.fragment);
     },
 
+    _addSemanticUniform: function (symbol, uniformType, semantic) {
+        // This case is only for SKIN_MATRIX
+        // TODO
+        if (attributeSemantics.indexOf(semantic) >= 0) {
+            this.attributeSemantics[semantic] = {
+                symbol: symbol,
+                type: uniformType
+            };
+        }
+        else if (matrixSemantics.indexOf(semantic) >= 0) {
+            var isTranspose = false;
+            var semanticNoTranspose = semantic;
+            if (semantic.match(/TRANSPOSE$/)) {
+                isTranspose = true;
+                semanticNoTranspose = semantic.slice(0, -9);
+            }
+            this.matrixSemantics[semantic] = {
+                symbol: symbol,
+                type: uniformType,
+                isTranspose: isTranspose,
+                semanticNoTranspose: semanticNoTranspose
+            };
+        }
+        else if (uniformSemantics.indexOf(semantic) >= 0) {
+            this.uniformSemantics[semantic] = {
+                symbol: symbol,
+                type: uniformType
+            };
+        }
+    },
+
+    _addMaterialUniform: function (symbol, type, uniformType, defaultValueFunc, isArray, materialUniforms) {
+        materialUniforms[symbol] = {
+            type: uniformType,
+            value: isArray ? uniformValueConstructor['array'] : (defaultValueFunc || uniformValueConstructor[type]),
+            semantic: null
+        };
+    },
+
     _parseUniforms: function () {
         var uniforms = {};
         var self = this;
@@ -234,13 +448,30 @@ Shader.prototype = {
 
         self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
-        function _uniformParser(str, type, symbol, isArray, semanticWrapper, semantic) {
-            if (type && symbol) {
+        function makeDefaultValueFunc(value) {
+            return value ? function () { return value; } : null;
+        }
+
+        function _uniformParser(str, type, content) {
+            var declaredUniforms = parseDeclarations(type, content);
+            var uniformMainStr = [];
+            for (var symbol in declaredUniforms) {
+
+                var uniformInfo = declaredUniforms[symbol];
+                var semantic = uniformInfo.semantic;
+                var tmpStr = symbol;
                 var uniformType = uniformTypeMap[type];
-                var isConfigurable = true;
-                var defaultValueFunc;
-                if (uniformType) {
-                    self._uniformList.push(symbol);
+                var defaultValueFunc = makeDefaultValueFunc(declaredUniforms[symbol].value);
+                if (declaredUniforms[symbol].isArray) {
+                    tmpStr += '[' + declaredUniforms[symbol].arraySize + ']';
+                    uniformType += 'v';
+                }
+
+                uniformMainStr.push(tmpStr);
+
+                self._uniformList.push(symbol);
+
+                if (!uniformInfo.ignore) {
                     if (type === 'sampler2D' || type === 'samplerCube') {
                         // Texture is default disabled
                         self.textures[symbol] = {
@@ -248,106 +479,24 @@ Shader.prototype = {
                             type: type
                         };
                     }
-                    if (isArray) {
-                        uniformType += 'v';
-                    }
-                    if (semantic) {
-                        // This case is only for SKIN_MATRIX
-                        // TODO
-                        if (attributeSemantics.indexOf(semantic) >= 0) {
-                            self.attributeSemantics[semantic] = {
-                                symbol: symbol,
-                                type: uniformType
-                            };
-                            isConfigurable = false;
-                        }
-                        else if (matrixSemantics.indexOf(semantic) >= 0) {
-                            var isTranspose = false;
-                            var semanticNoTranspose = semantic;
-                            if (semantic.match(/TRANSPOSE$/)) {
-                                isTranspose = true;
-                                semanticNoTranspose = semantic.slice(0, -9);
-                            }
-                            self.matrixSemantics[semantic] = {
-                                symbol: symbol,
-                                type: uniformType,
-                                isTranspose: isTranspose,
-                                semanticNoTranspose: semanticNoTranspose
-                            };
-                            isConfigurable = false;
-                        }
-                        else if (uniformSemantics.indexOf(semantic) >= 0) {
-                            self.uniformSemantics[semantic] = {
-                                symbol: symbol,
-                                type: uniformType
-                            };
-                            isConfigurable = false;
-                        }
-                        else {
-                            // The uniform is not configurable, which means it will not appear
-                            // in the material uniform properties
-                            if (semantic === 'unconfigurable') {
-                                isConfigurable = false;
-                            }
-                            else {
-                                // Uniform have a defalut value, like
-                                // uniform vec3 color: [1, 1, 1];
-                                defaultValueFunc = self._parseDefaultValue(type, semantic);
-                                if (!defaultValueFunc) {
-                                    throw new Error('Unkown semantic "' + semantic + '"');
-                                }
-                                else {
-                                    semantic = '';
-                                }
-                            }
-                        }
-                    }
 
-                    if (isConfigurable) {
-                        uniforms[symbol] = {
-                            type: uniformType,
-                            value: isArray ? uniformValueConstructor['array'] : (defaultValueFunc || uniformValueConstructor[type]),
-                            semantic: semantic || null
-                        };
+                    if (semantic) {
+                        // TODO Should not declare multiple symbols if have semantic.
+                        self._addSemanticUniform(symbol, uniformType, semantic);
+                    }
+                    else {
+                        self._addMaterialUniform(
+                            symbol, type, uniformType, defaultValueFunc,
+                            declaredUniforms[symbol].isArray, uniforms
+                        );
                     }
                 }
-                return ['uniform', type, symbol, isArray].join(' ') + ';\n';
             }
+            return uniformMainStr.length > 0
+                ? 'uniform ' + type + ' ' + uniformMainStr.join(',') + ';\n' : '';
         }
 
         this.uniformTemplates = uniforms;
-    },
-
-    _parseDefaultValue: function (type, str) {
-        var arrayRegex = /\[\s*(.*)\s*\]/;
-        if (type === 'vec2' || type === 'vec3' || type === 'vec4') {
-            var arrayStr = arrayRegex.exec(str)[1];
-            if (arrayStr) {
-                var arr = arrayStr.split(/\s*,\s*/);
-                return function () {
-                    return new vendor.Float32Array(arr);
-                };
-            }
-            else {
-                // Invalid value
-                return;
-            }
-        }
-        else if (type === 'bool') {
-            return function () {
-                return str.toLowerCase() === 'true' ? true : false;
-            };
-        }
-        else if (type === 'float') {
-            return function () {
-                return parseFloat(str);
-            };
-        }
-        else if (type === 'int') {
-            return function () {
-                return parseInt(str);
-            };
-        }
     },
 
     _parseAttributes: function () {
@@ -355,31 +504,20 @@ Shader.prototype = {
         var self = this;
         this._vertexCode = this._vertexCode.replace(attributeRegex, _attributeParser);
 
-        function _attributeParser(str, type, symbol, semanticWrapper, semantic) {
-            if (type && symbol) {
-                var size = 1;
-                switch (type) {
-                    case 'vec4':
-                        size = 4;
-                        break;
-                    case 'vec3':
-                        size = 3;
-                        break;
-                    case 'vec2':
-                        size = 2;
-                        break;
-                    case 'float':
-                        size = 1;
-                        break;
-                }
+        function _attributeParser(str, type, content) {
+            var declaredAttributes = parseDeclarations(type, content);
 
+            var size = attributeSizeMap[type] || 1;
+            var attributeMainStr = [];
+            for (var symbol in declaredAttributes) {
+                var semantic = declaredAttributes[symbol].semantic;
                 attributes[symbol] = {
-                    // Can only be float
+                    // TODO Can only be float
                     type: 'float',
                     size: size,
                     semantic: semantic || null
                 };
-
+                // TODO Should not declare multiple symbols if have semantic.
                 if (semantic) {
                     if (attributeSemantics.indexOf(semantic) < 0) {
                         throw new Error('Unkown semantic "' + semantic + '"');
@@ -391,9 +529,10 @@ Shader.prototype = {
                         };
                     }
                 }
+                attributeMainStr.push(symbol);
             }
 
-            return ['attribute', type, symbol].join(' ') + ';\n';
+            return 'attribute ' + type + ' ' + attributeMainStr.join(',') + ';\n';
         }
 
         this.attributes = attributes;
@@ -409,10 +548,10 @@ Shader.prototype = {
         function _defineParser(str, symbol, value) {
             var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
             if (!defines[symbol]) { // Haven't been defined by user
-                if (value == 'false') {
+                if (value === 'false') {
                     defines[symbol] = false;
                 }
-                else if (value == 'true') {
+                else if (value === 'true') {
                     defines[symbol] = true;
                 }
                 else {

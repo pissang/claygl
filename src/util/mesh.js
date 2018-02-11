@@ -18,7 +18,7 @@ var meshUtil = {
      *
      * @param {Array.<clay.Mesh>} meshes
      * @param {boolean} applyWorldTransform
-     * @return clay.Mesh
+     * @return {clay.Mesh}
      * @memberOf clay.util.mesh
      */
     merge: function (meshes, applyWorldTransform) {
