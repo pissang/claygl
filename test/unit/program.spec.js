@@ -150,6 +150,6 @@ describe('Program.Spec', function () {
         var program = renderer.getProgram(mesh);
 
         const locationList = program.enableAttributes(renderer, ['position', 'texCoord']);
-        assert.deepEqual(locationList, [0,1], JSON.stringify(locationList));
+        assert.deepEqual(locationList, [0, 1], JSON.stringify(locationList));
     });
 });

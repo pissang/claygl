@@ -147,7 +147,7 @@ function removeComment(code) {
 }
 
 function logSyntaxError() {
-    console.warn('Wrong uniform/attributes syntax');
+    console.error('Wrong uniform/attributes syntax');
 }
 
 function parseDeclarations(type, line) {
@@ -170,16 +170,16 @@ function parseDeclarations(type, line) {
             newTokens.push(tokens[i]);
         }
     }
-
     tokens = newTokens;
 
-    var TOKEN_TYPE_SYMBOL = 0;
-    var TOKEN_TYPE_ASSIGN = 1;
-    var TOKEN_TYPE_VEC = 2;
-    var TOKEN_TYPE_ARR = 3;
-    var TOKEN_TYPE_SEMANTIC = 4;
+    var TYPE_SYMBOL = 0;
+    var TYPE_ASSIGN = 1;
+    var TYPE_VEC = 2;
+    var TYPE_ARR = 3;
+    var TYPE_SEMANTIC = 4;
+    var TYPE_NORMAL = 5;
 
-    var tokenType = TOKEN_TYPE_SYMBOL;
+    var opType = TYPE_SYMBOL;
     var declarations = {};
     var declarationValue = null;
     var currentDeclaration;
@@ -205,45 +205,42 @@ function parseDeclarations(type, line) {
             continue;
         }
         if (token === '=') {
-            if (tokenType !== TOKEN_TYPE_SYMBOL
-            && tokenType !== TOKEN_TYPE_ARR) {
+            if (opType !== TYPE_SYMBOL
+            && opType !== TYPE_ARR) {
                 logSyntaxError();
                 break;
             }
-            tokenType = TOKEN_TYPE_ASSIGN;
+            opType = TYPE_ASSIGN;
 
             continue;
         }
         else if (token === ':') {
-            tokenType = TOKEN_TYPE_SEMANTIC;
+            opType = TYPE_SEMANTIC;
 
             continue;
         }
         else if (token === ',') {
-            if (tokenType === TOKEN_TYPE_SYMBOL) {
-                continue;
-            }
-            else if (tokenType === TOKEN_TYPE_VEC) {
+            if (opType === TYPE_VEC) {
                 if (!(declarationValue instanceof Array)) {
                     logSyntaxError();
                     break;
                 }
                 declarationValue.push(+tokens[++i]);
-
-                continue;
             }
             else {
-                logSyntaxError();
-                break;
+                opType = TYPE_NORMAL;
             }
+
+            continue;
         }
         else if (token === ')') {
             declarations[currentDeclaration].value = new vendor.Float32Array(declarationValue);
             declarationValue = null;
+            opType = TYPE_NORMAL;
             continue;
         }
         else if (token === '(') {
-            if (tokenType !== TOKEN_TYPE_VEC) {
+            if (opType !== TYPE_VEC) {
                 logSyntaxError();
                 break;
             }
@@ -255,27 +252,27 @@ function parseDeclarations(type, line) {
             continue;
         }
         else if (token.indexOf('vec') >= 0) {
-            if (tokenType !== TOKEN_TYPE_ASSIGN
+            if (opType !== TYPE_ASSIGN
             // Compatitable with old syntax `symbol: [1,2,3]`
-            && tokenType !== TOKEN_TYPE_SEMANTIC) {
+            && opType !== TYPE_SEMANTIC) {
                 logSyntaxError();
                 break;
             }
-            tokenType = TOKEN_TYPE_VEC;
+            opType = TYPE_VEC;
             declarationValue = [];
             continue;
         }
-        else if (tokenType === TOKEN_TYPE_ASSIGN) {
+        else if (opType === TYPE_ASSIGN) {
             if (type === 'bool') {
-                declarations[currentDeclaration].value = tokens[++i] === 'true';
+                declarations[currentDeclaration].value = token === 'true';
             }
             else {
-                declarations[currentDeclaration].value = parseFloat(tokens[++i]);
+                declarations[currentDeclaration].value = parseFloat(token);
             }
             declarationValue = null;
             continue;
         }
-        else if (tokenType === TOKEN_TYPE_SEMANTIC) {
+        else if (opType === TYPE_SEMANTIC) {
             var semantic = token;
             if (attributeSemantics.indexOf(semantic) >= 0
                 || uniformSemantics.indexOf(semantic) >= 0
@@ -300,6 +297,7 @@ function parseDeclarations(type, line) {
 
         // treat as symbol.
         addSymbol(token);
+        opType = TYPE_SYMBOL;
     }
 
     return declarations;
@@ -449,7 +447,7 @@ Shader.prototype = {
         self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
         function makeDefaultValueFunc(value) {
-            return value ? function () { return value; } : null;
+            return value != null ? function () { return value; } : null;
         }
 
         function _uniformParser(str, type, content) {

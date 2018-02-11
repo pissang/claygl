@@ -1,10 +1,12 @@
 import Base from './core/Base';
 import Animator from './animation/Animator';
 
-var requestAnimationFrame = window.requestAnimationFrame
-                            || window.msRequestAnimationFrame
-                            || window.mozRequestAnimationFrame
-                            || window.webkitRequestAnimationFrame
+var g = typeof window === 'undefined' ? global : window;
+
+var requestAnimationFrame = g.requestAnimationFrame
+                            || g.msRequestAnimationFrame
+                            || g.mozRequestAnimationFrame
+                            || g.webkitRequestAnimationFrame
                             || function (func){ setTimeout(func, 16); };
 
 /**

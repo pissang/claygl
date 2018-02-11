@@ -65,7 +65,7 @@ var Renderer = Base.extend(function () {
          * @type {number}
          * @private
          */
-        devicePixelRatio: window.devicePixelRatio || 1.0,
+        devicePixelRatio: (window && window.devicePixelRatio) || 1.0,
 
         /**
          * Clear color

@@ -50,7 +50,7 @@ PrimitivePool.prototype = {
         this._data = [];
         this._size = 0;
     }
-}
+};
 
 function Triangle() {
     this.vertices = [vec4Create(), vec4Create(), vec4Create()];
@@ -104,7 +104,7 @@ var CanvasRenderer = Base.extend({
 
     _height: 100,
 
-    devicePixelRatio: window.devicePixelRatio || 1.0,
+    devicePixelRatio: (window && window.devicePixelRatio) || 1.0,
 
     color: [0.0, 0.0, 0.0, 0.0],
 
