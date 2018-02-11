@@ -13,9 +13,7 @@ import BoundingBox from '../math/BoundingBox';
  * @param {number} [thetaLength]
  * @param {number} [radius]
  */
-var Sphere = Geometry.extend(
-/** @lends clay.geometry.Sphere# */
-{
+var Sphere = Geometry.extend(/** @lends clay.geometry.Sphere# */ {
     dynamic: false,
     /**
      * @type {number}

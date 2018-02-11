@@ -1090,6 +1090,16 @@ var Geometry = Base.extend(function () {
                 }
             }
         }
+        if (this.__vaoCache) {
+            var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
+            for (var id in this.__vaoCache) {
+                var vao = this.__vaoCache[id].vao;
+                if (vao) {
+                    vaoExt.deleteVertexArrayOES(vao);
+                }
+            }
+        }
+        this.__vaoCache = {};
         cache.deleteContext(renderer.__uid__);
     }
 

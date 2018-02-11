@@ -626,6 +626,8 @@ var Renderer = Base.extend(function () {
         var drawID;
         var currentVAO;
 
+        var vaoExt = this.getGLExtension('OES_vertex_array_object');
+
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
             if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
@@ -639,6 +641,14 @@ var Renderer = Base.extend(function () {
 
             var program = renderable.__program;
             var shader = material.shader;
+
+            var currentDrawID = geometry.__uid__ + '-' + program.__uid__;
+            if (currentDrawID !== drawID) {
+                // TODO Seems need to be bound to null immediately if vao is changed?
+                vaoExt.bindVertexArrayOES(null);
+                currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
+                drawID = currentDrawID;
+            }
 
             mat4.copy(matrices.WORLD, worldM);
             mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
@@ -739,11 +749,6 @@ var Renderer = Base.extend(function () {
             }
 
             this._updateSkeleton(renderable, program);
-            var currentDrawID = geometry.__uid__ + '-' + program.__uid__;
-            if (currentDrawID !== drawID) {
-                currentVAO = this._bindVAO(shader, geometry, program);
-                drawID = currentDrawID;
-            }
             this._renderObject(renderable, currentVAO);
 
             // After render hook
@@ -753,10 +758,8 @@ var Renderer = Base.extend(function () {
             prevProgram = program;
         }
 
-        // Remove programs incase it's not updated in the other passes.
-        for (var i = 0; i < list.length; i++) {
-            list[i].__program = null;
-        }
+        // TODO Seems need to be bound to null immediately if vao is changed?
+        vaoExt.bindVertexArrayOES(null);
 
         this.trigger('afterrenderpass', this, list, camera, passConfig);
 
@@ -805,11 +808,7 @@ var Renderer = Base.extend(function () {
         return renderInfo;
     },
 
-    _bindVAO: function (shader, geometry, program) {
-        // TODO FIX VAO EXT
-        // TODO ADD deleteVertexArrayOES
-        // var vaoExt = this.getGLExtension('OES_vertex_array_object');
-        var vaoExt = null;
+    _bindVAO: function (vaoExt, shader, geometry, program) {
         var isStatic = !geometry.dynamic;
         var _gl = this.gl;
 

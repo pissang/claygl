@@ -27,10 +27,12 @@
 
             loop: function (app) {
                 app.scene.remove(this._sphere);
-                this._sphere = app.createSphere({
+                var sphere = new clay.geometry.Sphere();
+                var mesh = app.createMesh(sphere, {
                     color: [Math.random(), Math.random(), Math.random()]
-                });
-                this._sphere.position.set(Math.random(), Math.random(), Math.random());
+                })
+                mesh.position.set(Math.random(), Math.random(), Math.random());
+                this._sphere = mesh;
             }
         });
 
