@@ -42,7 +42,7 @@ function RenderList() {
 
 RenderList.prototype.startCount = function () {
     this._opaqueCount = 0;
-    this._transparentList = 0;
+    this._transparentCount = 0;
 };
 
 RenderList.prototype.add = function (object, isTransparent) {

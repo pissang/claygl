@@ -293,7 +293,7 @@ var FilterNode = CompositorNode.extend(function () {
     },
 
     clear: function () {
-        Node.prototype.clear.call(this);
+        CompositorNode.prototype.clear.call(this);
 
         // Default disable all texture
         this.pass.material.disableTexturesAll();

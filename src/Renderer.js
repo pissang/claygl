@@ -505,7 +505,7 @@ var Renderer = Base.extend(function () {
             if (i > 0) {
                 var prevRenderable = list[i - 1];
                 var prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
-                var jointsLen = renderable.joints.length ? renderable.joints.length : 0;
+                var jointsLen = renderable.joints ? renderable.joints.length : 0;
                 // Keep program not change if joints, material, lightGroup are same of two renderables.
                 if (jointsLen === prevJointsLen
                     && renderable.material === prevRenderable.material
@@ -604,11 +604,11 @@ var Renderer = Base.extend(function () {
             var shader = material.shader;
 
             var currentDrawID = geometry.__uid__ + '-' + program.__uid__;
-            if (currentDrawID !== drawID) {
-                // TODO Seems need to be bound to null immediately if vao is changed?
+            var drawIDChanged = currentDrawID !== drawID;
+            drawID = currentDrawID;
+            if (drawIDChanged && vaoExt) {
+                // TODO Seems need to be bound to null immediately (or before bind another program?) if vao is changed
                 vaoExt.bindVertexArrayOES(null);
-                currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
-                drawID = currentDrawID;
             }
 
             mat4.copy(matrices.WORLD, worldM);
@@ -710,6 +710,9 @@ var Renderer = Base.extend(function () {
             }
 
             this._updateSkeleton(renderable, program);
+            if (drawIDChanged) {
+                currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
+            }
             this._renderObject(renderable, currentVAO);
 
             // After render hook
@@ -720,7 +723,9 @@ var Renderer = Base.extend(function () {
         }
 
         // TODO Seems need to be bound to null immediately if vao is changed?
-        vaoExt.bindVertexArrayOES(null);
+        if (vaoExt) {
+            vaoExt.bindVertexArrayOES(null);
+        }
 
         this.trigger('afterrenderpass', this, list, camera, passConfig);
     },
