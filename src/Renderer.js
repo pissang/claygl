@@ -751,15 +751,15 @@ var Renderer = Base.extend(function () {
 
         var glDrawMode = renderable.mode;
 
-        var uintExt = this.getGLExtension('OES_element_index_uint');
-        var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
-        var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
-
         if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
             _gl.lineWidth(this.lineWidth);
         }
 
         if (vao.indicesBuffer) {
+            var uintExt = this.getGLExtension('OES_element_index_uint');
+            var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
+            var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+
             _gl.drawElements(glDrawMode, vao.indicesBuffer.count, indicesType, 0);
         }
         else {
@@ -828,7 +828,6 @@ var Renderer = Base.extend(function () {
             else {
                 needsBindAttributes = false;
             }
-            vaoExt.bindVertexArrayOES(null);
             vaoExt.bindVertexArrayOES(vao.vao);
         }
         else if (vaoExt) {
