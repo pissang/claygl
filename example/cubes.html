@@ -72,12 +72,11 @@
 
             timeline.on('frame', function(deltaTime) {
                 var start = new Date().getTime();
-                var drawInfo = renderer.render(scene, camera);
+                renderer.render(scene, camera);
                 var renderTime = new Date().getTime() - start;
                 document.getElementById('time').innerHTML =
                         Math.round(1000 / deltaTime) + '<br />'
-                        + renderTime + '<br />'
-                        + drawInfo.renderedMeshCount + '(' + drawInfo.meshCount + ')';
+                        + renderTime + '<br />';
                 root.rotation.rotateY(Math.PI/500);
 
                 stats.update();

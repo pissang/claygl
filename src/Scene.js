@@ -3,6 +3,12 @@ import Light from './Light';
 import Camera from './Camera';
 import BoundingBox from './math/BoundingBox';
 import util from './core/util';
+import glmatrix from './dep/glmatrix';
+import LRUCache from './core/LRU';
+var mat4 = glmatrix.mat4;
+
+var IDENTITY = mat4.create();
+var WORLDVIEW = mat4.create();
 
 var programKeyCache = {};
 
@@ -25,6 +31,35 @@ function getProgramKey(lightNumbers) {
     return id;
 }
 
+function RenderList() {
+
+    this.opaque = [];
+    this.transparent = [];
+
+    this._opaqueCount = 0;
+    this._transparentCount = 0;
+}
+
+RenderList.prototype.startCount = function () {
+    this._opaqueCount = 0;
+    this._transparentList = 0;
+};
+
+RenderList.prototype.add = function (object, isTransparent) {
+    if (isTransparent) {
+        this.transparent[this._transparentCount++] = object;
+    }
+    else {
+        this.opaque[this._opaqueCount++] = object;
+    }
+};
+
+RenderList.prototype.endCount = function () {
+    this.transparent.length = this._transparentCount;
+    this.opaque.length = this._opaqueCount;
+};
+
+
 /**
  * @constructor clay.Scene
  * @extends clay.Node
@@ -36,25 +71,6 @@ var Scene = Node.extend(function () {
          * @type {clay.Material}
          */
         material: null,
-
-        /**
-         * @type {boolean}
-         */
-        autoUpdate: true,
-
-        /**
-         * Opaque renderable list, it will be updated automatically
-         * @type {clay.Renderable[]}
-         * @readonly
-         */
-        opaqueList: [],
-
-        /**
-         * Opaque renderable list, it will be updated automatically
-         * @type {clay.Renderable[]}
-         * @readonly
-         */
-        transparentList: [],
 
         lights: [],
 
@@ -92,10 +108,9 @@ var Scene = Node.extend(function () {
 
         _lightProgramKeys: {},
 
-        _opaqueObjectCount: 0,
-        _transparentObjectCount: 0,
-
         _nodeRepository: {},
+
+        _renderLists: new LRUCache(20)
 
     };
 }, function () {
@@ -122,14 +137,15 @@ var Scene = Node.extend(function () {
 
     // Remove node from scene
     removeFromScene: function (node) {
+        var idx;
         if (node instanceof Camera) {
-            var idx = this._cameraList.indexOf(node);
+            idx = this._cameraList.indexOf(node);
             if (idx >= 0) {
                 this._cameraList.splice(idx, 1);
             }
         }
         else if (node instanceof Light) {
-            var idx = this.lights.indexOf(node);
+            idx = this.lights.indexOf(node);
             if (idx >= 0) {
                 this.lights.splice(idx, 1);
             }
@@ -190,55 +206,6 @@ var Scene = Node.extend(function () {
         return newNode;
     },
 
-
-    /**
-     * Scene update
-     * @param  {boolean} force
-     * @param  {boolean} notUpdateLights
-     *         Useful in deferred pipeline
-     */
-    update: function (force, notUpdateLights) {
-        if (!(this.autoUpdate || force)) {
-            return;
-        }
-        Node.prototype.update.call(this, force);
-
-        var lights = this.lights;
-        var sceneMaterialTransparent = this.material && this.material.transparent;
-
-        this._opaqueObjectCount = 0;
-        this._transparentObjectCount = 0;
-
-        this._updateRenderList(this, sceneMaterialTransparent);
-
-        this.opaqueList.length = this._opaqueObjectCount;
-        this.transparentList.length = this._transparentObjectCount;
-
-        // reset
-        if (!notUpdateLights) {
-            this._previousLightNumber = this._lightNumber;
-
-            var lightNumber = {};
-            for (var i = 0; i < lights.length; i++) {
-                var light = lights[i];
-                var group = light.group;
-                if (!lightNumber[group]) {
-                    lightNumber[group] = {};
-                }
-                // User can use any type of light
-                lightNumber[group][light.type] = lightNumber[group][light.type] || 0;
-                lightNumber[group][light.type]++;
-            }
-            this._lightNumber = lightNumber;
-
-            for (var groupId in lightNumber) {
-                this._lightProgramKeys[groupId] = getProgramKey(lightNumber[groupId]);
-            }
-
-            this._updateLightUniforms();
-        }
-    },
-
     /**
      * Set main camera of the scene.
      * @param {claygl.Camera} camera
@@ -257,26 +224,75 @@ var Scene = Node.extend(function () {
         return this._cameraList[0];
     },
 
+    updateLights: function () {
+        var lights = this.lights;
+        this._previousLightNumber = this._lightNumber;
+
+        var lightNumber = {};
+        for (var i = 0; i < lights.length; i++) {
+            var light = lights[i];
+            var group = light.group;
+            if (!lightNumber[group]) {
+                lightNumber[group] = {};
+            }
+            // User can use any type of light
+            lightNumber[group][light.type] = lightNumber[group][light.type] || 0;
+            lightNumber[group][light.type]++;
+        }
+        this._lightNumber = lightNumber;
+
+        for (var groupId in lightNumber) {
+            this._lightProgramKeys[groupId] = getProgramKey(lightNumber[groupId]);
+        }
+
+        this._updateLightUniforms();
+    },
+
     // Traverse the scene and add the renderable
     // object to the render list
-    _updateRenderList: function (parent, sceneMaterialTransparent) {
+    updateRenderList: function (renderer, camera) {
+        var id = camera.__uid__;
+        var renderList = this._renderLists.get(id);
+        if (!renderList) {
+            renderList = new RenderList();
+            this._renderLists.put(id, renderList);
+        }
+        renderList.startCount();
+
+        var sceneMaterialTransparent = this.material && this.material.transparent || false;
+        this._doUpdateRenderList(renderer, this, camera, sceneMaterialTransparent, renderList);
+
+        renderList.endCount();
+
+        return renderList;
+    },
+
+    getRenderList: function (camera) {
+        return this._renderLists.get(camera.__uid__);
+    },
+
+    _doUpdateRenderList: function (renderer, parent, camera, sceneMaterialTransparent, renderList) {
         if (parent.invisible) {
             return;
         }
-
+        // TODO Optimize
         for (var i = 0; i < parent._children.length; i++) {
             var child = parent._children[i];
 
             if (child.isRenderable()) {
-                if (child.material.transparent || sceneMaterialTransparent) {
-                    this.transparentList[this._transparentObjectCount++] = child;
-                }
-                else {
-                    this.opaqueList[this._opaqueObjectCount++] = child;
+                // Frustum culling
+                var worldM = child.isSkinnedMesh() ? IDENTITY : child.worldTransform.array;
+                var geometry = child.geometry;
+
+                mat4.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
+                if (!geometry.boundingBox || !renderer.isFrustumCulled(
+                    child, this, camera, WORLDVIEW, camera.projectionMatrix.array
+                )) {
+                    renderList.add(child, child.material.transparent || sceneMaterialTransparent);
                 }
             }
             if (child._children.length > 0) {
-                this._updateRenderList(child, sceneMaterialTransparent);
+                this._doUpdateRenderList(renderer, child, camera, sceneMaterialTransparent, renderList);
             }
         }
     },
@@ -421,8 +437,8 @@ var Scene = Node.extend(function () {
      */
     dispose: function () {
         this.material = null;
-        this.opaqueList = [];
-        this.transparentList = [];
+        this._opaqueList = [];
+        this._transparentList = [];
 
         this.lights = [];
 

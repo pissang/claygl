@@ -411,15 +411,15 @@ var Renderer = Base.extend(function () {
         if (!notUpdateScene) {
             scene.update(false);
         }
+        scene.updateLights();
+
         camera = camera || scene.getMainCamera();
         if (!camera) {
             console.error('Can\'t find camera in the scene.');
             return;
         }
-        // Update if camera not mounted on the scene
-        if (!camera.getScene()) {
-            camera.update(true);
-        }
+        camera.update();
+        var renderList = scene.updateRenderList(this, camera);
 
         this._sceneRendering = scene;
 
@@ -427,11 +427,11 @@ var Renderer = Base.extend(function () {
         scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
         scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
 
-        var opaqueList = this.cullRenderList(scene.opaqueList, scene, camera);
-        var transparentList = this.cullRenderList(scene.transparentList, scene, camera);
+        var opaqueList = renderList.opaque;
+        var transparentList = renderList.transparent;
         var sceneMaterial = scene.material;
 
-        scene.trigger('beforerender', this, scene, camera);
+        scene.trigger('beforerender', this, scene, camera, renderList);
 
         // Render pre z
         if (preZ) {
@@ -453,30 +453,24 @@ var Renderer = Base.extend(function () {
         }
 
         // Render opaque list
-        var opaqueRenderInfo = this.renderPass(opaqueList, camera, {
+        this.renderPass(opaqueList, camera, {
             getMaterial: function (renderable) {
                 return sceneMaterial || renderable.material;
             },
             sortCompare: this.opaqueSortCompare
         });
 
-        var transparentRenderInfo = this.renderPass(transparentList, camera, {
+        this.renderPass(transparentList, camera, {
             getMaterial: function (renderable) {
                 return sceneMaterial || renderable.material;
             },
             sortCompare: this.transparentSortCompare
         });
 
-        var renderInfo = {};
-        for (var name in opaqueRenderInfo) {
-            renderInfo[name] = opaqueRenderInfo[name] + transparentRenderInfo[name];
-        }
-
-        scene.trigger('afterrender', this, scene, camera, renderInfo);
+        scene.trigger('afterrender', this, scene, camera, renderList);
 
         // Cleanup
         this._sceneRendering = null;
-        return renderInfo;
     },
 
     getProgram: function (renderable, renderMaterial, scene) {
@@ -531,32 +525,6 @@ var Renderer = Base.extend(function () {
     },
 
     /**
-     * Do frustum culling on render list
-     */
-    cullRenderList: function (list, scene, camera) {
-        var culledRenderList = [];
-        for (var i = 0; i < list.length; i++) {
-            var renderable = list[i];
-
-            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform.array;
-            var geometry = renderable.geometry;
-
-            mat4.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix.array , worldM);
-            if (geometry.boundingBox) {
-                if (this.isFrustumCulled(
-                    renderable, scene, camera, matrices.WORLDVIEW, camera.projectionMatrix.array
-                )) {
-                    continue;
-                }
-            }
-
-            culledRenderList.push(renderable);
-        }
-
-        return culledRenderList;
-    },
-
-    /**
      * Render a single renderable list in camera in sequence
      * @param {clay.Renderable[]} list List of all renderables.
      * @param {clay.Camera} camera
@@ -571,13 +539,6 @@ var Renderer = Base.extend(function () {
     renderPass: function(list, camera, passConfig) {
         this.trigger('beforerenderpass', this, list, camera, passConfig);
 
-        var renderInfo = {
-            triangleCount: 0,
-            vertexCount: 0,
-            drawCallCount: 0,
-            meshCount: list.length,
-            renderedMeshCount: 0
-        };
         passConfig = passConfig || {};
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
         passConfig.beforeRender = passConfig.beforeRender || noop;
@@ -762,8 +723,6 @@ var Renderer = Base.extend(function () {
         vaoExt.bindVertexArrayOES(null);
 
         this.trigger('afterrenderpass', this, list, camera, passConfig);
-
-        return renderInfo;
     },
 
     _updateSkeleton: function (object, program) {
@@ -791,8 +750,6 @@ var Renderer = Base.extend(function () {
         var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
         var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
-        var renderInfo = this._renderInfo;
-
         if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
             _gl.lineWidth(this.lineWidth);
         }
@@ -805,7 +762,6 @@ var Renderer = Base.extend(function () {
             // vertexCount may get the wrong value when geometry forget to mark dirty after update
             _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
         }
-        return renderInfo;
     },
 
     _bindVAO: function (vaoExt, shader, geometry, program) {
@@ -954,7 +910,7 @@ var Renderer = Base.extend(function () {
             // FIXME Only rendererable which cast shadow ?
 
             // FIXME boundingBox becomes much larger after transformd.
-            if (scene && object.isRenderable() && object.castShadow) {
+            if (scene && object.castShadow) {
                 scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
             }
             // Ignore frustum culling if object is skinned mesh.

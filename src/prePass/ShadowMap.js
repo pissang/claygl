@@ -91,7 +91,6 @@ var ShadowMapPass = Base.extend(function () {
         _depthMaterials: {},
         _distanceMaterials: {},
 
-        _opaqueCasters: [],
         _receivers: [],
         _lightsCastShadow: [],
 
@@ -163,10 +162,7 @@ var ShadowMapPass = Base.extend(function () {
         renderer.restoreClear();
     },
 
-    _updateCasterAndReceiver: function (renderer, mesh) {
-        if (mesh.castShadow) {
-            this._opaqueCasters.push(mesh);
-        }
+    _updateReceivers: function (renderer, mesh) {
         if (mesh.receiveShadow) {
             this._receivers.push(mesh);
             mesh.material.set('shadowEnabled', 1);
@@ -177,9 +173,6 @@ var ShadowMapPass = Base.extend(function () {
             mesh.material.set('shadowEnabled', 0);
         }
 
-        if (!mesh.material.shader && mesh.material.updateShader) {
-            mesh.material.updateShader(renderer);
-        }
         if (this.softShadow === ShadowMapPass.VSM) {
             mesh.material.define('fragment', 'USE_VSM');
             mesh.material.undefine('fragment', 'PCF_KERNEL_SIZE');
@@ -197,14 +190,13 @@ var ShadowMapPass = Base.extend(function () {
     },
 
     _update: function (renderer, scene) {
-        for (var i = 0; i < scene.opaqueList.length; i++) {
-            this._updateCasterAndReceiver(renderer, scene.opaqueList[i]);
-        }
-        for (var i = 0; i < scene.transparentList.length; i++) {
-            // TODO Transparent object receive shadow will be very slow
-            // in stealth demo, still not find the reason
-            this._updateCasterAndReceiver(renderer, scene.transparentList[i]);
-        }
+        var self = this;
+        scene.traverse(function (renderable) {
+            if (renderable.isRenderable()) {
+                self._updateReceivers(renderer, renderable);
+            }
+        });
+
         for (var i = 0; i < scene.lights.length; i++) {
             var light = scene.lights[i];
             if (light.castShadow) {
@@ -219,7 +211,6 @@ var ShadowMapPass = Base.extend(function () {
             this._shadowMapNumber[name] = 0;
         }
         this._lightsCastShadow.length = 0;
-        this._opaqueCasters.length = 0;
         this._receivers.length = 0;
 
         var _gl = renderer.gl;
@@ -231,6 +222,7 @@ var ShadowMapPass = Base.extend(function () {
             sceneCamera.update();
         }
 
+        scene.updateLights();
         this._update(renderer, scene);
 
         // Needs to update the receivers again if shadows come from 1 to 0.
@@ -280,7 +272,6 @@ var ShadowMapPass = Base.extend(function () {
                     scene,
                     sceneCamera,
                     light,
-                    this._opaqueCasters,
                     shadowCascadeClips,
                     directionalLightMatrices,
                     directionalLightShadowMaps
@@ -291,7 +282,6 @@ var ShadowMapPass = Base.extend(function () {
                     renderer,
                     scene,
                     light,
-                    this._opaqueCasters,
                     spotLightMatrices,
                     spotLightShadowMaps
                 );
@@ -301,7 +291,6 @@ var ShadowMapPass = Base.extend(function () {
                     renderer,
                     scene,
                     light,
-                    this._opaqueCasters,
                     pointLightShadowMaps
                 );
             }
@@ -385,12 +374,15 @@ var ShadowMapPass = Base.extend(function () {
         var lightViewProjMatrix = new Matrix4();
         var lightProjMatrix = new Matrix4();
 
-        return function (renderer, scene, sceneCamera, light, casters, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
+        return function (renderer, scene, sceneCamera, light, shadowCascadeClips, directionalLightMatrices, directionalLightShadowMaps) {
 
             var defaultShadowMaterial = this._getDepthMaterial(light);
             var passConfig = {
                 getMaterial: function (renderable) {
                     return renderable.shadowDepthMaterial || defaultShadowMaterial;
+                },
+                ifRender: function (renderable) {
+                    return renderable.castShadow;
                 },
                 sortCompare: Renderer.opaqueSortCompare
             };
@@ -467,7 +459,8 @@ var ShadowMapPass = Base.extend(function () {
                 // Reversed, left to right => far to near
                 renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
-                renderer.renderPass(casters, lightCamera, passConfig);
+                var renderList = scene.updateRenderList(renderer, lightCamera);
+                renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
                 // Filter for VSM
                 if (this.softShadow === ShadowMapPass.VSM) {
@@ -505,10 +498,14 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
+            ifRender: function (renderable) {
+                return renderable.castShadow;
+            },
             sortCompare: Renderer.opaqueSortCompare
         };
 
-        renderer.renderPass(renderer.cullRenderList(casters, null, lightCamera), lightCamera, passConfig);
+        var renderList = scene.updateRenderList(renderer, lightCamera);
+        renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);
 
@@ -526,7 +523,7 @@ var ShadowMapPass = Base.extend(function () {
         spotLightMatrices.push(matrix.array);
     },
 
-    renderPointLightShadow: function (renderer, scene, light, casters, pointLightShadowMaps) {
+    renderPointLightShadow: function (renderer, scene, light, pointLightShadowMaps) {
         var texture = this._getTexture(light);
         var _gl = renderer.gl;
         pointLightShadowMaps.push(texture);
@@ -535,6 +532,9 @@ var ShadowMapPass = Base.extend(function () {
         var passConfig = {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
+            },
+            ifRender: function (renderable) {
+                return renderable.castShadow;
             },
             sortCompare: Renderer.opaqueSortCompare
         };
@@ -547,7 +547,8 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            renderer.renderPass(renderer.cullRenderList(casters, null, camera), camera, passConfig);
+            var renderList = scene.updateRenderList(renderer, camera);
+            renderer.renderPass(renderList.opaque, camera, passConfig);
         }
 
         this._frameBuffer.unbind(renderer);
@@ -793,7 +794,6 @@ var ShadowMapPass = Base.extend(function () {
             }
         }
 
-        this._opaqueCasters = [];
         this._receivers = [];
         this._lightsCastShadow = [];
     }

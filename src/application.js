@@ -246,9 +246,6 @@ function App3D(dom, appNS) {
             appNS.loop(self);
 
             gScene.update();
-
-            self._updateGraphicOptions(appNS.graphic, gScene.opaqueList, false);
-            self._updateGraphicOptions(appNS.graphic, gScene.transparentList, false);
             var skyboxList = [];
             gScene.skybox && skyboxList.push(gScene.skybox);
             gScene.skydome && skyboxList.push(gScene.skydome);
@@ -279,6 +276,11 @@ function App3D(dom, appNS) {
             gGeometriesList = newGeometriesList;
         });
     });
+
+    gScene.on('beforerender', function (renderer, scene, camera, renderList) {
+        this._updateGraphicOptions(appNS.graphic, renderList.opaque, false);
+        this._updateGraphicOptions(appNS.graphic, renderList.transparent, false);
+    }, this);
 }
 
 function isImageLikeElement(val) {
@@ -424,7 +426,7 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
 App3D.prototype._doRender = function (renderer, scene) {
     var camera = scene.getMainCamera();
     camera.aspect = renderer.getViewportAspect();
-    renderer.render(scene);
+    renderer.render(scene, camera, true);
 };
 
 
@@ -451,11 +453,10 @@ function updateUsed(resource, list) {
     }
 }
 function collectResources(scene, textureResourceList, geometryResourceList) {
-    function trackQueue(queue) {
-        var prevMaterial;
-        var prevGeometry;
-        for (var i = 0; i < queue.length; i++) {
-            var renderable = queue[i];
+    var prevMaterial;
+    var prevGeometry;
+    scene.traverse(function (renderable) {
+        if (renderable.isRenderable()) {
             var geometry = renderable.geometry;
             var material = renderable.material;
 
@@ -488,10 +489,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
             prevMaterial = material;
             prevGeometry = geometry;
         }
-    }
-
-    trackQueue(scene.opaqueList);
-    trackQueue(scene.transparentList);
+    });
 
     for (var k = 0; k < scene.lights.length; k++) {
         // Track AmbientCubemap

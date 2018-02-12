@@ -111,7 +111,7 @@ var Camera = Node.extend(function () {
 
             return ray;
         };
-    })()
+    })(),
 
     /**
      * @function
