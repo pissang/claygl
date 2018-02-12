@@ -5,7 +5,7 @@
 # TODO: texture flipY?
 # http://github.com/pissang/
 # ############################################
-import sys, struct, json, os.path, math, argparse
+import sys, struct, json, os.path, math, argparse, ntpath
 
 try:
     from FbxCommon import *
@@ -1232,7 +1232,8 @@ def CorrectImagesPaths(pFilePath):
     for lGLTFImage in lib_images:
         lUri = lGLTFImage['uri']
         lUri = lUri.replace(r'[\\\/]+', os.path.sep)
-        lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
+        lUri = FindFileInDir(ntpath.basename(lUri), lFileDir)
+
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
             if not lRelUri == lGLTFImage['uri']:
@@ -1251,7 +1252,7 @@ def EmbedImagesToBinary(pBuffer, pFilePath):
 
         if not os.path.isfile(lUri):
             lUri = lUri.replace(r'[\\\/]+', os.path.sep)
-            lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
+            lUri = FindFileInDir(ntpath.basename(lUri), lFileDir)
         try:
             f = open(lUri, 'rb')
             lImgBytes = f.read()
