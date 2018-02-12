@@ -10,7 +10,7 @@
         var Shader = clay.Shader;
 
         var renderer = new clay.Renderer({
-            canvas : document.getElementById("Main")
+            canvas: document.getElementById("Main")
         });
         var timeline =  new clay.Timeline();
         timeline.start();
@@ -21,32 +21,32 @@
         var Vector3 = clay.Vector3;
         var particleRenderable = new clay.particle.ParticleRenderable();
         var emitter = new clay.particle.Emitter({
-            max : 5000,
-            amount : 7,
-            life : Value.constant(2),
-            spriteSize : Value.constant(400),
-            position : Value.random3D(new Vector3(-100, -30, 50), new Vector3(100, -40, 90)),
-            velocity : Value.random3D(new Vector3(-20, 0, -10), new Vector3(20, 20, 10))
+            max: 5000,
+            amount: 7,
+            life: Value.constant(2),
+            spriteSize: Value.constant(400),
+            position: Value.random3D(new Vector3(-100, -30, 50), new Vector3(100, -40, 90)),
+            velocity: Value.random3D(new Vector3(-20, 0, -10), new Vector3(20, 20, 10))
         });
         particleRenderable.addEmitter(emitter);
         particleRenderable.material.set('color', [1, 1, 1]);
         particleRenderable.material.set('sprite', new clay.Texture2D({
-            image : generateSprite()
+            image: generateSprite()
         }));
 
         var scene = new clay.Scene();
         var camera = new clay.camera.Perspective({
-            aspect : renderer.getViewportAspect(),
-            far : 1000,
-            near : 1
+            aspect: renderer.getViewportAspect(),
+            far: 1000,
+            near: 1
         });
         camera.position.set(0, 0, 120);
         scene.add(particleRenderable);
 
         var planeMesh = new clay.Mesh({
-            geometry : new clay.geometry.Plane(),
-            material : new clay.Material({
-                shader : clay.shader.library.get('clay.lambert')
+            geometry: new clay.geometry.Plane(),
+            material: new clay.Material({
+                shader: clay.shader.library.get('clay.lambert')
             })
         });
         planeMesh.material.set('color', [0.3, 0, 0]);
@@ -54,7 +54,7 @@
         scene.add(planeMesh);
 
         var light = new clay.light.Point({
-            range : 300
+            range: 300
         });
         light.position.z = 50;
         light.position.y = -40;

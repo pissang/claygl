@@ -612,7 +612,8 @@ var Renderer = Base.extend(function () {
             }
 
             mat4.copy(matrices.WORLD, worldM);
-            mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION , worldM);
+            mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM);
+            mat4.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix.array, worldM);
             if (shader.matrixSemantics.WORLDINVERSE ||
                 shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
                 mat4.invert(matrices.WORLDINVERSE, worldM);
@@ -829,9 +830,6 @@ var Renderer = Base.extend(function () {
                 needsBindAttributes = false;
             }
             vaoExt.bindVertexArrayOES(vao.vao);
-        }
-        else if (vaoExt) {
-            vaoExt.bindVertexArrayOES(null);
         }
 
         var availableAttributes = vao.availableAttributes;
