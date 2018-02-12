@@ -34,8 +34,8 @@
             document.body.insertBefore(stats.domElement, dom);
 
             var app = clay.application.create('#main', {
-                // Enable event. Or the mouseover, mouseout events will not be triggered.
-                event: true,
+
+                devicePixelRatio: 1,
 
                 init: function (app) {
                     // Create camera
@@ -45,8 +45,6 @@
                         'ortho',
                         [width, height, 10000]
                     );
-
-                    this._cubes = [];
 
                     var cnt = 100;
                     var distance = 20;
@@ -64,14 +62,12 @@
                                 0
                             );
                             cube.scale.set(size, size, size);
-                            this._cubes.push(cube);
                         }
                     }
                 },
 
                 loop: function (app) {
                     stats.end();
-
                     stats.begin();
                 }
             });

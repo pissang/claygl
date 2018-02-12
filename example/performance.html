@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <style>
+            html, body {
+                padding: 0;
+                margin: 0;
+            }
+
+            canvas {
+                position: absolute;
+                left: 0;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+
+            #stats {
+                z-index: 10;
+                position: relative;
+            }
+        </style>
+        <script src="lib/stats.js"></script>
+        <script src="../dist/claygl.js"></script>
+    </head>
+    <body>
+        <canvas id="main"></canvas>
+        <script>
+
+        var renderer = new clay.Renderer({
+            canvas: document.getElementById('main'),
+            devicePixelRatio: 1
+        });
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var timeline = new clay.Timeline();
+        timeline.start();
+        renderer.resize(width, height);
+
+        stats = new Stats();
+        document.body.appendChild(stats.domElement);
+
+        var material = new clay.Material({
+            shader: new clay.Shader(
+                clay.Shader.source('clay.basic.vertex'),
+                clay.Shader.source('clay.basic.fragment')
+            )
+        });
+        material.set('color', 'red');
+        var cubeGeo = new clay.geometry.Cube();
+
+        var scene = new clay.Scene();
+        var camera = new clay.camera.Orthographic({
+            left: -width / 2,
+            right: width / 2,
+            top: height / 2,
+            bottom: -height / 2,
+            near: 0,
+            far: 10000
+        });
+        camera.position.set(500, 500, 500);
+        camera.lookAt(new clay.Vector3(0, 0, 0));
+        var cnt = 100;
+        var distance = 20;
+        var size = 10 / 2;
+        for (var i = 0; i < cnt; ++i) {
+            for (var j = 0; j < cnt; ++j) {
+                var cube = new clay.Mesh({
+                    geometry: cubeGeo,
+                    material: material
+                });
+                cube.position.set(
+                    (i - cnt / 2) * distance,
+                    (j - cnt / 2) * distance,
+                    0
+                );
+                cube.scale.set(size, size, size);
+                scene.add(cube);
+            }
+        }
+
+        timeline.on('frame', function () {
+            stats.begin();
+            renderer.render(scene, camera);
+            stats.end();
+        });
+        </script>
+    </body>
+</html>

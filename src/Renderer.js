@@ -813,7 +813,6 @@ var Renderer = Base.extend(function () {
         var _gl = this.gl;
 
         var vaoId = this.__uid__ + '-' + program.__uid__;
-        geometry.__vaoCache = geometry.__vaoCache || {};
         var vao = geometry.__vaoCache[vaoId];
         if (!vao) {
             var chunks = geometry.getBufferChunks(this);

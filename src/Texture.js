@@ -11,9 +11,7 @@ import Cache from './core/Cache';
  * @alias clay.Texture
  * @extends clay.core.Base
  */
-var Texture = Base.extend(
-/** @lends clay.Texture# */
-{
+var Texture = Base.extend( /** @lends clay.Texture# */ {
     /**
      * Texture width, readonly when the texture source is image
      * @type {number}
@@ -122,7 +120,12 @@ var Texture = Base.extend(
      */
     dynamic: false,
 
-    NPOT: false
+    NPOT: false,
+
+    // PENDING
+    // Init it here to avoid deoptimization when it's assigned in application dynamically
+    __used: 0
+
 }, function () {
     this._cache = new Cache();
 },

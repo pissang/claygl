@@ -382,13 +382,19 @@ var Geometry = Base.extend(function () {
          */
         dynamic: true,
 
-        _enabledAttributes: null
+        _enabledAttributes: null,
+
+        // PENDING
+        // Init it here to avoid deoptimization when it's assigned in application dynamically
+        __used: 0
     };
 }, function() {
     // Use cache
     this._cache = new Cache();
 
     this._attributeList = Object.keys(this.attributes);
+
+    this.__vaoCache = {};
 },
 /** @lends clay.Geometry.prototype */
 {

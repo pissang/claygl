@@ -330,9 +330,9 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
             var eveType = _eveType;
 
             if (eveType.indexOf('touch') >= 0) {
-                var touch = eveType != 'touchend'
-                ? e.targetTouches[0]
-                : e.changedTouches[0];
+                var touch = eveType !== 'touchend'
+                    ? e.targetTouches[0]
+                    : e.changedTouches[0];
                 if (eveType === 'touchstart') {
                     eveType = 'mousedown';
                 }
@@ -430,22 +430,22 @@ App3D.prototype._doRender = function (renderer, scene) {
 
 function markUnused(resourceList) {
     for (var i = 0; i < resourceList.length; i++) {
-        resourceList[i].__used__ = 0;
+        resourceList[i].__used = 0;
     }
 }
 
 function checkAndDispose(renderer, resourceList) {
     for (var i = 0; i < resourceList.length; i++) {
-        if (!resourceList[i].__used__) {
+        if (!resourceList[i].__used) {
             resourceList[i].dispose(renderer);
         }
     }
 }
 
 function updateUsed(resource, list) {
-    resource.__used__ = resource.__used__ || 0;
-    resource.__used__++;
-    if (resource.__used__ === 1) {
+    resource.__used = resource.__used || 0;
+    resource.__used++;
+    if (resource.__used === 1) {
         // Don't push to the list twice.
         list.push(resource);
     }
@@ -560,8 +560,7 @@ function nearestPowerOfTwo(val) {
 }
 function convertTextureToPowerOfTwo(texture) {
     if ((texture.wrapS === Texture.REPEAT || texture.wrapT === Texture.REPEAT)
-     && texture.image
-     ) {
+     && texture.image) {
         // var canvas = document.createElement('canvas');
         var width = nearestPowerOfTwo(texture.width);
         var height = nearestPowerOfTwo(texture.height);
