@@ -16,6 +16,8 @@ export class BoundingBox {
 
     applyTransform(matrix: Matrix4): void;
 
+    transformFrom(source: BoundingBox, matrix: Matrix4): void;
+
     applyProjection(matrix: Matrix4): void;
 
     updateVertices(): void;

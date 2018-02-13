@@ -6,12 +6,6 @@ import Frustum from '../math/Frustum';
 import Matrix4 from '../math/Matrix4';
 import Renderer from '../Renderer';
 import Shader from '../Shader';
-import Light from '../Light';
-import Mesh from '../Mesh';
-import SpotLight from '../light/Spot';
-import DirectionalLight from '../light/Directional';
-import PointLight from '../light/Point';
-import shaderLibrary from '../shader/library';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
@@ -25,7 +19,6 @@ import TexturePool from '../compositor/TexturePool';
 
 import glMatrix from '../dep/glmatrix';
 var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
 
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
@@ -533,11 +526,73 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
-            ifRender: function (renderable) {
-                return renderable.castShadow;
-            },
             sortCompare: Renderer.opaqueSortCompare
         };
+
+        var renderListEachSide = {
+            px: [], py: [], pz: [], nx: [], ny: [], nz: []
+        };
+        var bbox = new BoundingBox();
+        var lightWorldPosition = light.getWorldPosition().array;
+        var lightBBox = new BoundingBox();
+        var range = light.range;
+        lightBBox.min.setArray(lightWorldPosition);
+        lightBBox.max.setArray(lightWorldPosition);
+        var extent = new Vector3(range, range, range);
+        lightBBox.max.add(extent);
+        lightBBox.min.sub(extent);
+
+        var targetsNeedRender = { px: false, py: false, pz: false, nx: false, ny: false, nz: false };
+        scene.traverse(function (renderable) {
+            if (renderable.isRenderable() && renderable.castShadow) {
+                var geometry = renderable.geometry;
+                if (!geometry.boundingBox) {
+                    for (var i = 0; i < targets.length; i++) {
+                        renderListEachSide[targets[i]].push(renderable);
+                    }
+                    return;
+                }
+                bbox.transformFrom(geometry.boundingBox, renderable.worldTransform);
+                if (!bbox.intersectBoundingBox(lightBBox)) {
+                    return;
+                }
+
+                bbox.updateVertices();
+                for (var i = 0; i < targets.length; i++) {
+                    targetsNeedRender[targets[i]] = false;
+                }
+                for (var i = 0; i < 8; i++) {
+                    var vtx = bbox.vertices[i];
+                    var x = vtx[0] - lightWorldPosition[0];
+                    var y = vtx[1] - lightWorldPosition[1];
+                    var z = vtx[2] - lightWorldPosition[2];
+                    var absx = Math.abs(x);
+                    var absy = Math.abs(y);
+                    var absz = Math.abs(z);
+                    if (absx > absy) {
+                        if (absx > absz) {
+                            targetsNeedRender[x > 0 ? 'px' : 'nx'] = true;
+                        }
+                        else {
+                            targetsNeedRender[z > 0 ? 'pz' : 'nz'] = true;
+                        }
+                    }
+                    else {
+                        if (absy > absz) {
+                            targetsNeedRender[y > 0 ? 'py' : 'ny'] = true;
+                        }
+                        else {
+                            targetsNeedRender[z > 0 ? 'pz' : 'nz'] = true;
+                        }
+                    }
+                }
+                for (var i = 0; i < targets.length; i++) {
+                    if (targetsNeedRender[targets[i]]) {
+                        renderListEachSide[targets[i]].push(renderable);
+                    }
+                }
+            }
+        });
 
         for (var i = 0; i < 6; i++) {
             var target = targets[i];
@@ -547,8 +602,7 @@ var ShadowMapPass = Base.extend(function () {
             this._frameBuffer.bind(renderer);
             _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-            var renderList = scene.updateRenderList(renderer, camera);
-            renderer.renderPass(renderList.opaque, camera, passConfig);
+            renderer.renderPass(renderListEachSide[target], camera, passConfig);
         }
 
         this._frameBuffer.unbind(renderer);
@@ -556,7 +610,7 @@ var ShadowMapPass = Base.extend(function () {
 
     _getDepthMaterial: function (light) {
         var shadowMaterial = this._lightMaterials[light.__uid__];
-        var isPointLight = light instanceof PointLight;
+        var isPointLight = light.type === 'POINT_LIGHT';
         if (!shadowMaterial) {
             var shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
             shadowMaterial = new Material({
@@ -616,7 +670,7 @@ var ShadowMapPass = Base.extend(function () {
         var resolution = light.shadowResolution || 512;
         cascade = cascade || 1;
         if (!texture) {
-            if (light instanceof PointLight) {
+            if (light.type === 'POINT_LIGHT') {
                 texture = new TextureCube();
             }
             else {

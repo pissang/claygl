@@ -12,9 +12,7 @@ var nameId = 0;
  * @constructor clay.Node
  * @extends clay.core.Base
  */
-var Node = Base.extend(
-/** @lends clay.Node# */
-{
+var Node = Base.extend(/** @lends clay.Node# */{
     /**
      * Scene node name
      * @type {string}
@@ -155,9 +153,6 @@ var Node = Base.extend(
      * @param {clay.Node} node
      */
     add: function (node) {
-        if (this._inIterating) {
-            console.warn('Add operation can cause unpredictable error when in iterating');
-        }
         var originalParent = node._parent;
         if (originalParent === this) {
             return;
@@ -182,9 +177,6 @@ var Node = Base.extend(
      * @param {clay.Node} node
      */
     remove: function (node) {
-        if (this._inIterating) {
-            console.warn('Remove operation can cause unpredictable error when in iterating');
-        }
         var children = this._children;
         var idx = children.indexOf(node);
         if (idx < 0) {
@@ -373,41 +365,34 @@ var Node = Base.extend(
     },
 
     /**
-     * Depth first traverse all its descendant scene nodes and
+     * Depth first traverse all its descendant scene nodes.
+     *
+     * **WARN** Don't do `add`, `remove` operation in the callback during traverse.
      * @param {Function} callback
      * @param {Node} [context]
-     * @param {Function} [filter]
      */
-    traverse: function (callback, context, filter) {
-
-        this._inIterating = true;
-
-        if (!filter || filter.call(context, this)) {
-            callback.call(context, this);
-        }
+    traverse: function (callback, context) {
+        callback.call(context, this);
         var _children = this._children;
         for(var i = 0, len = _children.length; i < len; i++) {
-            _children[i].traverse(callback, context, filter);
+            _children[i].traverse(callback, context);
         }
-
-        this._inIterating = false;
     },
 
     /**
      * Traverse all children nodes.
+     *
+     * **WARN** DON'T do `add`, `remove` operation in the callback during iteration.
+     *
      * @param {Function} callback
      * @param {Node} [context]
      */
-    eachChild: function (callback, context, ctor) {
-        this._inIterating = true;
-
+    eachChild: function (callback, context) {
         var _children = this._children;
         for(var i = 0, len = _children.length; i < len; i++) {
             var child = _children[i];
             callback.call(context, child, i);
         }
-
-        this._inIterating = false;
     },
 
     /**

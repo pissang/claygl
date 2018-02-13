@@ -35,7 +35,7 @@ var Vector3 = function(x, y, z) {
 
 Vector3.prototype = {
 
-    constructor : Vector3,
+    constructor: Vector3,
 
     /**
      * Add b to self

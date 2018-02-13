@@ -25,6 +25,8 @@ var BoundingBox = function (min, max) {
      * @type {clay.Vector3}
      */
     this.max = max || new Vector3(-Infinity, -Infinity, -Infinity);
+
+    this.vertices = null;
 };
 
 BoundingBox.prototype = {
@@ -148,7 +150,16 @@ BoundingBox.prototype = {
      * Apply an affine transform matrix to the bounding box
      * @param  {clay.Matrix4} matrix
      */
-    applyTransform: (function () {
+    applyTransform: function (matrix) {
+        this.transformFrom(this, matrix);
+    },
+
+    /**
+     * Get from another bounding box and an affine transform matrix.
+     * @param {clay.BoundingBox} source
+     * @param {clay.Matrix4} matrix
+     */
+    transformFrom: (function () {
         // http://dev.theomader.com/transform-bounding-boxes/
         var xa = vec3.create();
         var xb = vec3.create();
@@ -157,9 +168,9 @@ BoundingBox.prototype = {
         var za = vec3.create();
         var zb = vec3.create();
 
-        return function (matrix) {
-            var min = this.min.array;
-            var max = this.max.array;
+        return function (source, matrix) {
+            var min = source.min.array;
+            var max = source.max.array;
 
             var m = matrix.array;
 
@@ -172,6 +183,8 @@ BoundingBox.prototype = {
             za[0] = m[8] * min[2]; za[1] = m[9] * min[2]; za[2] = m[10] * min[2];
             zb[0] = m[8] * max[2]; zb[1] = m[9] * max[2]; zb[2] = m[10] * max[2];
 
+            min = this.min.array;
+            max = this.max.array;
             min[0] = Math.min(xa[0], xb[0]) + Math.min(ya[0], yb[0]) + Math.min(za[0], zb[0]) + m[12];
             min[1] = Math.min(xa[1], xb[1]) + Math.min(ya[1], yb[1]) + Math.min(za[1], zb[1]) + m[13];
             min[2] = Math.min(xa[2], xb[2]) + Math.min(ya[2], yb[2]) + Math.min(za[2], zb[2]) + m[14];
@@ -241,7 +254,7 @@ BoundingBox.prototype = {
         var vertices = this.vertices;
         if (!vertices) {
             // Cube vertices
-            var vertices = [];
+            vertices = [];
             for (var i = 0; i < 8; i++) {
                 vertices[i] = vec3.fromValues(0, 0, 0);
             }

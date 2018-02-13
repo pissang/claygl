@@ -902,10 +902,10 @@ var Renderer = Base.extend(function () {
         var cullingMatrix = new Matrix4();
         return function (object, scene, camera, worldViewMat, projectionMat) {
             // Bounding box can be a property of object(like light) or renderable.geometry
+            // PENDING
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
             cullingMatrix.array = worldViewMat;
-            cullingBoundingBox.copy(geoBBox);
-            cullingBoundingBox.applyTransform(cullingMatrix);
+            cullingBoundingBox.transformFrom(geoBBox, cullingMatrix);
 
             // Passingly update the scene bounding box
             // FIXME exclude very large mesh like ground plane or terrain ?
@@ -1076,7 +1076,7 @@ Renderer.opaqueSortCompare = Renderer.prototype.opaqueSortCompare = function(x, 
             }
             return x.material.__uid__ - y.material.__uid__;
         }
-        if (x.__program  && y.__program) {
+        if (x.__program && y.__program) {
             return x.__program.__uid__ - y.__program.__uid__;
         }
         return 0;

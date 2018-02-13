@@ -85,6 +85,7 @@ Frustum.prototype = {
 
         // Perspective projection
         var boundingBox = this.boundingBox;
+        var vertices = this.vertices;
         if (m15 === 0)  {
             var aspect = m5 / m0;
             var zNear = -m14 / (m10 - 1);
@@ -95,7 +96,6 @@ Frustum.prototype = {
             boundingBox.min.set(-farY * aspect, -farY, zFar);
             boundingBox.max.set(farY * aspect, farY, zNear);
             // update vertices
-            var vertices = this.vertices;
             //--- min z
             // min x
             vec3Set(vertices[0], -farY * aspect, -farY, zFar);
@@ -123,7 +123,6 @@ Frustum.prototype = {
 
             var min = boundingBox.min.array;
             var max = boundingBox.max.array;
-            var vertices = this.vertices;
             //--- min z
             // min x
             vec3Set(vertices[0], min[0], min[1], min[2]);
