@@ -106,7 +106,7 @@ function ProgramManager(renderer) {
 ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var cache = this._cache;
 
-    var key = 's' + material.shader.shaderID + 'm' + material.programKey;
+    var key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
     if (scene) {
         key += 'se' + scene.getProgramKey(renderable.lightGroup);
     }

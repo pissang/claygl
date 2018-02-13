@@ -39,13 +39,6 @@
         stats = new Stats();
         document.body.appendChild(stats.domElement);
 
-        var material = new clay.Material({
-            shader: new clay.Shader(
-                clay.Shader.source('clay.basic.vertex'),
-                clay.Shader.source('clay.basic.fragment')
-            )
-        });
-        material.set('color', 'red');
         var cubeGeo = new clay.geometry.Cube();
 
         var scene = new clay.Scene();
@@ -62,8 +55,16 @@
         var cnt = 100;
         var distance = 20;
         var size = 10 / 2;
+        var shader = new clay.Shader(
+            clay.Shader.source('clay.basic.vertex'),
+            clay.Shader.source('clay.basic.fragment')
+        );
         for (var i = 0; i < cnt; ++i) {
             for (var j = 0; j < cnt; ++j) {
+                var material = new clay.Material({
+                    shader: shader
+                });
+                material.set('color', 'red');
                 var cube = new clay.Mesh({
                     geometry: cubeGeo,
                     material: material

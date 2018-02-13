@@ -51,7 +51,10 @@ function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
  * Here is a basic example to create a standard material
 ```js
 var material = new clay.Material({
-
+    shader: new clay.Shader(
+        clay.Shader.source('clay.vertex'),
+        clay.Shader.source('clay.fragment')
+    )
 });
 ```
  * @constructor clay.Material
@@ -133,119 +136,6 @@ var Material = Base.extend(function () {
 {
     precision: 'highp',
 
-    bind: function(renderer, program, prevMaterial, prevProgram) {
-        var _gl = renderer.gl;
-        // PENDING Same texture in different material take different slot?
-
-        // May use shader of other material if shader code are same
-
-        // var sameProgram = prevProgram === program;
-
-        var currentTextureSlot = program.currentTextureSlot();
-
-        for (var u = 0; u < this._enabledUniforms.length; u++) {
-            var symbol = this._enabledUniforms[u];
-            var uniformValue = this.uniforms[symbol].value;
-            var uniformType = this.uniforms[symbol].type;
-            // Not use `instanceof` to determine if a value is texture in Material#bind.
-            // Use type instead, in some case texture may be in different namespaces.
-            // TODO Duck type validate.
-            if (uniformType === 't' && uniformValue) {
-                // Reset slot
-                uniformValue.__slot = -1;
-            }
-            else if (uniformType === 'tv') {
-                for (var i = 0; i < uniformValue.length; i++) {
-                    if (uniformValue[i] instanceof Texture) {
-                        uniformValue[i].__slot = -1;
-                    }
-                }
-            }
-        }
-        // Set uniforms
-        for (var u = 0; u < this._enabledUniforms.length; u++) {
-            var symbol = this._enabledUniforms[u];
-            var uniform = this.uniforms[symbol];
-            var uniformValue = uniform.value;
-            var uniformType = uniform.type;
-            // PENDING
-            // When binding two materials with the same shader
-            // Many uniforms will be be set twice even if they have the same value
-            // So add a evaluation to see if the uniform is really needed to be set
-            // if (prevMaterial && sameShader) {
-            //     if (prevMaterial.uniforms[symbol].value === uniformValue) {
-            //         continue;
-            //     }
-            // }
-
-            if (uniformValue === null) {
-                // FIXME Assume material with same shader have same order uniforms
-                // Or if different material use same textures,
-                // the slot will be different and still skipped because optimization
-                if (uniform.type === 't') {
-                    var slot = program.currentTextureSlot();
-                    var res = program.setUniform(_gl, '1i', symbol, slot);
-                    if (res) { // Texture is enabled
-                        // Still occupy the slot to make sure same texture in different materials have same slot.
-                        program.takeCurrentTextureSlot(renderer, null);
-                    }
-                }
-                continue;
-            }
-            else if (uniformType === 't') {
-                if (uniformValue.__slot < 0) {
-                    var slot = program.currentTextureSlot();
-                    var res = program.setUniform(_gl, '1i', symbol, slot);
-                    if (!res) { // Texture uniform is not enabled
-                        continue;
-                    }
-                    program.takeCurrentTextureSlot(renderer, uniformValue);
-                    uniformValue.__slot = slot;
-                }
-                // Multiple uniform use same texture..
-                else {
-                    program.setUniform(_gl, '1i', symbol, uniformValue.__slot);
-                }
-            }
-            else if (Array.isArray(uniformValue)) {
-                if (uniformValue.length === 0) {
-                    continue;
-                }
-                // Texture Array
-                if (uniformType === 'tv') {
-                    if (!program.hasUniform(symbol)) {
-                        continue;
-                    }
-
-                    var arr = [];
-                    for (var i = 0; i < uniformValue.length; i++) {
-                        var texture = uniformValue[i];
-
-                        if (texture.__slot < 0) {
-                            var slot = program.currentTextureSlot();
-                            arr.push(slot);
-                            program.takeCurrentTextureSlot(renderer, texture);
-                            texture.__slot = slot;
-                        }
-                        else {
-                            arr.push(texture.__slot);
-                        }
-                    }
-
-                    program.setUniform(_gl, '1iv', symbol, arr);
-                }
-                else {
-                    program.setUniform(_gl, uniform.type, symbol, uniformValue);
-                }
-            }
-            else{
-                program.setUniform(_gl, uniform.type, symbol, uniformValue);
-            }
-        }
-        // Texture slot maybe used out of material.
-        program.resetTextureSlot(currentTextureSlot);
-    },
-
     /**
      * Set material uniform
      * @example
@@ -287,29 +177,6 @@ var Material = Base.extend(function () {
             this.setUniform(key, val);
         }
     },
-
-    // /**
-    //  * Enable a uniform
-    //  * It only have effect on the uniform exists in shader.
-    //  * @param  {string} symbol
-    //  */
-    // enableUniform: function (symbol) {
-    //     if (this.uniforms[symbol] && !this.isUniformEnabled(symbol)) {
-    //         this._enabledUniforms.push(symbol);
-    //     }
-    // },
-
-    // /**
-    //  * Disable a uniform
-    //  * It will not affect the uniform state in the shader. Because the shader uniforms is parsed from shader code with naive regex. When using micro to disable some uniforms in the shader. It will still try to set these uniforms in each rendering pass. We can disable these uniforms manually if we need this bit performance improvement. Mostly we can simply ignore it.
-    //  * @param  {string} symbol
-    //  */
-    // disableUniform: function (symbol) {
-    //     var idx = this._enabledUniforms.indexOf(symbol);
-    //     if (idx >= 0) {
-    //         this._enabledUniforms.splice(idx, 1);
-    //     }
-    // },
 
     /**
      * @param  {string}  symbol
@@ -618,32 +485,16 @@ var Material = Base.extend(function () {
      */
     dirtyDefines: function () {
         this._programKey = '';
+    },
+
+    getProgramKey: function () {
+        if (!this._programKey) {
+            this._programKey = getProgramKey(
+                this.vertexDefines, this.fragmentDefines, this.getEnabledTextures()
+            );
+        }
+        return this._programKey;
     }
 });
-
-if (Object.defineProperty) {
-    Object.defineProperty(Material.prototype, 'shader', {
-        get: function () {
-            return this._shader || null;
-        },
-
-        set: function (val) {
-            // TODO
-            // console.warn('You need to use attachShader to set the shader.');
-            this._shader = val;
-        }
-    });
-
-    Object.defineProperty(Material.prototype, 'programKey', {
-        get: function () {
-            if (!this._programKey) {
-                this._programKey = getProgramKey(
-                    this.vertexDefines, this.fragmentDefines, this.getEnabledTextures()
-                );
-            }
-            return this._programKey;
-        }
-    });
-}
 
 export default Material;
