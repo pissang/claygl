@@ -475,7 +475,7 @@ var ShadowMapPass = Base.extend(function () {
         };
     })(),
 
-    renderSpotLightShadow: function (renderer, scene, light, casters, spotLightMatrices, spotLightShadowMaps) {
+    renderSpotLightShadow: function (renderer, scene, light, spotLightMatrices, spotLightShadowMaps) {
 
         var texture = this._getTexture(light);
         var lightCamera = this._getSpotLightCamera(light);

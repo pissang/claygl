@@ -179,6 +179,7 @@ var DeferredRenderer = Base.extend(function () {
         if (!opts.notUpdateScene) {
             scene.update(false, true);
         }
+        scene.updateLights();
 
         camera.update(true);
 
@@ -422,17 +423,6 @@ var DeferredRenderer = Base.extend(function () {
     _prepareLightShadow: (function () {
         var worldView = new Matrix4();
         return function (renderer, scene, camera) {
-            var shadowCasters;
-
-            shadowCasters = this._shadowCasters || (this._shadowCasters = []);
-            var count = 0;
-            var list = scene.opaqueList;
-            for (var i = 0; i < list.length; i++) {
-                if (list[i].castShadow) {
-                    shadowCasters[count++] = list[i];
-                }
-            }
-            shadowCasters.length = count;
 
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
@@ -453,24 +443,24 @@ var DeferredRenderer = Base.extend(function () {
                         }
 
                         this._prepareSingleLightShadow(
-                            renderer, scene, camera, light, shadowCasters, volumeMesh.material
+                            renderer, scene, camera, light, volumeMesh.material
                         );
                         break;
                     case 'DIRECTIONAL_LIGHT':
                         this._prepareSingleLightShadow(
-                            renderer, scene, camera, light, shadowCasters, null
+                            renderer, scene, camera, light, null
                         );
                 }
             }
         };
     })(),
 
-    _prepareSingleLightShadow: function (renderer, scene, camera, light, casters, material) {
+    _prepareSingleLightShadow: function (renderer, scene, camera, light, material) {
         switch (light.type) {
             case 'POINT_LIGHT':
                 var shadowMaps = [];
                 this.shadowMapPass.renderPointLightShadow(
-                    renderer, scene, light, casters, shadowMaps
+                    renderer, scene, light, shadowMaps
                 );
                 material.setUniform('lightShadowMap', shadowMaps[0]);
                 material.setUniform('lightShadowMapSize', light.shadowResolution);
@@ -479,7 +469,7 @@ var DeferredRenderer = Base.extend(function () {
                 var shadowMaps = [];
                 var lightMatrices = [];
                 this.shadowMapPass.renderSpotLightShadow(
-                    renderer, scene, light, casters, lightMatrices, shadowMaps
+                    renderer, scene, light, lightMatrices, shadowMaps
                 );
                 material.setUniform('lightShadowMap', shadowMaps[0]);
                 material.setUniform('lightMatrix', lightMatrices[0]);
@@ -490,7 +480,7 @@ var DeferredRenderer = Base.extend(function () {
                 var lightMatrices = [];
                 var cascadeClips = [];
                 this.shadowMapPass.renderDirectionalLightShadow(
-                    renderer, scene, camera, light, casters, cascadeClips, lightMatrices, shadowMaps
+                    renderer, scene, camera, light, cascadeClips, lightMatrices, shadowMaps
                 );
                 var cascadeClipsNear = cascadeClips.slice();
                 var cascadeClipsFar = cascadeClips.slice();
@@ -593,18 +583,6 @@ var DeferredRenderer = Base.extend(function () {
 
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
-            var viewport = renderer.viewport;
-            var dpr = viewport.devicePixelRatio;
-            var viewportUniform = [
-                viewport.x * dpr, viewport.y * dpr,
-                viewport.width * dpr, viewport.height * dpr
-            ];
-
-            var windowSizeUniform = [
-                this._lightAccumTex.width,
-                this._lightAccumTex.height
-            ];
-
             for (var i = 0; i < volumeMeshList.length; i++) {
                 var volumeMesh = volumeMeshList[i];
 
@@ -622,33 +600,17 @@ var DeferredRenderer = Base.extend(function () {
                 // depthMask must be enabled before clear DEPTH_BUFFER
                 gl.clear(gl.DEPTH_BUFFER_BIT);
 
-                Matrix4.multiply(worldViewProjection, camera.projectionMatrix, worldView);
-
-                var preZProgram = renderer.getProgram(volumeMesh, preZMaterial);
-                volumeMesh.__program = preZProgram;
-                renderer.validateProgram(preZProgram);
-                preZProgram.bind(renderer);
-
-                var semanticInfo = preZMaterial.shader.matrixSemantics.WORLDVIEWPROJECTION;
-                preZProgram.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection.array);
-                volumeMesh.render(renderer, preZMaterial, preZProgram);
+                renderer.renderPass([volumeMesh], camera, {
+                    getMaterial: function () {
+                        return preZMaterial;
+                    }
+                });
 
                 // Render light
                 gl.colorMask(true, true, true, true);
                 gl.depthMask(false);
-                var program = renderer.getProgram(volumeMesh, volumeMesh.material);
-                volumeMesh.__program = program;
-                renderer.validateProgram(program);
-                program.bind(renderer);
 
-                var semanticInfo = volumeMesh.material.shader.matrixSemantics.WORLDVIEWPROJECTION;
-                // Set some common uniforms
-                program.setUniform(gl, semanticInfo.type, semanticInfo.symbol, worldViewProjection.array);
-                program.setUniformOfSemantic(gl, 'WINDOW_SIZE', windowSizeUniform);
-                program.setUniformOfSemantic(gl, 'VIEWPORT', viewportUniform);
-
-                volumeMesh.material.bind(renderer, program);
-                volumeMesh.render(renderer, volumeMesh.material, program);
+                renderer.renderPass([volumeMesh], camera);
             }
 
             gl.depthFunc(gl.LESS);

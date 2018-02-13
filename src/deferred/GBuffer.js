@@ -204,7 +204,7 @@ var GBuffer = Base.extend(function () {
 
         renderTransparent: false,
 
-        _renderList: [],
+        _gBufferRenderList: [],
         // - R: normal.x
         // - G: normal.y
         // - B: normal.z
@@ -339,24 +339,27 @@ var GBuffer = Base.extend(function () {
 
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
-        var opaqueList = scene.opaqueList;
-        var transparentList = scene.transparentList;
+
+        var renderList = scene.updateRenderList(renderer, camera);
+
+        var opaqueList = renderList.opaque;
+        var transparentList = renderList.transparent;
 
         var offset = 0;
-        var renderList = this._renderList;
+        var gBufferRenderList = this._gBufferRenderList;
         for (var i = 0; i < opaqueList.length; i++) {
             if (!opaqueList[i].ignoreGBuffer) {
-                renderList[offset++] = opaqueList[i];
+                gBufferRenderList[offset++] = opaqueList[i];
             }
         }
         if (this.renderTransparent) {
             for (var i = 0; i < transparentList.length; i++) {
                 if (!transparentList[i].ignoreGBuffer) {
-                    renderList[offset++] = transparentList[i];
+                    gBufferRenderList[offset++] = transparentList[i];
                 }
             }
         }
-        renderList.length = offset;
+        gBufferRenderList.length = offset;
 
         gl.clearColor(0, 0, 0, 0);
         gl.depthMask(true);
@@ -401,7 +404,7 @@ var GBuffer = Base.extend(function () {
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
-            renderer.renderPass(renderList, camera, passConfig);
+            renderer.renderPass(gBufferRenderList, camera, passConfig);
 
         }
         if (enableTargetTexture3) {
@@ -429,7 +432,7 @@ var GBuffer = Base.extend(function () {
                 beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
                 sortCompare: renderer.opaqueSortCompare
             };
-            renderer.renderPass(renderList, camera, passConfig);
+            renderer.renderPass(gBufferRenderList, camera, passConfig);
         }
 
         renderer.bindSceneRendering(null);
