@@ -674,7 +674,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 ))
 
     range3 = range(3)
-    lVertexCount = 0;
+    lVertexCount = 0
 
     lNeedHash = False
     if lNormalLayer:
@@ -1323,8 +1323,9 @@ def Convert(
 
         # SplitMeshPerMaterial will fail if the mapped material is not per face (FbxLayerElement::eByPolygon) or if a material is multi-layered.
         # http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_geometry_converter_html
-        if not fbxConverter.SplitMeshesPerMaterial(lScene, True):
-            print('SplitMeshesPerMaterial fail')
+        # TODO May have bug
+        # if not fbxConverter.SplitMeshesPerMaterial(lScene, True):
+        #     print('SplitMeshesPerMaterial fail')
 
         PrepareSceneNode(lScene.GetRootNode())
 
