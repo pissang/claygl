@@ -256,7 +256,7 @@ function App3D(dom, appNS) {
             gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
 
             appNS.beforeRender && appNS.beforeRender(self);
-            self._doRender(gRenderer, gScene, true);
+            self._doRender(true);
             appNS.afterRender && appNS.afterRender(self);
 
             // Mark all resources unused;
@@ -422,11 +422,14 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
         prevMaterial = mat;
     }
 };
-
-App3D.prototype._doRender = function (renderer, scene) {
-    var camera = scene.getMainCamera();
-    camera.aspect = renderer.getViewportAspect();
-    renderer.render(scene, camera, true);
+/**
+ * Render the application scene with application  camera using the apllications renderer
+ * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
+ */
+App3D.prototype._doRender = function(notUpdateScene) {
+    var camera = this.scene.getMainCamera();
+    camera.aspect = this.renderer.getViewportAspect();
+    renderer.render(scene, camera, notUpdateScene);
 };
 
 
