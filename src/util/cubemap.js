@@ -237,26 +237,40 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
         useMipmap: false
     });
     var pixels = new Float32Array(sampleSize * roughnessLevels * 4);
-    for (var i = 0; i < sampleSize; i++) {
-        var x = i / sampleSize;
-        // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators
-        // http://stackoverflow.com/questions/1908492/unsigned-integer-in-javascript
-        // http://stackoverflow.com/questions/1822350/what-is-the-javascript-operator-and-how-do-you-use-it
-        var y = (i << 16 | i >>> 16) >>> 0;
-        y = ((y & 1431655765) << 1 | (y & 2863311530) >>> 1) >>> 0;
-        y = ((y & 858993459) << 2 | (y & 3435973836) >>> 2) >>> 0;
-        y = ((y & 252645135) << 4 | (y & 4042322160) >>> 4) >>> 0;
-        y = (((y & 16711935) << 8 | (y & 4278255360) >>> 8) >>> 0) / 4294967296;
+    var tmp = [];
 
-        for (var j = 0; j < roughnessLevels; j++) {
-            var roughness = j / roughnessLevels;
-            var a = roughness * roughness;
-            var phi = 2.0 * Math.PI * x;
+    function sortFunc(a, b) {
+        return Math.abs(a) - Math.abs(b);
+    }
+    for (var j = 0; j < roughnessLevels; j++) {
+        var roughness = j / roughnessLevels;
+        var a = roughness * roughness;
+
+        for (var i = 0; i < sampleSize; i++) {
+            // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators
+            // http://stackoverflow.com/questions/1908492/unsigned-integer-in-javascript
+            // http://stackoverflow.com/questions/1822350/what-is-the-javascript-operator-and-how-do-you-use-it
+            var y = (i << 16 | i >>> 16) >>> 0;
+            y = ((y & 1431655765) << 1 | (y & 2863311530) >>> 1) >>> 0;
+            y = ((y & 858993459) << 2 | (y & 3435973836) >>> 2) >>> 0;
+            y = ((y & 252645135) << 4 | (y & 4042322160) >>> 4) >>> 0;
+            y = (((y & 16711935) << 8 | (y & 4278255360) >>> 8) >>> 0) / 4294967296;
+
             // CDF
             var cosTheta = Math.sqrt((1 - y) / (1 + (a * a - 1.0) * y));
-            var sinTheta = Math.sqrt(1.0 - cosTheta * cosTheta);
+
+            tmp[i] = cosTheta;
+        }
+
+        tmp.sort(sortFunc);
+
+        for (var i = 0; i < sampleSize; i++) {
             var offset = (i * roughnessLevels + j) * 4;
+            var cosTheta = tmp[i];
+            var sinTheta = Math.sqrt(1.0 - cosTheta * cosTheta);
+            var x = i / sampleSize;
+            var phi = 2.0 * Math.PI * x;
             pixels[offset] = sinTheta * Math.cos(phi);
             pixels[offset + 1] = sinTheta * Math.sin(phi);
             pixels[offset + 2] = cosTheta;
