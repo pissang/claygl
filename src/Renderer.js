@@ -740,12 +740,7 @@ var Renderer = Base.extend(function () {
             program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
         }
     },
-    /**
-     * @param  {clay.Renderer} renderer
-     * @param  {clay.Material} [material]
-     * @return {Object}
-     * @private
-     */
+
     _renderObject: function (renderable, vao) {
         var _gl = this.gl;
         var geometry = renderable.geometry;
@@ -826,7 +821,7 @@ var Renderer = Base.extend(function () {
                     var res = program.setUniform(_gl, '1i', symbol, slot);
                     if (res) { // Texture is enabled
                         // Still occupy the slot to make sure same texture in different materials have same slot.
-                        program.takeCurrentTextureSlot(renderer, null);
+                        program.takeCurrentTextureSlot(this, null);
                     }
                 }
                 continue;
@@ -838,7 +833,7 @@ var Renderer = Base.extend(function () {
                     if (!res) { // Texture uniform is not enabled
                         continue;
                     }
-                    program.takeCurrentTextureSlot(renderer, uniformValue);
+                    program.takeCurrentTextureSlot(this, uniformValue);
                     uniformValue.__slot = slot;
                 }
                 // Multiple uniform use same texture..
@@ -863,7 +858,7 @@ var Renderer = Base.extend(function () {
                         if (texture.__slot < 0) {
                             var slot = program.currentTextureSlot();
                             arr.push(slot);
-                            program.takeCurrentTextureSlot(renderer, texture);
+                            program.takeCurrentTextureSlot(this, texture);
                             texture.__slot = slot;
                         }
                         else {
