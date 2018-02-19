@@ -192,7 +192,7 @@ var ShadowMapPass = Base.extend(function () {
 
         for (var i = 0; i < scene.lights.length; i++) {
             var light = scene.lights[i];
-            if (light.castShadow) {
+            if (light.castShadow && !light.invisible) {
                 this._lightsCastShadow.push(light);
             }
         }
@@ -452,7 +452,7 @@ var ShadowMapPass = Base.extend(function () {
                 // Reversed, left to right => far to near
                 renderer.setViewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize, 1);
 
-                var renderList = scene.updateRenderList(renderer, lightCamera);
+                var renderList = scene.updateRenderList(lightCamera);
                 renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
                 // Filter for VSM
@@ -497,7 +497,7 @@ var ShadowMapPass = Base.extend(function () {
             sortCompare: Renderer.opaqueSortCompare
         };
 
-        var renderList = scene.updateRenderList(renderer, lightCamera);
+        var renderList = scene.updateRenderList(lightCamera);
         renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
         this._frameBuffer.unbind(renderer);

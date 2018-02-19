@@ -258,7 +258,9 @@ var DeferredRenderer = Base.extend(function () {
 
         // Update volume meshes
         for (var i = 0; i < scene.lights.length; i++) {
-            this._updateLightProxy(scene.lights[i]);
+            if (!scene.lights[i].invisible) {
+                this._updateLightProxy(scene.lights[i]);
+            }
         }
 
         var shadowMapPass = this.shadowMapPass;
@@ -296,6 +298,10 @@ var DeferredRenderer = Base.extend(function () {
 
         for (var i = 0; i < scene.lights.length; i++) {
             var light = scene.lights[i];
+            if (light.invisible) {
+                continue;
+            }
+
             var uTpl = light.uniformTemplates;
 
             var volumeMesh = light.volumeMesh || light.__volumeMesh;
@@ -427,7 +433,7 @@ var DeferredRenderer = Base.extend(function () {
             for (var i = 0; i < scene.lights.length; i++) {
                 var light = scene.lights[i];
                 var volumeMesh = light.volumeMesh || light.__volumeMesh;
-                if (!light.castShadow) {
+                if (!light.castShadow || light.invisible) {
                     continue;
                 }
 

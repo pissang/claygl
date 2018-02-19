@@ -419,13 +419,9 @@ var Renderer = Base.extend(function () {
             return;
         }
         camera.update();
-        var renderList = scene.updateRenderList(this, camera);
+        var renderList = scene.updateRenderList(camera);
 
         this._sceneRendering = scene;
-
-        // Reset the scene bounding box;
-        scene.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
-        scene.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
 
         var opaqueList = renderList.opaque;
         var transparentList = renderList.transparent;
@@ -994,69 +990,6 @@ var Renderer = Base.extend(function () {
         _gl.colorMask(true, true, true, true);
         _gl.depthMask(true);
     },
-
-    /**
-     * If an scene object is culled by camera frustum
-     *
-     * Object can be a renderable or a light
-     *
-     * @param {clay.Node} Scene object
-     * @param {clay.Camera} camera
-     * @param {Array.<number>} worldViewMat represented with array
-     * @param {Array.<number>} projectionMat represented with array
-     */
-    isFrustumCulled: (function () {
-        // Frustum culling
-        // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
-        var cullingBoundingBox = new BoundingBox();
-        var cullingMatrix = new Matrix4();
-        return function (object, scene, camera, worldViewMat, projectionMat) {
-            // Bounding box can be a property of object(like light) or renderable.geometry
-            // PENDING
-            var geoBBox = object.boundingBox || object.geometry.boundingBox;
-            cullingMatrix.array = worldViewMat;
-            cullingBoundingBox.transformFrom(geoBBox, cullingMatrix);
-
-            // Passingly update the scene bounding box
-            // FIXME exclude very large mesh like ground plane or terrain ?
-            // FIXME Only rendererable which cast shadow ?
-
-            // FIXME boundingBox becomes much larger after transformd.
-            if (scene && object.castShadow) {
-                scene.viewBoundingBoxLastFrame.union(cullingBoundingBox);
-            }
-            // Ignore frustum culling if object is skinned mesh.
-            if (object.frustumCulling && !object.isSkinnedMesh())  {
-                if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
-                    return true;
-                }
-
-                cullingMatrix.array = projectionMat;
-                if (
-                    cullingBoundingBox.max.array[2] > 0 &&
-                    cullingBoundingBox.min.array[2] < 0
-                ) {
-                    // Clip in the near plane
-                    cullingBoundingBox.max.array[2] = -1e-20;
-                }
-
-                cullingBoundingBox.applyProjection(cullingMatrix);
-
-                var min = cullingBoundingBox.min.array;
-                var max = cullingBoundingBox.max.array;
-
-                if (
-                    max[0] < -1 || min[0] > 1
-                    || max[1] < -1 || min[1] > 1
-                    || max[2] < -1 || min[2] > 1
-                ) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-    })(),
 
     /**
      * Dispose given scene, including all geometris, textures and shaders in the scene

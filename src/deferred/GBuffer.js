@@ -340,7 +340,7 @@ var GBuffer = Base.extend(function () {
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
 
-        var renderList = scene.updateRenderList(renderer, camera);
+        var renderList = scene.updateRenderList(camera);
 
         var opaqueList = renderList.opaque;
         var transparentList = renderList.transparent;

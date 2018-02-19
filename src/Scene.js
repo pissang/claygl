@@ -5,6 +5,7 @@ import BoundingBox from './math/BoundingBox';
 import util from './core/util';
 import glmatrix from './dep/glmatrix';
 import LRUCache from './core/LRU';
+import Matrix4 from './math/Matrix4';
 var mat4 = glmatrix.mat4;
 
 var IDENTITY = mat4.create();
@@ -194,6 +195,9 @@ var Scene = Node.extend(function () {
         var lightNumber = {};
         for (var i = 0; i < lights.length; i++) {
             var light = lights[i];
+            if (light.invisible) {
+                continue;
+            }
             var group = light.group;
             if (!lightNumber[group]) {
                 lightNumber[group] = {};
@@ -213,7 +217,7 @@ var Scene = Node.extend(function () {
 
     // Traverse the scene and add the renderable
     // object to the render list
-    updateRenderList: function (renderer, camera) {
+    updateRenderList: function (camera) {
         var id = camera.__uid__;
         var renderList = this._renderLists.get(id);
         if (!renderList) {
@@ -222,8 +226,11 @@ var Scene = Node.extend(function () {
         }
         renderList.startCount();
 
+        this.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+        this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+
         var sceneMaterialTransparent = this.material && this.material.transparent || false;
-        this._doUpdateRenderList(renderer, this, camera, sceneMaterialTransparent, renderList);
+        this._doUpdateRenderList(this, camera, sceneMaterialTransparent, renderList);
 
         renderList.endCount();
 
@@ -234,7 +241,7 @@ var Scene = Node.extend(function () {
         return this._renderLists.get(camera.__uid__);
     },
 
-    _doUpdateRenderList: function (renderer, parent, camera, sceneMaterialTransparent, renderList) {
+    _doUpdateRenderList: function (parent, camera, sceneMaterialTransparent, renderList) {
         if (parent.invisible) {
             return;
         }
@@ -248,17 +255,80 @@ var Scene = Node.extend(function () {
                 var geometry = child.geometry;
 
                 mat4.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
-                if (!geometry.boundingBox || !renderer.isFrustumCulled(
-                    child, this, camera, WORLDVIEW, camera.projectionMatrix.array
+                if (!geometry.boundingBox || !this.isFrustumCulled(
+                    child, camera, WORLDVIEW, camera.projectionMatrix.array
                 )) {
                     renderList.add(child, child.material.transparent || sceneMaterialTransparent);
                 }
             }
             if (child._children.length > 0) {
-                this._doUpdateRenderList(renderer, child, camera, sceneMaterialTransparent, renderList);
+                this._doUpdateRenderList(child, camera, sceneMaterialTransparent, renderList);
             }
         }
     },
+
+    /**
+     * If an scene object is culled by camera frustum
+     *
+     * Object can be a renderable or a light
+     *
+     * @param {clay.Node} object
+     * @param {clay.Camera} camera
+     * @param {Array.<number>} worldViewMat represented with array
+     * @param {Array.<number>} projectionMat represented with array
+     */
+    isFrustumCulled: (function () {
+        // Frustum culling
+        // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
+        var cullingBoundingBox = new BoundingBox();
+        var cullingMatrix = new Matrix4();
+        return function (object, camera, worldViewMat, projectionMat) {
+            // Bounding box can be a property of object(like light) or renderable.geometry
+            // PENDING
+            var geoBBox = object.boundingBox || object.geometry.boundingBox;
+            cullingMatrix.array = worldViewMat;
+            cullingBoundingBox.transformFrom(geoBBox, cullingMatrix);
+
+            // Passingly update the scene bounding box
+            // FIXME exclude very large mesh like ground plane or terrain ?
+            // FIXME Only rendererable which cast shadow ?
+
+            // FIXME boundingBox becomes much larger after transformd.
+            if (object.castShadow) {
+                this.viewBoundingBoxLastFrame.union(cullingBoundingBox);
+            }
+            // Ignore frustum culling if object is skinned mesh.
+            if (object.frustumCulling && !object.isSkinnedMesh())  {
+                if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
+                    return true;
+                }
+
+                cullingMatrix.array = projectionMat;
+                if (
+                    cullingBoundingBox.max.array[2] > 0 &&
+                    cullingBoundingBox.min.array[2] < 0
+                ) {
+                    // Clip in the near plane
+                    cullingBoundingBox.max.array[2] = -1e-20;
+                }
+
+                cullingBoundingBox.applyProjection(cullingMatrix);
+
+                var min = cullingBoundingBox.min.array;
+                var max = cullingBoundingBox.max.array;
+
+                if (
+                    max[0] < -1 || min[0] > 1
+                    || max[1] < -1 || min[1] > 1
+                    || max[2] < -1 || min[2] > 1
+                ) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    })(),
 
     _updateLightUniforms: function () {
         var lights = this.lights;
@@ -274,6 +344,11 @@ var Scene = Node.extend(function () {
         for (var i = 0; i < lights.length; i++) {
 
             var light = lights[i];
+
+            if (light.invisible) {
+                continue;
+            }
+
             var group = light.group;
 
             for (var symbol in light.uniformTemplates) {
