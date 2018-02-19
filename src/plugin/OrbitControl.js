@@ -548,6 +548,9 @@ var OrbitControl = Base.extend(function () {
         else if (e.button === 1) {
             this._mode = 'pan';
         }
+        else {
+            this._mode = null;
+        }
 
         // Reset rotate velocity
         this._rotateVelocity.set(0, 0);
