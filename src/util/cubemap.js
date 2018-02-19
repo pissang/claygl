@@ -240,7 +240,7 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
     var tmp = [];
 
     function sortFunc(a, b) {
-        return Math.abs(a) - Math.abs(b);
+        return Math.abs(b) - Math.abs(a);
     }
     for (var j = 0; j < roughnessLevels; j++) {
         var roughness = j / roughnessLevels;
@@ -259,7 +259,6 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
 
             // CDF
             var cosTheta = Math.sqrt((1 - y) / (1 + (a * a - 1.0) * y));
-
             tmp[i] = cosTheta;
         }
 
