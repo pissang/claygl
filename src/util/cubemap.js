@@ -232,6 +232,8 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
         type: Texture.FLOAT,
         minFilter: Texture.NEAREST,
         magFilter: Texture.NEAREST,
+        wrapS: Texture.CLAMP_TO_EDGE,
+        wrapT: Texture.CLAMP_TO_EDGE,
         useMipmap: false
     });
     var pixels = new Float32Array(sampleSize * roughnessLevels * 4);
