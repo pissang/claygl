@@ -166,47 +166,6 @@ var Scene = Node.extend(function () {
     },
 
     /**
-     * Clone a new scene node recursively, including material, skeleton.
-     * Shader and geometry instances will not been cloned
-     * @param  {clay.Node} node
-     * @return {clay.Node}
-     */
-    cloneNode: function (node) {
-        var newNode = node.clone();
-        var materialsMap = {};
-
-        var cloneSkeleton = function (current, currentNew) {
-            if (current.skeleton) {
-                currentNew.skeleton = current.skeleton.clone(node, newNode);
-                currentNew.joints = current.joints.slice();
-            }
-            if (current.material) {
-                materialsMap[current.material.__uid__] = {
-                    oldMat: current.material
-                };
-            }
-            for (var i = 0; i < current._children.length; i++) {
-                cloneSkeleton(current._children[i], currentNew._children[i]);
-            }
-        };
-
-        cloneSkeleton(node, newNode);
-
-        for (var guid in materialsMap) {
-            materialsMap[guid].newMat = materialsMap[guid].oldMat.clone();
-        }
-
-        // Replace material
-        newNode.traverse(function (current) {
-            if (current.material) {
-                current.material = materialsMap[current.material.__uid__].newMat;
-            }
-        });
-
-        return newNode;
-    },
-
-    /**
      * Set main camera of the scene.
      * @param {claygl.Camera} camera
      */
@@ -222,6 +181,10 @@ var Scene = Node.extend(function () {
      */
     getMainCamera: function () {
         return this._cameraList[0];
+    },
+
+    getLights: function () {
+        return this.lights;
     },
 
     updateLights: function () {
