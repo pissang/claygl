@@ -186,6 +186,7 @@ var OrbitControl = Base.extend(function () {
         dom.removeEventListener('mousemove', this._mouseMoveHandler);
         dom.removeEventListener('mouseup', this._mouseUpHandler);
         dom.removeEventListener('mousewheel', this._mouseWheelHandler);
+        dom.removeEventListener('mouseout', this._mouseUpHandler);
 
         if (this.timeline) {
             this.timeline.off('frame', this.update);
@@ -539,6 +540,7 @@ var OrbitControl = Base.extend(function () {
 
         dom.addEventListener('mousemove', this._mouseMoveHandler);
         dom.addEventListener('mouseup', this._mouseUpHandler);
+        dom.addEventListener('mouseout', this._mouseUpHandler);
 
         if (e.button === 0) {
             this._mode = 'rotate';
@@ -637,6 +639,7 @@ var OrbitControl = Base.extend(function () {
         dom.removeEventListener('touchend', this._mouseUpHandler);
         dom.removeEventListener('mousemove', this._mouseMoveHandler);
         dom.removeEventListener('mouseup', this._mouseUpHandler);
+        dom.removeEventListener('mouseout', this._mouseUpHandler);
 
         this._processGesture(event, 'end');
     },
