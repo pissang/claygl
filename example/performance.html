@@ -32,7 +32,7 @@
         });
         var width = window.innerWidth;
         var height = window.innerHeight;
-        var timeline = new clay.Timeline();
+        var timeline = new clay.animation.Timeline();
         timeline.start();
         renderer.resize(width, height);
 
@@ -51,7 +51,7 @@
             far: 10000
         });
         camera.position.set(500, 500, 500);
-        camera.lookAt(new clay.Vector3(0, 0, 0));
+        camera.lookAt(new clay.math.Vector3(0, 0, 0));
         var cnt = 100;
         var distance = 20;
         var size = 10 / 2;
