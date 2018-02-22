@@ -2,7 +2,7 @@ import { Vector2 } from './Vector2';
 
 export class Matrix2 {
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     clone(): Matrix2;
 

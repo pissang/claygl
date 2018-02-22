@@ -39,7 +39,7 @@ class Value {
 
 class Matrix2 {
 
-    _array: Float32Array;
+    array: Array;
 
     clone(): Matrix2;
 

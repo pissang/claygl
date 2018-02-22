@@ -2,7 +2,7 @@ import { Vector2 } from './Vector2';
 
 export class Matrix2d {
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     clone(): Matrix2d;
 

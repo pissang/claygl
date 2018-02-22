@@ -4,7 +4,7 @@ import { Matrix3 } from './Matrix3';
 
 export class Matrix4 {
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     forward: Vector3;
 

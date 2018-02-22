@@ -12,7 +12,7 @@ export class Vector2 {
 
     y: number;
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     _dirty: boolean;
 
@@ -20,7 +20,7 @@ export class Vector2 {
 
     set(x: number, y: number): Vector2;
 
-    setArray(arr: Float32Array): Vector2;
+    setArray(arr: ArrayLike): Vector2;
     setArray(arr: number[]): Vector2;
 
     clone(): Vector2;

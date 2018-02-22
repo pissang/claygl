@@ -5,7 +5,7 @@ import { Matrix4 } from './Matrix4';
 
 export class Matrix3 {
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     clone(): Matrix3;
 

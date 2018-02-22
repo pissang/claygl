@@ -13,7 +13,7 @@ export class Vector3 {
 
     z: number;
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     _dirty: boolean;
 
@@ -21,7 +21,7 @@ export class Vector3 {
 
     set(x: number, y: number, z: number): Vector3;
 
-    setArray(arr: Float32Array): Vector3;
+    setArray(arr: ArrayLike): Vector3;
     setArray(arr: number[]): Vector3;
 
     clone(): Vector3;

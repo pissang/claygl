@@ -16,7 +16,7 @@ export class Quaternion {
 
     w: number;
 
-    _array: Float32Array;
+    array: ArrayLike;
 
     _dirty: boolean;
 
@@ -26,7 +26,7 @@ export class Quaternion {
 
     set(x: number, y: number, z: number, w: number): Quaternion;
 
-    setArray(arr: Float32Array): Quaternion;
+    setArray(arr: ArrayLike): Quaternion;
     setArray(arr: number[]): Quaternion;
 
     clone(): Quaternion;
