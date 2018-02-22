@@ -56,7 +56,7 @@ var headerLengthInt = 31; // The header length in 32 bit ints
 var FOURCC_DXT1 = fourCCToInt32('DXT1');
 var FOURCC_DXT3 = fourCCToInt32('DXT3');
 var FOURCC_DXT5 = fourCCToInt32('DXT5');
-    // Offsets into the header array
+// Offsets into the header array
 var off_magic = 0;
 
 var off_size = 1;
@@ -119,9 +119,9 @@ var ret = {
             var _width = width;
             var _height = height;
             textures[f] = new Texture2D({
-                width : _width,
-                height : _height,
-                format : internalFormat
+                width: _width,
+                height: _height,
+                format: internalFormat
             });
             var mipmaps = [];
             for (var i = 0; i < mipmapCount; i++) {

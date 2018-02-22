@@ -58,6 +58,10 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
   <canvas id="main"></canvas>
   <script>
     clay.application.create('#main', {
+
+      width: window.innerWidth,
+      height: window.innerHeight,
+
       init: function (renderer, scene, timeline) {
         // Create camera
         this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);

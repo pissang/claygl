@@ -1,9 +1,5 @@
 // Sampler clip is especially for the animation sampler in glTF
 // Use Typed Array can reduce a lot of heap memory
-//
-// TODO Sync target transform
-
-import TransformTrack from './TransformTrack';
 
 import glMatrix from '../dep/glmatrix';
 var quat = glMatrix.quat;
@@ -302,7 +298,11 @@ SamplerTrack.prototype._findRange = function (time) {
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  * @param  {number} w
  */
-SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
+SamplerTrack.prototype.blend1D = function (t1, t2, w) {
+    vec3.lerp(this.position, t1.position, t2.position, w);
+    vec3.lerp(this.scale, t1.scale, t2.scale, w);
+    quat.slerp(this.rotation, t1.rotation, t2.rotation, w);
+};
 /**
  * 2D blending between three clips
  * @function
@@ -312,21 +312,56 @@ SamplerTrack.prototype.blend1D = TransformTrack.prototype.blend1D;
  * @param  {number} f
  * @param  {number} g
  */
-SamplerTrack.prototype.blend2D = TransformTrack.prototype.blend2D;
+SamplerTrack.prototype.blend2D = (function () {
+    var q1 = quat.create();
+    var q2 = quat.create();
+    return function (t1, t2, t3, f, g) {
+        var a = 1 - f - g;
+
+        this.position[0] = t1.position[0] * a + t2.position[0] * f + t3.position[0] * g;
+        this.position[1] = t1.position[1] * a + t2.position[1] * f + t3.position[1] * g;
+        this.position[2] = t1.position[2] * a + t2.position[2] * f + t3.position[2] * g;
+
+        this.scale[0] = t1.scale[0] * a + t2.scale[0] * f + t3.scale[0] * g;
+        this.scale[1] = t1.scale[1] * a + t2.scale[1] * f + t3.scale[1] * g;
+        this.scale[2] = t1.scale[2] * a + t2.scale[2] * f + t3.scale[2] * g;
+
+        // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205403(v=vs.85).aspx
+        // http://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.quaternion.xmquaternionbarycentric(v=vs.85).aspx
+        var s = f + g;
+        if (s === 0) {
+            quat.copy(this.rotation, t1.rotation);
+        }
+        else {
+            quat.slerp(q1, t1.rotation, t2.rotation, s);
+            quat.slerp(q2, t1.rotation, t3.rotation, s);
+            quat.slerp(this.rotation, q1, q2, g / s);
+        }
+    };
+})();
 /**
  * Additive blending between two clips
  * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
-SamplerTrack.prototype.additiveBlend = TransformTrack.prototype.additiveBlend;
+SamplerTrack.prototype.additiveBlend = function (t1, t2) {
+    vec3.add(this.position, t1.position, t2.position);
+    vec3.add(this.scale, t1.scale, t2.scale);
+    quat.multiply(this.rotation, t2.rotation, t1.rotation);
+};
 /**
  * Subtractive blending between two clips
  * @function
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
  * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
  */
-SamplerTrack.prototype.subtractiveBlend = TransformTrack.prototype.subtractiveBlend;
+SamplerTrack.prototype.subtractiveBlend = function (t1, t2) {
+    vec3.sub(this.position, t1.position, t2.position);
+    vec3.sub(this.scale, t1.scale, t2.scale);
+    quat.invert(this.rotation, t2.rotation);
+    quat.multiply(this.rotation, this.rotation, t1.rotation);
+};
 
 /**
  * Clone a new SamplerTrack

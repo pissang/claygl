@@ -71,20 +71,20 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {number} [width] Container width.
  * @property {number} [height] Container height.
  * @property {number} [devicePixelRatio]
- * @property {Object} [graphic] Graphic configuration including shadow, postEffect
+ * @property {Object} [graphic] Graphic configuration including shadow, color space.
  * @property {boolean} [graphic.shadow=false] If enable shadow
- * @property {boolean} [graphic.linear=false] If use linear space
+ * @property {boolean} [graphic.linear=false] If use linear color space
  * @property {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
  * @property {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
  */
 
 /**
- * Using App3D is a much convenient way to create and manage your 3D application.
+ * Using App3D is a much more convenient way to create and manage your 3D application.
  *
  * It provides the abilities to:
  *
  * + Manage application loop and rendering.
- * + GPU resource collection automatically without memory leak concern.
+ * + Collect GPU resource automatically without memory leak concern.
  * + Mouse event management.
  * + Create scene objects, materials, textures with simpler code.
  * + Load models with one line of code.

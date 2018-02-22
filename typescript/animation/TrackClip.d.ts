@@ -6,7 +6,7 @@ interface ISamplerClipOption extends IClipOption {
     tracks: SamplerTrack[]
 }
 
-export class SamplerClip extends Clip {
+export class TrackClip extends Clip {
 
     constructor(option?: ISamplerClipOption);
 
@@ -18,13 +18,13 @@ export class SamplerClip extends Clip {
 
     getSubClip(starTime: number, endTime: number): void;
 
-    blend1D(clip1: SamplerClip, clip2: SamplerClip): void;
+    blend1D(clip1: TrackClip, clip2: TrackClip): void;
 
-    blend2D(clip1: SamplerClip, clip2: SamplerClip, clip3: SamplerClip, f: number, g: number): void;
+    blend2D(clip1: TrackClip, clip2: TrackClip, clip3: TrackClip, f: number, g: number): void;
 
-    additiveBlend(clip1: SamplerClip, clip2: SamplerClip): void;
+    additiveBlend(clip1: TrackClip, clip2: TrackClip): void;
 
-    subtractiveBlend(clip1: SamplerClip, clip2: SamplerClip): void;
+    subtractiveBlend(clip1: TrackClip, clip2: TrackClip): void;
 
-    copy(clip: SamplerClip): void;
+    copy(clip: TrackClip): void;
 }

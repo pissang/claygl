@@ -152,7 +152,7 @@ function logSyntaxError() {
 
 function parseDeclarations(type, line) {
     var speratorsRegexp = /[,=\(\):]/;
-    var tokens = removeComment(line)
+    var tokens = line
         // Convert `symbol: [1,2,3]` to `symbol: vec3(1,2,3)`
         .replace(/:\s*\[\s*(.*)\s*\]/g, '=' + type + '($1)')
         .replace(/\s+/g, '')
@@ -323,6 +323,9 @@ function Shader(vertex, fragment) {
         fragment = vertex.fragment;
         vertex = vertex.vertex;
     }
+
+    vertex = removeComment(vertex);
+    fragment = removeComment(fragment);
 
     this._shaderID = getShaderID(vertex, fragment);
 

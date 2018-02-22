@@ -199,7 +199,7 @@ var Timeline = Base.extend(function () {
         this._clips = [];
     },
     /**
-     * Create a animator
+     * Create an animator
      * @param  {Object} target
      * @param  {Object} [options]
      * @param  {boolean} [options.loop]
