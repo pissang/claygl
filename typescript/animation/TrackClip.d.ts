@@ -14,7 +14,7 @@ export class TrackClip extends Clip {
 
     tracks: SamplerTrack[];
 
-    addTrack(jointClip: SamplerTrack): void;
+    addTrack(trackClip: SamplerTrack): void;
 
     getSubClip(starTime: number, endTime: number): void;
 

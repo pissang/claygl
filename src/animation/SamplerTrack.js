@@ -169,7 +169,7 @@ SamplerTrack.prototype.setTime = function (time) {
         }
     }
     // Loop handling
-    if (key == len - 2) {
+    if (key === len - 2) {
         this._cacheKey = 0;
         this._cacheTime = 0;
     }

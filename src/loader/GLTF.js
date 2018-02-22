@@ -115,9 +115,7 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
  * @constructor clay.loader.GLTF
  * @extends clay.core.Base
  */
-var GLTFLoader = Base.extend(
-/** @lends clay.loader.GLTF# */
-{
+var GLTFLoader = Base.extend(/** @lends clay.loader.GLTF# */ {
     /**
      *
      * @type {clay.Node}
@@ -1152,14 +1150,15 @@ function () {
 
                 track.channels[path] = getAccessorData(json, lib, samplerInfo.output);
             }
+            var tracksList = [];
+            for (var hash in tracks) {
+                tracksList.push(tracks[hash]);
+            }
             var clip = new TrackClip({
                 name: animationInfo.name,
-                loop: true
+                loop: true,
+                tracks: tracksList
             });
-            for (var hash in tracks) {
-                clip.addTrack(tracks[hash]);
-            }
-            clip.calcLifeFromTracks();
             lib.clips.push(clip);
         }, this);
 

@@ -36,6 +36,8 @@ var TrackClip = function (opts) {
      * @type {clay.animation.SamplerTrack[]}
      */
     this.tracks = opts.tracks || [];
+
+    this.calcLifeFromTracks();
 };
 
 TrackClip.prototype = Object.create(Clip.prototype);
@@ -94,6 +96,7 @@ TrackClip.prototype.calcLifeFromTracks = function () {
  */
 TrackClip.prototype.addTrack = function (track) {
     this.tracks.push(track);
+    this.calcLifeFromTracks();
 };
 
 /**

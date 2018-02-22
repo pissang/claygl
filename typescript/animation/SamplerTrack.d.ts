@@ -1,6 +1,11 @@
+import { Node } from '../Node';
+
 export class SamplerTrack {
 
-    constructor();
+    constructor(opts?: {
+        name?: string,
+        target?: Node
+    });
 
     name: string;
 
