@@ -11,7 +11,7 @@ function createCube(material) {
         material: material,
         geometry : new clay.geometry.Cube()
     });
-    mesh.scale.set(5, 5, 5);
+    mesh.scale.set(4, 4, 4);
     root.add(mesh);
 
     return root;

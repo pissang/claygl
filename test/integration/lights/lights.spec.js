@@ -12,7 +12,7 @@ function createCube() {
         }),
         geometry: new clay.geometry.Cube()
     });
-    mesh.scale.set(5, 5, 5);
+    mesh.scale.set(3, 3, 3);
     root.add(mesh);
 
     return root;
