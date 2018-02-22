@@ -221,6 +221,39 @@ var Scene = Node.extend(function () {
     },
 
     /**
+     * Clone a node and it's children, including mesh, camera, light, etc.
+     * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
+     *
+     * @param {clay.Node} node
+     * @return {clay.Node}
+     */
+    cloneNode: function (node) {
+        var newNode = node.clone();
+        var clonedNodesMap = {};
+        function buildNodesMap(sNode, tNode) {
+            clonedNodesMap[sNode.__uid__] = tNode;
+
+            for (var i = 0; i < sNode._children.length; i++) {
+                var sChild = sNode._children[i];
+                var tChild = tNode._children[i];
+                buildNodesMap(sChild, tChild);
+            }
+        }
+        buildNodesMap(node, newNode);
+
+        newNode.traverse(function (newChild) {
+            if (newChild.skeleton) {
+                newChild.skeleton = newChild.skeleton.clone(clonedNodesMap);
+            }
+            if (newChild.material) {
+                newChild.material = newChild.material.clone();
+            }
+        });
+
+        return newNode;
+    },
+
+    /**
      * Traverse the scene and add the renderable object to the render list.
      * It needs camera for the frustum culling.
      *

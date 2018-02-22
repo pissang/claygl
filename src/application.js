@@ -1228,8 +1228,8 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
 // TODO cloneModel
 
 /**
- * Clone a node and it's children, including mesh, camera, light, etc.
- * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
+ * Similar to `app.scene.cloneNode`, except it will mount the cloned node to the scene automatically.
+ * See more in {@link clay.Scene#cloneNode}
  *
  * @param {clay.Node} node
  * @param {clay.Node} [parentNode] Parent node that new cloned node will be mounted.
@@ -1239,28 +1239,7 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
 App3D.prototype.cloneNode = function (node, parentNode) {
     parentNode = parentNode || node.getParent();
 
-    var newNode = node.clone();
-    var clonedNodesMap = {};
-    function buildNodesMap(sNode, tNode) {
-        clonedNodesMap[sNode.__uid__] = tNode;
-
-        for (var i = 0; i < sNode._children.length; i++) {
-            var sChild = sNode._children[i];
-            var tChild = tNode._children[i];
-            buildNodesMap(sChild, tChild);
-        }
-    }
-    buildNodesMap(node, newNode);
-
-    newNode.traverse(function (newChild) {
-        if (newChild.skeleton) {
-            newChild.skeleton = newChild.skeleton.clone(clonedNodesMap);
-        }
-        if (newChild.material) {
-            newChild.material = newChild.material.clone();
-        }
-    });
-
+    var newNode = this.scene.cloneNode(node, parentNode);
     if (parentNode) {
         parentNode.add(newNode);
     }
