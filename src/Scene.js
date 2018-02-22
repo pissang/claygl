@@ -60,6 +60,11 @@ RenderList.prototype.endCount = function () {
     this.opaque.length = this._opaqueCount;
 };
 
+/**
+ * @typedef {Object} clay.Scene.RenderList
+ * @property {Array.<clay.Renderable>} opaque
+ * @property {Array.<clay.Renderable>} transparent
+ */
 
 /**
  * @constructor clay.Scene
@@ -215,8 +220,13 @@ var Scene = Node.extend(function () {
         this._updateLightUniforms();
     },
 
-    // Traverse the scene and add the renderable
-    // object to the render list
+    /**
+     * Traverse the scene and add the renderable object to the render list.
+     * It needs camera for the frustum culling.
+     *
+     * @param {clay.Camera} camera
+     * @return {clay.Scene.RenderList}
+     */
     updateRenderList: function (camera) {
         var id = camera.__uid__;
         var renderList = this._renderLists.get(id);
@@ -237,6 +247,11 @@ var Scene = Node.extend(function () {
         return renderList;
     },
 
+    /**
+     * Get render list. Used after {@link clay.Scene#updateRenderList}
+     * @param {clay.Camera} camera
+     * @return {clay.Scene.RenderList}
+     */
     getRenderList: function (camera) {
         return this._renderLists.get(camera.__uid__);
     },

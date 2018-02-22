@@ -2,11 +2,17 @@ import { Material } from './Material';
 import { Renderable } from './Renderable';
 import { Shader } from './Shader';
 import { Node } from './Node';
+import { Camera } from './Camera';
 
 interface ISceneOption extends INodeOption {
     material?: Material;
     autoUpdate?: boolean;
 }
+
+type RenderList = {
+    opaque: Renderable[],
+    transparent: Renderable[]
+};
 
 export class Scene extends Node {
 
@@ -16,11 +22,11 @@ export class Scene extends Node {
 
     autoUpdate: boolean;
 
-    opaqueList: Renderable[];
+    getMainCamera(): Camera;
+    setMainCamera(camera: Camera): void;
 
-    transparentList: Renderable[];
-
-    getNode(name: string): Node;
+    updateRenderList(camera: Camera): RenderList;
+    getRenderList(camera: Camera): RenderList;
 
     dispose(): void;
 }

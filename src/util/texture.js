@@ -69,8 +69,8 @@ var textureUtil = {
                 texture.error(onerror);
             }
         }
-        else if (typeof(path) == 'object' && typeof(path.px) !== 'undefined') {
-            var texture = new TextureCube();
+        else if (typeof path === 'object' && typeof(path.px) !== 'undefined') {
+            texture = new TextureCube();
             texture.load(path);
             texture.success(onsuccess);
             texture.error(onerror);

@@ -6,9 +6,7 @@ import createCompositor from '../createCompositor';
  * @constructor clay.loader.FX
  * @extends clay.core.Base
  */
-var FXLoader = Base.extend(
-/** @lends clay.loader.FX# */
-{
+var FXLoader = Base.extend(/** @lends clay.loader.FX# */ {
     /**
      * @type {string}
      */
