@@ -8,10 +8,11 @@ function createCube() {
 
     const mesh = new clay.Mesh({
         material: new clay.Material({
-            shader : clay.shader.library.get('clay.standard')
+            shader: clay.shader.library.get('clay.standard')
         }),
-        geometry : new clay.geometry.Cube()
+        geometry: new clay.geometry.Cube()
     });
+    mesh.scale.set(5, 5, 5);
     root.add(mesh);
 
     return root;
@@ -19,7 +20,7 @@ function createCube() {
 
 describe('Integration.lights.Spec', function () {
     it('directional light', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const light = new clay.light.Directional({
             intensity: 1
@@ -32,13 +33,13 @@ describe('Integration.lights.Spec', function () {
         const cube = createCube();
         scene.add(cube);
 
-        const drawInfo = renderer.render(scene, camera);
+        renderer.render(scene, camera);
 
-        util.assertWith(canvas, { fixture : path.join(__dirname, 'directional-light.png') }, done);
+        util.assertWith(canvas, { fixture: path.join(__dirname, 'directional-light.png') }, done);
     });
 
     it('ambient light', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         scene.add(new clay.light.Ambient({
             intensity: 0.3
@@ -47,13 +48,13 @@ describe('Integration.lights.Spec', function () {
         const cube = createCube();
         scene.add(cube);
 
-        const drawInfo = renderer.render(scene, camera);
+        renderer.render(scene, camera);
 
-        util.assertWith(canvas, { fixture : path.join(__dirname, 'ambient-light.png') }, done);
+        util.assertWith(canvas, { fixture: path.join(__dirname, 'ambient-light.png') }, done);
     });
 
     it('point light', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const light = new clay.light.Point({
             castShadow: false,
@@ -67,8 +68,8 @@ describe('Integration.lights.Spec', function () {
         const cube = createCube();
         scene.add(cube);
 
-        const drawInfo = renderer.render(scene, camera);
+        renderer.render(scene, camera);
 
-        util.assertWith(canvas, { fixture : path.join(__dirname, 'point-light.png') }, done);
+        util.assertWith(canvas, { fixture: path.join(__dirname, 'point-light.png') }, done);
     });
 });

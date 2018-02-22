@@ -9,10 +9,11 @@ function createCube(shader) {
 
     const mesh = new clay.Mesh({
         material: new clay.Material({
-            shader : shader
+            shader: shader
         }),
-        geometry : new clay.geometry.Cube()
+        geometry: new clay.geometry.Cube()
     });
+    mesh.scale.set(5, 5, 5);
     root.add(mesh);
 
     return root;
@@ -21,7 +22,7 @@ function createCube(shader) {
 describe('Integration.AmbientCubeMap.Spec', function () {
     it('ambient cube map light', function (done) {
         this.timeout(10000);
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const cubemap = clay.util.texture.loadTexture(
             path.join(__dirname, 'hdr', 'pisa.hdr'),
@@ -39,9 +40,9 @@ describe('Integration.AmbientCubeMap.Spec', function () {
                 const cube = createCube();
                 scene.add(cube);
 
-                const drawInfo = renderer.render(scene, camera);
+                renderer.render(scene, camera);
 
-                util.assertWith(canvas, { fixture : path.join(__dirname, 'ambient-cube-map-light.png') }, done);
+                util.assertWith(canvas, { fixture: path.join(__dirname, 'ambient-cube-map-light.png') }, done);
             });
     });
 });

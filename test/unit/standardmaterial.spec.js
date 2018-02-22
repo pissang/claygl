@@ -8,7 +8,7 @@ describe('StandardMaterial.Spec', function () {
     });
 
     it('append defines in shader source dynamically', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
 
         const material = new clay.StandardMaterial({
             linear: true,

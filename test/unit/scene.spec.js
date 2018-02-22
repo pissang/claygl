@@ -8,17 +8,17 @@ describe('Scene.Spec', function () {
     });
 
     it('a clean scene', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
         renderer.render(scene, camera);
     });
 
     it('add/remove a node', function () {
         const nodeName = 'spec';
         const root = new clay.Node({
-            name : 'spec'
+            name: 'spec'
         });
 
-        const { scene } = helper.createQtekScene();
+        const { scene } = helper.createClayScene();
 
         scene.addToScene(root);
         let actual = scene.getNode(nodeName);
@@ -37,7 +37,7 @@ describe('Scene.Spec', function () {
             geometry: new clay.geometry.Cube()
         });
 
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
         //TODO clone of skeleton
         //cloneNode is a part deep clone: geometry won't be cloned but material and skeleton will
         const cloned = scene.cloneNode(mesh);
@@ -51,7 +51,7 @@ describe('Scene.Spec', function () {
     });
 
     it('invoking update shouldn\'t throw any error', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
         //scene.update is called in render.render
         const originUpdate = scene.update;
         let called = false;
@@ -70,7 +70,7 @@ describe('Scene.Spec', function () {
         const Shader = clay.Shader,
             Material = clay.Material;
 
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
 
         const cube = new clay.geometry.Cube();
 

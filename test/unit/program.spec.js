@@ -78,7 +78,7 @@ describe('Program.Spec', function () {
 
 
     it('enableTexture/disableTexture, enableTexturesAll/disableTexturesAll', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
 
         const mesh = createMesh();
         const material = mesh.material;
@@ -113,7 +113,7 @@ describe('Program.Spec', function () {
     });
 
     it('#hasUniform', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
 
         const mesh = createMesh();
         var program = renderer.getProgram(mesh);
@@ -122,7 +122,7 @@ describe('Program.Spec', function () {
     });
 
     it('textureslot methods', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
 
         const mesh = createMesh();
         var program = renderer.getProgram(mesh);
@@ -145,7 +145,7 @@ describe('Program.Spec', function () {
     });
 
     it('#enableAttributes shoud return actual attrib locations', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
         const mesh = createMesh();
         var program = renderer.getProgram(mesh);
 

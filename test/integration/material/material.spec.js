@@ -11,7 +11,7 @@ function createCube(material) {
         material: material,
         geometry : new clay.geometry.Cube()
     });
-    mesh.scale.set(4, 4, 4);
+    mesh.scale.set(5, 5, 5);
     root.add(mesh);
 
     return root;
@@ -19,7 +19,7 @@ function createCube(material) {
 
 describe('Integration.Material.Spec', function () {
     it('metalness and roughness', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
         const light = new clay.light.Point({
             intensity  : 0.8,
             castShadow : false,
@@ -40,7 +40,7 @@ describe('Integration.Material.Spec', function () {
         const cube = createCube(material);
         scene.add(cube);
 
-        const drawInfo = renderer.render(scene, camera);
+        renderer.render(scene, camera);
 
         util.assertWith(canvas, { fixture : path.join(__dirname, 'metalness.png') }, done);
     });
@@ -48,7 +48,7 @@ describe('Integration.Material.Spec', function () {
     it('maps', function (done) {
         this.timeout(10000);
 
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
         const light = new clay.light.Point({
             intensity : 0.8,
             castShadow: false,
@@ -71,11 +71,11 @@ describe('Integration.Material.Spec', function () {
                 const filePath = path.join(__dirname, 'textures', 'material', 'iron-rusted4-' + mapInfo[1] + '.png');
                 tex.load(filePath);
                 tex.success(() => {
-                        resolve({
-                            'define' : mapInfo[0],
-                            'texture' : tex
-                        });
+                    resolve({
+                        define: mapInfo[0],
+                        texture: tex
                     });
+                });
                 tex.error(reject);
             });
         });
@@ -101,8 +101,8 @@ describe('Integration.Material.Spec', function () {
             const root = new clay.Node();
             root.add(mesh);
             scene.add(root);
-            const drawInfo = renderer.render(scene, camera);
-            util.assertWith(canvas, { fixture : path.join(__dirname, 'maps.png'), diffOptions : { diffRatio : 0.1 } }, done);
+            renderer.render(scene, camera);
+            util.assertWith(canvas, { fixture: path.join(__dirname, 'maps.png'), diffOptions : { diffRatio : 0.1 } }, done);
         });
     });
 });

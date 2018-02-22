@@ -28,5 +28,7 @@ export class Scene extends Node {
     updateRenderList(camera: Camera): RenderList;
     getRenderList(camera: Camera): RenderList;
 
+    cloneNode(node: Node): Node;
+
     dispose(): void;
 }

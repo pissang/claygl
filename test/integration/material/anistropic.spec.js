@@ -4,7 +4,7 @@ const path = require('path');
 
 describe('Integration.Anistropic.Spec', function () {
     it('texture anistropic', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene({
+        const { renderer, scene, camera, canvas } = helper.createClayScene({
             size: [600, 600],
             cameraPosition: [0, 4, 14]
         });
@@ -46,7 +46,7 @@ describe('Integration.Anistropic.Spec', function () {
                 planeMesh.rotation.rotateX(-Math.PI/2);
                 root.add(planeMesh);
 
-                const drawInfo = renderer.render(scene, camera);
+                renderer.render(scene, camera);
 
                 util.assertWith(canvas, { fixture: path.join(__dirname, 'anistropic.png') }, done);
             });

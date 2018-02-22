@@ -8,7 +8,7 @@ module.exports = {
      * @param {Object} [options.size=[200, 200]]  canvas size
      * @param {Object} [options.cameraPosition=[0, 0, 20]]
      */
-    createQtekScene(options = {}) {
+    createClayScene(options = {}) {
         const size = options.size || [200, 200];
         const canvas = document.createElement('canvas');
         canvas.width = size[0];

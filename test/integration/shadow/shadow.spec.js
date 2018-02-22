@@ -31,7 +31,7 @@ function addCubes(scene) {
 
 describe('Integration.shadow.Spec', function () {
     it('directional light shadow', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const shadowMapPass = new clay.prePass.ShadowMap({
             softShadow: clay.prePass.PCF
@@ -60,7 +60,7 @@ describe('Integration.shadow.Spec', function () {
     });
 
     it('directional light shadow with VSM', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const shadowMapPass = new clay.prePass.ShadowMap({
             softShadow: clay.prePass.VSM
@@ -90,7 +90,7 @@ describe('Integration.shadow.Spec', function () {
 
 
     it('point light shadow', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const shadowMapPass = new clay.prePass.ShadowMap({
             softShadow: clay.prePass.PCF
@@ -115,7 +115,7 @@ describe('Integration.shadow.Spec', function () {
     });
 
     it('point light shadow with VSM', function (done) {
-        const { renderer, scene, camera, canvas } = helper.createQtekScene();
+        const { renderer, scene, camera, canvas } = helper.createClayScene();
 
         const shadowMapPass = new clay.prePass.ShadowMap({
             softShadow: clay.prePass.VSM

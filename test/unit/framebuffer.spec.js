@@ -4,14 +4,14 @@ const clay = require('../../dist/claygl');
 
 describe('FrameBuffer.Spec', function () {
     it('constructor', function () {
-        const { renderer, scene, camera } = helper.createQtekScene();
+        const { renderer, scene, camera } = helper.createClayScene();
         const frameBuffer = new clay.FrameBuffer();
 
         assert(frameBuffer.depthBuffer);
     });
 
     it('can attach to a texture', function () {
-        const { canvas, renderer, scene, camera } = helper.createQtekScene();
+        const { canvas, renderer, scene, camera } = helper.createClayScene();
         const gl = canvas.gl;
 
         //create an empty texture
@@ -25,7 +25,7 @@ describe('FrameBuffer.Spec', function () {
     });
 
     it('can detach a target', function () {
-        const { canvas, renderer, scene, camera } = helper.createQtekScene();
+        const { canvas, renderer, scene, camera } = helper.createClayScene();
         const gl = canvas.gl;
 
         //create an empty texture
@@ -41,7 +41,7 @@ describe('FrameBuffer.Spec', function () {
     });
 
     it('can bind to a renderer', function () {
-        const { canvas, renderer, scene, camera } = helper.createQtekScene();
+        const { canvas, renderer, scene, camera } = helper.createClayScene();
         const gl = canvas.gl;
 
         //create an empty texture
@@ -61,7 +61,7 @@ describe('FrameBuffer.Spec', function () {
     });
 
     it('unbind', function () {
-        const { canvas, renderer, scene, camera } = helper.createQtekScene();
+        const { canvas, renderer, scene, camera } = helper.createClayScene();
         const gl = canvas.gl;
 
         //create an empty texture

@@ -5,12 +5,12 @@ const path = require('path');
 
 class FixtureReporter extends BaseReporter {
   constructor(runner) {
-    super(runner);    
+    super(runner);
     const failedTitles = [];
     runner.on('fail', (test, err) => {
         const title = test.fullTitle();
         //record failed integration tests
-        failedTitles.push(title);    
+        failedTitles.push(title);
         console.log('[X] %s', title);
     });
     runner.on('end', () => {
@@ -18,7 +18,7 @@ class FixtureReporter extends BaseReporter {
         const path = generateReport(failedTitles, errors);
         if (errors.length > 0) {
             console.log(errors.length + ' tests failed.');
-            console.log('Fixture report generated in : ', path);    
+            console.log('Fixture report generated in : ', path);
         }
     });
   }
