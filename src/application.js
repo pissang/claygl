@@ -716,7 +716,7 @@ App3D.prototype.createMaterial = function (matConfig) {
                 // Try to load a texture.
                 this.loadTexture(val, {
                     convertToPOT: matConfig.convertTextureToPOT,
-                    flipY: matConfig.textureFlipY
+                    flipY: matConfig.textureFlipY == null ? true : matConfig.textureFlipY
                 }).then(makeTextureSetter(key));
             }
             else {
