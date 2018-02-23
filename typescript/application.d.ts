@@ -57,6 +57,7 @@ interface IMaterialBasicConfig {
     shader?: string;
     transparent?: boolean;
     convertTextureToPOT?: boolean;
+    textureFlipY?: boolean;
 }
 
 interface IStandardMRMaterialConfig {

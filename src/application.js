@@ -218,7 +218,7 @@ function App3D(dom, appNS) {
         dom.innerHTML = '';
         EVE_NAMES.forEach(function (eveType) {
             this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
-        });
+        }, this);
     };
 
     gRayPicking && this._initMouseEvents(gRayPicking);
@@ -692,6 +692,7 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
  * @param {boolean} [convertTextureToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
+ * @param {boolean} [textureFlipY=true] If flip y of texture.
  * @return {clay.Material}
  */
 App3D.prototype.createMaterial = function (matConfig) {
@@ -714,7 +715,8 @@ App3D.prototype.createMaterial = function (matConfig) {
             ) {
                 // Try to load a texture.
                 this.loadTexture(val, {
-                    convertToPOT: matConfig.convertTextureToPOT
+                    convertToPOT: matConfig.convertTextureToPOT,
+                    flipY: matConfig.textureFlipY
                 }).then(makeTextureSetter(key));
             }
             else {

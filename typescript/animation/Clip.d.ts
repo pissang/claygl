@@ -1,5 +1,5 @@
 
-interface IClipOption {
+export interface IClipOption {
     target?: any;
     life?: number;
     delay?: number;

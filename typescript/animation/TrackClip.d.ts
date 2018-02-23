@@ -1,14 +1,14 @@
-import { Clip } from './Clip';
+import { Clip, IClipOption } from './Clip';
 import { SamplerTrack } from './SamplerTrack';
 
-interface ISamplerClipOption extends IClipOption {
+interface ITrackClipOption extends IClipOption {
     name?: string;
     tracks: SamplerTrack[]
 }
 
 export class TrackClip extends Clip {
 
-    constructor(option?: ISamplerClipOption);
+    constructor(option?: ITrackClipOption);
 
     name: string;
 
