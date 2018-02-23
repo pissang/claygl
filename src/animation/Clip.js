@@ -94,11 +94,11 @@ Clip.prototype = {
     setLoop: function (loop) {
         this._loop = loop;
         if (loop) {
-            if (typeof(loop) == 'number') {
+            if (typeof loop === 'number') {
                 this._loopRemained = loop;
             }
             else {
-                this._loopRemained = 1e8;
+                this._loopRemained = Infinity;
             }
         }
     },

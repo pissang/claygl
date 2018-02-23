@@ -14,9 +14,7 @@ import Vector3 from '../math/Vector3';
  *     light.lookAt(clay.Vector3.ZERO);
  *     scene.add(light);
  */
-var DirectionalLight = Light.extend(
-/** @lends clay.light.Directional# */
-{
+var DirectionalLight = Light.extend(/** @lends clay.light.Directional# */ {
     /**
      * @type {number}
      */

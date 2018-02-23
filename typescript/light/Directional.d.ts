@@ -17,6 +17,10 @@ export class Directional extends Light {
 
     shadowSlopeScale: number;
 
+    shadowCascade: number;
+
+    cascadeSplitLogFactor: number;
+
     // uniformTemplates : {
 
     //     directionalLightColor: ILightUniformTemplate<number[]>;

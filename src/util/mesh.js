@@ -237,14 +237,12 @@ var meshUtil = {
             var jointReverseMap = bucket.jointReverseMap;
             var subJointNumber = bucket.joints.length;
 
-            var subMat = material.clone();
-            subMat.name = [material.name, b].join('-');
-
             var subGeo = new Geometry();
 
             var subMesh = new Mesh({
                 name: [mesh.name, i].join('-'),
-                material: subMat,
+                // DON'T clone material.
+                material: material,
                 geometry: subGeo,
                 skeleton: skeleton,
                 joints: bucket.joints.slice()

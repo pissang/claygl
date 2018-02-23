@@ -624,7 +624,7 @@ var ShadowMapPass = Base.extend(function () {
             shadowMaterial.setUniform('slopeScale', light.shadowSlopeScale);
         }
         if (light.shadowBias != null) {
-            shadowMaterial.setUniform('shadowBias', light.shadowBias);
+            shadowMaterial.setUniform('bias', light.shadowBias);
         }
         if (this.softShadow === ShadowMapPass.VSM) {
             shadowMaterial.define('fragment', 'USE_VSM');
