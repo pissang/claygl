@@ -5,9 +5,9 @@ import Shader from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
 import glenum from '../core/glenum';
-import vertexEssl from '../shader/source/compositor/vertex.glsl.js';
+import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
 
-Shader['import'](vertexEssl);
+Shader['import'](vertexGlsl);
 
 var planeGeo = new Plane();
 var mesh = new Mesh({

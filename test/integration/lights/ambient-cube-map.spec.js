@@ -13,7 +13,8 @@ function createCube(shader) {
         }),
         geometry: new clay.geometry.Cube()
     });
-    // mesh.scale.set(3, 3, 3);
+    // TODO Set scale to large will fail on CircleCI
+    // mesh.scale.set(5, 5, 5);
     root.add(mesh);
 
     return root;

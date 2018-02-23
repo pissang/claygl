@@ -1,6 +1,51 @@
 
 // http://blog.selfshadow.com/publications/s2013-shading-course/
 
+
+@export clay.standard.chunk.varying
+varying vec2 v_Texcoord;
+varying vec3 v_Normal;
+varying vec3 v_WorldPosition;
+varying vec3 v_Barycentric;
+
+#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+#endif
+
+#if defined(AOMAP_ENABLED)
+varying vec2 v_Texcoord2;
+#endif
+
+#ifdef VERTEX_COLOR
+varying vec4 v_Color;
+#endif
+@end
+
+@export clay.standard.chunk.light_header
+#ifdef AMBIENT_LIGHT_COUNT
+@import clay.header.ambient_light
+#endif
+
+#ifdef AMBIENT_SH_LIGHT_COUNT
+@import clay.header.ambient_sh_light
+#endif
+
+#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
+@import clay.header.ambient_cubemap_light
+#endif
+
+#ifdef POINT_LIGHT_COUNT
+@import clay.header.point_light
+#endif
+#ifdef DIRECTIONAL_LIGHT_COUNT
+@import clay.header.directional_light
+#endif
+#ifdef SPOT_LIGHT_COUNT
+@import clay.header.spot_light
+#endif
+@end
+
 @export clay.standard.vertex
 
 #define SHADER_NAME standard
@@ -24,26 +69,13 @@ attribute vec4 tangent : TANGENT;
 
 #ifdef VERTEX_COLOR
 attribute vec4 a_Color : COLOR;
-varying vec4 v_Color;
 #endif
 
 attribute vec3 barycentric;
 
+@import clay.standard.chunk.varying
+
 @import clay.chunk.skinning_header
-
-varying vec2 v_Texcoord;
-varying vec3 v_Normal;
-varying vec3 v_WorldPosition;
-varying vec3 v_Barycentric;
-
-#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
-varying vec3 v_Tangent;
-varying vec3 v_Bitangent;
-#endif
-
-#if defined(AOMAP_ENABLED)
-varying vec2 v_Texcoord2;
-#endif
 
 void main()
 {
@@ -94,20 +126,10 @@ void main()
 #define ROUGHNESS_CHANNEL 0
 #define METALNESS_CHANNEL 1
 
+
+@import clay.standard.chunk.varying
+
 uniform mat4 viewInverse : VIEWINVERSE;
-
-varying vec2 v_Texcoord;
-varying vec3 v_Normal;
-varying vec3 v_WorldPosition;
-
-#ifdef VERTEX_COLOR
-varying vec4 v_Color;
-#endif
-
-#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
-varying vec3 v_Tangent;
-varying vec3 v_Bitangent;
-#endif
 
 #ifdef NORMALMAP_ENABLED
 uniform sampler2D normalMap;
@@ -165,7 +187,6 @@ uniform vec4 viewport : VIEWPORT;
 #ifdef AOMAP_ENABLED
 uniform sampler2D aoMap;
 uniform float aoIntensity;
-varying vec2 v_Texcoord2;
 #endif
 
 uniform vec3 color : [1.0, 1.0, 1.0];
@@ -190,34 +211,13 @@ uniform float emissionIntensity: 1;
 // Uniforms for wireframe
 uniform float lineWidth : 0.0;
 uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
-varying vec3 v_Barycentric;
 
 // Max mipmap level of environment map
 #ifdef ENVIRONMENTMAP_PREFILTER
 uniform float maxMipmapLevel: 5;
 #endif
 
-#ifdef AMBIENT_LIGHT_COUNT
-@import clay.header.ambient_light
-#endif
-
-#ifdef AMBIENT_SH_LIGHT_COUNT
-@import clay.header.ambient_sh_light
-#endif
-
-#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
-@import clay.header.ambient_cubemap_light
-#endif
-
-#ifdef POINT_LIGHT_COUNT
-@import clay.header.point_light
-#endif
-#ifdef DIRECTIONAL_LIGHT_COUNT
-@import clay.header.directional_light
-#endif
-#ifdef SPOT_LIGHT_COUNT
-@import clay.header.spot_light
-#endif
+@import clay.standard.chunk.light_header
 
 // Import util functions and uniforms needed
 @import clay.util.calculate_attenuation
