@@ -3,6 +3,22 @@ import glenum from './core/glenum';
 import mathUtil from './math/util';
 var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
+function nearestPowerOfTwo(val) {
+    return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
+}
+function convertTextureToPowerOfTwo(texture, canvas) {
+    // var canvas = document.createElement('canvas');
+    var width = nearestPowerOfTwo(texture.width);
+    var height = nearestPowerOfTwo(texture.height);
+    canvas = canvas || document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(texture.image, 0, 0, width, height);
+
+    return canvas;
+}
+
 /**
  * @constructor clay.Texture2D
  * @extends clay.Texture
@@ -45,7 +61,13 @@ var Texture2D = Texture.extend(function () {
          *         pixels: null
          *     }, ....]
          */
-        mipmaps: []
+        mipmaps: [],
+
+        /**
+         * If convert texture to power-of-two
+         * @type {boolean}
+         */
+        convertToPOT: false
     };
 }, {
 
@@ -61,11 +83,18 @@ var Texture2D = Texture.extend(function () {
         var glFormat = this.format;
         var glType = this.type;
 
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
+        // Convert to pot is only available when using image/canvas/video element.
+        var convertToPOT = !!(this.convertToPOT
+            && !this.mipmaps.length && this.image
+            && (this.wrapS === Texture.REPEAT || this.wrapT === Texture.REPEAT)
+            && this.NPOT
+        );
 
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, convertToPOT ? this.wrapS : this.getAvailableWrapS());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, convertToPOT ? this.wrapT : this.getAvailableWrapT());
+
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, convertToPOT ? this.magFilter : this.getAvailableMagFilter());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, convertToPOT ? this.minFilter : this.getAvailableMinFilter());
 
         var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
         if (anisotropicExt && this.anisotropic > 1) {
@@ -85,15 +114,15 @@ var Texture2D = Texture.extend(function () {
             var height = this.height;
             for (var i = 0; i < this.mipmaps.length; i++) {
                 var mipmap = this.mipmaps[i];
-                this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
+                this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
                 width /= 2;
                 height /= 2;
             }
         }
         else {
-            this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
+            this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
 
-            if (this.useMipmap && !this.NPOT) {
+            if (this.useMipmap && (!this.NPOT || convertToPOT)) {
                 _gl.generateMipmap(_gl.TEXTURE_2D);
             }
         }
@@ -101,9 +130,14 @@ var Texture2D = Texture.extend(function () {
         _gl.bindTexture(_gl.TEXTURE_2D, null);
     },
 
-    _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
+    _updateTextureData: function (_gl, data, level, width, height, glFormat, glType, convertToPOT) {
         if (data.image) {
-            _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, data.image);
+            var imgData = data.image;
+            if (convertToPOT) {
+                this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
+                imgData = this._potCanvas;
+            }
+            _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
         }
         else {
             // Can be used as a blank texture when writing render to texture(RTT)
@@ -133,17 +167,7 @@ var Texture2D = Texture.extend(function () {
     },
 
     isPowerOfTwo: function () {
-        var width;
-        var height;
-        if (this.image) {
-            width = this.image.width;
-            height = this.image.height;
-        }
-        else {
-            width = this.width;
-            height = this.height;
-        }
-        return isPowerOfTwo(width) && isPowerOfTwo(height);
+        return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
     },
 
     isRenderable: function () {

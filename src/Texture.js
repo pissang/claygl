@@ -206,13 +206,13 @@ var Texture = Base.extend( /** @lends clay.Texture# */ {
     getAvailableMinFilter: function () {
         var minFilter = this.minFilter;
         if (this.NPOT || !this.useMipmap) {
-            if (minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
-                minFilter == glenum.NEAREST_MIPMAP_LINEAR
+            if (minFilter === glenum.NEAREST_MIPMAP_NEAREST ||
+                minFilter === glenum.NEAREST_MIPMAP_LINEAR
             ) {
                 return glenum.NEAREST;
             }
-            else if (minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
-                minFilter == glenum.LINEAR_MIPMAP_NEAREST
+            else if (minFilter === glenum.LINEAR_MIPMAP_LINEAR ||
+                minFilter === glenum.LINEAR_MIPMAP_NEAREST
             ) {
                 return glenum.LINEAR;
             }

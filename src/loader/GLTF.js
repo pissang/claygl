@@ -184,6 +184,12 @@ var GLTFLoader = Base.extend(/** @lends clay.loader.GLTF# */ {
      */
     textureFlipY: false,
 
+    /**
+     * If convert texture to power-of-two
+     * @type {boolean}
+     */
+    textureConvertToPOT: false,
+
     shaderLibrary: null
 },
 function () {
@@ -536,7 +542,8 @@ function () {
             util.defaults(parameters, {
                 wrapS: Texture.REPEAT,
                 wrapT: Texture.REPEAT,
-                flipY: this.textureFlipY
+                flipY: this.textureFlipY,
+                convertToPOT: this.textureConvertToPOT
             });
 
             var target = textureInfo.target || glenum.TEXTURE_2D;

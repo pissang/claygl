@@ -56,7 +56,7 @@ interface ITextureCubeImageList {
 interface IMaterialBasicConfig {
     shader?: string;
     transparent?: boolean;
-    convertTextureToPOT?: boolean;
+    textureConvertToPOT?: boolean;
     textureFlipY?: boolean;
 }
 
@@ -160,6 +160,7 @@ export namespace application {
             autoPlayAnimation?: boolean;
             upAxis?: 'y'|'z';
             textureFlipY?: boolean;
+            textureConvertToPOT?: boolean;
             textureRootPath?: string
         }, parentNode?: Node): Promise<IGLTFLoaderResult>
 

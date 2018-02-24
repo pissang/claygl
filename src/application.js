@@ -553,28 +553,6 @@ App3D.prototype.loadTexture = function (urlOrImg, opts, useCache) {
     return promise;
 };
 
-function nearestPowerOfTwo(val) {
-    return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
-}
-function convertTextureToPowerOfTwo(texture) {
-    if ((texture.wrapS === Texture.REPEAT || texture.wrapT === Texture.REPEAT)
-     && texture.image) {
-        // var canvas = document.createElement('canvas');
-        var width = nearestPowerOfTwo(texture.width);
-        var height = nearestPowerOfTwo(texture.height);
-        if (width !== texture.width || height !== texture.height) {
-            var canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(texture.image, 0, 0, width, height);
-            canvas.srcImage = texture.image;
-            texture.image = canvas;
-            texture.dirty();
-        }
-    }
-}
-
 /**
  * Create a texture from image or string synchronously. Texture can be use directly and don't have to wait for it's loaded.
  * @param {ImageLike} img
@@ -612,11 +590,6 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
         }
         else {
             texture.load(urlOrImg);
-            if (opts && opts.convertToPOT) {
-                texture.success(function () {
-                    convertTextureToPowerOfTwo(texture);
-                });
-            }
         }
     }
     else if (isImageLikeElement(urlOrImg)) {
@@ -691,7 +664,7 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
- * @param {boolean} [convertTextureToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
+ * @param {boolean} [textureConvertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {boolean} [textureFlipY=true] If flip y of texture.
  * @return {clay.Material}
  */
@@ -715,7 +688,7 @@ App3D.prototype.createMaterial = function (matConfig) {
             ) {
                 // Try to load a texture.
                 this.loadTexture(val, {
-                    convertToPOT: matConfig.convertTextureToPOT,
+                    convertToPOT: matConfig.textureConvertToPOT || false,
                     flipY: matConfig.textureFlipY == null ? true : matConfig.textureFlipY
                 }).then(makeTextureSetter(key));
             }
@@ -1149,6 +1122,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * @param {boolean} [opts.autoPlayAnimation=true] If autoplay the animation of model.
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
+ * @param {boolean} [opts.textureConvertToPOT=false] If convert texture to power-of-two
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
  * @param {clay.Node} [parentNode] Parent node that model will be mounted. Default to be scene
  * @return {Promise}
@@ -1169,7 +1143,8 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
         shader: shader,
         textureRootPath: opts.textureRootPath,
         crossOrigin: 'Anonymous',
-        textureFlipY: opts.textureFlipY
+        textureFlipY: opts.textureFlipY,
+        textureConvertToPOT: opts.textureConvertToPOT
     };
     if (opts.upAxis && opts.upAxis.toLowerCase() === 'z') {
         loaderOpts.rootNode.rotation.identity().rotateX(-Math.PI / 2);

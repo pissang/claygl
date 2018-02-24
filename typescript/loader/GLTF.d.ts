@@ -16,6 +16,7 @@ interface IGLTFLoaderOption {
     shader?: string;
     crossOrigin?: string;
     textureFlipY?: boolean;
+    textureConvertToPOT?: boolean;
 
     includeMaterial?: boolean;
     includeCamera?: boolean;
@@ -46,14 +47,15 @@ export class GLTF extends Base {
     textureRootPath: string;
     bufferRootPath: string;
 
-    shader?: string;
-    crossOrigin?: string;
-    textureFlipY?: boolean;
+    shader: string;
+    crossOrigin: string;
+    textureFlipY: boolean;
+    textureConvertToPOT: boolean;
 
-    includeMaterial?: boolean;
-    includeCamera?: boolean;
-    includeMesh?: boolean;
-    includeTexture?: boolean;
+    includeMaterial: boolean;
+    includeCamera: boolean;
+    includeMesh: boolean;
+    includeTexture: boolean;
 
 
     load(url: string): void;

@@ -5,11 +5,14 @@ export interface ITexture2DOption extends ITextureOption {
     image?: HTMLElement;
     pixels?: ArrayBufferView;
     mipmaps?: ArrayBufferView[];
+    convertToPOT?: boolean;
 }
 
 export class Texture2D extends Texture {
 
     constructor(option?: ITexture2DOption);
+
+    convertToPOT: boolean;
 
     image: HTMLElement;
 
