@@ -14,14 +14,15 @@ const float fSampleNumber = float(SAMPLE_NUMBER);
 
 @import clay.util.rgbm
 
+
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
     vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;
 
-    vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-    vec3 tangentX = normalize(cross(upVector, N));
-    vec3 tangentY = cross(N, tangentX);
+    vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+    vec3 tangentX = normalize(cross(N, upVector));
+    vec3 tangentZ = cross(N, tangentX);
     // Tangent to world space
-    return tangentX * H.x + tangentY * H.y + N * H.z;
+    return normalize(tangentX * H.x + N * H.y + tangentZ * H.z);
 }
 
 void main() {
@@ -30,7 +31,6 @@ void main() {
     vec3 V = normalize(v_WorldPosition - eyePos);
 
     vec3 N = V;
-    vec3 R = V;
 
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;

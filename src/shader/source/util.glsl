@@ -117,7 +117,7 @@ vec4 RGBMEncode(vec3 color, float range) {
 vec4 decodeHDR(vec4 color)
 {
 #if defined(RGBM_DECODE) || defined(RGBM)
-    return vec4(RGBMDecode(color, 51.5), 1.0);
+    return vec4(RGBMDecode(color, 20.1), 1.0);
 #else
     return color;
 #endif
@@ -126,7 +126,7 @@ vec4 decodeHDR(vec4 color)
 vec4 encodeHDR(vec4 color)
 {
 #if defined(RGBM_ENCODE) || defined(RGBM)
-    return RGBMEncode(color.xyz, 51.5);
+    return RGBMEncode(color.xyz, 20.1);
 #else
     return color;
 #endif

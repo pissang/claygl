@@ -25,7 +25,7 @@ void main()
     vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
     vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;
 
-    vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 51.5);
+    vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 20.1);
     // TODO mix ?
     gl_FragColor.rgb = lightColor * envTexel * envWeight;
 

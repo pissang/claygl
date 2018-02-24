@@ -87,7 +87,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
             height: height,
             // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
             type: textureType === Texture.FLOAT ?
-                    Texture.HALF_FLOAT : textureType
+                Texture.HALF_FLOAT : textureType
         });
         textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
             // PENDING encodeRGBM so it can be decoded as RGBM
@@ -271,8 +271,8 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
             var x = i / sampleSize;
             var phi = 2.0 * Math.PI * x;
             pixels[offset] = sinTheta * Math.cos(phi);
-            pixels[offset + 1] = sinTheta * Math.sin(phi);
-            pixels[offset + 2] = cosTheta;
+            pixels[offset + 1] = cosTheta;
+            pixels[offset + 2] = sinTheta * Math.sin(phi);
             pixels[offset + 3] = 1.0;
         }
     }
