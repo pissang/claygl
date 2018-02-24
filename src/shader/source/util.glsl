@@ -93,8 +93,6 @@ float decodeFloat(const in vec4 color)
 @export clay.util.rgbm_decode
 vec3 RGBMDecode(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
-  // Premultiply alpha ?
-  // return range * rgbm.rgb;
 }
 @end
 

@@ -303,9 +303,7 @@ var Scene = Node.extend(function () {
                 var geometry = child.geometry;
 
                 mat4.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
-                if (!geometry.boundingBox || !this.isFrustumCulled(
-                    child, camera, WORLDVIEW, camera.projectionMatrix.array
-                )) {
+                if (!geometry.boundingBox || !this.isFrustumCulled(child, camera, WORLDVIEW)) {
                     renderList.add(child, child.material.transparent || sceneMaterialTransparent);
                 }
             }
@@ -330,7 +328,7 @@ var Scene = Node.extend(function () {
         // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
         var cullingBoundingBox = new BoundingBox();
         var cullingMatrix = new Matrix4();
-        return function (object, camera, worldViewMat, projectionMat) {
+        return function(object, camera, worldViewMat) {
             // Bounding box can be a property of object(like light) or renderable.geometry
             // PENDING
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
@@ -351,7 +349,7 @@ var Scene = Node.extend(function () {
                     return true;
                 }
 
-                cullingMatrix.array = projectionMat;
+                cullingMatrix.array = camera.projectionMatrix.array;
                 if (
                     cullingBoundingBox.max.array[2] > 0 &&
                     cullingBoundingBox.min.array[2] < 0

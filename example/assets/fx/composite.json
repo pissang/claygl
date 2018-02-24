@@ -967,7 +967,7 @@
         },
         {
             "name" : "FXAA",
-            "shader" : "#source(clay.compositor.fxaa3)",
+            "shader" : "#source(clay.compositor.fxaa)",
             "inputs" : {
                 "texture" : "composite"
             }

@@ -416,7 +416,7 @@ var DeferredRenderer = Base.extend(function () {
             }
         }
 
-        this._renderVolumeMeshList(renderer, camera, volumeMeshList);
+        this._renderVolumeMeshList(renderer, scene, camera, volumeMeshList);
 
         this.trigger('lightaccumulate', renderer, scene, camera);
 
@@ -442,9 +442,7 @@ var DeferredRenderer = Base.extend(function () {
                     case 'SPOT_LIGHT':
                         // Frustum culling
                         Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
-                        if (renderer.isFrustumCulled(
-                            volumeMesh, null, camera, worldView.array, camera.projectionMatrix.array
-                        )) {
+                        if (scene.isFrustumCulled(volumeMesh, camera, worldView.array)) {
                             continue;
                         }
 
@@ -573,12 +571,14 @@ var DeferredRenderer = Base.extend(function () {
     },
 
     _renderVolumeMeshList: (function () {
-        var worldViewProjection = new Matrix4();
         var worldView = new Matrix4();
         var preZMaterial = new Material({
             shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
-        return function (renderer, camera, volumeMeshList) {
+        function getPreZMaterial() {
+            return preZMaterial;
+        }
+        return function (renderer, scene, camera, volumeMeshList) {
             var gl = renderer.gl;
 
             gl.enable(gl.DEPTH_TEST);
@@ -594,9 +594,7 @@ var DeferredRenderer = Base.extend(function () {
 
                 // Frustum culling
                 Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);
-                if (renderer.isFrustumCulled(
-                    volumeMesh, null, camera, worldView.array, camera.projectionMatrix.array
-                )) {
+                if (scene.isFrustumCulled(volumeMesh, camera, worldView.array)) {
                     continue;
                 }
 
@@ -607,9 +605,7 @@ var DeferredRenderer = Base.extend(function () {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
 
                 renderer.renderPass([volumeMesh], camera, {
-                    getMaterial: function () {
-                        return preZMaterial;
-                    }
+                    getMaterial: getPreZMaterial
                 });
 
                 // Render light
