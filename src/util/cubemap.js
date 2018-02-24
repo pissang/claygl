@@ -239,9 +239,9 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
     var pixels = new Float32Array(sampleSize * roughnessLevels * 4);
     var tmp = [];
 
-    function sortFunc(a, b) {
-        return Math.abs(b) - Math.abs(a);
-    }
+    // function sortFunc(a, b) {
+    //     return Math.abs(b) - Math.abs(a);
+    // }
     for (var j = 0; j < roughnessLevels; j++) {
         var roughness = j / roughnessLevels;
         var a = roughness * roughness;
@@ -261,8 +261,6 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
             var cosTheta = Math.sqrt((1 - y) / (1 + (a * a - 1.0) * y));
             tmp[i] = cosTheta;
         }
-
-        tmp.sort(sortFunc);
 
         for (var i = 0; i < sampleSize; i++) {
             var offset = (i * roughnessLevels + j) * 4;
