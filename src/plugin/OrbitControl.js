@@ -421,6 +421,8 @@ var OrbitControl = Base.extend(function () {
         this.setBeta(this.getBeta());
 
         this._vectorDamping(velocity, this.damping);
+
+        velocity.x = velocity.y = 0;
     },
 
     _updateDistance: function (deltaTime) {
@@ -446,6 +448,8 @@ var OrbitControl = Base.extend(function () {
             .scaleAndAdd(yAxis, -velocity.y * len / 200);
 
         this._vectorDamping(velocity, 0);
+
+        velocity.x = velocity.y = 0;
     },
 
     _updateTransform: function () {
@@ -585,12 +589,12 @@ var OrbitControl = Base.extend(function () {
 
         if (!haveGesture) {
             if (this._mode === 'rotate') {
-                this._rotateVelocity.y = (x - this._mouseX) / this.domElement.clientHeight * 2 * rotateSensitivity[0];
-                this._rotateVelocity.x = (y - this._mouseY) / this.domElement.clientWidth * 2 * rotateSensitivity[1];
+                this._rotateVelocity.y += (x - this._mouseX) / this.domElement.clientWidth * 2 * rotateSensitivity[0];
+                this._rotateVelocity.x += (y - this._mouseY) / this.domElement.clientHeight * 2 * rotateSensitivity[1];
             }
             else if (this._mode === 'pan') {
-                this._panVelocity.x = (x - this._mouseX) / this.domElement.clientWidth * panSensitivity[0] * 400;
-                this._panVelocity.y = (-y + this._mouseY) / this.domElement.clientHeight * panSensitivity[1] * 400;
+                this._panVelocity.x += (x - this._mouseX) / this.domElement.clientWidth * panSensitivity[0] * 400;
+                this._panVelocity.y += (-y + this._mouseY) / this.domElement.clientHeight * panSensitivity[1] * 400;
             }
         }
 
