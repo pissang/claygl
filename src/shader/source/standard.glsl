@@ -522,7 +522,7 @@ void main() {
 
         float falloff;
         // Fomular from real-time-rendering
-        falloff = clamp((c - a) /( b - a), 0.0, 1.0);
+        falloff = clamp((c - a) /(b - a), 0.0, 1.0);
         falloff = pow(falloff, falloffFactor);
 
         vec3 H = normalize(L + V);
@@ -545,9 +545,9 @@ void main() {
 #endif
 
     vec4 outColor = albedoColor;
-    outColor.rgb *= diffuseTerm;
+    outColor.rgb *= max(diffuseTerm, vec3(0.0));
 
-    outColor.rgb += specularTerm;
+    outColor.rgb += max(specularTerm, vec3(0.0));
 
 
 #ifdef AMBIENT_CUBEMAP_LIGHT_COUNT
