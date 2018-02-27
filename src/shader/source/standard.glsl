@@ -561,7 +561,7 @@ void main() {
     vec3 envTexel2;
     for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)
     {{
-        envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 20.1);
+        envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
         // TODO mix ?
         outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
     }}
@@ -574,7 +574,7 @@ void main() {
 
     #ifdef PARALLAX_CORRECTED
     L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);
-    #endif
+#endif
 
     #ifdef ENVIRONMENTMAP_PREFILTER
     float rough = clamp(1.0 - g, 0.0, 1.0);

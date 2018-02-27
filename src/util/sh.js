@@ -126,7 +126,7 @@ function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
                     texel[1] = pixels[i++] / 255;
                     texel[2] = pixels[i++] / 255;
                     // RGBM Decode
-                    var scale = pixels[i++] / 255 * 20.1;
+                    var scale = pixels[i++] / 255 * 8.12;
                     texel[0] *= scale;
                     texel[1] *= scale;
                     texel[2] *= scale;
