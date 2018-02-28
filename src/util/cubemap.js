@@ -199,6 +199,8 @@ cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
         width: 512,
         height: 256,
         type: Texture.HALF_FLOAT,
+        wrapS: Texture.CLAMP_TO_EDGE,
+        wrapT: Texture.CLAMP_TO_EDGE,
         minFilter: Texture.NEAREST,
         magFilter: Texture.NEAREST,
         useMipmap: false
