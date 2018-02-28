@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # ############################################
 # fbx to glTF2.0 converter
 # glTF spec : https://github.com/KhronosGroup/glTF/blob/master/specification/2.0
