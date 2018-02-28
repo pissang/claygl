@@ -1235,6 +1235,19 @@ def CorrectImagesPaths(pFilePath):
         lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
+            # If an alternative output directory is specified, copy all textures to output directory
+            if args.output:
+                lOutputDir = os.path.dirname(args.output)
+                print(lOutputDir)
+                # If textures are in a dir and that dir does not yet exist, create it
+                lRelTextureDir = os.path.dirname(lRelUri)
+                print("lRelTextureDir = " + lRelTextureDir)
+                lFullTextureDir = os.path.join(lOutputDir, lRelTextureDir)
+                print("lFullTextureDir = " + lFullTextureDir)
+                if not os.path.exists(lFullTextureDir):
+                    os.makedirs(lFullTextureDir)
+                shutil.copyfile(lUri, os.path.join(lOutputDir, lRelUri))
+                print('Textures copied to output folder')
             if not lRelUri == lGLTFImage['uri']:
                 print('Changed texture file path from "' + lGLTFImage['uri'] + '" to "' + lRelUri + '"')
             lGLTFImage['uri'] = lRelUri
