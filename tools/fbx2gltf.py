@@ -2,7 +2,6 @@
 # fbx to glTF2.0 converter
 # glTF spec : https://github.com/KhronosGroup/glTF/blob/master/specification/2.0
 # fbx version 2018.1.1
-# TODO: texture flipY?
 # http://github.com/pissang/
 # ############################################
 import sys, struct, json, os.path, math, argparse
@@ -409,6 +408,11 @@ def CreateTexture(pProperty):
     else:
         return None, lScaleU, lScaleV, lTranslationU, lTranslationV
 
+def GetRoughnessFromExponentShininess(pShininess):
+    # PENDING Is max 1024?
+    lGlossiness = math.log(pShininess) / math.log(1024.0)
+    return min(max(1 - lGlossiness, 0), 1)
+
 def ConvertToPBRMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
     lShading = str(pMaterial.ShadingModel.Get()).lower()
@@ -426,54 +430,82 @@ def ConvertToPBRMaterial(pMaterial):
             "roughnessFactor": 1
         }
     }
-    lValues = lGLTFMaterial["pbrMetallicRoughness"];
+    lValues = lGLTFMaterial["pbrMetallicRoughness"]
 
     lMaterialIdx = len(lib_materials)
 
-    if (lShading == 'unknown'):
-        lib_materials.append(lGLTFMaterial)
-        return lMaterialIdx, 1, 1, 0, 0
+    # print(dir(pMaterial))
 
-    lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
+    if hasattr(pMaterial, 'Emissive'):
+        lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
 
-    lTransparency = MatGetOpacity(pMaterial)
-    if lTransparency < 1:
-        lGLTFMaterial['alphaMode'] = 'BLEND'
-        lValues['baseColorFactor'][3] = lTransparency
+    if hasattr(pMaterial, 'TransparencyFactor'):
+        lTransparency = MatGetOpacity(pMaterial)
+        if lTransparency < 1:
+            lGLTFMaterial['alphaMode'] = 'BLEND'
+            lValues['baseColorFactor'][3] = lTransparency
 
-    if pMaterial.Diffuse.GetSrcObjectCount() > 0:
-        # TODO other textures ?
-        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Diffuse)
-        if not lTextureIdx == None:
-            lValues['baseColorTexture'] = {
-                "index": lTextureIdx,
-                "texCoord": 0
-            }
-    else:
-        lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
+    if hasattr(pMaterial, 'Diffuse'):
+        if pMaterial.Diffuse.GetSrcObjectCount() > 0:
+            # TODO other textures ?
+            lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Diffuse)
+            if not lTextureIdx == None:
+                lValues['baseColorTexture'] = {
+                    "index": lTextureIdx,
+                    "texCoord": 0
+                }
+        else:
+            lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
 
-    if pMaterial.Bump.GetSrcObjectCount() > 0:
-        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Bump)
-        if not lTextureIdx == None:
-            lGLTFMaterial['normalTexture'] = {
-                "index": lTextureIdx,
-                "texCoord": 0
-            }
+    if hasattr(pMaterial, 'Bump'):
+        if pMaterial.Bump.GetSrcObjectCount() > 0:
+            lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.Bump)
+            if not lTextureIdx == None:
+                lGLTFMaterial['normalTexture'] = {
+                    "index": lTextureIdx,
+                    "texCoord": 0
+                }
 
-    if pMaterial.NormalMap.GetSrcObjectCount() > 0:
-        lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.NormalMap)
-        if not lTextureIdx == None:
-            lGLTFMaterial['normalTexture'] = {
-                "index": lTextureIdx,
-                "texCoord": 0
-            }
-    # PENDING
+    if hasattr(pMaterial, 'NormalMap'):
+        if pMaterial.NormalMap.GetSrcObjectCount() > 0:
+            lTextureIdx, lScaleU, lScaleV, lTranslationU, lTranslationV = CreateTexture(pMaterial.NormalMap)
+            if not lTextureIdx == None:
+                lGLTFMaterial['normalTexture'] = {
+                    "index": lTextureIdx,
+                    "texCoord": 0
+                }
 
-    if lShading == 'phong':
-        lGLossiness = math.log(pMaterial.Shininess.Get()) / math.log(8192)
-        lValues['roughnessFactor'] = min(max(1 - lGLossiness, 0), 1)
+    if hasattr(pMaterial, 'NormalMShininessap'):
+        lValues['roughnessFactor'] = GetRoughnessFromExponentShininess(pMaterial.Shininess.Get())
 
     lib_materials.append(lGLTFMaterial)
+
+
+    if lShading == 'unknown':
+        # Maybe shading of VRay
+        lProp = pMaterial.GetFirstProperty()
+        lCount = 0
+        while lProp:
+            lPropName = lProp.GetName()
+            if lPropName == '' or lCount >= 100:
+                break
+
+            if lPropName == 'EmissiveColor':
+                # Need to cast to double3
+                # https://forums.autodesk.com/t5/fbx-forum/fbxproperty-get-in-2013-1-python/td-p/4243290
+                lGLTFMaterial['emissiveFactor'] = list(FbxPropertyDouble3(lProp).Get())
+            elif lPropName == 'DiffuseColor':
+                lValues['baseColorFactor'][0:3] = list(FbxPropertyDouble3(lProp).Get())
+            elif lPropName == 'SpecularColor':
+                pass
+            elif lPropName == 'ShininessExponent':
+                lValues['roughnessFactor'] = GetRoughnessFromExponentShininess(FbxPropertyDouble1(lProp).Get())
+
+
+            lProp = pMaterial.GetNextProperty(lProp)
+            lCount += 1
+
+
     return lMaterialIdx, lScaleU, lScaleV, lTranslationU, lTranslationV
 
 
