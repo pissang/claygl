@@ -1221,6 +1221,8 @@ def GetNodeIdx(pNode):
 
 
 def FindFileInDir(pFileName, pDir):
+    print("pFileName = " + pFileName)
+    print("pDir = " + pDir)
     for root, dirs, files in os.walk(pDir):
         for file in files:
             if file == pFileName:
@@ -1228,13 +1230,23 @@ def FindFileInDir(pFileName, pDir):
 
 def CorrectImagesPaths(pFilePath):
     lFileFullPath = os.path.join(os.getcwd(), pFilePath)
-    lFileDir = os.path.dirname(lFileFullPath)
+    lFileExtension = pFilePath.rsplit('.', 1)[1].lower()
+    print("lFileExtension = " + lFileExtension)
+    print("lFileFullPath = " + lFileFullPath)
     for lGLTFImage in lib_images:
         lUri = lGLTFImage['uri']
         lUri = lUri.replace(r'[\\\/]+', os.path.sep)
+        if lFileExtension == 'zip':
+            lFileDir = os.path.dirname(lGLTFImage['uri'])
+        else:
+            lFileDir = os.path.dirname(lFileFullPath)
+        print("lFileDir = " + lFileDir)
         lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
+        lUriMine = str(lUri)
+        print("lUriMine = " + lUriMine)
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
+            print("lRelUri = " + str(lRelUri) )
             # If an alternative output directory is specified, copy all textures to output directory
             if args.output:
                 lOutputDir = os.path.dirname(args.output)
