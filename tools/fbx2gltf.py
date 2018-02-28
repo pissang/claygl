@@ -1221,45 +1221,35 @@ def GetNodeIdx(pNode):
 
 
 def FindFileInDir(pFileName, pDir):
-    print("pFileName = " + pFileName)
-    print("pDir = " + pDir)
     for root, dirs, files in os.walk(pDir):
         for file in files:
             if file == pFileName:
                 return os.path.join(root, file)
 
+
 def CorrectImagesPaths(pFilePath):
     lFileFullPath = os.path.join(os.getcwd(), pFilePath)
     lFileExtension = pFilePath.rsplit('.', 1)[1].lower()
-    print("lFileExtension = " + lFileExtension)
-    print("lFileFullPath = " + lFileFullPath)
     for lGLTFImage in lib_images:
         lUri = lGLTFImage['uri']
         lUri = lUri.replace(r'[\\\/]+', os.path.sep)
+        # FBX SDK extracts zip input files to temp folder, so use lGLTFImage uri instead to find temp folder
         if lFileExtension == 'zip':
             lFileDir = os.path.dirname(lGLTFImage['uri'])
         else:
             lFileDir = os.path.dirname(lFileFullPath)
-        print("lFileDir = " + lFileDir)
         lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
-        lUriMine = str(lUri)
-        print("lUriMine = " + lUriMine)
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
-            print("lRelUri = " + str(lRelUri) )
             # If an alternative output directory is specified, copy all textures to output directory
             if args.output:
                 lOutputDir = os.path.dirname(args.output)
-                print(lOutputDir)
                 # If textures are in a dir and that dir does not yet exist, create it
                 lRelTextureDir = os.path.dirname(lRelUri)
-                print("lRelTextureDir = " + lRelTextureDir)
                 lFullTextureDir = os.path.join(lOutputDir, lRelTextureDir)
-                print("lFullTextureDir = " + lFullTextureDir)
                 if not os.path.exists(lFullTextureDir):
                     os.makedirs(lFullTextureDir)
                 shutil.copyfile(lUri, os.path.join(lOutputDir, lRelUri))
-                print('Textures copied to output folder')
             if not lRelUri == lGLTFImage['uri']:
                 print('Changed texture file path from "' + lGLTFImage['uri'] + '" to "' + lRelUri + '"')
             lGLTFImage['uri'] = lRelUri
