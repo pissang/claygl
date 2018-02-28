@@ -38,11 +38,12 @@ var Renderable = Node.extend(/** @lends clay.Renderable# */ {
      * @type {Number}
      */
     renderOrder: 0,
+
     /**
      * Used when mode is LINES, LINE_STRIP or LINE_LOOP
      * @type {number}
      */
-    lineWidth: 1,
+    // lineWidth: 1,
 
     /**
      * If enable culling

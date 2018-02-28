@@ -743,9 +743,9 @@ var Renderer = Base.extend(function () {
 
         var glDrawMode = renderable.mode;
 
-        if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
-            _gl.lineWidth(this.lineWidth);
-        }
+        // if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
+        //     _gl.lineWidth(this.lineWidth);
+        // }
 
         if (vao.indicesBuffer) {
             var uintExt = this.getGLExtension('OES_element_index_uint');
