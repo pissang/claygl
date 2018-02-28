@@ -3,8 +3,8 @@ import SphereGeometry from '../geometry/Sphere';
 import Shader from '../Shader';
 import Material from '../Material';
 
-import basicEssl from '../shader/source/basic.glsl.js';
-Shader.import(basicEssl);
+import skydomeGLSL from '../shader/source/skydome.glsl.js';
+Shader.import(skydomeGLSL);
 /**
  * @constructor clay.plugin.Skydome
  *
@@ -15,16 +15,15 @@ Shader.import(basicEssl);
  *         scene: scene
  *     });
  *     skydome.material.set('diffuseMap', skyTex);
- */
+*/
 var Skydome = Mesh.extend(function () {
 
-    var skydomeShader = new Shader(Shader.source('clay.basic.vertex'), Shader.source('clay.basic.fragment'));
+    var skydomeShader = new Shader(Shader.source('clay.skydome.vertex'), Shader.source('clay.skydome.fragment'));
 
     var material = new Material({
         shader: skydomeShader,
         depthMask: false
     });
-    material.enableTexture('diffuseMap');
 
     return {
         /**
@@ -88,11 +87,11 @@ var Skydome = Mesh.extend(function () {
     },
 
     setEnvironmentMap: function (envMap) {
-        this.material.set('diffuseMap', envMap);
+        this.material.set('environmentMap', envMap);
     },
 
     getEnvironmentMap: function () {
-        return this.material.get('diffuseMap');
+        return this.material.get('environmentMap');
     },
 
     dispose: function (renderer) {

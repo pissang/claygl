@@ -30,7 +30,7 @@
             var skydome = new clay.plugin.Skydome({
                 scene : scene
             });
-            skydome.material.set('diffuseMap', texture);
+            skydome.setEnvironmentMap(texture);
 
             var control = new clay.plugin.OrbitControl({
                 target : camera,

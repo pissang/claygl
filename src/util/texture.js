@@ -123,7 +123,7 @@ var textureUtil = {
         var skydome = new Skydome({
             scene: new Scene()
         });
-        skydome.material.set('diffuseMap', panoramaMap);
+        skydome.setEnvironmentMap(panoramaMap);
 
         option = option || {};
         if (option.encodeRGBM) {

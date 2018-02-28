@@ -15,7 +15,8 @@ glob(ROOT + '**/*.glsl', function (err, files) {
             // .replace(/\/\/\//g, temporalPlaceHolder)
             .replace(/[ \t]*\/\/.*\n/g, '' ) // remove //
             .replace(/[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
-            .replace(/\n{2,}/g, '\n' ); // # \n+ to \n
+            .replace(/\n{2,}/g, '\n' ) // # \n+ to \n
+            .replace(/ +/g, ' ');   // Remove spaces.
             // .replace(new RegExp(temporalPlaceHolder, 'g'), '///');
 
         // var dir = path.dirname(filePath);

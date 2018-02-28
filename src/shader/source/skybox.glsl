@@ -1,4 +1,5 @@
 @export clay.skybox.vertex
+#define SHADER_NAME skybox
 
 uniform mat4 world : WORLD;
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;

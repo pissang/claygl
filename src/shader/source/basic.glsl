@@ -90,17 +90,17 @@ void main()
 #endif
 
 #ifdef DIFFUSEMAP_ENABLED
-    vec4 tex = decodeHDR(texture2D(diffuseMap, v_Texcoord));
+    vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));
 
 #ifdef SRGB_DECODE
-    tex = sRGBToLinear(tex);
+    texel = sRGBToLinear(texel);
 #endif
 
 #if defined(DIFFUSEMAP_ALPHA_ALPHA)
-    gl_FragColor.a = tex.a;
+    gl_FragColor.a = texel.a;
 #endif
 
-    gl_FragColor.rgb *= tex.rgb;
+    gl_FragColor.rgb *= texel.rgb;
 #endif
 
     gl_FragColor.rgb += emission;

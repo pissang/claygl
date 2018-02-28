@@ -1,3 +1,4 @@
+#define SHADER_NAME prefilter
 #define SAMPLE_NUMBER 1024
 #define PI 3.14159265358979
 
@@ -6,11 +7,10 @@ uniform samplerCube environmentMap;
 uniform sampler2D normalDistribution;
 
 uniform float roughness : 0.5;
+uniform int maxSampleNumber: 1024
 
 varying vec2 v_Texcoord;
 varying vec3 v_WorldPosition;
-
-const float fSampleNumber = float(SAMPLE_NUMBER);
 
 @import clay.util.rgbm
 
@@ -34,10 +34,13 @@ void main() {
 
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
-
+    float fMaxSampleNumber = float(maxSampleNumber);
 
     for (int i = 0; i < SAMPLE_NUMBER; i++) {
-        vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);
+        if (i > maxSampleNumber) {
+            break;
+        }
+        vec3 H = importanceSampleNormal(float(i) / fMaxSampleNumber, roughness, N);
         vec3 L = reflect(-V, H);
 
         float NoL = clamp(dot(N, L), 0.0, 1.0);

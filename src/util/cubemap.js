@@ -120,10 +120,16 @@ cubemapUtil.prefilterEnvironmentMap = function (
     });
     var ArrayCtor = vendor[textureType === Texture.UNSIGNED_BYTE ? 'Uint8Array' : 'Float32Array'];
     for (var i = 0; i < mipmapNum; i++) {
+        // console.time('prefilter');
         prefilteredCubeMap.mipmaps[i] = {
             pixels: {}
         };
         skyEnv.material.set('roughness', i / (targets.length - 1));
+        var maxSampleNumber = renderTargetTmp.width * renderTargetTmp.height;
+        if (renderTargetTmp.width >= 32) {
+            maxSampleNumber /= 4;
+        }
+        skyEnv.material.set('maxSampleNumber', Math.min(maxSampleNumber, 1024));
 
         // Tweak fov
         // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
@@ -161,6 +167,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
         renderTargetTmp.width /= 2;
         renderTargetTmp.height /= 2;
         renderTargetTmp.dirty();
+        // console.timeEnd('prefilter');
     }
 
     frameBuffer.dispose(renderer);

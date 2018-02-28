@@ -808,7 +808,7 @@ var Renderer = Base.extend(function () {
             }
             var uniformType = uniform.type;
 
-            if (uniformValue === null) {
+            if (uniformValue == null) {
                 // FIXME Assume material with same shader have same order uniforms
                 // Or if different material use same textures,
                 // the slot will be different and still skipped because optimization
