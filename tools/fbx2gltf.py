@@ -413,6 +413,28 @@ def GetRoughnessFromExponentShininess(pShininess):
     lGlossiness = math.log(pShininess) / math.log(1024.0)
     return min(max(1 - lGlossiness, 0), 1)
 
+def GetMetalnessFromSpecular(pSpecular, pBaseColor):
+    # x = pSpecular[0]
+    # y = pBaseColor[0]
+    # a = 0.04
+    # b = x + y - 0.08
+    # c = 0.04 - x
+    # k = b * b - 4 * a * c
+    # if k >= 0:
+    #     return math.sqrt(k)
+    # return 0
+
+    # PENDING
+    if pSpecular[0] > 0.5:
+        return 1
+    else:
+        return 0
+
+def ScaleV3(v3, scale):
+    v3[0] *= scale
+    v3[1] *= scale
+    v3[2] *= scale
+
 def ConvertToPBRMaterial(pMaterial):
     lMaterialName = pMaterial.GetName()
     lShading = str(pMaterial.ShadingModel.Get()).lower()
@@ -434,10 +456,12 @@ def ConvertToPBRMaterial(pMaterial):
 
     lMaterialIdx = len(lib_materials)
 
+    lSpecularColor = [0, 0, 0]
     # print(dir(pMaterial))
 
     if hasattr(pMaterial, 'Emissive'):
         lGLTFMaterial['emissiveFactor'] = list(pMaterial.Emissive.Get())
+        ScaleV3(lGLTFMaterial['emissiveFactor'], pMaterial.EmissiveFactor.Get())
 
     if hasattr(pMaterial, 'TransparencyFactor'):
         lTransparency = MatGetOpacity(pMaterial)
@@ -456,6 +480,10 @@ def ConvertToPBRMaterial(pMaterial):
                 }
         else:
             lValues['baseColorFactor'][0:3] = list(pMaterial.Diffuse.Get())
+
+    if hasattr(pMaterial, 'Specular'):
+        lSpecularColor = list(pMaterial.Specular.Get())
+        ScaleV3(lSpecularColor, pMaterial.SpecularFactor.Get())
 
     if hasattr(pMaterial, 'Bump'):
         if pMaterial.Bump.GetSrcObjectCount() > 0:
@@ -480,7 +508,6 @@ def ConvertToPBRMaterial(pMaterial):
 
     lib_materials.append(lGLTFMaterial)
 
-
     if lShading == 'unknown':
         # Maybe shading of VRay
         lProp = pMaterial.GetFirstProperty()
@@ -497,14 +524,16 @@ def ConvertToPBRMaterial(pMaterial):
             elif lPropName == 'DiffuseColor':
                 lValues['baseColorFactor'][0:3] = list(FbxPropertyDouble3(lProp).Get())
             elif lPropName == 'SpecularColor':
-                pass
+                lSpecularColor = list(FbxPropertyDouble3(lProp).Get())
+            elif lPropName == 'SpecularFactor':
+                ScaleV3(lSpecularColor, FbxPropertyDouble1(lProp).Get())
             elif lPropName == 'ShininessExponent':
                 lValues['roughnessFactor'] = GetRoughnessFromExponentShininess(FbxPropertyDouble1(lProp).Get())
-
 
             lProp = pMaterial.GetNextProperty(lProp)
             lCount += 1
 
+    lValues['metallicFactor'] = GetMetalnessFromSpecular(lSpecularColor, lValues['baseColorFactor'][0:3])
 
     return lMaterialIdx, lScaleU, lScaleV, lTranslationU, lTranslationV
 
