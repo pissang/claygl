@@ -1243,7 +1243,7 @@ def CorrectImagesPaths(pFilePath):
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
             # If an alternative output directory is specified, copy all textures to output directory
-            if args.output:
+            if lOutputDirSpecified:
                 lOutputDir = os.path.dirname(args.output)
                 # If textures are in a dir and that dir does not yet exist, create it
                 lRelTextureDir = os.path.dirname(lRelUri)
@@ -1467,11 +1467,14 @@ if __name__ == "__main__":
         lDuration = float(lTimeRange[1])
 
     if not args.output:
+        lOutputDirSpecified = False
         lBasename, lExt = os.path.splitext(args.file)
         if args.binary:
             args.output = lBasename + '.glb'
         else:
             args.output = lBasename + '.gltf'
+    else:
+        lOutputDirSpecified = True
 
     # PENDING Not use INFINITY poseTime or some joint transform without animation maybe not right.
     lPoseTime = FbxTime()
