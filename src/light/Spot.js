@@ -5,9 +5,7 @@ import Vector3 from '../math/Vector3';
  * @constructor clay.light.Spot
  * @extends clay.Light
  */
-var SpotLight = Light.extend(
-/**@lends clay.light.Spot */
-{
+var SpotLight = Light.extend(/**@lends clay.light.Spot */ {
     /**
      * @type {number}
      */
@@ -27,12 +25,12 @@ var SpotLight = Light.extend(
     /**
      * @type {number}
      */
-    shadowBias: 0.0002,
+    shadowBias: 0.001,
     /**
      * @type {number}
      */
     shadowSlopeScale: 2.0
-},{
+}, {
 
     type: 'SPOT_LIGHT',
 

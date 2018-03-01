@@ -516,7 +516,7 @@ def ConvertToPBRMaterial(pMaterial):
             lPropName = lProp.GetName()
             if lPropName == '' or lCount >= 100:
                 break
-
+            # TODO texture
             if lPropName == 'EmissiveColor':
                 # Need to cast to double3
                 # https://forums.autodesk.com/t5/fbx-forum/fbxproperty-get-in-2013-1-python/td-p/4243290
