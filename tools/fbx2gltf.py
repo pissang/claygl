@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # ############################################
 # fbx to glTF2.0 converter
 # glTF spec : https://github.com/KhronosGroup/glTF/blob/master/specification/2.0
@@ -1287,15 +1288,30 @@ def FindFileInDir(pFileName, pDir):
             if file == pFileName:
                 return os.path.join(root, file)
 
+
 def CorrectImagesPaths(pFilePath):
     lFileFullPath = os.path.join(os.getcwd(), pFilePath)
-    lFileDir = os.path.dirname(lFileFullPath)
+    lFileExtension = pFilePath.rsplit('.', 1)[1].lower()
     for lGLTFImage in lib_images:
         lUri = lGLTFImage['uri']
         lUri = lUri.replace(r'[\\\/]+', os.path.sep)
+        # FBX SDK extracts zip input files to temp folder, so use lGLTFImage uri instead to find temp folder
+        if lFileExtension == 'zip':
+            lFileDir = os.path.dirname(lGLTFImage['uri'])
+        else:
+            lFileDir = os.path.dirname(lFileFullPath)
         lUri = FindFileInDir(os.path.basename(lUri), lFileDir)
         if lUri:
             lRelUri = os.path.relpath(lUri, lFileDir)
+            # If an alternative output directory is specified, copy all textures to output directory
+            if lOutputDirSpecified:
+                lOutputDir = os.path.dirname(args.output)
+                # If textures are in a dir and that dir does not yet exist, create it
+                lRelTextureDir = os.path.dirname(lRelUri)
+                lFullTextureDir = os.path.join(lOutputDir, lRelTextureDir)
+                if not os.path.exists(lFullTextureDir):
+                    os.makedirs(lFullTextureDir)
+                shutil.copyfile(lUri, os.path.join(lOutputDir, lRelUri))
             if not lRelUri == lGLTFImage['uri']:
                 print('Changed texture file path from "' + lGLTFImage['uri'] + '" to "' + lRelUri + '"')
             lGLTFImage['uri'] = lRelUri
@@ -1512,11 +1528,14 @@ if __name__ == "__main__":
         lDuration = float(lTimeRange[1])
 
     if not args.output:
+        lOutputDirSpecified = False
         lBasename, lExt = os.path.splitext(args.file)
         if args.binary:
             args.output = lBasename + '.glb'
         else:
             args.output = lBasename + '.gltf'
+    else:
+        lOutputDirSpecified = True
 
     # PENDING Not use INFINITY poseTime or some joint transform without animation maybe not right.
     lPoseTime = FbxTime()
