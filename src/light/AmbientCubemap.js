@@ -56,6 +56,10 @@ var AmbientCubemapLight = Light.extend({
         cubemap.dispose(renderer);
     },
 
+    getBRDFLookup: function () {
+        return this._brdfLookup;
+    },
+
     uniformTemplates: {
         ambientCubemapLightColor: {
             type: '3f',

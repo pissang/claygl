@@ -134,7 +134,7 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
         var standardMaterial = renderable.material;
 
         var color = standardMaterial.get('color');
-        var metalness = standardMaterial.get('metalness');
+        var metalness = standardMaterial.get('metalness') || 0;
 
         var diffuseMap = standardMaterial.get('diffuseMap');
         var metalnessMap = standardMaterial.get('metalnessMap');

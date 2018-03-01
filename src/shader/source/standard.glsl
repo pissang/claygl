@@ -358,7 +358,7 @@ void main() {
 #endif
 
 #ifdef USE_ROUGHNESS
-    float g = 1.0 - roughness;
+    float g = clamp(1.0 - roughness, 0.0, 1.0);
     #ifdef ROUGHNESSMAP_ENABLED
     float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];
     // Adjust the brightness
