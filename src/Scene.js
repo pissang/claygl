@@ -258,9 +258,10 @@ var Scene = Node.extend(function () {
      * It needs camera for the frustum culling.
      *
      * @param {clay.Camera} camera
+     * @param {boolean} updateSceneBoundingBox
      * @return {clay.Scene.RenderList}
      */
-    updateRenderList: function (camera) {
+    updateRenderList: function (camera, updateSceneBoundingBox) {
         var id = camera.__uid__;
         var renderList = this._renderLists.get(id);
         if (!renderList) {
@@ -269,11 +270,13 @@ var Scene = Node.extend(function () {
         }
         renderList.startCount();
 
-        this.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
-        this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+        if (updateSceneBoundingBox) {
+            this.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+            this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+        }
 
         var sceneMaterialTransparent = this.material && this.material.transparent || false;
-        this._doUpdateRenderList(this, camera, sceneMaterialTransparent, renderList);
+        this._doUpdateRenderList(this, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox);
 
         renderList.endCount();
 
@@ -289,7 +292,7 @@ var Scene = Node.extend(function () {
         return this._renderLists.get(camera.__uid__);
     },
 
-    _doUpdateRenderList: function (parent, camera, sceneMaterialTransparent, renderList) {
+    _doUpdateRenderList: function (parent, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox) {
         if (parent.invisible) {
             return;
         }
@@ -303,12 +306,12 @@ var Scene = Node.extend(function () {
                 var geometry = child.geometry;
 
                 mat4.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
-                if (!geometry.boundingBox || !this.isFrustumCulled(child, camera, WORLDVIEW)) {
+                if (updateSceneBoundingBox && !geometry.boundingBox || !this.isFrustumCulled(child, camera, WORLDVIEW)) {
                     renderList.add(child, child.material.transparent || sceneMaterialTransparent);
                 }
             }
             if (child._children.length > 0) {
-                this._doUpdateRenderList(child, camera, sceneMaterialTransparent, renderList);
+                this._doUpdateRenderList(child, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox);
             }
         }
     },

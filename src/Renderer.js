@@ -419,7 +419,7 @@ var Renderer = Base.extend(function () {
             return;
         }
         camera.update();
-        var renderList = scene.updateRenderList(camera);
+        var renderList = scene.updateRenderList(camera, true);
 
         this._sceneRendering = scene;
 

@@ -180,6 +180,7 @@ var DeferredRenderer = Base.extend(function () {
             scene.update(false, true);
         }
         scene.updateLights();
+        // Render list will be updated in gbuffer.
 
         camera.update(true);
 
