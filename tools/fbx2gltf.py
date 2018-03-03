@@ -5,7 +5,7 @@
 # fbx version 2018.1.1
 # http://github.com/pissang/
 # ############################################
-import sys, struct, json, os.path, math, argparse
+import sys, struct, json, os.path, math, argparse, shutil
 
 try:
     from FbxCommon import *
