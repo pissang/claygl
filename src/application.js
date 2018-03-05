@@ -69,6 +69,7 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {Function} init Initialization callback that will be called when initing app.
  *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
  * @property {Function} loop Loop callback that will be called each frame.
+ * @property {boolean} [autoRender=true] If render automatically each frame.
  * @property {Function} [beforeRender]
  * @property {Function} [afterRender]
  * @property {number} [width] Container width.
@@ -140,6 +141,10 @@ function App3D(dom, appNS) {
     appNS = appNS || {};
     appNS.graphic = appNS.graphic || {};
 
+    if (appNS.autoRender == null) {
+        appNS.autoRender = true;
+    }
+
     if (typeof dom === 'string') {
         dom = document.querySelector(dom);
     }
@@ -205,7 +210,10 @@ function App3D(dom, appNS) {
          * @name clay.application.App3D#elapsedTime
          * @type {number}
          */
-        elapsedTime: { get: function () { return gElapsedTime; }}
+        elapsedTime: { get: function () { return gElapsedTime; }},
+
+        _appNS: { get: function () { return appNS; } },
+        _shadowPass: { get: function () { return gShadowPass; } },
     });
 
     /**
@@ -246,13 +254,14 @@ function App3D(dom, appNS) {
     this._geoCache = new LRUCache(20);
     this._texCache = new LRUCache(20);
 
+    // GPU Resources.
+    this._texturesList = {};
+    this._geometriesList = {};
+
     // Do init the application.
     var initPromise = Promise.resolve(appNS.init && appNS.init(this));
     // Use the inited camera.
     gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
-
-    var gTexturesList = {};
-    var gGeometriesList = {};
 
     if (!appNS.loop) {
         console.warn('Miss loop method.');
@@ -260,41 +269,20 @@ function App3D(dom, appNS) {
 
     var self = this;
     initPromise.then(function () {
-        appNS.loop && gTimeline.on('frame', function (frameTime) {
+        gTimeline.on('frame', function (frameTime) {
             gFrameTime = frameTime;
             gElapsedTime += frameTime;
-            appNS.loop(self);
 
-            gScene.update();
-            var skyboxList = [];
-            gScene.skybox && skyboxList.push(gScene.skybox);
-            gScene.skydome && skyboxList.push(gScene.skydome);
-            self._updateGraphicOptions(appNS.graphic, skyboxList, true);
+            appNS.loop && appNS.loop(self);
 
             gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
-            // Render shadow pass
-            gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
 
             appNS.beforeRender && appNS.beforeRender(self);
-            self._doRender(gRenderer, gScene, true);
+            if (appNS.autoRender) {
+                self.render();
+            }
             appNS.afterRender && appNS.afterRender(self);
-
-            // Mark all resources unused;
-            markUnused(gTexturesList);
-            markUnused(gGeometriesList);
-
-            // Collect resources used in this frame.
-            var newTexturesList = [];
-            var newGeometriesList = [];
-            collectResources(gScene, newTexturesList, newGeometriesList);
-
-            // Dispose those unsed resources.
-            checkAndDispose(gRenderer, gTexturesList);
-            checkAndDispose(gRenderer, gGeometriesList);
-
-            gTexturesList = newTexturesList;
-            gGeometriesList = newGeometriesList;
-        });
+        }, this);
     });
 
     gScene.on('beforerender', function (renderer, scene, camera, renderList) {
@@ -447,6 +435,45 @@ App3D.prototype._doRender = function (renderer, scene) {
     var camera = scene.getMainCamera();
     camera.aspect = renderer.getViewportAspect();
     renderer.render(scene, camera, true);
+};
+
+/**
+ * Do render
+ */
+App3D.prototype.render = function () {
+    var scene = this.scene;
+    var renderer = this.renderer;
+    var appNS = this._appNS;
+    var shadowPass = this._shadowPass;
+    var texturesList = this._texturesList;
+    var geometriesList = this._geometriesList;
+
+    scene.update();
+    var skyboxList = [];
+    scene.skybox && skyboxList.push(scene.skybox);
+    scene.skydome && skyboxList.push(scene.skydome);
+
+    this._updateGraphicOptions(appNS.graphic, skyboxList, true);
+    // Render shadow pass
+    shadowPass && shadowPass.render(renderer, scene, null, true);
+
+    this._doRender(renderer, scene, true);
+
+    // Mark all resources unused;
+    markUnused(texturesList);
+    markUnused(geometriesList);
+
+    // Collect resources used in this frame.
+    var newTexturesList = [];
+    var newGeometriesList = [];
+    collectResources(scene, newTexturesList, newGeometriesList);
+
+    // Dispose those unsed resources.
+    checkAndDispose(renderer, texturesList);
+    checkAndDispose(renderer, geometriesList);
+
+    this._texturesList = newTexturesList;
+    this._geometriesList = newGeometriesList;
 };
 
 

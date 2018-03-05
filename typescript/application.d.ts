@@ -104,6 +104,8 @@ export namespace application {
         graphic?: IGraphicOption;
 
         event?: boolean;
+
+        autoRender?: boolean
     }
 
     export class App3D {
