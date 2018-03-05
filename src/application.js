@@ -277,11 +277,9 @@ function App3D(dom, appNS) {
 
             gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
 
-            appNS.beforeRender && appNS.beforeRender(self);
             if (appNS.autoRender) {
                 self.render();
             }
-            appNS.afterRender && appNS.afterRender(self);
         }, this);
     });
 
@@ -441,6 +439,8 @@ App3D.prototype._doRender = function (renderer, scene) {
  * Do render
  */
 App3D.prototype.render = function () {
+    appNS.beforeRender && appNS.beforeRender(self);
+
     var scene = this.scene;
     var renderer = this.renderer;
     var appNS = this._appNS;
@@ -474,6 +474,8 @@ App3D.prototype.render = function () {
 
     this._texturesList = newTexturesList;
     this._geometriesList = newGeometriesList;
+
+    appNS.afterRender && appNS.afterRender(self);
 };
 
 
