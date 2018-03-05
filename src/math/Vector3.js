@@ -916,38 +916,86 @@ Vector3.eulerFromMat3 = function (out, m, order) {
     return out;
 };
 
-// TODO return new.
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_X = new Vector3(1, 0, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_X = new Vector3(-1, 0, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_Y = new Vector3(0, 1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_Y = new Vector3(0, -1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_Z = new Vector3(0, 0, 1);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
-/**
- * @type {clay.Vector3}
- */
-Vector3.UP = new Vector3(0, 1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.ZERO = new Vector3(0, 0, 0);
+Object.defineProperties(Vector3, {
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_X: {
+        get: function () {
+            return new Vector3(1, 0, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    NEGATIVE_X: {
+        get: function () {
+            return new Vector3(-1, 0, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_Y: {
+        get: function () {
+            return new Vector3(0, 1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    NEGATIVE_Y: {
+        get: function () {
+            return new Vector3(0, -1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_Z: {
+        get: function () {
+            return new Vector3(0, 0, 1);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     */
+    NEGATIVE_Z: {
+        get: function () {
+            return new Vector3(0, 0, -1);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    UP: {
+        get: function () {
+            return new Vector3(0, 1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    ZERO: {
+        get: function () {
+            return new Vector3();
+        }
+    }
+});
 
 export default Vector3;

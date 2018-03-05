@@ -55,6 +55,9 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
  */
 /**
+ * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement|clay.Texture2D} TextureLike
+ */
+/**
  * @typedef {string|Array.<number>} Color
  */
 /**
@@ -66,8 +69,8 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {Function} init Initialization callback that will be called when initing app.
  *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
  * @property {Function} loop Loop callback that will be called each frame.
- * @property {Function} beforeRender
- * @property {Function} afterRender
+ * @property {Function} [beforeRender]
+ * @property {Function} [afterRender]
  * @property {number} [width] Container width.
  * @property {number} [height] Container height.
  * @property {number} [devicePixelRatio]
@@ -76,6 +79,23 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {boolean} [graphic.linear=false] If use linear color space
  * @property {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
  * @property {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+ */
+
+/**
+ * @typedef {Object} StandardMaterialMRConfig
+ * @property {string} [shader='standardMR']
+ * @property {Color} [color]
+ * @property {number} [alpha]
+ * @property {number} [metalness]
+ * @property {number} [roughness]
+ * @property {Color} [emission]
+ * @property {number} [emissionIntensity]
+ * @property {boolean} [transparent]
+ * @property {TextureLike} [diffuseMap]
+ * @property {TextureLike} [normalMap]
+ * @property {TextureLike} [roughnessMap]
+ * @property {TextureLike} [metalnessMap]
+ * @property {TextureLike} [emissiveMap]
  */
 
 /**
@@ -660,7 +680,7 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
 
 /**
  * Create a material.
- * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
+ * @param {Object|StandardMaterialMRConfig} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
