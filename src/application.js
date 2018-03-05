@@ -664,7 +664,7 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
- * @param {boolean} [convertTextureToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
+ * @param {boolean} [textureConvertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {boolean} [textureFlipY=true] If flip y of texture.
  * @return {clay.Material}
  */
@@ -688,7 +688,7 @@ App3D.prototype.createMaterial = function (matConfig) {
             ) {
                 // Try to load a texture.
                 this.loadTexture(val, {
-                    convertToPOT: matConfig.convertTextureToPOT || false,
+                    convertToPOT: matConfig.textureConvertToPOT || false,
                     flipY: matConfig.textureFlipY == null ? true : matConfig.textureFlipY
                 }).then(makeTextureSetter(key));
             }
@@ -1122,7 +1122,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * @param {boolean} [opts.autoPlayAnimation=true] If autoplay the animation of model.
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
- * @param {boolean} [opts.convertTextureToPOT=false] If convert texture to power-of-two
+ * @param {boolean} [opts.textureConvertToPOT=false] If convert texture to power-of-two
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
  * @param {clay.Node} [parentNode] Parent node that model will be mounted. Default to be scene
  * @return {Promise}
@@ -1144,7 +1144,7 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
         textureRootPath: opts.textureRootPath,
         crossOrigin: 'Anonymous',
         textureFlipY: opts.textureFlipY,
-        convertTextureToPOT: opts.convertTextureToPOT
+        textureConvertToPOT: opts.textureConvertToPOT
     };
     if (opts.upAxis && opts.upAxis.toLowerCase() === 'z') {
         loaderOpts.rootNode.rotation.identity().rotateX(-Math.PI / 2);

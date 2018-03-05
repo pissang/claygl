@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="../dist/claygl.js"></script>
-    <title>Vertex Color Test</title>
+    <title>None Power of Two Texture Test</title>
 </head>
 <body>
     <style>
@@ -19,11 +19,12 @@
         var app = clay.application.create('#main', {
             init: function (app) {
                 // Create camera
-                this._camera = app.createCamera([0, 0, 3], [0, 0, 0]);
+                this._camera = app.createCamera([2, 2, 2], [0, 0, 0]);
                 // Load boombox model. return a load promise to make sure the look will be start after model loaded.
-                return app.loadModel('./assets/models/test/VertexColorTest.glb', {
+                return app.loadModel('./assets/models/test/BoxTextured.glb', {
                     shader: 'clay.basic',
-                    waitTextureLoaded: true
+                    waitTextureLoaded: true,
+                    textureConvertToPOT: true
                 });
             },
 
