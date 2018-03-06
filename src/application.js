@@ -439,6 +439,7 @@ App3D.prototype._doRender = function (renderer, scene) {
  * Do render
  */
 App3D.prototype.render = function () {
+    var appNS = this._appNS;
     appNS.beforeRender && appNS.beforeRender(self);
 
     var scene = this.scene;
