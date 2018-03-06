@@ -111,17 +111,20 @@ export namespace application {
     export class App3D {
         constructor(dom: HTMLElement|string, appNS: IAppNS);
 
-        readonly container?: HTMLElement;
+        readonly container: HTMLElement;
 
-        readonly renderer?: Renderer;
+        readonly renderer: Renderer;
 
-        readonly scene?: Scene;
+        readonly scene: Scene;
 
-        readonly timeline?: Timeline;
+        readonly timeline: Timeline;
 
-        readonly frameTime?: number;
+        readonly frameTime: number;
 
-        readonly elapsedTime?: number;
+        readonly elapsedTime: number;
+
+        readonly width: number;
+        readonly height: number;
 
         resize(width: number, height: number): void;
 

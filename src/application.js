@@ -212,6 +212,19 @@ function App3D(dom, appNS) {
          */
         elapsedTime: { get: function () { return gElapsedTime; }},
 
+        /**
+         * Width of viewport.
+         * @name clay.application.App3D#width
+         * @type {number}
+         */
+        width: { get: function () { return gRenderer.getWidth(); }},
+        /**
+         * Height of viewport.
+         * @name clay.application.App3D#height
+         * @type {number}
+         */
+        height: { get: function () { return gRenderer.getHeight(); }},
+
         _appNS: { get: function () { return appNS; } },
         _shadowPass: { get: function () { return gShadowPass; } },
     });
@@ -273,9 +286,13 @@ function App3D(dom, appNS) {
             gFrameTime = frameTime;
             gElapsedTime += frameTime;
 
-            appNS.loop && appNS.loop(self);
+            var camera = gScene.getMainCamera();
+            if (camera) {
+                camera.aspect = gRenderer.getViewportAspect();
+            }
+            gRayPicking && (gRayPicking.camera = camera);
 
-            gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
+            appNS.loop && appNS.loop(self);
 
             if (appNS.autoRender) {
                 self.render();
@@ -431,7 +448,6 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
 
 App3D.prototype._doRender = function (renderer, scene) {
     var camera = scene.getMainCamera();
-    camera.aspect = renderer.getViewportAspect();
     renderer.render(scene, camera, true);
 };
 
