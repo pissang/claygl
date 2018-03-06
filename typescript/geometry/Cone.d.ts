@@ -9,7 +9,7 @@ interface IConeGeometryOption {
     heightSegements?: number;
 }
 
-export class Cone extends Geometry{
+export class Cone extends Geometry {
 
     constructor(option?: IConeGeometryOption);
 

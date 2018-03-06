@@ -69,5 +69,8 @@ export { shader }
 import * as util from './typescript/util/index';
 export { util }
 
+import * as deferred from './typescript/deferred/index';
+export { deferred }
+
 // import * as math from './typescript/math/index';
 // export { math }
