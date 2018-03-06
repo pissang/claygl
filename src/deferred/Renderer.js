@@ -593,6 +593,7 @@ var DeferredRenderer = Base.extend(function () {
 
                 // Use prez to avoid one pixel rendered twice
                 gl.colorMask(false, false, false, false);
+                gl.depthMask(true);
                 // depthMask must be enabled before clear DEPTH_BUFFER
                 gl.clear(gl.DEPTH_BUFFER_BIT);
 
