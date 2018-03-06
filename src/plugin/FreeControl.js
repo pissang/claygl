@@ -9,7 +9,7 @@ import Vector3 from '../math/Vector3';
  *         domElement: renderer.canvas
  *     });
  *     ...
- *     animation.on('frame', function(frameTime) {
+ *     timeline.on('frame', function(frameTime) {
  *         control.update(frameTime);
  *         renderer.render(scene, camera);
  *     });
@@ -55,7 +55,7 @@ var FreeControl = Base.extend(function() {
         /**
          * @type {clay.Timeline}
          */
-        animation: null,
+        timeline: null,
 
         _moveForward: false,
         _moveBackward: false,
@@ -72,15 +72,15 @@ var FreeControl = Base.extend(function() {
     this._mouseMove = this._mouseMove.bind(this);
 
     if (this.domElement) {
-        this.enable();
+        this.init();
     }
 },
 /** @lends clay.plugin.FreeControl.prototype */
 {
     /**
-     * Enable control
+     * init control
      */
-    enable: function() {
+    init: function() {
         // Use pointer lock
         // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
         var el = this.domElement;
@@ -96,17 +96,15 @@ var FreeControl = Base.extend(function() {
         document.addEventListener('keydown', this._keyDown);
         document.addEventListener('keyup', this._keyUp);
 
-        if (this.animation) {
-            this.animation.on('frame', this._detectMovementChange, this);
+        if (this.timeline) {
+            this.timeline.on('frame', this._detectMovementChange, this);
         }
     },
 
     /**
-     * Disable control
+     * Dispose control
      */
-    disable: function() {
-
-        this.target.off('beforeupdate', this._beforeUpdateCamera);
+    dispose: function() {
 
         var el = this.domElement;
 
@@ -127,8 +125,8 @@ var FreeControl = Base.extend(function() {
         document.removeEventListener('keydown', this._keyDown);
         document.removeEventListener('keyup', this._keyUp);
 
-        if (this.animation) {
-            this.animation.off('frame', this._detectMovementChange);
+        if (this.timeline) {
+            this.timeline.off('frame', this._detectMovementChange);
         }
     },
 
@@ -145,7 +143,7 @@ var FreeControl = Base.extend(function() {
      * Control update. Should be invoked every frame
      * @param {number} frameTime Frame time
      */
-    update: function(frameTime) {
+    update: function (frameTime) {
         var target = this.target;
 
         var position = this.target.position;
@@ -187,7 +185,8 @@ var FreeControl = Base.extend(function() {
             || document.webkitPointerLockElement === this.domElement
         ) {
             document.addEventListener('mousemove', this._mouseMove, false);
-        } else {
+        }
+        else {
             document.removeEventListener('mousemove', this._mouseMove);
         }
     },

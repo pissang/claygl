@@ -18,6 +18,7 @@ import { Perspective as PerspectiveCamera } from './camera/Perspective';
 import { Orthographic as OrthographicCamera } from './camera/Orthographic';
 import { Point as PointLight } from './light/Point';
 import { IGLTFLoaderResult } from './loader/GLTF';
+import { ShadowMap } from './prePass/ShadowMap';
 
 interface IGraphicOption {
 

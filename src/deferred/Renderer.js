@@ -60,7 +60,7 @@ var DeferredRenderer = Base.extend(function () {
 
     var lightAccumulateBlendFunc = function (gl) {
         gl.blendEquation(gl.FUNC_ADD);
-        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
     };
 
     var createLightPassMat = function (shader) {
@@ -112,9 +112,7 @@ var DeferredRenderer = Base.extend(function () {
 
         _gBuffer: new GBuffer(),
 
-        _lightAccumFrameBuffer: new FrameBuffer({
-            depthBuffer: false
-        }),
+        _lightAccumFrameBuffer: new FrameBuffer(),
 
         _lightAccumTex: new Texture2D({
             // FIXME Device not support float texture
@@ -582,13 +580,7 @@ var DeferredRenderer = Base.extend(function () {
         return function (renderer, scene, camera, volumeMeshList) {
             var gl = renderer.gl;
 
-            gl.enable(gl.DEPTH_TEST);
-            gl.disable(gl.CULL_FACE);
-            gl.blendEquation(gl.FUNC_ADD);
-            gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
             gl.depthFunc(gl.LEQUAL);
-
-            gl.clear(gl.DEPTH_BUFFER_BIT);
 
             for (var i = 0; i < volumeMeshList.length; i++) {
                 var volumeMesh = volumeMeshList[i];
@@ -601,7 +593,6 @@ var DeferredRenderer = Base.extend(function () {
 
                 // Use prez to avoid one pixel rendered twice
                 gl.colorMask(false, false, false, false);
-                gl.depthMask(true);
                 // depthMask must be enabled before clear DEPTH_BUFFER
                 gl.clear(gl.DEPTH_BUFFER_BIT);
 
@@ -611,7 +602,6 @@ var DeferredRenderer = Base.extend(function () {
 
                 // Render light
                 gl.colorMask(true, true, true, true);
-                gl.depthMask(false);
 
                 renderer.renderPass([volumeMesh], camera);
             }

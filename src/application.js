@@ -226,7 +226,6 @@ function App3D(dom, appNS) {
         height: { get: function () { return gRenderer.getHeight(); }},
 
         _appNS: { get: function () { return appNS; } },
-        _shadowPass: { get: function () { return gShadowPass; } },
     });
 
     /**
@@ -461,7 +460,7 @@ App3D.prototype.render = function () {
     var scene = this.scene;
     var renderer = this.renderer;
     var appNS = this._appNS;
-    var shadowPass = this._shadowPass;
+    var shadowPass = this.shadowPass;
     var texturesList = this._texturesList;
     var geometriesList = this._geometriesList;
 
