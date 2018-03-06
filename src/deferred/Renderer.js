@@ -603,6 +603,7 @@ var DeferredRenderer = Base.extend(function () {
                 // Render light
                 gl.colorMask(true, true, true, true);
 
+                volumeMesh.material.depthMask = true;
                 renderer.renderPass([volumeMesh], camera);
             }
 
