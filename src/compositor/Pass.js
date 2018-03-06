@@ -27,17 +27,17 @@ var Pass = Base.extend(function () {
          * @type {string}
          */
         // PENDING shader or fragment ?
-        fragment : '',
+        fragment: '',
 
         /**
          * @type {Object}
          */
-        outputs : null,
+        outputs: null,
 
         /**
          * @type {clay.Material}
          */
-        material : null,
+        material: null,
 
         /**
          * @type {Boolean}

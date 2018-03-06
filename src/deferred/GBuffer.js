@@ -194,7 +194,7 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
  */
 var GBuffer = Base.extend(function () {
 
-    return {
+    return /** @lends clay.deferred.GBuffer# */ {
 
         enableTargetTexture1: true,
 
@@ -328,10 +328,10 @@ var GBuffer = Base.extend(function () {
     },
 
     /**
-     * Update G Buffer
+     * Update GBuffer
      * @param {clay.Renderer} renderer
      * @param {clay.Scene} scene
-     * @param {clay.camera.Perspective} camera
+     * @param {clay.Camera} camera
      */
     update: function (renderer, scene, camera) {
 
@@ -439,6 +439,20 @@ var GBuffer = Base.extend(function () {
         frameBuffer.unbind(renderer);
     },
 
+    /**
+     * Debug output of gBuffer. Use `type` parameter to choos the debug output type, which can be:
+     *
+     * + 'normal'
+     * + 'depth'
+     * + 'position'
+     * + 'glossiness'
+     * + 'metalness'
+     * + 'albedo'
+     *
+     * @param {clay.Renderer} renderer
+     * @param {clay.Camera} camera
+     * @param {string} [type='normal']
+     */
     renderDebug: function (renderer, camera, type, viewport) {
         var debugTypes = {
             normal: 0,
@@ -518,6 +532,15 @@ var GBuffer = Base.extend(function () {
      * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
+        this._gBufferTex1.dispose(renderer);
+        this._gBufferTex2.dispose(renderer);
+        this._gBufferTex3.dispose(renderer);
+
+        this._defaultNormalMap.dispose(renderer);
+        this._defaultRoughnessMap.dispose(renderer);
+        this._defaultMetalnessMap.dispose(renderer);
+        this._defaultDiffuseMap.dispose(renderer);
+        this._frameBuffer.dispose(renderer);
     }
 });
 

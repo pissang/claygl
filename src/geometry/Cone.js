@@ -14,9 +14,7 @@ var vec2 = glMatrix.vec2;
  * @param {number} [opt.capSegments]
  * @param {number} [opt.heightSegments]
  */
-var Cone = Geometry.extend(
-/** @lends clay.geometry.Cone# */
-{
+var Cone = Geometry.extend(/** @lends clay.geometry.Cone# */ {
     dynamic: false,
     /**
      * @type {number}
