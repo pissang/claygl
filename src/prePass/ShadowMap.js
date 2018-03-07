@@ -25,6 +25,31 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 import shadowmapEssl from '../shader/source/shadowmap.glsl.js';
 Shader['import'](shadowmapEssl);
 
+function getDepthMaterialUniform(renderable, depthMaterial, symbol) {
+    if (symbol === 'alphaMap') {
+        return renderable.material.get('diffuseMap');
+    }
+    else if (symbol === 'alphaCutoff') {
+        if (renderable.material.isDefined('fragment', 'ALPHA_TEST')
+            && renderable.material.get('diffuseMap')
+        ) {
+            var alphaCutoff = renderable.material.get('alphaCutoff');
+            return alphaCutoff || 0;
+        }
+        return 0;
+    }
+    else {
+        return depthMaterial.get(symbol);
+    }
+}
+
+function isDepthMaterialChanged(renderable, prevRenderable) {
+    var matA = renderable.material;
+    var matB = prevRenderable.material;
+    return matA.get('diffuseMap') !== matB.get('diffuseMap')
+        || (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0);
+}
+
 /**
  * Pass rendering shadow map.
  *
@@ -374,6 +399,8 @@ var ShadowMapPass = Base.extend(function () {
                 getMaterial: function (renderable) {
                     return renderable.shadowDepthMaterial || defaultShadowMaterial;
                 },
+                isMaterialChanged: isDepthMaterialChanged,
+                getUniform: getDepthMaterialUniform,
                 ifRender: function (renderable) {
                     return renderable.castShadow;
                 },
@@ -491,6 +518,8 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
+            isMaterialChanged: isDepthMaterialChanged,
+            getUniform: getDepthMaterialUniform,
             ifRender: function (renderable) {
                 return renderable.castShadow;
             },
@@ -526,6 +555,7 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
+            getUniform: getDepthMaterialUniform,
             sortCompare: Renderer.opaqueSortCompare
         };
 

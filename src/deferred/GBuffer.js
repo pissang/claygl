@@ -46,9 +46,9 @@ function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDi
             // TODO DIFFUSEMAP_ALPHA_ALPHA
             if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
                 var alphaCutoff = standardMaterial.get('alphaCutoff');
-                return alphaCutoff || 0.0;
+                return alphaCutoff || 0;
             }
-            return 0.0;
+            return 0;
         }
         else {
             var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
@@ -321,7 +321,7 @@ var GBuffer = Base.extend(function () {
                 },
                 getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
                 isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
-                    return !prevRenderable || renderable.material !== prevRenderable.material;
+                    return renderable.material !== prevRenderable.material;
                 },
                 sortCompare: renderer.opaqueSortCompare
             };

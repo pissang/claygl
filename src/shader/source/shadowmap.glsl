@@ -3,18 +3,13 @@
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 
 attribute vec3 position : POSITION;
-
-#ifdef SHADOW_TRANSPARENT
 attribute vec2 texcoord : TEXCOORD_0;
-#endif
 
 @import clay.chunk.skinning_header
 
 varying vec4 v_ViewPosition;
 
-#ifdef SHADOW_TRANSPARENT
 varying vec2 v_Texcoord;
-#endif
 
 void main(){
 
@@ -30,26 +25,20 @@ void main(){
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
     gl_Position = v_ViewPosition;
 
-#ifdef SHADOW_TRANSPARENT
     v_Texcoord = texcoord;
-#endif
 }
 @end
 
 @export clay.sm.depth.fragment
 
 varying vec4 v_ViewPosition;
-
-#ifdef SHADOW_TRANSPARENT
 varying vec2 v_Texcoord;
-#endif
 
 uniform float bias : 0.001;
 uniform float slopeScale : 1.0;
 
-#ifdef SHADOW_TRANSPARENT
-uniform sampler2D transparentMap;
-#endif
+uniform sampler2D alphaMap;
+uniform float alphaCutoff: 0.0;
 
 @import clay.util.encode_float
 
@@ -76,13 +65,11 @@ void main(){
     float dy = dFdy(depth);
     depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
 
-#ifdef SHADOW_TRANSPARENT
-    if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {
-        // Hi-Z
-        gl_FragColor = encodeFloat(0.9999);
-        return;
+    if (alphaCutoff > 0.0) {
+        if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+            discard;
+        }
     }
-#endif
 
     gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
 #endif
@@ -161,8 +148,6 @@ void main(){
 
 float tapShadowMap(sampler2D map, vec2 uv, float z){
     vec4 tex = texture2D(map, uv);
-    // FIXME premultiplied alpha?
-    // tex.rgb /= tex.a;
     return step(z, decodeFloat(tex) * 2.0 - 1.0);
 }
 

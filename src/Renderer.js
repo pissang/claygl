@@ -546,6 +546,7 @@ var Renderer = Base.extend(function () {
         passConfig = passConfig || {};
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
         passConfig.getUniform = passConfig.getUniform || defaultGetUniform;
+        // PENDING Better solution?
         passConfig.isMaterialChanged = passConfig.isMaterialChanged || defaultIsMaterialChanged;
         passConfig.beforeRender = passConfig.beforeRender || noop;
         passConfig.afterRender = passConfig.afterRender || noop;
@@ -999,6 +1000,29 @@ var Renderer = Base.extend(function () {
         this.renderPass(list, camera, {
             ifRender: function (renderable) {
                 return !renderable.ignorePreZ;
+            },
+            isMaterialChanged: function (renderable, prevRenderable) {
+                var matA = renderable.material;
+                var matB = prevRenderable.material;
+                return matA.get('diffuseMap') !== matB.get('diffuseMap')
+                    || (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0);
+            },
+            getUniform: function (renderable, depthMaterial, symbol) {
+                if (symbol === 'alphaMap') {
+                    return renderable.material.get('diffuseMap');
+                }
+                else if (symbol === 'alphaCutoff') {
+                    if (renderable.material.isDefined('fragment', 'ALPHA_TEST')
+                        && renderable.material.get('diffuseMap')
+                    ) {
+                        var alphaCutoff = renderable.material.get('alphaCutoff');
+                        return alphaCutoff || 0;
+                    }
+                    return 0;
+                }
+                else {
+                    return depthMaterial.get(symbol);
+                }
             },
             getMaterial: function () {
                 return preZPassMaterial;
