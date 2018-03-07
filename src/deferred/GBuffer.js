@@ -46,9 +46,9 @@ function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDi
             // TODO DIFFUSEMAP_ALPHA_ALPHA
             if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
                 var alphaCutoff = standardMaterial.get('alphaCutoff');
-                return alphaCutoff == null ? 1.0 : alphaCutoff;
+                return alphaCutoff || 0.0;
             }
-            return 1.0;
+            return 0.0;
         }
         else {
             var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
@@ -78,6 +78,7 @@ function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
             case 'color':
             case 'uvRepeat':
             case 'uvOffset':
+            case 'alpha':
                 return standardMaterial.get(symbol);
             case 'metalness':
                 return standardMaterial.get('metalness') || 0;
@@ -89,6 +90,13 @@ function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
                 return !!standardMaterial.get('metalnessMap');
             case 'linear':
                 return standardMaterial.isDefined('SRGB_DECODE');
+            case 'alphaCutoff':
+                // TODO DIFFUSEMAP_ALPHA_ALPHA
+                if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
+                    var alphaCutoff = standardMaterial.get('alphaCutoff');
+                    return alphaCutoff || 0.0;
+                }
+                return 0.0;
         }
     };
 }

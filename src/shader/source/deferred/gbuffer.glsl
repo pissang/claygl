@@ -100,7 +100,7 @@ uniform bool useRoughGlossMap;
 uniform bool useRoughness;
 uniform bool doubleSided;
 
-uniform float alphaCutoff: 1.0;
+uniform float alphaCutoff: 0.0;
 uniform float alpha: 1.0;
 
 uniform int roughGlossChannel: 0;
@@ -124,7 +124,7 @@ void main()
             N = -N;
         }
     }
-    if (alphaCutoff < 1.0) {
+    if (alphaCutoff > 0.0) {
         float a = texture2D(diffuseMap, v_Texcoord).a * alpha;
         if (a < alphaCutoff) {
             discard;
@@ -182,6 +182,9 @@ uniform float metalness;
 uniform bool useMetalnessMap;
 uniform bool linear;
 
+uniform float alphaCutoff: 0.0;
+uniform float alpha: 1.0;
+
 varying vec2 v_Texcoord;
 
 @import clay.util.srgb
@@ -197,6 +200,12 @@ void main ()
     vec4 texel = texture2D(diffuseMap, v_Texcoord);
     if (linear) {
         texel = sRGBToLinear(texel);
+    }
+    if (alphaCutoff > 0.0) {
+        float a = texel.a * alpha;
+        if (a < alphaCutoff) {
+            discard;
+        }
     }
 
     gl_FragColor.rgb = texel.rgb * color;
