@@ -29,6 +29,9 @@ var errorShader = {};
 function defaultGetMaterial(renderable) {
     return renderable.material;
 }
+function defaultGetUniform(renderable, material, symbol) {
+    return material.uniforms[symbol].value;
+}
 
 function noop() {}
 
@@ -526,6 +529,7 @@ var Renderer = Base.extend(function () {
      * @param {clay.Camera} camera
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
+     * @param {Function} [passConfig.getUniform] Get material uniform value.
      * @param {Function} [passConfig.beforeRender] Before render each renderable.
      * @param {Function} [passConfig.afterRender] After render each renderable
      * @param {Function} [passConfig.ifRender] If render the renderable.
@@ -537,6 +541,7 @@ var Renderer = Base.extend(function () {
 
         passConfig = passConfig || {};
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
+        passConfig.getUniform = passConfig.getUniform || defaultGetUniform;
         passConfig.beforeRender = passConfig.beforeRender || noop;
         passConfig.afterRender = passConfig.afterRender || noop;
 
@@ -575,6 +580,7 @@ var Renderer = Base.extend(function () {
 
         var prevMaterial;
         var prevProgram;
+        var prevRenderable;
 
         // Status
         var depthTest, depthMask;
@@ -677,7 +683,11 @@ var Renderer = Base.extend(function () {
                     }
                 }
 
-                this._bindMaterial(material, program, prevMaterial || null, prevProgram || null);
+                this._bindMaterial(
+                    renderable, material, program,
+                    prevRenderable || null, prevMaterial || null, prevProgram || null,
+                    passConfig.getUniform
+                );
                 prevMaterial = material;
             }
 
@@ -761,7 +771,7 @@ var Renderer = Base.extend(function () {
         }
     },
 
-    _bindMaterial: function (material, program, prevMaterial, prevProgram) {
+    _bindMaterial: function (renderable, material, program, prevRenderable, prevMaterial, prevProgram, getUniformValue) {
         var _gl = this.gl;
         // PENDING Same texture in different material take different slot?
 
@@ -774,7 +784,7 @@ var Renderer = Base.extend(function () {
 
         for (var u = 0; u < textureUniforms.length; u++) {
             var symbol = textureUniforms[u];
-            var uniformValue = material.uniforms[symbol].value;
+            var uniformValue = getUniformValue(renderable, material, symbol);
             var uniformType = material.uniforms[symbol].type;
             // Not use `instanceof` to determine if a value is texture in Material#bind.
             // Use type instead, in some case texture may be in different namespaces.
@@ -785,7 +795,7 @@ var Renderer = Base.extend(function () {
             }
             else if (uniformType === 'tv') {
                 for (var i = 0; i < uniformValue.length; i++) {
-                    if (uniformValue[i] instanceof Texture) {
+                    if (uniformValue[i]) {
                         uniformValue[i].__slot = -1;
                     }
                 }
@@ -796,13 +806,14 @@ var Renderer = Base.extend(function () {
         for (var u = 0; u < enabledUniforms.length; u++) {
             var symbol = enabledUniforms[u];
             var uniform = material.uniforms[symbol];
-            var uniformValue = uniform.value;
+            var uniformValue = getUniformValue(renderable, material, symbol);
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
             // So add a evaluation to see if the uniform is really needed to be set
             if (prevMaterial && sameProgram) {
-                if (prevMaterial.uniforms[symbol].value === uniformValue) {
+                var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
+                if (prevUniformValue === uniformValue) {
                     continue;
                 }
             }

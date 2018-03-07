@@ -24,161 +24,64 @@ function createFillCanvas(color) {
     return canvas;
 }
 
-function attachTextureToSlot(renderer, program, symbol, texture, slot) {
-    var gl = renderer.gl;
-    program.setUniform(gl, '1i', symbol, slot);
+// TODO specularColor
+// TODO Performance improvement
+function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
 
-    gl.activeTexture(gl.TEXTURE0 + slot);
-    // Maybe texture is not loaded yet;
-    if (texture.isRenderable()) {
-        texture.bind(renderer);
-    }
-    else {
-        // Bind texture to null
-        texture.unbind(renderer);
-    }
-}
-
-// TODO Use globalShader insteadof globalMaterial?
-function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
-
-    var previousNormalMap;
-    var previousRougGlossMap;
-    var previousRenderable;
-
-    return function (renderable, gBufferMat, prevMaterial) {
-        // Material not change
-        if (previousRenderable && previousRenderable.material === renderable.material) {
-            return;
-        }
-
+    return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
-        var program = renderable.__program;
-
-        var glossiness;
-        var roughGlossMap;
-        var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
-        var doubleSided = standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
-        var roughGlossChannel;
-        if (useRoughnessWorkflow) {
-            glossiness = 1.0 - standardMaterial.get('roughness');
-            roughGlossMap = standardMaterial.get('roughnessMap');
-            roughGlossChannel = standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL');
+        if (symbol === 'doubleSided') {
+            return standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
+        }
+        else if (symbol === 'uvRepeat' || symbol === 'uvOffset' || symbol === 'alpha') {
+            return standardMaterial.get(symbol);
+        }
+        else if (symbol === 'normalMap') {
+            return standardMaterial.get('normalMap') || defaultNormalMap;
+        }
+        else if (symbol === 'diffuseMap') {
+            return standardMaterial.get('diffuseMap') || defaultDiffuseMap;
         }
         else {
-            glossiness = standardMaterial.get('glossiness');
-            roughGlossMap = standardMaterial.get('glossinessMap');
-            roughGlossChannel = standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
-        }
-        var useRoughGlossMap = !!roughGlossMap;
-
-        var normalMap = standardMaterial.get('normalMap') || defaultNormalMap;
-        var uvRepeat = standardMaterial.get('uvRepeat');
-        var uvOffset = standardMaterial.get('uvOffset');
-
-        roughGlossMap = roughGlossMap || defaultRoughnessMap;
-
-        if (prevMaterial !== gBufferMat) {
-            gBufferMat.set('glossiness', glossiness);
-            gBufferMat.set('normalMap', normalMap);
-            gBufferMat.set('roughGlossMap', roughGlossMap);
-            gBufferMat.set('useRoughGlossMap', +useRoughGlossMap);
-            gBufferMat.set('useRoughness', +useRoughnessWorkflow);
-            gBufferMat.set('doubleSided', +doubleSided);
-            gBufferMat.set('roughGlossChannel', +roughGlossChannel || 0);
-            gBufferMat.set('uvRepeat', uvRepeat);
-            gBufferMat.set('uvOffset', uvOffset);
-        }
-        else {
-            program.setUniform(
-                gl, '1f', 'glossiness', glossiness
-            );
-
-            if (previousNormalMap !== normalMap) {
-                attachTextureToSlot(this, program, 'normalMap', normalMap, 0);
-            }
-            if (previousRougGlossMap !== roughGlossMap) {
-                attachTextureToSlot(this, program, 'roughGlossMap', roughGlossMap, 1);
-            }
-            program.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
-            program.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
-            program.setUniform(gl, '1i', 'doubleSided', +doubleSided);
-            program.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
-            if (uvRepeat != null) {
-                program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            }
-            if (uvOffset != null) {
-                program.setUniform(gl, '2f', 'uvOffset', uvOffset);
+            var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
+            var roughGlossMap = useRoughnessWorkflow ? standardMaterial.get('roughnessMap') : standardMaterial.get('glossinessMap');
+            switch (symbol) {
+                case 'glossiness':
+                    return useRoughnessWorkflow ? (1.0 - standardMaterial.get('roughness')) : standardMaterial.get('glossiness');
+                case 'roughGlossMap':
+                    return roughGlossMap;
+                case 'useRoughGlossMap':
+                    return !!roughGlossMap;
+                case 'useRoughness':
+                    return useRoughnessWorkflow;
+                case 'roughGlossChannel':
+                    return useRoughnessWorkflow
+                        ? standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL')
+                        : standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
             }
         }
-
-        previousNormalMap = normalMap;
-        previousRougGlossMap = roughGlossMap;
-
-        previousRenderable = renderable;
     };
 }
 
-function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
-    var previousDiffuseMap;
-    var previousRenderable;
-    var previousMetalnessMap;
-
-    return function (renderable, gBufferMat, prevMaterial) {
-        // Material not change
-        if (previousRenderable && previousRenderable.material === renderable.material) {
-            return;
-        }
-
-        var program = renderable.__program;
+function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
+    return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
-
-        var color = standardMaterial.get('color');
-        var metalness = standardMaterial.get('metalness') || 0;
-
-        var diffuseMap = standardMaterial.get('diffuseMap');
-        var metalnessMap = standardMaterial.get('metalnessMap');
-
-        var uvRepeat = standardMaterial.get('uvRepeat');
-        var uvOffset = standardMaterial.get('uvOffset');
-
-        var useMetalnessMap = !!metalnessMap;
-
-        diffuseMap = diffuseMap || defaultDiffuseMap;
-        metalnessMap = metalnessMap || defaultMetalnessMap;
-
-        if (prevMaterial !== gBufferMat) {
-            gBufferMat.set('color', color);
-            gBufferMat.set('metalness', metalness);
-            gBufferMat.set('diffuseMap', diffuseMap);
-            gBufferMat.set('metalnessMap', metalnessMap);
-            gBufferMat.set('useMetalnessMap', +useMetalnessMap);
-            gBufferMat.set('uvRepeat', uvRepeat);
-            gBufferMat.set('uvOffset', uvOffset);
-            // TODO
-            gBufferMat.set('linear', +standardMaterial.linear || 0);
+        switch (symbol) {
+            case 'color':
+            case 'uvRepeat':
+            case 'uvOffset':
+                return standardMaterial.get(symbol);
+            case 'metalness':
+                return standardMaterial.get('metalness') || 0;
+            case 'diffuseMap':
+                return standardMaterial.get(symbol) || defaultDiffuseMap;
+            case 'metalnessMap':
+                return standardMaterial.get(symbol) || defaultMetalnessMap;
+            case 'useMetalnessMap':
+                return !!standardMaterial.get('metalnessMap');
+            case 'linear':
+                return standardMaterial.isDefined('SRGB_DECODE');
         }
-        else {
-            program.setUniform(gl, '1f', 'metalness', metalness);
-
-            program.setUniform(gl, '3f', 'color', color);
-            if (previousDiffuseMap !== diffuseMap) {
-                attachTextureToSlot(this, program, 'diffuseMap', diffuseMap, 0);
-            }
-            if (previousMetalnessMap !== metalnessMap) {
-                attachTextureToSlot(this, program, 'metalnessMap', metalnessMap, 1);
-            }
-            program.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
-            program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            program.setUniform(gl, '2f', 'uvOffset', uvOffset);
-
-            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear || 0);
-        }
-
-        previousDiffuseMap = diffuseMap;
-        previousMetalnessMap = metalnessMap;
-
-        previousRenderable = renderable;
     };
 }
 
@@ -400,7 +303,7 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial1;
                 },
-                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap),
+                getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
@@ -429,7 +332,7 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial2;
                 },
-                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                getUniform: getGetUniformHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
                 sortCompare: renderer.opaqueSortCompare
             };
             renderer.renderPass(gBufferRenderList, camera, passConfig);
