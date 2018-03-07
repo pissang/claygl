@@ -126,6 +126,8 @@ void main()
 #define ROUGHNESS_CHANNEL 0
 #define METALNESS_CHANNEL 1
 
+#define DIFFUSEMAP_ALPHA_ALPHA
+
 
 @import clay.standard.chunk.varying
 
