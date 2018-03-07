@@ -19,6 +19,7 @@ import { Orthographic as OrthographicCamera } from './camera/Orthographic';
 import { Point as PointLight } from './light/Point';
 import { IGLTFLoaderResult } from './loader/GLTF';
 import { ShadowMap } from './prePass/ShadowMap';
+import { IDictionary } from './core/container';
 
 interface IGraphicOption {
 
@@ -126,6 +127,8 @@ export namespace application {
 
         readonly width: number;
         readonly height: number;
+
+        readonly methods: IDictionary<Function>;
 
         resize(width: number, height: number): void;
 

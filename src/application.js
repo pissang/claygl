@@ -75,6 +75,7 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {number} [width] Container width.
  * @property {number} [height] Container height.
  * @property {number} [devicePixelRatio]
+ * @property {Object.<string, Function>} [methods] Methods that will be injected to App3D#methods.
  * @property {Object} [graphic] Graphic configuration including shadow, color space.
  * @property {boolean} [graphic.shadow=false] If enable shadow
  * @property {boolean} [graphic.linear=false] If use linear color space
@@ -177,6 +178,11 @@ function App3D(dom, appNS) {
 
     gTimeline.start();
 
+    var userMethods = {};
+    for (var key in appNS.methods) {
+        userMethods[key] = appNS.methods[key].bind(appNS, this);
+    }
+
     Object.defineProperties(this, {
         /**
          * Container dom element
@@ -224,6 +230,13 @@ function App3D(dom, appNS) {
          * @type {number}
          */
         height: { get: function () { return gRenderer.getHeight(); }},
+
+        /**
+         * Methods from
+         * @name clay.application.App3D#height
+         * @type {number}
+         */
+        methods: { get: function () { return userMethods; } },
 
         _shadowPass: { get: function () { return gShadowPass; } },
 
@@ -298,6 +311,8 @@ function App3D(dom, appNS) {
             if (appNS.autoRender) {
                 self.render();
             }
+
+            self.collectResources();
         }, this);
     });
 
@@ -461,10 +476,7 @@ App3D.prototype.render = function () {
 
     var scene = this.scene;
     var renderer = this.renderer;
-    var appNS = this._appNS;
     var shadowPass = this._shadowPass;
-    var texturesList = this._texturesList;
-    var geometriesList = this._geometriesList;
 
     scene.update();
     var skyboxList = [];
@@ -477,6 +489,14 @@ App3D.prototype.render = function () {
 
     this._doRender(renderer, scene, true);
 
+    appNS.afterRender && appNS.afterRender(self);
+};
+
+App3D.prototype.collectResources = function () {
+    var renderer = this.render;
+    var scene = this.scene;
+    var texturesList = this._texturesList;
+    var geometriesList = this._geometriesList;
     // Mark all resources unused;
     markUnused(texturesList);
     markUnused(geometriesList);
@@ -492,8 +512,6 @@ App3D.prototype.render = function () {
 
     this._texturesList = newTexturesList;
     this._geometriesList = newGeometriesList;
-
-    appNS.afterRender && appNS.afterRender(self);
 };
 
 
