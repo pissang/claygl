@@ -32,6 +32,9 @@ function defaultGetMaterial(renderable) {
 function defaultGetUniform(renderable, material, symbol) {
     return material.uniforms[symbol].value;
 }
+function defaultIsMaterialChanged(renderabled, prevRenderable, material, prevMaterial) {
+    return material !== prevMaterial;
+}
 
 function noop() {}
 
@@ -530,6 +533,7 @@ var Renderer = Base.extend(function () {
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
      * @param {Function} [passConfig.getUniform] Get material uniform value.
+     * @param {Function} [passConfig.isMaterialChanged] If material changed.
      * @param {Function} [passConfig.beforeRender] Before render each renderable.
      * @param {Function} [passConfig.afterRender] After render each renderable
      * @param {Function} [passConfig.ifRender] If render the renderable.
@@ -542,6 +546,7 @@ var Renderer = Base.extend(function () {
         passConfig = passConfig || {};
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
         passConfig.getUniform = passConfig.getUniform || defaultGetUniform;
+        passConfig.isMaterialChanged = passConfig.isMaterialChanged || defaultIsMaterialChanged;
         passConfig.beforeRender = passConfig.beforeRender || noop;
         passConfig.afterRender = passConfig.afterRender || noop;
 
@@ -658,7 +663,9 @@ var Renderer = Base.extend(function () {
             }
 
             // Program changes also needs reset the materials.
-            if (prevMaterial !== material || programChanged) {
+            if (programChanged || passConfig.isMaterialChanged(
+                renderable, prevRenderable, material, prevMaterial
+            )) {
                 if (material.depthTest !== depthTest) {
                     material.depthTest ? _gl.enable(_gl.DEPTH_TEST) : _gl.disable(_gl.DEPTH_TEST);
                     depthTest = material.depthTest;
@@ -727,6 +734,7 @@ var Renderer = Base.extend(function () {
             renderable.afterRender(this);
 
             prevProgram = program;
+            prevRenderable = renderable;
         }
 
         // TODO Seems need to be bound to null immediately if vao is changed?

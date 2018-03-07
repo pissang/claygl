@@ -37,10 +37,18 @@ function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDi
             return standardMaterial.get(symbol);
         }
         else if (symbol === 'normalMap') {
-            return standardMaterial.get('normalMap') || defaultNormalMap;
+            return standardMaterial.get(symbol) || defaultNormalMap;
         }
         else if (symbol === 'diffuseMap') {
-            return standardMaterial.get('diffuseMap') || defaultDiffuseMap;
+            return standardMaterial.get(symbol) || defaultDiffuseMap;
+        }
+        else if (symbol === 'alphaCutoff') {
+            // TODO DIFFUSEMAP_ALPHA_ALPHA
+            if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
+                var alphaCutoff = standardMaterial.get('alphaCutoff');
+                return alphaCutoff == null ? 1.0 : alphaCutoff;
+            }
+            return 1.0;
         }
         else {
             var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
@@ -304,6 +312,9 @@ var GBuffer = Base.extend(function () {
                     return gBufferMaterial1;
                 },
                 getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
+                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
+                    return !prevRenderable || renderable.material !== prevRenderable.material;
+                },
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
@@ -333,6 +344,9 @@ var GBuffer = Base.extend(function () {
                     return gBufferMaterial2;
                 },
                 getUniform: getGetUniformHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
+                    return !prevRenderable || renderable.material !== prevRenderable.material;
+                },
                 sortCompare: renderer.opaqueSortCompare
             };
             renderer.renderPass(gBufferRenderList, camera, passConfig);

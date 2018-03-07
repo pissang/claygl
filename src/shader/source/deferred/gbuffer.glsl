@@ -90,6 +90,7 @@ varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
 
 uniform sampler2D normalMap;
+uniform sampler2D diffuseMap;
 varying vec3 v_Tangent;
 varying vec3 v_Bitangent;
 
@@ -98,6 +99,9 @@ uniform sampler2D roughGlossMap;
 uniform bool useRoughGlossMap;
 uniform bool useRoughness;
 uniform bool doubleSided;
+
+uniform float alphaCutoff: 1.0;
+uniform float alpha: 1.0;
 
 uniform int roughGlossChannel: 0;
 
@@ -110,6 +114,7 @@ float indexingTexel(in vec4 texel, in int idx) {
 
 void main()
 {
+
     vec3 N = v_Normal;
 
     if (doubleSided) {
@@ -117,6 +122,12 @@ void main()
         vec3 V = eyePos - v_WorldPosition;
         if (dot(N, V) < 0.0) {
             N = -N;
+        }
+    }
+    if (alphaCutoff < 1.0) {
+        float a = texture2D(diffuseMap, v_Texcoord).a * alpha;
+        if (a < alphaCutoff) {
+            discard;
         }
     }
 
