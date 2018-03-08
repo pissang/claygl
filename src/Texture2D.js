@@ -44,6 +44,7 @@ var Texture2D = Texture.extend(function () {
         /**
          * @type {?HTMLImageElement|HTMLCanvasElemnet}
          */
+        // TODO mark dirty when assigned.
         image: null,
         /**
          * Pixels data. Will be ignored if image is set.

@@ -823,6 +823,15 @@ var Renderer = Base.extend(function () {
             if (prevMaterial && sameProgram) {
                 var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
                 if (prevUniformValue === uniformValue) {
+                    if (uniform.type === 't') {
+                        // Still take the slot to make sure same texture in different materials have same slot.
+                        program.takeCurrentTextureSlot(this, null);
+                    }
+                    else if (uniformType === 'tv' && uniformValue) {
+                        for (var i = 0; i < uniformValue.length; i++) {
+                            program.takeCurrentTextureSlot(this, null);
+                        }
+                    }
                     continue;
                 }
             }
@@ -836,7 +845,7 @@ var Renderer = Base.extend(function () {
                     var slot = program.currentTextureSlot();
                     var res = program.setUniform(_gl, '1i', symbol, slot);
                     if (res) { // Texture is enabled
-                        // Still occupy the slot to make sure same texture in different materials have same slot.
+                        // Still take the slot to make sure same texture in different materials have same slot.
                         program.takeCurrentTextureSlot(this, null);
                     }
                 }
