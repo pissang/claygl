@@ -317,8 +317,11 @@ function App3D(dom, appNS) {
     });
 
     gScene.on('beforerender', function (renderer, scene, camera, renderList) {
-        this._updateGraphicOptions(appNS.graphic, renderList.opaque, false);
-        this._updateGraphicOptions(appNS.graphic, renderList.transparent, false);
+        if (this._inRender) {
+            // Only update graphic options when using #render function.
+            this._updateGraphicOptions(appNS.graphic, renderList.opaque, false);
+            this._updateGraphicOptions(appNS.graphic, renderList.transparent, false);
+        }
     }, this);
 }
 
@@ -471,6 +474,7 @@ App3D.prototype._doRender = function (renderer, scene) {
  * Do render
  */
 App3D.prototype.render = function () {
+    this._inRender = true;
     var appNS = this._appNS;
     appNS.beforeRender && appNS.beforeRender(self);
 
@@ -490,6 +494,7 @@ App3D.prototype.render = function () {
     this._doRender(renderer, scene, true);
 
     appNS.afterRender && appNS.afterRender(self);
+    this._inRender = false;
 };
 
 App3D.prototype.collectResources = function () {

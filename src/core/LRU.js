@@ -5,7 +5,7 @@ import LinkedList from './LinkedList';
  * @constructor
  * @alias clay.core.LRU
  */
-var LRU = function(maxSize) {
+var LRU = function (maxSize) {
 
     this._list = new LinkedList();
 
@@ -18,7 +18,7 @@ var LRU = function(maxSize) {
  * Set cache max size
  * @param {number} size
  */
-LRU.prototype.setMaxSize = function(size) {
+LRU.prototype.setMaxSize = function (size) {
     this._maxSize = size;
 };
 
@@ -26,8 +26,8 @@ LRU.prototype.setMaxSize = function(size) {
  * @param  {string} key
  * @param  {} value
  */
-LRU.prototype.put = function(key, value) {
-    if (typeof(this._map[key]) == 'undefined') {
+LRU.prototype.put = function (key, value) {
+    if (!this._map.hasOwnProperty(key)) {
         var len = this._list.length();
         if (len >= this._maxSize && len > 0) {
             // Remove the least recently used
@@ -46,9 +46,9 @@ LRU.prototype.put = function(key, value) {
  * @param  {string} key
  * @return {}
  */
-LRU.prototype.get = function(key) {
+LRU.prototype.get = function (key) {
     var entry = this._map[key];
-    if (typeof(entry) != 'undefined') {
+    if (this._map.hasOwnProperty(key)) {
         // Put the latest used entry in the tail
         if (entry !== this._list.tail) {
             this._list.remove(entry);
@@ -62,9 +62,9 @@ LRU.prototype.get = function(key) {
 /**
  * @param {string} key
  */
-LRU.prototype.remove = function(key) {
+LRU.prototype.remove = function (key) {
     var entry = this._map[key];
-    if (typeof(entry) != 'undefined') {
+    if (typeof(entry) !== 'undefined') {
         delete this._map[key];
         this._list.remove(entry);
     }
@@ -73,7 +73,7 @@ LRU.prototype.remove = function(key) {
 /**
  * Clear the cache
  */
-LRU.prototype.clear = function() {
+LRU.prototype.clear = function () {
     this._list.clear();
     this._map = {};
 };
