@@ -2,6 +2,7 @@
 // with tonemapping, lut and vignette
 // http://filmicgames.com/archives/75
 @export clay.compositor.hdr.composite
+#define TONEMAPPING
 
 uniform sampler2D texture;
 #ifdef BLOOM_ENABLED
@@ -137,12 +138,14 @@ void main()
 #else
     float exposureBias = exposure;
 #endif
-    texel.rgb *= exposureBias;
 
     // Tone mapping
     // vec3 color = uncharted2ToneMap(tex) / uncharted2ToneMap(whiteScale);
     // vec3 color = filmicToneMap(tex);
+#ifdef TONEMAPPING
+    texel.rgb *= exposureBias;
     texel.rgb = ACESToneMapping(texel.rgb);
+#endif
     texel = linearTosRGB(texel);
 
 // Color lut
