@@ -77,17 +77,16 @@ varying vec3 v_Barycentric;
 
 void main()
 {
-
-#ifdef RENDER_TEXCOORD
-    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
-    return;
-#endif
-
     gl_FragColor = vec4(color, alpha);
 
 #ifdef VERTEX_COLOR
     gl_FragColor *= v_Color;
 #endif
+
+#ifdef SRGB_DECODE
+    gl_FragColor = sRGBToLinear(gl_FragColor);
+#endif
+
 
 #ifdef DIFFUSEMAP_ENABLED
     vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));

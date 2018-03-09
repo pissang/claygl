@@ -318,6 +318,10 @@ void main() {
     albedoColor *= v_Color;
 #endif
 
+#ifdef SRGB_DECODE
+    albedoColor = sRGBToLinear(albedoColor);
+#endif
+
     vec3 eyePos = viewInverse[3].xyz;
     vec3 V = normalize(eyePos - v_WorldPosition);
 

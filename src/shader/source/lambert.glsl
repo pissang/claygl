@@ -115,19 +115,14 @@ varying vec4 v_Color;
 
 void main()
 {
-#ifdef RENDER_NORMAL
-    gl_FragColor = vec4(v_Normal * 0.5 + 0.5, 1.0);
-    return;
-#endif
-#ifdef RENDER_TEXCOORD
-    gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);
-    return;
-#endif
-
     gl_FragColor = vec4(color, alpha);
 
 #ifdef VERTEX_COLOR
     gl_FragColor *= v_Color;
+#endif
+
+#ifdef SRGB_DECODE
+    gl_FragColor = sRGBToLinear(gl_FragColor);
 #endif
 
 #ifdef DIFFUSEMAP_ENABLED
