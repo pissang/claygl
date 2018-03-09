@@ -1,14 +1,27 @@
 import Light from '../Light';
+import colorUtil from '../core/color';
+var parseColor = colorUtil.parseToFloat;
 
 /**
  * @constructor clay.light.Ambient
+ * @param {Color} [color='#fff'] Optional color of ambient light, default white.
+ * @param {number} [intensity=1] Optional intensity of ambient light, default 1.
  * @extends clay.Light
  */
 var AmbientLight = Light.extend({
 
     castShadow: false
 
-}, {
+}, function(color, intensity)  {
+  if (typeof color === 'string') {
+      color = parseColor(color);
+      this.color = color;
+  }
+
+  if (typeof intensity === 'number') {
+      this.intensity = intensity;
+  }
+},{
 
     type: 'AMBIENT_LIGHT',
 

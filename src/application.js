@@ -1123,13 +1123,7 @@ App3D.prototype.createPointLight = function (position, range, color, intensity) 
  * @param {number} [intensity=1] Intensity of ambient light.
  */
 App3D.prototype.createAmbientLight = function (color, intensity) {
-    var light = new AmbientLight();
-
-    if (typeof color === 'string') {
-        color = parseColor(color);
-    }
-    color != null && (light.color = color);
-    intensity != null && (light.intensity = intensity);
+    var light = new AmbientLight(color , intensity);
 
     this.scene.add(light);
 
