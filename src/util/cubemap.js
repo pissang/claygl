@@ -124,7 +124,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
         prefilteredCubeMap.mipmaps[i] = {
             pixels: {}
         };
-        skyEnv.material.set('roughness', i / (targets.length - 1));
+        skyEnv.material.set('roughness', i / (mipmapNum - 1));
         var maxSampleNumber = renderTargetTmp.width * renderTargetTmp.height;
         if (renderTargetTmp.width >= 32) {
             maxSampleNumber /= 4;
