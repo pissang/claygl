@@ -9643,39 +9643,87 @@ Vector3.eulerFromMat3 = function (out, m, order) {
     return out;
 };
 
-// TODO return new.
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_X = new Vector3(1, 0, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_X = new Vector3(-1, 0, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_Y = new Vector3(0, 1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_Y = new Vector3(0, -1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.POSITIVE_Z = new Vector3(0, 0, 1);
-/**
- * @type {clay.Vector3}
- */
-Vector3.NEGATIVE_Z = new Vector3(0, 0, -1);
-/**
- * @type {clay.Vector3}
- */
-Vector3.UP = new Vector3(0, 1, 0);
-/**
- * @type {clay.Vector3}
- */
-Vector3.ZERO = new Vector3(0, 0, 0);
+Object.defineProperties(Vector3, {
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_X: {
+        get: function () {
+            return new Vector3(1, 0, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    NEGATIVE_X: {
+        get: function () {
+            return new Vector3(-1, 0, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_Y: {
+        get: function () {
+            return new Vector3(0, 1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    NEGATIVE_Y: {
+        get: function () {
+            return new Vector3(0, -1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    POSITIVE_Z: {
+        get: function () {
+            return new Vector3(0, 0, 1);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     */
+    NEGATIVE_Z: {
+        get: function () {
+            return new Vector3(0, 0, -1);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    UP: {
+        get: function () {
+            return new Vector3(0, 1, 0);
+        }
+    },
+    /**
+     * @type {clay.Vector3}
+     * @readOnly
+     * @memberOf clay.Vector3
+     */
+    ZERO: {
+        get: function () {
+            return new Vector3();
+        }
+    }
+});
 
 var vec3$3 = glmatrix.vec3;
 
@@ -10702,523 +10750,6 @@ Matrix4.translate = function(out, a, v) {
     return out;
 };
 
-var DIRTY_PREFIX = '__dt__';
-
-var Cache = function () {
-
-    this._contextId = 0;
-
-    this._caches = [];
-
-    this._context = {};
-};
-
-Cache.prototype = {
-
-    use: function (contextId, documentSchema) {
-        var caches = this._caches;
-        if (!caches[contextId]) {
-            caches[contextId] = {};
-
-            if (documentSchema) {
-                caches[contextId] = documentSchema();
-            }
-        }
-        this._contextId = contextId;
-
-        this._context = caches[contextId];
-    },
-
-    put: function (key, value) {
-        this._context[key] = value;
-    },
-
-    get: function (key) {
-        return this._context[key];
-    },
-
-    dirty: function (field) {
-        field = field || '';
-        var key = DIRTY_PREFIX + field;
-        this.put(key, true);
-    },
-
-    dirtyAll: function (field) {
-        field = field || '';
-        var key = DIRTY_PREFIX + field;
-        var caches = this._caches;
-        for (var i = 0; i < caches.length; i++) {
-            if (caches[i]) {
-                caches[i][key] = true;
-            }
-        }
-    },
-
-    fresh: function (field) {
-        field = field || '';
-        var key = DIRTY_PREFIX + field;
-        this.put(key, false);
-    },
-
-    freshAll: function (field) {
-        field = field || '';
-        var key = DIRTY_PREFIX + field;
-        var caches = this._caches;
-        for (var i = 0; i < caches.length; i++) {
-            if (caches[i]) {
-                caches[i][key] = false;
-            }
-        }
-    },
-
-    isDirty: function (field) {
-        field = field || '';
-        var key = DIRTY_PREFIX + field;
-        var context = this._context;
-        return  !context.hasOwnProperty(key)
-            || context[key] === true;
-    },
-
-    deleteContext: function (contextId) {
-        delete this._caches[contextId];
-        this._context = {};
-    },
-
-    delete: function (key) {
-        delete this._context[key];
-    },
-
-    clearAll: function () {
-        this._caches = {};
-    },
-
-    getContext: function () {
-        return this._context;
-    },
-
-    eachContext : function (cb, context) {
-        var keys = Object.keys(this._caches);
-        keys.forEach(function (key) {
-            cb && cb.call(context, key);
-        });
-    },
-
-    miss: function (key) {
-        return ! this._context.hasOwnProperty(key);
-    }
-};
-
-Cache.prototype.constructor = Cache;
-
-/**
- * Base class for all textures like compressed texture, texture2d, texturecube
- * TODO mapping
- */
-/**
- * @constructor
- * @alias clay.Texture
- * @extends clay.core.Base
- */
-var Texture$1 = Base.extend( /** @lends clay.Texture# */ {
-    /**
-     * Texture width, readonly when the texture source is image
-     * @type {number}
-     */
-    width: 512,
-    /**
-     * Texture height, readonly when the texture source is image
-     * @type {number}
-     */
-    height: 512,
-    /**
-     * Texel data type.
-     * Possible values:
-     *  + {@link clay.Texture.UNSIGNED_BYTE}
-     *  + {@link clay.Texture.HALF_FLOAT}
-     *  + {@link clay.Texture.FLOAT}
-     *  + {@link clay.Texture.UNSIGNED_INT_24_8_WEBGL}
-     *  + {@link clay.Texture.UNSIGNED_INT}
-     * @type {number}
-     */
-    type: glenum.UNSIGNED_BYTE,
-    /**
-     * Format of texel data
-     * Possible values:
-     *  + {@link clay.Texture.RGBA}
-     *  + {@link clay.Texture.DEPTH_COMPONENT}
-     *  + {@link clay.Texture.DEPTH_STENCIL}
-     * @type {number}
-     */
-    format: glenum.RGBA,
-    /**
-     * Texture wrap. Default to be REPEAT.
-     * Possible values:
-     *  + {@link clay.Texture.CLAMP_TO_EDGE}
-     *  + {@link clay.Texture.REPEAT}
-     *  + {@link clay.Texture.MIRRORED_REPEAT}
-     * @type {number}
-     */
-    wrapS: glenum.REPEAT,
-    /**
-     * Texture wrap. Default to be REPEAT.
-     * Possible values:
-     *  + {@link clay.Texture.CLAMP_TO_EDGE}
-     *  + {@link clay.Texture.REPEAT}
-     *  + {@link clay.Texture.MIRRORED_REPEAT}
-     * @type {number}
-     */
-    wrapT: glenum.REPEAT,
-    /**
-     * Possible values:
-     *  + {@link clay.Texture.NEAREST}
-     *  + {@link clay.Texture.LINEAR}
-     *  + {@link clay.Texture.NEAREST_MIPMAP_NEAREST}
-     *  + {@link clay.Texture.LINEAR_MIPMAP_NEAREST}
-     *  + {@link clay.Texture.NEAREST_MIPMAP_LINEAR}
-     *  + {@link clay.Texture.LINEAR_MIPMAP_LINEAR}
-     * @type {number}
-     */
-    minFilter: glenum.LINEAR_MIPMAP_LINEAR,
-    /**
-     * Possible values:
-     *  + {@link clay.Texture.NEAREST}
-     *  + {@link clay.Texture.LINEAR}
-     * @type {number}
-     */
-    magFilter: glenum.LINEAR,
-    /**
-     * If enable mimap.
-     * @type {boolean}
-     */
-    useMipmap: true,
-
-    /**
-     * Anisotropic filtering, enabled if value is larger than 1
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/EXT_texture_filter_anisotropic
-     * @type {number}
-     */
-    anisotropic: 1,
-    // pixelStorei parameters, not available when texture is used as render target
-    // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
-    /**
-     * If flip in y axis for given image source
-     * @type {boolean}
-     * @default true
-     */
-    flipY: true,
-
-    /**
-     * A flag to indicate if texture source is sRGB
-     */
-    sRGB: true,
-    /**
-     * @type {number}
-     * @default 4
-     */
-    unpackAlignment: 4,
-    /**
-     * @type {boolean}
-     * @default false
-     */
-    premultiplyAlpha: false,
-
-    /**
-     * Dynamic option for texture like video
-     * @type {boolean}
-     */
-    dynamic: false,
-
-    NPOT: false,
-
-    // PENDING
-    // Init it here to avoid deoptimization when it's assigned in application dynamically
-    __used: 0
-
-}, function () {
-    this._cache = new Cache();
-},
-/** @lends clay.Texture.prototype */
-{
-
-    getWebGLTexture: function (renderer) {
-        var _gl = renderer.gl;
-        var cache = this._cache;
-        cache.use(renderer.__uid__);
-
-        if (cache.miss('webgl_texture')) {
-            // In a new gl context, create new texture and set dirty true
-            cache.put('webgl_texture', _gl.createTexture());
-        }
-        if (this.dynamic) {
-            this.update(renderer);
-        }
-        else if (cache.isDirty()) {
-            this.update(renderer);
-            cache.fresh();
-        }
-
-        return cache.get('webgl_texture');
-    },
-
-    bind: function () {},
-    unbind: function () {},
-
-    /**
-     * Mark texture is dirty and update in the next frame
-     */
-    dirty: function () {
-        if (this._cache) {
-            this._cache.dirtyAll();
-        }
-    },
-
-    update: function (renderer) {},
-
-    // Update the common parameters of texture
-    updateCommon: function (renderer) {
-        var _gl = renderer.gl;
-        _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
-        _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
-        _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
-
-        // Use of none-power of two texture
-        // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-        if (this.format === glenum.DEPTH_COMPONENT) {
-            this.useMipmap = false;
-        }
-
-        var sRGBExt = renderer.getGLExtension('EXT_sRGB');
-        // Fallback
-        if (this.format === Texture$1.SRGB && !sRGBExt) {
-            this.format = Texture$1.RGB;
-        }
-        if (this.format === Texture$1.SRGB_ALPHA && !sRGBExt) {
-            this.format = Texture$1.RGBA;
-        }
-
-        this.NPOT = !this.isPowerOfTwo();
-    },
-
-    getAvailableWrapS: function () {
-        if (this.NPOT) {
-            return glenum.CLAMP_TO_EDGE;
-        }
-        return this.wrapS;
-    },
-    getAvailableWrapT: function () {
-        if (this.NPOT) {
-            return glenum.CLAMP_TO_EDGE;
-        }
-        return this.wrapT;
-    },
-    getAvailableMinFilter: function () {
-        var minFilter = this.minFilter;
-        if (this.NPOT || !this.useMipmap) {
-            if (minFilter === glenum.NEAREST_MIPMAP_NEAREST ||
-                minFilter === glenum.NEAREST_MIPMAP_LINEAR
-            ) {
-                return glenum.NEAREST;
-            }
-            else if (minFilter === glenum.LINEAR_MIPMAP_LINEAR ||
-                minFilter === glenum.LINEAR_MIPMAP_NEAREST
-            ) {
-                return glenum.LINEAR;
-            }
-            else {
-                return minFilter;
-            }
-        }
-        else {
-            return minFilter;
-        }
-    },
-    getAvailableMagFilter: function () {
-        return this.magFilter;
-    },
-
-    nextHighestPowerOfTwo: function (x) {
-        --x;
-        for (var i = 1; i < 32; i <<= 1) {
-            x = x | x >> i;
-        }
-        return x + 1;
-    },
-    /**
-     * @param  {clay.Renderer} renderer
-     */
-    dispose: function (renderer) {
-
-        var cache = this._cache;
-
-        cache.use(renderer.__uid__);
-
-        var webglTexture = cache.get('webgl_texture');
-        if (webglTexture){
-            renderer.gl.deleteTexture(webglTexture);
-        }
-        cache.deleteContext(renderer.__uid__);
-
-    },
-    /**
-     * Test if image of texture is valid and loaded.
-     * @return {boolean}
-     */
-    isRenderable: function () {},
-
-    /**
-     * Test if texture size is power of two
-     * @return {boolean}
-     */
-    isPowerOfTwo: function () {}
-});
-
-Object.defineProperty(Texture$1.prototype, 'width', {
-    get: function () {
-        return this._width;
-    },
-    set: function (value) {
-        this._width = value;
-    }
-});
-Object.defineProperty(Texture$1.prototype, 'height', {
-    get: function () {
-        return this._height;
-    },
-    set: function (value) {
-        this._height = value;
-    }
-});
-
-/* DataType */
-
-/**
- * @type {number}
- */
-Texture$1.BYTE = glenum.BYTE;
-/**
- * @type {number}
- */
-Texture$1.UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
-/**
- * @type {number}
- */
-Texture$1.SHORT = glenum.SHORT;
-/**
- * @type {number}
- */
-Texture$1.UNSIGNED_SHORT = glenum.UNSIGNED_SHORT;
-/**
- * @type {number}
- */
-Texture$1.INT = glenum.INT;
-/**
- * @type {number}
- */
-Texture$1.UNSIGNED_INT = glenum.UNSIGNED_INT;
-/**
- * @type {number}
- */
-Texture$1.FLOAT = glenum.FLOAT;
-/**
- * @type {number}
- */
-Texture$1.HALF_FLOAT = 0x8D61;
-
-/**
- * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
- * @type {number}
- */
-Texture$1.UNSIGNED_INT_24_8_WEBGL = 34042;
-
-/* PixelFormat */
-/**
- * @type {number}
- */
-Texture$1.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
-/**
- * @type {number}
- */
-Texture$1.DEPTH_STENCIL = glenum.DEPTH_STENCIL;
-/**
- * @type {number}
- */
-Texture$1.ALPHA = glenum.ALPHA;
-/**
- * @type {number}
- */
-Texture$1.RGB = glenum.RGB;
-/**
- * @type {number}
- */
-Texture$1.RGBA = glenum.RGBA;
-/**
- * @type {number}
- */
-Texture$1.LUMINANCE = glenum.LUMINANCE;
-/**
- * @type {number}
- */
-Texture$1.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
-
-/**
- * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
- * @type {number}
- */
-Texture$1.SRGB = 0x8C40;
-/**
- * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
- * @type {number}
- */
-Texture$1.SRGB_ALPHA = 0x8C42;
-
-/* Compressed Texture */
-Texture$1.COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
-Texture$1.COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
-Texture$1.COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
-Texture$1.COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
-
-/* TextureMagFilter */
-/**
- * @type {number}
- */
-Texture$1.NEAREST = glenum.NEAREST;
-/**
- * @type {number}
- */
-Texture$1.LINEAR = glenum.LINEAR;
-
-/* TextureMinFilter */
-/**
- * @type {number}
- */
-Texture$1.NEAREST_MIPMAP_NEAREST = glenum.NEAREST_MIPMAP_NEAREST;
-/**
- * @type {number}
- */
-Texture$1.LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
-/**
- * @type {number}
- */
-Texture$1.NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
-/**
- * @type {number}
- */
-Texture$1.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
-
-/* TextureWrapMode */
-/**
- * @type {number}
- */
-Texture$1.REPEAT = glenum.REPEAT;
-/**
- * @type {number}
- */
-Texture$1.CLAMP_TO_EDGE = glenum.CLAMP_TO_EDGE;
-/**
- * @type {number}
- */
-Texture$1.MIRRORED_REPEAT = glenum.MIRRORED_REPEAT;
-
 /**
  * Simple double linked list. Compared with array, it has O(1) remove operation.
  * @constructor
@@ -11481,7 +11012,7 @@ LinkedList.Entry = function (val) {
  * @constructor
  * @alias clay.core.LRU
  */
-var LRU$1 = function(maxSize) {
+var LRU$1 = function (maxSize) {
 
     this._list = new LinkedList();
 
@@ -11494,7 +11025,7 @@ var LRU$1 = function(maxSize) {
  * Set cache max size
  * @param {number} size
  */
-LRU$1.prototype.setMaxSize = function(size) {
+LRU$1.prototype.setMaxSize = function (size) {
     this._maxSize = size;
 };
 
@@ -11502,8 +11033,8 @@ LRU$1.prototype.setMaxSize = function(size) {
  * @param  {string} key
  * @param  {} value
  */
-LRU$1.prototype.put = function(key, value) {
-    if (typeof(this._map[key]) == 'undefined') {
+LRU$1.prototype.put = function (key, value) {
+    if (!this._map.hasOwnProperty(key)) {
         var len = this._list.length();
         if (len >= this._maxSize && len > 0) {
             // Remove the least recently used
@@ -11522,9 +11053,9 @@ LRU$1.prototype.put = function(key, value) {
  * @param  {string} key
  * @return {}
  */
-LRU$1.prototype.get = function(key) {
+LRU$1.prototype.get = function (key) {
     var entry = this._map[key];
-    if (typeof(entry) != 'undefined') {
+    if (this._map.hasOwnProperty(key)) {
         // Put the latest used entry in the tail
         if (entry !== this._list.tail) {
             this._list.remove(entry);
@@ -11538,9 +11069,9 @@ LRU$1.prototype.get = function(key) {
 /**
  * @param {string} key
  */
-LRU$1.prototype.remove = function(key) {
+LRU$1.prototype.remove = function (key) {
     var entry = this._map[key];
-    if (typeof(entry) != 'undefined') {
+    if (typeof(entry) !== 'undefined') {
         delete this._map[key];
         this._list.remove(entry);
     }
@@ -11549,7 +11080,7 @@ LRU$1.prototype.remove = function(key) {
 /**
  * Clear the cache
  */
-LRU$1.prototype.clear = function() {
+LRU$1.prototype.clear = function () {
     this._list.clear();
     this._map = {};
 };
@@ -12587,6 +12118,796 @@ var Material = Base.extend(function () {
             );
         }
         return this._programKey;
+    }
+});
+
+var DIRTY_PREFIX = '__dt__';
+
+var Cache = function () {
+
+    this._contextId = 0;
+
+    this._caches = [];
+
+    this._context = {};
+};
+
+Cache.prototype = {
+
+    use: function (contextId, documentSchema) {
+        var caches = this._caches;
+        if (!caches[contextId]) {
+            caches[contextId] = {};
+
+            if (documentSchema) {
+                caches[contextId] = documentSchema();
+            }
+        }
+        this._contextId = contextId;
+
+        this._context = caches[contextId];
+    },
+
+    put: function (key, value) {
+        this._context[key] = value;
+    },
+
+    get: function (key) {
+        return this._context[key];
+    },
+
+    dirty: function (field) {
+        field = field || '';
+        var key = DIRTY_PREFIX + field;
+        this.put(key, true);
+    },
+
+    dirtyAll: function (field) {
+        field = field || '';
+        var key = DIRTY_PREFIX + field;
+        var caches = this._caches;
+        for (var i = 0; i < caches.length; i++) {
+            if (caches[i]) {
+                caches[i][key] = true;
+            }
+        }
+    },
+
+    fresh: function (field) {
+        field = field || '';
+        var key = DIRTY_PREFIX + field;
+        this.put(key, false);
+    },
+
+    freshAll: function (field) {
+        field = field || '';
+        var key = DIRTY_PREFIX + field;
+        var caches = this._caches;
+        for (var i = 0; i < caches.length; i++) {
+            if (caches[i]) {
+                caches[i][key] = false;
+            }
+        }
+    },
+
+    isDirty: function (field) {
+        field = field || '';
+        var key = DIRTY_PREFIX + field;
+        var context = this._context;
+        return  !context.hasOwnProperty(key)
+            || context[key] === true;
+    },
+
+    deleteContext: function (contextId) {
+        delete this._caches[contextId];
+        this._context = {};
+    },
+
+    delete: function (key) {
+        delete this._context[key];
+    },
+
+    clearAll: function () {
+        this._caches = {};
+    },
+
+    getContext: function () {
+        return this._context;
+    },
+
+    eachContext : function (cb, context) {
+        var keys = Object.keys(this._caches);
+        keys.forEach(function (key) {
+            cb && cb.call(context, key);
+        });
+    },
+
+    miss: function (key) {
+        return ! this._context.hasOwnProperty(key);
+    }
+};
+
+Cache.prototype.constructor = Cache;
+
+/**
+ * Base class for all textures like compressed texture, texture2d, texturecube
+ * TODO mapping
+ */
+/**
+ * @constructor
+ * @alias clay.Texture
+ * @extends clay.core.Base
+ */
+var Texture = Base.extend( /** @lends clay.Texture# */ {
+    /**
+     * Texture width, readonly when the texture source is image
+     * @type {number}
+     */
+    width: 512,
+    /**
+     * Texture height, readonly when the texture source is image
+     * @type {number}
+     */
+    height: 512,
+    /**
+     * Texel data type.
+     * Possible values:
+     *  + {@link clay.Texture.UNSIGNED_BYTE}
+     *  + {@link clay.Texture.HALF_FLOAT}
+     *  + {@link clay.Texture.FLOAT}
+     *  + {@link clay.Texture.UNSIGNED_INT_24_8_WEBGL}
+     *  + {@link clay.Texture.UNSIGNED_INT}
+     * @type {number}
+     */
+    type: glenum.UNSIGNED_BYTE,
+    /**
+     * Format of texel data
+     * Possible values:
+     *  + {@link clay.Texture.RGBA}
+     *  + {@link clay.Texture.DEPTH_COMPONENT}
+     *  + {@link clay.Texture.DEPTH_STENCIL}
+     * @type {number}
+     */
+    format: glenum.RGBA,
+    /**
+     * Texture wrap. Default to be REPEAT.
+     * Possible values:
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
+     * @type {number}
+     */
+    wrapS: glenum.REPEAT,
+    /**
+     * Texture wrap. Default to be REPEAT.
+     * Possible values:
+     *  + {@link clay.Texture.CLAMP_TO_EDGE}
+     *  + {@link clay.Texture.REPEAT}
+     *  + {@link clay.Texture.MIRRORED_REPEAT}
+     * @type {number}
+     */
+    wrapT: glenum.REPEAT,
+    /**
+     * Possible values:
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_NEAREST}
+     *  + {@link clay.Texture.NEAREST_MIPMAP_LINEAR}
+     *  + {@link clay.Texture.LINEAR_MIPMAP_LINEAR}
+     * @type {number}
+     */
+    minFilter: glenum.LINEAR_MIPMAP_LINEAR,
+    /**
+     * Possible values:
+     *  + {@link clay.Texture.NEAREST}
+     *  + {@link clay.Texture.LINEAR}
+     * @type {number}
+     */
+    magFilter: glenum.LINEAR,
+    /**
+     * If enable mimap.
+     * @type {boolean}
+     */
+    useMipmap: true,
+
+    /**
+     * Anisotropic filtering, enabled if value is larger than 1
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/EXT_texture_filter_anisotropic
+     * @type {number}
+     */
+    anisotropic: 1,
+    // pixelStorei parameters, not available when texture is used as render target
+    // http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml
+    /**
+     * If flip in y axis for given image source
+     * @type {boolean}
+     * @default true
+     */
+    flipY: true,
+
+    /**
+     * A flag to indicate if texture source is sRGB
+     */
+    sRGB: true,
+    /**
+     * @type {number}
+     * @default 4
+     */
+    unpackAlignment: 4,
+    /**
+     * @type {boolean}
+     * @default false
+     */
+    premultiplyAlpha: false,
+
+    /**
+     * Dynamic option for texture like video
+     * @type {boolean}
+     */
+    dynamic: false,
+
+    NPOT: false,
+
+    // PENDING
+    // Init it here to avoid deoptimization when it's assigned in application dynamically
+    __used: 0
+
+}, function () {
+    this._cache = new Cache();
+},
+/** @lends clay.Texture.prototype */
+{
+
+    getWebGLTexture: function (renderer) {
+        var _gl = renderer.gl;
+        var cache = this._cache;
+        cache.use(renderer.__uid__);
+
+        if (cache.miss('webgl_texture')) {
+            // In a new gl context, create new texture and set dirty true
+            cache.put('webgl_texture', _gl.createTexture());
+        }
+        if (this.dynamic) {
+            this.update(renderer);
+        }
+        else if (cache.isDirty()) {
+            this.update(renderer);
+            cache.fresh();
+        }
+
+        return cache.get('webgl_texture');
+    },
+
+    bind: function () {},
+    unbind: function () {},
+
+    /**
+     * Mark texture is dirty and update in the next frame
+     */
+    dirty: function () {
+        if (this._cache) {
+            this._cache.dirtyAll();
+        }
+    },
+
+    update: function (renderer) {},
+
+    // Update the common parameters of texture
+    updateCommon: function (renderer) {
+        var _gl = renderer.gl;
+        _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
+        _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
+        _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
+
+        // Use of none-power of two texture
+        // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
+        if (this.format === glenum.DEPTH_COMPONENT) {
+            this.useMipmap = false;
+        }
+
+        var sRGBExt = renderer.getGLExtension('EXT_sRGB');
+        // Fallback
+        if (this.format === Texture.SRGB && !sRGBExt) {
+            this.format = Texture.RGB;
+        }
+        if (this.format === Texture.SRGB_ALPHA && !sRGBExt) {
+            this.format = Texture.RGBA;
+        }
+
+        this.NPOT = !this.isPowerOfTwo();
+    },
+
+    getAvailableWrapS: function () {
+        if (this.NPOT) {
+            return glenum.CLAMP_TO_EDGE;
+        }
+        return this.wrapS;
+    },
+    getAvailableWrapT: function () {
+        if (this.NPOT) {
+            return glenum.CLAMP_TO_EDGE;
+        }
+        return this.wrapT;
+    },
+    getAvailableMinFilter: function () {
+        var minFilter = this.minFilter;
+        if (this.NPOT || !this.useMipmap) {
+            if (minFilter === glenum.NEAREST_MIPMAP_NEAREST ||
+                minFilter === glenum.NEAREST_MIPMAP_LINEAR
+            ) {
+                return glenum.NEAREST;
+            }
+            else if (minFilter === glenum.LINEAR_MIPMAP_LINEAR ||
+                minFilter === glenum.LINEAR_MIPMAP_NEAREST
+            ) {
+                return glenum.LINEAR;
+            }
+            else {
+                return minFilter;
+            }
+        }
+        else {
+            return minFilter;
+        }
+    },
+    getAvailableMagFilter: function () {
+        return this.magFilter;
+    },
+
+    nextHighestPowerOfTwo: function (x) {
+        --x;
+        for (var i = 1; i < 32; i <<= 1) {
+            x = x | x >> i;
+        }
+        return x + 1;
+    },
+    /**
+     * @param  {clay.Renderer} renderer
+     */
+    dispose: function (renderer) {
+
+        var cache = this._cache;
+
+        cache.use(renderer.__uid__);
+
+        var webglTexture = cache.get('webgl_texture');
+        if (webglTexture){
+            renderer.gl.deleteTexture(webglTexture);
+        }
+        cache.deleteContext(renderer.__uid__);
+
+    },
+    /**
+     * Test if image of texture is valid and loaded.
+     * @return {boolean}
+     */
+    isRenderable: function () {},
+
+    /**
+     * Test if texture size is power of two
+     * @return {boolean}
+     */
+    isPowerOfTwo: function () {}
+});
+
+Object.defineProperty(Texture.prototype, 'width', {
+    get: function () {
+        return this._width;
+    },
+    set: function (value) {
+        this._width = value;
+    }
+});
+Object.defineProperty(Texture.prototype, 'height', {
+    get: function () {
+        return this._height;
+    },
+    set: function (value) {
+        this._height = value;
+    }
+});
+
+/* DataType */
+
+/**
+ * @type {number}
+ */
+Texture.BYTE = glenum.BYTE;
+/**
+ * @type {number}
+ */
+Texture.UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
+/**
+ * @type {number}
+ */
+Texture.SHORT = glenum.SHORT;
+/**
+ * @type {number}
+ */
+Texture.UNSIGNED_SHORT = glenum.UNSIGNED_SHORT;
+/**
+ * @type {number}
+ */
+Texture.INT = glenum.INT;
+/**
+ * @type {number}
+ */
+Texture.UNSIGNED_INT = glenum.UNSIGNED_INT;
+/**
+ * @type {number}
+ */
+Texture.FLOAT = glenum.FLOAT;
+/**
+ * @type {number}
+ */
+Texture.HALF_FLOAT = 0x8D61;
+
+/**
+ * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
+ * @type {number}
+ */
+Texture.UNSIGNED_INT_24_8_WEBGL = 34042;
+
+/* PixelFormat */
+/**
+ * @type {number}
+ */
+Texture.DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
+/**
+ * @type {number}
+ */
+Texture.DEPTH_STENCIL = glenum.DEPTH_STENCIL;
+/**
+ * @type {number}
+ */
+Texture.ALPHA = glenum.ALPHA;
+/**
+ * @type {number}
+ */
+Texture.RGB = glenum.RGB;
+/**
+ * @type {number}
+ */
+Texture.RGBA = glenum.RGBA;
+/**
+ * @type {number}
+ */
+Texture.LUMINANCE = glenum.LUMINANCE;
+/**
+ * @type {number}
+ */
+Texture.LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
+
+/**
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ * @type {number}
+ */
+Texture.SRGB = 0x8C40;
+/**
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ * @type {number}
+ */
+Texture.SRGB_ALPHA = 0x8C42;
+
+/* Compressed Texture */
+Texture.COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
+Texture.COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
+Texture.COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
+Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
+
+/* TextureMagFilter */
+/**
+ * @type {number}
+ */
+Texture.NEAREST = glenum.NEAREST;
+/**
+ * @type {number}
+ */
+Texture.LINEAR = glenum.LINEAR;
+
+/* TextureMinFilter */
+/**
+ * @type {number}
+ */
+Texture.NEAREST_MIPMAP_NEAREST = glenum.NEAREST_MIPMAP_NEAREST;
+/**
+ * @type {number}
+ */
+Texture.LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
+/**
+ * @type {number}
+ */
+Texture.NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
+/**
+ * @type {number}
+ */
+Texture.LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
+
+/* TextureWrapMode */
+/**
+ * @type {number}
+ */
+Texture.REPEAT = glenum.REPEAT;
+/**
+ * @type {number}
+ */
+Texture.CLAMP_TO_EDGE = glenum.CLAMP_TO_EDGE;
+/**
+ * @type {number}
+ */
+Texture.MIRRORED_REPEAT = glenum.MIRRORED_REPEAT;
+
+var mathUtil = {};
+
+mathUtil.isPowerOfTwo = function (value) {
+    return (value & (value - 1)) === 0;
+};
+
+mathUtil.nextPowerOfTwo = function (value) {
+    value --;
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    value ++;
+
+    return value;
+};
+
+mathUtil.nearestPowerOfTwo = function (value) {
+    return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
+};
+
+var isPowerOfTwo = mathUtil.isPowerOfTwo;
+
+function nearestPowerOfTwo(val) {
+    return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
+}
+function convertTextureToPowerOfTwo(texture, canvas) {
+    // var canvas = document.createElement('canvas');
+    var width = nearestPowerOfTwo(texture.width);
+    var height = nearestPowerOfTwo(texture.height);
+    canvas = canvas || document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(texture.image, 0, 0, width, height);
+
+    return canvas;
+}
+
+/**
+ * @constructor clay.Texture2D
+ * @extends clay.Texture
+ *
+ * @example
+ *     ...
+ *     var mat = new clay.Material({
+ *         shader: clay.shader.library.get('clay.phong', 'diffuseMap')
+ *     });
+ *     var diffuseMap = new clay.Texture2D();
+ *     diffuseMap.load('assets/textures/diffuse.jpg');
+ *     mat.set('diffuseMap', diffuseMap);
+ *     ...
+ *     diffuseMap.success(function () {
+ *         // Wait for the diffuse texture loaded
+ *         animation.on('frame', function (frameTime) {
+ *             renderer.render(scene, camera);
+ *         });
+ *     });
+ */
+var Texture2D = Texture.extend(function () {
+    return /** @lends clay.Texture2D# */ {
+        /**
+         * @type {?HTMLImageElement|HTMLCanvasElemnet}
+         */
+        // TODO mark dirty when assigned.
+        image: null,
+        /**
+         * Pixels data. Will be ignored if image is set.
+         * @type {?Uint8Array|Float32Array}
+         */
+        pixels: null,
+        /**
+         * @type {Array.<Object>}
+         * @example
+         *     [{
+         *         image: mipmap0,
+         *         pixels: null
+         *     }, {
+         *         image: mipmap1,
+         *         pixels: null
+         *     }, ....]
+         */
+        mipmaps: [],
+
+        /**
+         * If convert texture to power-of-two
+         * @type {boolean}
+         */
+        convertToPOT: false
+    };
+}, {
+
+    textureType: 'texture2D',
+
+    update: function (renderer) {
+
+        var _gl = renderer.gl;
+        _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
+
+        this.updateCommon(renderer);
+
+        var glFormat = this.format;
+        var glType = this.type;
+
+        // Convert to pot is only available when using image/canvas/video element.
+        var convertToPOT = !!(this.convertToPOT
+            && !this.mipmaps.length && this.image
+            && (this.wrapS === Texture.REPEAT || this.wrapT === Texture.REPEAT)
+            && this.NPOT
+        );
+
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, convertToPOT ? this.wrapS : this.getAvailableWrapS());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, convertToPOT ? this.wrapT : this.getAvailableWrapT());
+
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, convertToPOT ? this.magFilter : this.getAvailableMagFilter());
+        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, convertToPOT ? this.minFilter : this.getAvailableMinFilter());
+
+        var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
+        if (anisotropicExt && this.anisotropic > 1) {
+            _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
+        }
+
+        // Fallback to float type if browser don't have half float extension
+        if (glType === 36193) {
+            var halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
+            if (!halfFloatExt) {
+                glType = glenum.FLOAT;
+            }
+        }
+
+        if (this.mipmaps.length) {
+            var width = this.width;
+            var height = this.height;
+            for (var i = 0; i < this.mipmaps.length; i++) {
+                var mipmap = this.mipmaps[i];
+                this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
+                width /= 2;
+                height /= 2;
+            }
+        }
+        else {
+            this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
+
+            if (this.useMipmap && (!this.NPOT || convertToPOT)) {
+                _gl.generateMipmap(_gl.TEXTURE_2D);
+            }
+        }
+
+        _gl.bindTexture(_gl.TEXTURE_2D, null);
+    },
+
+    _updateTextureData: function (_gl, data, level, width, height, glFormat, glType, convertToPOT) {
+        if (data.image) {
+            var imgData = data.image;
+            if (convertToPOT) {
+                this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
+                imgData = this._potCanvas;
+            }
+            _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
+        }
+        else {
+            // Can be used as a blank texture when writing render to texture(RTT)
+            if (
+                glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
+                && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
+            ) {
+                _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
+            }
+            else {
+                // Is a render target if pixels is null
+                _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, glFormat, glType, data.pixels);
+            }
+        }
+    },
+
+    /**
+     * @param  {clay.Renderer} renderer
+     * @memberOf clay.Texture2D.prototype
+     */
+    generateMipmap: function (renderer) {
+        var _gl = renderer.gl;
+        if (this.useMipmap && !this.NPOT) {
+            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
+            _gl.generateMipmap(_gl.TEXTURE_2D);
+        }
+    },
+
+    isPowerOfTwo: function () {
+        return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
+    },
+
+    isRenderable: function () {
+        if (this.image) {
+            return this.image.nodeName === 'CANVAS'
+                || this.image.nodeName === 'VIDEO'
+                || this.image.complete;
+        }
+        else {
+            return !!(this.width && this.height);
+        }
+    },
+
+    bind: function (renderer) {
+        renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, this.getWebGLTexture(renderer));
+    },
+
+    unbind: function (renderer) {
+        renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, null);
+    },
+
+    load: function (src, crossOrigin) {
+        var image = new Image();
+        if (crossOrigin) {
+            image.crossOrigin = crossOrigin;
+        }
+        var self = this;
+        image.onload = function () {
+            self.dirty();
+            self.trigger('success', self);
+            image.onload = null;
+        };
+        image.onerror = function () {
+            self.trigger('error', self);
+            image.onerror = null;
+        };
+
+        image.src = src;
+        this.image = image;
+
+        return this;
+    }
+});
+
+Object.defineProperty(Texture2D.prototype, 'width', {
+    get: function () {
+        if (this.image) {
+            return this.image.width;
+        }
+        return this._width;
+    },
+    set: function (value) {
+        if (this.image) {
+            console.warn('Texture from image can\'t set width');
+        }
+        else {
+            if (this._width !== value) {
+                this.dirty();
+            }
+            this._width = value;
+        }
+    }
+});
+Object.defineProperty(Texture2D.prototype, 'height', {
+    get: function () {
+        if (this.image) {
+            return this.image.height;
+        }
+        return this._height;
+    },
+    set: function (value) {
+        if (this.image) {
+            console.warn('Texture from image can\'t set height');
+        }
+        else {
+            if (this._height !== value) {
+                this.dirty();
+            }
+            this._height = value;
+        }
     }
 });
 
@@ -13790,7 +14111,7 @@ var lightEssl = [
     exportEnd
 ].join('\n');
 
-var prezGlsl = "@export clay.prez.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@export clay.prez.fragment\nvoid main()\n{\n gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n@end";
+var prezGlsl = "@export clay.prez.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord;\n}\n@end\n@export clay.prez.fragment\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {\n discard;\n }\n }\n gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n}\n@end";
 
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
@@ -13807,6 +14128,12 @@ var errorShader = {};
 
 function defaultGetMaterial(renderable) {
     return renderable.material;
+}
+function defaultGetUniform(renderable, material, symbol) {
+    return material.uniforms[symbol].value;
+}
+function defaultIsMaterialChanged(renderabled, prevRenderable, material, prevMaterial) {
+    return material !== prevMaterial;
 }
 
 function noop$1() {}
@@ -13923,6 +14250,14 @@ var Renderer = Base.extend(function () {
          */
         viewport: {},
 
+        /**
+         * Canvas creator
+         * @type {Function}
+         */
+        createCanvas: function () {
+            return document.createElement('canvas');
+        },
+
         // Set by FrameBuffer#bind
         __currentFrameBuffer: null,
 
@@ -13934,7 +14269,7 @@ var Renderer = Base.extend(function () {
 }, function () {
 
     if (!this.canvas) {
-        this.canvas = document.createElement('canvas');
+        this.canvas = this.createCanvas();
     }
     var canvas = this.canvas;
     try {
@@ -13969,6 +14304,13 @@ var Renderer = Base.extend(function () {
 
     // Init managers
     this._programMgr = new ProgramManager(this);
+
+    var blankCanvas = this.createCanvas();
+    blankCanvas.width = blankCanvas.height = 1;
+    var ctx = blankCanvas.getContext('2d');
+    this._placeholderTexture = new Texture2D({
+        canvas: blankCanvas
+    });
 },
 /** @lends clay.Renderer.prototype. **/
 {
@@ -14198,7 +14540,7 @@ var Renderer = Base.extend(function () {
             return;
         }
         camera.update();
-        var renderList = scene.updateRenderList(camera);
+        var renderList = scene.updateRenderList(camera, true);
 
         this._sceneRendering = scene;
 
@@ -14305,6 +14647,8 @@ var Renderer = Base.extend(function () {
      * @param {clay.Camera} camera
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
+     * @param {Function} [passConfig.getUniform] Get material uniform value.
+     * @param {Function} [passConfig.isMaterialChanged] If material changed.
      * @param {Function} [passConfig.beforeRender] Before render each renderable.
      * @param {Function} [passConfig.afterRender] After render each renderable
      * @param {Function} [passConfig.ifRender] If render the renderable.
@@ -14316,6 +14660,9 @@ var Renderer = Base.extend(function () {
 
         passConfig = passConfig || {};
         passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
+        passConfig.getUniform = passConfig.getUniform || defaultGetUniform;
+        // PENDING Better solution?
+        passConfig.isMaterialChanged = passConfig.isMaterialChanged || defaultIsMaterialChanged;
         passConfig.beforeRender = passConfig.beforeRender || noop$1;
         passConfig.afterRender = passConfig.afterRender || noop$1;
 
@@ -14354,6 +14701,7 @@ var Renderer = Base.extend(function () {
 
         var prevMaterial;
         var prevProgram;
+        var prevRenderable;
 
         // Status
         var depthTest, depthMask;
@@ -14431,7 +14779,9 @@ var Renderer = Base.extend(function () {
             }
 
             // Program changes also needs reset the materials.
-            if (prevMaterial !== material || programChanged) {
+            if (programChanged || passConfig.isMaterialChanged(
+                renderable, prevRenderable, material, prevMaterial
+            )) {
                 if (material.depthTest !== depthTest) {
                     material.depthTest ? _gl.enable(_gl.DEPTH_TEST) : _gl.disable(_gl.DEPTH_TEST);
                     depthTest = material.depthTest;
@@ -14456,7 +14806,11 @@ var Renderer = Base.extend(function () {
                     }
                 }
 
-                this._bindMaterial(material, program, prevMaterial || null, prevProgram || null);
+                this._bindMaterial(
+                    renderable, material, program,
+                    prevRenderable || null, prevMaterial || null, prevProgram || null,
+                    passConfig.getUniform
+                );
                 prevMaterial = material;
             }
 
@@ -14496,6 +14850,7 @@ var Renderer = Base.extend(function () {
             renderable.afterRender(this);
 
             prevProgram = program;
+            prevRenderable = renderable;
         }
 
         // TODO Seems need to be bound to null immediately if vao is changed?
@@ -14540,7 +14895,7 @@ var Renderer = Base.extend(function () {
         }
     },
 
-    _bindMaterial: function (material, program, prevMaterial, prevProgram) {
+    _bindMaterial: function (renderable, material, program, prevRenderable, prevMaterial, prevProgram, getUniformValue) {
         var _gl = this.gl;
         // PENDING Same texture in different material take different slot?
 
@@ -14550,10 +14905,11 @@ var Renderer = Base.extend(function () {
         var currentTextureSlot = program.currentTextureSlot();
         var enabledUniforms = material.getEnabledUniforms();
         var textureUniforms = material.getTextureUniforms();
+        var placeholderTexture = this._placeholderTexture;
 
         for (var u = 0; u < textureUniforms.length; u++) {
             var symbol = textureUniforms[u];
-            var uniformValue = material.uniforms[symbol].value;
+            var uniformValue = getUniformValue(renderable, material, symbol);
             var uniformType = material.uniforms[symbol].type;
             // Not use `instanceof` to determine if a value is texture in Material#bind.
             // Use type instead, in some case texture may be in different namespaces.
@@ -14564,52 +14920,64 @@ var Renderer = Base.extend(function () {
             }
             else if (uniformType === 'tv') {
                 for (var i = 0; i < uniformValue.length; i++) {
-                    if (uniformValue[i] instanceof Texture) {
+                    if (uniformValue[i]) {
                         uniformValue[i].__slot = -1;
                     }
                 }
             }
         }
 
+        placeholderTexture.__slot = -1;
+
         // Set uniforms
         for (var u = 0; u < enabledUniforms.length; u++) {
             var symbol = enabledUniforms[u];
             var uniform = material.uniforms[symbol];
-            var uniformValue = uniform.value;
+            var uniformValue = getUniformValue(renderable, material, symbol);
+            var uniformType = uniform.type;
+
+            if (uniformType === 't') {
+                if (!uniformValue || !uniformValue.isRenderable()) {
+                    uniformValue = placeholderTexture;
+                }
+            }
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
             // So add a evaluation to see if the uniform is really needed to be set
             if (prevMaterial && sameProgram) {
-                if (prevMaterial.uniforms[symbol].value === uniformValue) {
+                var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
+                if (uniformType === 't') {
+                    if (!prevUniformValue || !prevUniformValue.isRenderable()) {
+                        prevUniformValue = placeholderTexture;
+                    }
+                }
+
+                if (prevUniformValue === uniformValue) {
+                    if (uniform.type === 't') {
+                        // Still take the slot to make sure same texture in different materials have same slot.
+                        program.takeCurrentTextureSlot(this, null);
+                    }
+                    else if (uniformType === 'tv' && uniformValue) {
+                        for (var i = 0; i < uniformValue.length; i++) {
+                            program.takeCurrentTextureSlot(this, null);
+                        }
+                    }
                     continue;
                 }
             }
-            var uniformType = uniform.type;
 
             if (uniformValue == null) {
-                // FIXME Assume material with same shader have same order uniforms
-                // Or if different material use same textures,
-                // the slot will be different and still skipped because optimization
-                if (uniform.type === 't') {
-                    var slot = program.currentTextureSlot();
-                    var res = program.setUniform(_gl, '1i', symbol, slot);
-                    if (res) { // Texture is enabled
-                        // Still occupy the slot to make sure same texture in different materials have same slot.
-                        program.takeCurrentTextureSlot(this, null);
-                    }
-                }
                 continue;
             }
             else if (uniformType === 't') {
                 if (uniformValue.__slot < 0) {
                     var slot = program.currentTextureSlot();
                     var res = program.setUniform(_gl, '1i', symbol, slot);
-                    if (!res) { // Texture uniform is not enabled
-                        continue;
+                    if (res) { // Texture uniform is enabled
+                        program.takeCurrentTextureSlot(this, uniformValue);
+                        uniformValue.__slot = slot;
                     }
-                    program.takeCurrentTextureSlot(this, uniformValue);
-                    uniformValue.__slot = slot;
                 }
                 // Multiple uniform use same texture..
                 else {
@@ -14759,6 +15127,29 @@ var Renderer = Base.extend(function () {
         this.renderPass(list, camera, {
             ifRender: function (renderable) {
                 return !renderable.ignorePreZ;
+            },
+            isMaterialChanged: function (renderable, prevRenderable) {
+                var matA = renderable.material;
+                var matB = prevRenderable.material;
+                return matA.get('diffuseMap') !== matB.get('diffuseMap')
+                    || (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0);
+            },
+            getUniform: function (renderable, depthMaterial, symbol) {
+                if (symbol === 'alphaMap') {
+                    return renderable.material.get('diffuseMap');
+                }
+                else if (symbol === 'alphaCutoff') {
+                    if (renderable.material.isDefined('fragment', 'ALPHA_TEST')
+                        && renderable.material.get('diffuseMap')
+                    ) {
+                        var alphaCutoff = renderable.material.get('alphaCutoff');
+                        return alphaCutoff || 0;
+                    }
+                    return 0;
+                }
+                else {
+                    return depthMaterial.get(symbol);
+                }
             },
             getMaterial: function () {
                 return preZPassMaterial;
@@ -17512,9 +17903,10 @@ var Scene = Node.extend(function () {
      * It needs camera for the frustum culling.
      *
      * @param {clay.Camera} camera
+     * @param {boolean} updateSceneBoundingBox
      * @return {clay.Scene.RenderList}
      */
-    updateRenderList: function (camera) {
+    updateRenderList: function (camera, updateSceneBoundingBox) {
         var id = camera.__uid__;
         var renderList = this._renderLists.get(id);
         if (!renderList) {
@@ -17523,11 +17915,13 @@ var Scene = Node.extend(function () {
         }
         renderList.startCount();
 
-        this.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
-        this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+        if (updateSceneBoundingBox) {
+            this.viewBoundingBoxLastFrame.min.set(Infinity, Infinity, Infinity);
+            this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
+        }
 
         var sceneMaterialTransparent = this.material && this.material.transparent || false;
-        this._doUpdateRenderList(this, camera, sceneMaterialTransparent, renderList);
+        this._doUpdateRenderList(this, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox);
 
         renderList.endCount();
 
@@ -17543,7 +17937,7 @@ var Scene = Node.extend(function () {
         return this._renderLists.get(camera.__uid__);
     },
 
-    _doUpdateRenderList: function (parent, camera, sceneMaterialTransparent, renderList) {
+    _doUpdateRenderList: function (parent, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox) {
         if (parent.invisible) {
             return;
         }
@@ -17557,12 +17951,12 @@ var Scene = Node.extend(function () {
                 var geometry = child.geometry;
 
                 mat4$3.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
-                if (!geometry.boundingBox || !this.isFrustumCulled(child, camera, WORLDVIEW)) {
+                if (updateSceneBoundingBox && !geometry.boundingBox || !this.isFrustumCulled(child, camera, WORLDVIEW)) {
                     renderList.add(child, child.material.transparent || sceneMaterialTransparent);
                 }
             }
             if (child._children.length > 0) {
-                this._doUpdateRenderList(child, camera, sceneMaterialTransparent, renderList);
+                this._doUpdateRenderList(child, camera, sceneMaterialTransparent, renderList, updateSceneBoundingBox);
             }
         }
     },
@@ -19378,278 +19772,6 @@ var ParametricSurface$1 = Geometry.extend(
     }
 });
 
-var mathUtil = {};
-
-mathUtil.isPowerOfTwo = function (value) {
-    return (value & (value - 1)) === 0;
-};
-
-mathUtil.nextPowerOfTwo = function (value) {
-    value --;
-    value |= value >> 1;
-    value |= value >> 2;
-    value |= value >> 4;
-    value |= value >> 8;
-    value |= value >> 16;
-    value ++;
-
-    return value;
-};
-
-mathUtil.nearestPowerOfTwo = function (value) {
-    return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
-};
-
-var isPowerOfTwo = mathUtil.isPowerOfTwo;
-
-function nearestPowerOfTwo(val) {
-    return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
-}
-function convertTextureToPowerOfTwo(texture, canvas) {
-    // var canvas = document.createElement('canvas');
-    var width = nearestPowerOfTwo(texture.width);
-    var height = nearestPowerOfTwo(texture.height);
-    canvas = canvas || document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(texture.image, 0, 0, width, height);
-
-    return canvas;
-}
-
-/**
- * @constructor clay.Texture2D
- * @extends clay.Texture
- *
- * @example
- *     ...
- *     var mat = new clay.Material({
- *         shader: clay.shader.library.get('clay.phong', 'diffuseMap')
- *     });
- *     var diffuseMap = new clay.Texture2D();
- *     diffuseMap.load('assets/textures/diffuse.jpg');
- *     mat.set('diffuseMap', diffuseMap);
- *     ...
- *     diffuseMap.success(function () {
- *         // Wait for the diffuse texture loaded
- *         animation.on('frame', function (frameTime) {
- *             renderer.render(scene, camera);
- *         });
- *     });
- */
-var Texture2D = Texture$1.extend(function () {
-    return /** @lends clay.Texture2D# */ {
-        /**
-         * @type {?HTMLImageElement|HTMLCanvasElemnet}
-         */
-        image: null,
-        /**
-         * Pixels data. Will be ignored if image is set.
-         * @type {?Uint8Array|Float32Array}
-         */
-        pixels: null,
-        /**
-         * @type {Array.<Object>}
-         * @example
-         *     [{
-         *         image: mipmap0,
-         *         pixels: null
-         *     }, {
-         *         image: mipmap1,
-         *         pixels: null
-         *     }, ....]
-         */
-        mipmaps: [],
-
-        /**
-         * If convert texture to power-of-two
-         * @type {boolean}
-         */
-        convertToPOT: false
-    };
-}, {
-
-    textureType: 'texture2D',
-
-    update: function (renderer) {
-
-        var _gl = renderer.gl;
-        _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
-
-        this.updateCommon(renderer);
-
-        var glFormat = this.format;
-        var glType = this.type;
-
-        // Convert to pot is only available when using image/canvas/video element.
-        var convertToPOT = !!(this.convertToPOT
-            && !this.mipmaps.length && this.image
-            && (this.wrapS === Texture$1.REPEAT || this.wrapT === Texture$1.REPEAT)
-            && this.NPOT
-        );
-
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, convertToPOT ? this.wrapS : this.getAvailableWrapS());
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, convertToPOT ? this.wrapT : this.getAvailableWrapT());
-
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, convertToPOT ? this.magFilter : this.getAvailableMagFilter());
-        _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, convertToPOT ? this.minFilter : this.getAvailableMinFilter());
-
-        var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
-        if (anisotropicExt && this.anisotropic > 1) {
-            _gl.texParameterf(_gl.TEXTURE_2D, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropic);
-        }
-
-        // Fallback to float type if browser don't have half float extension
-        if (glType === 36193) {
-            var halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
-            if (!halfFloatExt) {
-                glType = glenum.FLOAT;
-            }
-        }
-
-        if (this.mipmaps.length) {
-            var width = this.width;
-            var height = this.height;
-            for (var i = 0; i < this.mipmaps.length; i++) {
-                var mipmap = this.mipmaps[i];
-                this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
-                width /= 2;
-                height /= 2;
-            }
-        }
-        else {
-            this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
-
-            if (this.useMipmap && (!this.NPOT || convertToPOT)) {
-                _gl.generateMipmap(_gl.TEXTURE_2D);
-            }
-        }
-
-        _gl.bindTexture(_gl.TEXTURE_2D, null);
-    },
-
-    _updateTextureData: function (_gl, data, level, width, height, glFormat, glType, convertToPOT) {
-        if (data.image) {
-            var imgData = data.image;
-            if (convertToPOT) {
-                this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
-                imgData = this._potCanvas;
-            }
-            _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
-        }
-        else {
-            // Can be used as a blank texture when writing render to texture(RTT)
-            if (
-                glFormat <= Texture$1.COMPRESSED_RGBA_S3TC_DXT5_EXT
-                && glFormat >= Texture$1.COMPRESSED_RGB_S3TC_DXT1_EXT
-            ) {
-                _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
-            }
-            else {
-                // Is a render target if pixels is null
-                _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, glFormat, glType, data.pixels);
-            }
-        }
-    },
-
-    /**
-     * @param  {clay.Renderer} renderer
-     * @memberOf clay.Texture2D.prototype
-     */
-    generateMipmap: function (renderer) {
-        var _gl = renderer.gl;
-        if (this.useMipmap && !this.NPOT) {
-            _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
-            _gl.generateMipmap(_gl.TEXTURE_2D);
-        }
-    },
-
-    isPowerOfTwo: function () {
-        return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
-    },
-
-    isRenderable: function () {
-        if (this.image) {
-            return this.image.nodeName === 'CANVAS'
-                || this.image.nodeName === 'VIDEO'
-                || this.image.complete;
-        }
-        else {
-            return !!(this.width && this.height);
-        }
-    },
-
-    bind: function (renderer) {
-        renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, this.getWebGLTexture(renderer));
-    },
-
-    unbind: function (renderer) {
-        renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, null);
-    },
-
-    load: function (src, crossOrigin) {
-        var image = new Image();
-        if (crossOrigin) {
-            image.crossOrigin = crossOrigin;
-        }
-        var self = this;
-        image.onload = function () {
-            self.dirty();
-            self.trigger('success', self);
-            image.onload = null;
-        };
-        image.onerror = function () {
-            self.trigger('error', self);
-            image.onerror = null;
-        };
-
-        image.src = src;
-        this.image = image;
-
-        return this;
-    }
-});
-
-Object.defineProperty(Texture2D.prototype, 'width', {
-    get: function () {
-        if (this.image) {
-            return this.image.width;
-        }
-        return this._width;
-    },
-    set: function (value) {
-        if (this.image) {
-            console.warn('Texture from image can\'t set width');
-        }
-        else {
-            if (this._width !== value) {
-                this.dirty();
-            }
-            this._width = value;
-        }
-    }
-});
-Object.defineProperty(Texture2D.prototype, 'height', {
-    get: function () {
-        if (this.image) {
-            return this.image.height;
-        }
-        return this._height;
-    },
-    set: function (value) {
-        if (this.image) {
-            console.warn('Texture from image can\'t set height');
-        }
-        else {
-            if (this._height !== value) {
-                this.dirty();
-            }
-            this._height = value;
-        }
-    }
-});
-
 var isPowerOfTwo$1 = mathUtil.isPowerOfTwo;
 
 var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
@@ -19681,7 +19803,7 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         });
  *     });
  */
-var TextureCube = Texture$1.extend(function () {
+var TextureCube = Texture.extend(function () {
     return /** @lends clay.TextureCube# */{
 
         /**
@@ -20432,7 +20554,7 @@ var request = {
     get : get
 };
 
-var standardEssl = "\n@export clay.standard.chunk.varying\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#if defined(AOMAP_ENABLED)\nvarying vec2 v_Texcoord2;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n@end\n@export clay.standard.chunk.light_header\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n@import clay.header.ambient_cubemap_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@end\n@export clay.standard.vertex\n#define SHADER_NAME standard\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#if defined(AOMAP_ENABLED)\nattribute vec2 texcoord2 : TEXCOORD_1;\n#endif\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\n#endif\nattribute vec3 barycentric;\n@import clay.standard.chunk.varying\n@import clay.chunk.skinning_header\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n v_Barycentric = barycentric;\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n#endif\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n#if defined(AOMAP_ENABLED)\n v_Texcoord2 = texcoord2;\n#endif\n}\n@end\n@export clay.standard.fragment\n#define PI 3.14159265358979\n#define GLOSSINESS_CHANNEL 0\n#define ROUGHNESS_CHANNEL 0\n#define METALNESS_CHANNEL 1\n@import clay.standard.chunk.varying\nuniform mat4 viewInverse : VIEWINVERSE;\n#ifdef NORMALMAP_ENABLED\nuniform sampler2D normalMap;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\nuniform sampler2D diffuseMap;\n#endif\n#ifdef SPECULARMAP_ENABLED\nuniform sampler2D specularMap;\n#endif\n#ifdef USE_ROUGHNESS\nuniform float roughness : 0.5;\n #ifdef ROUGHNESSMAP_ENABLED\nuniform sampler2D roughnessMap;\n #endif\n#else\nuniform float glossiness: 0.5;\n #ifdef GLOSSINESSMAP_ENABLED\nuniform sampler2D glossinessMap;\n #endif\n#endif\n#ifdef METALNESSMAP_ENABLED\nuniform sampler2D metalnessMap;\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\nuniform samplerCube environmentMap;\n #ifdef PARALLAX_CORRECTED\nuniform vec3 environmentBoxMin;\nuniform vec3 environmentBoxMax;\n #endif\n#endif\n#ifdef BRDFLOOKUP_ENABLED\nuniform sampler2D brdfLookup;\n#endif\n#ifdef EMISSIVEMAP_ENABLED\nuniform sampler2D emissiveMap;\n#endif\n#ifdef SSAOMAP_ENABLED\nuniform sampler2D ssaoMap;\nuniform vec4 viewport : VIEWPORT;\n#endif\n#ifdef AOMAP_ENABLED\nuniform sampler2D aoMap;\nuniform float aoIntensity;\n#endif\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef USE_METALNESS\nuniform float metalness : 0.0;\n#else\nuniform vec3 specularColor : [0.1, 0.1, 0.1];\n#endif\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float emissionIntensity: 1;\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\n#ifdef ENVIRONMENTMAP_PREFILTER\nuniform float maxMipmapLevel: 5;\n#endif\n@import clay.standard.chunk.light_header\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.plugin.compute_shadow_map\n@import clay.util.parallax_correct\n@import clay.util.ACES\nfloat G_Smith(float g, float ndv, float ndl)\n{\n float roughness = 1.0 - g;\n float k = roughness * roughness / 2.0;\n float G1V = ndv / (ndv * (1.0 - k) + k);\n float G1L = ndl / (ndl * (1.0 - k) + k);\n return G1L * G1V;\n}\nvec3 F_Schlick(float ndv, vec3 spec) {\n return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nfloat D_Phong(float g, float ndh) {\n float a = pow(8192.0, g);\n return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(float g, float ndh) {\n float r = 1.0 - g;\n float a = r * r;\n float tmp = ndh * ndh * (a - 1.0) + 1.0;\n return a / (PI * tmp * tmp);\n}\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\nuniform float parallaxOcclusionScale : 0.02;\nuniform float parallaxMaxLayers : 20;\nuniform float parallaxMinLayers : 5;\nuniform sampler2D parallaxOcclusionMap;\nmat3 transpose(in mat3 inMat)\n{\n vec3 i0 = inMat[0];\n vec3 i1 = inMat[1];\n vec3 i2 = inMat[2];\n return mat3(\n vec3(i0.x, i1.x, i2.x),\n vec3(i0.y, i1.y, i2.y),\n vec3(i0.z, i1.z, i2.z)\n );\n}\nvec2 parallaxUv(vec2 uv, vec3 viewDir)\n{\n float numLayers = mix(parallaxMaxLayers, parallaxMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));\n float layerHeight = 1.0 / numLayers;\n float curLayerHeight = 0.0;\n vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);\n vec2 curUv = uv;\n float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n for (int i = 0; i < 30; i++) {\n curLayerHeight += layerHeight;\n curUv -= deltaUv;\n height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n if (height < curLayerHeight) {\n break;\n }\n }\n vec2 prevUv = curUv + deltaUv;\n float next = height - curLayerHeight;\n float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;\n return mix(curUv, prevUv, next / (next - prev));\n}\n#endif\nvoid main() {\n vec4 albedoColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n albedoColor *= v_Color;\n#endif\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = normalize(eyePos - v_WorldPosition);\n vec2 uv = v_Texcoord;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n#endif\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\n uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = texture2D(diffuseMap, uv);\n #ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n #endif\n albedoColor.rgb *= texel.rgb;\n #ifdef DIFFUSEMAP_ALPHA_ALPHA\n albedoColor.a *= texel.a;\n #endif\n#endif\n#ifdef USE_METALNESS\n float m = metalness;\n #ifdef METALNESSMAP_ENABLED\n float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];\n m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);\n #endif\n vec3 baseColor = albedoColor.rgb;\n albedoColor.rgb = baseColor * (1.0 - m);\n vec3 spec = mix(vec3(0.04), baseColor, m);\n#else\n vec3 spec = specularColor;\n#endif\n#ifdef USE_ROUGHNESS\n float g = 1.0 - roughness;\n #ifdef ROUGHNESSMAP_ENABLED\n float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n #endif\n#else\n float g = glossiness;\n #ifdef GLOSSINESSMAP_ENABLED\n float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n #endif\n#endif\n#ifdef SPECULARMAP_ENABLED\n spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;\n#endif\n vec3 N = v_Normal;\n#ifdef DOUBLE_SIDED\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n#endif\n#ifdef NORMALMAP_ENABLED\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, uv).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n tbn[1] = -tbn[1];\n N = normalize(tbn * N);\n }\n }\n#endif\n vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);\n vec3 specularTerm = vec3(0.0, 0.0, 0.0);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n vec3 fresnelTerm = F_Schlick(ndv, spec);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {{\n diffuseTerm += ambientLightColor[_idx_];\n }}\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseTerm += calcAmbientSHLight(_idx_, N) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int _idx_ = 0; _idx_ < POINT_LIGHT_COUNT; _idx_++)\n {{\n vec3 lightPosition = pointLightPosition[_idx_];\n vec3 lc = pointLightColor[_idx_];\n float range = pointLightRange[_idx_];\n vec3 L = lightPosition - v_WorldPosition;\n float dist = length(L);\n float attenuation = lightAttenuation(dist, range);\n L /= dist;\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if(shadowEnabled)\n {\n shadowContrib = shadowContribsPoint[_idx_];\n }\n#endif\n vec3 li = lc * ndl * attenuation * shadowContrib;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }}\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++)\n {{\n vec3 L = -normalize(directionalLightDirection[_idx_]);\n vec3 lc = directionalLightColor[_idx_];\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if(shadowEnabled)\n {\n shadowContrib = shadowContribsDir[_idx_];\n }\n#endif\n vec3 li = lc * ndl * shadowContrib;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }}\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = spotLightPosition[i];\n vec3 spotLightDirection = -normalize(spotLightDirection[i]);\n vec3 lc = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 L = lightPosition - v_WorldPosition;\n float dist = length(L);\n float attenuation = lightAttenuation(dist, range);\n L /= dist;\n float c = dot(spotLightDirection, L);\n float falloff;\n falloff = clamp((c - a) /(b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if (shadowEnabled)\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n vec3 li = lc * attenuation * (1.0 - falloff) * shadowContrib * ndl;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }\n#endif\n vec4 outColor = albedoColor;\n outColor.rgb *= max(diffuseTerm, vec3(0.0));\n outColor.rgb += max(specularTerm, vec3(0.0));\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n vec3 L = reflect(-V, N);\n float rough2 = clamp(1.0 - g, 0.0, 1.0);\n float bias2 = rough2 * 5.0;\n vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;\n vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;\n vec3 envTexel2;\n for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)\n {{\n envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);\n outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;\n }}\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\n vec3 envWeight = g * fresnelTerm;\n vec3 L = reflect(-V, N);\n #ifdef PARALLAX_CORRECTED\n L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);\n#endif\n #ifdef ENVIRONMENTMAP_PREFILTER\n float rough = clamp(1.0 - g, 0.0, 1.0);\n float bias = rough * maxMipmapLevel;\n vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;\n #ifdef BRDFLOOKUP_ENABLED\n vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n envWeight = spec * brdfParam.x + brdfParam.y;\n #endif\n #else\n vec3 envTexel = textureCube(environmentMap, L).xyz;\n #endif\n outColor.rgb += envTexel * envWeight;\n#endif\n float aoFactor = 1.0;\n#ifdef SSAOMAP_ENABLED\n aoFactor = min(texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);\n#endif\n#ifdef AOMAP_ENABLED\n aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);\n#endif\n outColor.rgb *= aoFactor;\n vec3 lEmission = emission;\n#ifdef EMISSIVEMAP_ENABLED\n lEmission *= texture2D(emissiveMap, uv).rgb;\n#endif\n outColor.rgb += lEmission * emissionIntensity;\n if(lineWidth > 0.)\n {\n outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (outColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n outColor.rgb = ACESToneMapping(outColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n outColor = linearTosRGB(outColor);\n#endif\n gl_FragColor = encodeHDR(outColor);\n}\n@end\n@export clay.standardMR.vertex\n@import clay.standard.vertex\n@end\n@export clay.standardMR.fragment\n#define USE_METALNESS\n#define USE_ROUGHNESS\n@import clay.standard.fragment\n@end";
+var standardEssl = "\n@export clay.standard.chunk.varying\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\n#endif\n#if defined(AOMAP_ENABLED)\nvarying vec2 v_Texcoord2;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n@end\n@export clay.standard.chunk.light_header\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n@import clay.header.ambient_cubemap_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@end\n@export clay.standard.vertex\n#define SHADER_NAME standard\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#if defined(AOMAP_ENABLED)\nattribute vec2 texcoord2 : TEXCOORD_1;\n#endif\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\n#endif\nattribute vec3 barycentric;\n@import clay.standard.chunk.varying\n@import clay.chunk.skinning_header\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n v_Barycentric = barycentric;\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n#endif\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n#if defined(AOMAP_ENABLED)\n v_Texcoord2 = texcoord2;\n#endif\n}\n@end\n@export clay.standard.fragment\n#define PI 3.14159265358979\n#define GLOSSINESS_CHANNEL 0\n#define ROUGHNESS_CHANNEL 0\n#define METALNESS_CHANNEL 1\n#define DIFFUSEMAP_ALPHA_ALPHA\n@import clay.standard.chunk.varying\nuniform mat4 viewInverse : VIEWINVERSE;\n#ifdef NORMALMAP_ENABLED\nuniform sampler2D normalMap;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\nuniform sampler2D diffuseMap;\n#endif\n#ifdef SPECULARMAP_ENABLED\nuniform sampler2D specularMap;\n#endif\n#ifdef USE_ROUGHNESS\nuniform float roughness : 0.5;\n #ifdef ROUGHNESSMAP_ENABLED\nuniform sampler2D roughnessMap;\n #endif\n#else\nuniform float glossiness: 0.5;\n #ifdef GLOSSINESSMAP_ENABLED\nuniform sampler2D glossinessMap;\n #endif\n#endif\n#ifdef METALNESSMAP_ENABLED\nuniform sampler2D metalnessMap;\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\nuniform samplerCube environmentMap;\n #ifdef PARALLAX_CORRECTED\nuniform vec3 environmentBoxMin;\nuniform vec3 environmentBoxMax;\n #endif\n#endif\n#ifdef BRDFLOOKUP_ENABLED\nuniform sampler2D brdfLookup;\n#endif\n#ifdef EMISSIVEMAP_ENABLED\nuniform sampler2D emissiveMap;\n#endif\n#ifdef SSAOMAP_ENABLED\nuniform sampler2D ssaoMap;\nuniform vec4 viewport : VIEWPORT;\n#endif\n#ifdef AOMAP_ENABLED\nuniform sampler2D aoMap;\nuniform float aoIntensity;\n#endif\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef USE_METALNESS\nuniform float metalness : 0.0;\n#else\nuniform vec3 specularColor : [0.1, 0.1, 0.1];\n#endif\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float emissionIntensity: 1;\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\n#ifdef ENVIRONMENTMAP_PREFILTER\nuniform float maxMipmapLevel: 5;\n#endif\n@import clay.standard.chunk.light_header\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.plugin.compute_shadow_map\n@import clay.util.parallax_correct\n@import clay.util.ACES\nfloat G_Smith(float g, float ndv, float ndl)\n{\n float roughness = 1.0 - g;\n float k = roughness * roughness / 2.0;\n float G1V = ndv / (ndv * (1.0 - k) + k);\n float G1L = ndl / (ndl * (1.0 - k) + k);\n return G1L * G1V;\n}\nvec3 F_Schlick(float ndv, vec3 spec) {\n return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nfloat D_Phong(float g, float ndh) {\n float a = pow(8192.0, g);\n return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(float g, float ndh) {\n float r = 1.0 - g;\n float a = r * r;\n float tmp = ndh * ndh * (a - 1.0) + 1.0;\n return a / (PI * tmp * tmp);\n}\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\nuniform float parallaxOcclusionScale : 0.02;\nuniform float parallaxMaxLayers : 20;\nuniform float parallaxMinLayers : 5;\nuniform sampler2D parallaxOcclusionMap;\nmat3 transpose(in mat3 inMat)\n{\n vec3 i0 = inMat[0];\n vec3 i1 = inMat[1];\n vec3 i2 = inMat[2];\n return mat3(\n vec3(i0.x, i1.x, i2.x),\n vec3(i0.y, i1.y, i2.y),\n vec3(i0.z, i1.z, i2.z)\n );\n}\nvec2 parallaxUv(vec2 uv, vec3 viewDir)\n{\n float numLayers = mix(parallaxMaxLayers, parallaxMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));\n float layerHeight = 1.0 / numLayers;\n float curLayerHeight = 0.0;\n vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);\n vec2 curUv = uv;\n float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n for (int i = 0; i < 30; i++) {\n curLayerHeight += layerHeight;\n curUv -= deltaUv;\n height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;\n if (height < curLayerHeight) {\n break;\n }\n }\n vec2 prevUv = curUv + deltaUv;\n float next = height - curLayerHeight;\n float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;\n return mix(curUv, prevUv, next / (next - prev));\n}\n#endif\nvoid main() {\n vec4 albedoColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n albedoColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n albedoColor = sRGBToLinear(albedoColor);\n#endif\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = normalize(eyePos - v_WorldPosition);\n vec2 uv = v_Texcoord;\n#if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n#endif\n#ifdef PARALLAXOCCLUSIONMAP_ENABLED\n uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = texture2D(diffuseMap, uv);\n #ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n #endif\n albedoColor.rgb *= texel.rgb;\n #ifdef DIFFUSEMAP_ALPHA_ALPHA\n albedoColor.a *= texel.a;\n #endif\n#endif\n#ifdef USE_METALNESS\n float m = metalness;\n #ifdef METALNESSMAP_ENABLED\n float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];\n m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);\n #endif\n vec3 baseColor = albedoColor.rgb;\n albedoColor.rgb = baseColor * (1.0 - m);\n vec3 spec = mix(vec3(0.04), baseColor, m);\n#else\n vec3 spec = specularColor;\n#endif\n#ifdef USE_ROUGHNESS\n float g = clamp(1.0 - roughness, 0.0, 1.0);\n #ifdef ROUGHNESSMAP_ENABLED\n float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n #endif\n#else\n float g = glossiness;\n #ifdef GLOSSINESSMAP_ENABLED\n float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n #endif\n#endif\n#ifdef SPECULARMAP_ENABLED\n spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;\n#endif\n vec3 N = v_Normal;\n#ifdef DOUBLE_SIDED\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n#endif\n#ifdef NORMALMAP_ENABLED\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, uv).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n tbn[1] = -tbn[1];\n N = normalize(tbn * N);\n }\n }\n#endif\n vec3 diffuseTerm = vec3(0.0, 0.0, 0.0);\n vec3 specularTerm = vec3(0.0, 0.0, 0.0);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n vec3 fresnelTerm = F_Schlick(ndv, spec);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {{\n diffuseTerm += ambientLightColor[_idx_];\n }}\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseTerm += calcAmbientSHLight(_idx_, N) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int _idx_ = 0; _idx_ < POINT_LIGHT_COUNT; _idx_++)\n {{\n vec3 lightPosition = pointLightPosition[_idx_];\n vec3 lc = pointLightColor[_idx_];\n float range = pointLightRange[_idx_];\n vec3 L = lightPosition - v_WorldPosition;\n float dist = length(L);\n float attenuation = lightAttenuation(dist, range);\n L /= dist;\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if(shadowEnabled)\n {\n shadowContrib = shadowContribsPoint[_idx_];\n }\n#endif\n vec3 li = lc * ndl * attenuation * shadowContrib;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }}\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++)\n {{\n vec3 L = -normalize(directionalLightDirection[_idx_]);\n vec3 lc = directionalLightColor[_idx_];\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if(shadowEnabled)\n {\n shadowContrib = shadowContribsDir[_idx_];\n }\n#endif\n vec3 li = lc * ndl * shadowContrib;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }}\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = spotLightPosition[i];\n vec3 spotLightDirection = -normalize(spotLightDirection[i]);\n vec3 lc = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 L = lightPosition - v_WorldPosition;\n float dist = length(L);\n float attenuation = lightAttenuation(dist, range);\n L /= dist;\n float c = dot(spotLightDirection, L);\n float falloff;\n falloff = clamp((c - a) /(b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if (shadowEnabled)\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n vec3 li = lc * attenuation * (1.0 - falloff) * shadowContrib * ndl;\n diffuseTerm += li;\n specularTerm += li * fresnelTerm * D_Phong(g, ndh);\n }\n#endif\n vec4 outColor = albedoColor;\n outColor.rgb *= max(diffuseTerm, vec3(0.0));\n outColor.rgb += max(specularTerm, vec3(0.0));\n#ifdef AMBIENT_CUBEMAP_LIGHT_COUNT\n vec3 L = reflect(-V, N);\n float rough2 = clamp(1.0 - g, 0.0, 1.0);\n float bias2 = rough2 * 5.0;\n vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;\n vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;\n vec3 envTexel2;\n for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)\n {{\n envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);\n outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;\n }}\n#endif\n#ifdef ENVIRONMENTMAP_ENABLED\n vec3 envWeight = g * fresnelTerm;\n vec3 L = reflect(-V, N);\n #ifdef PARALLAX_CORRECTED\n L = parallaxCorrect(L, v_WorldPosition, environmentBoxMin, environmentBoxMax);\n#endif\n #ifdef ENVIRONMENTMAP_PREFILTER\n float rough = clamp(1.0 - g, 0.0, 1.0);\n float bias = rough * maxMipmapLevel;\n vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;\n #ifdef BRDFLOOKUP_ENABLED\n vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n envWeight = spec * brdfParam.x + brdfParam.y;\n #endif\n #else\n vec3 envTexel = textureCube(environmentMap, L).xyz;\n #endif\n outColor.rgb += envTexel * envWeight;\n#endif\n float aoFactor = 1.0;\n#ifdef SSAOMAP_ENABLED\n aoFactor = min(texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);\n#endif\n#ifdef AOMAP_ENABLED\n aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);\n#endif\n outColor.rgb *= aoFactor;\n vec3 lEmission = emission;\n#ifdef EMISSIVEMAP_ENABLED\n lEmission *= texture2D(emissiveMap, uv).rgb;\n#endif\n outColor.rgb += lEmission * emissionIntensity;\n if(lineWidth > 0.)\n {\n outColor.rgb = mix(outColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (outColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n outColor.rgb = ACESToneMapping(outColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n outColor = linearTosRGB(outColor);\n#endif\n gl_FragColor = encodeHDR(outColor);\n}\n@end\n@export clay.standardMR.vertex\n@import clay.standard.vertex\n@end\n@export clay.standardMR.fragment\n#define USE_METALNESS\n#define USE_ROUGHNESS\n@import clay.standard.fragment\n@end";
 
 // Import standard shader
 Shader['import'](standardEssl);
@@ -20469,7 +20591,7 @@ var standardShader;
  */
 var StandardMaterial = Material.extend(function () {
     if (!standardShader) {
-        standardShader = new Shader(Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
+        standardShader = new Shader(Shader.source('clay.standardMR.vertex'), Shader.source('clay.standardMR.fragment'));
     }
     return /** @lends clay.StandardMaterial# */ {
         shader: standardShader
@@ -20535,42 +20657,51 @@ var StandardMaterial = Material.extend(function () {
         /**
          * @type {clay.Texture2D}
          */
+        diffuseMap: null,
 
         /**
          * @type {clay.Texture2D}
          */
+        normalMap: null,
 
         /**
          * @type {clay.Texture2D}
          */
+        roughnessMap: null,
 
         /**
          * @type {clay.Texture2D}
          */
+        metalnessMap: null,
         /**
          * @type {clay.Texture2D}
          */
+        emissiveMap: null,
 
         /**
          * @type {clay.TextureCube}
          */
+        environmentMap: null,
 
         /**
          * @type {clay.BoundingBox}
          */
-
+        environmentBox: null,
         /**
          * BRDF Lookup is generated by clay.util.cubemap.integrateBrdf
          * @type {clay.Texture2D}
          */
+        brdfLookup: null,
 
         /**
          * @type {clay.Texture2D}
          */
+        ssaoMap: null,
 
         /**
          * @type {clay.Texture2D}
          */
+        aoMap: null,
 
         /**
          * @type {Array.<number>}
@@ -20619,9 +20750,6 @@ var StandardMaterial = Material.extend(function () {
          */
         metalnessChannel: 1
     });
-
-    this.define('fragment', 'USE_METALNESS');
-    this.define('fragment', 'USE_ROUGHNESS');
 }, {
     clone: function () {
         var material = new StandardMaterial({
@@ -21023,9 +21151,9 @@ var Skeleton = Base.extend(function () {
 
 var utilGlsl = "\n@export clay.util.rand\nhighp float rand(vec2 uv) {\n const highp float a = 12.9898, b = 78.233, c = 43758.5453;\n highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);\n return fract(sin(sn) * c);\n}\n@end\n@export clay.util.calculate_attenuation\nuniform float attenuationFactor : 5.0;\nfloat lightAttenuation(float dist, float range)\n{\n float attenuation = 1.0;\n attenuation = dist*dist/(range*range+1.0);\n float att_s = attenuationFactor;\n attenuation = 1.0/(attenuation*att_s+1.0);\n att_s = 1.0/(att_s+1.0);\n attenuation = attenuation - att_s;\n attenuation /= 1.0 - att_s;\n return clamp(attenuation, 0.0, 1.0);\n}\n@end\n@export clay.util.edge_factor\nfloat edgeFactor(float width)\n{\n vec3 d = fwidth(v_Barycentric);\n vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);\n return min(min(a3.x, a3.y), a3.z);\n}\n@end\n@export clay.util.encode_float\nvec4 encodeFloat(const in float depth)\n{\n const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);\n const vec4 bit_mask = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);\n vec4 res = fract(depth * bitShifts);\n res -= res.xxyz * bit_mask;\n return res;\n}\n@end\n@export clay.util.decode_float\nfloat decodeFloat(const in vec4 color)\n{\n const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);\n return dot(color, bitShifts);\n}\n@end\n@export clay.util.float\n@import clay.util.encode_float\n@import clay.util.decode_float\n@end\n@export clay.util.rgbm_decode\nvec3 RGBMDecode(vec4 rgbm, float range) {\n return range * rgbm.rgb * rgbm.a;\n}\n@end\n@export clay.util.rgbm_encode\nvec4 RGBMEncode(vec3 color, float range) {\n if (dot(color, color) == 0.0) {\n return vec4(0.0);\n }\n vec4 rgbm;\n color /= range;\n rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6)), 0.0, 1.0);\n rgbm.a = ceil(rgbm.a * 255.0) / 255.0;\n rgbm.rgb = color / rgbm.a;\n return rgbm;\n}\n@end\n@export clay.util.rgbm\n@import clay.util.rgbm_decode\n@import clay.util.rgbm_encode\nvec4 decodeHDR(vec4 color)\n{\n#if defined(RGBM_DECODE) || defined(RGBM)\n return vec4(RGBMDecode(color, 8.12), 1.0);\n#else\n return color;\n#endif\n}\nvec4 encodeHDR(vec4 color)\n{\n#if defined(RGBM_ENCODE) || defined(RGBM)\n return RGBMEncode(color.xyz, 8.12);\n#else\n return color;\n#endif\n}\n@end\n@export clay.util.srgb\nvec4 sRGBToLinear(in vec4 value) {\n return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);\n}\nvec4 linearTosRGB(in vec4 value) {\n return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);\n}\n@end\n@export clay.chunk.skinning_header\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\nmat4 getSkinMatrix(float idx) {\n return skinMatrix[int(idx)];\n}\n#endif\n@end\n@export clay.chunk.skin_matrix\nmat4 skinMatrixWS = getSkinMatrix(joint.x) * weight.x;\nif (weight.y > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.y) * weight.y;\n}\nif (weight.z > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.z) * weight.z;\n}\nfloat weightW = 1.0-weight.x-weight.y-weight.z;\nif (weightW > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.w) * weightW;\n}\n@end\n@export clay.util.parallax_correct\nvec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {\n vec3 first = (boxMax - pos) / dir;\n vec3 second = (boxMin - pos) / dir;\n vec3 further = max(first, second);\n float dist = min(further.x, min(further.y, further.z));\n vec3 fixedPos = pos + dir * dist;\n vec3 boxCenter = (boxMax + boxMin) * 0.5;\n return normalize(fixedPos - boxCenter);\n}\n@end\n@export clay.util.clamp_sample\nvec4 clampSample(const in sampler2D texture, const in vec2 coord)\n{\n#ifdef STEREO\n float eye = step(0.5, coord.x) * 0.5;\n vec2 coordClamped = clamp(coord, vec2(eye, 0.0), vec2(0.5 + eye, 1.0));\n#else\n vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));\n#endif\n return texture2D(texture, coordClamped);\n}\n@end\n@export clay.util.ACES\nvec3 ACESToneMapping(vec3 color)\n{\n const float A = 2.51;\n const float B = 0.03;\n const float C = 2.43;\n const float D = 0.59;\n const float E = 0.14;\n return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\n@end";
 
-var basicEssl = "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Barycentric = barycentric;\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.basic.fragment\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n#ifdef RENDER_TEXCOORD\n gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n return;\n#endif\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n gl_FragColor.a = texel.a;\n#endif\n gl_FragColor.rgb *= texel.rgb;\n#endif\n gl_FragColor.rgb += emission;\n if( lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var basicEssl = "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Barycentric = barycentric;\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.basic.fragment\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n gl_FragColor.a = texel.a;\n#endif\n gl_FragColor.rgb *= texel.rgb;\n#endif\n gl_FragColor.rgb += emission;\n if( lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
-var lambertEssl = "\n@export clay.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.lambert.fragment\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.plugin.compute_shadow_map\n@import clay.util.ACES\nvoid main()\n{\n#ifdef RENDER_NORMAL\n gl_FragColor = vec4(v_Normal * 0.5 + 0.5, 1.0);\n return;\n#endif\n#ifdef RENDER_TEXCOORD\n gl_FragColor = vec4(v_Texcoord, 1.0, 1.0);\n return;\n#endif\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n gl_FragColor.a *= tex.a;\n#endif\n#endif\n vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {\n diffuseColor += ambientLightColor[_idx_];\n }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if( shadowEnabled )\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = pointLightPosition[i];\n vec3 lightColor = pointLightColor[i];\n float range = pointLightRange[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float ndl = dot( v_Normal, lightDirection );\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsPoint[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n {\n vec3 lightDirection = -directionalLightDirection[i];\n vec3 lightColor = directionalLightColor[i];\n float ndl = dot(v_Normal, normalize(lightDirection));\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsDir[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = -spotLightPosition[i];\n vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n vec3 lightColor = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float c = dot(spotLightDirection, lightDirection);\n float falloff;\n falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n float ndl = dot(v_Normal, lightDirection);\n ndl = clamp(ndl, 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n }\n#endif\n gl_FragColor.rgb *= diffuseColor;\n gl_FragColor.rgb += emission;\n if(lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var lambertEssl = "\n@export clay.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.lambert.fragment\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.plugin.compute_shadow_map\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n gl_FragColor.a *= tex.a;\n#endif\n#endif\n vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {\n diffuseColor += ambientLightColor[_idx_];\n }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if( shadowEnabled )\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = pointLightPosition[i];\n vec3 lightColor = pointLightColor[i];\n float range = pointLightRange[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float ndl = dot( v_Normal, lightDirection );\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsPoint[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n {\n vec3 lightDirection = -directionalLightDirection[i];\n vec3 lightColor = directionalLightColor[i];\n float ndl = dot(v_Normal, normalize(lightDirection));\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsDir[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = -spotLightPosition[i];\n vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n vec3 lightColor = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float c = dot(spotLightDirection, lightDirection);\n float falloff;\n falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n float ndl = dot(v_Normal, lightDirection);\n ndl = clamp(ndl, 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n }\n#endif\n gl_FragColor.rgb *= diffuseColor;\n gl_FragColor.rgb += emission;\n if(lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
 var wireframeEssl = "@export clay.wireframe.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );\n v_Barycentric = barycentric;\n}\n@end\n@export clay.wireframe.fragment\nuniform vec3 color : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\nuniform float lineWidth : 1.0;\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\nvoid main()\n{\n gl_FragColor.rgb = color;\n gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;\n}\n@end";
 
@@ -21561,8 +21689,8 @@ function () {
                 }
             });
             util$1.defaults(parameters, {
-                wrapS: Texture$1.REPEAT,
-                wrapT: Texture$1.REPEAT,
+                wrapS: Texture.REPEAT,
+                wrapT: Texture.REPEAT,
                 flipY: this.textureFlipY,
                 convertToPOT: this.textureConvertToPOT
             });
@@ -22332,9 +22460,7 @@ var PointLight = Light.extend(/** @lends clay.light.Point# */ {
  * @constructor clay.light.Spot
  * @extends clay.Light
  */
-var SpotLight = Light.extend(
-/**@lends clay.light.Spot */
-{
+var SpotLight = Light.extend(/**@lends clay.light.Spot */ {
     /**
      * @type {number}
      */
@@ -22354,12 +22480,12 @@ var SpotLight = Light.extend(
     /**
      * @type {number}
      */
-    shadowBias: 0.0002,
+    shadowBias: 0.001,
     /**
      * @type {number}
      */
     shadowSlopeScale: 2.0
-},{
+}, {
 
     type: 'SPOT_LIGHT',
 
@@ -22635,7 +22761,7 @@ var FrameBuffer = Base.extend(
                 var texture = obj.texture;
                 // FIXME some texture format can't generate mipmap
                 if (!texture.NPOT && texture.useMipmap
-                    && texture.minFilter === Texture$1.LINEAR_MIPMAP_LINEAR) {
+                    && texture.minFilter === Texture.LINEAR_MIPMAP_LINEAR) {
                     var target = texture.textureType === 'textureCube' ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
                     _gl.bindTexture(target, texture.getWebGLTexture(renderer));
                     _gl.generateMipmap(target);
@@ -22864,17 +22990,17 @@ var Pass = Base.extend(function () {
          * @type {string}
          */
         // PENDING shader or fragment ?
-        fragment : '',
+        fragment: '',
 
         /**
          * @type {Object}
          */
-        outputs : null,
+        outputs: null,
 
         /**
          * @type {clay.Material}
          */
-        material : null,
+        material: null,
 
         /**
          * @type {Boolean}
@@ -23446,15 +23572,15 @@ var ret = {
         switch(fourCC) {
             case FOURCC_DXT1:
                 blockBytes = 8;
-                internalFormat = Texture$1.COMPRESSED_RGB_S3TC_DXT1_EXT;
+                internalFormat = Texture.COMPRESSED_RGB_S3TC_DXT1_EXT;
                 break;
             case FOURCC_DXT3:
                 blockBytes = 16;
-                internalFormat = Texture$1.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                internalFormat = Texture.COMPRESSED_RGBA_S3TC_DXT3_EXT;
                 break;
             case FOURCC_DXT5:
                 blockBytes = 16;
-                internalFormat = Texture$1.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+                internalFormat = Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT;
                 break;
             default:
                 return null;
@@ -23671,7 +23797,7 @@ var ret$1 = {
         texture.height = height;
         texture.pixels = pixels;
         // HALF_FLOAT can't use Float32Array
-        texture.type = Texture$1.FLOAT;
+        texture.type = Texture.FLOAT;
         return texture;
     },
 
@@ -23983,7 +24109,7 @@ var textureUtil = {
 
 var integrateBRDFShaderCode = "#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform sampler2D normalDistribution;\nuniform vec2 viewportSize : [512, 256];\nconst vec3 N = vec3(0.0, 0.0, 1.0);\nconst float fSampleNumber = float(SAMPLE_NUMBER);\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);\n vec3 tangentX = normalize(cross(N, upVector));\n vec3 tangentZ = cross(N, tangentX);\n return normalize(tangentX * H.x + N * H.y + tangentZ * H.z);\n}\nfloat G_Smith(float roughness, float NoV, float NoL) {\n float k = roughness * roughness / 2.0;\n float G1V = NoV / (NoV * (1.0 - k) + k);\n float G1L = NoL / (NoL * (1.0 - k) + k);\n return G1L * G1V;\n}\nvoid main() {\n vec2 uv = gl_FragCoord.xy / viewportSize;\n float NoV = uv.x;\n float roughness = uv.y;\n vec3 V;\n V.x = sqrt(1.0 - NoV * NoV);\n V.y = 0.0;\n V.z = NoV;\n float A = 0.0;\n float B = 0.0;\n for (int i = 0; i < SAMPLE_NUMBER; i++) {\n vec3 H = importanceSampleNormal(float(i) / fSampleNumber, roughness, N);\n vec3 L = reflect(-V, H);\n float NoL = clamp(L.z, 0.0, 1.0);\n float NoH = clamp(H.z, 0.0, 1.0);\n float VoH = clamp(dot(V, H), 0.0, 1.0);\n if (NoL > 0.0) {\n float G = G_Smith(roughness, NoV, NoL);\n float G_Vis = G * VoH / (NoH * NoV);\n float Fc = pow(1.0 - VoH, 5.0);\n A += (1.0 - Fc) * G_Vis;\n B += Fc * G_Vis;\n }\n }\n gl_FragColor = vec4(vec2(A, B) / fSampleNumber, 0.0, 1.0);\n}\n";
 
-var prefilterFragCode = "#define SHADER_NAME prefilter\n#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform sampler2D normalDistribution;\nuniform float roughness : 0.5;\nuniform int maxSampleNumber: 1024\nvarying vec2 v_Texcoord;\nvarying vec3 v_WorldPosition;\n@import clay.util.rgbm\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);\n vec3 tangentX = normalize(cross(N, upVector));\n vec3 tangentZ = cross(N, tangentX);\n return normalize(tangentX * H.x + N * H.y + tangentZ * H.z);\n}\nvoid main() {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = normalize(v_WorldPosition - eyePos);\n vec3 N = V;\n vec3 prefilteredColor = vec3(0.0);\n float totalWeight = 0.0;\n float fMaxSampleNumber = float(maxSampleNumber);\n for (int i = 0; i < SAMPLE_NUMBER; i++) {\n if (i > maxSampleNumber) {\n break;\n }\n vec3 H = importanceSampleNormal(float(i) / fMaxSampleNumber, roughness, N);\n vec3 L = reflect(-V, H);\n float NoL = clamp(dot(N, L), 0.0, 1.0);\n if (NoL > 0.0) {\n prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;\n totalWeight += NoL;\n }\n }\n gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));\n}\n";
+var prefilterFragCode = "#define SHADER_NAME prefilter\n#define SAMPLE_NUMBER 1024\n#define PI 3.14159265358979\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform samplerCube environmentMap;\nuniform sampler2D normalDistribution;\nuniform float roughness : 0.5;\nvarying vec2 v_Texcoord;\nvarying vec3 v_WorldPosition;\n@import clay.util.rgbm\nvec3 importanceSampleNormal(float i, float roughness, vec3 N) {\n vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;\n vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);\n vec3 tangentX = normalize(cross(N, upVector));\n vec3 tangentZ = cross(N, tangentX);\n return normalize(tangentX * H.x + N * H.y + tangentZ * H.z);\n}\nvoid main() {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = normalize(v_WorldPosition - eyePos);\n vec3 N = V;\n vec3 prefilteredColor = vec3(0.0);\n float totalWeight = 0.0;\n float fMaxSampleNumber = float(SAMPLE_NUMBER);\n for (int i = 0; i < SAMPLE_NUMBER; i++) {\n vec3 H = importanceSampleNormal(float(i) / fMaxSampleNumber, roughness, N);\n vec3 L = reflect(-V, H);\n float NoL = clamp(dot(N, L), 0.0, 1.0);\n if (NoL > 0.0) {\n prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;\n totalWeight += NoL;\n }\n }\n gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));\n}\n";
 
 // Cubemap prefilter utility
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
@@ -24057,8 +24183,8 @@ cubemapUtil.prefilterEnvironmentMap = function (
             width: width,
             height: height,
             // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
-            type: textureType === Texture$1.FLOAT ?
-                Texture$1.HALF_FLOAT : textureType
+            type: textureType === Texture.FLOAT ?
+                Texture.HALF_FLOAT : textureType
         });
         textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
             // PENDING encodeRGBM so it can be decoded as RGBM
@@ -24078,7 +24204,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
 
     // Force to be UNSIGNED_BYTE
     if (textureOpts.encodeRGBM) {
-        textureType = prefilteredCubeMap.type = Texture$1.UNSIGNED_BYTE;
+        textureType = prefilteredCubeMap.type = Texture.UNSIGNED_BYTE;
     }
 
     var renderTargetTmp = new Texture2D({
@@ -24089,18 +24215,13 @@ cubemapUtil.prefilterEnvironmentMap = function (
     var frameBuffer = new FrameBuffer({
         depthBuffer: false
     });
-    var ArrayCtor = vendor[textureType === Texture$1.UNSIGNED_BYTE ? 'Uint8Array' : 'Float32Array'];
+    var ArrayCtor = vendor[textureType === Texture.UNSIGNED_BYTE ? 'Uint8Array' : 'Float32Array'];
     for (var i = 0; i < mipmapNum; i++) {
         // console.time('prefilter');
         prefilteredCubeMap.mipmaps[i] = {
             pixels: {}
         };
-        skyEnv.material.set('roughness', i / (targets.length - 1));
-        var maxSampleNumber = renderTargetTmp.width * renderTargetTmp.height;
-        if (renderTargetTmp.width >= 32) {
-            maxSampleNumber /= 4;
-        }
-        skyEnv.material.set('maxSampleNumber', Math.min(maxSampleNumber, 1024));
+        skyEnv.material.set('roughness', i / (mipmapNum - 1));
 
         // Tweak fov
         // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
@@ -24117,7 +24238,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
             renderer.render(dummyScene, camera);
             renderer.gl.readPixels(
                 0, 0, renderTargetTmp.width, renderTargetTmp.height,
-                Texture$1.RGBA, textureType, pixels
+                Texture.RGBA, textureType, pixels
             );
 
             // var canvas = document.createElement('canvas');
@@ -24169,9 +24290,11 @@ cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
     var texture = new Texture2D({
         width: 512,
         height: 256,
-        type: Texture$1.HALF_FLOAT,
-        minFilter: Texture$1.NEAREST,
-        magFilter: Texture$1.NEAREST,
+        type: Texture.HALF_FLOAT,
+        wrapS: Texture.CLAMP_TO_EDGE,
+        wrapT: Texture.CLAMP_TO_EDGE,
+        minFilter: Texture.NEAREST,
+        magFilter: Texture.NEAREST,
         useMipmap: false
     });
     pass.setUniform('normalDistribution', normalDistribution);
@@ -24207,11 +24330,11 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
     var normalDistribution = new Texture2D({
         width: roughnessLevels,
         height: sampleSize,
-        type: Texture$1.FLOAT,
-        minFilter: Texture$1.NEAREST,
-        magFilter: Texture$1.NEAREST,
-        wrapS: Texture$1.CLAMP_TO_EDGE,
-        wrapT: Texture$1.CLAMP_TO_EDGE,
+        type: Texture.FLOAT,
+        minFilter: Texture.NEAREST,
+        magFilter: Texture.NEAREST,
+        wrapS: Texture.CLAMP_TO_EDGE,
+        wrapT: Texture.CLAMP_TO_EDGE,
         useMipmap: false
     });
     var pixels = new Float32Array(sampleSize * roughnessLevels * 4);
@@ -24310,6 +24433,10 @@ var AmbientCubemapLight = Light.extend({
         this.cubemap.__prefiltered = true;
 
         cubemap.dispose(renderer);
+    },
+
+    getBRDFLookup: function () {
+        return this._brdfLookup;
     },
 
     uniformTemplates: {
@@ -24499,13 +24626,38 @@ function isPowerOfTwo$2(width, height) {
             (height & (height-1)) === 0;
 }
 
-var shadowmapEssl = "@export clay.sm.depth.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n#ifdef SHADOW_TRANSPARENT\nattribute vec2 texcoord : TEXCOORD_0;\n#endif\n@import clay.chunk.skinning_header\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nvoid main(){\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n gl_Position = v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\n v_Texcoord = texcoord;\n#endif\n}\n@end\n@export clay.sm.depth.fragment\nvarying vec4 v_ViewPosition;\n#ifdef SHADOW_TRANSPARENT\nvarying vec2 v_Texcoord;\n#endif\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\n#ifdef SHADOW_TRANSPARENT\nuniform sampler2D transparentMap;\n#endif\n@import clay.util.encode_float\nvoid main(){\n float depth = v_ViewPosition.z / v_ViewPosition.w;\n#ifdef USE_VSM\n depth = depth * 0.5 + 0.5;\n float moment1 = depth;\n float moment2 = depth * depth;\n float dx = dFdx(depth);\n float dy = dFdy(depth);\n moment2 += 0.25*(dx*dx+dy*dy);\n gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n float dx = dFdx(depth);\n float dy = dFdy(depth);\n depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n#ifdef SHADOW_TRANSPARENT\n if (texture2D(transparentMap, v_Texcoord).a <= 0.1) {\n gl_FragColor = encodeFloat(0.9999);\n return;\n }\n#endif\n gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n@export clay.sm.debug_depth\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n@import clay.util.decode_float\nvoid main() {\n vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n float depth = decodeFloat(tex);\n gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n@end\n@export clay.sm.distance.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvarying vec3 v_WorldPosition;\nvoid main (){\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n@end\n@export clay.sm.distance.fragment\nuniform vec3 lightPosition;\nuniform float range : 100;\nvarying vec3 v_WorldPosition;\n@import clay.util.encode_float\nvoid main(){\n float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n dist = dist / range;\n gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n@export clay.plugin.shadow_map_common\n@import clay.util.decode_float\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n vec4 tex = texture2D(map, uv);\n return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n float shadowContrib = tapShadowMap(map, uv, z);\n vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n }}\n return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#else\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n return shadowContrib / 9.0;\n#endif\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n return pcf(map, uv, z, textureSize, vec2(1.0));\n}\nfloat chebyshevUpperBound(vec2 moments, float z){\n float p = 0.0;\n z = z * 0.5 + 0.5;\n if (z <= moments.x) {\n p = 1.0;\n }\n float variance = moments.y - moments.x * moments.x;\n variance = max(variance, 0.0000001);\n float mD = moments.x - z;\n float pMax = variance / (variance + mD * mD);\n pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n return max(p, pMax);\n}\nfloat computeShadowContrib(\n sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n posInLightSpace.xyz /= posInLightSpace.w;\n float z = posInLightSpace.z;\n if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n #ifdef USE_VSM\n vec2 moments = texture2D(map, uv * scale + offset).xy;\n return chebyshevUpperBound(moments, z);\n #else\n return pcf(map, uv * scale + offset, z, textureSize, scale);\n #endif\n }\n return 1.0;\n}\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n float dist = length(direction);\n vec4 shadowTex = textureCube(map, direction);\n#ifdef USE_VSM\n vec2 moments = shadowTex.xy;\n float variance = moments.y - moments.x * moments.x;\n float mD = moments.x - dist;\n float p = variance / (variance + mD * mD);\n if(moments.x + 0.001 < dist){\n return clamp(p, 0.0, 1.0);\n }else{\n return 1.0;\n }\n#else\n return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n@end\n@export clay.plugin.compute_shadow_map\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1]:unconfigurable;\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE]:unconfigurable;\nuniform float directionalLightShadowMapSizes[1]:unconfigurable;\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE]:unconfigurable;\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE]:unconfigurable;\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#endif\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\nuniform bool shadowEnabled : true;\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n@import clay.plugin.shadow_map_common\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n spotLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n#ifdef SHADOW_CASCADE\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n / (gl_DepthRange.far - gl_DepthRange.near);\n float shadowContrib;\n shadowContribs[0] = 1.0;\n for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n if (\n depth >= shadowCascadeClipsNear[_idx_] &&\n depth <= shadowCascadeClipsFar[_idx_]\n ) {\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[0],\n vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n );\n shadowContribs[0] = shadowContrib;\n }\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#else\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n vec3 lightPosition;\n vec3 direction;\n for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n lightPosition = pointLightPosition[_idx_];\n direction = position - lightPosition;\n shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n }}\n for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n@end";
+var shadowmapEssl = "@export clay.sm.depth.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n@import clay.chunk.skinning_header\nvarying vec4 v_ViewPosition;\nvarying vec2 v_Texcoord;\nvoid main(){\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n gl_Position = v_ViewPosition;\n v_Texcoord = texcoord;\n}\n@end\n@export clay.sm.depth.fragment\nvarying vec4 v_ViewPosition;\nvarying vec2 v_Texcoord;\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\n@import clay.util.encode_float\nvoid main(){\n float depth = v_ViewPosition.z / v_ViewPosition.w;\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {\n discard;\n }\n }\n#ifdef USE_VSM\n depth = depth * 0.5 + 0.5;\n float moment1 = depth;\n float moment2 = depth * depth;\n float dx = dFdx(depth);\n float dy = dFdy(depth);\n moment2 += 0.25*(dx*dx+dy*dy);\n gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);\n#else\n float dx = dFdx(depth);\n float dy = dFdy(depth);\n depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n#endif\n}\n@end\n@export clay.sm.debug_depth\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n@import clay.util.decode_float\nvoid main() {\n vec4 tex = texture2D(depthMap, v_Texcoord);\n#ifdef USE_VSM\n gl_FragColor = vec4(tex.rgb, 1.0);\n#else\n float depth = decodeFloat(tex);\n gl_FragColor = vec4(depth, depth, depth, 1.0);\n#endif\n}\n@end\n@export clay.sm.distance.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvarying vec3 v_WorldPosition;\nvoid main (){\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n}\n@end\n@export clay.sm.distance.fragment\nuniform vec3 lightPosition;\nuniform float range : 100;\nvarying vec3 v_WorldPosition;\n@import clay.util.encode_float\nvoid main(){\n float dist = distance(lightPosition, v_WorldPosition);\n#ifdef USE_VSM\n gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);\n#else\n dist = dist / range;\n gl_FragColor = encodeFloat(dist);\n#endif\n}\n@end\n@export clay.plugin.shadow_map_common\n@import clay.util.decode_float\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n vec4 tex = texture2D(map, uv);\n return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n float shadowContrib = tapShadowMap(map, uv, z);\n vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n }}\n return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#else\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n return shadowContrib / 9.0;\n#endif\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n return pcf(map, uv, z, textureSize, vec2(1.0));\n}\nfloat chebyshevUpperBound(vec2 moments, float z){\n float p = 0.0;\n z = z * 0.5 + 0.5;\n if (z <= moments.x) {\n p = 1.0;\n }\n float variance = moments.y - moments.x * moments.x;\n variance = max(variance, 0.0000001);\n float mD = moments.x - z;\n float pMax = variance / (variance + mD * mD);\n pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);\n return max(p, pMax);\n}\nfloat computeShadowContrib(\n sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n posInLightSpace.xyz /= posInLightSpace.w;\n float z = posInLightSpace.z;\n if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n #ifdef USE_VSM\n vec2 moments = texture2D(map, uv * scale + offset).xy;\n return chebyshevUpperBound(moments, z);\n #else\n return pcf(map, uv * scale + offset, z, textureSize, scale);\n #endif\n }\n return 1.0;\n}\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n float dist = length(direction);\n vec4 shadowTex = textureCube(map, direction);\n#ifdef USE_VSM\n vec2 moments = shadowTex.xy;\n float variance = moments.y - moments.x * moments.x;\n float mD = moments.x - dist;\n float p = variance / (variance + mD * mD);\n if(moments.x + 0.001 < dist){\n return clamp(p, 0.0, 1.0);\n }else{\n return 1.0;\n }\n#else\n return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n#endif\n}\n@end\n@export clay.plugin.compute_shadow_map\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1]:unconfigurable;\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE]:unconfigurable;\nuniform float directionalLightShadowMapSizes[1]:unconfigurable;\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE]:unconfigurable;\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE]:unconfigurable;\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#endif\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\nuniform bool shadowEnabled : true;\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n@import clay.plugin.shadow_map_common\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n spotLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n#ifdef SHADOW_CASCADE\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n / (gl_DepthRange.far - gl_DepthRange.near);\n float shadowContrib;\n shadowContribs[0] = 1.0;\n for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n if (\n depth >= shadowCascadeClipsNear[_idx_] &&\n depth <= shadowCascadeClipsFar[_idx_]\n ) {\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[0],\n vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n );\n shadowContribs[0] = shadowContrib;\n }\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#else\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n vec3 lightPosition;\n vec3 direction;\n for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n lightPosition = pointLightPosition[_idx_];\n direction = position - lightPosition;\n shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n }}\n for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n@end";
 
 var mat4$8 = glmatrix.mat4;
 
 var targets$2 = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 Shader['import'](shadowmapEssl);
+
+function getDepthMaterialUniform(renderable, depthMaterial, symbol) {
+    if (symbol === 'alphaMap') {
+        return renderable.material.get('diffuseMap');
+    }
+    else if (symbol === 'alphaCutoff') {
+        if (renderable.material.isDefined('fragment', 'ALPHA_TEST')
+            && renderable.material.get('diffuseMap')
+        ) {
+            var alphaCutoff = renderable.material.get('alphaCutoff');
+            return alphaCutoff || 0;
+        }
+        return 0;
+    }
+    else {
+        return depthMaterial.get(symbol);
+    }
+}
+
+function isDepthMaterialChanged(renderable, prevRenderable) {
+    var matA = renderable.material;
+    var matB = prevRenderable.material;
+    return matA.get('diffuseMap') !== matB.get('diffuseMap')
+        || (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0);
+}
 
 /**
  * Pass rendering shadow map.
@@ -24856,6 +25008,8 @@ var ShadowMapPass = Base.extend(function () {
                 getMaterial: function (renderable) {
                     return renderable.shadowDepthMaterial || defaultShadowMaterial;
                 },
+                isMaterialChanged: isDepthMaterialChanged,
+                getUniform: getDepthMaterialUniform,
                 ifRender: function (renderable) {
                     return renderable.castShadow;
                 },
@@ -24973,6 +25127,8 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
+            isMaterialChanged: isDepthMaterialChanged,
+            getUniform: getDepthMaterialUniform,
             ifRender: function (renderable) {
                 return renderable.castShadow;
             },
@@ -25008,6 +25164,7 @@ var ShadowMapPass = Base.extend(function () {
             getMaterial: function (renderable) {
                 return renderable.shadowDepthMaterial || defaultShadowMaterial;
             },
+            getUniform: getDepthMaterialUniform,
             sortCompare: Renderer.opaqueSortCompare
         };
 
@@ -25127,7 +25284,7 @@ var ShadowMapPass = Base.extend(function () {
         var parameter = {
             width: size,
             height: size,
-            type: Texture$1.FLOAT
+            type: Texture.FLOAT
         };
         var tmpTexture = this._texturePool.get(parameter);
 
@@ -25163,7 +25320,7 @@ var ShadowMapPass = Base.extend(function () {
             texture.width = resolution * cascade;
             texture.height = resolution;
             if (this.softShadow === ShadowMapPass.VSM) {
-                texture.type = Texture$1.FLOAT;
+                texture.type = Texture.FLOAT;
                 texture.anisotropic = 4;
             }
             else {
@@ -25761,7 +25918,7 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
         renderer.render(dummyScene, camera);
         renderer.gl.readPixels(
             0, 0, width, height,
-            Texture$1.RGBA, Texture$1.UNSIGNED_BYTE, cubePixels[targets$3[i]]
+            Texture.RGBA, Texture.UNSIGNED_BYTE, cubePixels[targets$3[i]]
         );
         framebuffer.unbind(renderer);
     }
@@ -25794,6 +25951,9 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement} ImageLike
  */
 /**
+ * @typedef {string|HTMLCanvasElement|HTMLImageElement|HTMLVideoElement|clay.Texture2D} TextureLike
+ */
+/**
  * @typedef {string|Array.<number>} Color
  */
 /**
@@ -25805,16 +25965,35 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {Function} init Initialization callback that will be called when initing app.
  *                      You can return a promise in init to start the loop asynchronously when the promise is resolved.
  * @property {Function} loop Loop callback that will be called each frame.
- * @property {Function} beforeRender
- * @property {Function} afterRender
+ * @property {boolean} [autoRender=true] If render automatically each frame.
+ * @property {Function} [beforeRender]
+ * @property {Function} [afterRender]
  * @property {number} [width] Container width.
  * @property {number} [height] Container height.
  * @property {number} [devicePixelRatio]
+ * @property {Object.<string, Function>} [methods] Methods that will be injected to App3D#methods.
  * @property {Object} [graphic] Graphic configuration including shadow, color space.
  * @property {boolean} [graphic.shadow=false] If enable shadow
  * @property {boolean} [graphic.linear=false] If use linear color space
  * @property {boolean} [graphic.tonemapping=false] If enable ACES tone mapping.
  * @property {boolean} [event=false] If enable mouse/touch event. It will slow down the system if geometries are complex.
+ */
+
+/**
+ * @typedef {Object} StandardMaterialMRConfig
+ * @property {string} [shader='standardMR']
+ * @property {Color} [color]
+ * @property {number} [alpha]
+ * @property {number} [metalness]
+ * @property {number} [roughness]
+ * @property {Color} [emission]
+ * @property {number} [emissionIntensity]
+ * @property {boolean} [transparent]
+ * @property {TextureLike} [diffuseMap]
+ * @property {TextureLike} [normalMap]
+ * @property {TextureLike} [roughnessMap]
+ * @property {TextureLike} [metalnessMap]
+ * @property {TextureLike} [emissiveMap]
  */
 
 /**
@@ -25859,6 +26038,10 @@ function App3D(dom, appNS) {
     appNS = appNS || {};
     appNS.graphic = appNS.graphic || {};
 
+    if (appNS.autoRender == null) {
+        appNS.autoRender = true;
+    }
+
     if (typeof dom === 'string') {
         dom = document.querySelector(dom);
     }
@@ -25890,6 +26073,11 @@ function App3D(dom, appNS) {
     var gElapsedTime = 0;
 
     gTimeline.start();
+
+    var userMethods = {};
+    for (var key in appNS.methods) {
+        userMethods[key] = appNS.methods[key].bind(appNS, this);
+    }
 
     Object.defineProperties(this, {
         /**
@@ -25924,7 +26112,31 @@ function App3D(dom, appNS) {
          * @name clay.application.App3D#elapsedTime
          * @type {number}
          */
-        elapsedTime: { get: function () { return gElapsedTime; }}
+        elapsedTime: { get: function () { return gElapsedTime; }},
+
+        /**
+         * Width of viewport.
+         * @name clay.application.App3D#width
+         * @type {number}
+         */
+        width: { get: function () { return gRenderer.getWidth(); }},
+        /**
+         * Height of viewport.
+         * @name clay.application.App3D#height
+         * @type {number}
+         */
+        height: { get: function () { return gRenderer.getHeight(); }},
+
+        /**
+         * Methods from
+         * @name clay.application.App3D#height
+         * @type {number}
+         */
+        methods: { get: function () { return userMethods; } },
+
+        _shadowPass: { get: function () { return gShadowPass; } },
+
+        _appNS: { get: function () { return appNS; } },
     });
 
     /**
@@ -25965,13 +26177,14 @@ function App3D(dom, appNS) {
     this._geoCache = new LRU$1(20);
     this._texCache = new LRU$1(20);
 
+    // GPU Resources.
+    this._texturesList = {};
+    this._geometriesList = {};
+
     // Do init the application.
     var initPromise = Promise.resolve(appNS.init && appNS.init(this));
     // Use the inited camera.
     gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
-
-    var gTexturesList = {};
-    var gGeometriesList = {};
 
     if (!appNS.loop) {
         console.warn('Miss loop method.');
@@ -25979,46 +26192,32 @@ function App3D(dom, appNS) {
 
     var self = this;
     initPromise.then(function () {
-        appNS.loop && gTimeline.on('frame', function (frameTime) {
+        gTimeline.on('frame', function (frameTime) {
             gFrameTime = frameTime;
             gElapsedTime += frameTime;
-            appNS.loop(self);
 
-            gScene.update();
-            var skyboxList = [];
-            gScene.skybox && skyboxList.push(gScene.skybox);
-            gScene.skydome && skyboxList.push(gScene.skydome);
-            self._updateGraphicOptions(appNS.graphic, skyboxList, true);
+            var camera = gScene.getMainCamera();
+            if (camera) {
+                camera.aspect = gRenderer.getViewportAspect();
+            }
+            gRayPicking && (gRayPicking.camera = camera);
 
-            gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
-            // Render shadow pass
-            gShadowPass && gShadowPass.render(gRenderer, gScene, null, true);
+            appNS.loop && appNS.loop(self);
 
-            appNS.beforeRender && appNS.beforeRender(self);
-            self._doRender(gRenderer, gScene, true);
-            appNS.afterRender && appNS.afterRender(self);
+            if (appNS.autoRender) {
+                self.render();
+            }
 
-            // Mark all resources unused;
-            markUnused(gTexturesList);
-            markUnused(gGeometriesList);
-
-            // Collect resources used in this frame.
-            var newTexturesList = [];
-            var newGeometriesList = [];
-            collectResources(gScene, newTexturesList, newGeometriesList);
-
-            // Dispose those unsed resources.
-            checkAndDispose(gRenderer, gTexturesList);
-            checkAndDispose(gRenderer, gGeometriesList);
-
-            gTexturesList = newTexturesList;
-            gGeometriesList = newGeometriesList;
-        });
+            self.collectResources();
+        }, this);
     });
 
     gScene.on('beforerender', function (renderer, scene, camera, renderList) {
-        this._updateGraphicOptions(appNS.graphic, renderList.opaque, false);
-        this._updateGraphicOptions(appNS.graphic, renderList.transparent, false);
+        if (this._inRender) {
+            // Only update graphic options when using #render function.
+            this._updateGraphicOptions(appNS.graphic, renderList.opaque, false);
+            this._updateGraphicOptions(appNS.graphic, renderList.transparent, false);
+        }
     }, this);
 }
 
@@ -26164,8 +26363,56 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
 
 App3D.prototype._doRender = function (renderer, scene) {
     var camera = scene.getMainCamera();
-    camera.aspect = renderer.getViewportAspect();
     renderer.render(scene, camera, true);
+};
+
+/**
+ * Do render
+ */
+App3D.prototype.render = function () {
+    this._inRender = true;
+    var appNS = this._appNS;
+    appNS.beforeRender && appNS.beforeRender(self);
+
+    var scene = this.scene;
+    var renderer = this.renderer;
+    var shadowPass = this._shadowPass;
+
+    scene.update();
+    var skyboxList = [];
+    scene.skybox && skyboxList.push(scene.skybox);
+    scene.skydome && skyboxList.push(scene.skydome);
+
+    this._updateGraphicOptions(appNS.graphic, skyboxList, true);
+    // Render shadow pass
+    shadowPass && shadowPass.render(renderer, scene, null, true);
+
+    this._doRender(renderer, scene, true);
+
+    appNS.afterRender && appNS.afterRender(self);
+    this._inRender = false;
+};
+
+App3D.prototype.collectResources = function () {
+    var renderer = this.renderer;
+    var scene = this.scene;
+    var texturesList = this._texturesList;
+    var geometriesList = this._geometriesList;
+    // Mark all resources unused;
+    markUnused(texturesList);
+    markUnused(geometriesList);
+
+    // Collect resources used in this frame.
+    var newTexturesList = [];
+    var newGeometriesList = [];
+    collectResources(scene, newTexturesList, newGeometriesList);
+
+    // Dispose those unsed resources.
+    checkAndDispose(renderer, texturesList);
+    checkAndDispose(renderer, geometriesList);
+
+    this._texturesList = newTexturesList;
+    this._geometriesList = newGeometriesList;
 };
 
 
@@ -26399,11 +26646,11 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
 
 /**
  * Create a material.
- * @param {Object} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
+ * @param {Object|StandardMaterialMRConfig} materialConfig. materialConfig contains `shader`, `transparent` and uniforms that used in corresponding uniforms.
  *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
  * @param {string|clay.Shader} [shader='clay.standardMR'] Default to be standard shader with metalness and roughness workflow.
  * @param {boolean} [transparent=false] If material is transparent.
- * @param {boolean} [convertTextureToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
+ * @param {boolean} [textureConvertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {boolean} [textureFlipY=true] If flip y of texture.
  * @return {clay.Material}
  */
@@ -26423,11 +26670,11 @@ App3D.prototype.createMaterial = function (matConfig) {
         if (material.uniforms[key]) {
             var val = matConfig[key];
             if ((material.uniforms[key].type === 't' || isImageLikeElement(val))
-                && !(val instanceof Texture$1)
+                && !(val instanceof Texture)
             ) {
                 // Try to load a texture.
                 this.loadTexture(val, {
-                    convertToPOT: matConfig.convertTextureToPOT || false,
+                    convertToPOT: matConfig.textureConvertToPOT || false,
                     flipY: matConfig.textureFlipY == null ? true : matConfig.textureFlipY
                 }).then(makeTextureSetter(key));
             }
@@ -26861,7 +27108,7 @@ App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, d
  * @param {boolean} [opts.autoPlayAnimation=true] If autoplay the animation of model.
  * @param {boolean} [opts.upAxis='y'] Change model to y up if upAxis is 'z'
  * @param {boolean} [opts.textureFlipY=false]
- * @param {boolean} [opts.convertTextureToPOT=false] If convert texture to power-of-two
+ * @param {boolean} [opts.textureConvertToPOT=false] If convert texture to power-of-two
  * @param {string} [opts.textureRootPath] Root path of texture. Default to be relative with glTF file.
  * @param {clay.Node} [parentNode] Parent node that model will be mounted. Default to be scene
  * @return {Promise}
@@ -26883,7 +27130,7 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
         textureRootPath: opts.textureRootPath,
         crossOrigin: 'Anonymous',
         textureFlipY: opts.textureFlipY,
-        convertTextureToPOT: opts.convertTextureToPOT
+        textureConvertToPOT: opts.textureConvertToPOT
     };
     if (opts.upAxis && opts.upAxis.toLowerCase() === 'z') {
         loaderOpts.rootNode.rotation.identity().rotateX(-Math.PI / 2);
@@ -28227,7 +28474,7 @@ var downsampleEssl = "@export clay.compositor.downsample\nuniform sampler2D text
 
 var upsampleEssl = "\n@export clay.compositor.upsample\n#define HIGH_QUALITY\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.clamp_sample\nvoid main()\n{\n#ifdef HIGH_QUALITY\n vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n vec4 s;\n s = decodeHDR(clampSample(texture, v_Texcoord - d.xy));\n s += decodeHDR(clampSample(texture, v_Texcoord - d.wy)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord - d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zw)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord )) * 4.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xw)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n gl_FragColor = encodeHDR(s / 16.0);\n#else\n vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n vec4 s;\n s = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n gl_FragColor = encodeHDR(s / 4.0);\n#endif\n}\n@end";
 
-var hdrEssl = "@export clay.compositor.hdr.composite\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n#ifdef COLOR_CORRECTION\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float saturation : 1.0;\n#endif\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvec3 ACESToneMapping(vec3 color)\n{\n const float A = 2.51;\n const float B = 0.03;\n const float C = 2.43;\n const float D = 0.59;\n const float E = 0.14;\n return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\nfloat eyeAdaption(float fLum)\n{\n return mix(0.2, fLum, 0.5);\n}\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n float blueColor = color.b * 63.0;\n vec2 quad1;\n quad1.y = floor(floor(blueColor) / 8.0);\n quad1.x = floor(blueColor) - (quad1.y * 8.0);\n vec2 quad2;\n quad2.y = floor(ceil(blueColor) / 8.0);\n quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n vec2 texPos1;\n texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n vec2 texPos2;\n texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n vec4 newColor1 = texture2D(lut, texPos1);\n vec4 newColor2 = texture2D(lut, texPos2);\n vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n return newColor.rgb;\n}\n#endif\n@import clay.util.rgbm\nvoid main()\n{\n vec4 texel = vec4(0.0);\n vec4 originalTexel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n texel = decodeHDR(texture2D(texture, v_Texcoord));\n originalTexel = texel;\n#endif\n#ifdef BLOOM_ENABLED\n vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));\n texel.rgb += bloomTexel.rgb * bloomIntensity;\n texel.a += bloomTexel.a * bloomIntensity;\n#endif\n#ifdef LENSFLARE_ENABLED\n texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n texel.a = min(texel.a, 1.0);\n#ifdef LUM_ENABLED\n float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n float exposureBias = adaptedLumDest * exposure;\n#else\n float exposureBias = exposure;\n#endif\n texel.rgb *= exposureBias;\n texel.rgb = ACESToneMapping(texel.rgb);\n texel = linearTosRGB(texel);\n#ifdef LUT_ENABLED\n texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n#ifdef COLOR_CORRECTION\n texel.rgb = clamp(texel.rgb + vec3(brightness), 0.0, 1.0);\n texel.rgb = clamp((texel.rgb - vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n float lum = dot(texel.rgb, vec3(0.2125, 0.7154, 0.0721));\n texel.rgb = mix(vec3(lum), texel.rgb, saturation);\n#endif\n#ifdef VIGNETTE\n vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n gl_FragColor = encodeHDR(texel);\n#ifdef DEBUG\n #if DEBUG == 1\n gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n #elif DEBUG == 2\n gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);\n #elif DEBUG == 3\n gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));\n #endif\n#endif\n if (originalTexel.a <= 0.01 && gl_FragColor.a > 1e-5) {\n gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));\n }\n#ifdef PREMULTIPLY_ALPHA\n gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
+var hdrEssl = "@export clay.compositor.hdr.composite\n#define TONEMAPPING\nuniform sampler2D texture;\n#ifdef BLOOM_ENABLED\nuniform sampler2D bloom;\n#endif\n#ifdef LENSFLARE_ENABLED\nuniform sampler2D lensflare;\nuniform sampler2D lensdirt;\n#endif\n#ifdef LUM_ENABLED\nuniform sampler2D lum;\n#endif\n#ifdef LUT_ENABLED\nuniform sampler2D lut;\n#endif\n#ifdef COLOR_CORRECTION\nuniform float brightness : 0.0;\nuniform float contrast : 1.0;\nuniform float saturation : 1.0;\n#endif\n#ifdef VIGNETTE\nuniform float vignetteDarkness: 1.0;\nuniform float vignetteOffset: 1.0;\n#endif\nuniform float exposure : 1.0;\nuniform float bloomIntensity : 0.25;\nuniform float lensflareIntensity : 1;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvec3 ACESToneMapping(vec3 color)\n{\n const float A = 2.51;\n const float B = 0.03;\n const float C = 2.43;\n const float D = 0.59;\n const float E = 0.14;\n return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\nfloat eyeAdaption(float fLum)\n{\n return mix(0.2, fLum, 0.5);\n}\n#ifdef LUT_ENABLED\nvec3 lutTransform(vec3 color) {\n float blueColor = color.b * 63.0;\n vec2 quad1;\n quad1.y = floor(floor(blueColor) / 8.0);\n quad1.x = floor(blueColor) - (quad1.y * 8.0);\n vec2 quad2;\n quad2.y = floor(ceil(blueColor) / 8.0);\n quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n vec2 texPos1;\n texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n vec2 texPos2;\n texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n vec4 newColor1 = texture2D(lut, texPos1);\n vec4 newColor2 = texture2D(lut, texPos2);\n vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n return newColor.rgb;\n}\n#endif\n@import clay.util.rgbm\nvoid main()\n{\n vec4 texel = vec4(0.0);\n vec4 originalTexel = vec4(0.0);\n#ifdef TEXTURE_ENABLED\n texel = decodeHDR(texture2D(texture, v_Texcoord));\n originalTexel = texel;\n#endif\n#ifdef BLOOM_ENABLED\n vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));\n texel.rgb += bloomTexel.rgb * bloomIntensity;\n texel.a += bloomTexel.a * bloomIntensity;\n#endif\n#ifdef LENSFLARE_ENABLED\n texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;\n#endif\n texel.a = min(texel.a, 1.0);\n#ifdef LUM_ENABLED\n float fLum = texture2D(lum, vec2(0.5, 0.5)).r;\n float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));\n float exposureBias = adaptedLumDest * exposure;\n#else\n float exposureBias = exposure;\n#endif\n#ifdef TONEMAPPING\n texel.rgb *= exposureBias;\n texel.rgb = ACESToneMapping(texel.rgb);\n#endif\n texel = linearTosRGB(texel);\n#ifdef LUT_ENABLED\n texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));\n#endif\n#ifdef COLOR_CORRECTION\n texel.rgb = clamp(texel.rgb + vec3(brightness), 0.0, 1.0);\n texel.rgb = clamp((texel.rgb - vec3(0.5))*contrast+vec3(0.5), 0.0, 1.0);\n float lum = dot(texel.rgb, vec3(0.2125, 0.7154, 0.0721));\n texel.rgb = mix(vec3(lum), texel.rgb, saturation);\n#endif\n#ifdef VIGNETTE\n vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(vignetteOffset);\n texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));\n#endif\n gl_FragColor = encodeHDR(texel);\n#ifdef DEBUG\n #if DEBUG == 1\n gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));\n #elif DEBUG == 2\n gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);\n #elif DEBUG == 3\n gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));\n #endif\n#endif\n if (originalTexel.a <= 0.01 && gl_FragColor.a > 1e-5) {\n gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));\n }\n#ifdef PREMULTIPLY_ALPHA\n gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
 
 var dofEssl = "@export clay.compositor.dof.coc\nuniform sampler2D depth;\nuniform float zNear: 0.1;\nuniform float zFar: 2000;\nuniform float focalDist: 3;\nuniform float focalRange: 1;\nuniform float focalLength: 30;\nuniform float fstop: 2.8;\nvarying vec2 v_Texcoord;\n@import clay.util.encode_float\nvoid main()\n{\n float z = texture2D(depth, v_Texcoord).r * 2.0 - 1.0;\n float dist = 2.0 * zNear * zFar / (zFar + zNear - z * (zFar - zNear));\n float aperture = focalLength / fstop;\n float coc;\n float uppper = focalDist + focalRange;\n float lower = focalDist - focalRange;\n if (dist <= uppper && dist >= lower) {\n coc = 0.5;\n }\n else {\n float focalAdjusted = dist > uppper ? uppper : lower;\n coc = abs(aperture * (focalLength * (dist - focalAdjusted)) / (dist * (focalAdjusted - focalLength)));\n coc = clamp(coc, 0.0, 0.4) / 0.4000001;\n if (dist < lower) {\n coc = -coc;\n }\n coc = coc * 0.5 + 0.5;\n }\n gl_FragColor = encodeFloat(coc);\n}\n@end\n@export clay.compositor.dof.premultiply\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nvoid main() {\n float fCoc = max(abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0), 0.1);\n gl_FragColor = encodeHDR(\n vec4(decodeHDR(texture2D(texture, v_Texcoord)).rgb * fCoc, 1.0)\n );\n}\n@end\n@export clay.compositor.dof.min_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.float\nvoid main()\n{\n vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n fCoc = min(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export clay.compositor.dof.max_coc\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.float\nvoid main()\n{\n vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n float fCoc = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zy)));\n fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.xw)));\n fCoc = max(fCoc, decodeFloat(texture2D(coc, v_Texcoord + d.zw)));\n gl_FragColor = encodeFloat(fCoc);\n}\n@end\n@export clay.compositor.dof.coc_upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.float\nvoid main()\n{\n#ifdef HIGH_QUALITY\n vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n float s;\n s = decodeFloat(texture2D(coc, v_Texcoord - d.xy));\n s += decodeFloat(texture2D(coc, v_Texcoord - d.wy)) * 2.0;\n s += decodeFloat(texture2D(coc, v_Texcoord - d.zy));\n s += decodeFloat(texture2D(coc, v_Texcoord + d.zw)) * 2.0;\n s += decodeFloat(texture2D(coc, v_Texcoord )) * 4.0;\n s += decodeFloat(texture2D(coc, v_Texcoord + d.xw)) * 2.0;\n s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n s += decodeFloat(texture2D(coc, v_Texcoord + d.wy)) * 2.0;\n s += decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n gl_FragColor = encodeFloat(s / 16.0);\n#else\n vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n float s;\n s = decodeFloat(texture2D(coc, v_Texcoord + d.xy));\n s += decodeFloat(texture2D(coc, v_Texcoord + d.zy));\n s += decodeFloat(texture2D(coc, v_Texcoord + d.xw));\n s += decodeFloat(texture2D(coc, v_Texcoord + d.zw));\n gl_FragColor = encodeFloat(s / 4.0);\n#endif\n}\n@end\n@export clay.compositor.dof.upsample\n#define HIGH_QUALITY\nuniform sampler2D coc;\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nfloat tap(vec2 uv, inout vec4 color, float baseWeight) {\n float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * baseWeight;\n color += decodeHDR(texture2D(texture, uv)) * weight;\n return weight;\n}\nvoid main()\n{\n#ifdef HIGH_QUALITY\n vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n vec4 color = vec4(0.0);\n float baseWeight = 1.0 / 16.0;\n float w = tap(v_Texcoord - d.xy, color, baseWeight);\n w += tap(v_Texcoord - d.wy, color, baseWeight * 2.0);\n w += tap(v_Texcoord - d.zy, color, baseWeight);\n w += tap(v_Texcoord + d.zw, color, baseWeight * 2.0);\n w += tap(v_Texcoord , color, baseWeight * 4.0);\n w += tap(v_Texcoord + d.xw, color, baseWeight * 2.0);\n w += tap(v_Texcoord + d.zy, color, baseWeight);\n w += tap(v_Texcoord + d.wy, color, baseWeight * 2.0);\n w += tap(v_Texcoord + d.xy, color, baseWeight);\n gl_FragColor = encodeHDR(color / w);\n#else\n vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n vec4 color = vec4(0.0);\n float baseWeight = 1.0 / 4.0;\n float w = tap(v_Texcoord + d.xy, color, baseWeight);\n w += tap(v_Texcoord + d.zy, color, baseWeight);\n w += tap(v_Texcoord + d.xw, color, baseWeight);\n w += tap(v_Texcoord + d.zw, color, baseWeight);\n gl_FragColor = encodeHDR(color / w);\n#endif\n}\n@end\n@export clay.compositor.dof.downsample\nuniform sampler2D texture;\nuniform sampler2D coc;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.decode_float\nfloat tap(vec2 uv, inout vec4 color) {\n float weight = abs(decodeFloat(texture2D(coc, uv)) * 2.0 - 1.0) * 0.25;\n color += decodeHDR(texture2D(texture, uv)) * weight;\n return weight;\n}\nvoid main()\n{\n vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n vec4 color = vec4(0.0);\n float weight = tap(v_Texcoord + d.xy, color);\n weight += tap(v_Texcoord + d.zy, color);\n weight += tap(v_Texcoord + d.xw, color);\n weight += tap(v_Texcoord + d.zw, color);\n color /= weight;\n gl_FragColor = encodeHDR(color);\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_frag\n@import clay.util.float\nvec4 doBlur(sampler2D targetTexture, vec2 offset) {\n#ifdef BLUR_COC\n float cocSum = 0.0;\n#else\n vec4 color = vec4(0.0);\n#endif\n float weightSum = 0.0;\n float kernelWeight = 1.0 / float(KERNEL_SIZE);\n for (int i = 0; i < KERNEL_SIZE; i++) {\n vec2 coord = v_Texcoord + offset * float(i);\n float w = kernelWeight;\n#ifdef BLUR_COC\n float fCoc = decodeFloat(texture2D(targetTexture, coord)) * 2.0 - 1.0;\n cocSum += clamp(fCoc, -1.0, 0.0) * w;\n#else\n float fCoc = decodeFloat(texture2D(coc, coord)) * 2.0 - 1.0;\n vec4 texel = texture2D(targetTexture, coord);\n #if !defined(BLUR_NEARFIELD)\n w *= abs(fCoc);\n #endif\n color += decodeHDR(texel) * w;\n#endif\n weightSum += w;\n }\n#ifdef BLUR_COC\n return encodeFloat(clamp(cocSum / weightSum, -1.0, 0.0) * 0.5 + 0.5);\n#else\n return color / weightSum;\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_1\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n gl_FragColor = doBlur(texture, vec2(0.0, offset.y));\n#if !defined(BLUR_COC)\n gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_2\n#define KERNEL_SIZE 5\nuniform sampler2D texture;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n offset.y /= 2.0;\n gl_FragColor = doBlur(texture, -offset);\n#if !defined(BLUR_COC)\n gl_FragColor = encodeHDR(gl_FragColor);\n#endif\n}\n@end\n@export clay.compositor.dof.hexagonal_blur_3\n#define KERNEL_SIZE 5\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform sampler2D coc;\nvarying vec2 v_Texcoord;\nuniform float blurSize : 1.0;\nuniform vec2 textureSize : [512.0, 512.0];\n@import clay.util.rgbm\n@import clay.compositor.dof.hexagonal_blur_frag\nvoid main()\n{\n vec2 offset = blurSize / textureSize;\n#if !defined(BLUR_NEARFIELD) && !defined(BLUR_COC)\n offset *= abs(decodeFloat(texture2D(coc, v_Texcoord)) * 2.0 - 1.0);\n#endif\n offset.y /= 2.0;\n vec2 vDownRight = vec2(offset.x, -offset.y);\n vec4 texel1 = doBlur(texture1, -offset);\n vec4 texel2 = doBlur(texture1, vDownRight);\n vec4 texel3 = doBlur(texture2, vDownRight);\n#ifdef BLUR_COC\n float coc1 = decodeFloat(texel1) * 2.0 - 1.0;\n float coc2 = decodeFloat(texel2) * 2.0 - 1.0;\n float coc3 = decodeFloat(texel3) * 2.0 - 1.0;\n gl_FragColor = encodeFloat(\n ((coc1 + coc2 + coc3) / 3.0) * 0.5 + 0.5\n );\n#else\n vec4 color = (texel1 + texel2 + texel3) / 3.0;\n gl_FragColor = encodeHDR(color);\n#endif\n}\n@end\n@export clay.compositor.dof.composite\n#define DEBUG 0\nuniform sampler2D original;\nuniform sampler2D blurred;\nuniform sampler2D nearfield;\nuniform sampler2D coc;\nuniform sampler2D nearcoc;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.float\nvoid main()\n{\n vec4 blurredColor = decodeHDR(texture2D(blurred, v_Texcoord));\n vec4 originalColor = decodeHDR(texture2D(original, v_Texcoord));\n float fCoc = decodeFloat(texture2D(coc, v_Texcoord));\n fCoc = abs(fCoc * 2.0 - 1.0);\n float weight = smoothstep(0.0, 1.0, fCoc);\n#ifdef NEARFIELD_ENABLED\n vec4 nearfieldColor = decodeHDR(texture2D(nearfield, v_Texcoord));\n float fNearCoc = decodeFloat(texture2D(nearcoc, v_Texcoord));\n fNearCoc = abs(fNearCoc * 2.0 - 1.0);\n gl_FragColor = encodeHDR(\n mix(\n nearfieldColor, mix(originalColor, blurredColor, weight),\n pow(1.0 - fNearCoc, 4.0)\n )\n );\n#else\n gl_FragColor = encodeHDR(mix(originalColor, blurredColor, weight));\n#endif\n#if DEBUG == 1\n gl_FragColor = vec4(vec3(fCoc), 1.0);\n#elif DEBUG == 2\n gl_FragColor = vec4(vec3(fNearCoc), 1.0);\n#elif DEBUG == 3\n gl_FragColor = encodeHDR(blurredColor);\n#elif DEBUG == 4\n gl_FragColor = encodeHDR(nearfieldColor);\n#endif\n}\n@end";
 
@@ -28418,7 +28665,7 @@ function convertParameter(paramInfo) {
             if (val != null) {
                 // Convert string to enum
                 if (typeof val === 'string') {
-                    val = Texture$1[val];
+                    val = Texture[val];
                 }
                 param[name] = val;
             }
@@ -28533,7 +28780,7 @@ function tryConvertExpr(string) {
 
 // Alias
 
-var gbufferEssl = "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n@import clay.chunk.skinning_header\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef FIRST_PASS\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n #ifdef FIRST_PASS\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n if (hasTangent) {\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n }\n #endif\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n#ifdef FIRST_PASS\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n if (hasTangent) {\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n }\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n if (idx == 3) return texel.a;\n else if (idx == 1) return texel.g;\n else if (idx == 2) return texel.b;\n else return texel.r;\n}\nvoid main()\n{\n vec3 N = v_Normal;\n if (doubleSided) {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = eyePos - v_WorldPosition;\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n }\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n N = normalize(tbn * N);\n }\n }\n gl_FragColor.rgb = (N + 1.0) * 0.5;\n float g = glossiness;\n if (useRoughGlossMap) {\n float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n if (useRoughness) {\n g2 = 1.0 - g2;\n }\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n }\n gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main ()\n{\n float m = metalness;\n if (useMetalnessMap) {\n vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n }\n vec4 texel = texture2D(diffuseMap, v_Texcoord);\n if (linear) {\n texel = sRGBToLinear(texel);\n }\n gl_FragColor.rgb = texel.rgb * color;\n gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform int debug: 0;\nvoid main ()\n{\n @import clay.deferred.chunk.gbuffer_read\n if (debug == 0) {\n gl_FragColor = vec4(N, 1.0);\n }\n else if (debug == 1) {\n gl_FragColor = vec4(vec3(z), 1.0);\n }\n else if (debug == 2) {\n gl_FragColor = vec4(position, 1.0);\n }\n else if (debug == 3) {\n gl_FragColor = vec4(vec3(glossiness), 1.0);\n }\n else if (debug == 4) {\n gl_FragColor = vec4(vec3(metalness), 1.0);\n }\n else {\n gl_FragColor = vec4(albedo, 1.0);\n }\n}\n@end";
+var gbufferEssl = "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n@import clay.chunk.skinning_header\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef FIRST_PASS\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n #ifdef FIRST_PASS\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n if (hasTangent) {\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n }\n #endif\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n#ifdef FIRST_PASS\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n if (hasTangent) {\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n }\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nuniform sampler2D diffuseMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n if (idx == 3) return texel.a;\n else if (idx == 1) return texel.g;\n else if (idx == 2) return texel.b;\n else return texel.r;\n}\nvoid main()\n{\n vec3 N = v_Normal;\n if (doubleSided) {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = eyePos - v_WorldPosition;\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n }\n if (alphaCutoff > 0.0) {\n float a = texture2D(diffuseMap, v_Texcoord).a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n N = normalize(tbn * N);\n }\n }\n gl_FragColor.rgb = (N + 1.0) * 0.5;\n float g = glossiness;\n if (useRoughGlossMap) {\n float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n if (useRoughness) {\n g2 = 1.0 - g2;\n }\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n }\n gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main ()\n{\n float m = metalness;\n if (useMetalnessMap) {\n vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n }\n vec4 texel = texture2D(diffuseMap, v_Texcoord);\n if (linear) {\n texel = sRGBToLinear(texel);\n }\n if (alphaCutoff > 0.0) {\n float a = texel.a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n gl_FragColor.rgb = texel.rgb * color;\n gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform int debug: 0;\nvoid main ()\n{\n @import clay.deferred.chunk.gbuffer_read\n if (debug == 0) {\n gl_FragColor = vec4(N, 1.0);\n }\n else if (debug == 1) {\n gl_FragColor = vec4(vec3(z), 1.0);\n }\n else if (debug == 2) {\n gl_FragColor = vec4(position, 1.0);\n }\n else if (debug == 3) {\n gl_FragColor = vec4(vec3(glossiness), 1.0);\n }\n else if (debug == 4) {\n gl_FragColor = vec4(vec3(metalness), 1.0);\n }\n else {\n gl_FragColor = vec4(albedo, 1.0);\n }\n}\n@end";
 
 var chunkEssl = "@export clay.deferred.chunk.light_head\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\nuniform vec2 windowSize: WINDOW_SIZE;\nuniform vec4 viewport: VIEWPORT;\nuniform mat4 viewProjectionInv;\n#ifdef DEPTH_ENCODED\n@import clay.util.decode_float\n#endif\n@end\n@export clay.deferred.chunk.gbuffer_read\n vec2 uv = gl_FragCoord.xy / windowSize;\n vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n vec4 texel1 = texture2D(gBufferTexture1, uv);\n vec4 texel3 = texture2D(gBufferTexture3, uv);\n if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n discard;\n }\n float glossiness = texel1.a;\n float metalness = texel3.a;\n vec3 N = texel1.rgb * 2.0 - 1.0;\n float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n vec2 xy = uv2 * 2.0 - 1.0;\n vec4 projectedPos = vec4(xy, z, 1.0);\n vec4 p4 = viewProjectionInv * projectedPos;\n vec3 position = p4.xyz / p4.w;\n vec3 albedo = texel3.rgb;\n vec3 diffuseColor = albedo * (1.0 - metalness);\n vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n@export clay.deferred.chunk.light_equation\nfloat D_Phong(in float g, in float ndh) {\n float a = pow(8192.0, g);\n return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(in float g, in float ndh) {\n float r = 1.0 - g;\n float a = r * r;\n float tmp = ndh * ndh * (a - 1.0) + 1.0;\n return a / (3.1415926 * tmp * tmp);\n}\nvec3 F_Schlick(in float ndv, vec3 spec) {\n return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nvec3 lightEquation(\n in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n in float ndl, in float ndh, in float ndv, in float g\n)\n{\n return ndl * lightColor\n * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n@end";
 
@@ -28550,161 +28797,80 @@ function createFillCanvas(color) {
     return canvas;
 }
 
-function attachTextureToSlot(renderer, program, symbol, texture, slot) {
-    var gl = renderer.gl;
-    program.setUniform(gl, '1i', symbol, slot);
+// TODO specularColor
+// TODO Performance improvement
+function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
 
-    gl.activeTexture(gl.TEXTURE0 + slot);
-    // Maybe texture is not loaded yet;
-    if (texture.isRenderable()) {
-        texture.bind(renderer);
-    }
-    else {
-        // Bind texture to null
-        texture.unbind(renderer);
-    }
-}
-
-// TODO Use globalShader insteadof globalMaterial?
-function getBeforeRenderHook1 (gl, defaultNormalMap, defaultRoughnessMap) {
-
-    var previousNormalMap;
-    var previousRougGlossMap;
-    var previousRenderable;
-
-    return function (renderable, gBufferMat, prevMaterial) {
-        // Material not change
-        if (previousRenderable && previousRenderable.material === renderable.material) {
-            return;
-        }
-
+    return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
-        var program = renderable.__program;
-
-        var glossiness;
-        var roughGlossMap;
-        var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
-        var doubleSided = standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
-        var roughGlossChannel;
-        if (useRoughnessWorkflow) {
-            glossiness = 1.0 - standardMaterial.get('roughness');
-            roughGlossMap = standardMaterial.get('roughnessMap');
-            roughGlossChannel = standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL');
+        if (symbol === 'doubleSided') {
+            return standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
+        }
+        else if (symbol === 'uvRepeat' || symbol === 'uvOffset' || symbol === 'alpha') {
+            return standardMaterial.get(symbol);
+        }
+        else if (symbol === 'normalMap') {
+            return standardMaterial.get(symbol) || defaultNormalMap;
+        }
+        else if (symbol === 'diffuseMap') {
+            return standardMaterial.get(symbol) || defaultDiffuseMap;
+        }
+        else if (symbol === 'alphaCutoff') {
+            // TODO DIFFUSEMAP_ALPHA_ALPHA
+            if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
+                var alphaCutoff = standardMaterial.get('alphaCutoff');
+                return alphaCutoff || 0;
+            }
+            return 0;
         }
         else {
-            glossiness = standardMaterial.get('glossiness');
-            roughGlossMap = standardMaterial.get('glossinessMap');
-            roughGlossChannel = standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
-        }
-        var useRoughGlossMap = !!roughGlossMap;
-
-        var normalMap = standardMaterial.get('normalMap') || defaultNormalMap;
-        var uvRepeat = standardMaterial.get('uvRepeat');
-        var uvOffset = standardMaterial.get('uvOffset');
-
-        roughGlossMap = roughGlossMap || defaultRoughnessMap;
-
-        if (prevMaterial !== gBufferMat) {
-            gBufferMat.set('glossiness', glossiness);
-            gBufferMat.set('normalMap', normalMap);
-            gBufferMat.set('roughGlossMap', roughGlossMap);
-            gBufferMat.set('useRoughGlossMap', +useRoughGlossMap);
-            gBufferMat.set('useRoughness', +useRoughnessWorkflow);
-            gBufferMat.set('doubleSided', +doubleSided);
-            gBufferMat.set('roughGlossChannel', +roughGlossChannel || 0);
-            gBufferMat.set('uvRepeat', uvRepeat);
-            gBufferMat.set('uvOffset', uvOffset);
-        }
-        else {
-            program.setUniform(
-                gl, '1f', 'glossiness', glossiness
-            );
-
-            if (previousNormalMap !== normalMap) {
-                attachTextureToSlot(this, program, 'normalMap', normalMap, 0);
-            }
-            if (previousRougGlossMap !== roughGlossMap) {
-                attachTextureToSlot(this, program, 'roughGlossMap', roughGlossMap, 1);
-            }
-            program.setUniform(gl, '1i', 'useRoughGlossMap', +useRoughGlossMap);
-            program.setUniform(gl, '1i', 'useRoughness', +useRoughnessWorkflow);
-            program.setUniform(gl, '1i', 'doubleSided', +doubleSided);
-            program.setUniform(gl, '1i', 'roughGlossChannel', +roughGlossChannel || 0);
-            if (uvRepeat != null) {
-                program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            }
-            if (uvOffset != null) {
-                program.setUniform(gl, '2f', 'uvOffset', uvOffset);
+            var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
+            var roughGlossMap = useRoughnessWorkflow ? standardMaterial.get('roughnessMap') : standardMaterial.get('glossinessMap');
+            switch (symbol) {
+                case 'glossiness':
+                    return useRoughnessWorkflow ? (1.0 - standardMaterial.get('roughness')) : standardMaterial.get('glossiness');
+                case 'roughGlossMap':
+                    return roughGlossMap;
+                case 'useRoughGlossMap':
+                    return !!roughGlossMap;
+                case 'useRoughness':
+                    return useRoughnessWorkflow;
+                case 'roughGlossChannel':
+                    return useRoughnessWorkflow
+                        ? standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL')
+                        : standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
             }
         }
-
-        previousNormalMap = normalMap;
-        previousRougGlossMap = roughGlossMap;
-
-        previousRenderable = renderable;
     };
 }
 
-function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
-    var previousDiffuseMap;
-    var previousRenderable;
-    var previousMetalnessMap;
-
-    return function (renderable, gBufferMat, prevMaterial) {
-        // Material not change
-        if (previousRenderable && previousRenderable.material === renderable.material) {
-            return;
-        }
-
-        var program = renderable.__program;
+function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
+    return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
-
-        var color = standardMaterial.get('color');
-        var metalness = standardMaterial.get('metalness');
-
-        var diffuseMap = standardMaterial.get('diffuseMap');
-        var metalnessMap = standardMaterial.get('metalnessMap');
-
-        var uvRepeat = standardMaterial.get('uvRepeat');
-        var uvOffset = standardMaterial.get('uvOffset');
-
-        var useMetalnessMap = !!metalnessMap;
-
-        diffuseMap = diffuseMap || defaultDiffuseMap;
-        metalnessMap = metalnessMap || defaultMetalnessMap;
-
-        if (prevMaterial !== gBufferMat) {
-            gBufferMat.set('color', color);
-            gBufferMat.set('metalness', metalness);
-            gBufferMat.set('diffuseMap', diffuseMap);
-            gBufferMat.set('metalnessMap', metalnessMap);
-            gBufferMat.set('useMetalnessMap', +useMetalnessMap);
-            gBufferMat.set('uvRepeat', uvRepeat);
-            gBufferMat.set('uvOffset', uvOffset);
-            // TODO
-            gBufferMat.set('linear', +standardMaterial.linear || 0);
+        switch (symbol) {
+            case 'color':
+            case 'uvRepeat':
+            case 'uvOffset':
+            case 'alpha':
+                return standardMaterial.get(symbol);
+            case 'metalness':
+                return standardMaterial.get('metalness') || 0;
+            case 'diffuseMap':
+                return standardMaterial.get(symbol) || defaultDiffuseMap;
+            case 'metalnessMap':
+                return standardMaterial.get(symbol) || defaultMetalnessMap;
+            case 'useMetalnessMap':
+                return !!standardMaterial.get('metalnessMap');
+            case 'linear':
+                return standardMaterial.isDefined('SRGB_DECODE');
+            case 'alphaCutoff':
+                // TODO DIFFUSEMAP_ALPHA_ALPHA
+                if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
+                    var alphaCutoff = standardMaterial.get('alphaCutoff');
+                    return alphaCutoff || 0.0;
+                }
+                return 0.0;
         }
-        else {
-            program.setUniform(gl, '1f', 'metalness', metalness);
-
-            program.setUniform(gl, '3f', 'color', color);
-            if (previousDiffuseMap !== diffuseMap) {
-                attachTextureToSlot(this, program, 'diffuseMap', diffuseMap, 0);
-            }
-            if (previousMetalnessMap !== metalnessMap) {
-                attachTextureToSlot(this, program, 'metalnessMap', metalnessMap, 1);
-            }
-            program.setUniform(gl, '1i', 'useMetalnessMap', +useMetalnessMap);
-            program.setUniform(gl, '2f', 'uvRepeat', uvRepeat);
-            program.setUniform(gl, '2f', 'uvOffset', uvOffset);
-
-            program.setUniform(gl, '1i', 'linear', +standardMaterial.linear || 0);
-        }
-
-        previousDiffuseMap = diffuseMap;
-        previousMetalnessMap = metalnessMap;
-
-        previousRenderable = renderable;
     };
 }
 
@@ -28720,7 +28886,7 @@ function getBeforeRenderHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
  */
 var GBuffer = Base.extend(function () {
 
-    return {
+    return /** @lends clay.deferred.GBuffer# */ {
 
         enableTargetTexture1: true,
 
@@ -28736,21 +28902,21 @@ var GBuffer = Base.extend(function () {
         // - B: normal.z
         // - A: glossiness
         _gBufferTex1: new Texture2D({
-            minFilter: Texture$1.NEAREST,
-            magFilter: Texture$1.NEAREST,
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST,
             // PENDING
-            type: Texture$1.HALF_FLOAT
+            type: Texture.HALF_FLOAT
         }),
 
         // - R: depth
         _gBufferTex2: new Texture2D({
-            minFilter: Texture$1.NEAREST,
-            magFilter: Texture$1.NEAREST,
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST,
             // format: Texture.DEPTH_COMPONENT,
             // type: Texture.UNSIGNED_INT
 
-            format: Texture$1.DEPTH_STENCIL,
-            type: Texture$1.UNSIGNED_INT_24_8_WEBGL
+            format: Texture.DEPTH_STENCIL,
+            type: Texture.UNSIGNED_INT_24_8_WEBGL
         }),
 
         // - R: albedo.r
@@ -28758,8 +28924,8 @@ var GBuffer = Base.extend(function () {
         // - B: albedo.b
         // - A: metalness
         _gBufferTex3: new Texture2D({
-            minFilter: Texture$1.NEAREST,
-            magFilter: Texture$1.NEAREST
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST
         }),
 
         _defaultNormalMap: new Texture2D({
@@ -28854,10 +29020,10 @@ var GBuffer = Base.extend(function () {
     },
 
     /**
-     * Update G Buffer
+     * Update GBuffer
      * @param {clay.Renderer} renderer
      * @param {clay.Scene} scene
-     * @param {clay.camera.Perspective} camera
+     * @param {clay.Camera} camera
      */
     update: function (renderer, scene, camera) {
 
@@ -28866,7 +29032,7 @@ var GBuffer = Base.extend(function () {
         var frameBuffer = this._frameBuffer;
         var viewport = frameBuffer.viewport;
 
-        var renderList = scene.updateRenderList(camera);
+        var renderList = scene.updateRenderList(camera, true);
 
         var opaqueList = renderList.opaque;
         var transparentList = renderList.transparent;
@@ -28926,7 +29092,10 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial1;
                 },
-                beforeRender: getBeforeRenderHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap),
+                getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
+                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
+                    return renderable.material !== prevRenderable.material;
+                },
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
@@ -28955,7 +29124,10 @@ var GBuffer = Base.extend(function () {
                 getMaterial: function () {
                     return gBufferMaterial2;
                 },
-                beforeRender: getBeforeRenderHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                getUniform: getGetUniformHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
+                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
+                    return !prevRenderable || renderable.material !== prevRenderable.material;
+                },
                 sortCompare: renderer.opaqueSortCompare
             };
             renderer.renderPass(gBufferRenderList, camera, passConfig);
@@ -28965,6 +29137,20 @@ var GBuffer = Base.extend(function () {
         frameBuffer.unbind(renderer);
     },
 
+    /**
+     * Debug output of gBuffer. Use `type` parameter to choos the debug output type, which can be:
+     *
+     * + 'normal'
+     * + 'depth'
+     * + 'position'
+     * + 'glossiness'
+     * + 'metalness'
+     * + 'albedo'
+     *
+     * @param {clay.Renderer} renderer
+     * @param {clay.Camera} camera
+     * @param {string} [type='normal']
+     */
     renderDebug: function (renderer, camera, type, viewport) {
         var debugTypes = {
             normal: 0,
@@ -29044,6 +29230,15 @@ var GBuffer = Base.extend(function () {
      * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
+        this._gBufferTex1.dispose(renderer);
+        this._gBufferTex2.dispose(renderer);
+        this._gBufferTex3.dispose(renderer);
+
+        this._defaultNormalMap.dispose(renderer);
+        this._defaultRoughnessMap.dispose(renderer);
+        this._defaultMetalnessMap.dispose(renderer);
+        this._defaultDiffuseMap.dispose(renderer);
+        this._frameBuffer.dispose(renderer);
     }
 });
 
@@ -29060,9 +29255,7 @@ var vec2$1 = glmatrix.vec2;
  * @param {number} [opt.capSegments]
  * @param {number} [opt.heightSegments]
  */
-var Cone$1 = Geometry.extend(
-/** @lends clay.geometry.Cone# */
-{
+var Cone$1 = Geometry.extend(/** @lends clay.geometry.Cone# */ {
     dynamic: false,
     /**
      * @type {number}
@@ -29294,7 +29487,7 @@ var DeferredRenderer = Base.extend(function () {
 
     var lightAccumulateBlendFunc = function (gl) {
         gl.blendEquation(gl.FUNC_ADD);
-        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
     };
 
     var createLightPassMat = function (shader) {
@@ -29346,15 +29539,13 @@ var DeferredRenderer = Base.extend(function () {
 
         _gBuffer: new GBuffer(),
 
-        _lightAccumFrameBuffer: new FrameBuffer({
-            depthBuffer: false
-        }),
+        _lightAccumFrameBuffer: new FrameBuffer(),
 
         _lightAccumTex: new Texture2D({
             // FIXME Device not support float texture
-            type: Texture$1.HALF_FLOAT,
-            minFilter: Texture$1.NEAREST,
-            magFilter: Texture$1.NEAREST
+            type: Texture.HALF_FLOAT,
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST
         }),
 
         _fullQuadPass: new Pass({
@@ -29414,6 +29605,7 @@ var DeferredRenderer = Base.extend(function () {
             scene.update(false, true);
         }
         scene.updateLights();
+        // Render list will be updated in gbuffer.
 
         camera.update(true);
 
@@ -29815,13 +30007,7 @@ var DeferredRenderer = Base.extend(function () {
         return function (renderer, scene, camera, volumeMeshList) {
             var gl = renderer.gl;
 
-            gl.enable(gl.DEPTH_TEST);
-            gl.disable(gl.CULL_FACE);
-            gl.blendEquation(gl.FUNC_ADD);
-            gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
             gl.depthFunc(gl.LEQUAL);
-
-            gl.clear(gl.DEPTH_BUFFER_BIT);
 
             for (var i = 0; i < volumeMeshList.length; i++) {
                 var volumeMesh = volumeMeshList[i];
@@ -29844,8 +30030,8 @@ var DeferredRenderer = Base.extend(function () {
 
                 // Render light
                 gl.colorMask(true, true, true, true);
-                gl.depthMask(false);
 
+                volumeMesh.material.depthMask = true;
                 renderer.renderPass([volumeMesh], camera);
             }
 
@@ -32580,7 +32766,7 @@ function unpackID(r, g, b){
  *         domElement: renderer.canvas
  *     });
  *     ...
- *     animation.on('frame', function(frameTime) {
+ *     timeline.on('frame', function(frameTime) {
  *         control.update(frameTime);
  *         renderer.render(scene, camera);
  *     });
@@ -32626,7 +32812,7 @@ var FreeControl = Base.extend(function() {
         /**
          * @type {clay.Timeline}
          */
-        animation: null,
+        timeline: null,
 
         _moveForward: false,
         _moveBackward: false,
@@ -32643,15 +32829,15 @@ var FreeControl = Base.extend(function() {
     this._mouseMove = this._mouseMove.bind(this);
 
     if (this.domElement) {
-        this.enable();
+        this.init();
     }
 },
 /** @lends clay.plugin.FreeControl.prototype */
 {
     /**
-     * Enable control
+     * init control
      */
-    enable: function() {
+    init: function() {
         // Use pointer lock
         // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
         var el = this.domElement;
@@ -32667,17 +32853,15 @@ var FreeControl = Base.extend(function() {
         document.addEventListener('keydown', this._keyDown);
         document.addEventListener('keyup', this._keyUp);
 
-        if (this.animation) {
-            this.animation.on('frame', this._detectMovementChange, this);
+        if (this.timeline) {
+            this.timeline.on('frame', this._detectMovementChange, this);
         }
     },
 
     /**
-     * Disable control
+     * Dispose control
      */
-    disable: function() {
-
-        this.target.off('beforeupdate', this._beforeUpdateCamera);
+    dispose: function() {
 
         var el = this.domElement;
 
@@ -32698,8 +32882,8 @@ var FreeControl = Base.extend(function() {
         document.removeEventListener('keydown', this._keyDown);
         document.removeEventListener('keyup', this._keyUp);
 
-        if (this.animation) {
-            this.animation.off('frame', this._detectMovementChange);
+        if (this.timeline) {
+            this.timeline.off('frame', this._detectMovementChange);
         }
     },
 
@@ -32716,7 +32900,7 @@ var FreeControl = Base.extend(function() {
      * Control update. Should be invoked every frame
      * @param {number} frameTime Frame time
      */
-    update: function(frameTime) {
+    update: function (frameTime) {
         var target = this.target;
 
         var position = this.target.position;
@@ -32758,7 +32942,8 @@ var FreeControl = Base.extend(function() {
             || document.webkitPointerLockElement === this.domElement
         ) {
             document.addEventListener('mousemove', this._mouseMove, false);
-        } else {
+        }
+        else {
             document.removeEventListener('mousemove', this._mouseMove);
         }
     },
@@ -34237,7 +34422,7 @@ function copyIfNecessary(arr, shallow) {
 /**
  * @name clay.version
  */
-var version = '1.1.0';
+var version = '1.1.1';
 
 var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n v_Texcoord = texcoord;\n gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 
@@ -34686,4 +34871,4 @@ var vr = {
     StereoCamera : StereoCamera
 };
 
-export { animation, application, async, Camera, camera, compositor, core, createCompositor, deferred, dep, FrameBuffer, Geometry, geometry, Joint, Light, light, loader, Material, math, BoundingBox, Frustum, Matrix2, Matrix2d, Matrix3, Matrix4, Plane$1 as Plane, Quaternion, Ray, Value, Vector2, Vector3, Vector4, Mesh, Node, particle, picking, plugin, prePass, Renderable, Renderer, Scene, Shader, shader, Skeleton, StandardMaterial, StaticGeometry, Texture$1 as Texture, Texture2D, TextureCube, Timeline, util, version, vr };
+export { animation, application, async, Camera, camera, compositor, core, createCompositor, deferred, dep, FrameBuffer, Geometry, geometry, Joint, Light, light, loader, Material, math, BoundingBox, Frustum, Matrix2, Matrix2d, Matrix3, Matrix4, Plane$1 as Plane, Quaternion, Ray, Value, Vector2, Vector3, Vector4, Mesh, Node, particle, picking, plugin, prePass, Renderable, Renderer, Scene, Shader, shader, Skeleton, StandardMaterial, StaticGeometry, Texture, Texture2D, TextureCube, Timeline, util, version, vr };
