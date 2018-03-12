@@ -125,11 +125,6 @@ cubemapUtil.prefilterEnvironmentMap = function (
             pixels: {}
         };
         skyEnv.material.set('roughness', i / (mipmapNum - 1));
-        var maxSampleNumber = renderTargetTmp.width * renderTargetTmp.height;
-        if (renderTargetTmp.width >= 32) {
-            maxSampleNumber /= 4;
-        }
-        skyEnv.material.set('maxSampleNumber', Math.min(maxSampleNumber, 1024));
 
         // Tweak fov
         // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/

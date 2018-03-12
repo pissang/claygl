@@ -7,7 +7,6 @@ uniform samplerCube environmentMap;
 uniform sampler2D normalDistribution;
 
 uniform float roughness : 0.5;
-uniform int maxSampleNumber: 1024
 
 varying vec2 v_Texcoord;
 varying vec3 v_WorldPosition;
@@ -34,12 +33,9 @@ void main() {
 
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
-    float fMaxSampleNumber = float(maxSampleNumber);
+    float fMaxSampleNumber = float(SAMPLE_NUMBER);
 
     for (int i = 0; i < SAMPLE_NUMBER; i++) {
-        if (i > maxSampleNumber) {
-            break;
-        }
         vec3 H = importanceSampleNormal(float(i) / fMaxSampleNumber, roughness, N);
         vec3 L = reflect(-V, H);
 
