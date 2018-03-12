@@ -8,6 +8,7 @@ import BoundingBox from './math/BoundingBox';
 import Matrix4 from './math/Matrix4';
 import Material from './Material';
 import Vector2 from './math/Vector2';
+import Texture2D from './Texture2D';
 import ProgramManager from './gpu/ProgramManager';
 
 // Light header
@@ -150,6 +151,14 @@ var Renderer = Base.extend(function () {
          */
         viewport: {},
 
+        /**
+         * Canvas creator
+         * @type {Function}
+         */
+        createCanvas: function () {
+            return document.createElement('canvas');
+        },
+
         // Set by FrameBuffer#bind
         __currentFrameBuffer: null,
 
@@ -161,7 +170,7 @@ var Renderer = Base.extend(function () {
 }, function () {
 
     if (!this.canvas) {
-        this.canvas = document.createElement('canvas');
+        this.canvas = this.createCanvas();
     }
     var canvas = this.canvas;
     try {
@@ -196,6 +205,13 @@ var Renderer = Base.extend(function () {
 
     // Init managers
     this._programMgr = new ProgramManager(this);
+
+    var blankCanvas = this.createCanvas();
+    blankCanvas.width = blankCanvas.height = 1;
+    var ctx = blankCanvas.getContext('2d');
+    this._placeholderTexture = new Texture2D({
+        canvas: blankCanvas
+    });
 },
 /** @lends clay.Renderer.prototype. **/
 {
@@ -790,6 +806,7 @@ var Renderer = Base.extend(function () {
         var currentTextureSlot = program.currentTextureSlot();
         var enabledUniforms = material.getEnabledUniforms();
         var textureUniforms = material.getTextureUniforms();
+        var placeholderTexture = this._placeholderTexture;
 
         for (var u = 0; u < textureUniforms.length; u++) {
             var symbol = textureUniforms[u];
@@ -811,17 +828,28 @@ var Renderer = Base.extend(function () {
             }
         }
 
+        placeholderTexture.__slot = -1;
+
         // Set uniforms
         for (var u = 0; u < enabledUniforms.length; u++) {
             var symbol = enabledUniforms[u];
             var uniform = material.uniforms[symbol];
             var uniformValue = getUniformValue(renderable, material, symbol);
+            var uniformType = uniform.type;
+
+            if (uniformValue == null && uniformType === 't') {
+                uniformValue = placeholderTexture;
+            }
             // PENDING
             // When binding two materials with the same shader
             // Many uniforms will be be set twice even if they have the same value
             // So add a evaluation to see if the uniform is really needed to be set
             if (prevMaterial && sameProgram) {
                 var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
+                if (prevUniformValue == null && uniformType === 't') {
+                    prevUniformValue = placeholderTexture;
+                }
+
                 if (prevUniformValue === uniformValue) {
                     if (uniform.type === 't') {
                         // Still take the slot to make sure same texture in different materials have same slot.
@@ -835,31 +863,18 @@ var Renderer = Base.extend(function () {
                     continue;
                 }
             }
-            var uniformType = uniform.type;
 
             if (uniformValue == null) {
-                // FIXME Assume material with same shader have same order uniforms
-                // Or if different material use same textures,
-                // the slot will be different and still skipped because optimization
-                if (uniform.type === 't') {
-                    // PENDING Will -1 cause some unkown problem?
-                    var res = program.setUniform(_gl, '1i', symbol, -1);
-                    if (res) { // Texture is enabled
-                        // Still take the slot to make sure same texture in different materials have same slot.
-                        program.takeCurrentTextureSlot(this, null);
-                    }
-                }
                 continue;
             }
             else if (uniformType === 't') {
                 if (uniformValue.__slot < 0) {
                     var slot = program.currentTextureSlot();
                     var res = program.setUniform(_gl, '1i', symbol, slot);
-                    if (!res) { // Texture uniform is not enabled
-                        continue;
+                    if (res) { // Texture uniform is enabled
+                        program.takeCurrentTextureSlot(this, uniformValue);
+                        uniformValue.__slot = slot;
                     }
-                    program.takeCurrentTextureSlot(this, uniformValue);
-                    uniformValue.__slot = slot;
                 }
                 // Multiple uniform use same texture..
                 else {
