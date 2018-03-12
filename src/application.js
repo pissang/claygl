@@ -232,8 +232,8 @@ function App3D(dom, appNS) {
         height: { get: function () { return gRenderer.getHeight(); }},
 
         /**
-         * Methods from
-         * @name clay.application.App3D#height
+         * Methods from {@link clay.application.create}
+         * @name clay.application.App3D#methods
          * @type {number}
          */
         methods: { get: function () { return userMethods; } },
