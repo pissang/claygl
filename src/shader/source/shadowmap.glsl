@@ -48,6 +48,12 @@ void main(){
     float depth = v_ViewPosition.z / v_ViewPosition.w;
     // float depth = gl_FragCoord.z / gl_FragCoord.w;
 
+    if (alphaCutoff > 0.0) {
+        if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+            discard;
+        }
+    }
+
 #ifdef USE_VSM
     depth = depth * 0.5 + 0.5;
     float moment1 = depth;
@@ -64,12 +70,6 @@ void main(){
     float dx = dFdx(depth);
     float dy = dFdy(depth);
     depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
-
-    if (alphaCutoff > 0.0) {
-        if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
-            discard;
-        }
-    }
 
     gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
 #endif

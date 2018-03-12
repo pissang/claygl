@@ -842,8 +842,8 @@ var Renderer = Base.extend(function () {
                 // Or if different material use same textures,
                 // the slot will be different and still skipped because optimization
                 if (uniform.type === 't') {
-                    var slot = program.currentTextureSlot();
-                    var res = program.setUniform(_gl, '1i', symbol, slot);
+                    // PENDING Will -1 cause some unkown problem?
+                    var res = program.setUniform(_gl, '1i', symbol, -1);
                     if (res) { // Texture is enabled
                         // Still take the slot to make sure same texture in different materials have same slot.
                         program.takeCurrentTextureSlot(this, null);
