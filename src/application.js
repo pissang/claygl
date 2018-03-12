@@ -498,7 +498,7 @@ App3D.prototype.render = function () {
 };
 
 App3D.prototype.collectResources = function () {
-    var renderer = this.render;
+    var renderer = this.renderer;
     var scene = this.scene;
     var texturesList = this._texturesList;
     var geometriesList = this._geometriesList;
