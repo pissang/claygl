@@ -837,8 +837,10 @@ var Renderer = Base.extend(function () {
             var uniformValue = getUniformValue(renderable, material, symbol);
             var uniformType = uniform.type;
 
-            if (uniformValue == null && uniformType === 't') {
-                uniformValue = placeholderTexture;
+            if (uniformType === 't') {
+                if (!uniformValue || !uniformValue.isRenderable()) {
+                    uniformValue = placeholderTexture;
+                }
             }
             // PENDING
             // When binding two materials with the same shader
@@ -846,8 +848,10 @@ var Renderer = Base.extend(function () {
             // So add a evaluation to see if the uniform is really needed to be set
             if (prevMaterial && sameProgram) {
                 var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
-                if (prevUniformValue == null && uniformType === 't') {
-                    prevUniformValue = placeholderTexture;
+                if (uniformType === 't') {
+                    if (!prevUniformValue || !prevUniformValue.isRenderable()) {
+                        prevUniformValue = placeholderTexture;
+                    }
                 }
 
                 if (prevUniformValue === uniformValue) {
