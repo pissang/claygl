@@ -1144,6 +1144,7 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
  * @param {number} [diffuseIntenstity=0.7] Intensity of diffuse light.
  * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
  * @param {number} [prefilteredCubemapSize=32] The size of prefilerted cubemap. Larger value will take more time to do expensive prefiltering.
+ * @return {Promise}
  */
 App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure, prefilteredCubemapSize) {
     var self = this;
