@@ -173,13 +173,13 @@ var GBuffer = Base.extend(function () {
         // - A: metalness
         _gBufferTex3: new Texture2D({
             minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST,
-            type: Texture.HALF_FLOAT
+            magFilter: Texture.NEAREST
         }),
 
         _gBufferTex4: new Texture2D({
             minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST
+            magFilter: Texture.NEAREST,
+            type: Texture.FLOAT
         }),
 
         _defaultNormalMap: new Texture2D({
@@ -410,6 +410,10 @@ var GBuffer = Base.extend(function () {
             frameBuffer.bind(renderer);
 
             setViewport();
+
+            // Remove jittering in temporal aa.
+            // PENDING. Better solution?
+            camera.update();
 
             var gBufferMaterial3 = this._gBufferMaterial3;
             var cameraViewProj = mat4.create();
