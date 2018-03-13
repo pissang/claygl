@@ -21,6 +21,7 @@ function convertToArray(val) {
 /**
  * @constructor
  * @alias clay.plugin.OrbitControl
+ * @extends clay.core.Base
  */
 var OrbitControl = Base.extend(function () {
 

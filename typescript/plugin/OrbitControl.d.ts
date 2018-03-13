@@ -1,6 +1,7 @@
 import { Node } from '../Node';
 import { Vector3 } from '../math/Vector3';
 import { Timeline } from '../Timeline';
+import { Base } from '../core/Base';
 
 interface IOrbitControlOption {
     target?: Node;
@@ -27,7 +28,7 @@ interface IOrbitControlOption {
     panSensitivity?: number;
 }
 
-export class OrbitControl {
+export class OrbitControl extends Base {
 
     constructor(option?: IOrbitControlOption);
 

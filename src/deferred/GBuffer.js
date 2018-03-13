@@ -4,12 +4,14 @@ import Texture from '../Texture';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
-import ForwardRenderer from '../Renderer';
 import Pass from '../compositor/Pass';
 import Matrix4 from '../math/Matrix4';
+import glmatrix from '../dep/glmatrix';
 
 import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
 import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
+
+var mat4 = glmatrix.mat4;
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
@@ -26,7 +28,7 @@ function createFillCanvas(color) {
 
 // TODO specularColor
 // TODO Performance improvement
-function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
+function getGetUniformHook1(defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
 
     return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
@@ -71,7 +73,7 @@ function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDi
     };
 }
 
-function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
+function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
     return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
         switch (symbol) {
@@ -103,10 +105,11 @@ function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
 
 /**
  * GBuffer is provided for deferred rendering and SSAO, SSR pass.
- * It will do two passes rendering to three target textures. See
+ * It will do three passes rendering to four target textures. See
  * + {@link clay.deferred.GBuffer#getTargetTexture1}
  * + {@link clay.deferred.GBuffer#getTargetTexture2}
  * + {@link clay.deferred.GBuffer#getTargetTexture3}
+ * + {@link clay.deferred.GBuffer#getTargetTexture4}
  * @constructor
  * @alias clay.deferred.GBuffer
  * @extends clay.core.Base
@@ -115,11 +118,29 @@ var GBuffer = Base.extend(function () {
 
     return /** @lends clay.deferred.GBuffer# */ {
 
+        /**
+         * If enable gbuffer texture 1.
+         * @type {boolean}
+         */
         enableTargetTexture1: true,
 
+        /**
+         * If enable gbuffer texture 2.
+         * @type {boolean}
+         */
         enableTargetTexture2: true,
 
+        /**
+         * If enable gbuffer texture 3.
+         * @type {boolean}
+         */
         enableTargetTexture3: true,
+
+        /**
+         * If enable gbuffer texture 4.
+         * @type {boolean}
+         */
+        enableTargetTexture4: false,
 
         renderTransparent: false,
 
@@ -151,6 +172,12 @@ var GBuffer = Base.extend(function () {
         // - B: albedo.b
         // - A: metalness
         _gBufferTex3: new Texture2D({
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST,
+            type: Texture.HALF_FLOAT
+        }),
+
+        _gBufferTex4: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST
         }),
@@ -186,7 +213,25 @@ var GBuffer = Base.extend(function () {
             shader: new Shader(
                 Shader.source('clay.deferred.gbuffer.vertex'),
                 Shader.source('clay.deferred.gbuffer2.fragment')
-            )
+            ),
+            vertexDefines: {
+                SECOND_PASS: null
+            },
+            fragmentDefines: {
+                SECOND_PASS: null
+            }
+        }),
+        _gBufferMaterial3: new Material({
+            shader: new Shader(
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer3.fragment')
+            ),
+            vertexDefines: {
+                THIRD_PASS: null
+            },
+            fragmentDefines: {
+                THIRD_PASS: null
+            }
         }),
 
         _debugPass: new Pass({
@@ -214,6 +259,9 @@ var GBuffer = Base.extend(function () {
 
         this._gBufferTex3.width = width;
         this._gBufferTex3.height = height;
+
+        this._gBufferTex4.width = width;
+        this._gBufferTex4.height = height;
     },
 
     // TODO is dpr needed?
@@ -288,8 +336,9 @@ var GBuffer = Base.extend(function () {
         var enableTargetTexture1 = this.enableTargetTexture1;
         var enableTargetTexture2 = this.enableTargetTexture2;
         var enableTargetTexture3 = this.enableTargetTexture3;
-        if (!enableTargetTexture1 && !enableTargetTexture3) {
-            console.warn('Can\'t disable targetTexture1 targetTexture3 both');
+        var enableTargetTexture4 = this.enableTargetTexture4;
+        if (!enableTargetTexture1 && !enableTargetTexture3 && !enableTargetTexture4) {
+            console.warn('Can\'t disable targetTexture1, targetTexture3, targetTexture4 both');
             enableTargetTexture1 = true;
         }
 
@@ -297,13 +346,7 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
         }
 
-        // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
-        renderer.bindSceneRendering(scene);
-        if (enableTargetTexture1) {
-            // Pass 1
-            frameBuffer.attach(this._gBufferTex1);
-            frameBuffer.bind(renderer);
-
+        function setViewport() {
             if (viewport) {
                 var dpr = viewport.devicePixelRatio;
                 // use scissor to make sure only clear the viewport
@@ -314,15 +357,28 @@ var GBuffer = Base.extend(function () {
             if (viewport) {
                 gl.disable(gl.SCISSOR_TEST);
             }
+        }
+
+        function isMaterialChanged(renderable, prevRenderable, material, prevMaterial) {
+            return renderable.material !== prevRenderable.material;
+        }
+
+        // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
+        renderer.bindSceneRendering(scene);
+        if (enableTargetTexture1) {
+            // Pass 1
+            frameBuffer.attach(this._gBufferTex1);
+            frameBuffer.bind(renderer);
+
+            setViewport();
+
             var gBufferMaterial1 = this._gBufferMaterial1;
             var passConfig = {
                 getMaterial: function () {
                     return gBufferMaterial1;
                 },
-                getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
-                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
-                    return renderable.material !== prevRenderable.material;
-                },
+                getUniform: getGetUniformHook1(this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
+                isMaterialChanged: isMaterialChanged,
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
@@ -335,28 +391,52 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex3);
             frameBuffer.bind(renderer);
 
-            if (viewport) {
-                var dpr = viewport.devicePixelRatio;
-                // use scissor to make sure only clear the viewport
-                gl.enable(gl.SCISSOR_TEST);
-                gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
-            }
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            if (viewport) {
-                gl.disable(gl.SCISSOR_TEST);
-            }
+            setViewport();
 
             var gBufferMaterial2 = this._gBufferMaterial2;
             var passConfig = {
                 getMaterial: function () {
                     return gBufferMaterial2;
                 },
-                getUniform: getGetUniformHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
-                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
-                    return !prevRenderable || renderable.material !== prevRenderable.material;
-                },
+                getUniform: getGetUniformHook2(this._defaultDiffuseMap, this._defaultMetalnessMap),
+                isMaterialChanged: isMaterialChanged,
                 sortCompare: renderer.opaqueSortCompare
             };
+            renderer.renderPass(gBufferRenderList, camera, passConfig);
+        }
+
+        if (enableTargetTexture4) {
+            frameBuffer.attach(this._gBufferTex4);
+            frameBuffer.bind(renderer);
+
+            setViewport();
+
+            var gBufferMaterial3 = this._gBufferMaterial3;
+            var cameraViewProj = mat4.create();
+            mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial3;
+                },
+                afterRender: function (renderer, renderable) {
+                    renderable.__prevWorldViewProjection = renderable.__prevWorldViewProjection || mat4.create();
+                    mat4.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
+                },
+                getUniform: function (renderable, gBufferMat, symbol) {
+                    if (symbol === 'prevWorldViewProjection') {
+                        return renderable.__prevWorldViewProjection;
+                    }
+                    else if (symbol === 'firstRender') {
+                        return !renderable.__prevWorldViewProjection;
+                    }
+                    else {
+                        return gBufferMat.get(symbol);
+                    }
+                },
+                isMaterialChanged: isMaterialChanged,
+                sortCompare: renderer.opaqueSortCompare
+            };
+
             renderer.renderPass(gBufferRenderList, camera, passConfig);
         }
 
@@ -373,6 +453,7 @@ var GBuffer = Base.extend(function () {
      * + 'glossiness'
      * + 'metalness'
      * + 'albedo'
+     * + 'velocity'
      *
      * @param {clay.Renderer} renderer
      * @param {clay.Camera} camera
@@ -385,7 +466,8 @@ var GBuffer = Base.extend(function () {
             position: 2,
             glossiness: 3,
             metalness: 4,
-            albedo: 5
+            albedo: 5,
+            velocity: 6
         };
         if (debugTypes[type] == null) {
             console.warn('Unkown type "' + type + '"');
@@ -408,6 +490,7 @@ var GBuffer = Base.extend(function () {
         debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
         debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
         debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
+        debugPass.setUniform('gBufferTexture4', this._gBufferTex4);
         debugPass.setUniform('debug', debugTypes[type]);
         debugPass.setUniform('viewProjectionInv', viewProjectionInv.array);
         debugPass.render(renderer);
@@ -450,6 +533,17 @@ var GBuffer = Base.extend(function () {
      */
     getTargetTexture3: function () {
         return this._gBufferTex3;
+    },
+
+    /**
+     * Get fourth target texture.
+     * Channel storage:
+     * + R: velocity.r
+     * + G: velocity.g
+     * @return {clay.Texture2D}
+     */
+    getTargetTexture4: function () {
+        return this._gBufferTex4;
     },
 
 

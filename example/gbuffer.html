@@ -11,12 +11,16 @@
             var renderer = new clay.Renderer({
                 canvas: document.getElementById('main')
             });
-            var gbuffer = new clay.deferred.GBuffer();
+            var gbuffer = new clay.deferred.GBuffer({
+                enableTargetTexture4: true
+            });
             var camera = new clay.camera.Perspective({
                 aspect: renderer.getViewportAspect()
             });
             camera.position.set(0, 0, 6);
 
+            var timeline =  new clay.Timeline();
+            timeline.start();
             var scene = new clay.Scene();
 
             var loader = new clay.loader.GLTF();
@@ -43,31 +47,31 @@
                     });
                     tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
                         .success(function () {
-                            // FIXME
-                            tex.wrapS = clay.Texture.REPEAT;
-                            tex.wrapT = clay.Texture.REPEAT;
+                            update();
                         });
                     material[mapInfo[0]] = tex;
                 });
 
                 mesh.scale.set(1.4, 1.4, 1.4);
                 scene.add(mesh);
+
+                update();
             });
 
             var control = new clay.plugin.OrbitControl({
                 target: camera,
-                domElement: renderer.canvas
+                domElement: renderer.canvas,
+                timeline: timeline
             });
 
-            var timeline =  new clay.Timeline();
-            timeline.start();
-            timeline.on('frame', function(deltaTime) {
-                control.update(deltaTime);
+            control.on('update', update);
+
+            function update() {
                 scene.update();
                 camera.update();
                 gbuffer.update(renderer, scene, camera);
                 gbuffer.renderDebug(renderer, camera, config.debugType);
-            });
+            }
 
             window.onresize = function() {
                 renderer.resize(window.innerWidth, window.innerHeight);
@@ -85,7 +89,11 @@
             var gui = new dat.GUI();
 
             gui.add(config, 'debugType', [
-                'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo'
-            ]);
+                'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo', 'velocity'
+            ]).onChange(function () {
+                update();
+            });
+
+            update();
         </script>
 </html>

@@ -56,6 +56,7 @@ function VertexArrayObject(availableAttributes, availableAttributeSymbols, indic
 }
 /**
  * @constructor clay.Renderer
+ * @extends clay.core.Base
  */
 var Renderer = Base.extend(function () {
     return /** @lends clay.Renderer# */ {
@@ -747,7 +748,7 @@ var Renderer = Base.extend(function () {
             this._renderObject(renderable, currentVAO);
 
             // After render hook
-            passConfig.afterRender.call(this, renderable);
+            passConfig.afterRender(this, renderable);
             renderable.afterRender(this);
 
             prevProgram = program;

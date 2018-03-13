@@ -8,6 +8,7 @@ import { Texture } from './Texture';
 import { FrameBuffer } from './FrameBuffer';
 import { Renderable } from './Renderable';
 import { Vector2 } from './math/Vector2';
+import { Base } from './core/Base';
 
 
 interface IRendererOption {
@@ -46,7 +47,7 @@ interface IPassConfig {
     sortCompare: (a: Renderable, b: Renderable) => number;
 }
 
-export class Renderer {
+export class Renderer extends Base {
 
     constructor(option?: IRendererOption);
 

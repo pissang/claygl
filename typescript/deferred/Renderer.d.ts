@@ -5,13 +5,14 @@ import { Texture2D } from '../Texture2D'
 import { FrameBuffer } from '../FrameBuffer'
 import { ShadowMap } from '../prePass/ShadowMap'
 import { GBuffer } from './GBuffer'
+import { Base } from '../core/Base';
 
 interface IDeferredRendererOption {
     shadowMapPass?: ShadowMap;
     autoResize?: boolean;
 }
 
-export class Renderer {
+export class Renderer extends Base {
 
     constructor(option?: IDeferredRendererOption);
 

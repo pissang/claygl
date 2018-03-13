@@ -1,33 +1,39 @@
 @export clay.deferred.gbuffer.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+
+attribute vec3 position : POSITION;
+
+#if defined(SECOND_PASS) || defined(FIRST_PASS)
+attribute vec2 texcoord : TEXCOORD_0;
+uniform vec2 uvRepeat;
+uniform vec2 uvOffset;
+varying vec2 v_Texcoord;
+#endif
+
+#ifdef FIRST_PASS
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
 uniform mat4 world : WORLD;
 
-uniform vec2 uvRepeat;
-uniform vec2 uvOffset;
+varying vec3 v_Normal;
 
-attribute vec3 position : POSITION;
-attribute vec2 texcoord : TEXCOORD_0;
-
-#ifdef FIRST_PASS
 attribute vec3 normal : NORMAL;
+attribute vec4 tangent : TANGENT;
+
+varying vec3 v_Tangent;
+varying vec3 v_Bitangent;
+varying vec3 v_WorldPosition;
+
+#endif
+
+#ifdef THIRD_PASS
+uniform mat4 prevWorldViewProjection;
+varying vec4 v_ViewPosition;
+varying vec4 v_PrevViewPosition;
 #endif
 
 @import clay.chunk.skinning_header
 
-
-#ifdef FIRST_PASS
-varying vec3 v_Normal;
-
-attribute vec4 tangent : TANGENT;
-varying vec3 v_Tangent;
-varying vec3 v_Bitangent;
-varying vec3 v_WorldPosition;
-#endif
-
-
-varying vec2 v_Texcoord;
 
 void main()
 {
@@ -55,9 +61,9 @@ void main()
     #endif
 #endif
 
-    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
-
+#if defined(SECOND_PASS) || defined(FIRST_PASS)
     v_Texcoord = texcoord * uvRepeat + uvOffset;
+#endif
 
 #ifdef FIRST_PASS
     v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
@@ -68,6 +74,14 @@ void main()
     }
     v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 #endif
+
+#ifdef THIRD_PASS
+    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
+    v_PrevViewPosition = prevWorldViewProjection * vec4(skinnedPosition, 1.0);
+#endif
+
+    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
 }
 
 
@@ -189,7 +203,7 @@ varying vec2 v_Texcoord;
 
 @import clay.util.srgb
 
-void main ()
+void main()
 {
     float m = metalness;
 
@@ -217,9 +231,35 @@ void main ()
 @end
 
 
+@export clay.deferred.gbuffer3.fragment
+
+uniform bool firstRender;
+
+varying vec4 v_ViewPosition;
+varying vec4 v_PrevViewPosition;
+
+void main()
+{
+    vec2 a = v_ViewPosition.xy / v_ViewPosition.w * 0.5 + 0.5;
+    vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w * 0.5 + 0.5;
+
+    if (firstRender) {
+        gl_FragColor = vec4(-2.0, -2.0, 0.0, 1.0);
+    }
+    else {
+        gl_FragColor = vec4(a - b, 0.0, 1.0);
+    }
+}
+
+@end
+
+
+
 @export clay.deferred.gbuffer.debug
 
 @import clay.deferred.chunk.light_head
+
+uniform sampler2D gBufferTexture4;
 // DEBUG
 // - 0: normal
 // - 1: depth
@@ -227,6 +267,7 @@ void main ()
 // - 3: glossiness
 // - 4: metalness
 // - 5: albedo
+// - 6: velocity
 uniform int debug: 0;
 
 void main ()
@@ -248,8 +289,13 @@ void main ()
     else if (debug == 4) {
         gl_FragColor = vec4(vec3(metalness), 1.0);
     }
-    else {
+    else if (debug == 5) {
         gl_FragColor = vec4(albedo, 1.0);
+    }
+    else {
+        vec4 color = texture2D(gBufferTexture4, uv);
+        color.rg *= 100.0;
+        gl_FragColor = color;
     }
 }
 @end

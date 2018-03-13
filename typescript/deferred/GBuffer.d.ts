@@ -2,6 +2,7 @@ import { Renderer } from '../Renderer'
 import { Camera } from '../Camera'
 import { Scene } from '../Scene'
 import { Texture2D } from '../Texture2D'
+import { Base } from '../core/Base';
 
 interface IGBufferOption {
     enableTargetTexture1?: boolean;
@@ -11,7 +12,7 @@ interface IGBufferOption {
     renderTransparent?: boolean;
 }
 
-export class GBuffer {
+export class GBuffer extends Base {
 
     constructor(option?: IGBufferOption);
 
