@@ -179,7 +179,8 @@ var GBuffer = Base.extend(function () {
         _gBufferTex4: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
-            type: Texture.FLOAT
+            // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
+            type: Texture.HALF_FLOAT
         }),
 
         _defaultNormalMap: new Texture2D({
@@ -346,7 +347,7 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
         }
 
-        function setViewport() {
+        function clearViewport() {
             if (viewport) {
                 var dpr = viewport.devicePixelRatio;
                 // use scissor to make sure only clear the viewport
@@ -370,7 +371,7 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex1);
             frameBuffer.bind(renderer);
 
-            setViewport();
+            clearViewport();
 
             var gBufferMaterial1 = this._gBufferMaterial1;
             var passConfig = {
@@ -391,7 +392,7 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex3);
             frameBuffer.bind(renderer);
 
-            setViewport();
+            clearViewport();
 
             var gBufferMaterial2 = this._gBufferMaterial2;
             var passConfig = {
@@ -406,10 +407,10 @@ var GBuffer = Base.extend(function () {
         }
 
         if (enableTargetTexture4) {
-            frameBuffer.attach(this._gBufferTex4);
             frameBuffer.bind(renderer);
+            frameBuffer.attach(this._gBufferTex4);
 
-            setViewport();
+            clearViewport();
 
             // Remove jittering in temporal aa.
             // PENDING. Better solution?

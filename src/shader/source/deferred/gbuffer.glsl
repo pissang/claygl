@@ -240,14 +240,14 @@ varying vec4 v_PrevViewPosition;
 
 void main()
 {
-    vec2 a = v_ViewPosition.xy / v_ViewPosition.w * 0.5 + 0.5;
-    vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w * 0.5 + 0.5;
+    vec2 a = v_ViewPosition.xy / v_ViewPosition.w;
+    vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
     if (firstRender) {
         gl_FragColor = vec4(-2.0, -2.0, 0.0, 1.0);
     }
     else {
-        gl_FragColor = vec4(a - b, 0.0, 1.0);
+        gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
     }
 }
 
