@@ -30,6 +30,10 @@ varying vec3 v_WorldPosition;
 uniform mat4 prevWorldViewProjection;
 varying vec4 v_ViewPosition;
 varying vec4 v_PrevViewPosition;
+#ifdef SKINNING
+uniform mat4 prevSkinMatrix[JOINT_COUNT];
+#endif
+
 #endif
 
 @import clay.chunk.skinning_header
@@ -37,8 +41,8 @@ varying vec4 v_PrevViewPosition;
 
 void main()
 {
-
     vec3 skinnedPosition = position;
+    vec3 prevSkinnedPosition = position;
 
 #ifdef FIRST_PASS
     vec3 skinnedNormal = normal;
@@ -59,6 +63,20 @@ void main()
         skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
     }
     #endif
+
+    #ifdef THIRD_PASS
+    // Weighted Sum Skinning Matrix
+    // PENDING Must be assigned.
+    {
+        mat4 prevSkinMatrixWS = prevSkinMatrix[int(joint.x)] * weight.x;
+        if (weight.y > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.y)] * weight.y; }
+        if (weight.z > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.z)] * weight.z; }
+        float weightW = 1.0-weight.x-weight.y-weight.z;
+        if (weightW > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.w)] * weightW; }
+        prevSkinnedPosition = (prevSkinMatrixWS * vec4(position, 1.0)).xyz;
+    }
+    #endif
+
 #endif
 
 #if defined(SECOND_PASS) || defined(FIRST_PASS)
@@ -77,7 +95,7 @@ void main()
 
 #ifdef THIRD_PASS
     v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
-    v_PrevViewPosition = prevWorldViewProjection * vec4(skinnedPosition, 1.0);
+    v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);
 #endif
 
     gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
@@ -294,7 +312,8 @@ void main ()
     }
     else {
         vec4 color = texture2D(gBufferTexture4, uv);
-        color.rg *= 100.0;
+        color.rg -= 0.5;
+        color.rg *= 2.0;
         gl_FragColor = color;
     }
 }

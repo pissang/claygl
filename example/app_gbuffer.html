@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+    <title>GBuffer of animated model</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+
+        var config = {
+            debugType: 'normal'
+        }
+        var gui = new dat.GUI();
+
+        gui.add(config, 'debugType', [
+            'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo', 'velocity'
+        ]);
+
+        var app = clay.application.create('#main', {
+
+            autoRender: false,
+
+            init: function (app) {
+
+                this._gbuffer = new clay.deferred.GBuffer({
+                    enableTargetTexture4: true
+                });
+
+                // Create camera
+                this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);
+
+                // Load boombox model.
+                app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf');
+
+                // Create light
+                app.createDirectionalLight([-1, -1, -1]);
+
+                // Use orbit control
+                this._control = new clay.plugin.OrbitControl({
+                    target: this._camera,
+                    domElement: app.container,
+                    timeline: app.timeline
+                });
+            },
+
+            loop: function (app) {
+                app.scene.update();
+                this._gbuffer.resize(app.width, app.height);
+                this._gbuffer.update(app.renderer, app.scene, this._camera);
+                this._gbuffer.renderDebug(app.renderer, this._camera, config.debugType);
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="../dist/claygl.js?2"></script>
+        <script type="text/javascript" src="lib/dat.gui.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <canvas id="main"></canvas>
+        <script type="text/javascript">
+            var renderer = new clay.Renderer({
+                canvas: document.getElementById('main')
+            });
+            var gbuffer = new clay.deferred.GBuffer({
+                enableTargetTexture4: true
+            });
+            var camera = new clay.camera.Perspective({
+                aspect: renderer.getViewportAspect()
+            });
+            camera.position.set(0, 0, 6);
+            renderer.resize(window.innerWidth, window.innerHeight);
+
+            var scene = new clay.Scene();
+
+            var cube = new clay.Mesh({
+                geometry: new clay.geometry.Cube(),
+                material: new clay.StandardMaterial()
+            });
+            scene.add(cube);
+
+            function update() {
+                scene.update();
+                camera.update();
+                gbuffer.update(renderer, scene, camera);
+                gbuffer.renderDebug(renderer, camera, 'velocity');
+            }
+
+            var timeline = new clay.Timeline();
+            // timeline.on('frame', function () {
+                cube.position.x = -3;
+                update();
+                cube.position.x = 3;
+                update();
+            //     cube.position.y = 1;
+            //     update();
+            // });
+            // timeline.start();
+        </script>
+</html>

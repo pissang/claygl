@@ -152,6 +152,8 @@ var GBuffer = Base.extend(function () {
         _gBufferTex1: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
             // PENDING
             type: Texture.HALF_FLOAT
         }),
@@ -160,6 +162,8 @@ var GBuffer = Base.extend(function () {
         _gBufferTex2: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
             // format: Texture.DEPTH_COMPONENT,
             // type: Texture.UNSIGNED_INT
 
@@ -173,12 +177,16 @@ var GBuffer = Base.extend(function () {
         // - A: metalness
         _gBufferTex3: new Texture2D({
             minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST
+            magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE
         }),
 
         _gBufferTex4: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
             // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
             type: Texture.HALF_FLOAT
         }),
@@ -424,12 +432,22 @@ var GBuffer = Base.extend(function () {
                     return gBufferMaterial3;
                 },
                 afterRender: function (renderer, renderable) {
+                    if (renderable.isSkinnedMesh()) {
+                        var skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__uid__, renderable.joints);
+                        if (!renderable.__prevSkinMatricesArray || renderable.__prevSkinMatricesArray.length !== skinMatricesArray.length) {
+                            renderable.__prevSkinMatricesArray = new Float32Array(skinMatricesArray.length);
+                        }
+                        renderable.__prevSkinMatricesArray.set(skinMatricesArray);
+                    }
                     renderable.__prevWorldViewProjection = renderable.__prevWorldViewProjection || mat4.create();
                     mat4.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
                 },
                 getUniform: function (renderable, gBufferMat, symbol) {
                     if (symbol === 'prevWorldViewProjection') {
                         return renderable.__prevWorldViewProjection;
+                    }
+                    else if (symbol === 'prevSkinMatrix') {
+                        return renderable.__prevSkinMatricesArray;
                     }
                     else if (symbol === 'firstRender') {
                         return !renderable.__prevWorldViewProjection;
