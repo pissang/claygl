@@ -37,10 +37,10 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 <img src="./screenshot/dota2hero.jpg" width="500" />
 </a>
 
-[Worldcup 2014 Intro Movie](https://github.com/pissang/worldcup-intro)
+[Paper Cut Art Generator](https://github.com/pissang/papercut-box-art)
 
-<a href="https://github.com/pissang/worldcup-intro" target="_blank">
-<img src="https://github.com/pissang/worldcup-intro/raw/master/screenshots/2.png" width="500" alt="">
+<a href="https://github.com/pissang/papercut-box-art" target="_blank">
+<img src="https://github.com/pissang/papercut-box-art/blob/master/screenshots/3.jpg" width="500" alt="">
 </a>
 
 
@@ -83,7 +83,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 </body>
 </html>
 ```
-
+<!--
 ## Current Features
 
 + Scene graph based management of lights, meshes, cameras, materials and shaders
@@ -110,7 +110,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 + Full deferred pipeline.
 + Physically based rendering, Full HDR pipeline.
 + Stereo rendering, VR ready.
-
+ -->
 
 ### FBX to glTF2.0 Converter
 
