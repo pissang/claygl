@@ -262,7 +262,7 @@ void main()
     vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
     if (firstRender) {
-        gl_FragColor = vec4(-2.0, -2.0, 0.0, 1.0);
+        gl_FragColor = vec4(0.0);
     }
     else {
         gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
