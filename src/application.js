@@ -332,7 +332,7 @@ function isImageLikeElement(val) {
 }
 
 function getKeyFromImageLike(val) {
-    typeof val === 'string'
+    return typeof val === 'string'
         ? val : (val.__key__ || (val.__key__ = util.genGUID()));
 }
 

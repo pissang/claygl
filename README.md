@@ -3,7 +3,6 @@
 <img width="100%" src="./screenshot/claygl-logo.jpg" />
 
 [![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl)
-
 [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
 ClayGL is a WebGL graphic library for building scalable Web3D applications.
