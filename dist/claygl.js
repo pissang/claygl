@@ -14161,6 +14161,7 @@ function VertexArrayObject(availableAttributes, availableAttributeSymbols, indic
 }
 /**
  * @constructor clay.Renderer
+ * @extends clay.core.Base
  */
 var Renderer = Base.extend(function () {
     return /** @lends clay.Renderer# */ {
@@ -14852,7 +14853,7 @@ var Renderer = Base.extend(function () {
             this._renderObject(renderable, currentVAO);
 
             // After render hook
-            passConfig.afterRender.call(this, renderable);
+            passConfig.afterRender(this, renderable);
             renderable.afterRender(this);
 
             prevProgram = program;
@@ -23040,14 +23041,14 @@ var Pass = Base.extend(function () {
      * @param {string} name
      * @param {} value
      */
-    setUniform : function(name, value) {
+    setUniform: function(name, value) {
         this.material.setUniform(name, value);
     },
     /**
      * @param  {string} name
      * @return {}
      */
-    getUniform : function(name) {
+    getUniform: function(name) {
         var uniform = this.material.uniforms[name];
         if (uniform) {
             return uniform.value;
@@ -23057,7 +23058,7 @@ var Pass = Base.extend(function () {
      * @param  {clay.Texture} texture
      * @param  {number} attachment
      */
-    attachOutput : function(texture, attachment) {
+    attachOutput: function(texture, attachment) {
         if (!this.outputs) {
             this.outputs = {};
         }
@@ -23067,7 +23068,7 @@ var Pass = Base.extend(function () {
     /**
      * @param  {clay.Texture} texture
      */
-    detachOutput : function(texture) {
+    detachOutput: function(texture) {
         for (var attachment in this.outputs) {
             if (this.outputs[attachment] === texture) {
                 this.outputs[attachment] = null;
@@ -23075,7 +23076,7 @@ var Pass = Base.extend(function () {
         }
     },
 
-    bind : function(renderer, frameBuffer) {
+    bind: function(renderer, frameBuffer) {
 
         if (this.outputs) {
             for (var attachment in this.outputs) {
@@ -23091,14 +23092,14 @@ var Pass = Base.extend(function () {
         }
     },
 
-    unbind : function(renderer, frameBuffer) {
+    unbind: function(renderer, frameBuffer) {
         frameBuffer.unbind(renderer);
     },
     /**
      * @param  {clay.Renderer} renderer
      * @param  {clay.FrameBuffer} [frameBuffer]
      */
-    render : function(renderer, frameBuffer) {
+    render: function(renderer, frameBuffer) {
 
         var _gl = renderer.gl;
 
@@ -23123,7 +23124,7 @@ var Pass = Base.extend(function () {
 
         // FIXME Don't clear in each pass in default, let the color overwrite the buffer
         // FIXME pixels may be discard
-        var clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT : 0;
+        var clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT: 0;
         _gl.depthMask(true);
         if (this.clearColor) {
             clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
@@ -26134,8 +26135,8 @@ function App3D(dom, appNS) {
         height: { get: function () { return gRenderer.getHeight(); }},
 
         /**
-         * Methods from
-         * @name clay.application.App3D#height
+         * Methods from {@link clay.application.create}
+         * @name clay.application.App3D#methods
          * @type {number}
          */
         methods: { get: function () { return userMethods; } },
@@ -27046,6 +27047,7 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
  * @param {number} [diffuseIntenstity=0.7] Intensity of diffuse light.
  * @param {number} [exposure=1] Exposure of HDR image. Only if image in first paramter is HDR.
  * @param {number} [prefilteredCubemapSize=32] The size of prefilerted cubemap. Larger value will take more time to do expensive prefiltering.
+ * @return {Promise}
  */
 App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure, prefilteredCubemapSize) {
     var self = this;
@@ -28786,9 +28788,11 @@ function tryConvertExpr(string) {
 
 // Alias
 
-var gbufferEssl = "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\n#ifdef FIRST_PASS\nattribute vec3 normal : NORMAL;\n#endif\n@import clay.chunk.skinning_header\n#ifdef FIRST_PASS\nvarying vec3 v_Normal;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef FIRST_PASS\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n #ifdef FIRST_PASS\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n if (hasTangent) {\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n }\n #endif\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n#ifdef FIRST_PASS\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n if (hasTangent) {\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n }\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nuniform sampler2D diffuseMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n if (idx == 3) return texel.a;\n else if (idx == 1) return texel.g;\n else if (idx == 2) return texel.b;\n else return texel.r;\n}\nvoid main()\n{\n vec3 N = v_Normal;\n if (doubleSided) {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = eyePos - v_WorldPosition;\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n }\n if (alphaCutoff > 0.0) {\n float a = texture2D(diffuseMap, v_Texcoord).a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n N = normalize(tbn * N);\n }\n }\n gl_FragColor.rgb = (N + 1.0) * 0.5;\n float g = glossiness;\n if (useRoughGlossMap) {\n float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n if (useRoughness) {\n g2 = 1.0 - g2;\n }\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n }\n gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main ()\n{\n float m = metalness;\n if (useMetalnessMap) {\n vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n }\n vec4 texel = texture2D(diffuseMap, v_Texcoord);\n if (linear) {\n texel = sRGBToLinear(texel);\n }\n if (alphaCutoff > 0.0) {\n float a = texel.a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n gl_FragColor.rgb = texel.rgb * color;\n gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform int debug: 0;\nvoid main ()\n{\n @import clay.deferred.chunk.gbuffer_read\n if (debug == 0) {\n gl_FragColor = vec4(N, 1.0);\n }\n else if (debug == 1) {\n gl_FragColor = vec4(vec3(z), 1.0);\n }\n else if (debug == 2) {\n gl_FragColor = vec4(position, 1.0);\n }\n else if (debug == 3) {\n gl_FragColor = vec4(vec3(glossiness), 1.0);\n }\n else if (debug == 4) {\n gl_FragColor = vec4(vec3(metalness), 1.0);\n }\n else {\n gl_FragColor = vec4(albedo, 1.0);\n }\n}\n@end";
+var gbufferEssl = "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n#if defined(SECOND_PASS) || defined(FIRST_PASS)\nattribute vec2 texcoord : TEXCOORD_0;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nvarying vec2 v_Texcoord;\n#endif\n#ifdef FIRST_PASS\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nvarying vec3 v_Normal;\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\n#ifdef THIRD_PASS\nuniform mat4 prevWorldViewProjection;\nvarying vec4 v_ViewPosition;\nvarying vec4 v_PrevViewPosition;\n#ifdef SKINNING\nuniform mat4 prevSkinMatrix[JOINT_COUNT];\n#endif\n#endif\n@import clay.chunk.skinning_header\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 prevSkinnedPosition = position;\n#ifdef FIRST_PASS\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n #ifdef FIRST_PASS\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n if (hasTangent) {\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n }\n #endif\n #ifdef THIRD_PASS\n {\n mat4 prevSkinMatrixWS = prevSkinMatrix[int(joint.x)] * weight.x;\n if (weight.y > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.y)] * weight.y; }\n if (weight.z > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.z)] * weight.z; }\n float weightW = 1.0-weight.x-weight.y-weight.z;\n if (weightW > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.w)] * weightW; }\n prevSkinnedPosition = (prevSkinMatrixWS * vec4(position, 1.0)).xyz;\n }\n #endif\n#endif\n#if defined(SECOND_PASS) || defined(FIRST_PASS)\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n#endif\n#ifdef FIRST_PASS\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n if (hasTangent) {\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n }\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n#ifdef THIRD_PASS\n v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nuniform sampler2D diffuseMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n if (idx == 3) return texel.a;\n else if (idx == 1) return texel.g;\n else if (idx == 2) return texel.b;\n else return texel.r;\n}\nvoid main()\n{\n vec3 N = v_Normal;\n if (doubleSided) {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = eyePos - v_WorldPosition;\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n }\n if (alphaCutoff > 0.0) {\n float a = texture2D(diffuseMap, v_Texcoord).a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n N = normalize(tbn * N);\n }\n }\n gl_FragColor.rgb = (N + 1.0) * 0.5;\n float g = glossiness;\n if (useRoughGlossMap) {\n float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n if (useRoughness) {\n g2 = 1.0 - g2;\n }\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n }\n gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main()\n{\n float m = metalness;\n if (useMetalnessMap) {\n vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n }\n vec4 texel = texture2D(diffuseMap, v_Texcoord);\n if (linear) {\n texel = sRGBToLinear(texel);\n }\n if (alphaCutoff > 0.0) {\n float a = texel.a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n gl_FragColor.rgb = texel.rgb * color;\n gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer3.fragment\nuniform bool firstRender;\nvarying vec4 v_ViewPosition;\nvarying vec4 v_PrevViewPosition;\nvoid main()\n{\n vec2 a = v_ViewPosition.xy / v_ViewPosition.w;\n vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;\n if (firstRender) {\n gl_FragColor = vec4(-2.0, -2.0, 0.0, 1.0);\n }\n else {\n gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);\n }\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform sampler2D gBufferTexture4;\nuniform int debug: 0;\nvoid main ()\n{\n @import clay.deferred.chunk.gbuffer_read\n if (debug == 0) {\n gl_FragColor = vec4(N, 1.0);\n }\n else if (debug == 1) {\n gl_FragColor = vec4(vec3(z), 1.0);\n }\n else if (debug == 2) {\n gl_FragColor = vec4(position, 1.0);\n }\n else if (debug == 3) {\n gl_FragColor = vec4(vec3(glossiness), 1.0);\n }\n else if (debug == 4) {\n gl_FragColor = vec4(vec3(metalness), 1.0);\n }\n else if (debug == 5) {\n gl_FragColor = vec4(albedo, 1.0);\n }\n else {\n vec4 color = texture2D(gBufferTexture4, uv);\n color.rg -= 0.5;\n color.rg *= 2.0;\n gl_FragColor = color;\n }\n}\n@end";
 
 var chunkEssl = "@export clay.deferred.chunk.light_head\nuniform sampler2D gBufferTexture1;\nuniform sampler2D gBufferTexture2;\nuniform sampler2D gBufferTexture3;\nuniform vec2 windowSize: WINDOW_SIZE;\nuniform vec4 viewport: VIEWPORT;\nuniform mat4 viewProjectionInv;\n#ifdef DEPTH_ENCODED\n@import clay.util.decode_float\n#endif\n@end\n@export clay.deferred.chunk.gbuffer_read\n vec2 uv = gl_FragCoord.xy / windowSize;\n vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;\n vec4 texel1 = texture2D(gBufferTexture1, uv);\n vec4 texel3 = texture2D(gBufferTexture3, uv);\n if (dot(texel1.rgb, vec3(1.0)) == 0.0) {\n discard;\n }\n float glossiness = texel1.a;\n float metalness = texel3.a;\n vec3 N = texel1.rgb * 2.0 - 1.0;\n float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;\n vec2 xy = uv2 * 2.0 - 1.0;\n vec4 projectedPos = vec4(xy, z, 1.0);\n vec4 p4 = viewProjectionInv * projectedPos;\n vec3 position = p4.xyz / p4.w;\n vec3 albedo = texel3.rgb;\n vec3 diffuseColor = albedo * (1.0 - metalness);\n vec3 specularColor = mix(vec3(0.04), albedo, metalness);\n@end\n@export clay.deferred.chunk.light_equation\nfloat D_Phong(in float g, in float ndh) {\n float a = pow(8192.0, g);\n return (a + 2.0) / 8.0 * pow(ndh, a);\n}\nfloat D_GGX(in float g, in float ndh) {\n float r = 1.0 - g;\n float a = r * r;\n float tmp = ndh * ndh * (a - 1.0) + 1.0;\n return a / (3.1415926 * tmp * tmp);\n}\nvec3 F_Schlick(in float ndv, vec3 spec) {\n return spec + (1.0 - spec) * pow(1.0 - ndv, 5.0);\n}\nvec3 lightEquation(\n in vec3 lightColor, in vec3 diffuseColor, in vec3 specularColor,\n in float ndl, in float ndh, in float ndv, in float g\n)\n{\n return ndl * lightColor\n * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));\n}\n@end";
+
+var mat4$9 = glmatrix.mat4;
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
@@ -28805,7 +28809,7 @@ function createFillCanvas(color) {
 
 // TODO specularColor
 // TODO Performance improvement
-function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
+function getGetUniformHook1(defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
 
     return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
@@ -28850,7 +28854,7 @@ function getGetUniformHook1(gl, defaultNormalMap, defaultRoughnessMap, defaultDi
     };
 }
 
-function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
+function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
     return function (renderable, gBufferMat, symbol) {
         var standardMaterial = renderable.material;
         switch (symbol) {
@@ -28882,10 +28886,11 @@ function getGetUniformHook2(gl, defaultDiffuseMap, defaultMetalnessMap) {
 
 /**
  * GBuffer is provided for deferred rendering and SSAO, SSR pass.
- * It will do two passes rendering to three target textures. See
+ * It will do three passes rendering to four target textures. See
  * + {@link clay.deferred.GBuffer#getTargetTexture1}
  * + {@link clay.deferred.GBuffer#getTargetTexture2}
  * + {@link clay.deferred.GBuffer#getTargetTexture3}
+ * + {@link clay.deferred.GBuffer#getTargetTexture4}
  * @constructor
  * @alias clay.deferred.GBuffer
  * @extends clay.core.Base
@@ -28894,11 +28899,29 @@ var GBuffer = Base.extend(function () {
 
     return /** @lends clay.deferred.GBuffer# */ {
 
+        /**
+         * If enable gbuffer texture 1.
+         * @type {boolean}
+         */
         enableTargetTexture1: true,
 
+        /**
+         * If enable gbuffer texture 2.
+         * @type {boolean}
+         */
         enableTargetTexture2: true,
 
+        /**
+         * If enable gbuffer texture 3.
+         * @type {boolean}
+         */
         enableTargetTexture3: true,
+
+        /**
+         * If enable gbuffer texture 4.
+         * @type {boolean}
+         */
+        enableTargetTexture4: false,
 
         renderTransparent: false,
 
@@ -28910,6 +28933,8 @@ var GBuffer = Base.extend(function () {
         _gBufferTex1: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
             // PENDING
             type: Texture.HALF_FLOAT
         }),
@@ -28918,6 +28943,8 @@ var GBuffer = Base.extend(function () {
         _gBufferTex2: new Texture2D({
             minFilter: Texture.NEAREST,
             magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
             // format: Texture.DEPTH_COMPONENT,
             // type: Texture.UNSIGNED_INT
 
@@ -28931,7 +28958,18 @@ var GBuffer = Base.extend(function () {
         // - A: metalness
         _gBufferTex3: new Texture2D({
             minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST
+            magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE
+        }),
+
+        _gBufferTex4: new Texture2D({
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST,
+            wrapS: Texture.CLAMP_TO_EDGE,
+            wrapT: Texture.CLAMP_TO_EDGE,
+            // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
+            type: Texture.HALF_FLOAT
         }),
 
         _defaultNormalMap: new Texture2D({
@@ -28965,7 +29003,25 @@ var GBuffer = Base.extend(function () {
             shader: new Shader(
                 Shader.source('clay.deferred.gbuffer.vertex'),
                 Shader.source('clay.deferred.gbuffer2.fragment')
-            )
+            ),
+            vertexDefines: {
+                SECOND_PASS: null
+            },
+            fragmentDefines: {
+                SECOND_PASS: null
+            }
+        }),
+        _gBufferMaterial3: new Material({
+            shader: new Shader(
+                Shader.source('clay.deferred.gbuffer.vertex'),
+                Shader.source('clay.deferred.gbuffer3.fragment')
+            ),
+            vertexDefines: {
+                THIRD_PASS: null
+            },
+            fragmentDefines: {
+                THIRD_PASS: null
+            }
         }),
 
         _debugPass: new Pass({
@@ -28993,6 +29049,9 @@ var GBuffer = Base.extend(function () {
 
         this._gBufferTex3.width = width;
         this._gBufferTex3.height = height;
+
+        this._gBufferTex4.width = width;
+        this._gBufferTex4.height = height;
     },
 
     // TODO is dpr needed?
@@ -29067,8 +29126,9 @@ var GBuffer = Base.extend(function () {
         var enableTargetTexture1 = this.enableTargetTexture1;
         var enableTargetTexture2 = this.enableTargetTexture2;
         var enableTargetTexture3 = this.enableTargetTexture3;
-        if (!enableTargetTexture1 && !enableTargetTexture3) {
-            console.warn('Can\'t disable targetTexture1 targetTexture3 both');
+        var enableTargetTexture4 = this.enableTargetTexture4;
+        if (!enableTargetTexture1 && !enableTargetTexture3 && !enableTargetTexture4) {
+            console.warn('Can\'t disable targetTexture1, targetTexture3, targetTexture4 both');
             enableTargetTexture1 = true;
         }
 
@@ -29076,13 +29136,7 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
         }
 
-        // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
-        renderer.bindSceneRendering(scene);
-        if (enableTargetTexture1) {
-            // Pass 1
-            frameBuffer.attach(this._gBufferTex1);
-            frameBuffer.bind(renderer);
-
+        function clearViewport() {
             if (viewport) {
                 var dpr = viewport.devicePixelRatio;
                 // use scissor to make sure only clear the viewport
@@ -29093,15 +29147,28 @@ var GBuffer = Base.extend(function () {
             if (viewport) {
                 gl.disable(gl.SCISSOR_TEST);
             }
+        }
+
+        function isMaterialChanged(renderable, prevRenderable, material, prevMaterial) {
+            return renderable.material !== prevRenderable.material;
+        }
+
+        // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
+        renderer.bindSceneRendering(scene);
+        if (enableTargetTexture1) {
+            // Pass 1
+            frameBuffer.attach(this._gBufferTex1);
+            frameBuffer.bind(renderer);
+
+            clearViewport();
+
             var gBufferMaterial1 = this._gBufferMaterial1;
             var passConfig = {
                 getMaterial: function () {
                     return gBufferMaterial1;
                 },
-                getUniform: getGetUniformHook1(gl, this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
-                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
-                    return renderable.material !== prevRenderable.material;
-                },
+                getUniform: getGetUniformHook1(this._defaultNormalMap, this._defaultRoughnessMap, this._defaultDiffuseMap),
+                isMaterialChanged: isMaterialChanged,
                 sortCompare: renderer.opaqueSortCompare
             };
             // FIXME Use MRT if possible
@@ -29114,28 +29181,66 @@ var GBuffer = Base.extend(function () {
             frameBuffer.attach(this._gBufferTex3);
             frameBuffer.bind(renderer);
 
-            if (viewport) {
-                var dpr = viewport.devicePixelRatio;
-                // use scissor to make sure only clear the viewport
-                gl.enable(gl.SCISSOR_TEST);
-                gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
-            }
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            if (viewport) {
-                gl.disable(gl.SCISSOR_TEST);
-            }
+            clearViewport();
 
             var gBufferMaterial2 = this._gBufferMaterial2;
             var passConfig = {
                 getMaterial: function () {
                     return gBufferMaterial2;
                 },
-                getUniform: getGetUniformHook2(gl, this._defaultDiffuseMap, this._defaultMetalnessMap),
-                isMaterialChanged: function (renderable, prevRenderable, material, prevMaterial) {
-                    return !prevRenderable || renderable.material !== prevRenderable.material;
-                },
+                getUniform: getGetUniformHook2(this._defaultDiffuseMap, this._defaultMetalnessMap),
+                isMaterialChanged: isMaterialChanged,
                 sortCompare: renderer.opaqueSortCompare
             };
+            renderer.renderPass(gBufferRenderList, camera, passConfig);
+        }
+
+        if (enableTargetTexture4) {
+            frameBuffer.bind(renderer);
+            frameBuffer.attach(this._gBufferTex4);
+
+            clearViewport();
+
+            // Remove jittering in temporal aa.
+            // PENDING. Better solution?
+            camera.update();
+
+            var gBufferMaterial3 = this._gBufferMaterial3;
+            var cameraViewProj = mat4$9.create();
+            mat4$9.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
+            var passConfig = {
+                getMaterial: function () {
+                    return gBufferMaterial3;
+                },
+                afterRender: function (renderer, renderable) {
+                    if (renderable.isSkinnedMesh()) {
+                        var skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__uid__, renderable.joints);
+                        if (!renderable.__prevSkinMatricesArray || renderable.__prevSkinMatricesArray.length !== skinMatricesArray.length) {
+                            renderable.__prevSkinMatricesArray = new Float32Array(skinMatricesArray.length);
+                        }
+                        renderable.__prevSkinMatricesArray.set(skinMatricesArray);
+                    }
+                    renderable.__prevWorldViewProjection = renderable.__prevWorldViewProjection || mat4$9.create();
+                    mat4$9.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
+                },
+                getUniform: function (renderable, gBufferMat, symbol) {
+                    if (symbol === 'prevWorldViewProjection') {
+                        return renderable.__prevWorldViewProjection;
+                    }
+                    else if (symbol === 'prevSkinMatrix') {
+                        return renderable.__prevSkinMatricesArray;
+                    }
+                    else if (symbol === 'firstRender') {
+                        return !renderable.__prevWorldViewProjection;
+                    }
+                    else {
+                        return gBufferMat.get(symbol);
+                    }
+                },
+                isMaterialChanged: isMaterialChanged,
+                sortCompare: renderer.opaqueSortCompare
+            };
+
             renderer.renderPass(gBufferRenderList, camera, passConfig);
         }
 
@@ -29152,6 +29257,7 @@ var GBuffer = Base.extend(function () {
      * + 'glossiness'
      * + 'metalness'
      * + 'albedo'
+     * + 'velocity'
      *
      * @param {clay.Renderer} renderer
      * @param {clay.Camera} camera
@@ -29164,7 +29270,8 @@ var GBuffer = Base.extend(function () {
             position: 2,
             glossiness: 3,
             metalness: 4,
-            albedo: 5
+            albedo: 5,
+            velocity: 6
         };
         if (debugTypes[type] == null) {
             console.warn('Unkown type "' + type + '"');
@@ -29187,6 +29294,7 @@ var GBuffer = Base.extend(function () {
         debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
         debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
         debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
+        debugPass.setUniform('gBufferTexture4', this._gBufferTex4);
         debugPass.setUniform('debug', debugTypes[type]);
         debugPass.setUniform('viewProjectionInv', viewProjectionInv.array);
         debugPass.render(renderer);
@@ -29229,6 +29337,17 @@ var GBuffer = Base.extend(function () {
      */
     getTargetTexture3: function () {
         return this._gBufferTex3;
+    },
+
+    /**
+     * Get fourth target texture.
+     * Channel storage:
+     * + R: velocity.r
+     * + G: velocity.g
+     * @return {clay.Texture2D}
+     */
+    getTargetTexture4: function () {
+        return this._gBufferTex4;
     },
 
 
@@ -33259,6 +33378,7 @@ function convertToArray(val) {
 /**
  * @constructor
  * @alias clay.plugin.OrbitControl
+ * @extends clay.core.Base
  */
 var OrbitControl = Base.extend(function () {
 
@@ -33967,7 +34087,7 @@ var StaticGeometry = Geometry.extend({
 });
 
 // TODO test
-var mat4$10 = glmatrix.mat4;
+var mat4$11 = glmatrix.mat4;
 var vec3$19 = glmatrix.vec3;
 
 /**
@@ -34009,7 +34129,7 @@ var meshUtil = {
             }
         }
 
-        var inverseTransposeMatrix = mat4$10.create();
+        var inverseTransposeMatrix = mat4$11.create();
         // Initialize the array data and merge bounding box
         var nVertex = 0;
         var nFace = 0;
@@ -34045,8 +34165,8 @@ var meshUtil = {
             var nVertex = currentGeo.vertexCount;
 
             var matrix = applyWorldTransform ? mesh.worldTransform.array : mesh.localTransform.array;
-            mat4$10.invert(inverseTransposeMatrix, matrix);
-            mat4$10.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
+            mat4$11.invert(inverseTransposeMatrix, matrix);
+            mat4$11.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
             for (var nn = 0; nn < attributeNames.length; nn++) {
                 var name = attributeNames[nn];
@@ -34428,7 +34548,7 @@ function copyIfNecessary(arr, shallow) {
 /**
  * @name clay.version
  */
-var version = '1.1.1';
+var version = '1.1.2';
 
 var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n v_Texcoord = texcoord;\n gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 

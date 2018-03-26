@@ -71,14 +71,14 @@ var Pass = Base.extend(function () {
      * @param {string} name
      * @param {} value
      */
-    setUniform : function(name, value) {
+    setUniform: function(name, value) {
         this.material.setUniform(name, value);
     },
     /**
      * @param  {string} name
      * @return {}
      */
-    getUniform : function(name) {
+    getUniform: function(name) {
         var uniform = this.material.uniforms[name];
         if (uniform) {
             return uniform.value;
@@ -88,7 +88,7 @@ var Pass = Base.extend(function () {
      * @param  {clay.Texture} texture
      * @param  {number} attachment
      */
-    attachOutput : function(texture, attachment) {
+    attachOutput: function(texture, attachment) {
         if (!this.outputs) {
             this.outputs = {};
         }
@@ -98,7 +98,7 @@ var Pass = Base.extend(function () {
     /**
      * @param  {clay.Texture} texture
      */
-    detachOutput : function(texture) {
+    detachOutput: function(texture) {
         for (var attachment in this.outputs) {
             if (this.outputs[attachment] === texture) {
                 this.outputs[attachment] = null;
@@ -106,7 +106,7 @@ var Pass = Base.extend(function () {
         }
     },
 
-    bind : function(renderer, frameBuffer) {
+    bind: function(renderer, frameBuffer) {
 
         if (this.outputs) {
             for (var attachment in this.outputs) {
@@ -122,14 +122,14 @@ var Pass = Base.extend(function () {
         }
     },
 
-    unbind : function(renderer, frameBuffer) {
+    unbind: function(renderer, frameBuffer) {
         frameBuffer.unbind(renderer);
     },
     /**
      * @param  {clay.Renderer} renderer
      * @param  {clay.FrameBuffer} [frameBuffer]
      */
-    render : function(renderer, frameBuffer) {
+    render: function(renderer, frameBuffer) {
 
         var _gl = renderer.gl;
 
