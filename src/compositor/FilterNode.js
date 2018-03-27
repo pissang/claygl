@@ -149,7 +149,7 @@ var FilterNode = CompositorNode.extend(function () {
                 var texture = this._compositor.allocateTexture(parameters);
                 this._outputTextures[name] = texture;
                 var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-                if (typeof(attachment) == 'string') {
+                if (typeof(attachment) === 'string') {
                     attachment = _gl[attachment];
                 }
                 attachedTextures[attachment] = texture;
@@ -167,7 +167,7 @@ var FilterNode = CompositorNode.extend(function () {
 
             // Because the data of texture is changed over time,
             // Here update the mipmaps of texture each time after rendered;
-            this._compositor.getFrameBuffer().updateMipmap(renderer.gl);
+            this._compositor.getFrameBuffer().updateMipmap(renderer);
         }
 
         for (var inputName in this.inputLinks) {
