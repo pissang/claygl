@@ -34,6 +34,10 @@ var AmbientCubemapLight = Light.extend({
      * @param {number} [size=32]
      */
     prefilter: function (renderer, size) {
+        if (!renderer.getGLExtension('EXT_shader_texture_lod')) {
+            console.warn('Device not support textureCubeLodEXT');
+            return;
+        }
         if (!this._brdfLookup) {
             this._normalDistribution = cubemapUtil.generateNormalDistribution();
             this._brdfLookup = cubemapUtil.integrateBRDF(renderer, this._normalDistribution);

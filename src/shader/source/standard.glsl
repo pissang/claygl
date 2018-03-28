@@ -571,7 +571,11 @@ void main() {
     vec3 envTexel2;
     for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++)
     {{
+    #ifdef SUPPORT_TEXTURE_LOD
         envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
+    #else
+        envTexel2 = RGBMDecode(textureCube(ambientCubemapLightCubemap[_idx_], L), 8.12);
+    #endif
         // TODO mix ?
         outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
     }}
@@ -590,7 +594,11 @@ void main() {
     float rough = clamp(1.0 - g, 0.0, 1.0);
     float bias = rough * maxMipmapLevel;
     // PENDING Only env map can have HDR
+        #ifdef SUPPORT_TEXTURE_LOD
     vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
+        #else
+    vec3 envTexel = decodeHDR(textureCube(environmentMap, L)).rgb;
+        #endif
 
         #ifdef BRDFLOOKUP_ENABLED
     vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;

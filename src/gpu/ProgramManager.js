@@ -139,13 +139,22 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var fragmentDefineStr = skinDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
 
     var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
-    var fragmentCode = getExtensionCode([
-        // TODO Not hard coded
+
+    var extensions = [
         'OES_standard_derivatives',
         'EXT_shader_texture_lod'
-    ]) + '\n'
-    + getPrecisionCode(material.precision) + '\n'
-    + fragmentDefineStr + '\n' + material.shader.fragment;
+    ].filter(function (ext) {
+        return renderer.getGLExtension(ext) != null;
+    });
+
+    if (extensions.indexOf('EXT_shader_texture_lod') >= 0) {
+        fragmentDefineStr += '\n#define SUPPORT_TEXTURE_LOD';
+    }
+
+    var fragmentCode = getExtensionCode(extensions) + '\n'
+        + getPrecisionCode(material.precision) + '\n'
+        + fragmentDefineStr + '\n'
+        + material.shader.fragment;
 
     var finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
     var finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);

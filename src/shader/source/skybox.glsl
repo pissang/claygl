@@ -46,7 +46,7 @@ void main()
     vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
     vec4 texel = decodeHDR(texture2D(environmentMap, uv));
 #else
-    #ifdef LOD
+    #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)
     vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, V, lod));
     #else
     vec4 texel = decodeHDR(textureCube(environmentMap, V));
