@@ -34,18 +34,6 @@ var Mesh = Renderable.extend(/** @lends clay.Mesh# */ {
         return !!(this.skeleton && this.joints && this.joints.length > 0);
     },
 
-    getSkinMatricesTexture: function () {
-        this._skinMatricesTexture = this._skinMatricesTexture || new Texture2D({
-            type: glenum.FLOAT,
-            minFilter: glenum.NEAREST,
-            magFilter: glenum.NEAREST,
-            useMipmap: false,
-            flipY: false
-        });
-
-        return this._skinMatricesTexture;
-    },
-
     clone: function () {
         var mesh = Renderable.prototype.clone.call(this);
         mesh.skeleton = this.skeleton;

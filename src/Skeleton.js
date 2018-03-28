@@ -1,5 +1,7 @@
 import Base from './core/Base';
 import Joint from './Joint';
+import Texture2D from './Texture2D';
+import Texture from './Texture';
 
 import glMatrix from './dep/glmatrix';
 var quat = glMatrix.quat;
@@ -202,6 +204,48 @@ var Skeleton = Base.extend(function () {
             }
         }
         return subArray;
+    },
+
+    getSubSkinMatricesTexture: function (meshId, joints) {
+        var skinMatrices = this.getSubSkinMatrices(meshId, joints);
+        var size;
+        var numJoints = this.joints.length;
+        if (numJoints > 256) {
+            size = 64;
+        }
+        else if (numJoints > 64) {
+            size = 32;
+        }
+        else if (numJoints > 16) {
+            size = 16;
+        }
+        else {
+            size = 8;
+        }
+
+        var texture = this._skinMatricesTexture = this._skinMatricesTexture || new Texture2D({
+            type: Texture.FLOAT,
+            minFilter: Texture.NEAREST,
+            magFilter: Texture.NEAREST,
+            useMipmap: false,
+            flipY: false
+        });
+        texture.width = size;
+        texture.height = size;
+
+        if (!texture.pixels || texture.pixels.length !== size * size * 4) {
+            texture.pixels = new Float32Array(size * size * 4);
+        }
+        texture.pixels.set(skinMatrices);
+        texture.dirty();
+
+        return texture;
+    },
+
+    getSkinMatricesTexture: function () {
+
+
+        return this._skinMatricesTexture;
     },
 
     _setPose: function () {

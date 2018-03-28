@@ -772,7 +772,7 @@ var Renderer = Base.extend(function () {
                 culling = renderable.culling;
                 culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
             }
-
+            // TODO Not update skeleton in each renderable.
             this._updateSkeleton(renderable, program);
             if (drawIDChanged) {
                 currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
@@ -795,13 +795,27 @@ var Renderer = Base.extend(function () {
         this.trigger('afterrenderpass', this, list, camera, passConfig);
     },
 
+    getMaxJointNumber: function () {
+        return this._glinfo.getMaxJointNumber();
+    },
+
     _updateSkeleton: function (object, program) {
         var _gl = this.gl;
+        var skeleton = object.skeleton;
         // Set pose matrices of skinned mesh
-        if (object.skeleton) {
-            object.skeleton.update();
-            var skinMatricesArray = object.skeleton.getSubSkinMatrices(object.__uid__, object.joints);
-            program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+        if (skeleton) {
+            skeleton.update();
+            if (object.joints.length > this._glinfo.getMaxJointNumber()) {
+                var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.__uid__, object.joints);
+                var slot = program.currentTextureSlot();
+                program.useTextureSlot(this, skinMatricesTexture, slot);
+                program.setUniform(_gl, '1i', 'skinMatricesTexture', slot);
+                program.setUniform(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
+            }
+            else {
+                var skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
+                program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+            }
         }
     },
 

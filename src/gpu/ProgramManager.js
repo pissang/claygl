@@ -126,11 +126,15 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var enabledTextures = material.getEnabledTextures();
     var skinDefineCode = '';
     if (isSkinnedMesh) {
-        // TODO Add skinning code?
-        skinDefineCode = '\n' + getDefineCode({
+        var skinDefines = {
             SKINNING: null,
             JOINT_COUNT: renderable.joints.length
-        }) + '\n';
+        };
+        if (renderable.joints.length > renderer.getMaxJointNumber()) {
+            skinDefines.USE_SKIN_MATRICES_TEXTURE = null;
+        }
+        // TODO Add skinning code?
+        skinDefineCode = '\n' + getDefineCode(skinDefines) + '\n';
     }
     // TODO Optimize key generation
     // VERTEX

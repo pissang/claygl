@@ -4290,11 +4290,6 @@
 				"texCoord" : 0
 			},
 			"emissiveFactor": [1, 1, 1],
-			"occlusionTexture" : {
-				"index" : 7,
-				"texCoord" : 0,
-				"strength" : 1
-			},
 			"doubleSided": false,
 			"name": "body_albedo"
 		},

@@ -27,9 +27,6 @@
 
                 app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
 
-                // Load boombox model.
-                app.loadModel('./assets/models/busterDrone/busterDrone.gltf');
-
                 // Create light
                 app.createDirectionalLight([-1, -1, -1]);
 
@@ -38,6 +35,12 @@
                     target: this._camera,
                     domElement: app.container
                 });
+
+                // Load boombox model.
+                return app.loadModel('./assets/models/busterDrone/busterDrone.gltf', {
+                    waitTextureLoaded: true
+                });
+
             },
 
             loop: function (app) {
