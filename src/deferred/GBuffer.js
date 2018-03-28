@@ -456,7 +456,10 @@ var GBuffer = Base.extend(function () {
                         return gBufferMat.get(symbol);
                     }
                 },
-                isMaterialChanged: isMaterialChanged,
+                isMaterialChanged: function () {
+                    // Always update prevWorldViewProjection
+                    return true;
+                },
                 sortCompare: renderer.opaqueSortCompare
             };
 
