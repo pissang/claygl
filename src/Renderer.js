@@ -618,12 +618,18 @@ var Renderer = Base.extend(function () {
 
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
+            var isSceneNode = renderable.worldTransform != null;
+            var worldM;
+
             if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
                 continue;
             }
 
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
-            var worldM = renderable.isSkinnedMesh() ? matrices.IDENTITY : renderable.worldTransform.array;
+            if (isSceneNode) {
+                worldM = (renderable.isSkinnedMesh && renderable.isSkinnedMesh())
+                    ? matrices.IDENTITY : renderable.worldTransform.array;
+            }
             var geometry = renderable.geometry;
             var material = passConfig.getMaterial.call(this, renderable);
 
@@ -637,25 +643,26 @@ var Renderer = Base.extend(function () {
                 // TODO Seems need to be bound to null immediately (or before bind another program?) if vao is changed
                 vaoExt.bindVertexArrayOES(null);
             }
-
-            mat4.copy(matrices.WORLD, worldM);
-            mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM);
-            mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM);
-            if (shader.matrixSemantics.WORLDINVERSE ||
-                shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
-                mat4.invert(matrices.WORLDINVERSE, worldM);
-            }
-            if (shader.matrixSemantics.WORLDVIEWINVERSE ||
-                shader.matrixSemantics.WORLDVIEWINVERSETRANSPOSE) {
-                mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
-            }
-            if (shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSE ||
-                shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE) {
-                mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
+            if (isSceneNode) {
+                mat4.copy(matrices.WORLD, worldM);
+                mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM);
+                mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM);
+                if (shader.matrixSemantics.WORLDINVERSE ||
+                    shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDINVERSE, worldM);
+                }
+                if (shader.matrixSemantics.WORLDVIEWINVERSE ||
+                    shader.matrixSemantics.WORLDVIEWINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
+                }
+                if (shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSE ||
+                    shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE) {
+                    mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
+                }
             }
 
             // Before render hook
-            renderable.beforeRender(this);
+            renderable.beforeRender && renderable.beforeRender(this);
             passConfig.beforeRender.call(this, renderable, material, prevMaterial);
 
             var programChanged = program !== prevProgram;
@@ -721,15 +728,18 @@ var Renderer = Base.extend(function () {
             }
 
             var matrixSemanticKeys = shader.matrixSemanticKeys;
-            for (var k = 0; k < matrixSemanticKeys.length; k++) {
-                var semantic = matrixSemanticKeys[k];
-                var semanticInfo = shader.matrixSemantics[semantic];
-                var matrix = matrices[semantic];
-                if (semanticInfo.isTranspose) {
-                    var matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
-                    mat4.transpose(matrix, matrixNoTranspose);
+
+            if (isSceneNode) {
+                for (var k = 0; k < matrixSemanticKeys.length; k++) {
+                    var semantic = matrixSemanticKeys[k];
+                    var semanticInfo = shader.matrixSemantics[semantic];
+                    var matrix = matrices[semantic];
+                    if (semanticInfo.isTranspose) {
+                        var matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
+                        mat4.transpose(matrix, matrixNoTranspose);
+                    }
+                    program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
                 }
-                program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
             }
 
             if (renderable.cullFace !== cullFace) {
@@ -753,7 +763,7 @@ var Renderer = Base.extend(function () {
 
             // After render hook
             passConfig.afterRender(this, renderable);
-            renderable.afterRender(this);
+            renderable.afterRender && renderable.afterRender(this);
 
             prevProgram = program;
             prevRenderable = renderable;
@@ -782,6 +792,9 @@ var Renderer = Base.extend(function () {
         var geometry = renderable.geometry;
 
         var glDrawMode = renderable.mode;
+        if (glDrawMode == null) {
+            glDrawMode = 0x0004;
+        }
 
         // if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
         //     _gl.lineWidth(this.lineWidth);

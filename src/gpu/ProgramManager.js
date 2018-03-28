@@ -106,11 +106,12 @@ function ProgramManager(renderer) {
 ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var cache = this._cache;
 
+    var isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
     var key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
     if (scene) {
         key += 'se' + scene.getProgramKey(renderable.lightGroup);
     }
-    if (renderable.isSkinnedMesh()) {
+    if (isSkinnedMesh) {
         key += ',' + renderable.joints.length;
     }
     var program = cache[key];
@@ -124,7 +125,7 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var _gl = renderer.gl;
     var enabledTextures = material.getEnabledTextures();
     var skinDefineCode = '';
-    if (renderable.isSkinnedMesh()) {
+    if (isSkinnedMesh) {
         // TODO Add skinning code?
         skinDefineCode = '\n' + getDefineCode({
             SKINNING: null,
@@ -139,12 +140,12 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
 
     var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
     var fragmentCode = getExtensionCode([
-            // TODO Not hard coded
-            'OES_standard_derivatives',
-            'EXT_shader_texture_lod'
-        ]) + '\n'
-            + getPrecisionCode(material.precision) + '\n'
-            + fragmentDefineStr + '\n' + material.shader.fragment;
+        // TODO Not hard coded
+        'OES_standard_derivatives',
+        'EXT_shader_texture_lod'
+    ]) + '\n'
+    + getPrecisionCode(material.precision) + '\n'
+    + fragmentDefineStr + '\n' + material.shader.fragment;
 
     var finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
     var finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
