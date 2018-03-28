@@ -18,8 +18,14 @@ void main()
 
 @export clay.skybox.fragment
 
+#define PI 3.1415926
+
 uniform mat4 viewInverse : VIEWINVERSE;
+#ifdef EQUIRECTANGULAR
+uniform sampler2D environmentMap;
+#else
 uniform samplerCube environmentMap;
+#endif
 uniform float lod: 0.0;
 
 varying vec3 v_WorldPosition;
@@ -33,11 +39,18 @@ varying vec3 v_WorldPosition;
 void main()
 {
     vec3 eyePos = viewInverse[3].xyz;
-    vec3 viewDirection = normalize(v_WorldPosition - eyePos);
-#ifdef LOD
-    vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, viewDirection, lod));
+    vec3 V = normalize(v_WorldPosition - eyePos);
+#ifdef EQUIRECTANGULAR
+    float phi = acos(V.y);
+    float theta = atan(-V.x, V.z) + PI;
+    vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
+    vec4 texel = decodeHDR(texture2D(environmentMap, uv));
 #else
-    vec4 texel = decodeHDR(textureCube(environmentMap, viewDirection));
+    #ifdef LOD
+    vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, V, lod));
+    #else
+    vec4 texel = decodeHDR(textureCube(environmentMap, V));
+    #endif
 #endif
 
 #ifdef SRGB_DECODE

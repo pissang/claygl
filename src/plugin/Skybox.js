@@ -3,6 +3,7 @@ import Mesh from '../Mesh';
 import CubeGeometry from '../geometry/Cube';
 import Shader from '../Shader';
 import Material from '../Material';
+import Texture from '../Texture';
 
 import skyboxEssl from '../shader/source/skybox.glsl.js';
 Shader.import(skyboxEssl);
@@ -96,6 +97,14 @@ var Skybox = Mesh.extend(function () {
      * @param {clay.TextureCube} envMap
      */
     setEnvironmentMap: function (envMap) {
+        if (envMap.textureType === 'texture2D') {
+            this.material.define('EQUIRECTANGULAR');
+            // LINEAR filter can remove the artifacts in pole
+            envMap.minFilter = Texture.LINEAR;
+        }
+        else {
+            this.material.undefine('EQUIRECTANGULAR');
+        }
         this.material.set('environmentMap', envMap);
     },
     /**
