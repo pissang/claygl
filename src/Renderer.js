@@ -62,7 +62,7 @@ function PlaceHolderTexture(renderer) {
         }
         gl.bindTexture(gl.TEXTURE_2D, webglTexture);
         if (firstBind) {
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.FLOAT, blankCanvas);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, blankCanvas);
         }
     };
     this.unbind = function (renderer) {
@@ -631,6 +631,7 @@ var Renderer = Base.extend(function () {
         var transparent;
         var drawID;
         var currentVAO;
+        var materialTakesTextureSlot;
 
         var vaoExt = this.getGLExtension('OES_vertex_array_object');
 
@@ -737,7 +738,7 @@ var Renderer = Base.extend(function () {
                     }
                 }
 
-                this._bindMaterial(
+                materialTakesTextureSlot = this._bindMaterial(
                     renderable, material, program,
                     prevRenderable || null, prevMaterial || null, prevProgram || null,
                     passConfig.getUniform
@@ -773,7 +774,7 @@ var Renderer = Base.extend(function () {
                 culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
             }
             // TODO Not update skeleton in each renderable.
-            this._updateSkeleton(renderable, program);
+            this._updateSkeleton(renderable, program, materialTakesTextureSlot);
             if (drawIDChanged) {
                 currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
             }
@@ -799,7 +800,7 @@ var Renderer = Base.extend(function () {
         return this._glinfo.getMaxJointNumber();
     },
 
-    _updateSkeleton: function (object, program) {
+    _updateSkeleton: function (object, program, slot) {
         var _gl = this.gl;
         var skeleton = object.skeleton;
         // Set pose matrices of skinned mesh
@@ -807,7 +808,6 @@ var Renderer = Base.extend(function () {
             skeleton.update();
             if (object.joints.length > this._glinfo.getMaxJointNumber()) {
                 var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.__uid__, object.joints);
-                var slot = program.currentTextureSlot();
                 program.useTextureSlot(this, skinMatricesTexture, slot);
                 program.setUniform(_gl, '1i', 'skinMatricesTexture', slot);
                 program.setUniform(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
@@ -970,8 +970,10 @@ var Renderer = Base.extend(function () {
                 program.setUniform(_gl, uniform.type, symbol, uniformValue);
             }
         }
+        var newSlot = program.currentTextureSlot();
         // Texture slot maybe used out of material.
         program.resetTextureSlot(currentTextureSlot);
+        return newSlot;
     },
 
     _bindVAO: function (vaoExt, shader, geometry, program) {

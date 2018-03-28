@@ -41,7 +41,11 @@
                 this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);
 
                 // Load boombox model.
-                app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf');
+                app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf').then(function (result) {
+                    result.materials.forEach(function (mat) {
+                        mat.set('metalness', 1);
+                    });
+                });
 
                 // Create light
                 app.createDirectionalLight([-1, -1, -1]);

@@ -31,7 +31,7 @@
                 });
 
                 // Load boombox model. return a load promise to make sure the look will be start after model loaded.
-                return app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
+                app.loadModel('./assets/models/BoomBox/BoomBox.gltf', {
                     waitTextureLoaded: true
                 }).then(function (result) {
                     result.rootNode.scale.set(100, 100, 100);

@@ -120,17 +120,17 @@
             timeline.start();
             timeline.addClip(clip);
 
-            var skeletonDebugScene = createSkeletonDebugScene(skeleton, clay);
-            skeletonDebugScene.position.x = -10;
+            // var skeletonDebugScene = createSkeletonDebugScene(skeleton, clay);
+            // skeletonDebugScene.position.x = -10;
             timeline.on('frame', function() {
                 control.update(50);
                 skeleton.update();
                 deferredRenderer.render(renderer, scene, camera);
 
-                renderer.saveClear();
-                renderer.clearBit = renderer.gl.DEPTH_BUFFER_BIT;
-                renderer.render(skeletonDebugScene, camera);
-                renderer.restoreClear();
+                // renderer.saveClear();
+                // renderer.clearBit = renderer.gl.DEPTH_BUFFER_BIT;
+                // renderer.render(skeletonDebugScene, camera);
+                // renderer.restoreClear();
             });
         });
     </script>
