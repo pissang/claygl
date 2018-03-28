@@ -683,9 +683,9 @@ function () {
 
         var isStandardMaterial = this.useStandardMaterial;
         var material;
-        var diffuseMap, roughnessMap, metalnessMap, normalMap, emissiveMap;
+        var diffuseMap, roughnessMap, metalnessMap, normalMap, emissiveMap, occlusionMap;
         var enabledTextures = [];
-            // TODO texCoord
+        // TODO texCoord
         if (metallicRoughnessMatInfo.baseColorTexture) {
             diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index] || null;
             diffuseMap && enabledTextures.push('diffuseMap');
@@ -702,6 +702,10 @@ function () {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
             emissiveMap && enabledTextures.push('emissiveMap');
         }
+        if (materialInfo.occlusionTexture) {
+            occlusionMap = lib.textures[materialInfo.occlusionTexture.index] || null;
+            occlusionMap && enabledTextures.push('occlusionMap');
+        }
         var baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
         var commonProperties = {
@@ -709,6 +713,7 @@ function () {
             roughnessMap: roughnessMap || null,
             metalnessMap: metalnessMap || null,
             normalMap: normalMap || null,
+            occlusionMap: occlusionMap || null,
             emissiveMap: emissiveMap || null,
             color: baseColor.slice(0, 3),
             alpha: baseColor[3],
@@ -776,7 +781,7 @@ function () {
         }
 
         var material;
-        var diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap;
+        var diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap, occlusionMap;
         var enabledTextures = [];
             // TODO texCoord
         if (specularGlossinessMatInfo.diffuseTexture) {
@@ -795,6 +800,10 @@ function () {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
             emissiveMap && enabledTextures.push('emissiveMap');
         }
+        if (materialInfo.occlusionTexture) {
+            occlusionMap = lib.textures[materialInfo.occlusionTexture.index] || null;
+            occlusionMap && enabledTextures.push('occlusionMap');
+        }
         var diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
         var commonProperties = {
@@ -803,6 +812,7 @@ function () {
             specularMap: specularMap || null,
             normalMap: normalMap || null,
             emissiveMap: emissiveMap || null,
+            occlusionMap: occlusionMap || null,
             color: diffuseColor.slice(0, 3),
             alpha: diffuseColor[3],
             specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],

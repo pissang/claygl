@@ -161,6 +161,10 @@ uniform sampler2D glossinessMap;
 uniform sampler2D metalnessMap;
 #endif
 
+#ifdef OCCLUSIONMAP_ENABLED
+uniform sampler2D occlusionMap;
+#endif
+
 #ifdef ENVIRONMENTMAP_ENABLED
 uniform samplerCube environmentMap;
 
@@ -608,6 +612,11 @@ void main() {
 
 #ifdef AOMAP_ENABLED
     aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);
+#endif
+
+#ifdef OCCLUSIONMAP_ENABLED
+    // Use R channel for occlusion. Same with glTF.
+    aoFactor = min(1.0 - clamp((1.0 - texture2D(occlusionMap, v_Texcoord).r), 0.0, 1.0), aoFactor);
 #endif
 
     outColor.rgb *= aoFactor;
