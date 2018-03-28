@@ -8,7 +8,9 @@ import Texture from './Texture';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
 
-import './shader/builtinCompositor';
+import registerBuiltinCompositor from './shader/registerBuiltinCompositor';
+
+registerBuiltinCompositor(Shader);
 
 var shaderSourceReg = /^#source\((.*?)\)/;
 

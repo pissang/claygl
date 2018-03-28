@@ -19,7 +19,6 @@ import ParametricSurfaceGeo from './geometry/ParametricSurface';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
 import Texture from './Texture';
-import shaderLibrary from './shader/library';
 import Mesh from './Mesh';
 import Material from './Material';
 import PerspectiveCamera from './camera/Perspective';
@@ -43,8 +42,9 @@ import textureUtil from './util/texture';
 import colorUtil from './core/color';
 var parseColor = colorUtil.parseToFloat;
 
-import './shader/builtin';
+import shaderLibrary from './shader/builtin';
 import Shader from './Shader';
+
 
 var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
     'touchstart', 'touchend', 'touchmove',

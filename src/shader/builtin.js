@@ -30,3 +30,6 @@ library.template('clay.skybox', Shader.source('clay.skybox.vertex'), Shader.sour
 library.template('clay.prez', Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'));
 library.template('clay.standard', Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
 library.template('clay.standardMR', Shader.source('clay.standardMR.vertex'), Shader.source('clay.standardMR.fragment'));
+
+// TODO Must export a module and be used in the other modules. Or it will be tree shaked
+export default library;
