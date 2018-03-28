@@ -1,29 +1,29 @@
 // Shader for prez pass
 @export clay.prez.vertex
 
-uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
+uniform mat4 WVP : WORLDVIEWPROJECTION;
 
-attribute vec3 position : POSITION;
-attribute vec2 texcoord : TEXCOORD_0;
+attribute vec3 pos : POSITION;
+attribute vec2 uv : TEXCOORD_0;
 
 @import clay.chunk.skinning_header
 
-varying vec2 v_Texcoord;
+varying vec2 v_Uv;
 
 void main()
 {
 
-    vec3 skinnedPosition = position;
+    vec3 P = pos;
 
 #ifdef SKINNING
 
     @import clay.chunk.skin_matrix
 
-    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    P = (skinMatrixWS * vec4(pos, 1.0)).xyz;
 #endif
 
-    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
-    v_Texcoord = texcoord;
+    gl_Position = WVP * vec4(P, 1.0);
+    v_Uv = uv;
 }
 
 @end
@@ -34,16 +34,16 @@ void main()
 uniform sampler2D alphaMap;
 uniform float alphaCutoff: 0.0;
 
-varying vec2 v_Texcoord;
+varying vec2 v_Uv;
 
 void main()
 {
     if (alphaCutoff > 0.0) {
-        if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+        if (texture2D(alphaMap, v_Uv).a <= alphaCutoff) {
             discard;
         }
     }
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 }
 
 @end

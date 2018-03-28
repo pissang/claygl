@@ -5,7 +5,6 @@ import GLInfo from './core/GLInfo';
 import glenum from './core/glenum';
 import Material from './Material';
 import Vector2 from './math/Vector2';
-import Texture2D from './Texture2D';
 import ProgramManager from './gpu/ProgramManager';
 
 // Light header
@@ -48,6 +47,30 @@ function VertexArrayObject(availableAttributes, availableAttributeSymbols, indic
     this.indicesBuffer = indicesBuffer;
 
     this.vao = null;
+}
+
+function PlaceHolderTexture(renderer) {
+    var blankCanvas = renderer.createCanvas();
+    blankCanvas.width = blankCanvas.height = 1;
+    var ctx = blankCanvas.getContext('2d');
+    var webglTexture;
+    this.bind = function (renderer) {
+        var gl = renderer.gl;
+        var firstBind = !webglTexture;
+        if (firstBind) {
+            webglTexture = gl.createTexture();
+        }
+        gl.bindTexture(gl.TEXTURE_2D, webglTexture);
+        if (firstBind) {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.FLOAT, blankCanvas);
+        }
+    };
+    this.unbind = function (renderer) {
+        renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, null);
+    };
+    this.isRenderable = function () {
+        return true;
+    };
 }
 /**
  * @constructor clay.Renderer
@@ -202,12 +225,7 @@ var Renderer = Base.extend(function () {
     // Init managers
     this._programMgr = new ProgramManager(this);
 
-    var blankCanvas = this.createCanvas();
-    blankCanvas.width = blankCanvas.height = 1;
-    var ctx = blankCanvas.getContext('2d');
-    this._placeholderTexture = new Texture2D({
-        canvas: blankCanvas
-    });
+    this._placeholderTexture = new PlaceHolderTexture(this);
 },
 /** @lends clay.Renderer.prototype. **/
 {

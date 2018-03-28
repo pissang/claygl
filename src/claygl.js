@@ -112,25 +112,26 @@ import Renderer$92 from './Renderer';
 import Scene$93 from './Scene';
 import Shader$94 from './Shader';
 import library$95 from './shader/library';
-import light$96 from './shader/source/header/light';
-import Skeleton$97 from './Skeleton';
-import StandardMaterial$98 from './StandardMaterial';
-import StaticGeometry$99 from './StaticGeometry';
-import Texture$100 from './Texture';
-import Texture2D$101 from './Texture2D';
-import TextureCube$102 from './TextureCube';
-import Timeline$103 from './Timeline';
-import cubemap$104 from './util/cubemap';
-import dds$105 from './util/dds';
-import delaunay$106 from './util/delaunay';
-import hdr$107 from './util/hdr';
-import mesh$108 from './util/mesh';
-import sh$109 from './util/sh';
-import texture$110 from './util/texture';
-import transferable$111 from './util/transferable';
-import version$112 from './version';
-import CardboardDistorter$113 from './vr/CardboardDistorter';
-import StereoCamera$114 from './vr/StereoCamera';
+import registerBuiltinCompositor$96 from './shader/registerBuiltinCompositor';
+import light$97 from './shader/source/header/light';
+import Skeleton$98 from './Skeleton';
+import StandardMaterial$99 from './StandardMaterial';
+import StaticGeometry$100 from './StaticGeometry';
+import Texture$101 from './Texture';
+import Texture2D$102 from './Texture2D';
+import TextureCube$103 from './TextureCube';
+import Timeline$104 from './Timeline';
+import cubemap$105 from './util/cubemap';
+import dds$106 from './util/dds';
+import delaunay$107 from './util/delaunay';
+import hdr$108 from './util/hdr';
+import mesh$109 from './util/mesh';
+import sh$110 from './util/sh';
+import texture$111 from './util/texture';
+import transferable$112 from './util/transferable';
+import version$113 from './version';
+import CardboardDistorter$114 from './vr/CardboardDistorter';
+import StereoCamera$115 from './vr/StereoCamera';
 
 
 var animation = {
@@ -320,39 +321,40 @@ export { Shader$94 as Shader };
 
 var shader = {
     library : library$95,
+    registerBuiltinCompositor : registerBuiltinCompositor$96,
     source : {
     header : {
-        light : light$96
+        light : light$97
     }
     }
 };
 export { shader };
 
-export { Skeleton$97 as Skeleton };
-export { StandardMaterial$98 as StandardMaterial };
-export { StaticGeometry$99 as StaticGeometry };
-export { Texture$100 as Texture };
-export { Texture2D$101 as Texture2D };
-export { TextureCube$102 as TextureCube };
-export { Timeline$103 as Timeline };
+export { Skeleton$98 as Skeleton };
+export { StandardMaterial$99 as StandardMaterial };
+export { StaticGeometry$100 as StaticGeometry };
+export { Texture$101 as Texture };
+export { Texture2D$102 as Texture2D };
+export { TextureCube$103 as TextureCube };
+export { Timeline$104 as Timeline };
 
 var util = {
-    cubemap : cubemap$104,
-    dds : dds$105,
-    delaunay : delaunay$106,
-    hdr : hdr$107,
-    mesh : mesh$108,
-    sh : sh$109,
-    texture : texture$110,
-    transferable : transferable$111
+    cubemap : cubemap$105,
+    dds : dds$106,
+    delaunay : delaunay$107,
+    hdr : hdr$108,
+    mesh : mesh$109,
+    sh : sh$110,
+    texture : texture$111,
+    transferable : transferable$112
 };
 export { util };
 
-export { version$112 as version };
+export { version$113 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$113,
-    StereoCamera : StereoCamera$114
+    CardboardDistorter : CardboardDistorter$114,
+    StereoCamera : StereoCamera$115
 };
 export { vr };
 ;
