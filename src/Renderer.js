@@ -3,9 +3,6 @@
 import Base from './core/Base';
 import GLInfo from './core/GLInfo';
 import glenum from './core/glenum';
-import vendor from './core/vendor';
-import BoundingBox from './math/BoundingBox';
-import Matrix4 from './math/Matrix4';
 import Material from './Material';
 import Vector2 from './math/Vector2';
 import Texture2D from './Texture2D';
@@ -14,9 +11,7 @@ import ProgramManager from './gpu/ProgramManager';
 // Light header
 import Shader from './Shader';
 
-import lightShader from './shader/source/header/light';
 import prezEssl from './shader/source/prez.glsl.js';
-Shader['import'](lightShader);
 Shader['import'](prezEssl);
 
 import glMatrix from './dep/glmatrix';
@@ -546,7 +541,7 @@ var Renderer = Base.extend(function () {
     /**
      * Render a single renderable list in camera in sequence
      * @param {clay.Renderable[]} list List of all renderables.
-     * @param {clay.Camera} camera
+     * @param {clay.Camera} [camera] Camera provide view matrix and porjection matrix. It can be null.
      * @param {Object} [passConfig]
      * @param {Function} [passConfig.getMaterial] Get renderable material.
      * @param {Function} [passConfig.getUniform] Get material uniform value.
@@ -591,10 +586,17 @@ var Renderer = Base.extend(function () {
         var time = Date.now();
 
         // Calculate view and projection matrix
-        mat4.copy(matrices.VIEW, camera.viewMatrix.array);
-        mat4.copy(matrices.PROJECTION, camera.projectionMatrix.array);
-        mat4.multiply(matrices.VIEWPROJECTION, camera.projectionMatrix.array, matrices.VIEW);
-        mat4.copy(matrices.VIEWINVERSE, camera.worldTransform.array);
+        if (camera) {
+            mat4.copy(matrices.VIEW, camera.viewMatrix.array);
+            mat4.copy(matrices.PROJECTION, camera.projectionMatrix.array);
+            mat4.copy(matrices.VIEWINVERSE, camera.worldTransform.array);
+        }
+        else {
+            mat4.identity(matrices.VIEW);
+            mat4.identity(matrices.PROJECTION);
+            mat4.identity(matrices.VIEWINVERSE);
+        }
+        mat4.multiply(matrices.VIEWPROJECTION, matrices.PROJECTION, matrices.VIEW);
         mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
         mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
@@ -638,7 +640,7 @@ var Renderer = Base.extend(function () {
 
             mat4.copy(matrices.WORLD, worldM);
             mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM);
-            mat4.multiplyAffine(matrices.WORLDVIEW, camera.viewMatrix.array, worldM);
+            mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM);
             if (shader.matrixSemantics.WORLDINVERSE ||
                 shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
                 mat4.invert(matrices.WORLDINVERSE, worldM);
@@ -663,8 +665,10 @@ var Renderer = Base.extend(function () {
                 // Set some common uniforms
                 program.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
                 program.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
-                program.setUniformOfSemantic(_gl, 'NEAR', camera.near);
-                program.setUniformOfSemantic(_gl, 'FAR', camera.far);
+                if (camera) {
+                    program.setUniformOfSemantic(_gl, 'NEAR', camera.near);
+                    program.setUniformOfSemantic(_gl, 'FAR', camera.far);
+                }
                 program.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
                 program.setUniformOfSemantic(_gl, 'TIME', time);
                 // DEPRECATED

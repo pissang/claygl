@@ -1,4 +1,8 @@
 import Node from './Node';
+import Shader from './Shader';
+
+import lightShader from './shader/source/header/light';
+Shader['import'](lightShader);
 
 /**
  * @constructor clay.Light
