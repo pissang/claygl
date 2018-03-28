@@ -1149,7 +1149,7 @@ App3D.prototype.createAmbientLight = function (color, intensity) {
 App3D.prototype.createAmbientCubemapLight = function (envImage, specIntensity, diffIntensity, exposure, prefilteredCubemapSize) {
     var self = this;
     if (exposure == null) {
-        exposure = 1;
+        exposure = 0;
     }
     if (prefilteredCubemapSize == null) {
         prefilteredCubemapSize = 32;
