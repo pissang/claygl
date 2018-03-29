@@ -5,9 +5,7 @@ import Vector3 from '../math/Vector3';
 import Matrix4 from '../math/Matrix4';
 import Renderable from '../Renderable';
 import glenum from '../core/glenum';
-import glmatrix from '../dep/glmatrix';
-
-var vec3 = glmatrix.vec3;
+import vec3 from '../glmatrix/vec3';
 
 /**
  * @constructor clay.picking.RayPicking

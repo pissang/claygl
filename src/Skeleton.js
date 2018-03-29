@@ -3,10 +3,9 @@ import Joint from './Joint';
 import Texture2D from './Texture2D';
 import Texture from './Texture';
 
-import glMatrix from './dep/glmatrix';
-var quat = glMatrix.quat;
-var vec3 = glMatrix.vec3;
-var mat4 = glMatrix.mat4;
+import mat4 from './glmatrix/mat4';
+import vec3 from './glmatrix/vec3';
+import quat from './glmatrix/quat';
 
 /**
  * @constructor clay.Skeleton

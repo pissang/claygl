@@ -1,5 +1,5 @@
-import glMatrix from '../dep/glmatrix';
-var quat = glMatrix.quat;
+import quat from '../glmatrix/quat';
+import mat3 from '../glmatrix/mat3';
 
 /**
  * @constructor
@@ -150,7 +150,6 @@ Quaternion.prototype = {
      * @return {clay.Quaternion}
      */
     fromMat4: (function () {
-        var mat3 = glMatrix.mat3;
         var m3 = mat3.create();
         return function (m) {
             mat3.fromMat4(m3, m.array);

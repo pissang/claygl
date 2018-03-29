@@ -1,9 +1,8 @@
 // Sampler clip is especially for the animation sampler in glTF
 // Use Typed Array can reduce a lot of heap memory
 
-import glMatrix from '../dep/glmatrix';
-var quat = glMatrix.quat;
-var vec3 = glMatrix.vec3;
+import quat from '../glmatrix/quat';
+import vec3 from '../glmatrix/vec3';
 
 // lerp function with offset in large array
 function vec3lerp(out, a, b, t, oa, ob) {

@@ -1,7 +1,6 @@
 import Field from './Field';
 import Vector3 from '../math/Vector3';
-import glMatrix from '../dep/glmatrix';
-var vec3 =  glMatrix.vec3;
+import vec3 from '../glmatrix/vec3';
 
 /**
  * @constructor clay.particle.ForceField

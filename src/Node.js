@@ -2,9 +2,8 @@ import Base from './core/Base';
 import Vector3 from './math/Vector3';
 import Quaternion from './math/Quaternion';
 import Matrix4 from './math/Matrix4';
-import glMatrix from './dep/glmatrix';
+import mat4 from './glmatrix/mat4';
 import BoundingBox from './math/BoundingBox';
-var mat4 = glMatrix.mat4;
 
 var nameId = 0;
 

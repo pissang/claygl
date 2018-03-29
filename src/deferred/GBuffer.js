@@ -6,12 +6,10 @@ import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
 import Pass from '../compositor/Pass';
 import Matrix4 from '../math/Matrix4';
-import glmatrix from '../dep/glmatrix';
+import mat4 from '../glmatrix/mat4';
 
 import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
 import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
-
-var mat4 = glmatrix.mat4;
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);

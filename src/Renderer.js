@@ -13,9 +13,8 @@ import Shader from './Shader';
 import prezEssl from './shader/source/prez.glsl.js';
 Shader['import'](prezEssl);
 
-import glMatrix from './dep/glmatrix';
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
+import mat4 from './glmatrix/mat4';
+import vec3 from './glmatrix/vec3';
 
 var mat4Create = mat4.create;
 

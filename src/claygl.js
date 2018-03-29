@@ -54,15 +54,15 @@ import vendor$34 from './core/vendor';
 import createCompositor$35 from './createCompositor';
 import GBuffer$36 from './deferred/GBuffer';
 import Renderer$37 from './deferred/Renderer';
-import glmatrix$38 from './dep/glmatrix';
-import FrameBuffer$39 from './FrameBuffer';
-import Geometry$40 from './Geometry';
-import Cone$41 from './geometry/Cone';
-import Cube$42 from './geometry/Cube';
-import Cylinder$43 from './geometry/Cylinder';
-import ParametricSurface$44 from './geometry/ParametricSurface';
-import Plane$45 from './geometry/Plane';
-import Sphere$46 from './geometry/Sphere';
+import FrameBuffer$38 from './FrameBuffer';
+import Geometry$39 from './Geometry';
+import Cone$40 from './geometry/Cone';
+import Cube$41 from './geometry/Cube';
+import Cylinder$42 from './geometry/Cylinder';
+import ParametricSurface$43 from './geometry/ParametricSurface';
+import Plane$44 from './geometry/Plane';
+import Sphere$45 from './geometry/Sphere';
+import GeometryBase$46 from './GeometryBase';
 import Joint$47 from './Joint';
 import Light$48 from './Light';
 import Ambient$49 from './light/Ambient';
@@ -203,25 +203,20 @@ var deferred = {
 };
 export { deferred };
 
-
-var dep = {
-    glmatrix : glmatrix$38
-};
-export { dep };
-
-export { FrameBuffer$39 as FrameBuffer };
-export { Geometry$40 as Geometry };
+export { FrameBuffer$38 as FrameBuffer };
+export { Geometry$39 as Geometry };
 
 var geometry = {
-    Cone : Cone$41,
-    Cube : Cube$42,
-    Cylinder : Cylinder$43,
-    ParametricSurface : ParametricSurface$44,
-    Plane : Plane$45,
-    Sphere : Sphere$46
+    Cone : Cone$40,
+    Cube : Cube$41,
+    Cylinder : Cylinder$42,
+    ParametricSurface : ParametricSurface$43,
+    Plane : Plane$44,
+    Sphere : Sphere$45
 };
 export { geometry };
 
+export { GeometryBase$46 as GeometryBase };
 export { Joint$47 as Joint };
 export { Light$48 as Light };
 

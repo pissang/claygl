@@ -1,9 +1,8 @@
-import glMatrix from '../dep/glmatrix';
+import mat4 from '../glmatrix/mat4';
+import vec3 from '../glmatrix/vec3';
+import quat from '../glmatrix/quat';
+import mat3 from '../glmatrix/mat3';
 import Vector3 from './Vector3';
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
-var mat3 = glMatrix.mat3;
-var quat = glMatrix.quat;
 
 /**
  * @constructor

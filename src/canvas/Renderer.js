@@ -1,12 +1,9 @@
 import Base from '../core/Base';
-import glMatrix from '../dep/glmatrix';
-import glenum from '../core/glenum';
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
-var vec4 = glMatrix.vec4;
+import vec3 from '../glmatrix/vec3';
+import mat4 from '../glmatrix/mat4';
+import vec4 from '../glmatrix/vec4';
 
-var vec3Set = vec3.set;
-var vec3Create = vec3.create;
+import glenum from '../core/glenum';
 
 var vec4Create = vec4.create;
 

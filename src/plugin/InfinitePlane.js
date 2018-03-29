@@ -2,13 +2,7 @@ import Mesh from '../Mesh';
 import Geometry from '../Geometry';
 import Plane from '../math/Plane';
 import Vector3 from '../math/Vector3';
-import Matrix4 from '../math/Matrix4';
 import Ray from '../math/Ray';
-
-import glMatrix from '../dep/glmatrix';
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
-var vec4 = glMatrix.vec4;
 
 var uvs = [[0, 0], [0, 1], [1, 1], [1, 0]];
 var tris = [0, 1, 2, 2, 3, 0];

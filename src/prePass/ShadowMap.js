@@ -17,8 +17,7 @@ import OrthoCamera from '../camera/Orthographic';
 import Pass from '../compositor/Pass';
 import TexturePool from '../compositor/TexturePool';
 
-import glMatrix from '../dep/glmatrix';
-var mat4 = glMatrix.mat4;
+import mat4 from '../glmatrix/mat4';
 
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 

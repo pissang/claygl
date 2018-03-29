@@ -3,10 +3,9 @@ import Light from './Light';
 import Camera from './Camera';
 import BoundingBox from './math/BoundingBox';
 import util from './core/util';
-import glmatrix from './dep/glmatrix';
+import mat4 from './glmatrix/mat4';
 import LRUCache from './core/LRU';
 import Matrix4 from './math/Matrix4';
-var mat4 = glmatrix.mat4;
 
 var IDENTITY = mat4.create();
 var WORLDVIEW = mat4.create();

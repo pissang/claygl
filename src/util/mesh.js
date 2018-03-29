@@ -2,11 +2,9 @@
 import Geometry from '../Geometry';
 import Mesh from '../Mesh';
 import Node from '../Node';
-import StandardMaterial from '../StandardMaterial';
 import BoundingBox from '../math/BoundingBox';
-import glMatrix from '../dep/glmatrix';
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
+import vec3 from '../glmatrix/vec3';
+import mat4 from '../glmatrix/mat4';
 
 /**
  * @namespace clay.util.mesh

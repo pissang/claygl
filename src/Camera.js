@@ -3,9 +3,9 @@ import Matrix4 from './math/Matrix4';
 import Frustum from './math/Frustum';
 import Ray from './math/Ray';
 
-import glMatrix from './dep/glmatrix';
-var vec3 = glMatrix.vec3;
-var vec4 = glMatrix.vec4;
+import vec4 from './glmatrix/vec4';
+import vec3 from './glmatrix/vec3';
+
 
 /**
  * @constructor clay.Camera

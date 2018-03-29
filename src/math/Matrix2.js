@@ -1,5 +1,4 @@
-import glMatrix from '../dep/glmatrix';
-var mat2 = glMatrix.mat2;
+import mat2 from '../glmatrix/mat2';
 
 /**
  * @constructor

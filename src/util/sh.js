@@ -8,8 +8,7 @@ import Skybox from '../plugin/Skybox';
 import Skydome from '../plugin/Skydome';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Scene from '../Scene';
-import glmatrix from '../dep/glmatrix';
-var vec3 = glmatrix.vec3;
+import vec3 from '../glmatrix/vec3';
 var sh = {};
 
 import projectEnvMapShaderCode from './shader/projectEnvMap.glsl.js';

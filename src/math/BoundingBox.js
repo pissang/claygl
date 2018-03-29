@@ -1,9 +1,8 @@
 import Vector3 from './Vector3';
-import glMatrix from '../dep/glmatrix';
-var vec3 = glMatrix.vec3;
+import vec3 from '../glmatrix/vec3';
 
-var vec3Copy = vec3.copy;
 var vec3Set = vec3.set;
+var vec3Copy = vec3.copy;
 
 /**
  * Axis aligned bounding box

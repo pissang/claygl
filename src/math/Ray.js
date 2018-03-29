@@ -1,6 +1,5 @@
 import Vector3 from './Vector3';
-import glMatrix from '../dep/glmatrix';
-var vec3 = glMatrix.vec3;
+import vec3 from '../glmatrix/vec3';
 
 var EPSILON = 1e-5;
 

@@ -2,16 +2,12 @@ import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import Particle from './Particle';
 import Value from '../math/Value';
-import glMatrix from '../dep/glmatrix';
-var vec3 =  glMatrix.vec3;
 
 /**
  * @constructor clay.particle.Emitter
  * @extends clay.core.Base
  */
-var Emitter = Base.extend(
-/** @lends clay.particle.Emitter# */
-{
+var Emitter = Base.extend( /** @lends clay.particle.Emitter# */ {
     /**
      * Maximum number of particles created by this emitter
      * @type {number}

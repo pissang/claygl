@@ -9,10 +9,6 @@
  */
 import util from './core/util';
 import vendor from './core/vendor';
-import glMatrix from './dep/glmatrix';
-var mat2 = glMatrix.mat2;
-var mat3 = glMatrix.mat3;
-var mat4 = glMatrix.mat4;
 
 var uniformRegex = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\s\S]*?);/g;
 var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+([\s\S]*?);/g;
@@ -35,6 +31,14 @@ var uniformTypeMap = {
     'mat4': 'm4'
 };
 
+function createZeroArray(len) {
+    var arr = [];
+    for (var i = 0; i < len; i++) {
+        arr[i] = 0;
+    }
+    return arr;
+}
+
 var uniformValueConstructor = {
     'bool': function () { return true; },
     'int': function () { return 0; },
@@ -42,17 +46,17 @@ var uniformValueConstructor = {
     'sampler2D': function () { return null; },
     'samplerCube': function () { return null; },
 
-    'vec2': function () { return [0, 0]; },
-    'vec3': function () { return [0, 0, 0]; },
-    'vec4': function () { return [0, 0, 0, 0]; },
+    'vec2': function () { return createZeroArray(2); },
+    'vec3': function () { return createZeroArray(3); },
+    'vec4': function () { return createZeroArray(4); },
 
-    'ivec2': function () { return [0, 0]; },
-    'ivec3': function () { return [0, 0, 0]; },
-    'ivec4': function () { return [0, 0, 0, 0]; },
+    'ivec2': function () { return createZeroArray(2); },
+    'ivec3': function () { return createZeroArray(3); },
+    'ivec4': function () { return createZeroArray(4); },
 
-    'mat2': function () { return mat2.create(); },
-    'mat3': function () { return mat3.create(); },
-    'mat4': function () { return mat4.create(); },
+    'mat2': function () { return createZeroArray(4); },
+    'mat3': function () { return createZeroArray(9); },
+    'mat4': function () { return createZeroArray(16); },
 
     'array': function () { return []; }
 };

@@ -1,8 +1,8 @@
 import Clip from './Clip';
 
-import glMatrix from '../dep/glmatrix';
-var quat = glMatrix.quat;
-var vec3 = glMatrix.vec3;
+import quat from '../glmatrix/quat';
+import vec3 from '../glmatrix/vec3';
+
 
 /**
  *

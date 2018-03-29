@@ -1,8 +1,7 @@
 import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
-import glMatrix from '../dep/glmatrix';
-var vec3 = glMatrix.vec3;
-var vec2 = glMatrix.vec2;
+import vec3 from '../glmatrix/vec3';
+import vec2 from '../glmatrix/vec2';
 
 /**
  * @constructor clay.geometry.Cone
