@@ -83,11 +83,13 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 </html>
 ```
 
-#### Minimum example code
+#### Minimum bundle example
 
-This example is about 28k(gzipped) after bundled by webpack 4.0.
+This example is about 28k(gzipped) after bundled by webpack 4.0. It draws a triangle on the screen.
 
 ```js
+import { Renderer, Geometry, Shader, Material } from 'claygl';
+
 const vsCode = `
 attribute vec3 position: POSITION;
 void main() {
@@ -99,7 +101,7 @@ void main() {
     gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
 `;
-import { Renderer, Geometry, Shader, Material } from 'claygl';
+
 const renderer = new Renderer({
     canvas: document.getElementById('main')
 });
@@ -114,7 +116,7 @@ geometry.attributes.position.fromArray([
 const material = new Material({
     shader: new Shader(vsCode, fsCode)
 });
-renderer.renderPass([{ geometry, material }]);
+renderer.renderPass([ { geometry, material } ]);
 ```
 
 
