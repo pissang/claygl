@@ -7,7 +7,7 @@
 
 ClayGL is a WebGL graphic library for building scalable Web3D applications.
 
-It's easy to use, configurable for high-quality graphics. Benefit from the modularity and tree shaking, it can be scaled down to 30k(gzipped) for a basic 3D application.
+It's easy to use, configurable for high-quality graphics. Benefit from the modularity and tree shaking, it can be scaled down to 22k(gzipped) for a basic 3D application.
 
 #### [Download](https://github.com/pissang/claygl/releases)
 
@@ -85,10 +85,10 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 
 #### Minimum bundle example
 
-This example is about 28k(gzipped) after bundled by webpack 4.0. It draws a triangle on the screen.
+This example is about 22k(gzipped) after bundled by webpack 4.0. It draws a triangle on the screen.
 
 ```js
-import { Renderer, Geometry, Shader, Material } from 'claygl';
+import { Renderer, GeometryBase, Shader, Material } from 'claygl';
 
 const vsCode = `
 attribute vec3 position: POSITION;
@@ -106,13 +106,16 @@ const renderer = new Renderer({
     canvas: document.getElementById('main')
 });
 renderer.resize(400, 400);
-const geometry = new Geometry();
+
+const geometry = new GeometryBase();
+geometry.createAttribute('position', 'float', 3);
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray([
     [-0.5, -0.5, 0],
     [0.5, -0.5, 0],
     [0, 0.5, 0]
 ]);
+
 const material = new Material({
     shader: new Shader(vsCode, fsCode)
 });
