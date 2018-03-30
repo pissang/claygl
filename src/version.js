@@ -1,4 +1,4 @@
 /**
  * @name clay.version
  */
-export default '1.1.4';
+export default '1.2.0';
