@@ -538,6 +538,17 @@ var OrbitControl = Base.extend(function () {
 
             this._processGesture(e, 'start');
         }
+        else {
+            if (e.button === 0) {
+                this._mode = 'rotate';
+            }
+            else if (e.button === 1) {
+                this._mode = 'pan';
+            }
+            else {
+                this._mode = null;
+            }
+        }
 
         var dom = this.domElement;
         dom.addEventListener('touchmove', this._mouseMoveHandler);
@@ -546,16 +557,6 @@ var OrbitControl = Base.extend(function () {
         dom.addEventListener('mousemove', this._mouseMoveHandler);
         dom.addEventListener('mouseup', this._mouseUpHandler);
         dom.addEventListener('mouseout', this._mouseUpHandler);
-
-        if (e.button === 0) {
-            this._mode = 'rotate';
-        }
-        else if (e.button === 1) {
-            this._mode = 'pan';
-        }
-        else {
-            this._mode = null;
-        }
 
         // Reset rotate velocity
         this._rotateVelocity.set(0, 0);
