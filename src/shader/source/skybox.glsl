@@ -43,6 +43,7 @@ void main()
 #ifdef EQUIRECTANGULAR
     float phi = acos(V.y);
     // consistent with cubemap.
+    // atan(y, x) is same with atan2 ?
     float theta = atan(-V.x, V.z) + PI * 0.5;
     vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
     vec4 texel = decodeHDR(texture2D(environmentMap, fract(uv)));
