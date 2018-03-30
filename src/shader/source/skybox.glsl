@@ -42,9 +42,10 @@ void main()
     vec3 V = normalize(v_WorldPosition - eyePos);
 #ifdef EQUIRECTANGULAR
     float phi = acos(V.y);
-    float theta = atan(-V.x, V.z) + PI;
+    // consistent with cubemap.
+    float theta = atan(-V.x, V.z) + PI * 0.5;
     vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
-    vec4 texel = decodeHDR(texture2D(environmentMap, uv));
+    vec4 texel = decodeHDR(texture2D(environmentMap, fract(uv)));
 #else
     #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)
     vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, V, lod));
