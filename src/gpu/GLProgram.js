@@ -302,7 +302,7 @@ var GLProgram = Base.extend({
         _gl.linkProgram(program);
 
         if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-            return 'Could not link program\n' + 'VALIDATE_STATUS: ' + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ', gl error [' + _gl.getError() + ']';
+            return 'Could not link program\n' + _gl.getProgramInfoLog(program);
         }
 
         // Cache uniform locations

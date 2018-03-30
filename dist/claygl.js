@@ -8719,7 +8719,7 @@ var GLProgram = Base.extend({
         _gl.linkProgram(program);
 
         if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
-            return 'Could not link program\n' + 'VALIDATE_STATUS: ' + _gl.getProgramParameter(program, _gl.VALIDATE_STATUS) + ', gl error [' + _gl.getError() + ']';
+            return 'Could not link program\n' + _gl.getProgramInfoLog(program);
         }
 
         // Cache uniform locations
@@ -9590,7 +9590,7 @@ Shader.source = function (name) {
     return obj;
 };
 
-var prezGlsl = "@export clay.prez.vertex\nuniform mat4 WVP : WORLDVIEWPROJECTION;\nattribute vec3 pos : POSITION;\nattribute vec2 uv : TEXCOORD_0;\n@import clay.chunk.skinning_header\nvarying vec2 v_Uv;\nvoid main()\n{\n vec3 P = pos;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n P = (skinMatrixWS * vec4(pos, 1.0)).xyz;\n#endif\n gl_Position = WVP * vec4(P, 1.0);\n v_Uv = uv;\n}\n@end\n@export clay.prez.fragment\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\nvarying vec2 v_Uv;\nvoid main()\n{\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Uv).a <= alphaCutoff) {\n discard;\n }\n }\n gl_FragColor = vec4(0.0,0.0,0.0,1.0);\n}\n@end";
+var prezGlsl = "@export clay.prez.vertex\nuniform mat4 WVP : WORLDVIEWPROJECTION;\nattribute vec3 pos : POSITION;\nattribute vec2 uv : TEXCOORD_0;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec3 P = pos;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n P = (skinMatrixWS * vec4(pos, 1.0)).xyz;\n#endif\n gl_Position = WVP * vec4(P, 1.0);\n v_Texcoord = uv;\n}\n@end\n@export clay.prez.fragment\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {\n discard;\n }\n }\n gl_FragColor = vec4(0.0,0.0,0.0,1.0);\n}\n@end";
 
 /* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
 
@@ -16498,6 +16498,10 @@ var Scene = Node.extend(function () {
             // Bounding box can be a property of object(like light) or renderable.geometry
             // PENDING
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
+            if (!geoBBox) {
+                return false;
+            }
+
             cullingMatrix.array = worldViewMat;
             cullingBoundingBox.transformFrom(geoBBox, cullingMatrix);
 

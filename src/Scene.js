@@ -334,6 +334,10 @@ var Scene = Node.extend(function () {
             // Bounding box can be a property of object(like light) or renderable.geometry
             // PENDING
             var geoBBox = object.boundingBox || object.geometry.boundingBox;
+            if (!geoBBox) {
+                return false;
+            }
+
             cullingMatrix.array = worldViewMat;
             cullingBoundingBox.transformFrom(geoBBox, cullingMatrix);
 
