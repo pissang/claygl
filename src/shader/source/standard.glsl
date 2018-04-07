@@ -137,6 +137,9 @@ uniform mat4 viewInverse : VIEWINVERSE;
 uniform sampler2D normalMap;
 #endif
 
+// Scalar multiplier applied to each normal vector of normal texture.
+uniform float normalScale: 1.0;
+
 #ifdef DIFFUSEMAP_ENABLED
 uniform sampler2D diffuseMap;
 #endif
@@ -404,6 +407,9 @@ void main() {
             // FIXME Why need to negate
             tbn[1] = -tbn[1];
             N = normalize(tbn * N);
+
+            // Apply scalar multiplier to normal vector of texture.
+            N = normalize(N * vec3(normalScale, normalScale, 1.0));
         }
     }
 #endif
