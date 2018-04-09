@@ -209,6 +209,8 @@ var FilterNode = CompositorNode.extend(function () {
         else {
             height = parameters.height;
         }
+        width = Math.ceil(width);
+        height = Math.ceil(height);
         if (
             parametersCopy.width !== width
             || parametersCopy.height !== height
