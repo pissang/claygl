@@ -403,13 +403,12 @@ void main() {
     if (dot(v_Tangent, v_Tangent) > 0.0) {
         vec3 normalTexel = texture2D(normalMap, uv).xyz;
         if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
-            N = normalTexel * 2.0 - 1.0;
+            N = (normalTexel * 2.0 - 1.0);
+            // Apply scalar multiplier to normal vector of texture.
+            N = normalize(N * vec3(normalScale, normalScale, 1.0));
             // FIXME Why need to negate
             tbn[1] = -tbn[1];
             N = normalize(tbn * N);
-
-            // Apply scalar multiplier to normal vector of texture.
-            N = normalize(N * vec3(normalScale, normalScale, 1.0));
         }
     }
 #endif
