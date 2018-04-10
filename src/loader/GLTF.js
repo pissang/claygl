@@ -685,6 +685,16 @@ function () {
         var material;
         var diffuseMap, roughnessMap, metalnessMap, normalMap, emissiveMap, occlusionMap;
         var enabledTextures = [];
+
+        /**
+         * The scalar multiplier applied to each normal vector of the normal texture.
+         *
+         * @type {number}
+         *
+         * XXX This value is ignored if `materialInfo.normalTexture` is not specified.
+         */
+        var normalScale = 1.0;
+
         // TODO texCoord
         if (metallicRoughnessMatInfo.baseColorTexture) {
             diffuseMap = lib.textures[metallicRoughnessMatInfo.baseColorTexture.index] || null;
@@ -695,8 +705,14 @@ function () {
             roughnessMap && enabledTextures.push('metalnessMap', 'roughnessMap');
         }
         if (materialInfo.normalTexture) {
+
             normalMap = lib.textures[materialInfo.normalTexture.index] || null;
             normalMap && enabledTextures.push('normalMap');
+
+            if (typeof materialInfo.normalTexture.scale === 'number') {
+                normalScale = materialInfo.normalTexture.scale;
+            }
+
         }
         if (materialInfo.emissiveTexture) {
             emissiveMap = lib.textures[materialInfo.emissiveTexture.index] || null;
@@ -721,7 +737,8 @@ function () {
             roughness: metallicRoughnessMatInfo.roughnessFactor || 0,
             emission: materialInfo.emissiveFactor || [0, 0, 0],
             emissionIntensity: 1,
-            alphaCutoff: materialInfo.alphaCutoff || 0
+            alphaCutoff: materialInfo.alphaCutoff || 0,
+            normalScale: normalScale
         };
         if (commonProperties.roughnessMap) {
             // In glTF metallicFactor will do multiply, which is different from StandardMaterial.

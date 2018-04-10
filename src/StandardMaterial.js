@@ -8,7 +8,7 @@ import util from './core/util';
 Shader['import'](standardEssl);
 
 var TEXTURE_PROPERTIES = ['diffuseMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'environmentMap', 'brdfLookup', 'ssaoMap', 'aoMap'];
-var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff'];
+var SIMPLE_PROPERTIES = ['color', 'emission', 'emissionIntensity', 'alpha', 'roughness', 'metalness', 'uvRepeat', 'uvOffset', 'aoIntensity', 'alphaCutoff', 'normalScale'];
 var PROPERTIES_CHANGE_SHADER = ['linear', 'encodeRGBM', 'decodeRGBM', 'doubleSided', 'alphaTest', 'roughnessChannel', 'metalnessChannel', 'environmentMapPrefiltered'];
 
 var NUM_DEFINE_MAP = {
@@ -95,6 +95,15 @@ var StandardMaterial = Material.extend(function () {
          * @type {number}
          */
         alphaCutoff: 0.9,
+
+        /**
+         * Scalar multiplier applied to each normal vector of normal texture.
+         *
+         * @type {number}
+         *
+         * XXX This value is considered only if a normal texture is specified.
+         */
+        normalScale: 1.0,
 
         /**
          * @type {boolean}
