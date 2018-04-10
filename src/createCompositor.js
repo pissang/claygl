@@ -162,6 +162,13 @@ function createNode(nodeInfo, lib, opts) {
     return node;
 }
 
+function defaultWidthFunc(width, height) {
+    return width;
+}
+function defaultHeightFunc(width, height) {
+    return height;
+}
+
 function convertParameter(paramInfo) {
     var param = {};
     if (!paramInfo) {
@@ -178,6 +185,8 @@ function convertParameter(paramInfo) {
                 param[name] = val;
             }
         });
+
+    var sizeScale = paramInfo.scale || 1;
     ['width', 'height']
         .forEach(function(name) {
             if (paramInfo[name] != null) {
@@ -185,7 +194,7 @@ function convertParameter(paramInfo) {
                 if (typeof val === 'string') {
                     val = val.trim();
                     param[name] = createSizeParser(
-                        name, tryConvertExpr(val)
+                        name, tryConvertExpr(val), sizeScale
                     );
                 }
                 else {
@@ -193,6 +202,13 @@ function convertParameter(paramInfo) {
                 }
             }
         });
+    if (!param.width) {
+        param.width = defaultWidthFunc;
+    }
+    if (!param.height) {
+        param.height = defaultHeightFunc;
+    }
+
     if (paramInfo.useMipmap != null) {
         param.useMipmap = paramInfo.useMipmap;
     }
@@ -260,11 +276,12 @@ function createSizeSetHandler(name, exprFunc) {
     };
 }
 
-function createSizeParser(name, exprFunc) {
+function createSizeParser(name, exprFunc, scale) {
+    scale = scale || 1;
     return function (renderer) {
         var dpr = renderer.getDevicePixelRatio();
-        var width = renderer.getWidth();
-        var height = renderer.getHeight();
+        var width = renderer.getWidth() * scale;
+        var height = renderer.getHeight() * scale;
         return exprFunc(width, height, dpr);
     };
 }
