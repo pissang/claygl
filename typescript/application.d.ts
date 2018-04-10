@@ -78,6 +78,9 @@ interface IStandardMRMaterialConfig {
     roughnessMap?: Texture2DLike;
     normalMap?: Texture2DLike;
     emissiveMap?: Texture2DLike;
+
+    texturesReady?: (textures: Texture2D[]) => void;
+    textureLoaded?: (textureName: string, texture: Texture2D) => void;
 }
 
 type MaterialConfig = IMaterialBasicConfig|IStandardMRMaterialConfig;

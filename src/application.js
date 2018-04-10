@@ -756,6 +756,8 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
  * @param {boolean} [transparent=false] If material is transparent.
  * @param {boolean} [textureConvertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
  * @param {boolean} [textureFlipY=true] If flip y of texture.
+ * @param {Function} [textureLoaded] Callback when single texture loaded.
+ * @param {Function} [texturesReady] Callback when all texture loaded.
  * @return {clay.Material}
  */
 App3D.prototype.createMaterial = function (matConfig) {
@@ -765,9 +767,12 @@ App3D.prototype.createMaterial = function (matConfig) {
     var material = new Material({
         shader: shader
     });
+    var texturesLoading = [];
     function makeTextureSetter(key) {
         return function (texture) {
             material.setUniform(key, texture);
+            matConfig.textureLoaded && matConfig.textureLoaded(key, texture);
+            return texture;
         };
     }
     for (var key in matConfig) {
@@ -777,10 +782,10 @@ App3D.prototype.createMaterial = function (matConfig) {
                 && !(val instanceof Texture)
             ) {
                 // Try to load a texture.
-                this.loadTexture(val, {
+                texturesLoading.push(this.loadTexture(val, {
                     convertToPOT: matConfig.textureConvertToPOT || false,
                     flipY: matConfig.textureFlipY == null ? true : matConfig.textureFlipY
-                }).then(makeTextureSetter(key));
+                }).then(makeTextureSetter(key)));
             }
             else {
                 material.setUniform(key, val);
@@ -792,6 +797,14 @@ App3D.prototype.createMaterial = function (matConfig) {
         matConfig.depthMask = false;
         matConfig.transparent = true;
     }
+
+
+    if (matConfig.texturesReady) {
+        Promise.all(texturesLoading).then(function (textures) {
+            matConfig.texturesReady(textures);
+        });
+    }
+
     return material;
 };
 
