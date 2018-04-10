@@ -77,7 +77,7 @@ attribute vec3 normal : NORMAL;
  *
  *
  * @constructor clay.Geometry
- * @extends clay.Geometry
+ * @extends clay.GeometryBase
  */
 var Geometry = GeometryBase.extend(function () {
     return /** @lends clay.Geometry# */ {

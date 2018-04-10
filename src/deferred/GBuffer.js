@@ -114,6 +114,13 @@ function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
  */
 var GBuffer = Base.extend(function () {
 
+    var commonTextureOpts = {
+        minFilter: Texture.NEAREST,
+        magFilter: Texture.NEAREST,
+        wrapS: Texture.CLAMP_TO_EDGE,
+        wrapT: Texture.CLAMP_TO_EDGE,
+    };
+
     return /** @lends clay.deferred.GBuffer# */ {
 
         /**
@@ -147,47 +154,30 @@ var GBuffer = Base.extend(function () {
         // - G: normal.y
         // - B: normal.z
         // - A: glossiness
-        _gBufferTex1: new Texture2D({
-            minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST,
-            wrapS: Texture.CLAMP_TO_EDGE,
-            wrapT: Texture.CLAMP_TO_EDGE,
+        _gBufferTex1: new Texture2D(Object.assign({
             // PENDING
             type: Texture.HALF_FLOAT
-        }),
+        }, commonTextureOpts)),
 
         // - R: depth
-        _gBufferTex2: new Texture2D({
-            minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST,
-            wrapS: Texture.CLAMP_TO_EDGE,
-            wrapT: Texture.CLAMP_TO_EDGE,
+        _gBufferTex2: new Texture2D(Object.assign({
             // format: Texture.DEPTH_COMPONENT,
             // type: Texture.UNSIGNED_INT
 
             format: Texture.DEPTH_STENCIL,
             type: Texture.UNSIGNED_INT_24_8_WEBGL
-        }),
+        }, commonTextureOpts)),
 
         // - R: albedo.r
         // - G: albedo.g
         // - B: albedo.b
         // - A: metalness
-        _gBufferTex3: new Texture2D({
-            minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST,
-            wrapS: Texture.CLAMP_TO_EDGE,
-            wrapT: Texture.CLAMP_TO_EDGE
-        }),
+        _gBufferTex3: new Texture2D(commonTextureOpts),
 
-        _gBufferTex4: new Texture2D({
-            minFilter: Texture.NEAREST,
-            magFilter: Texture.NEAREST,
-            wrapS: Texture.CLAMP_TO_EDGE,
-            wrapT: Texture.CLAMP_TO_EDGE,
+        _gBufferTex4: new Texture2D(Object.assign({
             // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
             type: Texture.HALF_FLOAT
-        }),
+        }, commonTextureOpts)),
 
         _defaultNormalMap: new Texture2D({
             image: createFillCanvas('#000')
@@ -306,8 +296,10 @@ var GBuffer = Base.extend(function () {
      * @param {clay.Renderer} renderer
      * @param {clay.Scene} scene
      * @param {clay.Camera} camera
+     * @param {Object} opts
      */
-    update: function (renderer, scene, camera) {
+    update: function (renderer, scene, camera, opts) {
+        opts = opts || {};
 
         var gl = renderer.gl;
 
@@ -350,7 +342,7 @@ var GBuffer = Base.extend(function () {
         }
 
         if (enableTargetTexture2) {
-            frameBuffer.attach(this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
+            frameBuffer.attach(opts.targetTexture2 || this._gBufferTex2, renderer.gl.DEPTH_STENCIL_ATTACHMENT);
         }
 
         function clearViewport() {
@@ -366,7 +358,7 @@ var GBuffer = Base.extend(function () {
             }
         }
 
-        function isMaterialChanged(renderable, prevRenderable, material, prevMaterial) {
+        function isMaterialChanged(renderable, prevRenderable) {
             return renderable.material !== prevRenderable.material;
         }
 
@@ -374,7 +366,7 @@ var GBuffer = Base.extend(function () {
         renderer.bindSceneRendering(scene);
         if (enableTargetTexture1) {
             // Pass 1
-            frameBuffer.attach(this._gBufferTex1);
+            frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1);
             frameBuffer.bind(renderer);
 
             clearViewport();
@@ -395,7 +387,7 @@ var GBuffer = Base.extend(function () {
         if (enableTargetTexture3) {
 
             // Pass 2
-            frameBuffer.attach(this._gBufferTex3);
+            frameBuffer.attach(opts.targetTexture3 || this._gBufferTex3);
             frameBuffer.bind(renderer);
 
             clearViewport();
@@ -414,7 +406,7 @@ var GBuffer = Base.extend(function () {
 
         if (enableTargetTexture4) {
             frameBuffer.bind(renderer);
-            frameBuffer.attach(this._gBufferTex4);
+            frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4);
 
             clearViewport();
 
