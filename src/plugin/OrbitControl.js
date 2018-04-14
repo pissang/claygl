@@ -165,7 +165,7 @@ var OrbitControl = Base.extend(function () {
         dom.addEventListener('touchstart', this._mouseDownHandler);
 
         dom.addEventListener('mousedown', this._mouseDownHandler);
-        dom.addEventListener('mousewheel', this._mouseWheelHandler);
+        dom.addEventListener('wheel', this._mouseWheelHandler);
 
         if (this.timeline) {
             this.timeline.on('frame', this.update);
@@ -186,7 +186,7 @@ var OrbitControl = Base.extend(function () {
         dom.removeEventListener('mousedown', this._mouseDownHandler);
         dom.removeEventListener('mousemove', this._mouseMoveHandler);
         dom.removeEventListener('mouseup', this._mouseUpHandler);
-        dom.removeEventListener('mousewheel', this._mouseWheelHandler);
+        dom.removeEventListener('wheel', this._mouseWheelHandler);
         dom.removeEventListener('mouseout', this._mouseUpHandler);
 
         if (this.timeline) {
@@ -610,12 +610,11 @@ var OrbitControl = Base.extend(function () {
         if (this._isAnimating()) {
             return;
         }
-        var delta = e.wheelDelta // Webkit
-                || -e.detail; // Firefox
+        var delta = e.deltaY;
         if (delta === 0) {
             return;
         }
-        this._zoomHandler(e, delta > 0 ? -1 : 1);
+        this._zoomHandler(e, delta > 0 ? 1 : -1);
     },
 
     _pinchHandler: function (e) {
