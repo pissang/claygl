@@ -101,6 +101,7 @@ import ParticleRenderable$81 from './particle/ParticleRenderable';
 import PixelPicking$82 from './picking/PixelPicking';
 import RayPicking$83 from './picking/RayPicking';
 import FreeControl$84 from './plugin/FreeControl';
+import GamepadControl$117 from './plugin/GamepadControl';
 import GestureMgr$85 from './plugin/GestureMgr';
 import InfinitePlane$86 from './plugin/InfinitePlane';
 import OrbitControl$87 from './plugin/OrbitControl';
@@ -301,6 +302,7 @@ export { picking };
 
 var plugin = {
     FreeControl : FreeControl$84,
+    GamepadControl: GamepadControl$117,
     GestureMgr : GestureMgr$85,
     InfinitePlane : InfinitePlane$86,
     OrbitControl : OrbitControl$87,
