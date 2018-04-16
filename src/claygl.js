@@ -101,38 +101,39 @@ import ParticleRenderable$81 from './particle/ParticleRenderable';
 import PixelPicking$82 from './picking/PixelPicking';
 import RayPicking$83 from './picking/RayPicking';
 import FreeControl$84 from './plugin/FreeControl';
-import GestureMgr$85 from './plugin/GestureMgr';
-import InfinitePlane$86 from './plugin/InfinitePlane';
-import OrbitControl$87 from './plugin/OrbitControl';
-import Skybox$88 from './plugin/Skybox';
-import Skydome$89 from './plugin/Skydome';
-import EnvironmentMap$90 from './prePass/EnvironmentMap';
-import ShadowMap$91 from './prePass/ShadowMap';
-import Renderable$92 from './Renderable';
-import Renderer$93 from './Renderer';
-import Scene$94 from './Scene';
-import Shader$95 from './Shader';
-import library$96 from './shader/library';
-import registerBuiltinCompositor$97 from './shader/registerBuiltinCompositor';
-import light$98 from './shader/source/header/light';
-import Skeleton$99 from './Skeleton';
-import StandardMaterial$100 from './StandardMaterial';
-import StaticGeometry$101 from './StaticGeometry';
-import Texture$102 from './Texture';
-import Texture2D$103 from './Texture2D';
-import TextureCube$104 from './TextureCube';
-import Timeline$105 from './Timeline';
-import cubemap$106 from './util/cubemap';
-import dds$107 from './util/dds';
-import delaunay$108 from './util/delaunay';
-import hdr$109 from './util/hdr';
-import mesh$110 from './util/mesh';
-import sh$111 from './util/sh';
-import texture$112 from './util/texture';
-import transferable$113 from './util/transferable';
-import version$114 from './version';
-import CardboardDistorter$115 from './vr/CardboardDistorter';
-import StereoCamera$116 from './vr/StereoCamera';
+import GamepadControl$85 from './plugin/GamepadControl';
+import GestureMgr$86 from './plugin/GestureMgr';
+import InfinitePlane$87 from './plugin/InfinitePlane';
+import OrbitControl$88 from './plugin/OrbitControl';
+import Skybox$89 from './plugin/Skybox';
+import Skydome$90 from './plugin/Skydome';
+import EnvironmentMap$91 from './prePass/EnvironmentMap';
+import ShadowMap$92 from './prePass/ShadowMap';
+import Renderable$93 from './Renderable';
+import Renderer$94 from './Renderer';
+import Scene$95 from './Scene';
+import Shader$96 from './Shader';
+import library$97 from './shader/library';
+import registerBuiltinCompositor$98 from './shader/registerBuiltinCompositor';
+import light$99 from './shader/source/header/light';
+import Skeleton$100 from './Skeleton';
+import StandardMaterial$101 from './StandardMaterial';
+import StaticGeometry$102 from './StaticGeometry';
+import Texture$103 from './Texture';
+import Texture2D$104 from './Texture2D';
+import TextureCube$105 from './TextureCube';
+import Timeline$106 from './Timeline';
+import cubemap$107 from './util/cubemap';
+import dds$108 from './util/dds';
+import delaunay$109 from './util/delaunay';
+import hdr$110 from './util/hdr';
+import mesh$111 from './util/mesh';
+import sh$112 from './util/sh';
+import texture$113 from './util/texture';
+import transferable$114 from './util/transferable';
+import version$115 from './version';
+import CardboardDistorter$116 from './vr/CardboardDistorter';
+import StereoCamera$117 from './vr/StereoCamera';
 
 
 var animation = {
@@ -301,62 +302,63 @@ export { picking };
 
 var plugin = {
     FreeControl : FreeControl$84,
-    GestureMgr : GestureMgr$85,
-    InfinitePlane : InfinitePlane$86,
-    OrbitControl : OrbitControl$87,
-    Skybox : Skybox$88,
-    Skydome : Skydome$89
+    GamepadControl : GamepadControl$85,
+    GestureMgr : GestureMgr$86,
+    InfinitePlane : InfinitePlane$87,
+    OrbitControl : OrbitControl$88,
+    Skybox : Skybox$89,
+    Skydome : Skydome$90
 };
 export { plugin };
 
 
 var prePass = {
-    EnvironmentMap : EnvironmentMap$90,
-    ShadowMap : ShadowMap$91
+    EnvironmentMap : EnvironmentMap$91,
+    ShadowMap : ShadowMap$92
 };
 export { prePass };
 
-export { Renderable$92 as Renderable };
-export { Renderer$93 as Renderer };
-export { Scene$94 as Scene };
-export { Shader$95 as Shader };
+export { Renderable$93 as Renderable };
+export { Renderer$94 as Renderer };
+export { Scene$95 as Scene };
+export { Shader$96 as Shader };
 
 var shader = {
-    library : library$96,
-    registerBuiltinCompositor : registerBuiltinCompositor$97,
+    library : library$97,
+    registerBuiltinCompositor : registerBuiltinCompositor$98,
     source : {
     header : {
-        light : light$98
+        light : light$99
     }
     }
 };
 export { shader };
 
-export { Skeleton$99 as Skeleton };
-export { StandardMaterial$100 as StandardMaterial };
-export { StaticGeometry$101 as StaticGeometry };
-export { Texture$102 as Texture };
-export { Texture2D$103 as Texture2D };
-export { TextureCube$104 as TextureCube };
-export { Timeline$105 as Timeline };
+export { Skeleton$100 as Skeleton };
+export { StandardMaterial$101 as StandardMaterial };
+export { StaticGeometry$102 as StaticGeometry };
+export { Texture$103 as Texture };
+export { Texture2D$104 as Texture2D };
+export { TextureCube$105 as TextureCube };
+export { Timeline$106 as Timeline };
 
 var util = {
-    cubemap : cubemap$106,
-    dds : dds$107,
-    delaunay : delaunay$108,
-    hdr : hdr$109,
-    mesh : mesh$110,
-    sh : sh$111,
-    texture : texture$112,
-    transferable : transferable$113
+    cubemap : cubemap$107,
+    dds : dds$108,
+    delaunay : delaunay$109,
+    hdr : hdr$110,
+    mesh : mesh$111,
+    sh : sh$112,
+    texture : texture$113,
+    transferable : transferable$114
 };
 export { util };
 
-export { version$114 as version };
+export { version$115 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$115,
-    StereoCamera : StereoCamera$116
+    CardboardDistorter : CardboardDistorter$116,
+    StereoCamera : StereoCamera$117
 };
 export { vr };
 ;
