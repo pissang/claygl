@@ -11,9 +11,7 @@ import vec3 from '../glmatrix/vec3';
  * @constructor clay.picking.RayPicking
  * @extends clay.core.Base
  */
-var RayPicking = Base.extend(
-/** @lends clay.picking.RayPicking# */
-{
+var RayPicking = Base.extend(/** @lends clay.picking.RayPicking# */{
     /**
      * Target scene
      * @type {clay.Scene}
@@ -108,13 +106,11 @@ var RayPicking = Base.extend(
             }
 
             var geometry = renderable.geometry;
-            // Ignore bounding box of skinned mesh?
-            if (!isSkinnedMesh) {
-                if (geometry.boundingBox) {
-                    if (!ray.intersectBoundingBox(geometry.boundingBox)) {
-                        return;
-                    }
-                }
+
+            var bbox = isSkinnedMesh ? renderable.skeleton.boundingBox : geometry.boundingBox;
+
+            if (bbox && !ray.intersectBoundingBox(bbox)) {
+                return;
             }
             // Use user defined picking algorithm
             if (geometry.pick) {
