@@ -2,10 +2,16 @@ import Base from './core/Base';
 import Joint from './Joint';
 import Texture2D from './Texture2D';
 import Texture from './Texture';
+import BoundingBox from './math/BoundingBox';
+import Matrix4 from './math/Matrix4';
 
 import mat4 from './glmatrix/mat4';
 import vec3 from './glmatrix/vec3';
 import quat from './glmatrix/quat';
+
+
+var tmpBoundingBox = new BoundingBox();
+var tmpMat4 = new Matrix4();
 
 /**
  * @constructor clay.Skeleton
@@ -28,6 +34,12 @@ var Skeleton = Base.extend(function () {
          * @type {Array.<clay.Joint>}
          */
         joints: [],
+
+        /**
+         * bounding box with bound geometry.
+         * @type {clay.BoundingBox}
+         */
+        boundingBox: null,
 
         _clips: [],
 
@@ -158,6 +170,57 @@ var Skeleton = Base.extend(function () {
         };
     })(),
 
+    /**
+     * Update boundingBox of each joint bound to geometry.
+     * ASSUME skeleton and geometry joints are matched.
+     * @param {clay.Geometry} geometry
+     */
+    updateJointsBoundingBoxes: function (geometry) {
+        var attributes = geometry.attributes;
+        var positionAttr = attributes.position;
+        var jointAttr = attributes.joint;
+        var weightAttr = attributes.weight;
+
+        var jointsBoundingBoxes = [];
+        for (var i = 0; i < this.joints.length; i++) {
+            jointsBoundingBoxes[i] = new BoundingBox();
+            jointsBoundingBoxes[i].__updated = false;
+        }
+
+        var vtxJoint = [];
+        var vtxPos = [];
+        var vtxWeight = [];
+        var maxJointIdx = 0;
+        for (var i = 0; i < geometry.vertexCount; i++) {
+            jointAttr.get(i, vtxJoint);
+            positionAttr.get(i, vtxPos);
+            weightAttr.get(i, vtxWeight);
+
+            for (var k = 0; k < 4; k++) {
+                if (vtxWeight[k] > 0.01) {
+                    var jointIdx = vtxJoint[k];
+                    maxJointIdx = Math.max(maxJointIdx, jointIdx);
+
+                    var min = jointsBoundingBoxes[jointIdx].min.array;
+                    var max = jointsBoundingBoxes[jointIdx].max.array;
+
+                    jointsBoundingBoxes[jointIdx].__updated = true;
+
+                    min = vec3.min(min, min, vtxPos);
+                    max = vec3.max(max, max, vtxPos);
+                }
+            }
+        }
+
+        this._jointsBoundingBoxes = jointsBoundingBoxes;
+
+        this.boundingBox = new BoundingBox();
+
+        if (maxJointIdx < this.joints.length - 1) {
+            console.warn('Geometry joints and skeleton joints don\'t match');
+        }
+    },
+
     setJointMatricesArray: function (arr) {
         this._invBindPoseMatricesArray = arr;
         this._skinMatricesArray = new Float32Array(arr.length);
@@ -178,6 +241,8 @@ var Skeleton = Base.extend(function () {
 
         this._setPose();
 
+        var jointsBoundingBoxes = this._jointsBoundingBoxes;
+
         for (var i = 0; i < this.joints.length; i++) {
             var joint = this.joints[i];
             mat4.multiply(
@@ -185,6 +250,21 @@ var Skeleton = Base.extend(function () {
                 joint.node.worldTransform.array,
                 this._jointMatricesSubArrays[i]
             );
+        }
+        if (this.boundingBox) {
+            this.boundingBox.min.set(Infinity, Infinity, Infinity);
+            this.boundingBox.max.set(-Infinity, -Infinity, -Infinity);
+            for (var i = 0; i < this.joints.length; i++) {
+                var joint = this.joints[i];
+                var bbox = jointsBoundingBoxes[i];
+                if (bbox.__updated) {
+                    tmpBoundingBox.copy(bbox);
+                    tmpMat4.array = this._skinMatricesSubArrays[i];
+                    tmpBoundingBox.applyTransform(tmpMat4);
+
+                    this.boundingBox.union(tmpBoundingBox);
+                }
+            }
         }
     },
 
@@ -316,6 +396,10 @@ var Skeleton = Base.extend(function () {
 
             skeleton.updateMatricesSubArrays();
         }
+
+        skeleton._jointsBoundingBoxe = (this._jointsBoundingBoxes || []).map(function (bbox) {
+            return bbox.clone();
+        });
 
         skeleton.update();
 

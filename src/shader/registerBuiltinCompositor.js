@@ -8,7 +8,6 @@ import brightEssl from './source/compositor/bright.glsl.js';
 import downsampleEssl from './source/compositor/downsample.glsl.js';
 import upsampleEssl from './source/compositor/upsample.glsl.js';
 import hdrEssl from './source/compositor/hdr.glsl.js';
-import dofEssl from './source/compositor/dof.glsl.js';
 import lensflareEssl from './source/compositor/lensflare.glsl.js';
 import blendEssl from './source/compositor/blend.glsl.js';
 import fxaaEssl from './source/compositor/fxaa.glsl.js';
@@ -27,7 +26,6 @@ export default function register(Shader) {
     Shader['import'](downsampleEssl);
     Shader['import'](upsampleEssl);
     Shader['import'](hdrEssl);
-    Shader['import'](dofEssl);
     Shader['import'](lensflareEssl);
     Shader['import'](blendEssl);
 

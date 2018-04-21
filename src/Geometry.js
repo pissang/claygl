@@ -156,6 +156,7 @@ var Geometry = GeometryBase.extend(function () {
             max._dirty = true;
         }
     },
+
     /**
      * Generate normals per vertex.
      */

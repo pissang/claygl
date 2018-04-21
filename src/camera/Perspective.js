@@ -4,9 +4,7 @@ import Camera from '../Camera';
  * @constructor clay.camera.Perspective
  * @extends clay.Camera
  */
-var Perspective = Camera.extend(
-/** @lends clay.camera.Perspective# */
-{
+var Perspective = Camera.extend(/** @lends clay.camera.Perspective# */{
     /**
      * Vertical field of view in degrees
      * @type {number}

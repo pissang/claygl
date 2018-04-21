@@ -110,7 +110,9 @@ export namespace application {
 
         event?: boolean;
 
-        autoRender?: boolean
+        autoRender?: boolean;
+
+        methods?: IDictionary<Function>;
     }
 
     export class App3D {

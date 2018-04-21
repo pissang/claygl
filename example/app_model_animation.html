@@ -17,6 +17,11 @@
     <div id="main"></div>
     <script>
         var app = clay.application.create('#main', {
+
+            graphic: {
+                shadow: true
+            },
+
             init: function (app) {
                 // Create camera
                 this._camera = app.createCamera([0, 150, 200], [0, 100, 0]);

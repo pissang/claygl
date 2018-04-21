@@ -501,6 +501,10 @@ function () {
         function enableSkinningForMesh(mesh, skeleton, jointIndices) {
             mesh.skeleton = skeleton;
             mesh.joints = jointIndices;
+
+            if (!skeleton.boundingBox) {
+                skeleton.updateJointsBoundingBoxes(mesh.geometry);
+            }
         }
 
         function getJointIndex(joint) {

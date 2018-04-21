@@ -21,6 +21,7 @@ var cubemapUtil = {};
 
 var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
+// TODO Downsample
 /**
  * @name clay.util.cubemap.prefilterEnvironmentMap
  * @param  {clay.Renderer} renderer

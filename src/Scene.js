@@ -333,7 +333,16 @@ var Scene = Node.extend(function () {
         return function(object, camera, worldViewMat) {
             // Bounding box can be a property of object(like light) or renderable.geometry
             // PENDING
-            var geoBBox = object.boundingBox || object.geometry.boundingBox;
+            var geoBBox = object.boundingBox;
+            if (!geoBBox) {
+                if (object.skeleton && object.skeleton.boundingBox) {
+                    geoBBox = object.skeleton.boundingBox;
+                }
+                else {
+                    geoBBox = object.geometry.boundingBox;
+                }
+            }
+
             if (!geoBBox) {
                 return false;
             }
@@ -350,7 +359,7 @@ var Scene = Node.extend(function () {
                 this.viewBoundingBoxLastFrame.union(cullingBoundingBox);
             }
             // Ignore frustum culling if object is skinned mesh.
-            if (object.frustumCulling && !object.isSkinnedMesh())  {
+            if (object.frustumCulling)  {
                 if (!cullingBoundingBox.intersectBoundingBox(camera.frustum.boundingBox)) {
                     return true;
                 }

@@ -25,7 +25,6 @@ define(function (require) {
         opt = opt || {};
         opt.enableBloom = opt.enableBloom == null ? true : opt.enableBloom;
         opt.enableLensflare = opt.enableLensflare == null ? true : opt.enableLensflare;
-        opt.enableDepthOfField = opt.enableDepthOfField == null ? false : opt.enableDepthOfField;
 
 
         var compositor = clay.compositor.createCompositor(json, {
@@ -64,7 +63,6 @@ define(function (require) {
         }
 
         var finalCompositeNode = compositor.getNodeByName('composite');
-        var cocNode = compositor.getNodeByName('coc');
 
         var lensColorTex = new clay.Texture2D();
         lensColorTex.load('assets/textures/lensflare/lenscolor.png');
@@ -93,20 +91,6 @@ define(function (require) {
         compositor.disableLensflare = function () {
             finalCompositeNode.inputs.lensflare = null;
             compositor.dirty();
-        };
-
-        compositor.enableDepthOfField = function () {
-            finalCompositeNode.inputs.texture = 'dof_composite';
-            compositor.dirty();
-        };
-
-        compositor.disableDepthOfField = function () {
-            finalCompositeNode.inputs.texture = 'source';
-            compositor.dirty();
-        };
-
-        compositor.setDepthTexture = function (depthTexture) {
-            cocNode.setParameter('depth', depthTexture);
         };
 
         opt.enableBloom ? compositor.enableBloom() : compositor.disableBloom();

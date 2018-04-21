@@ -29,6 +29,9 @@ function defaultGetUniform(renderable, material, symbol) {
 function defaultIsMaterialChanged(renderabled, prevRenderable, material, prevMaterial) {
     return material !== prevMaterial;
 }
+function defaultIfRender(renderable) {
+    return true;
+}
 
 function noop() {}
 
@@ -580,6 +583,8 @@ var Renderer = Base.extend(function () {
         passConfig.beforeRender = passConfig.beforeRender || noop;
         passConfig.afterRender = passConfig.afterRender || noop;
 
+        var ifRenderObject = passConfig.ifRender || defaultIfRender;
+
         this.updatePrograms(list, this._sceneRendering, passConfig);
         if (passConfig.sortCompare) {
             list.sort(passConfig.sortCompare);
@@ -639,7 +644,7 @@ var Renderer = Base.extend(function () {
             var isSceneNode = renderable.worldTransform != null;
             var worldM;
 
-            if (passConfig.ifRender && !passConfig.ifRender(renderable)) {
+            if (!ifRenderObject(renderable)) {
                 continue;
             }
 
@@ -804,6 +809,7 @@ var Renderer = Base.extend(function () {
         var skeleton = object.skeleton;
         // Set pose matrices of skinned mesh
         if (skeleton) {
+            // TODO Update before culling.
             skeleton.update();
             if (object.joints.length > this._glinfo.getMaxJointNumber()) {
                 var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.__uid__, object.joints);
@@ -885,8 +891,9 @@ var Renderer = Base.extend(function () {
             var uniform = material.uniforms[symbol];
             var uniformValue = getUniformValue(renderable, material, symbol);
             var uniformType = uniform.type;
+            var isTexture = uniformType === 't';
 
-            if (uniformType === 't') {
+            if (isTexture) {
                 if (!uniformValue || !uniformValue.isRenderable()) {
                     uniformValue = placeholderTexture;
                 }
@@ -897,14 +904,14 @@ var Renderer = Base.extend(function () {
             // So add a evaluation to see if the uniform is really needed to be set
             if (prevMaterial && sameProgram) {
                 var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
-                if (uniformType === 't') {
+                if (isTexture) {
                     if (!prevUniformValue || !prevUniformValue.isRenderable()) {
                         prevUniformValue = placeholderTexture;
                     }
                 }
 
                 if (prevUniformValue === uniformValue) {
-                    if (uniform.type === 't') {
+                    if (isTexture) {
                         // Still take the slot to make sure same texture in different materials have same slot.
                         program.takeCurrentTextureSlot(this, null);
                     }
@@ -920,7 +927,7 @@ var Renderer = Base.extend(function () {
             if (uniformValue == null) {
                 continue;
             }
-            else if (uniformType === 't') {
+            else if (isTexture) {
                 if (uniformValue.__slot < 0) {
                     var slot = program.currentTextureSlot();
                     var res = program.setUniform(_gl, '1i', symbol, slot);

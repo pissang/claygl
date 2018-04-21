@@ -1,6 +1,5 @@
 import Renderable from './Renderable';
 import glenum from './core/glenum';
-import Texture2D from './Texture2D';
 
 /**
  * @constructor clay.Mesh
