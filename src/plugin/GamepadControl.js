@@ -69,7 +69,7 @@ var GamepadControl = Base.extend(function() {
          *
          * @type {function}
          */
-        onGamepadDisconnected: function(event){},
+        onGamepadDisconnected: function(gamepad){},
 
         // Private properties:
 
@@ -90,6 +90,7 @@ var GamepadControl = Base.extend(function() {
 }, function() {
 
     this._checkGamepadCompatibility = this._checkGamepadCompatibility.bind(this);
+    this._disconnectGamepad = this._disconnectGamepad.bind(this);
     this._getStandardGamepad = this._getStandardGamepad.bind(this);
     this._scanPressedGamepadButtons = this._scanPressedGamepadButtons.bind(this);
     this._scanInclinedGamepadAxes = this._scanInclinedGamepadAxes.bind(this);
@@ -118,7 +119,7 @@ var GamepadControl = Base.extend(function() {
             this.timeline.on('frame', this.update);
         }
 
-        window.addEventListener('gamepaddisconnected', this.onGamepadDisconnected);
+        window.addEventListener('gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -133,7 +134,7 @@ var GamepadControl = Base.extend(function() {
             this.timeline.off('frame', this.update);
         }
 
-        window.removeEventListener('gamepaddisconnected', this.onGamepadDisconnected);
+        window.removeEventListener('gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -203,6 +204,14 @@ var GamepadControl = Base.extend(function() {
             this.onStandardGamepadReady(event.gamepad);
 
         }
+
+    },
+
+    _disconnectGamepad: function(event) {
+
+        this._standardGamepadAvailable = false;
+
+        this.onGamepadDisconnected(event.gamepad);
 
     },
 
