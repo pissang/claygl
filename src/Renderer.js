@@ -59,7 +59,7 @@ function PlaceHolderTexture(renderer) {
     this.bind = function (renderer) {
         if (!blankCanvas) {
             // TODO Environment not support createCanvas.
-            blankCanvas = renderer.createCanvas();
+            blankCanvas = vendor.createCanvas();
             blankCanvas.width = blankCanvas.height = 1;
             blankCanvas.getContext('2d');
         }
