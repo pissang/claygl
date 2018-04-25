@@ -36,12 +36,19 @@ float lightAttenuation(float dist, float range)
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
 @export clay.util.edge_factor
 
+#ifdef SUPPORT_STANDARD_DERIVATIVES
 float edgeFactor(float width)
 {
     vec3 d = fwidth(v_Barycentric);
     vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
     return min(min(a3.x, a3.y), a3.z);
 }
+#else
+float edgeFactor(float width)
+{
+    return 1.0;
+}
+#endif
 
 @end
 

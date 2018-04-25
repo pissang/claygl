@@ -154,6 +154,9 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     if (extensions.indexOf('EXT_shader_texture_lod') >= 0) {
         fragmentDefineStr += '\n#define SUPPORT_TEXTURE_LOD';
     }
+    if (extensions.indexOf('OES_standard_derivatives') >= 0) {
+        fragmentDefineStr += '\n#define SUPPORT_STANDARD_DERIVATIVES';
+    }
 
     var fragmentCode = getExtensionCode(extensions) + '\n'
         + getPrecisionCode(material.precision) + '\n'
