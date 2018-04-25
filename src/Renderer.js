@@ -3,6 +3,8 @@
 import Base from './core/Base';
 import GLInfo from './core/GLInfo';
 import glenum from './core/glenum';
+import vendor from './core/vendor';
+
 import Material from './Material';
 import Vector2 from './math/Vector2';
 import ProgramManager from './gpu/ProgramManager';
@@ -52,11 +54,16 @@ function VertexArrayObject(availableAttributes, availableAttributeSymbols, indic
 }
 
 function PlaceHolderTexture(renderer) {
-    var blankCanvas = renderer.createCanvas();
-    blankCanvas.width = blankCanvas.height = 1;
-    var ctx = blankCanvas.getContext('2d');
+    var blankCanvas;
     var webglTexture;
     this.bind = function (renderer) {
+        if (!blankCanvas) {
+            // TODO Environment not support createCanvas.
+            blankCanvas = renderer.createCanvas();
+            blankCanvas.width = blankCanvas.height = 1;
+            blankCanvas.getContext('2d');
+        }
+
         var gl = renderer.gl;
         var firstBind = !webglTexture;
         if (firstBind) {
@@ -108,7 +115,7 @@ var Renderer = Base.extend(function () {
          * @type {number}
          * @private
          */
-        devicePixelRatio: (window && window.devicePixelRatio) || 1.0,
+        devicePixelRatio: (typeof window !== 'undefined' && window.devicePixelRatio) || 1.0,
 
         /**
          * Clear color
@@ -172,14 +179,6 @@ var Renderer = Base.extend(function () {
          */
         viewport: {},
 
-        /**
-         * Canvas creator
-         * @type {Function}
-         */
-        createCanvas: function () {
-            return document.createElement('canvas');
-        },
-
         // Set by FrameBuffer#bind
         __currentFrameBuffer: null,
 
@@ -191,7 +190,7 @@ var Renderer = Base.extend(function () {
 }, function () {
 
     if (!this.canvas) {
-        this.canvas = this.createCanvas();
+        this.canvas = vendor.createCanvas();
     }
     var canvas = this.canvas;
     try {

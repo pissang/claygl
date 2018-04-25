@@ -36,5 +36,5 @@ function get(options) {
 }
 
 export default {
-    get : get
+    get: get
 };

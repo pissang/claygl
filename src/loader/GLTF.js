@@ -5,7 +5,6 @@
  * TODO Morph targets
  */
 import Base from '../core/Base';
-import request from '../core/request';
 import util from '../core/util';
 import vendor from '../core/vendor';
 
@@ -210,7 +209,7 @@ function () {
             this.rootPath = url.slice(0, url.lastIndexOf('/'));
         }
 
-        request.get({
+        vendor.request.get({
             url: url,
             onprogress: function (percent, loaded, total) {
                 self.trigger('progress', percent, loaded, total);
@@ -224,7 +223,10 @@ function () {
                     self.parseBinary(data);
                 }
                 else {
-                    self.parse(JSON.parse(data));
+                    if (typeof data === 'string') {
+                        data = JSON.parse(data);
+                    }
+                    self.parse(data);
                 }
             }
         });
@@ -447,7 +449,7 @@ function () {
     },
 
     _loadBuffer: function (path, onsuccess, onerror) {
-        request.get({
+        vendor.request.get({
             url: this.resolveBinaryPath(path),
             responseType: 'arraybuffer',
             onload: function (buffer) {

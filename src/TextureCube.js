@@ -2,6 +2,7 @@ import Texture from './Texture';
 import glenum from './core/glenum';
 import util from './core/util';
 import mathUtil from './math/util';
+import vendor from './core/vendor';
 var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
 var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
@@ -200,7 +201,7 @@ var TextureCube = Texture.extend(function () {
         var loading = 0;
         var self = this;
         util.each(imageList, function (src, target){
-            var image = new Image();
+            var image = vendor.createImage();
             if (crossOrigin) {
                 image.crossOrigin = crossOrigin;
             }

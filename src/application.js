@@ -326,9 +326,9 @@ function App3D(dom, appNS) {
 }
 
 function isImageLikeElement(val) {
-    return val instanceof Image
-        || val instanceof HTMLCanvasElement
-        || val instanceof HTMLVideoElement;
+    return (typeof Image !== 'undefined' && val instanceof Image)
+        || (typeof HTMLCanvasElement !== 'undefined' && val instanceof HTMLCanvasElement)
+        || (typeof HTMLVideoElement !== 'undefined' && val instanceof HTMLVideoElement);
 }
 
 function getKeyFromImageLike(val) {

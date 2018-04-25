@@ -1,5 +1,5 @@
 import notifier from '../core/mixin/notifier';
-import request from '../core/request';
+import vendor from '../core/vendor';
 import util  from '../core/util';
 
 /**
@@ -7,7 +7,7 @@ import util  from '../core/util';
  * @alias clay.async.Task
  * @mixes clay.core.mixin.notifier
  */
-var Task = function() {
+function Task() {
     this._fullfilled = false;
     this._rejected = false;
 };
@@ -55,7 +55,7 @@ util.extend(Task.prototype, notifier);
 
 function makeRequestTask(url, responseType) {
     var task = new Task();
-    request.get({
+    vendor.request.get({
         url: url,
         responseType: responseType,
         onload: function(res) {
@@ -68,7 +68,7 @@ function makeRequestTask(url, responseType) {
     return task;
 }
 /**
- * Make a request task
+ * Make a vendor.request task
  * @param  {string|object|object[]|string[]} url
  * @param  {string} [responseType]
  * @example
@@ -87,17 +87,20 @@ function makeRequestTask(url, responseType) {
 Task.makeRequestTask = function(url, responseType) {
     if (typeof url === 'string') {
         return makeRequestTask(url, responseType);
-    } else if (url.url) {   //  Configure object
+    }
+    else if (url.url) {   //  Configure object
         var obj = url;
         return makeRequestTask(obj.url, obj.responseType);
-    } else if (Array.isArray(url)) {  // Url list
+    }
+    else if (Array.isArray(url)) {  // Url list
         var urlList = url;
         var tasks = [];
         urlList.forEach(function(obj) {
             var url, responseType;
             if (typeof obj === 'string') {
                 url = obj;
-            } else if (Object(obj) === obj) {
+            }
+            else if (Object(obj) === obj) {
                 url = obj.url;
                 responseType = obj.responseType;
             }

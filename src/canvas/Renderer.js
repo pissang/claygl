@@ -101,7 +101,7 @@ var CanvasRenderer = Base.extend({
 
     _height: 100,
 
-    devicePixelRatio: (window && window.devicePixelRatio) || 1.0,
+    devicePixelRatio: (typeof window !== 'undefined' && window.devicePixelRatio) || 1.0,
 
     color: [0.0, 0.0, 0.0, 0.0],
 

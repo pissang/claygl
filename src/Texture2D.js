@@ -1,5 +1,6 @@
 import Texture from './Texture';
 import glenum from './core/glenum';
+import vendor from './core/vendor';
 import mathUtil from './math/util';
 var isPowerOfTwo = mathUtil.isPowerOfTwo;
 
@@ -191,7 +192,7 @@ var Texture2D = Texture.extend(function () {
     },
 
     load: function (src, crossOrigin) {
-        var image = new Image();
+        var image = vendor.createImage();
         if (crossOrigin) {
             image.crossOrigin = crossOrigin;
         }

@@ -1,6 +1,6 @@
 import Texture2D from '../Texture2D';
 import TextureCube from '../TextureCube';
-import request from '../core/request';
+import vendor from '../core/vendor';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Skydome from '../plugin/Skydome';
 import Scene from '../Scene';
@@ -239,7 +239,7 @@ var textureUtil = {
     },
 
     _fetchTexture: function (path, onsuccess, onerror) {
-        request.get({
+        vendor.request.get({
             url: path,
             responseType: 'arraybuffer',
             onload: onsuccess,

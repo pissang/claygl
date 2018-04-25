@@ -1,13 +1,7 @@
 import Base from './core/Base';
+import vendor from './core/vendor';
 import Animator from './animation/Animator';
 
-var g = typeof window === 'undefined' ? global : window;
-
-var requestAnimationFrame = g.requestAnimationFrame
-                            || g.msRequestAnimationFrame
-                            || g.mozRequestAnimationFrame
-                            || g.webkitRequestAnimationFrame
-                            || function (func){ setTimeout(func, 16); };
 
 /**
  * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
@@ -150,6 +144,8 @@ var Timeline = Base.extend(function () {
         this._time = Date.now();
 
         this._pausedTime = 0;
+
+        var requestAnimationFrame = vendor.requestAnimationFrame;
 
         function step() {
             if (self._running) {

@@ -1,5 +1,5 @@
 import Base from '../core/Base';
-import request from '../core/request';
+import vendor from '../core/vendor';
 import createCompositor from '../createCompositor';
 
 /**
@@ -42,7 +42,7 @@ var FXLoader = Base.extend(/** @lends clay.loader.FX# */ {
             this.rootPath = url.slice(0, url.lastIndexOf('/'));
         }
 
-        request.get({
+        vendor.request.get({
             url: url,
             onprogress: function(percent, loaded, total) {
                 self.trigger('progress', percent, loaded, total);
