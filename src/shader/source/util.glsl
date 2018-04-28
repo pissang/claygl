@@ -162,18 +162,21 @@ attribute vec4 joint : JOINT;
 #ifdef USE_SKIN_MATRICES_TEXTURE
 uniform sampler2D skinMatricesTexture : ignore;
 uniform float skinMatricesTextureSize: ignore;
-mat4 getSkinMatrix(float idx) {
+mat4 getSkinMatrix(sampler2D tex, float idx) {
     float j = idx * 4.0;
     float x = mod(j, skinMatricesTextureSize);
     float y = floor(j / skinMatricesTextureSize) + 0.5;
     vec2 scale = vec2(skinMatricesTextureSize);
 
     return mat4(
-        texture2D(skinMatricesTexture, vec2(x + 0.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 1.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 2.5, y) / scale),
-        texture2D(skinMatricesTexture, vec2(x + 3.5, y) / scale)
+        texture2D(tex, vec2(x + 0.5, y) / scale),
+        texture2D(tex, vec2(x + 1.5, y) / scale),
+        texture2D(tex, vec2(x + 2.5, y) / scale),
+        texture2D(tex, vec2(x + 3.5, y) / scale)
     );
+}
+mat4 getSkinMatrix(float idx) {
+    return getSkinMatrix(skinMatricesTexture, idx);
 }
 #else
 uniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;

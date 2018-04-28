@@ -423,11 +423,40 @@ var GBuffer = Base.extend(function () {
                 },
                 afterRender: function (renderer, renderable) {
                     if (renderable.isSkinnedMesh()) {
-                        var skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.__uid__, renderable.joints);
-                        if (!renderable.__prevSkinMatricesArray || renderable.__prevSkinMatricesArray.length !== skinMatricesArray.length) {
-                            renderable.__prevSkinMatricesArray = new Float32Array(skinMatricesArray.length);
+                        var skeleton = renderable.skeleton;
+                        var joints = renderable.joints;
+                        if (joints.length > renderer.getMaxJointNumber()) {
+                            var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(renderable.__uid__, joints);
+                            var prevSkinMatricesTexture = renderable.__prevSkinMatricesTexture;
+                            if (!prevSkinMatricesTexture) {
+                                prevSkinMatricesTexture = renderable.__prevSkinMatricesTexture = new Texture2D({
+                                    type: Texture.FLOAT,
+                                    minFilter: Texture.NEAREST,
+                                    magFilter: Texture.NEAREST,
+                                    useMipmap: false,
+                                    flipY: false
+                                });
+                            }
+                            if (!prevSkinMatricesTexture.pixels
+                                || prevSkinMatricesTexture.pixels.length !== skinMatricesTexture.pixels.length
+                            ) {
+                                prevSkinMatricesTexture.pixels = new Float32Array(skinMatricesTexture.pixels);
+                            }
+                            else {
+                                for (var i = 0; i < skinMatricesTexture.pixels.length; i++) {
+                                    prevSkinMatricesTexture.pixels[i] = skinMatricesTexture.pixels[i];
+                                }
+                            }
+                            prevSkinMatricesTexture.width = skinMatricesTexture.width;
+                            prevSkinMatricesTexture.height = skinMatricesTexture.height;
                         }
-                        renderable.__prevSkinMatricesArray.set(skinMatricesArray);
+                        else {
+                            var skinMatricesArray = skeleton.getSubSkinMatrices(renderable.__uid__, joints);
+                            if (!renderable.__prevSkinMatricesArray || renderable.__prevSkinMatricesArray.length !== skinMatricesArray.length) {
+                                renderable.__prevSkinMatricesArray = new Float32Array(skinMatricesArray.length);
+                            }
+                            renderable.__prevSkinMatricesArray.set(skinMatricesArray);
+                        }
                     }
                     renderable.__prevWorldViewProjection = renderable.__prevWorldViewProjection || mat4.create();
                     mat4.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
@@ -438,6 +467,9 @@ var GBuffer = Base.extend(function () {
                     }
                     else if (symbol === 'prevSkinMatrix') {
                         return renderable.__prevSkinMatricesArray;
+                    }
+                    else if (symbol === 'prevSkinMatricesTexture') {
+                        return renderable.__prevSkinMatricesTexture;
                     }
                     else if (symbol === 'firstRender') {
                         return !renderable.__prevWorldViewProjection;

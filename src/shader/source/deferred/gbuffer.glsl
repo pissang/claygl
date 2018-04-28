@@ -26,17 +26,27 @@ varying vec3 v_WorldPosition;
 
 #endif
 
+@import clay.chunk.skinning_header
+
 #ifdef THIRD_PASS
 uniform mat4 prevWorldViewProjection;
 varying vec4 v_ViewPosition;
 varying vec4 v_PrevViewPosition;
 #ifdef SKINNING
+#ifdef USE_SKIN_MATRICES_TEXTURE
+uniform sampler2D prevSkinMatricesTexture;
+mat4 getPrevSkinMatrix(float idx) {
+    return getSkinMatrix(prevSkinMatricesTexture, idx);
+}
+#else
 uniform mat4 prevSkinMatrix[JOINT_COUNT];
+mat4 getPrevSkinMatrix(float idx) {
+    return prevSkinMatrix[int(idx)];
+}
+#endif
 #endif
 
 #endif
-
-@import clay.chunk.skinning_header
 
 
 void main()
@@ -68,11 +78,11 @@ void main()
     // Weighted Sum Skinning Matrix
     // PENDING Must be assigned.
     {
-        mat4 prevSkinMatrixWS = prevSkinMatrix[int(joint.x)] * weight.x;
-        if (weight.y > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.y)] * weight.y; }
-        if (weight.z > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.z)] * weight.z; }
+        mat4 prevSkinMatrixWS = getPrevSkinMatrix(joint.x) * weight.x;
+        if (weight.y > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.y) * weight.y; }
+        if (weight.z > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.z) * weight.z; }
         float weightW = 1.0-weight.x-weight.y-weight.z;
-        if (weightW > 1e-4) { prevSkinMatrixWS += prevSkinMatrix[int(joint.w)] * weightW; }
+        if (weightW > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.w) * weightW; }
         prevSkinnedPosition = (prevSkinMatrixWS * vec4(position, 1.0)).xyz;
     }
     #endif
