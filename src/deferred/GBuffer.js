@@ -422,7 +422,8 @@ var GBuffer = Base.extend(function () {
                     return gBufferMaterial3;
                 },
                 afterRender: function (renderer, renderable) {
-                    if (renderable.isSkinnedMesh()) {
+                    var isSkinnedMesh = renderable.isSkinnedMesh();
+                    if (isSkinnedMesh) {
                         var skeleton = renderable.skeleton;
                         var joints = renderable.joints;
                         if (joints.length > renderer.getMaxJointNumber()) {
@@ -459,7 +460,13 @@ var GBuffer = Base.extend(function () {
                         }
                     }
                     renderable.__prevWorldViewProjection = renderable.__prevWorldViewProjection || mat4.create();
-                    mat4.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
+                    if (isSkinnedMesh) {
+                        // Ignore world transform of skinned mesh.
+                        mat4.copy(renderable.__prevWorldViewProjection, cameraViewProj);
+                    }
+                    else {
+                        mat4.multiply(renderable.__prevWorldViewProjection, cameraViewProj, renderable.worldTransform.array);
+                    }
                 },
                 getUniform: function (renderable, gBufferMat, symbol) {
                     if (symbol === 'prevWorldViewProjection') {
