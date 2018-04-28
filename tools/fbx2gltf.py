@@ -98,7 +98,7 @@ def MatGetOpacity(pMaterial):
     lFactor = pMaterial.TransparencyFactor.Get()
     lColor = pMaterial.TransparentColor.Get()
 
-    return 1.0 - lFactor * (lColor[0] + lColor[1] + lColor[2]) / 3;
+    return 1.0 - lFactor * (lColor[0] + lColor[1] + lColor[2]) / 3.0;
 
 
 def quantize(pList, pStride, pMin, pMax):
@@ -106,18 +106,18 @@ def quantize(pList, pStride, pMin, pMax):
     lMultiplier = []
     lDivider = []
     # TODO dynamic precision? may lose info?
-    lPrecision = 1e6
+    lPrecision = float(1e6)
     for i in lRange:
         pMax[i] = math.ceil(pMax[i] * lPrecision) / lPrecision;
         pMin[i] = math.floor(pMin[i] * lPrecision) / lPrecision;
         if pMax[i] == pMin[i]:
-            lMultiplier.append(0)
-            lDivider.append(0)
+            lMultiplier.append(0.0)
+            lDivider.append(0.0)
         else:
-            lDividerTmp = (pMax[i] - pMin[i]) / 65535;
+            lDividerTmp = (pMax[i] - pMin[i]) / 65535.0;
             lDividerTmp = math.ceil(lDividerTmp * lPrecision) / lPrecision
             lDivider.append(lDividerTmp)
-            lMultiplier.append(1 / lDividerTmp)
+            lMultiplier.append(1.0 / lDividerTmp)
 
     lNewList = []
     for item in pList:
@@ -996,7 +996,7 @@ def V3Same(a, b):
 def V4Same(a, b):
     return abs(a[0] - b[0]) < EPSILON and abs(a[1] - b[1]) < EPSILON and abs(a[2] - b[2]) < EPSILON and abs(a[3] - b[3]) < EPSILON
 def V3Middle(a, b):
-    return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]
+    return [(a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0, (a[2] + b[2]) / 2.0]
 def QuatSlerp(a, b, t):
     [ax, ay, az, aw] = a
     [bx, by, bz, bw] = b
@@ -1015,8 +1015,8 @@ def QuatSlerp(a, b, t):
         ## standard case (slerp)
         omega = math.acos(cosom)
         sinom = math.sin(omega)
-        scale0 = math.sin((1.0 - t) * omega) / sinom
-        scale1 = math.sin(t * omega) / sinom
+        scale0 = math.sin((1.0 - t) * omega) / float(sinom)
+        scale1 = math.sin(t * omega) / float(sinom)
     else:
         ## "from" and "to" quaternions are very close
         ##  ... so we can do a linear interpolation
@@ -1113,7 +1113,7 @@ def ConvertNodeAnimation(pGLTFAnimation, pAnimLayer, pNode, pSampleRate, pStartT
     lStartTimeDouble = max(lStartTimeDouble, pStartTime)
 
     if lDuration > 0:
-        lNumFrames = math.ceil(lDuration / pSampleRate)
+        lNumFrames = int(math.ceil(lDuration / float(pSampleRate)))
 
         lTime = FbxTime()
 
@@ -1368,7 +1368,7 @@ def Convert(
     filePath,
     ouptutFile = '',
     excluded = [],
-    animFrameRate = 1 / 20,
+    animFrameRate = 1.0 / 20.0,
     startTime = 0,
     duration = 1000,
     poseTime = TIME_INFINITY,
@@ -1550,7 +1550,7 @@ if __name__ == "__main__":
         args.file,
         args.output,
         excluded,
-        1 / args.framerate,
+        1.0 / float(args.framerate),
         lStartTime,
         lDuration,
         lPoseTime,
