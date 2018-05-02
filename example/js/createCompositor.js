@@ -95,9 +95,6 @@ define(function (require) {
 
         opt.enableBloom ? compositor.enableBloom() : compositor.disableBloom();
         opt.enableLensflare ? compositor.enableLensflare() : compositor.disableLensflare();
-        opt.enableDepthOfField ? compositor.enableDepthOfField() : compositor.disableDepthOfField();
-
-        compositor.setDepthTexture(opt.depthTexture);
 
         if (opt.stereo) {
             compositor.nodes.forEach(function (node) {
