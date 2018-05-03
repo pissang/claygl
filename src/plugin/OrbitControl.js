@@ -539,11 +539,21 @@ var OrbitControl = Base.extend(function () {
             this._processGesture(e, 'start');
         }
         else {
+            // Left button.
             if (e.button === 0) {
                 this._mode = 'rotate';
             }
+            // Middle button.
             else if (e.button === 1) {
                 this._mode = 'pan';
+
+                /**
+                 * Vendors like Mozilla provide a mouse-driven panning feature
+                 * that is activated when the middle mouse button is pressed.
+                 *
+                 * @see https://w3c.github.io/uievents/#event-type-mousedown
+                 */
+                e.preventDefault();
             }
             else {
                 this._mode = null;
