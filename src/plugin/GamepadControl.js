@@ -1,5 +1,6 @@
 import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
+import vendor from '../core/vendor';
 
 /**
  * Gamepad Control plugin.
@@ -113,13 +114,13 @@ var GamepadControl = Base.extend(function() {
          *
          * @see https://w3c.github.io/gamepad/#dom-gamepadevent
          */
-        window.addEventListener('gamepadconnected', this._checkGamepadCompatibility);
+        vendor.addEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
         if (this.timeline) {
             this.timeline.on('frame', this.update);
         }
 
-        window.addEventListener('gamepaddisconnected', this._disconnectGamepad);
+        vendor.addEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -128,13 +129,13 @@ var GamepadControl = Base.extend(function() {
      */
     dispose: function() {
 
-        window.removeEventListener('gamepadconnected', this._checkGamepadCompatibility);
+        vendor.removeEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
         if (this.timeline) {
             this.timeline.off('frame', this.update);
         }
 
-        window.removeEventListener('gamepaddisconnected', this._disconnectGamepad);
+        vendor.removeEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -181,7 +182,7 @@ var GamepadControl = Base.extend(function() {
         target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
 
         // Reset values to avoid lost of control.
-        
+
         this._moveForward = this._moveBackward = this._moveLeft = this._moveRight = false;
         this._offsetPitch = this._offsetRoll = 0;
 
@@ -254,9 +255,9 @@ var GamepadControl = Base.extend(function() {
                     case 15:
                         this._moveRight = true;
                         break;
-    
+
                 }
-                
+
             }
 
         }

@@ -38,6 +38,7 @@ import LRUCache from './core/LRU';
 import util from './core/util';
 import shUtil from './util/sh';
 import textureUtil from './util/texture';
+import vendor from './core/vendor';
 
 import colorUtil from './core/color';
 var parseColor = colorUtil.parseToFloat;
@@ -272,7 +273,7 @@ function App3D(dom, appNS) {
 
         dom.innerHTML = '';
         EVE_NAMES.forEach(function (eveType) {
-            this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
+            this[makeHandlerName(eveType)] && vendor.removeEventListener(dom, makeHandlerName(eveType));
         }, this);
     };
 
@@ -363,11 +364,11 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
 
     var oldTarget = null;
     EVE_NAMES.forEach(function (_eveType) {
-        dom.addEventListener(_eveType, this[makeHandlerName(_eveType)] = function (e) {
+        vendor.addEventListener(dom, _eveType, this[makeHandlerName(_eveType)] = function (e) {
             if (!rayPicking.camera) { // Not have camera yet.
                 return;
             }
-            e.preventDefault();
+            e.preventDefault && e.preventDefault();
 
             var box = dom.getBoundingClientRect();
             var offsetX, offsetY;

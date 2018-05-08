@@ -1,5 +1,6 @@
 import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
+import vendor from '../core/vendor';
 
 /**
  * @constructor clay.plugin.FreeControl
@@ -87,14 +88,14 @@ var FreeControl = Base.extend(function() {
 
         //Must request pointer lock after click event, can't not do it directly
         //Why ? ?
-        el.addEventListener('click', this._requestPointerLock);
+        vendor.addEventListener(el, 'click', this._requestPointerLock);
 
-        document.addEventListener('pointerlockchange', this._lockChange);
-        document.addEventListener('mozpointerlockchange', this._lockChange);
-        document.addEventListener('webkitpointerlockchange', this._lockChange);
+        vendor.addEventListener(document, 'pointerlockchange', this._lockChange);
+        vendor.addEventListener(document, 'mozpointerlockchange', this._lockChange);
+        vendor.addEventListener(document, 'webkitpointerlockchange', this._lockChange);
 
-        document.addEventListener('keydown', this._keyDown);
-        document.addEventListener('keyup', this._keyUp);
+        vendor.addEventListener(document, 'keydown', this._keyDown);
+        vendor.addEventListener(document, 'keyup', this._keyUp);
 
         if (this.timeline) {
             this.timeline.on('frame', this._detectMovementChange, this);
@@ -116,14 +117,14 @@ var FreeControl = Base.extend(function() {
             el.exitPointerLock();
         }
 
-        this.domElement.removeEventListener('click', this._requestPointerLock);
+        vendor.removeEventListener(el, 'click', this._requestPointerLock);
 
-        document.removeEventListener('pointerlockchange', this._lockChange);
-        document.removeEventListener('mozpointerlockchange', this._lockChange);
-        document.removeEventListener('webkitpointerlockchange', this._lockChange);
+        vendor.removeEventListener(document, 'pointerlockchange', this._lockChange);
+        vendor.removeEventListener(document, 'mozpointerlockchange', this._lockChange);
+        vendor.removeEventListener(document, 'webkitpointerlockchange', this._lockChange);
 
-        document.removeEventListener('keydown', this._keyDown);
-        document.removeEventListener('keyup', this._keyUp);
+        vendor.removeEventListener(document, 'keydown', this._keyDown);
+        vendor.removeEventListener(document, 'keyup', this._keyUp);
 
         if (this.timeline) {
             this.timeline.off('frame', this._detectMovementChange);
@@ -184,10 +185,10 @@ var FreeControl = Base.extend(function() {
             || document.mozPointerLockElement === this.domElement
             || document.webkitPointerLockElement === this.domElement
         ) {
-            document.addEventListener('mousemove', this._mouseMove, false);
+            vendor.addEventListener(document, 'mousemove', this._mouseMove, false);
         }
         else {
-            document.removeEventListener('mousemove', this._mouseMove);
+            vendor.removeEventListener(document, 'mousemove', this._mouseMove);
         }
     },
 

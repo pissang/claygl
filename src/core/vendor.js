@@ -46,6 +46,8 @@ if (typeof window !== 'undefined') {
 else if (typeof global !== 'undefined') {
     g = global;
 }
+
+
 vendor.requestAnimationFrame = g.requestAnimationFrame
     || g.msRequestAnimationFrame
     || g.mozRequestAnimationFrame
@@ -62,6 +64,14 @@ vendor.createImage = function () {
 
 vendor.request = {
     get: request.get
+};
+
+vendor.addEventListener = function (dom, type, func, useCapture) {
+    dom.addEventListener(type, func, useCapture);
+};
+
+vendor.removeEventListener = function (dom, type, func) {
+    dom.removeEventListener(type, func);
 };
 
 export default vendor;

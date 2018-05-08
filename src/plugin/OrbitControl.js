@@ -2,6 +2,7 @@ import Base from '../core/Base';
 import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import GestureMgr from './GestureMgr';
+import vendor from '../core/vendor';
 
 function firstNotNull() {
     for (var i = 0, len = arguments.length; i < len; i++) {
@@ -162,10 +163,10 @@ var OrbitControl = Base.extend(function () {
     init: function () {
         var dom = this.domElement;
 
-        dom.addEventListener('touchstart', this._mouseDownHandler);
+        vendor.addEventListener(dom, 'touchstart', this._mouseDownHandler);
 
-        dom.addEventListener('mousedown', this._mouseDownHandler);
-        dom.addEventListener('wheel', this._mouseWheelHandler);
+        vendor.addEventListener(dom, 'mousedown', this._mouseDownHandler);
+        vendor.addEventListener(dom, 'wheel', this._mouseWheelHandler);
 
         if (this.timeline) {
             this.timeline.on('frame', this.update);
@@ -179,15 +180,15 @@ var OrbitControl = Base.extend(function () {
     dispose: function () {
         var dom = this.domElement;
 
-        dom.removeEventListener('touchstart', this._mouseDownHandler);
-        dom.removeEventListener('touchmove', this._mouseMoveHandler);
-        dom.removeEventListener('touchend', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'touchstart', this._mouseDownHandler);
+        vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
 
-        dom.removeEventListener('mousedown', this._mouseDownHandler);
-        dom.removeEventListener('mousemove', this._mouseMoveHandler);
-        dom.removeEventListener('mouseup', this._mouseUpHandler);
-        dom.removeEventListener('wheel', this._mouseWheelHandler);
-        dom.removeEventListener('mouseout', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mousedown', this._mouseDownHandler);
+        vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'wheel', this._mouseWheelHandler);
+        vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         if (this.timeline) {
             this.timeline.off('frame', this.update);
@@ -561,12 +562,12 @@ var OrbitControl = Base.extend(function () {
         }
 
         var dom = this.domElement;
-        dom.addEventListener('touchmove', this._mouseMoveHandler);
-        dom.addEventListener('touchend', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.addEventListener(dom, 'touchend', this._mouseUpHandler);
 
-        dom.addEventListener('mousemove', this._mouseMoveHandler);
-        dom.addEventListener('mouseup', this._mouseUpHandler);
-        dom.addEventListener('mouseout', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.addEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         // Reset rotate velocity
         this._rotateVelocity.set(0, 0);
@@ -613,7 +614,7 @@ var OrbitControl = Base.extend(function () {
         this._mouseX = x;
         this._mouseY = y;
 
-        e.preventDefault();
+        e.preventDefault && e.preventDefault();
     },
 
     _mouseWheelHandler: function (e) {
@@ -648,16 +649,16 @@ var OrbitControl = Base.extend(function () {
             this._startCountingStill();
         }
 
-        e.preventDefault();
+        e.preventDefault && e.preventDefault();
     },
 
     _mouseUpHandler: function (event) {
         var dom = this.domElement;
-        dom.removeEventListener('touchmove', this._mouseMoveHandler);
-        dom.removeEventListener('touchend', this._mouseUpHandler);
-        dom.removeEventListener('mousemove', this._mouseMoveHandler);
-        dom.removeEventListener('mouseup', this._mouseUpHandler);
-        dom.removeEventListener('mouseout', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         this._processGesture(event, 'end');
     },

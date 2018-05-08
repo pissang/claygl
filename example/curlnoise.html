@@ -7,9 +7,11 @@
 <body style="margin:0px;">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['../dist/claygl'], function(clay){
+        require(['../dist/claygl', 'text!./assets/fx/curlnoise.essl'], function(clay, esslCode){
 
             var Shader = clay.Shader;
+
+            clay.Shader.import(esslCode);
 
             var SIZE = 1024;
 
