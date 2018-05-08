@@ -636,7 +636,9 @@ var Renderer = Base.extend(function () {
         var currentVAO;
         var materialTakesTextureSlot;
 
-        var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        // var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        // not use vaoExt, some platforms may mess it up.
+        var vaoExt = null;
 
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
