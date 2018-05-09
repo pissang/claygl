@@ -785,19 +785,24 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             if not vertexKey in lPrimitive['indicesMap']:
                 lIndex = len(lPrimitive['positions'])
                 lPrimitive['positions'].append(lPositions[lControlPointIndex])
-                if lNormalLayer:
+                if lNormalLayer and lNormal: # incase unsupported mapping mode returns none.
                     lPrimitive['normals'].append(lNormal)
                 # PENDING
+                # Texcoord may be put in the second layer
                 if lPrimitive['useTexcoords1']:
                     if lUv2Layer:
-                        lPrimitive['texcoords0'].append(lUv2)
+                        if lUv2: # incase unsupported mapping mode returns none.
+                            lPrimitive['texcoords0'].append(lUv2)
                     else:
-                        lPrimitive['texcoords0'].append(lUv)
+                        if lUv: # incase unsupported mapping mode returns none.
+                            lPrimitive['texcoords0'].append(lUv)
                 else:
                     if lUvLayer:
-                        lPrimitive['texcoords0'].append(lUv)
+                        if lUv: # incase unsupported mapping mode returns none.
+                            lPrimitive['texcoords0'].append(lUv)
                     if lUv2Layer:
-                        lPrimitive['texcoords1'].append(lUv2)
+                        if lUv2: # incase unsupported mapping mode returns none.
+                            lPrimitive['texcoords1'].append(lUv2)
                 if hasSkin:
                     lPrimitive['joints'].append(lJoints[lControlPointIndex])
                     lPrimitive['weights'].append(lWeights[lControlPointIndex])
