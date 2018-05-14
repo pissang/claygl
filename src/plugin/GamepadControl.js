@@ -96,6 +96,8 @@ var GamepadControl = Base.extend(function() {
     this._scanPressedGamepadButtons = this._scanPressedGamepadButtons.bind(this);
     this._scanInclinedGamepadAxes = this._scanInclinedGamepadAxes.bind(this);
 
+    this.update = this.update.bind(this);
+
     // If browser supports Gamepad API:
     if (typeof navigator.getGamepads === 'function') {
         this.init();
@@ -180,6 +182,16 @@ var GamepadControl = Base.extend(function() {
         target.rotateAround(target.position, this.up, -this._offsetPitch * frameTime * Math.PI / 360);
         var xAxis = target.localTransform.x;
         target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
+
+        /*
+         * If necessary: trigger `update` event.
+         * XXX This can economize rendering OPs.
+         */
+        if (this._moveForward === true || this._moveBackward === true || this._moveLeft === true
+            || this._moveRight === true || this._offsetPitch !== 0 || this._offsetRoll !== 0)
+        {
+            this.trigger('update');
+        }
 
         // Reset values to avoid lost of control.
 
