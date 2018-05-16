@@ -197,13 +197,13 @@ var FilterNode = CompositorNode.extend(function () {
             }
         }
         var width, height;
-        if (parameters.width instanceof Function) {
+        if (typeof parameters.width === 'function') {
             width = parameters.width.call(this, renderer);
         }
         else {
             width = parameters.width;
         }
-        if (parameters.height instanceof Function) {
+        if (typeof parameters.height === 'function') {
             height = parameters.height.call(this, renderer);
         }
         else {

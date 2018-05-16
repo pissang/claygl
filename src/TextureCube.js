@@ -211,11 +211,9 @@ var TextureCube = Texture.extend(function () {
                     self.dirty();
                     self.trigger('success', self);
                 }
-                image.onload = null;
             };
             image.onerror = function () {
                 loading --;
-                image.onerror = null;
             };
 
             loading++;

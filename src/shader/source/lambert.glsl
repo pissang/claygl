@@ -62,6 +62,8 @@ void main()
 
 @export clay.lambert.fragment
 
+#define DIFFUSEMAP_ALPHA_ALPHA
+
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;

@@ -47,6 +47,7 @@ void main()
 
 @export clay.basic.fragment
 
+#define DIFFUSEMAP_ALPHA_ALPHA
 
 varying vec2 v_Texcoord;
 uniform sampler2D diffuseMap;

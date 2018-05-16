@@ -200,11 +200,9 @@ var Texture2D = Texture.extend(function () {
         image.onload = function () {
             self.dirty();
             self.trigger('success', self);
-            image.onload = null;
         };
         image.onerror = function () {
             self.trigger('error', self);
-            image.onerror = null;
         };
 
         image.src = src;

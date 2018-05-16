@@ -136,7 +136,7 @@ function createNode(nodeInfo, lib, opts) {
         if (nodeInfo.parameters) {
             for (var name in nodeInfo.parameters) {
                 var val = nodeInfo.parameters[name];
-                if (typeof(val) === 'string') {
+                if (typeof val === 'string') {
                     val = val.trim();
                     if (val.charAt(0) === '#') {
                         val = lib.textures[val.substr(1)];
@@ -148,6 +148,9 @@ function createNode(nodeInfo, lib, opts) {
                             )
                         );
                     }
+                }
+                else if (typeof val === 'function') {
+                    node.on('beforerender', val);
                 }
                 node.setParameter(name, val);
             }
