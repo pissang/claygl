@@ -1038,6 +1038,9 @@ App3D.prototype.createCamera = function (position, target, type, extent) {
         camera.near = 0;
         camera.far = extent[2];
     }
+    else {
+        camera.aspect = this.renderer.getViewportAspect();
+    }
 
     this.scene.add(camera);
 
