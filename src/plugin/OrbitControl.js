@@ -152,8 +152,6 @@ var OrbitControl = Base.extend(function () {
     this._mouseUpHandler = this._mouseUpHandler.bind(this);
     this._pinchHandler = this._pinchHandler.bind(this);
 
-    this.update = this.update.bind(this);
-
     this.init();
 }, /** @lends clay.plugin.OrbitControl# */ {
     /**
@@ -169,7 +167,7 @@ var OrbitControl = Base.extend(function () {
         vendor.addEventListener(dom, 'wheel', this._mouseWheelHandler);
 
         if (this.timeline) {
-            this.timeline.on('frame', this.update);
+            this.timeline.on('frame', this.update, this);
         }
     },
 
@@ -423,8 +421,6 @@ var OrbitControl = Base.extend(function () {
         this.setBeta(this.getBeta());
 
         this._vectorDamping(velocity, this.damping);
-
-        velocity.x = velocity.y = 0;
     },
 
     _updateDistance: function (deltaTime) {
