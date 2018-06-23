@@ -6165,6 +6165,8 @@ if (typeof window !== 'undefined') {
 else if (typeof global !== 'undefined') {
     g = global;
 }
+
+
 vendor.requestAnimationFrame = g.requestAnimationFrame
     || g.msRequestAnimationFrame
     || g.mozRequestAnimationFrame
@@ -6181,6 +6183,14 @@ vendor.createImage = function () {
 
 vendor.request = {
     get: request.get
+};
+
+vendor.addEventListener = function (dom, type, func, useCapture) {
+    dom.addEventListener(type, func, useCapture);
+};
+
+vendor.removeEventListener = function (dom, type, func) {
+    dom.removeEventListener(type, func);
 };
 
 /**
@@ -11214,7 +11224,9 @@ var Renderer = Base.extend(function () {
         var currentVAO;
         var materialTakesTextureSlot;
 
-        var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        // var vaoExt = this.getGLExtension('OES_vertex_array_object');
+        // not use vaoExt, some platforms may mess it up.
+        var vaoExt = null;
 
         for (var i = 0; i < list.length; i++) {
             var renderable = list[i];
@@ -19176,11 +19188,9 @@ var Texture2D = Texture.extend(function () {
         image.onload = function () {
             self.dirty();
             self.trigger('success', self);
-            image.onload = null;
         };
         image.onerror = function () {
             self.trigger('error', self);
-            image.onerror = null;
         };
 
         image.src = src;
@@ -19437,11 +19447,9 @@ var TextureCube = Texture.extend(function () {
                     self.dirty();
                     self.trigger('success', self);
                 }
-                image.onload = null;
             };
             image.onerror = function () {
                 loading --;
-                image.onerror = null;
             };
 
             loading++;
@@ -20681,9 +20689,9 @@ var Skeleton = Base.extend(function () {
 
 var utilGlsl = "\n@export clay.util.rand\nhighp float rand(vec2 uv) {\n const highp float a = 12.9898, b = 78.233, c = 43758.5453;\n highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);\n return fract(sin(sn) * c);\n}\n@end\n@export clay.util.calculate_attenuation\nuniform float attenuationFactor : 5.0;\nfloat lightAttenuation(float dist, float range)\n{\n float attenuation = 1.0;\n attenuation = dist*dist/(range*range+1.0);\n float att_s = attenuationFactor;\n attenuation = 1.0/(attenuation*att_s+1.0);\n att_s = 1.0/(att_s+1.0);\n attenuation = attenuation - att_s;\n attenuation /= 1.0 - att_s;\n return clamp(attenuation, 0.0, 1.0);\n}\n@end\n@export clay.util.edge_factor\n#ifdef SUPPORT_STANDARD_DERIVATIVES\nfloat edgeFactor(float width)\n{\n vec3 d = fwidth(v_Barycentric);\n vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);\n return min(min(a3.x, a3.y), a3.z);\n}\n#else\nfloat edgeFactor(float width)\n{\n return 1.0;\n}\n#endif\n@end\n@export clay.util.encode_float\nvec4 encodeFloat(const in float depth)\n{\n const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);\n const vec4 bit_mask = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);\n vec4 res = fract(depth * bitShifts);\n res -= res.xxyz * bit_mask;\n return res;\n}\n@end\n@export clay.util.decode_float\nfloat decodeFloat(const in vec4 color)\n{\n const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);\n return dot(color, bitShifts);\n}\n@end\n@export clay.util.float\n@import clay.util.encode_float\n@import clay.util.decode_float\n@end\n@export clay.util.rgbm_decode\nvec3 RGBMDecode(vec4 rgbm, float range) {\n return range * rgbm.rgb * rgbm.a;\n}\n@end\n@export clay.util.rgbm_encode\nvec4 RGBMEncode(vec3 color, float range) {\n if (dot(color, color) == 0.0) {\n return vec4(0.0);\n }\n vec4 rgbm;\n color /= range;\n rgbm.a = clamp(max(max(color.r, color.g), max(color.b, 1e-6)), 0.0, 1.0);\n rgbm.a = ceil(rgbm.a * 255.0) / 255.0;\n rgbm.rgb = color / rgbm.a;\n return rgbm;\n}\n@end\n@export clay.util.rgbm\n@import clay.util.rgbm_decode\n@import clay.util.rgbm_encode\nvec4 decodeHDR(vec4 color)\n{\n#if defined(RGBM_DECODE) || defined(RGBM)\n return vec4(RGBMDecode(color, 8.12), 1.0);\n#else\n return color;\n#endif\n}\nvec4 encodeHDR(vec4 color)\n{\n#if defined(RGBM_ENCODE) || defined(RGBM)\n return RGBMEncode(color.xyz, 8.12);\n#else\n return color;\n#endif\n}\n@end\n@export clay.util.srgb\nvec4 sRGBToLinear(in vec4 value) {\n return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);\n}\nvec4 linearTosRGB(in vec4 value) {\n return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);\n}\n@end\n@export clay.chunk.skinning_header\n#ifdef SKINNING\nattribute vec3 weight : WEIGHT;\nattribute vec4 joint : JOINT;\n#ifdef USE_SKIN_MATRICES_TEXTURE\nuniform sampler2D skinMatricesTexture : ignore;\nuniform float skinMatricesTextureSize: ignore;\nmat4 getSkinMatrix(sampler2D tex, float idx) {\n float j = idx * 4.0;\n float x = mod(j, skinMatricesTextureSize);\n float y = floor(j / skinMatricesTextureSize) + 0.5;\n vec2 scale = vec2(skinMatricesTextureSize);\n return mat4(\n texture2D(tex, vec2(x + 0.5, y) / scale),\n texture2D(tex, vec2(x + 1.5, y) / scale),\n texture2D(tex, vec2(x + 2.5, y) / scale),\n texture2D(tex, vec2(x + 3.5, y) / scale)\n );\n}\nmat4 getSkinMatrix(float idx) {\n return getSkinMatrix(skinMatricesTexture, idx);\n}\n#else\nuniform mat4 skinMatrix[JOINT_COUNT] : SKIN_MATRIX;\nmat4 getSkinMatrix(float idx) {\n return skinMatrix[int(idx)];\n}\n#endif\n#endif\n@end\n@export clay.chunk.skin_matrix\nmat4 skinMatrixWS = getSkinMatrix(joint.x) * weight.x;\nif (weight.y > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.y) * weight.y;\n}\nif (weight.z > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.z) * weight.z;\n}\nfloat weightW = 1.0-weight.x-weight.y-weight.z;\nif (weightW > 1e-4)\n{\n skinMatrixWS += getSkinMatrix(joint.w) * weightW;\n}\n@end\n@export clay.util.parallax_correct\nvec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {\n vec3 first = (boxMax - pos) / dir;\n vec3 second = (boxMin - pos) / dir;\n vec3 further = max(first, second);\n float dist = min(further.x, min(further.y, further.z));\n vec3 fixedPos = pos + dir * dist;\n vec3 boxCenter = (boxMax + boxMin) * 0.5;\n return normalize(fixedPos - boxCenter);\n}\n@end\n@export clay.util.clamp_sample\nvec4 clampSample(const in sampler2D texture, const in vec2 coord)\n{\n#ifdef STEREO\n float eye = step(0.5, coord.x) * 0.5;\n vec2 coordClamped = clamp(coord, vec2(eye, 0.0), vec2(0.5 + eye, 1.0));\n#else\n vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));\n#endif\n return texture2D(texture, coordClamped);\n}\n@end\n@export clay.util.ACES\nvec3 ACESToneMapping(vec3 color)\n{\n const float A = 2.51;\n const float B = 0.03;\n const float C = 2.43;\n const float D = 0.59;\n const float E = 0.14;\n return (color * (A * color + B)) / (color * (C * color + D) + E);\n}\n@end";
 
-var basicEssl = "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Barycentric = barycentric;\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.basic.fragment\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n gl_FragColor.a = texel.a;\n#endif\n gl_FragColor.rgb *= texel.rgb;\n#endif\n gl_FragColor.rgb += emission;\n if( lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var basicEssl = "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Barycentric = barycentric;\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.basic.fragment\n#define DIFFUSEMAP_ALPHA_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n gl_FragColor.a = texel.a;\n#endif\n gl_FragColor.rgb *= texel.rgb;\n#endif\n gl_FragColor.rgb += emission;\n if( lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
-var lambertEssl = "\n@export clay.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.lambert.fragment\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.plugin.compute_shadow_map\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n gl_FragColor.a *= tex.a;\n#endif\n#endif\n vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {\n diffuseColor += ambientLightColor[_idx_];\n }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if( shadowEnabled )\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = pointLightPosition[i];\n vec3 lightColor = pointLightColor[i];\n float range = pointLightRange[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float ndl = dot( v_Normal, lightDirection );\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsPoint[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n {\n vec3 lightDirection = -directionalLightDirection[i];\n vec3 lightColor = directionalLightColor[i];\n float ndl = dot(v_Normal, normalize(lightDirection));\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsDir[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = -spotLightPosition[i];\n vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n vec3 lightColor = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float c = dot(spotLightDirection, lightDirection);\n float falloff;\n falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n float ndl = dot(v_Normal, lightDirection);\n ndl = clamp(ndl, 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n }\n#endif\n gl_FragColor.rgb *= diffuseColor;\n gl_FragColor.rgb += emission;\n if(lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
+var lambertEssl = "\n@export clay.lambert.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 normal : NORMAL;\nattribute vec3 barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\n@import clay.chunk.skinning_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 skinnedNormal = normal;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4( skinnedPosition, 1.0 );\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Normal = normalize( ( worldInverseTranspose * vec4(skinnedNormal, 0.0) ).xyz );\n v_WorldPosition = ( world * vec4( skinnedPosition, 1.0) ).xyz;\n v_Barycentric = barycentric;\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n}\n@end\n@export clay.lambert.fragment\n#define DIFFUSEMAP_ALPHA_ALPHA\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D diffuseMap;\nuniform sampler2D alphaMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\n#ifdef AMBIENT_LIGHT_COUNT\n@import clay.header.ambient_light\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n@import clay.header.ambient_sh_light\n#endif\n#ifdef POINT_LIGHT_COUNT\n@import clay.header.point_light\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n@import clay.header.directional_light\n#endif\n#ifdef SPOT_LIGHT_COUNT\n@import clay.header.spot_light\n#endif\n@import clay.util.calculate_attenuation\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.plugin.compute_shadow_map\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 tex = texture2D( diffuseMap, v_Texcoord );\n#ifdef SRGB_DECODE\n tex.rgb = pow(tex.rgb, vec3(2.2));\n#endif\n gl_FragColor.rgb *= tex.rgb;\n#ifdef DIFFUSEMAP_ALPHA_ALPHA\n gl_FragColor.a *= tex.a;\n#endif\n#endif\n vec3 diffuseColor = vec3(0.0, 0.0, 0.0);\n#ifdef AMBIENT_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_LIGHT_COUNT; _idx_++)\n {\n diffuseColor += ambientLightColor[_idx_];\n }\n#endif\n#ifdef AMBIENT_SH_LIGHT_COUNT\n for(int _idx_ = 0; _idx_ < AMBIENT_SH_LIGHT_COUNT; _idx_++)\n {{\n diffuseColor += calcAmbientSHLight(_idx_, v_Normal) * ambientSHLightColor[_idx_];\n }}\n#endif\n#ifdef POINT_LIGHT_COUNT\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsPoint[POINT_LIGHT_COUNT];\n if( shadowEnabled )\n {\n computeShadowOfPointLights(v_WorldPosition, shadowContribsPoint);\n }\n#endif\n for(int i = 0; i < POINT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = pointLightPosition[i];\n vec3 lightColor = pointLightColor[i];\n float range = pointLightRange[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float ndl = dot( v_Normal, lightDirection );\n float shadowContrib = 1.0;\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsPoint[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * attenuation * shadowContrib;\n }\n#endif\n#ifdef DIRECTIONAL_LIGHT_COUNT\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsDir[DIRECTIONAL_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfDirectionalLights(v_WorldPosition, shadowContribsDir);\n }\n#endif\n for(int i = 0; i < DIRECTIONAL_LIGHT_COUNT; i++)\n {\n vec3 lightDirection = -directionalLightDirection[i];\n vec3 lightColor = directionalLightColor[i];\n float ndl = dot(v_Normal, normalize(lightDirection));\n float shadowContrib = 1.0;\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsDir[i];\n }\n#endif\n diffuseColor += lightColor * clamp(ndl, 0.0, 1.0) * shadowContrib;\n }\n#endif\n#ifdef SPOT_LIGHT_COUNT\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n float shadowContribsSpot[SPOT_LIGHT_COUNT];\n if(shadowEnabled)\n {\n computeShadowOfSpotLights(v_WorldPosition, shadowContribsSpot);\n }\n#endif\n for(int i = 0; i < SPOT_LIGHT_COUNT; i++)\n {\n vec3 lightPosition = -spotLightPosition[i];\n vec3 spotLightDirection = -normalize( spotLightDirection[i] );\n vec3 lightColor = spotLightColor[i];\n float range = spotLightRange[i];\n float a = spotLightUmbraAngleCosine[i];\n float b = spotLightPenumbraAngleCosine[i];\n float falloffFactor = spotLightFalloffFactor[i];\n vec3 lightDirection = lightPosition - v_WorldPosition;\n float dist = length(lightDirection);\n float attenuation = lightAttenuation(dist, range);\n lightDirection /= dist;\n float c = dot(spotLightDirection, lightDirection);\n float falloff;\n falloff = clamp((c - a) /( b - a), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n float ndl = dot(v_Normal, lightDirection);\n ndl = clamp(ndl, 0.0, 1.0);\n float shadowContrib = 1.0;\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\n if( shadowEnabled )\n {\n shadowContrib = shadowContribsSpot[i];\n }\n#endif\n diffuseColor += lightColor * ndl * attenuation * (1.0-falloff) * shadowContrib;\n }\n#endif\n gl_FragColor.rgb *= diffuseColor;\n gl_FragColor.rgb += emission;\n if(lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n}\n@end";
 
 var wireframeEssl = "@export clay.wireframe.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );\n v_Barycentric = barycentric;\n}\n@end\n@export clay.wireframe.fragment\nuniform vec3 color : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\nuniform float lineWidth : 1.0;\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\nvoid main()\n{\n gl_FragColor.rgb = color;\n gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;\n}\n@end";
 
@@ -25638,7 +25646,7 @@ function App3D(dom, appNS) {
 
         dom.innerHTML = '';
         EVE_NAMES.forEach(function (eveType) {
-            this[makeHandlerName(eveType)] && dom.removeEventListener(makeHandlerName(eveType));
+            this[makeHandlerName(eveType)] && vendor.removeEventListener(dom, makeHandlerName(eveType));
         }, this);
     };
 
@@ -25729,11 +25737,11 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
 
     var oldTarget = null;
     EVE_NAMES.forEach(function (_eveType) {
-        dom.addEventListener(_eveType, this[makeHandlerName(_eveType)] = function (e) {
+        vendor.addEventListener(dom, _eveType, this[makeHandlerName(_eveType)] = function (e) {
             if (!rayPicking.camera) { // Not have camera yet.
                 return;
             }
-            e.preventDefault();
+            e.preventDefault && e.preventDefault();
 
             var box = dom.getBoundingClientRect();
             var offsetX, offsetY;
@@ -26402,6 +26410,9 @@ App3D.prototype.createCamera = function (position, target, type, extent) {
         camera.bottom = -extent[1] / 2;
         camera.near = 0;
         camera.far = extent[2];
+    }
+    else {
+        camera.aspect = this.renderer.getViewportAspect();
     }
 
     this.scene.add(camera);
@@ -27840,13 +27851,13 @@ var FilterNode$1 = CompositorNode.extend(function () {
             }
         }
         var width, height;
-        if (parameters.width instanceof Function) {
+        if (typeof parameters.width === 'function') {
             width = parameters.width.call(this, renderer);
         }
         else {
             width = parameters.width;
         }
-        if (parameters.height instanceof Function) {
+        if (typeof parameters.height === 'function') {
             height = parameters.height.call(this, renderer);
         }
         else {
@@ -28119,7 +28130,7 @@ function createNode(nodeInfo, lib, opts) {
         if (nodeInfo.parameters) {
             for (var name in nodeInfo.parameters) {
                 var val = nodeInfo.parameters[name];
-                if (typeof(val) === 'string') {
+                if (typeof val === 'string') {
                     val = val.trim();
                     if (val.charAt(0) === '#') {
                         val = lib.textures[val.substr(1)];
@@ -28131,6 +28142,9 @@ function createNode(nodeInfo, lib, opts) {
                             )
                         );
                     }
+                }
+                else if (typeof val === 'function') {
+                    node.on('beforerender', val);
                 }
                 node.setParameter(name, val);
             }
@@ -32934,6 +32948,8 @@ function unpackID(r, g, b){
     return (r << 16) + (g<<8) + b;
 }
 
+var doc = typeof document === 'undefined' ? {} : document;
+
 /**
  * @constructor clay.plugin.FreeControl
  * @example
@@ -33020,14 +33036,14 @@ var FreeControl = Base.extend(function() {
 
         //Must request pointer lock after click event, can't not do it directly
         //Why ? ?
-        el.addEventListener('click', this._requestPointerLock);
+        vendor.addEventListener(el, 'click', this._requestPointerLock);
 
-        document.addEventListener('pointerlockchange', this._lockChange);
-        document.addEventListener('mozpointerlockchange', this._lockChange);
-        document.addEventListener('webkitpointerlockchange', this._lockChange);
+        vendor.addEventListener(doc, 'pointerlockchange', this._lockChange);
+        vendor.addEventListener(doc, 'mozpointerlockchange', this._lockChange);
+        vendor.addEventListener(doc, 'webkitpointerlockchange', this._lockChange);
 
-        document.addEventListener('keydown', this._keyDown);
-        document.addEventListener('keyup', this._keyUp);
+        vendor.addEventListener(doc, 'keydown', this._keyDown);
+        vendor.addEventListener(doc, 'keyup', this._keyUp);
 
         if (this.timeline) {
             this.timeline.on('frame', this._detectMovementChange, this);
@@ -33049,14 +33065,14 @@ var FreeControl = Base.extend(function() {
             el.exitPointerLock();
         }
 
-        this.domElement.removeEventListener('click', this._requestPointerLock);
+        vendor.removeEventListener(el, 'click', this._requestPointerLock);
 
-        document.removeEventListener('pointerlockchange', this._lockChange);
-        document.removeEventListener('mozpointerlockchange', this._lockChange);
-        document.removeEventListener('webkitpointerlockchange', this._lockChange);
+        vendor.removeEventListener(doc, 'pointerlockchange', this._lockChange);
+        vendor.removeEventListener(doc, 'mozpointerlockchange', this._lockChange);
+        vendor.removeEventListener(doc, 'webkitpointerlockchange', this._lockChange);
 
-        document.removeEventListener('keydown', this._keyDown);
-        document.removeEventListener('keyup', this._keyUp);
+        vendor.removeEventListener(doc, 'keydown', this._keyDown);
+        vendor.removeEventListener(doc, 'keyup', this._keyUp);
 
         if (this.timeline) {
             this.timeline.off('frame', this._detectMovementChange);
@@ -33113,14 +33129,14 @@ var FreeControl = Base.extend(function() {
 
     _lockChange: function() {
         if (
-            document.pointerLockElement === this.domElement
-            || document.mozPointerLockElement === this.domElement
-            || document.webkitPointerLockElement === this.domElement
+            doc.pointerLockElement === this.domElement
+            || doc.mozPointerLockElement === this.domElement
+            || doc.webkitPointerLockElement === this.domElement
         ) {
-            document.addEventListener('mousemove', this._mouseMove, false);
+            vendor.addEventListener(doc, 'mousemove', this._mouseMove, false);
         }
         else {
-            document.removeEventListener('mousemove', this._mouseMove);
+            vendor.removeEventListener(doc, 'mousemove', this._mouseMove);
         }
     },
 
@@ -33280,6 +33296,8 @@ var GamepadControl = Base.extend(function() {
     this._scanPressedGamepadButtons = this._scanPressedGamepadButtons.bind(this);
     this._scanInclinedGamepadAxes = this._scanInclinedGamepadAxes.bind(this);
 
+    this.update = this.update.bind(this);
+
     // If browser supports Gamepad API:
     if (typeof navigator.getGamepads === 'function') {
         this.init();
@@ -33298,13 +33316,13 @@ var GamepadControl = Base.extend(function() {
          *
          * @see https://w3c.github.io/gamepad/#dom-gamepadevent
          */
-        window.addEventListener('gamepadconnected', this._checkGamepadCompatibility);
+        vendor.addEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
         if (this.timeline) {
             this.timeline.on('frame', this.update);
         }
 
-        window.addEventListener('gamepaddisconnected', this._disconnectGamepad);
+        vendor.addEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -33313,13 +33331,13 @@ var GamepadControl = Base.extend(function() {
      */
     dispose: function() {
 
-        window.removeEventListener('gamepadconnected', this._checkGamepadCompatibility);
+        vendor.removeEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
         if (this.timeline) {
             this.timeline.off('frame', this.update);
         }
 
-        window.removeEventListener('gamepaddisconnected', this._disconnectGamepad);
+        vendor.removeEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
 
     },
 
@@ -33365,8 +33383,18 @@ var GamepadControl = Base.extend(function() {
         var xAxis = target.localTransform.x;
         target.rotateAround(target.position, xAxis, -this._offsetRoll * frameTime * Math.PI / 360);
 
+        /*
+         * If necessary: trigger `update` event.
+         * XXX This can economize rendering OPs.
+         */
+        if (this._moveForward === true || this._moveBackward === true || this._moveLeft === true
+            || this._moveRight === true || this._offsetPitch !== 0 || this._offsetRoll !== 0)
+        {
+            this.trigger('update');
+        }
+
         // Reset values to avoid lost of control.
-        
+
         this._moveForward = this._moveBackward = this._moveLeft = this._moveRight = false;
         this._offsetPitch = this._offsetRoll = 0;
 
@@ -33439,9 +33467,9 @@ var GamepadControl = Base.extend(function() {
                     case 15:
                         this._moveRight = true;
                         break;
-    
+
                 }
-                
+
             }
 
         }
@@ -33868,8 +33896,6 @@ var OrbitControl = Base.extend(function () {
     this._mouseUpHandler = this._mouseUpHandler.bind(this);
     this._pinchHandler = this._pinchHandler.bind(this);
 
-    this.update = this.update.bind(this);
-
     this.init();
 }, /** @lends clay.plugin.OrbitControl# */ {
     /**
@@ -33879,13 +33905,13 @@ var OrbitControl = Base.extend(function () {
     init: function () {
         var dom = this.domElement;
 
-        dom.addEventListener('touchstart', this._mouseDownHandler);
+        vendor.addEventListener(dom, 'touchstart', this._mouseDownHandler);
 
-        dom.addEventListener('mousedown', this._mouseDownHandler);
-        dom.addEventListener('wheel', this._mouseWheelHandler);
+        vendor.addEventListener(dom, 'mousedown', this._mouseDownHandler);
+        vendor.addEventListener(dom, 'wheel', this._mouseWheelHandler);
 
         if (this.timeline) {
-            this.timeline.on('frame', this.update);
+            this.timeline.on('frame', this.update, this);
         }
     },
 
@@ -33896,15 +33922,15 @@ var OrbitControl = Base.extend(function () {
     dispose: function () {
         var dom = this.domElement;
 
-        dom.removeEventListener('touchstart', this._mouseDownHandler);
-        dom.removeEventListener('touchmove', this._mouseMoveHandler);
-        dom.removeEventListener('touchend', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'touchstart', this._mouseDownHandler);
+        vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
 
-        dom.removeEventListener('mousedown', this._mouseDownHandler);
-        dom.removeEventListener('mousemove', this._mouseMoveHandler);
-        dom.removeEventListener('mouseup', this._mouseUpHandler);
-        dom.removeEventListener('wheel', this._mouseWheelHandler);
-        dom.removeEventListener('mouseout', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mousedown', this._mouseDownHandler);
+        vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'wheel', this._mouseWheelHandler);
+        vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         if (this.timeline) {
             this.timeline.off('frame', this.update);
@@ -34139,8 +34165,6 @@ var OrbitControl = Base.extend(function () {
         this.setBeta(this.getBeta());
 
         this._vectorDamping(velocity, this.damping);
-
-        velocity.x = velocity.y = 0;
     },
 
     _updateDistance: function (deltaTime) {
@@ -34256,11 +34280,21 @@ var OrbitControl = Base.extend(function () {
             this._processGesture(e, 'start');
         }
         else {
+            // Left button.
             if (e.button === 0) {
                 this._mode = 'rotate';
             }
+            // Middle button.
             else if (e.button === 1) {
                 this._mode = 'pan';
+
+                /**
+                 * Vendors like Mozilla provide a mouse-driven panning feature
+                 * that is activated when the middle mouse button is pressed.
+                 *
+                 * @see https://w3c.github.io/uievents/#event-type-mousedown
+                 */
+                e.preventDefault();
             }
             else {
                 this._mode = null;
@@ -34268,12 +34302,12 @@ var OrbitControl = Base.extend(function () {
         }
 
         var dom = this.domElement;
-        dom.addEventListener('touchmove', this._mouseMoveHandler);
-        dom.addEventListener('touchend', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.addEventListener(dom, 'touchend', this._mouseUpHandler);
 
-        dom.addEventListener('mousemove', this._mouseMoveHandler);
-        dom.addEventListener('mouseup', this._mouseUpHandler);
-        dom.addEventListener('mouseout', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.addEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.addEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         // Reset rotate velocity
         this._rotateVelocity.set(0, 0);
@@ -34320,7 +34354,7 @@ var OrbitControl = Base.extend(function () {
         this._mouseX = x;
         this._mouseY = y;
 
-        e.preventDefault();
+        e.preventDefault && e.preventDefault();
     },
 
     _mouseWheelHandler: function (e) {
@@ -34355,16 +34389,16 @@ var OrbitControl = Base.extend(function () {
             this._startCountingStill();
         }
 
-        e.preventDefault();
+        e.preventDefault && e.preventDefault();
     },
 
     _mouseUpHandler: function (event) {
         var dom = this.domElement;
-        dom.removeEventListener('touchmove', this._mouseMoveHandler);
-        dom.removeEventListener('touchend', this._mouseUpHandler);
-        dom.removeEventListener('mousemove', this._mouseMoveHandler);
-        dom.removeEventListener('mouseup', this._mouseUpHandler);
-        dom.removeEventListener('mouseout', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
+        vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
+        vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
 
         this._processGesture(event, 'end');
     },
@@ -34905,7 +34939,7 @@ function copyIfNecessary(arr, shallow) {
 /**
  * @name clay.version
  */
-var version = '1.2.1';
+var version = '1.2.2';
 
 var outputEssl$1 = "@export clay.vr.disorter.output.vertex\nattribute vec2 texcoord: TEXCOORD_0;\nattribute vec3 position: POSITION;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n v_Texcoord = texcoord;\n gl_Position = vec4(position.xy, 0.5, 1.0);\n}\n@end\n@export clay.vr.disorter.output.fragment\nuniform sampler2D texture;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n gl_FragColor = texture2D(texture, v_Texcoord);\n}\n@end";
 
