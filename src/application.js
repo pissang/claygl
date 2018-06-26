@@ -153,7 +153,9 @@ function App3D(dom, appNS) {
 
     if (!dom) { throw new Error('Invalid dom'); }
 
-    var isDomCanvas = dom.nodeName.toUpperCase() === 'CANVAS';
+    var isDomCanvas = !dom.nodeName  // Not in dom environment
+        || dom.nodeName.toUpperCase() === 'CANVAS';
+
     var rendererOpts = {};
     isDomCanvas && (rendererOpts.canvas = dom);
     appNS.devicePixelRatio && (rendererOpts.devicePixelRatio = appNS.devicePixelRatio);

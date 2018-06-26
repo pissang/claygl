@@ -60,16 +60,22 @@ void main(){
     float moment2 = depth * depth;
 
     // Adjusting moments using partial derivative
+    #ifdef SUPPORT_STANDARD_DERIVATIVES
     float dx = dFdx(depth);
     float dy = dFdy(depth);
     moment2 += 0.25*(dx*dx+dy*dy);
+    #endif
 
     gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
 #else
     // Add slope scaled bias using partial derivative
+    #ifdef SUPPORT_STANDARD_DERIVATIVES
     float dx = dFdx(depth);
     float dy = dFdy(depth);
     depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
+    #else
+    depth += bias;
+    #endif
 
     gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
 #endif
