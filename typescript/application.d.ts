@@ -135,6 +135,8 @@ export namespace application {
 
         readonly methods: IDictionary<Function>;
 
+        render(): void;
+
         resize(width: number, height: number): void;
 
         dispose(): void;
