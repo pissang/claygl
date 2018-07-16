@@ -78,7 +78,8 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
     if (quantizeExtension) {
         var decodedArr = new vendor.Float32Array(size * accessorInfo.count);
         var decodeMatrix = quantizeExtension.decodeMatrix;
-        var decodeOffset, decodeScale;
+        var decodeOffset;
+        var decodeScale;
         var decodeOffset = new Array(size);
         var decodeScale = new Array(size);
         for (var k = 0; k < size; k++) {
@@ -95,6 +96,34 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
     }
     return arr;
 }
+
+function base64ToBinary(input, charStart) {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const lookup = new Uint8Array(130);
+    for (var i = 0; i < chars.length; i++) {
+        lookup[chars.charCodeAt(i)] = i;
+    }
+    // Ignore
+    var len = input.length - charStart;
+    if (input.charAt(len - 1) === '=') { len--; }
+    if (input.charAt(len - 1) === '=') { len--; }
+
+    var uarray = new Uint8Array((len / 4) * 3);
+
+    for (var i = 0, j = charStart; i < uarray.length;) {
+        var c1 = lookup[input.charCodeAt(j++)];
+        var c2 = lookup[input.charCodeAt(j++)];
+        var c3 = lookup[input.charCodeAt(j++)];
+        var c4 = lookup[input.charCodeAt(j++)];
+
+        uarray[i++] = (c1 << 2) | (c2 >> 4);
+        uarray[i++] = ((c2 & 15) << 4) | (c3 >> 2);
+        uarray[i++] = ((c3 & 3) << 6) | c4;
+    }
+
+    return uarray.buffer;
+}
+
 
 /**
  * @typedef {Object} clay.loader.GLTF.Result
@@ -449,16 +478,25 @@ function () {
     },
 
     _loadBuffer: function (path, onsuccess, onerror) {
-        vendor.request.get({
-            url: this.resolveBinaryPath(path),
-            responseType: 'arraybuffer',
-            onload: function (buffer) {
-                onsuccess && onsuccess(buffer);
-            },
-            onerror: function (buffer) {
-                onerror && onerror(buffer);
-            }
-        });
+        var base64Prefix = 'data:application/octet-stream;base64,';
+        var strStart = path.substr(0, base64Prefix.length);
+        if (strStart === base64Prefix) {
+            onsuccess(
+                base64ToBinary(path, base64Prefix.length)
+            );
+        }
+        else {
+            vendor.request.get({
+                url: this.resolveBinaryPath(path),
+                responseType: 'arraybuffer',
+                onload: function (buffer) {
+                    onsuccess && onsuccess(buffer);
+                },
+                onerror: function (buffer) {
+                    onerror && onerror(buffer);
+                }
+            });
+        }
     },
 
     // https://github.com/KhronosGroup/glTF/issues/100
