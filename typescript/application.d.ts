@@ -151,11 +151,11 @@ export namespace application {
         createMesh(geometry: Geometry, material?: MaterialLike, parentNode?: Node): Mesh;
         createNode(parentNode?: Node): Node;
 
-        createCube(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Geometry;
-        createCubeInside(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Geometry;
-        createSphere(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Geometry;
-        createPlane(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Geometry;
-        createParametricSurface(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Geometry;
+        createCube(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Mesh;
+        createCubeInside(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Mesh;
+        createSphere(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Mesh;
+        createPlane(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Mesh;
+        createParametricSurface(material?: MaterialLike, parentNode?: Node, subdiv?: number|number[]): Mesh;
 
         createCamera(position?: Vector3Like, target?: Vector3Like, type?: 'orthographic'|'ortho'|'perspective'): PerspectiveCamera|OrthographicCamera;
         createCamera(position?: Vector3Like, target?: Vector3Like, type?: 'orthographic'|'ortho', extent?: Vector3Like): PerspectiveCamera|OrthographicCamera;
