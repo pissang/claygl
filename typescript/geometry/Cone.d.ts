@@ -6,7 +6,7 @@ interface IConeGeometryOption {
     height?: number;
 
     capSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }
 
 export class Cone extends Geometry {
@@ -18,5 +18,5 @@ export class Cone extends Geometry {
     height?: number;
 
     capSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }

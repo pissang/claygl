@@ -2,7 +2,7 @@ import { Geometry } from '../Geometry'
 
 interface IPlaneGeometryOption {
     widthSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }
 
 export class Plane extends Geometry {
@@ -10,5 +10,5 @@ export class Plane extends Geometry {
     constructor(option?: IPlaneGeometryOption);
 
     widthSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }

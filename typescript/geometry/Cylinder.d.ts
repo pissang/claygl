@@ -5,7 +5,7 @@ interface ICylinderGeometryOption {
     height?: number;
 
     capSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }
 
 export class Cylinder extends Geometry {
@@ -16,5 +16,5 @@ export class Cylinder extends Geometry {
     height?: number;
 
     capSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 }

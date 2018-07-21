@@ -912,6 +912,7 @@ App3D.prototype.createSphere = function (material, parentNode, subdivision) {
     return this.createMesh(sphere, material, parentNode);
 };
 
+// TODO may be modified?
 /**
  * Create a plane mesh and add it to the scene or the given parent node.
  * @function

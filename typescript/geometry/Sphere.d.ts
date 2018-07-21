@@ -3,7 +3,7 @@ import { Geometry } from '../Geometry'
 
 interface ISphereGeometryOption {
     widthSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 
     phiStart?: number;
     phiLength?: number;
@@ -19,7 +19,7 @@ export class Sphere extends Geometry {
     constructor(option?: ISphereGeometryOption);
 
     widthSegments?: number;
-    heightSegements?: number;
+    heightSegments?: number;
 
     phiStart?: number;
     phiLength?: number;
