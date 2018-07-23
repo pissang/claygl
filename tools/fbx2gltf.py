@@ -627,6 +627,7 @@ def CreatePrimitiveRaw(matIndex, useTexcoords1=False, scaleU=1, scaleV=1,transla
         "texcoords1": [],
         "indices": [],
         "positions": [],
+        "vertexColors": [],
         "joints": [],
         "weights": [],
         "material": matIndex,
@@ -668,6 +669,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         lSecondMaterialLayer = lLayer2.GetMaterials()
 
     lNormalLayer = pMesh.GetElementNormal(0)
+    lVertexColorLayer = pMesh.GetElementVertexColor(0)
     lUvLayer = pMesh.GetElementUV(0)
     lUv2Layer = pMesh.GetElementUV(1)
 
@@ -742,6 +744,9 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
     if lNormalLayer:
         if lNormalLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
             lNeedHash = True
+    if lVertexColorLayer:
+        if lVertexColorLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
+            lNeedHash = True
     if lUvLayer:
         if lUvLayer.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
             lNeedHash = True
@@ -765,6 +770,16 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 lNormal = GetVertexAttribute(lNormalLayer, lControlPointIndex, lVertexCount)
                 if lNeedHash:
                     vertexKeyList += lNormal
+            if lVertexColorLayer:
+                lVertexColor = GetVertexAttribute(lVertexColorLayer, lControlPointIndex, lVertexCount)
+                lVertexColor = FbxVector4(
+                    lVertexColor.mRed,
+                    lVertexColor.mGreen,
+                    lVertexColor.mBlue,
+                    lVertexColor.mAlpha
+                )
+                if lNeedHash:
+                    vertexKeyList += lVertexColor
             if lUvLayer:
                 # PENDING GetTextureUVIndex?
                 lUv = GetVertexAttribute(lUvLayer, lControlPointIndex, lVertexCount)
@@ -787,6 +802,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 lPrimitive['positions'].append(lPositions[lControlPointIndex])
                 if lNormalLayer and lNormal: # incase unsupported mapping mode returns none.
                     lPrimitive['normals'].append(lNormal)
+                if lVertexColorLayer and lVertexColor: # incase unsupported mapping mode returns none.
+                    lPrimitive['vertexColors'].append(lVertexColor)
                 # PENDING
                 # Texcoord may be put in the second layer
                 if lPrimitive['useTexcoords1']:
@@ -821,10 +838,12 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
             'attributes': {
                 'POSITION': CreateAttributeBuffer(lPrimitive['positions'], 'f', 3)
             },
-            "material": lPrimitive['material']
+            'material': lPrimitive['material']
         }
         if len(lPrimitive['normals']) > 0:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lPrimitive['normals'], 'f', 3)
+        if len(lPrimitive['vertexColors']) > 0:
+            lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'f', 4)
         if len(lPrimitive['texcoords0']) > 0:
             ProcessUV(
                 lPrimitive['texcoords0'],
