@@ -64,9 +64,6 @@ GL_UNSIGNED_SHORT = 5123
 GL_UNSIGNED_INT = 5125
 GL_FLOAT = 5126
 
-GL_REPEAT = 0x2901
-
-
 GL_TEXTURE_2D = 0x0DE1
 GL_TEXTURE_CUBE_MAP = 0x8513
 GL_REPEAT = 0x2901
@@ -81,9 +78,10 @@ GL_LINEAR_MIPMAP_LINEAR = 0x2703
 GL_ARRAY_BUFFER = 0x8892
 GL_ELEMENT_ARRAY_BUFFER = 0x8893
 
-
 ENV_QUANTIZE = False
 ENV_FLIP_V = True
+ENV_8_BIT_COLORS = True
+
 
 _id = 0
 def GetId():
@@ -160,8 +158,8 @@ def quantize(pList, pStride, pMin, pMax):
     return lNewList, lDecodeMatrix, pMin, pMax
 
 
-def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
-    lGLTFAcessor = {}
+def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False, pNormalize=False):
+    lGLTFAccessor = {}
 
     if pMinMax:
         if len(pList) > 0:
@@ -194,7 +192,7 @@ def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
         pList, lDecodeMatrix, lDecodedMin, lDecodedMax = quantize(pList, pStride, lMin[0:], lMax[0:])
         pType = 'H'
         # https://github.com/KhronosGroup/glTF/blob/master/extensions/Vendor/WEB3D_quantized_attributes
-        lGLTFAcessor['extensions'] = {
+        lGLTFAccessor['extensions'] = {
             'WEB3D_quantized_attributes': {
                 'decodedMin': lDecodedMin,
                 'decodedMax': lDecodedMax,
@@ -219,36 +217,41 @@ def CreateAccessorBuffer(pList, pType, pStride, pMinMax=False, pQuantize=False):
             lData.append(struct.pack(lPackType, m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]))
 
     if pType == 'f':
-        lGLTFAcessor['componentType'] = GL_FLOAT
+        lGLTFAccessor['componentType'] = GL_FLOAT
     # Unsigned Int
     elif pType == 'I':
-        lGLTFAcessor['componentType'] = GL_UNSIGNED_INT
-
+        lGLTFAccessor['componentType'] = GL_UNSIGNED_INT
     # Unsigned Short
     elif pType == 'H':
-        lGLTFAcessor['componentType'] = GL_UNSIGNED_SHORT
+        lGLTFAccessor['componentType'] = GL_UNSIGNED_SHORT
+    # Unsigned Byte
+    elif pType == 'B':
+        lGLTFAccessor['componentType'] = GL_UNSIGNED_BYTE
 
     if pStride == 1:
-        lGLTFAcessor['type'] = 'SCALAR'
+        lGLTFAccessor['type'] = 'SCALAR'
     elif pStride == 2:
-        lGLTFAcessor['type'] = 'VEC2'
+        lGLTFAccessor['type'] = 'VEC2'
     elif pStride == 3:
-        lGLTFAcessor['type'] = 'VEC3'
+        lGLTFAccessor['type'] = 'VEC3'
     elif pStride == 4:
-        lGLTFAcessor['type'] = 'VEC4'
+        lGLTFAccessor['type'] = 'VEC4'
     elif pStride == 9:
-        lGLTFAcessor['type'] = 'MAT3'
+        lGLTFAccessor['type'] = 'MAT3'
     elif pStride == 16:
-        lGLTFAcessor['type'] = 'MAT4'
+        lGLTFAccessor['type'] = 'MAT4'
 
-    lGLTFAcessor['byteOffset'] = 0
-    lGLTFAcessor['count'] = len(pList)
+    lGLTFAccessor['byteOffset'] = 0
+    lGLTFAccessor['count'] = len(pList)
 
     if pMinMax:
-        lGLTFAcessor['max'] = lMax
-        lGLTFAcessor['min'] = lMin
+        lGLTFAccessor['max'] = lMax
+        lGLTFAccessor['min'] = lMin
 
-    return b''.join(lData), lGLTFAcessor
+    if pNormalize:
+        lGLTFAccessor['normalized'] = True
+
+    return b''.join(lData), lGLTFAccessor
 
 def appendToBuffer(pType, pBuffer, pData, pObj):
     lByteOffset = len(pBuffer)
@@ -261,8 +264,8 @@ def appendToBuffer(pType, pBuffer, pData, pObj):
     pObj['byteOffset'] = lByteOffset
     pBuffer.extend(pData)
 
-def CreateAttributeBuffer(pList, pType, pStride):
-    lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True, ENV_QUANTIZE)
+def CreateAttributeBuffer(pList, pType, pStride, pNormalize=False):
+    lData, lGLTFAttribute = CreateAccessorBuffer(pList, pType, pStride, True, ENV_QUANTIZE, pNormalize)
     appendToBuffer(pType, attributeBuffer, lData, lGLTFAttribute)
     idx = len(lib_accessors)
     lib_attributes_accessors.append(lGLTFAttribute)
@@ -803,6 +806,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 if lNormalLayer and lNormal: # incase unsupported mapping mode returns none.
                     lPrimitive['normals'].append(lNormal)
                 if lVertexColorLayer and lVertexColor: # incase unsupported mapping mode returns none.
+                    if ENV_8_BIT_COLORS:
+                        lVertexColor = [round(i * 255) for i in lVertexColor]
                     lPrimitive['vertexColors'].append(lVertexColor)
                 # PENDING
                 # Texcoord may be put in the second layer
@@ -843,7 +848,10 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if len(lPrimitive['normals']) > 0:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lPrimitive['normals'], 'f', 3)
         if len(lPrimitive['vertexColors']) > 0:
-            lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'f', 4)
+            if ENV_8_BIT_COLORS:
+                lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'B', 4, True)
+            else:
+                lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'f', 4)
         if len(lPrimitive['texcoords0']) > 0:
             ProcessUV(
                 lPrimitive['texcoords0'],
@@ -1539,6 +1547,7 @@ if __name__ == "__main__":
     parser.add_argument('--beautify', action="store_true", help="Beautify json output.")
 
     parser.add_argument('--noflipv', action="store_true", help="If not flip v in texcoord.")
+    parser.add_argument('--no8bitcolors', action="store_true", help="Store vertex colors using float VEC4 RGBA.")
     parser.add_argument('file')
 
     args = parser.parse_args()
@@ -1569,6 +1578,7 @@ if __name__ == "__main__":
 
     ENV_QUANTIZE = args.quantize
     ENV_FLIP_V = not args.noflipv
+    ENV_8_BIT_COLORS = not args.no8bitcolors
 
     Convert(
         args.file,
