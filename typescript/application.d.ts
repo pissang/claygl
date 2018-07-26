@@ -56,6 +56,7 @@ interface ITextureCubeImageList {
 }
 
 interface IMaterialBasicConfig {
+    name?: string,
     shader?: string;
     transparent?: boolean;
     textureConvertToPOT?: boolean;
@@ -63,6 +64,7 @@ interface IMaterialBasicConfig {
 }
 
 interface IStandardMRMaterialConfig {
+    name?: string,
     shader: 'clay.standardMR';
     color?: RGBLike;
     emission?: RGBLike;

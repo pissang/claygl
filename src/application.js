@@ -86,6 +86,7 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
 
 /**
  * @typedef {Object} StandardMaterialMRConfig
+ * @property {string} [name]
  * @property {string} [shader='standardMR']
  * @property {Color} [color]
  * @property {number} [alpha]
@@ -770,6 +771,10 @@ App3D.prototype.createMaterial = function (matConfig) {
     var material = new Material({
         shader: shader
     });
+    if (matConfig.name) {
+        material.name = matConfig.name;
+    }
+
     var texturesLoading = [];
     function makeTextureSetter(key) {
         return function (texture) {
