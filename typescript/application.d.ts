@@ -142,7 +142,7 @@ export namespace application {
         dispose(): void;
 
         loadTexture(img: ImageLike, opts?: ILoadTextureOpts, useCache?: boolean): Promise<Texture2D>;
-        loadTexturSync(img: ImageLike, opts?: ILoadTextureOpts, useCache?: boolean): Texture2D;
+        loadTextureSync(img: ImageLike, opts?: ILoadTextureOpts, useCache?: boolean): Texture2D;
 
         loadTextureCube(imgList: ITextureCubeImageList, opts?: ILoadTextureOpts): Promise<TextureCube>;
         loadTextureCubeSync(imgList: ITextureCubeImageList, opts?: ILoadTextureOpts): TextureCube;

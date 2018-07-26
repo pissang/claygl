@@ -6,7 +6,7 @@ import { Base } from './core/Base';
 import { Matrix4 } from './math/Matrix4';
 
 
-export class Geometry extends Base {
+export class Geometry extends GeometryBase {
 
     boundingBox: BoundingBox;
 
