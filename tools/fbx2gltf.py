@@ -80,7 +80,6 @@ GL_ELEMENT_ARRAY_BUFFER = 0x8893
 
 ENV_QUANTIZE = False
 ENV_FLIP_V = True
-ENV_8_BIT_COLORS = True
 
 
 _id = 0
@@ -775,12 +774,8 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                     vertexKeyList += lNormal
             if lVertexColorLayer:
                 lVertexColor = GetVertexAttribute(lVertexColorLayer, lControlPointIndex, lVertexCount)
-                lVertexColor = FbxVector4(
-                    lVertexColor.mRed,
-                    lVertexColor.mGreen,
-                    lVertexColor.mBlue,
-                    lVertexColor.mAlpha
-                )
+                lVertexColor = [lVertexColor.mRed, lVertexColor.mGreen, lVertexColor.mBlue, lVertexColor.mAlpha]
+                lVertexColor = [round(i * 255) for i in lVertexColor]
                 if lNeedHash:
                     vertexKeyList += lVertexColor
             if lUvLayer:
@@ -806,8 +801,6 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
                 if lNormalLayer and lNormal: # incase unsupported mapping mode returns none.
                     lPrimitive['normals'].append(lNormal)
                 if lVertexColorLayer and lVertexColor: # incase unsupported mapping mode returns none.
-                    if ENV_8_BIT_COLORS:
-                        lVertexColor = [round(i * 255) for i in lVertexColor]
                     lPrimitive['vertexColors'].append(lVertexColor)
                 # PENDING
                 # Texcoord may be put in the second layer
@@ -848,10 +841,7 @@ def ConvertMesh(pScene, pMesh, pNode, pSkin, pClusters):
         if len(lPrimitive['normals']) > 0:
             lGLTFPrimitive['attributes']['NORMAL'] = CreateAttributeBuffer(lPrimitive['normals'], 'f', 3)
         if len(lPrimitive['vertexColors']) > 0:
-            if ENV_8_BIT_COLORS:
-                lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'B', 4, True)
-            else:
-                lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'f', 4)
+            lGLTFPrimitive['attributes']['COLOR_0'] = CreateAttributeBuffer(lPrimitive['vertexColors'], 'B', 4, True)
         if len(lPrimitive['texcoords0']) > 0:
             ProcessUV(
                 lPrimitive['texcoords0'],
@@ -1545,9 +1535,7 @@ if __name__ == "__main__":
     parser.add_argument('-q', '--quantize', action='store_true', help="Quantize accessors with WEB3D_quantized_attributes extension")
     parser.add_argument('-b', '--binary', action="store_true", help="Export glTF-binary")
     parser.add_argument('--beautify', action="store_true", help="Beautify json output.")
-
     parser.add_argument('--noflipv', action="store_true", help="If not flip v in texcoord.")
-    parser.add_argument('--no8bitcolors', action="store_true", help="Store vertex colors using float VEC4 RGBA.")
     parser.add_argument('file')
 
     args = parser.parse_args()
@@ -1578,7 +1566,6 @@ if __name__ == "__main__":
 
     ENV_QUANTIZE = args.quantize
     ENV_FLIP_V = not args.noflipv
-    ENV_8_BIT_COLORS = not args.no8bitcolors
 
     Convert(
         args.file,
