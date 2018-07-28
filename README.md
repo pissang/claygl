@@ -68,7 +68,7 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
       width: window.innerWidth,
       height: window.innerHeight,
 
-      init(renderer, scene, timeline) {
+      init(app) {
         // Create camera
         this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
@@ -80,9 +80,8 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
         // Create light
         this._mainLight = app.createDirectionalLight([-1, -1, -1]);
       },
-
-      loop(renderer, scene, timeline) {
-        this._cube.rotation.rotateY(this.frameTime / 1000);
+      loop(app) {
+        this._cube.rotation.rotateY(app.frameTime / 1000);
       }
     });
   </script>
