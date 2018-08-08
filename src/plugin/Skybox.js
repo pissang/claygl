@@ -4,6 +4,8 @@ import CubeGeometry from '../geometry/Cube';
 import Shader from '../Shader';
 import Material from '../Material';
 import Texture from '../Texture';
+import PerspectiveCamera from '../camera/Perspective';
+import Matrix4 from '../math/Matrix4';
 
 import skyboxEssl from '../shader/source/skybox.glsl.js';
 Shader.import(skyboxEssl);
@@ -49,7 +51,9 @@ var Skybox = Mesh.extend(function () {
 
         environmentMap: null,
 
-        culling: false
+        culling: false,
+
+        _dummyCamera: new PerspectiveCamera()
     };
 }, function () {
     var scene = this.scene;
@@ -120,8 +124,17 @@ var Skybox = Mesh.extend(function () {
     },
 
     renderSkybox: function (renderer, camera) {
+        var dummyCamera = this._dummyCamera;
+        dummyCamera.aspect = renderer.getViewportAspect();
+        dummyCamera.fov = camera.fov || 50;
+        dummyCamera.updateProjectionMatrix();
+        Matrix4.invert(dummyCamera.invProjectionMatrix, dummyCamera.projectionMatrix);
+        dummyCamera.worldTransform.copy(camera.worldTransform);
+        dummyCamera.viewMatrix.copy(camera.viewMatrix);
+
         this.position.copy(camera.getWorldPosition());
         this.update();
+
         // Don't remember to disable blend
         renderer.gl.disable(renderer.gl.BLEND);
         if (this.material.get('lod') > 0) {
@@ -130,7 +143,7 @@ var Skybox = Mesh.extend(function () {
         else {
             this.material.undefine('fragment', 'LOD');
         }
-        renderer.renderPass([this], camera);
+        renderer.renderPass([this], dummyCamera);
     }
 });
 
