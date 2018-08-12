@@ -198,6 +198,9 @@ var OrbitControl = Base.extend(function () {
         if (this.timeline) {
             this.timeline.on('frame', this.update, this);
         }
+        if (this.target) {
+            this.decomposeTransform();
+        }
     },
 
     /**
@@ -347,6 +350,11 @@ var OrbitControl = Base.extend(function () {
 
         if (opts.center) {
             this.setCenter(opts.center);
+        }
+
+        if (this.target) {
+            this._updateTransform();
+            this.target.update();
         }
     },
 
