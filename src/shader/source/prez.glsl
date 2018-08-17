@@ -6,6 +6,9 @@ uniform mat4 WVP : WORLDVIEWPROJECTION;
 attribute vec3 pos : POSITION;
 attribute vec2 uv : TEXCOORD_0;
 
+uniform vec2 uvRepeat : [1.0, 1.0];
+uniform vec2 uvOffset : [0.0, 0.0];
+
 @import clay.chunk.skinning_header
 
 varying vec2 v_Texcoord;
@@ -23,7 +26,7 @@ void main()
 #endif
 
     gl_Position = WVP * vec4(P, 1.0);
-    v_Texcoord = uv;
+    v_Texcoord = uv * uvRepeat + uvOffset;
 }
 
 @end

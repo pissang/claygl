@@ -1107,6 +1107,12 @@ var Renderer = Base.extend(function () {
                     }
                     return 0;
                 }
+                else if (symbol === 'uvRepeat') {
+                    return renderable.material.get('uvRepeat');
+                }
+                else if (symbol === 'uvOffset') {
+                    return renderable.material.get('uvOffset');
+                }
                 else {
                     return depthMaterial.get(symbol);
                 }

@@ -54,8 +54,8 @@ uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 uniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;
 uniform mat4 world : WORLD;
 
-uniform vec2 uvRepeat : [1.0, 1.0];
-uniform vec2 uvOffset : [0.0, 0.0];
+uniform vec2 uvRepeat = vec2(1.0, 1.0);
+uniform vec2 uvOffset = vec2(0.0, 0.0);
 
 attribute vec3 position : POSITION;
 attribute vec2 texcoord : TEXCOORD_0;
