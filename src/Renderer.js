@@ -521,9 +521,6 @@ var Renderer = Base.extend(function () {
             }
             errorShader[program.__uid__] = true;
 
-            console.log(program.vertexCode);
-            console.log('--------------------');
-            console.log(program.fragmentCode);
             if (this.throwError) {
                 throw new Error(errorMsg);
             }
