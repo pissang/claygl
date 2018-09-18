@@ -99,7 +99,7 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 
 function base64ToBinary(input, charStart) {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-    const lookup = new Uint8Array(130);
+    var lookup = new Uint8Array(130);
     for (var i = 0; i < chars.length; i++) {
         lookup[chars.charCodeAt(i)] = i;
     }
