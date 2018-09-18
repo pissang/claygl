@@ -358,7 +358,7 @@ function () {
                 loading++;
                 var path = bufferInfo.uri;
 
-                self._loadBuffer(path, function (buffer) {
+                self._loadBuffers(path, function (buffer) {
                     lib.buffers[idx] = buffer;
                     checkLoad();
                 }, checkLoad);
@@ -440,7 +440,7 @@ function () {
      * Binary file path resolver. User can override it
      * @param {string} path
      */
-    resolveBinaryPath: function (path) {
+    resolveBufferPath: function (path) {
         if (path && path.match(/^data:(.*?)base64,/)) {
             return path;
         }
@@ -468,6 +468,25 @@ function () {
         return util.relative2absolute(path, rootPath);
     },
 
+    /**
+     * Buffer loader
+     * @param {string}
+     * @param {Function} onsuccess
+     * @param {Function} onerror
+     */
+    loadBuffer: function (path, onsuccess, onerror) {
+        vendor.request.get({
+            url: path,
+            responseType: 'arraybuffer',
+            onload: function (buffer) {
+                onsuccess && onsuccess(buffer);
+            },
+            onerror: function (buffer) {
+                onerror && onerror(buffer);
+            }
+        });
+    },
+
     _getShader: function () {
         if (typeof this.shader === 'string') {
             return this.shaderLibrary.get(this.shader);
@@ -477,7 +496,7 @@ function () {
         }
     },
 
-    _loadBuffer: function (path, onsuccess, onerror) {
+    _loadBuffers: function (path, onsuccess, onerror) {
         var base64Prefix = 'data:application/octet-stream;base64,';
         var strStart = path.substr(0, base64Prefix.length);
         if (strStart === base64Prefix) {
@@ -486,16 +505,11 @@ function () {
             );
         }
         else {
-            vendor.request.get({
-                url: this.resolveBinaryPath(path),
-                responseType: 'arraybuffer',
-                onload: function (buffer) {
-                    onsuccess && onsuccess(buffer);
-                },
-                onerror: function (buffer) {
-                    onerror && onerror(buffer);
-                }
-            });
+            this.loadBuffer(
+                this.resolveBufferPath(path),
+                onsuccess,
+                onerror
+            );
         }
     },
 
@@ -844,7 +858,7 @@ function () {
         var material;
         var diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap, occlusionMap;
         var enabledTextures = [];
-            // TODO texCoord
+        // TODO texCoord
         if (specularGlossinessMatInfo.diffuseTexture) {
             diffuseMap = lib.textures[specularGlossinessMatInfo.diffuseTexture.index] || null;
             diffuseMap && enabledTextures.push('diffuseMap');

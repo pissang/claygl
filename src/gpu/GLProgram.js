@@ -301,6 +301,15 @@ var GLProgram = Base.extend({
 
         _gl.linkProgram(program);
 
+        _gl.deleteShader(vertexShader);
+        _gl.deleteShader(fragmentShader);
+
+        this._program = program;
+
+        // Save code.
+        this.vertexCode = vertexShaderCode;
+        this.fragmentCode = fragmentShaderCode;
+
         if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
             return 'Could not link program\n' + _gl.getProgramInfoLog(program);
         }
@@ -311,14 +320,6 @@ var GLProgram = Base.extend({
             this._locations[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
         }
 
-        _gl.deleteShader(vertexShader);
-        _gl.deleteShader(fragmentShader);
-
-        this._program = program;
-
-        // Save code.
-        this.vertexCode = vertexShaderCode;
-        this.fragmentCode = fragmentShaderCode;
     }
 });
 

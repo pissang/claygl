@@ -205,10 +205,11 @@ var FreeControl = Base.extend(function() {
         this.trigger('change');
     },
 
-    _detectMovementChange: function () {
+    _detectMovementChange: function (frameTime) {
         if (this._moveForward || this._moveBackward || this._moveLeft || this._moveRight) {
             this.trigger('change');
         }
+        this.update(frameTime);
     },
 
     _keyDown: function(e) {

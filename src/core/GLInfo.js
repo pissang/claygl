@@ -51,14 +51,16 @@ function GLInfo(_gl) {
     };
 
     function createExtension(name) {
-        var ext = _gl.getExtension(name);
-        if (!ext) {
-            ext = _gl.getExtension('MOZ_' + name);
+        if (_gl.getExtension) {
+            var ext = _gl.getExtension(name);
+            if (!ext) {
+                ext = _gl.getExtension('MOZ_' + name);
+            }
+            if (!ext) {
+                ext = _gl.getExtension('WEBKIT_' + name);
+            }
+            extensions[name] = ext;
         }
-        if (!ext) {
-            ext = _gl.getExtension('WEBKIT_' + name);
-        }
-        extensions[name] = ext;
     }
 }
 

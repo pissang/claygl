@@ -241,8 +241,10 @@ var Renderer = Base.extend(function () {
         // set the display size of the canvas.
         var dpr = this.devicePixelRatio;
         if (width != null) {
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
+            if (canvas.style) {
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+            }
             // set the size of the drawingBuffer
             canvas.width = width * dpr;
             canvas.height = height * dpr;
@@ -519,12 +521,16 @@ var Renderer = Base.extend(function () {
             }
             errorShader[program.__uid__] = true;
 
+            console.log(program.vertexCode);
+            console.log('--------------------');
+            console.log(program.fragmentCode);
             if (this.throwError) {
                 throw new Error(errorMsg);
             }
             else {
                 this.trigger('error', errorMsg);
             }
+
         }
 
     },
