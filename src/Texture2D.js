@@ -174,9 +174,7 @@ var Texture2D = Texture.extend(function () {
 
     isRenderable: function () {
         if (this.image) {
-            return this.image.nodeName === 'CANVAS'
-                || this.image.nodeName === 'VIDEO'
-                || this.image.complete;
+            return this.image.width > 0 && this.image.height > 0;
         }
         else {
             return !!(this.width && this.height);

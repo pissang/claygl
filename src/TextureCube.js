@@ -264,9 +264,7 @@ Object.defineProperty(TextureCube.prototype, 'height', {
     }
 });
 function isImageRenderable(image) {
-    return image.nodeName === 'CANVAS' ||
-            image.nodeName === 'VIDEO' ||
-            image.complete;
+    return image.width > 0 && image.height > 0;
 }
 
 export default TextureCube;
