@@ -366,6 +366,10 @@ vec3.normalize = function(out, a) {
         out[0] = a[0] * len;
         out[1] = a[1] * len;
         out[2] = a[2] * len;
+    }else{
+        out[0] = 0;
+        out[1] = 0;
+        out[2] = 1;
     }
     return out;
 };
