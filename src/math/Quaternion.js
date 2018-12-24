@@ -262,6 +262,19 @@ Quaternion.prototype = {
         this._dirty = true;
         return this;
     },
+    /**
+     *
+     * @param axis
+     * @param rad
+     */
+    rotateAxis:function (axis,rad) {
+
+        var quat2 = new Quaternion().array;
+
+        quat.rotateAxis(this.array,quat2,axis,rad);
+        this._dirty = true;
+        return this;
+    },
 
     /**
      * Rotate self by a given radian about X axis
@@ -269,7 +282,8 @@ Quaternion.prototype = {
      * @return {clay.Quaternion}
      */
     rotateX: function (rad) {
-        quat.rotateX(this.array, this.array, rad);
+
+        quat.rotateX(this.array, rad);
         this._dirty = true;
         return this;
     },
@@ -280,7 +294,8 @@ Quaternion.prototype = {
      * @return {clay.Quaternion}
      */
     rotateY: function (rad) {
-        quat.rotateY(this.array, this.array, rad);
+
+        quat.rotateY(this.array, rad);
         this._dirty = true;
         return this;
     },
@@ -291,7 +306,7 @@ Quaternion.prototype = {
      * @return {clay.Quaternion}
      */
     rotateZ: function (rad) {
-        quat.rotateZ(this.array, this.array, rad);
+        quat.rotateZ(this.array, rad);
         this._dirty = true;
         return this;
     },

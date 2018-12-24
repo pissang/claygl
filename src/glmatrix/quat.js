@@ -199,6 +199,22 @@ quat.setAxisAngle = function(out, axis, rad) {
 };
 
 /**
+ * zh : 绕单位向量自转
+ * @param out  {quat}
+ * @param quat2  {quat}
+ * @param axis   {vec3}
+ * @param rad    {Number}
+ */
+
+quat.rotateAxis = function (out,quat2,axis,rad) {
+
+    vec3.normalize(axis,axis);
+    quat.setAxisAngle(quat2,axis,rad);
+    quat.multiply(out,out,quat2);
+
+}
+
+/**
  * Adds two quat's
  *
  * @param {quat} out the receiving quaternion
@@ -253,16 +269,13 @@ quat.scale = vec4.scale;
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-quat.rotateX = function (out, a, rad) {
-    rad *= 0.5;
+quat.rotateX = function (out,rad) {
 
-    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
-        bx = Math.sin(rad), bw = Math.cos(rad);
+    var quat2 =[0,0,0,1];
+    var axis = [1,0,0];
 
-    out[0] = ax * bw + aw * bx;
-    out[1] = ay * bw + az * bx;
-    out[2] = az * bw - ay * bx;
-    out[3] = aw * bw - ax * bx;
+    quat.rotateAxis(out,quat2,axis,rad);
+
     return out;
 };
 
@@ -274,16 +287,13 @@ quat.rotateX = function (out, a, rad) {
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-quat.rotateY = function (out, a, rad) {
-    rad *= 0.5;
+quat.rotateY = function (out,rad) {
 
-    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
-        by = Math.sin(rad), bw = Math.cos(rad);
+    var quat2 =[0,0,0,1];
+    var axis = [0,1,0];
 
-    out[0] = ax * bw - az * by;
-    out[1] = ay * bw + aw * by;
-    out[2] = az * bw + ax * by;
-    out[3] = aw * bw - ay * by;
+    quat.rotateAxis(out,quat2,axis,rad);
+
     return out;
 };
 
@@ -295,16 +305,12 @@ quat.rotateY = function (out, a, rad) {
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-quat.rotateZ = function (out, a, rad) {
-    rad *= 0.5;
+quat.rotateZ = function (out,rad) {
+    var quat2 =[0,0,0,1];
+    var axis = [0,0,1];
 
-    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
-        bz = Math.sin(rad), bw = Math.cos(rad);
+    quat.rotateAxis(out,quat2,axis,rad);
 
-    out[0] = ax * bw + ay * bz;
-    out[1] = ay * bw - ax * bz;
-    out[2] = az * bw + aw * bz;
-    out[3] = aw * bw - az * bz;
     return out;
 };
 
