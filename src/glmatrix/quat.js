@@ -207,11 +207,9 @@ quat.setAxisAngle = function(out, axis, rad) {
  */
 
 quat.rotateAxis = function (out,quat2,axis,rad) {
-
     vec3.normalize(axis,axis);
     quat.setAxisAngle(quat2,axis,rad);
     quat.multiply(out,out,quat2);
-
 }
 
 /**
@@ -270,12 +268,9 @@ quat.scale = vec4.scale;
  * @returns {quat} out
  */
 quat.rotateX = function (out,rad) {
-
     var quat2 =[0,0,0,1];
     var axis = [1,0,0];
-
     quat.rotateAxis(out,quat2,axis,rad);
-
     return out;
 };
 
@@ -288,12 +283,9 @@ quat.rotateX = function (out,rad) {
  * @returns {quat} out
  */
 quat.rotateY = function (out,rad) {
-
     var quat2 =[0,0,0,1];
     var axis = [0,1,0];
-
     quat.rotateAxis(out,quat2,axis,rad);
-
     return out;
 };
 
@@ -308,9 +300,7 @@ quat.rotateY = function (out,rad) {
 quat.rotateZ = function (out,rad) {
     var quat2 =[0,0,0,1];
     var axis = [0,0,1];
-
     quat.rotateAxis(out,quat2,axis,rad);
-
     return out;
 };
 
@@ -325,7 +315,6 @@ quat.rotateZ = function (out,rad) {
  */
 quat.calculateW = function (out, a) {
     var x = a[0], y = a[1], z = a[2];
-
     out[0] = x;
     out[1] = y;
     out[2] = z;
