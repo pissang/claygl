@@ -12,7 +12,8 @@ var EXTENSION_LIST = [
     'EXT_shader_texture_lod',
     'WEBGL_draw_buffers',
     'EXT_frag_depth',
-    'EXT_sRGB'
+    'EXT_sRGB',
+    'ANGLE_instanced_arrays'
 ];
 
 var PARAMETER_NAMES = [

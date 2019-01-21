@@ -209,6 +209,23 @@ if (weightW > 1e-4)
 }
 @end
 
+@export clay.chunk.instancing_header
+#ifdef INSTANCING
+attribute vec4 instanceMat1;
+attribute vec4 instanceMat2;
+attribute vec4 instanceMat3;
+#endif
+@end
+
+@export clay.chunk.instancing_matrix
+mat4 instanceMat = mat4(
+    vec4(instanceMat1.xyz, 0.0),
+    vec4(instanceMat2.xyz, 0.0),
+    vec4(instanceMat3.xyz, 0.0),
+    vec4(instanceMat1.w, instanceMat2.w, instanceMat3.w, 1.0)
+);
+@end
+
 
 
 @export clay.util.parallax_correct

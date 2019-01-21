@@ -186,7 +186,7 @@ function Attribute(name, type, size, semantic) {
  * @param {number} nVertex
  */
 Attribute.prototype.init = function (nVertex) {
-    if (!this.value || this.value.length != nVertex * this.size) {
+    if (!this.value || this.value.length !== nVertex * this.size) {
         var ArrayConstructor = getArrayCtorByType(this.type);
         this.value = new ArrayConstructor(nVertex * this.size);
     }
@@ -284,7 +284,7 @@ var GeometryBase = Base.extend(function () {
         // Init it here to avoid deoptimization when it's assigned in application dynamically
         __used: 0
     };
-}, function() {
+}, function () {
     // Use cache
     this._cache = new Cache();
 
@@ -547,7 +547,7 @@ var GeometryBase = Base.extend(function () {
                     // Only update when they are dirty.
                     // TODO: Use BufferSubData?
                     _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.dynamic ? glenum.DYNAMIC_DRAW : glenum.STATIC_DRAW);
+                    _gl.bufferData(_gl.ARRAY_BUFFER, attribute.value, this.dynamic ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW);
                 }
 
                 attributeBuffers[k] = new AttributeBuffer(name, attribute.type, buffer, attribute.size, attribute.semantic);
@@ -568,7 +568,7 @@ var GeometryBase = Base.extend(function () {
             }
             indicesBuffer.count = this.indices.length;
             _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-            _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.indices, this.dynamic ? glenum.DYNAMIC_DRAW : glenum.STATIC_DRAW);
+            _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, this.indices, this.dynamic ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW);
         }
     },
 

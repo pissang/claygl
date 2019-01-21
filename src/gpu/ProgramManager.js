@@ -107,12 +107,16 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var cache = this._cache;
 
     var isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
+    var isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
     var key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
     if (scene) {
         key += 'se' + scene.getProgramKey(renderable.lightGroup);
     }
     if (isSkinnedMesh) {
-        key += ',' + renderable.joints.length;
+        key += ',sk' + renderable.joints.length;
+    }
+    if (isInstancedMesh) {
+        key += ',is';
     }
     var program = cache[key];
 
@@ -124,7 +128,7 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     var renderer = this._renderer;
     var _gl = renderer.gl;
     var enabledTextures = material.getEnabledTextures();
-    var skinDefineCode = '';
+    var extraDefineCode = '';
     if (isSkinnedMesh) {
         var skinDefines = {
             SKINNING: null,
@@ -134,13 +138,16 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
             skinDefines.USE_SKIN_MATRICES_TEXTURE = null;
         }
         // TODO Add skinning code?
-        skinDefineCode = '\n' + getDefineCode(skinDefines) + '\n';
+        extraDefineCode += '\n' + getDefineCode(skinDefines) + '\n';
+    }
+    if (isInstancedMesh) {
+        extraDefineCode += '\n#define INSTANCING\n';
     }
     // TODO Optimize key generation
     // VERTEX
-    var vertexDefineStr = skinDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
+    var vertexDefineStr = extraDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
     // FRAGMENT
-    var fragmentDefineStr = skinDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
+    var fragmentDefineStr = extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
 
     var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
 

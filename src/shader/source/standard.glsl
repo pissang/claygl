@@ -77,32 +77,40 @@ attribute vec3 barycentric;
 
 @import clay.chunk.skinning_header
 
+@import clay.chunk.instancing_header
+
 void main()
 {
-
-    vec3 skinnedPosition = position;
-    vec3 skinnedNormal = normal;
-    vec3 skinnedTangent = tangent.xyz;
+    vec4 skinnedPosition = vec4(position, 1.0);
+    vec4 skinnedNormal = vec4(normal, 0.0);
+    vec4 skinnedTangent = vec4(tangent.xyz, 0.0);
 #ifdef SKINNING
 
     @import clay.chunk.skin_matrix
 
-    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    skinnedPosition = skinMatrixWS * skinnedPosition;
     // Upper 3x3 of skinMatrix is orthogonal
-    skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
-    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+    skinnedNormal = skinMatrixWS * skinnedNormal;
+    skinnedTangent = skinMatrixWS * skinnedTangent;
 #endif
 
-    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+#ifdef INSTANCING
+    @import clay.chunk.instancing_matrix
+    skinnedPosition = instanceMat * skinnedPosition;
+    skinnedNormal = instanceMat * skinnedNormal;
+    skinnedTangent = instanceMat * skinnedTangent;
+#endif
+
+    gl_Position = worldViewProjection * skinnedPosition;
 
     v_Texcoord = texcoord * uvRepeat + uvOffset;
-    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
+    v_WorldPosition = (world * skinnedPosition).xyz;
     v_Barycentric = barycentric;
 
-    v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
+    v_Normal = normalize((worldInverseTranspose * skinnedNormal).xyz);
 
 #if defined(PARALLAXOCCLUSIONMAP_ENABLED) || defined(NORMALMAP_ENABLED)
-    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
+    v_Tangent = normalize((worldInverseTranspose * skinnedTangent).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
 #endif
 

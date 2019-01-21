@@ -10,22 +10,29 @@ uniform vec2 uvOffset = vec2(0.0, 0.0);
 
 @import clay.chunk.skinning_header
 
+@import clay.chunk.instancing_header
+
 varying vec4 v_ViewPosition;
 
 varying vec2 v_Texcoord;
 
 void main(){
 
-    vec3 skinnedPosition = position;
+    vec4 P = vec4(position, 1.0);
 
 #ifdef SKINNING
 
     @import clay.chunk.skin_matrix
 
-    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    P = skinMatrixWS * P;
 #endif
 
-    v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
+#ifdef INSTANCING
+    @import clay.chunk.instancing_matrix
+    P = instanceMat * P;
+#endif
+
+    v_ViewPosition = worldViewProjection * P;
     gl_Position = v_ViewPosition;
 
     v_Texcoord = texcoord * uvRepeat + uvOffset;
@@ -118,15 +125,22 @@ varying vec3 v_WorldPosition;
 
 void main (){
 
-    vec3 skinnedPosition = position;
+    vec4 P = vec4(position, 1.0);
+
 #ifdef SKINNING
+
     @import clay.chunk.skin_matrix
 
-    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+    P = skinMatrixWS * P;
 #endif
 
-    gl_Position = worldViewProjection * vec4(skinnedPosition , 1.0);
-    v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
+#ifdef INSTANCING
+    @import clay.chunk.instancing_matrix
+    P = instanceMat * P;
+#endif
+
+    gl_Position = worldViewProjection * P;
+    v_WorldPosition = (world * P).xyz;
 }
 
 @end

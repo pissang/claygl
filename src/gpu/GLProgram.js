@@ -267,6 +267,18 @@ var GLProgram = Base.extend({
         return locationList;
     },
 
+    getAttribLocation: function (_gl, symbol) {
+        var locationMap = this._locations;
+
+        var location = locationMap[symbol];
+        if (location == null) {
+            location = _gl.getAttribLocation(this._program, symbol);
+            locationMap[symbol] = location;
+        }
+
+        return location;
+    },
+
     buildProgram: function (_gl, shader, vertexShaderCode, fragmentShaderCode) {
         var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
         var program = _gl.createProgram();

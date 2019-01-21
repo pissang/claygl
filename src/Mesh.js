@@ -29,6 +29,8 @@ var Mesh = Renderable.extend(/** @lends clay.Mesh# */ {
     }
 }, {
 
+    isInstancedMesh: function () { return false; },
+
     isSkinnedMesh: function () {
         return !!(this.skeleton && this.joints && this.joints.length > 0);
     },

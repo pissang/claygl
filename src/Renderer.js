@@ -786,7 +786,7 @@ var Renderer = Base.extend(function () {
             if (drawIDChanged) {
                 currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
             }
-            this._renderObject(renderable, currentVAO);
+            this._renderObject(renderable, currentVAO, program);
 
             // After render hook
             passConfig.afterRender(this, renderable);
@@ -828,7 +828,7 @@ var Renderer = Base.extend(function () {
         }
     },
 
-    _renderObject: function (renderable, vao) {
+    _renderObject: function (renderable, vao, program) {
         var _gl = this.gl;
         var geometry = renderable.geometry;
 
@@ -837,22 +837,72 @@ var Renderer = Base.extend(function () {
             glDrawMode = 0x0004;
         }
 
-        // if (glDrawMode === glenum.LINES || glDrawMode === glenum.LINE_STRIP || glDrawMode === glenum.LINE_LOOP) {
-        //     _gl.lineWidth(this.lineWidth);
-        // }
+        var ext = null;
+        var isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
+        if (isInstanced) {
+            ext = this.getGLExtension('ANGLE_instanced_arrays');
+            isInstanced = ext != null;
+        }
+
+        var instancedAttrLocations;
+        if (isInstanced) {
+            instancedAttrLocations = this._bindInstancedAttributes(renderable, program, ext);
+        }
 
         if (vao.indicesBuffer) {
             var uintExt = this.getGLExtension('OES_element_index_uint');
             var useUintExt = uintExt && (geometry.indices instanceof Uint32Array);
             var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
-            _gl.drawElements(glDrawMode, vao.indicesBuffer.count, indicesType, 0);
+            if (isInstanced) {
+                ext.drawElementsInstancedANGLE(
+                    glDrawMode, vao.indicesBuffer.count, indicesType, 0, renderable.getInstanceCount()
+                );
+            }
+            else {
+                _gl.drawElements(glDrawMode, vao.indicesBuffer.count, indicesType, 0);
+            }
         }
         else {
-            // FIXME Use vertex number in buffer
-            // vertexCount may get the wrong value when geometry forget to mark dirty after update
-            _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
+            if (isInstanced) {
+                ext.drawArraysInstancedANGLE(glDrawMode, 0, geometry.vertexCount, renderable.getInstanceCount());
+            }
+            else {
+                // FIXME Use vertex number in buffer
+                // vertexCount may get the wrong value when geometry forget to mark dirty after update
+                _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
+            }
         }
+
+        if (isInstanced) {
+            for (var i = 0; i < instancedAttrLocations.length; i++) {
+                _gl.disableVertexAttribArray(instancedAttrLocations[i]);
+            }
+        }
+    },
+
+    _bindInstancedAttributes: function (renderable, program, ext) {
+        var _gl = this.gl;
+        var instancedBuffers = renderable.getInstancedAttributesBuffers(this);
+        var locations = [];
+
+        for (var i = 0; i < instancedBuffers.length; i++) {
+            var bufferObj = instancedBuffers[i];
+            var location = program.getAttribLocation(_gl, bufferObj.symbol);
+            if (location < 0) {
+                continue;
+            }
+
+            var glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;;
+            _gl.enableVertexAttribArray(location);  // TODO
+            _gl.bindBuffer(_gl.ARRAY_BUFFER, bufferObj.buffer);
+            _gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
+            ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
+
+            locations.push(location);
+        }
+
+        return locations;
     },
 
     _bindMaterial: function (renderable, material, program, prevRenderable, prevMaterial, prevProgram, getUniformValue) {

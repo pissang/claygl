@@ -10,6 +10,7 @@ import mat4 from '../glmatrix/mat4';
  * @namespace clay.util.mesh
  */
 var meshUtil = {
+
     /**
      * Merge multiple meshes to one.
      * Note that these meshes must have the same material

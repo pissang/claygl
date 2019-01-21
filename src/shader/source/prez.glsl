@@ -11,21 +11,28 @@ uniform vec2 uvOffset : [0.0, 0.0];
 
 @import clay.chunk.skinning_header
 
+@import clay.chunk.instancing_header
+
 varying vec2 v_Texcoord;
 
 void main()
 {
 
-    vec3 P = pos;
+    vec4 P = vec4(pos, 1.0);
 
 #ifdef SKINNING
 
     @import clay.chunk.skin_matrix
 
-    P = (skinMatrixWS * vec4(pos, 1.0)).xyz;
+    P = skinMatrixWS * P;
 #endif
 
-    gl_Position = WVP * vec4(P, 1.0);
+#ifdef INSTANCING
+    @import clay.chunk.instancing_matrix
+    P = instanceMat * P;
+#endif
+
+    gl_Position = WVP * P;
     v_Texcoord = uv * uvRepeat + uvOffset;
 }
 
