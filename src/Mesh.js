@@ -15,13 +15,7 @@ var Mesh = Renderable.extend(/** @lends clay.Mesh# */ {
      * Joints indices Meshes can share the one skeleton instance and each mesh can use one part of joints. Joints indices indicate the index of joint in the skeleton instance
      * @type {number[]}
      */
-    joints: null,
-
-    /**
-     * If store the skin matrices in vertex texture
-     * @type {bool}
-     */
-    useSkinMatricesTexture: false
+    joints: null
 
 }, function () {
     if (!this.joints) {

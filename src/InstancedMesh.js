@@ -1,5 +1,8 @@
 import Mesh from './Mesh';
 import Cache from './core/Cache';
+import BoundingBox from './math/BoundingBox';
+
+var tmpBoundingBox = new BoundingBox();
 
 var InstancedMesh = Mesh.extend(function () {
     return {
@@ -100,6 +103,19 @@ var InstancedMesh = Mesh.extend(function () {
             instanceMat3 = instancedAttributes.instanceMat3.value = new Float32Array(arraySize);
         }
 
+        var geometry = this.geometry;
+        var needsUpdateBoundingBox = false;
+        if (geometry.boundingBox || this.instances.length > 0) {
+            needsUpdateBoundingBox = true;
+            this.boundingBox = this.boundingBox || new BoundingBox();
+
+            this.boundingBox.min.set(Infinity, Infinity, Infinity);
+            this.boundingBox.max.set(-Infinity, -Infinity, -Infinity);
+        }
+        else {
+            this.boundingBox = null;
+        }
+
         for (var i = 0; i < this.instances.length; i++) {
             var instance = this.instances[i];
             var node = instance.node;
@@ -123,6 +139,12 @@ var InstancedMesh = Mesh.extend(function () {
             instanceMat3[i4 + 1] = transform[9];
             instanceMat3[i4 + 2] = transform[10];
             instanceMat3[i4 + 3] = transform[14];
+
+            // Update bounding box
+            if (needsUpdateBoundingBox) {
+                tmpBoundingBox.transformFrom(geometry.boundingBox, node.worldTransform);
+                this.boundingBox.union(tmpBoundingBox, this.boundingBox);
+            }
         }
 
         this._cache.dirty('dirty');
