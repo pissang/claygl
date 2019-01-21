@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <title>Skinned Mesh Instancing</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+
+            graphic: {
+                shadow: true,
+                tonemapping: true
+            },
+            init: function (app) {
+                // Create camera
+                this._camera = app.createCamera([100, 300, 800], [0, 100, 0]);
+                this._camera.far = 10000;
+
+                // Load boombox model.
+                app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf')
+                    .then(function (result) {
+
+                        const instancedMeshes = result.meshes.map(mesh => {
+                            return new clay.InstancedMesh({
+                                geometry: mesh.geometry,
+                                material: mesh.material,
+                                skeleton: mesh.skeleton,
+                                joints: mesh.joints,
+                                frustumCulling: false,
+                                instances: []
+                            });
+                        });
+
+                        result.meshes.forEach((mesh, idx) => {
+                            var parent = mesh.getParent();
+                            parent.remove(mesh);
+                            parent.add(instancedMeshes[idx]);
+                        });
+
+                        var ROBOT_COUNT = 8;
+                        var instances = [];
+                        for (var i = 0; i < ROBOT_COUNT; i++) {
+                            for (var j = 0; j < ROBOT_COUNT; j++) {
+                                var node = new clay.Node();
+                                node.position.x = (i - ROBOT_COUNT / 2) * 150;
+                                node.position.z = (j - ROBOT_COUNT / 2) * 150;
+
+                                instances.push({
+                                    node: node
+                                });
+                                app.scene.add(node);
+                            }
+                        }
+
+                        instancedMeshes.forEach(mesh => {
+                            mesh.instances = instances;
+                        });
+                    });
+
+                var plane = app.createPlane();
+                plane.rotation.rotateX(-Math.PI / 2);
+                plane.scale.set(1000, 1000, 1);
+                plane.castShadow = false;
+
+                // Create light
+                this._mainLight = app.createDirectionalLight([-2, -1, -1]);
+                this._mainLight.intensity = 1;
+                this._mainLight.shadowResolution = 2048;
+            },
+
+            loop: function (app) {
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+    </script>
+</body>
+</html>

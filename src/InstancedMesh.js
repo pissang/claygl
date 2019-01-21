@@ -103,10 +103,8 @@ var InstancedMesh = Mesh.extend(function () {
             instanceMat3 = instancedAttributes.instanceMat3.value = new Float32Array(arraySize);
         }
 
-        var geometry = this.geometry;
-        var needsUpdateBoundingBox = false;
-        if (geometry.boundingBox || this.instances.length > 0) {
-            needsUpdateBoundingBox = true;
+        var sourceBoundingBox = (this.skeleton && this.skeleton.boundingBox) || this.geometry.boundingBox;
+        if (sourceBoundingBox && this.instances.length > 0) {
             this.boundingBox = this.boundingBox || new BoundingBox();
 
             this.boundingBox.min.set(Infinity, Infinity, Infinity);
@@ -141,8 +139,8 @@ var InstancedMesh = Mesh.extend(function () {
             instanceMat3[i4 + 3] = transform[14];
 
             // Update bounding box
-            if (needsUpdateBoundingBox) {
-                tmpBoundingBox.transformFrom(geometry.boundingBox, node.worldTransform);
+            if (sourceBoundingBox) {
+                tmpBoundingBox.transformFrom(sourceBoundingBox, node.worldTransform);
                 this.boundingBox.union(tmpBoundingBox, this.boundingBox);
             }
         }
