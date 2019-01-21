@@ -47,10 +47,6 @@ function GLInfo(_gl) {
         return parameters[name];
     };
 
-    this.getMaxJointNumber = function () {
-        return 15;
-    };
-
     function createExtension(name) {
         if (_gl.getExtension) {
             var ext = _gl.getExtension(name);

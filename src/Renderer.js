@@ -179,6 +179,12 @@ var Renderer = Base.extend(function () {
          */
         viewport: {},
 
+        /**
+         * Max joint number
+         * @type {number}
+         */
+        maxJointNumber: 20,
+
         // Set by FrameBuffer#bind
         __currentFrameBuffer: null,
 
@@ -805,7 +811,7 @@ var Renderer = Base.extend(function () {
     },
 
     getMaxJointNumber: function () {
-        return this._glinfo.getMaxJointNumber();
+        return this.maxJointNumber;
     },
 
     _updateSkeleton: function (object, program, slot) {
@@ -815,7 +821,7 @@ var Renderer = Base.extend(function () {
         if (skeleton) {
             // TODO Update before culling.
             skeleton.update();
-            if (object.joints.length > this._glinfo.getMaxJointNumber()) {
+            if (object.joints.length > this.getMaxJointNumber()) {
                 var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.__uid__, object.joints);
                 program.useTextureSlot(this, skinMatricesTexture, slot);
                 program.setUniform(_gl, '1i', 'skinMatricesTexture', slot);
