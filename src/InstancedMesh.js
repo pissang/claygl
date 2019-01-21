@@ -78,6 +78,8 @@ var InstancedMesh = Mesh.extend(function () {
             }
 
             cache.fresh('dirty');
+
+            cache.put('buffers', buffers);
         }
 
         return buffers;
