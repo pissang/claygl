@@ -23,6 +23,7 @@ void main(){
 @end
 
 @end
+
 @export clay.picking.color.fragment
 
 uniform vec4 color : [1.0, 1.0, 1.0, 1.0];

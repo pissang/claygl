@@ -12,6 +12,8 @@ attribute vec3 barycentric;
 
 @import clay.chunk.skinning_header
 
+@import clay.chunk.instancing_header
+
 varying vec2 v_Texcoord;
 varying vec3 v_Barycentric;
 
@@ -22,18 +24,22 @@ varying vec4 v_Color;
 
 void main()
 {
-    vec3 skinnedPosition = position;
+    vec4 skinnedPosition = vec4(position, 1.0);
 
 #ifdef SKINNING
     @import clay.chunk.skin_matrix
+    skinnedPosition = skinMatrixWS * skinnedPosition;
+#endif
 
-    skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#ifdef INSTANCING
+    @import clay.chunk.instancing_matrix
+    skinnedPosition = instanceMat * skinnedPosition;
 #endif
 
     v_Texcoord = texcoord * uvRepeat + uvOffset;
     v_Barycentric = barycentric;
 
-    gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+    gl_Position = worldViewProjection * skinnedPosition;
 
 #ifdef VERTEX_COLOR
     v_Color = a_Color;

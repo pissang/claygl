@@ -702,7 +702,7 @@ var OrbitControl = Base.extend(function () {
         if (this._isAnimating()) {
             return;
         }
-        this._zoomHandler(e, e.pinchScale > 1 ? -0.4 : 0.4);
+        this._zoomHandler(e, e.pinchScale > 1 ? 0.4 : -0.4);
     },
 
     _zoomHandler: function (e, delta) {
