@@ -661,7 +661,9 @@ var Renderer = Base.extend(function () {
             // Skinned mesh will transformed to joint space. Ignore the mesh transform
             if (isSceneNode) {
                 worldM = (renderable.isSkinnedMesh && renderable.isSkinnedMesh())
-                    ? matrices.IDENTITY : renderable.worldTransform.array;
+                    // TODO
+                    ? (renderable.offsetMatrix ? renderable.offsetMatrix.array :matrices.IDENTITY)
+                    : renderable.worldTransform.array;
             }
             var geometry = renderable.geometry;
             var material = passConfig.getMaterial.call(this, renderable);
@@ -847,7 +849,10 @@ var Renderer = Base.extend(function () {
         var isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
         if (isInstanced) {
             ext = this.getGLExtension('ANGLE_instanced_arrays');
-            isInstanced = ext != null;
+            if (!ext) {
+                console.warn('Device not support ANGLE_instanced_arrays extension');
+                return;
+            }
         }
 
         var instancedAttrLocations;

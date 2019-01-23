@@ -23,6 +23,12 @@ var Mesh = Renderable.extend(/** @lends clay.Mesh# */ {
     }
 }, {
 
+    /**
+     * Offset matrix used for multiple skinned mesh clone sharing one skeleton
+     * @type {clay.Matrix4}
+     */
+    offsetMatrix: null,
+
     isInstancedMesh: function () { return false; },
 
     isSkinnedMesh: function () {

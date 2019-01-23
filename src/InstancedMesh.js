@@ -4,9 +4,23 @@ import BoundingBox from './math/BoundingBox';
 
 var tmpBoundingBox = new BoundingBox();
 
-var InstancedMesh = Mesh.extend(function () {
-    return {
 
+/**
+ * @constructor clay.InstancedMesh
+ * @extends clay.Mesh
+ */
+var InstancedMesh = Mesh.extend(function () {
+    return /** @lends clay.InstancedMesh# */ {
+
+        /**
+         * Instances array. Each object in array must have node property
+         * @type Array
+         * @example
+         *  var node = new clay.Node()
+         *  instancedMesh.instances.push({
+         *      node: node
+         *  });
+         */
         instances: [],
 
         instancedAttributes: {},

@@ -11,6 +11,7 @@ export * from './typescript/TextureCube';
 export * from './typescript/Texture';
 export * from './typescript/Timeline';
 export * from './typescript/Mesh';
+export * from './typescript/InstancedMesh';
 export * from './typescript/Renderable';
 
 export * from './typescript/math/Vector2';

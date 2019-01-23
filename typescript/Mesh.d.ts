@@ -1,7 +1,9 @@
 import { Renderable } from './Renderable';
 import { Skeleton } from './Skeleton';
 
-interface IMeshOption extends IRenderableOption {
+import { Matrix4 } from './math/Matrix4';
+
+export interface IMeshOption extends IRenderableOption {
     skeleton?: Skeleton;
     joints?: number[];
 }
@@ -13,6 +15,8 @@ export class Mesh extends Renderable {
     joints: number[];
 
     skeleton: Skeleton;
+
+    offsetMatrix: Matrix4;
 
     clone(): Mesh;
 
