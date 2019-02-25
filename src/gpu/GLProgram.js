@@ -248,7 +248,7 @@ var GLProgram = Base.extend({
         }
 
         for (var i = 0; i < enabledAttributeListInContext.length; i++) {
-            switch(enabledAttributeListInContext[i]){
+            switch (enabledAttributeListInContext[i]){
                 case SHADER_STATE_TO_ENABLE:
                     _gl.enableVertexAttribArray(i);
                     enabledAttributeListInContext[i] = SHADER_STATE_PENDING;
@@ -277,6 +277,14 @@ var GLProgram = Base.extend({
         }
 
         return location;
+    },
+
+    isAttribEnabled: function (renderer, location) {
+        var enabledAttributeListInContext
+            = enabledAttributeList[renderer.__uid__]
+            || [];
+
+        return !!enabledAttributeListInContext[location];
     },
 
     buildProgram: function (_gl, shader, vertexShaderCode, fragmentShaderCode) {

@@ -887,7 +887,10 @@ var Renderer = Base.extend(function () {
 
         if (isInstanced) {
             for (var i = 0; i < instancedAttrLocations.length; i++) {
-                _gl.disableVertexAttribArray(instancedAttrLocations[i]);
+                if (!instancedAttrLocations[i].enabled) {
+                    _gl.disableVertexAttribArray(instancedAttrLocations[i].location);
+                }
+                ext.vertexAttribDivisorANGLE(instancedAttrLocations[i].location, 0);
             }
         }
     },
@@ -905,12 +908,17 @@ var Renderer = Base.extend(function () {
             }
 
             var glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;;
-            _gl.enableVertexAttribArray(location);  // TODO
+            var isEnabled = program.isAttribEnabled(this, location);
+            if (!program.isAttribEnabled(this, location)) {
+                _gl.enableVertexAttribArray(location);
+            }
+            locations.push({
+                location: location,
+                enabled: isEnabled
+            });
             _gl.bindBuffer(_gl.ARRAY_BUFFER, bufferObj.buffer);
             _gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
             ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
-
-            locations.push(location);
         }
 
         return locations;
