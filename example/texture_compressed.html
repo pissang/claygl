@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+</head>
+<body>
+    <style>
+        body, canvas {
+            margin: 0;
+        }
+    </style>
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const shader = new clay.Shader(
+            clay.Shader.source('clay.compositor.vertex'),
+            clay.Shader.source('clay.compositor.output')
+        );
+        const planeGeo = new clay.geometry.Plane();
+        function createRect(texture, x, y, width, height) {
+            const mat = new clay.Material({ shader });
+            mat.set('texture', texture);
+            const mesh = new clay.Mesh({
+                geometry: planeGeo, material: mat
+            });
+            mesh.position.set(
+                x / canvas.width * 2.0 - 1.0,
+                y / canvas.height * 2.0 - 1.0,
+                0
+            );
+            mesh.scale.set(
+                width / canvas.width,
+                height / canvas.height,
+                1
+            );
+
+            return mesh;
+        }
+
+        const renderer = new clay.Renderer({ canvas });
+        const scene = new clay.Scene();
+        const camera = new clay.camera.Orthographic();
+
+        [
+            ['test-pvr.ktx', 'WEBGL_compressed_texture_pvrtc'],
+            ['test-etc.ktx', 'WEBGL_compressed_texture_etc1'],
+            ['test-s3tc.ktx', 'WEBGL_compressed_texture_s3tc']
+        ].forEach((obj, idx) => {
+            fetch('assets/textures/compressed/' + obj[0]).then(res => res.arrayBuffer())
+                .then(ab => {
+                    const res = clay.util.ktx.parse(ab);
+                    const tex = new clay.Texture2D({
+                        pixels: res.pixels,
+                        width: res.width,
+                        height: res.height,
+                        format: res.format,
+                        minFilter: clay.Texture.LINEAR,
+                        magFilter: clay.Texture.LINEAR,
+                        useMipmap: false
+                    });
+
+                    const mesh = createRect(tex, idx * 140, 256, 128, 128);
+                    scene.add(mesh);
+                    renderer.render(scene, camera);
+                });
+        });
+    </script>
+</body>
+</html>

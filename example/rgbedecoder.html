@@ -7,16 +7,16 @@
         <canvas width="1200" height="640" id="Main"></canvas>
         <script>
             clay.core.request.get({
-                url : 'assets/textures/hdr/pisa.hdr',
-                responseType : 'arraybuffer',
-                onload : function(data) {
+                url: 'assets/textures/hdr/pisa.hdr',
+                responseType: 'arraybuffer',
+                onload: function(data) {
                     var texture = clay.util.hdr.parseRGBE(data);
 
                     var renderer = new clay.Renderer({
-                        canvas : document.getElementById('Main')
+                        canvas: document.getElementById('Main')
                     });
                     var pass = new clay.compositor.Pass({
-                        fragment : clay.Shader.source('clay.compositor.output')
+                        fragment: clay.Shader.source('clay.compositor.output')
                     });
                     pass.setUniform('texture', texture);
                     pass.render(renderer);

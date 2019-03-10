@@ -128,13 +128,14 @@ import cubemap$108 from './util/cubemap';
 import dds$109 from './util/dds';
 import delaunay$110 from './util/delaunay';
 import hdr$111 from './util/hdr';
-import mesh$112 from './util/mesh';
-import sh$113 from './util/sh';
-import texture$114 from './util/texture';
-import transferable$115 from './util/transferable';
-import version$116 from './version';
-import CardboardDistorter$117 from './vr/CardboardDistorter';
-import StereoCamera$118 from './vr/StereoCamera';
+import ktx$112 from './util/ktx';
+import mesh$113 from './util/mesh';
+import sh$114 from './util/sh';
+import texture$115 from './util/texture';
+import transferable$116 from './util/transferable';
+import version$117 from './version';
+import CardboardDistorter$118 from './vr/CardboardDistorter';
+import StereoCamera$119 from './vr/StereoCamera';
 
 
 var animation = {
@@ -349,18 +350,19 @@ var util = {
     dds : dds$109,
     delaunay : delaunay$110,
     hdr : hdr$111,
-    mesh : mesh$112,
-    sh : sh$113,
-    texture : texture$114,
-    transferable : transferable$115
+    ktx : ktx$112,
+    mesh : mesh$113,
+    sh : sh$114,
+    texture : texture$115,
+    transferable : transferable$116
 };
 export { util };
 
-export { version$116 as version };
+export { version$117 as version };
 
 var vr = {
-    CardboardDistorter : CardboardDistorter$117,
-    StereoCamera : StereoCamera$118
+    CardboardDistorter : CardboardDistorter$118,
+    StereoCamera : StereoCamera$119
 };
 export { vr };
 ;

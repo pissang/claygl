@@ -144,8 +144,18 @@ var Texture2D = Texture.extend(function () {
         else {
             // Can be used as a blank texture when writing render to texture(RTT)
             if (
-                glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
-                && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT
+                // S3TC
+                (glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT
+                    && glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT)
+                // ETC
+                || glFormat === Texture.COMPRESSED_RGB_ETC1_WEBGL
+                // PVRTC
+                || (glFormat >= Texture.COMPRESSED_RGB_PVRTC_4BPPV1_IMG
+                    && glFormat <= Texture.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG)
+                // ATC
+                || (glFormat === Texture.COMPRESSED_RGB_ATC_WEBGL
+                    && glFormat === Texture.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL
+                    && glFormat === Texture.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL)
             ) {
                 _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
             }
