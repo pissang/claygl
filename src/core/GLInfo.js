@@ -11,6 +11,7 @@ var EXTENSION_LIST = [
     'WEBGL_compressed_texture_etc1',
     'WEBGL_compressed_texture_pvrtc',
     'WEBGL_compressed_texture_atc',
+    'WEBGL_compressed_texture_astc',
     'WEBGL_depth_texture',
     'EXT_texture_filter_anisotropic',
     'EXT_shader_texture_lod',

@@ -10,6 +10,7 @@
     <style>
         body, canvas {
             margin: 0;
+            background: #000;
         }
     </style>
     <canvas></canvas>
@@ -27,16 +28,19 @@
             const mat = new clay.Material({ shader });
             mat.set('texture', texture);
             const mesh = new clay.Mesh({
-                geometry: planeGeo, material: mat
+                geometry: planeGeo, material: mat,
+                culling: false
             });
+            const sx = width / canvas.width;
+            const sy = height / canvas.height;
             mesh.position.set(
-                x / canvas.width * 2.0 - 1.0,
-                y / canvas.height * 2.0 - 1.0,
+                x / canvas.width * 2.0 - 1.0 + sx,
+                1.0 - y / canvas.height * 2.0 - sy,
                 0
             );
             mesh.scale.set(
-                width / canvas.width,
-                height / canvas.height,
+                sx,
+                -sy,
                 1
             );
 
@@ -47,29 +51,81 @@
         const scene = new clay.Scene();
         const camera = new clay.camera.Orthographic();
 
+        let x = 0;
+        let y = 10;
+        let size = 128;
+        let marginX = 50;
+        let marginY = 50;
         [
-            ['test-pvr.ktx', 'WEBGL_compressed_texture_pvrtc'],
-            ['test-etc.ktx', 'WEBGL_compressed_texture_etc1'],
-            ['test-s3tc.ktx', 'WEBGL_compressed_texture_s3tc']
-        ].forEach((obj, idx) => {
-            fetch('assets/textures/compressed/' + obj[0]).then(res => res.arrayBuffer())
-                .then(ab => {
-                    const res = clay.util.ktx.parse(ab);
-                    const tex = new clay.Texture2D({
-                        pixels: res.pixels,
-                        width: res.width,
-                        height: res.height,
-                        format: res.format,
-                        minFilter: clay.Texture.LINEAR,
-                        magFilter: clay.Texture.LINEAR,
-                        useMipmap: false
-                    });
+            ['test.png', 'Reference(PNG)'],
+            ['test-pvr.ktx', 'pvrtc'],
+            ['test-etc.ktx', 'etc1'],
+            ['test-s3tc.ktx', 's3tc']
+        ].forEach(obj => {
+            const isReference = obj[0].match(/png$/);
+            const url = 'assets/textures/compressed/' + obj[0];
+            const localX = x;
+            const localY = y;
+            x += size + marginX;
+            if (x + size > canvas.width || isReference) {
+                x = 0;
+                y += size + marginY;
+            }
+            function create(tex) {
+                const textCanvas = document.createElement('canvas');
+                const ctx = textCanvas.getContext('2d');
+                ctx.font = '30px sans-serif';
+                let width = ctx.measureText(obj[1]).width;
+                textCanvas.width = width;
+                textCanvas.height = 40;
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = '30px sans-serif';
+                ctx.fillText(obj[1], 0, 0);
 
-                    const mesh = createRect(tex, idx * 140, 256, 128, 128);
-                    scene.add(mesh);
-                    renderer.render(scene, camera);
+                const textMesh = createRect(new clay.Texture2D({
+                    image: textCanvas,
+                    flipY: false
+                }), localX, localY, textCanvas.width, textCanvas.height);
+
+                const mesh = createRect(tex, localX, localY + textCanvas.height, size, size);
+                scene.add(textMesh);
+                scene.add(mesh);
+            }
+            if (isReference) {
+                const tex = new clay.Texture2D({
+                    minFilter: clay.Texture.LINEAR,
+                    magFilter: clay.Texture.LINEAR,
+                    useMipmap: false,
+                    flipY: false
                 });
+                tex.load(url);
+                tex.success(() => {
+                    create(tex);
+                });
+            }
+            else {
+                fetch(url).then(res => res.arrayBuffer())
+                    .then(ab => {
+                        const res = clay.util.ktx.parse(ab);
+                        create(new clay.Texture2D({
+                            pixels: res.pixels,
+                            width: res.width,
+                            height: res.height,
+                            format: res.format,
+                            minFilter: clay.Texture.LINEAR,
+                            magFilter: clay.Texture.LINEAR,
+                            useMipmap: false
+                        }));
+                    });
+            }
         });
+        function update() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(update);
+        }
+        update();
     </script>
 </body>
 </html>
