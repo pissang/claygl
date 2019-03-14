@@ -14,7 +14,7 @@ export class Vector4 {
 
     w: number;
 
-    array: ArrayLike;
+    array: ArrayLike<number>;
 
     _dirty: boolean;
 
@@ -22,7 +22,7 @@ export class Vector4 {
 
     set(x: number, y: number, z: number, w: number): Vector4;
 
-    setArray(arr: ArrayLike): Vector4;
+    setArray(arr: ArrayLike<number>): Vector4;
     setArray(arr: number[]): Vector4;
 
     clone(): Vector4;

@@ -1,4 +1,4 @@
-import { Texture } from './Texture';
+import { Texture, ITextureOption } from './Texture';
 import { Renderer } from './Renderer';
 
 export interface ITexture2DOption extends ITextureOption {
@@ -26,9 +26,9 @@ export class Texture2D extends Texture {
 
     isRenderable(): boolean;
 
-    bind(gl): boolean;
+    bind(gl: WebGLRenderingContext): boolean;
 
-    unbind(gl): boolean;
+    unbind(gl: WebGLRenderingContext): boolean;
 
     load(src: string): void;
 

@@ -3,7 +3,7 @@ import { notifier } from './mixin/notifier';
 export class Base implements notifier {
     __GUID__ : number
 
-    trigger(name: string, ...args): void;
+    trigger(name: string, ...args: any[]): void;
 
     on(name: string, action: Function, context?:any): void;
 

@@ -55,11 +55,11 @@ export class GeometryBase extends Base {
 
     isUseIndices(): boolean;
 
-    initIndicesFromArray(array: Array): void;
+    initIndicesFromArray(array: Array<number>): void;
 
-    setTriangleIndices(idx, arr: number[]): void;
+    setTriangleIndices(idx: number, arr: number[]): void;
 
-    getTriangleIndices(idx, out: number[]): number[];
+    getTriangleIndices(idx: number, out: number[]): number[];
 
     createAttribute(name: string, type: string, size: number, semantic?: string): IStaticGeometryAttribute;
 

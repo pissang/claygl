@@ -1,7 +1,9 @@
-import { Node } from 'Node';
+import { Node } from '../Node';
 import { Texture } from '../Texture';
+import { IDictionary } from '../core/container';
+import { ICompositorNodeOutput } from '../compositor/CompositorNode';
 
-interface ICompositorTextureNodeOption {
+export interface ICompositorTextureNodeOption {
     name?: string;
     outputs?: IDictionary<ICompositorNodeOutput>;
     texture: Texture;

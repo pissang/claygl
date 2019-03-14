@@ -5,7 +5,7 @@ import { Matrix4 } from './Matrix4';
 
 export class Matrix3 {
 
-    array: ArrayLike;
+    array: ArrayLike<number>;
 
     clone(): Matrix3;
 

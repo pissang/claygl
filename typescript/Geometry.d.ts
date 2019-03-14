@@ -3,6 +3,7 @@ import {
     IStaticGeometryAttribute, IDefaultStaticGeometryAttributes
 } from './GeometryBase';
 import { Base } from './core/Base';
+import { BoundingBox } from './math/BoundingBox';
 import { Matrix4 } from './math/Matrix4';
 
 

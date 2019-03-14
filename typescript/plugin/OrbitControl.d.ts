@@ -76,9 +76,9 @@ export class OrbitControl extends Base {
         beta?: number;
         center?: [number, number, number];
         duration?: number;
-        easing?: string|function;
+        easing?: string|Function;
         done?: () => void;
-    });
+    }): any;
 
     stopAllAnimation(): void;
 

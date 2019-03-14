@@ -1,2 +1,2 @@
 export { GBuffer } from './GBuffer';
-export { Renderer } from './Renderer';
+export { DeferredRenderer } from './Renderer';

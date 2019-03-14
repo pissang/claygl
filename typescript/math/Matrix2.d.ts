@@ -2,7 +2,7 @@ import { Vector2 } from './Vector2';
 
 export class Matrix2 {
 
-    array: ArrayLike;
+    array: ArrayLike<number>;
 
     clone(): Matrix2;
 

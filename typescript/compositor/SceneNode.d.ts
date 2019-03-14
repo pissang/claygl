@@ -1,6 +1,8 @@
-import { Node } from 'Node';
+import { Node } from '../Node';
 import { Scene } from '../Scene';
 import { Camera } from '../Camera';
+import { IDictionary } from '../core/container';
+import { ICompositorNodeOutput } from '../compositor/CompositorNode';
 
 interface ICompositorSceneNodeOption {
     name?: string;

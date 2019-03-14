@@ -74,5 +74,5 @@ export class Node extends Base {
 
     rotateAround(point: Vector3, axis: Vector3, angle: number): void;
 
-    lookAt(target: Vector3, up?: Vector3);
+    lookAt(target: Vector3, up?: Vector3): void;
 }

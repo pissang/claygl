@@ -1,3 +1,4 @@
+import { Vector3 } from './Vector3';
 import { Matrix2 } from './Matrix2';
 import { Matrix2d } from './Matrix2d';
 import { Matrix3 } from './Matrix3';
@@ -12,7 +13,7 @@ export class Vector2 {
 
     y: number;
 
-    array: ArrayLike;
+    array: ArrayLike<number>;
 
     _dirty: boolean;
 
@@ -20,7 +21,7 @@ export class Vector2 {
 
     set(x: number, y: number): Vector2;
 
-    setArray(arr: ArrayLike): Vector2;
+    setArray(arr: ArrayLike<number>): Vector2;
     setArray(arr: number[]): Vector2;
 
     clone(): Vector2;

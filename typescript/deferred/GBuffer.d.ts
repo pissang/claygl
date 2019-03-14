@@ -22,7 +22,7 @@ export class GBuffer extends Base {
 
     renderTransparent: boolean;
 
-    resize(width, height): void;
+    resize(width: number, height: number): void;
 
     update(renderer: Renderer, scene: Scene, camera: Camera): void;
 

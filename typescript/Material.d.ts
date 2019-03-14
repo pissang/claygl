@@ -1,4 +1,5 @@
 import { Base } from './core/Base';
+import { IDictionary } from './core/container';
 import { Shader, IShaderUniform } from './Shader';
 import { Renderer } from './Renderer';
 

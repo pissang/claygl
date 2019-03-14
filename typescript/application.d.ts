@@ -16,7 +16,6 @@ import { Spot as SpotLight } from './light/Spot';
 import { Point as PointLight } from './light/Point';
 import { Perspective as PerspectiveCamera } from './camera/Perspective';
 import { Orthographic as OrthographicCamera } from './camera/Orthographic';
-import { Point as PointLight } from './light/Point';
 import { IGLTFLoaderResult } from './loader/GLTF';
 import { ShadowMap } from './prePass/ShadowMap';
 import { IDictionary } from './core/container';
@@ -95,7 +94,7 @@ type RGBLike = [number, number, number]|string;
 export namespace application {
 
     interface IAppNS {
-        init: (app: App3D) => PromiseLike;
+        init: (app: App3D) => PromiseLike<any> | void;
 
         loop?: (app: App3D) => void;
 

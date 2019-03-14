@@ -13,21 +13,21 @@ export namespace texture {
         nz: string;
     }
 
-    export function loadTexture(path: string, onsuccess: (texture?: clay.texture.Texture2D) => any, onerror: Function): clay.texture.Texture2D;
-    export function loadTexture(path: string, option: Object, onsuccess: (texture?: clay.texture.Texture2D) => any, onerror: Function): clay.texture.Texture2D;
+    export function loadTexture(path: string, onsuccess: (texture?: Texture2D) => any, onerror: Function): Texture2D;
+    export function loadTexture(path: string, option: Object, onsuccess: (texture?: Texture2D) => any, onerror: Function): Texture2D;
 
-    export function loadTexture(path: ITextureCubeImageSrc, onsuccess: (texture?: clay.texture.TextureCube) => any, onerror: Function): clay.texture.TextureCube;
-    export function loadTexture(path: ITextureCubeImageSrc, option: Object, onsuccess: (texture?: clay.texture.TextureCube) => any, onerror: Function): clay.texture.TextureCube;
+    export function loadTexture(path: ITextureCubeImageSrc, onsuccess: (texture?: TextureCube) => any, onerror: Function): TextureCube;
+    export function loadTexture(path: ITextureCubeImageSrc, option: Object, onsuccess: (texture?: TextureCube) => any, onerror: Function): TextureCube;
 
-    export function loadPanorama(path: string, cubemap: clay.texture.TextureCube, renderer: Renderer, onsuccess: (texture: clay.texture.TextureCube) => any, onerror: Function): void;
+    export function loadPanorama(path: string, cubemap: TextureCube, renderer: Renderer, onsuccess: (texture: TextureCube) => any, onerror: Function): void;
 
-    export function panoramaToCubeMap(panoramaMap: clay.texture.Texture2D, cubemap: clay.texture.TextureCube, renderer: Renderer): void;
+    export function panoramaToCubeMap(panoramaMap: Texture2D, cubemap: TextureCube, renderer: Renderer): void;
 
-    export function createChessboard(size: number, unitSize: number, color1: string, color2: string): clay.texture.Texture2D;
-    export function createChessboard(size: number, unitSize: number, color1: string): clay.texture.Texture2D;
-    export function createChessboard(size: number, unitSize: number): clay.texture.Texture2D;
-    export function createChessboard(size: number): clay.texture.Texture2D;
-    export function createChessboard(): clay.texture.Texture2D;
+    export function createChessboard(size: number, unitSize: number, color1: string, color2: string): Texture2D;
+    export function createChessboard(size: number, unitSize: number, color1: string): Texture2D;
+    export function createChessboard(size: number, unitSize: number): Texture2D;
+    export function createChessboard(size: number): Texture2D;
+    export function createChessboard(): Texture2D;
 
-    export function createBlank(color?: string): clay.texture.Texture2D;
+    export function createBlank(color?: string): Texture2D;
 }

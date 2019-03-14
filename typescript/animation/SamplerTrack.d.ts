@@ -22,5 +22,5 @@ export class SamplerTrack {
         scale: Float32Array;
     }
 
-    getSubClip(startTime: number, endTime: number): SamplerClip;
+    getSubClip(startTime: number, endTime: number): SamplerTrack;
 }

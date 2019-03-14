@@ -1,4 +1,4 @@
-import { Texture } from './Texture';
+import { Texture, ITextureOption } from './Texture';
 
 interface ITextureCubeImages {
     px: HTMLElement;
@@ -48,9 +48,9 @@ export class TextureCube extends Texture {
 
     isRenderable(): boolean;
 
-    bind(gl): boolean;
+    bind(gl: WebGLRenderingContext): boolean;
 
-    unbind(gl): boolean;
+    unbind(gl: WebGLRenderingContext): boolean;
 
     load(imageList: ITextureCubeImageSrc): void;
 
