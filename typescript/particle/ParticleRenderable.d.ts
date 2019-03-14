@@ -1,11 +1,10 @@
-import { Renderable} from '../Renderable';
-import { Material} from '../Material';
-import { Geometry} from '../Geometry';
-import { Node} from '../Node';
-import { Base} from '../core/Base';
-import { Vector3} from '../math/Vector3';
-import { Vector3} from '../math/Vector3';
-import { Emitter} from 'Emitter';
+import { Renderable, IRenderableOption } from '../Renderable';
+import { Material } from '../Material';
+import { Geometry } from '../Geometry';
+import { Node } from '../Node';
+import { Base } from '../core/Base';
+import { Vector3 } from '../math/Vector3';
+import { Emitter } from './Emitter';
 
 interface IParticleSystemOption extends IRenderableOption {
     loop?: boolean;

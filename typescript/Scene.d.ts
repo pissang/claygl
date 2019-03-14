@@ -1,7 +1,7 @@
 import { Material } from './Material';
 import { Renderable } from './Renderable';
 import { Shader } from './Shader';
-import { Node } from './Node';
+import { Node, INodeOption } from './Node';
 import { Camera } from './Camera';
 
 interface ISceneOption extends INodeOption {

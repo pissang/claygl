@@ -1,10 +1,10 @@
-import { Pass } from 'Pass';
+import { Pass } from '../compositor/Pass';
 import { Base } from '../core/Base';
 import { IDictionary } from '../core/container';
 import { Texture } from '../Texture';
 import { Renderer } from '../Renderer';
 
-interface ICompositorNodeInput {
+export interface ICompositorNodeInput {
     // TODO
     // string
     // Node
@@ -12,7 +12,7 @@ interface ICompositorNodeInput {
     pin: string;
 }
 
-interface ICompositorNodeOutputParameter {
+export interface ICompositorNodeOutputParameter {
     // TODO
     // number;
     // (renderer?: Renderer): number;
@@ -31,7 +31,7 @@ interface ICompositorNodeOutputParameter {
     flipY?: boolean;
 }
 
-interface ICompositorNodeOutput {
+export interface ICompositorNodeOutput {
     // string
     // number
     attachment?: any;
@@ -40,14 +40,14 @@ interface ICompositorNodeOutput {
     outputLastFrame?: boolean;
 }
 
-interface ICompositorNodeOption {
+export interface ICompositorNodeOption {
     name?: string;
     shader: string;
     inputs: IDictionary<ICompositorNodeInput>;
     outputs?: IDictionary<ICompositorNodeOutput>;
 }
 
-interface ICompositorNodeLink {
+export interface ICompositorNodeLink {
     node: CompositorNode;
     pin: string;
 }

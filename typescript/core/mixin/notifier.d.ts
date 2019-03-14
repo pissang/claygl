@@ -5,7 +5,7 @@ interface INotifierEventHandler {
 
 export interface notifier {
 
-    trigger?(name: string, ...args): void;
+    trigger?(name: string, ...args: any[]): void;
 
     on?(name: string, action: Function, context?:any): void;
 

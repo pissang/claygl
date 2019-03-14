@@ -1,9 +1,9 @@
-import { Node } from './Node';
+import { Node, INodeOption } from './Node';
 import { Material } from './Material';
 import { Geometry } from './Geometry';
 import { Skeleton } from './Skeleton';
 
-interface IRenderableOption extends INodeOption {
+export interface IRenderableOption extends INodeOption {
 
     material?: Material;
     geometry?: Geometry;
@@ -24,7 +24,7 @@ interface IRenderableOption extends INodeOption {
     receiveShadow?: boolean;
 }
 
-interface IRenderableRenderInfo {
+export interface IRenderableRenderInfo {
     faceNumber: number;
     vertexNumber: number;
     drawCallNumber: number;

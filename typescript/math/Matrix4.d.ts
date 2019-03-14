@@ -4,7 +4,7 @@ import { Matrix3 } from './Matrix3';
 
 export class Matrix4 {
 
-    array: ArrayLike;
+    array: ArrayLike<number>;
 
     forward: Vector3;
 

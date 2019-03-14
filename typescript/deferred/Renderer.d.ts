@@ -12,7 +12,7 @@ interface IDeferredRendererOption {
     autoResize?: boolean;
 }
 
-export class Renderer extends Base {
+export class DeferredRenderer extends Base {
 
     constructor(option?: IDeferredRendererOption);
 
@@ -20,7 +20,7 @@ export class Renderer extends Base {
 
     autoResize: boolean;
 
-    resize(width, height): void;
+    resize(width: number, height: number): void;
 
     render(renderer: Renderer, scene: Scene, camera: Camera, opts?: {
         renderToTarget?: boolean,

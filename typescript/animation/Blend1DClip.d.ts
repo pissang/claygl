@@ -1,4 +1,4 @@
-import { Clip } from './Clip';
+import { Clip, BlendClip, IClipOption } from './Clip';
 
 interface IBlend1DClipOption<T extends BlendClip> extends IClipOption {
     output?: T;
@@ -20,5 +20,5 @@ export class Blend1DClip<T extends BlendClip> extends Clip {
 
     position: number;
 
-    addInput(position: number, inputClip: T, offset: number);
+    addInput(position: number, inputClip: T, offset: number): IBlend1DClipInputEntry<T>;
 }

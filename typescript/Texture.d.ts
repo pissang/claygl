@@ -1,7 +1,7 @@
 import { Base } from './core/Base';
 
 
-interface ITextureOption {
+export interface ITextureOption {
     width?: number;
     height?: number;
     type?: number;

@@ -15,9 +15,9 @@ interface IAnimationAnimateOption {
     setter?: (key: string, value: any) => any;
 }
 
-declare function easingFunc(percent: number) : number;
+type easingFunc = (percent: number) => number;
 
-interface IAnimator<T> {
+export interface IAnimator<T> {
 
     when(time: number, props: Object, easing: string|easingFunc) : IAnimator<T>;
 
@@ -36,7 +36,7 @@ interface IAnimator<T> {
     done(callback: Function): IAnimator<T>;
 }
 
-export class Timeline extends clay.Base {
+export class Timeline extends Base {
 
     constructor(option?: IAnimationOption);
 

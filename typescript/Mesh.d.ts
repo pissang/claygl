@@ -1,7 +1,7 @@
 import { Renderable } from './Renderable';
 import { Skeleton } from './Skeleton';
-
 import { Matrix4 } from './math/Matrix4';
+import { IRenderableOption } from './Renderable';
 
 export interface IMeshOption extends IRenderableOption {
     skeleton?: Skeleton;

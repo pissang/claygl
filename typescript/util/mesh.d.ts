@@ -1,5 +1,5 @@
-import { Mesh } from '../Mesh.d.ts';
-import { Node } from '../Node.d.ts';
+import { Mesh } from '../Mesh';
+import { Node } from '../Node';
 
 export namespace mesh {
 

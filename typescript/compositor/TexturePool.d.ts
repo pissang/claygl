@@ -1,3 +1,4 @@
+import { Texture } from '../Texture';
 import { Texture2D, ITexture2DOption } from '../Texture2D'
 import { Renderer } from '../Renderer';
 

@@ -1,4 +1,4 @@
-import { Node } from './Node';
+import { Node, INodeOption } from './Node';
 
 export interface ILightOption extends INodeOption {}
 

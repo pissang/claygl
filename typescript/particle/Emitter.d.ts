@@ -1,8 +1,8 @@
 import { Base } from '../core/Base';
-import { Value } from '../math/Value';
+import { Value, VectorValue, ConstantValue, Random1D, Random2D, Random3D } from '../math/Value';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
-import { Particle } from 'Particle';
+import { Particle } from './Particle';
 
 interface IValueGetter1D {
     get(): number;
