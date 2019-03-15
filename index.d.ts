@@ -1,37 +1,26 @@
-export * from './typescript/Renderer';
-export * from './typescript/Material';
-export * from './typescript/Geometry';
-export * from './typescript/Shader';
-export * from './typescript/Renderer';
-export * from './typescript/Node';
+export * from './typescript/application';
+export * from './typescript/Camera';
+export * from './typescript/createCompositor';
 export * from './typescript/FrameBuffer';
+export * from './typescript/Geometry';
+export * from './typescript/GeometryBase';
+export * from './typescript/InstancedMesh';
+export * from './typescript/Joint';
+export * from './typescript/Light';
+export * from './typescript/Material';
+export * from './typescript/Mesh';
+export * from './typescript/Node';
+export * from './typescript/Renderable';
+export * from './typescript/Renderer';
 export * from './typescript/Scene';
+export * from './typescript/Shader';
+export * from './typescript/Skeleton';
+export * from './typescript/Texture';
 export * from './typescript/Texture2D';
 export * from './typescript/TextureCube';
-export * from './typescript/Texture';
 export * from './typescript/Timeline';
-export * from './typescript/Mesh';
-export * from './typescript/InstancedMesh';
-export * from './typescript/Renderable';
 
-export * from './typescript/math/Vector2';
-export * from './typescript/math/Vector3';
-export * from './typescript/math/Vector4';
-export * from './typescript/math/Quaternion';
-export * from './typescript/math/Matrix2';
-export * from './typescript/math/Matrix2d';
-export * from './typescript/math/Matrix3';
-export * from './typescript/math/Matrix4';
-
-export * from './typescript/math/Frustum';
-export * from './typescript/math/Plane';
-export * from './typescript/math/Value';
-export * from './typescript/math/BoundingBox';
-export * from './typescript/math/Ray';
-
-export * from './typescript/application';
-
-export * from './typescript/createCompositor';
+export * from './typescript/math';
 
 // https://stackoverflow.com/questions/30357634/how-do-i-use-namespaces-with-typescript-external-modules
 import * as light from './typescript/light/index';
