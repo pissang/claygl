@@ -47,6 +47,9 @@ export { compositor }
 import * as particle from './typescript/particle/index';
 export { particle }
 
+import * as picking from './typescript/picking/index';
+export { picking }
+
 import * as plugin from './typescript/plugin/index';
 export { plugin }
 
