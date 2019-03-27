@@ -176,11 +176,11 @@ export namespace application {
         createSpotLight(position?: Vector3Like, target?: Vector3Like, range?: number, color?: RGBLike, intensity?: number): SpotLight;
         createPointLight(position?: Vector3Like, range?: number, color?: RGBLike, intensity?: number): PointLight;
         createAmbientLight(color?: RGBLike, intensity?: number): AmbientLight;
-        createAmbientCubemapLight(envImage: ImageLike|TextureCube, specularIntensity?: number, diffuseIntensity?: number, exposure?: number, prefilteredCubemapSize?: number): {
+        createAmbientCubemapLight(envImage: ImageLike|TextureCube, specularIntensity?: number, diffuseIntensity?: number, exposure?: number, prefilteredCubemapSize?: number): Promise<{
             specular: AmbientCubemapLight,
             diffuse: AmbientSHLight,
             environmentMap: TextureCube|Texture2D
-        }
+        }>;
 
         loadModel(url: string, opts: {
             shader?: string;
