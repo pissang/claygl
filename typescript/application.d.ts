@@ -26,7 +26,17 @@ interface IGraphicOption {
 
     linear?: boolean;
 
-    tonemapping?: boolean
+    tonemapping?: boolean;
+}
+
+interface IGLAttributes {
+
+    alpha?: boolean;
+    depth?: boolean;
+    stencil?: boolean;
+    antialias?: boolean;
+    premultipliedAlpha?: boolean;
+    preserveDrawingBuffer?: boolean;
 }
 
 interface ILoadTextureOpts {
@@ -108,6 +118,7 @@ export namespace application {
         devicePixelRatio?: number;
 
         graphic?: IGraphicOption;
+        glAttributes?: IGLAttributes;
 
         event?: boolean;
 

@@ -65,6 +65,17 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @typedef {HTMLElement|string} DomQuery
  */
 
+
+/**
+ * @typedef {Object} GLAttributes
+ * @param {boolean} [alpha=true]
+ * @param {boolean} [depth=true]
+ * @param {boolean} [stencil=true]
+ * @param {boolean} [antialias=true]
+ * @param {boolean} [premultipliedAlpha=true]
+ * @param {boolean} [preserveDrawingBuffer=false]
+ */
+
 /**
  * @typedef {Object} App3DNamespace
  * @property {Function} init Initialization callback that will be called when initing app.
@@ -76,6 +87,7 @@ var EVE_NAMES = ['click', 'dblclick', 'mouseover', 'mouseout', 'mousemove',
  * @property {number} [width] Container width.
  * @property {number} [height] Container height.
  * @property {number} [devicePixelRatio]
+ * @property {GLAttributes} [glAttributes] Attributes for creating gl context
  * @property {Object.<string, Function>} [methods] Methods that will be injected to App3D#methods.
  * @property {Object} [graphic] Graphic configuration including shadow, color space.
  * @property {boolean} [graphic.shadow=false] If enable shadow
@@ -144,6 +156,8 @@ function App3D(dom, appNS) {
     appNS = appNS || {};
     appNS.graphic = appNS.graphic || {};
 
+    appNS.glAttributes = appNS.glAttributes || {};
+
     if (appNS.autoRender == null) {
         appNS.autoRender = true;
     }
@@ -160,6 +174,12 @@ function App3D(dom, appNS) {
     var rendererOpts = {};
     isDomCanvas && (rendererOpts.canvas = dom);
     appNS.devicePixelRatio && (rendererOpts.devicePixelRatio = appNS.devicePixelRatio);
+
+    ['alpha', 'depth', 'stencil', 'antialias', 'premultipliedAlpha', 'preserveDrawingBuffer'].forEach(function (attrName) {
+        if (appNS.glAttributes[attrName] != null) {
+            rendererOpts[attrName] = appNS.glAttributes[attrName];
+        }
+    });
 
     var gRenderer = new Renderer(rendererOpts);
     var gWidth = appNS.width || dom.clientWidth;

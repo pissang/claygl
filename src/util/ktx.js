@@ -98,9 +98,9 @@ function parse(arraybuffer, loadMipmaps) {
     var mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
 
     for (var level = 0; level < mipmapCount; level ++) {
-        var imageSize = new Int32Array(arraybuffer, dataOffset, 1)[ 0 ]; // size per face, since not supporting array cubemaps
+        var imageSize = new Int32Array(arraybuffer, dataOffset, 1)[0]; // size per face, since not supporting array cubemaps
         for (var face = 0; face < numberOfFaces; face ++) {
-            var byteArray = new Uint8Array(arraybuffer, dataOffset + 4, imageSize );
+            var byteArray = new Uint8Array(arraybuffer, dataOffset + 4, imageSize);
             mipmaps.push({
                 pixels: byteArray,
                 width: width,

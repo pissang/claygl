@@ -81,6 +81,7 @@ function PlaceHolderTexture(renderer) {
         return true;
     };
 }
+
 /**
  * @constructor clay.Renderer
  * @extends clay.core.Base
