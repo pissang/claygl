@@ -14,6 +14,8 @@ attribute vec3 barycentric;
 
 @import clay.chunk.instancing_header
 
+@import clay.util.logdepth_vertex_header
+
 varying vec2 v_Texcoord;
 varying vec3 v_Barycentric;
 
@@ -21,6 +23,7 @@ varying vec3 v_Barycentric;
 attribute vec4 a_Color : COLOR;
 varying vec4 v_Color;
 #endif
+
 
 void main()
 {
@@ -44,6 +47,8 @@ void main()
 #ifdef VERTEX_COLOR
     v_Color = a_Color;
 #endif
+
+    @import clay.util.logdepth_vertex_main
 }
 
 @end
@@ -73,6 +78,8 @@ varying vec4 v_Color;
 uniform float lineWidth : 0.0;
 uniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];
 varying vec3 v_Barycentric;
+
+@import clay.util.logdepth_fragment_header
 
 @import clay.util.edge_factor
 
@@ -129,6 +136,8 @@ void main()
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);
+
+    @import clay.util.logdepth_fragment_main
 
 }
 

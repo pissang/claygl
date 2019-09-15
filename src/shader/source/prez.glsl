@@ -1,6 +1,8 @@
 // Shader for prez pass
 @export clay.prez.vertex
 
+#define SHADER_NAME prez
+
 uniform mat4 WVP : WORLDVIEWPROJECTION;
 
 attribute vec3 pos : POSITION;
@@ -12,6 +14,8 @@ uniform vec2 uvOffset : [0.0, 0.0];
 @import clay.chunk.skinning_header
 
 @import clay.chunk.instancing_header
+
+@import clay.util.logdepth_vertex_header
 
 varying vec2 v_Texcoord;
 
@@ -34,6 +38,8 @@ void main()
 
     gl_Position = WVP * P;
     v_Texcoord = uv * uvRepeat + uvOffset;
+
+    @import clay.util.logdepth_vertex_main
 }
 
 @end
@@ -43,6 +49,8 @@ void main()
 
 uniform sampler2D alphaMap;
 uniform float alphaCutoff: 0.0;
+
+@import clay.util.logdepth_fragment_header
 
 varying vec2 v_Texcoord;
 
@@ -54,6 +62,8 @@ void main()
         }
     }
     gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+
+    @import clay.util.logdepth_fragment_main
 }
 
 @end

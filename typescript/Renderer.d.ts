@@ -23,6 +23,8 @@ interface IRendererOption {
     antialias?: boolean;
     premultipliedAlpha?: boolean;
     preserveDrawingBuffer?: boolean;
+
+    logDepthBuffer?: boolean;
 }
 
 interface IRenderInfo {
@@ -70,6 +72,8 @@ export class Renderer extends Base {
     premultipliedAlpha: boolean;
 
     preserveDrawingBuffer: boolean;
+
+    logDepthBuffer?: boolean;
 
     throwShaderError: boolean;
 

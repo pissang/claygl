@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../dist/claygl.js"></script>
+    <script src="lib/dat.gui.js"></script>
+    <title>Log Depth Buffer</title>
+</head>
+<body>
+    <style>
+        html, body, #main {
+            overflow: hidden;
+            background: #111;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <div id="main"></div>
+    <script>
+        var app = clay.application.create('#main', {
+
+            init: function (app) {
+                app.renderer.logDepthBuffer = true;
+                // Create camera
+                this._camera = app.createCamera([0, 3, 8], [0, 1, 0]);
+                this._camera.far = 10;
+
+                // Create lights
+                app.createDirectionalLight([-2, -1, -1], '#fff', 0.7);
+                app.createAmbientLight('#fff', 0.3);
+
+                // Create geometries.
+                for (let i = 0; i < 10; i++) {
+                    let cube = app.createCube({
+                        color: [Math.random(), Math.random(), Math.random()]
+                    });
+                    let x = Math.random() * 1e-3;
+                    let y = Math.random() * 1e-3;
+                    let z = Math.random() * 1e-3;
+                    cube.position.set(x, y, z);
+                }
+
+                this._control = new clay.plugin.OrbitControl({
+                    target: this._camera,
+                    domElement: app.container
+                });
+
+            },
+
+            loop: function (app) {
+                this._control.update(app.frameTime);
+            }
+        });
+
+        window.onresize = function () {
+            app.resize()
+        };
+
+        var config = {
+            logDepthBuffer: true
+        };
+        var gui = new dat.GUI();
+        gui.add(config, 'logDepthBuffer').onChange(function () {
+            app.renderer.logDepthBuffer = config.logDepthBuffer;
+        });
+    </script>
+</body>
+</html>

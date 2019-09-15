@@ -79,6 +79,8 @@ attribute vec3 barycentric;
 
 @import clay.chunk.instancing_header
 
+@import clay.util.logdepth_vertex_header
+
 void main()
 {
     vec4 skinnedPosition = vec4(position, 1.0);
@@ -121,6 +123,8 @@ void main()
 #if defined(AOMAP_ENABLED)
     v_Texcoord2 = texcoord2;
 #endif
+
+    @import clay.util.logdepth_vertex_main
 }
 
 @end
@@ -235,6 +239,8 @@ uniform float maxMipmapLevel: 5;
 #endif
 
 @import clay.standard.chunk.light_header
+
+@import clay.util.logdepth_fragment_header
 
 // Import util functions and uniforms needed
 @import clay.util.calculate_attenuation
@@ -666,6 +672,8 @@ void main() {
     outColor = linearTosRGB(outColor);
 #endif
     gl_FragColor = encodeHDR(outColor);
+
+    @import clay.util.logdepth_fragment_main
 }
 
 @end

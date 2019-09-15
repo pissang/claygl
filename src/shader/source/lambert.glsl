@@ -25,6 +25,8 @@ varying vec4 v_Color;
 @import clay.chunk.skinning_header
 @import clay.chunk.instancing_header
 
+@import clay.util.logdepth_vertex_header
+
 varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 varying vec3 v_WorldPosition;
@@ -62,6 +64,8 @@ void main()
 #ifdef VERTEX_COLOR
     v_Color = a_Color;
 #endif
+
+    @import clay.util.logdepth_vertex_main
 }
 
 @end
@@ -110,6 +114,8 @@ varying vec4 v_Color;
 #ifdef SPOT_LIGHT_COUNT
 @import clay.header.spot_light
 #endif
+
+@import clay.util.logdepth_fragment_header
 
 // Import util functions and uniforms needed
 @import clay.util.calculate_attenuation
@@ -291,6 +297,8 @@ void main()
 #endif
 
     gl_FragColor = encodeHDR(gl_FragColor);
+
+    @import clay.util.logdepth_fragment_main
 }
 
 @end

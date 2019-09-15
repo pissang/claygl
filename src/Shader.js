@@ -87,7 +87,9 @@ var uniformSemantics = [
     'NEAR',
     'FAR',
     // Time
-    'TIME'
+    'TIME',
+    // Log depth buffer
+    'LOG_DEPTH_BUFFER_FC'
 ];
 var matrixSemantics = [
     'WORLD',

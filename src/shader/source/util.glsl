@@ -277,3 +277,38 @@ vec3 ACESToneMapping(vec3 color)
     return (color * (A * color + B)) / (color * (C * color + D) + E);
 }
 @end
+
+
+@export clay.util.logdepth_vertex_header
+#ifdef LOG_DEPTH
+#ifdef SUPPORT_FRAG_DEPTH
+varying float v_FragDepth;
+#else
+uniform float logDepthBufFC: LOG_DEPTH_BUFFER_FC;
+#endif
+#endif
+@end
+
+@export clay.util.logdepth_vertex_main
+#ifdef LOG_DEPTH
+    #ifdef SUPPORT_FRAG_DEPTH
+        v_FragDepth = 1.0 + gl_Position.w;
+    #else
+        gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC - 1.0;
+        gl_Position.z *= gl_Position.w;
+    #endif
+#endif
+@end
+
+@export clay.util.logdepth_fragment_header
+#if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
+varying float v_FragDepth;
+uniform float logDepthBufFC : LOG_DEPTH_BUFFER_FC;
+#endif
+@end
+
+@export clay.util.logdepth_fragment_main
+#if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
+    gl_FragDepthEXT = log2(v_FragDepth) * logDepthBufFC * 0.5;
+#endif
+@end

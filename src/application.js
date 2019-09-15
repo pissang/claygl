@@ -175,7 +175,9 @@ function App3D(dom, appNS) {
     isDomCanvas && (rendererOpts.canvas = dom);
     appNS.devicePixelRatio && (rendererOpts.devicePixelRatio = appNS.devicePixelRatio);
 
-    ['alpha', 'depth', 'stencil', 'antialias', 'premultipliedAlpha', 'preserveDrawingBuffer'].forEach(function (attrName) {
+    [
+        'alpha', 'depth', 'stencil', 'antialias', 'premultipliedAlpha', 'preserveDrawingBuffer'
+    ].forEach(function (attrName) {
         if (appNS.glAttributes[attrName] != null) {
             rendererOpts[attrName] = appNS.glAttributes[attrName];
         }

@@ -86,7 +86,7 @@ function getExtensionCode(exts) {
     // TODO vertex ? extension enum ?
     var extensionStr = [];
     for (var i = 0; i < exts.length; i++) {
-        extensionStr.push('#extension GL_' + exts[i] + ' : enable');
+        extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
     }
     return extensionStr.join('\n');
 }
@@ -103,7 +103,7 @@ function ProgramManager(renderer) {
     this._cache = {};
 }
 
-ProgramManager.prototype.getProgram = function (renderable, material, scene) {
+ProgramManager.prototype.getProgram = function (renderable, material, scene, renderer) {
     var cache = this._cache;
 
     var isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
@@ -117,6 +117,9 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     }
     if (isInstancedMesh) {
         key += ',is';
+    }
+    if (renderer.logDepthBuffer) {
+        key += ',ld';
     }
     var program = cache[key];
 
@@ -143,27 +146,30 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene) {
     if (isInstancedMesh) {
         extraDefineCode += '\n#define INSTANCING\n';
     }
+    if (renderer.logDepthBuffer) {
+        extraDefineCode += '\n#define LOG_DEPTH\n';
+    }
     // TODO Optimize key generation
     // VERTEX
     var vertexDefineStr = extraDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
     // FRAGMENT
     var fragmentDefineStr = extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
 
-    var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
-
     var extensions = [
-        'OES_standard_derivatives',
-        'EXT_shader_texture_lod'
+        ['OES_standard_derivatives', 'TEXTURE_LOD'],
+        ['EXT_shader_texture_lod', 'STANDARD_DERIVATIVES'],
+        ['EXT_frag_depth', 'FRAG_DEPTH']
     ].filter(function (ext) {
-        return renderer.getGLExtension(ext) != null;
+        return renderer.getGLExtension(ext[0]) != null;
     });
 
-    if (extensions.indexOf('EXT_shader_texture_lod') >= 0) {
-        fragmentDefineStr += '\n#define SUPPORT_TEXTURE_LOD';
-    }
-    if (extensions.indexOf('OES_standard_derivatives') >= 0) {
-        fragmentDefineStr += '\n#define SUPPORT_STANDARD_DERIVATIVES';
-    }
+    for (var i = 0; i < extensions.length; i++) {
+        var extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
+        fragmentDefineStr += extDefineCode;
+        vertexDefineStr += extDefineCode;
+    };
+
+    var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
 
     var fragmentCode = getExtensionCode(extensions) + '\n'
         + getPrecisionCode(material.precision) + '\n'

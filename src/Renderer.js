@@ -135,6 +135,11 @@ var Renderer = Base.extend(function () {
         // http://www.khronos.org/registry/webgl/specs/latest/#2.4
 
         /**
+         * If enable log depth buffer
+         * @type {boolean}
+         */
+        logDepthBuffer: false,
+        /**
          * If enable alpha, default true
          * @type {boolean}
          */
@@ -517,7 +522,7 @@ var Renderer = Base.extend(function () {
 
     getProgram: function (renderable, renderMaterial, scene) {
         renderMaterial = renderMaterial || renderable.material;
-        return this._programMgr.getProgram(renderable, renderMaterial, scene);
+        return this._programMgr.getProgram(renderable, renderMaterial, scene, this);
     },
 
     validateProgram: function (program) {
@@ -536,7 +541,6 @@ var Renderer = Base.extend(function () {
             }
 
         }
-
     },
 
     updatePrograms: function (list, scene, passConfig) {
@@ -559,7 +563,7 @@ var Renderer = Base.extend(function () {
                 }
             }
 
-            var program = this._programMgr.getProgram(renderable, renderMaterial, scene);
+            var program = this._programMgr.getProgram(renderable, renderMaterial, scene, this);
 
             this.validateProgram(program);
 
@@ -711,6 +715,11 @@ var Renderer = Base.extend(function () {
                 if (camera) {
                     program.setUniformOfSemantic(_gl, 'NEAR', camera.near);
                     program.setUniformOfSemantic(_gl, 'FAR', camera.far);
+
+                    if (this.logDepthBuffer) {
+                        // TODO Semantic?
+                        program.setUniformOfSemantic(_gl, 'LOG_DEPTH_BUFFER_FC', 2.0 / (Math.log(camera.far + 1.0 ) / Math.LN2));
+                    }
                 }
                 program.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
                 program.setUniformOfSemantic(_gl, 'TIME', time);
@@ -1152,6 +1161,9 @@ var Renderer = Base.extend(function () {
             shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
         });
         this._prezMaterial = preZPassMaterial;
+        if (this.logDepthBuffer) {
+            this._prezMaterial.setUniform('logDepthBufFC', 2.0 / (Math.log(camera.far + 1.0 ) / Math.LN2));
+        }
 
         _gl.colorMask(false, false, false, false);
         _gl.depthMask(true);
