@@ -823,16 +823,14 @@ App3D.prototype.createMaterial = function (matConfig) {
         }
     }
 
-    if (matConfig.transparent) {
-        matConfig.depthMask = false;
-        matConfig.transparent = true;
-    }
-
-
     if (matConfig.texturesReady) {
         Promise.all(texturesLoading).then(function (textures) {
             matConfig.texturesReady(textures);
         });
+    }
+    if (matConfig.transparent) {
+        material.depthTest = false;
+        material.transparent = true;
     }
 
     return material;
