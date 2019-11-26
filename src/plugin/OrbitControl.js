@@ -143,6 +143,13 @@ var OrbitControl = Base.extend(function () {
         zoomSensitivity: 1,
 
         /**
+         * Invert zoom direction?
+         *
+         * @type {boolean}
+         */
+        invertZoomDirection: false,
+
+        /**
          * @param {number}
          */
         panSensitivity: 1,
@@ -695,7 +702,17 @@ var OrbitControl = Base.extend(function () {
         if (delta === 0) {
             return;
         }
-        this._zoomHandler(e, delta > 0 ? 1 : -1);
+
+        if ( this.invertZoomDirection ) {
+
+            this._zoomHandler(e, delta > 0 ? -1 : 1);
+
+        } else {
+
+            this._zoomHandler(e, delta > 0 ? 1 : -1);
+
+        }
+        
     },
 
     _pinchHandler: function (e) {
