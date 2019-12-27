@@ -15,11 +15,11 @@ varying vec2 v_Texcoord;
 void main()
 {
     vec2 resolution = 1.0 / viewport.zw;
-    vec3 rgbNW =  decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ) ).xyz;
-    vec3 rgbNE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ) ).xyz;
-    vec3 rgbSW = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ) ).xyz;
-    vec3 rgbSE = decodeHDR( texture2D( texture, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ) ).xyz;
-    vec4 rgbaM  = decodeHDR( texture2D( texture,  gl_FragCoord.xy  * resolution ) );
+    vec3 rgbNW =  decodeHDR( texture2D( texture, v_Texcoord + vec2( -1.0, -1.0 ) * resolution ) ).xyz;
+    vec3 rgbNE = decodeHDR( texture2D( texture, v_Texcoord + vec2( 1.0, -1.0 ) * resolution ) ).xyz;
+    vec3 rgbSW = decodeHDR( texture2D( texture, v_Texcoord + vec2( -1.0, 1.0 ) * resolution ) ).xyz;
+    vec3 rgbSE = decodeHDR( texture2D( texture, v_Texcoord + vec2( 1.0, 1.0 ) * resolution ) ).xyz;
+    vec4 rgbaM  = decodeHDR( texture2D( texture,  v_Texcoord ) );
     vec3 rgbM  = rgbaM.xyz;
     float opacity  = rgbaM.w;
 
@@ -44,12 +44,12 @@ void main()
           max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
                 dir * rcpDirMin)) * resolution;
 
-    vec3 rgbA = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 1.0 / 3.0 - 0.5 ) ) ).xyz;
-    rgbA += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * ( 2.0 / 3.0 - 0.5 ) ) ).xyz;
+    vec3 rgbA = decodeHDR( texture2D( texture, v_Texcoord + dir * ( 1.0 / 3.0 - 0.5 ) ) ).xyz;
+    rgbA += decodeHDR( texture2D( texture, v_Texcoord + dir * ( 2.0 / 3.0 - 0.5 ) ) ).xyz;
     rgbA *= 0.5;
 
-    vec3 rgbB = decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * -0.5 ) ).xyz;
-    rgbB += decodeHDR( texture2D( texture, gl_FragCoord.xy  * resolution + dir * 0.5 ) ).xyz;
+    vec3 rgbB = decodeHDR( texture2D( texture, v_Texcoord + dir * -0.5 ) ).xyz;
+    rgbB += decodeHDR( texture2D( texture, v_Texcoord + dir * 0.5 ) ).xyz;
     rgbB *= 0.25;
     rgbB += rgbA * 0.5;
 
