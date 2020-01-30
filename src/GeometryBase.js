@@ -82,7 +82,7 @@ function Attribute(name, type, size, semantic) {
             };
             // Copy from source to target
             this.copy = function (target, source) {
-                this.value[target] = this.value[target];
+                this.value[target] = this.value[source];
             };
             break;
         case 2:
