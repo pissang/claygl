@@ -120,10 +120,6 @@ var Renderable = Node.extend(/** @lends clay.Renderable# */ {
 
     getBoundingBox: function (filter, out) {
         out = Node.prototype.getBoundingBox.call(this, filter, out);
-        if (this.geometry && this.geometry.boundingBox) {
-            out.union(this.geometry.boundingBox);
-        }
-
         return out;
     },
 
