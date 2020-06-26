@@ -531,8 +531,8 @@ var OrbitControl = Base.extend(function () {
 
         // PENDING
         this._center
-            .scaleAndAdd(xAxis, -velocity.x * len / 200)
-            .scaleAndAdd(yAxis, -velocity.y * len / 200);
+            .scaleAndAdd(xAxis.normalize(), -velocity.x * len / 200)
+            .scaleAndAdd(yAxis.normalize(), -velocity.y * len / 200);
 
         this._vectorDamping(velocity, 0);
 
