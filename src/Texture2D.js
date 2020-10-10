@@ -117,8 +117,8 @@ var Texture2D = Texture.extend(function () {
             for (var i = 0; i < this.mipmaps.length; i++) {
                 var mipmap = this.mipmaps[i];
                 this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
-                width = Math.ceil(width / 2);
-                height = Math.ceil(height / 2);
+                width = Math.max(width / 2);
+                height = Math.max(height / 2);
             }
         }
         else {
