@@ -165,13 +165,13 @@ var PixelPicking = Base.extend(function() {
 
 function packID(id){
     var r = id >> 16;
-    var g = (id - (r << 8)) >> 8;
-    var b = id - (r << 16) - (g<<8);
+    var g = (id - (r << 16)) >> 8;
+    var b = id - (r << 16) - (g << 8);
     return [r, g, b];
 }
 
 function unpackID(r, g, b){
-    return (r << 16) + (g<<8) + b;
+    return (r << 16) + (g <<8 ) + b;
 }
 
 export default PixelPicking;
