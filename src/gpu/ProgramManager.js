@@ -156,8 +156,8 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene, ren
     var fragmentDefineStr = extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
 
     var extensions = [
-        ['OES_standard_derivatives', 'TEXTURE_LOD'],
-        ['EXT_shader_texture_lod', 'STANDARD_DERIVATIVES'],
+        ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
+        ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
         ['EXT_frag_depth', 'FRAG_DEPTH']
     ].filter(function (ext) {
         return renderer.getGLExtension(ext[0]) != null;

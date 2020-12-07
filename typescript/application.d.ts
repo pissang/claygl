@@ -74,7 +74,7 @@ interface IMaterialBasicConfig {
 
 interface IStandardMRMaterialConfig {
     name?: string,
-    shader: 'clay.standardMR';
+    shader?: 'clay.standardMR';
     color?: RGBLike;
     emission?: RGBLike;
 
