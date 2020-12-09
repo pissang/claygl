@@ -526,8 +526,8 @@ var OrbitControl = Base.extend(function () {
         var len = this._distance;
 
         var target = this.target;
-        var yAxis = target.worldTransform.y;
-        var xAxis = target.worldTransform.x;
+        var yAxis = target.localTransform.y;
+        var xAxis = target.localTransform.x;
 
         // PENDING
         this._center
