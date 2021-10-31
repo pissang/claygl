@@ -278,7 +278,7 @@ function App3D(dom, appNS) {
      */
     this.resize = function (width, height) {
         gWidth = width || appNS.width || dom.clientWidth;
-        gHeight = height || dom.height || dom.clientHeight;
+        gHeight = height || appNS.height || dom.clientHeight;
         gRenderer.resize(gWidth, gHeight);
     };
 
